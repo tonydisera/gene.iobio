@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>gene inspector.iobio</title>
+	<!-- libraries -->
+	<script src="assets/js/jquery.1.11.1.min.js"></script>
+	<script src="assets/js/jquery-ui.min.js"></script>
+	<script src="assets/js/handlebars-v2.0.0.min.js"></script>	
+	<script src="assets/js/typeahead.bundle.min.js"></script>	
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>	
+	<script src="assets/js/d3.min.js"></script>	
+
+	<!-- bam.iobio libraries -->
+	<script src="assets/js/class.js"></script>
+    <script src="assets/js/bam.js"></script>
+    <script src="assets/js/bin.js"></script>
+    <script src="assets/js/inflate.js"></script>
+    <script src="assets/js/binary.js"></script>
+
+    <!-- vcf.iobio libraries -->
+    <script src="assets/js/jdataview.js"></script>
+    <script src="assets/js/jparser.js"></script>
+    <script src="assets/js/inflate.js"></script>
+    <script src="assets/js/pako_deflate.min.js"></script>
+    <script src="assets/js/jsbgzf.js"></script>
+    <script src="assets/js/js-bv-sampling.js"></script>
+    <script src="assets/js/js-local-vcf.js"></script> 
+    <script src="assets/js/js-bv-common.js"></script>
+    <script src="assets/js/js-local-bam.js"></script>
+
+
+
+
+	<!-- fonts -->
+	<link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
+
+
+	<!-- css -->
+	<link rel="stylesheet" href="assets/css/jquery-ui.css" />	
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/gene.d3.css" />
+    <link rel="stylesheet" href="assets/css/site.css" />
+
+        <!-- handlebar templates -->
+    <script id='track-legend-template' type="text/x-handlebars-template">     
+        <div id="track-legend">
+          <span style="padding-left: 10px"></span>
+
+          <div style="padding-left: 100px; margin-top: -20px;">
+
+              <svg id="snp" class="type" width="34" height="14" transform="translate(0,0)">
+                <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">SNP</text>
+                <rect class="variant snp" rx="1" ry="1" x="1" width="8" y="2" height="8" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+              </svg>
+              <svg id="del" class="type" width="34" height="14" transform="translate(0,0)">
+                <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">DEL</text>       
+                <polygon class="variant del" points="1,2 5,9 9,2" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+              </svg>
+              <svg id="ins" class="type" width="34" height="14" transform="translate(0,0)">
+                <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;"> INS</text>
+                <polygon class="variant ins" points="1,9 5,2 9,9" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+              </svg>
+
+              <span style="padding-left: 10px"></span>
+              
+              <svg   width="48" height="17" transform="translate(0,0)">
+                <text class="name" x="2" y="12" style="fill-opacity: 1;font-size: 11px;font-style: bold;">Color by:</text>
+              </svg>
+
+              <svg id="impact-scheme" class="current" width="45" height="17" transform="translate(0,0)">
+                <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 11px;font-style: bold;">IMPACT</text>
+              </svg>
+
+              <svg id="effect-scheme" width="45" height="17" transform="translate(0,0)" >
+                <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 11px;font-style: bold;">EFFECT</text>
+              </svg>
+
+              <svg id="LOW" class="impact" width="34" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Low</text>
+                <rect class="variant  LOW" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="MODIFIER"  class="impact" width="53" height="14"  transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Modifier</text>
+                <rect class="variant  MODIFIER" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="MODERATE"  class="impact" width="57" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Moderate</text>
+                <rect class="variant  MODERATE" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="HIGH"  class="impact" width="37" height="14"  transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">High</text>
+                <rect class="variant  HIGH" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+
+              <span style="padding-left: 10px"></span>
+
+              <svg id="frameshift" class="effect hidden" width="61" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Frameshift</text>
+                <rect class="variant  frameshift" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="missense" class="effect hidden" width="54" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Missense</text>
+                <rect class="variant  missense" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="synonymous" class="effect hidden" width="70" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Synonymous</text>
+                <rect class="variant  synonymous" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="mirna" class="effect hidden" width="47" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">miRNA</text>
+                <rect class="variant  mirna" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="regulatory" class="effect hidden" width="62" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Regulatory</text>
+                <rect class="variant  regulatory" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="indel" class="effect hidden" width="38" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Indel</text>
+                <rect class="variant  indel" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="splice" class="effect hidden" width="44" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice</text>
+                <rect class="variant  splice" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="intron" class="effect hidden" width="43" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Intron</text>
+                <rect class="variant  intron" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+              <svg id="other" class="effect hidden" width="53" height="14" transform="translate(0,0)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Other</text>
+                <rect class="variant  other" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
+              </svg>
+            </div>
+        </div>
+    </script>
+    
+</head>
+
+
+<body>
+ <div id="container">
+    <div class="box-shadow">
+
+    	<section id="app-title-section">
+    	   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
+            <span id="bloodhound" >
+                <input class="typeahead" style="margin-top: 5px" type="text" placeholder="Search By Gene Name or Region (chr2:3000000-3000010)">
+            </span>
+           <span class="iobioproject">
+            an iobio project
+           </span>   
+        </section>
+
+
+
+        <div id="region-track" class="track">
+            <div id="gene-name" class='track-info results'></div>  
+
+            <div class="track-chart">
+                <div id="gene-region-info">
+                    <span id="gene-region-start"></span>
+                    <span id="gene-ref-name"></span>
+                    <span id="gene-region-end"></span>
+                </div>
+
+                <div id="region-chart"></div>
+            </div>
+        </div>
+
+
+<!--
+        <div id="view-finder-track" class="track">
+            <div class='track-info'>Zoom into a region</div>  
+            <div id="view-finder-chart" class="track-chart"></div>           
+        </div>
+-->
+        
+        <div id="gene-track" class="track">
+            <div class="track-info">
+                <div>Transcripts</div>
+                <div >
+                  <svg id="multi-scheme" class="current" width="30" height="17" transform="translate(0,0)">
+                    <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 11px;font-style: bold;">All</text>
+                  </svg>
+
+                  <svg id="single-scheme" width="58" height="17" transform="translate(0,0)" >
+                    <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 11px;font-style: bold;">Selected</text>
+                  </svg>
+
+                </div>
+
+            </div>
+            <div id="gene-viz" class="track-chart"></div>               
+        </div>
+
+
+        <div id="zoom-region-track" class="track">
+            <div  class='track-info'></div>  
+            <div class="track-chart">
+                <div>
+                    <input type="text" id="zoom-region-start"></input>
+                    <input type="text" id="zoom-region-end"></input>
+                </div>
+                <div id="zoom-region-chart" ></div>
+            </div>
+        </div>
+    </div>  
+
+
+
+
+	<div id="vcf-track" class="track box-shadow" >
+        <div class="track-info" style="margin-bottom: 10px;">
+            <span class="stats-label">Examine variants in gene</span>
+            <span class="loader" style="padding-left: 10px;">
+                <img src="assets/images/loading-squares.gif"/>
+            </span>
+            <div class="stats-box">
+                <div id="add-vcf-track" style="float: left;">
+
+                    <div class="btn-group" style="display:  inline;">
+                      <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Load File <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <div class="file" onClick="onVcfFileButtonClicked()">
+                                <input type="file" name="files[]" id="vcf-file"  multiple />
+                                <label class="file-button" for="vcf-file" >Choose VCF File</label>
+                            </div>
+                        </li>
+                        <li>
+                            <a onClick="displayUrlBox()" href="#">Enter URL for VCF</a>
+                        </li>    
+                      </ul>
+                    </div>
+
+                    <div id="url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
+                        <input id="url-input" type="text" class="form-control" placeholder="Search for..." >
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Go</button>
+                        </span>
+                    </div>
+                </div>     
+
+            </div>            
+        </div>          
+        <div class="track-chart">
+            <div>
+                 <div class="variant-count badge" id="vcf-count" style="margin-bottom: 4px;"></div>
+            </div>
+            <div id="vcf-legend"></div>
+            <div id="vcf-variants"></div>
+        </div>
+    </div>
+
+
+    <div id="fb-track" class="track box-shadow" >
+        <div class="track-info">
+            <span class="stats-label">Discover missing variants</span>
+            <span class="loader" style="padding-left: 10px;">
+                <img src="assets/images/loading-squares.gif"/>
+            </span>
+            <div>
+                <button class="btn btn-default" onClick="callVariants()">Call Freebayes</button>
+            </div>
+        </div>    
+
+        <div class="track-chart">
+             <div>
+                 <div class="variant-count badge" id="fb-count" style="margin-bottom: 4px;"></div>
+             </div>
+             <div id="fb-legend"></div>
+
+             <div id="fb-variants"></div>
+        </div>
+    </div>
+
+
+
+
+    <div id="bam-track" class="track box-shadow" >
+        <div class="track-info">
+            Examine alignments for gene
+            <div id="add-bam-track" style="float: left;">
+
+                <div class="btn-group" style="display:  inline;">
+                  <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    Load File <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                         <div class="file" onClick="onBamFileButtonClicked()">
+                            <input type="file" name="files[]" id="bam-file"  multiple />
+                            <label class="file-button" for="bam-file" >Choose BAM File</label>
+                        </div>
+                    </li>
+                    <li>
+                        <a onClick="displayBamUrlBox()" href="#">Enter URL for BAM</a>
+                    </li>    
+                   
+                  </ul>
+                </div>
+
+                <div id="bam-url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
+                    <input id="bam-url-input" type="text" class="form-control" placeholder="http://..." >
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go</button>
+                    </span>
+                </div>
+            </div>     
+        </div>
+
+        <div id="bam-depth" class="track-chart"></div>
+    </div>
+
+
+
+
+ 	<script>
+        var div = d3.select("body").append("div")   
+            .attr("class", "tooltip")               
+            .style("opacity", 0);
+    </script>    
+
+    <script src="app/region.d3.js"></script>
+    <script src="app/barChartVaryWidth.d3.js"></script>
+	<script src="app/line.d3.js"></script>
+	<script src="app/gene.d3.js"></script>
+	<script src="app/variant.d3.js"></script>
+    <script src="app/bam.iobio.js"></script>
+	<script type="text/javascript" src="app/vcf.iobio.js"></script>
+	<script src="app/app.js"></script>	
+
+
+ </div>
+</body>
+</html>

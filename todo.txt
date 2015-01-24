@@ -1,0 +1,15 @@
+todo
+-------------
+
+- shrink/expand view options for transcripts
+   - figure out when to show transcript name (currently hidden by opacity in css)
+
+- show selected file names in tracks ( or in info tooltip in top section)
+
+- x-axis slightly off for bam chart due to y-axis
+
+- inject bam and vcf into url
+
+
+
+

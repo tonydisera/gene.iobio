@@ -1,0 +1,64 @@
+
+#view-finder-chart.ibo-gene .utr { 
+  fill: gray;
+  stroke: gray;
+  opacity: .4;
+}
+#view-finder-chart.ibo-gene .cds { 
+  fill: gray;
+  stroke: gray;
+  opacity: .7;
+}
+
+.ibo-gene .utr { 
+  fill: #3d8901;
+  stroke: #3d8901;
+  opacity: .4;
+}
+.ibo-gene .cds { 
+  fill: #3d8901;
+  stroke: #3d8901;
+  opacity: .7;
+}
+.ibo-gene .transcript.selected .utr { 
+  fill: #58DA00;
+  stroke: #50A019;
+  opacity: .4;
+}
+.ibo-gene .transcript.selected .cds { 
+  fill: #58DA00;
+  stroke: #50A019;
+  opacity: .8;
+}
+
+.ibo-gene .transcript.selected .reference {
+  stroke: rgb(0, 0, 0);
+  stroke-width: 1.5px;
+}
+.ibo-gene .reference { stroke: rgb(150,150,150); }
+.ibo-gene .name { 
+  font-size: 10px; fill: rgb(120,120,120); 
+
+  /*For now, we hide the transcript name */
+  opacity: 1; 
+}
+.ibo-gene .name:hover { 
+  cursor: pointer;
+  font-size: 12px;
+  fill: black;
+}
+.ibo-gene .arrow { stroke: rgb(150,150,150); fill: none; }
+.ibo-gene .axis path, .ibo-gene .axis line { fill: none; stroke: lightgrey; shape-rendering: crispEdges; }
+.ibo-gene .axis { font-size: 10px; }
+.ibo-gene .tooltip {   
+  position: absolute;           
+  text-align: center;           
+  z-index:20;
+  color:white;
+  padding: 4px 6px 4px 6px;             
+  font: 11px arial;        
+  background: rgb(80,80,80);   
+  border: 0px;      
+  border-radius: 4px;           
+  pointer-events: none;         
+}
