@@ -466,9 +466,8 @@ header {
   opacity: 1;
 }
 .snp,  .del,  .ins { 
-  fill: #5A7BB8;
-  stroke: #5A7BB8;
-  opacity: .9;
+  fill: #FAF5BE;
+  stroke: #807D7D;
 }
 .variant.unique,  .variant.unique,  .varian.unique { 
   fill:    #F65C44;

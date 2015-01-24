@@ -101,7 +101,12 @@ function geneD3() {
         d3.select(this).selectAll("svg")
           .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
           .attr("preserveAspectRatio", "xMaxYMid meet");
-        }
+      } 
+
+      d3.select(this).selectAll("svg")
+        .attr("width", widthPercent ? widthPercent : width)
+        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
+
 
 
       // Otherwise, create the skeletal chart.      

@@ -271,7 +271,10 @@ function initTranscriptControls() {
         if ($('#transcript-btn-group').data('open')) {
             $('#transcript-btn-group').data('open', false);
             onCloseTranscriptMenuEvent();
-        } else $('#transcript-btn-group').data('open', true);
+        } else {
+        	//$('#transcript-menu').css("min-height", "1000");
+        	$('#transcript-btn-group').data('open', true);
+        }
     });
 
     $(document).click(function () {
@@ -283,6 +286,7 @@ function initTranscriptControls() {
 
 }
 function onCloseTranscriptMenuEvent() {
+	d3.selectAll("#gene-viz .transcript").remove();
  	selectedTranscript = transcriptMenuChart.selectedTranscript();
  	loadTracksForGene();
 }
@@ -409,6 +413,7 @@ function loadGeneWidget() {
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
 		    	window.gene = response[0];
+		    	window.selectedTranscript = null;
 		    	loadTracksForGene();
 
 	       	},
@@ -537,7 +542,9 @@ function showTranscripts(regionStart, regionEnd) {
 		// TODO:  Need a way of selecting the transcript that you want to
 		// use when determining the variant's effect and impact (snpEff annotation)
 		// For now, let's just grab the first one in the list.
-		selectedTranscript = transcripts.length > 0 ? transcripts[0] : null;
+		if (!selectedTranscript) {
+			selectedTranscript = transcripts.length > 0 ? transcripts[0] : null;
+		}
 	}
 
 
