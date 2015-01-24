@@ -38,7 +38,8 @@ var regionEnd = null;
 var gene = '';
 var selectedTranscript = null;
 var transcriptChart =  null;
-var transcriptViewMode = "multi";
+var transcriptViewMode = "single";
+var transcriptMenuChart = null;
 
 // bam data (read coverage) and area chart.
 var bamData = null;
@@ -160,11 +161,14 @@ function init() {
 	// Create transcript chart
 	transcriptChart = geneD3()
 	    .width(1000)
+	    .widthPercent("100%")
+	    .heightPercent("100%")
 	    .margin({top: 10, right: 0, bottom: 20, left: 0})
 	    .showXAxis(false)
 	    .showBrush(true)
 	    .trackHeight(16)
 	    .cdsHeight(12)
+	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 
 			if (!brush.empty()) {
@@ -196,7 +200,19 @@ function init() {
 	    	callVariants(regionStart, regionEnd);
 		});	
 
-	
+    transcriptMenuChart = geneD3()
+	    .width(600)
+	    .margin({top: 5, right: 5, bottom: 5, left: 120})
+	    .showXAxis(true)
+	    .showBrush(false)
+	    .trackHeight(12)
+	    .cdsHeight(8)
+	    .showLabel(true)
+	    .on("d3selected", function(d) {
+	    	window.selectedTranscript = d;
+	    	showTranscripts();
+	    });
+
 
 
 	// This is an x-axis for the selected region		    
@@ -248,22 +264,27 @@ function init() {
 }
 
 function initTranscriptControls() {
-	d3.selectAll('#single-scheme')
-		.on("click", function(d) {
-			d3.select(this).attr("class", "current");
-			d3.select('#multi-scheme').attr("class", "");
-			transcriptViewMode = "single";
-			$('#zoom-region-track').css("display", "none");
-			showTranscripts();
-		});
-	d3.selectAll('#multi-scheme')
-		.on("click", function(d) {
-			d3.select(this).attr("class", "current");
-			d3.select('#single-scheme').attr("class", "");
-			transcriptViewMode = "multi";
-			$('#zoom-region-track').css("display", "none");
-			showTranscripts();
-		});
+
+	 $('#transcript-btn-group').data('open', false);
+
+	 $('#transcript-dropdown-button').click(function () {
+        if ($('#transcript-btn-group').data('open')) {
+            $('#transcript-btn-group').data('open', false);
+            onCloseTranscriptMenuEvent();
+        } else $('#transcript-btn-group').data('open', true);
+    });
+
+    $(document).click(function () {
+        if ($('#transcript-btn-group').data('open')) {
+            $('#transcript-btn-group').data('open', false);
+            onCloseTranscriptMenuEvent();
+        }
+    });
+
+}
+function onCloseTranscriptMenuEvent() {
+ 	selectedTranscript = transcriptMenuChart.selectedTranscript();
+ 	loadTracksForGene();
 }
 
 function initVariantLegend() {
@@ -540,6 +561,9 @@ function showTranscripts(regionStart, regionEnd) {
 
 	selection = d3.select("#gene-viz").datum(transcripts);    
 	transcriptChart(selection);
+
+	selection = d3.select("#transcript-menu-item").datum(window.gene.transcripts);
+	transcriptMenuChart(selection);
 
 }
 

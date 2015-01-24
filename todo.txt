@@ -1,5 +1,7 @@
 todo
 -------------
+- select transcript not shown in viewfinder after selection
+
 
 - shrink/expand view options for transcripts
    - figure out when to show transcript name (currently hidden by opacity in css)

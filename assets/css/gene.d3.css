@@ -35,17 +35,21 @@
   stroke: rgb(0, 0, 0);
   stroke-width: 1.5px;
 }
-.ibo-gene .reference { stroke: rgb(150,150,150); }
-.ibo-gene .name { 
-  font-size: 10px; fill: rgb(120,120,120); 
-
-  /*For now, we hide the transcript name */
-  opacity: 1; 
+.ibo-gene .reference { 
+  stroke: rgb(150,150,150); 
 }
-.ibo-gene .name:hover { 
+.ibo-gene .name { 
+  font-size: 13px; fill: 
+  rgb(120,120,120); 
+}
+#transcript-menu-item.ibo-gene .name { 
+  font-size: 11px; fill: 
+  rgb(120,120,120); 
+}
+#transcript-menu-item.ibo-gene .name:hover { 
   cursor: pointer;
-  font-size: 12px;
   fill: black;
+  font-style: bold;
 }
 .ibo-gene .arrow { stroke: rgb(150,150,150); fill: none; }
 .ibo-gene .axis path, .ibo-gene .axis line { fill: none; stroke: lightgrey; shape-rendering: crispEdges; }

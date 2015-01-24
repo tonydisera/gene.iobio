@@ -177,15 +177,21 @@
         
         <div id="gene-track" class="track">
             <div class="track-info">
-                <div>Transcripts</div>
+                <div>Zoom into a Region</div>
                 <div >
-                  <svg id="multi-scheme" class="current" width="30" height="17" transform="translate(0,0)">
-                    <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 11px;font-style: bold;">All</text>
-                  </svg>
+                  <div id="select-transcript" style="float: left;">
 
-                  <svg id="single-scheme" width="58" height="17" transform="translate(0,0)" >
-                    <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 11px;font-style: bold;">Selected</text>
-                  </svg>
+                    <div id="transcript-btn-group" class="btn-group" style="display:  inline;">
+                      <button id="transcript-dropdown-button" type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Choose Transcript <span class="caret"></span>
+                      </button>
+                      <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
+                        <li id="transcript-menu-item">
+                        </li>
+                      </ul>
+                    </div>
+                </div>     
+
 
                 </div>
 

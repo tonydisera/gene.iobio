@@ -10,7 +10,10 @@ function geneD3() {
   // defaults
 
   // dispatch events
-  var dispatch = d3.dispatch("d3brush");
+  var dispatch = d3.dispatch("d3brush", "d3selected");
+
+  var selectedTranscript = null;
+
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},
@@ -33,8 +36,8 @@ function geneD3() {
       regionStart = undefined,
       regionEnd = undefined,
       showXAxis = true,
-      widthPercent = "100%",
-      heightPercent = "100%",
+      widthPercent = null,
+      heightPercent = null,
       showBrush = false;
       
 
@@ -89,15 +92,16 @@ function geneD3() {
 
       svg.enter()
         .append("svg")
-        .attr("width", widthPercent)
-        .attr("height", heightPercent)
-        .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
-        .attr("preserveAspectRatio", "xMaxYMid meet");
+        .attr("width", widthPercent ? widthPercent : width)
+        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
-      d3.select(this).selectAll("svg")
-         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance));
+      if (widthPercent && heightPercent) {
+        d3.select(this).selectAll("svg")
+          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
+          .attr("preserveAspectRatio", "xMaxYMid meet");
+        }
 
 
       // Otherwise, create the skeletal chart.      
@@ -177,8 +181,8 @@ function geneD3() {
       var axisEnter = svg.selectAll("g.x.axis").data([0]).enter().append('g');   
       if (showXAxis) {
         axisEnter.attr("class", "x axis")
-                 .attr("transform",   "translate(0," + y.range()[0] + ")");  
-        svg.selectAll("g.x.axis").attr("transform",   "translate(0," + y.range()[0] + ")");
+                 .attr("transform",   "translate(" + margin.left + "," + y.range()[0] + ")");
+        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + y.range()[0] + ")");
       }  
 
 
@@ -220,24 +224,29 @@ function geneD3() {
           .attr('y2', trackHeight/2);
 
 
+
       transcript.selectAll(".name").remove();
-      transcript.selectAll('.name').data(function(d) { return [[d.start, d.transcript_id]] })
-        .enter().append('text')
-          .attr('class', 'name')
-          .attr('x', function(d) { return (d[0]); })
-          .attr('y', 0)
-          .attr('text-anchor', 'top')
-          .attr('alignment-baseline', 'left')
-          .text(function(d) { return d[1]; })
-          .style('fill-opacity', 0)
-          .on("mouseover", function(d) {
-            d3.select(this).style("font-style", "bold");
-            d3.select(this.parentNode).attr("class", "transcript selected");
-          })
-          .on("mouseout", function(d) {
-            d3.select(this).style("font-style", "regular");
-            d3.select(this.parentNode).attr("class", "transcript");
-          });
+      if (showLabel) {
+        transcript.selectAll('.name').data(function(d) { return [[d.start, d.transcript_id]] })
+                  .enter().append('text')
+                    .attr('class', 'name')
+                    .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0 })
+                    .attr('y', 0 )
+                    .attr('text-anchor', 'top')
+                    .attr('alignment-baseline', 'left')
+                    .text(function(d) { return d[1]; })
+                    .style('fill-opacity', 0)
+                    .on("mouseover", function(d) {
+                      d3.select(this).style("font-style", "bold");
+                      d3.select(this.parentNode).attr("class", "transcript selected");
+                      selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
+                    })
+                    .on("mouseout", function(d) {
+                      d3.select(this).style("font-style", "regular");
+                      d3.select(this.parentNode).attr("class", "transcript");
+                    });
+
+      }
       
       transcript.selectAll(".arrow").remove();
       transcript.selectAll('.arrow').data(centerSpan)
@@ -290,8 +299,8 @@ function geneD3() {
 
       transcript.selectAll('.name').transition()
         .duration(700)
-        .attr('x', function(d) { return x(d[0]); })
-        .attr('y', trackHeight)   
+        .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0; })
+        .attr('y', function(d) { return margin.left > 0 ? trackHeight : 0; })   
         .text(function(d) { return d[1]; })                
         .style('fill-opacity', 1);
 
@@ -466,6 +475,17 @@ function geneD3() {
     return chart;
   }
 
+  chart.selectedTranscript = function(_) {
+    if (!arguments.length) return selectedTranscript;
+    selectedTranscript = _;
+    return chart;
+  }
+
+  chart.showLabel = function(_) {
+    if (!arguments.length) return showLabel;
+    showLabel = _;
+    return chart;
+  }
   // This adds the "on" methods to our custom exports
   d3.rebind(chart, dispatch, "on");
 
