@@ -10,6 +10,9 @@ body {
   margin-right: 10px;
 }
 
+.hide {
+  display: none !important;
+}
 
 .box-shadow {
   box-shadow: 2px 2px 9px 0px rgba(0,0,0,0.15);
@@ -24,8 +27,10 @@ section {
 }
 
 .track { 
-    display: flex;
-    flex-direction: row;
+    display:         flex;
+    display: -webkit-flex;
+            flex-direction: row;
+    -webkit-flex-direction: row;
     align-items: flex-start;
     background-color: white;
     padding-top: 10px;
@@ -38,8 +43,10 @@ section {
     
 }
 .track-info {
-    order: 1;
-    flex: 0 0 220px;
+            order: 1;
+    -webkit-order: 1;
+            flex: 0 0 220px;
+    -webkit-flex: 0 0 220px;
     color: rgb(120,120,120);
     margin-right: 10px;   
     font-size: 18px;
@@ -48,8 +55,10 @@ section {
 }
 
 .track-chart {
-    order: 2;
-    flex:  1 0 auto;
+            order: 2;
+    -webkit-order: 2;
+            flex:  1 0 auto;
+    -webkit-flex:  1 0 auto;
 }
 
 .bars .chartlabel {
@@ -112,7 +121,6 @@ section {
 }
 
 #view-finder-track {
-    display: none;
     align-items: center;
 }
 #view-finder-chart {
@@ -124,17 +132,14 @@ section {
 }
 
 #gene-track {
-  display: none;
   padding-top: 0px;  
 }
 
 #bam-track {
-  display: none;
   margin-bottom: 0px !important;
 }
 
 #vcf-track {
-  display: none;
 }
 #track-legend {
   margin-top: -24px;
@@ -147,7 +152,6 @@ section {
 }
 
 #fb-track {
-  display: none;
 }
 #fb-legend {
   display: none;
@@ -182,8 +186,10 @@ section {
 
 }
 .stats-chart {
-    order: 1;
-    flex:  0 0 180px;
+            order: 1;
+    -webkit-order: 1;
+            flex:  0 0 180px;
+    -webkit-flex:  0 0 180px;
    
 }
 .stats-label {
@@ -191,8 +197,10 @@ section {
 }
 
 .variant-count {
-  order: 2;
-  flex: 0 0 40px;
+          order: 2;
+  -webkit-order: 2;
+          flex: 0 0 40px;
+  -webkit-flex: 0 0 40px;
   font-size: 12px;
   margin-top: -8px;
   text-align: center;
@@ -406,7 +414,6 @@ header {
 
 
 #zoom-region-track {
-    display: none;
     margin-top: -40px;
 }
 

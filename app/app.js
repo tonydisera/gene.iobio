@@ -174,7 +174,7 @@ function init() {
 			if (!brush.empty()) {
 				regionStart = d3.round(brush.extent()[0]);
 				regionEnd   = d3.round(brush.extent()[1]);
-				$('#zoom-region-track').css("display", "flex");
+				$('#zoom-region-track').removeClass("hide");
 
 				var selection = d3.select("#zoom-region-chart").datum([]);
 		  		zoomRegionChart.regionStart(regionStart);
@@ -191,7 +191,7 @@ function init() {
 				// the entire gene region;
 				regionStart = window.gene.start;
 				regionEnd   = window.gene.end;
-				$('#zoom-region-track').css("display", "none");
+				$('#zoom-region-track').addClass("hide");
 			}
 
        		//showTranscripts(regionStart, regionEnd);
@@ -454,16 +454,16 @@ function loadTracksForGene() {
 	regionStart = null;
 	regionEnd = null;
 
-    $('#gene-track').css("display", "flex");
-	$('#view-finder-track').css("display", "flex");
+    $('#gene-track').removeClass("hide");
+	$('#view-finder-track').removeClass("hide");
 
 	$('#add-vcf-track').css("visibility", "visible");
-	$('#vcf-track').css("display", "flex");
+	$('#vcf-track').removeClass("hide");
 
 	$('#add-bam-track').css("visibility", "visible");
-	$('#bam-track').css("display", "flex");
+	$('#bam-track').removeClass("hide");
 
-	$('#zoom-region-track').css("display", "none");
+	$('#zoom-region-track').addClass("hide");
 
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
@@ -718,7 +718,7 @@ function showBamDepth(regionStart, regionEnd) {
 		return;
 	}
 
-	$('#bam-track').css("display","flex");
+	$('#bam-track').removeClass("hide");
 	
 
 	if (regionStart && regionEnd) {
@@ -744,7 +744,7 @@ function showBamDepth(regionStart, regionEnd) {
 		});
 	}
 
-	$('#fb-track').css("display","flex");
+	$('#fb-track').removeClass("hide");
 
 
 
@@ -909,7 +909,7 @@ function callVariants(regionStart, regionEnd) {
 	if (window.bam == null || window.getBamRefName == null) {
 		return;
 	}
-	$('#fb-track').css("display", "flex");
+	$('#fb-track').removeClass("hide");
 
 	$("#fb-track .loader").css("display", "inline");
 
