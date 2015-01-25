@@ -111,13 +111,11 @@ section {
     
 }
 #gene-region-info {
-  text-align: center;
 }
 #gene-region-start {
-  float: left;
 }
 #gene-region-end {
-  float: right;
+  padding-left: 5px;
 }
 
 #view-finder-track {
@@ -133,6 +131,7 @@ section {
 
 #gene-track {
   padding-top: 0px;  
+  margin-top: 30px;
 }
 
 #bam-track {
@@ -622,7 +621,6 @@ header {
  */
 .results  { 
   text-align: left; 
-  margin-bottom: 26px;
   color: #3d8901;
 }
 

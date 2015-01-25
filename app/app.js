@@ -469,8 +469,7 @@ function loadTracksForGene() {
 	gene.regionEnd   = formatRegion(window.gene.end);
 
     $('#gene-name').text(window.gene.gene_name + " " + window.gene.chr);   
-    $('#gene-region-start').text(window.gene.regionStart);
-    $('#gene-region-end').text(window.gene.regionEnd);
+    $('#gene-region-info').text(window.gene.regionStart + "-" + window.gene.regionEnd);
 
 
     // Show the x-Axis of the gene region
@@ -478,6 +477,7 @@ function loadTracksForGene() {
 	regionChart.regionStart(+window.gene.start);
 	regionChart.regionEnd(+window.gene.end);
 	regionChart(selection);
+
 
    	// This will be the view finder, allowing the user to select
 	// a subregion of the gene to zoom in on the tracks.
@@ -513,6 +513,9 @@ function loadTracksForGene() {
 	showBamDepth();
 	showVariants();
 	callVariants();
+
+	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
+
 }
 
 function showTranscripts(regionStart, regionEnd) {
@@ -755,7 +758,9 @@ function fillBamChart(data, regionStart, regionEnd) {
 	window.bamDepthChart.xStart(regionStart);
 	window.bamDepthChart.xEnd(regionEnd);
 
-	window.bamDepthChart(d3.select("#bam-depth").datum(data));			
+	window.bamDepthChart(d3.select("#bam-depth").datum(data));		
+	d3.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
+	
 	window.scrollTo(0,document.body.scrollHeight);
 }
 
@@ -875,6 +880,8 @@ function fillVariantChart(data, regionStart, regionEnd) {
 	$('#vcf-count').text(data.features.length + ' Variants');
 
     setVariantLegendCounts();
+   	d3.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
+
 
 }
 
@@ -1014,6 +1021,9 @@ function fillFreebayesChart(data, regionStart, regionEnd) {
 	// Load the chart with the new data
 	var selection = d3.select("#fb-variants").datum([data]);    
     fbChart(selection);
+
+    d3.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
+
 
     window.scrollTo(0,document.body.scrollHeight);
 

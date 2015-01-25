@@ -25,7 +25,7 @@ function geneD3() {
   // axis
   var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom")
+    .orient("right")
     .tickFormat(tickFormatter);
   // variables 
   var trackHeight = 20,
@@ -325,13 +325,6 @@ function geneD3() {
       svg.select(".x.axis").transition()
           .duration(200)
           .call(xAxis);  
-
-      // End gene model
-
-
-
-
-
         
     });
 
@@ -372,7 +365,8 @@ function geneD3() {
     return pathStr;
   }
 
-  function tickFormatter (d) {
+  function tickFormatter (d,i) {
+
     if ((d / 1000000) >= 1)
       d = d / 1000000 + "M";
     else if ((d / 1000) >= 1)
