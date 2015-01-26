@@ -45,7 +45,7 @@
     <script id='track-legend-template' type="text/x-handlebars-template">     
         <div id="track-legend">
          <div>
-          <div>
+          <div style="margin-top: -6px;">
 
               <svg id="snp" class="type" width="34" height="14" transform="translate(0,0)">
                 <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">SNP</text>
@@ -91,7 +91,7 @@
                 <rect class="variant  impact_NOIMPACT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
               </svg>
           </div>
-          <div style="padding-left: 174px;margin-top: -4px;">
+          <div style="padding-left: 174px;">
 
               
               <svg id="effect-scheme" width="55" height="15" transform="translate(0,0)">
@@ -152,7 +152,9 @@
                 <rect class="variant  effect_NOEFFECT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
               </svg>
             </div>
-            <div style="padding-left: 174px;margin-top: -4px;">
+
+
+            <div id="compare-legend" class="hide" style="padding-left: 174px;">
 
               
               <svg id="compare-scheme" width="55" height="15" transform="translate(0,0)">

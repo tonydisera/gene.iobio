@@ -250,6 +250,7 @@ function init() {
 			    .showBrush(false)
 			    .on("d3rendered", function() {
 			    	applyVariantFilters();
+					
 			    });
 
 	// Create the freebayes variant chart
@@ -261,7 +262,7 @@ function init() {
 			    .verticalPadding(2)
 			    .showBrush(false)
 			    .on("d3rendered", function() {
-			    	applyVariantFilters();	
+				   applyVariantFilters();
 			    });
 
 
@@ -399,10 +400,8 @@ function initVariantLegend() {
 	    	vcfChart.clazz(classifyByCompare);
 	    	fbChart.clazz(classifyByCompare);
 
-	    	vcf.compareVcfRecords(vcfData, fbData, function() {
-		    	showVariants(regionStart ? regionStart : window.gene.start, regionEnd ? regionEnd : window.gene.end);
-		    	callVariants(regionStart ? regionStart : window.gene.start, regionEnd ? regionEnd : window.gene.end);
-	    	})
+	    	showVariants(regionStart, regionEnd);
+	    	callVariants(regionStart, regionEnd);
 
 	    });
 }
@@ -650,6 +649,7 @@ function loadTracksForGene() {
 	showBamDepth();
 	showVariants();
 	callVariants();
+
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
@@ -950,7 +950,20 @@ function showVariants(regionStart, regionEnd) {
 	        maxLevel = _pileupVariants(vcfChart, data.features, gene.start, gene.end);
 			data.maxLevel = maxLevel + 1;
 
-	        fillVariantChart(data, window.gene.start, window.gene.end);
+			var commonSchemeClass = d3.select("#compare-scheme").attr("class");
+		    	if (commonSchemeClass == null) {
+		    		commonSchemeClass = "";
+		    	}
+		    	if (vcfData && fbData && commonSchemeClass.indexOf("current") >= 0) {
+			    	vcf.compareVcfRecords(vcfData, fbData, function() {
+				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
+				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
+			    	});
+				} else {
+					fillVariantChart(data, window.gene.start, window.gene.end);
+				}
+
+	        f
 		});		
 	}
 
@@ -1020,6 +1033,10 @@ function fillVariantChart(data, regionStart, regionEnd) {
     setVariantLegendCounts();
 	    
    	d3.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
+
+   	if (fbData) {
+   		$('#compare-legend').removeClass("hide");
+   	}
 
 
 }
@@ -1135,10 +1152,22 @@ function callVariants(regionStart, regionEnd) {
 				fbData = data;
 
 				maxLevel = _pileupVariants(fbChart, fbData.features, gene.start, gene.end);
-				fbData.maxLevel = maxLevel + 1;			
+				fbData.maxLevel = maxLevel + 1;		
+
+				var commonSchemeClass = d3.select("#compare-scheme").attr("class");
+		    	if (commonSchemeClass == null) {
+		    		commonSchemeClass = "";
+		    	}
+		    	if (vcfData && fbData && commonSchemeClass.indexOf("current") >= 0) {
+			    	vcf.compareVcfRecords(vcfData, fbData, function() {
+				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
+				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
+			    	});
+				} else {
+					fillFreebayesChart(fbData, window.gene.start, window.gene.end);
+				}
 
 
-				fillFreebayesChart(fbData, window.gene.start, window.gene.end);
 			});
 			
 		});
@@ -1173,6 +1202,10 @@ function fillFreebayesChart(data, regionStart, regionEnd) {
     
     $('#filter-track').removeClass("hide");
 	setVariantLegendCounts();
+
+	if (vcfData) {
+		$('#compare-legend').removeClass("hide");
+	}
 
     window.scrollTo(0,document.body.scrollHeight);
 

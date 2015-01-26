@@ -1,10 +1,9 @@
 todo
 -------------
-- select transcript not shown in viewfinder after selection
 
+- duplicate snps showing up on vcf track after compare?
 
-- shrink/expand view options for transcripts
-   - figure out when to show transcript name (currently hidden by opacity in css)
+- select transcript on hover over text or svg
 
 - show selected file names in tracks ( or in info tooltip in top section)
 
