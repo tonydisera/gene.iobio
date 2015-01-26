@@ -54,6 +54,7 @@ var fbChart = null;
 var fbData = null;
 
 var variantCounts = null;
+var clickedAnnotIds = new Object();
 
 // The colors for the variant stats bar chart
 var statsColors = {
@@ -96,8 +97,7 @@ $(document).ready(function(){
 
 function init() {
 
-    $('#vcf-legend').html(trackLegendTemplate());
-    $('#fb-legend').html(trackLegendTemplate());
+    $('#variant-legend').html(trackLegendTemplate());
 
 	loadGeneWidget();
 	$('#bloodhound .typeahead').focus();
@@ -196,8 +196,13 @@ function init() {
 
        		//showTranscripts(regionStart, regionEnd);
 			showBamDepth(regionStart, regionEnd);
-	    	showVariants(regionStart, regionEnd);
+			showVariants(regionStart, regionEnd);
 	    	callVariants(regionStart, regionEnd);
+
+	    	
+
+
+
 		});	
 
     transcriptMenuChart = geneD3()
@@ -242,7 +247,10 @@ function init() {
 			    .showXAxis(true)
 			    .variantHeight(6)
 			    .verticalPadding(2)
-			    .showBrush(false);
+			    .showBrush(false)
+			    .on("d3rendered", function() {
+			    	applyVariantFilters();
+			    });
 
 	// Create the freebayes variant chart
 	fbChart = variantD3()
@@ -251,7 +259,11 @@ function init() {
 			    .showXAxis(true)
 			    .variantHeight(6)
 			    .verticalPadding(2)
-			    .showBrush(false);
+			    .showBrush(false)
+			    .on("d3rendered", function() {
+			    	applyVariantFilters();
+			    });
+
 
 
 	// Initialize variant legend
@@ -272,7 +284,6 @@ function initTranscriptControls() {
             $('#transcript-btn-group').data('open', false);
             onCloseTranscriptMenuEvent();
         } else {
-        	//$('#transcript-menu').css("min-height", "1000");
         	$('#transcript-btn-group').data('open', true);
         }
     });
@@ -292,9 +303,10 @@ function onCloseTranscriptMenuEvent() {
 }
 
 function initVariantLegend() {
-	d3.selectAll(".type, .impact, .effect")
+	d3.selectAll(".type, .impact, .effect .compare")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
+
 	    d3.selectAll(".variant")
 	      .filter( function(d,i) {
 	      	var theClasses = d3.select(this).attr("class");
@@ -309,63 +321,186 @@ function initVariantLegend() {
 	    d3.selectAll(".variant")
 	      .filter( function(d,i) {
 	    	var theClasses = d3.select(this).attr("class");
-	    	if (theClasses.indexOf(id) >= 0) {
+	    	var theParentClasses = d3.select(this.parentNode).attr("class");
+	    	if (theParentClasses.indexOf("impact") >= 0 
+	    		|| theParentClasses.indexOf("effect") >= 0
+	    		|| theParentClasses.indexOf("compare") >= 0) {
+	    		return false;
+	    	} else if (theClasses.indexOf(id) >= 0) {
 	    		return false;
 	    	} else {
-	    		return true;
+	    		var aClickedId = false;
+	    		for (key in clickedAnnotIds) {
+	    			var on = clickedAnnotIds[key];
+	    			if (on && theClasses.indexOf(key) >= 0) {
+	    				aClickedId = true;
+	    			}
+	    		}
+	    		if (aClickedId) {
+	    			return false;
+
+	    		} else {
+		    		return true;
+	    		}
 	    	}
 	      })
 	      .style("opacity", .1);
 		
 	  })
 	  .on("mouseout", function(d) {
-	  	d3.selectAll(".variant")
-	  	   .style("opacity", 1);
+	  	applyVariantFilters();
+	  })
+	  .on("click", function(d) {
+	  	var on = null;
+	  	if (d3.select(this).attr("class").indexOf("current") >= 0) {
+	  		on = false;
+	  	} else {
+	  		on = true;
+	  	}
+	  	// Remove from or add to list of clicked ids
+	  	window.clickedAnnotIds[d3.select(this).attr("id")] = on;
+
+	  	d3.select(this).classed("current", on);
+	  	applyVariantFilters();
 	  });
 
 	  d3.selectAll('#impact-scheme')
 	    .on("click", function(d) {
-	    	d3.select(this).attr("class", "current");
-	    	d3.select('#effect-scheme').attr("class", "");
+	    	d3.select('#impact-scheme').classed("current", true);
+	    	d3.select('#effect-scheme' ).classed("current", false);
+	    	d3.select('#compare-scheme').classed("current", false);
 
-	    	d3.selectAll('.impact')
-	    	  .attr("class", "impact");
-	    	d3.selectAll('.effect')
-	    	  .attr("class", "effect hidden");
+	    	vcfChart.clazz(classifyByImpact);
+	    	fbChart.clazz(classifyByImpact);
 
-	    	vcfChart.clazz(function (d) { 
-	    		var impacts = "";
-			    for (key in d.impact) {
-			      impacts += " " + key;
-			    }
-			    return  'variant ' + d.type.toLowerCase() + impacts; 
-	    	});
 	    	showVariants(regionStart, regionEnd);
+	    	callVariants(regionStart, regionEnd);
 	    });
 	  d3.selectAll('#effect-scheme')
 	    .on("click", function(d) {
-	    	d3.select(this).attr("class", "current");
-	    	d3.select('#impact-scheme').attr("class", "");
+	    	d3.select('#impact-scheme').classed("current", false);
+	    	d3.select('#effect-scheme' ).classed("current", true);
+	    	d3.select('#compare-scheme').classed("current", false);
 
-	    	d3.selectAll('.effect')
-	    	  .attr("class", "effect");
-	    	d3.selectAll('.impact')
-	    	  .attr("class", "impact hidden");
 
-	    	vcfChart.clazz(function (d) { 
-	    		var effects = "";
-			    for (key in d.effectCategory) {
-			      effects += " " + key;
-			    }
-			    return  'variant ' + d.type.toLowerCase() + effects; 
-	    	});
+	    	vcfChart.clazz(classifyByEffect);
+	    	fbChart.clazz(classifyByEffect);
+
 	    	showVariants(regionStart, regionEnd);
+	    	callVariants(regionStart, regionEnd);
 	    });
+	   d3.selectAll('#compare-scheme')
+	    .on("click", function(d) {
+	    	d3.select('#impact-scheme').classed("current", false);
+	    	d3.select('#effect-scheme' ).classed("current", false);
+	    	d3.select('#compare-scheme').classed("current", true);
+
+
+	    	vcfChart.clazz(classifyByCompare);
+	    	fbChart.clazz(classifyByCompare);
+
+	    	vcf.compareVcfRecords(vcfData, fbData, function() {
+		    	showVariants(regionStart ? regionStart : window.gene.start, regionEnd ? regionEnd : window.gene.end);
+		    	callVariants(regionStart ? regionStart : window.gene.start, regionEnd ? regionEnd : window.gene.end);
+	    	})
+
+	    });
+}
+
+function classifyByImpact(d) {
+	var impacts = "";
+	var colorimpacts = "";
+	var effects = "";
+	
+	for (key in d.impact) {
+	  impacts += " " + key;
+	  colorimpacts += " " + 'impact_'+key;
+	}
+	for (key in d.effectCategory) {
+	  effects += " " + key;
+	}
+	
+	return  'variant ' + d.type.toLowerCase() + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+}
+function classifyByEffect(d) { 
+	var effects = "";
+	var coloreffects = "";
+	var impacts = "";
+	
+    for (key in d.effectCategory) {
+      effects += " " + key;
+      coloreffects += " " + 'effect_'+key;
+    }
+    for (key in d.impact) {
+      impacts += " " + key;
+    }
+    
+    return  'variant ' + d.type.toLowerCase() + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+}
+function classifyByCompare(d) { 
+	var effects = "";
+	var impacts = "";
+	
+    for (key in d.effectCategory) {
+      effects += " " + key;
+    }
+    for (key in d.impact) {
+      impacts += " " + key;
+    }
+    
+    return  'variant ' + d.type.toLowerCase() + effects + impacts + ' ' + d.consensus + ' ' + 'compare_'+d.consensus; 
+}
+
+function applyVariantFilters() {
+	// Find out if there are any filters set
+  	var filtersApply = false;
+  	for (key in clickedAnnotIds) {
+		var on = clickedAnnotIds[key];
+		if (on ) {
+			filtersApply = true;
+		}
+	}
+
+	// If there existing filters set, take
+	// opacity of previous hover down to .1
+	if (filtersApply) {
+
+	  	d3.selectAll(".variant")
+	  	   .filter( function(d,i) {
+	    	var theClasses = d3.select(this).attr("class");
+	    	var theParentClasses = d3.select(this.parentNode).attr("class");
+	    	
+	    	var aClickedId = false;
+    		if (theParentClasses.indexOf("impact") >= 0 || theParentClasses.indexOf("effect") >= 0) {
+    			return false;
+    		} else {
+		    	for (key in clickedAnnotIds) {
+	    			var on = clickedAnnotIds[key];
+	    			if (on && theClasses.indexOf(key) >= 0) {
+	    				aClickedId = true;
+	    			}
+	    		}
+	    		if (aClickedId) {
+	    			false
+	    		} else {
+		    		return true;
+	    		}
+    		}
+	      })
+	      .style("opacity", .1);
+	     
+
+	// Otherwise, if no filters exist, everything
+	// is set back to opacity of 1.
+	} else {
+    	d3.selectAll(".variant").style("opacity", 1);
+	}
 }
 
 function loadGeneWidget() {
 	// kicks off the loading/processing of `local` and `prefetch`
 	gene_engine.initialize();
+	
 	 
 	var typeahead = $('#bloodhound .typeahead').typeahead({
 	  hint: true,
@@ -649,7 +784,7 @@ function onVcfFileButtonClicked() {
 
 function onVcfFilesSelected(event) {
 
-	$('#vcf-track').css("display","flex");
+	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
 	$("#vcf-track .loader").css("display", "inline");
 
@@ -768,7 +903,7 @@ function showVariants(regionStart, regionEnd) {
 	if (window.vcf == null || window.getVcfRefName == null) {
 		return;
 	}
-	$('#vcf-track').css("display","flex");
+	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
 	$("#vcf-track .loader").css("display", "inline");
 
@@ -870,7 +1005,7 @@ function fillVariantChart(data, regionStart, regionEnd) {
 	
 	// Set the vertical layer count so that the height of the chart can be recalculated	                                	
 	vcfChart.verticalLayers(data.maxLevel);
-	
+
 	// Load the chart with the new data
 	var selection = d3.select("#vcf-variants").datum([data]);    
     vcfChart(selection);
@@ -879,7 +1014,9 @@ function fillVariantChart(data, regionStart, regionEnd) {
 
 	$('#vcf-count').text(data.features.length + ' Variants');
 
+    $('#filter-track').removeClass("hide");
     setVariantLegendCounts();
+	    
    	d3.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
 
 
@@ -894,18 +1031,26 @@ function setVariantLegendCounts() {
 	variantCounts.MODERATE = d3.selectAll("#vcf-variants .variant.MODERATE")[0].length;
 	variantCounts.HIGH = d3.selectAll("#vcf-variants .variant.HIGH")[0].length;
 
+/*
 	if (d3.select("#impact-scheme").attr("class") == "current") {
 		d3.selectAll(".impact").attr("class", function(d) {
+			var theClasses = d3.select(this).attr("class");
+			var baseClasses = "";
+			if (theClasses.indexOf("current") >= 0) {
+				baseClasses = "impact current";
+			} else {
+				baseClasses = "impact";
+			}
 			var impact = d3.select(this)[0][0].id;
 			var count = variantCounts[impact];
 			if (count == 0) {
-				return "impact inactive";
+				return baseClasses + " inactive";
 			} else {
-				return "impact";
+				return basesClasses;
 			}
 		});
 	}
-
+*/
 	// TODO:  Need to do the same thing for effect.
 }
 
@@ -1023,7 +1168,9 @@ function fillFreebayesChart(data, regionStart, regionEnd) {
     fbChart(selection);
 
     d3.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
-
+    
+    $('#filter-track').removeClass("hide");
+	setVariantLegendCounts();
 
     window.scrollTo(0,document.body.scrollHeight);
 

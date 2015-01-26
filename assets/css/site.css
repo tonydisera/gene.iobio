@@ -141,7 +141,7 @@ section {
 #vcf-track {
 }
 #track-legend {
-  margin-top: -24px;
+  margin-top: 10px;
 }
 #vcf-count {
   display: none;
@@ -471,14 +471,13 @@ header {
   stroke-width: 1px;
   opacity: 1;
 }
+/*
 .snp,  .del,  .ins { 
-  fill: #FAF5BE;
+  fill: white;
   stroke: #807D7D;
 }
-.variant.unique,  .variant.unique,  .varian.unique { 
-  fill:    #F65C44;
-  stroke:  #F65C44;
-}
+*/
+
 .ibo-variant .reference { 
   stroke: rgb(150,150,150); 
 }
@@ -502,111 +501,127 @@ header {
   stroke-dasharray: 5,5;
 }
 
-.variant.LOW{
+.variant.impact_LOW{
   fill: #71CEFF;
   stroke: #84B4CD;
  
 } 
-.variant.MODIFIER{
+.variant.impact_MODIFIER{
   fill: #75A5C2;
   stroke: #75A5C2;
 } 
-.variant.MODERATE{
+.variant.impact_MODERATE{
   fill: #F9A366;
   stroke: #D88C56;
 } 
-.variant.HIGH{
-  fill:#bd0026;
-  stroke: #741F30;
+.variant.impact_HIGH{
+  fill: #D00202;
+  stroke: #930F0F;
+}
+.variant.impact_NOIMPACT { 
+  fill: #FAF5BE;
+  stroke: #807D7D;
 }
 
 
 
 
-
-.variant.frameshift{
-  fill:rgb(231,41,138);
-  stroke:rgb(231,41,138);
+.variant.effect_frameshift{
+  fill: #D00202;
+  stroke: #930F0F;
 } 
-.variant.missense{
+.variant.effect_missense{
   fill: rgb(13, 236, 210);
   stroke: rgb(142, 145, 145);
 } 
-.variant.synonymous{
+.variant.effect_synonymous{
   fill:rgb(117,112,179);
   stroke:rgb(117,112,179);
 } 
-.variant.mirna{
+.variant.effect_mirna{
   fill: #b2df8a;
-  stroke: #b2df8a;
+  stroke: #80A65F;
 } 
-.variant.regulatory{
+.variant.effect_regulatory{
   fill: #3d8901;
   stroke: #3d8901;
 } 
-.variant.splice{
+.variant.effect_splice{
   fill:rgb(230,171,2);
-  stroke:rgb(230,171,2);
+  stroke: rgb(168, 125, 1);
 }
-.variant.intron{
+.variant.effect_intron{
   fill:#74add1;
-  stroke:#74add1;
+  stroke: #5A88A5;
 }
-.variant.other{
+.variant.effect_other{
   fill: rgb(187, 187, 187);
-  stroke: rgb(187, 187, 187);
+  stroke: rgb(160, 142, 142);
 }
-.variant.indel {
+.variant.effect_indel {
   fill: #fb9a99;
-  stroke: #fb9a99;
+  stroke: #DB8988;
 }
+.variant.effect_utr {
+  fill: #D77777;
+  stroke: #D77777;
+}
+.variant.effect_downstream {
+  fill: #F48E45;
+  stroke: #C36F33;
+}
+.variant.effect_upstream {
+  fill: #6187B2;
+  stroke: #6187B2;
+}
+.variant.effect_NOEFFECT { 
+  fill: #FAF5BE;
+  stroke: #807D7D;
+}
+
+.variant.compare_unique {
+  fill: #D00202 !important;
+  stroke: #930F0F !important;
+}
+.variant.compare_common {
+  fill: #6187B2 !important; 
+  stroke: #6187B2 !important;
+}
+
 
 
 
 /* LEGEND */
+.impact.nocolor, .effect.nocolor {
+ 
+}
 .impact:hover {
   cursor: pointer;
-  border: black;
-  border-width: 1px;
-  border-style: solid;
 }
 .effect:hover {
   cursor: pointer;
-  border: black;
-  border-width: 1px;
-  border-style: solid;
+}
+.compare:hover {
+  cursor: pointer;
 }
 .type:hover {
   cursor: pointer;
-  border: black;
-  border-width: 1px;
-  border-style: solid;
 }
-#impact-scheme:hover, #effect-scheme:hover {
+#impact-scheme:hover, #effect-scheme:hover,  #compare-scheme:hover{
   cursor: pointer;
-  border: black;
-  border-width: 1px;
-  border-style: solid;  
 }
-#impact-scheme.current, #effect-scheme.current {
-  cursor: pointer;
-  border: black;
-  border-width: 2px;
-  border-style: solid;  
+.current{
+  font-weight: bold;
+  text-decoration: underline;
 }
 #impact-scheme, #effect-scheme {
-  cursor: pointer;
-  border: white;
-  border-width: 2px;
-  border-style: solid;  
+  
 }
 .impact.inactive, .effect.inactive {
   pointer-events: none;
   opacity: .5;
 }
-.impact.hidden, .effect.hidden {
-  display: none;
-}
+
 
 
 
@@ -625,24 +640,6 @@ header {
 }
 
 
-#single-scheme:hover, #multi-scheme:hover {
-  cursor: pointer;
-  border: black;
-  border-width: 1px;
-  border-style: solid;  
-}
-#single-scheme.current, #multi-scheme.current {
-  cursor: pointer;
-  border: black;
-  border-width: 2px;
-  border-style: solid;  
-}
-#single-scheme, #multi-scheme {
-  cursor: pointer;
-  border: white;
-  border-width: 2px;
-  border-style: solid;  
-}
 
 /* 
  * dropdown 

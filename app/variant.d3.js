@@ -1,5 +1,5 @@
 function variantD3() {
-   var dispatch = d3.dispatch("d3brush");
+   var dispatch = d3.dispatch("d3brush", "d3rendered");
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},
@@ -33,10 +33,16 @@ function variantD3() {
 
   var clazz = function (d) { 
     var impacts = "";
+    var colorimpacts = "";
+    var effects = "";
     for (key in d.impact) {
       impacts += " " + key;
+      colorimpacts += " " + 'impact_'+key;
     }
-    return  'variant ' + d.type.toLowerCase() + impacts; 
+    for (key in d.effectCategory) {
+      effects += " " + key;
+    }
+    return  'variant ' + d.type.toLowerCase() + impacts + effects + colorimpacts;
   };
       
       
@@ -325,7 +331,7 @@ function variantD3() {
               })
               .attr('height', function(d) { 
                 return variantHeight; 
-              }); 
+              });
 
         trackindel.selectAll('.variant.del')
             .transition()  
@@ -357,10 +363,11 @@ function variantD3() {
                   var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding));
                   var tx = "translate(" + xCoord + "," + yCoord + ")"; 
                   return tx;
-              });       
+              });
+                 
        
 
-      }
+      } 
 
 
 
@@ -370,8 +377,11 @@ function variantD3() {
         svg.select(".x.axis").transition()
             .duration(200)
             .call(xAxis);       
-        }
+      }
 
+      
+      dispatch.d3rendered();
+ 
     });
 
   }

@@ -100,7 +100,7 @@ var effectCategories = [
 ['disruptive_inframe_insertion' ,'indel'],
 ['inframe_deletion' ,'indel'],
 ['disruptive_inframe_deletion'  ,'indel'],
-['downstream_gene_variant'  ,'other'],
+['downstream_gene_variant'  ,'downstream'],
 ['exon_variant' ,'other'],
 ['exon_loss_variant'  ,'other'],
 ['frameshift_variant' ,'frameshift'],
@@ -109,7 +109,7 @@ var effectCategories = [
 ['conserved_intergenic_variant' ,'other'],
 ['intragenic_variant' ,'other'],
 ['intron_variant' ,'intron'],
-['conserved_intron_variant' ,'other'],
+['conserved_intron_variant' ,'intron'],
 ['miRNA','mirna'],
 ['missense_variant' ,'missense'],
 ['initiator_codon_variant'  ,'missense'],
@@ -129,11 +129,11 @@ var effectCategories = [
 ['stop_retained_variant'  ,'synonymous'],
 ['transcript_variant' ,'other'],
 ['regulatory_region_variant'  ,'regulatory'],
-['upstream_gene_variant'  ,'other'],
-['3_prime_UTR_variant'  ,'other'],
-['3_prime_UTR_truncation +','exon_loss other'],
-['5_prime_UTR_variant'  ,'other'],
-['5_prime_UTR_truncation +','exon_loss_variant  other']
+['upstream_gene_variant'  ,'upstream'],
+['3_prime_UTR_variant'  ,'utr'],
+['3_prime_UTR_truncation +','utr'],
+['5_prime_UTR_variant'  ,'utr'],
+['5_prime_UTR_truncation +','utr']
 ]; 
 
 
@@ -663,26 +663,36 @@ var effectCategories = [
             });
 
             var effectCats = new Object();
-            var found = false;
-            for (var y = 0; y < effectCategories.length; y++) {
-              var cat = effectCategories[y];
-              var eff = cat[0];
-              var effCat = cat[1];
+            if ($.isEmptyObject(effects)) {
+              effectCats['NOEFFECT'] = 'NOEFFECT';
+            } else {
+              var found = false;
+              for (var y = 0; y < effectCategories.length; y++) {
+                var cat = effectCategories[y];
+                var eff = cat[0];
+                var effCat = cat[1];
 
-              if (effects[eff]) {
-                effectCats[effCat] = effCat;
-                found = true;
+                if (effects[eff]) {
+                  effectCats[effCat] = effCat;
+                  found = true;
+                }
+              };            
+              if (!found) {
+                effectCats['other'] = 'other';
               }
-            };
-            if (!found) {
-              effectCats['other'] = 'other';
+
             }
 
+            if ($.isEmptyObject(impacts)) {
+              impacts["NOIMPACT"] = "NOIMPACT";
+            }
+
+            
 
             variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
               'strand': regionStrand, 'type': type, 'id': rec.id, 'ref': rec.ref, 
               'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
-              'effect': effects, 'effectCategory': effectCats, 'impact': impacts} );
+              'effect': effects, 'effectCategory': effectCats, 'impact': impacts, 'compare': rec.compare} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;
@@ -770,7 +780,7 @@ var effectCategories = [
     var features2 = variants2.features;
 
     // Iterate through the variants from the first set,
-    // marking the compare field based on whether a 
+    // marking the consensus field based on whether a 
     // matching variant from the second list is encountered.
     for (var idx1 = 0; idx1 < features1.length; idx1++) {
       variant1 = features1[idx1];
@@ -789,8 +799,8 @@ var effectCategories = [
           idx2 = x;
 
           if (variant1.ref == variant2.ref && variant1.alt == variant2.alt) {
-            variant1.consensus = 'match';
-            variant2.consensus = 'match';
+            variant1.consensus = 'commmon';
+            variant2.consensus = 'common';
 
             variants1.countMatch++;
             variants2.countMatch++;
@@ -798,7 +808,7 @@ var effectCategories = [
           } else {
             // We need to mark variant2 as 'diff' so we don't revisit it
             // when variant2 drives the comparison loop.
-            variant2.consensus = 'unique';
+            variant2.consensus = 'common';
           }
         } else if (variant1.start < variant2.start) {
           // We have moved beyond variant1's position,
