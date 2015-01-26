@@ -799,7 +799,7 @@ var effectCategories = [
           idx2 = x;
 
           if (variant1.ref == variant2.ref && variant1.alt == variant2.alt) {
-            variant1.consensus = 'commmon';
+            variant1.consensus = 'common';
             variant2.consensus = 'common';
 
             variants1.countMatch++;

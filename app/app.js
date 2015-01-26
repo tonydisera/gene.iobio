@@ -261,7 +261,7 @@ function init() {
 			    .verticalPadding(2)
 			    .showBrush(false)
 			    .on("d3rendered", function() {
-			    	applyVariantFilters();
+			    	applyVariantFilters();	
 			    });
 
 
@@ -303,7 +303,7 @@ function onCloseTranscriptMenuEvent() {
 }
 
 function initVariantLegend() {
-	d3.selectAll(".type, .impact, .effect .compare")
+	d3.selectAll(".type, .impact, .effect, .compare")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -471,7 +471,9 @@ function applyVariantFilters() {
 	    	var theParentClasses = d3.select(this.parentNode).attr("class");
 	    	
 	    	var aClickedId = false;
-    		if (theParentClasses.indexOf("impact") >= 0 || theParentClasses.indexOf("effect") >= 0) {
+    		if (theParentClasses.indexOf("impact" ) >= 0 
+    			|| theParentClasses.indexOf("effect ") >= 0 
+    			|| theParentClasses.indexOf("compare ") >= 0 ) {
     			return false;
     		} else {
 		    	for (key in clickedAnnotIds) {

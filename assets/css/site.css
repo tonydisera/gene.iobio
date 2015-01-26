@@ -501,6 +501,16 @@ header {
   stroke-dasharray: 5,5;
 }
 
+.variant.compare_unique{
+  fill: #F9A366 !important;
+  stroke: #D88C56 !important;
+}
+
+.variant.compare_common{
+  fill: #6187B2 !important; 
+  stroke: #6187B2 !important;
+}
+
 .variant.impact_LOW{
   fill: #71CEFF;
   stroke: #84B4CD;
@@ -579,14 +589,7 @@ header {
   stroke: #807D7D;
 }
 
-.variant.compare_unique {
-  fill: #D00202 !important;
-  stroke: #930F0F !important;
-}
-.variant.compare_common {
-  fill: #6187B2 !important; 
-  stroke: #6187B2 !important;
-}
+
 
 
 
