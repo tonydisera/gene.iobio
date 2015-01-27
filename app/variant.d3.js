@@ -1,5 +1,5 @@
 function variantD3() {
-   var dispatch = d3.dispatch("d3brush", "d3rendered");
+   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3tooltip", "d3notooltip");
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},
@@ -294,12 +294,15 @@ function variantD3() {
                            + '<br>impact: ' + impactDisplay)                                 
                  .style("left", (d3.event.pageX) + "px") 
                  .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 24) + "px");    
+                 .style("top", (d3.event.pageY - 24) + "px");   
+
+              dispatch.d3tooltip(d.start); 
             })                  
            .on("mouseout", function(d) {       
               container.select('.tooltip').transition()        
                  .duration(500)      
                  .style("opacity", 0);   
+              dispatch.d3notooltip(); 
             });           
 
 

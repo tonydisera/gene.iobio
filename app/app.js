@@ -235,10 +235,11 @@ function init() {
 	                    .kind("area")
 						.margin( {top: 0, right: 0, bottom: 20, left: 0} )
 						.showXAxis(true)
-						.showYAxis(true)
+						.showYAxis(false)
 						.showTooltip(true)
 						.pos( function(d) { return d[0] })
 				   		.depth( function(d) { return d[1] });
+
 
 	// Create the vcf track
 	vcfChart = variantD3()
@@ -251,7 +252,17 @@ function init() {
 			    .on("d3rendered", function() {
 			    	applyVariantFilters();
 					
-			    });
+			    })			    
+			    .on('d3tooltip', function(start) {
+			    	if (bamData) {
+						bamDepthChart.showCircle()(start);
+			    	}
+				})
+				.on('d3notooltip', function(start) {
+					if (bamData){
+						bamDepthChart.hideCircle()();
+					}
+				});
 
 	// Create the freebayes variant chart
 	fbChart = variantD3()
@@ -263,8 +274,17 @@ function init() {
 			    .showBrush(false)
 			    .on("d3rendered", function() {
 				   applyVariantFilters();
-			    });
-
+			    })
+			    .on('d3tooltip', function(start) {
+			    	if (bamData) {
+						bamDepthChart.showCircle()(start);
+			    	}
+				})
+				.on('d3notooltip', function(start) {
+					if (bamData){
+						bamDepthChart.hideCircle()();
+					}
+				});
 
 
 	// Initialize variant legend
@@ -589,6 +609,8 @@ function loadTracksForGene() {
 
 	regionStart = null;
 	regionEnd = null;
+	vcfData = null;
+	fbData = null;
 
     $('#gene-track').removeClass("hide");
 	$('#view-finder-track').removeClass("hide");
@@ -954,7 +976,7 @@ function showVariants(regionStart, regionEnd) {
 		    	if (commonSchemeClass == null) {
 		    		commonSchemeClass = "";
 		    	}
-		    	if (vcfData && fbData && commonSchemeClass.indexOf("current") >= 0) {
+		    	if (fbData && commonSchemeClass.indexOf("current") >= 0) {
 			    	vcf.compareVcfRecords(vcfData, fbData, function() {
 				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
 				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
@@ -962,8 +984,6 @@ function showVariants(regionStart, regionEnd) {
 				} else {
 					fillVariantChart(data, window.gene.start, window.gene.end);
 				}
-
-	        f
 		});		
 	}
 
@@ -1158,7 +1178,7 @@ function callVariants(regionStart, regionEnd) {
 		    	if (commonSchemeClass == null) {
 		    		commonSchemeClass = "";
 		    	}
-		    	if (vcfData && fbData && commonSchemeClass.indexOf("current") >= 0) {
+		    	if (vcfData && commonSchemeClass.indexOf("current") >= 0) {
 			    	vcf.compareVcfRecords(vcfData, fbData, function() {
 				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
 				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);

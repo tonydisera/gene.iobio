@@ -7,8 +7,80 @@ lineD3 = function module() {
 
   var kind = KIND_LINE;
 
+  var x = null;
+  var y = null;
+  var container = null;
+
+  var formatter = d3.format(',');
+
+
+  var theData = null;
+
   var pos    = function(d) { return d.pos };
   var depth  = function(d) { return d.depth };
+
+  var getScreenCoords = function(x, y, ctm) {
+    var xn = ctm.e + x*ctm.a;
+    var yn = ctm.f + y*ctm.d;
+    return { x: xn, y: yn };
+  }
+
+  var showCircle = function(start) {
+    // Find the closest position in the data
+    d = null;
+    if (theData) {
+      for (var i = 0; i < theData.length - 1; i++) {
+        if (start >= pos(theData[i])  &&  start <= pos(theData[i+1])) {
+          d = theData[i];
+          break;
+        }
+      }
+    }
+
+
+    // Get the x for this position
+    if (d) {
+      var mousex = d3.round(x(pos(d)));
+      var mousey = d3.round(y(depth(d)));
+      var posx = d3.round(pos(d));
+      var depthy = d3.round(depth(d));
+
+      var offsetTop = container[0][0].offsetTop;
+      var offsetLeft = container[0][0].offsetLeft;
+
+      console.log(posx + ' ' +  mousex + ' ------ ' + depthy + ' ' + mousey );
+      var tooltipText = 'position ' + formatter(parseInt(   posx  ));
+      tooltipText += '<br>depth ' + parseInt(   depthy );
+             
+      var tooltip = container.select('.tooltip');
+              tooltip.transition()        
+                 .duration(200)      
+                 .style("opacity", .9);      
+              tooltip.html(tooltipText)                         
+                 .style("left",  (offsetLeft + mousex) + "px") 
+                 .style("text-align", 'left')    
+                 .style("top", (offsetTop + mousey + 24) + "px");    
+
+      var circle = container.select(".circle");
+              circle.transition()
+                    .duration(200)
+                    .style("opacity", 1);
+              circle.attr("cx", mousex)
+                    .attr("cy", mousey );
+              
+    }
+  };
+
+  var hideCircle = function() {
+    container.select(".circle").transition()        
+                 .duration(500)      
+                 .style("opacity", 0);  
+    container.select(".tooltip").transition()
+             .duration(500)
+             .style("opacity", 0); 
+  }
+
+
   var formatXTick = null;
 
 
@@ -36,8 +108,9 @@ lineD3 = function module() {
 
    
     selection.each(function(data) {
+      theData = data;
 
-      var container = d3.select(this);
+      container = d3.select(this);
 
       // add tooltip div
       var tooltip = container.selectAll(".tooltip").data([0])
@@ -45,9 +118,13 @@ lineD3 = function module() {
           .attr("class", "tooltip")               
           .style("opacity", 0);
 
+
       var svg = d3.select(this)
                   .selectAll("svg")
                   .data([data]);
+
+      
+  
 
       svg.enter()
         .append("svg")
@@ -61,7 +138,18 @@ lineD3 = function module() {
       d3.select(this).selectAll("svg")
          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
-      
+      // add a circle
+      var circle = svg.selectAll(".circle").data([0])
+        .enter().append('circle')
+          .attr("class", "circle")
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", 5.5)
+          .style("fill", "none")
+          .style("stroke", "red")               
+          .style("stroke-width", "2")               
+          .style("opacity", 0);
+
       if (kind == KIND_AREA && showGradient) {
           var defs = svg.selectAll("defs").data([data]).enter()
                         .append("defs");
@@ -92,7 +180,6 @@ lineD3 = function module() {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // Tooltip     
-      var formatter = d3.format(',');
       svgGroup.on("mouseover", function(d) {  
              var tooltipText = '';  
              mousex = d3.mouse(this)[0];
@@ -120,10 +207,10 @@ lineD3 = function module() {
            });     
 
         
-      var x = d3.scale.linear()
+      x = d3.scale.linear()
           .range([0, width]);
 
-      var y = d3.scale.linear()
+      y = d3.scale.linear()
           .range([height - margin.top , 0]);
 
 
@@ -282,7 +369,16 @@ lineD3 = function module() {
 
   });
 }
-
+  exports.showCircle = function(_) {
+    if (!arguments.length) return showCircle;
+    showCircle = _;
+    return exports;
+  }
+  exports.hideCircle = function(_) {
+    if (!arguments.length) return hideCircle;
+    hideCircle = _;
+    return exports;
+  }
  
   exports.showTooltip = function(_) {
     if (!arguments.length) return showTooltip;

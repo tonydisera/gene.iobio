@@ -1,6 +1,8 @@
 todo
 -------------
 
+- position is off on bam chart
+
 - duplicate snps showing up on vcf track after compare?
 
 - select transcript on hover over text or svg
