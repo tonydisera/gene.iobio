@@ -6,10 +6,14 @@ var geneiobio_server = "http://localhost:3000/";
 // bam iobio
 var bam = null;
 var getBamRefName = null;
+var bamFileOpened = false;
+var bamUrlEntered = false;
 
 // vcf iobio
 var vcf = null;
 var getVcfRefName = null;
+var vcfFileOpened = false;
+var vcfUrlEntered= false;
 
 // BAM and BAI file names
 var bamFile = null;
@@ -743,6 +747,7 @@ function onBamFileButtonClicked() {
 
 function onBamFilesSelected(event) {
 	var me = this;
+	window.bamFileOpened = true;
 	if (event.target.files.length != 2) {
 	   alert('must select both a .bam and .bai file');
 	   return;
@@ -789,6 +794,20 @@ function onBamFilesSelected(event) {
 }
 
 function onBamUrlEntered() {
+
+	var bamUrl = $('#bam-url-input').val();
+
+	$('#bam-url-input-group').css('visibility', 'hidden');
+    
+    window.bam = new Bam(bamUrl);
+    window.bamUrlEntered = true;
+    window.getBamRefName = stripRefName;
+
+
+
+    // Show the vcf variants.  
+	this.showBamDepth();
+
 }
 
 function displayBamUrlBox() {
@@ -807,6 +826,7 @@ function onVcfFileButtonClicked() {
 }
 
 function onVcfFilesSelected(event) {
+	vcfFileOpened = true;
 
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
@@ -852,7 +872,33 @@ function onVcfFilesSelected(event) {
 }
 
 function onVcfUrlEntered() {
+	$('#vcf-track').removeClass("hide");
+	$('#vcf-variants').css("display", "none");
+	$("#vcf-track .loader").css("display", "inline");
+
+	var vcfUrl = $('#url-input').val();
+
+	$('#url-input-group').css('visibility', 'hidden');
+
     
+    window.vcf.openVcfUrl(vcfUrl);
+    window.vcfUrlEntered = true;
+    window.getVcfRefName = stripRefName;
+
+
+
+    // Show the vcf variants.  
+	this.showVariants();
+
+	// If a sub-region of the gene was selected, 
+	// show the read coverage and called variants
+	// for the filtered region.  (Note: it is necessary
+	// to first get the full data for read coverage and
+	// the called variants so that subsequent selections
+	// can just filter on the full data.)
+	if (regionStart && regionEnd) {
+		showVariants(regionStart, regionEnd);
+	}
 }
 
 
@@ -876,7 +922,11 @@ function stripRefName(refName) {
 }
 
 function showBamDepth(regionStart, regionEnd) {
-	if (window.bam == null || window.getBamRefName == null) {
+	if (window.bam && window.bamUrlEntered) {
+
+	} else if (window.bam == null || 
+		(!window.bamFileOpened) ||
+	    (window.bamFileOpened && window.getBamRefName == null)) {
 		return;
 	}
 
@@ -899,11 +949,12 @@ function showBamDepth(regionStart, regionEnd) {
 		// the read converage.
 		var refName = window.getBamRefName(window.gene.chr);
 	 	window.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, 
-	 									1000, function(data) {
+	 		1000, 
+	 		function(data) {
 				window.bamData = data;
 
 				fillBamChart(window.bamData, window.gene.start, window.gene.end);
-		});
+			});
 	}
 
 	$('#fb-track').removeClass("hide");
@@ -924,9 +975,14 @@ function fillBamChart(data, regionStart, regionEnd) {
 }
 
 function showVariants(regionStart, regionEnd) {
-	if (window.vcf == null || window.getVcfRefName == null) {
+	if (window.vcf && window.vcfUrlEntered) {
+
+	} else if (window.vcf == null || 
+		(!window.vcfFileOpened) ||
+	    (window.vcfFileOpened && window.getVcfRefName == null)) {
 		return;
 	}
+
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
 	$("#vcf-track .loader").css("display", "inline");
@@ -958,6 +1014,7 @@ function showVariants(regionStart, regionEnd) {
 		fillVariantChart(vcfDataFiltered, regionStart, regionEnd);
 	
 	} else {
+
 
 		// A gene has been selected.  Read the variants for the gene region.
 		var refName = window.getVcfRefName(window.gene.chr);

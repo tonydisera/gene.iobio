@@ -260,7 +260,7 @@ header {
   padding: 6px 4px !important;
   line-height: 24px;
   max-width: 600px;
-  min-width: 300px;
+  min-width: 600px;
   float:right;
 }
 
@@ -275,7 +275,7 @@ header {
   padding: 6px 4px !important;
   line-height: 24px;
   max-width: 600px;
-  min-width: 300px;
+  min-width: 600px;
   float:right;
 }
 
@@ -513,16 +513,16 @@ header {
 
 .variant.impact_LOW{
   fill: #71CEFF;
-  stroke: #84B4CD;
+  stroke: #729BB0;
  
 } 
 .variant.impact_MODIFIER{
   fill: #75A5C2;
-  stroke: #75A5C2;
+  stroke: #476E86;
 } 
 .variant.impact_MODERATE{
   fill: #F9A366;
-  stroke: #D88C56;
+  stroke: #9D684D;
 } 
 .variant.impact_HIGH{
   fill: #D00202;
@@ -537,16 +537,16 @@ header {
 
 
 .variant.effect_frameshift{
-  fill: #D00202;
-  stroke: #930F0F;
+  fill: #A95959;
+  stroke: #891616;
 } 
 .variant.effect_missense{
   fill: rgb(13, 236, 210);
   stroke: rgb(142, 145, 145);
 } 
 .variant.effect_synonymous{
-  fill:rgb(117,112,179);
-  stroke:rgb(117,112,179);
+  fill: rgb(150, 143, 236);
+  stroke: rgb(80, 77, 121);
 } 
 .variant.effect_mirna{
   fill: #b2df8a;
@@ -554,11 +554,11 @@ header {
 } 
 .variant.effect_regulatory{
   fill: #3d8901;
-  stroke: #3d8901;
+  stroke: #1E340D;
 } 
 .variant.effect_splice{
-  fill:rgb(230,171,2);
-  stroke: rgb(168, 125, 1);
+  fill: rgb(234, 216, 90);
+  stroke: rgb(182, 150, 55);
 }
 .variant.effect_intron{
   fill:#74add1;
@@ -566,28 +566,30 @@ header {
 }
 .variant.effect_other{
   fill: rgb(187, 187, 187);
-  stroke: rgb(160, 142, 142);
+  stroke: rgb(124, 109, 109);
 }
 .variant.effect_indel {
   fill: #fb9a99;
-  stroke: #DB8988;
+  stroke: #AE6362;
 }
 .variant.effect_utr {
   fill: #D77777;
-  stroke: #D77777;
+  stroke: #882626;
 }
 .variant.effect_downstream {
   fill: #F48E45;
   stroke: #C36F33;
 }
 .variant.effect_upstream {
-  fill: #6187B2;
+  fill: #ADC9E8;
   stroke: #6187B2;
 }
 .variant.effect_NOEFFECT { 
   fill: #FAF5BE;
   stroke: #807D7D;
 }
+
+
 
 
 

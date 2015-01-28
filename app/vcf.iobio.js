@@ -66,14 +66,14 @@ vcfiobio = function module() {
   var sourceType = "url";
 
   //var vcfstatsAliveServer    = "ws://localhost:7070";
-  //var tabixServer            = "ws://localhost:7090";
+  var tabixServer            = "ws://localhost:7090";
   //var vcfReadDeptherServer   = "ws://localhost:7062";
   //var emailServer            = "ws://localhost:7068";
   //var catInputServer         = "ws://localhost:7063";
-  //var snpEffServer           = "ws://localhost:8040";
+  var snpEffServer           = "ws://localhost:8040";
 
   var vcfstatsAliveServer    = "ws://vcfstatsalive.iobio.io";
-  var tabixServer            = "ws://tabix.iobio.io";
+  //var tabixServer            = "ws://tabix.iobio.io";
   var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
   var emailServer            = "ws://localhost:7068";
   var catInputServer         = "ws://localhost:7063";
@@ -136,8 +136,9 @@ var effectCategories = [
 ['5_prime_UTR_truncation +','utr']
 ]; 
 
-
-
+  exports.isFile = function() {
+    return sourceType != null && sourceType == SOURCE_TYPE_FILE;
+  }
   exports.openVcfUrl = function(url) {
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;
@@ -460,9 +461,17 @@ var effectCategories = [
     }
     
   }
- 
   // NEW
   exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
+    if (sourceType == SOURCE_TYPE_URL) {
+      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback);
+    } else {
+      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback);
+    }
+  }
+ 
+  // NEW
+  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -487,6 +496,71 @@ var effectCategories = [
 
     });
 
+  }
+
+  // NEW
+  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
+    var me = this;
+    var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
+    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + "&encoding=binary";
+
+    // This is the full url for vcfstatsalive server which is piped its input from tabixserver
+    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(tabixUrl));
+
+    // Connect to the snpEff server    
+    var client = BinaryClient(snpEffServer);
+
+    var annotatedData = "";
+    client.on('open', function(stream){
+
+        // Run the command
+        var stream = client.createStream({event:'run', params : {'url':url}});
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           annotatedData += data;
+        });
+
+        // Whem all of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          var annotatedRecs = annotatedData.split("\n");
+          var vcfObjects = [];
+
+          annotatedRecs.forEach(function(record) {
+            if (record.charAt(0) == "#") {
+              // Bypass header
+            } else {
+
+              // Parse the vcf record into its fields
+              var fields = record.split('\t');
+              var pos    = fields[1];
+              var id     = fields[2];
+              var ref    = fields[3];
+              var alt    = fields[4];
+              var qual   = fields[5];
+              var filter = fields[6];
+              var info   = fields[7];
+
+              // Turn vcf record into a JSON object and add it to an array
+              var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                               'qual': qual, 'filter': filter, 'info': info};
+              vcfObjects.push(vcfObject);
+            }
+          });
+
+           // Parse the vcf object into a variant object that is visualized by the client.
+          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+          callback(results);
+          
+        });
+    });
+     
   }
 
   // NEW
@@ -615,14 +689,22 @@ var effectCategories = [
             }
             var end = +rec.pos + len;
 
-            // Parse the snpEff annotations from the info field
+          
+
+
+            // Parse the svtype and snpEff annotations from the info field
             var effects = new Object();
-            var impacts = new Object();            
+            var impacts = new Object();  
+            var varType = null;          
             var annotTokens = rec.info.split(";");
             // Iterate through the annotation fields, looking for the
             // annotation EFF
             annotTokens.forEach(function(annotToken) {
-              if (annotToken.indexOf("EFF=") >= 0) {
+              if (annotToken.indexOf("SVTYPE=") >= 0) {
+                varType = annotToken.substring(7, annotToken.length);                
+              } else if (annotToken.indexOf("TYPE=") >= 0) {
+                varType = annotToken.substring(5, annotToken.length);                
+              } else if (annotToken.indexOf("EFF=") >= 0) {
                 // We have found the EFF annotation. Now split
                 // the EFF annotation into its parts.  Each
                 // part represents the annotations for a given
@@ -687,6 +769,9 @@ var effectCategories = [
               impacts["NOIMPACT"] = "NOIMPACT";
             }
 
+            if (varType && varType != type) {
+              console.log("type mismatch " + 'vartype=' + varType +' type=' + type);
+            }
             
 
             variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 

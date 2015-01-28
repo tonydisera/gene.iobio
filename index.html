@@ -283,9 +283,9 @@
                     </div>
 
                     <div id="url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
-                        <input id="url-input" type="text" class="form-control" placeholder="Search for..." >
+                        <input id="url-input" type="text"  value="http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz" class="form-control" placeholder="http://..." >
                         <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Go</button>
+                            <button class="btn btn-default" onClick="onVcfUrlEntered()" type="button">Go</button>
                         </span>
                     </div>
                 </div>     
@@ -360,9 +360,9 @@
                 </div>
 
                 <div id="bam-url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
-                    <input id="bam-url-input" type="text" class="form-control" placeholder="http://..." >
+                    <input id="bam-url-input" type="text" value="http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam" class="form-control" placeholder="http://..." >
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="button">Go</button>
+                        <button class="btn btn-default" onClick="onBamUrlEntered()" type="button">Go</button>
                     </span>
                 </div>
             </div>     

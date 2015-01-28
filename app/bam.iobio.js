@@ -588,69 +588,108 @@ var Bam = Class.extend({
       }
    }, 
 
-
-   //
-   //
    // NEW
-   //
-   //
    getCoverageForRegion: function(refName, start, end, maxPoints, callback) {
+       if ( this.sourceType == "url") {
+          this._getRemoteCoverageForRegion(refName, start, end, maxPoints, callback);
+       } else {
+          this._getLocalCoverageForRegion(refName, start, end, maxPoints, callback);
+       }
+   },
+
+
+   // NEW
+   _getLocalCoverageForRegion: function(refName, start, end, maxPoints, callback) {
       var me = this;
       var samRecs = [];
       samRecs.length = 0;
       this.convert('sam', refName, start, end, function(data,e) {
-        var lines = data.split('\n');
-        lines.forEach(function(line) {
-          var fields = line.split('\t');
-          var pos = fields[3];
-          var len = fields[8];
-          if (pos && len) {
-            samRecs.push( {'pos': +pos, 'len': +len});
-          }
-        });
-
-        var baseCoverage = [];
-        baseCoverage.length = 0;  
-        var regionLength = end - start;
-        for (var i = 0; i < regionLength; i++) {
-          baseCoverage[i] = [start + i, 0];
-        }      
-        samRecs.forEach(function(samRec) {
-          for (var i = 0; i < Math.abs(samRec.len); i++) {            
-            if (samRec.len < 0) {
-              pos = samRec.pos - i;
-            } else {
-              pos = samRec.pos  + i;
-            }
-
-            var idx = pos - start;
-            var depth = null;
-            
-            
-            if (idx >= 0 && idx <= regionLength) {
-              coverageRec = baseCoverage[idx];
-              if (coverageRec == null) {
-                coverageRec = [pos, 1];
-              } else {
-                coverageRec[1]++;
-              }
-              baseCoverage[idx] = coverageRec;
-            }
-          }
-        });
-        
-        if (maxPoints && maxPoints > 0) {
-          var factor = d3.round(baseCoverage.length / maxPoints);
-          var baseCoverageReduced = me.reducePoints(baseCoverage, factor, function(d) {return d[0]}, function(d) {return d[1]});
-          callback(baseCoverageReduced);
-        } else {
-          callback(baseCoverage);
-        }
-
-
+        me._parseSamRecords(data, start, end, maxPoints, callback);
       }, 
-      {noHeader:true});     
+      {noHeader:false});     
    },  
+
+   // NEW
+   _getRemoteCoverageForRegion: function(refName, start, end, maxPoints, callback) {
+      var me = this;
+      var regionParm = ' ' + refName + ":" + start + "-" + end;
+      
+      var url = this.iobio.samtools + "?cmd= view " + this.bamUri + regionParm;
+      var client = BinaryClient(this.iobio.samtools);
+      
+      var samData = "";
+      client.on('open', function(stream){
+          var stream = client.createStream({event:'run', params : {'url':url}});
+
+          stream.on('data', function(data, options) {
+             if (data == undefined) {
+              return; 
+             } 
+             samData += data;
+          });
+
+          stream.on('end', function() {
+             me._parseSamRecords(samData, start, end, maxPoints, callback);
+          });
+      });
+
+   },
+
+
+   // NEW
+   _parseSamRecords: function(data, start, end, maxPoints, callback) {
+      var me = this;
+      var samRecs = [];
+      var lines = data.split('\n');
+      lines.forEach(function(line) {
+        var fields = line.split('\t');
+        var pos = fields[3];
+        var len = fields[8];
+        if (pos && len) {
+          samRecs.push( {'pos': +pos, 'len': +len});
+        }
+      });
+
+      var baseCoverage = [];
+      baseCoverage.length = 0;  
+      var regionLength = end - start;
+      for (var i = 0; i < regionLength; i++) {
+        baseCoverage[i] = [start + i, 0];
+      }      
+      samRecs.forEach(function(samRec) {
+        for (var i = 0; i < Math.abs(samRec.len); i++) {            
+          if (samRec.len < 0) {
+            pos = samRec.pos - i;
+          } else {
+            pos = samRec.pos  + i;
+          }
+
+          var idx = pos - start;
+          var depth = null;
+          
+          
+          if (idx >= 0 && idx <= regionLength) {
+            coverageRec = baseCoverage[idx];
+            if (coverageRec == null) {
+              coverageRec = [pos, 1];
+            } else {
+              coverageRec[1]++;
+            }
+            baseCoverage[idx] = coverageRec;
+          }
+        }
+      });
+      
+      if (maxPoints && maxPoints > 0) {
+        var factor = d3.round(baseCoverage.length / maxPoints);
+        var baseCoverageReduced = me.reducePoints(baseCoverage, factor, function(d) {return d[0]}, function(d) {return d[1]});
+        callback(baseCoverageReduced);
+      } else {
+        callback(baseCoverage);
+      }
+
+   },
+
 
 
   
