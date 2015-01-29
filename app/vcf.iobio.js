@@ -66,18 +66,18 @@ vcfiobio = function module() {
   var sourceType = "url";
 
   //var vcfstatsAliveServer    = "ws://localhost:7070";
-  var tabixServer            = "ws://localhost:7090";
+  //var tabixServer            = "ws://localhost:7090";
   //var vcfReadDeptherServer   = "ws://localhost:7062";
   //var emailServer            = "ws://localhost:7068";
   //var catInputServer         = "ws://localhost:7063";
-  var snpEffServer           = "ws://localhost:8040";
+  //var snpEffServer           = "ws://localhost:8040";
 
   var vcfstatsAliveServer    = "ws://vcfstatsalive.iobio.io";
-  //var tabixServer            = "ws://tabix.iobio.io";
+  var tabixServer            = "ws://tabix.iobio.io";
   var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
   var emailServer            = "ws://localhost:7068";
   var catInputServer         = "ws://localhost:7063";
-  var snpEffServer           = "ws://localhost:8040";
+  var snpEffServer           = "ws://snpeff.iobio.io";
 
   var vcfURL;
   var vcfReader;

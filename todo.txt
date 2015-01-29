@@ -1,6 +1,10 @@
 todo
 -------------
 
+- Use she-bang on iobio snpEffServer.js
+
+- Investigate memory usage java snpEffServer 
+
 - position is off on bam chart
 
 - duplicate snps showing up on vcf track after compare?
