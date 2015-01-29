@@ -1,7 +1,8 @@
 //
 // Global Variables
 //
-var geneiobio_server = "http://localhost:3000/";
+//var geneiobio_server = "http://localhost:3000/";
+var geneiobio_server = "http://geneinfo.iobio.io/";
 
 // bam iobio
 var bam = null;
