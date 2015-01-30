@@ -288,7 +288,7 @@ function variantD3() {
                 }
                 impactDisplay += key;
               }    
-              tooltip.html(d.type + ': ' + d.start + ' - ' + d.end 
+              tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : "")
                            + '<br>ref: ' + d.ref + ' alt:' + d.alt
                            + '<br>effect: ' + effectDisplay
                            + '<br>impact: ' + impactDisplay)                                 
