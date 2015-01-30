@@ -68,15 +68,13 @@ vcfiobio = function module() {
   //var vcfstatsAliveServer    = "ws://localhost:7070";
   //var tabixServer            = "ws://localhost:7090";
   //var vcfReadDeptherServer   = "ws://localhost:7062";
-  //var emailServer            = "ws://localhost:7068";
-  //var catInputServer         = "ws://localhost:7063";
+  var emailServer            = "ws://localhost:7068";
+  var catInputServer         = "ws://localhost:7063";
   //var snpEffServer           = "ws://localhost:8040";
 
   var vcfstatsAliveServer    = "ws://vcfstatsalive.iobio.io";
   var tabixServer            = "ws://tabix.iobio.io";
   var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
-  var emailServer            = "ws://localhost:7068";
-  var catInputServer         = "ws://localhost:7063";
   var snpEffServer           = "ws://snpeff.iobio.io";
   var snpSiftServer          = "ws://snpsift.iobio.io";
 
@@ -506,16 +504,14 @@ var effectCategories = [
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
 
     var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - \'(AF<0.001)\' ' + encodeURIComponent(tabixUrl));
-    //var url = encodeURI(snpSiftUrl);
-
+    
     // This is the full url for vcfstatsalive server which is piped its input from tabixserver
-    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
-    //var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(tabixUrl));
+    //var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
+    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(tabixUrl));
 
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
-    //var client = BinaryClient(snpSiftServer);
-
+    
     var annotatedData = "";
     client.on('open', function(stream){
 

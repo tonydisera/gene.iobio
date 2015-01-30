@@ -25,7 +25,7 @@ function geneD3() {
   // axis
   var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("right")
+    .orient("bottom")
     .tickFormat(tickFormatter);
   // variables 
   var trackHeight = 20,
@@ -134,45 +134,45 @@ function geneD3() {
                 .attr('class', 'brush-line')
                 .attr('x1', xExtent)
                 .attr('x2', xExtent)          
-                .attr('y1', heightExtent)
-                .attr('y2', heightExtent + 20);
+                .attr('y1', heightExtent - 20)
+                .attr('y2', heightExtent);
 
                g.append('line')
                 .attr('class', 'brush-line')
                 .attr('x1', Math.min(xExtent, 70) )
                 .attr('x2', 0)          
-                .attr('y1', heightExtent + 20)
-                .attr('y2', heightExtent + 30);  
+                .attr('y1', heightExtent + 0)
+                .attr('y2', heightExtent + 10);  
 
                if (xExtent > (width - margin.left - margin.right - 70)) {
                  g.append('line')
                   .attr('class', 'brush-line')
                   .attr('x1', 70 )
                   .attr('x2', xExtent)          
-                  .attr('y1', heightExtent + 20)
-                  .attr('y2', heightExtent + 20);
+                  .attr('y1', heightExtent + 0)
+                  .attr('y2', heightExtent + 0);
 
                  g.append('line')
                   .attr('class', 'brush-line')
                   .attr('x1', xExtent)
                   .attr('x2', width - margin.left - margin.right)          
-                  .attr('y1', heightExtent + 20)
-                  .attr('y2', heightExtent + 30);
+                  .attr('y1', heightExtent + 0)
+                  .attr('y2', heightExtent + 10);
 
                } else {
                 g.append('line')
                   .attr('class', 'brush-line')
                   .attr('x1', Math.min( xExtent, 70) )
                   .attr('x2', width - margin.left - margin.right - 70)          
-                  .attr('y1', heightExtent + 20)
-                  .attr('y2', heightExtent + 20);
+                  .attr('y1', heightExtent + 0)
+                  .attr('y2', heightExtent + 0);
 
                  g.append('line')
                   .attr('class', 'brush-line')
                   .attr('x1', width - margin.left - margin.right - 70)
                   .attr('x2', width - margin.left - margin.right )          
-                  .attr('y1', heightExtent + 20)
-                  .attr('y2', heightExtent + 30);
+                  .attr('y1', heightExtent + 0)
+                  .attr('y2', heightExtent + 10);
 
                }
 
@@ -186,14 +186,14 @@ function geneD3() {
       var axisEnter = svg.selectAll("g.x.axis").data([0]).enter().append('g');   
       if (showXAxis) {
         axisEnter.attr("class", "x axis")
-                 .attr("transform",   "translate(" + margin.left + "," + y.range()[0] + ")");
-        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + y.range()[0] + ")");
+                 .attr("transform",   "translate(" + margin.left + "," + "0" + ")");
+        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + "0" + ")");
       }  
 
 
       if (showBrush) {
-        var brushHeight = height + 10;
-        var brushY = -10;
+        var brushHeight = height + 30;
+        var brushY = -30;
         g.selectAll("g.x.brush").remove();
         g.selectAll("g.x.brush").data([0]).enter().append("g")
             .attr("class", "x brush")

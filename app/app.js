@@ -20,8 +20,6 @@ var vcfUrlEntered= false;
 var bamFile = null;
 var baiFile = null;
 
-// The x-axis for the gene region
-var regionChart = null;
 
 // A view finder, showing a single transcript which
 // is a union of all transcripts.  This chart
@@ -115,61 +113,14 @@ function init() {
 	window.vcf = vcfiobio();
 
 
-	// Create region chart; an x-axis of the gene region
-	regionChart = regionD3()
-			    .width(1000)
-			    .height(0)
-			    .margin({top: 0, right: 0, bottom: 22, left: 0});
-
-	// Create the view finder chart which is a single transcript
-	// that represents the union of all transcripts for a gene.
-	// The user will be able to select a region on this chart,
-	// causing all of the tracks to zoom to this selected region.
-	/*
-	viewFinderChart = geneD3()
-	    .width(1000)
-	    .margin({top: 20, right: 0, bottom: 10, left: 0})
-	    .showXAxis(false)
-	    .showBrush(true)
-	    .trackHeight(22)
-        .on("d3brush", function(brush) {
-
-        	$('#zoom-region-track').css("display", "flex");
-
-			if (!brush.empty()) {
-				regionStart = d3.round(brush.extent()[0]);
-				regionEnd   = d3.round(brush.extent()[1]);
-			} else {
-				// Treat a click as a region selection on the entire gene region.
-				// That way, we won't recall the variants and re-read the bam and
-				// vcf files, but instead just use the data already gathered for 
-				// the entire gene region;
-				regionStart = window.gene.start;
-				regionEnd   = window.gene.end;
-			}
-
-			var selection = d3.select("#zoom-region-chart").datum([]);
-	  		zoomRegionChart.regionStart(regionStart);
-			zoomRegionChart.regionEnd(regionEnd);
-       		zoomRegionChart(selection);
-
-       		$('#zoom-region-start').val(formatRegion(regionStart) );
-       		$('#zoom-region-end').val(formatRegion(regionEnd));
-
-       		showTranscripts(regionStart, regionEnd);
-			showBamDepth(regionStart, regionEnd);
-	    	showVariants(regionStart, regionEnd);
-	    	callVariants(regionStart, regionEnd);
-		});	
-*/
-
+	
 	// Create transcript chart
 	transcriptChart = geneD3()
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top: 10, right: 0, bottom: 20, left: 0})
-	    .showXAxis(false)
+	    .margin({top: 60, right: 0, bottom: 20, left: 0})
+	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)
 	    .cdsHeight(12)
@@ -185,6 +136,7 @@ function init() {
 		  		zoomRegionChart.regionStart(regionStart);
 				zoomRegionChart.regionEnd(regionEnd);
 	       		zoomRegionChart(selection);
+	       		d3.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
 	       		$('#zoom-region-start').val(formatRegion(regionStart) );
 	       		$('#zoom-region-end').val(formatRegion(regionEnd));
@@ -229,7 +181,7 @@ function init() {
 	zoomRegionChart = regionD3()
 			    .width(1000)
 			    .height(0)
-			    .margin({top: 0, right: 0, bottom: 19, left: 0});
+			    .margin({top: 0, right: 0, bottom: 40, left: 0});
 
 	// Create the coverage chart
 	bamDepthChart = lineD3()
@@ -631,15 +583,9 @@ function loadTracksForGene() {
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
 
-    $('#gene-name').text(window.gene.gene_name + " " + window.gene.chr);   
+    $('#gene-name').text(window.gene.chr);   
     $('#gene-region-info').text(window.gene.regionStart + "-" + window.gene.regionEnd);
 
-
-    // Show the x-Axis of the gene region
-    var selection = d3.select("#region-chart").datum([]);
-	regionChart.regionStart(+window.gene.start);
-	regionChart.regionEnd(+window.gene.end);
-	regionChart(selection);
 
 
    	// This will be the view finder, allowing the user to select
@@ -738,6 +684,9 @@ function showTranscripts(regionStart, regionEnd) {
 
 	selection = d3.select("#transcript-menu-item").datum(window.gene.transcripts);
 	transcriptMenuChart(selection);
+
+	d3.select("#gene-viz .x.axis .tick text").style("text-anchor", "start");
+
 
 }
 

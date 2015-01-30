@@ -1,14 +1,4 @@
 
-#view-finder-chart.ibo-gene .utr { 
-  fill: gray;
-  stroke: gray;
-  opacity: .4;
-}
-#view-finder-chart.ibo-gene .cds { 
-  fill: gray;
-  stroke: gray;
-  opacity: .7;
-}
 
 .ibo-gene .utr { 
   fill: #3d8901;
@@ -53,7 +43,7 @@
 }
 .ibo-gene .arrow { stroke: rgb(150,150,150); fill: none; }
 .ibo-gene .axis path, .ibo-gene .axis line { fill: none; stroke: lightgrey; shape-rendering: crispEdges; }
-.ibo-gene .axis { font-size: 10px; }
+.ibo-gene .x.axis text{ font-size: 13px; }
 .ibo-gene .tooltip {   
   position: absolute;           
   text-align: center;           
