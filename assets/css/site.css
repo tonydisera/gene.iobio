@@ -168,15 +168,18 @@ section {
 
 
 .loader {
-    font-size:14px;   
-    position:relative;
-    margin-top: 70px;
-    margin-left:-6px;
+    text-align: center;
+    margin-top: 40px;
+    margin-right: 210px;
     display:none;
 }
 .loader img {
     height:12px; 
     width: 80px;
+}
+.loader-label {
+  color: #3d8901;
+  font-size:18px;   
 }
 
 .stats-box { 

@@ -186,7 +186,7 @@
     	<section id="app-title-section">
     	   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
             <span id="bloodhound" >
-                <input class="typeahead" style="margin-top: 5px" type="text" placeholder="Search By Gene Name or Region (chr2:3000000-3000010)">
+                <input class="typeahead" style="margin-top: 5px" type="text" placeholder="Search By Gene Name">
             </span>
            <span class="iobioproject">
             an iobio project
@@ -204,7 +204,7 @@
         <div id="gene-track" class="track hide">
             <div class="track-info">
                 <div>Zoom into a Region</div>
-                <div >
+                <div style="margin-top: 10px;" >
                   <div id="select-transcript" style="float: left;">
 
                     <div id="transcript-btn-group" class="btn-group" style="display:  inline;">
@@ -243,12 +243,9 @@
 
 	<div id="vcf-track" class="track box-shadow hide" >
         <div class="track-info" style="margin-bottom: 10px;">
-            <span class="stats-label">Examine variants in gene</span>
-            <span class="loader" style="padding-left: 10px;">
-                <img src="assets/images/loading-squares.gif"/>
-            </span>
+            <span class="stats-label">Examine variants</span>
             <div class="stats-box">
-                <div id="add-vcf-track" style="float: left;">
+                <div id="add-vcf-track" style="float: left;margin-top: 10px">
 
                     <div class="btn-group" style="display:  inline;">
                       <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -281,8 +278,13 @@
             <div>
                  <div class="variant-count badge" id="vcf-count" style="margin-bottom: 4px;"></div>
             </div>
-            <div id="vcf-legend"></div>
             <div id="vcf-variants"></div>
+
+            <div class="loader">
+                <span class="loader-label"></span>
+                <img src="assets/images/loading-squares.gif"/>
+            </div>
+
         </div>
     </div>
 
@@ -300,9 +302,7 @@
     <div id="fb-track" class="track box-shadow hide" >
         <div class="track-info">
             <span class="stats-label">Discover missing variants</span>
-            <span class="loader" style="padding-left: 10px;">
-                <img src="assets/images/loading-squares.gif"/>
-            </span>
+           
             <div>
                 <button class="btn btn-default" onClick="callVariants()">Call Freebayes</button>
             </div>
@@ -312,9 +312,14 @@
              <div>
                  <div class="variant-count badge" id="fb-count" style="margin-bottom: 4px;"></div>
              </div>
-             <div id="fb-legend"></div>
 
              <div id="fb-variants"></div>
+
+            <div class="loader">
+                <span class="loader-label"></span>
+                <img src="assets/images/loading-squares.gif"/>
+            </div>
+
         </div>
     </div>
 
@@ -323,8 +328,9 @@
 
     <div id="bam-track" class="track box-shadow hide" >
         <div class="track-info">
-            Examine alignments for gene
-            <div id="add-bam-track" style="float: left;">
+            <span class="stats-label">Examine alignments</span>
+            
+            <div id="add-bam-track" style="float: left;margin-top: 10px">
 
                 <div class="btn-group" style="display:  inline;">
                   <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -353,7 +359,13 @@
             </div>     
         </div>
 
-        <div id="bam-depth" class="track-chart"></div>
+        <div id="bam-depth" class="track-chart">
+            <div class="loader">
+                <span class="loader-label"></span>
+                <img src="assets/images/loading-squares.gif"/>
+            </div>
+
+        </div>
     </div>
 
 

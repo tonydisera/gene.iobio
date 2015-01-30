@@ -696,6 +696,9 @@ function onBamFileButtonClicked() {
 }
 
 function onBamFilesSelected(event) {
+	$("#bam-track .loader").css("display", "block");
+	$("#bam-track .loader-label").text("Loading File")
+
 	var me = this;
 	window.bamFileOpened = true;
 	if (event.target.files.length != 2) {
@@ -744,6 +747,9 @@ function onBamFilesSelected(event) {
 }
 
 function onBamUrlEntered() {
+	$("#bam-track .loader").css("display", "block");
+	$("#bam-track .loader-label").text("Streaming File")
+
 
 	var bamUrl = $('#bam-url-input').val();
 
@@ -780,7 +786,9 @@ function onVcfFilesSelected(event) {
 
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
-	$("#vcf-track .loader").css("display", "inline");
+	$("#vcf-track .loader").css("display", "block");
+	$('#vcf-track .loader-label').text("Loading File");
+
 
 	window.vcf.openVcfFile( event, function(vcfFile) {
 
@@ -824,7 +832,9 @@ function onVcfFilesSelected(event) {
 function onVcfUrlEntered() {
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
-	$("#vcf-track .loader").css("display", "inline");
+	$("#vcf-track .loader").css("display", "block");
+	$('#vcf-track .loader-label').text("Streaming Variant Data");
+
 
 	var vcfUrl = $('#url-input').val();
 
@@ -872,6 +882,7 @@ function stripRefName(refName) {
 }
 
 function showBamDepth(regionStart, regionEnd) {
+
 	if (window.bam && window.bamUrlEntered) {
 
 	} else if (window.bam == null || 
@@ -902,6 +913,8 @@ function showBamDepth(regionStart, regionEnd) {
 	 		1000, 
 	 		function(data) {
 				window.bamData = data;
+				
+				$("#bam-track .loader-label").text("Loading Chart")
 
 				fillBamChart(window.bamData, window.gene.start, window.gene.end);
 			});
@@ -914,6 +927,7 @@ function showBamDepth(regionStart, regionEnd) {
 }
 
 function fillBamChart(data, regionStart, regionEnd) {
+	$("#bam-track .loader").css("display", "none");
 
 	window.bamDepthChart.xStart(regionStart);
 	window.bamDepthChart.xEnd(regionEnd);
@@ -935,7 +949,7 @@ function showVariants(regionStart, regionEnd) {
 
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
-	$("#vcf-track .loader").css("display", "inline");
+	$("#vcf-track .loader").css("display", "block");
 
 
 
@@ -965,6 +979,7 @@ function showVariants(regionStart, regionEnd) {
 	
 	} else {
 
+	    $('#vcf-track .loader-label').text("Annotating Variants in realtime");
 
 		// A gene has been selected.  Read the variants for the gene region.
 		var refName = window.getVcfRefName(window.gene.chr);
@@ -984,11 +999,13 @@ function showVariants(regionStart, regionEnd) {
 		    		commonSchemeClass = "";
 		    	}
 		    	if (fbData && commonSchemeClass.indexOf("current") >= 0) {
+			   	    $('#vcf-track .loader-label').text("Comparing variant sets");
 			    	vcf.compareVcfRecords(vcfData, fbData, function() {
 				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
 				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
 			    	});
 				} else {
+			   	    $('#vcf-track .loader-label').text("Loading chart");
 					fillVariantChart(data, window.gene.start, window.gene.end);
 				}
 		});		
@@ -1109,7 +1126,8 @@ function callVariants(regionStart, regionEnd) {
 	}
 	$('#fb-track').removeClass("hide");
 
-	$("#fb-track .loader").css("display", "inline");
+	$("#fb-track .loader").css("display", "block");
+	$("#fb-track .loader-label").text("Calling Variants with Freebayes")
 
 	$('#fb-variants').css("display", "none");
 
@@ -1173,6 +1191,7 @@ function callVariants(regionStart, regionEnd) {
                 vcfRecs.push(vcfRec.join("\t"));
 			})
 			
+			$("#fb-track .loader-label").text("Annotating Variants in realtime")
 
 			window.vcf.annotateVcfRecords(vcfRecs, window.gene.start, window.gene.end, 
 				window.gene.strand, window.selectedTranscript, function(data){
