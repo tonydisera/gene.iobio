@@ -277,8 +277,10 @@ BamRecord.prototype.convertTo = function(format) {
  var keys = [ "readName", "flag", "segment", "pos", "mq", "cigar", "rnext", "pnext", "tlen", "seq", "quals", "tags"   ]
  
  if (format == "sam") {
-    for (var i=0; i < keys.length; i++)
+    for (var i=0; i < keys.length; i++) {
+        if (keys[i] == 'pos') this[keys[i]] += 1;
         record += this[keys[i]] + '\t'
+    }
       // if (keys[i] == 'rnext')
       //   record += this.indexToChr[ keys['rnext']-1 ] + '\t';
       // else
