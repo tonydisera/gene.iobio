@@ -79,7 +79,7 @@ section {
 
 .iobioapp {
     font-size: 34px;
-    color: #3d8901;
+    color: #3586C0;
     font-family: Quicksand;
     float: left;
 }
@@ -117,7 +117,7 @@ section {
   text-align: center;
   margin-bottom: 0px;
   padding-bottom: 0px;
-  color: #3d8901;
+  color: #3586C0;
   font-size: 18px;
     
 }
@@ -189,7 +189,7 @@ section {
     width: 80px;
 }
 .loader-label {
-  color: #3d8901;
+  color:#3586C0;
   font-size:18px;   
 }
 
@@ -666,7 +666,7 @@ header {
  */
 .results  { 
   text-align: left; 
-  color: #3d8901;
+  color: #3586C0;
 }
 
 

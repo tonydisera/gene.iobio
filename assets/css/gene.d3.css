@@ -1,13 +1,13 @@
 
 
 .ibo-gene .utr { 
-  fill: #3d8901;
-  stroke: #3d8901;
+  fill: rgb(49, 102, 147);
+  stroke: #0B5388;
   opacity: .4;
 }
 .ibo-gene .cds { 
-  fill: #3d8901;
-  stroke: #3d8901;
+  fill: rgb(49, 102, 147);
+  stroke: #0B5388;
   opacity: .7;
 }
 .ibo-gene .transcript.selected .utr { 
