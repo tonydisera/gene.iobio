@@ -55,7 +55,7 @@ function variantD3() {
     // Not sure why, but we have to bump up the layers by one; otherwise,
     // y will be negative for first layer
     height = verticalLayers * (variantHeight + verticalPadding);  
-    height += (variantHeight + verticalPadding);  
+    //height += (variantHeight + verticalPadding);  
     // Account for the margin when we are showing the xAxis
     if (showXAxis) {
       height += margin.bottom; 
@@ -312,6 +312,7 @@ function variantD3() {
                 impactDisplay += key;
               }    
               tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : "")
+                           + '<br>type (annotated): ' + d.typeAnnotated 
                            + '<br>ref: ' + d.ref + ' alt:' + d.alt
                            + '<br>effect: ' + effectDisplay
                            + '<br>impact: ' + impactDisplay 
@@ -319,11 +320,10 @@ function variantD3() {
                            + '<br>filter: ' + d.filter 
                            + '<br>allele freq: ' + d.af
                            + '<br>combined depth: ' + d.combinedDepth 
-                           + '<br>type (annotated): ' + d.typeAnnotated 
-                           + '<br>genotypes: ' + d.genotypes 
-                           + '<br>genotypes: ' + d.genotypeForAlt 
-                           + '<br>zygosity: ' + d.zygosity 
-                           + '<br>phased: ' + d.phased 
+                          // + '<br>genotypes: ' + d.genotypes 
+                         //  + '<br>genotypes: ' + d.genotypeForAlt 
+                         //  + '<br>zygosity: ' + d.zygosity 
+                         //  + '<br>phased: ' + d.phased 
                            )                                 
                  .style("left", (d3.event.pageX) + "px") 
                  .style("text-align", 'left')    

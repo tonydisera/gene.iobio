@@ -232,7 +232,7 @@ function init() {
     afChart = histogramD3()
                        .width(400)
                        .height(70)
-					   .margin( {left: 40, right: 0, top: 10, bottom: 20})
+					   .margin( {left: 40, right: 0, top: 0, bottom: 20})
 					   .xValue( function(d, i) { return d[0] })
 					   .yValue( function(d, i) { return Math.log(d[1]) })
 					   .yAxisLabel( "log(frequency)" )
@@ -808,6 +808,7 @@ function onBamFilesSelected(event) {
 	    alert('must select both a .bam and .bai file');
 	 }
 
+	$('#bam-name').text(bamFile.name);
 
 	window.bam = new Bam( bamFile, { bai: baiFile });
 	window.getBamRefName = null;
@@ -841,6 +842,8 @@ function onBamUrlEntered() {
 
 
 	var bamUrl = $('#bam-url-input').val();
+	$('#bam-name').text(bamUrl);
+
 
 	$('#bam-url-input-group').css('visibility', 'hidden');
     
@@ -881,7 +884,7 @@ function onVcfFilesSelected(event) {
 
 	window.vcf.openVcfFile( event, function(vcfFile) {
 
-
+		$('#vcf-name').text(vcfFile.name);
 		window.getVcfRefName = null;
 		window.vcf.getReferenceNames(function(refNames) {
 
@@ -926,6 +929,8 @@ function onVcfUrlEntered() {
 
 
 	var vcfUrl = $('#url-input').val();
+	$('#vcf-name').text(vcfUrl);
+
 
 	$('#url-input-group').css('visibility', 'hidden');
 

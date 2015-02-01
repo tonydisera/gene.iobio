@@ -246,6 +246,30 @@
 
 
 
+    <div id="filter-track" class="track box-shadow hide">
+        <div class="track-info">
+          <span class="stats-label">Filter Variants</span>
+        </div>    
+
+        <div class="track-chart">
+             <div id="variant-legend"></div>
+
+            <div id="af" class="hide" style="font-size: 10px;">
+                <div id="af" >
+                  <div>Allele Frequency Spectrum</div>
+                  <svg id="vcf-af-chart"/>
+                  <div style="display: right;">
+                    <input type="text" id="af-amount" readonly="" style="border:none;width: 60px;">
+                    <div id="af-range" style="width: 342px;display: inline-block;"></div>
+                  </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
 
 	<div id="vcf-track" class="track box-shadow hide" >
         <div class="track-info" style="margin-bottom: 10px;">
@@ -281,38 +305,18 @@
             </div>            
         </div>          
         <div class="track-chart">
-            <div>
-                 <div class="variant-count badge" id="vcf-count" style="margin-bottom: 4px;"></div>
+            <div style="text-align: center">
+                 <div class="variant-count badge" id="vcf-count" style="float:left; margin-top: 4px;margin-bottom: 4px;"></div>
+                 <span id="vcf-name" style="margin-left: -60px;font-size: 12px"></span>
             </div>
             <div id="vcf-variants"></div>
             <div class="loader">
                 <span class="loader-label"></span>
                 <img src="assets/images/loading-squares.gif"/>
             </div>
-            <div id="af" class="hide" style="font-size: 10px;margin-top:20px">
-                <div id="af" >
-                  <div>Allele Frequency Spectrum</div>
-                  <svg id="vcf-af-chart"/>
-                  <div style="display: right;">
-                    <input type="text" id="af-amount" readonly="" style="border:none;width: 60px;">
-                    <div id="af-range" style="width: 342px;display: inline-block;"</div>
-                  </div>
-                </div>
-            </div>
         </div>
       </div>
 
-    </div>
-
-    <div id="filter-track" class="track box-shadow hide">
-        <div class="track-info">
-          <span class="stats-label">Filter Variants</span>
-        </div>    
-
-        <div class="track-chart">
-             <div id="variant-legend"></div>
-        </div>
-    </div>
 
 
     <div id="fb-track" class="track box-shadow hide" >
@@ -376,6 +380,7 @@
         </div>
 
         <div id="bam-depth" class="track-chart">
+            <div id="bam-name" style="text-align: center; margin-top: -8px; font-size:12px"></div>
             <div class="loader">
                 <span class="loader-label"></span>
                 <img src="assets/images/loading-squares.gif"/>
