@@ -1,6 +1,18 @@
 todo
 -------------
 
+
+
+- How to tell which snpEff annotation belongs to which alt
+
+- Can Yi change vcfstatsalive to show stats by alt, not variant counts?
+
+- Use annotatation END= instead of calculated len?  are long variants rendering correctly?
+
+- How to send bam header along with data to freebayes?
+
+- Do I need to call bammerger before calling variants?
+
 - Use she-bang on iobio snpEffServer.js
 
 - Investigate memory usage java snpEffServer 
@@ -16,6 +28,8 @@ todo
 - x-axis slightly off for bam chart due to y-axis
 
 - inject bam and vcf into url
+
+- variants at very beginning and end of chart are truncated
 
 
 

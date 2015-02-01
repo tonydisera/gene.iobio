@@ -15,8 +15,8 @@ function regionD3() {
   var borderRadius = 1,
       regionStart = undefined,
       regionEnd = undefined,
-      heightPercent = "100%",
-      widthPercent = "100%";
+      heightPercent = null,
+      widthPercent = null;
 
   //  options
   var defaults = {};
@@ -41,8 +41,8 @@ function regionD3() {
 
       svg.enter()
         .append("svg")
-        .attr("width", widthPercent)
-        .attr("height", heightPercent)
+        .attr("width", widthPercent ? widthPercent : width+margin.left+margin.right)
+        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom)
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
         .attr("preserveAspectRatio", "xMaxYMid meet");
 

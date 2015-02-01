@@ -98,7 +98,18 @@ section {
 }
 
 
+.chart rect {
+    fill: rgb(49, 102, 147);
+}
 
+.bar rect {
+    opacity: .75;
+    fill: rgb(49, 102, 147);
+}
+
+.bar rect.selected {
+  fill: rgb(60, 159, 244);
+}
 
 
 
@@ -503,6 +514,16 @@ header {
 .brush-line {
   stroke: rgb(150,150,150); 
   stroke-dasharray: 5,5;
+}
+
+.dashed {
+  stroke: rgb(150,150,150); 
+  stroke-dasharray: 5,5;
+}
+
+.divider text {
+  font-size: 12px;
+  fill: rgb(120,120,120);
 }
 
 .variant.compare_unique{

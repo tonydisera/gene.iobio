@@ -451,26 +451,26 @@ var effectCategories = [
     return allPoints;
   }
 
-
-  exports.getStats = function(refs, options, callback) {    
+  // MODIFIED
+  exports.getStats = function(refs, regionParm, options, callback) {    
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteStats(refs, options, callback);
+      this._getRemoteStats(refs, regionParm, options, callback);
     } else {
-      this._getLocalStats(refs, options, callback);
+      this._getLocalStats(refs, regionParm, options, callback);
     }
     
   }
   // NEW
-  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
+  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback) {
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback);
+      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback);
     } else {
-      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback);
+      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback);
     }
   }
  
   // NEW
-  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
+  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -498,16 +498,23 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
+  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback) {
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
 
-    var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - \'(AF<0.001)\' ' + encodeURIComponent(tabixUrl));
-    
-    // This is the full url for vcfstatsalive server which is piped its input from tabixserver
-    //var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
-    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(tabixUrl));
+    var url = null;
+    if (afMax) {
+      //var filterString = "'(AF<0.001)'";
+      //filterString = "'((AF>" + afMin + ")&(AF<" + afMax + "))'";
+      filterString = "'(AF<" + afMax + ")'";
+      var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(tabixUrl));
+      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
+    } else {
+      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(tabixUrl));
+    }
+
+    console.log(url);
 
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
@@ -548,10 +555,15 @@ var effectCategories = [
               var qual   = fields[5];
               var filter = fields[6];
               var info   = fields[7];
+              var format = fields[8];
+              var genotypes = [];
+              for (var i = 9; i < fields.length; i++) {
+                genotypes.push(fields[i]);
+              }
 
               // Turn vcf record into a JSON object and add it to an array
               var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                               'qual': qual, 'filter': filter, 'info': info};
+                               'qual': qual, 'filter': filter, 'info': info, 'genotypes': genotypes};
               vcfObjects.push(vcfObject);
             }
           });
@@ -593,10 +605,15 @@ var effectCategories = [
           var qual   = fields[5];
           var filter = fields[6];
           var info   = fields[7];
+          var format = fields[8];
+          var genotypes = [];
+          for (var i = 9; i < fields.length; i++) {
+            genotypes.push(fields[i]);
+          }
 
           // Turn vcf record into a JSON object and add it to an array
           var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                           'qual': qual, 'filter': filter, 'info': info};
+                           'qual': qual, 'filter': filter, 'info': info, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
       });
@@ -657,7 +674,7 @@ var effectCategories = [
   }
 
   exports.parseVcfRecords = function(vcfRecs, regionStart, regionEnd, regionStrand, selectedTranscript) {
-
+      var me = this;
       var nameTokens = selectedTranscript.transcript_id.split('.');
       var selectedTranscriptID = nameTokens.length > 0 ? nameTokens[0] : selectedTranscript;
 
@@ -679,6 +696,7 @@ var effectCategories = [
           } else {
             alts.push(rec.alt);
           }
+          var altIdx = 0;
           alts.forEach(function(alt) {
             var len = alt.length;
             var type = 'SNP';
@@ -697,16 +715,23 @@ var effectCategories = [
             // Parse the svtype and snpEff annotations from the info field
             var effects = new Object();
             var impacts = new Object();  
-            var varType = null;          
+            var af = null;       
+            var typeAnnotated = null;
+            var combinedDepth = null;
             var annotTokens = rec.info.split(";");
             // Iterate through the annotation fields, looking for the
             // annotation EFF
             annotTokens.forEach(function(annotToken) {
-              if (annotToken.indexOf("SVTYPE=") >= 0) {
-                varType = annotToken.substring(7, annotToken.length);                
-              } else if (annotToken.indexOf("TYPE=") >= 0) {
-                varType = annotToken.substring(5, annotToken.length);                
-              } else if (annotToken.indexOf("EFF=") >= 0) {
+              if (annotToken.indexOf("AF=") == 0) {
+                // TODO:  vcfstatsalive must look at af by alt.
+                // For now, just grab first af
+                //af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), altIdx);   
+                af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), 0);    
+              } if (annotToken.indexOf("TYPE=") == 0) {
+                typeAnnotated = me.parseAnnotForAlt(annotToken.substring(5, annotToken.length), altIdx);     
+              } if (annotToken.indexOf("DP=") == 0) {
+                combinedDepth = annotToken.substring(3, annotToken.length);                
+              } else if (annotToken.indexOf("EFF=") == 0) {
                 // We have found the EFF annotation. Now split
                 // the EFF annotation into its parts.  Each
                 // part represents the annotations for a given
@@ -771,19 +796,61 @@ var effectCategories = [
               impacts["NOIMPACT"] = "NOIMPACT";
             }
 
-            if (varType && varType != type) {
-              console.log("type mismatch " + 'vartype=' + varType +' type=' + type);
+            // Parse genotypes
+            var genotypes = [];
+            rec.genotypes.forEach(function(genotype) {
+              if (genotype == ".") {
+
+              } else {
+                var tokens = genotype.split(":");
+                genotypes.push(tokens[0]);
+              }
+            });
+
+            var gtNumber = altIdx + 1;
+            var genotypeForAlt = null;
+            var zygosity = null;
+            var phased = null;
+            //TODO: Need to send in which sample we are evaluating
+            // For now, just loop through until we find a genotype for
+            // this alt
+            genotypes.forEach(function(gt) {
+              if (gt.indexOf(gtNumber) >= 0) {
+                  genotypeForAlt = gt;                
+              }
+            });
+
+            if (genotypeForAlt) {
+              var delim = null;
+              if (genotypeForAlt.indexOf("|") > 0) {
+                delim = "|";
+                phased = true;
+              } else {
+                delim = "/";
+                phased = false;
+              }
+              var tokens = genotypeForAlt.split(delim);
+              if (tokens.length == 2) {
+                if (tokens[0] == tokens[1]) {
+                  zygosity = "HOM";
+                } else {
+                  zygosity = "HET";
+                }
+              }
             }
-            
 
             variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
               'strand': regionStrand, 'type': type, 'id': rec.id, 'ref': rec.ref, 
               'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
+              'af': af, 'combinedDepth': combinedDepth, 'typeAnnotated': typeAnnotated,
+              'genotypes': genotypes, 'genotypeForAlt': genotypeForAlt, 'zygosity': zygosity, 'phased': phased,
               'effect': effects, 'effectCategory': effectCats, 'impact': impacts, 'compare': rec.compare} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;
             }
+
+            altIdx++;
           });
         }
 
@@ -813,6 +880,21 @@ var effectCategories = [
         'features': variants};
 
       return results;
+  };
+
+  exports.parseAnnotForAlt = function(value, altIdx) {
+    var annotValue = "";
+    if (value.indexOf(",") > 0) {
+      var tokens = value.split(",");
+      if (tokens.length > altIdx) {
+        annotValue = tokens[altIdx];
+      } else {
+        annotValue = value;
+      }
+    }  else {
+      annotValue = value;
+    }   
+    return annotValue;       
   };
 
   exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
@@ -922,10 +1004,11 @@ var effectCategories = [
 
   };
 
+  // MODIFIED
   // We we are dealing with a local VCF, we will create a mini-vcf of all of the sampled regions.
   // This mini-vcf will be streamed to vcfstatsAliveServer.  
-  exports._getLocalStats = function(refs, options, callback) {      
-    this._getRegions(refs, options);
+  exports._getLocalStats = function(refs, regionParm, options, callback) {    
+    this._getRegions(refs, regionParm, options);
     
     this._streamVcf(vcfstatsAliveServer, callback);
 
@@ -1042,11 +1125,13 @@ var effectCategories = [
 
   }
 
-  exports._getRemoteStats = function(refs, options, callback) {      
+  // MODIFIED
+  exports._getRemoteStats = function(refs, regionParm, options, callback) {      
     var me = this;
 
-    me._getRegions(refs, options);
-
+    
+    me._getRegions(refs, regionParm, options);
+    
     // This is the tabix url.  Here we send the regions as arguments.  tabix
     // output (vcf header+records for the regions) will be piped
     // to the vcfstatsalive server.
@@ -1095,52 +1180,56 @@ var effectCategories = [
 
 
  
-
-  exports._getRegions = function(refs, options) {
+  // MODIFIED
+  exports._getRegions = function(refs, regionObject, options) {
 
     regionIndex = 0;
     regions.length = 0;
-
-
     var bedRegions;
-    for (var j=0; j < refs.length; j++) {
-      var ref      = refData[refs[j]];
-      var start    = options.start;
-      var end      = options.end ? options.end : ref.refLength;
-      var length   = end - start;
-      if ( length < options.binSize * options.binNumber) {
-        regions.push({
-          'name' : ref.name,
-          'start': start,
-          'end'  : end    
-        });
-      } else {
-         // create random reference coordinates
-         for (var i=0; i < options.binNumber; i++) {   
-            var s = start + parseInt(Math.random()*length); 
-            regions.push( {
-               'name' : ref.name,
-               'start' : s,
-               'end' : s + options.binSize
-            }); 
-         }
-         // sort by start value
-         regions = regions.sort(function(a,b) {
-            var x = a.start; var y = b.start;
-            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-         });               
-         
-         // intelligently determine exome bed coordinates
-         /*
-         if (options.exomeSampling)
-            options.bed = me._generateExomeBed(options.sequenceNames[0]);
-         
-         // map random region coordinates to bed coordinates
-         if (options.bed != undefined)
-            bedRegions = me._mapToBedCoordinates(SQs[0].name, regions, options.bed)
-          */
-      }
-    } 
+
+    if (regionObject) {
+      regions.push( regionObject );
+    } else {
+      for (var j=0; j < refs.length; j++) {
+        var ref      = refData[refs[j]];
+        var start    = options.start;
+        var end      = options.end ? options.end : ref.refLength;
+        var length   = end - start;
+        if ( length < options.binSize * options.binNumber) {
+          regions.push({
+            'name' : ref.name,
+            'start': start,
+            'end'  : end    
+          });
+        } else {
+           // create random reference coordinates
+           for (var i=0; i < options.binNumber; i++) {   
+              var s = start + parseInt(Math.random()*length); 
+              regions.push( {
+                 'name' : ref.name,
+                 'start' : s,
+                 'end' : s + options.binSize
+              }); 
+           }
+           // sort by start value
+           regions = regions.sort(function(a,b) {
+              var x = a.start; var y = b.start;
+              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+           });               
+           
+           // intelligently determine exome bed coordinates
+           /*
+           if (options.exomeSampling)
+              options.bed = me._generateExomeBed(options.sequenceNames[0]);
+           
+           // map random region coordinates to bed coordinates
+           if (options.bed != undefined)
+              bedRegions = me._mapToBedCoordinates(SQs[0].name, regions, options.bed)
+            */
+        }
+      } 
+
+    }
     return regions;     
 
   }

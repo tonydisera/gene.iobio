@@ -35,7 +35,7 @@ var Bam = Class.extend({
       
 
 //      this.iobio.bamtools = "ws://localhost:8061";
-//      this.iobio.samtools = "ws://localhost:8060";
+ //    this.iobio.samtools = "ws://localhost:8060";
 //      this.iobio.bamReadDepther = "ws://localhost:8021";
 //      this.iobio.bamMerger = "ws://localhost:8030";      
 //      this.iobio.bamstatsAlive = "ws://localhost:7100"
@@ -701,20 +701,52 @@ var Bam = Class.extend({
    //
    getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
+/*
+    // This only worked for remote
+    var urlBam =  this.sourceType == "url" ? 
+                    this._getBamMergeUrl(refName, regionStart, regionEnd) 
+                    : "http://client";  
+    var minionParms = this.sourceType == "url" ? "?" : "?protocol=websocket&"; 
 
-    var urlBam = this._getBamMergeUrl(refName, regionStart, regionEnd);             
 
     var urlF = this.iobio.freebayes 
-    //+ "?protocol=websocket&binary=true&"
-               + "?cmd=-f ./data/references/hs_ref_chr" + refName + ".fa"                     
-               //+ ' ' + encodeURIComponent("http://client");
+               + minionParms
+               + "cmd=-f ./data/references/hs_ref_chr" + refName + ".fa"                     
                + ' ' + encodeURIComponent(urlBam);
 
      
-    var url = this.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 0" '
+    var url = this.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
+              + encodeURIComponent(encodeURI(urlF));
+    this._callVariants(refName, regionStart, regionEnd, regionStrand, this.iobio.vcflib, encodeURI(url), callback);
+*/
+
+/*
+    var catInputServer = "ws://localhost:7063";
+    var url = encodeURI( catInputServer + "?protocol=websocket&encoding=binary&cmd=" + encodeURIComponent("http://client"));
+    this._callVariants(refName, regionStart, regionEnd, regionStrand, catInputServer, url, callback);
+*/    
+
+
+
+    var urlF = this.iobio.freebayes 
+      + "?cmd=-f ./data/references/hs_ref_chr" + refName + ".fa" + " " 
+      + encodeURIComponent(this._getBamUrl(refName,regionStart,regionEnd));
+
+    var url = this.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
               + encodeURIComponent(encodeURI(urlF));
 
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, encodeURI(url), callback);
+    this._callVariants(refName, regionStart, regionEnd, regionStrand, this.iobio.vcflib, encodeURI(url), callback);
+
+
+/*
+
+    var catInputServer = "ws://localhost:7063";
+    var url = encodeURI( catInputServer + "?cmd=" 
+      +  encodeURIComponent(this._getBamUrl(refName,regionStart,regionEnd)));
+    this._callVariants(refName, regionStart, regionEnd, regionStrand, catInputServer, url, callback);
+*/
+    
+
 
    },
 
@@ -723,7 +755,7 @@ var Bam = Class.extend({
    // NEW
    //
    //
-   getSamtoolsVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
+   getRemoteSamtoolsVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
     var urlBam = this._getBamMergeUrl(refName, regionStart, regionEnd);             
 
@@ -736,7 +768,7 @@ var Bam = Class.extend({
             + ' ' + encodeURIComponent(encodeURI(urlS));
     console.log(encodeURI(url));
 
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, encodeURI(url), callback);
+    this._callVariants(refName, regionStart, regionEnd, regionStrand, this.iobio.vcflib, encodeURI(url), callback);
    },
 
     //
@@ -745,7 +777,7 @@ var Bam = Class.extend({
    //
    //
    _getBamMergeUrl: function(refName, regionStart, regionEnd) {
-    var theBam  = "http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam";
+    var theBam  = this.bamUri;
 
     var url = this.iobio.bamMerger + '?binary=true&cmd=' + refName + ':' + regionStart + '-' + regionEnd 
     + " '" 
@@ -765,10 +797,10 @@ var Bam = Class.extend({
    // NEW
    //
    //
-   _callVariants: function(refName, regionStart, regionEnd, regionStrand, url, callback) {
+   _callVariants: function(refName, regionStart, regionEnd, regionStrand, server, url, callback) {
     
     var me = this;
-    var client = BinaryClient(url);
+    var client = BinaryClient(server);
   
     var variant = null;
     var stream = null;
@@ -815,55 +847,72 @@ var Bam = Class.extend({
     });
 
 /*
-    //
-    // stream the bam
-    //
-    client.on("stream", function(stream) {
 
-      // Open bai and bam files
-      var bamR = new readBinaryBAM(me.options.bai, me.bamUri, function(baiR) {
-        // Get bam front (head and refs)      
-        bamR.bamFront(function(){
+    if (this.sourceType == "file") {
+      //
+      // stream the bam
+      //
+      client.on("stream", function(stream) {
 
-        var withReads = bamR.refsWithReads().map(function(x) {return x[1]});        
-        var refsNregions = samplingRegions(withReads, {}).regions;
-        var bamblks = [bamR.headUba];
+        me.convert('sam', refName, regionStart, regionEnd, function(data,e) {
+          stream.write(data);
+          stream.end();
+        }, 
+        {noHeader:false});   
 
-        var bgzfHdr = bgzf(bamR.headUba);
-        stream.write([bgzfHdr]); //Send header
 
-        var regcnt = 0;
-        var totcnt = bgzfHdr.length + EOFblk.length;
+        COMMENT OUT!!
+        // Open bai and bam file
+        var bamR = new readBinaryBAM(me.options.bai, me.bamUri, function(baiR) {
 
-        bamR.throttledRegions2BAM(
-          refsNregions,
-          function(bgzfblks, fn, regmap){
-            //Only send two regions
-            if (bamblks && regcnt < 2) {
+          // Get bam front (head and refs)      
+          bamR.bamFront(function(){
 
-              stream.write(bgzfblks);
-              
-              totcnt = totcnt + bgzfblks.reduce(
-                function(S, x){return S+x.length},0);
-              regcnt = regcnt + 1;
-              fn.call(this, regmap);    // Step next region
-            } else {
-              //stream.write(EOFblk);
+          var withReads = bamR.refsWithReads().map(function(x) {return x[1]});        
+          var refsNregions = samplingRegions(withReads, {}).regions;
+          var bamblks = [bamR.headUba];
 
-              console.log("FINISHED, total bytes sent:", totcnt);
-            }
-          });
-        }); 
+          var bgzfHdr = bgzf(bamR.headUba);
+          stream.write([bgzfHdr]); //Send header
 
+          var regcnt = 0;
+          var totcnt = bgzfHdr.length + EOFblk.length;
+
+          bamR.throttledRegions2BAM(
+            refsNregions,
+            function(bgzfblks, fn, regmap){
+              //Only send two regions
+              if (bamblks && regcnt < 2) {
+
+                stream.write(bgzfblks);
+                
+                totcnt = totcnt + bgzfblks.reduce(
+                  function(S, x){return S+x.length},0);
+                regcnt = regcnt + 1;
+                fn.call(this, regmap);    // Step next region
+              } else {
+                //stream.write(EOFblk);
+
+                console.log("FINISHED, total bytes sent:", totcnt);
+              }
+            });
+          }); 
+       
+
+        });
+           
+        
+        
+
+        client.on("error", function(error) {
+          console.log("error encountered in streamBam " + error);
+        });
       });
-      
-      
+    }
+    */
 
-      client.on("error", function(error) {
-        console.log("error encountered in streamBam " + error);
-      });
-    });
-*/
+
+
 
    },  
 

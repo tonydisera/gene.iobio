@@ -51,6 +51,8 @@ var bamDepthChart = null;
 // VCF track 
 var vcfChart = null;
 var vcfData = null;
+var vcfAfData = null;
+var afChart = null;
 
 // Freebayes (called) variants track
 var fbChart = null;
@@ -58,6 +60,9 @@ var fbData = null;
 
 var variantCounts = null;
 var clickedAnnotIds = new Object();
+
+var afMin = null;
+var afMax = null;
 
 // The colors for the variant stats bar chart
 var statsColors = {
@@ -99,6 +104,7 @@ $(document).ready(function(){
 
 
 function init() {
+	var me = this;
 
     $('#variant-legend').html(trackLegendTemplate());
 
@@ -221,6 +227,36 @@ function init() {
 					}
 				});
 
+ 	// Create allele frequency chart
+ 	// Allele freq chart)
+    afChart = histogramD3()
+                       .width(400)
+                       .height(70)
+					   .margin( {left: 40, right: 0, top: 10, bottom: 20})
+					   .xValue( function(d, i) { return d[0] })
+					   .yValue( function(d, i) { return Math.log(d[1]) })
+					   .yAxisLabel( "log(frequency)" )
+					   .on("d3click", function(d, on) {
+
+						   	var lowerVal = on ? ( d[0]      * 2) / 100 : 0;
+							var upperVal = on ? ((d[0] + 1) * 2) / 100 : 1;
+					   		
+						   	me.showAfSlider(lowerVal, upperVal);
+
+						   	me.filterVariantsByAf(lowerVal, upperVal);
+
+					   });
+	afChart.formatXTick( function(d,i) {
+		return (d * 2) + '%';
+	});
+	afChart.tooltipText( function(d, i) { 
+		var value = vcfAfData[i][1];
+		var lowerVal =  d[0]      * 2;
+		var upperVal = (d[0] + 1) * 2;
+		return  d3.round(value) + ' variants with ' + lowerVal + "-" + upperVal + '%' + ' AF ';
+	});
+
+
 	// Create the freebayes variant chart
 	fbChart = variantD3()
 			    .width(1000)
@@ -245,7 +281,7 @@ function init() {
 
 
 	// Initialize variant legend
-	initVariantLegend();
+	initFilterTrack();
 
 	// Initialize transcript view buttons
 	initTranscriptControls();
@@ -280,7 +316,60 @@ function onCloseTranscriptMenuEvent() {
  	loadTracksForGene();
 }
 
-function initVariantLegend() {
+function showAfSlider(lowVal, highVal) {
+
+
+    // Initialize allele frequency slider
+    $( "#af-range" ).slider({
+      range: true,
+      min: lowVal * 1000,
+      max: highVal * 1000,
+      values: [ lowVal * 1000, highVal * 1000 ],
+      slide: function( event, ui ) {
+        $( "#af-amount" ).val( ui.values[ 0 ] / 10 + " - " + ui.values[ 1 ] / 10 + "%" );
+      },
+      change: function( event, ui ) {
+      	afMin = ui.values[0] / 1000;
+        afMax = ui.values[1] / 1000;
+      	filterVariantsByAf(afMin, afMax);
+      }
+    });
+    $( "#af-amount" ).val( $( "#af-range" ).slider( "values", 0 ) / 10 +
+      " - " + $( "#af-range" ).slider( "values", 1 ) / 10 + '%');	
+}
+
+function filterVariantsByAf(lowerVal, upperVal) {
+	var me = this;
+
+	   
+	var filteredFeatures = vcfData.features.filter(function(d) {
+		return (d.af >= lowerVal && d.af <= upperVal);
+	});
+
+	maxLevel = me._pileupVariants(vcfChart, filteredFeatures, 
+		regionStart ? regionStart : window.gene.start, 
+		regionEnd   ? regionEnd   : window.gene.end);		
+
+	var vcfDataFiltered = {	count: vcfData.count,
+							countMatch: vcfData.countMatch,
+							countUnique: vcfData.countUnique,
+							end: regionEnd,
+							features: filteredFeatures,
+							maxLevel: maxLevel + 1,
+							name: vcfData.name,
+							start: regionStart,
+							strand: vcfData.strand,
+							variantRegionStart: regionStart
+						};
+
+	me.fillVariantChart(vcfDataFiltered, regionStart, regionEnd);
+}
+
+function initFilterTrack() {
+
+	// Show af slider
+	this.showAfSlider(0, 1);
+
 	d3.selectAll(".type, .impact, .effect, .compare")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
@@ -988,6 +1077,8 @@ function showVariants(regionStart, regionEnd) {
 	                           window.gene.end, 
 	                           window.gene.strand, 
 	                           window.selectedTranscript,
+	                           window.afMin,
+	                           window.afMax,
 	                           function(data) {
 	        window.vcfData = data;
 
@@ -1008,10 +1099,51 @@ function showVariants(regionStart, regionEnd) {
 			   	    $('#vcf-track .loader-label').text("Loading chart");
 					fillVariantChart(data, window.gene.start, window.gene.end);
 				}
-		});		
+		});	
+
 	}
 
+	// Get the vcf stats for this region
+	vcfAfData = null;
+	$('#af').addClass("hide");		
+	var regionParm = {'name': window.getVcfRefName(window.gene.chr), 
+					  'start': regionStart ? regionStart : window.gene.start, 
+					  'end':   regionEnd   ? regionEnd   : window.gene.end
+					 };
+	window.vcf.getStats(null, regionParm, {}, function(stats) {
+		// Alelle Frequency
+		var afObj = stats.af_hist;
+		vcfAfData = vcf.jsonToArray2D(afObj);	
+		var afSelection = d3.select("#vcf-af-chart")
+						    .datum(vcfAfData);
+		var afOptions = {outliers: true, averageLine: false};		
+		$('#af').removeClass("hide");			    
+		afChart(afSelection, afOptions);	
+	});
 
+
+
+
+}
+
+function _pileupVariantsByZygosity(theChart, features, start, end) {
+	var spacing = 6;
+	var featuresHet = features.filter(function(d) {
+		return d.zygosity == null || d.zygosity == 'HET';
+	});
+	var maxLevelHet = _pileupVariants(theChart, featuresHet, start, end);
+
+	var featuresHom = features.filter(function(d) {
+		return d.zygosity != null && d.zygosity == 'HOM';
+	});
+	var maxLevelHom = _pileupVariants(theChart, featuresHom, start, end);
+
+	featuresHom.forEach( function(d) {
+		d.level = maxLevelHet + spacing + d.level;
+	});
+	theChart.dividerLevel(maxLevelHet + (spacing/2));
+	
+	return maxLevelHet + spacing + maxLevelHom;
 }
 
 function _pileupVariants(theChart, features, start, end) {
@@ -1022,8 +1154,7 @@ function _pileupVariants(theChart, features, start, end) {
 	theChart.lowestWidth(4);
 	var posToPixelFactor = Math.round((end - start) / vcfChart.width());
 	var maxLevel = vcf.pileupVcfRecords(features, window.gene.start, posToPixelFactor, vcfChart.lowestWidth() + 1);
-	console.log("pileup for " + features.length)
-	console.log("maxlevel = " + maxLevel + " factor = " + posToPixelFactor);
+
 
 	if ( maxLevel > 30) {
 		for( var i = 1; i < posToPixelFactor; i++) {
@@ -1081,6 +1212,8 @@ function fillVariantChart(data, regionStart, regionEnd) {
    	if (fbData) {
    		$('#compare-legend').removeClass("hide");
    	}
+
+
 
 
 }

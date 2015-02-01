@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>gene inspector.iobio</title>
+	<title>gene.iobio</title>
 	<!-- libraries -->
 	<script src="assets/js/jquery.1.11.1.min.js"></script>
 	<script src="assets/js/jquery-ui.min.js"></script>
 	<script src="assets/js/handlebars-v2.0.0.min.js"></script>	
 	<script src="assets/js/typeahead.bundle.min.js"></script>	
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>	
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>	
+
 	<script src="assets/js/d3.min.js"></script>	
 
 	<!-- bam.iobio libraries -->
 	<script src="assets/js/class.js"></script>
-    <script src="assets/js/bam.js"></script>
-    <script src="assets/js/bin.js"></script>
-    <script src="assets/js/inflate.js"></script>
-    <script src="assets/js/binary.js"></script>
+  <script src="assets/js/bam.js"></script>
+  <script src="assets/js/bin.js"></script>
+  <script src="assets/js/inflate.js"></script>
+  <script src="assets/js/binary.js"></script>
 
-    <!-- vcf.iobio libraries -->
-    <script src="assets/js/jdataview.js"></script>
-    <script src="assets/js/jparser.js"></script>
-    <script src="assets/js/inflate.js"></script>
-    <script src="assets/js/pako_deflate.min.js"></script>
-    <script src="assets/js/jsbgzf.js"></script>
-    <script src="assets/js/js-bv-sampling.js"></script>
-    <script src="assets/js/js-local-vcf.js"></script> 
-    <script src="assets/js/js-bv-common.js"></script>
-    <script src="assets/js/js-local-bam.js"></script>
+  <!-- vcf.iobio libraries -->
+  <script src="assets/js/jdataview.js"></script>
+  <script src="assets/js/jparser.js"></script>
+  <script src="assets/js/inflate.js"></script>
+  <script src="assets/js/pako_deflate.min.js"></script>
+  <script src="assets/js/jsbgzf.js"></script>
+  <script src="assets/js/js-bv-sampling.js"></script>
+  <script src="assets/js/js-local-vcf.js"></script> 
+  <script src="assets/js/js-bv-common.js"></script>
+  <script src="assets/js/js-local-bam.js"></script>
 
 
 
@@ -37,9 +38,14 @@
 
 	<!-- css -->
 	<link rel="stylesheet" href="assets/css/jquery-ui.css" />	
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/gene.d3.css" />
-    <link rel="stylesheet" href="assets/css/site.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/gene.d3.css" />
+  <link rel="stylesheet" href="assets/css/site.css" />
+
+  <!-- jquery ui -->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
 
         <!-- handlebar templates -->
     <script id='track-legend-template' type="text/x-handlebars-template">     
@@ -172,7 +178,7 @@
               </svg>
             </div>
 
-          </div>
+
         </div>
     </script>
     
@@ -279,13 +285,23 @@
                  <div class="variant-count badge" id="vcf-count" style="margin-bottom: 4px;"></div>
             </div>
             <div id="vcf-variants"></div>
-
             <div class="loader">
                 <span class="loader-label"></span>
                 <img src="assets/images/loading-squares.gif"/>
             </div>
-
+            <div id="af" class="hide" style="font-size: 10px;margin-top:20px">
+                <div id="af" >
+                  <div>Allele Frequency Spectrum</div>
+                  <svg id="vcf-af-chart"/>
+                  <div style="display: right;">
+                    <input type="text" id="af-amount" readonly="" style="border:none;width: 60px;">
+                    <div id="af-range" style="width: 342px;display: inline-block;"</div>
+                  </div>
+                </div>
+            </div>
         </div>
+      </div>
+
     </div>
 
     <div id="filter-track" class="track box-shadow hide">
@@ -377,12 +393,13 @@
             .style("opacity", 0);
     </script>    
 
-    <script src="app/region.d3.js"></script>
-    <script src="app/barChartVaryWidth.d3.js"></script>
-	<script src="app/line.d3.js"></script>
+  <script src="app/region.d3.js"></script>
+  <script src="app/barChartVaryWidth.d3.js"></script>
+	<script src="app/histogram.d3.js"></script>
+  <script src="app/line.d3.js"></script>
 	<script src="app/gene.d3.js"></script>
 	<script src="app/variant.d3.js"></script>
-    <script src="app/bam.iobio.js"></script>
+  <script src="app/bam.iobio.js"></script>
 	<script type="text/javascript" src="app/vcf.iobio.js"></script>
 	<script src="app/app.js"></script>	
 

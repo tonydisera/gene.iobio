@@ -26,7 +26,8 @@ function variantD3() {
       verticalLayers = 1,
       verticalPadding = 4,
       showTransition = true,
-      lowestWidth = 3;
+      lowestWidth = 3,
+      dividerLevel = null;
 
   //  options
   var defaults = {};
@@ -59,6 +60,8 @@ function variantD3() {
     if (showXAxis) {
       height += margin.bottom; 
     }
+    var dividerY = dividerLevel ? height - ((dividerLevel + 1) * (variantHeight + verticalPadding)) : null;
+
     
     
     // determine inner height (w/o margins)
@@ -181,6 +184,26 @@ function variantD3() {
       if (showXAxis) {
         svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + (y.range()[0] + margin.bottom) + ")");    
       } 
+
+      // Create dividing line
+      svg.selectAll(".divider").remove();
+      if (dividerLevel) {
+        var divider = svg.append("g")
+                         .attr("class", "divider")
+                         .attr("transform", "translate(0," + dividerY + ")");
+        divider.append("line").attr("class", "dashed")
+                              .attr("x1", 0)
+                              .attr("x2", width)
+                              .attr("y",  0);
+        divider.append("text").attr("x", width / 2)
+                              .attr("y", 20)
+                              .text("Heterozygous");
+        divider.append("text").attr("x", width / 2)
+                              .attr("y", -10)
+                              .text("Homozygous");
+
+      }
+
       
       
       // add tooltip div
@@ -291,7 +314,17 @@ function variantD3() {
               tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : "")
                            + '<br>ref: ' + d.ref + ' alt:' + d.alt
                            + '<br>effect: ' + effectDisplay
-                           + '<br>impact: ' + impactDisplay)                                 
+                           + '<br>impact: ' + impactDisplay 
+                           + '<br>qual: ' +  d.qual 
+                           + '<br>filter: ' + d.filter 
+                           + '<br>allele freq: ' + d.af
+                           + '<br>combined depth: ' + d.combinedDepth 
+                           + '<br>type (annotated): ' + d.typeAnnotated 
+                           + '<br>genotypes: ' + d.genotypes 
+                           + '<br>genotypes: ' + d.genotypeForAlt 
+                           + '<br>zygosity: ' + d.zygosity 
+                           + '<br>phased: ' + d.phased 
+                           )                                 
                  .style("left", (d3.event.pageX) + "px") 
                  .style("text-align", 'left')    
                  .style("top", (d3.event.pageY - 24) + "px");   
@@ -516,6 +549,12 @@ function variantD3() {
   chart.lowestWidth = function(_) {
     if (!arguments.length) return lowestWidth;
     lowestWidth = _;
+    return chart;
+  }
+
+  chart.dividerLevel = function(_) {
+    if (!arguments.length) return dividerLevel;
+    dividerLevel = _;
     return chart;
   }
 
