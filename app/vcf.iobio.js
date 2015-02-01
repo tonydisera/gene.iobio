@@ -685,6 +685,9 @@ var effectCategories = [
       // keep track of the region start based on the variants.
       var variantRegionStart = regionStart;
 
+      var homCount = 0;
+      var hetCount = 0;
+
       var variants = [];
       variants.length = 0;
 
@@ -833,8 +836,10 @@ var effectCategories = [
               if (tokens.length == 2) {
                 if (tokens[0] == tokens[1]) {
                   zygosity = "HOM";
+                  homCount++;
                 } else {
                   zygosity = "HET";
+                  hetCount++;
                 }
               }
             }
@@ -877,6 +882,7 @@ var effectCategories = [
       // 'features' that contains an array of variants for this region of interest.
       var results = {'start': +regionStart, 'end': +regionEnd, 'strand': regionStrand, 
         'variantRegionStart': variantRegionStart, 'name': 'vcf track', 
+        'homCount': homCount, 'hetCount': hetCount,
         'features': variants};
 
       return results;

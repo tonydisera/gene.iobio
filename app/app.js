@@ -346,7 +346,9 @@ function filterVariantsByAf(lowerVal, upperVal) {
 		return (d.af >= lowerVal && d.af <= upperVal);
 	});
 
-	maxLevel = me._pileupVariants(vcfChart, filteredFeatures, 
+	var splitByZyg = vcfData.hetCount > 0 && vcfData.homCount > 0;
+
+	maxLevel = me._pileupVariants(vcfChart, splitByZyg, filteredFeatures, 
 		regionStart ? regionStart : window.gene.start, 
 		regionEnd   ? regionEnd   : window.gene.end);		
 
@@ -1055,7 +1057,9 @@ function showVariants(regionStart, regionEnd) {
 			return (d.start >= regionStart && d.start <= regionEnd);
 		});
 
-		maxLevel = _pileupVariants(vcfChart, filteredFeatures, regionStart, regionEnd);		
+		var splitByZyg = vcfData.hetCount > 0 && vcfData.homCount > 0;
+
+		maxLevel = _pileupVariants(vcfChart, splitByZyg, filteredFeatures, regionStart, regionEnd);		
 
 		var vcfDataFiltered = {	count: vcfData.count,
 								countMatch: vcfData.countMatch,
@@ -1087,7 +1091,9 @@ function showVariants(regionStart, regionEnd) {
 	                           function(data) {
 	        window.vcfData = data;
 
-	        maxLevel = _pileupVariants(vcfChart, data.features, gene.start, gene.end);
+	        var splitByZyg = vcfData.hetCount > 0 && vcfData.homCount > 0;
+
+	        maxLevel = _pileupVariants(vcfChart, splitByZyg, data.features, gene.start, gene.end);
 			data.maxLevel = maxLevel + 1;
 
 			var commonSchemeClass = d3.select("#compare-scheme").attr("class");
@@ -1131,17 +1137,26 @@ function showVariants(regionStart, regionEnd) {
 
 }
 
+function _pileupVariants(theChart, splitByZyg, features, start, end) {
+	if (splitByZyg) {
+		return _pileupVariantsByZygosity(theChart, features, start, end);
+	} else {
+		return _pileupVariantsImpl(theChart, features, start, end);
+	}
+
+} 
+
 function _pileupVariantsByZygosity(theChart, features, start, end) {
 	var spacing = 6;
 	var featuresHet = features.filter(function(d) {
 		return d.zygosity == null || d.zygosity == 'HET';
 	});
-	var maxLevelHet = _pileupVariants(theChart, featuresHet, start, end);
+	var maxLevelHet = _pileupVariantsImpl(theChart, featuresHet, start, end);
 
 	var featuresHom = features.filter(function(d) {
 		return d.zygosity != null && d.zygosity == 'HOM';
 	});
-	var maxLevelHom = _pileupVariants(theChart, featuresHom, start, end);
+	var maxLevelHom = _pileupVariantsImpl(theChart, featuresHom, start, end);
 
 	featuresHom.forEach( function(d) {
 		d.level = maxLevelHet + spacing + d.level;
@@ -1151,7 +1166,7 @@ function _pileupVariantsByZygosity(theChart, features, start, end) {
 	return maxLevelHet + spacing + maxLevelHom;
 }
 
-function _pileupVariants(theChart, features, start, end) {
+function _pileupVariantsImpl(theChart, features, start, end) {
 	features.forEach(function(v) {
 		v.level = 0;
 	});
@@ -1281,7 +1296,9 @@ function callVariants(regionStart, regionEnd) {
 			return (d.start >= regionStart && d.start <= regionEnd);
 		});
 
-		maxLevel = _pileupVariants(fbChart, filteredFeatures, regionStart, regionEnd);
+		var splitByZyg = fbData.hetCount > 0 && fbData.homCount > 0;
+
+		maxLevel = _pileupVariants(fbChart, splitByZyg, filteredFeatures, regionStart, regionEnd);
 
 		var fbDataFiltered = {	count: fbData.count,
 								countMatch: fbData.countMatch,
@@ -1335,7 +1352,10 @@ function callVariants(regionStart, regionEnd) {
 				window.gene.strand, window.selectedTranscript, function(data){
 				fbData = data;
 
-				maxLevel = _pileupVariants(fbChart, fbData.features, gene.start, gene.end);
+				var splitByZyg = fbData.hetCount > 0 && fbData.homCount > 0;
+
+
+				maxLevel = _pileupVariants(fbChart, splitByZyg, fbData.features, gene.start, gene.end);
 				fbData.maxLevel = maxLevel + 1;		
 
 				var commonSchemeClass = d3.select("#compare-scheme").attr("class");
