@@ -590,31 +590,11 @@ var Bam = Class.extend({
 
    // NEW
    getCoverageForRegion: function(refName, start, end, maxPoints, callback) {
-       if ( this.sourceType == "url") {
-          this._getRemoteCoverageForRegion(refName, start, end, maxPoints, callback);
-       } else {
-          this._getLocalCoverageForRegion(refName, start, end, maxPoints, callback);
-       }
-   },
-
-
-   // NEW
-   _getLocalCoverageForRegion: function(refName, start, end, maxPoints, callback) {
-      var me = this;
-      var samRecs = [];
-      samRecs.length = 0;
-      this.convert('sam', refName, start, end, function(data,e) {
-        me._parseSamRecords(data, start, end, maxPoints, callback);
-      }, 
-      {noHeader:false});     
-   },  
-
-   // NEW
-   _getRemoteCoverageForRegion: function(refName, start, end, maxPoints, callback) {
       var me = this;
       var regionParm = ' ' + refName + ":" + start + "-" + end;
       
-      var url = this.iobio.samtools + "?cmd= view " + this.bamUri + regionParm;
+      var url = encodeURI( this.iobio.samtools + '?cmd= mpileup ' +  " " + encodeURIComponent(this._getBamUrl(refName,start,end)) );
+
       var client = BinaryClient(this.iobio.samtools);
       
       var samData = "";
@@ -629,24 +609,23 @@ var Bam = Class.extend({
           });
 
           stream.on('end', function() {
-             me._parseSamRecords(samData, start, end, maxPoints, callback);
+             me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
           });
       });
 
    },
 
-
-   // NEW
-   _parseSamRecords: function(data, start, end, maxPoints, callback) {
+      // NEW
+   _parseSamPileupRecords: function(data, start, end, maxPoints, callback) {
       var me = this;
       var samRecs = [];
       var lines = data.split('\n');
       lines.forEach(function(line) {
         var fields = line.split('\t');
-        var pos = fields[3];
-        var len = fields[8];
-        if (pos && len) {
-          samRecs.push( {'pos': +pos, 'len': +len});
+        var pos   = fields[1];
+        var depth = fields[3];
+        if (pos && depth) {
+          samRecs.push( {'pos': +pos, 'depth': +depth});
         }
       });
 
@@ -657,29 +636,12 @@ var Bam = Class.extend({
         baseCoverage[i] = [start + i, 0];
       }      
       samRecs.forEach(function(samRec) {
-        for (var i = 0; i < Math.abs(samRec.len); i++) {            
-          if (samRec.len < 0) {
-            pos = samRec.pos - i;
-          } else {
-            pos = samRec.pos  + i;
-          }
-
-          var idx = pos - start;
-          var depth = null;
-          
-          
-          if (idx >= 0 && idx <= regionLength) {
-            coverageRec = baseCoverage[idx];
-            if (coverageRec == null) {
-              coverageRec = [pos, 1];
-            } else {
-              coverageRec[1]++;
-            }
-            baseCoverage[idx] = coverageRec;
-          }
-        }
+        var idx = samRec.pos - start;
+        coverageRec = baseCoverage[idx];
+        coverageRec = [samRec.pos, samRec.depth];
+        baseCoverage[idx] = coverageRec;
       });
-      
+
       if (maxPoints && maxPoints > 0) {
         var factor = d3.round(baseCoverage.length / maxPoints);
         var baseCoverageReduced = me.reducePoints(baseCoverage, factor, function(d) {return d[0]}, function(d) {return d[1]});
@@ -688,7 +650,8 @@ var Bam = Class.extend({
         callback(baseCoverage);
       }
 
-   },
+    },
+
 
 
 

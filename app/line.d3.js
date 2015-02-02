@@ -50,7 +50,7 @@ lineD3 = function module() {
 
       console.log(posx + ' ' +  mousex + ' ------ ' + depthy + ' ' + mousey );
       var tooltipText = 'position ' + formatter(parseInt(   posx  ));
-      tooltipText += '<br>depth ' + parseInt(   depthy );
+      tooltipText += '<br>base coverage ' + parseInt(   depthy );
              
       var tooltip = container.select('.tooltip');
               tooltip.transition()        
