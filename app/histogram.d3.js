@@ -35,11 +35,11 @@ function histogramD3() {
       svg = d3.select(this);
 
       svg.attr("width", widthPercent ? widthPercent : width+margin.left+margin.right)
-        .attr("height", heightPercent ? heightPercent : height) 
-        .attr('viewBox', "0 0 " + 
+         .attr("height", heightPercent ? heightPercent : height) 
+         .attr('viewBox', "0 0 " + 
                          (parseInt(width) +  parseInt(margin.left) + parseInt(margin.right)) + " " + 
                          parseInt(height))
-        .attr("preserveAspectRatio", "xMidYMid meet");
+         .attr("preserveAspectRatio", "xMidYMid meet");
        
 
       // Convert data to standard representation greedily;
@@ -164,9 +164,9 @@ function histogramD3() {
             div.html( tooltipText(d, i) )
                .style("width", "100px")
                .style("height", "40px")
-               .style("left", (d3.event.pageX) - 42 + "px") 
+               .style("left", (d3.event.pageX) - 102 + "px") 
                .style("text-align", 'left')    
-               .style("top", (d3.event.pageY - 22) + "px");    
+               .style("top", (d3.event.pageY - 42) + "px");    
          })                  
          .on("mouseout", function(d) {       
             div.transition()        

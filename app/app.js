@@ -151,7 +151,8 @@ function init() {
 
 	       		$('#zoom-region-start').val(formatRegion(regionStart) );
 	       		$('#zoom-region-end').val(formatRegion(regionEnd));
-	       		d3.select('#track-section').style("padding-top", "298px");
+	       		var h = d3.select("#nav-section").node().offsetHeight;
+	       		d3.select('#track-section').style("padding-top", h + "px");
 
 			} else {
 				// Treat a click as a region selection on the entire gene region.
@@ -161,7 +162,8 @@ function init() {
 				regionStart = window.gene.start;
 				regionEnd   = window.gene.end;
 				$('#zoom-region-track').addClass("hide");
-	       		d3.select('#track-section').style("padding-top", "228px");
+	       		var h = d3.select("#nav-section").node().offsetHeight;
+	       		d3.select('#track-section').style("padding-top", h + "px");
 			}
 
        		//showTranscripts(regionStart, regionEnd);
@@ -299,6 +301,7 @@ function init() {
 	// Initialize transcript view buttons
 	initTranscriptControls();
 
+	
 	
 }
 
@@ -757,6 +760,10 @@ function loadTracksForGene() {
 
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
+
+	var h = d3.select("#nav-section").node().offsetHeight;
+	d3.select('#track-section').style("padding-top", h + "px");
+
 
 }
 

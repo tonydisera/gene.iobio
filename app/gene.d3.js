@@ -139,8 +139,8 @@ function geneD3() {
 
                g.append('line')
                 .attr('class', 'brush-line')
-                .attr('x1', 0 )
-                .attr('x2',  width - margin.left - margin.right)          
+                .attr('x1', 80 )
+                .attr('x2',  width - margin.left - margin.right - 80)          
                 .attr('y1', heightExtent - 10)
                 .attr('y2', heightExtent - 10);
 
