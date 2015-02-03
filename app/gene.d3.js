@@ -305,7 +305,7 @@ function geneD3() {
       transcript.selectAll('.name').transition()
         .duration(700)
         .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0; })
-        .attr('y', function(d) { return margin.left > 0 ? trackHeight : 0; })   
+        .attr('y', function(d) { return margin.left > 5 ? trackHeight : -10; })   
         .text(function(d) { return d[1]; })                
         .style('fill-opacity', 1);
 
