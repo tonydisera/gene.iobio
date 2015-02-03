@@ -187,6 +187,8 @@ function init() {
 	zoomRegionChart = regionD3()
 			    .width(1000)
 			    .height(0)
+			    .widthPercent("100%")
+			    .heightPercent("100%")
 			    .margin({top: 0, right: 4, bottom: 40, left: 4});
 
 	// Create the coverage chart
