@@ -335,6 +335,30 @@ function showAfSlider(lowVal, highVal) {
     // Initialize allele frequency slider
     $( "#af-range" ).slider({
       range: true,
+      min: 0,
+      max: 100,
+      values: [ 0, 100 ],
+      slide: function( event, ui ) {
+        $( "#af-amount" ).val( ui.values[ 0 ]  + " - " + ui.values[ 1 ]  + "%" );
+      },
+      change: function( event, ui ) {
+      	afMin = ui.values[0] / 100;
+        afMax = ui.values[1] / 100;
+      	filterVariantsByAf(afMin, afMax);
+
+      	showMinorAfSlider(afMin, afMax);
+
+      }
+    });
+    $( "#af-amount" ).val( $( "#af-range" ).slider( "values", 0 ) +
+      " - " + $( "#af-range" ).slider( "values", 1 ) + '%');	
+
+   
+}
+
+function showMinorAfSlider(lowVal, highVal) {
+ 	$( "#af-minor-range" ).slider({
+      range: true,
       min: lowVal * 1000,
       max: highVal * 1000,
       values: [ lowVal * 1000, highVal * 1000 ],
@@ -348,7 +372,7 @@ function showAfSlider(lowVal, highVal) {
       }
     });
     $( "#af-amount" ).val( $( "#af-range" ).slider( "values", 0 ) / 10 +
-      " - " + $( "#af-range" ).slider( "values", 1 ) / 10 + '%');	
+      " - " + $( "#af-minor-range" ).slider( "values", 1 ) / 10 + '%');		
 }
 
 function filterVariantsByAf(lowerVal, upperVal) {

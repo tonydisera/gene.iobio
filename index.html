@@ -297,18 +297,26 @@
               <div style="text-align: left">
                    <div class="variant-count badge" id="vcf-count" 
                    style="float: left; margin-top: 2px; margin-bottom: 4px; display: none; margin-right: 40px;"></div>
-                    <a id="af-link" class="hide"  data-toggle="collapse" style="font-size: 12px" href="#af" aria-expanded="false" aria-controls="collapseExample">
-                      Allele Frequency
-                    </a>
-                    <div id="af" class="collapse" style="font-size: 10px;">
-                        <div id="af" >
-                          <svg id="vcf-af-chart"/>
-                          <div style="display: right;">
-                            <input type="text" id="af-amount" readonly="" style="border:none;width: 60px;">
-                            <div id="af-range" style="width: 342px;display: inline-block;"></div>
+                    <div >
+                        <a id="af-link" class="hide"  data-toggle="collapse" style="font-size: 12px" href="#af" aria-expanded="false" aria-controls="collapseExample">
+                          Allele Frequency
+                        </a>
+
+                        <div id="af" class="collapse" style="font-size: 10px;">
+                        <div style="float: left; margin-right: 10px">
+                          <div >
+                            <input type="text" id="af-amount" readonly="" style="border:none;width: 50px;">
+                            <div id="af-range" style="width: 302px;display: inline-block;"></div>
+                          </div>
+                          <div style="margin-top: 20px;" >
+                            <input type="text" id="af-minor-amount" readonly="" style="border:none;width: 50px;">
+                            <div id="af-minor-range" style="width: 302px;display: inline-block;"></div>
                           </div>
                         </div>
-
+                        <div>
+                           <svg id="vcf-af-chart"/>
+                        </div>
+                      </div> 
                     </div>
 
                   
