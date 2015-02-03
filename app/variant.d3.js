@@ -322,12 +322,14 @@ function variantD3() {
                            + '<br>combined depth: ' + d.combinedDepth 
                           // + '<br>genotypes: ' + d.genotypes 
                          //  + '<br>genotypes: ' + d.genotypeForAlt 
-                         //  + '<br>zygosity: ' + d.zygosity 
+                           + '<br>zygosity: ' + d.zygosity 
                          //  + '<br>phased: ' + d.phased 
-                           )                                 
-                 .style("left", (d3.event.pageX) + "px") 
+                           )                    
+                 .style("width", "180px")
+                 .style("height", "130px")             
+                 .style("left", (d3.event.pageX - 182) + "px") 
                  .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 24) + "px");   
+                 .style("top", (d3.event.pageY - 132) + "px");   
 
               dispatch.d3tooltip(d.start); 
             })                  

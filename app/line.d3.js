@@ -48,7 +48,6 @@ lineD3 = function module() {
       var offsetTop = container[0][0].offsetTop;
       var offsetLeft = container[0][0].offsetLeft;
 
-      console.log(posx + ' ' +  mousex + ' ------ ' + depthy + ' ' + mousey );
       var tooltipText = 'position ' + formatter(parseInt(   posx  ));
       tooltipText += '<br>base coverage ' + parseInt(   depthy );
              
@@ -56,17 +55,19 @@ lineD3 = function module() {
               tooltip.transition()        
                  .duration(200)      
                  .style("opacity", .9);      
-              tooltip.html(tooltipText)                         
-                 .style("left",  (offsetLeft + mousex) + "px") 
+              tooltip.html(tooltipText)     
+                 .style("width", "130px")                    
+                 .style("height", "40px")                    
+                 .style("left",  (offsetLeft + margin.left + mousex - 132) + "px") 
                  .style("text-align", 'left')    
-                 .style("top", (offsetTop + mousey + 24) + "px");    
+                 .style("top", (offsetTop + margin.top + mousey - 42 + margin.top) + "px");    
 
       var circle = container.select(".circle");
               circle.transition()
                     .duration(200)
                     .style("opacity", 1);
-              circle.attr("cx", mousex)
-                    .attr("cy", mousey );
+              circle.attr("cx", mousex + margin.left)
+                    .attr("cy", mousey + margin.top );
               
     }
   };
@@ -194,10 +195,14 @@ lineD3 = function module() {
               tooltip.transition()        
                  .duration(200)      
                  .style("opacity", .9);      
-              tooltip.html(tooltipText)                         
-                 .style("left", (d3.event.pageX) + "px") 
+              tooltip.html(tooltipText)    
+                 .style("width", "130px")                    
+                 .style("height", "40px")                    
+                 .style("left", (d3.event.pageX - 130) + "px") 
                  .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 24) + "px");    
+                 .style("top", (d3.event.pageY - 42) + "px");    
+
+
           })    
                 
          .on("mouseout", function(d) {       

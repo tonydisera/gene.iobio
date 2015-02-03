@@ -162,9 +162,11 @@ function histogramD3() {
                .style("opacity", .9);  
 
             div.html( tooltipText(d, i) )
-               .style("left", (d3.event.pageX) + "px") 
+               .style("width", "100px")
+               .style("height", "40px")
+               .style("left", (d3.event.pageX) - 42 + "px") 
                .style("text-align", 'left')    
-               .style("top", (d3.event.pageY - 24) + "px");    
+               .style("top", (d3.event.pageY - 22) + "px");    
          })                  
          .on("mouseout", function(d) {       
             div.transition()        
