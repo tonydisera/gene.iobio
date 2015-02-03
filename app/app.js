@@ -125,7 +125,7 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top: 60, right: 0, bottom: 20, left: 0})
+	    .margin({top: 60, right: 4, bottom: 20, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)
@@ -187,7 +187,7 @@ function init() {
 	zoomRegionChart = regionD3()
 			    .width(1000)
 			    .height(0)
-			    .margin({top: 0, right: 0, bottom: 40, left: 0});
+			    .margin({top: 0, right: 4, bottom: 40, left: 4});
 
 	// Create the coverage chart
 	bamDepthChart = lineD3()
@@ -196,7 +196,7 @@ function init() {
 	                    .widthPercent("100%")
 	                    .heightPercent("100%")
 	                    .kind("area")
-						.margin( {top: 0, right: 0, bottom: 20, left: 0} )
+						.margin( {top: 10, right: 4, bottom: 20, left: 4} )
 						.showXAxis(true)
 						.showYAxis(false)
 						.showTooltip(true)
@@ -207,7 +207,7 @@ function init() {
 	// Create the vcf track
 	vcfChart = variantD3()
 			    .width(1000)
-			    .margin({top: 0, right: 0, bottom: 20, left: 0})
+			    .margin({top: 0, right: 4, bottom: 20, left: 4})
 			    .showXAxis(true)
 			    .variantHeight(6)
 			    .verticalPadding(2)
@@ -260,7 +260,7 @@ function init() {
 	// Create the freebayes variant chart
 	fbChart = variantD3()
 			    .width(1000)
-			    .margin({top: 0, right: 0, bottom: 20, left: 0})
+			    .margin({top: 0, right: 4, bottom: 20, left: 4})
 			    .showXAxis(true)
 			    .variantHeight(6)
 			    .verticalPadding(2)
