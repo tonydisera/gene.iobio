@@ -344,6 +344,8 @@ function showAfSlider(lowVal, highVal) {
       change: function( event, ui ) {
       	afMin = ui.values[0] / 100;
         afMax = ui.values[1] / 100;
+    	$( "#af-amount" ).removeClass("hide");
+    
       	filterVariantsByAf(afMin, afMax);
 
       	showMinorAfSlider(afMin, afMax);
@@ -368,6 +370,8 @@ function showMinorAfSlider(lowVal, highVal) {
       change: function( event, ui ) {
       	afMin = ui.values[0] / 1000;
         afMax = ui.values[1] / 1000;
+        $( "#af-amount" ).removeClass("hide");
+    
       	filterVariantsByAf(afMin, afMax);
       }
     });
