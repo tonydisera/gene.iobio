@@ -134,47 +134,15 @@ function geneD3() {
                 .attr('class', 'brush-line')
                 .attr('x1', xExtent)
                 .attr('x2', xExtent)          
-                .attr('y1', heightExtent - 20)
-                .attr('y2', heightExtent);
+                .attr('y1', heightExtent -20)
+                .attr('y2', heightExtent -10);
 
                g.append('line')
                 .attr('class', 'brush-line')
-                .attr('x1', Math.min(xExtent, 70) )
-                .attr('x2', 0)          
-                .attr('y1', heightExtent + 0)
-                .attr('y2', heightExtent + 10);  
-
-               if (xExtent > (width - margin.left - margin.right - 70)) {
-                 g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', 70 )
-                  .attr('x2', xExtent)          
-                  .attr('y1', heightExtent + 0)
-                  .attr('y2', heightExtent + 0);
-
-                 g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', xExtent)
-                  .attr('x2', width - margin.left - margin.right)          
-                  .attr('y1', heightExtent + 0)
-                  .attr('y2', heightExtent + 10);
-
-               } else {
-                g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', Math.min( xExtent, 70) )
-                  .attr('x2', width - margin.left - margin.right - 70)          
-                  .attr('y1', heightExtent + 0)
-                  .attr('y2', heightExtent + 0);
-
-                 g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', width - margin.left - margin.right - 70)
-                  .attr('x2', width - margin.left - margin.right )          
-                  .attr('y1', heightExtent + 0)
-                  .attr('y2', heightExtent + 10);
-
-               }
+                .attr('x1', 0 )
+                .attr('x2',  width - margin.left - margin.right)          
+                .attr('y1', heightExtent - 10)
+                .attr('y2', heightExtent - 10);
 
             }
 

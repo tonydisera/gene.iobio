@@ -188,7 +188,7 @@
 
 <body>
  <div id="container">
-    <div class="box-shadow">
+    <div id="nav-section" class="box-shadow"  style="position:fixed;background:white;width:100%;z-index:2;right:0px">
 
     	<section id="app-title-section">
     	   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
@@ -245,152 +245,156 @@
         </div>
     </div>  
 
+    <div id="track-section" style="padding-top:228px;">
 
+      <div id="filter-track" class="track box-shadow hide">
+          <div class="track-info">
+            <span class="stats-label">Filter Variants</span>
+          </div>    
 
-    <div id="filter-track" class="track box-shadow hide">
-        <div class="track-info">
-          <span class="stats-label">Filter Variants</span>
-        </div>    
+          <div class="track-chart">
+              <div id="variant-legend"></div>
 
-        <div class="track-chart">
-            <div id="variant-legend"></div>
-            <a  data-toggle="collapse" style="font-size: 12px" href="#af" aria-expanded="false" aria-controls="collapseExample">
-              Allele Frequency
-            </a>
-            <div id="af" class="collapse" style="font-size: 10px;">
-                <div id="af" >
-                  <svg id="vcf-af-chart"/>
-                  <div style="display: right;">
-                    <input type="text" id="af-amount" readonly="" style="border:none;width: 60px;">
-                    <div id="af-range" style="width: 342px;display: inline-block;"></div>
-                  </div>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-
-
-	<div id="vcf-track" class="track box-shadow hide" >
-        <div class="track-info" style="margin-bottom: 10px;">
-            <span class="stats-label">Examine variants</span>
-            <div class="stats-box">
-                <div id="add-vcf-track" style="float: left;margin-top: 10px">
-
-                    <div class="btn-group" style="display:  inline;">
-                      <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        Load File <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li style="color:  rgb(51, 51, 51);">
-                            <div class="file" onClick="onVcfFileButtonClicked()">
-                                <input type="file" name="files[]" id="vcf-file"  multiple />
-                                <label class="file-button" for="vcf-file" >Choose VCF File</label>
-                            </div>
-                        </li>
-                        <li>
-                            <a onClick="displayUrlBox()" href="#">Enter URL for VCF</a>
-                        </li>    
-                      </ul>
-                    </div>
-
-                    <div id="url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
-                        <input id="url-input" type="text"  value="http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz" class="form-control" placeholder="http://..." >
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" onClick="onVcfUrlEntered()" type="button">Go</button>
-                        </span>
-                    </div>
-                </div>     
-
-            </div>            
-        </div>          
-        <div class="track-chart">
-            <div style="text-align: center">
-                 <div class="variant-count badge" id="vcf-count" style="float:left; margin-top: 4px;margin-bottom: 4px;"></div>
-                 <span id="vcf-name" style="margin-left: -60px;font-size: 12px"></span>
-            </div>
-            <div id="vcf-variants"></div>
-            <div class="loader">
-                <span class="loader-label"></span>
-                <img src="assets/images/loading-squares.gif"/>
-            </div>
-        </div>
+          </div>
       </div>
 
 
 
-    <div id="fb-track" class="track box-shadow hide" >
-        <div class="track-info">
-            <span class="stats-label">Discover missing variants</span>
-           
-            <div>
-                <button class="btn btn-default" onClick="callVariants()">Call Freebayes</button>
-            </div>
-        </div>    
+  	  <div id="vcf-track" class="track box-shadow hide" >
+          <div class="track-info" style="margin-bottom: 10px;">
+              <span class="stats-label">Examine variants</span>
+              <div class="stats-box">
+                  <div id="add-vcf-track" style="float: left;margin-top: 10px">
 
-        <div class="track-chart">
-             <div>
-                 <div class="variant-count badge" id="fb-count" style="margin-bottom: 4px;"></div>
-             </div>
+                      <div class="btn-group" style="display:  inline;">
+                        <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          Load File <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                          <li style="color:  rgb(51, 51, 51);">
+                              <div class="file" onClick="onVcfFileButtonClicked()">
+                                  <input type="file" name="files[]" id="vcf-file"  multiple />
+                                  <label class="file-button" for="vcf-file" >Choose VCF File</label>
+                              </div>
+                          </li>
+                          <li>
+                              <a onClick="displayUrlBox()" href="#">Enter URL for VCF</a>
+                          </li>    
+                        </ul>
+                      </div>
 
-             <div id="fb-variants"></div>
+                      <div id="url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
+                          <input id="url-input" type="text"  value="http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz" class="form-control" placeholder="http://..." >
+                          <span class="input-group-btn">
+                              <button class="btn btn-default" onClick="onVcfUrlEntered()" type="button">Go</button>
+                          </span>
+                      </div>
+                  </div>     
 
-            <div class="loader">
-                <span class="loader-label"></span>
-                <img src="assets/images/loading-squares.gif"/>
-            </div>
-
-        </div>
-    </div>
-
-
-
-
-    <div id="bam-track" class="track box-shadow hide" >
-        <div class="track-info">
-            <span class="stats-label">Examine alignments</span>
-            
-            <div id="add-bam-track" style="float: left;margin-top: 10px">
-
-                <div class="btn-group" style="display:  inline;">
-                  <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Load File <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li style="color:  rgb(51, 51, 51);">
-                         <div class="file" onClick="onBamFileButtonClicked()">
-                            <input type="file" name="files[]" id="bam-file"  multiple />
-                            <label class="file-button" for="bam-file" >Choose BAM File</label>
+              </div>            
+          </div>          
+          <div class="track-chart">
+              <div style="text-align: left">
+                   <div class="variant-count badge" id="vcf-count" 
+                   style="float: left; margin-top: 2px; margin-bottom: 4px; display: none; margin-right: 40px;"></div>
+                    <a id="af-link" class="hide"  data-toggle="collapse" style="font-size: 12px" href="#af" aria-expanded="false" aria-controls="collapseExample">
+                      Allele Frequency
+                    </a>
+                    <div id="af" class="collapse" style="font-size: 10px;">
+                        <div id="af" >
+                          <svg id="vcf-af-chart"/>
+                          <div style="display: right;">
+                            <input type="text" id="af-amount" readonly="" style="border:none;width: 60px;">
+                            <div id="af-range" style="width: 342px;display: inline-block;"></div>
+                          </div>
                         </div>
-                    </li>
-                    <li>
-                        <a onClick="displayBamUrlBox()" href="#">Enter URL for BAM</a>
-                    </li>    
-                   
-                  </ul>
-                </div>
 
-                <div id="bam-url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
-                    <input id="bam-url-input" type="text" value="http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam" class="form-control" placeholder="http://..." >
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" onClick="onBamUrlEntered()" type="button">Go</button>
-                    </span>
-                </div>
-            </div>     
-        </div>
+                    </div>
 
-        <div id="bam-depth" class="track-chart">
-            <div id="bam-name" style="text-align: center; margin-top: -8px; font-size:12px"></div>
-            <div class="loader">
-                <span class="loader-label"></span>
-                <img src="assets/images/loading-squares.gif"/>
-            </div>
+                  
+              </div>
+              <div id="vcf-variants"></div>
+              <div class="loader">
+                  <span class="loader-label"></span>
+                  <img src="assets/images/loading-squares.gif"/>
+              </div>
+               <span id="vcf-name" class="hide" style="font-size: 12px"></span>
+          </div>
+      </div>
 
-        </div>
+
+
+      <div id="fb-track" class="track box-shadow hide" >
+          <div class="track-info">
+              <span class="stats-label">Discover missing variants</span>
+             
+              <div>
+                  <button class="btn btn-default" onClick="callVariants()">Call Freebayes</button>
+              </div>
+          </div>    
+
+          <div class="track-chart">
+               <div>
+                   <div class="variant-count badge" id="fb-count" style="margin-bottom: 4px;"></div>
+               </div>
+
+               <div id="fb-variants"></div>
+
+              <div class="loader">
+                  <span class="loader-label"></span>
+                  <img src="assets/images/loading-squares.gif"/>
+              </div>
+
+          </div>
+      </div>
+
+
+
+
+      <div id="bam-track" class="track box-shadow hide" >
+          <div class="track-info">
+              <span class="stats-label">Examine alignments</span>
+              
+              <div id="add-bam-track" style="float: left;margin-top: 10px">
+
+                  <div class="btn-group" style="display:  inline;">
+                    <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                      Load File <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                      <li style="color:  rgb(51, 51, 51);">
+                           <div class="file" onClick="onBamFileButtonClicked()">
+                              <input type="file" name="files[]" id="bam-file"  multiple />
+                              <label class="file-button" for="bam-file" >Choose BAM File</label>
+                          </div>
+                      </li>
+                      <li>
+                          <a onClick="displayBamUrlBox()" href="#">Enter URL for BAM</a>
+                      </li>    
+                     
+                    </ul>
+                  </div>
+
+                  <div id="bam-url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
+                      <input id="bam-url-input" type="text" value="http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam" class="form-control" placeholder="http://..." >
+                      <span class="input-group-btn">
+                          <button class="btn btn-default" onClick="onBamUrlEntered()" type="button">Go</button>
+                      </span>
+                  </div>
+              </div>     
+          </div>
+
+          <div id="bam-depth-track" class="track-chart">
+              <div class="loader">
+                  <span class="loader-label"></span>
+                  <img src="assets/images/loading-squares.gif"/>
+              </div>
+              <div id="bam-depth">
+              </div>
+              <div id="bam-name" class="hide" style="text-align: left;  font-size:12px"></div>
+          </div>
+      </div>
     </div>
-
 
 
 

@@ -125,7 +125,7 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top: 60, right: 4, bottom: 20, left: 4})
+	    .margin({top: 60, right: 4, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)
@@ -136,16 +136,22 @@ function init() {
 			if (!brush.empty()) {
 				regionStart = d3.round(brush.extent()[0]);
 				regionEnd   = d3.round(brush.extent()[1]);
+
 				$('#zoom-region-track').removeClass("hide");
 
-				var selection = d3.select("#zoom-region-chart").datum([]);
+				if (!selectedTranscript) {
+					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
+				}
+			    
+			    var selection = d3.select("#zoom-region-chart").datum([selectedTranscript]);
 		  		zoomRegionChart.regionStart(regionStart);
 				zoomRegionChart.regionEnd(regionEnd);
-	       		zoomRegionChart(selection);
+				zoomRegionChart(selection);
 	       		d3.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
 	       		$('#zoom-region-start').val(formatRegion(regionStart) );
 	       		$('#zoom-region-end').val(formatRegion(regionEnd));
+	       		d3.select('#track-section').style("padding-top", "298px");
 
 			} else {
 				// Treat a click as a region selection on the entire gene region.
@@ -155,6 +161,7 @@ function init() {
 				regionStart = window.gene.start;
 				regionEnd   = window.gene.end;
 				$('#zoom-region-track').addClass("hide");
+	       		d3.select('#track-section').style("padding-top", "228px");
 			}
 
        		//showTranscripts(regionStart, regionEnd);
@@ -184,12 +191,16 @@ function init() {
 
 
 	// This is an x-axis for the selected region		    
-	zoomRegionChart = regionD3()
-			    .width(1000)
-			    .height(0)
+	zoomRegionChart = geneD3()
 			    .widthPercent("100%")
 			    .heightPercent("100%")
-			    .margin({top: 0, right: 4, bottom: 40, left: 4});
+			    .width(1000)
+			    .margin({top: 30, right: 4, bottom: 0, left: 4})
+			    .showXAxis(true)
+			    .showBrush(false)
+			    .trackHeight(16)
+			    .cdsHeight(12)
+	    		.showLabel(false);
 
 	// Create the coverage chart
 	bamDepthChart = lineD3()
@@ -1026,6 +1037,8 @@ function showBamDepth(regionStart, regionEnd) {
 
 function fillBamChart(data, regionStart, regionEnd) {
 	$("#bam-track .loader").css("display", "none");
+    $('#bam-name').removeClass("hide");		
+
 
 	window.bamDepthChart.xStart(regionStart);
 	window.bamDepthChart.xEnd(regionEnd);
@@ -1033,7 +1046,7 @@ function fillBamChart(data, regionStart, regionEnd) {
 	window.bamDepthChart(d3.select("#bam-depth").datum(data));		
 	d3.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 	
-	window.scrollTo(0,document.body.scrollHeight);
+//	window.scrollTo(0,document.body.scrollHeight);
 }
 
 function showVariants(regionStart, regionEnd) {
@@ -1209,6 +1222,8 @@ function _pileupVariantsImpl(theChart, features, start, end) {
 function fillVariantChart(data, regionStart, regionEnd) {
 	$('#vcf-legend').css("display", "block");		
 	$('#vcf-count').css("display", "inline-block");		
+	$('#vcf-name').removeClass("hide");		
+	$('#af-link').removeClass("hide");
 	$('#vcf-variants').css("display", "inline");	
 	$("#vcf-track .loader").css("display", "none");
 
@@ -1222,7 +1237,7 @@ function fillVariantChart(data, regionStart, regionEnd) {
 	var selection = d3.select("#vcf-variants").datum([data]);    
     vcfChart(selection);
 
-    window.scrollTo(0,document.body.scrollHeight);
+//    window.scrollTo(0,document.body.scrollHeight);
 
 	$('#vcf-count').text(data.features.length + ' Variants');
 
@@ -1413,7 +1428,7 @@ function fillFreebayesChart(data, regionStart, regionEnd) {
 		$('#compare-legend').removeClass("hide");
 	}
 
-    window.scrollTo(0,document.body.scrollHeight);
+//    window.scrollTo(0,document.body.scrollHeight);
 
 }
 
