@@ -276,7 +276,7 @@ function variantD3() {
           .attr("d", function(d,i) {
             return d3.svg
                      .symbol()
-                     .type((d.type == 'DEL' ? 'triangle-down' : 'triangle-up'))
+                     .type((d.type == 'DEL' ? 'triangle-up' : 'circle'))
                      .size(symbolSize)();
           })
           .attr('class', function(d) { return clazz(d); })    
@@ -377,7 +377,7 @@ function variantD3() {
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
-                     .type((d.type == 'DEL' ? 'triangle-down' : 'triangle-up'))
+                     .type((d.type == 'DEL' ? 'triangle-up' : 'circle'))
                      .size(symbolSize)();
               }) 
               .attr("transform", function(d) { 
@@ -393,7 +393,7 @@ function variantD3() {
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
-                     .type((d.type == 'DEL' ? 'triangle-down' : 'triangle-up'))
+                     .type((d.type == 'DEL' ? 'triangle-up' : 'circle'))
                      .size(symbolSize)();
               })
               .attr("transform", function(d) { 
