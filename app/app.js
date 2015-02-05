@@ -130,7 +130,7 @@ function init() {
 	    .showBrush(true)
 	    .trackHeight(16)
 	    .cdsHeight(12)
-	    .showLabel(false)
+	    .showLabel(true)
 	    .on("d3brush", function(brush) {
 
 			if (!brush.empty()) {
@@ -486,8 +486,10 @@ function initFilterTrack() {
 	    	vcfChart.clazz(classifyByImpact);
 	    	fbChart.clazz(classifyByImpact);
 
-	    	showVariants(regionStart, regionEnd);
-	    	callVariants(regionStart, regionEnd);
+			fillVariantChart(vcfData, regionStart, regionEnd);
+	    	fillFreebayesChart(fbData, regionStart, regionEnd);
+	    	//showVariants(regionStart, regionEnd);
+	    	//callVariants(regionStart, regionEnd);
 	    });
 	  d3.selectAll('#effect-scheme')
 	    .on("click", function(d) {
@@ -499,8 +501,10 @@ function initFilterTrack() {
 	    	vcfChart.clazz(classifyByEffect);
 	    	fbChart.clazz(classifyByEffect);
 
-	    	showVariants(regionStart, regionEnd);
-	    	callVariants(regionStart, regionEnd);
+			fillVariantChart(vcfData, regionStart, regionEnd);
+	    	fillFreebayesChart(fbData, regionStart, regionEnd);
+	    	//showVariants(regionStart, regionEnd);
+	    	//callVariants(regionStart, regionEnd);
 	    });
 	   d3.selectAll('#compare-scheme')
 	    .on("click", function(d) {
@@ -512,6 +516,8 @@ function initFilterTrack() {
 	    	vcfChart.clazz(classifyByCompare);
 	    	fbChart.clazz(classifyByCompare);
 
+			//fillVariantChart(vcfData, regionStart, regionEnd);
+	    	//fillFreebayesChart(fbData, regionStart, regionEnd);
 	    	showVariants(regionStart, regionEnd);
 	    	callVariants(regionStart, regionEnd);
 

@@ -38,7 +38,8 @@ function geneD3() {
       showXAxis = true,
       widthPercent = null,
       heightPercent = null,
-      showBrush = false;
+      showBrush = false,
+      showLabel = false;
       
 
   //  options
