@@ -169,7 +169,7 @@ function init() {
        		//showTranscripts(regionStart, regionEnd);
 			showBamDepth(regionStart, regionEnd);
 			showVariants(regionStart, regionEnd);
-	    	callVariants(regionStart, regionEnd);
+	    	
 
 	    	
 
@@ -188,6 +188,7 @@ function init() {
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
 	    	showTranscripts();
+	    	showBamDepth();
 	    });
 
 
@@ -492,8 +493,6 @@ function initFilterTrack() {
 	    	if (fbData) {
 	    		fillFreebayesChart(fbData, regionStart, regionEnd);
 	    	}
-	    	//showVariants(regionStart, regionEnd);
-	    	//callVariants(regionStart, regionEnd);
 	    });
 	  d3.selectAll('#effect-scheme')
 	    .on("click", function(d) {
@@ -511,8 +510,6 @@ function initFilterTrack() {
 	    	if (fbData) {
 	    		fillFreebayesChart(fbData, regionStart, regionEnd);
 	    	}
-	    	//showVariants(regionStart, regionEnd);
-	    	//callVariants(regionStart, regionEnd);
 	    });
 	   d3.selectAll('#compare-scheme')
 	    .on("click", function(d) {
@@ -524,8 +521,7 @@ function initFilterTrack() {
 	    	vcfChart.clazz(classifyByCompare);
 	    	fbChart.clazz(classifyByCompare);
 
-			//fillVariantChart(vcfData, regionStart, regionEnd);
-	    	//fillFreebayesChart(fbData, regionStart, regionEnd);
+			
 	    	showVariants(regionStart, regionEnd);
 	    	callVariants(regionStart, regionEnd);
 
@@ -770,7 +766,6 @@ function loadTracksForGene() {
 	showTranscripts();
 	showBamDepth();
 	showVariants();
-	callVariants();
 
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
@@ -1049,7 +1044,10 @@ function showBamDepth(regionStart, regionEnd) {
 		return;
 	}
 
+	$("#bam-track .loader").css("display", "block");
 	$('#bam-track').removeClass("hide");
+	$('#bam-depth').addClass("hide");
+	$('#bam-name').addClass("hide");
 	
 
 	if (regionStart && regionEnd) {
@@ -1087,6 +1085,7 @@ function showBamDepth(regionStart, regionEnd) {
 function fillBamChart(data, regionStart, regionEnd) {
 	$("#bam-track .loader").css("display", "none");
     $('#bam-name').removeClass("hide");		
+	$('#bam-depth').removeClass("hide");
 
 
 	window.bamDepthChart.xStart(regionStart);
@@ -1094,6 +1093,8 @@ function fillBamChart(data, regionStart, regionEnd) {
 
 	window.bamDepthChart(d3.select("#bam-depth").datum(data));		
 	d3.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
+
+	callVariants();
 	
 //	window.scrollTo(0,document.body.scrollHeight);
 }
@@ -1110,6 +1111,8 @@ function showVariants(regionStart, regionEnd) {
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
 	$("#vcf-track .loader").css("display", "block");
+	$('#vcf-name').addClass("hide");		
+
 
 
 
