@@ -486,8 +486,12 @@ function initFilterTrack() {
 	    	vcfChart.clazz(classifyByImpact);
 	    	fbChart.clazz(classifyByImpact);
 
-			fillVariantChart(vcfData, regionStart, regionEnd);
-	    	fillFreebayesChart(fbData, regionStart, regionEnd);
+			if (vcfData) {
+				fillVariantChart(vcfData, regionStart, regionEnd);
+	    	} 
+	    	if (fbData) {
+	    		fillFreebayesChart(fbData, regionStart, regionEnd);
+	    	}
 	    	//showVariants(regionStart, regionEnd);
 	    	//callVariants(regionStart, regionEnd);
 	    });
@@ -501,8 +505,12 @@ function initFilterTrack() {
 	    	vcfChart.clazz(classifyByEffect);
 	    	fbChart.clazz(classifyByEffect);
 
-			fillVariantChart(vcfData, regionStart, regionEnd);
-	    	fillFreebayesChart(fbData, regionStart, regionEnd);
+	    	if (vcfData) {
+				fillVariantChart(vcfData, regionStart, regionEnd);
+	    	} 
+	    	if (fbData) {
+	    		fillFreebayesChart(fbData, regionStart, regionEnd);
+	    	}
 	    	//showVariants(regionStart, regionEnd);
 	    	//callVariants(regionStart, regionEnd);
 	    });
