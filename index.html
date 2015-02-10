@@ -11,8 +11,15 @@
 
 	<script src="assets/js/d3.min.js"></script>	
 
-	<!-- bam.iobio libraries -->
-	<script src="assets/js/class.js"></script>
+  <!-- jquery ui library -->
+  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
+  <!-- material design for bootstrap library -->
+  <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/material.min.js"></script>
+  <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/ripples.min.js"></script>
+
+  <!-- bam.iobio libraries -->
+  <script src="assets/js/class.js"></script>
   <script src="assets/js/bam.js"></script>
   <script src="assets/js/bin.js"></script>
   <script src="assets/js/inflate.js"></script>
@@ -32,19 +39,27 @@
 
 
 
+
 	<!-- fonts -->
 	<link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
 
 
-	<!-- css -->
+  <!-- jquery ui -->
 	<link rel="stylesheet" href="assets/css/jquery-ui.css" />	
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+
+  <!-- bootstrap  -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+ 
+  <!-- material design for bootstrap -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material-wfont.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/ripples.min.css">
+
+  <!-- site stylesheets -->
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
   <link rel="stylesheet" href="assets/css/site.css" />
 
-  <!-- jquery ui -->
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
 
         <!-- handlebar templates -->
@@ -188,7 +203,7 @@
 
 <body>
  <div id="container">
-    <div id="nav-section" class="box-shadow"  style="position:fixed;background:white;width:100%;z-index:2;right:0px;padding-right: 20px">
+    <div id="nav-section" class="sample shadow-z-1"  style="position:fixed;background:white;width:100%;z-index:2;right:0px;padding-right: 20px">
 
     	<section id="app-title-section">
     	   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
@@ -214,16 +229,18 @@
                 <div style="margin-top: 10px;" >
                   <div id="select-transcript" style="float: left;">
 
-                    <div id="transcript-btn-group" class="btn-group" style="display:  inline;">
-                      <button id="transcript-dropdown-button" type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        Choose Transcript <span class="caret"></span>
-                      </button>
-                      <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
-                        <li id="transcript-menu-item">
-                        </li>
-                      </ul>
-                    </div>
-                </div>     
+                    <div class="btn-toolbar">
+                      <div id="transcript-btn-group" class="btn-group" style="display:  inline;">
+                        <button id="transcript-dropdown-button" type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          Choose Transcript <span class="caret"></span>
+                        </button>
+                        <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
+                          <li id="transcript-menu-item">
+                          </li>
+                        </ul>
+                      </div>
+                    </div>   
+                </div>  
 
 
                 </div>
@@ -247,7 +264,7 @@
 
     <div id="track-section" style="padding-top:228px;">
 
-      <div id="filter-track" class="track box-shadow hide">
+      <div id="filter-track" class="track sample shadow-z-1 hide">
           <div class="track-info">
             <span class="stats-label">Filter Variants</span>
           </div>    
@@ -260,27 +277,29 @@
 
 
 
-  	  <div id="vcf-track" class="track box-shadow hide" >
+  	  <div id="vcf-track" class="track sample shadow-z-1 hide" >
           <div class="track-info" style="margin-bottom: 10px;">
               <span class="stats-label">Examine variants</span>
               <div class="stats-box">
                   <div id="add-vcf-track" style="float: left;margin-top: 10px">
-
-                      <div class="btn-group" style="display:  inline;">
-                        <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          Load File <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                          <li style="color:  rgb(51, 51, 51);">
-                              <div class="file" onClick="onVcfFileButtonClicked()">
-                                  <input type="file" name="files[]" id="vcf-file"  multiple />
-                                  <label class="file-button" for="vcf-file" >Choose VCF File</label>
-                              </div>
-                          </li>
-                          <li>
-                              <a onClick="displayUrlBox()" href="#">Enter URL for VCF</a>
-                          </li>    
-                        </ul>
+                      
+                      <div class="btn-toolbar">
+                        <div class="btn-group" style="display:  inline;">
+                          <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Load File <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu" role="menu">
+                            <li style="color:  rgb(51, 51, 51);">
+                                <div class="file" onClick="onVcfFileButtonClicked()">
+                                    <input type="file" name="files[]" id="vcf-file"  multiple />
+                                    <label class="file-button" for="vcf-file" >Choose VCF File</label>
+                                </div>
+                            </li>
+                            <li>
+                                <a onClick="displayUrlBox()" href="#">Enter URL for VCF</a>
+                            </li>    
+                          </ul>
+                        </div>
                       </div>
 
                       <div id="url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
@@ -291,7 +310,8 @@
                       </div>
                   </div>     
 
-              </div>            
+              </div>  
+          
           </div>          
           <div class="track-chart">
               <div style="text-align: left">
@@ -330,12 +350,12 @@
 
 
 
-      <div id="fb-track" class="track box-shadow hide" >
+      <div id="fb-track" class="track sample shadow-z-1 hide" >
           <div class="track-info">
               <span class="stats-label">Discover missing variants</span>
              
               <div>
-                  <button class="btn btn-default" onClick="callVariants()">Call Freebayes</button>
+                  <button class="btn btn-default  btn-raised" onClick="callVariants()">Call Freebayes</button>
               </div>
           </div>    
 
@@ -357,14 +377,15 @@
 
 
 
-      <div id="bam-track" class="track box-shadow hide" >
+      <div id="bam-track" class="track sample shadow-z-1 hide" >
           <div class="track-info">
               <span class="stats-label">Examine alignments</span>
               
               <div id="add-bam-track" style="float: left;margin-top: 10px">
 
-                  <div class="btn-group" style="display:  inline;">
-                    <button type="button" style="height: 42px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <div class="btn-toolbar">
+                   <div class="btn-group" style="display:  inline;">
+                    <button type="button" style="height: 42px;" class="btn btn-default  btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                       Load File <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
@@ -384,23 +405,26 @@
                   <div id="bam-url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
                       <input id="bam-url-input" type="text" value="http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam" class="form-control" placeholder="http://..." >
                       <span class="input-group-btn">
-                          <button class="btn btn-default" onClick="onBamUrlEntered()" type="button">Go</button>
+                          <button class="btn btn-default  btn-raised" onClick="onBamUrlEntered()" type="button">Go</button>
                       </span>
                   </div>
               </div>     
           </div>
+        </div>
 
-          <div id="bam-depth-track" class="track-chart">
-              <div class="loader">
-                  <span class="loader-label"></span>
-                  <img src="assets/images/loading-squares.gif"/>
-              </div>
-              <div id="bam-depth">
-              </div>
-              <div id="bam-name" class="hide" style="text-align: left;  font-size:12px"></div>
-          </div>
+        <div id="bam-depth-track" class="track-chart">
+            <div class="loader">
+                <span class="loader-label"></span>
+                <img src="assets/images/loading-squares.gif"/>
+            </div>
+            <div id="bam-depth">
+            </div>
+            <div id="bam-name" class="hide" style="text-align: left;  font-size:12px"></div>
+        </div>
       </div>
     </div>
+
+
 
 
 
