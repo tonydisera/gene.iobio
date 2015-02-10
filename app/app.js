@@ -106,6 +106,7 @@ $(document).ready(function(){
 function init() {
 	var me = this;
 
+
     $('#variant-legend').html(trackLegendTemplate());
 
 	loadGeneWidget();
@@ -180,7 +181,7 @@ function init() {
     transcriptMenuChart = geneD3()
 	    .width(600)
 	    .margin({top: 5, right: 5, bottom: 5, left: 120})
-	    .showXAxis(true)
+	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(12)
 	    .cdsHeight(8)
@@ -308,9 +309,9 @@ function init() {
 
 function initTranscriptControls() {
 
-	 $('#transcript-btn-group').data('open', false);
+	$('#transcript-btn-group').data('open', false);
 
-	 $('#transcript-dropdown-button').click(function () {
+	$('#transcript-dropdown-button').click(function () {
         if ($('#transcript-btn-group').data('open')) {
             $('#transcript-btn-group').data('open', false);
             onCloseTranscriptMenuEvent();
@@ -918,8 +919,15 @@ function onBamUrlEntered() {
 }
 
 function displayBamUrlBox() {
+	$('#bam-name').addClass("hide");
+    $('#bam-depth').addClass("hide");
+ 
 	$('#bam-url-input-group').css('visibility', 'visible');
-    $("#bam-url-input").focus();
+    //$("#bam-url-input").focus();
+    
+    //window.scrollTo(0,document.body.scrollHeight);
+
+
 
 }
 
@@ -1087,14 +1095,13 @@ function fillBamChart(data, regionStart, regionEnd) {
     $('#bam-name').removeClass("hide");		
 	$('#bam-depth').removeClass("hide");
 
-
 	window.bamDepthChart.xStart(regionStart);
 	window.bamDepthChart.xEnd(regionEnd);
 
 	window.bamDepthChart(d3.select("#bam-depth").datum(data));		
 	d3.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
-	callVariants();
+	callVariants(regionStart, regionEnd);
 	
 //	window.scrollTo(0,document.body.scrollHeight);
 }
@@ -1356,7 +1363,7 @@ function callVariants(regionStart, regionEnd) {
 
 	var refName = window.getBamRefName(window.gene.chr);
 
-	if (regionStart && regionEnd) {
+	if (fbData && regionStart && regionEnd) {
 		// The user has selected a region to zoom into.  Filter the
 		// variants based on the selected region
 
