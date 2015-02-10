@@ -1,7 +1,9 @@
 todo
 -------------
 
-
+- Transcript dropdown broken
+- Compare broken
+- Circle transcript area when mouseover variant
 
 - How to tell which snpEff annotation belongs to which alt
 
