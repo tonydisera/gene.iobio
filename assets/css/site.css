@@ -4,6 +4,10 @@ body {
 
 
 
+a, a:hover, a:focus {
+  color: rgb(53, 134, 192);
+}
+
 
 #container {
   margin-top:0px; 
@@ -165,6 +169,11 @@ section {
 #vcf-legend {
   display: none;
 }
+#variant-legend {
+  font-size: 11px;
+  color: rgb(102, 88, 92);
+  fill: rgb(102, 88, 92);
+}
 
 #fb-track {
 }
@@ -281,7 +290,7 @@ header {
   max-width: 800px;
   min-width: 800px;
   float:right;
-  font-size:11px;
+  font-size:12px;
 }
 
 #bam-url-input-group {
@@ -297,7 +306,7 @@ header {
   max-width: 800px;
   min-width: 800px;
   float:right;
-  font-size:11px;
+  font-size:12px;
 }
 
 
@@ -633,35 +642,82 @@ header {
 
 
 /* LEGEND */
-.impact.nocolor, .effect.nocolor {
- 
+.impact, .effect, .compare, .type {
+  border: solid thin white;
+  padding: 1px;
+
 }
-.impact:hover {
-  cursor: pointer;
+.impact.nocolor rect.variant, .effect.nocolor rect.variant, .compare.nocolor rect.variant {
+  fill: lightgrey !important;
+  stroke: grey !important;
 }
-.effect:hover {
+.impact:hover, .effect:hover, .compare:hover, .type:hover {
+  
   cursor: pointer;
+  border: solid thin white;
+  border-radius: 2px;
+  padding: 1px;
+  font-weight: bold;
+  fill: rgb(53, 134, 192);
 }
-.compare:hover {
+.impact.current:hover, .effect.current:hover, .compare.current:hover, .type.current:hover {
+  font-weight: bold;
   cursor: pointer;
-}
-.type:hover {
-  cursor: pointer;
-}
-#impact-scheme:hover, #effect-scheme:hover,  #compare-scheme:hover{
-  cursor: pointer;
+  border: solid thin black;
+  border-radius: 2px;
+  padding: 1px;
+  
 }
 .current{
   font-weight: bold;
-  text-decoration: underline;
+  border: solid thin black;
+  border-radius: 2px;
+  padding: 1px;
+ 
 }
-#impact-scheme, #effect-scheme {
+#impact-scheme, #effect-scheme, #compare-scheme {
   
+  cursor: pointer;
+  padding-top: 3px;
+  padding-left: 6px;
+}
+#type-scheme {
+  
+  padding-top: 3px;
+  padding-left: 6px;
 }
 .impact.inactive, .effect.inactive {
   pointer-events: none;
   opacity: .5;
 }
+#impact-scheme.current, #effect-scheme.current, #compare-scheme.current{
+  font-weight: bold;
+  border: none;
+ 
+}
+#impact-scheme .name, #effect-scheme .name, #compare-scheme .name, #type-scheme .name{
+  fill-opacity: 1;
+  font-size: 12px; 
+  font-weight: normal;
+}
+#impact-scheme.current .name, #effect-scheme.current .name, #compare-scheme.current .name {
+  fill-opacity: 1;
+  font-size: 12px;
+  font-style: bold;
+  color: rgb(53, 134, 192);
+  fill: rgb(53, 134, 192);
+}
+
+#impact-scheme:hover .name, #effect-scheme:hover .name, #compare-scheme:hover .name {
+  color: rgb(53, 134, 192);
+  fill: rgb(53, 134, 192);
+}
+#impact-arrow, #effect-arrow, #compare-arrow {
+  font-size: 11px;
+  color: rgb(53, 134, 192);
+  fill: rgb(53, 134, 192);
+}
+
 
 
 
@@ -729,6 +785,3 @@ header {
 .tt-suggestion p {
     margin: 0;
 }
-
-
-

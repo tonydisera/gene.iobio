@@ -7,12 +7,11 @@
 	<script src="assets/js/jquery-ui.min.js"></script>
 	<script src="assets/js/handlebars-v2.0.0.min.js"></script>	
 	<script src="assets/js/typeahead.bundle.min.js"></script>	
+  
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>	
 
 	<script src="assets/js/d3.min.js"></script>	
 
-  <!-- jquery ui library -->
-  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
   <!-- material design for bootstrap library -->
   <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/material.min.js"></script>
@@ -46,15 +45,18 @@
 
   <!-- jquery ui -->
 	<link rel="stylesheet" href="assets/css/jquery-ui.css" />	
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 
-  <!-- bootstrap  -->
+  <!-- bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+
  
-  <!-- material design for bootstrap -->
+  <!-- material design for bootstrap  -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material-wfont.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/ripples.min.css">
+
+
 
   <!-- site stylesheets -->
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
@@ -64,17 +66,23 @@
 
         <!-- handlebar templates -->
     <script id='track-legend-template' type="text/x-handlebars-template">     
-        <div id="track-legend">
+
+
+          <div >
+            Color by
+          </div>
         
-          <div style="margin-top: -6px;">
-              
-              <svg width="48" height="17" transform="translate(0,0)">
-                <text class="name" x="2" y="12" style="fill-opacity: 1;font-size: 11px;font-style: bold;">Color by:</text>
+          <div style="margin-top: -3px;">
+
+              <span id="impact-arrow" class="glyphicon glyphicon-arrow-right" 
+                    style="padding-left: 18px; visibility: visible;padding-right: 2px;" aria-hidden="true">
+              </span>
+
+              <svg id="impact-scheme" class="current" width="67" height="15" transform="translate(0,0)">
+                <text class="name" x="2" y="10">Impact</text>
               </svg>
 
-              <svg id="impact-scheme" class="current" width="65" height="15" transform="translate(0,0)">
-                <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 12px;font-style: bold;fill:  #337ab7;">Impact</text>
-              </svg>
+      
 
               <svg id="HIGH" class="impact" width="61" height="14" transform="translate(0,0)">
                 <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">High</text>
@@ -97,11 +105,14 @@
                 <rect class="variant  impact_NOIMPACT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
               </svg>
           </div>
-          <div style="padding-left: 52px;">
+          <div >
 
-              
-              <svg id="effect-scheme" width="65" height="15" transform="translate(0,0)" class="">
-                <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 12px;font-style: bold;fill:  #337ab7;">Effect</text>
+              <span id="effect-arrow" class="glyphicon glyphicon-arrow-right" 
+                    style="padding-left: 18px; visibility: hidden;padding-right: 2px;" aria-hidden="true">
+              </span>
+
+              <svg id="effect-scheme" width="67" height="15" transform="translate(0,0)" class="">
+                <text class="name" x="2" y="10">Effect</text>
               </svg>
 
 
@@ -153,18 +164,22 @@
                 <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Other</text>
                 <rect class="variant  effect_other" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
               </svg>
-              <svg id="NOEFFECT" class="impact" width="57" height="14" transform="translate(0,0)">
+              <svg id="NOEFFECT" class="effect" width="57" height="14" transform="translate(0,0)">
                 <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">No Effect</text>
                 <rect class="variant  effect_NOEFFECT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
               </svg>
             </div>
 
 
-            <div id="compare-legend" class="hide" style="padding-left: 50px;">
+            <div id="compare-legend" class="hide">
 
-              
+              <span id="compare-arrow" class="glyphicon glyphicon-arrow-right" 
+                    style="padding-left: 18px; visibility: hidden;padding-right: 2px;" aria-hidden="true">
+              </span>
+
+
               <svg id="compare-scheme" width="67" height="15" transform="translate(0,0)" class="">
-                <text class="name" x="2" y="10" style="fill-opacity: 1;font-size: 12px;font-style: bold;fill: #337ab7;">Compare</text>
+                <text class="name" x="2" y="10">Consensus</text>
               </svg>
 
 
@@ -178,23 +193,28 @@
               </svg>
             </div>
 
-          <div style="margin-top: 4px;">
+            <div style="margin-left: 34px;">
 
-              <svg id="snp" class="type" width="34" height="14" transform="translate(0,0)">
-                <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">SNP</text>
-                <rect class="variant snp" rx="1" ry="1" x="1" width="8" y="2" height="8" style="opacity: 0.1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+              <svg id="type-scheme" width="67" height="15" transform="translate(0,0)" class="">
+                <text class="name" x="2" y="10" >Type</text>
               </svg>
-              <svg id="ins" class="type" width="34" height="14" transform="translate(0,0)">
-                <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;"> INS</text>
-                <circle class="variant ins" cx="5" cy="5" r="4" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+
+              <svg id="snp" class="type" width="60" height="14" transform="translate(0,0)">
+                <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">SNP</text>
+                <rect class="variant snp" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
               </svg>
-               <svg id="del" class="type" width="34" height="14" transform="translate(0,0)">
-                <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">DEL</text>       
-                <polygon class="variant del" points="1,9 5,2 9,9" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+              <svg id="ins" class="type" width="58" height="14" transform="translate(0,0)">
+                <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;"> Insert</text>
+                <circle class="variant ins" cx="5" cy="5" r="3.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+              </svg>
+               <svg id="del" class="type" width="59" height="14" transform="translate(0,0)">
+                <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Delete</text>       
+                <polygon class="variant del" points="1,8 5,2 9,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
               </svg>
              
           </div>
 
+          
         </div>
     </script>
     
@@ -244,14 +264,14 @@
 
 
                 </div>
-
             </div>
             <div id="gene-viz" class="track-chart"></div>               
         </div>
 
 
         <div id="zoom-region-track" class="track hide">
-            <div  class='track-info'></div>  
+            <div  class='track-info'>
+            </div>  
             <div class="track-chart">
                 <div>
                     <input type="text" id="zoom-region-start"></input>
@@ -270,6 +290,7 @@
           </div>    
 
           <div class="track-chart">
+            
               <div id="variant-legend"></div>
 
           </div>
@@ -305,13 +326,15 @@
                       <div id="url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
                           <input id="url-input" type="text"  value="http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz" class="form-control" placeholder="http://..." >
                           <span class="input-group-btn">
-                              <button class="btn btn-default" onClick="onVcfUrlEntered()" type="button">Go</button>
+                            <button class="btn btn-primary btn-flat" onClick="onVcfUrlEntered()">
+                              <i class="mdi-navigation-check"></i> Go
+                            </button>
+
                           </span>
                       </div>
                   </div>     
-
               </div>  
-          
+
           </div>          
           <div class="track-chart">
               <div style="text-align: left">
@@ -404,8 +427,10 @@
 
                   <div id="bam-url-input-group" class="input-group" style="min-width: 300px;max-width: 600px;">
                       <input id="bam-url-input" type="text" value="http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam" class="form-control" placeholder="http://..." >
-                      <span class="input-group-btn">
-                          <button class="btn btn-default  btn-raised" onClick="onBamUrlEntered()" type="button">Go</button>
+                      <span class="input-group-btn">                          
+                        <button class="btn btn-primary btn-flat" onClick="onBamUrlEntered()">
+                          <i class="mdi-navigation-check"></i> Go
+                        </button>
                       </span>
                   </div>
               </div>     

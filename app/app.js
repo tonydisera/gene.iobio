@@ -106,6 +106,8 @@ $(document).ready(function(){
 function init() {
 	var me = this;
 
+    $.material.init();
+  
 
     $('#variant-legend').html(trackLegendTemplate());
 
@@ -439,7 +441,8 @@ function initFilterTrack() {
 	    	var theParentClasses = d3.select(this.parentNode).attr("class");
 	    	if (theParentClasses.indexOf("impact") >= 0 
 	    		|| theParentClasses.indexOf("effect") >= 0
-	    		|| theParentClasses.indexOf("compare") >= 0) {
+	    		|| theParentClasses.indexOf("compare") >= 0
+	    		|| theParentClasses.indexOf("type") >= 0)  {
 	    		return false;
 	    	} else if (theClasses.indexOf(id) >= 0) {
 	    		return false;
@@ -485,6 +488,14 @@ function initFilterTrack() {
 	    	d3.select('#effect-scheme' ).classed("current", false);
 	    	d3.select('#compare-scheme').classed("current", false);
 
+	    	d3.select('#impact-arrow').style("visibility", "visible");
+	    	d3.select('#effect-arrow' ).style("visibility", "hidden");
+	    	d3.select('#compare-arrow').style("visibility", "hidden");
+
+	    	d3.selectAll(".impact").classed("nocolor", false);
+	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".compare").classed("nocolor", true);
+
 	    	vcfChart.clazz(classifyByImpact);
 	    	fbChart.clazz(classifyByImpact);
 
@@ -501,6 +512,13 @@ function initFilterTrack() {
 	    	d3.select('#effect-scheme' ).classed("current", true);
 	    	d3.select('#compare-scheme').classed("current", false);
 
+	    	d3.select('#impact-arrow').style("visibility", "hidden");
+	    	d3.select('#effect-arrow' ).style("visibility", "visible");
+	    	d3.select('#compare-arrow').style("visibility", "hidden");
+
+	    	d3.selectAll(".impact").classed("nocolor", true);
+	    	d3.selectAll(".effect").classed("nocolor", false);
+	    	d3.selectAll(".compare").classed("nocolor", true);
 
 	    	vcfChart.clazz(classifyByEffect);
 	    	fbChart.clazz(classifyByEffect);
@@ -517,6 +535,15 @@ function initFilterTrack() {
 	    	d3.select('#impact-scheme').classed("current", false);
 	    	d3.select('#effect-scheme' ).classed("current", false);
 	    	d3.select('#compare-scheme').classed("current", true);
+
+
+	    	d3.select('#impact-arrow').style("visibility", "hidden");
+	    	d3.select('#effect-arrow' ).style("visibility", "hidden");
+	    	d3.select('#compare-arrow').style("visibility", "visible");
+
+	    	d3.selectAll(".impact").classed("nocolor", true);
+	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".compare").classed("nocolor", false);
 
 
 	    	vcfChart.clazz(classifyByCompare);
