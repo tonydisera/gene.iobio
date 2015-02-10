@@ -35,7 +35,7 @@ var Bam = Class.extend({
       
 
 //      this.iobio.bamtools = "ws://localhost:8061";
- //    this.iobio.samtools = "ws://localhost:8060";
+//     this.iobio.samtools = "ws://localhost:8060";
 //      this.iobio.bamReadDepther = "ws://localhost:8021";
 //      this.iobio.bamMerger = "ws://localhost:8030";      
 //      this.iobio.bamstatsAlive = "ws://localhost:7100"
@@ -593,7 +593,7 @@ var Bam = Class.extend({
       var me = this;
       var regionParm = ' ' + refName + ":" + start + "-" + end;
       
-      var url = encodeURI( this.iobio.samtools + '?cmd= mpileup ' +  " " + encodeURIComponent(this._getBamUrl(refName,start,end)) );
+      var url = encodeURI( this.iobio.samtools + '?encoding=utf8&cmd= mpileup ' +  " " + encodeURIComponent(this._getBamUrl(refName,start,end)) );
 
       var client = BinaryClient(this.iobio.samtools);
       
@@ -611,6 +611,11 @@ var Bam = Class.extend({
           stream.on('end', function() {
              me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
           });
+
+          stream.on("error", function(error) {
+            console.log("encountered stream error: " + error);
+          });
+
       });
 
    },
