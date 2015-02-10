@@ -45,29 +45,36 @@ lineD3 = function module() {
       var posx = d3.round(pos(d));
       var depthy = d3.round(depth(d));
 
-      var offsetTop = container[0][0].offsetTop;
-      var offsetLeft = container[0][0].offsetLeft;
+      var tooltipText = 'base coverage ' + parseInt(depthy);
 
-      var tooltipText = 'position ' + formatter(parseInt(   posx  ));
-      tooltipText += '<br>base coverage ' + parseInt(   depthy );
-             
-      var tooltip = container.select('.tooltip');
-              tooltip.transition()        
-                 .duration(200)      
-                 .style("opacity", .9);      
-              tooltip.html(tooltipText)     
-                 .style("width", "130px")                    
-                 .style("height", "40px")                    
-                 .style("left",  (offsetLeft + margin.left + mousex - 132) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (offsetTop + margin.top + mousey - 42 + margin.top) + "px");    
+      var labelX = mousex + margin.left - 50;
+      var labelY =  10; //mousey + margin.top - 25;
+
+      console.log(labelX + ' ' + width);
+
+      if (labelX > width - 75) {
+        labelX  = width - 75;
+      } else if (labelX < 25) {
+        labelX = 0;
+      }
+
+      var label = container.select(".circle-label");
+      label.transition()
+           .duration(200)
+          .style("opacity", 1);
+      label.attr("x", labelX)
+           .attr("y", labelY )
+           .attr("class", "circle-label")           
+           .text(tooltipText);
+
+
 
       var circle = container.select(".circle");
-              circle.transition()
-                    .duration(200)
-                    .style("opacity", 1);
-              circle.attr("cx", mousex + margin.left)
-                    .attr("cy", mousey + margin.top );
+      circle.transition()
+            .duration(200)
+            .style("opacity", 1);
+      circle.attr("cx", mousex + margin.left)
+            .attr("cy", mousey + margin.top );
               
     }
   };
@@ -75,7 +82,12 @@ lineD3 = function module() {
   var hideCircle = function() {
     container.select(".circle").transition()        
                  .duration(500)      
-                 .style("opacity", 0);  
+                 .style("opacity", 0); 
+    
+    container.select(".circle-label").transition()        
+                 .duration(500)      
+                 .style("opacity", 0);                    
+    
     container.select(".tooltip").transition()
              .duration(500)
              .style("opacity", 0); 
@@ -139,7 +151,7 @@ lineD3 = function module() {
       d3.select(this).selectAll("svg")
          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
-      // add a circle
+      // add a circle and label
       var circle = svg.selectAll(".circle").data([0])
         .enter().append('circle')
           .attr("class", "circle")
@@ -149,6 +161,14 @@ lineD3 = function module() {
           .style("fill", "none")
           .style("stroke", "red")               
           .style("stroke-width", "2")               
+          .style("opacity", 0);
+      var circleLabel = svg.selectAll(".circle-label").data([0])
+        .enter().append('text')
+          .attr("class", "circle-label")
+          .attr("x", 0)
+          .attr("y", 0)
+          .style("fill", "red")
+          .style("font-size", "11px")
           .style("opacity", 0);
 
       if (kind == KIND_AREA && showGradient) {
