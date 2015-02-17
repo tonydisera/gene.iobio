@@ -323,25 +323,34 @@ function variantD3() {
                   impactDisplay += ", ";
                 }
                 impactDisplay += key;
-              }    
+              }   
+              var ttWidth = 0;
+              if (d.ref.length > 20 || d.alt.length > 20) {
+                ttWidth = 260;
+              } else if (d.ref.length > 15 || d.alt.length > 15) {
+                ttWidth = 220;
+              } else {
+                ttWidth = 180;
+              }
               tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : "")
-                           + '<br>ref: ' + d.ref + ' alt:' + d.alt
+                           + '<br>ref: ' + d.ref 
+                           + '<br>alt: ' + d.alt
                            + '<br>effect: ' + effectDisplay
                            + '<br>impact: ' + impactDisplay 
-                           + '<br>qual: ' +  d.qual 
-                           + '<br>filter: ' + d.filter 
+                           + (d.qual != '' ? ('<br>qual: ' +  d.qual) : '') 
+                           + (d.filter != '.' ? ('<br>filter: ' + d.filter) : '') 
                            + '<br>allele freq: ' + d.af
                            + '<br>combined depth: ' + d.combinedDepth 
+                           + (d.zygosity != null ? ('<br>zygosity: ' + d.zygosity) : '')
                           // + '<br>genotypes: ' + d.genotypes 
                          //  + '<br>genotypes: ' + d.genotypeForAlt 
-                           + '<br>zygosity: ' + d.zygosity 
                          //  + '<br>phased: ' + d.phased 
                            )                    
-                 .style("width", "180px")
+                 .style("width", ttWidth + "px")
                  .style("height", "130px")             
-                 .style("left", (d3.event.pageX - 182) + "px") 
+                 .style("left", (d3.event.pageX - (ttWidth+2)) + "px") 
                  .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 132) + "px");   
+                 .style("top", (d3.event.pageY - 142) + "px");   
 
               dispatch.d3tooltip(d.start); 
             })                  
