@@ -845,11 +845,19 @@ var effectCategories = [
             }
 
             variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
-              'strand': regionStrand, 'type': type, 'id': rec.id, 'ref': rec.ref, 
+              'strand': regionStrand, 
+              'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
+              'id': rec.id, 'ref': rec.ref, 
               'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
-              'af': af, 'combinedDepth': combinedDepth, 'typeAnnotated': typeAnnotated,
-              'genotypes': genotypes, 'genotypeForAlt': genotypeForAlt, 'zygosity': zygosity, 'phased': phased,
-              'effect': effects, 'effectCategory': effectCats, 'impact': impacts, 'compare': rec.compare} );
+              'af': af, 'combinedDepth': combinedDepth,
+              'genotypes': genotypes, 
+              'genotypeForAlt': genotypeForAlt, 
+              'zygosity': zygosity, 
+              'phased': phased,
+              'effect': effects, 
+              'effectCategory': effectCats, 
+              'impact': impacts, 
+              'compare': rec.compare} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;

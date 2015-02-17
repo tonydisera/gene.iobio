@@ -45,6 +45,16 @@ function variantD3() {
     }
     return  'variant ' + d.type.toLowerCase() + impacts + effects + colorimpacts;
   };
+
+  function getSymbol(d,i) {
+     if (d.type.toUpperCase() == 'DEL') {
+        return 'triangle-up';
+     } else if (d.type.toUpperCase() == 'INS') {
+        return  'circle';
+     } else if (d.type.toUpperCase() == 'COMPLEX') {
+        return 'diamond';
+     }
+  }
       
       
   function chart(selection, options) {
@@ -150,9 +160,10 @@ function variantD3() {
 
       var symbolScale = d3.scale.linear()
                     .domain([1,6])
-                    .range([10,20]);
+                    .range([15,25]);
 
       var symbolSize = symbolScale(minWidth);
+     
 
       // Brush
       var brush = d3.svg.brush()
@@ -251,7 +262,7 @@ function variantD3() {
 
       // snps
       track.selectAll('.variant').data(function(d) { 
-        return d['features'].filter( function(d) { return d.type == 'SNP'; }) ;
+        return d['features'].filter( function(d) { return d.type.toUpperCase() == 'SNP'; }) ;
       }).enter().append('rect')
           .attr('class', function(d) { return clazz(d); })          
           .attr('rx', borderRadius)
@@ -269,14 +280,16 @@ function variantD3() {
       // insertions and deletions
       trackindel.selectAll('.variant').data(function(d) { 
         var indels = d['features'].filter( function(d){ 
-          return d.type == 'DEL' || d.type == 'INS'; 
+          return d.type.toUpperCase() == 'DEL' 
+              || d.type.toUpperCase() == 'INS' 
+              || d.type.toUpperCase() == 'COMPLEX'; 
         });
         return indels;
       }).enter().append('path')
           .attr("d", function(d,i) {
             return d3.svg
                      .symbol()
-                     .type((d.type == 'DEL' ? 'triangle-up' : 'circle'))
+                     .type( getSymbol(d,i) )
                      .size(symbolSize)();
           })
           .attr('class', function(d) { return clazz(d); })    
@@ -312,7 +325,6 @@ function variantD3() {
                 impactDisplay += key;
               }    
               tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : "")
-                           + '<br>type (annotated): ' + d.typeAnnotated 
                            + '<br>ref: ' + d.ref + ' alt:' + d.alt
                            + '<br>effect: ' + effectDisplay
                            + '<br>impact: ' + impactDisplay 
@@ -377,7 +389,7 @@ function variantD3() {
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
-                     .type((d.type == 'DEL' ? 'triangle-up' : 'circle'))
+                     .type(getSymbol(d,i))
                      .size(symbolSize)();
               }) 
               .attr("transform", function(d) { 
@@ -393,7 +405,7 @@ function variantD3() {
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
-                     .type((d.type == 'DEL' ? 'triangle-up' : 'circle'))
+                     .type(getSymbol(d,i))
                      .size(symbolSize)();
               })
               .attr("transform", function(d) { 
@@ -402,7 +414,22 @@ function variantD3() {
                   var tx = "translate(" + xCoord + "," + yCoord + ")"; 
                   return tx;
               });
-                 
+
+          trackindel.selectAll('.variant.complex')
+            .transition()                 
+              .duration(1000)  
+              .attr("d", function(d,i) {
+                return d3.svg
+                     .symbol()
+                     .type(getSymbol(d,i))
+                     .size(symbolSize)();
+              })
+              .attr("transform", function(d) { 
+                  var xCoord = x(d.start);
+                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding));
+                  var tx = "translate(" + xCoord + "," + yCoord + ")"; 
+                  return tx;
+              });                 
        
 
       } 
