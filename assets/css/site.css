@@ -152,6 +152,7 @@ section {
   margin-top: 20px;
   margin-bottom: 0px;
   padding-bottom: 0px;
+  clear: both;
 }
 
 #bam-track {
@@ -436,7 +437,7 @@ header {
 
 
 #zoom-region-chart .axis text  {
-    font-size: 13px;
+    font-size: 10px;
     fill: rgb(120,120,120);
     font-style: italic;
 }
@@ -445,8 +446,12 @@ header {
 #zoom-region-track {
     margin-top: -26px;
     margin-bottom: 0px;
+    padding-bottom: 0px;
 }
-
+#zoom-region-chart {
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
 #zoom-region-ref-name {
 }
 #zoom-region-start {
@@ -589,13 +594,13 @@ header {
   fill: rgb(13, 236, 210);
   stroke: rgb(142, 145, 145);
 } 
-.variant.effect_synonymous{
+.variant.effect_splice_acceptor{
   fill: rgb(150, 143, 236);
   stroke: rgb(80, 77, 121);
 } 
-.variant.effect_mirna{
-  fill: #b2df8a;
-  stroke: #80A65F;
+.variant.effect_splice_donor{
+  fill: #FFE216;
+  stroke: #B27619;
 } 
 .variant.effect_regulatory{
   fill: #3d8901;
@@ -605,9 +610,9 @@ header {
   fill: rgb(234, 216, 90);
   stroke: rgb(182, 150, 55);
 }
-.variant.effect_intron{
-  fill:#74add1;
-  stroke: #5A88A5;
+.variant.effect_exon_loss{
+  fill: #0CBEA3;
+  stroke: #137E83;
 }
 .variant.effect_other{
   fill: rgb(187, 187, 187);
@@ -621,18 +626,52 @@ header {
   fill: #D5A8D7;
   stroke: #882626;
 }
-.variant.effect_downstream {
+.variant.effect_stop_lost {
   fill: #F48E45;
   stroke: #C36F33;
 }
-.variant.effect_upstream {
+.variant.effect_start_lost {
+  fill: #D07583;
+  stroke: #903B48;
+}
+.variant.effect_stop_gained {
+  fill: #D0DB21;
+  stroke: #767C14;
+}
+.variant.effect_rare_amino_acid{
+  fill: rgb(234, 216, 90);
+  stroke: rgb(182, 150, 55);
+}
+.variant.effect_chromosome{
+  fill: #b2df8a;
+  stroke: #80A65F;
+} 
+.variant.effect_coding{
+  fill: #7BBA49;
+  stroke: #709D4D;
+} 
+.variant.effect_synonymous{
   fill: #ADC9E8;
   stroke: #6187B2;
+}
+.variant.effect_exon{
+  fill: rgb(150, 143, 236);
+  stroke: rgb(80, 77, 121);
+} 
+
+.variant.effect_other { 
+  fill: rgb(187, 187, 187);
+  stroke: rgb(124, 109, 109)
 }
 .variant.effect_NOEFFECT { 
   fill: #FAF5BE;
   stroke: #807D7D;
 }
+
+
+
+
+
 
 
 
@@ -785,3 +824,4 @@ header {
 .tt-suggestion p {
     margin: 0;
 }
+

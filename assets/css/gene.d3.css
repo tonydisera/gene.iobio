@@ -20,6 +20,12 @@
   stroke: #50A019;
   opacity: .8;
 }
+#transcript-menu-item.ibo-gene .utr:hover,
+#transcript-menu-item.ibo-gene .cds:hover,
+#transcript-menu-item.ibo-gene .reference:hover
+{ 
+  cursor: pointer;
+}
 
 .ibo-gene .transcript.selected .reference {
   stroke: rgb(0, 0, 0);
@@ -32,9 +38,13 @@
   font-size: 13px; fill: 
   rgb(120,120,120); 
 }
+#transcript-menu-item.ibo-gene .transcript.selected .name { 
+  font-style: bold;
+  fill: black;
+}
 #transcript-menu-item.ibo-gene .name { 
-  font-size: 11px; fill: 
-  rgb(120,120,120); 
+  font-size: 11px; 
+  fill: rgb(120,120,120); 
 }
 #transcript-menu-item.ibo-gene .name:hover { 
   cursor: pointer;
@@ -43,7 +53,7 @@
 }
 .ibo-gene .arrow { stroke: rgb(150,150,150); fill: none; }
 .ibo-gene .axis path, .ibo-gene .axis line { fill: none; stroke: lightgrey; shape-rendering: crispEdges; }
-.ibo-gene .x.axis text{ font-size: 13px; }
+.ibo-gene .x.axis text{ font-size: 10px; }
 .ibo-gene .tooltip {   
   position: absolute;           
   text-align: center;           

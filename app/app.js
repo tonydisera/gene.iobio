@@ -128,12 +128,12 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top: 60, right: 4, bottom: 0, left: 4})
+	    .margin({top: 20, right: 4, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)
 	    .cdsHeight(12)
-	    .showLabel(true)
+	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 
 			if (!brush.empty()) {
@@ -201,7 +201,7 @@ function init() {
 			    .widthPercent("100%")
 			    .heightPercent("100%")
 			    .width(1000)
-			    .margin({top: 30, right: 4, bottom: 0, left: 4})
+			    .margin({top: 20, right: 4, bottom: 0, left: 4})
 			    .showXAxis(true)
 			    .showBrush(false)
 			    .trackHeight(16)
@@ -848,10 +848,10 @@ function showTranscripts(regionStart, regionEnd) {
     }
 
     if (transcriptViewMode == "single") {
-
-    	// TODO:  Need to pick the selected transcript. 
-    	// For now, just getting the last one.
     	transcripts = [selectedTranscript];
+    	var cache = $('#transcript-dropdown-button').children();
+   		$('#transcript-dropdown-button').text(selectedTranscript.transcript_id).append(cache);
+   		getTranscriptSelector(selectedTranscript).attr("class", "transcript selected");
 	} 
 
 
@@ -864,6 +864,11 @@ function showTranscripts(regionStart, regionEnd) {
 	d3.select("#gene-viz .x.axis .tick text").style("text-anchor", "start");
 
 
+}
+
+function getTranscriptSelector(selectedTranscript) {
+	var selector = '#transcript-menu-item #transcript_' + selectedTranscript.transcript_id.split(".").join("_");
+	return $(selector);
 }
 
 

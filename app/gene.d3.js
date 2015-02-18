@@ -44,6 +44,8 @@ function geneD3() {
 
   //  options
   var defaults = {};
+
+  var brushAllowance = 0;
       
       
   function chart(selection, options) {
@@ -56,6 +58,8 @@ function geneD3() {
 
 
     selection.each(function(data) {
+
+       brushAllowance = showBrush ? 20 : 0;
 
        // calculate height
        height = data.length * (trackHeight + arrowHeight);
@@ -89,24 +93,24 @@ function geneD3() {
       // Select the svg element, if it exists.
       var svg = container.selectAll("svg").data([0]);
 
-      var brushAllowance = showBrush ? 20 : 0;
+    
 
       svg.enter()
         .append("svg")
         .attr("width", widthPercent ? widthPercent : width)
-        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
+        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       if (widthPercent && heightPercent) {
         d3.select(this).selectAll("svg")
-          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
+          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
           .attr("preserveAspectRatio", "xMaxYMid meet");
       } 
 
       d3.select(this).selectAll("svg")
         .attr("width", widthPercent ? widthPercent : width)
-        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
+        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
 
 
 
@@ -136,15 +140,33 @@ function geneD3() {
                 .attr('x1', xExtent)
                 .attr('x2', xExtent)          
                 .attr('y1', heightExtent -20)
-                .attr('y2', heightExtent -10);
+                .attr('y2', heightExtent );
 
                g.append('line')
                 .attr('class', 'brush-line')
-                .attr('x1', 80 )
-                .attr('x2',  width - margin.left - margin.right - 80)          
-                .attr('y1', heightExtent - 10)
-                .attr('y2', heightExtent - 10);
+                .attr('x1', 40 )
+                .attr('x2',  width - margin.left - margin.right - 40)          
+                .attr('y1', heightExtent)
+                .attr('y2', heightExtent);
 
+              if (widthPercent && heightPercent) {
+                svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
+                   .attr("preserveAspectRatio", "xMaxYMid meet");
+              } 
+
+              svg.attr("width", widthPercent ? widthPercent : width)
+                 .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
+
+
+            } else {
+               if (widthPercent && heightPercent) {
+                  svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+                     .attr("preserveAspectRatio", "xMaxYMid meet");
+                } 
+
+                svg.attr("width", widthPercent ? widthPercent : width)
+                   .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
+             
             }
 
             dispatch.d3brush(brush);
@@ -185,6 +207,7 @@ function geneD3() {
       var transcript = g.selectAll('.transcript').data(data);
       transcript.enter().append('g')
           .attr('class', 'transcript')
+          .attr("id", function(d,i) { return 'transcript_' +  d.transcript_id.split(".").join("_"); })
           .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
       
 
@@ -195,8 +218,15 @@ function geneD3() {
           .attr('x1', function(d) { return d3.round(x(d[0]))})
           .attr('x2', function(d) { return d3.round(x(d[1]))})                    
           .attr('y1', trackHeight/2)
-          .attr('y2', trackHeight/2);
-
+          .attr('y2', trackHeight/2)
+          .on("mouseover", function(d) {
+            d3.selectAll('.transcript.selected').attr("class", "transcript");
+            d3.select(this.parentNode).attr("class", "transcript selected");
+            selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
+          })
+          .on("mouseout", function(d) {
+            d3.select(this.parentNode).attr("class", "transcript");
+          });
 
 
       transcript.selectAll(".name").remove();
@@ -211,12 +241,11 @@ function geneD3() {
                     .text(function(d) { return d[1]; })
                     .style('fill-opacity', 0)
                     .on("mouseover", function(d) {
-                      d3.select(this).style("font-style", "bold");
+                      d3.selectAll('.transcript.selected').attr("class", "transcript");
                       d3.select(this.parentNode).attr("class", "transcript selected");
                       selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
                     })
                     .on("mouseout", function(d) {
-                      d3.select(this).style("font-style", "regular");
                       d3.select(this.parentNode).attr("class", "transcript");
                     });
 
@@ -239,6 +268,7 @@ function geneD3() {
           .attr('y', trackHeight /2)
           .attr('height', 0)
           .on("mouseover", function(d) {  
+              // show the tooltip
               var tooltip = container.select('.tooltip');
               tooltip.transition()        
                  .duration(200)      
@@ -247,12 +277,22 @@ function geneD3() {
                  .style("left", (d3.event.pageX) + "px") 
                  .style("text-align", 'left')    
                  .style("top", (d3.event.pageY - 24) + "px");    
-                 })                  
-           .on("mouseout", function(d) {       
+
+              // select the transcript  
+              d3.selectAll('.transcript.selected').attr("class", "transcript");
+              d3.select(this.parentNode).attr("class", "transcript selected");
+              selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
+           })                  
+           .on("mouseout", function(d) {   
+              // hide the tooltip    
               container.select('.tooltip').transition()        
                  .duration(500)      
                  .style("opacity", 0);   
-           });           
+
+              // de-select the transcript   
+              d3.select(this.parentNode).attr("class", "transcript");
+           })
+          
 
       // exit
       transcript.exit().remove();
