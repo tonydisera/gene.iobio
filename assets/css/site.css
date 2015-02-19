@@ -8,6 +8,27 @@ a, a:hover, a:focus {
   color: rgb(53, 134, 192);
 }
 
+#color-scheme {
+  font-size: 11px;
+  margin-bottom: 10px;
+  color: rgb(102, 88, 92);
+}
+
+.radio label {
+  cursor: pointer;
+  padding-left: 30px;
+  position: relative;
+  padding-top: 2px;
+  font-size:11px;
+
+}
+
+.radio, .checkbox {
+  position: relative;
+  display: inline;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 
 #container {
   margin-top:0px; 
@@ -58,6 +79,18 @@ section {
     font-size: 18px;
     max-width: 220px;
 
+}
+
+.track-expand {
+  font-size: 18px;
+  display: block;
+  background-color: white;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .track-chart {
@@ -715,15 +748,10 @@ header {
  
 }
 #impact-scheme, #effect-scheme, #compare-scheme {
-  
-  cursor: pointer;
-  padding-top: 3px;
-  padding-left: 6px;
+  padding-top: 2px;
 }
 #type-scheme {
-  
-  padding-top: 3px;
-  padding-left: 6px;
+  padding-top: 2px;
 }
 .impact.inactive, .effect.inactive {
   pointer-events: none;
@@ -747,15 +775,7 @@ header {
   fill: rgb(53, 134, 192);
 }
 
-#impact-scheme:hover .name, #effect-scheme:hover .name, #compare-scheme:hover .name {
-  color: rgb(53, 134, 192);
-  fill: rgb(53, 134, 192);
-}
-#impact-arrow, #effect-arrow, #compare-arrow {
-  font-size: 11px;
-  color: rgb(53, 134, 192);
-  fill: rgb(53, 134, 192);
-}
+
 
 
 

@@ -488,10 +488,6 @@ function initFilterTrack() {
 	    	d3.select('#effect-scheme' ).classed("current", false);
 	    	d3.select('#compare-scheme').classed("current", false);
 
-	    	d3.select('#impact-arrow').style("visibility", "visible");
-	    	d3.select('#effect-arrow' ).style("visibility", "hidden");
-	    	d3.select('#compare-arrow').style("visibility", "hidden");
-
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
 	    	d3.selectAll(".compare").classed("nocolor", true);
@@ -512,9 +508,6 @@ function initFilterTrack() {
 	    	d3.select('#effect-scheme' ).classed("current", true);
 	    	d3.select('#compare-scheme').classed("current", false);
 
-	    	d3.select('#impact-arrow').style("visibility", "hidden");
-	    	d3.select('#effect-arrow' ).style("visibility", "visible");
-	    	d3.select('#compare-arrow').style("visibility", "hidden");
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
@@ -536,10 +529,6 @@ function initFilterTrack() {
 	    	d3.select('#effect-scheme' ).classed("current", false);
 	    	d3.select('#compare-scheme').classed("current", true);
 
-
-	    	d3.select('#impact-arrow').style("visibility", "hidden");
-	    	d3.select('#effect-arrow' ).style("visibility", "hidden");
-	    	d3.select('#compare-arrow').style("visibility", "visible");
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", true);
