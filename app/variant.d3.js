@@ -68,7 +68,7 @@ function variantD3() {
     //height += (variantHeight + verticalPadding);  
     // Account for the margin when we are showing the xAxis
     if (showXAxis) {
-      height += margin.bottom; 
+      //height += margin.bottom; 
     }
     var dividerY = dividerLevel ? height - ((dividerLevel + 1) * (variantHeight + verticalPadding)) : null;
 

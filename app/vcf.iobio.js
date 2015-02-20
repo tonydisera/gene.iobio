@@ -139,10 +139,13 @@ var effectCategories = [
   exports.openVcfUrl = function(url) {
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;
+    vcfFile = null;
+    tabixFile = null;
   }
 
   exports.openVcfFile = function(event, callback) {
     sourceType = SOURCE_TYPE_FILE;
+    vcfURL = null;
                 
     if (event.target.files.length != 2) {
        alert('must select 2 files, both a .vcf.gz and .vcf.gz.tbi file');

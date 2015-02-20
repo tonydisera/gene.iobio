@@ -211,11 +211,11 @@ function init() {
 	// Create the coverage chart
 	bamDepthChart = lineD3()
 	                    .width(1000)
-	                    .height( 70 )
+	                    .height( 45 )
 	                    .widthPercent("100%")
 	                    .heightPercent("100%")
 	                    .kind("area")
-						.margin( {top: 10, right: 4, bottom: 20, left: 4} )
+						.margin( {top: 0, right: 4, bottom: 20, left: 4} )
 						.showXAxis(true)
 						.showYAxis(false)
 						.showTooltip(true)
@@ -226,7 +226,7 @@ function init() {
 	// Create the vcf track
 	vcfChart = variantD3()
 			    .width(1000)
-			    .margin({top: 0, right: 4, bottom: 20, left: 4})
+			    .margin({top: 0, right: 4, bottom: 16, left: 4})
 			    .showXAxis(true)
 			    .variantHeight(6)
 			    .verticalPadding(2)
@@ -254,17 +254,8 @@ function init() {
 					   .margin( {left: 40, right: 0, top: 0, bottom: 20})
 					   .xValue( function(d, i) { return d[0] })
 					   .yValue( function(d, i) { return Math.log(d[1]) })
-					   .yAxisLabel( "log(frequency)" )
-					   .on("d3click", function(d, on) {
-
-						   	var lowerVal = on ? ( d[0]      * 2) / 100 : 0;
-							var upperVal = on ? ((d[0] + 1) * 2) / 100 : 1;
-					   		
-						   	me.showAfSlider(lowerVal, upperVal);
-
-						   	me.filterVariantsByAf(lowerVal, upperVal);
-
-					   });
+					   .yAxisLabel( "log(frequency)" );
+					   
 	afChart.formatXTick( function(d,i) {
 		return (d * 2) + '%';
 	});
@@ -336,59 +327,17 @@ function onCloseTranscriptMenuEvent() {
  	loadTracksForGene();
 }
 
-function showAfSlider(lowVal, highVal) {
-
-
-    // Initialize allele frequency slider
-    $( "#af-range" ).slider({
-      range: true,
-      min: 0,
-      max: 100,
-      values: [ 0, 100 ],
-      slide: function( event, ui ) {
-        $( "#af-amount" ).val( ui.values[ 0 ]  + " - " + ui.values[ 1 ]  + "%" );
-      },
-      change: function( event, ui ) {
-      	afMin = ui.values[0] / 100;
-        afMax = ui.values[1] / 100;
-    	$( "#af-amount" ).removeClass("hide");
-    
-      	filterVariantsByAf(afMin, afMax);
-
-      	showMinorAfSlider(afMin, afMax);
-
-      }
-    });
-    $( "#af-amount" ).val( $( "#af-range" ).slider( "values", 0 ) +
-      " - " + $( "#af-range" ).slider( "values", 1 ) + '%');	
-
-   
+function onAfEnter(ele) {
+    if(event.keyCode == 13) {
+        filterVariantsByAf(); 
+    }
 }
 
-function showMinorAfSlider(lowVal, highVal) {
- 	$( "#af-minor-range" ).slider({
-      range: true,
-      min: lowVal * 1000,
-      max: highVal * 1000,
-      values: [ lowVal * 1000, highVal * 1000 ],
-      slide: function( event, ui ) {
-        $( "#af-amount" ).val( ui.values[ 0 ] / 10 + " - " + ui.values[ 1 ] / 10 + "%" );
-      },
-      change: function( event, ui ) {
-      	afMin = ui.values[0] / 1000;
-        afMax = ui.values[1] / 1000;
-        $( "#af-amount" ).removeClass("hide");
-    
-      	filterVariantsByAf(afMin, afMax);
-      }
-    });
-    $( "#af-amount" ).val( $( "#af-range" ).slider( "values", 0 ) / 10 +
-      " - " + $( "#af-minor-range" ).slider( "values", 1 ) / 10 + '%');		
-}
-
-function filterVariantsByAf(lowerVal, upperVal) {
+function filterVariantsByAf() {
 	var me = this;
 
+	var lowerVal = $('#af-amount-start').val() / 100;
+	var upperVal = $('#af-amount-end').val() / 100;
 	   
 	var filteredFeatures = vcfData.features.filter(function(d) {
 		return (d.af >= lowerVal && d.af <= upperVal);
@@ -417,8 +366,6 @@ function filterVariantsByAf(lowerVal, upperVal) {
 
 function initFilterTrack() {
 
-	// Show af slider
-	this.showAfSlider(0, 1);
 
 	d3.selectAll(".type, .impact, .effect, .compare")
 	  .on("mouseover", function(d) {  	  	
@@ -735,12 +682,13 @@ function loadTracksForGene() {
 	$('#view-finder-track').removeClass("hide");
 
 	$('#add-vcf-track').css("visibility", "visible");
-	$('#vcf-track').removeClass("hide");
 
 	$('#add-bam-track').css("visibility", "visible");
-	$('#bam-track').removeClass("hide");
 
 	$('#zoom-region-track').addClass("hide");
+
+	$('#datasource-button').css("visibility", "visible");
+	$('#transcript-btn-group').removeClass("hide");
 
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
@@ -862,7 +810,9 @@ function getTranscriptSelector(selectedTranscript) {
 
 
 function onBamFileButtonClicked() {	
-	$('#bam-url-input-group').css('visibility', 'hidden');
+	$('#bam-url-input').addClass('hide');
+	$('#bam-url-input').val('');
+
 }
 
 function onBamFilesSelected(event) {
@@ -890,6 +840,9 @@ function onBamFilesSelected(event) {
 	 }
 
 	$('#bam-name').text(bamFile.name);
+	$('#bam-file-info').removeClass('hide');
+	$('#bam-file-info').val(bamFile.name);
+
 
 	window.bam = new Bam( bamFile, { bai: baiFile });
 	window.getBamRefName = null;
@@ -906,36 +859,24 @@ function onBamFilesSelected(event) {
 		 		}
 			}
 		});
-		
-		// Show the read coverage 
-		this.showBamDepth();
-
 	
-		if (regionStart && regionEnd) {
-			this.showBamDepth(regionStart, regionEnd);
-		}
 	});
 }
+
 
 function onBamUrlEntered() {
 	$("#bam-track .loader").css("display", "block");
 	$("#bam-track .loader-label").text("Streaming File")
 
-
+	$('#bam-url-input').removeClass("hide");
 	var bamUrl = $('#bam-url-input').val();
 	$('#bam-name').text(bamUrl);
 
-
-	$('#bam-url-input-group').css('visibility', 'hidden');
     
     window.bam = new Bam(bamUrl);
     window.bamUrlEntered = true;
     window.getBamRefName = stripRefName;
 
-
-
-    // Show the vcf variants.  
-	this.showBamDepth();
 
 }
 
@@ -943,22 +884,25 @@ function displayBamUrlBox() {
 	$('#bam-name').addClass("hide");
     $('#bam-depth').addClass("hide");
  
-	$('#bam-url-input-group').css('visibility', 'visible');
-    //$("#bam-url-input").focus();
-    
-    //window.scrollTo(0,document.body.scrollHeight);
+	$('#bam-file-info').addClass('hide');
+    $('#bam-file-info').val('');
 
-
+    $('#bam-url-input').removeClass("hide");
+    $("#bam-url-input").focus();
 
 }
 
 function displayUrlBox() {
-	$('#url-input-group').css('visibility', 'visible');
+    $('#url-input').val('http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz');
+	$("#url-input").removeClass('hide');
     $("#url-input").focus();
+    $('#vcf-file-info').addClass('hide');
+    $('#vcf-file-info').val('');
 
 }
 function onVcfFileButtonClicked() {	
-	$('#url-input-group').css('visibility', 'hidden');
+	$('#url-input').addClass('hide');
+	$('#url-input').val('');
 }
 
 function onVcfFilesSelected(event) {
@@ -973,6 +917,8 @@ function onVcfFilesSelected(event) {
 	window.vcf.openVcfFile( event, function(vcfFile) {
 
 		$('#vcf-name').text(vcfFile.name);
+		$('#vcf-file-info').removeClass('hide');
+		$('#vcf-file-info').val(vcfFile.name);
 		window.getVcfRefName = null;
 		window.vcf.getReferenceNames(function(refNames) {
 
@@ -987,19 +933,6 @@ function onVcfFilesSelected(event) {
 			 		}
 				}
 			});
-
-			// Show the vcf variants.  
-			this.showVariants();
-
-			// If a sub-region of the gene was selected, 
-			// show the read coverage and called variants
-			// for the filtered region.  (Note: it is necessary
-			// to first get the full data for read coverage and
-			// the called variants so that subsequent selections
-			// can just filter on the full data.)
-			if (regionStart && regionEnd) {
-				showVariants(regionStart, regionEnd);
-			}
 
 		});
 
@@ -1020,12 +953,37 @@ function onVcfUrlEntered() {
 	$('#vcf-name').text(vcfUrl);
 
 
-	$('#url-input-group').css('visibility', 'hidden');
-
     
     window.vcf.openVcfUrl(vcfUrl);
     window.vcfUrlEntered = true;
     window.getVcfRefName = stripRefName;
+
+
+}
+
+function loadDataSources() {
+	if ($('#bam-url-input').val() != '') {
+		onBamUrlEntered();
+	}
+	if ($('#url-input').val() != '') {
+		onVcfUrlEntered();
+	}
+
+	var dsName = $('#datasource-name').val();
+	var cache = $('#variant-link').children();
+   	$('#variant-link').text(dsName).append(cache);
+   	$('#variant-link').attr("aria-expanded", true);
+   	$('#variant-panel').attr("aria-expanded", true);
+   	$('#variant-panel').addClass("in");
+
+
+	// Show the read coverage 
+	this.showBamDepth();
+
+
+	if (regionStart && regionEnd) {
+		this.showBamDepth(regionStart, regionEnd);
+	}
 
 
 
@@ -1042,7 +1000,6 @@ function onVcfUrlEntered() {
 		showVariants(regionStart, regionEnd);
 	}
 }
-
 
 
 function getRefName(refName) {
@@ -1074,6 +1031,8 @@ function showBamDepth(regionStart, regionEnd) {
 	}
 
 	$("#bam-track .loader").css("display", "block");
+
+	$('#variant-card').removeClass("hide");
 	$('#bam-track').removeClass("hide");
 	$('#bam-depth').addClass("hide");
 	$('#bam-name').addClass("hide");
@@ -1136,6 +1095,7 @@ function showVariants(regionStart, regionEnd) {
 		return;
 	}
 
+	$('#variant-card').removeClass("hide");
 	$('#vcf-track').removeClass("hide");
 	$('#vcf-variants').css("display", "none");
 	$("#vcf-track .loader").css("display", "block");
@@ -1236,6 +1196,7 @@ function _pileupVariants(theChart, splitByZyg, features, start, end) {
 	if (splitByZyg) {
 		return _pileupVariantsByZygosity(theChart, features, start, end);
 	} else {
+		theChart.dividerLevel(null);
 		return _pileupVariantsImpl(theChart, features, start, end);
 	}
 

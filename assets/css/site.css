@@ -37,6 +37,7 @@ a, a:hover, a:focus {
   margin-right: 10px;
 }
 
+
 .hide {
   display: none !important;
 }
@@ -60,12 +61,12 @@ section {
     -webkit-flex-direction: row;
     align-items: flex-start;
     background-color: white;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     padding-left: 10px;
     padding-right: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 8px;
+    margin-bottom: 8px;
 
     
 }
@@ -82,15 +83,15 @@ section {
 }
 
 .track-expand {
-  font-size: 18px;
+  font-size: 14px;
   display: block;
   background-color: white;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 10px;
   padding-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .track-chart {
@@ -133,7 +134,7 @@ section {
 
 #app-title-section {
   text-align: center;
-  padding-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 
@@ -190,9 +191,18 @@ section {
 
 #bam-track {
   margin-bottom: 0px !important;
+  margin-top: 0px !important;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  clear: both;
 }
 
 #vcf-track {
+  margin-top: 0px;
+  padding-top: 0px;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
 }
 #track-legend {
   margin-top: 10px;
@@ -311,20 +321,13 @@ header {
 }
 
 
-#url-input-group {
-  visibility: hidden;
-}
 
 #url-go-button  {  
 }
 
 #url-input {
   padding: 6px 4px !important;
-  line-height: 24px;
-  max-width: 800px;
-  min-width: 800px;
-  float:right;
-  font-size:12px;
+  font-size:11px;
 }
 
 #bam-url-input-group {
@@ -336,11 +339,7 @@ header {
 
 #bam-url-input {
   padding: 6px 4px !important;
-  line-height: 24px;
-  max-width: 800px;
-  min-width: 800px;
-  float:right;
-  font-size:12px;
+  font-size:11px;
 }
 
 
@@ -778,11 +777,14 @@ header {
 
 
 
-
-
+#datasource-button {
+  float: left;
+  margin-left: 30px;
+  visibility: hidden;
+}
 
 #bloodhound .typeahead { 
-  min-width: 500px;
+  min-width: 300px;
   font-size: 18px; 
   vertical-align: middle !important;
 }
@@ -804,7 +806,7 @@ header {
 .tt-hint {
   padding: 5px 8px !important;
   font-size: 18px !important;
-  line-height: 30px;
+  line-height: 24px;
   border: 1px solid #ccc !important;
   border-radius: 0px !important;
   outline: none !important;
