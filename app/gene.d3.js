@@ -39,7 +39,8 @@ function geneD3() {
       widthPercent = null,
       heightPercent = null,
       showBrush = false,
-      showLabel = false;
+      showLabel = false,
+      showBrushLine = false;
       
 
   //  options
@@ -134,41 +135,44 @@ function geneD3() {
 
             g.selectAll("line.brush-line").remove();
 
-            if (!brush.empty()) {
-              g.append('line')
-                .attr('class', 'brush-line')
-                .attr('x1', xExtent)
-                .attr('x2', xExtent)          
-                .attr('y1', heightExtent -20)
-                .attr('y2', heightExtent );
+            if (showBrushLine) {
+              if (!brush.empty()) {
+                g.append('line')
+                  .attr('class', 'brush-line')
+                  .attr('x1', xExtent)
+                  .attr('x2', xExtent)          
+                  .attr('y1', heightExtent -20)
+                  .attr('y2', heightExtent );
 
-               g.append('line')
-                .attr('class', 'brush-line')
-                .attr('x1', 40 )
-                .attr('x2',  width - margin.left - margin.right - 40)          
-                .attr('y1', heightExtent)
-                .attr('y2', heightExtent);
+                 g.append('line')
+                  .attr('class', 'brush-line')
+                  .attr('x1', 40 )
+                  .attr('x2',  width - margin.left - margin.right - 40)          
+                  .attr('y1', heightExtent)
+                  .attr('y2', heightExtent);
 
-              if (widthPercent && heightPercent) {
-                svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
-                   .attr("preserveAspectRatio", "xMaxYMid meet");
-              } 
-
-              svg.attr("width", widthPercent ? widthPercent : width)
-                 .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
-
-
-            } else {
-               if (widthPercent && heightPercent) {
-                  svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+                if (widthPercent && heightPercent) {
+                  svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
                      .attr("preserveAspectRatio", "xMaxYMid meet");
                 } 
 
                 svg.attr("width", widthPercent ? widthPercent : width)
-                   .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
-             
-            }
+                   .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
 
+
+              } else {
+                 if (widthPercent && heightPercent) {
+                    svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+                       .attr("preserveAspectRatio", "xMaxYMid meet");
+                  } 
+
+                  svg.attr("width", widthPercent ? widthPercent : width)
+                     .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
+               
+              }
+
+
+            }
             dispatch.d3brush(brush);
          });
 
@@ -492,6 +496,12 @@ function geneD3() {
   chart.showLabel = function(_) {
     if (!arguments.length) return showLabel;
     showLabel = _;
+    return chart;
+  }
+
+  chart.showBrushLine = function(_) {
+    if (!arguments.length) return showBrushLine;
+    showBrushLine = _;
     return chart;
   }
   // This adds the "on" methods to our custom exports

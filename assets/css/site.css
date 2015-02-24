@@ -203,11 +203,13 @@ a, a:hover, a:focus {
 }
 
 #bam-track {
-  margin-bottom: 0px !important;
-  margin-top: 0px !important;
+  margin-bottom: 0px ;
+  margin-top: -30px ;
   padding-top: 0px;
   padding-bottom: 0px;
   margin-bottom: 0px;
+  padding-left: 6px;
+  padding-right: 20px;
   clear: both;
 }
 
@@ -598,6 +600,7 @@ header {
   fill: rgb(120,120,120);
 }
 
+
 .variant.compare_unique1{
   fill: #D7D6D6 !important;
   stroke: #848181 !important
@@ -725,6 +728,10 @@ header {
 
 
 
+.variant.unique2 {
+  stroke: #E03C55 !important;
+  stroke-width: 1px !important;
+}
 
 
 
@@ -740,7 +747,7 @@ header {
 }
 .impact.nocolor rect.variant, .effect.nocolor rect.variant, .compare.nocolor rect.variant {
   fill: lightgrey !important;
-  stroke: grey !important;
+  stroke: grey;
 }
 .impact:hover, .effect:hover, .compare:hover, .type:hover {
   
@@ -776,7 +783,7 @@ header {
   pointer-events: none;
   opacity: .5;
 }
-#impact-scheme.current, #effect-scheme.current, #compare-scheme.current{
+#impact-scheme.current, #effect-scheme.current {
   font-weight: bold;
   border: none;
  
@@ -786,7 +793,7 @@ header {
   font-size: 12px; 
   font-weight: normal;
 }
-#impact-scheme.current .name, #effect-scheme.current .name, #compare-scheme.current .name {
+#impact-scheme.current .name, #effect-scheme.current .name{
   fill-opacity: 1;
   font-size: 12px;
   font-style: bold;
@@ -796,7 +803,7 @@ header {
   border-radius: 2px;
   padding: 1px;
 }
-#impact-scheme:hover , #effect-scheme:hover, #compare-scheme:hover {
+#impact-scheme:hover , #effect-scheme:hover{
   font-weight: bold;
   cursor: pointer;
 }

@@ -231,7 +231,7 @@
               </svg>
               <svg id="unique2" class="compare nocolor" width="80" height="14" transform="translate(0,0)">
                 <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Freebayes Only</text>
-                <rect class="variant  compare_unique2" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+                <rect class="variant unique2 compare_unique2" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
               </svg>
               <svg id="unique1" class="compare nocolor" width="56" height="14" transform="translate(0,0)">
                 <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">VCF Only</text>
@@ -308,14 +308,7 @@
           </div>
 
 
-          <div id="zoom-region-track" class="track hide">
-              <div class="track-chart">
-                  <div>
-                      <input type="text" id="zoom-region-start"></input>
-                      <input type="text" id="zoom-region-end"></input>
-                  </div>
-              </div>
-          </div>
+          
         </div>
       </div>
 
@@ -444,7 +437,12 @@
                       <img src="assets/images/loading-squares.gif"/>
                   </div>
 
-                  <div style="float:right;margin-top:-6px;">
+                 
+
+                  <div id="bam-depth">
+                  </div>
+
+                   <div style="float:right;margin-top:-10px;">
                     <a id="file-info-link" data-toggle="collapse" 
                       style="float:right;font-size: 12px;" 
                       href="#bam-name" aria-expanded="false" class="collapsed">
@@ -452,9 +450,6 @@
                     </a>
                     <div id="bam-name" class="collapse" style="font-size: 12px; margin-right: 20px;" aria-expanded="false">
                     </div>
-                  </div>
-
-                  <div id="bam-depth">
                   </div>
               </div>
             </div>

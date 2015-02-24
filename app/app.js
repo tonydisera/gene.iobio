@@ -166,7 +166,7 @@ function init() {
 				regionStart = d3.round(brush.extent()[0]);
 				regionEnd   = d3.round(brush.extent()[1]);
 
-				$('#zoom-region-track').removeClass("hide");
+				$('#bam-track').css("margin-top", "-85px");
 
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
@@ -178,10 +178,6 @@ function init() {
 				zoomRegionChart(selection);
 	       		d3.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
-	       		$('#zoom-region-start').val(formatRegion(regionStart) );
-	       		$('#zoom-region-end').val(formatRegion(regionEnd));
-	       		var h = d3.select("#nav-section").node().offsetHeight;
-	       		d3.select('#track-section').style("padding-top", h + "px");
 				$('#zoom-region-chart').removeClass("hide");
 
 			} else {
@@ -191,7 +187,9 @@ function init() {
 				// the entire gene region;
 				regionStart = window.gene.start;
 				regionEnd   = window.gene.end;
-				$('#zoom-region-track').addClass("hide");
+
+				$('#bam-track').css("margin-top", "-30px");
+				
 				$('#zoom-region-chart').addClass("hide");
 	       		var h = d3.select("#nav-section").node().offsetHeight;
 	       		d3.select('#track-section').style("padding-top", h + "px");
@@ -244,7 +242,7 @@ function init() {
 	                    .widthPercent("100%")
 	                    .heightPercent("100%")
 	                    .kind("area")
-						.margin( {top: 0, right: 4, bottom: 20, left: 4} )
+						.margin( {top: 10, right: 4, bottom: 20, left: 4} )
 						.showXAxis(true)
 						.showYAxis(false)
 						.showTooltip(true)
@@ -468,11 +466,9 @@ function initFilterTrack() {
 	    .on("click", function(d) {
 	    	d3.select('#impact-scheme').classed("current", true);
 	    	d3.select('#effect-scheme' ).classed("current", false);
-	    	d3.select('#compare-scheme').classed("current", false);
 
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
-	    	d3.selectAll(".compare").classed("nocolor", true);
 
 	    	vcfChart.clazz(classifyByImpact);
 	    	fbChart.clazz(classifyByImpact);
@@ -485,12 +481,10 @@ function initFilterTrack() {
 	    .on("click", function(d) {
 	    	d3.select('#impact-scheme').classed("current", false);
 	    	d3.select('#effect-scheme' ).classed("current", true);
-	    	d3.select('#compare-scheme').classed("current", false);
 
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
-	    	d3.selectAll(".compare").classed("nocolor", true);
 
 	    	vcfChart.clazz(classifyByEffect);
 	    	fbChart.clazz(classifyByEffect);
@@ -499,26 +493,7 @@ function initFilterTrack() {
 				fillVariantChart(vcfData, regionStart, regionEnd);
 	    	} 
 	    });
-	   d3.selectAll('#compare-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#impact-scheme').classed("current", false);
-	    	d3.select('#effect-scheme' ).classed("current", false);
-	    	d3.select('#compare-scheme').classed("current", true);
-
-
-	    	d3.selectAll(".impact").classed("nocolor", true);
-	    	d3.selectAll(".effect").classed("nocolor", true);
-	    	d3.selectAll(".compare").classed("nocolor", false);
-
-
-	    	vcfChart.clazz(classifyByCompare);
-	    	fbChart.clazz(classifyByCompare);
-
-			
-	    	showVariants(regionStart, regionEnd);
-	    	//callVariants(regionStart, regionEnd);
-
-	    });
+	  
 }
 
 function classifyByImpact(d) {
@@ -717,14 +692,12 @@ function loadTracksForGene() {
 
 	$('#add-bam-track').css("visibility", "visible");
 
-	$('#zoom-region-track').addClass("hide");
 
 	$('#datasource-button').css("visibility", "visible");
 	$('#transcript-btn-group').removeClass("hide");
 
 	d3.select('#impact-scheme').classed("current", true);
 	d3.select('#effect-scheme' ).classed("current", false);
-	d3.select('#compare-scheme').classed("current", false);
 	d3.selectAll(".impact").classed("nocolor", false);
 	d3.selectAll(".effect").classed("nocolor", true);
 	d3.selectAll(".compare").classed("nocolor", true);

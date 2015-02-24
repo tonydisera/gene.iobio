@@ -48,7 +48,7 @@ lineD3 = function module() {
       var tooltipText = 'base coverage ' + parseInt(depthy);
 
       var labelX = mousex + margin.left - 50;
-      var labelY =  10; //mousey + margin.top - 25;
+      var labelY =  20; //mousey + margin.top - 25;
 
       console.log(labelX + ' ' + width);
 
@@ -157,7 +157,7 @@ lineD3 = function module() {
           .attr("class", "circle")
           .attr("cx", 0)
           .attr("cy", 0)
-          .attr("r", 5.5)
+          .attr("r", 4)
           .style("fill", "none")
           .style("stroke", "red")               
           .style("stroke-width", "2")               
