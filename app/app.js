@@ -43,6 +43,9 @@ var selectedTranscript = null;
 var transcriptChart =  null;
 var transcriptViewMode = "single";
 var transcriptMenuChart = null;
+var transcriptPanelHeight = null;
+var transcriptCollapse = true;
+
 
 // bam data (read coverage) and area chart.
 var bamData = null;
@@ -107,9 +110,32 @@ function init() {
 	var me = this;
 
     $.material.init();
+
+   $( '#sidebar' ).simpleSidebar({
+    settings: {
+        opener: '#menu-button',
+        wrapper: '#container'
+    },
+    sidebar: {
+        align: 'left',
+        width: 120,
+        closingLinks: '#menu-button',
+        style: {
+            zIndex: 100
+        }
+    },
+    mask: {
+        style: {
+            backgroundColor: 'transparent',
+            opacity: 0,
+            filter: 'Alpha(opacity=0)'
+        }
+    }
+});
   
 
-    $('#variant-legend').html(trackLegendTemplate());
+    $('#filter-panel').html(trackLegendTemplate());
+    $('#sidebar').html(trackLegendTemplate());
 
 	loadGeneWidget();
 	$('#bloodhound .typeahead').focus();
@@ -156,6 +182,7 @@ function init() {
 	       		$('#zoom-region-end').val(formatRegion(regionEnd));
 	       		var h = d3.select("#nav-section").node().offsetHeight;
 	       		d3.select('#track-section').style("padding-top", h + "px");
+				$('#zoom-region-chart').removeClass("hide");
 
 			} else {
 				// Treat a click as a region selection on the entire gene region.
@@ -165,6 +192,7 @@ function init() {
 				regionStart = window.gene.start;
 				regionEnd   = window.gene.end;
 				$('#zoom-region-track').addClass("hide");
+				$('#zoom-region-chart').addClass("hide");
 	       		var h = d3.select("#nav-section").node().offsetHeight;
 	       		d3.select('#track-section').style("padding-top", h + "px");
 			}
@@ -172,6 +200,7 @@ function init() {
        		//showTranscripts(regionStart, regionEnd);
 			showBamDepth(regionStart, regionEnd);
 			showVariants(regionStart, regionEnd);
+			transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 	    	
 
 	    	
@@ -201,8 +230,8 @@ function init() {
 			    .widthPercent("100%")
 			    .heightPercent("100%")
 			    .width(1000)
-			    .margin({top: 20, right: 4, bottom: 0, left: 4})
-			    .showXAxis(true)
+			    .margin({top: 0, right: 4, bottom: 0, left: 4})
+			    .showXAxis(false)
 			    .showBrush(false)
 			    .trackHeight(16)
 			    .cdsHeight(12)
@@ -298,6 +327,12 @@ function init() {
 
 	
 	
+}
+
+function onCollapseTranscriptPanel() {
+	transcriptCollapse = !transcriptCollapse;
+	d3.select('#track-section').style("padding-top", transcriptCollapse ? transcriptPanelHeight + "px" : "89" + "px");
+
 }
 
 function initTranscriptControls() {
@@ -445,9 +480,6 @@ function initFilterTrack() {
 			if (vcfData) {
 				fillVariantChart(vcfData, regionStart, regionEnd);
 	    	} 
-	    	if (fbData) {
-	    		fillFreebayesChart(fbData, regionStart, regionEnd);
-	    	}
 	    });
 	  d3.selectAll('#effect-scheme')
 	    .on("click", function(d) {
@@ -466,9 +498,6 @@ function initFilterTrack() {
 	    	if (vcfData) {
 				fillVariantChart(vcfData, regionStart, regionEnd);
 	    	} 
-	    	if (fbData) {
-	    		fillFreebayesChart(fbData, regionStart, regionEnd);
-	    	}
 	    });
 	   d3.selectAll('#compare-scheme')
 	    .on("click", function(d) {
@@ -487,7 +516,7 @@ function initFilterTrack() {
 
 			
 	    	showVariants(regionStart, regionEnd);
-	    	callVariants(regionStart, regionEnd);
+	    	//callVariants(regionStart, regionEnd);
 
 	    });
 }
@@ -533,7 +562,7 @@ function classifyByCompare(d) {
       impacts += " " + key;
     }
     
-    return  'variant ' + d.type.toLowerCase() + effects + impacts + ' ' + d.consensus + ' ' + 'compare_'+d.consensus; 
+    return  'variant ' + d.type.toLowerCase() + effects + impacts + ' ' + d.consensus + ' ' + 'compare_' + d.consensus; 
 }
 
 function applyVariantFilters() {
@@ -588,7 +617,7 @@ function loadGeneWidget() {
 	// kicks off the loading/processing of `local` and `prefetch`
 	gene_engine.initialize();
 	
-	 
+	 	
 	var typeahead = $('#bloodhound .typeahead').typeahead({
 	  hint: true,
 	  highlight: true,
@@ -678,6 +707,9 @@ function loadTracksForGene() {
 	vcfData = null;
 	fbData = null;
 
+	$('#transcript-card').removeClass("hide");
+	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
+
     $('#gene-track').removeClass("hide");
 	$('#view-finder-track').removeClass("hide");
 
@@ -689,6 +721,15 @@ function loadTracksForGene() {
 
 	$('#datasource-button').css("visibility", "visible");
 	$('#transcript-btn-group').removeClass("hide");
+
+	d3.select('#impact-scheme').classed("current", true);
+	d3.select('#effect-scheme' ).classed("current", false);
+	d3.select('#compare-scheme').classed("current", false);
+	d3.selectAll(".impact").classed("nocolor", false);
+	d3.selectAll(".effect").classed("nocolor", true);
+	d3.selectAll(".compare").classed("nocolor", true);
+	vcfChart.clazz(classifyByImpact);
+
 
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
@@ -1081,7 +1122,7 @@ function fillBamChart(data, regionStart, regionEnd) {
 	window.bamDepthChart(d3.select("#bam-depth").datum(data));		
 	d3.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
-	callVariants(regionStart, regionEnd);
+	//callVariants(regionStart, regionEnd);
 	
 //	window.scrollTo(0,document.body.scrollHeight);
 }
@@ -1150,21 +1191,9 @@ function showVariants(regionStart, regionEnd) {
 
 	        maxLevel = _pileupVariants(vcfChart, splitByZyg, data.features, gene.start, gene.end);
 			data.maxLevel = maxLevel + 1;
+	   	    $('#vcf-track .loader-label').text("Loading chart");
+			fillVariantChart(data, window.gene.start, window.gene.end);
 
-			var commonSchemeClass = d3.select("#compare-scheme").attr("class");
-		    	if (commonSchemeClass == null) {
-		    		commonSchemeClass = "";
-		    	}
-		    	if (fbData && commonSchemeClass.indexOf("current") >= 0) {
-			   	    $('#vcf-track .loader-label').text("Comparing variant sets");
-			    	vcf.compareVcfRecords(vcfData, fbData, function() {
-				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
-				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
-			    	});
-				} else {
-			   	    $('#vcf-track .loader-label').text("Loading chart");
-					fillVariantChart(data, window.gene.start, window.gene.end);
-				}
 		});	
 
 	}
@@ -1289,6 +1318,11 @@ function fillVariantChart(data, regionStart, regionEnd) {
 
    	if (fbData) {
    		$('#compare-legend').removeClass("hide");
+
+   		// Remove from or add to list of clicked ids
+	  	//window.clickedAnnotIds["unique2"] = true;
+   		//d3.select("#unique2").classed("current", true);			
+		//applyVariantFilters();    	
    	}
 
 
@@ -1335,12 +1369,6 @@ function callVariants(regionStart, regionEnd) {
 	if (window.bam == null || window.getBamRefName == null) {
 		return;
 	}
-	$('#fb-track').removeClass("hide");
-
-	$("#fb-track .loader").css("display", "block");
-	$("#fb-track .loader-label").text("Calling Variants with Freebayes")
-
-	$('#fb-variants').css("display", "none");
 
 
 	var refName = window.getBamRefName(window.gene.chr);
@@ -1379,56 +1407,93 @@ function callVariants(regionStart, regionEnd) {
 
 		// Hide the stats.  Don't show until comparisons between call sets
 		// is finished.
-		$('#fb-stats').css("display", "none");
-		$('#fb-count').css("display", "none");
+		//$('#fb-stats').css("display", "none");
+		//$('#fb-count').css("display", "none");
+
+		$("#vcf-track .loader").removeClass("hide");
+		$("#vcf-track .loader").css("display", "block");
+
+		$('#vcf-track .loader-label').text("Calling Variants with Freebayes");
+
 
 		// Call Freebayes variants
 		window.bam.getFreebayesVariants(refName, 
 			window.gene.start, 
 			window.gene.end, 
 			window.gene.strand, 
-			function(vcfObjs) {
+			function(fbVariants) {
 
-		    var vcfRecs = [];
+		    var fbRecs = [];
 
-		    vcfRecs.push('##fileformat=VCFv4.1');
-			vcfRecs.push('##fileDate=20130402');
-			vcfRecs.push('##source=freeBayes version 0.9.9');
-			vcfRecs.push('##reference=/share/home/erik/references/Homo_sapiens_assembly19.fasta');
-			vcfRecs.push('##phasing=none');
-			vcfRecs.push('##commandline="freebayes -f /share/home/erik/references/Homo_sapiens_assembly19.fasta --min-alternate-fraction 0 --max-complex-gap 20 --pooled-continuous --genotype-qualities --stdin"');
-			vcfRecs.push('##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of samples with data">');
+		    fbRecs.push('##fileformat=VCFv4.1');
+			fbRecs.push('##fileDate=20130402');
+			fbRecs.push('##source=freeBayes version 0.9.9');
+			fbRecs.push('##reference=/share/home/erik/references/Homo_sapiens_assembly19.fasta');
+			fbRecs.push('##phasing=none');
+			fbRecs.push('##commandline="freebayes -f /share/home/erik/references/Homo_sapiens_assembly19.fasta --min-alternate-fraction 0 --max-complex-gap 20 --pooled-continuous --genotype-qualities --stdin"');
+			fbRecs.push('##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of samples with data">');
 
-			vcfObjs.forEach( function(v) {
-				vcfRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
-                vcfRecs.push(vcfRec.join("\t"));
+			// Parse the fb vcf data into json variant objects
+			fbVariants.forEach( function(v) {
+				fbRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
+                fbRecs.push(fbRec.join("\t"));
 			})
 			
-			$("#fb-track .loader-label").text("Annotating Variants in realtime")
+			$("#vcf-track .loader-label").text("Annotating Variants in realtime")
 
-			window.vcf.annotateVcfRecords(vcfRecs, window.gene.start, window.gene.end, 
+			// Annotate the fb variatns
+			window.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
 				window.gene.strand, window.selectedTranscript, function(data){
+
 				fbData = data;
 
-				var splitByZyg = fbData.hetCount > 0 && fbData.homCount > 0;
+				// This may not be the first time we call freebayes, so to
+				// avoid duplicate variants, get rid of the ones
+				// we added last round.
+				vcfData.features = vcfData.features.filter( function(d) {
+					return d.consensus != 'unique2';
+				});
+
+				// Compare the variant sets, marking the variants as unique1 (only in vcf), 
+				// unique2 (only in freebayes set), or common (in both sets).				
+				vcf.compareVcfRecords(vcfData, fbData, function() {
 
 
-				maxLevel = _pileupVariants(fbChart, splitByZyg, fbData.features, gene.start, gene.end);
-				fbData.maxLevel = maxLevel + 1;		
-
-				var commonSchemeClass = d3.select("#compare-scheme").attr("class");
-		    	if (commonSchemeClass == null) {
-		    		commonSchemeClass = "";
-		    	}
-		    	if (vcfData && commonSchemeClass.indexOf("current") >= 0) {
-			    	vcf.compareVcfRecords(vcfData, fbData, function() {
-				    	fillFreebayesChart(fbData, window.gene.start, window.gene.end);
-				    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
+			    	// Add unique freebayes variants to vcfData
+			    	fbData.features.forEach(function(d) {
+			    		if (d.consensus == 'unique2') {
+			    			vcfData.features.push(d);
+			    			if (d.zygosity != null && d.zygosity == 'HET') {
+			    				vcfData.hetCount++;
+			    			} else if (d.zygosity != null && d.zygosity == 'HOM') {
+			    				vcfData.homCount++;
+			    			}
+			    		}
 			    	});
-				} else {
-					fillFreebayesChart(fbData, window.gene.start, window.gene.end);
-				}
 
+
+			        var splitByZyg = vcfData.hetCount > 0 && vcfData.homCount > 0;
+
+
+			        maxLevel = _pileupVariants(vcfChart, splitByZyg, vcfData.features, gene.start, gene.end);
+					vcfData.maxLevel = maxLevel + 1;
+/*
+			   	   	d3.select('#impact-scheme').classed("current", false);
+			    	d3.select('#effect-scheme' ).classed("current", false);
+			    	d3.select('#compare-scheme').classed("current", true);
+
+
+			    	d3.selectAll(".impact").classed("nocolor", true);
+			    	d3.selectAll(".effect").classed("nocolor", true);
+			    	d3.selectAll(".compare").classed("nocolor", false);
+
+			    	vcfChart.clazz(classifyByCompare);
+*/
+
+
+			    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
+					
+			    });
 
 			});
 			

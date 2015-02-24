@@ -70,8 +70,10 @@ function variantD3() {
     if (showXAxis) {
       //height += margin.bottom; 
     }
+    if (dividerLevel) {
+      height += (variantHeight + verticalPadding);  
+    }
     var dividerY = dividerLevel ? height - ((dividerLevel + 1) * (variantHeight + verticalPadding)) : null;
-
     
     
     // determine inner height (w/o margins)

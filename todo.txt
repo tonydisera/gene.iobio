@@ -1,9 +1,14 @@
 todo
 -------------
 
-- Transcript dropdown broken
-- Compare broken
+
+- Zoom after call freebayes broken. (vcfData has to incorporate new unique variants. rather than creating
+clone - combinedData - need to remove unique2 from set before calling fb)
+
 - Circle transcript area when mouseover variant
+
+- When clicking on an impact, the filter panel rects are also set to opacity .1
+- When multiple annotations, force highest impact one to show first (for coloring)
 
 - How to tell which snpEff annotation belongs to which alt
 

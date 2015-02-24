@@ -4,6 +4,26 @@ body {
 
 
 
+
+
+
+#nav-section {
+  position:fixed;
+  width:100%;
+  z-index:2;
+  right:0px;
+  background-color: rgb(238, 238, 238);
+}
+
+section {
+    height: 60px;
+    text-align: left;
+    padding-left: 10px;
+    padding-right: 10px;
+    clear: both;
+}
+
+
 a, a:hover, a:focus {
   color: rgb(53, 134, 192);
 }
@@ -46,13 +66,6 @@ a, a:hover, a:focus {
   box-shadow: 2px 2px 9px 0px rgba(0,0,0,0.15);
 }
 
-section {
-    height: 60px;
-    text-align: left;
-    padding-left: 10px;
-    padding-right: 10px;
-    clear: both;
-}
 
 .track { 
     display:         flex;
@@ -134,7 +147,7 @@ section {
 
 #app-title-section {
   text-align: center;
-  margin-bottom: 25px;
+  background: white;
 }
 
 
@@ -213,10 +226,12 @@ section {
 #vcf-legend {
   display: none;
 }
-#variant-legend {
+#filter-panel {
   font-size: 11px;
   color: rgb(102, 88, 92);
   fill: rgb(102, 88, 92);
+  margin-left: 100px;
+  margin-top: -18px;
 }
 
 #fb-track {
@@ -583,14 +598,19 @@ header {
   fill: rgb(120,120,120);
 }
 
-.variant.compare_unique{
-  fill: #F9A366 !important;
-  stroke: #D88C56 !important;
+.variant.compare_unique1{
+  fill: #D7D6D6 !important;
+  stroke: #848181 !important
+}
+
+.variant.compare_unique2{
+  fill: #FFCC2A !important;
+  stroke: #997912 !important;
 }
 
 .variant.compare_common{
-  fill: #6187B2 !important; 
-  stroke: #6187B2 !important;
+  fill: rgb(255, 255, 255);
+  stroke: rgb(124, 109, 109);
 }
 
 .variant.impact_LOW{
@@ -772,6 +792,13 @@ header {
   font-style: bold;
   color: rgb(53, 134, 192);
   fill: rgb(53, 134, 192);
+  border: solid thin black;
+  border-radius: 2px;
+  padding: 1px;
+}
+#impact-scheme:hover , #effect-scheme:hover, #compare-scheme:hover {
+  font-weight: bold;
+  cursor: pointer;
 }
 
 

@@ -973,7 +973,7 @@ var effectCategories = [
       // through variants2 until we get to the same position
       // (or bypass it).  For each variant2 that matches
       // variant1, mark both as 'match'.
-      variant1.consensus = 'unique';
+      variant1.consensus = 'unique1';
       for (var x = idx2; x < features2.length; x++) {
         variant2 = features2[x];
         if (variant1.start == variant2.start) {
@@ -1009,7 +1009,7 @@ var effectCategories = [
     for (var x = 0; x < features2.length; x++) {
       variant2 = features2[x];
       if (variant2.consensus == null) {
-        variant2.consensus = 'unique';
+        variant2.consensus = 'unique2';
       }
     }
 
