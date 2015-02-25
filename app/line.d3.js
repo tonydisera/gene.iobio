@@ -48,7 +48,7 @@ lineD3 = function module() {
       var tooltipText = 'base coverage ' + parseInt(depthy);
 
       var labelX = mousex + margin.left - 50;
-      var labelY =  20; //mousey + margin.top - 25;
+      var labelY =  55; //mousey + margin.top - 25;
 
       console.log(labelX + ' ' + width);
 

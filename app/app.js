@@ -166,7 +166,7 @@ function init() {
 				regionStart = d3.round(brush.extent()[0]);
 				regionEnd   = d3.round(brush.extent()[1]);
 
-				$('#bam-track').css("margin-top", "-85px");
+				$('#bam-track').css("margin-top", "-70px");
 
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
@@ -228,17 +228,17 @@ function init() {
 			    .widthPercent("100%")
 			    .heightPercent("100%")
 			    .width(1000)
-			    .margin({top: 0, right: 4, bottom: 0, left: 4})
+			    .margin({top: 10, right: 4, bottom: 0, left: 4})
 			    .showXAxis(false)
 			    .showBrush(false)
-			    .trackHeight(16)
+			    .trackHeight(12)
 			    .cdsHeight(12)
 	    		.showLabel(false);
 
 	// Create the coverage chart
 	bamDepthChart = lineD3()
 	                    .width(1000)
-	                    .height( 45 )
+	                    .height( 35 )
 	                    .widthPercent("100%")
 	                    .heightPercent("100%")
 	                    .kind("area")
@@ -1078,7 +1078,6 @@ function showBamDepth(regionStart, regionEnd) {
 			});
 	}
 
-	$('#fb-track').removeClass("hide");
 
 
 
@@ -1351,6 +1350,7 @@ function callVariants(regionStart, regionEnd) {
 		// variants based on the selected region
 
 		// Filter freebayes variants by region
+		/*
 		var filteredFeatures = fbData.features.filter(function(d) {
 			return (d.start >= regionStart && d.start <= regionEnd);
 		});
@@ -1373,6 +1373,7 @@ function callVariants(regionStart, regionEnd) {
 
 
 		fillFreebayesChart(fbDataFiltered, regionStart, regionEnd);
+		*/
 
 	} else {
 
@@ -1450,19 +1451,6 @@ function callVariants(regionStart, regionEnd) {
 
 			        maxLevel = _pileupVariants(vcfChart, splitByZyg, vcfData.features, gene.start, gene.end);
 					vcfData.maxLevel = maxLevel + 1;
-/*
-			   	   	d3.select('#impact-scheme').classed("current", false);
-			    	d3.select('#effect-scheme' ).classed("current", false);
-			    	d3.select('#compare-scheme').classed("current", true);
-
-
-			    	d3.selectAll(".impact").classed("nocolor", true);
-			    	d3.selectAll(".effect").classed("nocolor", true);
-			    	d3.selectAll(".compare").classed("nocolor", false);
-
-			    	vcfChart.clazz(classifyByCompare);
-*/
-
 
 			    	fillVariantChart(vcfData, window.gene.start, window.gene.end);
 					
@@ -1477,39 +1465,6 @@ function callVariants(regionStart, regionEnd) {
 
 } 
 
-function fillFreebayesChart(data, regionStart, regionEnd) {
-	window.fbChart.regionStart(regionStart);
-	window.fbChart.regionEnd(regionEnd);
-
-	$('#fb-variants').css("display", "inline");
-	$("#fb-track .loader").css("display", "none");
-	$('#fb-legend').css("display", "block");		
-	$('#fb-count').css("display", "inline-block");
-	$('#fb-count').text(data.features.length + " variants");
-	
-
-
-
-	// Set the vertical layer count so that the height of the chart can be recalculated	         
-	fbChart.showTransition(true);                       	
-	fbChart.verticalLayers(data.maxLevel);
-
-	// Load the chart with the new data
-	var selection = d3.select("#fb-variants").datum([data]);    
-    fbChart(selection);
-
-    d3.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
-    
-    $('#filter-track').removeClass("hide");
-	setVariantLegendCounts();
-
-	if (vcfData) {
-		$('#compare-legend').removeClass("hide");
-	}
-
-//    window.scrollTo(0,document.body.scrollHeight);
-
-}
 
 
 
