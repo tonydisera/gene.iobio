@@ -229,11 +229,10 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 
 }
 
-VariantCard.prototype.loadDataSources = function() {
+VariantCard.prototype.loadDataSources = function(dataSourceName) {
 
-	var dsName = this.cardSelector.find('#datasource-name').val();
 	var cache = this.cardSelector.find('#variant-link').children();
-   	this.cardSelector.find('#variant-link').text(dsName).append(cache);
+   	this.cardSelector.find('#variant-link').text(dataSourceName).append(cache);
    	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
    	this.cardSelector.find('#variant-panel').attr("aria-expanded", true);
    	this.cardSelector.find('#variant-panel').addClass("in");

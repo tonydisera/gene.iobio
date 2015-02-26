@@ -622,7 +622,10 @@ function loadDataSources() {
 		onVcfUrlEntered();
 	}
 
-	variantCard.loadDataSources();
+	var dataSourceName = $('#datasource-name').val();
+
+
+	variantCard.loadDataSources(dataSourceName);
 
 }
 
