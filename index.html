@@ -17,8 +17,7 @@
   <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/material.min.js"></script>
   <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/ripples.min.js"></script>
 
-  <!-- simple sidebar -->
-  <script src="assets/js/jquery.simplesidebar.min.js"></script>
+
  
 
 
@@ -67,10 +66,128 @@
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
   <link rel="stylesheet" href="assets/css/site.css" />
 
+  <script id="variant-card-template" type="text/x-handlebars-template">
+      <div id="variant-card" class="track-expand shadow-z-1 hide" style="background-color:white;">
+
+
+          <div>
+            <a id="variant-link"   data-toggle="collapse"  href="#variant-panel" 
+               aria-expanded="false" >
+              Variants
+              <span class="caret"></span>
+            </a>
+
+          </div>
+
+        
+
+          <div id="variant-panel" class="collapse">
+           
+            <div id="vcf-track" class="track hide" >
+                     
+              <div class="track-chart">
+                  <div style="text-align: center;margin-left: 100px;margin-top: -18px;">
+
+
+
+                       <div class="variant-count badge" id="vcf-count" 
+                       style="float: left; margin-top: 2px; margin-bottom: 4px; display: none; margin-right: 40px;">
+                       </div>
+                       
+
+                       <div>
+                         
+                          <a id="button-find-missing-variants"
+                             style="float: left;font-size: 12px;vertical-align:top;padding-left:20px">
+                            Find missing variants
+                          </a>
+
+                          <a id="af-link" class="hide"  
+                            data-toggle="collapse" 
+                            style="float:left;font-size: 12px;vertical-align: top;padding-left:20px" 
+                            href="#af" 
+                            aria-expanded="false" aria-controls="collapseExample">
+                            Allele Frequency
+                          </a>
+                          <a id="file-info-link"   
+                            data-toggle="collapse" 
+                            style="float:right;font-size: 12px;vertical-align: top;margin-top: 0px;" 
+                            href="#file-info" aria-expanded="false" >
+                            File info
+                          </a>
+
+                       </div>
+                  </div>
+
+                  <div style="text-align:center;">
+                      <div id="af" class="collapse" style="font-size: 10px;">
+                        <div style="margin-right:145px;">
+                          <input  type="text"  id="af-amount-start" value="0"                           
+                          style="width:30px;margin-left: 10px;font-size: 12px;"/>
+                          -
+                          <input type="text"  id="af-amount-end" value="100" 
+                          style="width:30px;margin-left: 4px;font-size: 12px;"/>
+                          %
+                        </div>
+                        <div>
+                          <svg id="vcf-af-chart"/>
+                        </div>
+                      </div> 
+
+                      <span id="file-info" class="collapse" style="float:right;">
+                        <span id="vcf-name" class="hide" style="font-size: 12px"></span>
+                      </span>
+                  </div>
+
+                  
+                  <div class="loader">
+                      <span class="loader-label"></span>
+                      <img src="assets/images/loading-squares.gif"/>
+                  </div>
+
+                  <div id="vcf-variants"></div>
+          
+              </div>
+            </div>
+
+      
+            <div id="zoom-region-chart"  class="track hide"></div>
+
+            <div id="bam-track" class="track hide">
+              <div id="bam-depth-track" class="track-chart">
+                  <div class="loader">
+                      <span class="loader-label"></span>
+                      <img src="assets/images/loading-squares.gif"/>
+                  </div>
+
+                 
+
+                  <div id="bam-depth">
+                  </div>
+
+                   <div style="float:right;margin-top:-10px;">
+                    <a id="file-info-link" data-toggle="collapse" 
+                      style="float:right;font-size: 12px;" 
+                      href="#bam-name" aria-expanded="false" class="collapsed">
+                      File info
+                    </a>
+                    <div id="bam-name" class="collapse" style="font-size: 12px; margin-right: 20px;" aria-expanded="false">
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+          </div>
+      
+    
+      </div>
+  
+  </script>
+
 
 
         <!-- handlebar templates -->
-    <script id='track-legend-template' type="text/x-handlebars-template">     
+  <script id='track-legend-template' type="text/x-handlebars-template">     
 
           <div >
             <svg id="impact-scheme" class="current" width="40" height="15" transform="translate(0,0)">
@@ -244,11 +361,7 @@
             </span>
 
           </div>   
-
-
-
-
-    </script>
+  </script>
     
 </head>
 
@@ -330,132 +443,14 @@
           </div> 
       </div>  
 
-      <div id="variant-card" class="track-expand shadow-z-1 hide" style="background-color:white;">
-
-
-          <div>
-            <a id="variant-link"   data-toggle="collapse"  href="#variant-panel" 
-               aria-expanded="false" >
-              Variants
-              <span class="caret"></span>
-            </a>
-
-          </div>
-
-        
-
-          <div id="variant-panel" class="collapse">
-           
-            <div id="vcf-track" class="track hide" >
-                     
-              <div class="track-chart">
-                  <div style="text-align: center;margin-left: 100px;margin-top: -18px;">
-
-
-
-                       <div class="variant-count badge" id="vcf-count" 
-                       style="float: left; margin-top: 2px; margin-bottom: 4px; display: none; margin-right: 40px;">
-                       </div>
-                       
-
-                       <div>
-                          <a id="menu-button" style="float: left;font-size: 12px;vertical-align: top;padding-left:20px">
-                             Show Annotations
-                          </a>
-                          <a onclick="callVariants()" 
-                             style="float: left;font-size: 12px;vertical-align:top;padding-left:20px">
-                            Find missing variants
-                          </a>
-
-                          <a id="af-link" class="hide"  
-                            data-toggle="collapse" 
-                            style="float:left;font-size: 12px;vertical-align: top;padding-left:20px" 
-                            href="#af" 
-                            aria-expanded="false" aria-controls="collapseExample">
-                            Allele Frequency
-                          </a>
-                          <a id="file-info-link"   
-                            data-toggle="collapse" 
-                            style="float:right;font-size: 12px;vertical-align: top;margin-top: 0px;" 
-                            href="#file-info" aria-expanded="false" >
-                            File info
-                          </a>
-
-                       </div>
-                  </div>
-
-                  <div style="text-align:center;">
-                      <div id="af" class="collapse" style="font-size: 10px;">
-                        <div style="margin-right:145px;">
-                          <input type="text"  id="af-amount-start" value="0" 
-                          onkeydown="onAfEnter(this)"
-                          style="width:30px;margin-left: 10px;font-size: 12px;"/>
-                          -
-                          <input type="text"  id="af-amount-end" value="100" 
-                          onkeydown="onAfEnter(this)"
-                          style="width:30px;margin-left: 4px;font-size: 12px;"/>
-                          %
-                        </div>
-                        <div>
-                          <svg id="vcf-af-chart"/>
-                        </div>
-                      </div> 
-
-                      <span id="file-info" class="collapse" style="float:right;">
-                        <span id="vcf-name" class="hide" style="font-size: 12px"></span>
-                      </span>
-                  </div>
-
-                  
-                  <div class="loader">
-                      <span class="loader-label"></span>
-                      <img src="assets/images/loading-squares.gif"/>
-                  </div>
-
-                  <div id="vcf-variants"></div>
-          
-              </div>
-            </div>
-
-      
-            <div id="zoom-region-chart"  class="track hide"></div>
-
-            <div id="bam-track" class="track hide">
-              <div id="bam-depth-track" class="track-chart">
-                  <div class="loader">
-                      <span class="loader-label"></span>
-                      <img src="assets/images/loading-squares.gif"/>
-                  </div>
-
-                 
-
-                  <div id="bam-depth">
-                  </div>
-
-                   <div style="float:right;margin-top:-10px;">
-                    <a id="file-info-link" data-toggle="collapse" 
-                      style="float:right;font-size: 12px;" 
-                      href="#bam-name" aria-expanded="false" class="collapsed">
-                      File info
-                    </a>
-                    <div id="bam-name" class="collapse" style="font-size: 12px; margin-right: 20px;" aria-expanded="false">
-                    </div>
-                  </div>
-              </div>
-            </div>
-
-          </div>
-      
-    
+      <div id="variant-cards">
       </div>
+
     </div>
  
 </div>
 
 
-  <div id="sidebar" class="z-index-1" style="background-color: white;">
-    
-  </div>
 
     <div id="datasource-dialog" class="modal fade" tabindex="-1">
       <div class="modal-dialog" style="width: 800px">
@@ -587,6 +582,7 @@
 	<script src="app/variant.d3.js"></script>
   <script src="app/bam.iobio.js"></script>
 	<script type="text/javascript" src="app/vcf.iobio.js"></script>
+  <script src="app/variantCard.js"></script>  
 	<script src="app/app.js"></script>	
 
 

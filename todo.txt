@@ -1,14 +1,21 @@
 todo
 -------------
 
+- Big genes kill browser session
 
 - Zoom after call freebayes broken. (vcfData has to incorporate new unique variants. rather than creating
 clone - combinedData - need to remove unique2 from set before calling fb)
 
-- Circle transcript area when mouseover variant
-
 - When clicking on an impact, the filter panel rects are also set to opacity .1
+
 - When multiple annotations, force highest impact one to show first (for coloring)
+
+- position is off on bam chart, need to keep non-summarized data to display actual coverage
+
+- inject bam and vcf into url
+
+
+
 
 - How to tell which snpEff annotation belongs to which alt
 
@@ -24,19 +31,6 @@ clone - combinedData - need to remove unique2 from set before calling fb)
 
 - Investigate memory usage java snpEffServer 
 
-- position is off on bam chart
-
-- duplicate snps showing up on vcf track after compare?
-
-- select transcript on hover over text or svg
-
-- show selected file names in tracks ( or in info tooltip in top section)
-
-- x-axis slightly off for bam chart due to y-axis
-
-- inject bam and vcf into url
-
-- variants at very beginning and end of chart are truncated
 
 
 
