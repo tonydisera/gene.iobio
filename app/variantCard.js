@@ -166,8 +166,8 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 	this.bamFileOpened = true;
 	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamFile.name);
 
-	$('#bam-file-info-' + this.cardIndex).removeClass('hide');
-	$('#bam-file-info-' + this.cardIndex).val(bamFile.name);
+	$('#datasource-dialog #bam-file-info').removeClass('hide');
+	$('#datasource-dialog #bam-file-info').val(bamFile.name);
 
 
 	this.bam = new Bam( bamFile, { bai: baiFile });
@@ -214,7 +214,8 @@ VariantCard.prototype.onVcfFilesSelected = function() {
 	this.vcf.openVcfFile( event, function(vcfFile) {
 
 		me.cardSelector.find('#vcf-name').text(vcfFile.name);
-		$('#vcf-file-info' + this.cardIndex).removeClass('hide');
+		$('#datasource-dialog #vcf-file-info').removeClass('hide');
+		$('#datasource-dialog #vcf-file-info').val(vcfFile.name);
 
 		
 		me.getVcfRefName = null;

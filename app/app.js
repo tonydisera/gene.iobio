@@ -626,6 +626,8 @@ function addVariantCard() {
 
 
 function onBamFileButtonClicked() {	
+	$('#data-source-dialog #bam-file-info').removeClass("hide");
+
 	$('#bam-url-input').addClass('hide');
 	$('#bam-url-input').val('');
 }
@@ -646,10 +648,10 @@ function onBamUrlEntered() {
 }
 
 function displayBamUrlBox() {
-
-
-    $('#bam-url-input').removeClass("hide");
-    $("#bam-url-input").focus();
+	$('#bam-file-info').addClass('hide');
+    $('#bam-file-info').val('');
+    $('#datasource-dialog #bam-url-input').removeClass("hide");
+    $("#datasource-dialog #bam-url-input").focus();
 
 }
 
@@ -657,10 +659,13 @@ function displayUrlBox() {
     $('#url-input').val('http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz');
 	$("#url-input").removeClass('hide');
     $("#url-input").focus();
-
+    $('#datasource-dialog #vcf-file-info').addClass('hide');
+    $('#datasource-dialog #vcf-file-info').val('');
 
 }
 function onVcfFileButtonClicked() {	
+	$('#data-source-dialog #vcf-file-info').removeClass("hide");
+
 	$('#url-input').addClass('hide');
 	$('#url-input').val('');
 }
