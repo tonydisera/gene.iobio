@@ -62,7 +62,7 @@ var formatRegion = d3.format(",");
 
 
 // variant card
-var variantCard = null;
+var variantCards = [];
 
 
 
@@ -109,7 +109,9 @@ function init() {
 				regionEnd   = window.gene.end;
 			}
 
-	    	variantCard.onD3Brush(brush);
+			variantCards.forEach(function(variantCard) {
+		    	variantCard.onD3Brush(brush);
+			});
 
 			transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 		});	
@@ -126,7 +128,10 @@ function init() {
 	    	window.selectedTranscript = d;
 	    	showTranscripts();
 
-	    	variantCard.showBamDepth();
+			variantCards.forEach(function(variantCard) {
+		    	variantCard.showBamDepth();
+			});
+
 	    });
 
 	// Initialize variant legend
@@ -135,16 +140,50 @@ function init() {
 	// Initialize transcript view buttons
 	initTranscriptControls();
 
-	// Init variant card
-    $('#variant-cards').append(variantCardTemplate());    
-	variantCard = new VariantCard();
-	variantCard.init($( "#variant-cards #variant-card:eq(0)" ));
-	
+	initDataSourceDialog();
+
 }
 
 function onCollapseTranscriptPanel() {
 	transcriptCollapse = !transcriptCollapse;
 	d3.select('#track-section').style("padding-top", transcriptCollapse ? transcriptPanelHeight + "px" : "89" + "px");
+
+}
+
+function initDataSourceDialog() {
+	// listen for data sources open event
+	$( "#datasource-dialog" ).on('shown.bs.modal', function (e) {
+		if (variantCards.length == 0) {
+			addVariantCard();
+			$('#datasource-dialog #card-index').val(0);
+		}
+		var cardIndex = $('#datasource-dialog #card-index').val();
+		var variantCard = variantCards[+cardIndex];
+
+		if (variantCard.getBamName().indexOf("http") == 0) {
+			$('#datasource-dialog #bam-file-info').addClass("hide");
+			$('#datasource-dialog #bam-url-input').removeClass("hide");
+			$('#datasource-dialog #bam-url-input').val(variantCard.getBamName());
+		} else {
+			$('#datasource-dialog #bam-url-input').addClass("hide");
+			$('#datasource-dialog #bam-file-info').removeClass("hide");
+			$('#datasource-dialog #bam-file-info').val(variantCard.getBamName());
+		}
+
+		if (variantCard.getVcfName().indexOf("http") == 0) {
+			$('#datasource-dialog #vcf-file-info').addClass("hide");
+			$('#datasource-dialog #url-input').removeClass("hide");
+			$('#datasource-dialog #url-input').val(variantCard.getVcfName());
+		} else {
+			$('#datasource-dialog #url-input').addClass("hide");
+			$('#datasource-dialog #vcf-file-info').removeClass("hide");
+			$('#datasource-dialog #vcf-file-info').val(variantCard.getVcfName());
+		}
+
+
+		$('#datasource-dialog #datasource-name').removeClass("hide");
+		$('#datasource-dialog #datasource-name').val(variantCard.getName());
+  	});
 
 }
 
@@ -250,7 +289,10 @@ function initFilterTrack() {
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
 
-	    	variantCard.classifyVariants(classifyByImpact, regionStart, regionEnd);
+			variantCards.forEach(function(variantCard) {
+				variantCard.classifyVariants(classifyByImpact, regionStart, regionEnd);
+			});
+
 
 	    });
 	  d3.selectAll('#effect-scheme')
@@ -262,7 +304,10 @@ function initFilterTrack() {
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
 
-	    	variantCard.classifyVariants(classifyByEffect, regionStart, regionEnd);
+			variantCards.forEach(function(variantCard) {
+		    	variantCard.classifyVariants(classifyByEffect, regionStart, regionEnd);
+			});
+
 
 	    });
 	  
@@ -492,9 +537,12 @@ function loadTracksForGene() {
 	// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 	// chart is not rendered.
 	showTranscripts();
+	
+	variantCards.forEach(function(variantCard) {
+		variantCard.loadTracksForGene(classifyByImpact);
+	});
 
-	variantCard.loadTracksForGene(classifyByImpact);
-
+	
 }
 
 function showTranscripts(regionStart, regionEnd) {
@@ -564,6 +612,18 @@ function getTranscriptSelector(selectedTranscript) {
 	return $(selector);
 }
 
+function addVariantCard() {
+	$('#variant-cards').append(variantCardTemplate());  
+	var variantCard = new VariantCard();
+	variantCards.push(variantCard);	
+
+	var cardIndex = variantCards.length - 1;
+	var cardSelectorString = "#variant-cards .variant-card:eq(" + cardIndex + ")" ;
+	variantCard.init($(cardSelectorString), cardIndex);
+
+	$('#datasource-dialog #card-index').val(cardIndex);
+}
+
 
 function onBamFileButtonClicked() {	
 	$('#bam-url-input').addClass('hide');
@@ -571,21 +631,22 @@ function onBamFileButtonClicked() {
 }
 
 function onBamFilesSelected(event) {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 	variantCard.onBamFilesSelected(event);
 }
 
 
 function onBamUrlEntered() {
 	$('#bam-url-input').removeClass("hide");
+
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 	variantCard.onBamUrlEntered($('#bam-url-input').val());
 }
 
 function displayBamUrlBox() {
-	$('#bam-name').addClass("hide");
-    $('#bam-depth').addClass("hide");
- 
-	$('#bam-file-info').addClass('hide');
-    $('#bam-file-info').val('');
+
 
     $('#bam-url-input').removeClass("hide");
     $("#bam-url-input").focus();
@@ -596,8 +657,7 @@ function displayUrlBox() {
     $('#url-input').val('http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz');
 	$("#url-input").removeClass('hide');
     $("#url-input").focus();
-    $('#vcf-file-info').addClass('hide');
-    $('#vcf-file-info').val('');
+
 
 }
 function onVcfFileButtonClicked() {	
@@ -606,11 +666,17 @@ function onVcfFileButtonClicked() {
 }
 
 function onVcfFilesSelected(event) {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 	variantCard.onVcfFilesSelected(event);
 }
 
 function onVcfUrlEntered() {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
 	var vcfUrl = $('#url-input').val();
+
 	variantCard.onVcfUrlEntered(vcfUrl);
 }
 
@@ -624,6 +690,8 @@ function loadDataSources() {
 
 	var dataSourceName = $('#datasource-name').val();
 
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 
 	variantCard.loadDataSources(dataSourceName);
 

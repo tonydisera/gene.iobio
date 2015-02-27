@@ -67,7 +67,7 @@
   <link rel="stylesheet" href="assets/css/site.css" />
 
   <script id="variant-card-template" type="text/x-handlebars-template">
-      <div id="variant-card" class="track-expand shadow-z-1 hide" style="background-color:white;">
+      <div class="variant-card track-expand shadow-z-1 hide" style="background-color:white;">
 
 
           <div>
@@ -109,10 +109,10 @@
                             aria-expanded="false" aria-controls="collapseExample">
                             Allele Frequency
                           </a>
-                          <a id="file-info-link"   
+                          <a id="vcf-file-info-link"   
                             data-toggle="collapse" 
                             style="float:right;font-size: 12px;vertical-align: top;margin-top: 0px;" 
-                            href="#file-info" aria-expanded="false" >
+                            href="#vcf-file-info" aria-expanded="false" >
                             File info
                           </a>
 
@@ -134,7 +134,7 @@
                         </div>
                       </div> 
 
-                      <span id="file-info" class="collapse" style="float:right;">
+                      <span id="vcf-file-info" class="collapse" style="float:right;">
                         <span id="vcf-name" class="hide" style="font-size: 12px"></span>
                       </span>
                   </div>
@@ -166,7 +166,7 @@
                   </div>
 
                    <div style="float:right;margin-top:-10px;">
-                    <a id="file-info-link" data-toggle="collapse" 
+                    <a id="bam-file-info-link" data-toggle="collapse" 
                       style="float:right;font-size: 12px;" 
                       href="#bam-name" aria-expanded="false" class="collapsed">
                       File info
@@ -462,6 +462,21 @@
             </div>
 
             <div class="modal-body">
+
+              <div>
+                <select id="variant-card-select">
+                  <option>Proband</option>
+                  <option>Mother</option>
+                  <option>Father</option>
+                </select>
+
+
+                 <button type="button" style="height: 42px;" 
+                    class="btn btn-default btn-raised" onclick="addVariantCard()">
+                      Add Sample
+                 </button>
+              </div>
+
               <div id="add-bam-track" >
 
                 <div class="btn-toolbar" style="float:left;width:200px;">
@@ -488,6 +503,7 @@
                       </ul>
                   </div>
                 </div>
+                <input id="card-index" class="hide1" value="0" type="text"></input>
 
                 <div style="float: right;width: 550px;margin-top:25px;">
                     <input id="bam-url-input" type="text" class="form-control input-sm hide" 
