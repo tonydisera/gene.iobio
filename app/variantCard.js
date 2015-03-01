@@ -22,9 +22,31 @@ function VariantCard() {
 	this.d3CardSelector = null;
 	this.cardIndex = null;
 	this.name = null;
+	this.dirty = false;
 }
 
 // class methods
+
+VariantCard.prototype.setName = function(theName) {
+	if (theName) {
+		this.name = theName;
+	} else {
+		return theName;
+	}
+}
+
+VariantCard.prototype.setDirty = function(flag) {
+	if (flag == null) {
+		this.dirty = true;
+	} else {
+		this.dirty = flag;
+	}
+
+}
+
+VariantCard.prototype.isDirty = function() {
+	return this.dirty;
+}
 VariantCard.prototype.init = function(cardSelector, cardIndex) {
 	var me = this;
 
@@ -201,7 +223,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 
 }
 
-VariantCard.prototype.onVcfFilesSelected = function() {
+VariantCard.prototype.onVcfFilesSelected = function(event) {
 	var me = this;
 	this.vcfFileOpened = true;
 
@@ -355,8 +377,8 @@ VariantCard.prototype.onD3Brush = function(brush) {
 		this.cardSelector.find('#bam-track').css("margin-top", "-30px");
 		
 		this.cardSelector.find('#zoom-region-chart').addClass("hide");
-		var h = this.cardSelector.find("#nav-section").node().offsetHeight;
-		this.d3CardSelector.select('#track-section').style("padding-top", h + "px");
+		var h = $("#nav-section").height();
+		$('#track-section').css("padding-top", h + "px");
 	}
 
 	this.showBamDepth(regionStart, regionEnd);

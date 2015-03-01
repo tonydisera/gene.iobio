@@ -452,67 +452,68 @@
 
 
 
-    <div id="datasource-dialog" class="modal fade" tabindex="-1">
+
+<div id="datasource-dialog" class="modal fade" tabindex="-1">
+
+
       <div class="modal-dialog" style="width: 800px">
     
         <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-              <h4 class="modal-title">Enter Data Sources</h4>
+              <h4 class="modal-title" style="display: inline;float: left;">Enter Data Sources</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="float: right;">x
+              </button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body" style="margin-top: 20px;">
 
-              <div>
-                <select id="variant-card-select">
-                  <option>Proband</option>
-                  <option>Mother</option>
-                  <option>Father</option>
-                </select>
+                <div id="variant-card-buttons" class="btn-group hide">
+                   <button id="add-variant-card-button" type="btn btn-raised" class="btn btn-default btn-raised" onclick="addVariantCard()">
+                      <i class="mdi-content-add"></i>
+                      New
+                  </button>
+                </div>
 
-
-                 <button type="button" style="height: 42px;" 
-                    class="btn btn-default btn-raised" onclick="addVariantCard()">
-                      Add Sample
-                 </button>
+              <div style="padding-top: 20px;padding-bottom: 10px;clear: both;">
+                  <span style="float:left;width: 155px;padding-top: 10px;text-align: right;padding-right: 18px;">Name</span>
+                  <div style="float: left;width: 70%;">
+                    <input id="datasource-name" class="form-control input-sm" onchange="setDataSourceName()" type="text"/>
+                  </div>
               </div>
 
-              <div id="add-bam-track" >
 
-                <div class="btn-toolbar" style="float:left;width:200px;">
-                  <div class="btn-group" style="display:inline;">
+              <div id="add-bam-track">
 
-                      <button type="button" style="height: 42px;" 
-                      class="btn btn-default btn-raised dropdown-toggle" 
-                      data-toggle="dropdown" aria-expanded="false">
+                <div class="btn-toolbar" style="clear:both;float:left;width: 160px;">
+                  <div class="btn-group" style="display:inline;margin-top: 15px;">
+
+                      <button type="button" style="padding: 8px !important;width: 140px;" 
+                      class="btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         Alignment File 
                         <span class="caret"></span>
                       </button>
 
                       <ul class="dropdown-menu" role="menu">
                         <li style="color:  rgb(51, 51, 51);">
-                             <div class="file" onClick="onBamFileButtonClicked()">
-                                <input type="file" name="files[]" id="bam-file"  multiple />
-                                <label class="file-button" for="bam-file" >Choose BAM File</label>
+                             <div class="file" onclick="onBamFileButtonClicked()">
+                                <input type="file" name="files[]" id="bam-file-upload" 
+                                onchange="onBamFilesSelected(event)" multiple="">
+                                <label class="file-button" for="bam-file-upload">Choose BAM File</label>
                             </div>
                         </li>
                         <li>
-                            <a onClick="displayBamUrlBox()" href="#">Enter URL for BAM</a>
+                            <a onclick="displayBamUrlBox()" href="#">Enter URL for BAM</a>
                         </li>    
                        
                       </ul>
                   </div>
                 </div>
-                <input id="card-index" class="hide1" value="0" type="text"></input>
+                
 
-                <div style="float: right;width: 550px;margin-top:25px;">
-                    <input id="bam-url-input" type="text" class="form-control input-sm hide" 
-                    value="http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam" class="form-control" 
-                    placeholder="http://..." >
-                    <input id="bam-file-info" type="text"  
-                      value="" 
-                      readonly=""
-                      class="form-control input-sm hide" />
+                <div style="float: left;width: 70%;margin-top:25px;">
+                    <input id="bam-url-input" type="text" class="form-control input-sm" value="" placeholder="http://..."/>
+                    <input id="bam-file-info" type="text" value="" readonly="" 
+                    class="form-control input-sm empty hide"/>
                 </div>
 
               </div>
@@ -520,58 +521,42 @@
 
               <div id="add-vcf-track" style="clear:both;">
                   
-                  <div class="btn-toolbar" style="float: left; width:200px">
-                    <div class="btn-group" style="display:  inline;">
+                  <div class="btn-toolbar" style="float: left; width: 160px;">
+                    <div class="btn-group" style="display:  inline;margin-top: 15px;">
 
-                      <button type="button" style="height: 42px;" 
-                        class="btn btn-default dropdown-toggle" 
-                        data-toggle="dropdown" aria-expanded="false">
+                      <button type="button" style="padding: 8px !important;width: 140px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         Variant File <span class="caret"></span>
                       </button>
 
                       <ul class="dropdown-menu" role="menu">
                         <li style="color:  rgb(51, 51, 51);">
-                            <div class="file" onClick="onVcfFileButtonClicked()">
-                                <input type="file" name="files[]" id="vcf-file"  multiple />
-                                <label class="file-button" for="vcf-file" >Choose VCF File</label>
+                            <div class="file" onclick="onVcfFileButtonClicked()">
+                                <input type="file" name="files[]" id="vcf-file-upload" multiple="" onchange="onVcfFilesSelected(event)">
+                                <label class="file-button" for="vcf-file-upload">Choose VCF File</label>
                             </div>
                         </li>
                         <li>
-                            <a onClick="displayUrlBox()" href="#">Enter URL for VCF</a>
+                            <a onclick="displayUrlBox()" href="#">Enter URL for VCF</a>
                         </li>    
                       </ul>
                     </div>
                   </div>
 
-                  <div style="float: right;width: 550px;margin-top:25px;">
-                    <input id="url-input" type="text"  
-                      value="" 
-                      class="form-control input-sm hide" 
-                      placeholder="http://..." />
-                    <input id="vcf-file-info" type="text"  
-                      value="" 
-                      readonly=""
-                      class="form-control input-sm hide" />
+                  <div style="float: left;width: 70%;margin-top:25px;">
+                    <input id="url-input" type="text" value="" class="form-control input-sm empty" placeholder="http://...">
+                    <input id="vcf-file-info" type="text" value="" readonly="" class="form-control input-sm empty hide">
                   </div>
-            
-
               </div>     
 
-              <div  style="clear:both;padding-top: 10px;padding-bottom: 10px;">
-                  <span style="float:left;width:200px;padding-top: 10px;">Name</span>
-                  <div  style="float:right;width:550px;" >
-                    <input id="datasource-name" class="form-control input-sm" type="text" />
-                  </div>
-              </div>
-
-
+              <input id="card-index" class="hide" value="0" type="text">
             </div>
 
-            <div class="modal-footer" style="display: block;clear: both;margin-top: 10px;margin-bottom: 0px;padding-bottom: 10px;">
-              <button class="btn btn-primary btn-flat" data-dismiss="modal" onClick="loadDataSources()">
+            <div class="modal-footer" 
+            style="display: block;clear: both;margin-bottom: 0px;padding-bottom: 10px;padding-top: 20px;">
+              <button class="btn btn-raised default" data-dismiss="modal" onclick="loadDataSources()">
                 <i class="mdi-navigation-check"></i> Ok
               </button>
-              <button class="btn btn-default btn-flat">
+              <button class="btn btn-raised " data-dismiss="modal">
                 <i class="mdi-navigation-close"></i> Cancel
               </button>
             </div>
@@ -579,26 +564,28 @@
         </div>
 
       </div>
-    </div>
+ 
+</div>
 
 
 
 
- 	<script>
-        var div = d3.select("body").append("div")   
-            .attr("class", "tooltip")               
-            .style("opacity", 0);
-    </script>    
 
-  <script src="app/region.d3.js"></script>
-	<script src="app/histogram.d3.js"></script>
-  <script src="app/line.d3.js"></script>
-	<script src="app/gene.d3.js"></script>
-	<script src="app/variant.d3.js"></script>
-  <script src="app/bam.iobio.js"></script>
-	<script type="text/javascript" src="app/vcf.iobio.js"></script>
-  <script src="app/variantCard.js"></script>  
-	<script src="app/app.js"></script>	
+<script>
+    var div = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);
+</script>    
+
+<script src="app/region.d3.js"></script>
+<script src="app/histogram.d3.js"></script>
+<script src="app/line.d3.js"></script>
+<script src="app/gene.d3.js"></script>
+<script src="app/variant.d3.js"></script>
+<script src="app/bam.iobio.js"></script>
+<script type="text/javascript" src="app/vcf.iobio.js"></script>
+<script src="app/variantCard.js"></script>  
+<script src="app/app.js"></script>	
 
 
  </div>
