@@ -913,36 +913,45 @@ var effectCategories = [
   };
 
   exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
+    var pileup = pileupLayout().sort(null).size(800); // 1860
+    var maxlevel = pileup(variants);
+    return maxLevel;
+  }
+
+  exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
       widthFactor = widthFactor ? widthFactor : 1;
       // Variant's can overlap each over.  Set a field called variant.level which determines
       // how to stack the variants vertically in these cases.
-      var posLevels = [];
+      var posLevels = [];      
       posLevels.length = 0;
       var maxLevel = 0;
       variants.forEach(function(variant) {
 
-        // Figure out the highest Level for the positions
-        // encompassing this variant
-        var localMaxLevel = -1;
-        for (var i = 0; i < variant.len + (posToPixelFactor * widthFactor); i++) {
-          var idx = (variant.start - regionStart) + i;
-          var posLevel = posLevels[idx];
-
-          if (posLevel != null && posLevel > localMaxLevel) {
-            localMaxLevel = posLevel;
-          }
+        // get next available vertical spot starting at level 0
+        var idx = (variant.start - regionStart);// + i;
+        var posLevel = 0;
+        if (posLevels[idx] != undefined) {
+          for ( var k=0; k <= posLevels[idx].length; k++ ) {
+            if (posLevels[idx][k] == undefined) {
+              posLevel = k;
+              break;                
+            }
+          }            
         }
-        // Now bump up the level and set it on the variant.
-        variant.level = localMaxLevel + 1;
+        
+        // Set variant level.
+        variant.level = posLevel;
 
         // Now set new level for each positions comprised of this variant.
         for (var i = 0; i < variant.len + (posToPixelFactor * widthFactor); i++) {
           var idx = (variant.start - regionStart) + i;
-          posLevels[idx] = variant.level;
+          var stack = posLevels[idx] || [];
+          stack[variant.level] = true;
+          posLevels[idx] = stack;
 
           // Capture the max level of the entire region. 
-          if (posLevels[idx] > maxLevel) {
-            maxLevel = posLevels[idx];
+          if (posLevels[idx].length-1 > maxLevel) {
+            maxLevel = posLevels[idx].length - 1;
           }
         }
       });
