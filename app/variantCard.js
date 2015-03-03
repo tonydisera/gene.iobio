@@ -636,6 +636,7 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
 	this.cardSelector.find('#vcf-count').text(data.features.length + ' Variants');
 
     $('#filter-track').removeClass("hide");
+    $('#matrix-track').removeClass("hide");
     
 	    
    	this.d3CardSelector.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
@@ -644,8 +645,10 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
    		$('#compare-legend').removeClass("hide");
    	}
 
-
-
+   	//  TODO:  Change this so that we can indicate primary variant card
+   	if ( this.cardIndex == 0) {
+   		fillFeatureMatrix(this.vcfData);
+   	}
 
 }
 

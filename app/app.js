@@ -42,6 +42,18 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 
+var featureMatrix = null;
+var matrixColumns = [
+	'High impact',
+	'Sufficient coverage',
+	'Called in realtime by Freebayes',
+	'Variant not present in unaffected',
+	'Hom proband, het parent(s)',
+	'Not in 1000G',
+	'Not in ExAC'
+];
+
+
 
 // Filters
 this.clickedAnnotIds = new Object();
@@ -130,6 +142,12 @@ function init() {
 
 	    });
 
+	featureMatrix = featureMatrixD3()
+					    .margin({top: 0, right: 4, bottom: 4, left: 24})
+					    .cellSize(20)
+					    .columnLabelHeight(90)
+					    .rowLabelWidth(160);
+
 	// Initialize variant legend
 	initFilterTrack();
 
@@ -160,11 +178,6 @@ function initDataSourceDialog() {
 		initDataSourceFields();
 
   	});
-
-
-
-
-
 }
 
 function selectVariantCard(cardIndex) {
@@ -198,9 +211,6 @@ function initDataSourceFields() {
 		$('#datasource-dialog #vcf-file-info').val(variantCard.getVcfName());
 	}	
 	$('#datasource-dialog #datasource-name').val(variantCard.getName());
-
-
-
 }
 
 function initTranscriptControls() {
@@ -222,8 +232,8 @@ function initTranscriptControls() {
             onCloseTranscriptMenuEvent();
         }
     });
-
 }
+
 function onCloseTranscriptMenuEvent() {
 	d3.selectAll("#gene-viz .transcript").remove();
  	selectedTranscript = transcriptMenuChart.selectedTranscript();
@@ -770,6 +780,46 @@ function loadDataSources() {
 		}
 	});
 
+
+}
+
+function fillFeatureMatrix(vcfData) {
+
+	
+	// Fill all criteria array for each variant
+	vcfData.features.forEach( function(variant) {
+		var features = [];
+		for (var i = 0; i < matrixColumns.length; i++) {
+			randomIndex = Math.floor(Math.random() * 7) + 0;
+			if (i == randomIndex) {
+				features.push(1);
+			} else {
+				features.push(0);
+			}
+		}
+		variant.features = features;
+	});
+	// Sort the variants by the criteria that matches
+	var sortedFeatures = vcfData.features.sort(function (a, b) {
+	  var featuresA = a.features.join();
+	  var featuresB = b.features.join();
+	  if (featuresA < featuresB) {
+	    return 1;
+	  }
+	  if (featuresA > featuresB) {
+	    return -1;
+	  }
+	  // a must be equal to b
+	  return 0;
+	});
+	// Get the top 50 variants
+	var topFeatures = sortedFeatures.splice(0, 40);
+	
+
+	// Load the chart with the new data
+	featureMatrix.columnNames(matrixColumns);
+	var selection = d3.select("#feature-matrix").data([topFeatures]);    
+    this.featureMatrix(selection);
 
 }
 
