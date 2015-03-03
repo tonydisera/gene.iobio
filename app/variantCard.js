@@ -44,9 +44,26 @@ VariantCard.prototype.setDirty = function(flag) {
 
 }
 
-VariantCard.prototype.showCircle = function(variant) {
-	this.vcfChart.showCircle()(variant);
+VariantCard.prototype.highlightVariant = function(variant) {
+	if (variant) {
+	    this.d3CardSelector.selectAll("#vcf-variants .variant")
+	      .style("opacity", .1);
+	    this.d3CardSelector.selectAll("#vcf-variants .variant")
+	      .filter( function(d,i) {
+	        if (d.start == variant.start && d.end == variant.end && d.type == variant.type) {
+	          return true;
+	        } else {
+	          return false;
+	        }
+	       })
+	      .style("opacity", 1);  		
+	} else {
+		this.d3CardSelector.selectAll("#vcf-variants .variant")
+     			.style("opacity", 1);
+	}
+  
 }
+
 
 VariantCard.prototype.isDirty = function() {
 	return this.dirty;
@@ -651,7 +668,7 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
 
    	//  TODO:  Change this so that we can indicate primary variant card
    	if ( this.cardIndex == 0) {
-   		fillFeatureMatrix(this.vcfData);
+   		fillFeatureMatrix(data);
    	}
 
 }

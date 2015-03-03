@@ -8,7 +8,7 @@ function featureMatrixD3() {
       y = d3.scale.ordinal();
 
   // color scheme
-  var colorScale = d3.scale.category20();   
+  var colorScale = d3.scale.category20b();   
 
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
@@ -82,13 +82,18 @@ function featureMatrixD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
+         .attr("width", width)
          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
-      var g =  svg.selectAll("g.group").data([data]).enter()
+
+
+      svg.selectAll("g.group").remove();
+      var g =  svg.selectAll("g.group").data([data])
+        .enter()
         .append("g")
         .attr("class", "group")
-        .attr("transform",  "translate(" + rowLabelWidth + "," + (+columnLabelHeight - 20) + ")")
-     
+        .attr("transform",  "translate(" + rowLabelWidth + "," + (+columnLabelHeight - 20) + ")");
+
 
       // Create the X-axis at the top.  This will show the labels for the columns 
       svg.selectAll(".x.axis").remove();    
@@ -135,6 +140,7 @@ function featureMatrixD3() {
 
 
 
+
       // Generate the cols
       var cols = g.selectAll('.col').data(data);
       cols.enter().append('g')
@@ -160,6 +166,7 @@ function featureMatrixD3() {
           .style('fill', function(d, i) { 
             return (d == '1' ? colorScale(i) : "lightgrey");
           });
+
 
     
 
@@ -197,8 +204,6 @@ function featureMatrixD3() {
               dispatch.d3click(colObject, rowIndex);
             });
 
-      // exit
-      cols.exit().remove();
 
       // update 
       if (showTransition) {

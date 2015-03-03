@@ -63,8 +63,6 @@ function variantD3() {
      }
   }
 
-
-
   var showCircle = function(d) {
 
     // Get the x for this position
@@ -107,10 +105,10 @@ function variantD3() {
     // Not sure why, but we have to bump up the layers by one; otherwise,
     // y will be negative for first layer
     height = verticalLayers * (variantHeight + verticalPadding);  
-    //height += (variantHeight + verticalPadding);  
+    height += (variantHeight + verticalPadding);  
     // Account for the margin when we are showing the xAxis
     if (showXAxis) {
-      //height += margin.bottom; 
+      height += margin.bottom; 
     }
     if (dividerLevel) {
       height += (variantHeight + verticalPadding);  
@@ -647,6 +645,11 @@ function variantD3() {
   chart.hideCircle = function(_) {
     if (!arguments.length) return hideCircle;
     hideCircle = _;
+    return chart;
+  }
+  chart.highlightVariant = function(_) {
+    if (!arguments.length) return highlightVariant;
+    highlightVariant = _;
     return chart;
   }
  
