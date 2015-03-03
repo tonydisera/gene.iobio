@@ -146,7 +146,8 @@ function init() {
 					    .margin({top: 0, right: 4, bottom: 4, left: 24})
 					    .cellSize(20)
 					    .columnLabelHeight(90)
-					    .rowLabelWidth(160);
+					    .rowLabelWidth(160)
+					    .tooltipHTML(variantTooltipHTML);
 
 	// Initialize variant legend
 	initFilterTrack();
@@ -820,6 +821,38 @@ function fillFeatureMatrix(vcfData) {
 	featureMatrix.columnNames(matrixColumns);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);    
     this.featureMatrix(selection);
+
+}
+
+function variantTooltipHTML(variant, rowIndex) {
+
+	var effectDisplay = "";
+	for (var key in variant.effect) {
+	if (effectDisplay.length > 0) {
+	  	effectDisplay += ", ";
+	}
+		effectDisplay += key;
+	}    
+	var impactDisplay = "";
+	for (var key in variant.impact) {
+	if (impactDisplay.length > 0) {
+	  	impactDisplay += ", ";
+	}
+		impactDisplay += key;
+	}   
+	return (variant.type + ': ' 
+	    	 	+ variant.start 
+	    	 	+ (variant.end > variant.start+1 ?  ' - ' + variant.end : "")
+	    	 	+ '<br>ref: ' + variant.ref 
+				+ '<br>alt: ' + variant.alt
+				+ '<br>effect: ' + effectDisplay
+				+ '<br>impact: ' + impactDisplay 
+				+ (variant.qual != '' ? ('<br>qual: ' +  variant.qual) : '') 
+				+ (variant.filter != '.' ? ('<br>filter: ' + variant.filter) : '') 
+				+ '<br>allele freq: ' + variant.af
+				+ '<br>combined depth: ' + variant.combinedDepth 
+				+ (variant.zygosity != null ? ('<br>zygosity: ' + variant.zygosity) : '')
+	    	 );                    
 
 }
 

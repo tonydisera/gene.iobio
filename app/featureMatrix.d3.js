@@ -1,5 +1,5 @@
 function featureMatrixD3() {
-   var dispatch = d3.dispatch("d3click", "d3tooltip", "d3notooltip");
+   var dispatch = d3.dispatch("d3click", "d3mouseover", "d3mouseout");
 
   // dimensions
   var margin = {top: 10, right: 10, bottom: 10, left: 10};  
@@ -8,7 +8,11 @@ function featureMatrixD3() {
       y = d3.scale.ordinal();
 
   // color scheme
-  var colorScale = d3.scale.category20();    
+  var colorScale = d3.scale.category20();   
+
+  var tooltipHTML = function(colObject, rowIndex) {
+    return "tootip at row " + rowIndex;
+  }
  
   // variables 
   var heightPercent = "100%",
@@ -166,21 +170,25 @@ function featureMatrixD3() {
               tooltip.transition()        
                  .duration(1000)      
                  .style("opacity", .9);  
-              
-              tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : ""))                    
-                 .style("width",  "100px")
-                 .style("height", "20px")             
-                 .style("left", (d3.event.pageX - 50) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 20) + "px");   
+              var colObject = d3.select(this.parentNode).datum();
+              var rowIndex = d;
 
-              dispatch.d3tooltip(d.start); 
+              tooltip.html(tooltipHTML(colObject, rowIndex));
+
+              var h = tooltip[0][0].offsetHeight;
+              var w = tooltip[0][0].offsetWidth;
+
+              tooltip.style("left", (d3.event.pageX - w) + "px") 
+                     .style("text-align", 'left')    
+                     .style("top", (d3.event.pageY - h) + "px");   
+              
+              dispatch.d3mouseover(colObject, rowIndex ); 
             })                  
            .on("mouseout", function(d) {       
               container.select('.tooltip').transition()        
                  .duration(500)      
                  .style("opacity", 0);   
-              dispatch.d3notooltip(); 
+              dispatch.mouseout(); 
             });           
 
       // exit
@@ -296,9 +304,14 @@ function featureMatrixD3() {
     rowLabelWidth = _;
     return chart;
   }
-   chart.columnLabelHeight = function(_) {
+  chart.columnLabelHeight = function(_) {
     if (!arguments.length) return columnLabelHeight;
     columnLabelHeight = _;
+    return chart;
+  }
+  chart.tooltipHTML = function(_) {
+    if (!arguments.length) return tooltipHTML;
+    tooltipHTML = _;
     return chart;
   }
 
