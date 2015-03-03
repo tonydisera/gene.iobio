@@ -1,5 +1,5 @@
 function variantD3() {
-   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3tooltip", "d3notooltip");
+   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3mouseover", "d3mouseout");
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},
@@ -31,6 +31,12 @@ function variantD3() {
 
   //  options
   var defaults = {};
+
+  var tooltipHTML = function(variant) {
+    return (variant.type + ': ' 
+          + variant.start 
+          + (variant.end > variant.start+1 ?  ' - ' + variant.end : ""));
+  }
 
   var clazz = function (d) { 
     var impacts = "";
@@ -310,57 +316,29 @@ function variantD3() {
            .on("mouseover", function(d) {  
               var tooltip = container.select('.tooltip');
               tooltip.transition()        
-                 .duration(1000)      
-                 .style("opacity", .9);  
-              var effectDisplay = "";
-              for (var key in d.effect) {
-                if (effectDisplay.length > 0) {
-                  effectDisplay += ", ";
-                }
-                effectDisplay += key;
-              }    
-              var impactDisplay = "";
-              for (var key in d.impact) {
-                if (impactDisplay.length > 0) {
-                  impactDisplay += ", ";
-                }
-                impactDisplay += key;
-              }   
-              var ttWidth = 0;
-              if (d.ref.length > 20 || d.alt.length > 20) {
-                ttWidth = 260;
-              } else if (d.ref.length > 15 || d.alt.length > 15) {
-                ttWidth = 220;
-              } else {
-                ttWidth = 180;
-              }
-              tooltip.html(d.type + ': ' + d.start + (d.end > d.start+1 ?  ' - ' + d.end : "")
-                           + '<br>ref: ' + d.ref 
-                           + '<br>alt: ' + d.alt
-                           + '<br>effect: ' + effectDisplay
-                           + '<br>impact: ' + impactDisplay 
-                           + (d.qual != '' ? ('<br>qual: ' +  d.qual) : '') 
-                           + (d.filter != '.' ? ('<br>filter: ' + d.filter) : '') 
-                           + '<br>allele freq: ' + d.af
-                           + '<br>combined depth: ' + d.combinedDepth 
-                           + (d.zygosity != null ? ('<br>zygosity: ' + d.zygosity) : '')
-                          // + '<br>genotypes: ' + d.genotypes 
-                         //  + '<br>genotypes: ' + d.genotypeForAlt 
-                         //  + '<br>phased: ' + d.phased 
-                           )                    
-                 .style("width", ttWidth + "px")
-                 .style("height", "130px")             
-                 .style("left", (d3.event.pageX - (ttWidth+2)) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 142) + "px");   
+                     .duration(1000)      
+                     .style("opacity", .9);  
+              
+              tooltip.html(tooltipHTML(d));
 
-              dispatch.d3tooltip(d.start); 
+              var h = tooltip[0][0].offsetHeight;
+              var w = tooltip[0][0].offsetWidth;
+
+              if (d3.event.pageX < w) {
+                w = 0;
+              }
+
+              tooltip.style("left", (d3.event.pageX - w) + "px") 
+                     .style("text-align", 'left')    
+                     .style("top", (d3.event.pageY - h) + "px");   
+              
+              dispatch.d3mouseover(d); 
             })                  
            .on("mouseout", function(d) {       
               container.select('.tooltip').transition()        
                  .duration(500)      
                  .style("opacity", 0);   
-              dispatch.d3notooltip(); 
+              dispatch.d3mouseout(); 
             });           
 
 
@@ -595,6 +573,12 @@ function variantD3() {
   chart.dividerLevel = function(_) {
     if (!arguments.length) return dividerLevel;
     dividerLevel = _;
+    return chart;
+  }
+
+  chart.tooltipHTML = function(_) {
+    if (!arguments.length) return tooltipHTML;
+    tooltipHTML = _;
     return chart;
   }
 

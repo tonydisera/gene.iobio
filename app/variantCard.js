@@ -108,16 +108,16 @@ VariantCard.prototype.init = function(cardSelector, cardIndex) {
 			    .variantHeight(6)
 			    .verticalPadding(2)
 			    .showBrush(false)
+			    .tooltipHTML(variantTooltipHTML)
 			    .on("d3rendered", function() {
-			    	//applyVariantFilters();
-					
+			    	
 			    })			    
-			    .on('d3tooltip', function(start) {
+			    .on('d3mouseover', function(d) {
 			    	if (me.bamData) {
-						me.bamDepthChart.showCircle()(start);
+						me.bamDepthChart.showCircle()(d.start);
 			    	}
 				})
-				.on('d3notooltip', function(start) {
+				.on('d3mouseout', function() {
 					if (me.bamData){
 						me.bamDepthChart.hideCircle()();
 					}
