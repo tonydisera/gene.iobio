@@ -5,7 +5,20 @@ body {
 
 
 
+#feature-matrix rect {
+  fill: none;
+  stroke: rgb(230, 230, 230);
+  stroke-width: 2px;
+}
 
+#feature-matrix text {
+  font-size: 10px;
+  fill:  rgb(120,120,120);
+}
+
+#matrix-track {
+  overflow-x: scroll;
+}
 
 #nav-section {
   position:fixed;

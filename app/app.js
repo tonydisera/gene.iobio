@@ -42,6 +42,18 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 
+var featureMatrix = null;
+var matrixColumns = [
+	'High impact',
+	'Sufficient coverage',
+	'Called in realtime by Freebayes',
+	'Variant not present in unaffected',
+	'Hom proband, het parent(s)',
+	'Not in 1000G',
+	'Not in ExAC'
+];
+
+
 
 // Filters
 this.clickedAnnotIds = new Object();
@@ -62,7 +74,7 @@ var formatRegion = d3.format(",");
 
 
 // variant card
-var variantCard = null;
+var variantCards = [];
 
 
 
@@ -81,10 +93,6 @@ function init() {
 	loadGeneWidget();
 	$('#bloodhound .typeahead').focus();
 	
-	// Setup event handlers for File input
-	$('#bam-file').on('change', onBamFilesSelected);
-	$('#vcf-file').on('change', onVcfFilesSelected);	
-
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
@@ -109,7 +117,9 @@ function init() {
 				regionEnd   = window.gene.end;
 			}
 
-	    	variantCard.onD3Brush(brush);
+			variantCards.forEach(function(variantCard) {
+		    	variantCard.onD3Brush(brush);
+			});
 
 			transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 		});	
@@ -126,8 +136,17 @@ function init() {
 	    	window.selectedTranscript = d;
 	    	showTranscripts();
 
-	    	variantCard.showBamDepth();
+			variantCards.forEach(function(variantCard) {
+		    	variantCard.showBamDepth();
+			});
+
 	    });
+
+	featureMatrix = featureMatrixD3()
+					    .margin({top: 0, right: 4, bottom: 4, left: 24})
+					    .cellSize(20)
+					    .columnLabelHeight(90)
+					    .rowLabelWidth(160);
 
 	// Initialize variant legend
 	initFilterTrack();
@@ -135,17 +154,63 @@ function init() {
 	// Initialize transcript view buttons
 	initTranscriptControls();
 
-	// Init variant card
-    $('#variant-cards').append(variantCardTemplate());    
-	variantCard = new VariantCard();
-	variantCard.init($( "#variant-cards #variant-card:eq(0)" ));
-	
+	initDataSourceDialog();
+
 }
 
 function onCollapseTranscriptPanel() {
 	transcriptCollapse = !transcriptCollapse;
 	d3.select('#track-section').style("padding-top", transcriptCollapse ? transcriptPanelHeight + "px" : "89" + "px");
 
+}
+
+function initDataSourceDialog() {
+	// listen for data sources open event
+	$( "#datasource-dialog" ).on('shown.bs.modal', function (e) {
+		if (variantCards.length == 0) {
+			addVariantCard();
+			$('#datasource-dialog #card-index').val(0);
+
+		} else {
+			$('#variant-card-buttons').removeClass("hide");
+		}
+		
+		initDataSourceFields();
+
+  	});
+}
+
+function selectVariantCard(cardIndex) {
+	$('#datasource-dialog #card-index').val(+cardIndex);
+	initDataSourceFields();
+
+}
+
+function initDataSourceFields() {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+
+	if (variantCard.getBamName().indexOf("http") == 0) {
+		$('#datasource-dialog #bam-file-info').addClass("hide");
+		$('#datasource-dialog #bam-url-input').removeClass("hide");
+		$('#datasource-dialog #bam-url-input').val(variantCard.getBamName());
+	} else {
+		$('#datasource-dialog #bam-url-input').addClass("hide");
+		$('#datasource-dialog #bam-file-info').removeClass("hide");
+		$('#datasource-dialog #bam-file-info').val(variantCard.getBamName());
+	}
+
+	if (variantCard.getVcfName().indexOf("http") == 0) {
+		$('#datasource-dialog #vcf-file-info').addClass("hide");
+		$('#datasource-dialog #url-input').removeClass("hide");
+		$('#datasource-dialog #url-input').val(variantCard.getVcfName());
+	} else {
+		$('#datasource-dialog #url-input').addClass("hide");
+		$('#datasource-dialog #vcf-file-info').removeClass("hide");
+		$('#datasource-dialog #vcf-file-info').val(variantCard.getVcfName());
+	}	
+	$('#datasource-dialog #datasource-name').val(variantCard.getName());
 }
 
 function initTranscriptControls() {
@@ -167,8 +232,8 @@ function initTranscriptControls() {
             onCloseTranscriptMenuEvent();
         }
     });
-
 }
+
 function onCloseTranscriptMenuEvent() {
 	d3.selectAll("#gene-viz .transcript").remove();
  	selectedTranscript = transcriptMenuChart.selectedTranscript();
@@ -250,7 +315,10 @@ function initFilterTrack() {
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
 
-	    	variantCard.classifyVariants(classifyByImpact, regionStart, regionEnd);
+			variantCards.forEach(function(variantCard) {
+				variantCard.classifyVariants(classifyByImpact, regionStart, regionEnd);
+			});
+
 
 	    });
 	  d3.selectAll('#effect-scheme')
@@ -262,7 +330,10 @@ function initFilterTrack() {
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
 
-	    	variantCard.classifyVariants(classifyByEffect, regionStart, regionEnd);
+			variantCards.forEach(function(variantCard) {
+		    	variantCard.classifyVariants(classifyByEffect, regionStart, regionEnd);
+			});
+
 
 	    });
 	  
@@ -492,9 +563,12 @@ function loadTracksForGene() {
 	// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 	// chart is not rendered.
 	showTranscripts();
+	
+	variantCards.forEach(function(variantCard) {
+		variantCard.loadTracksForGene(classifyByImpact);
+	});
 
-	variantCard.loadTracksForGene(classifyByImpact);
-
+	
 }
 
 function showTranscripts(regionStart, regionEnd) {
@@ -564,31 +638,80 @@ function getTranscriptSelector(selectedTranscript) {
 	return $(selector);
 }
 
+function addVariantCard() {
+
+	$('#variant-cards').append(variantCardTemplate());  
+	var variantCard = new VariantCard();
+	variantCards.push(variantCard);	
+
+	var cardIndex = variantCards.length - 1;
+	var defaultName = "sample " + (+cardIndex + 1);
+	variantCard.setName(defaultName);
+
+	var cardSelectorString = "#variant-cards .variant-card:eq(" + cardIndex + ")" ;
+	variantCard.init($(cardSelectorString), cardIndex);
+
+
+	$('#datasource-dialog #card-index').val(cardIndex);
+
+
+	$('#datasource-dialog #datasource-name').val(defaultName);
+	$('#datasource-dialog #bam-file-info').addClass("hide");
+	$('#datasource-dialog #bam-url-input').addClass("hide");
+	$('#datasource-dialog #vcf-file-info').addClass("hide");
+	$('#datasource-dialog #url-input').addClass("hide");
+	$('#datasource-dialog #bam-file-info').val("");
+	$('#datasource-dialog #bam-url-input').val("");
+	$('#datasource-dialog #vcf-file-info').val("");
+	$('#datasource-dialog #url-input').val("");
+
+	$('#datasource-dialog #bam-file-upload').val("");
+	$('#datasource-dialog #vcf-file-upload').val("");
+	
+
+
+    $('#variant-card-buttons')
+         .append($("<a></a>")
+         .attr("id", "variant-card-button-" + cardIndex)
+         .attr("href", "javascript:void(0)")
+         .attr("onclick", 'selectVariantCard("'+ cardIndex + '")')
+         .attr("class", "btn btn-default")
+         .text(defaultName));
+
+}
+
 
 function onBamFileButtonClicked() {	
+	$('#datasource-dialog #bam-file-info').removeClass("hide");
+
 	$('#bam-url-input').addClass('hide');
 	$('#bam-url-input').val('');
 }
 
 function onBamFilesSelected(event) {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 	variantCard.onBamFilesSelected(event);
+	variantCard.setDirty();
 }
 
 
 function onBamUrlEntered() {
 	$('#bam-url-input').removeClass("hide");
+
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 	variantCard.onBamUrlEntered($('#bam-url-input').val());
+	variantCard.setDirty();
 }
 
 function displayBamUrlBox() {
-	$('#bam-name').addClass("hide");
-    $('#bam-depth').addClass("hide");
- 
 	$('#bam-file-info').addClass('hide');
     $('#bam-file-info').val('');
-
-    $('#bam-url-input').removeClass("hide");
-    $("#bam-url-input").focus();
+    $('#datasource-dialog #bam-url-input').removeClass("hide");
+    $("#datasource-dialog #bam-url-input").focus();
+    $('#datasource-dialog #bam-url-input').val('http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam');
+	
 
 }
 
@@ -596,23 +719,45 @@ function displayUrlBox() {
     $('#url-input').val('http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz');
 	$("#url-input").removeClass('hide');
     $("#url-input").focus();
-    $('#vcf-file-info').addClass('hide');
-    $('#vcf-file-info').val('');
+    $('#datasource-dialog #vcf-file-info').addClass('hide');
+    $('#datasource-dialog #vcf-file-info').val('');
 
 }
 function onVcfFileButtonClicked() {	
+	$('#datasource-dialog #vcf-file-info').removeClass("hide");
+
 	$('#url-input').addClass('hide');
 	$('#url-input').val('');
 }
 
 function onVcfFilesSelected(event) {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 	variantCard.onVcfFilesSelected(event);
+	variantCard.setDirty();
 }
 
 function onVcfUrlEntered() {
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
 	var vcfUrl = $('#url-input').val();
+
 	variantCard.onVcfUrlEntered(vcfUrl);
+	variantCard.setDirty();
 }
+
+
+function setDataSourceName() {	
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+	var dsName = $('#datasource-name').val();
+	variantCard.setName(dsName);
+	$('#variant-card-button-' + cardIndex ).text(dsName);
+
+}
+
 
 function loadDataSources() {
 	if ($('#bam-url-input').val() != '') {
@@ -624,8 +769,57 @@ function loadDataSources() {
 
 	var dataSourceName = $('#datasource-name').val();
 
+	var cardIndex = $('#datasource-dialog #card-index').val();
+	var variantCard = variantCards[+cardIndex];
 
-	variantCard.loadDataSources(dataSourceName);
+
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.isDirty()) {
+			variantCard.loadDataSources(dataSourceName);
+			variantCard.setDirty(false);
+		}
+	});
+
+
+}
+
+function fillFeatureMatrix(vcfData) {
+
+	
+	// Fill all criteria array for each variant
+	vcfData.features.forEach( function(variant) {
+		var features = [];
+		for (var i = 0; i < matrixColumns.length; i++) {
+			randomIndex = Math.floor(Math.random() * 7) + 0;
+			if (i == randomIndex) {
+				features.push(1);
+			} else {
+				features.push(0);
+			}
+		}
+		variant.features = features;
+	});
+	// Sort the variants by the criteria that matches
+	var sortedFeatures = vcfData.features.sort(function (a, b) {
+	  var featuresA = a.features.join();
+	  var featuresB = b.features.join();
+	  if (featuresA < featuresB) {
+	    return 1;
+	  }
+	  if (featuresA > featuresB) {
+	    return -1;
+	  }
+	  // a must be equal to b
+	  return 0;
+	});
+	// Get the top 50 variants
+	var topFeatures = sortedFeatures.splice(0, 40);
+	
+
+	// Load the chart with the new data
+	featureMatrix.columnNames(matrixColumns);
+	var selection = d3.select("#feature-matrix").data([topFeatures]);    
+    this.featureMatrix(selection);
 
 }
 

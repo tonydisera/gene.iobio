@@ -19,13 +19,55 @@ function VariantCard() {
 	this.getBamRefName = null;
 	this.getVcfRefName = null;
 	this.cardSelector = null;
+	this.d3CardSelector = null;
+	this.cardIndex = null;
+	this.name = null;
+	this.dirty = false;
 }
 
 // class methods
-VariantCard.prototype.init = function(cardSelector) {
+
+VariantCard.prototype.setName = function(theName) {
+	if (theName) {
+		this.name = theName;
+	} else {
+		return theName;
+	}
+}
+
+VariantCard.prototype.setDirty = function(flag) {
+	if (flag == null) {
+		this.dirty = true;
+	} else {
+		this.dirty = flag;
+	}
+
+}
+
+VariantCard.prototype.isDirty = function() {
+	return this.dirty;
+}
+VariantCard.prototype.init = function(cardSelector, cardIndex) {
 	var me = this;
 
+	this.d3CardSelector = d3.selectAll("#variant-cards .variant-card").filter(function(d, i) { return i == +cardIndex; });
 	this.cardSelector = cardSelector;
+	this.cardIndex = cardIndex;
+
+	this.cardSelector.find("#variant-link").attr("href", "#variant-panel-" + cardIndex);
+	this.cardSelector.find('#variant-panel').attr("id", "variant-panel-" + cardIndex);
+
+	this.cardSelector.find("#af-link").attr("href", "#af-" + cardIndex);
+	this.cardSelector.find('#af').attr("id", "af-" + cardIndex);
+
+
+	this.cardSelector.find("#vcf-file-info-link").attr("href", "#vcf-file-info-" + cardIndex);
+	this.cardSelector.find('#vcf-file-info').attr("id", "vcf-file-info-" + cardIndex);
+
+
+	this.cardSelector.find("#bam-file-info-link").attr("href", "#bam-name-" + cardIndex);
+	this.cardSelector.find('#bam-name').attr("id", "bam-name-" + cardIndex);
+
 
 	// init vcf.iobio
 	this.vcf = vcfiobio();
@@ -144,9 +186,10 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 	this.cardSelector.find("#bam-track .loader-label").text("Loading File");
 
 	this.bamFileOpened = true;
-	this.cardSelector.find('#bam-name').text(bamFile.name);
-	this.cardSelector.find('#bam-file-info').removeClass('hide');
-	this.cardSelector.find('#bam-file-info').val(bamFile.name);
+	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamFile.name);
+
+	$('#datasource-dialog #bam-file-info').removeClass('hide');
+	$('#datasource-dialog #bam-file-info').val(bamFile.name);
 
 
 	this.bam = new Bam( bamFile, { bai: baiFile });
@@ -172,7 +215,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 	this.cardSelector.find("#bam-track .loader").css("display", "block");
 	this.cardSelector.find("#bam-track .loader-label").text("Streaming File")
 
-	this.cardSelector.find('#bam-name').text(bamUrl);
+	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamUrl);
     
     this.bam = new Bam(bamUrl);
     this.bamUrlEntered = true;
@@ -180,7 +223,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 
 }
 
-VariantCard.prototype.onVcfFilesSelected = function() {
+VariantCard.prototype.onVcfFilesSelected = function(event) {
 	var me = this;
 	this.vcfFileOpened = true;
 
@@ -192,9 +235,10 @@ VariantCard.prototype.onVcfFilesSelected = function() {
 
 	this.vcf.openVcfFile( event, function(vcfFile) {
 
-		this.cardSelector.find('#vcf-name').text(vcfFile.name);
-		this.cardSelector.find('#vcf-file-info').removeClass('hide');
-		this.cardSelector.find('#vcf-file-info').val(vcfFile.name);
+		me.cardSelector.find('#vcf-name').text(vcfFile.name);
+		$('#datasource-dialog #vcf-file-info').removeClass('hide');
+		$('#datasource-dialog #vcf-file-info').val(vcfFile.name);
+
 		
 		me.getVcfRefName = null;
 		me.vcf.getReferenceNames(function(refNames) {
@@ -221,7 +265,8 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 	this.cardSelector.find('#vcf-variants').css("display", "none");
 	this.cardSelector.find("#vcf-track .loader").css("display", "block");
 	this.cardSelector.find('#vcf-track .loader-label').text("Streaming Variant Data");
-    
+ 	this.cardSelector.find('#vcf-name').text(vcfUrl);
+   
     this.vcf.openVcfUrl(vcfUrl);
     this.vcfUrlEntered = true;
     this.getVcfRefName = this.stripRefName;
@@ -230,12 +275,13 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 }
 
 VariantCard.prototype.loadDataSources = function(dataSourceName) {
+	this.name = dataSourceName;
 
 	var cache = this.cardSelector.find('#variant-link').children();
    	this.cardSelector.find('#variant-link').text(dataSourceName).append(cache);
    	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
-   	this.cardSelector.find('#variant-panel').attr("aria-expanded", true);
-   	this.cardSelector.find('#variant-panel').addClass("in");
+   	this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
+   	this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
 
 
 	// Show the read coverage 
@@ -262,7 +308,17 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 	}	
 }
 
+VariantCard.prototype.getBamName = function() {
+	return this.cardSelector.find('#bam-name-' + this.cardIndex).text();
+}
 
+VariantCard.prototype.getVcfName = function() {
+	return this.cardSelector.find('#vcf-name').text();
+}
+
+VariantCard.prototype.getName = function() {
+	return this.name;
+}
 
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
@@ -280,7 +336,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 
 	if (this.bam || this.vcf) {	       			
-		selection = d3.select("#zoom-region-chart").datum([]);
+		selection = this.d3CardSelector.select("#zoom-region-chart").datum([]);
 		this.zoomRegionChart.regionStart(+window.gene.start);
 		this.zoomRegionChart.regionEnd(+window.gene.end);
 		this.zoomRegionChart(selection);
@@ -305,11 +361,11 @@ VariantCard.prototype.onD3Brush = function(brush) {
 
 		this.cardSelector.find('#bam-track').css("margin-top", "-70px");
 
-	    var selection = d3.select("#zoom-region-chart").datum([window.selectedTranscript]);
+	    var selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
 		this.zoomRegionChart.regionStart(regionStart);
 		this.zoomRegionChart.regionEnd(regionEnd);
 		this.zoomRegionChart(selection);
-		d3.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
+		this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
 		this.cardSelector.find('#zoom-region-chart').removeClass("hide");
 
@@ -321,8 +377,8 @@ VariantCard.prototype.onD3Brush = function(brush) {
 		this.cardSelector.find('#bam-track').css("margin-top", "-30px");
 		
 		this.cardSelector.find('#zoom-region-chart').addClass("hide");
-		var h = d3.select("#nav-section").node().offsetHeight;
-		d3.select('#track-section').style("padding-top", h + "px");
+		var h = $("#nav-section").height();
+		$('#track-section').css("padding-top", h + "px");
 	}
 
 	this.showBamDepth(regionStart, regionEnd);
@@ -347,7 +403,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 	this.cardSelector.removeClass("hide");
 	this.cardSelector.find('#bam-track').removeClass("hide");
 	this.cardSelector.find('#bam-depth').addClass("hide");
-	this.cardSelector.find('#bam-name').addClass("hide");
+	this.cardSelector.find('#bam-name-' + this.cardIndex).addClass("hide");
 	
 
 	if (regionStart && regionEnd) {
@@ -383,14 +439,14 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 
 VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 	this.cardSelector.find("#bam-track .loader").css("display", "none");
-    this.cardSelector.find('#bam-name').removeClass("hide");		
+    this.cardSelector.find('#bam-name-' + this.cardIndex).removeClass("hide");		
 	this.cardSelector.find('#bam-depth').removeClass("hide");
 
 	this.bamDepthChart.xStart(regionStart);
 	this.bamDepthChart.xEnd(regionEnd);
 
-	this.bamDepthChart(d3.select("#bam-depth").datum(data));		
-	d3.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
+	this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(data));		
+	this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 }
 
 VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
@@ -477,11 +533,11 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 		// Alelle Frequency
 		var afObj = stats.af_hist;
 		vcfAfData = me.vcf.jsonToArray2D(afObj);	
-		var afSelection = d3.select("#vcf-af-chart")
+		var afSelection = me.d3CardSelector.select("#vcf-af-chart")
 						    .datum(vcfAfData);
 		var afOptions = {outliers: true, averageLine: false};		
 		me.cardSelector.find('#af').removeClass("hide");			    
-		me.afChart(afSelection, afOptions);	
+		me.afChart.call(afSelection, afSelection, afOptions);	
 	});
 
 }
@@ -574,22 +630,25 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
 	this.vcfChart.verticalLayers(data.maxLevel);
 
 	// Load the chart with the new data
-	var selection = d3.select("#vcf-variants").datum([data]);    
+	var selection = this.d3CardSelector.select("#vcf-variants").datum([data]);    
     this.vcfChart(selection);
 
 	this.cardSelector.find('#vcf-count').text(data.features.length + ' Variants');
 
     $('#filter-track').removeClass("hide");
+    $('#matrix-track').removeClass("hide");
     
 	    
-   	d3.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
+   	this.d3CardSelector.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
 
    	if (this.fbData) {
    		$('#compare-legend').removeClass("hide");
    	}
 
-
-
+   	//  TODO:  Change this so that we can indicate primary variant card
+   	if ( this.cardIndex == 0) {
+   		fillFeatureMatrix(this.vcfData);
+   	}
 
 }
 
