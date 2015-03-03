@@ -170,6 +170,7 @@ function featureMatrixD3() {
               tooltip.transition()        
                  .duration(1000)      
                  .style("opacity", .9);  
+
               var colObject = d3.select(this.parentNode).datum();
               var rowIndex = d;
 
@@ -189,7 +190,12 @@ function featureMatrixD3() {
                  .duration(500)      
                  .style("opacity", 0);   
               dispatch.d3mouseout(); 
-            });           
+            })
+            .on("click", function(d) {                
+              var colObject = d3.select(this.parentNode).datum();
+              var rowIndex = d;
+              dispatch.d3click(colObject, rowIndex);
+            });
 
       // exit
       cols.exit().remove();

@@ -147,7 +147,12 @@ function init() {
 					    .cellSize(20)
 					    .columnLabelHeight(90)
 					    .rowLabelWidth(160)
-					    .tooltipHTML(variantTooltipHTML);
+					    .tooltipHTML(variantTooltipHTML)
+					    .on('d3click', function(variant) {
+					    	if (variantCards.length > 0) {
+						    	variantCards[0].showCircle(variant);
+					    	}
+					    });
 
 	// Initialize variant legend
 	initFilterTrack();

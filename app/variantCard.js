@@ -44,6 +44,10 @@ VariantCard.prototype.setDirty = function(flag) {
 
 }
 
+VariantCard.prototype.showCircle = function(variant) {
+	this.vcfChart.showCircle()(variant);
+}
+
 VariantCard.prototype.isDirty = function() {
 	return this.dirty;
 }

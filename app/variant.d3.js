@@ -27,7 +27,8 @@ function variantD3() {
       verticalPadding = 4,
       showTransition = true,
       lowestWidth = 3,
-      dividerLevel = null;
+      dividerLevel = null,
+      container = null;
 
   //  options
   var defaults = {};
@@ -61,6 +62,41 @@ function variantD3() {
         return 'diamond';
      }
   }
+
+
+
+  var showCircle = function(d) {
+
+    // Get the x for this position
+    if (d) {
+      var mousex = d3.round(x(d.start));
+      var mousey = height - ((d.level + 1) * (variantHeight + verticalPadding));
+      
+
+      var circle = d3.select(this.container).select(".circle");
+      circle.transition()
+            .duration(200)
+            .style("opacity", 1);
+      circle.attr("cx", mousex + margin.left - 4)
+            .attr("cy", mousey + margin.top + 2);
+              
+    }
+  };
+
+  var hideCircle = function() {
+    container.select(".circle").transition()        
+                 .duration(500)      
+                 .style("opacity", 0); 
+    
+    container.select(".circle-label").transition()        
+                 .duration(500)      
+                 .style("opacity", 0);                    
+    
+    container.select(".tooltip").transition()
+             .duration(500)
+             .style("opacity", 0); 
+  }
+
       
       
   function chart(selection, options) {
@@ -87,7 +123,7 @@ function variantD3() {
 
     selection.each(function(data) {
        // set svg element
-       var container = d3.select(this).classed('ibo-variant', true);      
+       container = d3.select(this).classed('ibo-variant', true);      
 
       // Update the x-scale.
       // Update the x-scale.
@@ -433,6 +469,28 @@ function variantD3() {
             .call(xAxis);       
       }
 
+
+
+      // add a circle and label
+      svg.selectAll(".circle").remove();
+      var circle = svg.selectAll(".circle").data([0])
+        .enter().append('circle')
+          .attr("class", "circle")
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", 6)
+          .style("fill", "none")
+          .style("stroke", "red")               
+          .style("stroke-width", "2")               
+          .style("opacity", 0);
+      var circleLabel = svg.selectAll(".circle-label").data([0])
+        .enter().append('text')
+          .attr("class", "circle-label")
+          .attr("x", 0)
+          .attr("y", 0)
+          .style("fill", "red")
+          .style("font-size", "11px")
+          .style("opacity", 0);
       
       dispatch.d3rendered();
  
@@ -581,6 +639,17 @@ function variantD3() {
     tooltipHTML = _;
     return chart;
   }
+  chart.showCircle = function(_) {
+    if (!arguments.length) return showCircle;
+    showCircle = _;
+    return chart;
+  }
+  chart.hideCircle = function(_) {
+    if (!arguments.length) return hideCircle;
+    hideCircle = _;
+    return chart;
+  }
+ 
 
   
   // This adds the "on" methods to our custom exports
