@@ -6,7 +6,7 @@ function VariantCard() {
 	this.bam = null;
   	this.vcfChart = null;
 	this.vcfData = null;
-	this.fbData = null;
+	this.fbData = null;	
 	this.vcfAfData = null;
 	this.afChart = null;
 	this.afMin = null;
@@ -23,6 +23,8 @@ function VariantCard() {
 	this.cardIndex = null;
 	this.name = null;
 	this.dirty = false;
+
+
 }
 
 // class methods
@@ -662,9 +664,9 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
    		$('#compare-legend').removeClass("hide");
    	}
 
-   	//  TODO:  Change this so that we can indicate primary variant card
+   	//  TODO:  Change this so that we can indicate proband/primary variant card
    	if ( this.cardIndex == 0) {
-   		fillFeatureMatrix(data);
+   		window.showFeatureMatrix(this, data);
    	}
 
 }
@@ -772,6 +774,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	}
 
 } 
+
 
 
 VariantCard.prototype.classifyVariants = function(clazz) {

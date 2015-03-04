@@ -53,6 +53,12 @@ var matrixColumns = [
 	'Not in ExAC'
 ];
 
+var vcf1000GData = null;
+var vcfExACData = null;
+var vcf1000GUrl = "http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz";
+var vcfExACUrl  = "http://s3.amazonaws.com/vcf.files/ExAC.r0.2.sites.vep.vcf.gz";
+
+var depthThreshold = 4;
 
 
 // Filters
@@ -846,24 +852,102 @@ function loadDataSources() {
 
 }
 
-function fillFeatureMatrix(vcfData) {
+function showFeatureMatrix(theVariantCard, theVcfData) {
 
 	$("#matrix-track .loader").css("display", "block");
 	$("#matrix-track .loader-label").text("Analyzing Variants");
 	$("#feature-matrix").addClass("hide");
 
+	_getPopulationVariants(theVariantCard, theVcfData, fillFeatureMatrix);	
+}
+
+function _getPopulationVariants(theVariantCard, theVcfData, callback) {
+	var me = this;
+	if (window.vcf1000GData != null && window.vcfExACData != null) {
+		callback(theVcfData);
+	} else {
+		var vcf1000G = vcfiobio();
+		vcf1000G.openVcfUrl(this.vcf1000GUrl);
+		var refName = theVariantCard.getVcfRefName(window.gene.chr);
+		vcf1000G.getVariants(refName, 
+							   window.gene.start, 
+					           window.gene.end, 
+					           window.gene.strand, 
+					           window.selectedTranscript,
+					           0,
+					           1,
+					           function(data) {
+	        window.vcf1000GData = data;
+
+	        vcf1000G.compareVcfRecords(theVcfData, window.vcf1000GData, function() {
+
+			    var vcfExAC= vcfiobio();
+				vcfExAC.openVcfUrl(window.vcfExACUrl);
+				vcfExAC.getVariants(refName, 
+									   window.gene.start, 
+							           window.gene.end, 
+							           window.gene.strand, 
+							           window.selectedTranscript,
+							           0,
+							           1,
+							           function(data) {
+			        window.vcfExACData = data;
+
+			        vcfExAC.compareVcfRecords(theVcfData, window.vcfExACData, function(){
+				        callback(theVcfData);
+			        }, 'compareExAC' );
+			    });
+
+
+	        }, 'compare1000G' );
+
+	    });
+
+
+
+	}
+}
+
+
+function fillFeatureMatrix(vcfData) {
+
 	
 	// Fill all criteria array for each variant
 	vcfData.features.forEach( function(variant) {
-		var features = [];
-		for (var i = 0; i < matrixColumns.length; i++) {
-			randomIndex = Math.floor(Math.random() * 7) + 0;
-			if (i == randomIndex) {
-				features.push(1);
-			} else {
-				features.push(0);
-			}
+		var features = [0,0,0,0,0,0,0];
+
+		// high impact
+		for (var key in variant.impact) {
+			if (key == 'HIGH') {
+				features[0] = 1;
+				break;
+			} 
 		}
+
+		// adequate coverage
+		if (variant.combinedDepth != null && variant.combinedDepth != '' && variant.combinedDepth >= depthThreshold) {
+			features[1] = 1;
+		}
+
+		// unique freebayes call
+		if (variant.consensus == 'unique2') {
+			features[2] = 1;
+		}
+
+		// variant in proband, not present in unaffected relatives
+		features[3] = 1;
+
+		// hom variant in proband, het or non-existent in parents
+		features[4] = 1;
+
+
+		// variant not present in 1000 genomes
+		features[5] = variant.compare1000G == 'unique1' ? 1 : 0;
+
+
+		//variant not present in ExAC
+		features[6] = variant.compareExAC == 'unique1' ? 1 : 0;
+
 		variant.features = features;
 	});
 	// Sort the variants by the criteria that matches
@@ -880,8 +964,8 @@ function fillFeatureMatrix(vcfData) {
 	  return 0;
 	});
 	// Get the top 50 variants
-	var topFeatures = sortedFeatures.splice(0, 50);
-	//var topFeatures = sortedFeatures;
+	//var topFeatures = sortedFeatures.splice(0, 50);
+	var topFeatures = sortedFeatures;
 
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");

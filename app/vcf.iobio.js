@@ -858,7 +858,7 @@ var effectCategories = [
               'effect': effects, 
               'effectCategory': effectCats, 
               'impact': impacts, 
-              'compare': rec.compare} );
+              'consensus': rec.consensus} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;
@@ -959,7 +959,14 @@ var effectCategories = [
   }
 
 
-  exports.compareVcfRecords = function(variants1, variants2,  callback) {
+  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttribute) {
+    var set1Label = 'unique1';
+    var set2Label = 'unique2';
+    var commonLabel = 'common';
+    if (comparisonAttribute == null) {
+      comparisonAttribute = 'consensus';
+    }
+
     variants1.count = variants1.features.length;
     variants1.countMatch = 0;
 
@@ -982,7 +989,7 @@ var effectCategories = [
       // through variants2 until we get to the same position
       // (or bypass it).  For each variant2 that matches
       // variant1, mark both as 'match'.
-      variant1.consensus = 'unique1';
+      variant1[comparisonAttribute] = set1Label;
       for (var x = idx2; x < features2.length; x++) {
         variant2 = features2[x];
         if (variant1.start == variant2.start) {
@@ -992,8 +999,8 @@ var effectCategories = [
           idx2 = x;
 
           if (variant1.ref == variant2.ref && variant1.alt == variant2.alt) {
-            variant1.consensus = 'common';
-            variant2.consensus = 'common';
+            variant1[comparisonAttribute] =  commonLabel;
+            variant2[comparisonAttribute] =  commonLabel;
 
             variants1.countMatch++;
             variants2.countMatch++;
@@ -1001,7 +1008,7 @@ var effectCategories = [
           } else {
             // We need to mark variant2 as 'diff' so we don't revisit it
             // when variant2 drives the comparison loop.
-            variant2.consensus = 'common';
+            variant2[comparisonAttribute] = commonLabel;
           }
         } else if (variant1.start < variant2.start) {
           // We have moved beyond variant1's position,
@@ -1018,12 +1025,12 @@ var effectCategories = [
     for (var x = 0; x < features2.length; x++) {
       variant2 = features2[x];
       if (variant2.consensus == null) {
-        variant2.consensus = 'unique2';
+        variant2[comparisonAttribute] = set2Label;
       }
     }
 
-    variants1.countUnique = variants1.count - variants1.countMatch;
-    variants2.countUnique = variants2.count - variants2.countMatch;
+    //variants1.countUnique = variants1.count - variants1.countMatch;
+    //variants2.countUnique = variants2.count - variants2.countMatch;
     callback();
 
   };

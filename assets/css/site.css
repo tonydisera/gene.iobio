@@ -618,6 +618,7 @@ header {
 .variant.compare_unique2{
   fill: #FFCC2A !important;
   stroke: #997912 !important;
+
 }
 
 .variant.compare_common{
@@ -745,7 +746,8 @@ header {
 
 .variant.unique2 {
   stroke: #E03C55 !important;
-  stroke-width: 1px !important;
+  stroke-width: 1.5px !important;
+  stroke-opacity: 1;
 }
 
 
