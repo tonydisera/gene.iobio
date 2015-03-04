@@ -172,6 +172,21 @@ function init() {
 
 	initDataSourceDialog();
 
+	// Autoload data specified in url
+	var gene = getUrlParameter('gene');
+	if (gene != undefined) {
+		// load gene
+		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene});
+		var bam = getUrlParameter('bam') || '';
+		var vcf = getUrlParameter('vcf') || '';
+		if (bam != '' || vcf != '') {
+			initVariantCards();
+			$('#bam-url-input').val(bam)							
+			$('#url-input').val(vcf);			
+			loadDataSources();
+		}
+	}
+
 }
 
 function onCollapseTranscriptPanel() {
@@ -183,15 +198,7 @@ function onCollapseTranscriptPanel() {
 function initDataSourceDialog() {
 	// listen for data sources open event
 	$( "#datasource-dialog" ).on('shown.bs.modal', function (e) {
-		if (variantCards.length == 0) {
-			addVariantCard();
-			$('#datasource-dialog #card-index').val(0);
-
-		} else {
-			$('#variant-card-buttons').removeClass("hide");
-		}
-		
-		initDataSourceFields();
+		initVariantCards();
 
   	});
 }
@@ -200,6 +207,18 @@ function selectVariantCard(cardIndex) {
 	$('#datasource-dialog #card-index').val(+cardIndex);
 	initDataSourceFields();
 
+}
+
+function initVariantCards() {
+	if (variantCards.length == 0) {
+		addVariantCard();
+		$('#datasource-dialog #card-index').val(0);
+
+	} else {
+		$('#variant-card-buttons').removeClass("hide");
+	}
+	
+	initDataSourceFields();
 }
 
 function initDataSourceFields() {
@@ -373,6 +392,19 @@ function updateUrl(paramName, value) {
 	window.history.pushState({'index.html' : 'bar'},null,'?'+search.join('&'));	
 }
 
+function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}
+
 function classifyByImpact(d) {
 	var impacts = "";
 	var colorimpacts = "";
@@ -490,17 +522,8 @@ function loadGeneWidget() {
 	  // is compatible with the typeahead jQuery plugin
 	  source: gene_engine.ttAdapter()
 	});
-
-	// Attach initialized event to it
-	$('.typeahead').on('keyup', function(event) {
-		if (event.keyCode == 13) {
-			var val = $(this).typeahead('val').toUpperCase();
-			$(this).typeahead('close');
-			$(this).trigger('typeahead:selected', {"name": val});				
-		}				
-
-	})
-	typeahead.on('typeahead:selected',function(evt,data){
+	
+	typeahead.on('typeahead:selected',function(evt,data){		
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
 		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
@@ -666,7 +689,9 @@ function showTranscripts(regionStart, regionEnd) {
 
 	d3.select("#gene-viz .x.axis .tick text").style("text-anchor", "start");
 
-
+	// update track starting position after transcripts have been rendered
+	var h = d3.select("#nav-section").node().offsetHeight;
+	d3.select('#track-section').style("padding-top", h + "px");
 }
 
 function getTranscriptSelector(selectedTranscript) {
@@ -797,7 +822,7 @@ function setDataSourceName() {
 }
 
 
-function loadDataSources() {
+function loadDataSources() {	
 	if ($('#bam-url-input').val() != '') {
 		onBamUrlEntered();
 	}
