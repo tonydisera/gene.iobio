@@ -340,6 +340,23 @@ function initFilterTrack() {
 	  
 }
 
+function updateUrl(paramName, value) {
+	var params = {};
+	// turn params into hash
+	window.location.search.split('&').forEach(function(param){
+		if (param != '') {
+			var fields = param.split('=');
+			params[fields[0]] = params[fields[1]];
+		}
+	});
+	params[paramName] = value;
+	var search = [];
+	Object.keys(params).forEach(function(key) {
+		search.push(key + '=' + params[key]);
+	})
+	window.history.pushState({'index.html' : 'bar'},null,'?'+search.join('&'));	
+}
+
 function classifyByImpact(d) {
 	var impacts = "";
 	var colorimpacts = "";
@@ -485,6 +502,8 @@ function loadGeneWidget() {
 		    	window.gene = response[0];
 		    	window.selectedTranscript = null;
 		    	loadTracksForGene();
+		    	// add gene to url params
+		    	updateUrl('gene', window.gene.gene_name);
 
 	       	},
 		    error: function( xhr, status, errorThrown ) {
@@ -702,7 +721,7 @@ function onBamUrlEntered() {
 
 	var cardIndex = $('#datasource-dialog #card-index').val();
 	var variantCard = variantCards[+cardIndex];
-	variantCard.onBamUrlEntered($('#bam-url-input').val());
+	variantCard.onBamUrlEntered($('#bam-url-input').val());	
 	variantCard.setDirty();
 }
 
