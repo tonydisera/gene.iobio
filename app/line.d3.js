@@ -233,10 +233,10 @@ lineD3 = function module() {
 
         
       x = d3.scale.linear()
-          .range([0, width]);
+          .range([0, width - margin.left - margin.right]);
 
       y = d3.scale.linear()
-          .range([height - margin.top , 0]);
+          .range([height - margin.top, 0]);
 
 
       if (xStart && xEnd) {
