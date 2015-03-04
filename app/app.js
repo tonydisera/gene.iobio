@@ -360,8 +360,9 @@ function updateUrl(paramName, value) {
 	// turn params into hash
 	window.location.search.split('&').forEach(function(param){
 		if (param != '') {
+			param = param.split('?').length == 1 ? param : param.split('?')[1];
 			var fields = param.split('=');
-			params[fields[0]] = params[fields[1]];
+			params[fields[0]] = fields[1];
 		}
 	});
 	params[paramName] = value;
@@ -737,6 +738,7 @@ function onBamUrlEntered() {
 	var cardIndex = $('#datasource-dialog #card-index').val();
 	var variantCard = variantCards[+cardIndex];
 	variantCard.onBamUrlEntered($('#bam-url-input').val());	
+	updateUrl('bam', $('#bam-url-input').val());
 	variantCard.setDirty();
 }
 
@@ -779,6 +781,7 @@ function onVcfUrlEntered() {
 	var vcfUrl = $('#url-input').val();
 
 	variantCard.onVcfUrlEntered(vcfUrl);
+	updateUrl('vcf', vcfUrl);
 	variantCard.setDirty();
 }
 
