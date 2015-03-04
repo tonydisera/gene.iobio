@@ -349,10 +349,6 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.vcfData = null;
 	this.fbData = null;
 
-	this.cardSelector.find('#add-vcf-track').css("visibility", "visible");
-	this.cardSelector.find('#add-bam-track').css("visibility", "visible");
-
-	
 	this.vcfChart.clazz(classifyClazz);
 
 
@@ -371,7 +367,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	// loaded, the read coverage chart and called variant charts are
 	// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 	// chart is not rendered.
-	
+	$("#feature-matrix").addClass("hide");
 	this.showBamDepth();
 	this.showVariants();
 

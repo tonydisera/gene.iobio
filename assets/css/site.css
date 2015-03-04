@@ -218,19 +218,15 @@ a, a:hover, a:focus {
 #bam-track {
   margin-bottom: 0px ;
   margin-top: -30px ;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-  padding-left: 6px;
-  padding-right: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 0px;
   clear: both;
 }
 
 #vcf-track {
-  margin-top: 0px;
-  padding-top: 0px;
-  margin-bottom: 0px;
-  padding-bottom: 0px;
+  padding: 0px;
+  margin: 0px;
 }
 #track-legend {
   margin-top: 10px;
@@ -629,27 +625,33 @@ header {
   stroke: rgb(124, 109, 109);
 }
 
-.variant.impact_LOW{
-  fill: #71CEFF;
-  stroke: #729BB0;
- 
-} 
-.variant.impact_MODIFIER{
-  fill: #75A5C2;
-  stroke: #476E86;
+.variant.impact_HIGH{
+  fill: rgb(215,48,39);
+  stroke: #000;
+  stroke-opacity: .2;
 } 
 .variant.impact_MODERATE{
-  fill: #F9A366;
-  stroke: #9D684D;
+  fill: rgb(253,174,97);
+  stroke: #000;
+  stroke-opacity: .2;
 } 
-.variant.impact_HIGH{
-  fill: #D00202;
-  stroke: #930F0F;
+.variant.impact_MODIFIER{
+  /* fill: rgb(116,173,209); */
+  fill:  rgb(186,186,186);
+  stroke: #000;
+  stroke-opacity: .2;
+}
+.variant.impact_LOW { 
+  /* fill: rgb(224,243,248); */
+  fill:  rgb(224,224,224);;
+  stroke: #000;
+  stroke-opacity: .2;
 }
 .variant.impact_NOIMPACT { 
   fill: #FAF5BE;
   stroke: #807D7D;
 }
+
 
 
 

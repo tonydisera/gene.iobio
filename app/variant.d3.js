@@ -223,25 +223,31 @@ function variantD3() {
         .attr("width", widthPercent)
         .attr("height", heightPercent)
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
-        .attr("preserveAspectRatio", "xMinYMid meet");
+        .attr("preserveAspectRatio", "xMinYMid meet")
+        .append("g")
+        .attr("class", "group")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var g = svg.select("g.group");
+
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
+    
 
       // Create the X-axis.   
-      var g = svg;
-      svg.selectAll(".x.axis").remove();    
+      g.selectAll(".x.axis").remove();    
       if (showXAxis) {
-        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + (y.range()[0] + margin.bottom) + ")");    
+        g.append("g").attr("class", "x axis").attr("transform", "translate(0," + (y.range()[0] + margin.bottom) + ")");    
       } 
 
       // Create dividing line
-      svg.selectAll(".divider").remove();
+      g.selectAll(".divider").remove();
       if (dividerLevel) {
-        var divider = svg.append("g")
+        var divider = g.append("g")
                          .attr("class", "divider")
                          .attr("transform", "translate(0," + dividerY + ")");
         divider.append("line").attr("class", "dashed")
@@ -265,10 +271,7 @@ function variantD3() {
           .attr("class", "tooltip")               
           .style("opacity", 0);
 
-      
-      // Update the inner dimensions.
-      g.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+   
       // Start variant model
       // add elements
       var track = g.selectAll('.track.snp').data(data);

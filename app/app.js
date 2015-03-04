@@ -801,6 +801,10 @@ function loadDataSources() {
 
 function fillFeatureMatrix(vcfData) {
 
+	$("#matrix-track .loader").css("display", "block");
+	$("#matrix-track .loader-label").text("Analyzing Variants");
+	$("#feature-matrix").addClass("hide");
+
 	
 	// Fill all criteria array for each variant
 	vcfData.features.forEach( function(variant) {
@@ -829,13 +833,19 @@ function fillFeatureMatrix(vcfData) {
 	  return 0;
 	});
 	// Get the top 50 variants
-	//var topFeatures = sortedFeatures.splice(0, 40);
-	var topFeatures = sortedFeatures;
+	var topFeatures = sortedFeatures.splice(0, 50);
+	//var topFeatures = sortedFeatures;
+
+	$("#feature-matrix").removeClass("hide");
+	$("#matrix-track .loader").css("display", "none");
 
 	// Load the chart with the new data
 	featureMatrix.columnNames(matrixColumns);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);    
     this.featureMatrix(selection);
+
+
+
 
 }
 

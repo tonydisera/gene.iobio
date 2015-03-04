@@ -8,7 +8,7 @@ function featureMatrixD3() {
       y = d3.scale.ordinal();
 
   // color scheme
-  var colorScale = d3.scale.category20b();   
+  var colorScale = null;
 
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
@@ -164,7 +164,7 @@ function featureMatrixD3() {
           .attr('y', showTransition ? 0 : y(columnNames[i]) + y.rangeBand())
           .attr('width', cellSize)
           .style('fill', function(d, i) { 
-            return (d == '1' ? colorScale(i) : "lightgrey");
+            return (d == '1' ? colorScale[columnNames.length-1-i] : "lightgrey");
           });
 
 
@@ -302,6 +302,7 @@ function featureMatrixD3() {
   chart.columnNames = function(_) {
     if (!arguments.length) return columnNames;
     columnNames = _;
+    colorScale = colorbrewer.YlGnBu[columnNames.length+1];
     return chart;
   }
 
