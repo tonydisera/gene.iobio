@@ -147,7 +147,22 @@ function init() {
 					    .cellSize(20)
 					    .columnLabelHeight(90)
 					    .rowLabelWidth(160)
-					    .tooltipHTML(variantTooltipHTML);
+					    .tooltipHTML(variantTooltipHTML)
+					    .on('d3click', function(variant) {
+					    	if (variantCards.length > 0) {
+						    	variantCards[0].highlightVariant(variant);
+					    	}
+					    })
+					     .on('d3mouseover', function(variant) {
+					    	if (variantCards.length > 0) {
+						    	variantCards[0].highlightVariant();
+					    	}
+					    })
+					    .on('d3mouseout', function() {
+					    	if (variantCards.length > 0) {
+						    	variantCards[0].highlightVariant();
+					    	}
+					    });
 
 	// Initialize variant legend
 	initFilterTrack();
@@ -833,8 +848,8 @@ function fillFeatureMatrix(vcfData) {
 	  return 0;
 	});
 	// Get the top 50 variants
-	var topFeatures = sortedFeatures.splice(0, 40);
-	
+	//var topFeatures = sortedFeatures.splice(0, 40);
+	var topFeatures = sortedFeatures;
 
 	// Load the chart with the new data
 	featureMatrix.columnNames(matrixColumns);
