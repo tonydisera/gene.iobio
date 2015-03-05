@@ -1,5 +1,5 @@
 function featureMatrixD3() {
-   var dispatch = d3.dispatch("d3click", "d3mouseover", "d3mouseout");
+   var dispatch = d3.dispatch("d3click", "d3mouseover", "d3mouseout", "d3rowup", "d3rowdown");
 
   // dimensions
   var margin = {top: 10, right: 10, bottom: 10, left: 10};  
@@ -129,6 +129,38 @@ function featureMatrixD3() {
       svg.selectAll("g.x.axis path").classed("hide", true);
       svg.selectAll("g.y.axis .tick line").classed("hide", true);
       svg.selectAll("g.y.axis path").classed("hide", true);
+
+
+      // Add the up and down arrows to the x-axis
+      svg.selectAll("g.y.axis .tick .up").remove();
+      svg.selectAll("g.y.axis .tick")
+         .append("g")
+         .attr("class", "up")
+         .attr("transform", "translate(165, -10)")
+         .append("polygon")
+         .attr("points", "1,8 5,2 9,8")
+         .attr("x", "0")
+         .attr("y", "0")
+         .on("click", function(d,i) {
+            dispatch.d3rowup(i);
+         });
+
+
+      svg.selectAll("g.y.axis .tick .down").remove();
+      svg.selectAll("g.y.axis .tick")
+         .append("g")
+         .attr("class", "down")
+         .attr("transform", "translate(175, 10)")
+         .append("polygon")
+         .attr("points", "1,8 5,2 9,8")
+         .attr("x", "0")
+         .attr("y", "0")
+         .style("transform", "rotate(180deg)")
+         .on("click", function(d,i) {
+            dispatch.d3rowdown(i);
+         });
+
+
           
 
       // add tooltip div

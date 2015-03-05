@@ -16,6 +16,18 @@ body {
   fill:  rgb(120,120,120);
 }
 
+#feature-matrix .y.axis .tick .up polygon,
+#feature-matrix .y.axis .tick .down polygon {
+   fill:  lightgrey;
+   stroke: black;
+   stroke-width: 1px;
+}
+
+#feature-matrix .y.axis .tick .up polygon:hover,
+#feature-matrix .y.axis .tick .down polygon:hover {
+   cursor: pointer;
+}
+
 #matrix-track {
   overflow-x: scroll;
 }

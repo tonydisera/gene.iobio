@@ -42,15 +42,16 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 
+var featureVcfData = null;
 var featureMatrix = null;
 var matrixColumns = [
-	'High impact',
-	'Sufficient coverage',
-	'Called in realtime by Freebayes',
-	'Variant not present in unaffected',
-	'Hom proband, het parent(s)',
-	'Not in 1000G',
-	'Not in ExAC'
+	{name:'High impact'                         ,order:0, index:0},
+	{name:'Sufficient coverage'                 ,order:5, index:1},
+	{name:'Missing variant'                     ,order:6, index:2},
+	{name:'Variant not present in unaffected'   ,order:3, index:3},
+	{name:'Hom proband, het parent(s)'          ,order:4, index:4},
+	{name:'Not in 1000G'                        ,order:1, index:5},
+	{name:'Not in ExAC'                         ,order:2, index:6}
 ];
 
 var vcf1000G= null;
@@ -170,6 +171,40 @@ function init() {
 					    	if (variantCards.length > 0) {
 						    	variantCards[0].highlightVariant();
 					    	}
+					    })
+					    .on('d3rowup', function(i) {
+					    	var column = null;
+					    	var columnPrev = null;
+					    	matrixColumns.forEach(function(col) {
+					    		if (col.order == i) {
+					    			column = col;
+					    		} else if (col.order == i - 1) {
+					    			columnPrev = col;
+					    		}
+					    	});
+					    	if (column && columnPrev) {
+					    		column.order = column.order - 1;
+					    		columnPrev.order = columnPrev.order + 1;
+					    	}
+					    	fillFeatureMatrix(featureVcfData);
+					    	
+					    })
+					    .on('d3rowdown', function(i) {
+					    	var column = null;
+					    	var columnNext = null;
+					    	matrixColumns.forEach(function(col) {
+					    		if (col.order == i) {
+					    			column = col;
+					    		} else if (col.order == i + 1) {
+					    			columnNext = col;
+					    		}
+					    	});
+					    	if (column && columnNext) {
+					    		column.order = column.order + 1;
+					    		columnNext.order = columnNext.order - 1;
+					    	}
+					    	fillFeatureMatrix(featureVcfData);
+
 					    });
 
 	// Initialize variant legend
@@ -961,9 +996,29 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 
 }
 
+function getMatrixColumn(index) {
+	var theColumn = null;
+	matrixColumns.forEach(function(col) {
+		if (col.index == index) {
+			theColumn = col;
+		}
+	});
+	return theColumn;
+}
+
 
 function fillFeatureMatrix(vcfData) {
+	featureVcfData = vcfData;
 
+	matrixColumns = matrixColumns.sort(function(a, b) {
+		if (a.order == b.order) {
+			return 0;
+		} else if (a.order < b.order) {
+			return -1;
+		} else {
+			return 1;
+		}
+	});
 	
 	// Fill all criteria array for each variant
 	vcfData.features.forEach( function(variant) {
@@ -972,45 +1027,49 @@ function fillFeatureMatrix(vcfData) {
 		// high impact
 		for (var key in variant.impact) {
 			if (key == 'HIGH') {
-				features[0] = 1;
+				features[getMatrixColumn(0).order] = 1;
 				break;
 			} 
 		}
 
 		// adequate coverage
 		if (variant.combinedDepth != null && variant.combinedDepth != '' && variant.combinedDepth >= depthThreshold) {
-			features[1] = 1;
+			features[getMatrixColumn(1).order] = 1;
 		}
 
 		// unique freebayes call
 		if (variant.consensus == 'unique2') {
-			features[2] = 1;
+			features[getMatrixColumn(2).order] = 1;
 		}
 
 		// variant in proband, not present in unaffected relatives
-		features[3] = 1;
+		features[getMatrixColumn(3).order] = 1;
 
 		// hom variant in proband, het or non-existent in parents
-		features[4] = 1;
+		features[getMatrixColumn(4).order] = 1;
 
 
 		// variant not present in 1000 genomes
 		if (variant.compare1000G == 'unique1') {
-			features[5] = 1;
+			features[getMatrixColumn(5).order] = 1;
 		} 
 
 
 		//variant not present in ExAC
 		if (variant.compareExAC == 'unique1') {
-			features[6] = 1;
+			features[getMatrixColumn(6).order] = 1;
 		} 
 
 		variant.features = features;
 	});
 	// Sort the variants by the criteria that matches
 	var sortedFeatures = vcfData.features.sort(function (a, b) {
-	  var featuresA = a.features.join();
-	  var featuresB = b.features.join();
+	  var featuresA = "";
+	  var featuresB = "";
+	  for (var i = 0; i < matrixColumns.length; i++) {
+	  	featuresA += a.features[matrixColumns[i].index] + "-";
+	  	featuresB += b.features[matrixColumns[i].index] + "-";
+	  }
 	  if (featuresA < featuresB) {
 	    return 1;
 	  }
@@ -1021,20 +1080,19 @@ function fillFeatureMatrix(vcfData) {
 	  return 0;
 	});
 	// Get the top 50 variants
-	//var topFeatures = sortedFeatures.splice(0, 50);
-	var topFeatures = sortedFeatures;
+	var topFeatures = sortedFeatures.splice(0, 50);
+	//var topFeatures = sortedFeatures;
 
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
 
 	// Load the chart with the new data
-	featureMatrix.columnNames(matrixColumns);
+	var colNames = matrixColumns.map(function(col){
+		return col.name;
+	});
+	featureMatrix.columnNames(colNames);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);    
     this.featureMatrix(selection);
-
-
-
-
 }
 
 function variantTooltipHTML(variant, rowIndex) {
