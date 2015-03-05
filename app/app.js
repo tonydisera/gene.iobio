@@ -53,6 +53,8 @@ var matrixColumns = [
 	'Not in ExAC'
 ];
 
+var vcf1000G= null;
+var vcfExAC = null;
 var vcf1000GData = null;
 var vcfExACData = null;
 var vcf1000GUrl = "http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz";
@@ -587,6 +589,8 @@ function loadTracksForGene() {
 
 	regionStart = null;
 	regionEnd = null;
+	window.vcf1000GData = null;
+	window.vcfExACData = null;
 
 	$('#transcript-card').removeClass("hide");
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
@@ -852,21 +856,29 @@ function loadDataSources() {
 
 }
 
-function showFeatureMatrix(theVariantCard, theVcfData) {
+function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 
 	$("#matrix-track .loader").css("display", "block");
 	$("#matrix-track .loader-label").text("Analyzing Variants");
 	$("#feature-matrix").addClass("hide");
 
-	_getPopulationVariants(theVariantCard, theVcfData, fillFeatureMatrix);	
+	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
 }
 
-function _getPopulationVariants(theVariantCard, theVcfData, callback) {
-	var me = this;
-	if (window.vcf1000GData != null && window.vcfExACData != null) {
-		callback(theVcfData);
+function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, callback) {
+	if (window.vcf1000GData && window.vcfExACData) {
+		var filteredVcf1000GData = {};
+		var filteredVcfExACData = {};
+		filteredVcf1000GData.features = window.vcf1000GData.features.filter(function(variant) {
+			return variant.start >= regionStart && variant.end <= regionEnd;
+		});
+		filteredVcfExACData.features = window.vcfExACData.features.filter(function(variant) {
+			return variant.start >= regionStart && variant.end <= regionEnd;
+		});
+		compareVariantsToPopulation(theVcfData, filteredVcf1000GData, filteredVcfExACData, callback);
+
 	} else {
-		var vcf1000G = vcfiobio();
+		vcf1000G = vcfiobio();
 		vcf1000G.openVcfUrl(this.vcf1000GUrl);
 		var refName = theVariantCard.getVcfRefName(window.gene.chr);
 		vcf1000G.getVariants(refName, 
@@ -878,12 +890,11 @@ function _getPopulationVariants(theVariantCard, theVcfData, callback) {
 					           1,
 					           function(data) {
 	        window.vcf1000GData = data;
+	        window.vcf1000GData.features = window.vcf1000GData.features.sort(orderVariantsByPosition);
 
-	        vcf1000G.compareVcfRecords(theVcfData, window.vcf1000GData, function() {
-
-			    var vcfExAC= vcfiobio();
-				vcfExAC.openVcfUrl(window.vcfExACUrl);
-				vcfExAC.getVariants(refName, 
+			vcfExAC= vcfiobio();
+			vcfExAC.openVcfUrl(window.vcfExACUrl);
+			vcfExAC.getVariants(refName, 
 									   window.gene.start, 
 							           window.gene.end, 
 							           window.gene.strand, 
@@ -891,21 +902,63 @@ function _getPopulationVariants(theVariantCard, theVcfData, callback) {
 							           0,
 							           1,
 							           function(data) {
-			        window.vcfExACData = data;
+			    window.vcfExACData = data;
+			    window.vcfExACData.features = window.vcfExACData.features.sort(orderVariantsByPosition);
 
-			        vcfExAC.compareVcfRecords(theVcfData, window.vcfExACData, function(){
-				        callback(theVcfData);
-			        }, 'compareExAC' );
-			    });
-
-
-	        }, 'compare1000G' );
+			    compareVariantsToPopulation(theVcfData, window.vcf1000GData, window.vcfExACData, callback);
+			});
 
 	    });
-
-
-
 	}
+
+
+
+
+}
+
+function orderVariantsByPosition(a, b) {
+	var altRefA = a.alt + "->" + a.ref;
+	var altRefB = b.alt + "->" + b.ref;
+
+	if (a.start == b.start) {
+		if (altRefA == altRefB) {
+			return 0;
+		} else if ( altRefA < altRefB ) {
+			return -1;
+		} else {
+			return 1;
+		}
+	} else if (a.start < b.start) {
+		return -1;
+	} else {
+		return 1;
+	}
+}
+
+
+function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData, callback) {
+	theVcfData.features.forEach(function(variant) {
+		variant.compare1000G = null;
+		variant.compareExAC = null;
+	});
+	theVcf1000GData.features.forEach(function(variant) {
+		variant.compare1000G = null;
+		variant.compareExAC = null;
+	});
+	theVcfExACData.features.forEach(function(variant) {
+		variant.compare1000G = null;
+		variant.compareExAC = null;
+	});
+	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+
+    window.vcf1000G.compareVcfRecords(theVcfData, theVcf1000GData, function() {
+	        vcfExAC.compareVcfRecords(theVcfData, theVcfExACData, function(){
+
+		        callback(theVcfData);
+
+	        }, 'compareExAC' );
+    }, 'compare1000G' );
+
 }
 
 
@@ -942,11 +995,15 @@ function fillFeatureMatrix(vcfData) {
 
 
 		// variant not present in 1000 genomes
-		features[5] = variant.compare1000G == 'unique1' ? 1 : 0;
+		if (variant.compare1000G == 'unique1') {
+			features[5] = 1;
+		} 
 
 
 		//variant not present in ExAC
-		features[6] = variant.compareExAC == 'unique1' ? 1 : 0;
+		if (variant.compareExAC == 'unique1') {
+			features[6] = 1;
+		} 
 
 		variant.features = features;
 	});

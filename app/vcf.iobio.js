@@ -959,25 +959,28 @@ var effectCategories = [
   }
 
 
-  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttribute) {
+  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr) {
     var set1Label = 'unique1';
     var set2Label = 'unique2';
     var commonLabel = 'common';
+    var comparisonAttribute = comparisonAttr;
     if (comparisonAttribute == null) {
       comparisonAttribute = 'consensus';
     }
 
     variants1.count = variants1.features.length;
-    variants1.countMatch = 0;
+    //variants1.countMatch = 0;
 
     variants2.count = variants2.features.length;
-    variants2.countMatch = 0;
+    //variants2.countMatch = 0;
 
     var idx1 = 0;
     var idx2 = 0;
 
     var features1 = variants1.features;
     var features2 = variants2.features;
+
+
 
     // Iterate through the variants from the first set,
     // marking the consensus field based on whether a 
@@ -1008,7 +1011,7 @@ var effectCategories = [
           } else {
             // We need to mark variant2 as 'diff' so we don't revisit it
             // when variant2 drives the comparison loop.
-            variant2[comparisonAttribute] = commonLabel;
+            variant2[comparisonAttribute] = set2Label;
           }
         } else if (variant1.start < variant2.start) {
           // We have moved beyond variant1's position,
@@ -1024,7 +1027,7 @@ var effectCategories = [
     // loop through variants1 never discovered these variants.
     for (var x = 0; x < features2.length; x++) {
       variant2 = features2[x];
-      if (variant2.consensus == null) {
+      if (variant2[comparisonAttribute]  == null) {
         variant2[comparisonAttribute] = set2Label;
       }
     }
