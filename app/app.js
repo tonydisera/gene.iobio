@@ -216,20 +216,7 @@ function init() {
 	initDataSourceDialog();
 
 	// Autoload data specified in url
-	var gene = getUrlParameter('gene');
-	if (gene != undefined) {
-		// load gene
-		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene});
-		var bam = getUrlParameter('bam') || '';
-		var vcf = getUrlParameter('vcf') || '';
-		if (bam != '' || vcf != '') {
-			initVariantCards();
-			$('#bam-url-input').val(bam)							
-			$('#url-input').val(vcf);			
-			loadDataSources();
-		}
-	}
-
+	loadUrlSources();	
 }
 
 function onCollapseTranscriptPanel() {
@@ -244,6 +231,44 @@ function initDataSourceDialog() {
 		initVariantCards();
 
   	});
+}
+
+function loadUrlSources() {
+	var gene = getUrlParameter('gene');
+	if (gene != undefined) {
+		// load gene
+		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, callback:function(){
+				// run after gene has been loaded
+				// initialize variant cards
+				initVariantCards();
+				var addVC = false;
+
+				// load bam and vcf sources
+				// get all bam and vcf url params in hash
+				var bam = getUrlParameter(/bam*/) || '';
+				var vcf = getUrlParameter(/vcf*/) || '';		
+				// load all bams and vcfs that have a bam pair
+				Object.keys(bam).forEach(function(name) {
+					if (addVC) addVariantCard();
+					else addVC = true;
+					$('#bam-url-input').val(bam[name])
+					var vcfName = 'vcf' + name.replace('bam','');
+					if( vcf[vcfName] != undefined ) {
+						$('#url-input').val(vcf[vcfName]);
+						delete vcf[vcfName];
+					}
+					loadDataSources();
+				})		
+				// load vcfs that don't have a bam pair
+				Object.keys(vcf).forEach(function(name) {
+					if (addVC) addVariantCard();
+					else addVC = true;
+					$('#url-input').val(vcf[name]);
+					loadDataSources();
+				});
+			}
+		});		
+	}
 }
 
 function selectVariantCard(cardIndex) {
@@ -438,14 +463,26 @@ function updateUrl(paramName, value) {
 function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
+    var hits = {};
     for (var i = 0; i < sURLVariables.length; i++) 
-    {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) 
-        {
-            return sParameterName[1];
-        }
+    {    	
+        var sParameterName = sURLVariables[i].split('=');        
+        if (typeof sParam == 'string' || sParam instanceof String) {
+	        if (sParameterName[0] == sParam) 
+	        {
+	            return sParameterName[1];
+	        }
+	    } else {
+	    	var matches = sParameterName[0].match(sParam);
+	    	if ( matches != undefined && matches.length > 0 ) {
+	    		hits[sParameterName[0]] = sParameterName[1];
+	    	}
+	    }
     }
+    if (Object.keys(hits).length == 0)
+    	return undefined;
+    else
+    	return hits;
 }
 
 function classifyByImpact(d) {
@@ -581,11 +618,12 @@ function loadGeneWidget() {
 
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];
+		    	window.gene = response[0];		    	
 		    	window.selectedTranscript = null;
 		    	loadTracksForGene();
 		    	// add gene to url params
 		    	updateUrl('gene', window.gene.gene_name);
+		    	if(data.callback != undefined) data.callback();
 
 	       	},
 		    error: function( xhr, status, errorThrown ) {
@@ -808,7 +846,7 @@ function onBamUrlEntered() {
 	var cardIndex = $('#datasource-dialog #card-index').val();
 	var variantCard = variantCards[+cardIndex];
 	variantCard.onBamUrlEntered($('#bam-url-input').val());	
-	updateUrl('bam', $('#bam-url-input').val());
+	updateUrl('bam' + cardIndex, $('#bam-url-input').val());
 	variantCard.setDirty();
 }
 
@@ -851,7 +889,7 @@ function onVcfUrlEntered() {
 	var vcfUrl = $('#url-input').val();
 
 	variantCard.onVcfUrlEntered(vcfUrl);
-	updateUrl('vcf', vcfUrl);
+	updateUrl('vcf'+cardIndex, vcfUrl);
 	variantCard.setDirty();
 }
 
