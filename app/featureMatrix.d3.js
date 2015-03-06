@@ -10,6 +10,8 @@ function featureMatrixD3() {
   // color scheme
   var colorScale = null;
 
+  var container = null;
+
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
   }
@@ -41,7 +43,7 @@ function featureMatrixD3() {
       width += margin.left + margin.right + rowLabelWidth;
       var innerWidth = width - margin.left - margin.right - rowLabelWidth;
 
-      var container = d3.select(this);
+      container = d3.select(this);
 
 
 
@@ -136,7 +138,7 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "up")
-         .attr("transform", "translate(165, -10)")
+         .attr("transform", "translate(" + (+rowLabelWidth + 5) + ", -8)")
          .append("polygon")
          .attr("points", "1,8 5,2 9,8")
          .attr("x", "0")
@@ -150,7 +152,7 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "down")
-         .attr("transform", "translate(175, 10)")
+         .attr("transform", "translate(" + (+rowLabelWidth + 15) + ", 10)")
          .append("polygon")
          .attr("points", "1,8 5,2 9,8")
          .attr("x", "0")
@@ -191,16 +193,26 @@ function featureMatrixD3() {
             return 0;
           })
           .attr('height', function(d, i) { 
-            return showTransition ? 0 : cellSize;; 
+            return showTransition ? 0 : cellSize - 1; 
           })
           .attr('y', showTransition ? 0 : y(columnNames[i]) + y.rangeBand())
-          .attr('width', cellSize)
+          .attr('width', cellSize - 1)
           .style('fill', function(d, i) { 
             return (d == '1' ? colorScale[columnNames.length-1-i] : "lightgrey");
           });
 
-
+      cols.append('rect')
+          .attr('class', 'column-box')
+          .attr('x', function(d,i) { 
+            return 0;
+          })
+          .attr('height', function(d, i) { 
+            return (cellSize * columnNames.length) - 1;
+          })
+          .attr('y', y(columnNames[0]) + y.rangeBand())
+          .attr('width', cellSize - 1);
     
+       
 
      
       g.selectAll('.cell')
@@ -230,9 +242,15 @@ function featureMatrixD3() {
                  .style("opacity", 0);   
               dispatch.d3mouseout(); 
             })
-            .on("click", function(d) {                
+            .on("click", function(d, i) {                
               var colObject = d3.select(this.parentNode).datum();
+              var colIndex = Math.floor(i / columnNames.length); 
               var rowIndex = d;
+              var on = !(d3.select(this.parentNode).select(".column-box").attr("class").indexOf("current") > -1);
+              d3.select(this.parentNode).select(".column-box").classed("current", on);
+              d3.select(this.parentNode).classed("current", on);
+              var textDOM = container.selectAll('.x.axis .tick text')[0][colIndex];
+              d3.select(textDOM).classed("current", on);
               dispatch.d3click(colObject, rowIndex);
             });
 
@@ -253,13 +271,13 @@ function featureMatrixD3() {
                 return 0;
               })
               .attr('width', function(d) { 
-                return cellSize;
+                return  cellSize - 1;
               })
               .attr('y', function(d, i) {             
                 return y(columnNames[i]) + y.rangeBand();
               })
               .attr('height', function(d) { 
-                return cellSize; 
+                return cellSize - 1; 
               });
 
 

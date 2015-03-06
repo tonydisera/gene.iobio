@@ -53,6 +53,7 @@ var matrixColumns = [
 	{name:'Not in 1000G'                        ,order:1, index:5},
 	{name:'Not in ExAC'                         ,order:2, index:6}
 ];
+var clickedVariants = [];
 
 var vcf1000G= null;
 var vcfExAC = null;
@@ -159,18 +160,12 @@ function init() {
 					    .tooltipHTML(variantTooltipHTML)
 					    .on('d3click', function(variant) {
 					    	if (variantCards.length > 0) {
-						    	variantCards[0].highlightVariant(variant);
+						    	variantCards[0].highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
 					    	}
 					    })
 					     .on('d3mouseover', function(variant) {
-					    	if (variantCards.length > 0) {
-						    	variantCards[0].highlightVariant();
-					    	}
 					    })
 					    .on('d3mouseout', function() {
-					    	if (variantCards.length > 0) {
-						    	variantCards[0].highlightVariant();
-					    	}
 					    })
 					    .on('d3rowup', function(i) {
 					    	var column = null;
@@ -1045,8 +1040,13 @@ function getMatrixColumn(index) {
 }
 
 
-function fillFeatureMatrix(vcfData) {
-	featureVcfData = vcfData;
+function fillFeatureMatrix(theVcfData) {
+	featureVcfData = {};
+	featureVcfData.features = [];
+	theVcfData.features.forEach(function(variant) {
+		featureVcfData.features.push($.extend({}, variant));
+	});
+
 
 	matrixColumns = matrixColumns.sort(function(a, b) {
 		if (a.order == b.order) {
@@ -1059,7 +1059,7 @@ function fillFeatureMatrix(vcfData) {
 	});
 	
 	// Fill all criteria array for each variant
-	vcfData.features.forEach( function(variant) {
+	featureVcfData.features.forEach( function(variant) {
 		var features = [0,0,0,0,0,0,0];
 
 		// high impact
@@ -1101,13 +1101,17 @@ function fillFeatureMatrix(vcfData) {
 		variant.features = features;
 	});
 	// Sort the variants by the criteria that matches
-	var sortedFeatures = vcfData.features.sort(function (a, b) {
+	var sortedFeatures = featureVcfData.features.sort(function (a, b) {
 	  var featuresA = "";
 	  var featuresB = "";
+	  featuresA = a.features.join();
+	  featuresB = b.features.join();
+	  /*
 	  for (var i = 0; i < matrixColumns.length; i++) {
-	  	featuresA += a.features[matrixColumns[i].index] + "-";
-	  	featuresB += b.features[matrixColumns[i].index] + "-";
+	  	featuresA += a.features[matrixColumns[i].order] + "-";
+	  	featuresB += b.features[matrixColumns[i].order] + "-";
 	  }
+	  */
 	  if (featuresA < featuresB) {
 	    return 1;
 	  }
@@ -1118,7 +1122,7 @@ function fillFeatureMatrix(vcfData) {
 	  return 0;
 	});
 	// Get the top 50 variants
-	var topFeatures = sortedFeatures.splice(0, 50);
+	//var topFeatures = sortedFeatures.splice(0, 50);
 	//var topFeatures = sortedFeatures;
 
 	$("#feature-matrix").removeClass("hide");
@@ -1129,7 +1133,7 @@ function fillFeatureMatrix(vcfData) {
 		return col.name;
 	});
 	featureMatrix.columnNames(colNames);
-	var selection = d3.select("#feature-matrix").data([topFeatures]);    
+	var selection = d3.select("#feature-matrix").data([sortedFeatures]);    
     this.featureMatrix(selection);
 }
 
