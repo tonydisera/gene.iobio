@@ -43,9 +43,6 @@ body {
    cursor: pointer;
 }
 
-#matrix-track {
-  overflow-x: scroll;
-}
 
 #nav-section {
   position:fixed;
@@ -264,12 +261,28 @@ a, a:hover, a:focus {
 #vcf-legend {
   display: none;
 }
+#filter-and-rank-card {
+  display: table;
+  margin-top: 8px;
+}
+#filter-track {
+  display: table-cell;
+  min-width: 250px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+#matrix-track {
+  overflow-x: scroll;
+  width: 100%;
+  display: table-cell;
+}
+
 #filter-panel {
   font-size: 11px;
   color: rgb(102, 88, 92);
   fill: rgb(102, 88, 92);
-  margin-left: 100px;
-  margin-top: -18px;
+  margin-top: 5px;
+  overflow-y: auto;
 }
 
 #fb-track {

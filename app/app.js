@@ -1122,7 +1122,7 @@ function fillFeatureMatrix(theVcfData) {
 	  return 0;
 	});
 	// Get the top 50 variants
-	var topFeatures = sortedFeatures.splice(0, 50);
+	var topFeatures = sortedFeatures.splice(0, 30);
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");

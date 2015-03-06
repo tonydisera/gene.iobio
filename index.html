@@ -189,180 +189,140 @@
 
 
         <!-- handlebar templates -->
-  <script id='track-legend-template' type="text/x-handlebars-template">     
+  <script id='track-legend-template' type="text/x-handlebars-template">    
+      <div style="float:left;;width:60px">
+        <svg id="impact-scheme" class="current" width="40" height="15" transform="translate(0,0)">
+          <text class="name" x="0" y="10">Impact</text>
+        </svg>
+        <svg id="HIGH" class="impact" width="40" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">High</text>
+          <rect class="variant  impact_HIGH" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <svg id="MODERATE" class="impact" width="60" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Moderate</text>
+          <rect class="variant  impact_MODERATE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <svg id="MODIFIER" class="impact" width="60" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Modifier</text>
+          <rect class="variant  impact_MODIFIER" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <svg id="LOW" class="impact" width="40" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Low</text>
+          <rect class="variant  impact_LOW" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+      </div>
 
-          <div >
-            <svg id="impact-scheme" class="current" width="40" height="15" transform="translate(0,0)">
-              <text class="name" x="0" y="10">Impact</text>
-            </svg>
-            <svg id="HIGH" class="impact" width="40" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">High</text>
-              <rect class="variant  impact_HIGH" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            <svg id="MODERATE" class="impact" width="60" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Moderate</text>
-              <rect class="variant  impact_MODERATE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            <svg id="MODIFIER" class="impact" width="60" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Modifier</text>
-              <rect class="variant  impact_MODIFIER" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            <svg id="LOW" class="impact" width="40" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Low</text>
-              <rect class="variant  impact_LOW" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            <svg id="NOIMPACT" class="impact" width="65" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">No Impact</text>
-              <rect class="variant  impact_NOIMPACT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
+      <div style="float:left;width:70px;">
+        <svg id="effect-scheme" width="40" height="15" transform="translate(0,0)" class="">
+          <text class="name" x="0" y="10">Effect</text>
+        </svg>
+        <svg id="frameshift" class="effect nocolor" width="65" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Frameshift</text>
+          <rect class="variant  effect_frameshift" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <svg id="stop_lost" class="effect nocolor" width="55" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop lost</text>
+          <rect class="variant  effect_stop_lost" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <svg id="start_lost" class="effect nocolor" width="55" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Start lost</text>
+          <rect class="variant  effect_start_lost" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <svg id="stop_gained" class="effect nocolor" width="65" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop gained</text>
+          <rect class="variant  effect_stop_gained" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        </svg>
+        <a id="more-effect-link" href="#more-effect" data-toggle="collapse" aria-expanded="false" class="collapsed">
+                    more...            
+        </a>
+        <span id="more-effect" aria-expanded="false" class="collapse" style="height: 0px;">
+          <svg id="splice_acceptor" class="effect nocolor" width="85" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice Acceptor</text>
+            <rect class="variant  effect_splice_acceptor" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="splice_donor" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice donor</text>
+            <rect class="variant  effect_splice_donor" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="splice" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice region</text>
+            <rect class="variant  effect_splice" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="exon_loss" class="effect nocolor" width="60" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Exon loss</text>
+            <rect class="variant  effect_exon_loss" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="missense" class="effect nocolor" width="60" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Missense</text>
+            <rect class="variant  effect_missense" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
 
-            <span style="padding-left:100px;"></span>
+          <svg id="utr" class="effect nocolor" width="40" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">UTR</text>
+            <rect class="variant  effect_utr" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="synonymous" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
+              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Synonymous</text>
+            <rect class="variant  effect_synonymous" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="rare_amino_acid" class="effect nocolor" width="85" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Rare amino acid</text>
+            <rect class="variant  effect_rare_amino_acid" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg><svg id="chromosome" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Chromosome</text>
+            <rect class="variant  effect_coding" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg><svg id="indel" class="effect nocolor" width="44" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Indel</text>
+            <rect class="variant  effect_indel" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="coding" class="effect nocolor" width="50" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Coding</text>
+          <rect class="variant  effect_coding" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="regulatory" class="effect nocolor" width="70" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Regulatory</text>
+          <rect class="variant  effect_regulatory" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="exon" class="effect nocolor" width="44" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Exon</text>
+          <rect class="variant  effect_exon" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="other" class="effect nocolor" width="50" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Other</text>
+          <rect class="variant  effect_other" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="NOEFFECT" class="effect nocolor" width="60" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">No Effect</text>
+          <rect class="variant  effect_NOEFFECT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg> 
+        </span>
+      </div>
 
-            <svg id="type-scheme" width="35" height="15" transform="translate(0,0)" class="">
-              <text class="name" x="0" y="10">Type</text>
-            </svg>
+      <div style="float:left;;width:60px">
 
-            <svg id="snp" class="type" width="40" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">SNP</text>
-              <rect class="variant snp" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
-            </svg>
-            <svg id="ins" class="type" width="62" height="14" transform="translate(0,0)">
-              <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;"> Insertion</text>
-              <circle class="variant ins" cx="5" cy="5" r="3.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
-            </svg>
-            <svg id="del" class="type" width="62" height="14" transform="translate(0,0)">
-              <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Deletion</text>       
-              <polygon class="variant del" points="1,8 5,2 9,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
-            </svg>
+        <svg id="type-scheme" width="35" height="15" transform="translate(0,0)" class="">
+          <text class="name" x="0" y="10">Type</text>
+        </svg>
 
-            <svg id="complex" class="type" width="54" height="14" transform="translate(0,0)">
-              <text class="name" x="8" y="9" style="fill-opacity: 1;font-size: 10px;">Complex</text>       
-              <path d="M0,-4.161791450287818L2.4028114141347543,0 0,4.161791450287818 -2.4028114141347543,0Z" class="variant complex" transform="translate(3,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
-              </path>
-            </svg>
+        <svg id="snp" class="type" width="40" height="14" transform="translate(0,0)">
+          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">SNP</text>
+          <rect class="variant snp" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+        </svg>
+        <svg id="ins" class="type" width="62" height="14" transform="translate(0,0)">
+          <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;"> Insertion</text>
+          <circle class="variant ins" cx="5" cy="5" r="3.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+        </svg>
+        <svg id="del" class="type" width="62" height="14" transform="translate(0,0)">
+          <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Deletion</text>       
+          <polygon class="variant del" points="1,8 5,2 9,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+        </svg>
 
-          </div>
-
-          <div style="margin-top: 5px;clear:both;">
-
-            
-              <svg id="effect-scheme" width="40" height="15" transform="translate(0,0)" class="">
-                <text class="name" x="0" y="10">Effect</text>
-              </svg>
-
-
-              <svg id="frameshift" class="effect nocolor" width="65" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Frameshift</text>
-                <rect class="variant  effect_frameshift" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              
-              <svg id="stop_lost" class="effect nocolor" width="55" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop lost</text>
-                <rect class="variant  effect_stop_lost" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="start_lost" class="effect nocolor" width="55" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Start lost</text>
-                <rect class="variant  effect_start_lost" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="stop_gained" class="effect nocolor" width="65" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop gained</text>
-                <rect class="variant  effect_stop_gained" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="splice_acceptor" class="effect nocolor" width="85" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice Acceptor</text>
-                <rect class="variant  effect_splice_acceptor" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="splice_donor" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice donor</text>
-                <rect class="variant  effect_splice_donor" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="splice" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice region</text>
-                <rect class="variant  effect_splice" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="exon_loss" class="effect nocolor" width="60" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Exon loss</text>
-                <rect class="variant  effect_exon_loss" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="missense" class="effect nocolor" width="60" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Missense</text>
-                <rect class="variant  effect_missense" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-
-              <svg id="utr" class="effect nocolor" width="40" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">UTR</text>
-                <rect class="variant  effect_utr" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-
-
-              <svg id="synonymous" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
-                  <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Synonymous</text>
-                <rect class="variant  effect_synonymous" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-
-
-
-          </div>
-
-          <div style="padding-left: 43px;">
-              <svg id="rare_amino_acid" class="effect nocolor" width="85" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Rare amino acid</text>
-                <rect class="variant  effect_rare_amino_acid" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="chromosome" class="effect nocolor" width="75" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Chromosome</text>
-                <rect class="variant  effect_coding" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="indel" class="effect nocolor" width="44" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Indel</text>
-                <rect class="variant  effect_indel" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-
-
-            <svg id="coding" class="effect nocolor" width="50" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Coding</text>
-              <rect class="variant  effect_coding" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            <svg id="regulatory" class="effect nocolor" width="70" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Regulatory</text>
-              <rect class="variant  effect_regulatory" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            
-            
-            <svg id="exon" class="effect nocolor" width="44" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Exon</text>
-              <rect class="variant  effect_exon" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            
-            
-            <svg id="other" class="effect nocolor" width="50" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Other</text>
-              <rect class="variant  effect_other" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-            <svg id="NOEFFECT" class="effect nocolor" width="60" height="14" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">No Effect</text>
-              <rect class="variant  effect_NOEFFECT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-            </svg>
-
-            <span id="compare-legend" style="padding-left:50px;margin-top: 5px;" class="hide">
-              <svg id="compare-scheme" width="95" height="15" transform="translate(0,0)" class="">
-                <text class="name" x="0" y="10">Freebayes call set</text>
-              </svg>
-              <svg id="unique2" class="compare nocolor" width="80" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Freebayes Only</text>
-                <rect class="variant unique2 compare_unique2" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="unique1" class="compare nocolor" width="56" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">VCF Only</text>
-                <rect class="variant  compare_unique1" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-              <svg id="common" class="compare nocolor" width="40" height="14" transform="translate(0,0)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Both</text>
-                <rect class="variant  compare_common" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-              </svg>
-            </span>
-
-          </div>   
+        <svg id="complex" class="type" width="54" height="14" transform="translate(0,0)">
+          <text class="name" x="8" y="9" style="fill-opacity: 1;font-size: 10px;">Complex</text>       
+          <path d="M0,-4.161791450287818L2.4028114141347543,0 0,4.161791450287818 -2.4028114141347543,0Z" class="variant complex" transform="translate(3,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
+          </path>
+        </svg>
+      </div>
   </script>
     
 </head>
@@ -432,39 +392,45 @@
 
     <div id="track-section" style="padding-top:228px;">
 
-
-       <div id="filter-track" class="track-expand shadow-z-1 hide">
-          <div>
-            <a id="filter-link"  href="#filter-panel"  data-toggle="collapse" aria-expanded="true" >
-              Annotations<span class="caret"></span>
-            </a>
-          </div>
-  
-          <div id="filter-panel"  
-            class="collapse in" aria-expanded="true">
-          </div> 
-      </div>  
-
       <div id="variant-cards">
       </div>
 
-      <div id="matrix-track" class="track-expand shadow-z-1 hide">
-          <div>
-            <a id="matrix-link"  href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
-              Ranked Variants<span class="caret"></span>
-            </a>
-          </div>
-  
-          <div id="matrix-panel"  
-            class="collapse in" aria-expanded="true">
-              <div class="loader">
-                  <span class="loader-label"></span>
-                  <img src="assets/images/loading-squares.gif"/>
-              </div>
-            <div id="feature-matrix">
+
+      <div id="filter-and-rank-card">
+
+        <div id="filter-track"  class="track-expand shadow-z-1 hide">
+            <div>
+              <a id="filter-link"  href="#filter-panel"  data-toggle="collapse" aria-expanded="true" >
+                Filter<span class="caret"></span>
+              </a>
             </div>
-          </div> 
+    
+            <div id="filter-panel"  
+              class="collapse in" aria-expanded="true">
+            </div> 
+        </div>  
+
+        <div style="display:table-cell;min-width:8px"></div>
+
+        <div id="matrix-track"  class="track-expand shadow-z-1 hide">
+            <div>
+              <a id="matrix-link"  href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
+                Rank<span class="caret"></span>
+              </a>
+            </div>
+    
+            <div id="matrix-panel"  
+              class="collapse in" aria-expanded="true">
+                <div class="loader">
+                    <span class="loader-label"></span>
+                    <img src="assets/images/loading-squares.gif"/>
+                </div>
+              <div id="feature-matrix">
+              </div>
+            </div> 
+        </div>
       </div>
+
 
 
     </div>
