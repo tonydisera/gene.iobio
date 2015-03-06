@@ -50,7 +50,7 @@ function variantD3() {
     for (key in d.effectCategory) {
       effects += " " + key;
     }
-    return  'variant ' + d.type.toLowerCase() + impacts + effects + colorimpacts;
+    return  'variant ' + d.type.toLowerCase() + impacts + effects + ' ' + d.consensus + colorimpacts ;
   };
 
   function getSymbol(d,i) {
