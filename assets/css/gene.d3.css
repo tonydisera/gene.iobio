@@ -10,12 +10,12 @@
   stroke: #0B5388;
   opacity: .7;
 }
-.ibo-gene .transcript.selected .utr { 
+#transcript-menu-item.ibo-gene .transcript.selected .utr { 
   fill: #58DA00;
   stroke: #50A019;
   opacity: .4;
 }
-.ibo-gene .transcript.selected .cds { 
+#transcript-menu-item.ibo-gene .transcript.selected .cds { 
   fill: #58DA00;
   stroke: #50A019;
   opacity: .8;
@@ -27,7 +27,7 @@
   cursor: pointer;
 }
 
-.ibo-gene .transcript.selected .reference {
+#transcript-menu-item.ibo-gene .transcript.selected .reference {
   stroke: rgb(0, 0, 0);
   stroke-width: 1.5px;
 }

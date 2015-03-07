@@ -128,7 +128,7 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top: 20, right: 4, bottom: 0, left: 4})
+	    .margin({top: 35, right: 4, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)

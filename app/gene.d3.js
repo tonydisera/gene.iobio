@@ -187,8 +187,8 @@ function geneD3() {
 
 
       if (showBrush) {
-        var brushHeight = height + 30;
-        var brushY = -30;
+        var brushHeight = height + 20;
+        var brushY = -20;
         g.selectAll("g.x.brush").remove();
         g.selectAll("g.x.brush").data([0]).enter().append("g")
             .attr("class", "x brush")

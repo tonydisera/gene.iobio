@@ -3,7 +3,7 @@ body {
 }
 
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: #C84337;
+  color: #D35C51;
   font-size: 18px;
 }
 
@@ -237,7 +237,7 @@ a, a:hover, a:focus {
 
 #gene-track {
   padding-top: 0px;  
-  margin-top: 20px;
+  margin-top: 15px;
   margin-bottom: 0px;
   padding-bottom: 0px;
   clear: both;
@@ -482,7 +482,7 @@ header {
     font: 400 18px;
 }
 .arrow_box button { 
-  font:300 28px;
+  font: 28px;
   margin-top: 4px;
 }
 
@@ -910,13 +910,13 @@ header {
 #button-find-missing-variants {
   float:left;
   font-size: 12px;
-  margin-top: -4px;
+  margin-top: -2px;
   margin-left: 10px;
   width: 150px;
 }
 
 #bloodhound .typeahead { 
-  min-width: 300px;
+  min-width: 250px;
   font-size: 18px; 
   vertical-align: middle !important;
 }
