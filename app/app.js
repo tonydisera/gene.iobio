@@ -42,6 +42,17 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 
+// filters
+
+// Filters
+clickedAnnotIds = new Object();
+var afMin = null;
+var afMax = null;
+var depthThreshold = 4;
+
+
+
+// feature matrix (ranked variants)
 var featureVcfData = null;
 var featureMatrix = null;
 var matrixColumns = [
@@ -53,8 +64,6 @@ var matrixColumns = [
 	{name:'Not in 1000G'                        ,order:1, index:5},
 	{name:'Not in ExAC'                         ,order:2, index:6}
 ];
-var clickedVariants = [];
-
 var vcf1000G= null;
 var vcfExAC = null;
 var vcf1000GData = null;
@@ -62,11 +71,12 @@ var vcfExACData = null;
 var vcf1000GUrl = "http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz";
 var vcfExACUrl  = "http://s3.amazonaws.com/vcf.files/ExAC.r0.2.sites.vep.vcf.gz";
 
-var depthThreshold = 4;
 
+// Format the start and end positions with commas
+var formatRegion = d3.format(",");
 
-// Filters
-this.clickedAnnotIds = new Object();
+// variant card
+var variantCards = [];
 
 // The smaller the region, the wider we can
 // make the rect of each variant
@@ -78,14 +88,6 @@ var widthFactors = [
 	{'regionStart': 20001, 'regionEnd':   30000,  'factor': 2},
 	{'regionStart': 30001, 'regionEnd': 90000000,  'factor': 1},
 ];
-
-// Format the start and end positions with commas
-var formatRegion = d3.format(",");
-
-
-// variant card
-var variantCards = [];
-
 
 
 $(document).ready(function(){
@@ -102,6 +104,23 @@ function init() {
 
 	loadGeneWidget();
 	$('#bloodhound .typeahead').focus();
+
+	// listen for enter key on af amount input range
+	$('#af-amount-start').on('keydown', function() {
+		if(event.keyCode == 13) {
+			if (variantCards.length > 0) {
+				variantCards[0].filterVariantsByAf();
+			}
+	    }
+	});
+	$('#af-amount-end').on('keydown', function() {
+		if(event.keyCode == 13) {
+			if (variantCards.length > 0) {
+				variantCards[0].filterVariantsByAf();
+			}
+	    }
+	});
+
 	
 	
 	// Create transcript chart
@@ -131,7 +150,6 @@ function init() {
 		    	variantCard.onD3Brush(brush);
 			});
 
-			transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 		});	
 
     transcriptMenuChart = geneD3()
@@ -661,7 +679,6 @@ function loadTracksForGene() {
 	window.vcfExACData = null;
 
 	$('#transcript-card').removeClass("hide");
-	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 
     $('#gene-track').removeClass("hide");
     $('#view-finder-track').removeClass("hide");
@@ -704,6 +721,9 @@ function loadTracksForGene() {
 	variantCards.forEach(function(variantCard) {
 		variantCard.loadTracksForGene(classifyByImpact);
 	});
+
+	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
+
 
 	
 }

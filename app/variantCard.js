@@ -9,8 +9,6 @@ function VariantCard() {
 	this.fbData = null;	
 	this.vcfAfData = null;
 	this.afChart = null;
-	this.afMin = null;
-	this.afMax = null;
 	this.variantCounts = null;
 	this.bamData = null;
 	this.bamDepthChart = null;	 
@@ -175,13 +173,6 @@ VariantCard.prototype.init = function(cardSelector, cardIndex) {
 		me.callVariants.apply(me, []);
 	});
 
-	// listend for enter key on af amount input range
-	this.cardSelector.find('#af-amount-start').on('keydown', function() {
-		me.onAfEnter.apply(me, []);
-	});
-	this.cardSelector.find('#af-amount-end').on('keydown', function() {
-		me.onAfEnter.apply(me, []);
-	});
 
 };
 
@@ -809,15 +800,10 @@ VariantCard.prototype.stripRefName = function(refName) {
 }
 
 
-VariantCard.prototype.onAfEnter = function() {
-    if(event.keyCode == 13) {
-        this.filterVariantsByAf(); 
-    }
-}
 
 VariantCard.prototype.filterVariantsByAf = function() {
-	var lowerVal = this.cardSelector.find('#af-amount-start').val() / 100;
-	var upperVal = this.cardSelector.find('#af-amount-end').val() / 100;
+	var lowerVal = $('#af-amount-start').val() / 100;
+	var upperVal = $('#af-amount-end').val() / 100;
 	   
 	var filteredFeatures = this.vcfData.features.filter(function(d) {
 		return (d.af >= lowerVal && d.af <= upperVal);

@@ -2,7 +2,10 @@ body {
   font-family: 'Quattrocento Sans', sans-serif;
 }
 
-
+a.card-label, a.card-label:hover, a.card-label:focus {
+  color: #C84337;
+  font-size: 18px;
+}
 
 
 #feature-matrix rect {
@@ -90,8 +93,8 @@ a, a:hover, a:focus {
 #container {
   margin-top:0px; 
   margin-bottom: 10px; 
-  margin-left: 10px; 
-  margin-right: 10px;
+  margin-left: 4px; 
+  margin-right: 4px;
 }
 
 
@@ -207,6 +210,7 @@ a, a:hover, a:focus {
   text-align: center;
   margin-bottom: 0px;
   padding-bottom: 0px;
+  margin-right: 100px;
   color: #3586C0;
   font-size: 18px;
     
@@ -304,7 +308,6 @@ a, a:hover, a:focus {
 .loader {
     text-align: center;
     margin-top: 40px;
-    margin-right: 210px;
     display:none;
 }
 .loader img {
@@ -866,12 +869,50 @@ header {
 }
 
 
-
+.btn {
+  text-transform: none;
+}
 
 #datasource-button {
-  float: left;
   margin-left: 30px;
-  visibility: hidden;
+  margin-bottom: 1px;
+
+}
+
+.icon-button {
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  line-height: 22px;
+  font-size: 12px;
+  color: #3586C0 !important;
+}
+
+.icon-button-sm {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  line-height: 22px;
+  font-size: 12px;
+  color: #3586C0 !important;
+}
+
+.icon-button i,
+.icon-button-sm i {
+  float:     left;
+  font-size: 22px;
+  padding-right: 4px;
+  color: #3586C0 !important
+}
+
+#button-find-missing-variants {
+  float:left;
+  font-size: 12px;
+  margin-top: -4px;
+  margin-left: 10px;
+  width: 150px;
 }
 
 #bloodhound .typeahead { 

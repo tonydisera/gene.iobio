@@ -72,83 +72,62 @@
       <div class="variant-card track-expand shadow-z-1 hide" style="background-color:white;">
 
 
-          <div>
-            <a id="variant-link"   data-toggle="collapse"  href="#variant-panel" 
-               aria-expanded="false" >
+          <div style="text-align:center;margin-top: 6px">
+            <a id="variant-link"  class="card-label"  data-toggle="collapse"  href="#variant-panel" 
+               aria-expanded="false" style="float:left;text-align:left;width:134px;">
               Variants
               <span class="caret"></span>
             </a>
 
+            <button id="button-find-missing-variants"                       
+              class="btn btn-raised btn-default icon-button-sm"> 
+              <i class="mdi-action-find-in-page"></i>
+                Find missing variants
+            </button>
+
+            <div class="variant-count badge" id="vcf-count" style="display: none; margin-right: 130px;">
+            </div>
+
+            <div style="float:right">
+              <a id="af-link" class="hide"  
+                data-toggle="collapse" 
+                style="font-size: 12px;vertical-align: top;padding-right:20px" 
+                href="#af" 
+                aria-expanded="false" aria-controls="collapseExample">
+                Allele Frequency
+              </a>
+              <a id="vcf-file-info-link"   
+                data-toggle="collapse" 
+                style="font-size: 12px;vertical-align: top;margin-top: 0px;padding-right:10px" 
+                href="#vcf-file-info" aria-expanded="false" >
+                File info
+              </a>
+            </div>
+
+          </div>
+          <div style="text-align:center;clear:both;">
+              <div id="af" class="collapse" style="float:right;font-size: 10px;margin-top:-16px">
+                <div>
+                  <svg id="vcf-af-chart"/>
+                </div>
+              </div> 
+              <span id="vcf-file-info" class="collapse" style="float:right;margin-top:-16px;">
+                <span id="vcf-name" class="hide" style="font-size: 12px;padding-right:10px;"></span>
+              </span>
           </div>
 
         
 
-          <div id="variant-panel" class="collapse">
+          <div id="variant-panel" class="collapse" style="clear:both;">
            
             <div id="vcf-track" class="track hide" >
                      
               <div class="track-chart">
-                  <div style="text-align: center;margin-left: 100px;margin-top: -18px;">
-
-
-
-                       <div class="variant-count badge" id="vcf-count" 
-                       style="float: left; margin-top: 2px; margin-bottom: 4px; display: none; margin-right: 40px;">
-                       </div>
-                       
-
-                       <div>
-                         
-                          <a id="button-find-missing-variants"
-                             style="float: left;font-size: 12px;vertical-align:top;padding-left:20px">
-                            Find missing variants
-                          </a>
-
-                          <a id="af-link" class="hide"  
-                            data-toggle="collapse" 
-                            style="float:left;font-size: 12px;vertical-align: top;padding-left:20px" 
-                            href="#af" 
-                            aria-expanded="false" aria-controls="collapseExample">
-                            Allele Frequency
-                          </a>
-                          <a id="vcf-file-info-link"   
-                            data-toggle="collapse" 
-                            style="float:right;font-size: 12px;vertical-align: top;margin-top: 0px;" 
-                            href="#vcf-file-info" aria-expanded="false" >
-                            File info
-                          </a>
-
-                       </div>
-                  </div>
-
-                  <div style="text-align:center;">
-                      <div id="af" class="collapse" style="font-size: 10px;">
-                        <div style="margin-right:145px;">
-                          <input  type="text"  id="af-amount-start" value="0"                           
-                          style="width:30px;margin-left: 10px;font-size: 12px;"/>
-                          -
-                          <input type="text"  id="af-amount-end" value="100" 
-                          style="width:30px;margin-left: 4px;font-size: 12px;"/>
-                          %
-                        </div>
-                        <div>
-                          <svg id="vcf-af-chart"/>
-                        </div>
-                      </div> 
-
-                      <span id="vcf-file-info" class="collapse" style="float:right;">
-                        <span id="vcf-name" class="hide" style="font-size: 12px"></span>
-                      </span>
-                  </div>
-
-                  
                   <div class="loader">
                       <span class="loader-label"></span>
                       <img src="assets/images/loading-squares.gif"/>
                   </div>
-
                   <div id="vcf-variants"></div>
-          
               </div>
             </div>
 
@@ -169,11 +148,11 @@
 
                    <div style="float:right;margin-top:-10px;">
                     <a id="bam-file-info-link" data-toggle="collapse" 
-                      style="float:right;font-size: 12px;" 
+                      style="float:right;font-size: 12px;padding-right:10px;" 
                       href="#bam-name" aria-expanded="false" class="collapsed">
                       File info
                     </a>
-                    <div id="bam-name" class="collapse" style="font-size: 12px; margin-right: 20px;" aria-expanded="false">
+                    <div id="bam-name" class="collapse" style="font-size: 12px; padding-right: 10px;" aria-expanded="false">
                     </div>
                   </div>
               </div>
@@ -190,6 +169,7 @@
 
         <!-- handlebar templates -->
   <script id='track-legend-template' type="text/x-handlebars-template">    
+    <div>
       <div style="float:left;;width:60px">
         <svg id="impact-scheme" class="current" width="40" height="15" transform="translate(0,0)">
           <text class="name" x="0" y="10">Impact</text>
@@ -323,6 +303,24 @@
           </path>
         </svg>
       </div>
+    </div>
+    <div style="clear:both">
+        <div>
+          <span style="font-weight:bold">Allele Frequency</span>
+          <div>
+            <div>
+              <input  type="text"  id="af-amount-start" value="0"                           
+              style="width:30px;font-size: 12px;"/>
+              -
+              <input type="text"  id="af-amount-end" value="100" 
+              style="width:30px;margin-left: 4px;font-size: 12px;"/>
+              %
+            </div>
+          </div>
+        </div>
+
+    </div>
+
   </script>
     
 </head>
@@ -336,54 +334,52 @@
 
     	<section id="app-title-section">
     	   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
-            <button id="datasource-button"
-               class="btn btn-default btn-raised" data-toggle="modal" 
-               data-target="#datasource-dialog">
-               Data sources
-            </button>
-
-            <span id="bloodhound" style="margin-left: -250px;">
+            <span id="bloodhound" style="margin-left: 90px;">
                 <input class="typeahead shadow-z-1" style="margin-top: 10px" type="text" placeholder="Search By Gene Name">
             </span>
-           <span class="iobioproject">
+
+             <button id="datasource-button"
+               class="btn btn-default btn-raised icon-button" data-toggle="modal" 
+               data-target="#datasource-dialog">
+               <i class="mdi-action-settings" ></i>
+               Data Sources
+            </button>
+           <span href="http://iobio.io" class="iobioproject">
             an iobio project
            </span>   
       </section>
 
       <div id="transcript-card" class="shadow-z-1 hide" style="background:white;padding-top:5px;padding-bottom:5px">
-        <a id="transcript-link"   data-toggle="collapse" onclick="onCollapseTranscriptPanel()" href="#transcript-panel" 
-           aria-expanded="true" style="padding-left:20px" >
+        <a id="transcript-link" class="card-label"   data-toggle="collapse" onclick="onCollapseTranscriptPanel()" 
+           href="#transcript-panel" 
+           aria-expanded="true" style="float:left;margin-left:13px;width:130px" >
           Transcripts
           <span class="caret"></span>
         </a>
-
+        <div class="btn-toolbar" 
+           style="display: inline-block;float: left;margin-left: 10px;padding-top: 0px; margin-top: -10px;">
+           <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
+                <button id="transcript-dropdown-button" type="button"  
+                style="width:150px;"
+                class="btn btn-default dropdown-toggle icon-button-sm" 
+                data-toggle="dropdown" aria-expanded="false" >
+                  Choose Transcript 
+                  <span class="caret" style="margin-left:4px;"></span>
+                </button>
+                <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
+                  <li id="transcript-menu-item">
+                  </li>
+                </ul>
+            </div>
+        </div>    
+        <div id="region-track">
+          <span id="gene-name" style="margin-left: -200px;"></span>  
+          <span id="gene-region-info"></span>
+        </div>
         <div id="transcript-panel" class="collapse in" aria-expanded="true">
-
-          <div id="region-track">
-            <div class="btn-toolbar" style="display: inline-block;float: left;margin-left: 14px;padding-top: 0px; margin-top: -5px;">
-               <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
-                    <button id="transcript-dropdown-button" type="button"  class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="padding: 6px;font-size: 12px;">
-                      Choose Transcript 
-                      <span class="caret" style="margin-left:4px;"></span>
-                    </button>
-                    <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
-                      <li id="transcript-menu-item">
-                      </li>
-                    </ul>
-                </div>
-            </div>    
-
-            <span id="gene-name" style="margin-left: -200px;"></span>  
-            <span id="gene-region-info"></span>
-          </div>
-
-            
           <div id="gene-track" class="track hide">           
               <div id="gene-viz" class="track-chart"></div>               
           </div>
-
-
-          
         </div>
       </div>
 
@@ -400,7 +396,7 @@
 
         <div id="filter-track"  class="track-expand shadow-z-1 hide">
             <div>
-              <a id="filter-link"  href="#filter-panel"  data-toggle="collapse" aria-expanded="true" >
+              <a id="filter-link"  class="card-label" href="#filter-panel"  data-toggle="collapse" aria-expanded="true" >
                 Filter<span class="caret"></span>
               </a>
             </div>
@@ -414,7 +410,7 @@
 
         <div id="matrix-track"  class="track-expand shadow-z-1 hide">
             <div>
-              <a id="matrix-link"  href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
+              <a id="matrix-link"  class="card-label" href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
                 Rank<span class="caret"></span>
               </a>
             </div>
