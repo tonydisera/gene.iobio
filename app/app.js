@@ -48,7 +48,7 @@ var transcriptCollapse = true;
 clickedAnnotIds = new Object();
 var afMin = null;
 var afMax = null;
-var depthThreshold = 4;
+var coverageMin = 10;
 
 
 
@@ -109,14 +109,22 @@ function init() {
 	$('#af-amount-start').on('keydown', function() {
 		if(event.keyCode == 13) {
 			if (variantCards.length > 0) {
-				variantCards[0].filterVariantsByAf();
+				variantCards[0].filterVariants();
 			}
 	    }
 	});
 	$('#af-amount-end').on('keydown', function() {
 		if(event.keyCode == 13) {
 			if (variantCards.length > 0) {
-				variantCards[0].filterVariantsByAf();
+				variantCards[0].filterVariants();
+			}
+	    }
+	});
+	// listen for enter key on min coverage
+	$('#coverage-min').on('keydown', function() {
+		if(event.keyCode == 13) {
+			if (variantCards.length > 0) {
+				variantCards[0].filterVariants();
 			}
 	    }
 	});
@@ -361,7 +369,7 @@ function onCloseTranscriptMenuEvent() {
 function initFilterTrack() {
 
 
-	d3.selectAll(".type, .impact, .effect, .compare")
+	d3.selectAll(".type, .impact, .effect, .zygosity")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -380,9 +388,11 @@ function initFilterTrack() {
 	      .filter( function(d,i) {
 	    	var theClasses = d3.select(this).attr("class");
 	    	var theParentClasses = d3.select(this.parentNode).attr("class");
-	    	if (theParentClasses.indexOf("impact") >= 0 
+	    	if (theParentClasses == null) {
+	    		return false
+	    	} else if (theParentClasses.indexOf("impact") >= 0 
 	    		|| theParentClasses.indexOf("effect") >= 0
-	    		|| theParentClasses.indexOf("compare") >= 0
+	    		|| theParentClasses.indexOf("zygosity") >= 0
 	    		|| theParentClasses.indexOf("type") >= 0)  {
 	    		return false;
 	    	} else if (theClasses.indexOf(id) >= 0) {
@@ -511,7 +521,7 @@ function classifyByImpact(d) {
 	  effects += " " + key;
 	}
 	
-	return  'variant ' + d.type.toLowerCase() + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 function classifyByEffect(d) { 
 	var effects = "";
@@ -526,20 +536,7 @@ function classifyByEffect(d) {
       impacts += " " + key;
     }
     
-    return  'variant ' + d.type.toLowerCase() + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
-}
-function classifyByCompare(d) { 
-	var effects = "";
-	var impacts = "";
-	
-    for (key in d.effectCategory) {
-      effects += " " + key;
-    }
-    for (key in d.impact) {
-      impacts += " " + key;
-    }
-    
-    return  'variant ' + d.type.toLowerCase() + effects + impacts + ' ' + d.consensus + ' ' + 'compare_' + d.consensus; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 function applyVariantFilters() {
@@ -1091,7 +1088,7 @@ function fillFeatureMatrix(theVcfData) {
 		}
 
 		// adequate coverage
-		if (variant.combinedDepth != null && variant.combinedDepth != '' && variant.combinedDepth >= depthThreshold) {
+		if (variant.combinedDepth != null && variant.combinedDepth != '' && variant.combinedDepth >= coverageMin) {
 			features[getMatrixColumn(1).order] = 1;
 		}
 

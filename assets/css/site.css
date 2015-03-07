@@ -271,7 +271,7 @@ a, a:hover, a:focus {
 }
 #filter-track {
   display: table-cell;
-  min-width: 250px;
+  min-width: 300px;
   margin-top: 0px;
   margin-bottom: 0px;
 }
@@ -800,7 +800,7 @@ header {
 
 
 /* LEGEND */
-.impact, .effect, .compare, .type {
+.impact, .effect, .type, .zygosity {
   border: solid thin white;
   padding: 1px;
 
@@ -809,7 +809,7 @@ header {
   fill: lightgrey !important;
   stroke: grey;
 }
-.impact:hover, .effect:hover, .compare:hover, .type:hover {
+.impact:hover, .effect:hover, .zygosity:hover, .type:hover {
   
   cursor: pointer;
   border: solid thin white;
@@ -818,7 +818,7 @@ header {
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
-.impact.current:hover, .effect.current:hover, .compare.current:hover, .type.current:hover {
+.impact.current:hover, .effect.current:hover, .zygosity.current:hover, .type.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
@@ -836,7 +836,7 @@ header {
 #impact-scheme, #effect-scheme, #compare-scheme {
   padding-top: 2px;
 }
-#type-scheme {
+#type-scheme, #zygosity-scheme {
   padding-top: 2px;
 }
 .impact.inactive, .effect.inactive {
@@ -848,7 +848,7 @@ header {
   border: none;
  
 }
-#impact-scheme .name, #effect-scheme .name, #compare-scheme .name, #type-scheme .name{
+#impact-scheme .name, #effect-scheme .name, #compare-scheme .name, #type-scheme .name, #zygosity-scheme .name{
   fill-opacity: 1;
   font-size: 12px; 
   font-weight: normal;

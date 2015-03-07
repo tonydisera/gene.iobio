@@ -801,12 +801,32 @@ VariantCard.prototype.stripRefName = function(refName) {
 
 
 
-VariantCard.prototype.filterVariantsByAf = function() {
-	var lowerVal = $('#af-amount-start').val() / 100;
-	var upperVal = $('#af-amount-end').val() / 100;
+VariantCard.prototype.filterVariants = function() {
+	var afLowerVal = null;
+	var afUpperVal = null;
+	if ($('#af-amount-start') != '' && $('#af-amount-end') != '') {
+		afLowerVal  = $('#af-amount-start').val() / 100;
+		afUpperVal  = $('#af-amount-end').val() / 100;
+	} 
+
+	var coverageMin = null;
+	if ($('#coverage-min') != '') {
+		coverageMin = $('#coverage-min').val();
+	}
 	   
 	var filteredFeatures = this.vcfData.features.filter(function(d) {
-		return (d.af >= lowerVal && d.af <= upperVal);
+		var meetsAf = true;
+		if (afLowerVal && afUpperVal) {
+			meetsAf =  (d.af >= afLowerVal && d.af <= afUpperVal);
+		}
+		// TODO:  If combinedDepth not provided, access bam data to determine coverage for this
+		// region of variant
+		var meetsCoverage = true;
+		if (coverageMin) {
+ 			meetsCoverage = d.combinedDepth <= coverageMin;
+		}
+
+		return meetsAf && meetsCoverage;
 	});
 
 	var splitByZyg = this.vcfData.hetCount > 0 && this.vcfData.homCount > 0;

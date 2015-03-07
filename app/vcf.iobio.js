@@ -853,7 +853,7 @@ var effectCategories = [
               'af': af, 'combinedDepth': combinedDepth,
               'genotypes': genotypes, 
               'genotypeForAlt': genotypeForAlt, 
-              'zygosity': zygosity, 
+              'zygosity': zygosity ? zygosity : '', 
               'phased': phased,
               'effect': effects, 
               'effectCategory': effectCats, 
