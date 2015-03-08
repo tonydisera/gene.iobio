@@ -806,13 +806,13 @@ VariantCard.prototype.filterVariants = function() {
 	var afLowerVal = null;
 	var afUpperVal = null;
 	if ($('#af-amount-start') != '' && $('#af-amount-end') != '') {
-		afLowerVal  = $('#af-amount-start').val() / 100;
-		afUpperVal  = $('#af-amount-end').val() / 100;
+		afLowerVal  = +$('#af-amount-start').val() / 100;
+		afUpperVal  = +$('#af-amount-end').val() / 100;
 	} 
 
 	var coverageMin = null;
 	if ($('#coverage-min') != '') {
-		coverageMin = $('#coverage-min').val();
+		coverageMin = +$('#coverage-min').val();
 	}
 	   
 	var filteredFeatures = this.vcfData.features.filter(function(d) {
