@@ -35,6 +35,10 @@ VariantCard.prototype.setName = function(theName) {
 	}
 }
 
+VariantCard.prototype.getCardIndex = function() {
+	return this.cardIndex;
+}
+
 VariantCard.prototype.setDirty = function(flag) {
 	if (flag == null) {
 		this.dirty = true;
@@ -346,6 +350,8 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.vcfData = null;
 	this.fbData = null;
 
+	clearFilters();
+
 	this.vcfChart.clazz(classifyClazz);
 
 
@@ -370,7 +376,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 }
 
-VariantCard.prototype.onD3Brush = function(brush) {
+VariantCard.prototype.onBrush = function(brush) {
 	if (!brush.empty()) {
 
 		this.cardSelector.find('#bam-track').css("margin-top", "-70px");
@@ -394,6 +400,8 @@ VariantCard.prototype.onD3Brush = function(brush) {
 		var h = $("#nav-section").height();
 		$('#track-section').css("padding-top", h + "px");
 	}
+
+	
 
 	this.showBamDepth(regionStart, regionEnd);
 	this.showVariants(regionStart, regionEnd);
@@ -507,7 +515,8 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 								variantRegionStart: regionStart
 							};
 
-		this.fillVariantChart(vcfDataFiltered, regionStart, regionEnd);
+		var filteredVcfData = this.filterVariants();
+  		this.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 	
 	} else {
 
@@ -525,12 +534,10 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	                           function(data) {
 	        me.vcfData = data;
 
-	        var splitByZyg = me.vcfData.hetCount > 0 && me.vcfData.homCount > 0;
-
-	        maxLevel = me._pileupVariants(me.vcfChart, splitByZyg, data.features, window.gene.start, window.gene.end);
-			data.maxLevel = maxLevel + 1;
 	   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading chart");
-			me.fillVariantChart(data, window.gene.start, window.gene.end);
+
+	   	    var filteredVcfData = this.filterVariants();
+		  	this.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 
 		});	
 
@@ -772,13 +779,8 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 
 
-VariantCard.prototype.classifyVariants = function(clazz) {
+VariantCard.prototype.variantClass = function(clazz) {
 	this.vcfChart.clazz(clazz);
-
-	if (this.vcfData) {
-		this.fillVariantChart(this.vcfData, regionStart, regionEnd);
-	} 
-
 }
 
 VariantCard.prototype.getRefName = function(refName) {
@@ -801,8 +803,12 @@ VariantCard.prototype.stripRefName = function(refName) {
 
 
 
-VariantCard.prototype.filterVariants = function() {
+VariantCard.prototype.filterVariants = function(dataToFilter) {
 	var me = this;
+
+	var data = dataToFilter ? dataToFilter : this.vcfData;
+
+
 	var afLowerVal = null;
 	var afUpperVal = null;
 	if ($('#af-amount-start') != '' && $('#af-amount-end') != '') {
@@ -815,7 +821,13 @@ VariantCard.prototype.filterVariants = function() {
 		coverageMin = +$('#coverage-min').val();
 	}
 	   
-	var filteredFeatures = this.vcfData.features.filter(function(d) {
+	var filteredFeatures = data.features.filter(function(d) {
+
+		var meetsRegion = true;
+		if (window.regionStart != null && window.regionEnd != null ) {
+			meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+		}
+
 		var meetsAf = false;
 		if (afLowerVal != null && afUpperVal != null) {
 			meetsAf =  (d.af >= afLowerVal && d.af <= afUpperVal);
@@ -872,28 +884,27 @@ VariantCard.prototype.filterVariants = function() {
 		}
 
 
-		return meetsAf && meetsCoverage && meetsAnnot;
+		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot;
 	});
 
-	var splitByZyg = this.vcfData.hetCount > 0 && this.vcfData.homCount > 0;
+	var splitByZyg = data.hetCount > 0 && data.homCount > 0;
 
 	var maxLevel = this._pileupVariants(this.vcfChart, splitByZyg, filteredFeatures, 
 		regionStart ? regionStart : window.gene.start, 
 		regionEnd   ? regionEnd   : window.gene.end);		
 
-	var vcfDataFiltered = {	count: this.vcfData.count,
-							countMatch: this.vcfData.countMatch,
-							countUnique: this.vcfData.countUnique,
+	var vcfDataFiltered = {	count: data.count,
+							countMatch: data.countMatch,
+							countUnique: data.countUnique,
 							end: regionEnd,
 							features: filteredFeatures,
 							maxLevel: maxLevel + 1,
-							name: this.vcfData.name,
+							name: data.name,
 							start: regionStart,
-							strand: this.vcfData.strand,
+							strand: data.strand,
 							variantRegionStart: regionStart
 						};
-
-	this.fillVariantChart(vcfDataFiltered, regionStart, regionEnd);
+	return vcfDataFiltered;
 }
 
 VariantCard.prototype._isDictionary = function(obj) {

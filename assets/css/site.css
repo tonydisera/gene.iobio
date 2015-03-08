@@ -805,11 +805,11 @@ header {
   padding: 1px;
 
 }
-.impact.nocolor rect.variant, .effect.nocolor rect.variant, .compare.nocolor rect.variant {
+.impact.nocolor rect.variant, .effectCategory.nocolor rect.variant, .compare.nocolor rect.variant {
   fill: lightgrey !important;
   stroke: grey;
 }
-.impact:hover, .effect:hover, .zygosity:hover, .type:hover {
+.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover {
   
   cursor: pointer;
   border: solid thin white;
@@ -818,7 +818,7 @@ header {
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
-.impact.current:hover, .effect.current:hover, .zygosity.current:hover, .type.current:hover {
+.impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, .type.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;

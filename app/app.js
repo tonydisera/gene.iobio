@@ -109,24 +109,18 @@ function init() {
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
 		if(event.keyCode == 13) {
-			if (variantCards.length > 0) {
-				variantCards[0].filterVariants();
-			}
+			filterVariants();
 	    }
 	});
 	$('#af-amount-end').on('keydown', function() {
 		if(event.keyCode == 13) {
-			if (variantCards.length > 0) {
-				variantCards[0].filterVariants();
-			}
+			filterVariants();
 	    }
 	});
 	// listen for enter key on min coverage
 	$('#coverage-min').on('keydown', function() {
 		if(event.keyCode == 13) {
-			if (variantCards.length > 0) {
-				variantCards[0].filterVariants();
-			}
+			filterVariants();
 	    }
 	});
 
@@ -156,7 +150,7 @@ function init() {
 			}
 
 			variantCards.forEach(function(variantCard) {
-		    	variantCard.onD3Brush(brush);
+		    	variantCard.onBrush(brush);
 			});
 
 		});	
@@ -366,11 +360,23 @@ function onCloseTranscriptMenuEvent() {
 }
 
 
+function clearFilters() {
+	clickedAnnotIds = [];
+	annotsToInclude = [];
+	d3.selectAll('#filter-track .impact').classed('current', false);
+	d3.selectAll('#filter-track .effect').classed('current', false);
+	d3.selectAll('#filter-track .type').classed('current', false);
+	d3.selectAll('#filter-track .zygosity').classed('current', false);
+	$('af-amount-start').val(0);
+	$('af-amount-end').val(100);
+	$('coverage-min').val('');
+}
+
 
 function initFilterTrack() {
 
 
-	d3.selectAll(".type, .impact, .effect, .zygosity")
+	d3.selectAll(".type, .impact, .effectCategory, .zygosity")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -387,39 +393,6 @@ function initFilterTrack() {
 	    	}
 	      })
 	      .style("opacity", 1);
-
-/*
-	    d3.selectAll(".variant")
-	      .filter( function(d,i) {
-	    	var theClasses = d3.select(this).attr("class");
-	    	var theParentClasses = d3.select(this.parentNode).attr("class");
-	    	if (theParentClasses == null) {
-	    		return false;
-	    	} else if (theParentClasses.indexOf("impact") >= 0 
-	    		|| theParentClasses.indexOf("effect") >= 0
-	    		|| theParentClasses.indexOf("zygosity") >= 0
-	    		|| theParentClasses.indexOf("type") >= 0)  {
-	    		return false;
-	    	} else if (theClasses.indexOf(id) >= 0) {
-	    		return false;
-	    	} else {
-	    		var aClickedId = false;
-	    		for (key in clickedAnnotIds) {
-	    			var on = clickedAnnotIds[key];
-	    			if (on && theClasses.indexOf(key) >= 0) {
-	    				aClickedId = true;
-	    			}
-	    		}
-	    		if (aClickedId) {
-	    			return false;
-
-	    		} else {
-		    		return true;
-	    		}
-	    	}
-	      })
-	      .style("opacity", .1);
-		*/
 	  })
 	  .on("mouseout", function(d) {
 	  	d3.selectAll(".variant")
@@ -433,7 +406,9 @@ function initFilterTrack() {
 	  		on = true;
 	  	}
 	  	var schemeClass = d3.select(this).attr("class");
-	  	// strip out extraneous 'no color' class
+	  	// strip out extraneous 'no color' and 'current' class
+	  	// so that we are left with the attribute name of the
+	  	// annotation we will be filtering on.
 	  	if (schemeClass.indexOf('nocolor') >= 0) {
 	  		var tokens = schemeClass.split(' ');
 	  		tokens.forEach(function(clazz) {
@@ -442,6 +417,15 @@ function initFilterTrack() {
 	  			}
 	  		})
 	  	}
+	  	if (schemeClass.indexOf('current') >= 0) {
+	  		var tokens = schemeClass.split(' ');
+	  		tokens.forEach(function(clazz) {
+	  			if (clazz != 'current') {
+	  				schemeClass = clazz;
+	  			}
+	  		})
+	  	}
+
 
 	  	// Remove from or add to list of clicked ids
 	  	window.clickedAnnotIds[d3.select(this).attr("id")] = on;
@@ -450,10 +434,7 @@ function initFilterTrack() {
 	  														  'state': on};
 
 	  	d3.select(this).classed("current", on);
-	  	//applyVariantFilters();
-	  	if (variantCards.length > 0) {
-	  		variantCards[0].filterVariants();
-	  	}
+	  	filterVariants();
 	  });
 
 	  d3.selectAll('#impact-scheme')
@@ -462,10 +443,15 @@ function initFilterTrack() {
 	    	d3.select('#effect-scheme' ).classed("current", false);
 
 	    	d3.selectAll(".impact").classed("nocolor", false);
-	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".effectCategory").classed("nocolor", true);
 
 			variantCards.forEach(function(variantCard) {
-				variantCard.classifyVariants(classifyByImpact, regionStart, regionEnd);
+				variantCard.variantClass(classifyByImpact);
+		    	if (variantCard.getCardIndex() == 0) {
+			  		var filteredVcfData = variantCard.filterVariants();
+			  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+				}
+
 			});
 
 
@@ -477,15 +463,26 @@ function initFilterTrack() {
 
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
-	    	d3.selectAll(".effect").classed("nocolor", false);
+	    	d3.selectAll(".effectCategory").classed("nocolor", false);
 
 			variantCards.forEach(function(variantCard) {
-		    	variantCard.classifyVariants(classifyByEffect, regionStart, regionEnd);
+		    	variantCard.variantClass(classifyByEffect);
+		    	if (variantCard.getCardIndex() == 0) {
+			  		var filteredVcfData = variantCard.filterVariants();
+			  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+				}
 			});
 
 
 	    });
 	  
+}
+
+function filterVariants() {
+	if (variantCards.length > 0) {
+  		var filteredVcfData = variantCards[0].filterVariants();
+  		variantCards[0].fillVariantChart(filteredVcfData, regionStart, regionEnd);
+	 }
 }
 
 function updateUrl(paramName, value) {
@@ -714,8 +711,7 @@ function loadTracksForGene() {
 	d3.select('#impact-scheme').classed("current", true);
 	d3.select('#effect-scheme' ).classed("current", false);
 	d3.selectAll(".impact").classed("nocolor", false);
-	d3.selectAll(".effect").classed("nocolor", true);
-	d3.selectAll(".compare").classed("nocolor", true);
+	d3.selectAll(".effectCategory").classed("nocolor", true);
 	
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
