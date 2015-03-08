@@ -46,6 +46,7 @@ var transcriptCollapse = true;
 
 // Filters
 clickedAnnotIds = new Object();
+var annotsToInclude = new Object();
 var afMin = null;
 var afMax = null;
 var coverageMin = 10;
@@ -373,6 +374,9 @@ function initFilterTrack() {
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
+		d3.selectAll(".variant")
+		   .style("opacity", .1);
+
 	    d3.selectAll(".variant")
 	      .filter( function(d,i) {
 	      	var theClasses = d3.select(this).attr("class");
@@ -384,12 +388,13 @@ function initFilterTrack() {
 	      })
 	      .style("opacity", 1);
 
+/*
 	    d3.selectAll(".variant")
 	      .filter( function(d,i) {
 	    	var theClasses = d3.select(this).attr("class");
 	    	var theParentClasses = d3.select(this.parentNode).attr("class");
 	    	if (theParentClasses == null) {
-	    		return false
+	    		return false;
 	    	} else if (theParentClasses.indexOf("impact") >= 0 
 	    		|| theParentClasses.indexOf("effect") >= 0
 	    		|| theParentClasses.indexOf("zygosity") >= 0
@@ -414,10 +419,11 @@ function initFilterTrack() {
 	    	}
 	      })
 	      .style("opacity", .1);
-		
+		*/
 	  })
 	  .on("mouseout", function(d) {
-	  	applyVariantFilters();
+	  	d3.selectAll(".variant")
+		   .style("opacity", 1);
 	  })
 	  .on("click", function(d) {
 	  	var on = null;
@@ -426,11 +432,28 @@ function initFilterTrack() {
 	  	} else {
 	  		on = true;
 	  	}
+	  	var schemeClass = d3.select(this).attr("class");
+	  	// strip out extraneous 'no color' class
+	  	if (schemeClass.indexOf('nocolor') >= 0) {
+	  		var tokens = schemeClass.split(' ');
+	  		tokens.forEach(function(clazz) {
+	  			if (clazz != 'nocolor') {
+	  				schemeClass = clazz;
+	  			}
+	  		})
+	  	}
+
 	  	// Remove from or add to list of clicked ids
 	  	window.clickedAnnotIds[d3.select(this).attr("id")] = on;
+	  	window.annotsToInclude[d3.select(this).attr("id")] = {'key':   schemeClass , 
+	  														  'value': d3.select(this).attr("id"),  
+	  														  'state': on};
 
 	  	d3.select(this).classed("current", on);
-	  	applyVariantFilters();
+	  	//applyVariantFilters();
+	  	if (variantCards.length > 0) {
+	  		variantCards[0].filterVariants();
+	  	}
 	  });
 
 	  d3.selectAll('#impact-scheme')
@@ -540,6 +563,7 @@ function classifyByEffect(d) {
 }
 
 function applyVariantFilters() {
+
 	// Find out if there are any filters set
   	var filtersApply = false;
   	for (key in clickedAnnotIds) {
@@ -560,8 +584,8 @@ function applyVariantFilters() {
 	    	
 	    	var aClickedId = false;
     		if (theParentClasses.indexOf("impact" ) >= 0 
-    			|| theParentClasses.indexOf("effect ") >= 0 
-    			|| theParentClasses.indexOf("compare ") >= 0 ) {
+    			|| theParentClasses.indexOf("effect") >= 0 
+    			|| theParentClasses.indexOf("zygosity") >= 0 ) {
     			return false;
     		} else {
 		    	for (key in clickedAnnotIds) {

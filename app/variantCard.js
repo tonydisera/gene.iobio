@@ -802,6 +802,7 @@ VariantCard.prototype.stripRefName = function(refName) {
 
 
 VariantCard.prototype.filterVariants = function() {
+	var me = this;
 	var afLowerVal = null;
 	var afUpperVal = null;
 	if ($('#af-amount-start') != '' && $('#af-amount-end') != '') {
@@ -815,18 +816,63 @@ VariantCard.prototype.filterVariants = function() {
 	}
 	   
 	var filteredFeatures = this.vcfData.features.filter(function(d) {
-		var meetsAf = true;
-		if (afLowerVal && afUpperVal) {
+		var meetsAf = false;
+		if (afLowerVal != null && afUpperVal != null) {
 			meetsAf =  (d.af >= afLowerVal && d.af <= afUpperVal);
+		} else {
+			meetsAf = true;
 		}
 		// TODO:  If combinedDepth not provided, access bam data to determine coverage for this
 		// region of variant
 		var meetsCoverage = true;
 		if (coverageMin) {
- 			meetsCoverage = d.combinedDepth <= coverageMin;
+ 			meetsCoverage = d.combinedDepth >= coverageMin;
 		}
 
-		return meetsAf && meetsCoverage;
+		// Iterate through the clicked annotations for each variant. The variant
+		// needs to match needs to match
+		// at least one of the selected values (e.g. HIGH or MODERATE for IMPACT)
+		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
+		var matchCount = 0;
+		var evalAttributes = {};
+		for (key in annotsToInclude) {
+			var annot = annotsToInclude[key];
+			if (annot.state) {
+				if (evalAttributes[annot.key] == null) {
+					evalAttributes[annot.key] = 0;
+				}
+				var annotValue = d[annot.key] ? d[annot.key] : '';				
+				var match = false;
+				if (me._isDictionary(annotValue)) {
+					for (avKey in annotValue) {
+						if (avKey.toLowerCase() == annot.value.toLowerCase()) {
+							match = true;
+						}
+					}
+				} else  if (annotValue.toLowerCase() == annot.value.toLowerCase()){
+					match = true;
+				}
+				if (match) {
+					var count = evalAttributes[annot.key];
+					count++;
+					evalAttributes[annot.key] = count;
+				}
+			}
+		}
+
+		// If zero annots to evaluate, the variant meets the criteria.
+		// If annots are to be evaluated, the variant must match
+		// at least one value for each annot to consider.
+		var meetsAnnot = true;
+		for (key in evalAttributes) {
+			var count = evalAttributes[key];
+			if (count == 0) {
+				meetsAnnot = false;
+			}
+		}
+
+
+		return meetsAf && meetsCoverage && meetsAnnot;
 	});
 
 	var splitByZyg = this.vcfData.hetCount > 0 && this.vcfData.homCount > 0;
@@ -848,6 +894,19 @@ VariantCard.prototype.filterVariants = function() {
 						};
 
 	this.fillVariantChart(vcfDataFiltered, regionStart, regionEnd);
+}
+
+VariantCard.prototype._isDictionary = function(obj) {
+  if(!obj) {
+  	return false;
+  } 
+  if(Array.isArray(obj)) {
+  	return false;
+  }
+  if (obj.constructor != Object) {
+  	return false;
+  }
+  return true;
 }
 
 VariantCard.prototype.getWidthFactor = function(regionStart, regionEnd) {
