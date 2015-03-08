@@ -1,6 +1,8 @@
 todo
 -------------
 
+- Consider zoom region in VariantCard.filterVariants()
+
 - Big genes kill browser session
 
 - Zoom after call freebayes broken. (vcfData has to incorporate new unique variants. rather than creating
