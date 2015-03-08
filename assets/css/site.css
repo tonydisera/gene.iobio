@@ -3,7 +3,7 @@ body {
 }
 
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: #D35C51;
+  color: rgb(118, 99, 99);
   font-size: 18px;
 }
 
@@ -165,7 +165,7 @@ a, a:hover, a:focus {
 
 .iobio {
     font-size: 34px;
-    color: grey;
+    color: rgb(118, 99, 99);
     font-family: Quicksand;
     float: left;
 }
@@ -179,7 +179,7 @@ a, a:hover, a:focus {
 
 .iobioproject {
     font-size: 18px;
-    color: grey;
+    color: rgb(118, 99, 99);
     font-family: Quicksand;
     line-height: 45px;
     float: right;
