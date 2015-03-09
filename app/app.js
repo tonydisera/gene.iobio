@@ -1207,14 +1207,23 @@ function variantTooltipHTML(variant, rowIndex) {
 
 
 
-function cullVariantFilters(data) {
+function cullVariantFilters() {
 
 	d3.selectAll(".impact").each( function(d,i) {
 		var impact = d3.select(this).attr("id");
 		var count = d3.selectAll('#vcf-variants .variant.' + impact)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-
+	d3.selectAll(".type").each( function(d,i) {
+		var type = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + type)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	d3.selectAll(".zygosity").each( function(d,i) {
+		var zygosity = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + zygosity)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
 	d3.selectAll(".effectCategory").each( function(d,i) {
 		var effect = d3.select(this).attr("id");
 		var count = d3.selectAll('#vcf-variants .variant.' + effect)[0].length;
@@ -1245,15 +1254,6 @@ function cullVariantFilters(data) {
     		var activeElement = activeElements[i];
     		$('#effect-filter-box #more-effect').append($(activeElement));
     	}
-    	/*
-    	$('#effect-filter-box > .effectCategory').each(function() {
-    		$('#effect-filter-box #more-effect').prepend($(this));
-    		activeCount--;
-    		if (activeCount <= 6 ) {
-    			return false;
-    		}
-    	});
-*/
 
     } else {
     	$('#effect-filter-box #more-effect-link').addClass('hide');

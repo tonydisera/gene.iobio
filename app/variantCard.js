@@ -537,7 +537,12 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading chart");
 
 	   	    var filteredVcfData = this.filterVariants();
-		  	this.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
+		  	me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
+
+		  	if (me.cardIndex == 0) {
+			  	window.cullVariantFilters();
+		  	}
+
 
 		});	
 
@@ -668,7 +673,6 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
 
    	//  TODO:  Change this so that we can indicate proband/primary variant card
    	if ( this.cardIndex == 0) {
-   		window.cullVariantFilters(data);
    		window.showFeatureMatrix(this, data, regionStart, regionEnd);
    	}
 
