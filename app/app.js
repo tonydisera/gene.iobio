@@ -1207,36 +1207,62 @@ function variantTooltipHTML(variant, rowIndex) {
 
 
 
-function setVariantLegendCountsDEPRECATED() {
-	variantCounts = new Object();
+function cullVariantFilters(data) {
 
-	// Count the number of variants for each impact.
-	variantCounts.LOW = d3.selectAll("#vcf-variants .variant.LOW")[0].length;
-	variantCounts.MODIFIER = d3.selectAll("#vcf-variants .variant.MODIFIER")[0].length;
-	variantCounts.MODERATE = d3.selectAll("#vcf-variants .variant.MODERATE")[0].length;
-	variantCounts.HIGH = d3.selectAll("#vcf-variants .variant.HIGH")[0].length;
+	d3.selectAll(".impact").each( function(d,i) {
+		var impact = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + impact)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
 
-/*
-	if (d3.select("#impact-scheme").attr("class") == "current") {
-		d3.selectAll(".impact").attr("class", function(d) {
-			var theClasses = d3.select(this).attr("class");
-			var baseClasses = "";
-			if (theClasses.indexOf("current") >= 0) {
-				baseClasses = "impact current";
-			} else {
-				baseClasses = "impact";
-			}
-			var impact = d3.select(this)[0][0].id;
-			var count = variantCounts[impact];
-			if (count == 0) {
-				return baseClasses + " inactive";
-			} else {
-				return basesClasses;
-			}
-		});
-	}
+	d3.selectAll(".effectCategory").each( function(d,i) {
+		var effect = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + effect)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+
+	// First, move all elements out of the 'more' section
+	$('#effect-filter-box #more-effect svg').each(function() {
+    	$(this).insertBefore($('#effect-filter-box #more-effect-link'));
+    });
+    // Now move only inactive elements into the 'more section'
+    $('#effect-filter-box .inactive').each(function() {
+    	$(this).prependTo($('#effect-filter-box #more-effect'));
+    });
+    // If we have more that 6 active elements, keep the
+    // first 6 where they are and move the remaining to the 
+    // 'more' section.  If we 6 or less active elements,
+    // just hide the 'more' link.
+    var allCount = d3.selectAll("#effect-filter-box .effectCategory")[0].length;
+    var inactiveCount = d3.selectAll("#effect-filter-box .effectCategory.inactive")[0].length;
+    var activeCount = allCount - inactiveCount;
+    if (activeCount >= 4) {
+    	$('#effect-filter-box #more-effect-link').removeClass('hide');
+    	// Keep six active elements where they are.  The remainder should go in the 
+    	// 'more' section
+    	var activeElements = $('#effect-filter-box > .effectCategory');
+    	for (var i = 4; i < activeCount; i++) {
+    		var activeElement = activeElements[i];
+    		$('#effect-filter-box #more-effect').append($(activeElement));
+    	}
+    	/*
+    	$('#effect-filter-box > .effectCategory').each(function() {
+    		$('#effect-filter-box #more-effect').prepend($(this));
+    		activeCount--;
+    		if (activeCount <= 6 ) {
+    			return false;
+    		}
+    	});
 */
-	// TODO:  Need to do the same thing for effect.
+
+    } else {
+    	$('#effect-filter-box #more-effect-link').addClass('hide');
+
+    }
+
+
+
+
 }
 
 

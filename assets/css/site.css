@@ -839,9 +839,13 @@ header {
 #type-scheme, #zygosity-scheme {
   padding-top: 2px;
 }
-.impact.inactive, .effect.inactive {
+.impact.inactive  {
   pointer-events: none;
-  opacity: .5;
+  opacity: .4;
+}
+.effectCategory.inactive {
+  pointer-events: none;
+  display: none;
 }
 #impact-scheme.current, #effect-scheme.current {
   font-weight: bold;

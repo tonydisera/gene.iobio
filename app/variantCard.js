@@ -668,6 +668,7 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
 
    	//  TODO:  Change this so that we can indicate proband/primary variant card
    	if ( this.cardIndex == 0) {
+   		window.cullVariantFilters(data);
    		window.showFeatureMatrix(this, data, regionStart, regionEnd);
    	}
 
