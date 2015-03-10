@@ -56,15 +56,30 @@ var coverageMin = 10;
 // feature matrix (ranked variants)
 var featureVcfData = null;
 var featureMatrix = null;
-var matrixColumns = [
-	{name:'High impact'                         ,order:0, index:0},
-	{name:'Sufficient coverage'                 ,order:5, index:1},
-	{name:'Missing variant'                     ,order:6, index:2},
-	{name:'Variant not present in unaffected'   ,order:3, index:3},
-	{name:'Hom proband, het parent(s)'          ,order:4, index:4},
-	{name:'Not in 1000G'                        ,order:1, index:5},
-	{name:'Not in ExAC'                         ,order:2, index:6}
+var clinvarMap     =   {Y: 1,       N: 2};
+var impactMap      =   {HIGH: 1,    MODERATE: 2,  MODIFIER: 3,  LOW: 4};
+var inheritanceMap =   {denovo: 1,  recessive: 2};
+var afMap          = [ {min: +0,    max: +.1, value: +1},	 // note: min is inclusive, max is exlusive
+                       {min: +.1,   max: +.2, value: +2},	
+                       {min: +.2,   max: +.3, value: +3},	
+                       {min: +.3,   max: +.4, value: +4},	
+                       {min: +.4,   max: +.5, value: +5},	
+                       {min: +.5,   max: +.6, value: +6},	
+                       {min: +.6,   max: +.7, value: +7},	
+                       {min: +.7,   max: +.8, value: +8},	
+                       {min: +.8,   max: +.9, value: +9},	
+                       {min: +.9,   max: +1,  value: +10}	
 ];
+var matrixRows = [
+	{name:'Impact'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
+	{name:'ClinVar'             ,order:1, index:1, match: 'exact', attribute: 'clinvar',     map: clinvarMap },
+	{name:'Inheritance'         ,order:2, index:2, match: 'exact', attribute: 'inheritance', map: inheritanceMap},
+	{name:'AF (1000G)'          ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: afMap},
+	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afMap}
+];
+
+var featureUnknown = 99;
+
 var vcf1000G= null;
 var vcfExAC = null;
 var vcf1000GData = null;
@@ -191,7 +206,7 @@ function init() {
 					    .on('d3rowup', function(i) {
 					    	var column = null;
 					    	var columnPrev = null;
-					    	matrixColumns.forEach(function(col) {
+					    	matrixRows.forEach(function(col) {
 					    		if (col.order == i) {
 					    			column = col;
 					    		} else if (col.order == i - 1) {
@@ -208,7 +223,7 @@ function init() {
 					    .on('d3rowdown', function(i) {
 					    	var column = null;
 					    	var columnNext = null;
-					    	matrixColumns.forEach(function(col) {
+					    	matrixRows.forEach(function(col) {
 					    		if (col.order == i) {
 					    			column = col;
 					    		} else if (col.order == i + 1) {
@@ -1056,24 +1071,39 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	});
 	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
 
-    window.vcf1000G.compareVcfRecords(theVcfData, theVcf1000GData, function() {
-	        vcfExAC.compareVcfRecords(theVcfData, theVcfExACData, function(){
+    window.vcf1000G.compareVcfRecords(theVcfData, theVcf1000GData, 
+    	// This is the function that is called after all the variants have been compared
+    	// to the 1000G variant set.  In this case, we now move on to comparing the
+    	// proband variant set to the ExAC variant set.
+    	function() {
+	        window.vcfExAC.compareVcfRecords(theVcfData, theVcfExACData, 
+	        	// This is the function that is called after the variants have been compared
+	        	// to the ExAC population variant set. In this case, we have performed
+	        	// all comparisons (1000G in outer function and ExAc in this function), so we 
+	        	// can move on to building the feature matrix.
+	        	function(){
+		        	callback(theVcfData);
+		        }, 
+		        // This is the attribute on variant a (proband) and variant b (ExAC)
+		        // that will store whether the variant is unique or matches.
+		        'compareExAC',
+		    	// This is the callback function called every time we find the same variant
+		    	// in both sets. Here we take the ExAC variant's af and store it in the
+		    	// proband's variant for further sorting/display in the feature matrix.
+		        function(variantA, variantB) {
+		        	variantA.afExAC = variantB.af;
+		        });
+    	}, 
+    	// This is the attribute on variant a (proband) and variant b (1000G)
+		// that will store whether the variant is unique or matches.
+    	'compare1000G',
+    	// This is the callback function called every time we find the same variant
+    	// in both sets. Here we take the 1000G variant's af and store it in the
+    	// proband's variant for further sorting/display in the feature matrix.
+    	function(variantA, variantB) {
+    		variantA.af1000G = variantB.af;
+    	});
 
-		        callback(theVcfData);
-
-	        }, 'compareExAC' );
-    }, 'compare1000G' );
-
-}
-
-function getMatrixColumn(index) {
-	var theColumn = null;
-	matrixColumns.forEach(function(col) {
-		if (col.index == index) {
-			theColumn = col;
-		}
-	});
-	return theColumn;
 }
 
 
@@ -1084,8 +1114,8 @@ function fillFeatureMatrix(theVcfData) {
 		featureVcfData.features.push($.extend({}, variant));
 	});
 
-
-	matrixColumns = matrixColumns.sort(function(a, b) {
+	// Sort the matrix columns
+	matrixRows = matrixRows.sort(function(a, b) {
 		if (a.order == b.order) {
 			return 0;
 		} else if (a.order < b.order) {
@@ -1095,45 +1125,47 @@ function fillFeatureMatrix(theVcfData) {
 		}
 	});
 	
-	// Fill all criteria array for each variant
+	// Fill all features used in feature matrix for each variant
 	featureVcfData.features.forEach( function(variant) {
-		var features = [0,0,0,0,0,0,0];
-
-		// high impact
-		for (var key in variant.impact) {
-			if (key == 'HIGH') {
-				features[getMatrixColumn(0).order] = 1;
-				break;
-			} 
+		var features = [];
+		for (var i = 0; i < matrixRows.length; i++) {
+			features.push(null);
 		}
 
-		// adequate coverage
-		if (variant.combinedDepth != null && variant.combinedDepth != '' && variant.combinedDepth >= coverageMin) {
-			features[getMatrixColumn(1).order] = 1;
-		}
-
-		// unique freebayes call
-		if (variant.consensus == 'unique2') {
-			features[getMatrixColumn(2).order] = 1;
-		}
-
-		// variant in proband, not present in unaffected relatives
-		features[getMatrixColumn(3).order] = 1;
-
-		// hom variant in proband, het or non-existent in parents
-		features[getMatrixColumn(4).order] = 1;
-
-
-		// variant not present in 1000 genomes
-		if (variant.compare1000G == 'unique1') {
-			features[getMatrixColumn(5).order] = 1;
-		} 
-
-
-		//variant not present in ExAC
-		if (variant.compareExAC == 'unique1') {
-			features[getMatrixColumn(6).order] = 1;
-		} 
+		matrixRows.forEach( function(col) {
+			var rawValue = variant[col.attribute];
+			var mappedValue = null;
+			if (col.match == 'exact') {
+				// We are going to get the mapped value through exact match,
+				// so this will involve a simple associative array lookup.
+				// Some features (like impact) are multi-value and are stored in a
+				// an associative array.  In this case, we loop through the feature
+				// values, keeping the lowest (more important) mapped value.
+				if (isDictionary(rawValue)) {
+					// Iterate through the objects in the associative array.
+					// Keep the lowest mapped value
+					for (val in rawValue) {
+						var aMappedValue = col.map[val];
+						if (mappedValue == null || aMappedValue < mappedValue) {
+							mappedValue = aMappedValue;
+						}
+					}
+				} else {
+					mappedValue = col.map[rawValue];
+				}
+			} else if (col.match == 'range') {
+				// If this feature is a range, get the mapped value be testing if the
+				// value is within a min-max range.
+				if (isNumeric(rawValue)) {
+					col.map.forEach( function(rangeEntry) {
+						if (+rawValue >= rangeEntry.min && +rawValue < rangeEntry.max) {
+							mappedValue = rangeEntry.value;
+						}
+					});
+				}
+			}
+			features[col.order] = mappedValue ? mappedValue : featureUnknown;
+		});
 
 		variant.features = features;
 	});
@@ -1141,31 +1173,33 @@ function fillFeatureMatrix(theVcfData) {
 	var sortedFeatures = featureVcfData.features.sort(function (a, b) {
 	  var featuresA = "";
 	  var featuresB = "";
-	  featuresA = a.features.join();
-	  featuresB = b.features.join();
-	  /*
-	  for (var i = 0; i < matrixColumns.length; i++) {
-	  	featuresA += a.features[matrixColumns[i].order] + "-";
-	  	featuresB += b.features[matrixColumns[i].order] + "-";
+	  
+	  // The features have been initialized in the same order as
+	  // the matrix column order. In each interation,
+	  // exit with -1 or 1 if we have non-matching values;
+	  // otherwise, go to next iteration.  After iterating
+	  // through every column, if we haven't exited the
+	  // loop, that means all features of a and b match
+	  // so return 0;
+	  for (var i = 0; i < matrixRows.length; i++) {
+	  	if (a.features[i] < b.features[i]) {
+	  		return -1;
+	  	} else if (a.features[i] > b.features[i]) {
+			return 1;
+		} else {
+		}
 	  }
-	  */
-	  if (featuresA < featuresB) {
-	    return 1;
-	  }
-	  if (featuresA > featuresB) {
-	    return -1;
-	  }
-	  // a must be equal to b
 	  return 0;
 	});
-	// Get the top 50 variants
+
+	// Get the top 30 variants
 	var topFeatures = sortedFeatures.splice(0, 30);
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
 
 	// Load the chart with the new data
-	var colNames = matrixColumns.map(function(col){
+	var colNames = matrixRows.map(function(col){
 		return col.name;
 	});
 	featureMatrix.columnNames(colNames);
@@ -1189,20 +1223,43 @@ function variantTooltipHTML(variant, rowIndex) {
 	}
 		impactDisplay += key;
 	}   
-	return (variant.type + ': ' 
-	    	 	+ variant.start 
-	    	 	+ (variant.end > variant.start+1 ?  ' - ' + variant.end : "")
-	    	 	+ '<br>ref: ' + variant.ref 
-				+ '<br>alt: ' + variant.alt
-				+ '<br>effect: ' + effectDisplay
-				+ '<br>impact: ' + impactDisplay 
-				+ (variant.qual != '' ? ('<br>qual: ' +  variant.qual) : '') 
-				+ (variant.filter != '.' ? ('<br>filter: ' + variant.filter) : '') 
-				+ '<br>allele freq: ' + variant.af
-				+ '<br>combined depth: ' + variant.combinedDepth 
-				+ (variant.zygosity != null ? ('<br>zygosity: ' + variant.zygosity) : '')
-	    	 );                    
+	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
+	var refalt = variant.ref + "->" + variant.alt;
+	return (
+		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
+		+ tooltipRow('Impact', impactDisplay)
+		+ tooltipRow('Effect', effectDisplay)
+		+ tooltipRow('ClinVar', variant.clinvar )
+		+ tooltipRow('Qual', variant.qual) 
+		+ tooltipRow('Filter', variant.filter) 
+		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
+		+ tooltipRow('Zygosity', variant.zygosity)
+		+ tooltipRow('Inheritance',  variant.inheritance)
+		+ tooltipRow('AF', variant.af) 
+		+ tooltipRow('&nbsp;1000G', variant.af1000G)
+		+ tooltipRow('&nbsp;ExAC', variant.afExAC)
+	);                    
 
+}
+
+function tooltipRow(label, value) {
+	if (value && value != '') {
+		return '<div class="row">'
+		      + '<div class="col-md-4">' + label + '</div>'
+		      + '<div class="col-md-8">' + value + '</div>'
+		      + '</div>';
+	} else {
+		return "";
+	}
+}
+function tooltipRowNoLabel(value) {
+	if (value && value != '') {
+		return '<div class="row" style="text-align:center">'
+		      + '<div class="col-md-12">' + value + '</div>'
+		      + '</div>';
+	} else {
+		return "";
+	}
 }
 
 
@@ -1259,10 +1316,23 @@ function cullVariantFilters() {
     	$('#effect-filter-box #more-effect-link').addClass('hide');
 
     }
+}
 
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
 
-
-
+function isDictionary(obj) {
+  if(!obj) {
+  	return false;
+  } 
+  if(Array.isArray(obj)) {
+  	return false;
+  }
+  if (obj.constructor != Object) {
+  	return false;
+  }
+  return true;
 }
 
 

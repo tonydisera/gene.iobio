@@ -285,7 +285,7 @@ a, a:hover, a:focus {
   font-size: 11px;
   color: rgb(102, 88, 92);
   fill: rgb(102, 88, 92);
-  margin-top: 5px;
+  margin-top: 10px;
   overflow-y: auto;
 }
 
@@ -586,7 +586,6 @@ header {
 
 
 
-
 .brush .extent {
   stroke: #000;
   fill-opacity: .125;
@@ -596,16 +595,17 @@ header {
 
 .tooltip {   
   position: absolute;           
-  text-align: center;           
   z-index:20;
   color:white;
   padding: 4px 6px 4px 6px;             
-  font: 11px arial;        
+  font-size: 9px;        
   background: rgb(80,80,80);   
   border: 0px;      
   border-radius: 4px;           
   pointer-events: none;         
 }
+
+
 
 
 .variant {

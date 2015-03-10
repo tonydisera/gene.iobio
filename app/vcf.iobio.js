@@ -959,7 +959,7 @@ var effectCategories = [
   }
 
 
-  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr) {
+  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr, onMatchCallback) {
     var set1Label = 'unique1';
     var set2Label = 'unique2';
     var commonLabel = 'common';
@@ -1004,6 +1004,7 @@ var effectCategories = [
           if (variant1.ref == variant2.ref && variant1.alt == variant2.alt) {
             variant1[comparisonAttribute] =  commonLabel;
             variant2[comparisonAttribute] =  commonLabel;
+            onMatchCallback(variant1, variant2);
 
             variants1.countMatch++;
             variants2.countMatch++;

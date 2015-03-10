@@ -67,7 +67,7 @@ function featureMatrixD3() {
                         .scale(y)
                         .orient("left")
                         .outerTickSize(0)   
-                        .ticks(matrixColumns.length);
+                        .ticks(matrixRows.length);
                        
                         
       
@@ -114,7 +114,7 @@ function featureMatrixD3() {
 
       // Create the y-axis at the top.  This will show the labels for the rows 
       svg.selectAll(".y.axis").remove();    
-      svg.selectAll("g.y").data([matrixColumns]).enter()
+      svg.selectAll("g.y").data([matrixRows]).enter()
           .append("g")
           .attr("class", "y axis")
           .attr("transform", "translate(0," + columnLabelHeight + ")")
