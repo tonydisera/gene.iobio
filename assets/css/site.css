@@ -36,15 +36,39 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 
 #feature-matrix .y.axis .tick .up polygon,
 #feature-matrix .y.axis .tick .down polygon {
-   fill:  lightgrey;
+   fill:  #3586C0;
    stroke: black;
+   stroke-opacity: .55;
    stroke-width: 1px;
 }
+
+#feature-matrix .y.axis .tick text:hover,
+#feature-matrix .y.axis .tick text:hover {
+   font-weight: bold;
+   fill: rgb(53, 134, 192);
+}
+
+#feature-matrix .y.axis .tick text.current,
+#feature-matrix .y.axis .tick text.current {
+   font-weight: bold;
+   fill: rgb(53, 134, 192);
+}
+
 
 #feature-matrix .y.axis .tick .up polygon:hover,
 #feature-matrix .y.axis .tick .down polygon:hover {
    cursor: pointer;
 }
+
+#feature-matrix .y.axis .tick {
+    pointer-events: all;
+}
+#feature-matrix .y.axis .tick .up.faded,
+#feature-matrix .y.axis .tick .down.faded
+{
+    opacity: .3 !important;
+}
+
 
 
 #nav-section {
@@ -245,7 +269,7 @@ a, a:hover, a:focus {
 
 #bam-track {
   margin-bottom: 0px ;
-  margin-top: -30px ;
+  margin-top: -20px ;
   margin-left: 0px;
   margin-right: 0px;
   padding: 0px;
@@ -499,6 +523,17 @@ header {
     margin-top: 10px; 
 }
 
+#bam-depth .circle {
+  stroke:  rgb(79, 110, 229);
+  fill: none;
+  stroke-width: 2;
+}
+#bam-depth .circle-label {
+   fill:rgb(79, 110, 229);
+   font-size: 10px;
+   font-weight: bold;
+}
+
 
 .bar {
   stroke: black;
@@ -609,8 +644,10 @@ header {
 
 
 .variant {
-  stroke-width: 1px;
   opacity: 1;
+  stroke: #000;
+  stroke-width: 1px;
+  stroke-opacity: .2;
 }
 /*
 .snp,  .del,  .ins { 
@@ -655,41 +692,25 @@ header {
 
 .variant.compare_unique1{
   fill: #D7D6D6 !important;
-  stroke: #848181 !important
 }
-
 .variant.compare_unique2{
   fill: #FFCC2A !important;
-  stroke: #997912 !important;
-
 }
 
 .variant.compare_common{
   fill: rgb(255, 255, 255);
-  stroke: rgb(124, 109, 109);
 }
-
 .variant.impact_HIGH{
   fill: rgb(215,48,39);
-  stroke: #000;
-  stroke-opacity: .2;
 } 
 .variant.impact_MODERATE{
-  fill: rgb(253,174,97);
-  stroke: #000;
-  stroke-opacity: .2;
+  fill: rgb(239, 109, 86);
 } 
 .variant.impact_MODIFIER{
-  /* fill: rgb(116,173,209); */
-  fill:  rgb(186,186,186);
-  stroke: #000;
-  stroke-opacity: .2;
+  fill: rgb(173, 199, 221);
 }
 .variant.impact_LOW { 
-  /* fill: rgb(224,243,248); */
-  fill:  rgb(224,224,224);;
-  stroke: #000;
-  stroke-opacity: .2;
+  fill: rgb(195, 242, 255);
 }
 .variant.impact_NOIMPACT { 
   fill: #FAF5BE;
@@ -697,94 +718,66 @@ header {
 }
 
 
-
-
-
 .variant.effect_frameshift{
   fill: #A95959;
-  stroke: #891616;
 } 
 .variant.effect_missense{
   fill: rgb(13, 236, 210);
-  stroke: rgb(142, 145, 145);
 } 
 .variant.effect_splice_acceptor{
   fill: rgb(150, 143, 236);
-  stroke: rgb(80, 77, 121);
 } 
 .variant.effect_splice_donor{
   fill: #FFE216;
-  stroke: #B27619;
 } 
 .variant.effect_regulatory{
   fill: #3d8901;
-  stroke: #1E340D;
 } 
 .variant.effect_splice{
   fill: rgb(234, 216, 90);
-  stroke: rgb(182, 150, 55);
 }
 .variant.effect_exon_loss{
   fill: #0CBEA3;
-  stroke: #137E83;
 }
 .variant.effect_other{
   fill: rgb(187, 187, 187);
-  stroke: rgb(124, 109, 109);
 }
 .variant.effect_indel {
   fill: #fb9a99;
-  stroke: #AE6362;
 }
 .variant.effect_utr {
   fill: #D5A8D7;
-  stroke: #882626;
 }
 .variant.effect_stop_lost {
   fill: #F48E45;
-  stroke: #C36F33;
 }
 .variant.effect_start_lost {
   fill: #D07583;
-  stroke: #903B48;
 }
 .variant.effect_stop_gained {
   fill: #D0DB21;
-  stroke: #767C14;
 }
 .variant.effect_rare_amino_acid{
   fill: rgb(234, 216, 90);
-  stroke: rgb(182, 150, 55);
 }
 .variant.effect_chromosome{
   fill: #b2df8a;
-  stroke: #80A65F;
 } 
 .variant.effect_coding{
   fill: #7BBA49;
-  stroke: #709D4D;
 } 
 .variant.effect_synonymous{
   fill: #ADC9E8;
-  stroke: #6187B2;
 }
 .variant.effect_exon{
   fill: rgb(150, 143, 236);
-  stroke: rgb(80, 77, 121);
 } 
-
 .variant.effect_other { 
   fill: rgb(187, 187, 187);
-  stroke: rgb(124, 109, 109)
 }
 .variant.effect_NOEFFECT { 
   fill: #FAF5BE;
-  stroke: #807D7D;
 }
-
-
-
-
 
 
 .variant.unique2 {

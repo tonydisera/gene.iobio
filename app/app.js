@@ -190,9 +190,9 @@ function init() {
 
 	featureMatrix = featureMatrixD3()
 					    .margin({top: 0, right: 4, bottom: 4, left: 24})
-					    .cellSize(20)
+					    .cellSize(40)
 					    .columnLabelHeight(90)
-					    .rowLabelWidth(160)
+					    .rowLabelWidth(50)
 					    .tooltipHTML(variantTooltipHTML)
 					    .on('d3click', function(variant) {
 					    	if (variantCards.length > 0) {
@@ -1199,10 +1199,7 @@ function fillFeatureMatrix(theVcfData) {
 	$("#matrix-track .loader").css("display", "none");
 
 	// Load the chart with the new data
-	var colNames = matrixRows.map(function(col){
-		return col.name;
-	});
-	featureMatrix.columnNames(colNames);
+	featureMatrix.matrixRows(matrixRows);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);    
     this.featureMatrix(selection);
 }

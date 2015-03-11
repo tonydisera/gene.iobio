@@ -25,6 +25,9 @@ lineD3 = function module() {
     return { x: xn, y: yn };
   }
 
+  var formatCircleText = function(pos, depth) {
+        return pos + ',' + depth;
+  }
   var showCircle = function(start) {
     // Find the closest position in the data
     d = null;
@@ -45,29 +48,36 @@ lineD3 = function module() {
       var posx = d3.round(pos(d));
       var depthy = d3.round(depth(d));
 
-      var tooltipText = 'base coverage ' + parseInt(depthy);
-
-      var labelX = mousex + margin.left - 50;
-      var labelY =  55; //mousey + margin.top - 25;
-
-      console.log(labelX + ' ' + width);
-
-      if (labelX > width - 75) {
-        labelX  = width - 75;
-      } else if (labelX < 25) {
-        labelX = 0;
-      }
+   
+      var circleText = formatCircleText(posx, depthy);
 
       var label = container.select(".circle-label");
       label.transition()
            .duration(200)
           .style("opacity", 1);
-      label.attr("x", labelX)
-           .attr("y", labelY )
+      label.attr("x", 0)
+           .attr("y", margin.top)
            .attr("class", "circle-label")           
-           .text(tooltipText);
+           .text(circleText);
 
-
+      container.select(".circle-label")
+               .attr( "x", function (d,i) {
+                  var w = this.getBBox().width;
+                  var x = mousex + margin.left - (w/2);
+    
+                  if (x + (w/2) > width) {
+                    // If the circle label is too far to the right,
+                    // position it as far right as possible without
+                    // truncating the text.
+                    x  = width - (w/2);
+                  } else if (x - (w/2) < 0) {
+                    // If the circle label is position out-of-bounds
+                    // from the area, position the label to
+                    // start at x position 0;
+                    x = 0;
+                  }
+                  return x;
+               });
 
       var circle = container.select(".circle");
       circle.transition()
@@ -158,17 +168,12 @@ lineD3 = function module() {
           .attr("cx", 0)
           .attr("cy", 0)
           .attr("r", 4)
-          .style("fill", "none")
-          .style("stroke", "red")               
-          .style("stroke-width", "2")               
           .style("opacity", 0);
       var circleLabel = svg.selectAll(".circle-label").data([0])
         .enter().append('text')
           .attr("class", "circle-label")
           .attr("x", 0)
           .attr("y", 0)
-          .style("fill", "red")
-          .style("font-size", "11px")
           .style("opacity", 0);
 
       if (kind == KIND_AREA && showGradient) {
@@ -518,6 +523,12 @@ lineD3 = function module() {
   exports.xEnd = function(_) {
     if (!arguments.length) return xEnd;
     xEnd = _;
+    return exports;
+  }
+
+  exports.formatCircleText = function(_) {
+    if (!arguments.length) return formatCircleText;
+    formatCircleText = _;
     return exports;
   }
 

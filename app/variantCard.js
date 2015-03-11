@@ -134,7 +134,10 @@ VariantCard.prototype.init = function(cardSelector, cardIndex) {
 							.showYAxis(false)
 							.showTooltip(true)
 							.pos( function(d) { return d[0] })
-					   		.depth( function(d) { return d[1] });
+					   		.depth( function(d) { return d[1] })
+					   		.formatCircleText( function(pos, depth) {
+					   			return parseInt(depth) + 'x' ;
+					   		});
 
 
 		// Create the vcf track
