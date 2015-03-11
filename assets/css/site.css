@@ -7,6 +7,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   font-size: 18px;
 }
 
+.material-dropdown .form-control { background: white;}
 
 #feature-matrix rect {
   fill: none;
@@ -880,7 +881,29 @@ header {
 #datasource-button {
   margin-left: 30px;
   margin-bottom: 1px;
+  visibility: hidden;
 
+}
+
+#add-datasource-container {
+  margin-top: 150px;
+  width:100%;
+  text-align:center;
+  position: relative;
+}
+#add-datasource-container i {
+  font-size: 55px;
+  margin-right: 5px;
+}
+
+#datasource-dialog .twitter-typeahead { width: 100%;}
+
+#add-datasource-button {  
+  font-size: 40px;    
+  line-height: 55px;
+  padding: 25px;
+  padding-bottom: 20px;
+  background: white;
 }
 
 .icon-button {
@@ -924,6 +947,8 @@ header {
   font-size: 18px; 
   vertical-align: middle !important;
 }
+
+
 
 /* 
  * results

@@ -35,6 +35,14 @@ VariantCard.prototype.setName = function(theName) {
 	}
 }
 
+VariantCard.prototype.setRelationship = function(theRelationship) {
+	if (theRelationship) {
+		this.relationship = theRelationship;
+	} else {
+		return theRelationship;
+	}
+}
+
 VariantCard.prototype.getCardIndex = function() {
 	return this.cardIndex;
 }
@@ -77,7 +85,7 @@ VariantCard.prototype.isDirty = function() {
 	return this.dirty;
 }
 VariantCard.prototype.init = function(cardSelector, cardIndex) {
-	var me = this;
+	var me = this;	
 
 	this.d3CardSelector = d3.selectAll("#variant-cards .variant-card").filter(function(d, i) { return i == +cardIndex; });
 	this.cardSelector = cardSelector;
@@ -340,6 +348,10 @@ VariantCard.prototype.getVcfName = function() {
 
 VariantCard.prototype.getName = function() {
 	return this.name;
+}
+
+VariantCard.prototype.getRelationship = function() {
+	return this.relationship;
 }
 
 /* 

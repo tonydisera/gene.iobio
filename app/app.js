@@ -249,9 +249,16 @@ function initDataSourceDialog() {
   	});
 }
 
+function moveDataSourcesButton() {
+	$('#add-datasource-button').css('display', 'none');
+	$('#datasource-button').css('visibility', 'visible');
+}
+
 function loadUrlSources() {
 	var gene = getUrlParameter('gene');
 	if (gene != undefined) {
+		// move data source button
+		moveDataSourcesButton();
 		// load gene
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, callback:function(){
 				// run after gene has been loaded
@@ -330,6 +337,8 @@ function initDataSourceFields() {
 		$('#datasource-dialog #vcf-file-info').val(variantCard.getVcfName());
 	}	
 	$('#datasource-dialog #datasource-name').val(variantCard.getName());
+	var rel = variantCard.getRelationship();	
+	$('.material-dropdown li[value="' + rel + '"]').click();	
 }
 
 function initTranscriptControls() {
@@ -649,7 +658,11 @@ function loadGeneWidget() {
 
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];		    	
+		    	window.gene = response[0];		    
+		    	// set all searches to correct gene	
+		    	$('.typeahead.tt-input').val(window.gene.gene_name);
+		    	moveDataSourcesButton();
+		    	
 		    	window.selectedTranscript = null;
 		    	loadTracksForGene();
 		    	// add gene to url params
@@ -832,6 +845,7 @@ function addVariantCard() {
 
 
 	$('#datasource-dialog #datasource-name').val(defaultName);
+	$('.material-dropdown li[value="none"]').click();	
 	$('#datasource-dialog #bam-file-info').addClass("hide");
 	$('#datasource-dialog #bam-url-input').addClass("hide");
 	$('#datasource-dialog #vcf-file-info').addClass("hide");
@@ -888,6 +902,7 @@ function displayBamUrlBox() {
     $('#datasource-dialog #bam-url-input').removeClass("hide");
     $("#datasource-dialog #bam-url-input").focus();
     $('#datasource-dialog #bam-url-input').val('http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam');
+    onBamUrlEntered();
 	
 
 }
@@ -898,7 +913,7 @@ function displayUrlBox() {
     $("#url-input").focus();
     $('#datasource-dialog #vcf-file-info').addClass('hide');
     $('#datasource-dialog #vcf-file-info').val('');
-
+    onVcfUrlEntered();
 }
 function onVcfFileButtonClicked() {	
 	$('#datasource-dialog #vcf-file-info').removeClass("hide");
@@ -936,24 +951,35 @@ function setDataSourceName() {
 
 }
 
-
-function loadDataSources() {	
-	if ($('#bam-url-input').val() != '') {
-		onBamUrlEntered();
-	}
-	if ($('#url-input').val() != '') {
-		onVcfUrlEntered();
-	}
-
-	var dataSourceName = $('#datasource-name').val();
-
+function setDataSourceRelationship() {		
 	var cardIndex = $('#datasource-dialog #card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
+	var dsRelationship = $('#datasource-relationship').val();
+	variantCard.setRelationship(dsRelationship);	
+}
+
+function loadNewDataSources() {
+	// check if gene is selected
+	if(window.gene && window.gene != "") {
+		$('#datasource-dialog').modal('hide');
+		loadDataSources();	
+		// set search box back to no border
+		$('#datasource-dialog .twitter-typeahead').css('border', 'none');		
+	}
+	else {
+		$('#datasource-dialog .twitter-typeahead').css('border', '1px solid red');
+	}
+	
+}
+
+function loadDataSources() {	
+	// hide add data button
+	$('#add-datasource-container').css('display', 'none');
 
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isDirty()) {
-			variantCard.loadDataSources(dataSourceName);
+			variantCard.loadDataSources(variantCard.getName());
 			variantCard.setDirty(false);
 		}
 	});
