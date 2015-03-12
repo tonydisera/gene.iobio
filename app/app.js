@@ -55,21 +55,90 @@ var coverageMin = 10;
 
 // feature matrix (ranked variants)
 var featureVcfData = null;
-var featureMatrix = null;
-var clinvarMap     =   {Y: 1,       N: 2};
-var impactMap      =   {HIGH: 1,    MODERATE: 2,  MODIFIER: 3,  LOW: 4};
-var inheritanceMap =   {denovo: 1,  recessive: 2};
-var afMap          = [ {min: +0,    max: +.1, value: +1},	 // note: min is inclusive, max is exlusive
-                       {min: +.1,   max: +.2, value: +2},	
-                       {min: +.2,   max: +.3, value: +3},	
-                       {min: +.3,   max: +.4, value: +4},	
-                       {min: +.4,   max: +.5, value: +5},	
-                       {min: +.5,   max: +.6, value: +6},	
-                       {min: +.6,   max: +.7, value: +7},	
-                       {min: +.7,   max: +.8, value: +8},	
-                       {min: +.8,   max: +.9, value: +9},	
-                       {min: +.9,   max: +1,  value: +10}	
-];
+var featureMatrix  = null;
+var showClinVarSymbol = function (selection) {
+	selection.append('path')
+             .attr("d", d3.svg.symbol().type('cross').size(80) )
+             .attr('class', 'clinvar')    
+             .attr("transform", function(d) { 
+                var xCoord = 20;
+                var yCoord = 20;
+                var tx = "translate(" + xCoord + "," + yCoord + ")"; 
+                return tx;
+              });
+};
+var showAfSymbol = function(selection) {
+	var mappedValue = selection.datum().rank;
+	selection.append("rect")
+	         .attr('class', 'af')
+	         .attr("x", 1)
+	         .attr("y", 20)
+	         .attr("width", mappedValue * 3)
+	         .attr("height", 5);
+};
+var showRecessiveSymbol = function (selection) {
+	selection.append('rect')           
+             .attr('class', 'father')    
+             .attr('x', 3)
+             .attr('y', 6)
+             .attr('width', 9)
+             .attr('height', 9)
+             .style('stroke',  'black')
+    		 .style('stroke-width', 2)
+      		 .style('fill',  'none');
+
+	selection.append('circle')           
+             .attr('class', 'mother')    
+             .attr('cx', 30)
+             .attr('cy', 10)
+             .attr('r', 5)
+             .style('stroke',  'black')
+    		 .style('stroke-width', 2)
+      		 .style('fill',  'none');
+
+	selection.append('rect')           
+             .attr('class', 'proband')    
+             .attr('x', 15)
+             .attr('y', 25)
+             .attr('width', 9)
+             .attr('height', 9)
+             .style('stroke',  'black')
+    		 .style('stroke-width', 2)
+      		 .style('fill',  'none');
+
+};
+var showDeNovoSymbol = function (selection) {
+	
+};
+var showNoInheritSymbol = function (selection) {
+	
+};
+var clinvarMap     = {  Y: {value: 1, clazz: 'clinvar', symbolFunction: showClinVarSymbol},
+                        N: {value: 2, clazz: ''}
+                     };
+var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH'},    
+                        MODERATE: {value: 2, clazz: 'impact_MODERATE'},  
+                        MODIFIER: {value: 3, clazz: 'impact_MODIFIER'},
+                        LOW:      {value: 4, clazz: 'impact_LOW'}
+                     };
+var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction: showDeNovoSymbol},  
+                        recessive: {value: 2, clazz: 'recessive', symbolFunction: showRecessiveSymbol},
+                        none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
+                     };
+// For af range, min is inclusive, max is exlusive
+var afMap          = [ {min: +0,    max: +.1, value: +1,  clazz: 'blues_1',  symbolFunction: showAfSymbol},	
+                       {min: +.1,   max: +.2, value: +2,  clazz: 'blues_2',  symbolFunction: showAfSymbol},	
+                       {min: +.2,   max: +.3, value: +3,  clazz: 'blues_3',  symbolFunction: showAfSymbol},	
+                       {min: +.3,   max: +.4, value: +4,  clazz: 'blues_4',  symbolFunction: showAfSymbol},	
+                       {min: +.4,   max: +.5, value: +5,  clazz: 'blues_5',  symbolFunction: showAfSymbol},	
+                       {min: +.5,   max: +.6, value: +6,  clazz: 'blues_6',  symbolFunction: showAfSymbol},	
+                       {min: +.6,   max: +.7, value: +7,  clazz: 'blues_7',  symbolFunction: showAfSymbol},	
+                       {min: +.7,   max: +.8, value: +8,  clazz: 'blues_8',  symbolFunction: showAfSymbol},	
+                       {min: +.8,   max: +.9, value: +9,  clazz: 'blues_9',  symbolFunction: showAfSymbol},	
+                       {min: +.9,   max: +1,  value: +10, clazz: 'blues_10', symbolFunction: showAfSymbol}	
+                      ];
+
+
 var matrixRows = [
 	{name:'Impact'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
 	{name:'ClinVar'             ,order:1, index:1, match: 'exact', attribute: 'clinvar',     map: clinvarMap },
@@ -217,7 +286,7 @@ function init() {
 					    		column.order = column.order - 1;
 					    		columnPrev.order = columnPrev.order + 1;
 					    	}
-					    	fillFeatureMatrix(featureVcfData);
+					    	fillFeatureMatrix();
 					    	
 					    })
 					    .on('d3rowdown', function(i) {
@@ -234,7 +303,7 @@ function init() {
 					    		column.order = column.order + 1;
 					    		columnNext.order = columnNext.order - 1;
 					    	}
-					    	fillFeatureMatrix(featureVcfData);
+					    	fillFeatureMatrix();
 
 					    });
 
@@ -1108,11 +1177,13 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 
 
 function fillFeatureMatrix(theVcfData) {
-	featureVcfData = {};
-	featureVcfData.features = [];
-	theVcfData.features.forEach(function(variant) {
-		featureVcfData.features.push($.extend({}, variant));
-	});
+	if (theVcfData != null) {
+		featureVcfData = {};
+		featureVcfData.features = [];
+		theVcfData.features.forEach(function(variant) {
+			featureVcfData.features.push($.extend({}, variant));
+		});
+	}
 
 	// Sort the matrix columns
 	matrixRows = matrixRows.sort(function(a, b) {
@@ -1132,39 +1203,70 @@ function fillFeatureMatrix(theVcfData) {
 			features.push(null);
 		}
 
-		matrixRows.forEach( function(col) {
-			var rawValue = variant[col.attribute];
+		matrixRows.forEach( function(matrixRow) {
+			var rawValue = variant[matrixRow.attribute];
+			var theValue    = null;
 			var mappedValue = null;
-			if (col.match == 'exact') {
-				// We are going to get the mapped value through exact match,
-				// so this will involve a simple associative array lookup.
-				// Some features (like impact) are multi-value and are stored in a
-				// an associative array.  In this case, we loop through the feature
-				// values, keeping the lowest (more important) mapped value.
-				if (isDictionary(rawValue)) {
-					// Iterate through the objects in the associative array.
-					// Keep the lowest mapped value
-					for (val in rawValue) {
-						var aMappedValue = col.map[val];
-						if (mappedValue == null || aMappedValue < mappedValue) {
-							mappedValue = aMappedValue;
-						}
-					}
-				} else {
-					mappedValue = col.map[rawValue];
-				}
-			} else if (col.match == 'range') {
-				// If this feature is a range, get the mapped value be testing if the
-				// value is within a min-max range.
-				if (isNumeric(rawValue)) {
-					col.map.forEach( function(rangeEntry) {
-						if (+rawValue >= rangeEntry.min && +rawValue < rangeEntry.max) {
-							mappedValue = rangeEntry.value;
-						}
-					});
-				}
+			var mappedClazz = null;
+			var symbolFunction = null;
+			// Fake the clinvar, inheritance data for now
+			if (matrixRow.attribute == 'clinvar') {
+				rawValue = Math.random() > .5 ? 'Y' : 'N';
 			}
-			features[col.order] = mappedValue ? mappedValue : featureUnknown;
+			if (matrixRow.attribute == 'inheritance') {
+				rawValue = Math.random() > .5 ? 'recessive' : 'none';
+			}
+			if (rawValue != null) {
+				if (matrixRow.match == 'exact') {
+					// We are going to get the mapped value through exact match,
+					// so this will involve a simple associative array lookup.
+					// Some features (like impact) are multi-value and are stored in a
+					// an associative array.  In this case, we loop through the feature
+					// values, keeping the lowest (more important) mapped value.
+					if (isDictionary(rawValue)) {
+						// Iterate through the objects in the associative array.
+						// Keep the lowest mapped value
+						for (val in rawValue) {
+							var entry = matrixRow.map[val];
+							if (mappedValue == null || entry.value < mappedValue) {
+								mappedValue = entry.value;
+								mappedClazz = entry.clazz;
+								symbolFunction = entry.symbolFunction;
+								theValue = val;
+							}
+						}
+					} else {
+						mappedValue = matrixRow.map[rawValue].value;
+						mappedClazz = matrixRow.map[rawValue].clazz;
+						symbolFunction = matrixRow.map[rawValue].symbolFunction;
+						theValue = rawValue;
+
+					}
+				} else if (matrixRow.match == 'range') {
+					// If this feature is a range, get the mapped value be testing if the
+					// value is within a min-max range.
+					if (isNumeric(rawValue)) {
+						theValue = d3.format(",.3%")(+rawValue);
+						matrixRow.map.forEach( function(rangeEntry) {
+							if (+rawValue >= rangeEntry.min && +rawValue < rangeEntry.max) {
+								mappedValue = rangeEntry.value;
+								mappedClazz = rangeEntry.clazz;
+								symbolFunction = rangeEntry.symbolFunction;
+							}
+						});
+					}
+				}
+
+			} else {
+				rawValue = '';
+				mappedClazz = '';
+			}
+			features[matrixRow.order] = { 
+				                    'value': theValue, 
+				                    'rank': (mappedValue ? mappedValue : featureUnknown), 
+				                    'clazz': mappedClazz,
+				                    'symbolFunction': symbolFunction
+				                  };
 		});
 
 		variant.features = features;
@@ -1182,9 +1284,9 @@ function fillFeatureMatrix(theVcfData) {
 	  // loop, that means all features of a and b match
 	  // so return 0;
 	  for (var i = 0; i < matrixRows.length; i++) {
-	  	if (a.features[i] < b.features[i]) {
+	  	if (a.features[i].rank < b.features[i].rank) {
 	  		return -1;
-	  	} else if (a.features[i] > b.features[i]) {
+	  	} else if (a.features[i].rank > b.features[i].rank) {
 			return 1;
 		} else {
 		}
@@ -1193,7 +1295,7 @@ function fillFeatureMatrix(theVcfData) {
 	});
 
 	// Get the top 30 variants
-	var topFeatures = sortedFeatures.splice(0, 30);
+	var topFeatures = sortedFeatures.slice(0, sortedFeatures.length);
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
