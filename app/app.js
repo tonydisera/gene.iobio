@@ -1254,7 +1254,7 @@ function fillFeatureMatrix(theVcfData) {
 						// Keep the lowest mapped value
 						for (val in rawValue) {
 							var entry = matrixRow.map[val];
-							if (mappedValue == null || entry.value < mappedValue) {
+							if (entry != null && (mappedValue == null || entry.value < mappedValue)) {
 								mappedValue = entry.value;
 								mappedClazz = entry.clazz;
 								symbolFunction = entry.symbolFunction;

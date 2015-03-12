@@ -1004,7 +1004,12 @@ var effectCategories = [
           if (variant1.ref == variant2.ref && variant1.alt == variant2.alt) {
             variant1[comparisonAttribute] =  commonLabel;
             variant2[comparisonAttribute] =  commonLabel;
-            onMatchCallback(variant1, variant2);
+            if (onMatchCallback) {
+
+            }
+            if (onMatchCallback) {
+              onMatchCallback(variant1, variant2);
+            }
 
             variants1.countMatch++;
             variants2.countMatch++;
