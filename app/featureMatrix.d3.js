@@ -126,17 +126,6 @@ function featureMatrixD3() {
           .attr("dx", ".8em")
           .attr("dy", ".15em");
 
-      // Make up and down buttons more prominent when user mouses over row label.
-      /*
-      svg.selectAll(".y.axis .tick")
-          .on('mouseover', function(d,i) {
-            container.selectAll('.y.axis .up').classed("faded", true);
-            container.selectAll('.y.axis .down').classed("faded", true);
-            d3.select(this).selectAll(".up").classed("faded", i == 0);
-            d3.select(this).selectAll(".down").classed("faded", i == matrixRowNames.length - 1);
-          });
-      */
-
       // Add the up and down arrows to the x-axis
       svg.selectAll("g.y.axis .tick .up").remove();
       svg.selectAll("g.y.axis .tick")
@@ -153,7 +142,7 @@ function featureMatrixD3() {
             // the row that the user was moving is highlighted to show the
             // user what row we just shifted up or down..
             matrixRows.forEach( function(matrixRow) {
-              matrixRows[i].current = 'N';
+              matrixRow.current = 'N';
             });
             matrixRows[i].current = 'Y';
             container.select(".y.axis").selectAll("text").each( function(d1,i1) {
@@ -250,21 +239,51 @@ function featureMatrixD3() {
       
 
       // Generate cells
-      cols.selectAll('.cell').data(function(d) { 
+      var cells = cols.selectAll('.cell').data(function(d) { 
         return d['features'];
-      }).enter().append('rect')
-          .attr('class', function(d) { return "cell" + (d == '1' ? " on" : ""); })          
+      }).enter().append('g')
+          .attr('class', "cell") 
+          .attr('transform', function(d,i) {
+            return 'translate(0,' +  +(y(matrixRowNames[i]) + +y.rangeBand()) + ')';
+        });
+
+
+
+      cells.append('rect')
+          .attr('class', function(d,i) { 
+            return d.clazz;
+          })          
           .attr('x', function(d,i) { 
             return 0;
           })
           .attr('height', function(d, i) { 
-            return showTransition ? 0 : cellSize - 1; 
+            return cellSize - 1; 
           })
-          .attr('y', showTransition ? 0 : y(matrixRowNames[i]) + y.rangeBand())
-          .attr('width', cellSize - 1)
-          .style('fill', function(d, i) { 
-            return (d == '1' ? colorScale[matrixRowNames.length-1-i] : "lightgrey");
+          .attr('y', 0)
+          .attr('width', cellSize - 1);
+         
+
+
+      cells.append("text")
+          .text( function(d,i) {
+            return d.value;
+          })
+          .attr('class', 'hide')
+          .attr("x", 0)
+          .attr("y", function(d,i) { 
+            return (y.rangeBand()/2);
           });
+
+      var symbolCells = cells.filter( function(d,i) {
+              return matrixRows[i].symbol != null;
+           });
+
+      cells.each( function(d,i) {
+         var symbolFunction = d.symbolFunction;
+         if (symbolFunction) {
+           d3.select(this).call(symbolFunction);
+         }
+      });
 
       cols.append('rect')
           .attr('class', 'column-box')
@@ -318,6 +337,7 @@ function featureMatrixD3() {
 
 
       // update 
+      /*
       if (showTransition) {
         cols.transition()
             .duration(1000)
@@ -326,7 +346,7 @@ function featureMatrixD3() {
             });
 
 
-        cols.selectAll('.cell')
+        cols.selectAll('rect.cell')
               .transition()        
               .duration(1000)
               .attr('x', function(d,i) { 
@@ -343,6 +363,7 @@ function featureMatrixD3() {
               });
  
       }
+      */
     });
 
   }
