@@ -58,16 +58,17 @@ var featureVcfData = null;
 var featureMatrix  = null;
 var showClinVarSymbol = function (selection) {
 	selection.append('path')
-             .attr("d", d3.svg.symbol().type('cross').size(80) )
+             .attr("d", d3.svg.symbol().type('cross').size(40) )
              .attr('class', 'clinvar')    
              .attr("transform", function(d) { 
-                var xCoord = 20;
-                var yCoord = 20;
+                var xCoord = 15;
+                var yCoord = 15;
                 var tx = "translate(" + xCoord + "," + yCoord + ")"; 
                 return tx;
               });
 };
 var showAfSymbol = function(selection) {
+	/*
 	var mappedValue = selection.datum().rank;
 	selection.append("rect")
 	         .attr('class', 'af')
@@ -75,37 +76,11 @@ var showAfSymbol = function(selection) {
 	         .attr("y", 20)
 	         .attr("width", mappedValue * 3)
 	         .attr("height", 5);
+	 */
 };
 var showRecessiveSymbol = function (selection) {
-	selection.append('rect')           
-             .attr('class', 'father')    
-             .attr('x', 3)
-             .attr('y', 6)
-             .attr('width', 9)
-             .attr('height', 9)
-             .style('stroke',  'black')
-    		 .style('stroke-width', 2)
-      		 .style('fill',  'none');
-
-	selection.append('circle')           
-             .attr('class', 'mother')    
-             .attr('cx', 30)
-             .attr('cy', 10)
-             .attr('r', 5)
-             .style('stroke',  'black')
-    		 .style('stroke-width', 2)
-      		 .style('fill',  'none');
-
-	selection.append('rect')           
-             .attr('class', 'proband')    
-             .attr('x', 15)
-             .attr('y', 25)
-             .attr('width', 9)
-             .attr('height', 9)
-             .style('stroke',  'black')
-    		 .style('stroke-width', 2)
-      		 .style('fill',  'none');
-
+	selection.append("use")
+	          .attr("xlink:href", '#pedigree');
 };
 var showDeNovoSymbol = function (selection) {
 	
@@ -259,7 +234,7 @@ function init() {
 
 	featureMatrix = featureMatrixD3()
 					    .margin({top: 0, right: 4, bottom: 4, left: 24})
-					    .cellSize(40)
+					    .cellSize(30)
 					    .columnLabelHeight(90)
 					    .rowLabelWidth(50)
 					    .tooltipHTML(variantTooltipHTML)

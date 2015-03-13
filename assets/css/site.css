@@ -70,6 +70,17 @@ a.card-label, a.card-label:hover, a.card-label:focus {
     opacity: .3 !important;
 }
 
+.parent .left {
+  stroke: darkorange;
+}
+.parent .right {
+  stroke: grey;
+}
+.proband .left,
+.proband .right {
+  stroke: darkorange;
+}
+
 .clinvar {
   fill: red;  
 }
