@@ -327,20 +327,24 @@ function loadUrlSources() {
 
 				// load bam and vcf sources
 				// get all bam and vcf url params in hash
-				var bam = getUrlParameter(/bam*/) || '';
-				var vcf = getUrlParameter(/vcf*/) || '';		
+				var bam = getUrlParameter(/bam*/);
+				var vcf = getUrlParameter(/vcf*/);		
 				// load all bams and vcfs that have a bam pair
 				Object.keys(bam).forEach(function(name) {
 					if (addVC) addVariantCard();
 					else addVC = true;
 					$('#bam-url-input').val(bam[name])
+					onBamUrlEntered();
+
+					// check if there is a corresponding vcf file
 					var vcfName = 'vcf' + name.replace('bam','');
-					if( vcf[vcfName] != undefined ) {
+					if( vcf && vcf[vcfName] != undefined ) {
 						$('#url-input').val(vcf[vcfName]);
 						delete vcf[vcfName];
+						onVcfUrlEntered();
 					}
-					onBamUrlEntered();
-					onVcfUrlEntered();
+										
+					// load 
 					loadDataSources();
 				})		
 				// load vcfs that don't have a bam pair
