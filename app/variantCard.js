@@ -729,6 +729,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 		// A gene has been selected.  Read the variants for the gene region.
 
 		if (this.isViewable()) {
+			this.cardSelector.find("#vcf-track").removeClass("hide");
 			this.cardSelector.find("#vcf-track .loader").removeClass("hide");
 			this.cardSelector.find("#vcf-track .loader").css("display", "block");
 			this.cardSelector.find('#vcf-track .loader-label').text("Calling Variants with Freebayes");
@@ -757,6 +758,11 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					fbRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
 	                fbRecs.push(fbRec.join("\t"));
 			})
+			// determine whether refname has 'chr' in it or not
+			if (fbVariants[0].chrom.slice(0,3) == 'chr')
+				me.getVcfRefName = me.getRefName;
+			else 
+				me.getVcfRefName = me.stripRefName;
 			
 			if (me.isViewable()) {
 				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants in realtime")
@@ -766,18 +772,23 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					window.gene.strand, window.selectedTranscript, function(data){
 
 					me.fbData = data;
+					me.vcfData = me.vcfData || {
+						'start': data.start, 'end': data.end, 'strand': data.strand, 
+        				'variantRegionStart': data.variantRegionStart, 'name': 'vcf track', 
+        				'homCount': 0, 'hetCount': 0,
+        				'features': []
+        			}
 
 					// This may not be the first time we call freebayes, so to
 					// avoid duplicate variants, get rid of the ones
-					// we added last round.
+					// we added last round.					
 					me.vcfData.features = me.vcfData.features.filter( function(d) {
 						return d.consensus != 'unique2';
-					});
+					});					
 
 					// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 					// unique2 (only in freebayes set), or common (in both sets).				
-					me.vcf.compareVcfRecords(me.vcfData, me.fbData, function() {
-
+					me.vcf.compareVcfRecords(me.vcfData, me.fbData, function() {						
 
 				    	// Add unique freebayes variants to vcfData
 				    	me.fbData.features.forEach(function(d) {

@@ -330,30 +330,34 @@ function loadUrlSources() {
 				var bam = getUrlParameter(/bam*/);
 				var vcf = getUrlParameter(/vcf*/);		
 				// load all bams and vcfs that have a bam pair
-				Object.keys(bam).forEach(function(name) {
-					if (addVC) addVariantCard();
-					else addVC = true;
-					$('#bam-url-input').val(bam[name])
-					onBamUrlEntered();
+				if (bam != undefined) {
+					Object.keys(bam).forEach(function(name) {
+						if (addVC) addVariantCard();
+						else addVC = true;
+						$('#bam-url-input').val(bam[name])
+						onBamUrlEntered();
 
-					// check if there is a corresponding vcf file
-					var vcfName = 'vcf' + name.replace('bam','');
-					if( vcf && vcf[vcfName] != undefined ) {
-						$('#url-input').val(vcf[vcfName]);
-						delete vcf[vcfName];
-						onVcfUrlEntered();
-					}
-										
-					// load 
-					loadDataSources();
-				})		
+						// check if there is a corresponding vcf file
+						var vcfName = 'vcf' + name.replace('bam','');
+						if( vcf && vcf[vcfName] != undefined ) {
+							$('#url-input').val(vcf[vcfName]);
+							delete vcf[vcfName];
+							onVcfUrlEntered();
+						}
+											
+						// load 
+						loadDataSources();
+					})
+				}		
 				// load vcfs that don't have a bam pair
-				Object.keys(vcf).forEach(function(name) {
-					if (addVC) addVariantCard();
-					else addVC = true;
-					$('#url-input').val(vcf[name]);
-					loadDataSources();
-				});
+				if (vcf != undefined) {
+					Object.keys(vcf).forEach(function(name) {
+						if (addVC) addVariantCard();
+						else addVC = true;
+						$('#url-input').val(vcf[name]);
+						loadDataSources();
+					});
+				}
 			}
 		});		
 	}
