@@ -52,7 +52,7 @@ VariantCard.prototype.getCardIndex = function() {
  * visualized.
  */
 VariantCard.prototype.isViewable = function() {
-	return this.cardIndex == 0;
+	return this.relationship != 'mother' && this.relationship != 'father';
 }
 
 VariantCard.prototype.setDirty = function(flag) {
