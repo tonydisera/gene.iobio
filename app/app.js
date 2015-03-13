@@ -295,6 +295,8 @@ function loadUrlSources() {
 						$('#url-input').val(vcf[vcfName]);
 						delete vcf[vcfName];
 					}
+					onBamUrlEntered();
+					onVcfUrlEntered();
 					loadDataSources();
 				})		
 				// load vcfs that don't have a bam pair
@@ -882,6 +884,7 @@ function addVariantCard() {
          .attr("onclick", 'selectVariantCard("'+ cardIndex + '")')
          .attr("class", "btn btn-default")
          .text(defaultName));
+
 
 }
 
