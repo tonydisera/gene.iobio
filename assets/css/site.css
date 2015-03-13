@@ -935,6 +935,18 @@ header {
   background: white;
 }
 
+#variant-card-buttons .btn {  
+  border-right: 1px solid rgb(235,235,235);
+  border-bottom: 1px solid white;
+}
+
+#variant-card-buttons .btn:last {
+  border-right: 1px solid white;
+}
+#variant-card-buttons .btn:hover {
+  border-bottom: 1px solid #009587;
+}
+
 .icon-button {
   padding-right: 10px;
   padding-left: 10px;
