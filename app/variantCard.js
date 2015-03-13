@@ -758,7 +758,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	                fbRecs.push(fbRec.join("\t"));
 			})
 			
-			if (this.isViewable()) {
+			if (me.isViewable()) {
 				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants in realtime")
 
 				// Annotate the fb variatns

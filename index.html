@@ -456,6 +456,7 @@
                     <span class="loader-label"></span>
                     <img src="assets/images/loading-squares.gif"/>
                 </div>
+              
               <div id="feature-matrix">
               </div>
             </div> 
@@ -609,6 +610,56 @@
  
 </div>
 
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  
+  <symbol id="pedigree" width="30" height="30" viewBox="0 0 40 40">
+
+    <line x1="11" x2="24" y1="10" y2="10" fill="none" stroke-width="1" stroke="grey"></line>
+    <line x1="19" x2="19" y1="10" y2="18" fill="none" stroke-width="1" stroke="grey"></line>
+
+  <g class="parent">
+    <path d="M 7 14 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="left">
+    </path>
+    
+    <g transform="translate(15, 21), rotate(180)"> 
+        <path d="M 7 15 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="right">
+      </path>
+    </g>
+  </g>
+
+  <g class="parent">
+    <g transform="translate(40,-5)">
+      <g transform="rotate(90)">
+        <path d="M 10,10 C 10,3  19,3 19,10" stroke-width="2" fill="none" class="left">
+        </path>
+      </g>
+    </g>
+    
+    <g transform="translate(20,24)">
+       <g transform="rotate(270)">
+          <path d="M 10,10 C 10,3  19,3 19,10" stroke-width="2" fill="none" class="right">
+          </path>
+       </g>
+    </g>
+  </g>  
+
+  <g class="proband" transform="translate(12, 13)">
+    <path d="M 7 14 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="left">
+    </path>
+    
+    <g transform="translate(15, 21), rotate(180)"> 
+        <path d="M 7 15 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="right">
+        </path>
+    </g>
+  </g>
+
+  </symbol>
+  
+  <symbol id="denovo" viewBox="0 0 40 40">
+    <!-- <path>s and whatever other shapes in here -->  
+  </symbol>
+  
+</svg>
 
 
 
