@@ -57,15 +57,11 @@ var coverageMin = 10;
 var featureVcfData = null;
 var featureMatrix  = null;
 var showClinVarSymbol = function (selection) {
-	selection.append('path')
-             .attr("d", d3.svg.symbol().type('cross').size(40) )
-             .attr('class', 'clinvar')    
-             .attr("transform", function(d) { 
-                var xCoord = 15;
-                var yCoord = 15;
-                var tx = "translate(" + xCoord + "," + yCoord + ")"; 
-                return tx;
-              });
+	
+	selection.append("g")
+	         .attr("transform", "translate(6,6)")
+	         .append("use")
+	         .attr("xlink:href", "#icon-aid-kit");
 };
 var showAfSymbol = function(selection) {
 	/*
@@ -80,9 +76,11 @@ var showAfSymbol = function(selection) {
 };
 var showRecessiveSymbol = function (selection) {
 	selection.append("use")
-	          .attr("xlink:href", '#pedigree');
+	          .attr("xlink:href", '#recessive');
 };
 var showDeNovoSymbol = function (selection) {
+	selection.append("use")
+	          .attr("xlink:href", '#denovo');
 	
 };
 var showNoInheritSymbol = function (selection) {
@@ -1224,9 +1222,12 @@ function fillFeatureMatrix(theVcfData) {
 			// Fake the clinvar, inheritance data for now
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = Math.random() > .5 ? 'Y' : 'N';
-			}
-			if (matrixRow.attribute == 'inheritance') {
-				rawValue = Math.random() > .5 ? 'recessive' : 'none';
+			} else if (matrixRow.attribute == 'inheritance') {
+				if (Math.random() > .5) {
+					rawValue = 'recessive';
+				} else  {
+					rawValue = 'denovo';
+				} 
 			}
 			if (rawValue != null) {
 				if (matrixRow.match == 'exact') {

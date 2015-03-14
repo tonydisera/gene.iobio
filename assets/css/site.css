@@ -3,9 +3,11 @@ body {
 }
 
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: rgb(118, 99, 99);
-  font-size: 18px;
+  color: rgb(98, 98, 98);
+  font-size: 14px;
+  text-transform: uppercase;
 }
+
 
 .material-dropdown .form-control { background: white;}
 
@@ -37,7 +39,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 
 #feature-matrix .y.axis .tick .up polygon,
 #feature-matrix .y.axis .tick .down polygon {
-   fill:  #3586C0;
+   fill:  #EA9311;
    stroke: black;
    stroke-opacity: .55;
    stroke-width: 1px;
@@ -70,19 +72,30 @@ a.card-label, a.card-label:hover, a.card-label:focus {
     opacity: .3 !important;
 }
 
-.parent .left {
-  stroke: darkorange;
+#recessive .parent .left {
+  stroke: blue;
 }
-.parent .right {
+#recessive .parent .right {
   stroke: grey;
 }
-.proband .left,
-.proband .right {
-  stroke: darkorange;
+#recessive .proband .left,
+#recessive .proband .right {
+  stroke: blue;
 }
 
-.clinvar {
-  fill: red;  
+#denovo .parent .left {
+  stroke: grey;
+}
+#denovo .parent .right {
+  stroke: grey;
+}
+#denovo .proband .left,
+#denovo .proband .right {
+  stroke: red;
+}
+
+.aid-kit {
+  fill: darkorange;  
 }
 
 .af {
@@ -222,14 +235,14 @@ a, a:hover, a:focus {
 
 .iobio {
     font-size: 34px;
-    color: rgb(118, 99, 99);
+    color: rgb(98, 98, 98);
     font-family: Quicksand;
     float: left;
 }
 
 .iobioapp {
     font-size: 34px;
-    color: #3586C0;
+    color: #EA9311;
     font-family: Quicksand;
     float: left;
 }
@@ -268,7 +281,7 @@ a, a:hover, a:focus {
   margin-bottom: 0px;
   padding-bottom: 0px;
   margin-right: 100px;
-  color: #3586C0;
+  color: #EA9311;
   font-size: 18px;
     
 }
@@ -372,7 +385,7 @@ a, a:hover, a:focus {
     width: 80px;
 }
 .loader-label {
-  color:#3586C0;
+  color:#EA9311;
   font-size:18px;   
 }
 
@@ -739,7 +752,7 @@ header {
 } 
 .variant.impact_MODERATE,
 #feature-matrix rect.impact_MODERATE{
-  fill:  rgb(255, 159, 142);
+  fill:  rgb(239, 145, 96);
 } 
 .variant.impact_MODIFIER,
 #feature-matrix rect.impact_MODIFIER{
@@ -954,7 +967,8 @@ header {
   padding-bottom: 6px;
   line-height: 22px;
   font-size: 12px;
-  color: #3586C0 !important;
+  /*color: #EA9311 !important;*/
+  color: rgb(98, 98, 98) !important;
 }
 
 .icon-button-sm {
@@ -964,7 +978,8 @@ header {
   padding-right: 6px;
   line-height: 22px;
   font-size: 12px;
-  color: #3586C0 !important;
+  /*color: #EA9311 !important;*/
+  color: rgb(98, 98, 98) !important;
 }
 
 .icon-button i,
@@ -972,7 +987,7 @@ header {
   float:     left;
   font-size: 22px;
   padding-right: 4px;
-  color: #3586C0 !important
+  color: #EA9311 !important
 }
 
 #button-find-missing-variants {
@@ -996,7 +1011,7 @@ header {
  */
 .results  { 
   text-align: left; 
-  color: #3586C0;
+  color: #EA9311;
 }
 
 
