@@ -88,8 +88,6 @@ function featureMatrixD3() {
          .attr("width", width)
          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
-
-
       svg.selectAll("g.group").remove();
       var g =  svg.selectAll("g.group").data([data])
         .enter()

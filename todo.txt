@@ -1,7 +1,9 @@
 todo
 -------------
 
-- Consider zoom region in VariantCard.filterVariants()
+- <symbol> doesn't work on Safari (improper size).  Switch to using <defs>.  (Handlebar templates
+  don't seem to work on Safari either. geez. )  Another browser polyfill would be to just
+  inject paths directly into svg in symbolFunction.
 
 - Big genes kill browser session
 

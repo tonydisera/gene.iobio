@@ -57,30 +57,68 @@ var coverageMin = 10;
 var featureVcfData = null;
 var featureMatrix  = null;
 var showClinVarSymbol = function (selection) {
-	
 	selection.append("g")
-	         .attr("transform", "translate(6,6)")
+	         .attr("transform", "translate(7,7)")
 	         .append("use")
-	         .attr("xlink:href", "#icon-aid-kit");
+	         .attr("xlink:href", "#clinvar-symbol");
 };
 var showAfSymbol = function(selection) {
-	/*
-	var mappedValue = selection.datum().rank;
-	selection.append("rect")
-	         .attr('class', 'af')
-	         .attr("x", 1)
-	         .attr("y", 20)
-	         .attr("width", mappedValue * 3)
-	         .attr("height", 5);
-	 */
+	selection.append("g")
+	         .attr("class", selection.datum().clazz)
+	         .attr("transform", "translate(7,7)")
+	         .append("use")
+	         .attr("xlink:href", "#af-symbol")
+	         .style("fill", function(d,i) {
+	         	if (selection.datum().clazz == 'af_notpresent') {
+	         		return "rgb(217, 240, 163)";
+	         	} else if (selection.datum().clazz == 'af_unique') {
+	         		return "rgb(173, 221, 142)";
+	         	} else if (selection.datum().clazz == 'af_rare') {
+	         		return "rgb(65, 171, 93)";
+	         	} else if (selection.datum().clazz == 'af_uncommon') {
+	         		return "rgb(35, 132, 67)";
+	         	} else if (selection.datum().clazz == 'af_common') {
+	         		return "rgb(0, 104, 55)";
+	         	}
+	         })
+	         .attr("width", function(d,i) {
+	         	if (selection.datum().clazz == 'af_notpresent') {
+	         		return "8";
+	         	} else if (selection.datum().clazz == 'af_unique') {
+	         		return "10";
+	         	} else if (selection.datum().clazz == 'af_rare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af_uncommon') {
+	         		return "16";
+	         	} else if (selection.datum().clazz == 'af_common') {
+	         		return "20";
+	         	}
+	         })
+	         .attr("height", function(d,i) {
+	         	if (selection.datum().clazz == 'af_notpresent') {
+	         		return "8";
+	         	} else if (selection.datum().clazz == 'af_unique') {
+	         		return "10";
+	         	} else if (selection.datum().clazz == 'af_rare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af_uncommon') {
+	         		return "16";
+	         	} else if (selection.datum().clazz == 'af_common') {
+	         		return "20";
+	         	}
+	         });
 };
 var showRecessiveSymbol = function (selection) {
-	selection.append("use")
-	          .attr("xlink:href", '#recessive');
+	selection.append("g")
+	         .attr("transform", "translate(0,3)")
+	         .append("use")
+	         .attr("xlink:href", '#recessive-symbol');
 };
 var showDeNovoSymbol = function (selection) {
-	selection.append("use")
-	          .attr("xlink:href", '#denovo');
+	selection.append("g")
+	         .attr("transform", "translate(0,3)")
+	         .append("use")
+	         .attr("xlink:href", '#denovo-symbol');
 	
 };
 var showNoInheritSymbol = function (selection) {
@@ -98,17 +136,12 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         recessive: {value: 2, clazz: 'recessive', symbolFunction: showRecessiveSymbol},
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
-// For af range, min is inclusive, max is exlusive
-var afMap          = [ {min: +0,    max: +.1, value: +1,  clazz: 'blues_1',  symbolFunction: showAfSymbol},	
-                       {min: +.1,   max: +.2, value: +2,  clazz: 'blues_2',  symbolFunction: showAfSymbol},	
-                       {min: +.2,   max: +.3, value: +3,  clazz: 'blues_3',  symbolFunction: showAfSymbol},	
-                       {min: +.3,   max: +.4, value: +4,  clazz: 'blues_4',  symbolFunction: showAfSymbol},	
-                       {min: +.4,   max: +.5, value: +5,  clazz: 'blues_5',  symbolFunction: showAfSymbol},	
-                       {min: +.5,   max: +.6, value: +6,  clazz: 'blues_6',  symbolFunction: showAfSymbol},	
-                       {min: +.6,   max: +.7, value: +7,  clazz: 'blues_7',  symbolFunction: showAfSymbol},	
-                       {min: +.7,   max: +.8, value: +8,  clazz: 'blues_8',  symbolFunction: showAfSymbol},	
-                       {min: +.8,   max: +.9, value: +9,  clazz: 'blues_9',  symbolFunction: showAfSymbol},	
-                       {min: +.9,   max: +1,  value: +10, clazz: 'blues_10', symbolFunction: showAfSymbol}	
+// For af range, value must be > min and <= max
+var afMap          = [ {min: -3,   max: -1,  value: +1,  clazz: 'af_notpresent', symbolFunction: showAfSymbol},	
+                       {min: -1,   max: +0,  value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
+                       {min: +0,   max: +.1, value: +3,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
+                       {min: +.1,  max: +.5, value: +4,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
+                       {min: +.5,  max: +1,  value: +5,  clazz: 'af_commmon',    symbolFunction: showAfSymbol},	
                       ];
 
 
@@ -1139,6 +1172,8 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	theVcfData.features.forEach(function(variant) {
 		variant.compare1000G = null;
 		variant.compareExAC = null;
+		variant.af1000G = -1;
+		variant.afExAC= -1;
 	});
 	theVcf1000GData.features.forEach(function(variant) {
 		variant.compare1000G = null;
@@ -1171,6 +1206,9 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 		    	// proband's variant for further sorting/display in the feature matrix.
 		        function(variantA, variantB) {
 		        	variantA.afExAC = variantB.af;
+		        	if (variantA.afExAC == null || variantA.afExAC == '') {
+		        		variantA.afExAC = 0;
+		        	}
 		        });
     	}, 
     	// This is the attribute on variant a (proband) and variant b (1000G)
@@ -1181,6 +1219,10 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
     	// proband's variant for further sorting/display in the feature matrix.
     	function(variantA, variantB) {
     		variantA.af1000G = variantB.af;
+				if (variantA.af1000G == null || variantA.af1000G == '') {
+	        		variantA.af1000G = 0;
+	        	}
+
     	});
 
 }
@@ -1261,7 +1303,7 @@ function fillFeatureMatrix(theVcfData) {
 					if (isNumeric(rawValue)) {
 						theValue = d3.format(",.3%")(+rawValue);
 						matrixRow.map.forEach( function(rangeEntry) {
-							if (+rawValue >= rangeEntry.min && +rawValue < rangeEntry.max) {
+							if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
 								mappedValue = rangeEntry.value;
 								mappedClazz = rangeEntry.clazz;
 								symbolFunction = rangeEntry.symbolFunction;
@@ -1308,15 +1350,17 @@ function fillFeatureMatrix(theVcfData) {
 	});
 
 	// Get the top 30 variants
-	var topFeatures = sortedFeatures.slice(0, sortedFeatures.length);
+	var topFeatures = sortedFeatures.slice(0, 30);
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
 
 	// Load the chart with the new data
 	featureMatrix.matrixRows(matrixRows);
-	var selection = d3.select("#feature-matrix").data([topFeatures]);    
+	var selection = d3.select("#feature-matrix").data([topFeatures]);  
+
     this.featureMatrix(selection);
+		
 }
 
 function variantTooltipHTML(variant, rowIndex) {
@@ -1348,8 +1392,8 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
 		+ tooltipRow('AF', variant.af) 
-		+ tooltipRow('&nbsp;1000G', variant.af1000G)
-		+ tooltipRow('&nbsp;ExAC', variant.afExAC)
+		+ tooltipRow('&nbsp;1000G', variant.af1000G != -1 ? variant.af1000G : 'not present')
+		+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != -1 ? variant.afExAC  : 'not present')
 	);                    
 
 }

@@ -72,30 +72,38 @@ a.card-label, a.card-label:hover, a.card-label:focus {
     opacity: .3 !important;
 }
 
-#recessive .parent .left {
-  stroke: blue;
-}
-#recessive .parent .right {
-  stroke: grey;
-}
-#recessive .proband .left,
-#recessive .proband .right {
-  stroke: blue;
+.icon {
+  width: 30px;
+  height: 30px;
+  background: #eee;
 }
 
-#denovo .parent .left {
-  stroke: grey;
+#recessive-symbol .parent .left {
+  stroke: rgb(215, 48, 39);
 }
-#denovo .parent .right {
+#recessive-symbol .parent .right {
   stroke: grey;
+  stroke-width: 1;
 }
-#denovo .proband .left,
-#denovo .proband .right {
-  stroke: red;
+#recessive-symbol .proband .left,
+#recessive-symbol .proband .right {
+  stroke: rgb(215, 48, 39);
 }
 
-.aid-kit {
-  fill: darkorange;  
+#denovo-symbol .parent .left {
+  stroke: grey;
+}
+#denovo-symbol .parent .right {
+  stroke: grey;
+}
+#denovo-symbol .proband .left,
+#denovo-symbol .proband .right {
+  stroke: rgb(54, 144, 192);
+}
+
+#clinvar-symbol path {
+  /*fill: #BF503F;*/
+  fill: grey;
 }
 
 .af {
@@ -281,7 +289,7 @@ a, a:hover, a:focus {
   margin-bottom: 0px;
   padding-bottom: 0px;
   margin-right: 100px;
-  color: #EA9311;
+  color: rgb(98,98,98);
   font-size: 18px;
     
 }
@@ -385,7 +393,7 @@ a, a:hover, a:focus {
     width: 80px;
 }
 .loader-label {
-  color:#EA9311;
+  color: rgb(98,98,98);
   font-size:18px;   
 }
 
@@ -842,6 +850,8 @@ header {
 
 
 
+
+
 /* LEGEND */
 .impact, .effect, .type, .zygosity {
   border: solid thin white;
@@ -879,7 +889,7 @@ header {
 #impact-scheme, #effect-scheme, #compare-scheme {
   padding-top: 2px;
 }
-#type-scheme, #zygosity-scheme {
+#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme {
   padding-top: 2px;
 }
 .impact.inactive  {
@@ -890,12 +900,14 @@ header {
   pointer-events: none;
   display: none;
 }
-#impact-scheme.current, #effect-scheme.current {
+#impact-scheme.current, #effect-scheme.current, #inheritance-scheme, #af-scheme {
   font-weight: bold;
   border: none;
  
 }
-#impact-scheme .name, #effect-scheme .name, #compare-scheme .name, #type-scheme .name, #zygosity-scheme .name{
+#impact-scheme .name, #effect-scheme .name, #compare-scheme .name, 
+#type-scheme .name, #zygosity-scheme .name,
+#inheritance-scheme .name, #af-scheme .name{
   fill-opacity: 1;
   font-size: 12px; 
   font-weight: normal;
@@ -967,7 +979,6 @@ header {
   padding-bottom: 6px;
   line-height: 22px;
   font-size: 12px;
-  /*color: #EA9311 !important;*/
   color: rgb(98, 98, 98) !important;
 }
 
@@ -978,7 +989,6 @@ header {
   padding-right: 6px;
   line-height: 22px;
   font-size: 12px;
-  /*color: #EA9311 !important;*/
   color: rgb(98, 98, 98) !important;
 }
 
@@ -987,7 +997,8 @@ header {
   float:     left;
   font-size: 22px;
   padding-right: 4px;
-  color: #EA9311 !important
+  /*color: #EA9311 !important;*/
+  color: rgb(98,98,98) !important;
 }
 
 #button-find-missing-variants {
@@ -1011,7 +1022,7 @@ header {
  */
 .results  { 
   text-align: left; 
-  color: #EA9311;
+  color: rgb(98,98,98);
 }
 
 
