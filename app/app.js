@@ -69,16 +69,17 @@ var showAfSymbol = function(selection) {
 	         .append("use")
 	         .attr("xlink:href", "#af-symbol")
 	         .style("fill", function(d,i) {
+
 	         	if (selection.datum().clazz == 'af_notpresent') {
-	         		return "rgb(217, 240, 163)";
+	         		return "rgb(107, 174, 214)";
 	         	} else if (selection.datum().clazz == 'af_unique') {
-	         		return "rgb(173, 221, 142)";
+	         		return "rgb(66, 146, 198)";
 	         	} else if (selection.datum().clazz == 'af_rare') {
-	         		return "rgb(65, 171, 93)";
+	         		return "rgb(33, 113, 181)";
 	         	} else if (selection.datum().clazz == 'af_uncommon') {
-	         		return "rgb(35, 132, 67)";
+	         		return "rgb(8, 81, 156)";
 	         	} else if (selection.datum().clazz == 'af_common') {
-	         		return "rgb(0, 104, 55)";
+	         		return "rgb(8, 48, 107)";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
