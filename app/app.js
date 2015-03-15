@@ -71,15 +71,15 @@ var showAfSymbol = function(selection) {
 	         .style("fill", function(d,i) {
 
 	         	if (selection.datum().clazz == 'af_notpresent') {
-	         		return "rgb(107, 174, 214)";
+	         		return "rgb(240, 240, 240)";
 	         	} else if (selection.datum().clazz == 'af_unique') {
-	         		return "rgb(66, 146, 198)";
+	         		return "rgb(217, 217, 217)";
 	         	} else if (selection.datum().clazz == 'af_rare') {
-	         		return "rgb(33, 113, 181)";
+	         		return "rgb(189, 189, 189)";
 	         	} else if (selection.datum().clazz == 'af_uncommon') {
-	         		return "rgb(8, 81, 156)";
+	         		return "rgb(150, 150, 150)";
 	         	} else if (selection.datum().clazz == 'af_common') {
-	         		return "rgb(8, 48, 107)";
+	         		return "rgb(115, 115, 115)";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
@@ -125,13 +125,21 @@ var showDeNovoSymbol = function (selection) {
 var showNoInheritSymbol = function (selection) {
 	
 };
+var showImpactSymbol = function(selection) {
+	selection.append("g")
+	         .attr("transform", "translate(9,9)")
+	         .append("rect")
+	         .attr("width", 10)
+	         .attr("height", 10)
+	         .attr("class", "filter-symbol " + selection.datum().clazz);
+}
 var clinvarMap     = {  Y: {value: 1, clazz: 'clinvar', symbolFunction: showClinVarSymbol},
                         N: {value: 2, clazz: ''}
                      };
-var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH'},    
-                        MODERATE: {value: 2, clazz: 'impact_MODERATE'},  
-                        MODIFIER: {value: 3, clazz: 'impact_MODIFIER'},
-                        LOW:      {value: 4, clazz: 'impact_LOW'}
+var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH',     symbolFunction: showImpactSymbol},    
+                        MODERATE: {value: 2, clazz: 'impact_MODERATE', symbolFunction: showImpactSymbol},  
+                        MODIFIER: {value: 3, clazz: 'impact_MODIFIER', symbolFunction: showImpactSymbol},
+                        LOW:      {value: 4, clazz: 'impact_LOW',      symbolFunction: showImpactSymbol}
                      };
 var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction: showDeNovoSymbol},  
                         recessive: {value: 2, clazz: 'recessive', symbolFunction: showRecessiveSymbol},

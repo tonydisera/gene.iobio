@@ -106,11 +106,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   fill: grey;
 }
 
-.af {
-  fill: orange !important;
-  stroke-width: 1 !important;
-  stroke: black !important;
-}
+
 
 .blues_1{fill:rgb(247,251,255) !important}
 .blues_2{fill:rgb(222,235,247) !important}
@@ -703,12 +699,13 @@ header {
   stroke-width: 1px;
   stroke-opacity: .2;
 }
-/*
-.snp,  .del,  .ins { 
-  fill: white;
-  stroke: #807D7D;
+
+
+.filter-symbol {
+  stroke: #000 !important;
+  stroke-width: 1px !important;
+  stroke-opacity: .2 !important;
 }
-*/
 
 .ibo-variant .reference { 
   stroke: rgb(150,150,150); 
@@ -754,86 +751,82 @@ header {
 .variant.compare_common{
   fill: rgb(255, 255, 255);
 }
-.variant.impact_HIGH,
-#feature-matrix rect.impact_HIGH{
-  fill: rgb(215,48,39);
+.impact_HIGH{
+  fill: rgb(215,48,39) !important;
 } 
-.variant.impact_MODERATE,
-#feature-matrix rect.impact_MODERATE{
-  fill:  rgb(239, 145, 96);
+.impact_MODERATE{
+  fill:  rgb(239, 145, 96) !important;
 } 
-.variant.impact_MODIFIER,
-#feature-matrix rect.impact_MODIFIER{
-  fill: rgb(173, 199, 221);
+.impact_MODIFIER{
+  fill: rgb(173, 199, 221) !important ;
 }
-.variant.impact_LOW,
-#feature-matrix rect.impact_LOW { 
-  fill: rgb(195, 242, 255);
+.impact_LOW { 
+  fill: rgb(195, 242, 255) !important;
 }
-.variant.impact_NOIMPACT { 
-  fill: #FAF5BE;
+.impact_NOIMPACT { 
+  fill: #FAF5BE ;
   stroke: #807D7D;
 }
 
 
-.variant.effect_frameshift{
+.effect_frameshift{
   fill: #A95959;
 } 
-.variant.effect_missense{
+.effect_missense{
   fill: rgb(13, 236, 210);
 } 
-.variant.effect_splice_acceptor{
+.effect_splice_acceptor{
   fill: rgb(150, 143, 236);
 } 
-.variant.effect_splice_donor{
+.effect_splice_donor{
   fill: #FFE216;
 } 
-.variant.effect_regulatory{
+.effect_regulatory{
   fill: #3d8901;
 } 
-.variant.effect_splice{
+.effect_splice{
   fill: rgb(234, 216, 90);
 }
-.variant.effect_exon_loss{
+.effect_exon_loss{
   fill: #0CBEA3;
 }
-.variant.effect_other{
+.effect_other{
   fill: rgb(187, 187, 187);
 }
-.variant.effect_indel {
+.effect_indel {
   fill: #fb9a99;
 }
-.variant.effect_utr {
+.effect_utr {
   fill: #D5A8D7;
 }
-.variant.effect_stop_lost {
+.effect_stop_lost {
   fill: #F48E45;
 }
-.variant.effect_start_lost {
+.effect_start_lost {
   fill: #D07583;
 }
-.variant.effect_stop_gained {
+.effect_stop_gained {
   fill: #D0DB21;
 }
-.variant.effect_rare_amino_acid{
+.effect_rare_amino_acid{
   fill: rgb(234, 216, 90);
 }
-.variant.effect_chromosome{
+.effect_chromosome{
   fill: #b2df8a;
 } 
-.variant.effect_coding{
+.effect_coding{
   fill: #7BBA49;
 } 
-.variant.effect_synonymous{
+.effect_synonymous{
   fill: #ADC9E8;
 }
-.variant.effect_exon{
+.effect_exon{
   fill: rgb(150, 143, 236);
 } 
-.variant.effect_other { 
+.effect_other { 
   fill: rgb(187, 187, 187);
 }
-.variant.effect_NOEFFECT { 
+.effect_NOEFFECT { 
   fill: #FAF5BE;
 }
 
@@ -858,11 +851,11 @@ header {
   padding: 1px;
 
 }
-.impact.nocolor rect.variant, .effectCategory.nocolor rect.variant, .compare.nocolor rect.variant {
+.impact.nocolor rect, .effectCategory.nocolor rect, .compare.nocolor rect {
   fill: lightgrey !important;
   stroke: grey;
 }
-.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover {
+.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .af:hover, .inheritance:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -871,7 +864,8 @@ header {
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
-.impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, .type.current:hover {
+.impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, 
+.type.current:hover, .af.current:hover, .inheritance.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;

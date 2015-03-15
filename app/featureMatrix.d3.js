@@ -249,7 +249,7 @@ function featureMatrixD3() {
 
       cells.append('rect')
           .attr('class', function(d,i) { 
-            return d.clazz;
+            return "cell";
           })          
           .attr('x', function(d,i) { 
             return 0;
