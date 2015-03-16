@@ -1415,7 +1415,6 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('AF category',  variant.aflevel  != -1 ? variant.aflevel  : '')
 		+ tooltipRow('AF', variant.af) 
 		+ tooltipRow('&nbsp;1000G', variant.af1000G != -1 ? variant.af1000G : 'not present')
 		+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != -1 ? variant.afExAC  : 'not present')

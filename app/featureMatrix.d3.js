@@ -249,7 +249,7 @@ function featureMatrixD3() {
 
       cells.append('rect')
           .attr('class', function(d,i) { 
-            return "cell";
+            return "cellbox";
           })          
           .attr('x', function(d,i) { 
             return 0;
@@ -284,7 +284,7 @@ function featureMatrixD3() {
       });
 
       cols.append('rect')
-          .attr('class', 'column-box')
+          .attr('class', 'colbox')
           .attr('x', function(d,i) { 
             return 0;
           })
@@ -294,17 +294,17 @@ function featureMatrixD3() {
           .attr('y', y(matrixRowNames[0]) + y.rangeBand())
           .attr('width', cellSize - 1);
      
-      g.selectAll('.cell')
+      g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  
               var tooltip = container.select('.tooltip');
               tooltip.transition()        
                  .duration(1000)      
                  .style("opacity", .9);  
 
-              var colObject = d3.select(this.parentNode).datum();
-              var rowIndex = d;
+              var colObject = d3.select(this.parentNode.parentNode).datum();
+              
 
-              tooltip.html(tooltipHTML(colObject, rowIndex));
+              tooltip.html(tooltipHTML(colObject));
 
               var h = tooltip[0][0].offsetHeight;
               var w = tooltip[0][0].offsetWidth;
@@ -313,7 +313,7 @@ function featureMatrixD3() {
                      .style("text-align", 'left')    
                      .style("top", (d3.event.pageY - h) + "px");   
               
-              dispatch.d3mouseover(colObject, rowIndex ); 
+              dispatch.d3mouseover(colObject ); 
             })                  
            .on("mouseout", function(d) {       
               container.select('.tooltip').transition()        
@@ -322,15 +322,14 @@ function featureMatrixD3() {
               dispatch.d3mouseout(); 
             })
             .on("click", function(d, i) {                
-              var colObject = d3.select(this.parentNode).datum();
-              var colIndex = Math.floor(i / matrixRowNames.length); 
-              var rowIndex = d;
-              var on = !(d3.select(this.parentNode).select(".column-box").attr("class").indexOf("current") > -1);
-              d3.select(this.parentNode).select(".column-box").classed("current", on);
-              d3.select(this.parentNode).classed("current", on);
+              var colObject = d3.select(this.parentNode.parentNode).datum();
+              var colIndex = Math.floor(i / matrixRowNames.length);               
+              var on = !(d3.select(this.parentNode.parentNode).select(".colbox").attr("class").indexOf("current") > -1);
+              d3.select(this.parentNode.parentNode).select(".colbox").classed("current", on);
+              d3.select(this.parentNode.parentNode).classed("current", on);
               var textDOM = container.selectAll('.x.axis .tick text')[0][colIndex];
               d3.select(textDOM).classed("current", on);
-              dispatch.d3click(colObject, rowIndex);
+              dispatch.d3click(colObject);
             });
 
 

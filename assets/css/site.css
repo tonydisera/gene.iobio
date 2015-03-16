@@ -11,25 +11,34 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 
 .material-dropdown .form-control { background: white;}
 
-#feature-matrix rect {
-  fill: none;
+#feature-matrix rect.cellbox {
+  fill: white;
   stroke: rgb(230, 230, 230);
   stroke-width: 2px;
 }
 
-#feature-matrix rect:hover {
+#feature-matrix rect.cellbox:hover {
   cursor: pointer;
   font-weight: bold;
 }
 
-#feature-matrix rect.current {
+#feature-matrix rect.colbox {
+  fill:none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#feature-matrix rect.colbox.current {
   stroke: rgb(0, 0, 0) !important;
   stroke-width: 1px !important;
+  opacity: 1;
+  pointer-events: none;
 }
 
 #feature-matrix text {
   font-size: 10px;
   fill:  rgb(120,120,120);
+  pointer-events: none;
 }
 
 #feature-matrix .axis .tick text.current {
