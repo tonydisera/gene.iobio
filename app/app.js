@@ -140,10 +140,10 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
 // For af range, value must be > min and <= max
-var afMap          = [ {min: -1.1, max: +0,  value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
-                       {min: +0,   max: +.1, value: +3,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
-                       {min: +.1,  max: +.5, value: +4,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
-                       {min: +.5,  max: +1,  value: +5,  clazz: 'af_commmon',    symbolFunction: showAfSymbol},	
+var afMap          = [ {min: -1.1, max: +0,    value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
+                       {min: +0,   max: +.01,  value: +3,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
+                       {min: +.01,  max: +.05, value: +4,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
+                       {min: +.05,  max: +1,   value: +5,  clazz: 'af_common',    symbolFunction: showAfSymbol},	
                       ];
 
 
@@ -487,7 +487,7 @@ function clearFilters() {
 function initFilterTrack() {
 
 
-	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .af, .inheritance")
+	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .aflevel, .inheritance")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -1217,6 +1217,7 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 							}
 						});
 
+
 					});
 
 		        	callback(theVcfData);
@@ -1414,6 +1415,7 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
+		+ tooltipRow('AF category',  variant.aflevel  != -1 ? variant.aflevel  : '')
 		+ tooltipRow('AF', variant.af) 
 		+ tooltipRow('&nbsp;1000G', variant.af1000G != -1 ? variant.af1000G : 'not present')
 		+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != -1 ? variant.afExAC  : 'not present')

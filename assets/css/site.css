@@ -859,7 +859,7 @@ header {
   fill: lightgrey !important;
   stroke: grey;
 }
-.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .af:hover, .inheritance:hover  {
+.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .aflevel:hover, .inheritance:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -869,7 +869,7 @@ header {
   fill: rgb(53, 134, 192);
 }
 .impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, 
-.type.current:hover, .af.current:hover, .inheritance.current:hover {
+.type.current:hover, .aflevel.current:hover, .inheritance.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
