@@ -227,7 +227,7 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 
 	if (this.isViewable()) {
 		this.cardSelector.find("#bam-track .loader").css("display", "block");
-		this.cardSelector.find("#bam-track .loader-label").text("Loading File");
+		this.cardSelector.find("#bam-track .loader-label").text("Loading Alignment File");
 		this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamFile.name);
 
 		$('#datasource-dialog #bam-file-info').removeClass('hide');
@@ -256,7 +256,7 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 
 VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 	this.cardSelector.find("#bam-track .loader").css("display", "block");
-	this.cardSelector.find("#bam-track .loader-label").text("Streaming File")
+	this.cardSelector.find("#bam-track .loader-label").text("Streaming Alignment File")
 
 	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamUrl);
     
@@ -274,7 +274,7 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find("#vcf-track .loader").css("display", "block");
-		this.cardSelector.find('#vcf-track .loader-label').text("Loading File");
+		this.cardSelector.find('#vcf-track .loader-label').text("Loading VCF");
 	}
 
 	this.vcf.openVcfFile( event, function(vcfFile) {
@@ -472,7 +472,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 	 		function(data) {
 				me.bamData = data;
 				
-				me.cardSelector.find("#bam-track .loader-label").text("Loading Chart")
+				me.cardSelector.find("#bam-track .loader-label").text("Loading Coverage Chart")
 
 				me.fillBamChart(me.bamData, window.gene.start, window.gene.end);
 			});
@@ -550,7 +550,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	} else {
 
 		if (this.isViewable) {
-		    this.cardSelector.find('#vcf-track .loader-label').text("Annotating Variants in realtime");
+		    this.cardSelector.find('#vcf-track .loader-label').text("Annotating Variants with snpEff in realtime");
 		}
 
 		// A gene has been selected.  Read the variants for the gene region.
@@ -566,7 +566,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	        me.vcfData = data;
 
 	   	    if (me.isViewable()) {
-		   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading chart");
+		   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading variant chart");
 		   	    var filteredVcfData = this.filterVariants();
 			  	me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 			  	window.cullVariantFilters();
@@ -735,7 +735,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				me.getVcfRefName = me.stripRefName;
 			
 			if (me.isViewable()) {
-				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants in realtime")
+				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants with snpEFF in realtime")
 
 				// Annotate the fb variatns
 				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
