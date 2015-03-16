@@ -452,7 +452,7 @@ function initTranscriptControls() {
             $('#transcript-btn-group').data('open', false);
             onCloseTranscriptMenuEvent();
         } else {
-        	$('#transcript-btn-group').data('open', true);
+        	$('#transcript-btn-group').data('open', true);        	
         }
     });
 
@@ -465,9 +465,11 @@ function initTranscriptControls() {
 }
 
 function onCloseTranscriptMenuEvent() {
-	d3.selectAll("#gene-viz .transcript").remove();
- 	selectedTranscript = transcriptMenuChart.selectedTranscript();
- 	loadTracksForGene();
+	if (selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
+		d3.selectAll("#gene-viz .transcript").remove();
+	 	selectedTranscript = transcriptMenuChart.selectedTranscript();
+	 	loadTracksForGene();
+	 }
 }
 
 
