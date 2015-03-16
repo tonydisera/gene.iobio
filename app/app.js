@@ -472,6 +472,24 @@ function onCloseTranscriptMenuEvent() {
 	 }
 }
 
+function getCanonicalTranscript() {
+	var canonical;
+	var maxCdsLength = 0;
+	window.gene.transcripts.forEach(function(transcript) {
+		var cdsLength = 0;
+		transcript.features.forEach(function(feature) {
+			if (feature.feature_type == 'CDS') {
+				cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
+			}
+		})
+		if (cdsLength > maxCdsLength) {
+			maxCdsLength = cdsLength;
+			canonical = transcript;
+		}
+	})
+	return canonical;
+}
+
 
 function clearFilters() {
 	clickedAnnotIds = [];
