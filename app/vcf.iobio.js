@@ -858,7 +858,9 @@ var effectCategories = [
               'effect': effects, 
               'effectCategory': effectCats, 
               'impact': impacts, 
-              'consensus': rec.consensus} );
+              'consensus': rec.consensus,
+              'inheritance': '',
+              'aflevel': ''} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;

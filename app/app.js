@@ -70,9 +70,7 @@ var showAfSymbol = function(selection) {
 	         .attr("xlink:href", "#af-symbol")
 	         .style("fill", function(d,i) {
 
-	         	if (selection.datum().clazz == 'af_notpresent') {
-	         		return "rgb(240, 240, 240)";
-	         	} else if (selection.datum().clazz == 'af_unique') {
+	         	if (selection.datum().clazz == 'af_unique') {
 	         		return "rgb(217, 217, 217)";
 	         	} else if (selection.datum().clazz == 'af_rare') {
 	         		return "rgb(189, 189, 189)";
@@ -83,9 +81,7 @@ var showAfSymbol = function(selection) {
 	         	}
 	         })
 	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'af_notpresent') {
-	         		return "8";
-	         	} else if (selection.datum().clazz == 'af_unique') {
+	         	if (selection.datum().clazz == 'af_unique') {
 	         		return "10";
 	         	} else if (selection.datum().clazz == 'af_rare') {
 	         		return "12";
@@ -96,9 +92,7 @@ var showAfSymbol = function(selection) {
 	         	}
 	         })
 	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'af_notpresent') {
-	         		return "8";
-	         	} else if (selection.datum().clazz == 'af_unique') {
+	         	if (selection.datum().clazz == 'af_unique') {
 	         		return "10";
 	         	} else if (selection.datum().clazz == 'af_rare') {
 	         		return "12";
@@ -146,8 +140,7 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
 // For af range, value must be > min and <= max
-var afMap          = [ {min: -3,   max: -1,  value: +1,  clazz: 'af_notpresent', symbolFunction: showAfSymbol},	
-                       {min: -1,   max: +0,  value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
+var afMap          = [ {min: -1.1, max: +0,  value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
                        {min: +0,   max: +.1, value: +3,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
                        {min: +.1,  max: +.5, value: +4,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
                        {min: +.5,  max: +1,  value: +5,  clazz: 'af_commmon',    symbolFunction: showAfSymbol},	
@@ -494,7 +487,7 @@ function clearFilters() {
 function initFilterTrack() {
 
 
-	d3.selectAll(".type, .impact, .effectCategory, .zygosity")
+	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .af, .inheritance")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -659,7 +652,7 @@ function classifyByImpact(d) {
 	  effects += " " + key;
 	}
 	
-	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 function classifyByEffect(d) { 
 	var effects = "";
@@ -674,7 +667,7 @@ function classifyByEffect(d) {
       impacts += " " + key;
     }
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 function applyVariantFilters() {
@@ -838,8 +831,8 @@ function loadTracksForGene() {
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
 
-    $('#gene-name').text(window.gene.chr);   
-    $('#gene-region-info').text(window.gene.regionStart + "-" + window.gene.regionEnd);
+    $('#gene-name').text(window.gene.gene_name);   
+    $('#gene-region-info').text(window.gene.chr + ' ' + window.gene.regionStart + "-" + window.gene.regionEnd);
 
 
    	// This will be the view finder, allowing the user to select
@@ -1182,7 +1175,7 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 		variant.compare1000G = null;
 		variant.compareExAC = null;
 		variant.af1000G = -1;
-		variant.afExAC= -1;
+		variant.afExAC= -1;		
 	});
 	theVcf1000GData.features.forEach(function(variant) {
 		variant.compare1000G = null;
@@ -1205,6 +1198,27 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	        	// all comparisons (1000G in outer function and ExAc in this function), so we 
 	        	// can move on to building the feature matrix.
 	        	function(){
+
+	        		// Fill in the af level on each variant.  Use the af in the vcf if
+	        		// present, otherwise, use the 1000g af if present, otherwise use
+	        		// the ExAC af.
+	        		theVcfData.features.forEach(function(variant) {
+	        			theAf = null;
+						if (variant.af != -1 && variant.af != 0 && variant.af != '') {
+							theAf = variant.af;
+						} else if (variant.af1000G > -1) {
+							theAf = variant.af1000G;
+						} else if (variant.afExAC > -1) {
+							theAf = variant.afExAC;
+						}
+						afMap.forEach( function(rangeEntry) {
+							if (+theAf > rangeEntry.min && +theAf <= rangeEntry.max) {
+								variant.aflevel = rangeEntry.clazz;
+							}
+						});
+
+					});
+
 		        	callback(theVcfData);
 		        }, 
 		        // This is the attribute on variant a (proband) and variant b (ExAC)

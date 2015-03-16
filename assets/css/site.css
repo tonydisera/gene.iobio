@@ -3,7 +3,7 @@ body {
 }
 
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: rgb(98, 98, 98);
+  color: rgb(132, 132, 132);
   font-size: 14px;
   text-transform: uppercase;
 }
@@ -239,7 +239,7 @@ a, a:hover, a:focus {
 
 .iobio {
     font-size: 34px;
-    color: rgb(98, 98, 98);
+    color: rgb(132, 132, 132);
     font-family: Quicksand;
     float: left;
 }
@@ -285,9 +285,13 @@ a, a:hover, a:focus {
   margin-bottom: 0px;
   padding-bottom: 0px;
   margin-right: 100px;
-  color: rgb(98,98,98);
-  font-size: 18px;
+  color: rgb(132, 132, 132);
+/*  color: #EA9311 !important; */
+  font-size: 14px;
     
+}
+#gene-name {
+  color: #EA9311;
 }
 #gene-region-info {
   padding-left: 10px;
@@ -389,7 +393,7 @@ a, a:hover, a:focus {
     width: 80px;
 }
 .loader-label {
-  color: rgb(98,98,98);
+  color: rgb(132, 132, 132);
   font-size:18px;   
 }
 
@@ -574,12 +578,12 @@ header {
 }
 
 #bam-depth .circle {
-  stroke:  rgb(79, 110, 229);
+  stroke:  darkorange;
   fill: none;
   stroke-width: 2;
 }
 #bam-depth .circle-label {
-   fill:rgb(79, 110, 229);
+   fill: darkorange;
    font-size: 10px;
    font-weight: bold;
 }
@@ -973,7 +977,7 @@ header {
   padding-bottom: 6px;
   line-height: 22px;
   font-size: 12px;
-  color: rgb(98, 98, 98) !important;
+  color: rgb(132, 132, 132) !important;
 }
 
 .icon-button-sm {
@@ -983,7 +987,7 @@ header {
   padding-right: 6px;
   line-height: 22px;
   font-size: 12px;
-  color: rgb(98, 98, 98) !important;
+  color: rgb(132, 132, 132) !important;
 }
 
 .icon-button i,
@@ -991,8 +995,8 @@ header {
   float:     left;
   font-size: 22px;
   padding-right: 4px;
-  /*color: #EA9311 !important;*/
-  color: rgb(98,98,98) !important;
+  color: #EA9311 !important;
+  /* color: rgb(132, 132, 132) !important; */
 }
 
 #button-find-missing-variants {
@@ -1016,7 +1020,7 @@ header {
  */
 .results  { 
   text-align: left; 
-  color: rgb(98,98,98);
+  color: rgb(132, 132, 132);
 }
 
 
