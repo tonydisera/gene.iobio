@@ -529,9 +529,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 				return (d.start >= regionStart && d.start <= regionEnd);
 			});
 
-			var splitByZyg = this.vcfData.hetCount > 0 && this.vcfData.homCount > 0;
-
-			maxLevel = this._pileupVariants(this.vcfChart, splitByZyg, filteredFeatures, regionStart, regionEnd);		
+			maxLevel = this._pileupVariants(this.vcfChart, filteredFeatures, regionStart, regionEnd);		
 
 			var vcfDataFiltered = {	count: this.vcfData.count,
 									countMatch: this.vcfData.countMatch,
@@ -600,37 +598,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 
 }
 
-VariantCard.prototype._pileupVariants = function(theChart, splitByZyg, features, start, end) {
-	if (splitByZyg) {
-		return this._pileupVariantsByZygosity(theChart, features, start, end);
-	} else {
-		theChart.dividerLevel(null);
-		return this._pileupVariantsImpl(theChart, features, start, end);
-	}
 
-} 
 
-VariantCard.prototype._pileupVariantsByZygosity = function(theChart, features, start, end) {
-	var spacing = 6;
-	var featuresHet = features.filter(function(d) {
-		return d.zygosity == null || d.zygosity == 'HET';
-	});
-	var maxLevelHet = this._pileupVariantsImpl(theChart, featuresHet, start, end);
-
-	var featuresHom = features.filter(function(d) {
-		return d.zygosity != null && d.zygosity == 'HOM';
-	});
-	var maxLevelHom = this._pileupVariantsImpl(theChart, featuresHom, start, end);
-
-	featuresHom.forEach( function(d) {
-		d.level = maxLevelHet + spacing + d.level;
-	});
-	theChart.dividerLevel(maxLevelHet + (spacing/2));
-	
-	return maxLevelHet + spacing + maxLevelHom;
-}
-
-VariantCard.prototype._pileupVariantsImpl = function(theChart, features, start, end) {
+VariantCard.prototype._pileupVariants = function(theChart, features, start, end) {
 	var me = this;
 	features.forEach(function(v) {
 		v.level = 0;
@@ -803,10 +773,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				    	});
 
 
-				        var splitByZyg = me.vcfData.hetCount > 0 && me.vcfData.homCount > 0;
-
-
-				        maxLevel = me._pileupVariants(me.vcfChart, splitByZyg, me.vcfData.features, gene.start, gene.end);
+				        maxLevel = me._pileupVariants(me.vcfChart, me.vcfData.features, gene.start, gene.end);
 						me.vcfData.maxLevel = maxLevel + 1;
 
 				    	me.fillVariantChart(me.vcfData, window.gene.start, window.gene.end);
@@ -931,9 +898,8 @@ VariantCard.prototype.filterVariants = function(dataToFilter) {
 		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot;
 	});
 
-	var splitByZyg = data.hetCount > 0 && data.homCount > 0;
-
-	var maxLevel = this._pileupVariants(this.vcfChart, splitByZyg, filteredFeatures, 
+	
+	var maxLevel = this._pileupVariants(this.vcfChart, filteredFeatures, 
 		regionStart ? regionStart : window.gene.start, 
 		regionEnd   ? regionEnd   : window.gene.end);		
 

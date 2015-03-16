@@ -67,6 +67,13 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 
 
+#feature-matrix .y.axis .tick text.active,
+#feature-matrix .y.axis .tick text.active {
+   font-weight: bold;
+   fill:rgb(53, 134, 192);
+}
+
+
 #feature-matrix .y.axis .tick .up polygon:hover,
 #feature-matrix .y.axis .tick .down polygon:hover {
    cursor: pointer;
@@ -88,7 +95,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 
 #recessive-symbol .parent .left {
-  stroke: rgb(215, 48, 39);
+  stroke: darkorange;
 }
 #recessive-symbol .parent .right {
   stroke: grey;
@@ -96,7 +103,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 #recessive-symbol .proband .left,
 #recessive-symbol .proband .right {
-  stroke: rgb(215, 48, 39);
+  stroke: darkorange;
 }
 
 #denovo-symbol .parent .left {
