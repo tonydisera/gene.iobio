@@ -30,6 +30,7 @@ function geneD3() {
   // variables 
   var trackHeight = 20,
       borderRadius = 1,
+      minFtWidth = 0.5;
       utrHeight = undefined,
       cdsHeight = undefined,
       arrowHeight = undefined,
@@ -268,7 +269,7 @@ function geneD3() {
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { return d3.round(x(d.start))})
-          .attr('width', function(d) { return d3.round(x(d.end) - x(d.start))})
+          .attr('width', function(d) { return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start))) })
           .attr('y', trackHeight /2)
           .attr('height', 0)
           .on("mouseover", function(d) {  
@@ -326,7 +327,7 @@ function geneD3() {
         .transition()        
           .duration(700)
           .attr('x', function(d) { return d3.round(x(d.start))})
-          .attr('width', function(d) { return d3.round(x(d.end) - x(d.start))})
+          .attr('width', function(d) { return Math.max(minFtWidth, d3.round(x(d.end) - x(d.start)))})
           .attr('y', function(d) { 
             if(d.feature_type.toLowerCase() =='utr') return (trackHeight - utrHeight)/2; 
             else return (trackHeight - cdsHeight)/2; })
