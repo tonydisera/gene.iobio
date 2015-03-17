@@ -484,6 +484,21 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 }
 
 
+VariantCard.prototype.getBamDepthAtPos = function(pos) {
+	var data = this.d3CardSelector.select("#bam-depth").datum();
+	if (data == undefined) return null;
+
+	var d;
+    
+	for (var i = 0; i < data.length - 1; i++) {
+		if ( (pos >= data[i][0])  &&  (pos <= data[i+1][0]) ) {
+	  		d = data[i];
+	  		break;
+		}
+	}
+	return d[1];
+}
+
 
 VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 	if (this.isViewable) {
@@ -882,7 +897,11 @@ VariantCard.prototype.filterVariants = function(dataToFilter) {
 		// region of variant
 		var meetsCoverage = true;
 		if (coverageMin) {
- 			meetsCoverage = d.combinedDepth >= coverageMin;
+			if (d.depth)
+				meetsCoverage = d.depth >= coverageMin;
+			else {
+				meetsCoverage = me.getBamDepthAtPos(d.start) >= coverageMin;
+			}
 		}
 
 		// Iterate through the clicked annotations for each variant. The variant
