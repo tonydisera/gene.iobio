@@ -10,6 +10,9 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 
 
 .material-dropdown .form-control { background: white;}
+.material-dropdown li.disabled { color: rgb(210,210,210); cursor:auto }
+.material-dropdown li.disabled:hover { background: white}
+.material-dropdown li:hover { background: rgb(200,200,200);}
 
 #feature-matrix rect.cellbox {
   fill: white;

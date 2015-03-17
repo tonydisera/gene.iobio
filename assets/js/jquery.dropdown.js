@@ -55,6 +55,9 @@
           // Create the option
           var $option = $("<li></li>");
 
+          // Transfer classes
+          $option.addClass(this.className)
+
           // Style the option
           $option.addClass(options.optionStyle);
 
@@ -114,16 +117,29 @@
         //---------------------------------------//
 
         // On click, set the clicked one as selected
-        selectOptions.on("click", function(e) {
+        selectOptions.on("click", function(e) {          
+          if ( $(this).hasClass('disabled')) {
+            e.stopPropagation();
+            return;
+          }
           methods._select($dropdown, $(this));
         });
         // On click, set the clicked one as selected
-        $ul.on("click", "li:not(.dropdownjs-add)", function(e) {
+        $ul.on("click", "li:not(.dropdownjs-add)", function(e) {   
+          if($(this).hasClass('disabled')) {
+            e.stopPropagation();
+            return;
+          }      
           methods._select($dropdown, $(this));
           // trigger change event, if declared on the original selector
           $select.change();
         });
         selectOptions.on("keydown", function(e) {
+          if($(this).hasClass('disabled')) {
+            e.stopPropagation();
+            return;
+          }   
+          
           if (e.which === 27) {
             $(".dropdownjs > ul > li").each(function() { $(this).attr("tabindex", -1); });
             return $input.removeClass("focus").blur();
@@ -134,8 +150,9 @@
           }
         });
 
-        selectOptions.on("focus", function() {
-          if ($select.is(":disabled")) {
+        selectOptions.on("focus", function(e) {          
+          if ($select.is(":disabled") || $input.hasClass('disabled')) {
+            e.stopPropagation();
             return;
           }
           $input.addClass("focus");
@@ -143,8 +160,8 @@
 
         // Used to make the dropdown menu more dropdown-ish
         $input.on("click focus", function(e) {
-          e.stopPropagation();
-          if ($select.is(":disabled")) {
+          e.stopPropagation();          
+          if ($select.is(":disabled") || $input.hasClass('disabled')) {
             return;
           }
           $(".dropdownjs > ul > li").each(function() { $(this).attr("tabindex", -1); });

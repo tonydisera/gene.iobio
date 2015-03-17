@@ -418,6 +418,13 @@ function initDataSourceFields() {
 	var cardIndex = $('#datasource-dialog #card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
+	$('#datasource-dialog .material-dropdown li').removeClass('disabled')
+	if (cardIndex > 0) {
+    	$('#datasource-dialog .material-dropdown li[value="proband"]').addClass('disabled')    	
+    } else {    	
+    	$('#datasource-dialog .material-dropdown li[value!="proband"]').addClass('disabled')    	
+    }
+
 
 	if (variantCard.getBamName().indexOf("http") == 0) {
 		$('#datasource-dialog #bam-file-info').addClass("hide");
@@ -967,7 +974,6 @@ function addVariantCard() {
 
 
 	$('#datasource-dialog #datasource-name').val(defaultName);
-	$('.material-dropdown li[value="none"]').click();	
 	$('#datasource-dialog #bam-file-info').addClass("hide");
 	$('#datasource-dialog #bam-url-input').addClass("hide");
 	$('#datasource-dialog #vcf-file-info').addClass("hide");
@@ -979,7 +985,6 @@ function addVariantCard() {
 
 	$('#datasource-dialog #bam-file-upload').val("");
 	$('#datasource-dialog #vcf-file-upload').val("");
-	
 
 
     $('#variant-card-buttons')
@@ -990,7 +995,13 @@ function addVariantCard() {
          .attr("class", "btn btn-default")
          .text(defaultName));
 
-
+    if (cardIndex > 0) {
+    	$('#datasource-dialog .material-dropdown li').removeClass('disabled')
+    	$('#datasource-dialog .material-dropdown li[value="proband"]').addClass('disabled')
+    	$('.material-dropdown li[value="none"]').click();	
+    } else {
+    	$('.material-dropdown li[value="proband"]').click();	
+    }
 }
 
 

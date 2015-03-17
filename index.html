@@ -553,11 +553,11 @@
                       <div style="float:left">
                         <span style="float:left;width: 155px;padding-top: 10px;text-align: right;padding-right: 18px;">Relationship</span>
                         <div class="material-dropdown" style="float: left;width: 210px">
-                          <select id='datasource-relationship' class="form-control" placeholder="None" onchange="setDataSourceRelationship()">
-                            <option value="none">None</option>
+                          <select id='datasource-relationship' class="form-control" placeholder="Proband" onchange="setDataSourceRelationship()">                            
                             <option value="proband">Proband</option>
-                            <option value="mother">Mother</option>
-                            <option value="father">Father</option>                            
+                            <option value="none" class='disabled'>None</option>
+                            <option value="mother" class='disabled'>Mother</option>
+                            <option value="father" class='disabled'>Father</option>                            
                           </select>                                                    
                         </div>
                       </div>
