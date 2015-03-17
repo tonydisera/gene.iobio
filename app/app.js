@@ -269,7 +269,7 @@ function init() {
 					    .margin({top: 0, right: 4, bottom: 4, left: 24})
 					    .cellSize(30)
 					    .columnLabelHeight(90)
-					    .rowLabelWidth(50)
+					    .rowLabelWidth(100)
 					    .tooltipHTML(variantTooltipHTML)
 					    .on('d3click', function(variant) {
 					    	if (variantCards.length > 0) {

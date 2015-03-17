@@ -227,7 +227,7 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 
 	if (this.isViewable()) {
 		this.cardSelector.find("#bam-track .loader").css("display", "block");
-		this.cardSelector.find("#bam-track .loader-label").text("Loading File");
+		this.cardSelector.find("#bam-track .loader-label").text("Loading Alignment File");
 		this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamFile.name);
 
 		$('#datasource-dialog #bam-file-info').removeClass('hide');
@@ -256,7 +256,7 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 
 VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 	this.cardSelector.find("#bam-track .loader").css("display", "block");
-	this.cardSelector.find("#bam-track .loader-label").text("Streaming File")
+	this.cardSelector.find("#bam-track .loader-label").text("Streaming Alignment File")
 
 	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamUrl);
     
@@ -274,7 +274,7 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find("#vcf-track .loader").css("display", "block");
-		this.cardSelector.find('#vcf-track .loader-label').text("Loading File");
+		this.cardSelector.find('#vcf-track .loader-label').text("Loading VCF");
 	}
 
 	this.vcf.openVcfFile( event, function(vcfFile) {
@@ -472,7 +472,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 	 		function(data) {
 				me.bamData = data;
 				
-				me.cardSelector.find("#bam-track .loader-label").text("Loading Chart")
+				me.cardSelector.find("#bam-track .loader-label").text("Loading Coverage Chart")
 
 				me.fillBamChart(me.bamData, window.gene.start, window.gene.end);
 			});
@@ -544,9 +544,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 				return (d.start >= regionStart && d.start <= regionEnd);
 			});
 
-			var splitByZyg = this.vcfData.hetCount > 0 && this.vcfData.homCount > 0;
-
-			maxLevel = this._pileupVariants(this.vcfChart, splitByZyg, filteredFeatures, regionStart, regionEnd);		
+			maxLevel = this._pileupVariants(this.vcfChart, filteredFeatures, regionStart, regionEnd);		
 
 			var vcfDataFiltered = {	count: this.vcfData.count,
 									countMatch: this.vcfData.countMatch,
@@ -567,7 +565,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	} else {
 
 		if (this.isViewable) {
-		    this.cardSelector.find('#vcf-track .loader-label').text("Annotating Variants in realtime");
+		    this.cardSelector.find('#vcf-track .loader-label').text("Annotating Variants with snpEff in realtime");
 		}
 
 		// A gene has been selected.  Read the variants for the gene region.
@@ -583,7 +581,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	        me.vcfData = data;
 
 	   	    if (me.isViewable()) {
-		   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading chart");
+		   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading variant chart");
 		   	    var filteredVcfData = this.filterVariants();
 			  	me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 			  	window.cullVariantFilters();
@@ -615,37 +613,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 
 }
 
-VariantCard.prototype._pileupVariants = function(theChart, splitByZyg, features, start, end) {
-	if (splitByZyg) {
-		return this._pileupVariantsByZygosity(theChart, features, start, end);
-	} else {
-		theChart.dividerLevel(null);
-		return this._pileupVariantsImpl(theChart, features, start, end);
-	}
 
-} 
 
-VariantCard.prototype._pileupVariantsByZygosity = function(theChart, features, start, end) {
-	var spacing = 6;
-	var featuresHet = features.filter(function(d) {
-		return d.zygosity == null || d.zygosity == 'HET';
-	});
-	var maxLevelHet = this._pileupVariantsImpl(theChart, featuresHet, start, end);
-
-	var featuresHom = features.filter(function(d) {
-		return d.zygosity != null && d.zygosity == 'HOM';
-	});
-	var maxLevelHom = this._pileupVariantsImpl(theChart, featuresHom, start, end);
-
-	featuresHom.forEach( function(d) {
-		d.level = maxLevelHet + spacing + d.level;
-	});
-	theChart.dividerLevel(maxLevelHet + (spacing/2));
-	
-	return maxLevelHet + spacing + maxLevelHom;
-}
-
-VariantCard.prototype._pileupVariantsImpl = function(theChart, features, start, end) {
+VariantCard.prototype._pileupVariants = function(theChart, features, start, end) {
 	var me = this;
 	features.forEach(function(v) {
 		v.level = 0;
@@ -780,7 +750,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				me.getVcfRefName = me.stripRefName;
 			
 			if (me.isViewable()) {
-				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants in realtime")
+				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants with snpEFF in realtime")
 
 				// Annotate the fb variatns
 				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
@@ -818,10 +788,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				    	});
 
 
-				        var splitByZyg = me.vcfData.hetCount > 0 && me.vcfData.homCount > 0;
-
-
-				        maxLevel = me._pileupVariants(me.vcfChart, splitByZyg, me.vcfData.features, gene.start, gene.end);
+				        maxLevel = me._pileupVariants(me.vcfChart, me.vcfData.features, gene.start, gene.end);
 						me.vcfData.maxLevel = maxLevel + 1;
 
 				    	me.fillVariantChart(me.vcfData, window.gene.start, window.gene.end);
@@ -950,9 +917,8 @@ VariantCard.prototype.filterVariants = function(dataToFilter) {
 		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot;
 	});
 
-	var splitByZyg = data.hetCount > 0 && data.homCount > 0;
-
-	var maxLevel = this._pileupVariants(this.vcfChart, splitByZyg, filteredFeatures, 
+	
+	var maxLevel = this._pileupVariants(this.vcfChart, filteredFeatures, 
 		regionStart ? regionStart : window.gene.start, 
 		regionEnd   ? regionEnd   : window.gene.end);		
 

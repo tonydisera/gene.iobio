@@ -120,7 +120,7 @@ function featureMatrixD3() {
           .call(yAxis)
           .selectAll("text")
           .style("text-anchor", "start")
-          .attr("x", "4")
+          .attr("x", "2")
           .attr("dx", ".8em")
           .attr("dy", ".15em");
 
@@ -129,9 +129,9 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "up faded")
-         .attr("transform", "translate(0, -12)")
+         .attr("transform", "translate(" + rowLabelWidth + ", -14)")
          .append("polygon")
-         .attr("points", "1,8 5,4 9,8")
+         .attr("points", "1,12 10,4 20,12")
          .attr("x", "0")
          .attr("y", "0")
          .on("click", function(d,i) {
@@ -159,6 +159,8 @@ function featureMatrixD3() {
             container.selectAll('.y.axis .up').classed("faded", true);
             container.selectAll('.y.axis .down').classed("faded", true);
             d3.select(this.parentNode).classed("faded", false);
+            container.selectAll('.y.axis text').classed("active", false);
+            d3.select(this.parentNode.parentNode).select("text").classed("active", true);
          });
 
 
@@ -167,9 +169,9 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "down faded")
-         .attr("transform", "translate(10, 8)")
+         .attr("transform", "translate(" + (+rowLabelWidth + 21) + ", 15 )")
          .append("polygon")
-         .attr("points", "1,8 5,4 9,8")
+         .attr("points", "1,12 10,4 20,12")
          .attr("x", "0")
          .attr("y", "0")
          .style("transform", "rotate(180deg)")
@@ -198,6 +200,9 @@ function featureMatrixD3() {
             container.selectAll('.y.axis .up').classed("faded", true);
             container.selectAll('.y.axis .down').classed("faded", true);
             d3.select(this.parentNode).classed("faded", false);
+            container.selectAll('.y.axis text').classed("active", false);
+            d3.select(this.parentNode.parentNode).select("text").classed("active", true);
+
          });
   
       // Highlight of the last row label that we moved up or down.  Highlight this
