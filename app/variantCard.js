@@ -55,6 +55,10 @@ VariantCard.prototype.isViewable = function() {
 	return this.relationship != 'mother' && this.relationship != 'father';
 }
 
+VariantCard.prototype.getRelationship = function() {
+	return this.relationship;
+}
+
 VariantCard.prototype.setDirty = function(flag) {
 	if (flag == null) {
 		this.dirty = true;
@@ -298,12 +302,15 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 			 		}
 				}
 			});
+			return callback();
 		});
+
 	});
 
 }
 
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
+	var me = this;
 	
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -315,9 +322,30 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
    
     this.vcf.openVcfUrl(vcfUrl);
     this.vcfUrlEntered = true;
-    this.getVcfRefName = this.stripRefName;
+    this.getVcfRefName = null;
 
+}
 
+VariantCard.prototype.discoverVcfRefName = function(callback) {
+	var me = this;
+	if (this.getVcfRefName != null) {
+		callback();
+	}
+	if (!this.vcf.isFile()) {
+
+		this.vcf.loadRemoteIndex(null, function(refData) {
+	    	refData.forEach( function(ref) {
+	    		if (me.getVcfRefName == null) {
+			 		if (ref.name == window.gene.chr) {
+			 			me.getVcfRefName = me.getRefName;
+			 		} else if (ref.name == me.stripRefName(gene.chr)) {
+			 			me.getVcfRefName = me.stripRefName;
+			 		}
+				}
+	    	});
+	    	return callback();
+    	});
+	} 
 }
 
 VariantCard.prototype.loadDataSources = function(dataSourceName) {
@@ -520,9 +548,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 
 	if (this.vcf && this.vcfUrlEntered) {
 
-	} else if (this.vcf == null || 
-		(!this.vcfFileOpened) ||
-	    (this.vcfFileOpened && this.getVcfRefName == null)) {
+	} else if (this.vcf && this.vcfFileOpened) {
+
+	} else {
 		return;
 	}
 
@@ -569,8 +597,8 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 		}
 
 		// A gene has been selected.  Read the variants for the gene region.
-		var refName = this.getVcfRefName(window.gene.chr);
-		this.vcf.getVariants(refName, 
+		this.discoverVcfRefName( function() {
+			me.vcf.getVariants(me.getVcfRefName(window.gene.chr), 
 							   window.gene.start, 
 	                           window.gene.end, 
 	                           window.gene.strand, 
@@ -578,16 +606,18 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	                           this.afMin,
 	                           this.afMax,
 	                           function(data) {
-	        me.vcfData = data;
+		        me.vcfData = data;
 
-	   	    if (me.isViewable()) {
-		   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading variant chart");
-		   	    var filteredVcfData = this.filterVariants();
-			  	me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
-			  	window.cullVariantFilters();
-	   	    }
+		   	    if (me.isViewable()) {
+			   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading variant chart");
+			   	    var filteredVcfData = this.filterVariants();
+				  	me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
+				  	window.cullVariantFilters();
+		   	    }
 
-		});	
+			});	
+
+		});
 
 	}
 
@@ -595,19 +625,22 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	if (this.isViewable()) {
 		this.vcfAfData = null;
 		this.cardSelector.find('#af').addClass("hide");		
-		var regionParm = {'name': this.getVcfRefName(window.gene.chr), 
-						  'start': regionStart ? regionStart : window.gene.start, 
-						  'end':   regionEnd   ? regionEnd   : window.gene.end
-						 };
-		this.vcf.getStats(null, regionParm, {}, function(stats) {
-			// Alelle Frequency
-			var afObj = stats.af_hist;
-			vcfAfData = me.vcf.jsonToArray2D(afObj);	
-			var afSelection = me.d3CardSelector.select("#vcf-af-chart")
-							    .datum(vcfAfData);
-			var afOptions = {outliers: true, averageLine: false};		
-			me.cardSelector.find('#af').removeClass("hide");			    
-			me.afChart.call(afSelection, afSelection, afOptions);	
+		this.discoverVcfRefName( function() {
+			var regionParm = {'name': me.getVcfRefName(window.gene.chr), 
+							  'start': regionStart ? regionStart : window.gene.start, 
+							  'end':   regionEnd   ? regionEnd   : window.gene.end
+							 };
+			me.vcf.getStats(null, regionParm, {}, function(stats) {
+				// Alelle Frequency
+				var afObj = stats.af_hist;
+				vcfAfData = me.vcf.jsonToArray2D(afObj);	
+				var afSelection = me.d3CardSelector.select("#vcf-af-chart")
+								    .datum(vcfAfData);
+				var afOptions = {outliers: true, averageLine: false};		
+				me.cardSelector.find('#af').removeClass("hide");			    
+				me.afChart.call(afSelection, afSelection, afOptions);	
+			});
+
 		});
 	}
 
@@ -934,6 +967,35 @@ VariantCard.prototype.filterVariants = function(dataToFilter) {
 							variantRegionStart: regionStart
 						};
 	return vcfDataFiltered;
+}
+
+
+VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, compareAttribute, matchAttribute, matchCallback ) {
+	var me = this;
+	if (this.vcfData == null) {
+		var refName = this.getVcfRefName(window.gene.chr);
+		this.vcf.getVariants(refName, 
+		 window.gene.start, 
+		 window.gene.end, 
+		 window.gene.strand, 
+		 window.selectedTranscript,
+		 0,
+		 1,
+		 function(data) {
+		 	me.vcfData = data;
+			me.vcfData.features.forEach( function(feature) {
+				feature[compareAttribute] = '';
+			});
+			me.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 								 	
+		 });
+	} else {
+		this.vcfData.features.forEach( function(feature) {
+			feature[compareAttribute] = '';
+		});
+		this.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 	
+	}
+
+
 }
 
 
