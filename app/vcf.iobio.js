@@ -975,10 +975,9 @@ var effectCategories = [
     }
 
     variants1.count = variants1.features.length;
-    //variants1.countMatch = 0;
 
     variants2.count = variants2.features.length;
-    //variants2.countMatch = 0;
+
 
     var idx1 = 0;
     var idx2 = 0;
@@ -991,61 +990,56 @@ var effectCategories = [
     // Iterate through the variants from the first set,
     // marking the consensus field based on whether a 
     // matching variant from the second list is encountered.
-    for (var idx1 = 0; idx1 < features1.length; idx1++) {
+    while (idx1 < features1.length && idx2 < features2.length) {
       variant1 = features1[idx1];
+      variant2 = features2[idx2];
+      var refAlt1 = variant1.ref + "->" + variant1.alt;
+      var refAlt2 = variant2.ref + "->" + variant2.alt;
 
-      // Default variant1 as 'unique'.  Now iterate 
-      // through variants2 until we get to the same position
-      // (or bypass it).  For each variant2 that matches
-      // variant1, mark both as 'match'.
-      variant1[comparisonAttribute] = set1Label;
-      for (var x = idx2; x < features2.length; x++) {
-        variant2 = features2[x];
-        if (variant1.start == variant2.start) {
-          // We are at the right position.  No need
-          // to go back to previous variants for
-          // next iteration. (better performance)
-          idx2 = x;
+      if (variant1.start == variant2.start) {
 
-          if (variant1.ref == variant2.ref && variant1.alt == variant2.alt) {
-            variant1[comparisonAttribute] =  commonLabel;
-            variant2[comparisonAttribute] =  commonLabel;
-            if (onMatchCallback) {
+        if (refAlt1 == refAlt2) {
+          variant1[comparisonAttribute] =  commonLabel;
+          variant2[comparisonAttribute] =  commonLabel;
 
-            }
-            if (onMatchCallback) {
-              onMatchCallback(variant1, variant2);
-            }
-
-            variants1.countMatch++;
-            variants2.countMatch++;
-
-          } else {
-            // We need to mark variant2 as 'diff' so we don't revisit it
-            // when variant2 drives the comparison loop.
-            variant2[comparisonAttribute] = set2Label;
+          if (onMatchCallback) {
+            onMatchCallback(variant1, variant2);
           }
-        } else if (variant1.start < variant2.start) {
-          // We have moved beyond variant1's position,
-          // so exit the variant2 iteration.
-          break;
+          idx1++;
+          idx2++;
+        } else if (refAlt1 < refAlt2) {
+          variant1[comparisonAttribute] = set1Label;
+          idx1++;
+        } else {
+          variant2[comparisonAttribute] = set2Label;
+          idx2++;
         }
-      } // End lookup variant2 loop
+      } else if (variant1.start < variant2.start) {
+        variant1[comparisonAttribute] = set1Label;
+        idx1++;
+      } else if (variant2.start < variant1.start) {
+        variant2[comparisonAttribute] = set2Label;
+        idx2++;
+      }
 
     }
 
-    // Iterate through the second set of variants, marking
-    // the unvisited variants as different since the prior
-    // loop through variants1 never discovered these variants.
-    for (var x = 0; x < features2.length; x++) {
-      variant2 = features2[x];
-      if (variant2[comparisonAttribute]  == null) {
+    // If we get to the end of one set before the other,
+    // mark the remaining as unique
+    //
+    if (idx1 < features1.length) {
+      for(x = idx1; x < features1.length; x++) {
+        var variant1 = features1[x];
+        variant1[comparisonAttribute] = set1Label;
+      }
+    } 
+    if (idx2 < features2.length) {
+      for(x = idx2; x < features2.length; x++) {
+        var variant2 = features2[x];
         variant2[comparisonAttribute] = set2Label;
       }
-    }
+    } 
 
-    //variants1.countUnique = variants1.count - variants1.countMatch;
-    //variants2.countUnique = variants2.count - variants2.countMatch;
     callback();
 
   };

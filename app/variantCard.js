@@ -52,7 +52,8 @@ VariantCard.prototype.getCardIndex = function() {
  * visualized.
  */
 VariantCard.prototype.isViewable = function() {
-	return this.relationship != 'mother' && this.relationship != 'father';
+	//return this.relationship != 'mother' && this.relationship != 'father';
+	return true;
 }
 
 VariantCard.prototype.getRelationship = function() {
@@ -96,7 +97,7 @@ VariantCard.prototype.highlightVariants = function(variants) {
 VariantCard.prototype.isDirty = function() {
 	return this.dirty;
 }
-VariantCard.prototype.init = function(cardSelector, cardIndex) {
+VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 	var me = this;	
 
 	// init vcf.iobio
@@ -104,8 +105,8 @@ VariantCard.prototype.init = function(cardSelector, cardIndex) {
 	this.cardIndex = cardIndex;
 
 	if (this.isViewable()) {
-		this.d3CardSelector = d3.selectAll("#variant-cards .variant-card").filter(function(d, i) { return i == +cardIndex; });
 		this.cardSelector = cardSelector;
+		this.d3CardSelector = d3CardSelector;
 
 		this.cardSelector.find("#variant-link").attr("href", "#variant-panel-" + cardIndex);
 		this.cardSelector.find('#variant-panel').attr("id", "variant-panel-" + cardIndex);
@@ -357,6 +358,7 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 	   	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
 	   	this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
 	   	this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
+<<<<<<< Updated upstream
 }
 
 VariantCard.prototype.loadDataSources = function(dataSourceName) {
@@ -366,14 +368,29 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 		this.showDataSources();
 
 		// Show the read coverage 		
+=======
+	}
 
+	// Show the read coverage 
+	this.showBamDepth();
+>>>>>>> Stashed changes
+
+	if (this.isViewable()) {
 		if (regionStart && regionEnd) {
 			this.showBamDepth(regionStart, regionEnd);
 		} else {
 			this.showBamDepth();
 		}
+<<<<<<< Updated upstream
 	    
+=======
+	}
 
+    // Show the vcf variants.  
+	this.showVariants();
+>>>>>>> Stashed changes
+
+	if (this.isViewable()) {
 		// If a sub-region of the gene was selected, 
 		// show the read coverage and called variants
 		// for the filtered region.  (Note: it is necessary
@@ -623,7 +640,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 				  		me.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 				  	else
 				  		me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
-				  	window.cullVariantFilters();
+				  	if (me.getRelationship() == 'proband') {
+				  		window.cullVariantFilters();
+				  	}
 		   	    }
 			});	
 
@@ -731,8 +750,8 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
    		$('#compare-legend').removeClass("hide");
    	}
 
-   	//  TODO:  Change this so that we can indicate proband/primary variant card
-   	if ( this.isViewable) {
+   	// Fill in the feature matrix for the proband variant card.
+   	if ( this.getRelationship() == 'proband') {
    		window.showFeatureMatrix(this, data, regionStart, regionEnd);
    	}
 
@@ -982,25 +1001,35 @@ VariantCard.prototype.filterVariants = function(dataToFilter) {
 
 VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, compareAttribute, matchAttribute, matchCallback ) {
 	var me = this;
+
 	if (this.vcfData == null) {
-		var refName = this.getVcfRefName(window.gene.chr);
-		this.vcf.getVariants(refName, 
-		 window.gene.start, 
-		 window.gene.end, 
-		 window.gene.strand, 
-		 window.selectedTranscript,
-		 0,
-		 1,
-		 function(data) {
-		 	me.vcfData = data;
-			me.vcfData.features.forEach( function(feature) {
-				feature[compareAttribute] = '';
-			});
-			me.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 								 	
-		 });
+		this.discoverVcfRefName( function() {
+
+			me.vcf.getVariants(me.getVcfRefName(window.gene.chr), 
+			 window.gene.start, 
+			 window.gene.end, 
+			 window.gene.strand, 
+			 window.selectedTranscript,
+			 0,
+			 1,
+			 function(data) {
+			 	me.vcfData = data;
+			 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
+			 	var i = 0;
+				me.vcfData.features.forEach( function(feature) {
+					feature[compareAttribute] = '';
+					feature.order = i++;
+				});
+				me.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 								 	
+			 });
+		});
+		
 	} else {
+		this.vcfData.features = this.vcfData.features.sort(orderVariantsByPosition);
+	 	var i = 0;
 		this.vcfData.features.forEach( function(feature) {
 			feature[compareAttribute] = '';
+			feature.order = i++;
 		});
 		this.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 	
 	}
