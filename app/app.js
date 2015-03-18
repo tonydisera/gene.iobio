@@ -1037,14 +1037,14 @@ function displayBamUrlBox() {
     $('#bam-file-info').val('');
     $('#datasource-dialog #bam-url-input').removeClass("hide");
     $("#datasource-dialog #bam-url-input").focus();
-    $('#datasource-dialog #bam-url-input').val('http://s3.amazonaws.com/1000genomes/data/HG04141/alignment/HG04141.mapped.ILLUMINA.bwa.BEB.low_coverage.20130415.bam');
+    $('#datasource-dialog #bam-url-input').val('ftp://ftp.sra.ebi.ac.uk/vol1/ERA172/ERA172924/bam/NA12877_S1.bam');
     onBamUrlEntered();
 	
 
 }
 
 function displayUrlBox() {
-    $('#url-input').val('http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz');
+    $('#url-input').val('http://s3.amazonaws.com/plantinum/NA12878.vcf.gz');
 	$("#url-input").removeClass('hide');
     $("#url-input").focus();
     $('#datasource-dialog #vcf-file-info').addClass('hide');
@@ -1253,7 +1253,12 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 
 					});
 
-		        	callback(theVcfData);
+					// Now that we have compared the variants to the population get get the allele frequency,
+					// we need to compare the proband variants to mother and father variants to determine
+					// the inheritance mode.  After this completes, we are ready to show the
+					// feature matrix.
+					window.compareVariantsToPedigree(theVcfData, callback);
+
 		        }, 
 		        // This is the attribute on variant a (proband) and variant b (ExAC)
 		        // that will store whether the variant is unique or matches.
@@ -1281,6 +1286,81 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	        	}
 
     	});
+
+}
+
+function compareVariantsToPedigree(theVcfData, callback) {
+	theVcfData.features.forEach(function(variant) {
+		variant.compareMother = null;
+		variant.compareFater = null;
+		variant.inheritance = 'none';
+	});
+	var motherVariantCard = null;
+	var fatherVariantCard = null;
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.getRelationship() == 'mother') {
+			motherVariantCard= variantCard;
+		} else if (variantCard.getRelationship() == 'father') {
+			fatherVariantCard = variantCard;
+		}
+	});
+	if (motherVariantCard == null || fatherVariantCard == null) {
+		callback(theVcfData);
+
+	} else {
+	
+		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+
+	    motherVariantCard.compareVcfRecords(theVcfData,
+	    	// This is the function that is called after all the proband variants have been compared
+	    	// to the mother variant set.  In this case, we now move on to comparing the
+	    	// father variant set to the proband variant set.
+	    	function() {
+		        fatherVariantCard.compareVcfRecords(theVcfData, 
+		        	// This is the function that is called after the proband variants have been compared
+		        	// to the father variant set. 
+		        	function(){
+
+		        		// Fill in the af level on each variant.  Use the af in the vcf if
+		        		// present, otherwise, use the 1000g af if present, otherwise use
+		        		// the ExAC af.
+		        		theVcfData.features.forEach(function(variant) {
+		        			if (variant.motherZygosity == 'het' && variant.fatherZygosity == 'het') {
+		        				variant.inheritance = 'recessive';
+		        			} else if (variant.motherZygosity == '' && variant.fatherZygosity == '') {
+		        				variant.inheritance = 'denovo';
+		        			}
+						});
+
+			        	callback(theVcfData);
+			        }, 
+			        // This is the attribute on variant a (proband) and variant b (father)
+			        // that will store whether the variant is unique or matches.
+			        'compareFather',
+			        // This is the attribute on the proband variant that will store the
+			        // father's zygosity in the case where the variant match
+			        'fatherZygosity',
+			    	// This is the callback function called every time we find the same variant
+			    	// in both sets. Here we take the father variant's zygosity and store it in the
+			    	// proband's variant for further sorting/display in the feature matrix.
+			        function(variantA, variantB) {
+			        	variantA.fatherZygosity = variantB.zygosity;
+			        });
+	    	}, 
+	    	// This is the attribute on variant a (proband) and variant b (mother)
+			// that will store whether the variant is unique or matches.
+	    	'compareMother',
+	    	// This is the attribute on the proband variant that will store the
+			// mother's zygosity in the case where the variant match
+			'motherZygosity',
+	    	// This is the callback function called every time we find the same variant
+	    	// in both sets. Here we take the mother variant's af and store it in the
+	    	// proband's variant for further sorting/display in the feature matrix.
+	    	function(variantA, variantB) {
+	    		variantA.motherZygosity = variantB.zygosity;
+
+	    	});
+	}
 
 }
 
@@ -1321,13 +1401,7 @@ function fillFeatureMatrix(theVcfData) {
 			// Fake the clinvar, inheritance data for now
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = Math.random() > .5 ? 'Y' : 'N';
-			} else if (matrixRow.attribute == 'inheritance') {
-				if (Math.random() > .5) {
-					rawValue = 'recessive';
-				} else  {
-					rawValue = 'denovo';
-				} 
-			}
+			} 
 			if (rawValue != null) {
 				if (matrixRow.match == 'exact') {
 					// We are going to get the mapped value through exact match,

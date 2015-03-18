@@ -319,7 +319,9 @@ var effectCategories = [
 
 
   exports.loadRemoteIndex = function(theVcfUrl, callback) {
-    vcfURL = theVcfUrl;
+    if (theVcfUrl != null) {
+      vcfURL = theVcfUrl;
+    }
     sourceType = SOURCE_TYPE_URL;
 
     var client = BinaryClient(vcfReadDeptherServer);
@@ -365,6 +367,8 @@ var effectCategories = [
     });
 
   };
+
+
 
 
   exports.getReferences = function(minLengthPercent, maxLengthPercent) {
