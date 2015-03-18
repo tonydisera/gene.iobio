@@ -434,7 +434,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		$("#feature-matrix").addClass("hide");
 		if (this.bam)
 			this.showBamDepth();
-		if (this.vcf)
+		if (this.vcfUrlEntered || this.vcfFileOpened)
 			this.showVariants();
 	}
 }
