@@ -320,25 +320,31 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 
 }
 
-VariantCard.prototype.loadDataSources = function(dataSourceName) {
-	this.name = dataSourceName;
+VariantCard.prototype.showDataSources = function(dataSourceName) {
+		this.name = dataSourceName;
+		$('#add-datasource-container').css('display', 'none');
 
-	if (this.isViewable()) {
 		var cache = this.cardSelector.find('#variant-link').children();
 	   	this.cardSelector.find('#variant-link').text(dataSourceName).append(cache);
 	   	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
 	   	this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
 	   	this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
+}
 
-		// Show the read coverage 
-		this.showBamDepth();
+VariantCard.prototype.loadDataSources = function(dataSourceName) {
+	this.name = dataSourceName;
+
+	if (this.isViewable()) {
+		this.showDataSources();
+
+		// Show the read coverage 		
 
 		if (regionStart && regionEnd) {
 			this.showBamDepth(regionStart, regionEnd);
+		} else {
+			this.showBamDepth();
 		}
-
-	    // Show the vcf variants.  
-		this.showVariants();
+	    
 
 		// If a sub-region of the gene was selected, 
 		// show the read coverage and called variants
@@ -348,7 +354,10 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 		// can just filter on the full data.)
 		if (regionStart && regionEnd) {
 			this.showVariants(regionStart, regionEnd);
-		}	
+		} else {
+			// Show the vcf variants.  
+			this.showVariants();
+		}
 	}
 
 }
@@ -395,8 +404,10 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 		// chart is not rendered.
 		$("#feature-matrix").addClass("hide");
-		this.showBamDepth();
-		this.showVariants();
+		if (this.bam)
+			this.showBamDepth();
+		if (this.vcf)
+			this.showVariants();
 	}
 }
 
@@ -433,7 +444,7 @@ VariantCard.prototype.onBrush = function(brush) {
 }
 
 
-VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
+VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {	
 	var me = this;
 
 	if (this.bam && this.bamUrlEntered) {
@@ -452,16 +463,15 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 	this.cardSelector.find('#bam-name-' + this.cardIndex).addClass("hide");
 	
 
-	if (regionStart && regionEnd) {
-
-		// The user has selected a region.  Filter the existing bam data
-		// to return only records in the specified region.
-		var filteredData = this.bamData.filter(function(d) { 
-			return (d[0] >= regionStart && d[0] <= regionEnd);
-		}); 
-		
-		this.fillBamChart(filteredData, regionStart, regionEnd);
-
+	if (this.bamData) {
+		if (regionStart && regionEnd) {
+			var filteredData = this.bamData.filter(function(d) { 
+				return (d[0] >= regionStart && d[0] <= regionEnd);
+			}); 
+			me.fillBamChart(filteredData, regionStart, regionEnd);
+		} else {
+			me.fillBamChart(me.bamData, window.gene.start, window.gene.end);
+		}
 	} else {
 
 		// A gene has been selected.  Read the bam file to obtain
@@ -474,7 +484,14 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 				
 				me.cardSelector.find("#bam-track .loader-label").text("Loading Coverage Chart")
 
-				me.fillBamChart(me.bamData, window.gene.start, window.gene.end);
+				if (regionStart && regionEnd) {
+					var filteredData = me.bamData.filter(function(d) { 
+						return (d[0] >= regionStart && d[0] <= regionEnd);
+					}); 
+					me.fillBamChart(filteredData, regionStart, regionEnd);
+				} else {
+					me.fillBamChart(me.bamData, window.gene.start, window.gene.end);
+				}
 			});
 	}
 
@@ -516,6 +533,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 }
 
 VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
+	console.log('showVariants')
 	var me = this;
 
 	if (this.vcf && this.vcfUrlEntered) {
@@ -535,7 +553,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	}
 
 
-	if( regionStart && regionEnd) {
+	if( this.vcfData) {
 
 		// The user has selected a region to zoom into.  Filter the
 		// variants based on the selected region
@@ -543,23 +561,13 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 			var filteredFeatures = this.vcfData.features.filter(function(d) {
 				return (d.start >= regionStart && d.start <= regionEnd);
 			});
-
-			maxLevel = this._pileupVariants(this.vcfChart, filteredFeatures, regionStart, regionEnd);		
-
-			var vcfDataFiltered = {	count: this.vcfData.count,
-									countMatch: this.vcfData.countMatch,
-									countUnique: this.vcfData.countUnique,
-									end: regionEnd,
-									features: filteredFeatures,
-									maxLevel: maxLevel + 1,
-									name: this.vcfData.name,
-									start: regionStart,
-									strand: this.vcfData.strand,
-									variantRegionStart: regionStart
-								};
+				
 
 			var filteredVcfData = this.filterVariants();
-	  		this.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+			if (regionStart && regionEnd)
+	  			this.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+	  		else
+	  			this.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 		}
 	
 	} else {
@@ -583,7 +591,10 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	   	    if (me.isViewable()) {
 		   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading variant chart");
 		   	    var filteredVcfData = this.filterVariants();
-			  	me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
+		   	    if (regionStart && regionEnd)
+			  		me.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+			  	else
+			  		me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 			  	window.cullVariantFilters();
 	   	    }
 

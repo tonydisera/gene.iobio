@@ -378,8 +378,10 @@ function loadUrlSources() {
 							onVcfUrlEntered();
 						}
 											
-						// load 
-						loadDataSources();
+						// show bam/vcf tracks
+						variantCards.forEach( function(variantCard) {							
+								variantCard.showDataSources(variantCard.getName());						
+						});				
 					})
 				}		
 				// load vcfs that don't have a bam pair
