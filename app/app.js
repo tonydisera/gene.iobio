@@ -1041,7 +1041,7 @@ function displayBamUrlBox() {
     $('#bam-file-info').val('');
     $('#datasource-dialog #bam-url-input').removeClass("hide");
     $("#datasource-dialog #bam-url-input").focus();
-    $('#datasource-dialog #bam-url-input').val('ftp://ftp.sra.ebi.ac.uk/vol1/ERA172/ERA172924/bam/NA12877_S1.bam');
+    $('#datasource-dialog #bam-url-input').val('http://s3.amazonaws.com/iobio/NA12878_S1.bam');
     onBamUrlEntered();
 	
 

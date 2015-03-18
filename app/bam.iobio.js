@@ -588,36 +588,47 @@ var Bam = Class.extend({
       }
    }, 
 
+   transformRefName: function(refName, callback) {
+    this.getHeader(function(header) {
+      header.sq.forEach(function(seq) {
+        if (seq.name == refName || seq.name.split('chr')[1] == refName || seq.name == refName.split('chr')[1])
+          callback(seq.name);        
+      })
+      callback(refName); // not found
+    })
+   },
+
    // NEW
    getCoverageForRegion: function(refName, start, end, maxPoints, callback) {
       var me = this;
-      var regionParm = ' ' + refName + ":" + start + "-" + end;
-      
-      var url = encodeURI( this.iobio.samtools + '?encoding=utf8&cmd= mpileup ' +  " " + encodeURIComponent(this._getBamUrl(refName,start,end)) );
+      this.transformRefName(refName, function(trRefName){        
+        var regionParm = ' ' + trRefName + ":" + start + "-" + end;
+        
+        var url = encodeURI( me.iobio.samtools + '?encoding=utf8&cmd= mpileup ' +  " " + encodeURIComponent(me._getBamUrl(trRefName,start,end)) );
 
-      var client = BinaryClient(this.iobio.samtools);
-      
-      var samData = "";
-      client.on('open', function(stream){
-          var stream = client.createStream({event:'run', params : {'url':url}});
+        var client = BinaryClient(me.iobio.samtools);
+        
+        var samData = "";
+        client.on('open', function(stream){
+            var stream = client.createStream({event:'run', params : {'url':url}});
 
-          stream.on('data', function(data, options) {
-             if (data == undefined) {
-              return; 
-             } 
-             samData += data;
-          });
+            stream.on('data', function(data, options) {
+               if (data == undefined) {
+                return; 
+               } 
+               samData += data;
+            });
 
-          stream.on('end', function() {
-             me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
-          });
+            stream.on('end', function() {
+               me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
+            });
 
-          stream.on("error", function(error) {
-            console.log("encountered stream error: " + error);
-          });
+            stream.on("error", function(error) {
+              console.log("encountered stream error: " + error);
+            });
 
+        });
       });
-
    },
 
       // NEW

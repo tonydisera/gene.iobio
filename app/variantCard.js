@@ -561,7 +561,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 }
 
 VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
-	console.log('showVariants')
+	
 	var me = this;
 
 	if (this.vcf && this.vcfUrlEntered) {
