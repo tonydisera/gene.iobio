@@ -390,7 +390,11 @@ function loadUrlSources() {
 						if (addVC) addVariantCard();
 						else addVC = true;
 						$('#url-input').val(vcf[name]);
-						loadDataSources();
+						onVcfUrlEntered();
+						// show bam/vcf tracks
+						variantCards.forEach( function(variantCard) {							
+							variantCard.showDataSources(variantCard.getName());						
+						});				
 					});
 				}
 			}
