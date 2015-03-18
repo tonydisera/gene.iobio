@@ -358,7 +358,6 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 	   	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
 	   	this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
 	   	this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
-<<<<<<< Updated upstream
 }
 
 VariantCard.prototype.loadDataSources = function(dataSourceName) {
@@ -367,13 +366,7 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 	if (this.isViewable()) {
 		this.showDataSources();
 
-		// Show the read coverage 		
-=======
 	}
-
-	// Show the read coverage 
-	this.showBamDepth();
->>>>>>> Stashed changes
 
 	if (this.isViewable()) {
 		if (regionStart && regionEnd) {
@@ -381,14 +374,7 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 		} else {
 			this.showBamDepth();
 		}
-<<<<<<< Updated upstream
-	    
-=======
 	}
-
-    // Show the vcf variants.  
-	this.showVariants();
->>>>>>> Stashed changes
 
 	if (this.isViewable()) {
 		// If a sub-region of the gene was selected, 
