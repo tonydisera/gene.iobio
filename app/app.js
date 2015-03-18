@@ -1162,7 +1162,7 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 	} else {
 		vcf1000G = vcfiobio();
 		vcf1000G.openVcfUrl(this.vcf1000GUrl);
-		var refName = theVariantCard.getVcfRefName(window.gene.chr);
+		var refName = theVariantCard.stripRefName(window.gene.chr);
 		vcf1000G.getVariants(refName, 
 							   window.gene.start, 
 					           window.gene.end, 
@@ -1227,10 +1227,8 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	});
 	theVcf1000GData.features.forEach(function(variant) {
 		variant.compare1000G = null;
-		variant.compareExAC = null;
 	});
 	theVcfExACData.features.forEach(function(variant) {
-		variant.compare1000G = null;
 		variant.compareExAC = null;
 	});
 	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
@@ -1252,13 +1250,14 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	        		// the ExAC af.
 	        		theVcfData.features.forEach(function(variant) {
 	        			theAf = null;
-						if (variant.af != -1 && variant.af != 0 && variant.af != '') {
-							theAf = variant.af;
-						} else if (variant.af1000G > -1) {
-							theAf = variant.af1000G;
-						} else if (variant.afExAC > -1) {
+						if (variant.afExAC != null && variant.afExAC != '' && variant.afExAC > -1) {
 							theAf = variant.afExAC;
+						} else if (variant.af1000G != null && variant.af1000G != '' && variant.af1000G > -1) {
+							theAf = variant.af1000G;
+						} else {
+							theAf = -1;
 						}
+						variant.af = theAf;
 						afMap.forEach( function(rangeEntry) {
 							if (+theAf > rangeEntry.min && +theAf <= rangeEntry.max) {
 								variant.aflevel = rangeEntry.clazz;
@@ -1296,9 +1295,9 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
     	// proband's variant for further sorting/display in the feature matrix.
     	function(variantA, variantB) {
     		variantA.af1000G = variantB.af;
-				if (variantA.af1000G == null || variantA.af1000G == '') {
-	        		variantA.af1000G = 0;
-	        	}
+			if (variantA.af1000G == null || variantA.af1000G == '') {
+        		variantA.af1000G = 0;
+        	}
 
     	});
 
@@ -1325,10 +1324,6 @@ function compareVariantsToPedigree(theVcfData, callback) {
 	} else {
 	
 		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
-		var i = 0;
-		theVcfData.features.forEach(function(feature) {
-			feature.order = i++;
-		})
 
 	    motherVariantCard.compareVcfRecords(theVcfData,
 	    	// This is the function that is called after all the proband variants have been compared
@@ -1502,7 +1497,7 @@ function fillFeatureMatrix(theVcfData) {
 	});
 
 	// Get the top 30 variants
-	var topFeatures = sortedFeatures.slice(0, 30);
+	var topFeatures = sortedFeatures.slice(0, sortedFeatures.length);
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
@@ -1512,7 +1507,13 @@ function fillFeatureMatrix(theVcfData) {
 	var selection = d3.select("#feature-matrix").data([topFeatures]);  
 
     this.featureMatrix(selection);
-		
+
+    // We have new properties to filter on, so refresh the proband variant chart.
+	variantCards.forEach(function(variantCard) {
+		if (variantCard.getRelationship() == 'proband') {
+			variantCard.fillVariantChart(theVcfData, regionStart, regionEnd, true);
+		}
+	})		
 }
 
 function variantTooltipHTML(variant, rowIndex) {
@@ -1543,14 +1544,16 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('compareMother',  variant.compareMother)
-		+ tooltipRow('motherZygosity',  variant.motherZygosity)
-		+ tooltipRow('compareFather',  variant.compareFather)
-		+ tooltipRow('fatherZygosity',  variant.fatherZygosity)
-		+ tooltipRow('order',  variant.order)
+	//	+ tooltipRow('compareMother',  variant.compareMother)
+	//	+ tooltipRow('motherZygosity',  variant.motherZygosity)
+	//	+ tooltipRow('compareFather',  variant.compareFather)
+	//	+ tooltipRow('fatherZygosity',  variant.fatherZygosity)
+	//	+ tooltipRow('compare1000G',  variant.compare1000G)
+	//	+ tooltipRow('compareExAC',  variant.compareExAC)
 		+ tooltipRow('AF', variant.af) 
-		+ tooltipRow('&nbsp;1000G', variant.af1000G != -1 ? variant.af1000G : 'not present')
-		+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != -1 ? variant.afExAC  : 'not present')
+		+ tooltipRow('AF category', variant.aflevel) 
+	//	+ tooltipRow('&nbsp;1000G', variant.af1000G != null ? variant.af1000G : '')
+	//	+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != null ? variant.afExAC  : '')
 	);                    
 
 }

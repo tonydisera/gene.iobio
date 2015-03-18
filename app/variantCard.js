@@ -702,10 +702,14 @@ VariantCard.prototype._pileupVariants = function(theChart, features, start, end)
 	return maxLevel;
 }
 
-VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) {
+VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, bypassFeatureMatrix) {
 	if (data == null) {
 		return;
 	}
+	if (bypassFeatureMatrix == null) {
+		bypassFeatureMatrix = false;
+	}
+
 
 	$('#vcf-legend').css("display", "block");		
 	this.cardSelector.find('#vcf-count').css("display", "inline-block");		
@@ -737,9 +741,11 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd) 
    	}
 
    	// Fill in the feature matrix for the proband variant card.
-   	if ( this.getRelationship() == 'proband') {
-   		window.showFeatureMatrix(this, data, regionStart, regionEnd);
-   	}
+   	if (!bypassFeatureMatrix) {
+	   	if ( this.getRelationship() == 'proband') {
+	   		window.showFeatureMatrix(this, data, regionStart, regionEnd);
+	   	}
+	   }
 
 }
 
@@ -1001,10 +1007,8 @@ VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, c
 			 function(data) {
 			 	me.vcfData = data;
 			 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
-			 	var i = 0;
 				me.vcfData.features.forEach( function(feature) {
 					feature[compareAttribute] = '';
-					feature.order = i++;
 				});
 				me.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 								 	
 			 });
@@ -1012,10 +1016,8 @@ VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, c
 		
 	} else {
 		this.vcfData.features = this.vcfData.features.sort(orderVariantsByPosition);
-	 	var i = 0;
 		this.vcfData.features.forEach( function(feature) {
 			feature[compareAttribute] = '';
-			feature.order = i++;
 		});
 		this.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 	
 	}
