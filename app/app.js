@@ -873,7 +873,7 @@ function loadTracksForGene() {
 	// ??????  TODO:  Need to figure out the cannonical transcript.	
 	var transcript = [];
 	if (window.gene.transcripts && window.gene.transcripts.length > 0 ) {
-		transcript = window.gene.transcripts[0];
+		transcript = getCanonicalTranscript();
 	}
 
 
@@ -921,7 +921,7 @@ function showTranscripts(regionStart, regionEnd) {
 		// use when determining the variant's effect and impact (snpEff annotation)
 		// For now, let's just grab the first one in the list.
 		if (!selectedTranscript) {
-			selectedTranscript = transcripts.length > 0 ? transcripts[0] : null;
+			selectedTranscript = getCanonicalTranscript();
 		}
 	}
 
