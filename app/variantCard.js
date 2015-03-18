@@ -621,7 +621,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 
 		   	    if (me.isViewable()) {
 			   	    me.cardSelector.find('#vcf-track .loader-label').text("Loading variant chart");
-			   	    var filteredVcfData = this.filterVariants();
+			   	    var filteredVcfData = me.filterVariants();
 			   	    if (regionStart && regionEnd)
 				  		me.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 				  	else
