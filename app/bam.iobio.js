@@ -18,7 +18,7 @@ var Bam = Class.extend({
             me.setHeader(bam.header);
             me.provide(bam); 
          });
-      } else if ( this.bamUri.slice(0,4) == "http" ) {
+      } else if ( this.bamUri.slice(0,4) == "http" || this.bamUri.slice(0,3) == "ftp" ) {
          this.sourceType = "url";         
       }
       
