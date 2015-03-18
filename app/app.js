@@ -964,7 +964,6 @@ function getTranscriptSelector(selectedTranscript) {
 
 function addVariantCard() {
 
-	$('#variant-cards').append(variantCardTemplate());  
 	var variantCard = new VariantCard();
 	variantCards.push(variantCard);	
 
@@ -972,8 +971,20 @@ function addVariantCard() {
 	var defaultName = "sample " + (+cardIndex + 1);
 	variantCard.setName(defaultName);
 
-	var cardSelectorString = "#variant-cards .variant-card:eq(" + cardIndex + ")" ;
-	variantCard.init($(cardSelectorString), cardIndex);
+	// TODO:  Should really test to make sure that first card is proband, but
+	var cardSelectorString = null;
+	if (cardIndex == 0) {
+		$('#proband-variant-card').append(variantCardTemplate());  
+		cardSelectorString = "#proband-variant-card .variant-card:eq(" + cardIndex + ")" ;
+	} else {
+		$('#other-variant-cards').append(variantCardTemplate());  
+		cardSelectorString = "#other-variant-cards .variant-card:eq(" + (+cardIndex - 1) + ")" ;
+	}
+
+	var d3CardSelector = d3.selectAll(".variant-card").filter(function(d, i) { return i == +cardIndex; });
+
+
+	variantCard.init($(cardSelectorString), d3CardSelector, cardIndex);
 
 
 	$('#datasource-dialog #card-index').val(cardIndex);
@@ -1188,13 +1199,13 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 }
 
 function orderVariantsByPosition(a, b) {
-	var altRefA = a.alt + "->" + a.ref;
-	var altRefB = b.alt + "->" + b.ref;
+	var refAltA = a.ref + "->" + a.alt;
+	var refAltB = b.ref + "->" + b.alt;
 
 	if (a.start == b.start) {
-		if (altRefA == altRefB) {
+		if (refAltA == refAltB) {
 			return 0;
-		} else if ( altRefA < altRefB ) {
+		} else if ( refAltA < refAltB ) {
 			return -1;
 		} else {
 			return 1;
@@ -1314,6 +1325,10 @@ function compareVariantsToPedigree(theVcfData, callback) {
 	} else {
 	
 		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+		var i = 0;
+		theVcfData.features.forEach(function(feature) {
+			feature.order = i++;
+		})
 
 	    motherVariantCard.compareVcfRecords(theVcfData,
 	    	// This is the function that is called after all the proband variants have been compared
@@ -1329,9 +1344,11 @@ function compareVariantsToPedigree(theVcfData, callback) {
 		        		// present, otherwise, use the 1000g af if present, otherwise use
 		        		// the ExAC af.
 		        		theVcfData.features.forEach(function(variant) {
-		        			if (variant.motherZygosity == 'het' && variant.fatherZygosity == 'het') {
+		        			if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
+		        				&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
+		        				&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
 		        				variant.inheritance = 'recessive';
-		        			} else if (variant.motherZygosity == '' && variant.fatherZygosity == '') {
+		        			} else if (variant.compareMother == 'unique1' && variant.compareFather == 'unique1') {
 		        				variant.inheritance = 'denovo';
 		        			}
 						});
@@ -1348,7 +1365,7 @@ function compareVariantsToPedigree(theVcfData, callback) {
 			    	// in both sets. Here we take the father variant's zygosity and store it in the
 			    	// proband's variant for further sorting/display in the feature matrix.
 			        function(variantA, variantB) {
-			        	variantA.fatherZygosity = variantB.zygosity;
+			        	variantA.fatherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
 			        });
 	    	}, 
 	    	// This is the attribute on variant a (proband) and variant b (mother)
@@ -1361,7 +1378,7 @@ function compareVariantsToPedigree(theVcfData, callback) {
 	    	// in both sets. Here we take the mother variant's af and store it in the
 	    	// proband's variant for further sorting/display in the feature matrix.
 	    	function(variantA, variantB) {
-	    		variantA.motherZygosity = variantB.zygosity;
+	    		variantA.motherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
 
 	    	});
 	}
@@ -1526,6 +1543,11 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
+		+ tooltipRow('compareMother',  variant.compareMother)
+		+ tooltipRow('motherZygosity',  variant.motherZygosity)
+		+ tooltipRow('compareFather',  variant.compareFather)
+		+ tooltipRow('fatherZygosity',  variant.fatherZygosity)
+		+ tooltipRow('order',  variant.order)
 		+ tooltipRow('AF', variant.af) 
 		+ tooltipRow('&nbsp;1000G', variant.af1000G != -1 ? variant.af1000G : 'not present')
 		+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != -1 ? variant.afExAC  : 'not present')

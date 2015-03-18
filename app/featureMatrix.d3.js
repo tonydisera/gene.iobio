@@ -49,7 +49,7 @@ function featureMatrixD3() {
 
 
     
-      x.domain(data.map(function(d) {  return d.type + " " + d.start + " " + d.alt + "->" + d.ref }));
+      x.domain(data.map(function(d) {  return d.type + " " + d.start + " " + d.ref + "->" + d.alt }));
       x.rangeRoundBands([0, innerWidth], 0, 0);
  
       y.domain(matrixRowNames);
