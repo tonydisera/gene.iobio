@@ -14,6 +14,8 @@ function geneD3() {
 
   var selectedTranscript = null;
 
+  var geneD3_showBrush = false;
+
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},
@@ -38,8 +40,7 @@ function geneD3() {
       regionEnd = undefined,
       showXAxis = true,
       widthPercent = null,
-      heightPercent = null,
-      showBrush = false,
+      heightPercent = null,     
       showLabel = false,
       showBrushLine = false;
       
@@ -61,7 +62,7 @@ function geneD3() {
 
     selection.each(function(data) {
 
-       brushAllowance = showBrush ? 20 : 0;
+       brushAllowance = geneD3_showBrush ? 20 : 0;
 
        // calculate height
        height = data.length * (trackHeight + arrowHeight);
@@ -187,7 +188,7 @@ function geneD3() {
       }  
 
 
-      if (showBrush) {
+      if (geneD3_showBrush) {
         var brushHeight = height + 20;
         var brushY = -20;
         g.selectAll("g.x.brush").remove();
@@ -484,7 +485,7 @@ function geneD3() {
 
   chart.showBrush = function(_) {
     if (!arguments.length) return showBrush;
-    showBrush = _;
+    geneD3_showBrush = _;
     return chart;
   }
 
