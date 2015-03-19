@@ -878,25 +878,31 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			window.gene.strand, 
 			function(fbVariants) {
 
+			if (fbVariants == null || fbVariants.length == 0) {
+				return;
+			}
+
 			var fbRecs = [];
 
-			    fbRecs.push('##fileformat=VCFv4.1');
-				fbRecs.push('##fileDate=20130402');
-				fbRecs.push('##source=freeBayes version 0.9.9');
-				fbRecs.push('##reference=/share/home/erik/references/Homo_sapiens_assembly19.fasta');
-				fbRecs.push('##phasing=none');
-				fbRecs.push('##commandline="freebayes -f /share/home/erik/references/Homo_sapiens_assembly19.fasta --min-alternate-fraction 0 --max-complex-gap 20 --pooled-continuous --genotype-qualities --stdin"');
-				fbRecs.push('##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of samples with data">');
+			// In order to annotate the variants, we need to add a vcf header
+			// before calling the snpEff service.
+		    fbRecs.push('##fileformat=VCFv4.1');
+			fbRecs.push('##fileDate=20130402');
+			fbRecs.push('##source=freeBayes version 0.9.9');
+			fbRecs.push('##reference=/share/home/erik/references/Homo_sapiens_assembly19.fasta');
+			fbRecs.push('##phasing=none');
+			fbRecs.push('##commandline="freebayes -f /share/home/erik/references/Homo_sapiens_assembly19.fasta --min-alternate-fraction 0 --max-complex-gap 20 --pooled-continuous --genotype-qualities --stdin"');
+			fbRecs.push('##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of samples with data">');
 
-				// Parse the fb vcf data into json variant objects
-				fbVariants.forEach( function(v) {
-					fbRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
-	                fbRecs.push(fbRec.join("\t"));
+			// Parse the fb vcf data into json variant objects
+			fbVariants.forEach( function(v) {
+				fbRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
+                fbRecs.push(fbRec.join("\t"));
 			})
 			
 			
 			if (me.isViewable()) {
-				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants with snpEFF in realtime")
+				me.cardSelector.find("#vcf-track .loader-label").text("Annotating variants with snpEFF in realtime")
 
 				// Annotate the fb variatns
 				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
@@ -917,6 +923,8 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 						return d.consensus != 'unique2';
 					});					
 
+					me.cardSelector.find('#vcf-track .loader-label').text("Comparing call sets");
+
 					// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 					// unique2 (only in freebayes set), or common (in both sets).				
 					me.vcf.compareVcfRecords(me.vcfData, me.fbData, function() {						
@@ -929,6 +937,8 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
 						me.fbData.maxLevel = maxLevel + 1;
+
+						me.cardSelector.find('#vcf-track .loader-label').text("Loading chart");
 
 				    	me.fillFreebayesChart(me.fbData, window.gene.start, window.gene.end);
 						
