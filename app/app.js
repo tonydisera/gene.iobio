@@ -1545,6 +1545,17 @@ function variantTooltipHTML(variant, rowIndex) {
 	}   
 	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
 	var refalt = variant.ref + "->" + variant.alt;
+
+	if (variant.af == -1 || variant.af == null || variant.af == '') {
+		afLabel = "AF";
+		af = "unknown"
+	} else if (variant.af == variant.afExAC) {
+		afLabel = "AF(ExAC)";
+	} else if (variant.af == variant.af1000G) {
+		afLabel = "AF(1000G)";
+	} else {
+		afLabel = "AF";
+	}
 	return (
 		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
 		+ tooltipRow('Impact', impactDisplay)
@@ -1555,16 +1566,7 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-	//	+ tooltipRow('compareMother',  variant.compareMother)
-	//	+ tooltipRow('motherZygosity',  variant.motherZygosity)
-	//	+ tooltipRow('compareFather',  variant.compareFather)
-	//	+ tooltipRow('fatherZygosity',  variant.fatherZygosity)
-	//	+ tooltipRow('compare1000G',  variant.compare1000G)
-	//	+ tooltipRow('compareExAC',  variant.compareExAC)
-		+ tooltipRow('AF', variant.af) 
-		+ tooltipRow('AF category', variant.aflevel) 
-	//	+ tooltipRow('&nbsp;1000G', variant.af1000G != null ? variant.af1000G : '')
-	//	+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != null ? variant.afExAC  : '')
+		+ tooltipRow(afLabel, variant.af) 
 	);                    
 
 }
@@ -1572,8 +1574,8 @@ function variantTooltipHTML(variant, rowIndex) {
 function tooltipRow(label, value) {
 	if (value && value != '') {
 		return '<div class="row">'
-		      + '<div class="col-md-4">' + label + '</div>'
-		      + '<div class="col-md-8">' + value + '</div>'
+		      + '<div class="col-md-5">' + label + '</div>'
+		      + '<div class="col-md-7">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";
