@@ -560,6 +560,9 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 	 	this.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, 
 	 		1000, 
 	 		function(data) {
+	 			if (data == null) {
+	 				return;
+	 			}
 				me.bamData = data;
 				
 				me.cardSelector.find("#bam-track .loader-label").text("Loading Coverage Chart")
