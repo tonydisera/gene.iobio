@@ -20,6 +20,19 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   font-size: 11px;
 }
 
+.checkbox label .check {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  top: 7px;
+  left: -3px;
+  margin-right: 11px;
+}
+
 .badge {
   display: inline-block;
   min-width: 10px;
