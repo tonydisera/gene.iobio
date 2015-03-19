@@ -623,7 +623,9 @@ var Bam = Class.extend({
             });
 
             stream.on('end', function() {
-               me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
+               if (samData != "") {
+                 me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
+               }
             });
 
             stream.on("error", function(error) {
@@ -683,51 +685,17 @@ var Bam = Class.extend({
    //
    getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
-/*
-    // This only worked for remote
-    var urlBam =  this.sourceType == "url" ? 
-                    this._getBamMergeUrl(refName, regionStart, regionEnd) 
-                    : "http://client";  
-    var minionParms = this.sourceType == "url" ? "?" : "?protocol=websocket&"; 
+    var me = this;
+    this.transformRefName(refName, function(trRefName){        
+      var urlF = me.iobio.freebayes 
+        + "?cmd=-f ./data/references/hs_ref_chr" + trRefName + ".fa" + " " 
+        + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
 
+      var url = me.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
+                + encodeURIComponent(encodeURI(urlF));
 
-    var urlF = this.iobio.freebayes 
-               + minionParms
-               + "cmd=-f ./data/references/hs_ref_chr" + refName + ".fa"                     
-               + ' ' + encodeURIComponent(urlBam);
-
-     
-    var url = this.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
-              + encodeURIComponent(encodeURI(urlF));
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, this.iobio.vcflib, encodeURI(url), callback);
-*/
-
-/*
-    var catInputServer = "ws://localhost:7063";
-    var url = encodeURI( catInputServer + "?protocol=websocket&encoding=binary&cmd=" + encodeURIComponent("http://client"));
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, catInputServer, url, callback);
-*/    
-
-
-
-    var urlF = this.iobio.freebayes 
-      + "?cmd=-f ./data/references/hs_ref_chr" + refName + ".fa" + " " 
-      + encodeURIComponent(this._getBamUrl(refName,regionStart,regionEnd));
-
-    var url = this.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
-              + encodeURIComponent(encodeURI(urlF));
-
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, this.iobio.vcflib, encodeURI(url), callback);
-
-
-/*
-
-    var catInputServer = "ws://localhost:7063";
-    var url = encodeURI( catInputServer + "?cmd=" 
-      +  encodeURIComponent(this._getBamUrl(refName,regionStart,regionEnd)));
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, catInputServer, url, callback);
-*/
-    
+      me._callVariants(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflib, encodeURI(url), callback);
+    });
 
 
    },

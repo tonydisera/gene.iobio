@@ -223,7 +223,7 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top: 35, right: 4, bottom: 0, left: 4})
+	    .margin({top:20, right: 4, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)
@@ -1141,7 +1141,6 @@ function loadDataSources() {
 function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 
 	$("#matrix-track .loader").css("display", "block");
-	$("#matrix-track .loader-label").text("Analyzing Variants");
 	$("#feature-matrix").addClass("hide");
 
 	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
@@ -1162,7 +1161,9 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 	} else {
 		vcf1000G = vcfiobio();
 		vcf1000G.openVcfUrl(this.vcf1000GUrl);
-		var refName = theVariantCard.getVcfRefName(window.gene.chr);
+		var refName = theVariantCard.stripRefName(window.gene.chr);
+		$("#matrix-track .loader-label").text("Loading 1000G data");
+
 		vcf1000G.getVariants(refName, 
 							   window.gene.start, 
 					           window.gene.end, 
@@ -1176,6 +1177,7 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 
 			vcfExAC= vcfiobio();
 			vcfExAC.openVcfUrl(window.vcfExACUrl);
+			$("#matrix-track .loader-label").text("Loading ExAC data");
 			vcfExAC.getVariants(refName, 
 									   window.gene.start, 
 							           window.gene.end, 
@@ -1187,6 +1189,7 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 			    window.vcfExACData = data;
 			    window.vcfExACData.features = window.vcfExACData.features.sort(orderVariantsByPosition);
 
+				$("#matrix-track .loader-label").text("Comparing variants to population");
 			    compareVariantsToPopulation(theVcfData, window.vcf1000GData, window.vcfExACData, callback);
 			});
 
@@ -1227,10 +1230,8 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	});
 	theVcf1000GData.features.forEach(function(variant) {
 		variant.compare1000G = null;
-		variant.compareExAC = null;
 	});
 	theVcfExACData.features.forEach(function(variant) {
-		variant.compare1000G = null;
 		variant.compareExAC = null;
 	});
 	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
@@ -1252,13 +1253,14 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	        		// the ExAC af.
 	        		theVcfData.features.forEach(function(variant) {
 	        			theAf = null;
-						if (variant.af != -1 && variant.af != 0 && variant.af != '') {
-							theAf = variant.af;
-						} else if (variant.af1000G > -1) {
-							theAf = variant.af1000G;
-						} else if (variant.afExAC > -1) {
+						if (variant.afExAC != null && variant.afExAC != '' && variant.afExAC > -1) {
 							theAf = variant.afExAC;
+						} else if (variant.af1000G != null && variant.af1000G != '' && variant.af1000G > -1) {
+							theAf = variant.af1000G;
+						} else {
+							theAf = -1;
 						}
+						variant.af = theAf;
 						afMap.forEach( function(rangeEntry) {
 							if (+theAf > rangeEntry.min && +theAf <= rangeEntry.max) {
 								variant.aflevel = rangeEntry.clazz;
@@ -1272,6 +1274,8 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
+					$("#matrix-track .loader-label").text("Comparing variants to family data");
+
 					window.compareVariantsToPedigree(theVcfData, callback);
 
 		        }, 
@@ -1296,9 +1300,9 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
     	// proband's variant for further sorting/display in the feature matrix.
     	function(variantA, variantB) {
     		variantA.af1000G = variantB.af;
-				if (variantA.af1000G == null || variantA.af1000G == '') {
-	        		variantA.af1000G = 0;
-	        	}
+			if (variantA.af1000G == null || variantA.af1000G == '') {
+        		variantA.af1000G = 0;
+        	}
 
     	});
 
@@ -1325,10 +1329,6 @@ function compareVariantsToPedigree(theVcfData, callback) {
 	} else {
 	
 		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
-		var i = 0;
-		theVcfData.features.forEach(function(feature) {
-			feature.order = i++;
-		})
 
 	    motherVariantCard.compareVcfRecords(theVcfData,
 	    	// This is the function that is called after all the proband variants have been compared
@@ -1352,6 +1352,7 @@ function compareVariantsToPedigree(theVcfData, callback) {
 		        				variant.inheritance = 'denovo';
 		        			}
 						});
+		        		$("#matrix-track .loader-label").text("Ranking variants");
 
 			        	callback(theVcfData);
 			        }, 
@@ -1502,7 +1503,12 @@ function fillFeatureMatrix(theVcfData) {
 	});
 
 	// Get the top 30 variants
-	var topFeatures = sortedFeatures.slice(0, 30);
+	var topFeatures = null;
+	if($('#matrixCheckbox').prop('checked')) {
+		topFeatures = sortedFeatures.slice(0, sortedFeatures.length)
+	} else {
+		topFeatures = sortedFeatures.slice(0, 30 );
+	}
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
@@ -1512,7 +1518,13 @@ function fillFeatureMatrix(theVcfData) {
 	var selection = d3.select("#feature-matrix").data([topFeatures]);  
 
     this.featureMatrix(selection);
-		
+
+    // We have new properties to filter on, so refresh the proband variant chart.
+	variantCards.forEach(function(variantCard) {
+		if (variantCard.getRelationship() == 'proband') {
+			variantCard.fillVariantChart(theVcfData, regionStart, regionEnd, true);
+		}
+	})		
 }
 
 function variantTooltipHTML(variant, rowIndex) {
@@ -1533,6 +1545,16 @@ function variantTooltipHTML(variant, rowIndex) {
 	}   
 	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
 	var refalt = variant.ref + "->" + variant.alt;
+
+	if (variant.af == -1 || variant.af == null || variant.af == '') {
+		afLabel = "AF";
+	} else if (variant.af == variant.afExAC) {
+		afLabel = "AF(ExAC)";
+	} else if (variant.af == variant.af1000G) {
+		afLabel = "AF(1000G)";
+	} else {
+		afLabel = "AF";
+	}
 	return (
 		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
 		+ tooltipRow('Impact', impactDisplay)
@@ -1540,17 +1562,10 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('ClinVar', variant.clinvar )
 		+ tooltipRow('Qual', variant.qual) 
 		+ tooltipRow('Filter', variant.filter) 
-		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
+		+ tooltipRow('Depth', variant.combinedDepth ? variant.combinedDepth + ' (combined)' : null) 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('compareMother',  variant.compareMother)
-		+ tooltipRow('motherZygosity',  variant.motherZygosity)
-		+ tooltipRow('compareFather',  variant.compareFather)
-		+ tooltipRow('fatherZygosity',  variant.fatherZygosity)
-		+ tooltipRow('order',  variant.order)
-		+ tooltipRow('AF', variant.af) 
-		+ tooltipRow('&nbsp;1000G', variant.af1000G != -1 ? variant.af1000G : 'not present')
-		+ tooltipRow('&nbsp;ExAC',  variant.afExAC  != -1 ? variant.afExAC  : 'not present')
+		+ tooltipRow(afLabel, variant.af == -1 ? 'unknown' : variant.af) 
 	);                    
 
 }
@@ -1558,8 +1573,8 @@ function variantTooltipHTML(variant, rowIndex) {
 function tooltipRow(label, value) {
 	if (value && value != '') {
 		return '<div class="row">'
-		      + '<div class="col-md-4">' + label + '</div>'
-		      + '<div class="col-md-8">' + value + '</div>'
+		      + '<div class="col-md-5">' + label + '</div>'
+		      + '<div class="col-md-7">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";
@@ -1629,6 +1644,11 @@ function cullVariantFilters() {
     	$('#effect-filter-box #more-effect-link').addClass('hide');
 
     }
+}
+
+function toggleMatrixCheckbox(element) {
+
+	fillFeatureMatrix();
 }
 
 function isNumeric(n) {

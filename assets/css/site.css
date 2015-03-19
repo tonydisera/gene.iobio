@@ -8,6 +8,48 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   text-transform: uppercase;
 }
 
+.chart-label {
+  color: rgb(53, 134, 192);
+  margin-left:4px;
+  font-size: 11px;
+}
+
+.togglebutton label {
+  font-weight: 400;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.checkbox label .check {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  top: 7px;
+  left: -3px;
+  margin-right: 11px;
+}
+
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #EA9311 !important;
+  text-align: center;
+  white-space: nowrap;
+  border: #EA9311;
+  border-style: solid;
+  vertical-align: baseline;
+  background-color: white;
+  border-radius: 10px;
+  border-width: 1px;
+}
 
 .material-dropdown .form-control { background: white;}
 .material-dropdown li.disabled { color: rgb(210,210,210); cursor:auto }
@@ -382,7 +424,7 @@ a, a:hover, a:focus {
   font-size: 11px;
   color: rgb(102, 88, 92);
   fill: rgb(102, 88, 92);
-  margin-top: 10px;
+  margin-top: 2px;
   overflow-y: auto;
 }
 
@@ -763,17 +805,6 @@ header {
   fill: rgb(120,120,120);
 }
 
-
-.variant.compare_unique1{
-  fill: #D7D6D6 !important;
-}
-.variant.compare_unique2{
-  fill: #FFCC2A !important;
-}
-
-.variant.compare_common{
-  fill: rgb(255, 255, 255);
-}
 .impact_HIGH{
   fill: rgb(215,48,39) !important;
 } 
@@ -851,13 +882,6 @@ header {
 }
 .effect_NOEFFECT { 
   fill: #FAF5BE;
-}
-
-
-.variant.unique2 {
-  stroke: #E03C55 !important;
-  stroke-width: 1.5px !important;
-  stroke-opacity: 1;
 }
 
 
@@ -1023,7 +1047,7 @@ header {
   font-size: 12px;
   margin-top: -2px;
   margin-left: 10px;
-  width: 150px;
+  width: 160px;
 }
 
 #bloodhound .typeahead { 
