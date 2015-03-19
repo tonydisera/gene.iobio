@@ -589,12 +589,15 @@ var Bam = Class.extend({
    }, 
 
    transformRefName: function(refName, callback) {
+    var found = false;
     this.getHeader(function(header) {
       header.sq.forEach(function(seq) {
-        if (seq.name == refName || seq.name.split('chr')[1] == refName || seq.name == refName.split('chr')[1])
+        if (seq.name == refName || seq.name.split('chr')[1] == refName || seq.name == refName.split('chr')[1]) {
+          found = true;
           callback(seq.name);        
+        }
       })
-      callback(refName); // not found
+      if (!found) callback(refName); // not found
     })
    },
 
