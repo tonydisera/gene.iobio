@@ -8,6 +8,12 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   text-transform: uppercase;
 }
 
+.chart-label {
+  color: rgb(53, 134, 192);
+  margin-left:4px;
+  font-size: 11px;
+}
+
 
 .material-dropdown .form-control { background: white;}
 .material-dropdown li.disabled { color: rgb(210,210,210); cursor:auto }
@@ -1005,7 +1011,7 @@ header {
   font-size: 12px;
   margin-top: -2px;
   margin-left: 10px;
-  width: 150px;
+  width: 160px;
 }
 
 #bloodhound .typeahead { 

@@ -1,30 +1,32 @@
-todo
--------------
-
+critical
+----------
 - <symbol> doesn't work on Safari (improper size).  Switch to using <defs>.  (Handlebar templates
   don't seem to work on Safari either. geez. )  Another browser polyfill would be to just
   inject paths directly into svg in symbolFunction.
 
-- Big genes kill browser session
-
-- Zoom after call freebayes broken. (vcfData has to incorporate new unique variants. rather than creating
-clone - combinedData - need to remove unique2 from set before calling fb)
-
-- When clicking on an impact, the filter panel rects are also set to opacity .1
+- Big genes kill browser session (robo1)
 
 - When multiple annotations, force highest impact one to show first (for coloring)
 
+- Switching to diff color scheme doesn't refresh fb variants.  
+  FB variants not in feature matrix. (this should also result in inheritance and af data being updated on fb variants)
+
+
+
+
+
+less critical
+-------------
+- When clicking on an impact, the filter panel rects are also set to opacity .1
+
 - position is off on bam chart, need to keep non-summarized data to display actual coverage
 
-- inject bam and vcf into url
+- remove af histogram and server call, replace with calculated frequencies from af data (after injected from 1000g, ExAC data) 
 
 
 
-
-- How to tell which snpEff annotation belongs to which alt
-
-- Can Yi change vcfstatsalive to show stats by alt, not variant counts?
-
+can wait
+-----------
 - Use annotatation END= instead of calculated len?  are long variants rendering correctly?
 
 - How to send bam header along with data to freebayes?

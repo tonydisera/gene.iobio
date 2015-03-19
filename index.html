@@ -85,7 +85,7 @@
             <button id="button-find-missing-variants"                       
               class="btn btn-raised btn-default icon-button-sm"> 
               <i class="mdi-action-find-in-page"></i>
-                Find missing variants
+                Call variants in realtime
             </button>
 
             <div class="variant-count badge" id="vcf-count" style="display: none; margin-right: 130px;">
@@ -103,9 +103,10 @@
                 data-toggle="collapse" 
                 style="font-size: 12px;vertical-align: top;margin-top: 0px;padding-right:10px" 
                 href="#vcf-file-info" aria-expanded="false" >
-                VCF info
+                data source info
               </a>
             </div>
+
 
           </div>
           <div style="text-align:center;clear:both;">
@@ -114,7 +115,9 @@
                   <svg id="vcf-af-chart"/>
                 </div>
               </div> 
-              <span id="vcf-file-info" class="collapse" style="float:right;margin-top:-16px;">
+              <span id="vcf-file-info" class="collapse" style="float:right;margin-top:-16px;text-align:right">
+                <div id="bam-name" style="font-size: 12px; padding-right: 10px;">
+                </div>
                 <span id="vcf-name" class="hide" style="font-size: 12px;padding-right:10px;"></span>
               </span>
           </div>
@@ -130,13 +133,28 @@
                       <span class="loader-label"></span>
                       <img src="assets/images/loading-squares.gif"/>
                   </div>
-                  <div id="fb-variants"></div>
-                  <div id="vcf-variants"></div>
+                  <div>
+                    <div  id="fb-chart-label" class="chart-label hide" style="margin-bottom: -20px;">
+                      Variants called in realtime
+                    </div>
+                    <div id="fb-variants">
+                    </div>
+                    <hr id="fb-separator" class="hide" style="margin-top: 0px;margin-bottom: 0px;">
+                  </div>
+                  <div >
+                    <div id="vcf-chart-label" class="chart-label hide" 
+                     style="margin-top: 4px;margin-bottom: -30px;">
+                      Variants loaded
+                    </div>
+                    <div id="vcf-variants">
+                    </div>
+                  </div>
               </div>
             </div>
 
       
             <div id="zoom-region-chart"  class="track hide"></div>
+
 
             <div id="bam-track" class="track hide">
               <div id="bam-depth-track" class="track-chart">
@@ -145,20 +163,13 @@
                       <img src="assets/images/loading-squares.gif"/>
                   </div>
 
-                 
-
-                  <div id="bam-depth">
-                  </div>
-
-                   <div style="float:right;margin-top:-10px;">
-                    <a id="bam-file-info-link" data-toggle="collapse" 
-                      style="float:right;font-size: 12px;padding-right:10px;" 
-                      href="#bam-name" aria-expanded="false" class="collapsed">
-                      BAM info
-                    </a>
-                    <div id="bam-name" class="collapse" style="font-size: 12px; padding-right: 10px;" aria-expanded="false">
+                  <div >
+                    <div id="bam-chart-label" class="chart-label hide" style="margin-top: 25px;margin-bottom: -35px;">Coverage
+                    </div>
+                    <div id="bam-depth">
                     </div>
                   </div>
+
               </div>
             </div>
 

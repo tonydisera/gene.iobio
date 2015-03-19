@@ -602,6 +602,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		this.cardSelector.find("#bam-track .loader").css("display", "none");
 	    this.cardSelector.find('#bam-name-' + this.cardIndex).removeClass("hide");		
 		this.cardSelector.find('#bam-depth').removeClass("hide");
+		this.cardSelector.find('#bam-chart-label').removeClass("hide");
 
 		this.bamDepthChart.xStart(regionStart);
 		this.bamDepthChart.xEnd(regionEnd);
@@ -779,9 +780,9 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 
 
 	$('#vcf-legend').css("display", "block");		
+	this.cardSelector.find('#vcf-chart-label').removeClass("hide");		
 	this.cardSelector.find('#vcf-count').css("display", "inline-block");		
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
-	this.cardSelector.find('#af-link').removeClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "inline");	
 	this.cardSelector.find("#vcf-track .loader").css("display", "none");
 
@@ -817,9 +818,13 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 }
 
 VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd) {
+
 	if (data == null) {
 		return;
 	}
+	this.cardSelector.find('#fb-chart-label').removeClass("hide");
+	this.cardSelector.find('#fb-separator').removeClass("hide");
+
 	this.fbChart.regionStart(regionStart);
 	this.fbChart.regionEnd(regionEnd);
 	
