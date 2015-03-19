@@ -1548,7 +1548,6 @@ function variantTooltipHTML(variant, rowIndex) {
 
 	if (variant.af == -1 || variant.af == null || variant.af == '') {
 		afLabel = "AF";
-		af = "unknown"
 	} else if (variant.af == variant.afExAC) {
 		afLabel = "AF(ExAC)";
 	} else if (variant.af == variant.af1000G) {
@@ -1563,10 +1562,10 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('ClinVar', variant.clinvar )
 		+ tooltipRow('Qual', variant.qual) 
 		+ tooltipRow('Filter', variant.filter) 
-		+ tooltipRow('Depth', variant.combinedDepth + ' (combined)') 
+		+ tooltipRow('Depth', variant.combinedDepth ? variant.combinedDepth + ' (combined)' : null) 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow(afLabel, variant.af) 
+		+ tooltipRow(afLabel, variant.af == -1 ? 'unknown' : variant.af) 
 	);                    
 
 }
