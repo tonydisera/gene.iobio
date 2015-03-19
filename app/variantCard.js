@@ -176,8 +176,34 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						}
 					});
 
+		// The 'missing variants' chart, variants that freebayes found that were not in orginal
+		// variant set from vcf
+		this.fbChart = variantD3()
+				    .width(1000)
+				    .margin({top: 0, right: 4, bottom: 0, left: 4})
+				    .showXAxis(false)
+				    .variantHeight(6)
+				    .verticalPadding(2)
+				    .showBrush(false)
+				    .tooltipHTML(variantTooltipHTML)
+				    .on("d3rendered", function() {
+				    	
+				    })			    
+				    .on('d3mouseover', function(d) {
+				    	if (me.bamData) {
+							me.bamDepthChart.showCircle()(d.start);
+				    	}
+					})
+					.on('d3mouseout', function() {
+						if (me.bamData){
+							me.bamDepthChart.hideCircle()();
+						}
+					});
+					
+
 	 	// Create allele frequency chart
 	 	// Allele freq chart)
+		// TODO:  Replace this with actual frequency after af grabbed from population (1000G/ExAC)
 	    this.afChart = histogramD3()
 	                       .width(400)
 	                       .height(70)
@@ -349,6 +375,28 @@ VariantCard.prototype.discoverVcfRefName = function(callback) {
 	} 
 }
 
+VariantCard.prototype.discoverBamRefName = function(callback) {
+	var me = this;
+	if (this.getBamRefName != null) {
+		callback();
+	}
+	if (!this.bam.isFile()) {
+
+		this.vcf.loadRemoteIndex(null, function(refData) {
+	    	refData.forEach( function(ref) {
+	    		if (me.getVcfRefName == null) {
+			 		if (ref.name == window.gene.chr) {
+			 			me.getVcfRefName = me.getRefName;
+			 		} else if (ref.name == me.stripRefName(gene.chr)) {
+			 			me.getVcfRefName = me.stripRefName;
+			 		}
+				}
+	    	});
+	    	return callback();
+    	});
+	} 
+}
+
 VariantCard.prototype.showDataSources = function(dataSourceName) {
 		this.name = dataSourceName;
 		$('#add-datasource-container').css('display', 'none');
@@ -471,6 +519,7 @@ VariantCard.prototype.onBrush = function(brush) {
 
 	this.showBamDepth(regionStart, regionEnd);
 	this.showVariants(regionStart, regionEnd);
+	this.showFreebayesVariants(regionStart, regionEnd);
 
 }
 
@@ -560,6 +609,24 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(data));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
+	}
+}
+
+VariantCard.prototype.showFreebayesVariants = function(regionStart, regionEnd) {
+	if (this.fbData == null) {
+		return;
+	}
+
+	if (this.isViewable) {
+		var fbDataFiltered = {features: null};
+		fbDataFiltered.features = this.fbData.features.filter(function(d) {
+			return (d.start >= regionStart && d.start <= regionEnd);
+		});
+		var filteredVcfData = this.filterVariants(fbDataFiltered, this.fbChart);
+		if (regionStart && regionEnd)
+  			this.fillFreebayesChart(filteredVcfData, regionStart, regionEnd);
+  		else
+  			this.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 	}
 }
 
@@ -749,6 +816,27 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 
 }
 
+VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd) {
+	if (data == null) {
+		return;
+	}
+	this.fbChart.regionStart(regionStart);
+	this.fbChart.regionEnd(regionEnd);
+	
+	// Set the vertical layer count so that the height of the chart can be recalculated	                                	
+	this.fbChart.verticalLayers(data.maxLevel);
+
+	// Load the chart with the new data
+	var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    
+    this.fbChart(selection);
+
+	this.cardSelector.find('#vcf-count').text((this.vcfData.features.length + data.features.length) + ' Variants');
+	this.cardSelector.find('#vcf-track .loader').css("display", "none");
+
+   	this.d3CardSelector.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
+
+}
+
 VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	var me = this;
 
@@ -758,7 +846,10 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	}
 
 
-	var refName = this.getBamRefName(window.gene.chr);
+	//var refName = this.getBamRefName(window.gene.chr);
+	// TODO:  Need to evaluate bam header to determine if 'chr' should be stripped
+	// from reference names
+	var refName = window.gene.chr;
 
 	if (this.fbData && regionStart && regionEnd) {
 		
@@ -797,11 +888,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					fbRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
 	                fbRecs.push(fbRec.join("\t"));
 			})
-			// determine whether refname has 'chr' in it or not
-			if (fbVariants[0].chrom.slice(0,3) == 'chr')
-				me.getVcfRefName = me.getRefName;
-			else 
-				me.getVcfRefName = me.stripRefName;
+			
 			
 			if (me.isViewable()) {
 				me.cardSelector.find("#vcf-track .loader-label").text("Annotating Variants with snpEFF in realtime")
@@ -830,22 +917,15 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					me.vcf.compareVcfRecords(me.vcfData, me.fbData, function() {						
 
 				    	// Add unique freebayes variants to vcfData
-				    	me.fbData.features.forEach(function(d) {
-				    		if (d.consensus == 'unique2') {
-				    			me.vcfData.features.push(d);
-				    			if (d.zygosity != null && d.zygosity == 'HET') {
-				    				me.vcfData.hetCount++;
-				    			} else if (d.zygosity != null && d.zygosity == 'HOM') {
-				    				me.vcfData.homCount++;
-				    			}
-				    		}
+				    	me.fbData.features = me.fbData.features.filter(function(d) {
+				    		return d.consensus == 'unique2';
 				    	});
 
 
-				        maxLevel = me._pileupVariants(me.vcfChart, me.vcfData.features, gene.start, gene.end);
-						me.vcfData.maxLevel = maxLevel + 1;
+				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
+						me.fbData.maxLevel = maxLevel + 1;
 
-				    	me.fillVariantChart(me.vcfData, window.gene.start, window.gene.end);
+				    	me.fillFreebayesChart(me.fbData, window.gene.start, window.gene.end);
 						
 				    });
 				});
@@ -883,7 +963,7 @@ VariantCard.prototype.stripRefName = function(refName) {
 
 
 
-VariantCard.prototype.filterVariants = function(dataToFilter) {
+VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 	var me = this;
 
 	var data = dataToFilter ? dataToFilter : this.vcfData;
@@ -972,7 +1052,8 @@ VariantCard.prototype.filterVariants = function(dataToFilter) {
 	});
 
 	
-	var maxLevel = this._pileupVariants(this.vcfChart, filteredFeatures, 
+	var maxLevel = this._pileupVariants(theChart ? theChart : this.vcfChart, 
+		filteredFeatures, 
 		regionStart ? regionStart : window.gene.start, 
 		regionEnd   ? regionEnd   : window.gene.end);		
 
