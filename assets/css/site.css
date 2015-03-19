@@ -14,6 +14,29 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   font-size: 11px;
 }
 
+.togglebutton label {
+  font-weight: 400;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #EA9311 !important;
+  text-align: center;
+  white-space: nowrap;
+  border: #EA9311;
+  border-style: solid;
+  vertical-align: baseline;
+  background-color: white;
+  border-radius: 10px;
+  border-width: 1px;
+}
 
 .material-dropdown .form-control { background: white;}
 .material-dropdown li.disabled { color: rgb(210,210,210); cursor:auto }
@@ -388,7 +411,7 @@ a, a:hover, a:focus {
   font-size: 11px;
   color: rgb(102, 88, 92);
   fill: rgb(102, 88, 92);
-  margin-top: 10px;
+  margin-top: 2px;
   overflow-y: auto;
 }
 

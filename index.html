@@ -396,7 +396,7 @@
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Recessive</text></svg>
           
-            <div style="margin-top: 20px;margin-bottom:4px">
+            <div style="margin-top: 24px;margin-bottom:4px">
               <span style="font-size:11px;">Coverage (min)</span>
               <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;">
               X
@@ -504,19 +504,33 @@
 
         <div id="matrix-track"  class="track-expand shadow-z-1 hide">
             <div>
-              <a id="matrix-link"  class="card-label" href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
+              <a style="float:left;padding-top:8px" id="matrix-link"  class="card-label" href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
                 Rank<span class="caret"></span>
               </a>
+
+             <div style="margin-top: -16px;color: rgb(98,98,98);margin-left: 70px;font-size:11px;">
+                Show all variants
+                <div class="checkbox checkbox-primary">
+                  <label>
+                    <input id="matrixCheckbox" type="checkbox" onchange="toggleMatrixCheckbox(this)">
+                  </label>
+                </div>
+              </div>
+
+
+
+
             </div>
+
     
-            <div id="matrix-panel"  
+            <div id="matrix-panel"  style="clear:both;"
               class="collapse in" aria-expanded="true">
                 <div class="loader">
                     <span class="loader-label"></span>
                     <img src="assets/images/loading-squares.gif"/>
                 </div>
-              
-              <div id="feature-matrix">
+
+              <div id="feature-matrix" style="overflow-x: auto;max-width: 740px;">
               </div>
             </div> 
         </div>

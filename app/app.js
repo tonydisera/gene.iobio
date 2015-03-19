@@ -1497,7 +1497,12 @@ function fillFeatureMatrix(theVcfData) {
 	});
 
 	// Get the top 30 variants
-	var topFeatures = sortedFeatures.slice(0, sortedFeatures.length);
+	var topFeatures = null;
+	if($('#matrixCheckbox').prop('checked')) {
+		topFeatures = sortedFeatures.slice(0, sortedFeatures.length)
+	} else {
+		topFeatures = sortedFeatures.slice(0, 30 );
+	}
 	
 	$("#feature-matrix").removeClass("hide");
 	$("#matrix-track .loader").css("display", "none");
@@ -1632,6 +1637,11 @@ function cullVariantFilters() {
     	$('#effect-filter-box #more-effect-link').addClass('hide');
 
     }
+}
+
+function toggleMatrixCheckbox(element) {
+
+	fillFeatureMatrix();
 }
 
 function isNumeric(n) {

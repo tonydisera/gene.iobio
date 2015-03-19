@@ -23,6 +23,8 @@ less critical
 
 - remove af histogram and server call, replace with calculated frequencies from af data (after injected from 1000g, ExAC data) 
 
+- Need to set width of feature-matrix so that it doesn't take entire screen  (right now it is hardcoded to 740px)
+
 
 
 can wait
