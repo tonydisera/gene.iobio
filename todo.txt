@@ -1,19 +1,29 @@
-critical
-----------
+blockers
+-----------
+- Big genes kill browser session (robo1)
+
+- Genome build selection in data sources, different references for FreeBayes call, different dbs for snpEff server
+
 - <symbol> doesn't work on Safari (improper size).  Switch to using <defs>.  (Handlebar templates
   don't seem to work on Safari either. geez. )  Another browser polyfill would be to just
   inject paths directly into svg in symbolFunction.
 
-- Big genes kill browser session (robo1)
+- ClinVar matrix
 
+- Additional rows in matrix for 
+	1. 'Proband only polymorphism'. This would be any variant that is present in the proband as either a heterozygous or homozygous alternate, but is homozygous reference in all other samples - just the parents in this case.
+
+	2. 'Proband only homozygous' would be a homozygous alternate site in the proband, where all other samples show homozygous reference or are heterozygous.
+
+- Any remaining Gabor bugs?
+
+
+critical
+----------
 - When multiple annotations, force highest impact one to show first (for coloring)
 
 - Switching to diff color scheme doesn't refresh fb variants.  
   FB variants not in feature matrix. (this should also result in inheritance and af data being updated on fb variants)
-
-- Need snpEff db for build 37 and 38, match vcf to correct annotation (Same needed for querying clinvar)
-
-
 
 
 
