@@ -15,6 +15,7 @@ function geneD3() {
   var selectedTranscript = null;
 
   var geneD3_showBrush = false;
+  var geneD3_showLabel = false;
 
 
   // dimensions
@@ -41,7 +42,6 @@ function geneD3() {
       showXAxis = true,
       widthPercent = null,
       heightPercent = null,     
-      showLabel = false,
       showBrushLine = false;
       
 
@@ -236,7 +236,7 @@ function geneD3() {
 
 
       transcript.selectAll(".name").remove();
-      if (showLabel) {
+      if (geneD3_showLabel) {
         transcript.selectAll('.name').data(function(d) { return [[d.start, d.transcript_id]] })
                   .enter().append('text')
                     .attr('class', 'name')
@@ -496,8 +496,8 @@ function geneD3() {
   }
 
   chart.showLabel = function(_) {
-    if (!arguments.length) return showLabel;
-    showLabel = _;
+    if (!arguments.length) return geneD3_showLabel;
+    geneD3_showLabel = _;
     return chart;
   }
 

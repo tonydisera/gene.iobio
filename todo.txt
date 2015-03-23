@@ -11,6 +11,8 @@ critical
 - Switching to diff color scheme doesn't refresh fb variants.  
   FB variants not in feature matrix. (this should also result in inheritance and af data being updated on fb variants)
 
+- Need snpEff db for build 37 and 38, match vcf to correct annotation (Same needed for querying clinvar)
+
 
 
 

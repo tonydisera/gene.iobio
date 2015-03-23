@@ -60,7 +60,6 @@ function featureMatrixD3() {
       var xAxis = d3.svg.axis()
                         .scale(x)
                         .orient("start")
-                        .outerTickSize(0)   
                         .ticks(data.length);
                        
 

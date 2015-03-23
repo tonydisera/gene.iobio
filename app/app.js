@@ -268,7 +268,7 @@ function init() {
 	featureMatrix = featureMatrixD3()
 					    .margin({top: 0, right: 4, bottom: 4, left: 24})
 					    .cellSize(30)
-					    .columnLabelHeight(90)
+					    .columnLabelHeight(100)
 					    .rowLabelWidth(100)
 					    .tooltipHTML(variantTooltipHTML)
 					    .on('d3click', function(variant) {
@@ -1388,6 +1388,9 @@ function compareVariantsToPedigree(theVcfData, callback) {
 
 
 function fillFeatureMatrix(theVcfData) {
+	// Set the width so that scrolling works properly
+	$('#feature-matrix').css('min-width', $('#matrix-panel').width());
+
 	if (theVcfData != null) {
 		featureVcfData = {};
 		featureVcfData.features = [];
@@ -1502,12 +1505,14 @@ function fillFeatureMatrix(theVcfData) {
 	  return 0;
 	});
 
-	// Get the top 30 variants
+	// Get the top 20 variants
 	var topFeatures = null;
-	if($('#matrixCheckbox').prop('checked')) {
+	if($('#matrixCheckboxAll').prop('checked')) {
 		topFeatures = sortedFeatures.slice(0, sortedFeatures.length)
-	} else {
-		topFeatures = sortedFeatures.slice(0, 30 );
+	} else if ($('#matrixCheckboxTop100').prop('checked')){
+		topFeatures = sortedFeatures.slice(0, 100 );
+	} else if ($('#matrixCheckboxTop20').prop('checked')){
+		topFeatures = sortedFeatures.slice(0, 20 );
 	}
 	
 	$("#feature-matrix").removeClass("hide");
@@ -1648,6 +1653,16 @@ function cullVariantFilters() {
 
 function toggleMatrixCheckbox(element) {
 
+	if (element.id == 'matrixCheckboxAll') {
+		$('#matrixCheckboxTop20').prop("checked", false);
+		$('#matrixCheckboxTop100').prop("checked", false);
+	} else if (element.id == 'matrixCheckboxTop100') {
+		$('#matrixCheckboxTop20').prop("checked", false);
+		$('#matrixCheckboxAll').prop("checked", false);
+	} else {
+		$('#matrixCheckboxAll').prop("checked", false);
+		$('#matrixCheckboxTop100').prop("checked", false);
+	}
 	fillFeatureMatrix();
 }
 
