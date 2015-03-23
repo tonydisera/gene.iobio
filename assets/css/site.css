@@ -81,7 +81,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 
 #feature-matrix text {
-  font-size: 9px;
+  font-size: 10px;
   fill:  rgb(120,120,120);
   pointer-events: none;
 }

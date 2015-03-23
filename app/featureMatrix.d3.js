@@ -57,10 +57,10 @@ function featureMatrixD3() {
 
     
       // axis
-      var xAxis = d3.svg.axis()
-                        .scale(x)
-                        .orient("start")
-                        .ticks(data.length);
+      //var xAxis = d3.svg.axis()
+      //                  .scale(x)
+      //                  .orient("start")
+      //                  .ticks(data.length);
                        
 
       var yAxis = d3.svg.axis()
@@ -76,16 +76,45 @@ function featureMatrixD3() {
 
       svg.enter()
         .append("svg")
-        .attr("width", width)
+        .attr("width", parseInt(width+margin.right))
         .attr("height", heightPercent)
-        .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+        .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height))
         .attr("preserveAspectRatio", "xMinYMid meet");
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr("width", width)
-         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
+         .attr("width", parseInt(width+margin.right))
+         .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height));
+
+
+
+
+      // Generate the column headers
+      svg.selectAll("g.colhdr").remove();
+      var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
+        .enter()
+        .append("g")
+        .attr("class", "colhdr")
+        .attr("transform",  "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")");
+
+      var colhdrs = colhdrGroup.selectAll('.colhdr').data(data);
+      colhdrs.enter().append('g')
+          .attr('class', 'colhdr')
+          .attr('transform', function(d,i) { 
+            return "translate(" + (x.rangeBand() * (i+1)) + ",0)";
+          })
+          .append("text")
+          .style("text-anchor", "start")
+          .attr("dx", ".8em")
+          .attr("dy", ".15em")
+          .attr("transform", function(d) {
+            return "rotate(-65)" ;
+          })
+          .text( function(d) {  return d.type + " " + d.start + " " + d.ref + "->" + d.alt });
+
+
+
 
       svg.selectAll("g.group").remove();
       var g =  svg.selectAll("g.group").data([data])
@@ -96,19 +125,19 @@ function featureMatrixD3() {
 
 
       // Create the X-axis at the top.  This will show the labels for the columns 
-      svg.selectAll(".x.axis").remove();    
-      svg.selectAll("g.x").data([data]).enter()
-          .append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(" + (+rowLabelWidth + d3.round(cellSize/2)) + "," + columnLabelHeight + ")")
-          .call(xAxis)
-          .selectAll("text")
-          .style("text-anchor", "start")
-          .attr("dx", ".8em")
-          .attr("dy", ".15em")
-          .attr("transform", function(d) {
-            return "rotate(-65)" ;
-          }); 
+      //svg.selectAll(".x.axis").remove();    
+      //svg.selectAll("g.x").data([data]).enter()
+      //    .append("g")
+      //    .attr("class", "x axis")
+      //    .attr("transform", "translate(" + (+rowLabelWidth + d3.round(cellSize/2)) + "," + columnLabelHeight + ")")
+      //    .call(xAxis)
+      //    .selectAll("text")
+      //    .style("text-anchor", "start")
+      //    .attr("dx", ".8em")
+      //    .attr("dy", ".15em")
+      //    .attr("transform", function(d) {
+      //      return "rotate(-65)" ;
+      //    }); 
 
       // Create the y-axis at the top.  This will show the labels for the rows 
       svg.selectAll(".y.axis").remove();    
@@ -219,8 +248,8 @@ function featureMatrixD3() {
 
       // Hide the ticks and the path of the x-axis, we are just interested
       // in the text
-      svg.selectAll("g.x.axis .tick line").classed("hide", true);
-      svg.selectAll("g.x.axis path").classed("hide", true);
+      //svg.selectAll("g.x.axis .tick line").classed("hide", true);
+      //svg.selectAll("g.x.axis path").classed("hide", true);
       svg.selectAll("g.y.axis .tick line").classed("hide", true);
       svg.selectAll("g.y.axis path").classed("hide", true);
 

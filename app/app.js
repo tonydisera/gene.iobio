@@ -266,7 +266,7 @@ function init() {
 	    });
 
 	featureMatrix = featureMatrixD3()
-					    .margin({top: 0, right: 4, bottom: 4, left: 24})
+					    .margin({top: 0, right: 40, bottom: 4, left: 24})
 					    .cellSize(30)
 					    .columnLabelHeight(100)
 					    .rowLabelWidth(100)
