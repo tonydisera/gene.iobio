@@ -40,13 +40,13 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
-  color: #EA9311 !important;
+  color: rgb(132, 132, 132);
   text-align: center;
   white-space: nowrap;
-  border: #EA9311;
+  border: rgb(132, 132, 132);
   border-style: solid;
   vertical-align: baseline;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   border-radius: 10px;
   border-width: 1px;
 }
@@ -159,7 +159,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 #denovo-symbol .proband .left,
 #denovo-symbol .proband .right {
-  stroke: rgb(54, 144, 192);
+  stroke: red;
 }
 
 #clinvar-symbol path {
@@ -762,14 +762,14 @@ header {
   opacity: 1;
   stroke: #000;
   stroke-width: 1px;
-  stroke-opacity: .2;
+  stroke-opacity: .3;
 }
 
 
 .filter-symbol {
   stroke: #000 !important;
   stroke-width: 1px !important;
-  stroke-opacity: .2 !important;
+  stroke-opacity: .3 !important;
 }
 
 .ibo-variant .reference { 
@@ -812,7 +812,7 @@ header {
   fill:  rgb(239, 145, 96) !important;
 } 
 .impact_MODIFIER{
-  fill: rgb(173, 199, 221) !important ;
+  fill: rgb(182, 197, 216)  !important;
 }
 .impact_LOW { 
   fill: rgb(195, 242, 255) !important;

@@ -686,9 +686,21 @@ var Bam = Class.extend({
    getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
     var me = this;
-    this.transformRefName(refName, function(trRefName){        
+    this.transformRefName(refName, function(trRefName){ 
+
+      var refFile = null;
+      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
+      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
+      // the reference name to determine if the references should be hg19 (starts with 'chr;)
+      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
+      // we point freebayes to a particular directory for the reference files.
+      if (trRefName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + trRefName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
+      }       
       var urlF = me.iobio.freebayes 
-        + "?cmd=-f ./data/references/hs_ref_chr" + trRefName + ".fa" + " " 
+        + "?cmd=-f " + refFile  + " " 
         + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
 
       var url = me.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '

@@ -16,6 +16,7 @@ function geneD3() {
 
   var geneD3_showBrush = false;
   var geneD3_showLabel = false;
+  var geneD3_showXAxis = true;
 
 
   // dimensions
@@ -38,8 +39,7 @@ function geneD3() {
       cdsHeight = undefined,
       arrowHeight = undefined,
       regionStart = undefined,
-      regionEnd = undefined,
-      showXAxis = true,
+      regionEnd = undefined,      
       widthPercent = null,
       heightPercent = null,     
       showBrushLine = false;
@@ -181,7 +181,7 @@ function geneD3() {
 
 
       var axisEnter = svg.selectAll("g.x.axis").data([0]).enter().append('g');   
-      if (showXAxis) {
+      if (geneD3_showXAxis) {
         axisEnter.attr("class", "x axis")
                  .attr("transform",   "translate(" + margin.left + "," + "0" + ")");
         svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + "0" + ")");
@@ -467,8 +467,8 @@ function geneD3() {
   };
 
   chart.showXAxis = function(_) {
-    if (!arguments.length) return showXAxis;
-    showXAxis = _;
+    if (!arguments.length) return geneD3_showXAxis;
+    geneD3_showXAxis = _;
     return chart;
   };
 
