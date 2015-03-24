@@ -106,9 +106,13 @@
                 data source info
               </a>
             </div>
-
-
           </div>
+          
+          <div class="loader">
+            <span class="loader-label"></span>
+            <img src="assets/images/loading-squares.gif"/>
+          </div> 
+
           <div style="text-align:center;clear:both;">
               <div id="af" class="collapse" style="float:right;font-size: 10px;margin-top:-16px">
                 <div>
@@ -122,17 +126,14 @@
               </span>
           </div>
 
-        
+   
+            
 
-          <div id="variant-panel" class="collapse" style="clear:both;">
-           
+          <div id="variant-panel" class="collapse in" aria-expanded="true" style="clear:both;">
+ 
             <div id="vcf-track" class="track hide" >
                      
               <div class="track-chart">
-                  <div class="loader">
-                      <span class="loader-label"></span>
-                      <img src="assets/images/loading-squares.gif"/>
-                  </div>
                   <div>
                     <div  id="fb-chart-label" class="chart-label hide" style="margin-bottom: -10px;">
                       Variants called in realtime
@@ -158,10 +159,6 @@
 
             <div id="bam-track" class="track hide">
               <div id="bam-depth-track" class="track-chart">
-                  <div class="loader">
-                      <span class="loader-label"></span>
-                      <img src="assets/images/loading-squares.gif"/>
-                  </div>
 
                   <div >
                     <div id="bam-chart-label" class="chart-label hide" style="margin-top: 22px;margin-bottom: -17px;">Coverage

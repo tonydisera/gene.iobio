@@ -449,6 +449,12 @@ a, a:hover, a:focus {
     margin-top: 40px;
     display:none;
 }
+.variant-card .loader {
+    margin-top: 0px !important;
+    margin-right: 260px;
+    display:none;
+}
+
 .loader img {
     height:12px; 
     width: 80px;
