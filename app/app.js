@@ -60,7 +60,9 @@ var showClinVarSymbol = function (selection) {
 	selection.append("g")
 	         .attr("transform", "translate(7,7)")
 	         .append("use")
-	         .attr("xlink:href", "#clinvar-symbol");
+	         .attr("xlink:href", "#clinvar-symbol")
+	         .attr("width", "16")
+	         .attr("height", "16");
 };
 var showAfSymbol = function(selection) {
 	selection.append("g")

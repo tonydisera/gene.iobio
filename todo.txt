@@ -2,14 +2,7 @@ blockers
 -----------
 - datasources dialog bug - names not showing up on variant cards, mixup with names when multiple samples added.
 
-- Freebayes calls - handle g37 vs. hg19 references
-
-- transcript chart variables not scoped (missing axis on main transcript chart - collision with transcript dropdown?)
-
 - Big genes kill browser session (robo1)
-
-
-- Genome build selection in data sources, different dbs for snpEff server
 
 - <symbol> doesn't work on Safari (improper size).  Switch to using <defs>.  (Handlebar templates
   don't seem to work on Safari either. geez. )  Another browser polyfill would be to just
@@ -29,6 +22,10 @@ critical
 
 - Switching to diff color scheme doesn't refresh fb variants.  
   FB variants not in feature matrix. (this should also result in inheritance and af data being updated on fb variants)
+
+- Genome build selection in data sources, different dbs for snpEff server
+
+- responsive layout for mobile
 
 
 

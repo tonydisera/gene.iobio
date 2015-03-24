@@ -203,6 +203,7 @@ function featureMatrixD3() {
          .attr("x", "0")
          .attr("y", "0")
          .style("transform", "rotate(180deg)")
+         .style("-webkit-transform", "rotate(180deg)")
          .on("click", function(d,i) {
             // We want to mark the row label that is going to be shifted up
             // or down so that after the matrix is resorted and rewdrawn,
