@@ -1059,7 +1059,7 @@ function displayBamUrlBox() {
 }
 
 function displayUrlBox() {
-    $('#url-input').val('http://s3.amazonaws.com/plantinum/NA12878.vcf.gz');
+    $('#url-input').val('http://s3.amazonaws.com/iobio/platinum/NA12878.vcf.gz');
 	$("#url-input").removeClass('hide');
     $("#url-input").focus();
     $('#datasource-dialog #vcf-file-info').addClass('hide');

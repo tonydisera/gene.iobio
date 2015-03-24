@@ -93,7 +93,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 
 #feature-matrix .y.axis .tick .up polygon,
 #feature-matrix .y.axis .tick .down polygon {
-   fill:  #EA9311;
+   fill:  rgb(186, 186, 186);
    stroke: black;
    stroke-opacity: .55;
    stroke-width: 1px;
