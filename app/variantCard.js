@@ -488,8 +488,10 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		$("#feature-matrix").addClass("hide");
 		if (this.bam)
 			this.showBamDepth();
-		if (this.vcfUrlEntered || this.vcfFileOpened)
+		if (this.vcfUrlEntered || this.vcfFileOpened) 
 			this.showVariants();
+
+		this.fillFreebayesChart(this.fbData, window.gene.start, window.gene.end);
 	}
 }
 
@@ -825,26 +827,32 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 
 VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd) {
 
-	if (data == null) {
-		return;
-	}
-	this.cardSelector.find('#fb-chart-label').removeClass("hide");
-	this.cardSelector.find('#fb-separator').removeClass("hide");
-
-	this.fbChart.regionStart(regionStart);
-	this.fbChart.regionEnd(regionEnd);
 	
-	// Set the vertical layer count so that the height of the chart can be recalculated	                                	
-	this.fbChart.verticalLayers(data.maxLevel);
+	if (data) {
+		this.cardSelector.find('#fb-chart-label').removeClass("hide");
+		this.cardSelector.find('#fb-separator').removeClass("hide");
 
-	// Load the chart with the new data
-	var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    
-    this.fbChart(selection);
+		this.fbChart.regionStart(regionStart);
+		this.fbChart.regionEnd(regionEnd);
+	
+		// Set the vertical layer count so that the height of the chart can be recalculated	    
+		this.fbChart.verticalLayers(data.maxLevel);
 
-	this.cardSelector.find('#vcf-count').text((this.vcfData.features.length + data.features.length) + ' Variants');
-	this.cardSelector.find('.loader').css("display", "none");
+		// Load the chart with the new data
+		var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    
+	    this.fbChart(selection);
 
-   	this.d3CardSelector.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
+		this.cardSelector.find('#vcf-count').text((this.vcfData.features.length + data.features.length) + ' Variants');
+		this.cardSelector.find('.loader').css("display", "none");
+
+	   	this.d3CardSelector.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
+	}  else {
+		this.cardSelector.find('#fb-chart-label').addClass("hide");
+		this.cardSelector.find('#fb-separator').addClass("hide");
+		this.d3CardSelector.select('#fb-variants svg').remove();
+	}                      	
+
+	
 
 }
 
