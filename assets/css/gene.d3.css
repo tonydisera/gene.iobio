@@ -1,24 +1,19 @@
 
 
-.ibo-gene .utr { 
-  fill: rgb(49, 102, 147);
-  stroke: #0B5388;
-  opacity: .4;
+
+.ibo-gene .cds, .ibo-gene .utr { 
+  fill: rgba(228, 205, 129, 0.23);
+  stroke: rgba(178, 151, 63, 0.42);
 }
-.ibo-gene .cds { 
-  fill: rgb(49, 102, 147);
-  stroke: #0B5388;
-  opacity: .7;
+#zoom-region-chart.ibo-gene .cds, .ibo-gene .utr { 
+  fill: rgba(228, 205, 129, 0.75);
+  stroke: rgba(178, 151, 63, 0.95);
 }
-#transcript-menu-item.ibo-gene .transcript.selected .utr { 
-  fill: #58DA00;
-  stroke: #50A019;
-  opacity: .4;
-}
-#transcript-menu-item.ibo-gene .transcript.selected .cds { 
-  fill: #58DA00;
-  stroke: #50A019;
-  opacity: .8;
+#transcript-menu-item.ibo-gene .transcript.selected .utr,
+#transcript-menu-item.ibo-gene .transcript.selected .cds
+{ 
+  fill: #BFC83F;
+  stroke: #BFC83F;
 }
 #transcript-menu-item.ibo-gene .utr:hover,
 #transcript-menu-item.ibo-gene .cds:hover,

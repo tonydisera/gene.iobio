@@ -1,15 +1,19 @@
+
+
 body {
   font-family: 'Quattrocento Sans', sans-serif;
 }
 
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: rgb(132, 132, 132);
+  color: #9AA12D;
   font-size: 14px;
   text-transform: uppercase;
+  font-family: Quicksand;
+  font-weight: 700;
 }
 
 .chart-label {
-  color: rgb(53, 134, 192);
+  color:  #6898A8;
   margin-left:4px;
   font-size: 11px;
 }
@@ -159,7 +163,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 #denovo-symbol .proband .left,
 #denovo-symbol .proband .right {
-  stroke: red;
+  stroke: #BFC83F;
 }
 
 #clinvar-symbol path {
@@ -307,7 +311,7 @@ a, a:hover, a:focus {
 
 .iobioapp {
     font-size: 34px;
-    color: #EA9311;
+    color: #6898A8;
     font-family: Quicksand;
     float: left;
 }
@@ -347,12 +351,12 @@ a, a:hover, a:focus {
   padding-bottom: 0px;
   margin-right: 100px;
   color: rgb(132, 132, 132);
-/*  color: #EA9311 !important; */
+/*  color: #6898A8 !important; */
   font-size: 14px;
     
 }
 #gene-name {
-  color: #EA9311;
+  color: #6898A8;
 }
 #gene-region-info {
   padding-left: 10px;
@@ -449,9 +453,17 @@ a, a:hover, a:focus {
     margin-top: 40px;
     display:none;
 }
-.variant-card .loader {
+.variant-card .vcfloader {
+    text-align: center;
     margin-top: 0px !important;
     margin-right: 260px;
+    display:none;
+}
+
+.variant-card #bam-track .loader {
+    text-align: center;
+    margin-top: 20px !important;
+    margin-right: 0px;
     display:none;
 }
 
@@ -462,6 +474,7 @@ a, a:hover, a:focus {
 .loader-label {
   color: rgb(132, 132, 132);
   font-size:18px;   
+  font-family: Quicksand;
 }
 
 .stats-box { 
@@ -645,12 +658,12 @@ header {
 }
 
 #bam-depth .circle {
-  stroke:  darkorange;
+  stroke:  #DB5A43;
   fill: none;
   stroke-width: 2;
 }
 #bam-depth .circle-label {
-   fill: darkorange;
+   fill: #DB5A43;
    font-size: 10px;
    font-weight: bold;
 }
@@ -700,14 +713,10 @@ header {
 }
 
 
-#zoom-region-track {
-    margin-top: -26px;
-    margin-bottom: 0px;
-    padding-bottom: 0px;
-}
+
 #zoom-region-chart {
-    margin-top: 10px;
-    margin-bottom: 0px;
+    margin-top: -10px;
+    margin-bottom: 10px;
 }
 #zoom-region-ref-name {
 }
@@ -812,16 +821,16 @@ header {
 }
 
 .impact_HIGH{
-  fill: rgb(215,48,39) !important;
+  fill: #DB5A43 !important;
 } 
 .impact_MODERATE{
-  fill:  rgb(239, 145, 96) !important;
+  fill:  #ED8023 !important;
 } 
 .impact_MODIFIER{
-  fill: rgb(182, 197, 216)  !important;
+  fill: #6898A8  !important;
 }
 .impact_LOW { 
-  fill: rgb(195, 242, 255) !important;
+  fill: #88CCED !important;
 }
 .impact_NOIMPACT { 
   fill: #FAF5BE ;
@@ -1044,7 +1053,7 @@ header {
   float:     left;
   font-size: 22px;
   padding-right: 4px;
-  color: #EA9311 !important;
+  color: #6898A8 !important;
   /* color: rgb(132, 132, 132) !important; */
 }
 

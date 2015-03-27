@@ -257,8 +257,8 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 	this.bamFileOpened = true;
 
 	if (this.isViewable()) {
-		this.cardSelector.find(".loader").css("display", "block");
-		this.cardSelector.find(".loader-label").text("Loading Alignment File");
+		this.cardSelector.find("#bam-track .loader").css("display", "block");
+		this.cardSelector.find("#bam-track .loader-label").text("Loading Alignment File");
 		this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamFile.name);
 
 		$('#datasource-dialog #bam-file-info').removeClass('hide');
@@ -286,8 +286,8 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 }
 
 VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
-	this.cardSelector.find(".loader").css("display", "block");
-	this.cardSelector.find(".loader-label").text("Streaming Alignment File");
+	this.cardSelector.find("#bam-track .loader").css("display", "block");
+	this.cardSelector.find("#bam-track .loader-label").text("Streaming Alignment File");
 
 
 	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamUrl);
@@ -305,8 +305,8 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
-		this.cardSelector.find(".loader").css("display", "block");
-		this.cardSelector.find('.loader-label').text("Loading VCF");
+		this.cardSelector.find(".vcfloader").css("display", "block");
+		this.cardSelector.find('.vcfloader .loader-label').text("Loading VCF");
 	}
 
 	this.vcf.openVcfFile( event, function(vcfFile) {
@@ -343,8 +343,8 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
-		this.cardSelector.find(".loader").css("display", "block");
-		this.cardSelector.find('.loader-label').text("Streaming Variant Data");
+		this.cardSelector.find(".vcfloader").css("display", "block");
+		this.cardSelector.find('.vcfloader .loader-label').text("Streaming Variant Data");
 	 	this.cardSelector.find('#vcf-name').text(vcfUrl);
 	}
    
@@ -474,8 +474,10 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 		this.vcfChart.clazz(classifyClazz);
 
-		if (this.bam || this.vcf) {	       			
-			selection = this.d3CardSelector.select("#zoom-region-chart").datum([]);
+		if (this.bam || this.vcf) {	      
+			this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+
+			selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
 			this.zoomRegionChart.regionStart(+window.gene.start);
 			this.zoomRegionChart.regionEnd(+window.gene.end);
 			this.zoomRegionChart(selection);
@@ -496,29 +498,31 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 }
 
 VariantCard.prototype.onBrush = function(brush) {
-	if (!brush.empty()) {
+	//if (!brush.empty()) {
 
-		this.cardSelector.find('#bam-track').css("margin-top", "-70px");
+		//this.cardSelector.find('#bam-track').css("margin-top", "-70px");
 
 	    var selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-		this.zoomRegionChart.regionStart(regionStart);
-		this.zoomRegionChart.regionEnd(regionEnd);
+		this.zoomRegionChart.regionStart(!brush.empty() ? regionStart : window.gene.start);
+		this.zoomRegionChart.regionEnd(!brush.empty() ? regionEnd : window.gene.end);
 		this.zoomRegionChart(selection);
 		this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
-		this.cardSelector.find('#zoom-region-chart').removeClass("hide");
+		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
-	} else {
+
+	//} else {
 		// Treat a click as a region selection on the entire gene region.
 		// That way, we won't recall the variants and re-read the bam and
 		// vcf files, but instead just use the data already gathered for 
 		// the entire gene region;
-		this.cardSelector.find('#bam-track').css("margin-top", "-30px");
 		
-		this.cardSelector.find('#zoom-region-chart').addClass("hide");
-		var h = $("#nav-section").height();
-		$('#track-section').css("padding-top", h + "px");
-	}
+		//this.cardSelector.find('#bam-track').css("margin-top", "-30px");
+		
+		//this.cardSelector.find('#zoom-region-chart').addClass("hide");
+		//var h = $("#nav-section").height();
+		//$('#track-section').css("padding-top", h + "px");
+	//}
 
 	
 
@@ -540,7 +544,6 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 		return;
 	}
 
-	this.cardSelector.find(".loader").css("display", "block");
 
 	this.cardSelector.removeClass("hide");
 	this.cardSelector.find('#bam-track').removeClass("hide");
@@ -570,7 +573,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 	 			}
 				me.bamData = data;
 				
-				me.cardSelector.find(".loader-label").text("Loading Coverage Chart")
+				me.cardSelector.find("#bam-track .loader-label").text("Loading Coverage Chart")
 
 				if (regionStart && regionEnd) {
 					var filteredData = me.bamData.filter(function(d) { 
@@ -607,7 +610,7 @@ VariantCard.prototype.getBamDepthAtPos = function(pos) {
 
 VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 	if (this.isViewable) {
-		this.cardSelector.find(".loader").css("display", "none");
+		this.cardSelector.find("#bam-track .loader").css("display", "none");
 	    this.cardSelector.find('#bam-name-' + this.cardIndex).removeClass("hide");		
 		this.cardSelector.find('#bam-depth').removeClass("hide");
 		this.cardSelector.find('#bam-chart-label').removeClass("hide");
@@ -617,6 +620,11 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(data));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
+
+		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+		this.cardSelector.find('#zoom-region-chart').css("margin-top", "20px");
+		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-90px");
+
 
 	}
 }
@@ -635,7 +643,7 @@ VariantCard.prototype.showFreebayesVariants = function(regionStart, regionEnd) {
 		if (regionStart && regionEnd)
   			this.fillFreebayesChart(filteredVcfData, regionStart, regionEnd);
   		else
-  			this.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
+  			this.fillFreebayesChart(filteredVcfData, window.gene.start, window.gene.end);
 	}
 }
 
@@ -655,7 +663,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 		this.cardSelector.removeClass("hide");
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
-		this.cardSelector.find(".loader").css("display", "block");
+		this.cardSelector.find(".vcfloader").css("display", "block");
 		this.cardSelector.find('#vcf-name').addClass("hide");		
 	}
 
@@ -666,7 +674,8 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 		// variants based on the selected region
 		if (this.isViewable) {
 			var filteredFeatures = this.vcfData.features.filter(function(d) {
-				return (d.start >= regionStart && d.start <= regionEnd);
+				var inRegion = (d.start >= regionStart && d.start <= regionEnd);
+				return inRegion;
 			});
 				
 
@@ -680,7 +689,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	} else {
 
 		if (this.isViewable) {
-		    this.cardSelector.find('.loader-label').text("Annotating Variants with snpEff in realtime");
+		    this.cardSelector.find('.vcfloader .loader-label').text("Annotating Variants with snpEff in realtime");
 		}
 
 		// A gene has been selected.  Read the variants for the gene region.
@@ -696,7 +705,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 		        me.vcfData = data;
 
 		   	    if (me.isViewable()) {
-			   	    me.cardSelector.find('.loader-label').text("Loading variant chart");
+			   	    me.cardSelector.find('.vcfloader .loader-label').text("Loading variant chart");
 			   	    var filteredVcfData = me.filterVariants();
 			   	    if (regionStart && regionEnd)
 				  		me.fillVariantChart(filteredVcfData, regionStart, regionEnd);
@@ -792,7 +801,7 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 	this.cardSelector.find('#vcf-count').css("display", "inline-block");		
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 	this.cardSelector.find('#vcf-variants').css("display", "inline");	
-	this.cardSelector.find(".loader").css("display", "none");
+	this.cardSelector.find(".vcfloader").css("display", "none");
 
 	this.vcfChart.regionStart(regionStart);
 	this.vcfChart.regionEnd(regionEnd);
@@ -805,6 +814,8 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
     this.vcfChart(selection);
 
 	this.cardSelector.find('#vcf-count').text(data.features.length + ' Variants');
+
+	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
     $('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
@@ -821,12 +832,12 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 	   	if ( this.getRelationship() == 'proband') {
 	   		window.showFeatureMatrix(this, data, regionStart, regionEnd);
 	   	}
-	   }
+	}
 
 }
 
 VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd) {
-
+	var me = this;
 	
 	if (data) {
 		this.cardSelector.find('#fb-chart-label').removeClass("hide");
@@ -843,9 +854,33 @@ VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd
 	    this.fbChart(selection);
 
 		this.cardSelector.find('#vcf-count').text((this.vcfData.features.length + data.features.length) + ' Variants');
-		this.cardSelector.find('.loader').css("display", "none");
+		this.cardSelector.find('.vcfloader').css("display", "none");
 
 	   	this.d3CardSelector.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
+
+	   	// Add the freebayes variant to the vcf data
+	   	me.vcfData.features = me.vcfData.features.filter( function(feature) {
+	   		return feature.fbCalled == null;
+	   	});
+	   	data.features.forEach( function(feature) {
+	   		feature.fbCalled = 'Y';
+	   		me.vcfData.features.push(feature);
+	   	});
+
+	   	// Figure out max level (lost for some reason)
+	   	var maxLevel = 1;
+	   	me.vcfData.features.forEach(function(feature) {
+	   		if (feature.level > maxLevel) {
+	   			maxLevel = feature.level;
+	   		}
+	   	});
+	   	me.vcfData.maxLevel = maxLevel;
+
+
+	   	if ( this.getRelationship() == 'proband') {
+	   		window.showFeatureMatrix(this, me.vcfData, regionStart, regionEnd);
+	   	}
+
 	}  else {
 		this.cardSelector.find('#fb-chart-label').addClass("hide");
 		this.cardSelector.find('#fb-separator').addClass("hide");
@@ -879,9 +914,9 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 		if (this.isViewable()) {
 			this.cardSelector.find("#vcf-track").removeClass("hide");
-			this.cardSelector.find(".loader").removeClass("hide");
-			this.cardSelector.find(".loader").css("display", "block");
-			this.cardSelector.find('.loader-label').text("Calling Variants with Freebayes");
+			this.cardSelector.find(".vcfloader").removeClass("hide");
+			this.cardSelector.find(".vcfloader").css("display", "block");
+			this.cardSelector.find('.vcfloader .loader-label').text("Calling Variants with Freebayes");
 		}
 
 
@@ -916,7 +951,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			
 			
 			if (me.isViewable()) {
-				me.cardSelector.find(".loader-label").text("Annotating variants with snpEFF in realtime")
+				me.cardSelector.find(".vcfloader .loader-label").text("Annotating variants with snpEFF in realtime")
 
 				// Annotate the fb variatns
 				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
@@ -937,7 +972,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 						return d.consensus != 'unique2';
 					});					
 
-					me.cardSelector.find('.loader-label').text("Comparing call sets");
+					me.cardSelector.find('.vcfloader .loader-label').text("Comparing call sets");
 
 					// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 					// unique2 (only in freebayes set), or common (in both sets).				
@@ -952,7 +987,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
 						me.fbData.maxLevel = maxLevel + 1;
 
-						me.cardSelector.find('.loader-label').text("Loading chart");
+						me.cardSelector.find('.vcfloader .loader-label').text("Loading chart");
 
 				    	me.fillFreebayesChart(me.fbData, window.gene.start, window.gene.end);
 						
