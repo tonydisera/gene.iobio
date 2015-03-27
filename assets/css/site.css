@@ -4,8 +4,37 @@ body {
   font-family: 'Quattrocento Sans', sans-serif;
 }
 
+.iobio {
+    font-size: 34px;
+    color: rgb(132, 132, 132);
+    font-family: Quicksand;
+    float: left;
+}
+
+.iobioapp {
+    font-size: 34px;
+    color: #6898A8;
+    font-family: Quicksand;
+    float: left;
+}
+
+.iobioproject {
+    font-size: 18px;
+    color: rgb(118, 99, 99);
+    font-family: Quicksand;
+    line-height: 45px;
+    float: right;
+}
+
+#app-title-section {
+  text-align: center;
+  background: white;
+}
+
+
+
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: #9AA12D;
+  color:  #6898A8;
   font-size: 14px;
   text-transform: uppercase;
   font-family: Quicksand;
@@ -300,33 +329,6 @@ a, a:hover, a:focus {
 
 .bars .chartlabel.missing {
   fill: none;
-}
-
-.iobio {
-    font-size: 34px;
-    color: rgb(132, 132, 132);
-    font-family: Quicksand;
-    float: left;
-}
-
-.iobioapp {
-    font-size: 34px;
-    color: #6898A8;
-    font-family: Quicksand;
-    float: left;
-}
-
-.iobioproject {
-    font-size: 18px;
-    color: rgb(118, 99, 99);
-    font-family: Quicksand;
-    line-height: 45px;
-    float: right;
-}
-
-#app-title-section {
-  text-align: center;
-  background: white;
 }
 
 

@@ -1541,7 +1541,9 @@ function variantTooltipHTML(variant, rowIndex) {
 	if (effectDisplay.length > 0) {
 	  	effectDisplay += ", ";
 	}
-		effectDisplay += key;
+		// Strip out "_" from effect
+		var tokens = key.split("_");
+		effectDisplay += tokens.join(" ");
 	}    
 	var impactDisplay = "";
 	for (var key in variant.impact) {
@@ -1553,15 +1555,7 @@ function variantTooltipHTML(variant, rowIndex) {
 	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
 	var refalt = variant.ref + "->" + variant.alt;
 
-	if (variant.af == -1 || variant.af == null || variant.af == '') {
-		afLabel = "AF";
-	} else if (variant.af == variant.afExAC) {
-		afLabel = "AF(ExAC)";
-	} else if (variant.af == variant.af1000G) {
-		afLabel = "AF(1000G)";
-	} else {
-		afLabel = "AF";
-	}
+	
 	return (
 		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
 		+ tooltipRow('Impact', impactDisplay)
@@ -1569,10 +1563,10 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('ClinVar', variant.clinvar )
 		+ tooltipRow('Qual', variant.qual) 
 		+ tooltipRow('Filter', variant.filter) 
-		+ tooltipRow('Depth', variant.combinedDepth ? variant.combinedDepth + ' (combined)' : null) 
 		+ tooltipRow('Zygosity', variant.zygosity)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow(afLabel, variant.af == -1 ? 'unknown' : variant.af) 
+		+ tooltipRow('AF ExAC', variant.afExAC == -1 ? ' ' : variant.afExAC) 
+		+ tooltipRow('AF 1000G', variant.af1000G == -1 ? ' ' : variant.af1000G) 
 	);                    
 
 }
@@ -1580,8 +1574,8 @@ function variantTooltipHTML(variant, rowIndex) {
 function tooltipRow(label, value) {
 	if (value && value != '') {
 		return '<div class="row">'
-		      + '<div class="col-md-5">' + label + '</div>'
-		      + '<div class="col-md-7">' + value + '</div>'
+		      + '<div class="col-md-6">' + label + '</div>'
+		      + '<div class="col-md-6">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";
