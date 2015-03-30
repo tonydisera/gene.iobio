@@ -20,9 +20,11 @@ function geneD3() {
 
 
   // dimensions
-  var margin = {top: 30, right: 0, bottom: 20, left: 110},
-      width = 800,
-      height = 400;  
+  var margin = {top: 30, right: 0, bottom: 20, left: 110};
+  var geneD3_width = 800,
+      geneD3_height = 400;  
+
+
   // scales
   var x = d3.scale.linear(),
       y = d3.scale.linear();
@@ -40,8 +42,8 @@ function geneD3() {
       arrowHeight = undefined,
       regionStart = undefined,
       regionEnd = undefined,      
-      widthPercent = null,
-      heightPercent = null,     
+      geneD3_geneD3_widthPercent = null,
+      geneD3_geneD3_heightPercent = null,     
       showBrushLine = false;
       
 
@@ -65,10 +67,10 @@ function geneD3() {
        brushAllowance = geneD3_showBrush ? 20 : 0;
 
        // calculate height
-       height = data.length * (trackHeight + arrowHeight);
+       geneD3_height = data.length * (trackHeight + arrowHeight);
 
        // determine inner height (w/o margins)
-       var innerHeight = height - margin.top - margin.bottom;
+       var innerHeight = geneD3_height - margin.top - margin.bottom;
 
        // set svg element
        var container = d3.select(this).classed('ibo-gene', true);      
@@ -86,7 +88,7 @@ function geneD3() {
                 ]);
 
       }
-      x  .range([0, width - margin.left - margin.right]);
+      x  .range([0, geneD3_width - margin.left - margin.right]);
 
       // Update the y-scale.
       y  .domain([0, data.length]);
@@ -100,20 +102,20 @@ function geneD3() {
 
       svg.enter()
         .append("svg")
-        .attr("width", widthPercent ? widthPercent : width)
-        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
+        .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
+        .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
-      if (widthPercent && heightPercent) {
+      if (geneD3_widthPercent && geneD3_heightPercent) {
         d3.select(this).selectAll("svg")
-          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+          .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
           .attr("preserveAspectRatio", "xMaxYMid meet");
       } 
 
       d3.select(this).selectAll("svg")
-        .attr("width", widthPercent ? widthPercent : width)
-        .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
+        .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
+        .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
 
 
 
@@ -149,27 +151,27 @@ function geneD3() {
                  g.append('line')
                   .attr('class', 'brush-line')
                   .attr('x1', 40 )
-                  .attr('x2',  width - margin.left - margin.right - 40)          
+                  .attr('x2',  geneD3_width - margin.left - margin.right - 40)          
                   .attr('y1', heightExtent)
                   .attr('y2', heightExtent);
 
-                if (widthPercent && heightPercent) {
-                  svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom+brushAllowance))
+                if (geneD3_widthPercent && geneD3_heightPercent) {
+                  svg.attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom+brushAllowance))
                      .attr("preserveAspectRatio", "xMaxYMid meet");
                 } 
 
-                svg.attr("width", widthPercent ? widthPercent : width)
-                   .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom+brushAllowance);
+                svg.attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
+                   .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom+brushAllowance);
 
 
               } else {
-                 if (widthPercent && heightPercent) {
-                    svg.attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+                 if (geneD3_widthPercent && geneD3_heightPercent) {
+                    svg.attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
                        .attr("preserveAspectRatio", "xMaxYMid meet");
                   } 
 
-                  svg.attr("width", widthPercent ? widthPercent : width)
-                     .attr("height", heightPercent ? heightPercent : height+margin.top+margin.bottom);
+                  svg.attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
+                     .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
                
               }
 
@@ -189,7 +191,7 @@ function geneD3() {
 
 
       if (geneD3_showBrush) {
-        var brushHeight = height + 20;
+        var brushHeight = geneD3_height + 20;
         var brushY = -20;
         g.selectAll("g.x.brush").remove();
         g.selectAll("g.x.brush").data([0]).enter().append("g")
@@ -396,26 +398,26 @@ function geneD3() {
   };
 
   chart.width = function(_) {
-    if (!arguments.length) return width;
-    width = _;
+    if (!arguments.length) return geneD3_width;
+    geneD3_width = _;
     return chart;
   };
 
   chart.height = function(_) {
-    if (!arguments.length) return height;
-    height = _;
+    if (!arguments.length) return geneD3_height;
+    geneD3_height = _;
     return chart;
   };
 
   chart.widthPercent = function(_) {
-    if (!arguments.length) return widthPercent;
-    widthPercent = _;
+    if (!arguments.length) return geneD3_widthPercent;
+    geneD3_widthPercent = _;
     return chart;
   };
 
   chart.heightPercent = function(_) {
-    if (!arguments.length) return heightPercent;
-    heightPercent = _;
+    if (!arguments.length) return geneD3_heightPercent;
+    geneD3_heightPercent = _;
     return chart;
   };
   

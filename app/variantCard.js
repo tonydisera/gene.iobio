@@ -415,7 +415,7 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 	this.name = dataSourceName;
 
 	if (this.isViewable()) {
-		this.showDataSources();
+		this.showDataSources(dataSourceName);
 
 	}
 

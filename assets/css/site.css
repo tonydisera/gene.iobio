@@ -4,41 +4,25 @@ body {
   font-family: 'Quattrocento Sans', sans-serif;
 }
 
-.iobio {
-    font-size: 34px;
-    color: rgb(132, 132, 132);
-    font-family: Quicksand;
-    float: left;
-}
-
-.iobioapp {
-    font-size: 34px;
-    color: #6898A8;
-    font-family: Quicksand;
-    float: left;
-}
-
-.iobioproject {
-    font-size: 18px;
-    color: rgb(118, 99, 99);
-    font-family: Quicksand;
-    line-height: 45px;
-    float: right;
-}
-
-#app-title-section {
-  text-align: center;
-  background: white;
-}
-
-
-
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color:  #6898A8;
+  color: rgba(104, 152, 168, 1);
   font-size: 14px;
   text-transform: uppercase;
   font-family: Quicksand;
   font-weight: 700;
+}
+
+a, a:hover, a:focus {
+  color: rgba(104, 152, 168, 1) !important;
+}
+
+#variant-card-buttons a.selected {
+  font-weight: bold;
+}
+
+
+.form-control-wrapper .material-input:before {
+  background-color: rgba(104, 152, 168, 1) !important;
 }
 
 .chart-label {
@@ -232,9 +216,6 @@ section {
 }
 
 
-a, a:hover, a:focus {
-  color: rgb(53, 134, 192);
-}
 
 #color-scheme {
   font-size: 11px;
@@ -329,6 +310,33 @@ a, a:hover, a:focus {
 
 .bars .chartlabel.missing {
   fill: none;
+}
+
+.iobio {
+    font-size: 34px;
+    color: rgb(132, 132, 132);
+    font-family: Quicksand;
+    float: left;
+}
+
+.iobioapp {
+    font-size: 34px;
+    color: #6898A8;
+    font-family: Quicksand;
+    float: left;
+}
+
+.iobioproject {
+    font-size: 18px;
+    color: rgb(118, 99, 99);
+    font-family: Quicksand;
+    line-height: 45px;
+    float: right;
+}
+
+#app-title-section {
+  text-align: center;
+  background: white;
 }
 
 
@@ -719,6 +727,8 @@ header {
 #zoom-region-chart {
     margin-top: -10px;
     margin-bottom: 10px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 #zoom-region-ref-name {
 }
@@ -823,16 +833,16 @@ header {
 }
 
 .impact_HIGH{
-  fill: #DB5A43 !important;
+  fill: #ad494A !important;
 } 
 .impact_MODERATE{
-  fill:  #ED8023 !important;
+  fill: #D6616b !important;
 } 
 .impact_MODIFIER{
-  fill: #6898A8  !important;
+  fill: rgba(231, 186, 82, 0.37);
 }
 .impact_LOW { 
-  fill: #88CCED !important;
+  fill: rgba(181, 207, 107, 0.65);
 }
 .impact_NOIMPACT { 
   fill: #FAF5BE ;

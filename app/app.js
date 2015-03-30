@@ -354,51 +354,59 @@ function loadUrlSources() {
 		// move data source button
 		moveDataSourcesButton();
 		// load gene
+		// For some reason, this trigger event is fired twice, so keep track of whether it
+		// has already been fired so that we don't load data sources twice.
+		var loadCount = 0;
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, callback:function(){
-				// run after gene has been loaded
-				// initialize variant cards
-				initVariantCards();
-				var addVC = false;
+				if (loadCount == 0) {
+					// run after gene has been loaded
+					// initialize variant cards
+					initVariantCards();
+					var addVC = false;
 
-				// load bam and vcf sources
-				// get all bam and vcf url params in hash
-				var bam = getUrlParameter(/bam*/);
-				var vcf = getUrlParameter(/vcf*/);		
-				// load all bams and vcfs that have a bam pair
-				if (bam != undefined) {
-					Object.keys(bam).forEach(function(name) {
-						if (addVC) addVariantCard();
-						else addVC = true;
-						$('#bam-url-input').val(bam[name])
-						onBamUrlEntered();
+					// load bam and vcf sources
+					// get all bam and vcf url params in hash
+					var bam = getUrlParameter(/bam*/);
+					var vcf = getUrlParameter(/vcf*/);		
+					// load all bams and vcfs that have a bam pair
+					if (bam != undefined) {
+						Object.keys(bam).forEach(function(name) {
+							if (addVC) addVariantCard();
+							else addVC = true;
+							$('#bam-url-input').val(bam[name])
+							onBamUrlEntered();
 
-						// check if there is a corresponding vcf file
-						var vcfName = 'vcf' + name.replace('bam','');
-						if( vcf && vcf[vcfName] != undefined ) {
-							$('#url-input').val(vcf[vcfName]);
-							delete vcf[vcfName];
+							// check if there is a corresponding vcf file
+							var vcfName = 'vcf' + name.replace('bam','');
+							if( vcf && vcf[vcfName] != undefined ) {
+								$('#url-input').val(vcf[vcfName]);
+								delete vcf[vcfName];
+								onVcfUrlEntered();
+							}
+												
+							// show bam/vcf tracks
+							variantCards.forEach( function(variantCard) {							
+									variantCard.showDataSources(variantCard.getName());						
+							});				
+						})
+					}		
+					// load vcfs that don't have a bam pair
+					if (vcf != undefined) {
+						Object.keys(vcf).forEach(function(name) {
+							if (addVC) addVariantCard();
+							else addVC = true;
+							$('#url-input').val(vcf[name]);
 							onVcfUrlEntered();
-						}
-											
-						// show bam/vcf tracks
-						variantCards.forEach( function(variantCard) {							
+							// show bam/vcf tracks
+							variantCards.forEach( function(variantCard) {							
 								variantCard.showDataSources(variantCard.getName());						
-						});				
-					})
-				}		
-				// load vcfs that don't have a bam pair
-				if (vcf != undefined) {
-					Object.keys(vcf).forEach(function(name) {
-						if (addVC) addVariantCard();
-						else addVC = true;
-						$('#url-input').val(vcf[name]);
-						onVcfUrlEntered();
-						// show bam/vcf tracks
-						variantCards.forEach( function(variantCard) {							
-							variantCard.showDataSources(variantCard.getName());						
-						});				
-					});
+							});				
+						});
+					}
+					loadCount++;
+
 				}
+
 			}
 		});		
 	}
@@ -406,6 +414,8 @@ function loadUrlSources() {
 
 function selectVariantCard(cardIndex) {
 	$('#datasource-dialog #card-index').val(+cardIndex);
+	$('#variant-card-buttons a.selected').removeClass("selected");
+	$('#variant-card-button-' + +cardIndex).addClass("selected");
 	initDataSourceFields();
 
 }
@@ -1425,9 +1435,10 @@ function fillFeatureMatrix(theVcfData) {
 			var mappedValue = null;
 			var mappedClazz = null;
 			var symbolFunction = null;
-			// Fake the clinvar, inheritance data for now
+			// Don't fill in clinvar for now
 			if (matrixRow.attribute == 'clinvar') {
-				rawValue = Math.random() > .5 ? 'Y' : 'N';
+				//rawValue = Math.random() > .5 ? 'Y' : 'N';
+				rawValue = 'N';
 			} 
 			if (rawValue != null) {
 				if (matrixRow.match == 'exact') {
