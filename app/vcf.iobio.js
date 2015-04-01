@@ -77,6 +77,7 @@ vcfiobio = function module() {
   var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
   var snpEffServer           = "ws://snpeff.iobio.io";
   var snpSiftServer          = "ws://snpsift.iobio.io";
+  var vtServer               = "ws://vt.iobio.io";
 
   var vcfURL;
   var vcfReader;
@@ -507,16 +508,22 @@ var effectCategories = [
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
+    if (refName.indexOf('chr') == 0) {
+      refFile = "./data/references_hg19/" + refName + ".fa";
+    } else {
+      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+    }       
+    var postProcessUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(encodeURI(tabixUrl)) );
 
     var url = null;
     if (afMax) {
       //var filterString = "'(AF<0.001)'";
       //filterString = "'((AF>" + afMin + ")&(AF<" + afMax + "))'";
       filterString = "'(AF<" + afMax + ")'";
-      var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(tabixUrl));
+      var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(postProcessUrl));
       url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
     } else {
-      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(tabixUrl));
+      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(postProcessUrl));
     }
 
     console.log(url);

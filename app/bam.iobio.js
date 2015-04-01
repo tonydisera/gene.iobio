@@ -32,6 +32,7 @@ var Bam = Class.extend({
       this.iobio.freebayes = "ws://freebayes.iobio.io";
       this.iobio.bcftools = "ws://bcftools.iobio.io";
       this.iobio.vcflib = "ws://vcflib.iobio.io";
+      this.iobio.vt = "ws://vt.iobio.io";
       
 
 //      this.iobio.bamtools = "ws://localhost:8061";
@@ -703,8 +704,10 @@ var Bam = Class.extend({
         + "?cmd=-f " + refFile  + " " 
         + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
 
+      var urlV = me.iobio.vt + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
+
       var url = me.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
-                + encodeURIComponent(encodeURI(urlF));
+                + encodeURIComponent(encodeURI(urlV));
 
       me._callVariants(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflib, encodeURI(url), callback);
     });
