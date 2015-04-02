@@ -71,6 +71,7 @@ vcfiobio = function module() {
   var emailServer            = "ws://localhost:7068";
   var catInputServer         = "ws://localhost:7063";
   //var snpEffServer           = "ws://localhost:8040";
+  var clinvarServer          = "ws://localhost:8040";
 
   var vcfstatsAliveServer    = "ws://vcfstatsalive.iobio.io";
   var tabixServer            = "ws://tabix.iobio.io";
@@ -467,16 +468,16 @@ var effectCategories = [
     
   }
   // NEW
-  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback) {
+  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar) {
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback);
+      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar);
     } else {
-      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback);
+      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar);
     }
   }
  
   // NEW
-  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback) {
+  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -496,15 +497,21 @@ var effectCategories = [
     // Get the vcf records for this region
     vcfReader.getRecords(refName, regionStart, regionEnd, function(records) {
 
-        me.annotateVcfRecords(headerRecords.concat(records), regionStart, regionEnd, regionStrand, 
+        var allRecs = headerRecords.concat(records);
+
+        me.annotateVcfRecords(allRecs, regionStart, regionEnd, regionStrand, 
           selectedTranscript, callback);
+
+        if (callbackClinvar) {
+          me.getClinvarRecords(allRecs, regionStart, regionEnd, callbackClinvar);
+        }
 
     });
 
   }
 
   // NEW
-  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback) {
+  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar) {
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
@@ -584,6 +591,11 @@ var effectCategories = [
           var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
           callback(results);
           
+
+          // Get the Clinvar variants, passing in the vcf recs that came back from snpEff.
+          if (callbackClinvar) {
+            me.getClinvarRecords(annotatedRecs, regionStart, regionEnd, callbackClinvar);
+          }
         });
     });
      
@@ -623,6 +635,7 @@ var effectCategories = [
             genotypes.push(fields[i]);
           }
 
+
           // Turn vcf record into a JSON object and add it to an array
           var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
                            'qual': qual, 'filter': filter, 'info': info, 'genotypes': genotypes};
@@ -636,6 +649,63 @@ var effectCategories = [
     });
 
   }
+
+  // NEW
+  exports.getClinvarRecords = function(records, regionStart, regionEnd, callback) {
+    var me = this;
+
+    // Multiallelic input vcf records were assigned a number submission
+    // index.  Create a map that ties the vcf record number to the
+    // clinvar records number
+    var sourceIndex = -1;
+    var clinvarIndex = 0;
+    clinvarToSourceMap = new Object();
+    records.forEach(function(record) {
+      if (record.charAt(0) == "#") {
+          // Bypass header
+      } else {
+
+          // Parse the vcf record into its fields
+          var fields = record.split('\t');
+          var pos    = fields[1];
+          var ref    = fields[3];
+          var alt    = fields[4];
+
+          if (pos == null || ref == null || alt == null) {
+
+          } else {
+            sourceIndex++;
+            // Figure out if this is multiallelic and increment
+            // the index accordinging.  
+
+            var altTokens = alt.split(",");
+            altTokens.forEach(function(altToken) {
+              clinvarIndex++;
+              clinvarToSourceMap[clinvarIndex] = sourceIndex;
+            });            
+          }
+
+
+      }
+    });
+
+
+    var clinvarVariants = null;
+    // Read the streamed JSON from clinvar service
+    me._streamVcfRegion(records, clinvarServer, function(clinvarData) {
+
+      var clinvarVariants = JSON.parse(clinvarData);
+
+      clinvarVariants.forEach(function(clinvarVariant) {
+        var sourceIndex = clinvarToSourceMap[clinvarVariant.recordNumber];
+        clinvarVariant.sourceIndex = sourceIndex;
+      });
+
+      callback(clinvarVariants);
+    });
+
+  }
+
 
   // NEW
   exports._streamVcfRegion = function(records, server, callback) {
@@ -717,10 +787,10 @@ var effectCategories = [
             var type = 'SNP';
             if (rec.ref == '.' || alt.length > rec.ref.length ) {
               type = 'INS';
-              len = rec.ref.length - alt.length;
+              len = alt.length - rec.ref.length;
             } else if (rec.alt == '.' || alt.length < rec.ref.length) {
               type = 'DEL';
-              len = alt.length - rec.ref.length;
+              len = rec.ref.length - alt.length;
             }
             var end = +rec.pos + len;
 
@@ -864,7 +934,7 @@ var effectCategories = [
               'af': af, 'combinedDepth': combinedDepth,
               'genotypes': genotypes, 
               'genotypeForAlt': genotypeForAlt, 
-              'zygosity': zygosity ? zygosity : '', 
+              'zygosity': zygosity ? zygosity : 'gt_unknown', 
               'phased': phased,
               'effect': effects, 
               'effectCategory': effectCats, 

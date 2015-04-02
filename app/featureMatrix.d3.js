@@ -341,11 +341,21 @@ function featureMatrixD3() {
               tooltip.html(tooltipHTML(colObject));
 
               var h = tooltip[0][0].offsetHeight;
-              var w = tooltip[0][0].offsetWidth;
+              var w = 300;
 
-              tooltip.style("left", (d3.event.pageX - w) + "px") 
-                     .style("text-align", 'left')    
-                     .style("top", (d3.event.pageY - h) + "px");   
+              if (d3.event.pageX < w) {
+                tooltip.style("width", w + "px")
+                       .style("left", (d3.event.pageX) + "px") 
+                       .style("text-align", 'left')    
+                       .style("top", (d3.event.pageY - h) + "px");   
+
+              } else {
+
+                tooltip.style("width", w + "px")
+                       .style("left", (d3.event.pageX - w) + "px") 
+                       .style("text-align", 'left')    
+                       .style("top", (d3.event.pageY - h) + "px");   
+              }
               
               dispatch.d3mouseover(colObject ); 
             })                  

@@ -179,10 +179,6 @@ a, a:hover, a:focus {
   stroke: #BFC83F;
 }
 
-#clinvar-symbol path {
-  /*fill: #BF503F;*/
-  fill: grey;
-}
 
 
 
@@ -424,7 +420,7 @@ section {
 }
 #filter-track {
   display: table-cell;
-  min-width: 300px;
+  min-width: 315px;
   margin-top: 0px;
   margin-bottom: 0px;
 }
@@ -839,7 +835,7 @@ header {
   fill: #D6616b !important;
 } 
 .impact_MODIFIER{
-  fill: rgba(231, 186, 82, 0.37);
+  fill: rgba(231, 186, 82, 0.6);
 }
 .impact_LOW { 
   fill: rgba(181, 207, 107, 0.65);
@@ -929,7 +925,7 @@ header {
   fill: lightgrey !important;
   stroke: grey;
 }
-.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .aflevel:hover, .inheritance:hover  {
+.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .aflevel:hover, .inheritance:hover, .clinvar:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -939,7 +935,7 @@ header {
   fill: rgb(53, 134, 192);
 }
 .impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, 
-.type.current:hover, .aflevel.current:hover, .inheritance.current:hover {
+.type.current:hover, .aflevel.current:hover, .inheritance.current:hover, .clinvar:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
@@ -957,7 +953,7 @@ header {
 #impact-scheme, #effect-scheme, #compare-scheme {
   padding-top: 2px;
 }
-#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme {
+#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme {
   padding-top: 2px;
 }
 .impact.inactive  {
@@ -968,14 +964,14 @@ header {
   pointer-events: none;
   display: none;
 }
-#impact-scheme.current, #effect-scheme.current, #inheritance-scheme, #af-scheme {
+#impact-scheme.current, #effect-scheme.current {
   font-weight: bold;
   border: none;
  
 }
 #impact-scheme .name, #effect-scheme .name, #compare-scheme .name, 
 #type-scheme .name, #zygosity-scheme .name,
-#inheritance-scheme .name, #af-scheme .name{
+#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name {
   fill-opacity: 1;
   font-size: 12px; 
   font-weight: normal;

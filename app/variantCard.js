@@ -355,25 +355,12 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 }
 
 VariantCard.prototype.discoverVcfRefName = function(callback) {
-	var me = this;
-	if (this.getVcfRefName != null) {
-		callback();
-	}
-	if (!this.vcf.isFile()) {
-
-		this.vcf.loadRemoteIndex(null, function(refData) {
-	    	refData.forEach( function(ref) {
-	    		if (me.getVcfRefName == null) {
-			 		if (ref.name == window.gene.chr) {
-			 			me.getVcfRefName = me.getRefName;
-			 		} else if (ref.name == me.stripRefName(gene.chr)) {
-			 			me.getVcfRefName = me.stripRefName;
-			 		}
-				}
-	    	});
-	    	return callback();
-    	});
-	} 
+	// TODO:  This became deprecated when Chase introduced this
+	// logic to determine ref name in vcf.iobio class.  
+	// Clean up code by removing placied where this method is
+	// invoked.
+	this.getVcfRefName = this.getRefName;
+	callback();
 }
 
 VariantCard.prototype.discoverBamRefName = function(callback) {
@@ -547,7 +534,6 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd) {
 
 	this.cardSelector.removeClass("hide");
 	this.cardSelector.find('#bam-track').removeClass("hide");
-	this.cardSelector.find('#bam-depth').addClass("hide");
 	this.cardSelector.find('#bam-name-' + this.cardIndex).addClass("hide");
 	
 
@@ -715,7 +701,8 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 				  		window.cullVariantFilters();
 				  	}
 		   	    }
-			});	
+			},
+			window.fillFeatureMatrixWithClinvar);	
 
 		});
 
@@ -808,6 +795,13 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 	
 	// Set the vertical layer count so that the height of the chart can be recalculated	                                	
 	this.vcfChart.verticalLayers(data.maxLevel);
+
+	// Filter out freebayes data
+	if (bypassFeatureMatrix) {
+		data.features = data.features.filter( function(feature) {
+			return feature.fbCalled == null;
+		 });
+	}
 
 	// Load the chart with the new data
 	var selection = this.d3CardSelector.select("#vcf-variants").datum([data]);    
@@ -1053,10 +1047,14 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		}
 
 		var meetsAf = false;
-		if (afLowerVal != null && afUpperVal != null) {
-			meetsAf =  (d.af >= afLowerVal && d.af <= afUpperVal);
-		} else {
+		if (d.af == -1) {
 			meetsAf = true;
+		} else {
+			if (afLowerVal != null && afUpperVal != null) {
+				meetsAf =  (d.af >= afLowerVal && d.af <= afUpperVal);
+			} else {
+				meetsAf = true;
+			}
 		}
 		// TODO:  If combinedDepth not provided, access bam data to determine coverage for this
 		// region of variant
@@ -1133,6 +1131,10 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 							variantRegionStart: regionStart
 						};
 	return vcfDataFiltered;
+}
+
+VariantCard.prototype.getClinvarRecords = function(theVcfData, regionStart, regionEnd, callback) {
+	this.vcf.getClinvarRecords(theVcfData, window.gene.start, window.gene.end, callback);
 }
 
 

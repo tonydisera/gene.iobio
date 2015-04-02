@@ -55,14 +55,32 @@ var coverageMin = 10;
 
 // feature matrix (ranked variants)
 var featureVcfData = null;
+var sourceVcfData = null;
 var featureMatrix  = null;
+
 var showClinVarSymbol = function (selection) {
 	selection.append("g")
 	         .attr("transform", "translate(7,7)")
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
 	         .attr("width", "16")
-	         .attr("height", "16");
+	         .attr("height", "16")
+	         .style("pointer-events", "none")
+	         .style("fill", function(d,i) {
+
+
+	         	if (selection.datum().clazz == 'clinvar_path') {
+	         		return "#ad494A";
+	         	} else if (selection.datum().clazz == 'clinvar_uc') {
+	         		return "rgba(231, 186, 82, 1)";
+	         	} else if (selection.datum().clazz == 'clinvar_benign') {
+	         		return "rgba(181, 207, 107, 1)";
+	         	} else if (selection.datum().clazz == 'clinvar_other') {
+	         		return "rgb(189, 189, 189)";
+	         	} else if (selection.datum().clazz == 'clinvar_cd') {
+	         		return "rgb(150, 150, 150)";
+	         	}
+	         });
 };
 var showAfSymbol = function(selection) {
 	selection.append("g")
@@ -70,6 +88,7 @@ var showAfSymbol = function(selection) {
 	         .attr("transform", "translate(7,7)")
 	         .append("use")
 	         .attr("xlink:href", "#af-symbol")
+	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
 	         	if (selection.datum().clazz == 'af_unique') {
@@ -109,13 +128,16 @@ var showRecessiveSymbol = function (selection) {
 	selection.append("g")
 	         .attr("transform", "translate(0,3)")
 	         .append("use")
-	         .attr("xlink:href", '#recessive-symbol');
+	         .attr("xlink:href", '#recessive-symbol')
+	         .style("pointer-events", "none");
+
 };
 var showDeNovoSymbol = function (selection) {
 	selection.append("g")
 	         .attr("transform", "translate(0,3)")
 	         .append("use")
-	         .attr("xlink:href", '#denovo-symbol');
+	         .attr("xlink:href", '#denovo-symbol')
+	         .style("pointer-events", "none");
 	
 };
 var showNoInheritSymbol = function (selection) {
@@ -127,10 +149,25 @@ var showImpactSymbol = function(selection) {
 	         .append("rect")
 	         .attr("width", 10)
 	         .attr("height", 10)
-	         .attr("class", "filter-symbol " + selection.datum().clazz);
+	         .attr("class", "filter-symbol " + selection.datum().clazz)
+	         .style("pointer-events", "none");
+
 }
-var clinvarMap     = {  Y: {value: 1, clazz: 'clinvar', symbolFunction: showClinVarSymbol},
-                        N: {value: 2, clazz: ''}
+var clinvarMap     = {  
+						'pathogenic'            : {value: 1, clazz: 'clinvar_path', symbolFunction: showClinVarSymbol},
+                        'likely_pathogenic'     : {value: 2, clazz: 'clinvar_path', symbolFunction: showClinVarSymbol},
+                        'uncertain_significance': {value: 3, clazz: 'clinvar_uc', symbolFunction: showClinVarSymbol},
+                        'benign'                : {value: 4, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
+                        'likely_benign'         : {value: 5, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
+                        'drug_response'         : {value: 6, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'confers_sensivity'     : {value: 7, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'risk_factor'           : {value: 8, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'other'                 : {value: 9, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'association'           : {value: 10, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'protective'            : {value: 11, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'conflicting_data_from_submitters': {value: 12, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},
+                        'not_provided'          : {value: 13, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'none'                  : {value: 14, clazz: ''}
                      };
 var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH',     symbolFunction: showImpactSymbol},    
                         MODERATE: {value: 2, clazz: 'impact_MODERATE', symbolFunction: showImpactSymbol},  
@@ -151,7 +188,7 @@ var afMap          = [ {min: -1.1, max: +0,    value: +2,  clazz: 'af_unique',  
 
 var matrixRows = [
 	{name:'Impact'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
-	{name:'ClinVar'             ,order:1, index:1, match: 'exact', attribute: 'clinvar',     map: clinvarMap },
+	{name:'ClinVar'             ,order:1, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: clinvarMap },
 	{name:'Inheritance'         ,order:2, index:2, match: 'exact', attribute: 'inheritance', map: inheritanceMap},
 	{name:'AF (1000G)'          ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: afMap},
 	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afMap}
@@ -532,7 +569,7 @@ function clearFilters() {
 function initFilterTrack() {
 
 
-	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .aflevel, .inheritance")
+	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .aflevel, .inheritance, .clinvar")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -697,7 +734,7 @@ function classifyByImpact(d) {
 	  effects += " " + key;
 	}
 	
-	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + d.clinvar + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 function classifyByEffect(d) { 
 	var effects = "";
@@ -712,7 +749,7 @@ function classifyByEffect(d) {
       impacts += " " + key;
     }
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + d.clinvar + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 function applyVariantFilters() {
@@ -1155,8 +1192,11 @@ function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 	$("#matrix-track .loader").css("display", "block");
 	$("#feature-matrix").addClass("hide");
 
-	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
+	sourceVcfData = theVcfData;
+
+	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix, fillFeatureMatrixWithClinvar);	
 }
+
 
 function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, callback) {
 	if (window.vcf1000GData && window.vcfExACData) {
@@ -1323,7 +1363,7 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 function compareVariantsToPedigree(theVcfData, callback) {
 	theVcfData.features.forEach(function(variant) {
 		variant.compareMother = null;
-		variant.compareFater = null;
+		variant.compareFather = null;
 		variant.inheritance = 'none';
 	});
 	var motherVariantCard = null;
@@ -1398,6 +1438,70 @@ function compareVariantsToPedigree(theVcfData, callback) {
 
 }
 
+function fillFeatureMatrixWithClinvar(clinvarObjects) {
+	var lastRecordNumber = clinvarObjects[clinvarObjects.length-1].recordNumber;
+	if (this.sourceVcfData) {
+		if (sourceVcfData.features.length == lastRecordNumber) {
+			for( var i = 0; i < clinvarObjects.length; i++) {
+				var idx = clinvarObjects[i].recordNumber - 1;
+				if (!sourceVcfData.features[idx].clinVarAccession) {
+					sourceVcfData.features[idx].clinVarAccession = clinvarObjects[i].clinvarAccession;
+				}
+
+				var clinSigObject = sourceVcfData.features[idx].clinVarClinicalSignificance;
+				if (clinSigObject == null) {
+					sourceVcfData.features[idx].clinVarClinicalSignificance = {"none": "Y"};
+				}
+
+				var clinsigTokens = clinvarObjects[i].clinicalSignificance;
+				if (clinsigTokens != "") {
+					var tokens = clinsigTokens.split("; ");
+					tokens.forEach(function(clinSigToken) {
+						// Replace space with underlink
+						clinSigToken = clinSigToken.split(" ").join("_").toLowerCase();
+						sourceVcfData.features[idx].clinVarClinicalSignificance[clinSigToken] = 'Y';
+
+						// Get the clinvar "classification" for the highest ranked clinvar 
+						// designation. (e.g. "pathologic" trumps "benign");
+						var mapEntry = clinvarMap[clinSigToken];
+						if (mapEntry != null) {
+							if (sourceVcfData.features[idx].clinvarRank == null || 
+								mapEntry.value < sourceVcfData.features[idx].clinvarRank) {
+								sourceVcfData.features[idx].clinvarRank = mapEntry.value;
+								sourceVcfData.features[idx].clinvar = mapEntry.clazz;
+							}
+						}
+					});
+				}
+
+
+
+				var phenotype = sourceVcfData.features[idx].clinVarPhenotype;
+				if (phenotype == null) {
+					sourceVcfData.features[idx].clinVarPhenotype = {};
+				}
+
+				var phTokens = clinvarObjects[i].phenotype;
+				if (phTokens != "") {
+					var tokens = phTokens.split("; ");
+					tokens.forEach(function(phToken) {
+						// Replace space with underlink
+						phToken = phToken.split(" ").join("_");
+						sourceVcfData.features[idx].clinVarPhenotype[phToken.toLowerCase()] = 'Y';
+					});
+				}
+
+				if (!sourceVcfData.features[idx].ncbiId) {
+					sourceVcfData.features[idx].ncbiId = clinvarObjects[i].ncbiId;
+				}
+				if (!sourceVcfData.features[idx].hgvsG) {
+					sourceVcfData.features[idx].hgvsG = clinvarObjects[i].hgvsG;
+				}
+			}
+			fillFeatureMatrix(this.sourceVcfData);
+		}
+	}
+}
 
 function fillFeatureMatrix(theVcfData) {
 	// Set the width so that scrolling works properly
@@ -1437,7 +1541,6 @@ function fillFeatureMatrix(theVcfData) {
 			var symbolFunction = null;
 			// Don't fill in clinvar for now
 			if (matrixRow.attribute == 'clinvar') {
-				//rawValue = Math.random() > .5 ? 'Y' : 'N';
 				rawValue = 'N';
 			} 
 			if (rawValue != null) {
@@ -1558,11 +1661,27 @@ function variantTooltipHTML(variant, rowIndex) {
 	}    
 	var impactDisplay = "";
 	for (var key in variant.impact) {
-	if (impactDisplay.length > 0) {
-	  	impactDisplay += ", ";
-	}
+		if (impactDisplay.length > 0) {
+		  	impactDisplay += ", ";
+		}
 		impactDisplay += key;
-	}   
+	} 
+	var clinSigDisplay = "";
+	for (var key in variant.clinVarClinicalSignificance) {
+		if (key != 'none') {
+			if (clinSigDisplay.length > 0) {
+			  	clinSigDisplay += ", ";
+			}
+			clinSigDisplay += key;
+		}
+	}
+	var phenotypeDisplay = "";
+	for (var key in variant.clinVarPhenotype) {
+		if (phenotypeDisplay.length > 0) {
+		  	phenotypeDisplay += ", ";
+		}
+		phenotypeDisplay += key;
+	}      
 	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
 	var refalt = variant.ref + "->" + variant.alt;
 
@@ -1571,22 +1690,27 @@ function variantTooltipHTML(variant, rowIndex) {
 		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
 		+ tooltipRow('Impact', impactDisplay)
 		+ tooltipRow('Effect', effectDisplay)
-		+ tooltipRow('ClinVar', variant.clinvar )
+		+ tooltipRow('ClinVar', clinSigDisplay)
+		+ tooltipRow('Phenotype', phenotypeDisplay)
 		+ tooltipRow('Qual', variant.qual) 
 		+ tooltipRow('Filter', variant.filter) 
-		+ tooltipRow('Zygosity', variant.zygosity)
+		+ tooltipRow('Zygosity', variant.zygosity == "gt_unknown" ? "(No genotype)" : variant.zygosity)
+		+ tooltipRow('GMAF', variant.gMaf)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('AF ExAC', variant.afExAC == -1 ? ' ' : variant.afExAC) 
-		+ tooltipRow('AF 1000G', variant.af1000G == -1 ? ' ' : variant.af1000G) 
+		+ tooltipRow('AF ExAC', variant.afExAC == -1 ? '.' : variant.afExAC) 
+		+ tooltipRow('AF 1000G', variant.af1000G == -1 ? '.' : variant.af1000G) 
+		+ tooltipRow('ClinVar #', variant.clinVarAccession)
+		+ tooltipRow('NCBI ID', variant.ncbiId)
+		+ tooltipRow('HGVS g', variant.hgvsG)
 	);                    
 
 }
 
-function tooltipRow(label, value) {
-	if (value && value != '') {
+function tooltipRow(label, value, alwaysShow) {
+	if (alwaysShow || (value && value != '')) {
 		return '<div class="row">'
-		      + '<div class="col-md-6">' + label + '</div>'
-		      + '<div class="col-md-6">' + value + '</div>'
+		      + '<div class="col-md-4">' + label + '</div>'
+		      + '<div class="col-md-8">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";

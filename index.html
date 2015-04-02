@@ -335,10 +335,16 @@
               <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Homozygous</text>       
                <rect class="filter-symbol hom" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
             </svg>
+
+            <svg id="gt_unknown" class="zygosity" width="75" height="14" transform="translate(0,0)">
+              <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">No Genotype</text>       
+               <rect class="filter-symbol gt_unknown" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
+            </svg>
+
       </div>
     </div>
     <div style="clear:both;padding-top:10px">
-      <div style="float:left;width:150px">
+      <div style="float:left;width:120px">
         <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
           <text class="name" x="0" y="10">Allele Frequency</text>
         </svg>
@@ -346,35 +352,35 @@
         
         <svg id="af_unique" class="aflevel" width="120" height="14" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Unique 0%</text>
-          <g class="variant af_unique">
+          <g class=" af_unique">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(217, 217, 217);"></use>
           </g>
         </svg>
         <svg id="af_rare" class="aflevel" width="120" height="14" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Rare &lt; 1%</text>
-          <g class="variant af_rare">
+          <g class=" af_rare">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(189, 189, 189);"></use>
           </g>
         </svg>
         <svg id="af_uncommon" class="aflevel" width="120" height="16" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Uncommon 1-5%</text>
-          <g class="variant af_uncommon">
+          <g class=" af_uncommon">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(150, 150, 150);"></use>
           </g>
         </svg>
         <svg id="af_common" class="aflevel" width="120" height="18" transform="translate(0,0)">
-          <g class="variant af_common">
+          <g class=" af_common">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="20" height="18" style="fill:rgb(115, 115, 115)"></use>
           </g>
           <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">Common &gt; 5%</text></svg>
      
       
-            <div style="margin-top:8px">
+            <div style="margin-top:26px">
               <input  type="text"  id="af-amount-start" value="0"                           
               style="width:40px;font-size: 11px;"/>
               -
               <input type="text"  id="af-amount-end" value="100" 
-              style="width:40px;margin-left: 4px;font-size: 11px;"/>
+              style="width:40px;margin-left: 1px;font-size: 11px;"/>
               %
             </div>
           
@@ -391,20 +397,64 @@
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#denovo-symbol" width="27" height="27"></use>
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Denovo</text></svg>
-          
-           <svg id="recessive" class="inheritance" width="90" height="20" transform="translate(0,0)">
+          </svg>
+
+          <svg id="recessive" class="inheritance" width="90" height="20" transform="translate(0,0)">
             <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#recessive-symbol" width="27" height="27"></use>
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Recessive</text></svg>
+          </svg>
           
-            <div style="margin-top: 24px;margin-bottom:4px">
-              <span style="font-size:11px;">Coverage (min)</span>
-              <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;">
-              X
-            </div>
+          <div style="margin-top: 40px;margin-bottom:4px">
+            <span style="font-size:11px;">Coverage (min)</span>
+            <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;">
+            X
+          </div>
         </div>
 
+
+        <div style="float:left;width:84px;">
+          <svg id="clinvar-scheme" class="" width="90" height="15" transform="translate(0,0)">
+              <text class="name" x="0" y="10">ClinVar</text>
+          </svg>
+          <svg id="clinvar_benign" class="clinvar" width="84" height="15" transform="translate(0,0)">
+            <g class="clinvar_benign" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: rgba(181, 207, 107, 1);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Benign</text>
+          </svg>
+          
+          <svg id="clinvar_path" class="clinvar" width="84" height="15" transform="translate(0,0)">
+            <g class="clinvar_path" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: #ad494A;"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Pathologic</text>
+          </svg>
+          
+          <svg id="clinvar_uc" class="clinvar" width="84" height="15" transform="translate(0,0)">
+            <g class="clinvar_uc" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill:rgba(231, 186, 82, 1);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Unknown signif </text>
+          </svg>
+
+          <svg id="clinvar_cd" class="clinvar" width="84" height="15" transform="translate(0,0)">
+            <g class="clinvar_cd" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: rgb(150, 150, 150);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Conflicting data</text>
+          </svg>
+
+          <svg id="clinvar_other" class="clinvar" width="84" height="15" transform="translate(0,0)">
+            <g class="clinvar_other" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: rgb(189, 189, 189);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Other </text>
+          </svg>
+
+
+        </div>
     </div>
    
 
