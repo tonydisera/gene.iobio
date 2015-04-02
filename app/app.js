@@ -641,8 +641,7 @@ function initFilterTrack() {
 			variantCards.forEach(function(variantCard) {
 				variantCard.variantClass(classifyByImpact);
 		    	if (variantCard.getCardIndex() == 0) {
-			  		var filteredVcfData = variantCard.filterVariants();
-			  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+		    		filterVariants();
 				}
 
 			});
@@ -661,8 +660,7 @@ function initFilterTrack() {
 			variantCards.forEach(function(variantCard) {
 		    	variantCard.variantClass(classifyByEffect);
 		    	if (variantCard.getCardIndex() == 0) {
-			  		var filteredVcfData = variantCard.filterVariants();
-			  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+		    		filterVariants();
 				}
 			});
 
@@ -675,6 +673,14 @@ function filterVariants() {
 	if (variantCards.length > 0) {
   		var filteredVcfData = variantCards[0].filterVariants();
   		variantCards[0].fillVariantChart(filteredVcfData, regionStart, regionEnd);
+
+
+
+  		var filteredFBData = variantCards[0].filterFreebayesVariants();
+  		if (filteredFBData != null) {
+	  		variantCards[0].fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
+  		}
+
 	 }
 }
 
