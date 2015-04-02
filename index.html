@@ -343,49 +343,100 @@
 
       </div>
     </div>
-    <div style="clear:both;padding-top:0px">
+    <div style="clear:both;padding-top:10px">
       <div style="float:left;width:120px">
-        <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
+         <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
           <text class="name" x="0" y="10">Allele Frequency</text>
         </svg>
+      <div style="float:left;width:60px;margin-top:-5px">
+        <svg id="afexac-scheme" class="current" width="120" height="15" transform="translate(0,0)">
+          <text class="name" x="0" y="10">ExAC</text>
+        </svg>
         
-        <svg id="af_unique" class="aflevel" width="120" height="12" transform="translate(0,0)">
-          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Novel</text>
-          <g class=" af_unique">
+        <svg id="afexac_unique" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">unknown</text>
+          <g class=" afexac_unique">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
           </g>
         </svg>
-        <svg id="af_uberrare" class="aflevel" width="120" height="12" transform="translate(0,0)">
+        <svg id="afexac_uberrare" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>
-          <g class=" af_uberrare">
+          <g class=" afexac_uberrare">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
           </g>
         </svg>
-        <svg id="af_superrare" class="aflevel" width="120" height="12" transform="translate(0,0)">
+        <svg id="afexac_superrare" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .1%</text>
-          <g class=" af_superrare">
+          <g class=" afexac_superrare">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(203, 174, 95);"></use>
           </g>
         </svg>
-        <svg id="af_rare" class="aflevel" width="120" height="12" transform="translate(0,0)">
+        <svg id="afexac_rare" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; 1%</text>
-          <g class=" af_rare">
+          <g class=" afexac_rare">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
           </g>
         </svg>
-        <svg id="af_uncommon" class="aflevel" width="120" height="16" transform="translate(0,0)">
+        <svg id="afexac_uncommon" class="afexaclevel" width="120" height="16" transform="translate(0,0)">
           <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">1-5%</text>
-          <g class=" af_uncommon">
+          <g class=" afexac_uncommon">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
           </g>
         </svg>
-        <svg id="af_common" class="aflevel" width="120" height="18" transform="translate(0,0)">
+        <svg id="af_common" class="afexaclevel" width="120" height="18" transform="translate(0,0)">
           <g class=" af_common">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
           </g>
           <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">&gt; 5%</text></svg>
      
       
+
+      </div>
+       <div style="float:left;width:60px;margin-top:-5px;">
+        <svg id="af1000g-scheme" class="" width="120" height="15" transform="translate(0,0)">
+          <text class="name" x="0" y="10">1000G</text>
+        </svg>
+
+        <svg id="af1000g_unique" class="af1000glevel nocolor" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">unknown</text>
+          <g class=" af1000g_unique">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
+          </g>
+        </svg>
+        <svg id="af1000g_uberrare" class="af1000glevel nocolor" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>
+          <g class=" af1000g_uberrare">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
+          </g>
+        </svg>
+        <svg id="af1000g_superrare" class="af1000glevel nocolor" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .1%</text>
+          <g class=" af1000g_superrare">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(203, 174, 95);"></use>
+          </g>
+        </svg>
+        <svg id="af1000g_rare" class="af1000glevel nocolor" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; 1%</text>
+          <g class=" af1000g_rare">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
+          </g>
+        </svg>
+        <svg id="af1000g_uncommon" class="af1000glevel nocolor" width="120" height="16" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">1-5%</text>
+          <g class=" af1000g_uncommon">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
+          </g>
+        </svg>
+        <svg id="af1000g_common" class="af1000glevel nocolor" width="120" height="18" transform="translate(0,0)">
+          <g class=" af1000g_common">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">&gt; 5%</text></svg>
+     
+      
+
+      </div>
+
             <div style="margin-top:0px">
               <input  type="text"  id="af-amount-start" value="0"                           
               style="width:40px;font-size: 11px;"/>
@@ -395,9 +446,7 @@
               %
             </div>
           
-
-
-      </div>
+</div>
 
       <div style="float:left;width:90px;">
           <svg id="inheritance-scheme" class="" width="90" height="15" transform="translate(0,0)">

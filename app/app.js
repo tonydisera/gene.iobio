@@ -82,7 +82,7 @@ var showClinVarSymbol = function (selection) {
 	         	}
 	         });
 };
-var showAfSymbol = function(selection) {
+var showAfExacSymbol = function(selection) {
 	selection.append("g")
 	         .attr("class", selection.datum().clazz)
 	         .attr("transform", "translate(7,7)")
@@ -92,47 +92,102 @@ var showAfSymbol = function(selection) {
 	         .style("fill", function(d,i) {
 
 
-	         	if (selection.datum().clazz == 'af_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique') {
 	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'af_uberrare') {
+	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'af_superrare') {
+	         	} else if (selection.datum().clazz == 'afexac_superrare') {
 	         		return "rgb(203, 174, 95);";
-	         	} else if (selection.datum().clazz == 'af_rare') {
+	         	} else if (selection.datum().clazz == 'afexac_rare') {
 	         		return "rgb(158, 186, 194)";
-	         	} else if (selection.datum().clazz == 'af_uncommon') {
+	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
 	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'af_common') {
+	         	} else if (selection.datum().clazz == 'afexac_common') {
 	         		return "rgb(69,117,180)";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'af_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique') {
 	         		return "10";
-	         	} else if (selection.datum().clazz == 'af_uberrare') {
+	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
-	         	} else if (selection.datum().clazz == 'af_superrare') {
+	         	} else if (selection.datum().clazz == 'afexac_superrare') {
 	         		return "12";
-	         	} else if (selection.datum().clazz == 'af_rare') {
+	         	} else if (selection.datum().clazz == 'afexac_rare') {
 	         		return "12";
-	         	} else if (selection.datum().clazz == 'af_uncommon') {
+	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
 	         		return "16";
-	         	} else if (selection.datum().clazz == 'af_common') {
+	         	} else if (selection.datum().clazz == 'afexac_common') {
 	         		return "20";
 	         	}
 	         })
 	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'af_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique') {
 	         		return "10";
-	         	} else if (selection.datum().clazz == 'af_uberrare') {
+	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
-	         	} else if (selection.datum().clazz == 'af_superrare') {
+	         	} else if (selection.datum().clazz == 'afexac_superrare') {
 	         		return "12";
-	         	} else if (selection.datum().clazz == 'af_rare') {
+	         	} else if (selection.datum().clazz == 'afexac_rare') {
 	         		return "12";
-	         	} else if (selection.datum().clazz == 'af_uncommon') {
+	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
 	         		return "16";
-	         	} else if (selection.datum().clazz == 'af_common') {
+	         	} else if (selection.datum().clazz == 'afexac_common') {
+	         		return "20";
+	         	}
+	         });
+};
+var showAf1000gSymbol = function(selection) {
+	selection.append("g")
+	         .attr("class", selection.datum().clazz)
+	         .attr("transform", "translate(7,7)")
+	         .append("use")
+	         .attr("xlink:href", "#af-symbol")
+	         .style("pointer-events", "none")
+	         .style("fill", function(d,i) {
+
+
+	         	if (selection.datum().clazz == 'af1000g_unique') {
+	         		return "rgb(215,48,39)";
+	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
+	         		return "rgb(252,141,89)";
+	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
+	         		return "rgb(203, 174, 95);";
+	         	} else if (selection.datum().clazz == 'af1000g_rare') {
+	         		return "rgb(158, 186, 194)";
+	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
+	         		return "rgb(145,191,219)";
+	         	} else if (selection.datum().clazz == 'af1000g_common') {
+	         		return "rgb(69,117,180)";
+	         	}
+	         })
+	         .attr("width", function(d,i) {
+	         	if (selection.datum().clazz == 'af1000g_unique') {
+	         		return "10";
+	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af1000g_rare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
+	         		return "16";
+	         	} else if (selection.datum().clazz == 'af1000g_common') {
+	         		return "20";
+	         	}
+	         })
+	         .attr("height", function(d,i) {
+	         	if (selection.datum().clazz == 'af1000g_unique') {
+	         		return "10";
+	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af1000g_rare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
+	         		return "16";
+	         	} else if (selection.datum().clazz == 'af1000g_common') {
 	         		return "20";
 	         	}
 	         });
@@ -192,21 +247,28 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
 // For af range, value must be > min and <= max
-var afMap          = [ {min: -1.1,  max: +0,     value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
-                       {min: +0,    max: +.0001, value: +3,  clazz: 'af_uberrare',   symbolFunction: showAfSymbol},	
-                       {min: +0,    max: +.001,  value: +4,  clazz: 'af_superrare',  symbolFunction: showAfSymbol},	
-                       {min: +0,    max: +.01,   value: +5,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
-                       {min: +.01,  max: +.05,   value: +6,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
-                       {min: +.05,  max: +1,     value: +7,  clazz: 'af_common',     symbolFunction: showAfSymbol},	
+var afExacMap      = [ {min: -1.1,  max: +0,     value: +2,  clazz: 'afexac_unique',     symbolFunction: showAfExacSymbol},	
+                       {min: +0,    max: +.0001, value: +3,  clazz: 'afexac_uberrare',   symbolFunction: showAfExacSymbol},	
+                       {min: +0,    max: +.001,  value: +4,  clazz: 'afexac_superrare',  symbolFunction: showAfExacSymbol},	
+                       {min: +0,    max: +.01,   value: +5,  clazz: 'afexac_rare',       symbolFunction: showAfExacSymbol},	
+                       {min: +.01,  max: +.05,   value: +6,  clazz: 'afexac_uncommon',   symbolFunction: showAfExacSymbol},	
+                       {min: +.05,  max: +1,     value: +7,  clazz: 'afexac_common',     symbolFunction: showAfExacSymbol},	
                       ];
+var af1000gMap      = [ {min: -1.1, max: +0,     value: +2,  clazz: 'af1000g_unique',     symbolFunction: showAf1000gSymbol},	
+                       {min: +0,    max: +.0001, value: +3,  clazz: 'af1000g_uberrare',   symbolFunction: showAf1000gSymbol},	
+                       {min: +0,    max: +.001,  value: +4,  clazz: 'af1000g_superrare',  symbolFunction: showAf1000gSymbol},	
+                       {min: +0,    max: +.01,   value: +5,  clazz: 'af1000g_rare',       symbolFunction: showAf1000gSymbol},	
+                       {min: +.01,  max: +.05,   value: +6,  clazz: 'af1000g_uncommon',   symbolFunction: showAf1000gSymbol},	
+                       {min: +.05,  max: +1,     value: +7,  clazz: 'af1000g_common',     symbolFunction: showAf1000gSymbol},	
+                      ];                      
 
 
 var matrixRows = [
 	{name:'Impact'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
 	{name:'ClinVar'             ,order:1, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: clinvarMap },
 	{name:'Inheritance'         ,order:2, index:2, match: 'exact', attribute: 'inheritance', map: inheritanceMap},
-	{name:'AF (1000G)'          ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: afMap},
-	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afMap}
+	{name:'AF (1000G)'          ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: af1000gMap},
+	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afExacMap}
 ];
 
 var featureUnknown = 99;
@@ -584,7 +646,7 @@ function clearFilters() {
 function initFilterTrack() {
 
 
-	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .aflevel, .inheritance, .clinvar")
+	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -681,6 +743,24 @@ function initFilterTrack() {
 
 
 	    });
+	   d3.selectAll('#afexac-scheme')
+	    .on("click", function(d) {
+	    	d3.select('#afexac-scheme' ).classed("current", true);
+	    	d3.select('#af1000g-scheme' ).classed("current", false);
+
+	    	d3.selectAll(".afexaclevel").classed("nocolor", false);
+	    	d3.selectAll(".af1000glevel").classed("nocolor", true);
+
+	    });
+	   d3.selectAll('#af1000g-scheme')
+	    .on("click", function(d) {
+	    	d3.select('#afexac-scheme' ).classed("current", false);
+	    	d3.select('#af1000g-scheme' ).classed("current", true);
+
+	    	d3.selectAll(".afexaclevel").classed("nocolor", true);
+	    	d3.selectAll(".af1000glevel").classed("nocolor", false);
+
+	    });
 	  
 }
 
@@ -755,7 +835,7 @@ function classifyByImpact(d) {
 	  effects += " " + key;
 	}
 	
-	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + d.clinvar + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.afexaclevel + ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 function classifyByEffect(d) { 
 	var effects = "";
@@ -770,7 +850,7 @@ function classifyByEffect(d) {
       impacts += " " + key;
     }
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + d.aflevel.toLowerCase() + ' ' + d.clinvar + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 function applyVariantFilters() {
@@ -1325,18 +1405,15 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 	        		// present, otherwise, use the 1000g af if present, otherwise use
 	        		// the ExAC af.
 	        		theVcfData.features.forEach(function(variant) {
-	        			theAf = null;
-						if (variant.afExAC != null && variant.afExAC != '' && variant.afExAC > -1) {
-							theAf = variant.afExAC;
-						} else if (variant.af1000G != null && variant.af1000G != '' && variant.af1000G > -1) {
-							theAf = variant.af1000G;
-						} else {
-							theAf = -1;
-						}
-						variant.af = theAf;
-						afMap.forEach( function(rangeEntry) {
-							if (+theAf > rangeEntry.min && +theAf <= rangeEntry.max) {
-								variant.aflevel = rangeEntry.clazz;
+
+						afExacMap.forEach( function(rangeEntry) {
+							if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
+								variant.afexaclevel = rangeEntry.clazz;
+							}
+						});
+						af1000gMap.forEach( function(rangeEntry) {
+							if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
+								variant.af1000glevel = rangeEntry.clazz;
 							}
 						});
 
@@ -1857,9 +1934,14 @@ function cullVariantFilters() {
 		var count = d3.selectAll('#vcf-variants .variant.' + effect)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-	d3.selectAll(".aflevel").each( function(d,i) {
-		var aflevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + aflevel)[0].length;
+	d3.selectAll(".afexaclevel").each( function(d,i) {
+		var afexaclevel = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + afexaclevel)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	d3.selectAll(".af1000glevel").each( function(d,i) {
+		var af1000glevel = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".inheritance").each( function(d,i) {

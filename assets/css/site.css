@@ -921,11 +921,15 @@ header {
   padding: 1px;
 
 }
-.impact.nocolor rect, .effectCategory.nocolor rect, .compare.nocolor rect {
+.impact.nocolor rect, .effectCategory.nocolor rect{
   fill: lightgrey !important;
   stroke: grey;
 }
-.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .aflevel:hover, .inheritance:hover, .clinvar:hover  {
+.afexaclevel.nocolor , .af1000glevel.nocolor {
+  opacity:  .2;
+}
+
+.impact:hover, .effectCategory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -935,7 +939,7 @@ header {
   fill: rgb(53, 134, 192);
 }
 .impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, 
-.type.current:hover, .aflevel.current:hover, .inheritance.current:hover, .clinvar:hover {
+.type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
@@ -950,13 +954,13 @@ header {
   padding: 1px;
  
 }
-#impact-scheme, #effect-scheme, #compare-scheme {
+#impact-scheme, #effect-scheme {
   padding-top: 2px;
 }
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme {
   padding-top: 2px;
 }
-.impact.inactive, .zygosity.inactive, .aflevel.inactive, .inheritance.inactive, .clinvar.inactive  {
+.impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .clinvar.inactive  {
   pointer-events: none;
   opacity: .4;
 }
@@ -964,19 +968,21 @@ header {
   pointer-events: none;
   display: none;
 }
-#impact-scheme.current, #effect-scheme.current {
+#impact-scheme.current, #effect-scheme.current, #af1000g-scheme.current, #afexac-scheme.current {
   font-weight: bold;
   border: none;
  
 }
 #impact-scheme .name, #effect-scheme .name, #compare-scheme .name, 
 #type-scheme .name, #zygosity-scheme .name,
-#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name {
+#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name,
+#afexac-scheme .name, #af1000g-scheme .name {
   fill-opacity: 1;
   font-size: 12px; 
   font-weight: normal;
 }
-#impact-scheme.current .name, #effect-scheme.current .name{
+#impact-scheme.current .name, #effect-scheme.current .name, 
+#af1000g-scheme.current .name, #afexac-scheme.current .name{
   fill-opacity: 1;
   font-size: 12px;
   font-style: bold;
@@ -986,7 +992,7 @@ header {
   border-radius: 2px;
   padding: 1px;
 }
-#impact-scheme:hover , #effect-scheme:hover{
+#impact-scheme:hover , #effect-scheme:hover, #af1000g-scheme:hover, #afexac-scheme:hover{
   font-weight: bold;
   cursor: pointer;
 }

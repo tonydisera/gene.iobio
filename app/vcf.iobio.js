@@ -960,7 +960,7 @@ var effectCategories = [
               'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
               'id': rec.id, 'ref': rec.ref, 
               'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
-              'af': af, 'combinedDepth': combinedDepth,
+              'af': af, 'combinedDepth': combinedDepth,             
               'genotypes': genotypes, 
               'genotypeForAlt': genotypeForAlt, 
               'zygosity': zygosity ? zygosity : 'gt_unknown', 
@@ -970,7 +970,8 @@ var effectCategories = [
               'impact': impacts, 
               'consensus': rec.consensus,
               'inheritance': '',
-              'aflevel': ''} );
+              'af1000glevel': '',
+              'afexaclevel:': ''} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;
