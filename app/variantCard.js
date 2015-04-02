@@ -682,7 +682,10 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 
 		// A gene has been selected.  Read the variants for the gene region.
 		this.discoverVcfRefName( function() {
-			$("#matrix-track .clinvar.loader").css("display", "inline");
+
+			if (me.getRelationship() == 'proband') {
+				$("#matrix-track .clinvar.loader").css("display", "inline");
+			}
 
 			me.vcf.getVariants(me.getVcfRefName(window.gene.chr), 
 							   window.gene.start, 
@@ -706,7 +709,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 				  	}
 		   	    }
 			},
-			window.fillFeatureMatrixWithClinvar);	
+			me.getRelationship() == 'proband' ? window.fillFeatureMatrixWithClinvar : null);	
 
 		});
 
