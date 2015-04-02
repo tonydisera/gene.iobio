@@ -1189,12 +1189,12 @@ function loadDataSources() {
 
 function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 
-	$("#matrix-track .loader").css("display", "block");
+	$("#matrix-panel .loader").css("display", "block");
 	$("#feature-matrix").addClass("hide");
 
 	sourceVcfData = theVcfData;
 
-	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix, fillFeatureMatrixWithClinvar);	
+	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
 }
 
 
@@ -1214,7 +1214,7 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 		vcf1000G = vcfiobio();
 		vcf1000G.openVcfUrl(this.vcf1000GUrl);
 		var refName = theVariantCard.stripRefName(window.gene.chr);
-		$("#matrix-track .loader-label").text("Loading 1000G data");
+		$("#matrix-panel .loader-label").text("Loading 1000G data");
 
 		vcf1000G.getVariants(refName, 
 							   window.gene.start, 
@@ -1229,7 +1229,7 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 
 			vcfExAC= vcfiobio();
 			vcfExAC.openVcfUrl(window.vcfExACUrl);
-			$("#matrix-track .loader-label").text("Loading ExAC data");
+			$("#matrix-panel .loader-label").text("Loading ExAC data");
 			vcfExAC.getVariants(refName, 
 									   window.gene.start, 
 							           window.gene.end, 
@@ -1241,7 +1241,7 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 			    window.vcfExACData = data;
 			    window.vcfExACData.features = window.vcfExACData.features.sort(orderVariantsByPosition);
 
-				$("#matrix-track .loader-label").text("Comparing variants to population");
+				$("#matrix-panel .loader-label").text("Comparing variants to population");
 			    compareVariantsToPopulation(theVcfData, window.vcf1000GData, window.vcfExACData, callback);
 			});
 
@@ -1326,7 +1326,7 @@ function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
-					$("#matrix-track .loader-label").text("Comparing variants to family data");
+					$("#matrix-panel .loader-label").text("Comparing variants to family data");
 
 					window.compareVariantsToPedigree(theVcfData, callback);
 
@@ -1404,7 +1404,7 @@ function compareVariantsToPedigree(theVcfData, callback) {
 		        				variant.inheritance = 'denovo';
 		        			}
 						});
-		        		$("#matrix-track .loader-label").text("Ranking variants");
+		        		$("#matrix-panel .loader-label").text("Ranking variants");
 
 			        	callback(theVcfData);
 			        }, 
@@ -1498,6 +1498,8 @@ function fillFeatureMatrixWithClinvar(clinvarObjects) {
 					sourceVcfData.features[idx].hgvsG = clinvarObjects[i].hgvsG;
 				}
 			}
+			$("#matrix-track .clinvar.loader").css("display", "none");
+
 			fillFeatureMatrix(this.sourceVcfData);
 		}
 	}
@@ -1632,7 +1634,7 @@ function fillFeatureMatrix(theVcfData) {
 	}
 	
 	$("#feature-matrix").removeClass("hide");
-	$("#matrix-track .loader").css("display", "none");
+	$("#matrix-panel .loader").css("display", "none");
 
 	// Load the chart with the new data
 	featureMatrix.matrixRows(matrixRows);

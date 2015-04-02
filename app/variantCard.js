@@ -678,8 +678,12 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 		    this.cardSelector.find('.vcfloader .loader-label').text("Annotating Variants with snpEff in realtime");
 		}
 
+
+
 		// A gene has been selected.  Read the variants for the gene region.
 		this.discoverVcfRefName( function() {
+			$("#matrix-track .clinvar.loader").css("display", "inline");
+
 			me.vcf.getVariants(me.getVcfRefName(window.gene.chr), 
 							   window.gene.start, 
 	                           window.gene.end, 
