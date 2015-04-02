@@ -83,9 +83,25 @@ VariantCard.prototype.highlightVariants = function(variants) {
 		     	});
 		     	return found;
 		     })
-		     .style("opacity", 1);  			
+		     .style("opacity", 1);  
+
+		this.d3CardSelector.selectAll("#fb-variants .variant")
+		    .style("opacity", .1);
+		this.d3CardSelector.selectAll("#fb-variants .variant")
+		    .filter( function(d,i) {
+		     	var found = false;
+		     	variants.forEach(function(variant) {
+			        if (d.start == variant.start && d.end == variant.end && d.type == variant.type) {
+			          found = true;
+			        } 
+		     	});
+		     	return found;
+		     })
+		     .style("opacity", 1);  				
 	} else {
 		this.d3CardSelector.selectAll("#vcf-variants .variant")
+     			.style("opacity", 1);
+     	this.d3CardSelector.selectAll("#fb-variants .variant")
      			.style("opacity", 1);
 	} 
 
@@ -803,15 +819,17 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 	// Set the vertical layer count so that the height of the chart can be recalculated	                                	
 	this.vcfChart.verticalLayers(data.maxLevel);
 
-	// Filter out freebayes data
-	if (bypassFeatureMatrix) {
-		data.features = data.features.filter( function(feature) {
+	// Filter out freebayes data for showing in variant chart since these variants
+	// show in there own chart above the loaded variants.
+	var dataWithoutFB = $.extend({}, data);
+	//if (bypassFeatureMatrix) {
+		dataWithoutFB.features = data.features.filter( function(feature) {
 			return feature.fbCalled == null;
 		 });
-	}
+	//}
 
 	// Load the chart with the new data
-	var selection = this.d3CardSelector.select("#vcf-variants").datum([data]);    
+	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);    
     this.vcfChart(selection);
 
 	this.cardSelector.find('#vcf-count').text(data.features.length + ' Variants');
@@ -854,33 +872,11 @@ VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd
 		var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    
 	    this.fbChart(selection);
 
-		this.cardSelector.find('#vcf-count').text((this.vcfData.features.length + data.features.length) + ' Variants');
+		this.cardSelector.find('#vcf-count').text(this.vcfData.features.length + ' Variants');
 		this.cardSelector.find('.vcfloader').css("display", "none");
 
 	   	this.d3CardSelector.select("#fb-variants .x.axis .tick text").style("text-anchor", "start");
 
-	   	// Add the freebayes variant to the vcf data
-	   	me.vcfData.features = me.vcfData.features.filter( function(feature) {
-	   		return feature.fbCalled == null;
-	   	});
-	   	data.features.forEach( function(feature) {
-	   		feature.fbCalled = 'Y';
-	   		me.vcfData.features.push(feature);
-	   	});
-
-	   	// Figure out max level (lost for some reason)
-	   	var maxLevel = 1;
-	   	me.vcfData.features.forEach(function(feature) {
-	   		if (feature.level > maxLevel) {
-	   			maxLevel = feature.level;
-	   		}
-	   	});
-	   	me.vcfData.maxLevel = maxLevel;
-
-
-	   	if ( this.getRelationship() == 'proband') {
-	   		window.showFeatureMatrix(this, me.vcfData, regionStart, regionEnd);
-	   	}
 
 	}  else {
 		this.cardSelector.find('#fb-chart-label').addClass("hide");
@@ -958,20 +954,26 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
 					window.gene.strand, window.selectedTranscript, function(data){
 
+				   	data.features.forEach( function(feature) {
+				   		feature.fbCalled = 'Y';
+				   	});
+
 					me.fbData = data;
-					me.vcfData = me.vcfData || {
-						'start': data.start, 'end': data.end, 'strand': data.strand, 
-        				'variantRegionStart': data.variantRegionStart, 'name': 'vcf track', 
-        				'homCount': 0, 'hetCount': 0,
-        				'features': []
-        			}
+					
+        			// Flag the variants as called by Freebayes and add unique to vcf
+        			// set
+					me.vcfData.features = me.vcfData.features.filter( function(feature) {
+				   		return feature.fbCalled == null;
+				   	});
 
 					// This may not be the first time we call freebayes, so to
 					// avoid duplicate variants, get rid of the ones
 					// we added last round.					
 					me.vcfData.features = me.vcfData.features.filter( function(d) {
 						return d.consensus != 'unique2';
-					});					
+					});		
+
+
 
 					me.cardSelector.find('.vcfloader .loader-label').text("Comparing call sets");
 
@@ -984,13 +986,38 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				    		return d.consensus == 'unique2';
 				    	});
 
+				    	// Add the unique freebayes variants to vcf data to include 
+				    	// in feature matrix
+				    	me.fbData.features.forEach( function(feature) {
+					   		me.vcfData.features.push(feature);
+					   	});
+					   	// Figure out max level (lost for some reason)
+					   	var maxLevel = 1;
+					   	me.vcfData.features.forEach(function(feature) {
+					   		if (feature.level > maxLevel) {
+					   			maxLevel = feature.level;
+					   		}
+					   	});
+					   	me.vcfData.maxLevel = maxLevel;
+
+
+
 
 				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
 						me.fbData.maxLevel = maxLevel + 1;
 
+						if (me.getRelationship() == 'proband') {
+				  			window.cullVariantFilters();
+				  		}
+				  		
 						me.cardSelector.find('.vcfloader .loader-label').text("Loading chart");
 
 				    	me.fillFreebayesChart(me.fbData, window.gene.start, window.gene.end);
+
+				    	if ( this.getRelationship() == 'proband') {
+	   						window.showFeatureMatrix(this, me.vcfData, regionStart, regionEnd);
+						}
+
 						
 				    });
 				});
@@ -1024,6 +1051,14 @@ VariantCard.prototype.stripRefName = function(refName) {
 		}
 	}
 	return strippedName;
+}
+
+VariantCard.prototype.filterFreebayesVariants = function() {
+	if (this.fbData != null) {
+		return  this.filterVariants(this.fbData, this.fbChart)
+	} else {
+		return null;
+	}
 }
 
 

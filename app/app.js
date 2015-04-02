@@ -91,19 +91,28 @@ var showAfSymbol = function(selection) {
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
+
 	         	if (selection.datum().clazz == 'af_unique') {
-	         		return "rgb(217, 217, 217)";
+	         		return "rgb(215,48,39)";
+	         	} else if (selection.datum().clazz == 'af_uberrare') {
+	         		return "rgb(252,141,89)";
+	         	} else if (selection.datum().clazz == 'af_superrare') {
+	         		return "rgb(203, 174, 95);";
 	         	} else if (selection.datum().clazz == 'af_rare') {
-	         		return "rgb(189, 189, 189)";
+	         		return "rgb(158, 186, 194)";
 	         	} else if (selection.datum().clazz == 'af_uncommon') {
-	         		return "rgb(150, 150, 150)";
+	         		return "rgb(145,191,219)";
 	         	} else if (selection.datum().clazz == 'af_common') {
-	         		return "rgb(115, 115, 115)";
+	         		return "rgb(69,117,180)";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'af_unique') {
 	         		return "10";
+	         	} else if (selection.datum().clazz == 'af_uberrare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af_superrare') {
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'af_rare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'af_uncommon') {
@@ -115,6 +124,10 @@ var showAfSymbol = function(selection) {
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'af_unique') {
 	         		return "10";
+	         	} else if (selection.datum().clazz == 'af_uberrare') {
+	         		return "12";
+	         	} else if (selection.datum().clazz == 'af_superrare') {
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'af_rare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'af_uncommon') {
@@ -179,10 +192,12 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
 // For af range, value must be > min and <= max
-var afMap          = [ {min: -1.1, max: +0,    value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
-                       {min: +0,   max: +.01,  value: +3,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
-                       {min: +.01,  max: +.05, value: +4,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
-                       {min: +.05,  max: +1,   value: +5,  clazz: 'af_common',    symbolFunction: showAfSymbol},	
+var afMap          = [ {min: -1.1,  max: +0,     value: +2,  clazz: 'af_unique',     symbolFunction: showAfSymbol},	
+                       {min: +0,    max: +.0001, value: +3,  clazz: 'af_uberrare',   symbolFunction: showAfSymbol},	
+                       {min: +0,    max: +.001,  value: +4,  clazz: 'af_superrare',  symbolFunction: showAfSymbol},	
+                       {min: +0,    max: +.01,   value: +5,  clazz: 'af_rare',       symbolFunction: showAfSymbol},	
+                       {min: +.01,  max: +.05,   value: +6,  clazz: 'af_uncommon',   symbolFunction: showAfSymbol},	
+                       {min: +.05,  max: +1,     value: +7,  clazz: 'af_common',     symbolFunction: showAfSymbol},	
                       ];
 
 
@@ -641,8 +656,7 @@ function initFilterTrack() {
 			variantCards.forEach(function(variantCard) {
 				variantCard.variantClass(classifyByImpact);
 		    	if (variantCard.getCardIndex() == 0) {
-			  		var filteredVcfData = variantCard.filterVariants();
-			  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+		    		filterVariants();
 				}
 
 			});
@@ -661,8 +675,7 @@ function initFilterTrack() {
 			variantCards.forEach(function(variantCard) {
 		    	variantCard.variantClass(classifyByEffect);
 		    	if (variantCard.getCardIndex() == 0) {
-			  		var filteredVcfData = variantCard.filterVariants();
-			  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+		    		filterVariants();
 				}
 			});
 
@@ -675,6 +688,14 @@ function filterVariants() {
 	if (variantCards.length > 0) {
   		var filteredVcfData = variantCards[0].filterVariants();
   		variantCards[0].fillVariantChart(filteredVcfData, regionStart, regionEnd);
+
+
+
+  		var filteredFBData = variantCards[0].filterFreebayesVariants();
+  		if (filteredFBData != null) {
+	  		variantCards[0].fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
+  		}
+
 	 }
 }
 
@@ -1726,8 +1747,11 @@ function fillFeatureMatrix(theVcfData) {
 	variantCards.forEach(function(variantCard) {
 		if (variantCard.getRelationship() == 'proband') {
 			variantCard.fillVariantChart(theVcfData, regionStart, regionEnd, true);
+	  		window.cullVariantFilters();
 		}
-	})		
+	});
+
+	
 }
 
 function variantTooltipHTML(variant, rowIndex) {
@@ -1833,6 +1857,23 @@ function cullVariantFilters() {
 		var count = d3.selectAll('#vcf-variants .variant.' + effect)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
+	d3.selectAll(".aflevel").each( function(d,i) {
+		var aflevel = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + aflevel)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	d3.selectAll(".inheritance").each( function(d,i) {
+		var inheritance = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + inheritance)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	d3.selectAll(".clinvar").each( function(d,i) {
+		var clinvar = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + clinvar)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+
+
 
 	// First, move all elements out of the 'more' section
 	$('#effect-filter-box #more-effect svg').each(function() {

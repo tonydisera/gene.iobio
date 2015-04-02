@@ -343,39 +343,50 @@
 
       </div>
     </div>
-    <div style="clear:both;padding-top:10px">
+    <div style="clear:both;padding-top:0px">
       <div style="float:left;width:120px">
         <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
           <text class="name" x="0" y="10">Allele Frequency</text>
         </svg>
-
         
-        <svg id="af_unique" class="aflevel" width="120" height="14" transform="translate(0,0)">
-          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Unique 0%</text>
+        <svg id="af_unique" class="aflevel" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Novel</text>
           <g class=" af_unique">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(217, 217, 217);"></use>
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
           </g>
         </svg>
-        <svg id="af_rare" class="aflevel" width="120" height="14" transform="translate(0,0)">
-          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Rare &lt; 1%</text>
+        <svg id="af_uberrare" class="aflevel" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>
+          <g class=" af_uberrare">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
+          </g>
+        </svg>
+        <svg id="af_superrare" class="aflevel" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .1%</text>
+          <g class=" af_superrare">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(203, 174, 95);"></use>
+          </g>
+        </svg>
+        <svg id="af_rare" class="aflevel" width="120" height="12" transform="translate(0,0)">
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; 1%</text>
           <g class=" af_rare">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(189, 189, 189);"></use>
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
           </g>
         </svg>
         <svg id="af_uncommon" class="aflevel" width="120" height="16" transform="translate(0,0)">
-          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">Uncommon 1-5%</text>
+          <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">1-5%</text>
           <g class=" af_uncommon">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(150, 150, 150);"></use>
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
           </g>
         </svg>
         <svg id="af_common" class="aflevel" width="120" height="18" transform="translate(0,0)">
           <g class=" af_common">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="20" height="18" style="fill:rgb(115, 115, 115)"></use>
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
           </g>
-          <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">Common &gt; 5%</text></svg>
+          <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">&gt; 5%</text></svg>
      
       
-            <div style="margin-top:26px">
+            <div style="margin-top:0px">
               <input  type="text"  id="af-amount-start" value="0"                           
               style="width:40px;font-size: 11px;"/>
               -
@@ -406,7 +417,7 @@
             <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Recessive</text></svg>
           </svg>
           
-          <div style="margin-top: 40px;margin-bottom:4px">
+          <div style="margin-top: 42px;margin-bottom:4px">
             <span style="font-size:11px;">Coverage (min)</span>
             <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;">
             X
