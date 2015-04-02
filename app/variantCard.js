@@ -1006,6 +1006,10 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
 						me.fbData.maxLevel = maxLevel + 1;
 
+						if (me.getRelationship() == 'proband') {
+				  			window.cullVariantFilters();
+				  		}
+				  		
 						me.cardSelector.find('.vcfloader .loader-label').text("Loading chart");
 
 				    	me.fillFreebayesChart(me.fbData, window.gene.start, window.gene.end);

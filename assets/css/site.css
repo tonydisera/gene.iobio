@@ -956,7 +956,7 @@ header {
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme {
   padding-top: 2px;
 }
-.impact.inactive  {
+.impact.inactive, .zygosity.inactive, .aflevel.inactive, .inheritance.inactive, .clinvar.inactive  {
   pointer-events: none;
   opacity: .4;
 }
