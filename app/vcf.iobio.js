@@ -71,7 +71,7 @@ vcfiobio = function module() {
   var emailServer            = "ws://localhost:7068";
   var catInputServer         = "ws://localhost:7063";
   //var snpEffServer           = "ws://localhost:8040";
-  var clinvarServer          = "ws://localhost:8040";
+  //var clinvarServer          = "ws://localhost:8040";
 
   var vcfstatsAliveServer    = "ws://vcfstatsalive.iobio.io";
   var tabixServer            = "ws://tabix.iobio.io";
@@ -79,6 +79,7 @@ vcfiobio = function module() {
   var snpEffServer           = "ws://snpeff.iobio.io";
   var snpSiftServer          = "ws://snpsift.iobio.io";
   var vtServer               = "ws://vt.iobio.io";
+  var clinvarServer          = "ws://clinvar.iobio.io";
 
   var vcfURL;
   var vcfReader;
