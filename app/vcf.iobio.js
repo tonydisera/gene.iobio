@@ -660,7 +660,8 @@ var effectCategories = [
     // clinvar records number
     var sourceIndex = -1;
     var clinvarIndex = 0;
-    clinvarToSourceMap = new Object();
+    var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term="
+    // clinvarToSourceMap = new Object();
     records.forEach(function(record) {
       if (record.charAt(0) == "#") {
           // Bypass header
@@ -675,35 +676,62 @@ var effectCategories = [
           if (pos == null || ref == null || alt == null) {
 
           } else {
-            sourceIndex++;
-            // Figure out if this is multiallelic and increment
-            // the index accordinging.  
+            // sourceIndex++;
+            // // Figure out if this is multiallelic and increment
+            // // the index accordinging.  
 
-            var altTokens = alt.split(",");
-            altTokens.forEach(function(altToken) {
-              clinvarIndex++;
-              clinvarToSourceMap[clinvarIndex] = sourceIndex;
-            });            
+            // var altTokens = alt.split(",");
+            // altTokens.forEach(function(altToken) {
+            //   clinvarIndex++;
+            //   clinvarToSourceMap[clinvarIndex] = sourceIndex;
+            // });            
+            url += pos + ',' 
           }
-
-
+          
       }
     });
 
+    url = url.slice(0,url.length-1) + '[c37]'
+
 
     var clinvarVariants = null;
-    // Read the streamed JSON from clinvar service
-    me._streamVcfRegion(records, clinvarServer, function(clinvarData) {
+    $.ajax( url )
+      .done(function(data) {        
+        var webenv = data["esearchresult"]["webenv"];
+        var queryKey = data["esearchresult"]["querykey"];
+        var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
+        $.ajax( summaryUrl )
+          .done(function(sumData) { 
+            var sorted = sumData.result.uids.sort(function(a,b){ 
+              var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+              var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+              if ( aStart > bStart) 
+                return 1; 
+              else 
+                return -1; 
+            })
+            sumData.result.uids = sorted
+            callback( sumData.result );
+          })
+          .fail(function() {
+            console.log('Error: clinvar http request failed to get summary data');
+          })
+      })
+      .fail(function() {
+        console.log('Error: clinvar http request failed to get IDs');
+      })
+    // // Read the streamed JSON from clinvar service
+    // me._streamVcfRegion(records, clinvarServer, function(clinvarData) {
 
-      var clinvarVariants = JSON.parse(clinvarData);
+    //   var clinvarVariants = JSON.parse(clinvarData);
 
-      clinvarVariants.forEach(function(clinvarVariant) {
-        var sourceIndex = clinvarToSourceMap[clinvarVariant.recordNumber];
-        clinvarVariant.sourceIndex = sourceIndex;
-      });
+    //   clinvarVariants.forEach(function(clinvarVariant) {
+    //     var sourceIndex = clinvarToSourceMap[clinvarVariant.recordNumber];
+    //     clinvarVariant.sourceIndex = sourceIndex;
+    //   });
 
-      callback(clinvarVariants);
-    });
+    //   callback(clinvarVariants);
+    // });
 
   }
 
