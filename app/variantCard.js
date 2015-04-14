@@ -11,6 +11,7 @@ function VariantCard() {
 	this.afChart = null;
 	this.variantCounts = null;
 	this.bamData = null;
+	this.zoomRegionChart = null;
 	this.bamDepthChart = null;	 
 	this.bamUrlEntered = false;
 	this.bamFileOpened = false;
