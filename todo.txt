@@ -1,15 +1,15 @@
 
 From Tuesday March 24th Meeting
 -------------------------------------------
+- Filtering by decimal points in af doesn't work.
+
+- After zooming in, "cliff" created in coverate chart (due to averaing?)
+
 Filters:
- - Don't filter out 'empty' values.  (af, zygosity filters should keep variants where value not present)
- - Grey out zygosity filters if not present in genotype of variant
- - Separate filters for 1000G AF and ExAC AF, separate values in tooltip of variant
- - AF categories should just show ranges, not a label.  The ranges are:
-     Not present, 0-0.01%,  <.1%, <1%, 1-5%, >5%
  - AF text input range should support 4 decimal precision
- - Use a different AF glyph
+ - Use a different AF glyph, use stroke, no fill when AF not present
  - Coverage should filter on GT coverage; if not present, filter on BAM coverage
+ - Display applied filters in variant card (by badge pf cpimt_d )
 
 - Mode of inheritance - dominant (present in affected, cannot be present in unaffected)
 
