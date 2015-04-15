@@ -31,10 +31,9 @@ Filters:
 blockers
 -----------
 
+- Freebayes - deletes not filtering out 
+
 - datasources dialog bugs - 
-   - names not showing up on variant cards
-   - mixup with names after re-opening datasources dialog after all variant cards (for proband, mother, father)
-     have been entered.
    - Safari only: relationship dropdown is open and won't close
 
 - Big genes kill browser session (robo1)

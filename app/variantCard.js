@@ -421,6 +421,12 @@ VariantCard.prototype.loadDataSources = function(dataSourceName) {
 	if (this.isViewable()) {
 		this.showDataSources(dataSourceName);
 
+		this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+		selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
+		this.zoomRegionChart.regionStart(+window.gene.start);
+		this.zoomRegionChart.regionEnd(+window.gene.end);
+		this.zoomRegionChart(selection);
+
 	}
 
 	if (this.isViewable()) {
@@ -480,7 +486,6 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 		if (this.bam || this.vcf) {	      
 			this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
-
 			selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
 			this.zoomRegionChart.regionStart(+window.gene.start);
 			this.zoomRegionChart.regionEnd(+window.gene.end);
