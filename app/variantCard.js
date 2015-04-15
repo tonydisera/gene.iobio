@@ -406,8 +406,17 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 	this.name = dataSourceName;
 	$('#add-datasource-container').css('display', 'none');
 
+	var title = this.getRelationship().toUpperCase();
+	if (title == null || title == '' || title == 'NONE') {
+		title = 'Sample';
+	}
+
 	var cache = this.cardSelector.find('#variant-link').children();
-   	this.cardSelector.find('#variant-link').text(dataSourceName).append(cache);
+   	this.cardSelector.find('#variant-link').text(title).append(cache);
+
+   	this.cardSelector.find('#variant-card-label').text(dataSourceName);
+
+
    	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
    	this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
    	this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");

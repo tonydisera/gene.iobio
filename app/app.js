@@ -480,8 +480,10 @@ function loadUrlSources() {
 
 					// load bam and vcf sources
 					// get all bam and vcf url params in hash
-					var bam = getUrlParameter(/bam*/);
-					var vcf = getUrlParameter(/vcf*/);		
+					var bam  = getUrlParameter(/bam*/);
+					var vcf  = getUrlParameter(/vcf*/);	
+					var rel  = getUrlParameter(/rel*/);
+					var dsname = getUrlParameter(/name*/);	
 					// load all bams and vcfs that have a bam pair
 					if (bam != undefined) {
 						Object.keys(bam).forEach(function(name) {
@@ -498,24 +500,48 @@ function loadUrlSources() {
 								onVcfUrlEntered();
 							}
 												
-							// show bam/vcf tracks
+							
 							variantCards.forEach( function(variantCard) {							
 									variantCard.showDataSources(variantCard.getName());						
 							});				
 						})
 					}		
 					// load vcfs that don't have a bam pair
-					if (vcf != undefined) {
+					if (vcf != undefined) {						
 						Object.keys(vcf).forEach(function(name) {
 							if (addVC) addVariantCard();
 							else addVC = true;
 							$('#url-input').val(vcf[name]);
 							onVcfUrlEntered();
-							// show bam/vcf tracks
+							
 							variantCards.forEach( function(variantCard) {							
 								variantCard.showDataSources(variantCard.getName());						
 							});				
 						});
+					}
+					if ( rel != undefined) {
+						var cardIndex = 0;
+						Object.keys(rel).forEach(function(idx) {
+							$('#card-index').val(cardIndex);
+							$('#datasource-relationship').val(rel[idx]);
+							setDataSourceRelationship();
+							cardIndex++;
+						});
+						variantCards.forEach( function(variantCard) {							
+							variantCard.showDataSources(variantCard.getName());						
+						});		
+					}
+					if ( dsname != undefined) {
+						var cardIndex = 0;
+						Object.keys(dsname).forEach(function(idx) {
+							$('#card-index').val(cardIndex);
+							$('#datasource-name').val(dsname[idx]);
+							setDataSourceName();
+							cardIndex++;
+						});
+						variantCards.forEach( function(variantCard) {							
+							variantCard.showDataSources(variantCard.getName());						
+						});							
 					}
 					loadCount++;
 
@@ -1249,6 +1275,7 @@ function setDataSourceName() {
 	var dsName = $('#datasource-name').val();
 	variantCard.setName(dsName);
 	$('#variant-card-button-' + cardIndex ).text(dsName);
+	updateUrl('name' + cardIndex, dsName);
 
 }
 
@@ -1258,6 +1285,7 @@ function setDataSourceRelationship() {
 
 	var dsRelationship = $('#datasource-relationship').val();
 	variantCard.setRelationship(dsRelationship);	
+	updateUrl('rel' + cardIndex, dsRelationship);
 }
 
 function loadNewDataSources() {

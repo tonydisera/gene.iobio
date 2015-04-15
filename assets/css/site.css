@@ -4,13 +4,24 @@ body {
   font-family: 'Quattrocento Sans', sans-serif;
 }
 
-a.card-label, a.card-label:hover, a.card-label:focus {
+.card-label {
   color: rgba(104, 152, 168, 1);
   font-size: 14px;
   text-transform: uppercase;
   font-family: Quicksand;
   font-weight: 700;
 }
+
+
+a.card-label, a.card-label:hover, a.card-label:focus {
+  color: rgba(104, 152, 168, 1);
+  font-size: 14px;
+  text-transform: uppercase;
+  font-family: Quicksand;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 
 a, a:hover, a:focus {
   color: rgba(104, 152, 168, 1) !important;
@@ -1075,7 +1086,7 @@ header {
   float:left;
   font-size: 12px;
   margin-top: -2px;
-  margin-left: 10px;
+  margin-left: 40px;
   width: 160px;
 }
 

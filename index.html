@@ -89,9 +89,11 @@
           <div style="text-align:center;margin-top: 6px">
             <a id="variant-link"  class="card-label"  data-toggle="collapse"  href="#variant-panel" 
                aria-expanded="false" style="float:left;text-align:left;width:134px;margin-top:-2px;">
-              Variants
+              Sample
               <span class="caret"></span>
             </a>
+
+            <span class="card-label" id="variant-card-label" style="float: left;margin-left: 10px;margin-top:-2px;"></span>
 
             <button id="button-find-missing-variants"                       
               class="btn btn-raised btn-default icon-button-sm"> 
@@ -147,7 +149,7 @@
               <div class="track-chart">
                   <div>
                     <div  id="fb-chart-label" class="chart-label hide" style="margin-bottom: -10px;">
-                      Variants called in realtime
+                      Missing Variants called
                     </div>
                     <div id="fb-variants">
                     </div>
@@ -577,7 +579,7 @@
         <a id="transcript-link" class="card-label"   data-toggle="collapse" onclick="onCollapseTranscriptPanel()" 
            href="#transcript-panel" 
            aria-expanded="true" style="float:left;margin-left:13px;width:130px" >
-          Transcripts
+          Gene
           <span class="caret"></span>
         </a>
         <div class="btn-toolbar" 
@@ -630,7 +632,7 @@
         <div id="filter-track"  class="track-expand shadow-z-1 hide">
             <div>
               <a id="filter-link"  class="card-label" href="#filter-panel"  data-toggle="collapse" aria-expanded="true" >
-                Filter<span class="caret"></span>
+                Filter Variants<span class="caret"></span>
               </a>
             </div>
     
@@ -644,7 +646,7 @@
         <div id="matrix-track"  class="track-expand shadow-z-1 hide">
             <div>
               <a style="float:left;padding-top:7px" id="matrix-link"  class="card-label" href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
-                Rank<span class="caret"></span>
+                Rank Variants<span class="caret"></span>
               </a>
 
              <div style="display:inline;margin-top: -6px;color: rgb(132,132,132);margin-left: 20px;font-size:11px;">
