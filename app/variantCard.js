@@ -957,35 +957,31 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			window.gene.start, 
 			window.gene.end, 
 			window.gene.strand, 
-			function(fbVariants) {
+			function(data) {
 
-			if (fbVariants == null || fbVariants.length == 0) {
+			if (data == null || data.length == 0) {
 				return;
 			}
 
+			// Parse string into records
 			var fbRecs = [];
+			var recs = data.split("\n");
+			recs.forEach( function(rec) {
+				// We need to inject in the contig header for downstream servers to function properly
+				if (rec.indexOf("#CHROM") == 0) {
+					fbRecs.push("##contig=<ID=" + refName + ">");
+				}
+				fbRecs.push(rec);
+			});
 
-			// In order to annotate the variants, we need to add a vcf header
-			// before calling the snpEff service.
-		    fbRecs.push('##fileformat=VCFv4.1');
-			fbRecs.push('##fileDate=20130402');
-			fbRecs.push('##source=freeBayes version 0.9.9');
-			fbRecs.push('##reference=/share/home/erik/references/Homo_sapiens_assembly19.fasta');
-			fbRecs.push('##phasing=none');
-			fbRecs.push('##commandline="freebayes -f /share/home/erik/references/Homo_sapiens_assembly19.fasta --min-alternate-fraction 0 --max-complex-gap 20 --pooled-continuous --genotype-qualities --stdin"');
-			fbRecs.push('##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of samples with data">');
 
-			// Parse the fb vcf data into json variant objects
-			fbVariants.forEach( function(v) {
-				fbRec = [v.chrom, v.pos, v.id, v.ref, v.alt, v.qual, v.filter, v.info, v.format, v.genotypes ];
-                fbRecs.push(fbRec.join("\t"));
-			})
+			
 			
 			
 			if (me.isViewable()) {
 				me.cardSelector.find(".vcfloader .loader-label").text("Annotating variants with snpEFF in realtime")
 
-				// Annotate the fb variatns
+				// Annotate the fb variants
 				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
 					window.gene.strand, window.selectedTranscript, function(data){
 
@@ -1060,7 +1056,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 						
 				    });
-				});
+				}, window.fillFeatureMatrixWithClinvar);
 			}
 			
 		});

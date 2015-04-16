@@ -502,11 +502,8 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
         me.annotateVcfRecords(allRecs, regionStart, regionEnd, regionStrand, 
-          selectedTranscript, callback);
+          selectedTranscript, callback, callbackClinvar);
 
-        if (callbackClinvar) {
-          me.getClinvarRecords(allRecs, regionStart, regionEnd, callbackClinvar);
-        }
 
     });
 
@@ -605,7 +602,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports.annotateVcfRecords = function(records, regionStart, regionEnd, regionStrand, selectedTranscript, callback) {
+  exports.annotateVcfRecords = function(records, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar) {
     var me = this;
 
 
@@ -613,7 +610,7 @@ var effectCategories = [
     // For each vcf records, call snpEff to get the annotations.
     // Each vcf record returned will have an EFF field in the 
     // info field.
-    me._streamVcfRegion(records, snpEffServer, function(annotatedData) {
+    me._annotateVcfRegion(records, function(annotatedData) {
 
       var annotatedRecs = annotatedData.split("\n");
       var vcfObjects = [];
@@ -644,11 +641,17 @@ var effectCategories = [
                            'qual': qual, 'filter': filter, 'info': info, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
-      });
+      }, 
+      callbackClinvar);
 
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
       callback(results);
+
+
+      if (callbackClinvar) {
+        me.getClinvarRecords(annotatedRecs, regionStart, regionEnd, callbackClinvar);
+      }
     });
 
   }
@@ -735,31 +738,116 @@ var effectCategories = [
       .fail(function() {
         console.log('Error: clinvar http request failed to get IDs');
       })
-    // // Read the streamed JSON from clinvar service
-    // me._streamVcfRegion(records, clinvarServer, function(clinvarData) {
-
-    //   var clinvarVariants = JSON.parse(clinvarData);
-
-    //   clinvarVariants.forEach(function(clinvarVariant) {
-    //     var sourceIndex = clinvarToSourceMap[clinvarVariant.recordNumber];
-    //     clinvarVariant.sourceIndex = sourceIndex;
-    //   });
-
-    //   callback(clinvarVariants);
-    // });
-
+   
   }
 
 
   // NEW
-  exports._streamVcfRegion = function(records, server, callback) {
+  exports._annotateVcfRegion = function(records, callback, callbackClinvar) {
 
-      var client = BinaryClient(server);
-      var url = encodeURI( server + "?protocol=websocket&cmd=" + encodeURIComponent("http://client"));
+      // open connection to iobio webservice that will request this data, since connections can only be opened from browser
+      var me = this;
+      var connectionID = this._makeid();
+      var clientSnpEff = BinaryClient(snpEffServer + '?id=', {'connectionID' : connectionID} );
+      clientSnpEff.on('open', function(stream){
+        var stream = clientSnpEff.createStream({event:'setID', 'connectionID':connectionID});
+        stream.end();
+      })
+
+      
+      var snpEffUrl = encodeURI( snpEffServer + "?protocol=websocket&cmd=" + encodeURIComponent("http://client?&id="+connectionID));
+
+      //
+      // stream the vcf records to snpEffClient
+      //
+      clientSnpEff.on("stream", function(stream) {
+
+        records.forEach( function(record) {
+          stream.write(record + "\n");
+        });
+
+        stream.end();
+
+      });
+      
+      clientSnpEff.on("error", function(error) {
+        console.log("error while streaming vcf records " + error);
+      });
+
+
+      var client = BinaryClient(afServer);
+      var afUrl = encodeURI( afServer + '?cmd= ' + encodeURIComponent(snpEffUrl));
+     
 
       var buffer = "";
       client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':url}});
+        //var stream = client.createStream({event:'run', params : {'url':afUrl}});
+        var stream = client.createStream({event:'run', params : {'url':afUrl}});
+        
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           buffer = buffer + data;
+        });
+
+        // Whem all of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          callback(buffer);
+        });
+        
+      });
+      
+      client.on("error", function(error) {
+        console.log("error while running af server " + error);
+      });
+
+
+     
+
+  }
+
+    // NEW
+  exports._annotateVcfRegionOrig = function(records, callback) {
+
+      // open connection to iobio webservice that will request this data, since connections can only be opened from browser
+      var me = this;
+      var connectionID = this._makeid();
+      var clientSnpEff = BinaryClient(afServer + '?id=', {'connectionID' : connectionID} );
+      clientSnpEff.on('open', function(stream){
+        var stream = clientSnpEff.createStream({event:'setID', 'connectionID':connectionID});
+        stream.end();
+      })
+
+      
+      var snpEffUrl = encodeURI( afServer + "?protocol=websocket&cmd=" + encodeURIComponent("http://client?&id="+connectionID));
+
+      //
+      // stream the vcf records to snpEffClient
+      //
+      clientSnpEff.on("stream", function(stream) {
+
+        records.forEach( function(record) {
+          stream.write(record + "\n");
+        });
+
+        stream.end();
+
+      });
+      
+      clientSnpEff.on("error", function(error) {
+        console.log("error while streaming vcf records " + error);
+      });
+
+     
+      var buffer = "";
+      clientSnpEff.on('open', function(){
+        //var stream = client.createStream({event:'run', params : {'url':afUrl}});
+        var stream = clientSnpEff.createStream({event:'run', params : {'url':snpEffUrl}});
         
         //
         // listen for stream data (the output) event. 
@@ -779,25 +867,8 @@ var effectCategories = [
         
       });
 
-      //
-      // stream the vcf records
-      //
-      client.on("stream", function(stream) {
-
-        records.forEach( function(record) {
-          stream.write(record + "\n");
-        });
-
-        stream.end();
-
-      });
-
-      
-      client.on("error", function(error) {
-        console.log("error while streaming vcf records " + error);
-      });
-
   }
+
 
   exports.parseVcfRecords = function(vcfRecs, regionStart, regionEnd, regionStrand, selectedTranscript) {
       var me = this;

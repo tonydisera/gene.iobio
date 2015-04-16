@@ -706,7 +706,7 @@ var Bam = Class.extend({
 
       var urlV = me.iobio.vt + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
 
-      var url = me.iobio.vcflib + '?format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 1" '
+      var url = me.iobio.vcflib + '?cmd=vcffilter -f "QUAL > 1" '
                 + encodeURIComponent(encodeURI(urlV));
 
       me._callVariants(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflib, encodeURI(url), callback);
@@ -715,26 +715,6 @@ var Bam = Class.extend({
 
    },
 
-   //
-   //
-   // NEW
-   //
-   //
-   getRemoteSamtoolsVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
-
-    var urlBam = this._getBamMergeUrl(refName, regionStart, regionEnd);             
-
-    var urlS = this.iobio.bcftools 
-              + '?cmd=view -vcg '
-              + ' ' + encodeURIComponent(encodeURI(this.iobio.samtools + '?&binary=true&cmd=mpileup -uf ./data/references/hs_ref_chr' + refName + ".fa"
-              + ' ' + encodeURIComponent(urlBam)));            
-
-    var url = this.iobio.vcflib + '?protocol=http&format=json&parseByLine=true&cmd=vcffilter -f "QUAL > 0" '
-            + ' ' + encodeURIComponent(encodeURI(urlS));
-    console.log(encodeURI(url));
-
-    this._callVariants(refName, regionStart, regionEnd, regionStrand, this.iobio.vcflib, encodeURI(url), callback);
-   },
 
     //
    //
@@ -778,31 +758,26 @@ var Bam = Class.extend({
       //
       // listen for stream data (the output) event. 
       //
+      var buf = '';
       stream.on('data', function(data, options) {
         if (data == undefined) {
           return;
         } 
-        // Ignore the header record (for now...)
-        if (data.indexOf("header") > -1) {
-          return;
-        }
-        var vcfRec = null;
+        
         var success = true;
         try {
-          vcfRec = JSON.parse(data).data;
+          buf += data;
         } catch(e) {
           success = false;
         }
         if(success) {
           if (callback) {
-            // Callback, passing the vcf rec as an argument
-            vcfRecs.push(vcfRec);
           }
         }               
       });
 
       stream.on('end', function() {
-        callback(vcfRecs);
+        callback(buf);
       });
 
       stream.on("error", function(error) {
