@@ -728,6 +728,24 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd) {
 	                           function(data) {
 		        me.vcfData = data;
 
+		        // We have the af1000g and afexac, so now determine the level for filtering
+		        // by range
+		        me.vcfData.features.forEach(function(variant) {
+
+					afExacMap.forEach( function(rangeEntry) {
+						if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
+							variant.afexaclevel = rangeEntry.clazz;
+						}
+					});
+					af1000gMap.forEach( function(rangeEntry) {
+						if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
+							variant.af1000glevel = rangeEntry.clazz;
+						}
+					});
+
+
+				});
+
 		   	    if (me.isViewable()) {
 			   	    me.cardSelector.find('.vcfloader .loader-label').text("Loading variant chart");
 			   	    var filteredVcfData = me.filterVariants();
@@ -868,6 +886,8 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 	   	}
 	}
 
+	window.cullVariantFilters();
+
 }
 
 VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd) {
@@ -991,6 +1011,11 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 
 					me.cardSelector.find('.vcfloader .loader-label').text("Comparing call sets");
+
+					// We have to order the variants in both sets before comparing
+					me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);					
+					me.fbData.features  = me.fbData.features.sort(orderVariantsByPosition);
+
 
 					// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 					// unique2 (only in freebayes set), or common (in both sets).				

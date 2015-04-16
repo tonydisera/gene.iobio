@@ -80,6 +80,7 @@ vcfiobio = function module() {
   var snpSiftServer          = "ws://snpsift.iobio.io";
   var vtServer               = "ws://vt.iobio.io";
   var clinvarServer          = "ws://clinvar.iobio.io";
+  var afServer               = "ws://af.iobio.io";
 
   var vcfURL;
   var vcfReader;
@@ -521,17 +522,18 @@ var effectCategories = [
     } else {
       refFile = "./data/references/hs_ref_chr" + refName + ".fa";
     }       
-    var postProcessUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(encodeURI(tabixUrl)) );
+    var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(encodeURI(tabixUrl)) );
+    var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
     var url = null;
     if (afMax) {
       //var filterString = "'(AF<0.001)'";
       //filterString = "'((AF>" + afMin + ")&(AF<" + afMax + "))'";
       filterString = "'(AF<" + afMax + ")'";
-      var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(postProcessUrl));
+      var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(afUrl));
       url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
     } else {
-      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(postProcessUrl));
+      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
     }
 
     console.log(url);
@@ -832,11 +834,17 @@ var effectCategories = [
             var af = null;       
             var typeAnnotated = null;
             var combinedDepth = null;
+            var af1000G = '.';
+            var afExAC = '.';
             var annotTokens = rec.info.split(";");
             // Iterate through the annotation fields, looking for the
             // annotation EFF
             annotTokens.forEach(function(annotToken) {
-              if (annotToken.indexOf("AF=") == 0) {
+              if (annotToken.indexOf("BGAF_1KG=") == 0) {
+                af1000G = annotToken.substring(9, annotToken.length);                
+              } else if (annotToken.indexOf("BGAF_EXAC=") == 0) {
+                afExAC = annotToken.substring(10, annotToken.length);
+              } else if (annotToken.indexOf("AF=") == 0) {
                 // TODO:  vcfstatsalive must look at af by alt.
                 // For now, just grab first af
                 //af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), altIdx);   
@@ -971,7 +979,9 @@ var effectCategories = [
               'consensus': rec.consensus,
               'inheritance': '',
               'af1000glevel': '',
-              'afexaclevel:': ''} );
+              'afexaclevel:': '',
+              'af1000G': af1000G,
+              'afExAC': afExAC} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;
@@ -984,6 +994,7 @@ var effectCategories = [
       });
 
       // Sort variants by start ascending, end descending
+      /*
       variants = variants.sort(function(a,b) {
         if ( a.start < b.start ) {
           return -1;
@@ -998,7 +1009,8 @@ var effectCategories = [
             return 0;
           }
         }
-      });      
+      });
+      */      
 
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
@@ -1100,8 +1112,8 @@ var effectCategories = [
     while (idx1 < features1.length && idx2 < features2.length) {
       variant1 = features1[idx1];
       variant2 = features2[idx2];
-      var refAlt1 = variant1.ref + "->" + variant1.alt;
-      var refAlt2 = variant2.ref + "->" + variant2.alt;
+      var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
+      var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
 
       if (variant1.start == variant2.start) {
 

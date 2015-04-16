@@ -1322,8 +1322,14 @@ function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 	$("#feature-matrix").addClass("hide");
 
 	sourceVcfData = theVcfData;
+	// we need to compare the proband variants to mother and father variants to determine
+	// the inheritance mode.  After this completes, we are ready to show the
+	// feature matrix.
+	$("#matrix-panel .loader-label").text("Comparing variants to family data");
 
-	_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
+	window.compareVariantsToPedigree(theVcfData, fillFeatureMatrix);
+
+	//_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
 }
 
 
@@ -1383,8 +1389,8 @@ function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionE
 }
 
 function orderVariantsByPosition(a, b) {
-	var refAltA = a.ref + "->" + a.alt;
-	var refAltB = b.ref + "->" + b.alt;
+	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
+	var refAltB = b.type.toLowerCase() + " " + b.ref + "->" + b.alt;
 
 	if (a.start == b.start) {
 		if (refAltA == refAltB) {
@@ -1908,8 +1914,8 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Zygosity', variant.zygosity == "gt_unknown" ? "(No genotype)" : variant.zygosity)
 		+ tooltipRow('GMAF', variant.gMaf)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('AF ExAC', variant.afExAC == -1 ? '.' : variant.afExAC) 
-		+ tooltipRow('AF 1000G', variant.af1000G == -1 ? '.' : variant.af1000G) 
+		+ tooltipRow('AF ExAC', variant.afExAC)
+		+ tooltipRow('AF 1000G', variant.af1000G)
 		+ tooltipRow('ClinVar uid', variant.clinVarUid)
 		// + tooltipRow('ClinVar #', variant.clinVarAccession)
 		// + tooltipRow('NCBI ID', variant.ncbiId)
