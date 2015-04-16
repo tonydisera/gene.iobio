@@ -704,16 +704,29 @@ var effectCategories = [
         var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
         $.ajax( summaryUrl )
           .done(function(sumData) { 
-            var sorted = sumData.result.uids.sort(function(a,b){ 
-              var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-              var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-              if ( aStart > bStart) 
-                return 1; 
-              else 
-                return -1; 
-            })
-            sumData.result.uids = sorted
-            callback( sumData.result );
+            if (sumData.result == null) {
+              if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
+                sumData.esummaryresult.forEach( function(message) {
+                  console.log(message);
+                });
+              }
+              console.log("No data returned from clinvar request " + summaryUrl);
+              sumData.result = {uids: []};
+              callback(sumData.result );
+
+            } else {
+              var sorted = sumData.result.uids.sort(function(a,b){ 
+                var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                if ( aStart > bStart) 
+                  return 1; 
+                else 
+                  return -1; 
+              })
+              sumData.result.uids = sorted
+              callback( sumData.result );
+
+            }
           })
           .fail(function() {
             console.log('Error: clinvar http request failed to get summary data');
