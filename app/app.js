@@ -357,9 +357,16 @@ function init() {
 				regionEnd   = window.gene.end;
 			}
 
+			var probandVariantCard = null;
 			variantCards.forEach(function(variantCard) {
 		    	variantCard.onBrush(brush);
+		    	if (variantCard.getRelationship() == 'proband') {
+		    		probandVariantCard = variantCard;
+		    	}
 			});
+			if (probandVariantCard) {
+				probandVariantCard.fillFeatureMatrix(regionStart, regionEnd);
+			}
 
 		});	
 
@@ -1059,15 +1066,42 @@ function loadTracksForGene() {
 	// chart is not rendered.
 	showTranscripts();
 	
-	variantCards.forEach(function(variantCard) {
-		variantCard.loadTracksForGene(classifyByImpact);
-	});
+	// This will recursively (a sequentially) call 
+	// loadTracksForGenes on each variant card.
+	// When done, we will fill the feature matrix for
+	// the proband variant card.
+	var index = 0;
+	loadTracksForGeneNextVariantCard(variantCards, index);
+	
 
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
-
-
 	
 }
+
+
+function loadTracksForGeneNextVariantCard(variantCards, index) {
+	if (index < variantCards.length) {
+		var variantCard = variantCards[index];
+
+		variantCard.loadTracksForGene(classifyByImpact, function() {
+			index++;
+			loadTracksForGeneNextVariantCard(variantCards, index);
+		})
+	} else {
+		// Now that we have loaded all of the "viewable" cards,
+		// figure out inheritance
+		var probandVariantCard = null;
+		variantCards.forEach( function (variantCard) {
+			if (variantCard.getRelationship() == 'proband') {
+				probandVariantCard = variantCard;
+			}
+		});
+		if (probandVariantCard) {
+			probandVariantCard.showFeatureMatrix();
+		}
+	}
+}
+
 
 function showTranscripts(regionStart, regionEnd) {
 
@@ -1306,14 +1340,32 @@ function loadDataSources() {
 	// hide add data button
 	$('#add-datasource-container').css('display', 'none');
 
-	variantCards.forEach( function(variantCard) {
-		if (variantCard.isDirty()) {
-			variantCard.loadDataSources(variantCard.getName());
-			variantCard.setDirty(false);
+	var index = 0;
+	loadNextVariantCard(variantCards, index);
+
+}
+
+function loadNextVariantCard(variantCards, index) {
+	if (index < variantCards.length) {
+		var variantCard = variantCards[index];
+
+		variantCard.loadDataSources(variantCard.getName(), function() {
+			index++;
+			loadNextVariantCard(variantCards, index);
+		})
+	} else {
+		// Now that we have loaded all of the "viewable" cards,
+		// figure out inheritance
+		var probandVariantCard = null;
+		variantCards.forEach( function (variantCard) {
+			if (variantCard.getRelationship() == 'proband') {
+				probandVariantCard = variantCard;
+			}
+		});
+		if (probandVariantCard) {
+			probandVariantCard.showFeatureMatrix();
 		}
-	});
-
-
+	}
 }
 
 function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
@@ -1325,68 +1377,16 @@ function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 	// we need to compare the proband variants to mother and father variants to determine
 	// the inheritance mode.  After this completes, we are ready to show the
 	// feature matrix.
-	$("#matrix-panel .loader-label").text("Comparing variants to family data");
+	$("#matrix-track .inheritance.loader").css("display", "inline");
 
-	window.compareVariantsToPedigree(theVcfData, fillFeatureMatrix);
-
-	//_getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, fillFeatureMatrix);	
-}
-
-
-function _getPopulationVariants(theVariantCard, theVcfData, regionStart, regionEnd, callback) {
-	if (window.vcf1000GData && window.vcfExACData) {
-		var filteredVcf1000GData = {};
-		var filteredVcfExACData = {};
-		filteredVcf1000GData.features = window.vcf1000GData.features.filter(function(variant) {
-			return variant.start >= regionStart && variant.end <= regionEnd;
-		});
-		filteredVcfExACData.features = window.vcfExACData.features.filter(function(variant) {
-			return variant.start >= regionStart && variant.end <= regionEnd;
-		});
-		compareVariantsToPopulation(theVcfData, filteredVcf1000GData, filteredVcfExACData, callback);
-
-	} else {
-		vcf1000G = vcfiobio();
-		vcf1000G.openVcfUrl(this.vcf1000GUrl);
-		var refName = theVariantCard.stripRefName(window.gene.chr);
-		$("#matrix-panel .loader-label").text("Loading 1000G data");
-
-		vcf1000G.getVariants(refName, 
-							   window.gene.start, 
-					           window.gene.end, 
-					           window.gene.strand, 
-					           window.selectedTranscript,
-					           0,
-					           1,
-					           function(data) {
-	        window.vcf1000GData = data;
-	        window.vcf1000GData.features = window.vcf1000GData.features.sort(orderVariantsByPosition);
-
-			vcfExAC= vcfiobio();
-			vcfExAC.openVcfUrl(window.vcfExACUrl);
-			$("#matrix-panel .loader-label").text("Loading ExAC data");
-			vcfExAC.getVariants(refName, 
-									   window.gene.start, 
-							           window.gene.end, 
-							           window.gene.strand, 
-							           window.selectedTranscript,
-							           0,
-							           1,
-							           function(data) {
-			    window.vcfExACData = data;
-			    window.vcfExACData.features = window.vcfExACData.features.sort(orderVariantsByPosition);
-
-				$("#matrix-panel .loader-label").text("Comparing variants to population");
-			    compareVariantsToPopulation(theVcfData, window.vcf1000GData, window.vcfExACData, callback);
-			});
-
-	    });
-	}
-
-
-
+	window.compareVariantsToPedigree(theVcfData, function() {
+		$("#matrix-track .inheritance.loader").css("display", "none");
+		fillFeatureMatrix(theVcfData);
+	});
 
 }
+
+
 
 function orderVariantsByPosition(a, b) {
 	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
@@ -1407,90 +1407,6 @@ function orderVariantsByPosition(a, b) {
 	}
 }
 
-
-function compareVariantsToPopulation(theVcfData, theVcf1000GData, theVcfExACData, callback) {
-	theVcfData.features.forEach(function(variant) {
-		variant.compare1000G = null;
-		variant.compareExAC = null;
-		variant.af1000G = -1;
-		variant.afExAC= -1;		
-	});
-	theVcf1000GData.features.forEach(function(variant) {
-		variant.compare1000G = null;
-	});
-	theVcfExACData.features.forEach(function(variant) {
-		variant.compareExAC = null;
-	});
-	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
-
-    window.vcf1000G.compareVcfRecords(theVcfData, theVcf1000GData, 
-    	// This is the function that is called after all the variants have been compared
-    	// to the 1000G variant set.  In this case, we now move on to comparing the
-    	// proband variant set to the ExAC variant set.
-    	function() {
-	        window.vcfExAC.compareVcfRecords(theVcfData, theVcfExACData, 
-	        	// This is the function that is called after the variants have been compared
-	        	// to the ExAC population variant set. In this case, we have performed
-	        	// all comparisons (1000G in outer function and ExAc in this function), so we 
-	        	// can move on to building the feature matrix.
-	        	function(){
-
-	        		// Fill in the af level on each variant.  Use the af in the vcf if
-	        		// present, otherwise, use the 1000g af if present, otherwise use
-	        		// the ExAC af.
-	        		theVcfData.features.forEach(function(variant) {
-
-						afExacMap.forEach( function(rangeEntry) {
-							if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
-								variant.afexaclevel = rangeEntry.clazz;
-							}
-						});
-						af1000gMap.forEach( function(rangeEntry) {
-							if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
-								variant.af1000glevel = rangeEntry.clazz;
-							}
-						});
-
-
-					});
-
-					// Now that we have compared the variants to the population get get the allele frequency,
-					// we need to compare the proband variants to mother and father variants to determine
-					// the inheritance mode.  After this completes, we are ready to show the
-					// feature matrix.
-					$("#matrix-panel .loader-label").text("Comparing variants to family data");
-
-					window.compareVariantsToPedigree(theVcfData, callback);
-
-		        }, 
-		        // This is the attribute on variant a (proband) and variant b (ExAC)
-		        // that will store whether the variant is unique or matches.
-		        'compareExAC',
-		    	// This is the callback function called every time we find the same variant
-		    	// in both sets. Here we take the ExAC variant's af and store it in the
-		    	// proband's variant for further sorting/display in the feature matrix.
-		        function(variantA, variantB) {
-		        	variantA.afExAC = variantB.af;
-		        	if (variantA.afExAC == null || variantA.afExAC == '') {
-		        		variantA.afExAC = 0;
-		        	}
-		        });
-    	}, 
-    	// This is the attribute on variant a (proband) and variant b (1000G)
-		// that will store whether the variant is unique or matches.
-    	'compare1000G',
-    	// This is the callback function called every time we find the same variant
-    	// in both sets. Here we take the 1000G variant's af and store it in the
-    	// proband's variant for further sorting/display in the feature matrix.
-    	function(variantA, variantB) {
-    		variantA.af1000G = variantB.af;
-			if (variantA.af1000G == null || variantA.af1000G == '') {
-        		variantA.af1000G = 0;
-        	}
-
-    	});
-
-}
 
 function compareVariantsToPedigree(theVcfData, callback) {
 	theVcfData.features.forEach(function(variant) {
@@ -1568,6 +1484,10 @@ function compareVariantsToPedigree(theVcfData, callback) {
 	    	});
 	}
 
+}
+
+function setFeatureMatrixSource(theVcfData) {
+	sourceVcfData = theVcfData;
 }
 
 function fillFeatureMatrixWithClinvar(clinVars) {	
@@ -1757,7 +1677,7 @@ function fillFeatureMatrix(theVcfData) {
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = 'N';
 			} 
-			if (rawValue != null) {
+			if (rawValue != null && rawValue != "") {
 				if (matrixRow.match == 'exact') {
 					// We are going to get the mapped value through exact match,
 					// so this will involve a simple associative array lookup.

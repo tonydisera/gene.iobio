@@ -101,6 +101,10 @@ function variantD3() {
     // merge options and defaults
     options = $.extend(defaults,options);
 
+    if (verticalLayers == null) {
+      console.log("variant chart - null vertical layers");
+    }
+
     // Recalculate the height based on the number of vertical layers
     // Not sure why, but we have to bump up the layers by one; otherwise,
     // y will be negative for first layer
