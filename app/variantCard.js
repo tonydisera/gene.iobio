@@ -702,12 +702,6 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		// The user has selected a region to zoom into.  Filter the
 		// variants based on the selected region
 		if (this.isViewable()) {
-			var filteredFeatures = this.vcfData.features.filter(function(d) {
-				var inRegion = (d.start >= regionStart && d.start <= regionEnd);
-				return inRegion;
-			});
-				
-
 			var filteredVcfData = this.filterVariants();
 			if (regionStart && regionEnd)
 	  			this.fillVariantChart(filteredVcfData, regionStart, regionEnd);
@@ -770,7 +764,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 				  	else
 				  		me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 				  	if (me.getRelationship() == 'proband') {
-				  		window.cullVariantFilters();
+				  		window.enableVariantFilters(true);
 				  	}
 		   	    }
 		   	    if (callbackDataLoaded) {
@@ -905,11 +899,14 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
    	if (!bypassFeatureMatrix) {
 	   	if ( this.getRelationship() == 'proband') {
 	   		window.setFeatureMatrixSource(data);
-	   		//window.showFeatureMatrix(this, data, regionStart, regionEnd);
 	   	}
 	}
 
-	window.cullVariantFilters();
+	if (this.getRelationship() == 'proband') {
+  		window.enableInheritanceFilters(this.vcfData);
+  		window.enableClinvarFilters(this.vcfData);
+  	}
+
 
 }
 
@@ -918,12 +915,8 @@ VariantCard.prototype.showFeatureMatrix = function() {
 }
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
-	var filteredFeatures = this.vcfData.features.filter(function(d) {
-		var inRegion = (d.start >= regionStart && d.start <= regionEnd);
-		return inRegion;
-	});
-	var filteredVcfData = {features: filteredFeatures};
-	filteredVcfData = this.filterVariants(filteredVcfData);
+	var filteredVcfData = this.filterVariants(this.vcfData);
+	
 	fillFeatureMatrix(filteredVcfData);
 }
 
@@ -1080,7 +1073,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 						me.fbData.maxLevel = maxLevel + 1;
 
 						if (me.getRelationship() == 'proband') {
-				  			window.cullVariantFilters();
+				  			//window.cullVariantFilters();
 				  		}
 				  		
 						me.cardSelector.find('.vcfloader .loader-label').text("Loading chart");

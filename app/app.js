@@ -798,18 +798,22 @@ function initFilterTrack() {
 }
 
 function filterVariants() {
-	if (variantCards.length > 0) {
-  		var filteredVcfData = variantCards[0].filterVariants();
-  		variantCards[0].fillVariantChart(filteredVcfData, regionStart, regionEnd);
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.isViewable()) {
+			var filteredVcfData = variantCard.filterVariants();
+	  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 
+	  		if (variantCard.getRelationship() == 'proband') {
+	  			var filteredFBData = variantCard.filterFreebayesVariants();
+	  			if (filteredFBData != null) {
+		  			variantCard.fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
+	  			}
+	  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
+			}
+		}
 
+	});
 
-  		var filteredFBData = variantCards[0].filterFreebayesVariants();
-  		if (filteredFBData != null) {
-	  		variantCards[0].fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
-  		}
-
-	 }
 }
 
 function updateUrl(paramName, value) {
@@ -1382,6 +1386,7 @@ function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 	window.compareVariantsToPedigree(theVcfData, function() {
 		$("#matrix-track .inheritance.loader").css("display", "none");
 		fillFeatureMatrix(theVcfData);
+
 	});
 
 }
@@ -1778,7 +1783,6 @@ function fillFeatureMatrix(theVcfData) {
 	variantCards.forEach(function(variantCard) {
 		if (variantCard.getRelationship() == 'proband') {
 			variantCard.fillVariantChart(theVcfData, regionStart, regionEnd, true);
-	  		window.cullVariantFilters();
 		}
 	});
 
@@ -1864,9 +1868,38 @@ function tooltipRowNoLabel(value) {
 	}
 }
 
+function enableClinvarFilters(theVcfData) {
+	var clinvarMap = {};
+	theVcfData.features.forEach( function(variant) {
+		if (variant.clinvar != null && variant.clinvar != '' && variant.clinvar != 'none') {
+			clinvarMap[variant.clinvar] = 'Y';
+		}
+	});
+	d3.selectAll(".clinvar").each( function(d,i) {
+		var clinvar = d3.select(this).attr("id");
+		var clinvarPresent = clinvarMap[clinvar];
+		d3.select(this).classed("inactive", clinvarPresent == null);
+	});
+
+}
+
+function enableInheritanceFilters(theVcfData) {
+	var inheritanceMap = {};
+	theVcfData.features.forEach( function(variant) {
+		if (variant.inheritance != null && variant.inheritance != '' && variant.inheritance != 'none') {
+			inheritanceMap[variant.inheritance] = 'Y';
+		}
+	});
+	d3.selectAll(".inheritance").each( function(d,i) {
+		var inheritance = d3.select(this).attr("id");
+		var inheritancePresent = inheritanceMap[inheritance];
+		d3.select(this).classed("inactive", inheritancePresent == null);
+	});
+}
 
 
-function cullVariantFilters() {
+
+function enableVariantFilters(fullRefresh) {
 
 	d3.selectAll(".impact").each( function(d,i) {
 		var impact = d3.select(this).attr("id");
@@ -1898,48 +1931,39 @@ function cullVariantFilters() {
 		var count = d3.selectAll('#vcf-variants .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-	d3.selectAll(".inheritance").each( function(d,i) {
-		var inheritance = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + inheritance)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".clinvar").each( function(d,i) {
-		var clinvar = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + clinvar)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
 
 
+	if (fullRefresh) {
+		// First, move all elements out of the 'more' section
+		$('#effect-filter-box #more-effect svg').each(function() {
+	    	$(this).insertBefore($('#effect-filter-box #more-effect-link'));
+	    });
+	    // Now move only inactive elements into the 'more section'
+	    $('#effect-filter-box .inactive').each(function() {
+	    	$(this).prependTo($('#effect-filter-box #more-effect'));
+	    });
+	    // If we have more that 6 active elements, keep the
+	    // first 6 where they are and move the remaining to the 
+	    // 'more' section.  If we 6 or less active elements,
+	    // just hide the 'more' link.
+	    var allCount = d3.selectAll("#effect-filter-box .effectCategory")[0].length;
+	    var inactiveCount = d3.selectAll("#effect-filter-box .effectCategory.inactive")[0].length;
+	    var activeCount = allCount - inactiveCount;
+	    if (activeCount >= 4) {
+	    	$('#effect-filter-box #more-effect-link').removeClass('hide');
+	    	// Keep six active elements where they are.  The remainder should go in the 
+	    	// 'more' section
+	    	var activeElements = $('#effect-filter-box > .effectCategory');
+	    	for (var i = 4; i < activeCount; i++) {
+	    		var activeElement = activeElements[i];
+	    		$('#effect-filter-box #more-effect').append($(activeElement));
+	    	}
 
-	// First, move all elements out of the 'more' section
-	$('#effect-filter-box #more-effect svg').each(function() {
-    	$(this).insertBefore($('#effect-filter-box #more-effect-link'));
-    });
-    // Now move only inactive elements into the 'more section'
-    $('#effect-filter-box .inactive').each(function() {
-    	$(this).prependTo($('#effect-filter-box #more-effect'));
-    });
-    // If we have more that 6 active elements, keep the
-    // first 6 where they are and move the remaining to the 
-    // 'more' section.  If we 6 or less active elements,
-    // just hide the 'more' link.
-    var allCount = d3.selectAll("#effect-filter-box .effectCategory")[0].length;
-    var inactiveCount = d3.selectAll("#effect-filter-box .effectCategory.inactive")[0].length;
-    var activeCount = allCount - inactiveCount;
-    if (activeCount >= 4) {
-    	$('#effect-filter-box #more-effect-link').removeClass('hide');
-    	// Keep six active elements where they are.  The remainder should go in the 
-    	// 'more' section
-    	var activeElements = $('#effect-filter-box > .effectCategory');
-    	for (var i = 4; i < activeCount; i++) {
-    		var activeElement = activeElements[i];
-    		$('#effect-filter-box #more-effect').append($(activeElement));
-    	}
+	    } else {
+	    	$('#effect-filter-box #more-effect-link').addClass('hide');
 
-    } else {
-    	$('#effect-filter-box #more-effect-link').addClass('hide');
-
-    }
+	    }
+	}
 }
 
 function toggleMatrixCheckbox(element) {
