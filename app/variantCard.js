@@ -78,7 +78,11 @@ VariantCard.prototype.highlightVariants = function(variants) {
 		    .filter( function(d,i) {
 		     	var found = false;
 		     	variants.forEach(function(variant) {
-			        if (d.start == variant.start && d.end == variant.end && d.type == variant.type) {
+			        if (d.start == variant.start 
+			        	&& d.end == variant.end 
+			        	&& d.ref == variant.ref 
+			        	&& d.alt == variant.alt 
+			        	&& d.type.toLowerCase() == variant.type.toLowerCase()) {
 			          found = true;
 			        } 
 		     	});
@@ -92,7 +96,11 @@ VariantCard.prototype.highlightVariants = function(variants) {
 		    .filter( function(d,i) {
 		     	var found = false;
 		     	variants.forEach(function(variant) {
-			        if (d.start == variant.start && d.end == variant.end && d.type == variant.type) {
+			        if (d.start == variant.start 
+			        	&& d.end == variant.end 
+			        	&& d.ref == variant.ref 
+			        	&& d.alt == variant.alt 
+			        	&& d.type.toLowerCase() == variant.type.toLowerCase()) {
 			          found = true;
 			        } 
 		     	});
@@ -186,10 +194,16 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    	if (me.bamData) {
 							me.bamDepthChart.showCircle()(d.start);
 				    	}
+				    	if (me.getRelationship() == 'proband') {
+				    		window.showCircleRelatedVariants(d);
+				    	}
 					})
 					.on('d3mouseout', function() {
 						if (me.bamData){
 							me.bamDepthChart.hideCircle()();
+						}
+						if (me.getRelationship() == 'proband') {
+							window.hideCircleRelatedVariants();
 						}
 					});
 
@@ -467,6 +481,20 @@ VariantCard.prototype.getName = function() {
 
 VariantCard.prototype.getRelationship = function() {
 	return this.relationship;
+}
+
+VariantCard.prototype.showVariantCircle = function(variant) {
+	if (this.vcfChart != null) {
+		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
+		this.vcfChart.showCircle()(variant, container);
+	}
+}
+
+VariantCard.prototype.hideVariantCircle = function(variant) {
+	if (this.vcfChart != null) {
+		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
+		this.vcfChart.hideCircle()(container);
+	}
 }
 
 /* 

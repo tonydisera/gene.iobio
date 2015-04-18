@@ -395,9 +395,9 @@ function init() {
 					    .rowLabelWidth(100)
 					    .tooltipHTML(variantTooltipHTML)
 					    .on('d3click', function(variant) {
-					    	if (variantCards.length > 0) {
-						    	variantCards[0].highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
-					    	}
+					    	variantCards.forEach(function(variantCard) {
+					    		variantCard.highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
+					    	});
 					    })
 					     .on('d3mouseover', function(variant) {
 					    })
@@ -1370,6 +1370,23 @@ function loadNextVariantCard(variantCards, index) {
 			probandVariantCard.showFeatureMatrix();
 		}
 	}
+}
+
+function showCircleRelatedVariants(variant) {
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.getRelationship() != 'proband' && variantCard.isViewable()) {
+			variantCard.showVariantCircle(variant);
+		}
+	});
+
+}
+
+function hideCircleRelatedVariants() {
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.getRelationship() != 'proband' && variantCard.isViewable()) {
+			variantCard.hideVariantCircle();
+		}
+	});
 }
 
 function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
