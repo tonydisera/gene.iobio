@@ -1188,6 +1188,25 @@ var effectCategories = [
     var features1 = variants1.features;
     var features2 = variants2.features;
 
+    // Ignore duplicates on proband
+    for (var i =0; i < features1.length - 1; i++) {
+      var variant = features1[i];
+      var nextVariant = features1[i+1];
+      if (i == 0) {
+        variant.dup = false;
+      }
+      nextVariant.dup = false;
+
+      if (variant.start == nextVariant.start) {
+           var refAlt = variant.type.toLowerCase() + ' ' + variant.ref + "->" + variant.alt;
+           var nextRefAlt = nextVariant.type.toLowerCase() + ' ' + nextVariant.ref + "->" + nextVariant.alt;
+
+           if (refAlt == nextRefAlt) {
+              nextVariant.dup = true;
+           }
+      }
+
+    }
 
 
     // Iterate through the variants from the first set,
@@ -1196,36 +1215,44 @@ var effectCategories = [
     while (idx1 < features1.length && idx2 < features2.length) {
       variant1 = features1[idx1];
       variant2 = features2[idx2];
-      var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
-      var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
 
-      if (variant1.start == variant2.start) {
+      if (variant1.dup) {
+        idx1++;
+      } else {
+        var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
+        var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
 
-        if (refAlt1 == refAlt2) {
-          variant1[comparisonAttribute] =  commonLabel;
-          variant2[comparisonAttribute] =  commonLabel;
+        if (variant1.start == variant2.start) {
 
-          if (onMatchCallback) {
-            onMatchCallback(variant1, variant2);
+          if (refAlt1 == refAlt2) {
+            variant1[comparisonAttribute] =  commonLabel;
+            variant2[comparisonAttribute] =  commonLabel;
+
+            if (onMatchCallback) {
+              onMatchCallback(variant1, variant2);
+            }
+            idx1++;
+            idx2++;
+          } else if (refAlt1 < refAlt2) {
+            variant1[comparisonAttribute] = set1Label;
+            idx1++;
+          } else {
+            variant2[comparisonAttribute] = set2Label;
+            idx2++;
           }
-          idx1++;
-          idx2++;
-        } else if (refAlt1 < refAlt2) {
+        } else if (variant1.start < variant2.start) {
           variant1[comparisonAttribute] = set1Label;
           idx1++;
-        } else {
+        } else if (variant2.start < variant1.start) {
           variant2[comparisonAttribute] = set2Label;
           idx2++;
         }
-      } else if (variant1.start < variant2.start) {
-        variant1[comparisonAttribute] = set1Label;
-        idx1++;
-      } else if (variant2.start < variant1.start) {
-        variant2[comparisonAttribute] = set2Label;
-        idx2++;
+
       }
 
-    }
+
+      }
+
 
     // If we get to the end of one set before the other,
     // mark the remaining as unique
