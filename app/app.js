@@ -453,6 +453,7 @@ function init() {
 function onCollapseTranscriptPanel() {
 	transcriptCollapse = !transcriptCollapse;
 	d3.select('#track-section').style("padding-top", transcriptCollapse ? transcriptPanelHeight + "px" : "89" + "px");
+	d3.select('#transcript-dropdown-button').classed("hide", !transcriptCollapse);
 
 }
 

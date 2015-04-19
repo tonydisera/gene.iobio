@@ -258,6 +258,17 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 			me.callVariants.apply(me, []);
 		});
 
+		this.cardSelector.find('#shrink-button').on('click', function() {
+			me.shrinkCard(true);
+		});
+		this.cardSelector.find('#expand-button').on('click', function() {
+			me.shrinkCard(false);
+		});
+		this.cardSelector.find('#minimize-button').on('click', function() {
+			me.minimizeCard(true);
+		});
+
+
 	}
 
 
@@ -425,15 +436,13 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 		title = 'Sample';
 	}
 
-	var cache = this.cardSelector.find('#variant-link').children();
-   	this.cardSelector.find('#variant-link').text(title).append(cache);
-
+   	this.cardSelector.find('#card-relationship-label').text(title);
    	this.cardSelector.find('#variant-card-label').text(dataSourceName);
 
 
-   	this.cardSelector.find('#variant-link').attr("aria-expanded", true);
-   	this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
-   	this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
+   	//this.cardSelector.find('#variant-link').attr("aria-expanded", true);
+   	//this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
+   	//this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
 
 
 }
@@ -495,6 +504,28 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
 		this.vcfChart.hideCircle()(container);
 	}
+}
+
+VariantCard.prototype.shrinkCard = function(shrink) {
+
+	this.minimizeCard(false);
+	this.d3CardSelector.select('#button-find-missing-variants').classed("hide", shrink);
+	this.d3CardSelector.select('#variant-right-labels').classed("hide", shrink);
+	this.d3CardSelector.select('#vcf-chart-label').classed("hide", shrink);
+	this.d3CardSelector.select('#variant-right-labels').classed("hide", shrink);
+
+	this.d3CardSelector.select('#zoom-region-chart').classed("hide", shrink);
+	this.d3CardSelector.select('#bam-track').classed("hide", shrink);
+
+}
+
+VariantCard.prototype.minimizeCard = function(minimize) {
+	this.d3CardSelector.select('#button-find-missing-variants').classed("hide", minimize);
+	this.d3CardSelector.select('#variant-right-labels').classed("hide", minimize);
+	this.d3CardSelector.select('#vcf-chart-label').classed("hide", minimize);
+	this.d3CardSelector.select('#variant-right-labels').classed("hide", minimize);
+
+	this.d3CardSelector.select('#variant-panel-' + this.cardIndex).classed("hide", minimize);
 }
 
 /* 

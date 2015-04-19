@@ -87,13 +87,12 @@
 
 
           <div style="text-align:center;margin-top: 6px">
-            <a id="variant-link"  class="card-label"  data-toggle="collapse"  href="#variant-panel" 
-               aria-expanded="false" style="float:left;text-align:left;width:134px;margin-top:-2px;">
+            <span id="card-relationship-label"  class="card-label" style="float:left;text-align:left;width:90px;margin-top:-2px;">
               Sample
-              <span class="caret"></span>
-            </a>
+            </span>
+                        
+            <span class="card-label" id="variant-card-label" style="float: left;margin-left: 5px;margin-top:-2px;"></span>
 
-            <span class="card-label" id="variant-card-label" style="float: left;margin-left: 10px;margin-top:-2px;"></span>
 
             <button id="button-find-missing-variants"                       
               class="btn btn-raised btn-default icon-button-sm"> 
@@ -104,7 +103,17 @@
             <div class="variant-count badge" id="vcf-count" style="display: none; margin-right: 130px;">
             </div>
 
-            <div style="float:right">
+            <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+              <i class="mdi-content-remove"></i>
+            </a>
+            <a href="javascript:void(0)" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
+              <i class="mdi-image-crop-7-5"></i>
+            </a>
+            <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+              <i class="mdi-image-crop-din"></i>
+            </a>
+
+            <div id="variant-right-labels" style="float:right">
               <a id="af-link" class="hide"  
                 data-toggle="collapse" 
                 style="font-size: 12px;vertical-align: top;padding-right:20px" 
@@ -119,6 +128,7 @@
                 data source info
               </a>
             </div>
+
           </div>
           
           <div class="loader vcfloader">
@@ -142,7 +152,7 @@
    
             
 
-          <div id="variant-panel" class="collapse in" aria-expanded="true" style="clear:both;">
+          <div id="variant-panel" style="clear:both;">
  
             <div id="vcf-track" class="track hide" >
                      
