@@ -400,8 +400,14 @@ function init() {
 					    	});
 					    })
 					     .on('d3mouseover', function(variant) {
+					    	variantCards.forEach(function(variantCard) {
+					    		variantCard.showVariantCircle(variant);
+					    	});
 					    })
 					    .on('d3mouseout', function() {
+					    	variantCards.forEach(function(variantCard) {
+					    		variantCard.hideVariantCircle();
+					    	});
 					    })
 					    .on('d3rowup', function(i) {
 					    	var column = null;
@@ -1795,7 +1801,7 @@ function fillFeatureMatrix(theVcfData) {
 	featureMatrix.matrixRows(matrixRows);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);  
 
-    this.featureMatrix(selection);
+    this.featureMatrix(selection, {showColumnLabels: false});
 
     // We have new properties to filter on, so refresh the proband variant chart.
 	variantCards.forEach(function(variantCard) {

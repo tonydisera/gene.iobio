@@ -37,8 +37,14 @@ function featureMatrixD3() {
     selection.each(function(data) {
       // Calculate height of matrix
       height = matrixRowNames.length * cellSize;   
-      height += margin.top + margin.bottom + columnLabelHeight;
-      var innerHeight = height - margin.top - margin.bottom - columnLabelHeight;
+      height += margin.top + margin.bottom;
+      if (options.showColumnLabels) {
+        height += columnLabelHeight;
+      }
+      var innerHeight = height - margin.top - margin.bottom;
+      if (options.showColumnLabels) {
+        innerHeight -= columnLabelHeight;
+      } 
 
       width = data.length * cellSize;   
       width += margin.left + margin.right + rowLabelWidth;
@@ -92,59 +98,51 @@ function featureMatrixD3() {
 
       // Generate the column headers
       svg.selectAll("g.colhdr").remove();
-      var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
-        .enter()
-        .append("g")
-        .attr("class", "colhdr")
-        .attr("transform",  "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")");
+        if (options.showColumnLabels) {
+        var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
+          .enter()
+          .append("g")
+          .attr("class", "colhdr")
+          .attr("transform",  "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")");
 
-      var colhdrs = colhdrGroup.selectAll('.colhdr').data(data);
-      colhdrs.enter().append('g')
-          .attr('class', 'colhdr')
-          .attr('transform', function(d,i) { 
-            return "translate(" + (x.rangeBand() * (i+1)) + ",0)";
-          })
-          .append("text")
-          .style("text-anchor", "start")
-          .attr("dx", ".8em")
-          .attr("dy", ".15em")
-          .attr("transform", function(d) {
-            return "rotate(-65)" ;
-          })
-          .text( function(d) {  return d.type + " " + d.start + " " + d.ref + "->" + d.alt });
+        var colhdrs = colhdrGroup.selectAll('.colhdr').data(data);
+        colhdrs.enter().append('g')
+            .attr('class', 'colhdr')
+            .attr('transform', function(d,i) { 
+              return "translate(" + (x.rangeBand() * (i+1)) + ",0)";
+            })
+            .append("text")
+            .style("text-anchor", "start")
+            .attr("dx", ".8em")
+            .attr("dy", ".15em")
+            .attr("transform", function(d) {
+              return "rotate(-65)" ;
+            })
+            .text( function(d) {  return d.type + " " + d.start + " " + d.ref + "->" + d.alt });
+
+      }
 
 
-
-
+      var translate = "translate(" + rowLabelWidth + ",";
+      if (options.showColumnLabels) {
+        translate += (+columnLabelHeight - cellSize) + ")";
+      } else {
+        translate += "-30)"
+      }
       svg.selectAll("g.group").remove();
       var g =  svg.selectAll("g.group").data([data])
         .enter()
         .append("g")
         .attr("class", "group")
-        .attr("transform",  "translate(" + rowLabelWidth + "," + (+columnLabelHeight - cellSize) + ")");
+        .attr("transform",  translate);
 
-
-      // Create the X-axis at the top.  This will show the labels for the columns 
-      //svg.selectAll(".x.axis").remove();    
-      //svg.selectAll("g.x").data([data]).enter()
-      //    .append("g")
-      //    .attr("class", "x axis")
-      //    .attr("transform", "translate(" + (+rowLabelWidth + d3.round(cellSize/2)) + "," + columnLabelHeight + ")")
-      //    .call(xAxis)
-      //    .selectAll("text")
-      //    .style("text-anchor", "start")
-      //    .attr("dx", ".8em")
-      //    .attr("dy", ".15em")
-      //    .attr("transform", function(d) {
-      //      return "rotate(-65)" ;
-      //    }); 
 
       // Create the y-axis at the top.  This will show the labels for the rows 
       svg.selectAll(".y.axis").remove();    
       svg.selectAll("g.y").data([matrixRowNames]).enter()
           .append("g")
           .attr("class", "y axis")
-          .attr("transform", "translate(1," + columnLabelHeight + ")")
+          .attr("transform", "translate(1," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
           .call(yAxis)
           .selectAll("text")
           .style("text-anchor", "start")

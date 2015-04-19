@@ -350,7 +350,7 @@
       </div>
 
       <!-- zygosity -->
-      <div style="width: 75px;float: left;">
+      <div style="width: 85px;float: left;">
             <svg id="zygosity-scheme" width="60" height="15" transform="translate(0,0)" class="">
               <text class="name" x="0" y="10">Zygosity</text>
             </svg>
@@ -370,12 +370,7 @@
             </svg>
       </div>
 
-    </div>
-
-    <div>
-
-      <!-- allele frequency-->
-      <div style="clear:both;padding-top:10px">
+      <!-- allele frequency-->      
         <div style="float:left;width:120px">
            <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
             <text class="name" x="0" y="10">Allele Frequency</text>
@@ -533,13 +528,23 @@
           </svg>
 
       </div>
+
     </div>
+
+    <div>
 
     <!-- Last row in filter panel -->
     <div style="clear:both; margin-bottom:4px;">
 
-        <!-- allele freq range -->
-          <div style="float:left">
+           <!-- coverage -->  
+          <div style="float:left;" >
+            <span style="font-size:11px;">Coverage (min)</span>
+            <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;">
+            X
+          </div>
+
+         <!-- allele freq range -->
+          <div style="float:left;padding-left:150px">
             <input  type="text"  id="af-amount-start" value="0"                           
             style="width:40px;font-size: 11px;"/>
             -
@@ -548,13 +553,6 @@
             %
           </div>
             
-           <!-- coverage -->  
-          <div style="float:right;" >
-            <span style="font-size:11px;">Coverage (min)</span>
-            <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;">
-            X
-          </div>
-          <div style="clear:both;"></div>
     </div>
 
   </script>
@@ -701,7 +699,7 @@
                     <img src="assets/images/loading-squares.gif"/>
                 </div>
 
-              <div id="feature-matrix" style="overflow-x: auto;max-width: 740px;">
+              <div id="feature-matrix" style="overflow-x: auto;max-width: 640px;">
               </div>
             </div> 
         </div>
