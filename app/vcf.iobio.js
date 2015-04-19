@@ -1178,40 +1178,40 @@ var effectCategories = [
     }
 
     variants1.count = variants1.features.length;
-
     variants2.count = variants2.features.length;
-
-
-    var idx1 = 0;
-    var idx2 = 0;
 
     var features1 = variants1.features;
     var features2 = variants2.features;
 
-    // Ignore duplicates on proband
-    for (var i =0; i < features1.length - 1; i++) {
-      var variant = features1[i];
-      var nextVariant = features1[i+1];
-      if (i == 0) {
-        variant.dup = false;
+    // Flag duplicates as this will throw off comparisons
+    var ignoreDups = function(features) {
+      for (var i =0; i < features.length - 1; i++) {
+        var variant = features[i];
+        var nextVariant = features[i+1];
+        if (i == 0) {
+          variant.dup = false;
+        }
+        nextVariant.dup = false;
+
+        if (variant.start == nextVariant.start) {
+             var refAlt = variant.type.toLowerCase() + ' ' + variant.ref + "->" + variant.alt;
+             var nextRefAlt = nextVariant.type.toLowerCase() + ' ' + nextVariant.ref + "->" + nextVariant.alt;
+
+             if (refAlt == nextRefAlt) {
+                nextVariant.dup = true;
+             }
+        }
       }
-      nextVariant.dup = false;
-
-      if (variant.start == nextVariant.start) {
-           var refAlt = variant.type.toLowerCase() + ' ' + variant.ref + "->" + variant.alt;
-           var nextRefAlt = nextVariant.type.toLowerCase() + ' ' + nextVariant.ref + "->" + nextVariant.alt;
-
-           if (refAlt == nextRefAlt) {
-              nextVariant.dup = true;
-           }
-      }
-
     }
+    ignoreDups(features1);
+    ignoreDups(features2);
 
 
     // Iterate through the variants from the first set,
     // marking the consensus field based on whether a 
     // matching variant from the second list is encountered.
+    var idx1 = 0;
+    var idx2 = 0;
     while (idx1 < features1.length && idx2 < features2.length) {
       variant1 = features1[idx1];
       variant2 = features2[idx2];
