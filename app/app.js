@@ -993,6 +993,10 @@ function loadGeneWidget() {
 		    	moveDataSourcesButton();
 		    	
 		    	window.selectedTranscript = null;
+		    	// Set all of the variant cards as "dirty"
+		    	variantCards.forEach(function(variantCard) {
+		    		variantCard.setDirty();
+		    	});
 		    	loadTracksForGene();
 		    	// add gene to url params
 		    	updateUrl('gene', window.gene.gene_name);

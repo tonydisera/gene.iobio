@@ -83,7 +83,7 @@ lineD3 = function module() {
       circle.transition()
             .duration(200)
             .style("opacity", 1);
-      circle.attr("cx", mousex + margin.left)
+      circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top );
               
     }

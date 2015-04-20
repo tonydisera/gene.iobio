@@ -645,7 +645,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		// the read converage.
 		var refName = this.getBamRefName(window.gene.chr);
 	 	this.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, 
-	 		1000, 
+	 		0, 
 	 		function(data) {
 	 			if (data == null) {
 	 				return;
@@ -695,6 +695,10 @@ VariantCard.prototype.getBamDepthAtPos = function(pos) {
 
 VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 	if (this.isViewable()) {
+		// Reduce down to 1000 points
+		var factor = d3.round(data.length / 1000);
+        var reducedData = this.bam.reducePoints(data, factor, function(d) {return d[0]}, function(d) {return d[1]});
+
 		this.cardSelector.find("#bam-track .loader").css("display", "none");
 	    this.cardSelector.find('#bam-name-' + this.cardIndex).removeClass("hide");		
 		this.cardSelector.find('#bam-depth').removeClass("hide");
@@ -703,7 +707,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		this.bamDepthChart.xStart(regionStart);
 		this.bamDepthChart.xEnd(regionEnd);
 
-		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(data));		
+		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
