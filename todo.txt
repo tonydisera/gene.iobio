@@ -17,10 +17,6 @@ Filters:
 
 - Affected/Unaffected status on datasources dialog
 
-- When variant selected in Feature matrix, need to highlight area or variant for non-proband variant cards
-
-- Show transcript (exons) in variant card by default (before zoom); show in the middle of coverage area chart with transparency
-
 - When zoomed into a small region, there is a cliff on the borders of the zoomed region for the coverage chart
   (most likely caused by code that is summarizing data points)
 
@@ -33,19 +29,13 @@ Filters:
 blockers
 -----------
 
-- Freebayes - deletes not filtering out 
-
 - datasources dialog bugs - 
    - Safari only: relationship dropdown is open and won't close
 
 - Big genes kill browser session (robo1)
 
-
 - Switching to diff color scheme doesn't refresh fb variants.  
   FB variants not in feature matrix. (this should also result in inheritance and af data being updated on fb variants)
-
-
-- ClinVar service
 
 - Additional rows in matrix for 
 	1. 'Proband only polymorphism'. This would be any variant that is present in the proband as either a heterozygous or homozygous alternate, but is homozygous reference in all other samples - just the parents in this case.
@@ -67,9 +57,6 @@ critical
 
 less critical
 -------------
-- When clicking on an impact, the filter panel rects are also set to opacity .1
-
-- position is off on bam chart, need to keep non-summarized data to display actual coverage
 
 - remove af histogram and server call, replace with calculated frequencies from af data (after injected from 1000g, ExAC data) 
 
@@ -79,8 +66,6 @@ less critical
 can wait
 -----------
 - Use annotatation END= instead of calculated len?  are long variants rendering correctly?
-
-- How to send bam header along with data to freebayes?
 
 - Use she-bang on iobio snpEffServer.js
 

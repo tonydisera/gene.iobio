@@ -510,10 +510,7 @@ function variantD3() {
           .attr("class", "circle")
           .attr("cx", 0)
           .attr("cy", 0)
-          .attr("r", 6)
-          .style("fill", "none")
-          .style("stroke", "red")               
-          .style("stroke-width", "2")               
+          .attr("r", 6)                    
           .style("opacity", 0);
       
       // add a arrow on the x-axis
@@ -525,18 +522,13 @@ function variantD3() {
       garrow.append('polygon')
           .attr("class", "arrow")
           .attr("points", "0,8 4,2 8,8")
-          .style("fill", "red")
-          .style("stroke", "red")               
-          .style("stroke-width", "1")               
           .style("opacity", 0);
       garrow.append('line')
-          .attr("class", "arrow")
+          .attr("class", "arrow arrow-line")
           .attr("x1", 4)
           .attr("x2", 4)
           .attr("y1", 8)
           .attr("y2", 50)
-          .style("stroke", "red")               
-          .style("stroke-width", "2")
           .style("opacity", 0);      
 
       

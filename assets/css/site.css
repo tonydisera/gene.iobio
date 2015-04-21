@@ -366,11 +366,9 @@ section {
   text-align: center;
   margin-bottom: 0px;
   padding-bottom: 0px;
-  margin-right: 100px;
+  margin-right: 300px;
   color: rgb(132, 132, 132);
-/*  color: #6898A8 !important; */
   font-size: 14px;
-    
 }
 #gene-name {
   color: #6898A8;
@@ -473,7 +471,7 @@ section {
 .variant-card .vcfloader {
     text-align: center;
     margin-top: 0px !important;
-    margin-right: 260px;
+    margin-left: 320px;
     display:none;
 }
 
@@ -674,13 +672,18 @@ header {
     margin-top: 10px; 
 }
 
-#bam-depth .circle {
-  stroke:  #DB5A43;
+#bam-depth .circle, #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
+  stroke:  #E73F22;
   fill: none;
   stroke-width: 2;
 }
+#vcf-variants .arrow, #fb-variants .arrow {
+  fill: #E73F22;
+  stroke-width: 2;
+  stroke: #E73F22;
+}
 #bam-depth .circle-label {
-   fill: #DB5A43;
+   fill: #E73F22;
    font-size: 10px;
    font-weight: bold;
 }
@@ -840,10 +843,10 @@ header {
 }
 
 .impact_HIGH{
-  fill: #ad494A !important;
+  fill: #E0292B !important;
 } 
 .impact_MODERATE{
-  fill: #D6616b !important;
+  fill: #F49A73 !important;
 } 
 .impact_MODIFIER{
   fill: rgba(231, 186, 82, 0.6);

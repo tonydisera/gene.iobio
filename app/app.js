@@ -549,7 +549,7 @@ function loadUrlSources() {
 						var cardIndex = 0;
 						Object.keys(dsname).forEach(function(idx) {
 							$('#card-index').val(cardIndex);
-							$('#datasource-name').val(dsname[idx]);
+							$('#datasource-name').val(decodeURI(dsname[idx]));
 							setDataSourceName();
 							cardIndex++;
 						});
@@ -1383,10 +1383,13 @@ function loadNextVariantCard(variantCards, index) {
 	}
 }
 
-function showCircleRelatedVariants(variant) {
+function showCircleRelatedVariants(variant, sourceVariantCard) {
 	variantCards.forEach( function(variantCard) {
-		if (variantCard.getRelationship() != 'proband' && variantCard.isViewable()) {
-			variantCard.showVariantCircle(variant);
+		if (variantCard.isViewable()) {
+			variantCard.hideVariantCircle();
+			if (sourceVariantCard == null || sourceVariantCard != variantCard) {
+				variantCard.showVariantCircle(variant);
+			}
 		}
 	});
 
@@ -1866,8 +1869,8 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Zygosity', variant.zygosity == "gt_unknown" ? "(No genotype)" : variant.zygosity)
 		+ tooltipRow('GMAF', variant.gMaf)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('AF ExAC', variant.afExAC)
-		+ tooltipRow('AF 1000G', variant.af1000G)
+		+ tooltipRow('AF ExAC', variant.afExAC, true)
+		+ tooltipRow('AF 1000G', variant.af1000G, true)
 		+ tooltipRow('ClinVar uid', variant.clinVarUid)
 		// + tooltipRow('ClinVar #', variant.clinVarAccession)
 		// + tooltipRow('NCBI ID', variant.ncbiId)

@@ -194,9 +194,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    	if (me.bamData) {
 							me.bamDepthChart.showCircle()(d.start);
 				    	}
-				    	if (me.getRelationship() == 'proband') {
-				    		window.showCircleRelatedVariants(d);
-				    	}
+				    	window.showCircleRelatedVariants(d, me);
 					})
 					.on('d3mouseout', function() {
 						if (me.bamData){
@@ -1058,10 +1056,14 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 			// Parse string into records
 			var fbRecs = [];
+			var contigHdrRecFound = false;
 			var recs = data.split("\n");
 			recs.forEach( function(rec) {
+				if (rec.indexOf("##contig") == 0) {
+					contigHdrRecFound = true;
+				}
 				// We need to inject in the contig header for downstream servers to function properly
-				if (rec.indexOf("#CHROM") == 0) {
+				if (rec.indexOf("#CHROM") == 0 && !contigHdrRecFound) {
 					fbRecs.push("##contig=<ID=" + refName + ">");
 				}
 				fbRecs.push(rec);
@@ -1197,6 +1199,11 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 
 	var data = dataToFilter ? dataToFilter : this.vcfData;
 
+	if ($('#afexac-scheme').attr('class').indexOf("current") >= 0) {
+		afField = "afExAC";
+	} else {
+		afField = "af1000G";
+	}
 
 	var afLowerVal = null;
 	var afUpperVal = null;
@@ -1218,15 +1225,22 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		}
 
 		var meetsAf = false;
-		if (d.af == -1) {
-			meetsAf = true;
+		// Treat null and blank af as 0
+		if (d[afField] == null || d[afField] == '') {
+			variantAf = 0;
 		} else {
-			if (afLowerVal != null && afUpperVal != null) {
-				meetsAf =  (d.af >= afLowerVal && d.af <= afUpperVal);
-			} else {
-				meetsAf = true;
-			}
+			variantAf = d[afField];
 		}
+		if (afLowerVal != null && afUpperVal != null) {
+			if (afLowerVal <= 0 && afUpperVal == 1) {
+				meetsAf = true;
+			} else {
+				meetsAf =  (variantAf >= afLowerVal && variantAf <= afUpperVal);
+			}
+		} else {
+			meetsAf = true;
+		}
+
 		// TODO:  If combinedDepth not provided, access bam data to determine coverage for this
 		// region of variant
 		var meetsCoverage = true;
