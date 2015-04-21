@@ -596,6 +596,11 @@ VariantCard.prototype.onBrush = function(brush) {
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
 
+		this.cardSelector.find('#vcf-track').removeClass("hide");
+		this.cardSelector.find('#vcf-variants').css("display", "block");
+		this.cardSelector.find(".vcfloader").css("display", "none");
+		this.cardSelector.find('#vcf-name').removeClass("hide");		
+
 	//} else {
 		// Treat a click as a region selection on the entire gene region.
 		// That way, we won't recall the variants and re-read the bam and
@@ -1260,11 +1265,7 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		// region of variant
 		var meetsCoverage = true;
 		if (coverageMin) {
-			if (d.depth)
-				meetsCoverage = d.depth >= coverageMin;
-			else {
-				meetsCoverage = me.getBamDepthAtPos(d.start) >= coverageMin;
-			}
+			meetsCoverage = me.getBamDepthAtPos(d.start) >= coverageMin;
 		}
 
 		// Iterate through the clicked annotations for each variant. The variant

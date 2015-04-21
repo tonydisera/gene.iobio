@@ -1,14 +1,16 @@
--Make sure clinvar updates FB variants and that FB variants are in feature matrix
+- Make sure clinvar updates FB variants and that FB variants are in feature matrix
+
+- How to deal with comparisons on multi-allelic genotypes
+
+- Inject #contig in header for afserver (for remote files)
 
 
 From Tuesday March 24th Meeting
 -------------------------------------------
-- Filtering by decimal points in af doesn't work.
 
 - After zooming in, "cliff" created in coverate chart (due to averaing?)
 
 Filters:
- - AF text input range should support 4 decimal precision
  - Use a different AF glyph, use stroke, no fill when AF not present
  - Coverage should filter on GT coverage; if not present, filter on BAM coverage
  - Display applied filters in variant card (by badge pf cpimt_d )
