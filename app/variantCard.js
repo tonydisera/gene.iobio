@@ -1077,7 +1077,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				me.cardSelector.find(".vcfloader .loader-label").text("Annotating variants with snpEFF in realtime")
 
 				// Annotate the fb variants
-				me.vcf.annotateVcfRecords(fbRecs, window.gene.start, window.gene.end, 
+				me.vcf.annotateVcfRecords(fbRecs, refName, window.gene.start, window.gene.end, 
 					window.gene.strand, window.selectedTranscript, function(data){
 
 				   	data.features.forEach( function(feature) {

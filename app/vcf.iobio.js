@@ -514,7 +514,7 @@ var effectCategories = [
 
         var allRecs = headerRecords.concat(records);
 
-        me.annotateVcfRecords(allRecs, regionStart, regionEnd, regionStrand, 
+        me.annotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, 
           selectedTranscript, callback, callbackClinvar);
 
 
@@ -616,7 +616,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports.annotateVcfRecords = function(records, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar) {
+  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar) {
     var me = this;
 
 
@@ -624,7 +624,7 @@ var effectCategories = [
     // For each vcf records, call snpEff to get the annotations.
     // Each vcf record returned will have an EFF field in the 
     // info field.
-    me._annotateVcfRegion(records, function(annotatedData) {
+    me._annotateVcfRegion(records, refName,function(annotatedData) {
 
       var annotatedRecs = annotatedData.split("\n");
       var vcfObjects = [];
@@ -757,7 +757,7 @@ var effectCategories = [
 
 
   // NEW
-  exports._annotateVcfRegion = function(records, callback, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, callback, callbackClinvar) {
 
       // open connection to iobio webservice that will request this data, since connections can only be opened from browser
       var me = this;
@@ -789,10 +789,15 @@ var effectCategories = [
       });
 
 
-      var client = BinaryClient(afServer);
-      var afUrl = encodeURI( afServer + '?cmd= ' + encodeURIComponent(snpEffUrl));
-     
+      if (refName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + refName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+      }       
+      var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(snpEffUrl) );
+      var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
+      var client = BinaryClient(afServer);
       var buffer = "";
       client.on('open', function(){
         //var stream = client.createStream({event:'run', params : {'url':afUrl}});
@@ -822,64 +827,6 @@ var effectCategories = [
 
 
      
-
-  }
-
-    // NEW
-  exports._annotateVcfRegionOrig = function(records, callback) {
-
-      // open connection to iobio webservice that will request this data, since connections can only be opened from browser
-      var me = this;
-      var connectionID = this._makeid();
-      var clientSnpEff = BinaryClient(afServer + '?id=', {'connectionID' : connectionID} );
-      clientSnpEff.on('open', function(stream){
-        var stream = clientSnpEff.createStream({event:'setID', 'connectionID':connectionID});
-        stream.end();
-      })
-
-      
-      var snpEffUrl = encodeURI( afServer + "?protocol=websocket&cmd=" + encodeURIComponent("http://client?&id="+connectionID));
-
-      //
-      // stream the vcf records to snpEffClient
-      //
-      clientSnpEff.on("stream", function(stream) {
-
-        records.forEach( function(record) {
-          stream.write(record + "\n");
-        });
-
-        stream.end();
-
-      });
-      
-      clientSnpEff.on("error", function(error) {
-        console.log("error while streaming vcf records " + error);
-      });
-
-     
-      var buffer = "";
-      clientSnpEff.on('open', function(){
-        //var stream = client.createStream({event:'run', params : {'url':afUrl}});
-        var stream = clientSnpEff.createStream({event:'run', params : {'url':snpEffUrl}});
-        
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('data', function(data, options) {
-           if (data == undefined) {
-              return;
-           } 
-           buffer = buffer + data;
-        });
-
-        // Whem all of the annotated vcf data has been returned, call
-        // the callback function.
-        stream.on('end', function() {
-          callback(buffer);
-        });
-        
-      });
 
   }
 
