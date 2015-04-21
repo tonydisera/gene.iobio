@@ -1174,45 +1174,47 @@ var effectCategories = [
     var idx1 = 0;
     var idx2 = 0;
     while (idx1 < features1.length && idx2 < features2.length) {
+      // Bypass duplicates
+      if (features1[idx1].dup) {
+        idx1++;
+      }
+      if (features2[idx2].dup) {
+        idx2++;
+      }
+
       variant1 = features1[idx1];
       variant2 = features2[idx2];
+      
+      var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
+      var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
 
-      if (variant1.dup) {
-        idx1++;
-      } else {
-        var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
-        var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
+      if (variant1.start == variant2.start) {
 
-        if (variant1.start == variant2.start) {
+        if (refAlt1 == refAlt2) {
+          variant1[comparisonAttribute] =  commonLabel;
+          variant2[comparisonAttribute] =  commonLabel;
 
-          if (refAlt1 == refAlt2) {
-            variant1[comparisonAttribute] =  commonLabel;
-            variant2[comparisonAttribute] =  commonLabel;
-
-            if (onMatchCallback) {
-              onMatchCallback(variant1, variant2);
-            }
-            idx1++;
-            idx2++;
-          } else if (refAlt1 < refAlt2) {
-            variant1[comparisonAttribute] = set1Label;
-            idx1++;
-          } else {
-            variant2[comparisonAttribute] = set2Label;
-            idx2++;
+          if (onMatchCallback) {
+            onMatchCallback(variant1, variant2);
           }
-        } else if (variant1.start < variant2.start) {
+          idx1++;
+          idx2++;
+        } else if (refAlt1 < refAlt2) {
           variant1[comparisonAttribute] = set1Label;
           idx1++;
-        } else if (variant2.start < variant1.start) {
+        } else {
           variant2[comparisonAttribute] = set2Label;
           idx2++;
         }
-
+      } else if (variant1.start < variant2.start) {
+        variant1[comparisonAttribute] = set1Label;
+        idx1++;
+      } else if (variant2.start < variant1.start) {
+        variant2[comparisonAttribute] = set2Label;
+        idx2++;
       }
 
-
-      }
+    }
 
 
     // If we get to the end of one set before the other,
