@@ -665,6 +665,8 @@ var Bam = Class.extend({
             stream.on('end', function() {
                if (samData != "") {
                  me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
+               } else {
+                 callback([]);
                }
             });
 
