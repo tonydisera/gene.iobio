@@ -494,10 +494,23 @@ var effectCategories = [
     var headerRecords = [];
     vcfReader.getHeader( function(header) {
        headerRecords = header.split("\n");
+
     });
 
     // Get the vcf records for this region
     vcfReader.getRecords(refName, regionStart, regionEnd, function(records) {
+        // Make sure #contig header rec is present
+        var contigHdrRecFound = false;
+        headerRecords.forEach(function(record) {
+              if (record.indexOf("##contig") == 0) {
+                contigHdrRecFound = true;
+              }
+              // We need to inject in the contig header for downstream servers to function properly
+              if (record.indexOf("#CHROM") == 0 && !contigHdrRecFound) {
+                headerRecords.push("##contig=<ID=" + refName + ">");
+              }
+        });
+
 
         var allRecs = headerRecords.concat(records);
 
@@ -554,15 +567,16 @@ var effectCategories = [
            annotatedData += data;
         });
 
-        // Whem all of the annotated vcf data has been returned, call
+        // Whenall of the annotated vcf data has been returned, call
         // the callback function.
         stream.on('end', function() {
           var annotatedRecs = annotatedData.split("\n");
           var vcfObjects = [];
+          var contigHdrRecFound = false;
 
           annotatedRecs.forEach(function(record) {
             if (record.charAt(0) == "#") {
-              // Bypass header
+              // bypass header rec
             } else {
 
               // Parse the vcf record into its fields
