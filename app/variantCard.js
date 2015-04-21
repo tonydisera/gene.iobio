@@ -546,9 +546,22 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 			this.zoomRegionChart.regionStart(+window.gene.start);
 			this.zoomRegionChart.regionEnd(+window.gene.end);
 			this.zoomRegionChart(selection);
-		}
 
-//		$("#feature-matrix").addClass("hide");
+		}
+		this.cardSelector.find('#bam-depth').addClass("hide");
+		this.cardSelector.find('#bam-chart-label').addClass("hide");
+		this.cardSelector.find('#button-find-missing-variants').css("visibility", "hidden");
+
+
+		this.cardSelector.find('#vcf-track').removeClass("hide");
+		this.cardSelector.find('#vcf-variants').css("display", "none");
+		this.cardSelector.find('#vcf-chart-label').addClass("hide");
+		this.cardSelector.find('#vcf-count').css("display", "none");		
+		this.cardSelector.find(".vcfloader").css("display", "block");
+		this.cardSelector.find('#vcf-name').addClass("hide");		
+		this.cardSelector.find('.vcfloader .loader-label').text("Loading Data for " + window.gene.gene_name)
+
+		$("#feature-matrix").addClass("hide");
 
 
 		// Load the read coverage and variant charts.  If a bam hasn't been
@@ -701,6 +714,8 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 	    this.cardSelector.find('#bam-name-' + this.cardIndex).removeClass("hide");		
 		this.cardSelector.find('#bam-depth').removeClass("hide");
 		this.cardSelector.find('#bam-chart-label').removeClass("hide");
+		this.cardSelector.find('#button-find-missing-variants').css("visibility", "visible");
+
 
 		this.bamDepthChart.xStart(regionStart);
 		this.bamDepthChart.xEnd(regionEnd);
