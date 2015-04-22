@@ -1,40 +1,35 @@
+Blockers
+-----------------------------------------------------------
 - Make sure clinvar updates FB variants and that FB variants are in feature matrix
 
-- How to deal with comparisons on multi-allelic genotypes
-
 - Inject #contig in header for afserver (for remote files)
-
-
-From Tuesday March 24th Meeting
--------------------------------------------
-
-- After zooming in, "cliff" created in coverate chart (due to averaing?)
-
-Filters:
- - Use a different AF glyph, use stroke, no fill when AF not present
- - Coverage should filter on GT coverage; if not present, filter on BAM coverage
- - Display applied filters in variant card (by badge pf cpimt_d )
-
-- Mode of inheritance - dominant (present in affected, cannot be present in unaffected)
-
-- Affected/Unaffected status on datasources dialog
-
-- When zoomed into a small region, there is a cliff on the borders of the zoomed region for the coverage chart
-  (most likely caused by code that is summarizing data points)
-
-- Add Variant Prioritization (VVP)
-
-- Sift and PolyPhen
-
-
-
-blockers
------------
 
 - datasources dialog bugs - 
    - Safari only: relationship dropdown is open and won't close
 
 - Big genes kill browser session (robo1)
+
+- How to deal with comparisons on multi-allelic genotypes
+
+- After zooming in, "cliff" created in coverate chart (due to averaing?)
+
+- Display applied filters in variant card (by badge)
+
+- When zoomed into a small region, there is a cliff on the borders of the zoomed region for the coverage chart
+  (most likely caused by code that is summarizing data points)
+
+
+important
+-------------------------------------------
+
+- Mode of inheritance - dominant (present in affected, cannot be present in unaffected)
+
+- Affected/Unaffected status on datasources dialog
+
+
+- Add Variant Prioritization (VVP)
+
+- Sift and PolyPhen
 
 - Switching to diff color scheme doesn't refresh fb variants.  
   FB variants not in feature matrix. (this should also result in inheritance and af data being updated on fb variants)
@@ -45,6 +40,7 @@ blockers
 	2. 'Proband only homozygous' would be a homozygous alternate site in the proband, where all other samples show homozygous reference or are heterozygous.
 
 - When url entered doesn't load bam/vcf, need to send error message insteading of staying 'in progress' with loading message
+
 
 
 critical

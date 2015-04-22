@@ -1866,6 +1866,7 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Phenotype', phenotypeDisplay)
 		+ tooltipRow('Qual', variant.qual) 
 		+ tooltipRow('Filter', variant.filter) 
+		+ tooltipRow('Depth (VCF)', variant.genotypeDepth) 
 		+ tooltipRow('Zygosity', variant.zygosity == "gt_unknown" ? "(No genotype)" : variant.zygosity)
 		+ tooltipRow('GMAF', variant.gMaf)
 		+ tooltipRow('Inheritance',  variant.inheritance)

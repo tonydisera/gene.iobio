@@ -153,10 +153,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: 10, right: 4, bottom: 0, left: 4})
+				    .margin({top: 20, right: 4, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .showBrush(false)
-				    .trackHeight(12)
+				    .trackHeight(16)
 				    .cdsHeight(12)
 		    		.showLabel(false);
 
@@ -394,33 +394,42 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 
 }
 
-VariantCard.prototype.discoverVcfRefName = function(callback) {
-	// TODO:  This became deprecated when Chase introduced this
-	// logic to determine ref name in vcf.iobio class.  
-	// Clean up code by removing placied where this method is
-	// invoked.
-	this.getVcfRefName = this.getRefName;
-	callback();
-}
 
-VariantCard.prototype.discoverBamRefName = function(callback) {
+VariantCard.prototype.discoverVcfRefName = function(callback) {
 	var me = this;
-	if (this.getBamRefName != null) {
+	if (this.getVcfRefName != null) {
 		callback();
 	}
-	if (!this.bam.isFile()) {
+	if (this.vcf.isFile()) {
+		this.vcf.getReferenceNames(function(refNames) {
+			refNames.forEach( function(refName) {
+	    		if (me.getVcfRefName == null) {
+			 		if (refName == window.gene.chr) {
+			 			me.getVcfRefName = me.getRefName;
+				    	callback();
+			 		} else if (refName == me.stripRefName(gene.chr)) {
+			 			me.getVcfRefName = me.stripRefName;
+			 			callback();
+			 		}
+				}
+	    	});
+
+		});
+
+	} else {
 
 		this.vcf.loadRemoteIndex(null, function(refData) {
 	    	refData.forEach( function(ref) {
 	    		if (me.getVcfRefName == null) {
 			 		if (ref.name == window.gene.chr) {
 			 			me.getVcfRefName = me.getRefName;
+			 			callback();
 			 		} else if (ref.name == me.stripRefName(gene.chr)) {
 			 			me.getVcfRefName = me.stripRefName;
+			 			callback();
 			 		}
 				}
 	    	});
-	    	return callback();
     	});
 	} 
 }
@@ -587,7 +596,16 @@ VariantCard.prototype.onBrush = function(brush) {
 
 		//this.cardSelector.find('#bam-track').css("margin-top", "-70px");
 
-	    var selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
+		// Filter the gene model to only show 'features' in selected region
+		var filteredTranscript =  $.extend({}, window.selectedTranscript);
+		filteredTranscript.features = window.selectedTranscript.features.filter(function(d) {
+			  var inRegion = (d.start >= regionStart && d.start <= regionEnd)
+                             || (d.end >= regionStart && d.end <= regionEnd) ;
+              return inRegion;
+
+		});
+
+	    var selection = this.d3CardSelector.select("#zoom-region-chart").datum([filteredTranscript]);
 		this.zoomRegionChart.regionStart(!brush.empty() ? regionStart : window.gene.start);
 		this.zoomRegionChart.regionEnd(!brush.empty() ? regionEnd : window.gene.end);
 		this.zoomRegionChart(selection);
@@ -1265,7 +1283,11 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		// region of variant
 		var meetsCoverage = true;
 		if (coverageMin) {
-			meetsCoverage = me.getBamDepthAtPos(d.start) >= coverageMin;
+			if (d.genotypeDepth != null && d.genotypeDepth != '') {
+				meetsCoverage = d.genotypeDepth >= coverageMin;
+			} else {
+				meetsCoverage = me.getBamDepthAtPos(d.start) >= coverageMin;
+			}
 		}
 
 		// Iterate through the clicked annotations for each variant. The variant

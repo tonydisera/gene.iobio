@@ -220,7 +220,15 @@ function geneD3() {
       
 
       transcript.selectAll(".reference").remove();
-      transcript.selectAll('.reference').data(function(d) { return [[d.start, d.end]] })
+      transcript.selectAll('.reference')
+        .data(function(d) { 
+          if (regionStart && regionEnd) {
+            return [[regionStart,regionEnd]];
+          } else {
+            return [[d.start, d.end]] 
+
+          }
+        })
         .enter().append('line')
           .attr('class', 'reference')
           .attr('x1', function(d) { return d3.round(x(d[0]))})
@@ -265,8 +273,12 @@ function geneD3() {
           .attr('class', 'arrow')
           .attr('d', centerArrow);      
       
-      transcript.selectAll('.utr').data(function(d) { 
-        return d['features'].filter( function(d) { var ft = d.feature_type.toLowerCase(); return ft == 'utr' || ft == 'cds';}) 
+      transcript.selectAll('.transcript rect').data(function(d) { 
+        return d['features'].filter( function(d) { 
+          var ft = d.feature_type.toLowerCase(); 
+          
+          return  (ft == 'utr' || ft == 'cds');
+        }) 
       }).enter().append('rect')
           .attr('class', function(d) { return d.feature_type.toLowerCase();})          
           .attr('rx', borderRadius)
@@ -302,8 +314,7 @@ function geneD3() {
            })
           
 
-      // exit
-      transcript.exit().remove();
+    
 
       // update 
       transcript.transition()

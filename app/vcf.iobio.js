@@ -596,7 +596,7 @@ var effectCategories = [
 
               // Turn vcf record into a JSON object and add it to an array
               var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                               'qual': qual, 'filter': filter, 'info': info, 'genotypes': genotypes};
+                               'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
               vcfObjects.push(vcfObject);
             }
           });
@@ -652,7 +652,7 @@ var effectCategories = [
 
           // Turn vcf record into a JSON object and add it to an array
           var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                           'qual': qual, 'filter': filter, 'info': info, 'genotypes': genotypes};
+                           'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
       }, 
@@ -849,6 +849,9 @@ var effectCategories = [
       var variants = [];
       variants.length = 0;
 
+
+
+
       vcfRecs.forEach(function(rec) {
         if (rec.pos && rec.id) {
           var alts = [];
@@ -870,7 +873,14 @@ var effectCategories = [
             }
             var end = +rec.pos + len;
 
-          
+            // Determine the format of the genotype fields
+            var gtTokens = {};
+            var idx = 0;
+            var tokens = rec.format.split(":");
+            tokens.forEach(function(token) {
+              gtTokens[token] = idx;
+              idx++;
+            })
 
 
             // Parse the svtype and snpEff annotations from the info field
@@ -965,28 +975,40 @@ var effectCategories = [
 
             // Parse genotypes
             var genotypes = [];
+            var genotypeDepths = [];
             rec.genotypes.forEach(function(genotype) {
               if (genotype == ".") {
 
               } else {
                 var tokens = genotype.split(":");
-                genotypes.push(tokens[0]);
+                gtIndex = gtTokens["GT"];
+                genotypes.push(tokens[gtIndex]);
+
+                gtDepthIndex = gtTokens["DP"];
+                if (gtDepthIndex) {
+                  genotypeDepths.push(tokens[gtDepthIndex]);
+                } else {
+                  genotypeDepths.push(null);
+                }
               }
             });
 
             var gtNumber = altIdx + 1;
             var genotypeForAlt = null;
+            var genotypeDepth = null;
             var zygosity = null;
             var phased = null;
             //TODO: Need to send in which sample we are evaluating
             // For now, just loop through until we find a genotype for
             // this alt
+            var x = 0;
             genotypes.forEach(function(gt) {
               if (gt.indexOf(gtNumber) >= 0) {
-                  genotypeForAlt = gt;                
+                  genotypeForAlt = gt;  
+                  genotypeDepth = genotypeDepths[x];              
               }
+              x++;
             });
-
             if (genotypeForAlt) {
               var delim = null;
               if (genotypeForAlt.indexOf("|") > 0) {
@@ -1016,6 +1038,7 @@ var effectCategories = [
               'af': af, 'combinedDepth': combinedDepth,             
               'genotypes': genotypes, 
               'genotypeForAlt': genotypeForAlt, 
+              'genotypeDepth' : genotypeDepth,
               'zygosity': zygosity ? zygosity : 'gt_unknown', 
               'phased': phased,
               'effect': effects, 
