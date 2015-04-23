@@ -9,18 +9,19 @@ Blockers
 
 - Big genes kill browser session (robo1)
 
-- How to deal with comparisons on multi-allelic genotypes
+- Some genes (with weird transcripts?) do nothing
 
-- After zooming in, "cliff" created in coverate chart (due to averaing?)
+- feature matrix sizing (wider than screen)
 
-- Display applied filters in variant card (by badge)
-
-- When zoomed into a small region, there is a cliff on the borders of the zoomed region for the coverage chart
-  (most likely caused by code that is summarizing data points)
 
 
 important
 -------------------------------------------
+- Display applied filters in variant card (by badge)
+
+- Display missing variants count in separate badge
+
+- How to deal with comparisons on multi-allelic genotypes
 
 - Mode of inheritance - dominant (present in affected, cannot be present in unaffected)
 
@@ -68,6 +69,8 @@ can wait
 - Use she-bang on iobio snpEffServer.js
 
 - Investigate memory usage java snpEffServer 
+
+- When zooming into region, transcript chart in variant card still hanging onto features (cds, utr) outside of region.
 
 
 

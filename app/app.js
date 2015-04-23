@@ -1405,6 +1405,10 @@ function hideCircleRelatedVariants() {
 
 function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
 
+	var windowWidth = $(window).width();
+	var filterPanelWidth = $('#filter-track').width();
+	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+
 	$("#matrix-panel .loader").css("display", "block");
 	$("#feature-matrix").addClass("hide");
 
