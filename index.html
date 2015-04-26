@@ -172,8 +172,37 @@
                         
             <span class="card-label" id="variant-card-label" style="float: left;margin-left: 5px;margin-top:-2px;"></span>
 
-            <div class="variant-count badge" id="vcf-count" style="display: none; margin-right: -130px;">
-            </div>
+            <ul class="nav nav-pills hide" id="variant-badges" style="float:left;margin-left:30px;margin-top:-2px">
+              <li>
+                <a href="javascript:void(0)"  style="padding-top:0px">
+                    Variants
+                    <span id="vcf-variant-count" class="badge"></span>
+                </a>
+              </li>
+
+              <li>
+                <a href="javascript:void(0)" id="button-find-missing-variants" style="padding-top:0px">
+                    <i class="mdi-action-find-in-page"></i>
+                    <span id="missing-variant-count-label">Find missing variants</span>
+                    <span id="missing-variant-count" class="badge"></span>
+                </a>
+              </li>
+              <li style="padding-left:10px;" >
+                    <span id="effectCategory-flag" class="filter-flag hide label label-primary">Effect</span>
+                    <span id="impact-flag"class="filter-flag hide label label-primary">Impact</span>
+                    <span id="type-flag" class="filter-flag hide label label-primary">Type</span>
+                    <span id="zygosity-flag" class="filter-flag hide label label-primary">Zygosity</span>
+                    <span id="afexaclevel-flag" class="filter-flag hide label label-primary">AF ExAC</span>
+                    <span id="af1000glevel-flag" class="filter-flag hide label label-primary">AF 1000G</span>
+                    <span id="inheritance-flag" class="filter-flag hide label label-primary">Inheritance</span>
+                    <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
+                    <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
+                    <span id="region-flag" class="hide label label-info">Zoom into region</span>
+                    <span id="displayed-variant-count" class="badge hide"></span>
+              </li>
+
+           </ul>
+
 
             <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
               <i class="mdi-content-remove"></i>
@@ -201,11 +230,6 @@
               </a>
             </div>
 
-            <button id="button-find-missing-variants"                       
-              class="btn btn-raised btn-default icon-button-sm"> 
-              <i class="mdi-action-find-in-page"></i>
-                Call missing variants
-            </button>
 
 
           </div>

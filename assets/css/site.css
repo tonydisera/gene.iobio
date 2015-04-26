@@ -472,7 +472,6 @@ section {
 .variant-card .vcfloader {
     text-align: center;
     margin-top: 0px !important;
-    margin-left: 320px;
     display:none;
 }
 
@@ -1087,7 +1086,7 @@ header {
 }
 
 #button-find-missing-variants {
-  float: right;
+  /*float: right;
   font-size: 12px;
   margin-top: -2px;
   margin-right: 20px;
@@ -1095,7 +1094,7 @@ header {
   padding-bottom: 2px;
   padding-left: 4px;
   padding-right: 4px;
-  line-height: 22px;
+  line-height: 22px;*/
 }
 
 #bloodhound .typeahead { 

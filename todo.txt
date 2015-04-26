@@ -3,14 +3,14 @@ Quick must have fixes
 - Clin var filters: split out likely pathogenic, likely benign
 - Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
 - Transcript dropdown gets munged.
-
 - Display missing variants count in separate badge
 
 Blockers
 -----------------------------------------------------------
-- Make sure clinvar updates FB variants and that FB variants are in feature matrix
+- Sam pileup stream gets truncated when concurrent streams.
 
-- Inject #contig in header for afserver (for remote files)
+ - VCF coverage (in genotype field) isn't matching circled bam depth on
+   platinum data sets
 
 - Big genes kill browser session (robo1)
 
@@ -21,8 +21,7 @@ Blockers
 - take out extra x-axis when both bam and vcf are shown in variant card
 
 
- - VCF coverage (in genotype field) isn't matching circled bam depth on
-   platinum data sets
+- Inject #contig in header for afserver (for remote files)
 
 
 important
