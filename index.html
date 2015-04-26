@@ -90,7 +90,7 @@
               <div class="btn-toolbar" style="width: 100px;">
                 <div class="btn-group" style="display:inline;margin-top: 15px;">
 
-                    <button type="button"
+                    <button type="button" style="width:80px"
                     class="icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                       Alignments
                       <span class="caret"></span>
@@ -126,7 +126,7 @@
                 <div class="btn-toolbar" style="width: 100px;">
                   <div class="btn-group" style="display:  inline;margin-top: 15px;">
 
-                    <button type="button" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <button type="button" style="width:80px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                       Variants<span class="caret"></span>
                     </button>
 
@@ -193,7 +193,7 @@
                 aria-expanded="false" aria-controls="collapseExample">
                 Allele Frequency
               </a>
-              <a id="vcf-file-info-link"   
+              <a id="vcf-file-info-link"   class="hide"
                 data-toggle="collapse" 
                 style="font-size: 12px;vertical-align: top;margin-top: 0px;padding-right:20px" 
                 href="#vcf-file-info" aria-expanded="false" >
@@ -648,7 +648,7 @@
     	<section id="app-title-section">
     	   <a id='home' href="/"><span class="iobioapp">gene</span><span class="iobio">.iobio</span></a>
             <span id="bloodhound">
-                <input class="typeahead shadow-z-1" style="margin-top: 10px" type="text" placeholder="Enter Gene Name">
+                <input class="typeahead" style="margin-top: 10px" type="text" placeholder="Enter Gene Name">
             </span>
 
              <button id="datasource-button"
@@ -665,7 +665,7 @@
       <div id="transcript-card" class="shadow-z-1 hide" style="background:white;padding-top:10px;">
         <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;width:130px">GENE</span>
 
-        <span style="float:right;margin-right:10px">
+        <span style="float:right;margin-right:14px">
           <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
             <i class="mdi-content-remove"></i>
           </a>
@@ -747,7 +747,7 @@
           </div>
 
 
-          <div id="proband-data" style="float:left;margin-right:20px;width:32%">
+          <div id="proband-data" style="float:left;margin-right:20px;width:60%">
             <input id="card-index" class="hide" value="0" type="text">
             <input id="datasource-relationship" class="hide" value="proband" type="text"/>
           </div>
@@ -762,6 +762,12 @@
             <input id="datasource-relationship" class="hide" value="father" type="text"/>
           </div>
 
+          <div class="fullview" style="clear:both;text-align:center;width: 100%;">
+            <button id="ok-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised">
+              <i class="mdi-action-done"></i>
+              Done
+            </button>
+          </div>
 
 
         </div>

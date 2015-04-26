@@ -521,6 +521,9 @@ function initDataCard() {
 	dataCardSelector.find('#minimize-button').on('click', function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
+	dataCardSelector.find('#ok-button').on('click', function() {
+		dataCardSelector.find('.fullview').addClass("hide");
+	});
 
 }
 
@@ -535,9 +538,11 @@ function toggleSampleTrio(show) {
 	if (show) {
 		$('#mother-data').removeClass("hide");
 		$('#father-data').removeClass("hide");
+		$('#proband-data').css("width", "32%");
 	} else {
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
+		$('#proband-data').css("width", "60%");
 	}
 
 
@@ -765,9 +770,11 @@ function initTranscriptControls() {
 	var transcriptCardSelector = $('#transcript-card');
 	transcriptCardSelector.find('#expand-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').removeClass("hide");
+		transcriptCardSelector.find('#gene-name').css("margin-left", "0");
 	});
 	transcriptCardSelector.find('#minimize-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').addClass("hide");
+		transcriptCardSelector.find('#gene-name').css("margin-left", "190px");
 	});
 
 
@@ -1982,8 +1989,14 @@ function fillFeatureMatrixWithClinvar2(clinvarObjects) {
 }
 
 function fillFeatureMatrix(theVcfData) {
+	var windowWidth = $(window).width();
+	var filterPanelWidth = $('#filter-track').width();
+	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+	
 	// Set the width so that scrolling works properly
 	$('#feature-matrix').css('min-width', $('#matrix-panel').width());
+
+
 
 	if (theVcfData != null) {
 		featureVcfData = {};
