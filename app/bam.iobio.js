@@ -603,6 +603,11 @@ var Bam = Class.extend({
    },
 
    getCoverageForRegion: function(refName, start, end, maxPoints, callback) {
+     this._getCoverageForRegionImpl(refName, start, end, maxPoints, callback);
+   },
+
+   getCoverageForRegionChunked: function(refName, start, end, maxPoints, callback) {
+      console.log("getCoverage for region " + refName + " " + start + "-" + end);
       var me = this;
       var chunkSize = 50000;
 
@@ -652,6 +657,8 @@ var Bam = Class.extend({
         var client = BinaryClient(me.iobio.samtools);
         
         var samData = "";
+        var samRecs = [];
+        var parseByLine = false;
         client.on('open', function(stream){
             var stream = client.createStream({event:'run', params : {'url':url}});
 
@@ -659,15 +666,28 @@ var Bam = Class.extend({
                if (data == undefined) {
                 return; 
                } 
-               samData += data;
+               if (parseByLine) {
+                  var fields = data.split('\t');
+                  var pos   = fields[1];
+                  var depth = fields[3];
+                  if (pos && depth) {
+                    samRecs.push( {'pos': +pos, 'depth': +depth});
+                  }
+               } else {
+                 samData += data;
+             }
             });
 
             stream.on('end', function() {
-               if (samData != "") {
-                 me._parseSamPileupRecords(samData, start, end, maxPoints, callback);
-               } else {
-                 callback([]);
-               }
+              if (parseByLine) {
+                me._parseSamPileupRecords(null, samRecs, start, end, maxPoints, callback);
+              } else {
+                 if (samData != "") {
+                   me._parseSamPileupRecords(samData, null, start, end, maxPoints, callback);
+                  } else {
+                  callback([]);
+                }
+              }
             });
 
             stream.on("error", function(error) {
@@ -679,18 +699,21 @@ var Bam = Class.extend({
    },
 
       // NEW
-   _parseSamPileupRecords: function(data, start, end, maxPoints, callback) {
+   _parseSamPileupRecords: function(data, samRecs, start, end, maxPoints, callback) {
       var me = this;
-      var samRecs = [];
-      var lines = data.split('\n');
-      lines.forEach(function(line) {
-        var fields = line.split('\t');
-        var pos   = fields[1];
-        var depth = fields[3];
-        if (pos && depth) {
-          samRecs.push( {'pos': +pos, 'depth': +depth});
-        }
-      });
+      if (samRecs == null) {
+        samRecs = [];
+        var lines = data.split('\n');
+        lines.forEach(function(line) {
+          var fields = line.split('\t');
+          var pos   = fields[1];
+          var depth = fields[3];
+          if (pos && depth) {
+            samRecs.push( {'pos': +pos, 'depth': +depth});
+          }
+        });
+        console.log("parsing samtools pileup recs " + lines.length + "  " + samRecs[0].pos + " - " + samRecs[samRecs.length-1].pos);
+      }
 
       var baseCoverage = [];
       baseCoverage.length = 0;  

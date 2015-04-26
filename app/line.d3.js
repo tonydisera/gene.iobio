@@ -83,7 +83,7 @@ lineD3 = function module() {
       circle.transition()
             .duration(200)
             .style("opacity", 1);
-      circle.attr("cx", mousex + margin.left + 2)
+      circle.attr("cx", mousex + margin.left - 2)
             .attr("cy", mousey + margin.top );
               
     }
@@ -238,10 +238,11 @@ lineD3 = function module() {
 
         
       x = d3.scale.linear()
-          .range([0, width - margin.left - margin.right]);
+          .range([0, width]);
 
+      var innerHeight = height - margin.top - margin.bottom;
       y = d3.scale.linear()
-          .range([height - margin.top, 0]);
+          .range([height, 0]);
 
 
       if (xStart && xEnd) {

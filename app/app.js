@@ -16,6 +16,7 @@ var gene_engine = new Bloodhound({
 // the variant filter panel
 var trackLegendTemplate = Handlebars.compile($('#track-legend-template').html());	
 var variantCardTemplate = Handlebars.compile($('#variant-card-template').html());
+var sampleDataTemplate  = Handlebars.compile($('#sample-data-template').html());
 
 // A view finder, showing a single transcript which
 // is a union of all transcripts.  This chart
@@ -35,6 +36,7 @@ var regionEnd = null;
 
 // Transcript data and chart
 var gene = '';
+var loadedUrl = false;
 var selectedTranscript = null;
 var transcriptChart =  null;
 var transcriptViewMode = "single";
@@ -286,6 +288,16 @@ var formatRegion = d3.format(",");
 
 // variant card
 var variantCards = [];
+var variantCardDefaultUrls = {
+	proband: 'http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz',
+	mother:  'http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz',
+	father:  'http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz'
+};
+var variantCardDefaultBamUrls = {
+	proband: 'http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam',
+	mother: 'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam',
+	father: 'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam'
+};
 
 // The smaller the region, the wider we can
 // make the rect of each variant
@@ -309,30 +321,15 @@ function init() {
 
     $.material.init();
 
-    $('#filter-panel').html(trackLegendTemplate());
+    // Iniitalize the 'samples' data card.
+    initDataCard();
+	
 
+	// Set up the gene search widget
 	loadGeneWidget();
 	$('#bloodhound .typeahead').focus();
 
-	// listen for enter key on af amount input range
-	$('#af-amount-start').on('keydown', function() {
-		if(event.keyCode == 13) {
-			filterVariants();
-	    }
-	});
-	$('#af-amount-end').on('keydown', function() {
-		if(event.keyCode == 13) {
-			filterVariants();
-	    }
-	});
-	// listen for enter key on min coverage
-	$('#coverage-min').on('keydown', function() {
-		if(event.keyCode == 13) {
-			filterVariants();
-	    }
-	});
 
-	
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
@@ -444,6 +441,16 @@ function init() {
 
 					    });
 
+	var matrixCardSelector = $('#matrix-track');
+	matrixCardSelector.find('#expand-button').on('click', function() {
+		matrixCardSelector.find('.fullview').removeClass("hide");
+	});
+	matrixCardSelector.find('#minimize-button').on('click', function() {
+		matrixCardSelector.find('.fullview').addClass("hide");
+	});
+
+
+
 	// Initialize variant legend
 	initFilterTrack();
 
@@ -452,8 +459,69 @@ function init() {
 
 	initDataSourceDialog();
 
-	// Autoload data specified in url
-	loadUrlSources();	
+	loadGeneFromUrl();
+}
+
+
+function initDataCard() {
+
+	var listenToEvents = function(panelSelector) {
+	    panelSelector.find('#datasource-name').on('change', function() {
+	    	setDataSourceName(panelSelector); 
+	    });
+
+	    panelSelector.find('#bam-url-input').on('change', function() {
+	    	onBamUrlEntered(panelSelector);
+	    });
+	    panelSelector.find('#display-bam-url-item').on('click', function() {
+	    	displayBamUrlBox(panelSelector);
+	    });
+	    panelSelector.find('#bam-file-selector-item').on('click', function() {
+	    	onBamFileButtonClicked(panelSelector);
+	    });
+	    panelSelector.find('#bam-file-upload').on('change', function() {
+	    	onBamFilesSelected(event, panelSelector);
+	    });
+	    panelSelector.find('#url-input').on('change', function() {
+	    	onVcfUrlEntered(panelSelector);
+	    });
+	    panelSelector.find('#display-vcf-url-item').on('click', function() {
+	    	displayUrlBox(panelSelector);
+	    });
+	    panelSelector.find('#vcf-file-selector-item').on('click', function() {
+	    	onVcfFileButtonClicked(panelSelector);
+	    });
+	    panelSelector.find('#vcf-file-upload').on('change', function() {
+	    	onVcfFilesSelected(event, panelSelector);
+	    });
+	}
+
+	$('#proband-data').append(sampleDataTemplate());
+	listenToEvents($('#proband-data'));
+	addVariantCard();
+	setDataSourceRelationship($('#proband-data'));
+
+
+	$('#mother-data').append(sampleDataTemplate());
+	$('#mother-data #sample-data-label').text("MOTHER");
+	listenToEvents($('#mother-data'));
+	addVariantCard();
+	setDataSourceRelationship($('#mother-data'));
+
+	$('#father-data').append(sampleDataTemplate());
+	$('#father-data #sample-data-label').text("FATHER");
+	listenToEvents($('#father-data'));
+	addVariantCard();
+	setDataSourceRelationship($('#father-data'));
+
+	var dataCardSelector = $('#data-card');
+	dataCardSelector.find('#expand-button').on('click', function() {
+		dataCardSelector.find('.fullview').removeClass("hide");
+	});
+	dataCardSelector.find('#minimize-button').on('click', function() {
+		dataCardSelector.find('.fullview').addClass("hide");
+	});
+
 }
 
 function onCollapseTranscriptPanel() {
@@ -462,6 +530,19 @@ function onCollapseTranscriptPanel() {
 	d3.select('#transcript-dropdown-button').classed("hide", !transcriptCollapse);
 
 }
+
+function toggleSampleTrio(show) {
+	if (show) {
+		$('#mother-data').removeClass("hide");
+		$('#father-data').removeClass("hide");
+	} else {
+		$('#mother-data').addClass("hide");
+		$('#father-data').addClass("hide");
+	}
+
+
+}
+
 
 function initDataSourceDialog() {
 	// listen for data sources open event
@@ -476,7 +557,63 @@ function moveDataSourcesButton() {
 	$('#datasource-button').css('visibility', 'visible');
 }
 
+function loadGeneFromUrl() {
+	var gene = getUrlParameter('gene');
+	if (gene != undefined) {
+		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+	}
+}
+
 function loadUrlSources() {
+	loadTracksForGene(true);
+
+	// get all bam and vcf url params in hash
+	var bam  = getUrlParameter(/bam*/);
+	var vcf  = getUrlParameter(/vcf*/);	
+	var rel  = getUrlParameter(/rel*/);
+	var dsname = getUrlParameter(/name*/);	
+
+	if ((bam != null && Object.keys(bam).length > 1) || (vcf != null && Object.keys(vcf).length > 1)) {
+		toggleSampleTrio(true);
+	} 
+
+	if (bam != null) {
+		Object.keys(bam).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
+			onBamUrlEntered(panelSelector);
+		});
+	}
+	if (vcf != null) {
+		Object.keys(vcf).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			panelSelector.find('#url-input').val(vcf[urlParameter]);
+			onVcfUrlEntered(panelSelector);
+		});
+	}
+	if (dsname != null) {
+		Object.keys(dsname).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(4);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			panelSelector.find('#datasource-name').val(dsname[urlParameter]);
+			setDataSourceName(panelSelector);
+		});
+
+	}
+
+
+}
+
+
+function loadUrlSourcesOrig() {
 	var gene = getUrlParameter('gene');
 	if (gene != undefined) {
 		// move data source button
@@ -624,6 +761,16 @@ function initDataSourceFields() {
 
 function initTranscriptControls() {
 
+
+	var transcriptCardSelector = $('#transcript-card');
+	transcriptCardSelector.find('#expand-button').on('click', function() {
+		transcriptCardSelector.find('.fullview').removeClass("hide");
+	});
+	transcriptCardSelector.find('#minimize-button').on('click', function() {
+		transcriptCardSelector.find('.fullview').addClass("hide");
+	});
+
+
 	$('#transcript-btn-group').data('open', false);
 
 	$('#transcript-dropdown-button').click(function () {
@@ -684,6 +831,39 @@ function clearFilters() {
 
 
 function initFilterTrack() {
+
+	// Init panel based on handlebards template
+	$('#filter-panel').html(trackLegendTemplate());
+
+	var filterCardSelector = $('#filter-track');
+	filterCardSelector.find('#expand-button').on('click', function() {
+		filterCardSelector.find('.fullview').removeClass("hide");
+		filterCardSelector.css('min-width', "615px");
+	});
+	filterCardSelector.find('#minimize-button').on('click', function() {
+		filterCardSelector.find('.fullview').addClass("hide");
+		filterCardSelector.css('min-width', "185px");
+	});
+
+
+
+	// listen for enter key on af amount input range
+	$('#af-amount-start').on('keydown', function() {
+		if(event.keyCode == 13) {
+			filterVariants();
+	    }
+	});
+	$('#af-amount-end').on('keydown', function() {
+		if(event.keyCode == 13) {
+			filterVariants();
+	    }
+	});
+	// listen for enter key on min coverage
+	$('#coverage-min').on('keydown', function() {
+		if(event.keyCode == 13) {
+			filterVariants();
+	    }
+	});
 
 
 	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar")
@@ -972,7 +1152,15 @@ function loadGeneWidget() {
 	  source: gene_engine.ttAdapter()
 	});
 	
-	typeahead.on('typeahead:selected',function(evt,data){		
+	typeahead.on('typeahead:selected',function(evt,data){	
+
+		// Ignore second event triggered by loading gene widget from url parameter
+		if (data.loadFromUrl && loadedUrl) {
+			return;
+		} else if (data.loadFromUrl) {
+			loadedUrl = true;
+		}
+		
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
 		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
@@ -991,16 +1179,23 @@ function loadGeneWidget() {
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
 		    	moveDataSourcesButton();
-		    	
 		    	window.selectedTranscript = null;
-		    	// Set all of the variant cards as "dirty"
-		    	variantCards.forEach(function(variantCard) {
-		    		variantCard.setDirty();
-		    	});
-		    	loadTracksForGene();
-		    	// add gene to url params
-		    	updateUrl('gene', window.gene.gene_name);
-		    	if(data.callback != undefined) data.callback();
+
+		    	if (data.loadFromUrl) {
+		    		// Autoload data specified in url
+					loadUrlSources();	
+		    	} else {
+			    	// Set all of the variant cards as "dirty"
+			    	variantCards.forEach(function(variantCard) {
+			    		variantCard.setDirty();
+			    	});
+			    	loadTracksForGene();
+			    	// add gene to url params
+			    	updateUrl('gene', window.gene.gene_name);
+			    	if(data.callback != undefined) data.callback();
+
+		    	}
+		    	
 
 	       	},
 		    error: function( xhr, status, errorThrown ) {
@@ -1035,18 +1230,19 @@ function loadGeneWidget() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-function loadTracksForGene() {
+function loadTracksForGene(bypassVariantCards) {
 
 	regionStart = null;
 	regionEnd = null;
 	window.vcf1000GData = null;
 	window.vcfExACData = null;
 
+	$('#data-card').removeClass("hide");
 	$('#transcript-card').removeClass("hide");
 
     $('#gene-track').removeClass("hide");
     $('#view-finder-track').removeClass("hide");
-	$('#datasource-button').css("visibility", "visible");
+	//$('#datasource-button').css("visibility", "visible");
 	$('#transcript-btn-group').removeClass("hide");
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
@@ -1085,8 +1281,16 @@ function loadTracksForGene() {
 	// loadTracksForGenes on each variant card.
 	// When done, we will fill the feature matrix for
 	// the proband variant card.
-	var index = 0;
-	loadTracksForGeneNextVariantCard(variantCards, index);
+	//var index = 0;
+	//loadTracksForGeneNextVariantCard(variantCards, index);
+
+	if (bypassVariantCards == null || !bypassVariantCards) {
+	 	variantCards.forEach(function(variantCard) {
+			variantCard.loadTracksForGene(classifyByImpact,  function() {
+					promiseFullTrio();
+			});
+		});
+	}
 	
 
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
@@ -1111,7 +1315,7 @@ function loadTracksForGeneNextVariantCard(variantCards, index) {
 				probandVariantCard = variantCard;
 			}
 		});
-		if (probandVariantCard) {
+		if (probandVariantCard && probandVariantCard.isLoaded()) {
 			probandVariantCard.showFeatureMatrix();
 		}
 	}
@@ -1193,7 +1397,7 @@ function addVariantCard() {
 	variantCards.push(variantCard);	
 
 	var cardIndex = variantCards.length - 1;
-	var defaultName = "sample " + (+cardIndex + 1);
+	var defaultName = " ";
 	variantCard.setName(defaultName);
 
 	// TODO:  Should really test to make sure that first card is proband, but
@@ -1247,92 +1451,187 @@ function addVariantCard() {
 }
 
 
-function onBamFileButtonClicked() {	
-	$('#datasource-dialog #bam-file-info').removeClass("hide");
+function onBamFileButtonClicked(panelSelector) {	
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	panelSelector.find('#bam-file-info').removeClass("hide");
 
-	$('#bam-url-input').addClass('hide');
-	$('#bam-url-input').val('');
+	panelSelector.find('#bam-url-input').addClass('hide');
+	panelSelector.find('#bam-url-input').val('');
 }
 
-function onBamFilesSelected(event) {
-	var cardIndex = $('#datasource-dialog #card-index').val();
+function onBamFilesSelected(event, panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	var cardIndex = panelSelector.find('#card-index').val();
+
 	var variantCard = variantCards[+cardIndex];
-	variantCard.onBamFilesSelected(event);
+
+	setDataSourceName(panelSelector);
+	setDataSourceRelationship(panelSelector);
+
+	variantCard.onBamFilesSelected(event, function(bamFileName) {
+		panelSelector.find('#bam-file-info').removeClass('hide');
+		panelSelector.find('#bam-file-info').val(bamFileName);
+		variantCard.loadBamDataSource(variantCard.getName());
+	});
 	variantCard.setDirty();
+
+
 }
 
 
-function onBamUrlEntered() {
-	$('#bam-url-input').removeClass("hide");
+function onBamUrlEntered(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	var bamUrlInput = panelSelector.find('#bam-url-input');
+	bamUrlInput.removeClass("hide");
 
-	var cardIndex = $('#datasource-dialog #card-index').val();
+	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
-	variantCard.onBamUrlEntered($('#bam-url-input').val());	
-	updateUrl('bam' + cardIndex, $('#bam-url-input').val());
+
+	setDataSourceName(panelSelector);
+	setDataSourceRelationship(panelSelector);
+
+	variantCard.onBamUrlEntered(bamUrlInput.val());	
+	variantCard.loadBamDataSource(variantCard.getName());
 	variantCard.setDirty();
+
+	updateUrl('bam' + cardIndex, bamUrlInput.val());
+
 }
 
-function displayBamUrlBox() {
-	$('#bam-file-info').addClass('hide');
-    $('#bam-file-info').val('');
-    $('#datasource-dialog #bam-url-input').removeClass("hide");
-    $("#datasource-dialog #bam-url-input").focus();
-    $('#datasource-dialog #bam-url-input').val('http://s3.amazonaws.com/iobio/NA12878_S1.bam');
-    onBamUrlEntered();
+function displayBamUrlBox(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	panelSelector.find('#bam-file-info').addClass('hide');
+    panelSelector.find('#bam-file-info').val('');
+    panelSelector.find('#bam-url-input').removeClass("hide");
+    panelSelector.find("#bam-url-input").focus();
+
+    var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+	if (panelSelector.find('#bam-url-input').val() == '') {
+	    panelSelector.find('#bam-url-input').val(variantCardDefaultBamUrls[variantCard.getRelationship()]);
+	}
+    onBamUrlEntered(panelSelector);
 	
 
 }
 
-function displayUrlBox() {
-    $('#url-input').val('http://s3.amazonaws.com/iobio/platinum/NA12878.vcf.gz');
-	$("#url-input").removeClass('hide');
-    $("#url-input").focus();
-    $('#datasource-dialog #vcf-file-info').addClass('hide');
-    $('#datasource-dialog #vcf-file-info').val('');
-    onVcfUrlEntered();
-}
-function onVcfFileButtonClicked() {	
-	$('#datasource-dialog #vcf-file-info').removeClass("hide");
+function displayUrlBox(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
 
-	$('#url-input').addClass('hide');
-	$('#url-input').val('');
-}
-
-function onVcfFilesSelected(event) {
-	var cardIndex = $('#datasource-dialog #card-index').val();
+	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
-	variantCard.onVcfFilesSelected(event);
+
+	if (panelSelector.find('#url-input').val() == '') {
+	    panelSelector.find('#url-input').val(variantCardDefaultUrls[variantCard.getRelationship()]);
+	}
+	panelSelector.find("#url-input").removeClass('hide');
+    panelSelector.find("#url-input").focus();
+    panelSelector.find('#vcf-file-info').addClass('hide');
+    panelSelector.find('#vcf-file-info').val('');
+    onVcfUrlEntered(panelSelector);
+}
+function onVcfFileButtonClicked(panelSelector) {	
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	panelSelector.find('#vcf-file-info').removeClass("hide");
+
+	panelSelector.find('#url-input').addClass('hide');
+	panelSelector.find('#url-input').val('');
+}
+
+function onVcfFilesSelected(event, panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+	setDataSourceName(panelSelector);
+	setDataSourceRelationship(panelSelector);
+
+	variantCard.onVcfFilesSelected(event, function(vcfFileName) {
+		panelSelector.find('#vcf-file-info').removeClass('hide');
+		panelSelector.find('#vcf-file-info').val(vcfFileName);
+		variantCard.loadVcfDataSource(variantCard.getName(), function() {
+			promiseFullTrio();
+
+		});
+	});
 	variantCard.setDirty();
 }
 
-function onVcfUrlEntered() {
-	var cardIndex = $('#datasource-dialog #card-index').val();
+function promiseFullTrio() {
+	var loaded = {};
+	variantCards.forEach(function(vc) {
+		if (vc.isLoaded()) {
+			loaded[vc.getRelationship()] = vc;
+		}
+	});
+	if (loaded.proband != null & loaded.mother  != null && loaded.father != null) {
+		loaded.proband.showFeatureMatrix(true);
+	}
+
+}
+
+function onVcfUrlEntered(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	var vcfUrl = $('#url-input').val();
+	setDataSourceName(panelSelector);
+	setDataSourceRelationship(panelSelector);
+
+
+	var vcfUrl = panelSelector.find('#url-input').val();
 
 	variantCard.onVcfUrlEntered(vcfUrl);
 	updateUrl('vcf'+cardIndex, vcfUrl);
+	variantCard.loadVcfDataSource(variantCard.getName(),  function() {
+		promiseFullTrio();
+	});
 	variantCard.setDirty();
 }
 
 
-function setDataSourceName() {	
-	var cardIndex = $('#datasource-dialog #card-index').val();
+function setDataSourceName(panelSelector) {	
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	var dsName = $('#datasource-name').val();
+	var dsName = panelSelector.find('#datasource-name').val();
 	variantCard.setName(dsName);
-	$('#variant-card-button-' + cardIndex ).text(dsName);
+	variantCard.showDataSources(dsName);
+	
+	//	$('#variant-card-button-' + cardIndex ).text(dsName);
 	updateUrl('name' + cardIndex, dsName);
 
 }
 
-function setDataSourceRelationship() {		
-	var cardIndex = $('#datasource-dialog #card-index').val();
+function setDataSourceRelationship(panelSelector) {		
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+
+	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	var dsRelationship = $('#datasource-relationship').val();
+	var dsRelationship = panelSelector.find('#datasource-relationship').val();
 	variantCard.setRelationship(dsRelationship);	
 	updateUrl('rel' + cardIndex, dsRelationship);
 }
@@ -1403,26 +1702,31 @@ function hideCircleRelatedVariants() {
 	});
 }
 
-function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd) {
+function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd, showInheritance) {
 
 	var windowWidth = $(window).width();
 	var filterPanelWidth = $('#filter-track').width();
 	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
+	//$("#matrix-track .inheritance.loader").css("display", "inline");
 	$("#matrix-panel .loader").css("display", "block");
 	$("#feature-matrix").addClass("hide");
 
 	sourceVcfData = theVcfData;
-	// we need to compare the proband variants to mother and father variants to determine
-	// the inheritance mode.  After this completes, we are ready to show the
-	// feature matrix.
-	$("#matrix-track .inheritance.loader").css("display", "inline");
 
-	window.compareVariantsToPedigree(theVcfData, function() {
-		$("#matrix-track .inheritance.loader").css("display", "none");
+	if (showInheritance) {
+		// we need to compare the proband variants to mother and father variants to determine
+		// the inheritance mode.  After this completes, we are ready to show the
+		// feature matrix.
+
+		window.compareVariantsToPedigree(theVcfData, function() {
+			//$("#matrix-track .inheritance.loader").css("display", "none");
+			fillFeatureMatrix(theVcfData);
+
+		});
+	} else {
 		fillFeatureMatrix(theVcfData);
-
-	});
+	}
 
 }
 

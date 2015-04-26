@@ -1,22 +1,38 @@
+Quick must have fixes
+-----------------------------------
+- FB variant filtered out MYLK2 CH20 30409363 a->g (qualit score 8)
+- Bam area chart - wrong y scale (see AIRE low coverage)
+
+- Clin var filters: split out likely pathogenic, likely benign
+- Hover over variant should circle coverage in mom and dad
+- Use X instead of arrow for missing variant
+- OK button on data card minimizes card
+- Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
+- Transcript dropdown gets munged.
+- Show fb count separately 
+
 Blockers
 -----------------------------------------------------------
 - Make sure clinvar updates FB variants and that FB variants are in feature matrix
 
 - Inject #contig in header for afserver (for remote files)
 
-- datasources dialog bugs - 
-   - Safari only: relationship dropdown is open and won't close
-
 - Big genes kill browser session (robo1)
 
 - Some genes (with weird transcripts?) do nothing
 
-- feature matrix sizing (wider than screen)
+- clinvar not working on large genes (ttn, dmd)
 
+- take out extra x-axis when both bam and vcf are shown in variant card
+
+- datasources dialog bugs - 
+   - Safari only: relationship dropdown is open and won't close
 
 
 important
 -------------------------------------------
+- Bam chart doesn't scale on x the same as transcript chart and variant chart
+
 - Display applied filters in variant card (by badge)
 
 - Display missing variants count in separate badge

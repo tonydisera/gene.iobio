@@ -26,6 +26,10 @@ function VariantCard() {
 
 }
 
+VariantCard.prototype.isLoaded = function() {
+	return this.vcf != null && this.vcfData != null;
+}
+
 // class methods
 
 VariantCard.prototype.setName = function(theName) {
@@ -272,8 +276,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 };
 
-VariantCard.prototype.onBamFilesSelected = function(event) {
+VariantCard.prototype.onBamFilesSelected = function(event, callback) {
 	var me = this;
+
+	this.bamData = null;
+	this.fbData = null;
 
 
 	if (event.target.files.length != 2) {
@@ -296,13 +303,13 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 	}
 	this.bamFileOpened = true;
 
+
 	if (this.isViewable()) {
 		this.cardSelector.find("#bam-track .loader").css("display", "block");
 		this.cardSelector.find("#bam-track .loader-label").text("Loading Alignment File");
 		this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamFile.name);
+		this.cardSelector.find("#bam-depth").addClass("hide");
 
-		$('#datasource-dialog #bam-file-info').removeClass('hide');
-		$('#datasource-dialog #bam-file-info').val(bamFile.name);
 	}
 
 
@@ -316,8 +323,15 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 			if (me.getBamRefName == null) {
 		 		if (ref.name == window.gene.chr) {
 		 			me.getBamRefName = me.getRefName;
+					if (callback) {
+						callback(bamFile.name);
+					}
 		 		} else if (ref.name == me.stripRefName(gene.chr)) {
 		 			me.getBamRefName = me.stripRefName;
+		 			if (callback) {
+						callback(bamFile.name);
+					}
+
 		 		}
 			}
 		});
@@ -326,8 +340,12 @@ VariantCard.prototype.onBamFilesSelected = function(event) {
 }
 
 VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
+	this.bamData = null;
+	this.fbData = null;
+
 	this.cardSelector.find("#bam-track .loader").css("display", "block");
 	this.cardSelector.find("#bam-track .loader-label").text("Streaming Alignment File");
+	this.cardSelector.find("#bam-depth").addClass("hide");
 
 
 	this.cardSelector.find('#bam-name-' + this.cardIndex).text(bamUrl);
@@ -338,9 +356,10 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 
 }
 
-VariantCard.prototype.onVcfFilesSelected = function(event) {
+VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 	var me = this;
 	this.vcfFileOpened = true;
+	this.vcfData = null;
 
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -352,10 +371,6 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 	this.vcf.openVcfFile( event, function(vcfFile) {
 
 		me.cardSelector.find('#vcf-name').text(vcfFile.name);
-		$('#datasource-dialog #vcf-file-info').removeClass('hide');
-		$('#datasource-dialog #vcf-file-info').val(vcfFile.name);
-
-		
 		me.getVcfRefName = null;
 		me.vcf.getReferenceNames(function(refNames) {
 
@@ -365,9 +380,16 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 				if (me.getVcfRefName == null) {
 			 		if (refName == window.gene.chr) {
 			 			me.getVcfRefName = me.getRefName;
+			 			if (callback) {
+				 			callback(vcfFile.name);
+			 			}
 			 		} else if (refName == me.stripRefName(gene.chr)) {
 			 			me.getVcfRefName = me.stripRefName;
+			 			if (callback) {
+				 			callback(vcfFile.name);
+			 			}
 			 		}
+
 				}
 			});
 			
@@ -379,6 +401,7 @@ VariantCard.prototype.onVcfFilesSelected = function(event) {
 
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 	var me = this;
+	this.vcfData = null;
 	
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -446,21 +469,21 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
    	this.cardSelector.find('#card-relationship-label').text(title);
    	this.cardSelector.find('#variant-card-label').text(dataSourceName);
 
-
-   	//this.cardSelector.find('#variant-link').attr("aria-expanded", true);
-   	//this.cardSelector.find('#variant-panel-' + this.cardIndex).attr("aria-expanded", true);
-   	//this.cardSelector.find('#variant-panel-' + this.cardIndex).addClass("in");
-
-
 }
 
 VariantCard.prototype.loadDataSources = function(dataSourceName, callback) {
 	var me = this;
 	this.name = dataSourceName;
 
+	if (window.gene == null) {
+		callback();
+		return;
+	}
+
 	if (!this.isDirty || !this.isViewable()) {
 		this.isDirty = false;
 		callback();
+		return;
 	}
 
 	this.showDataSources(dataSourceName);
@@ -475,12 +498,75 @@ VariantCard.prototype.loadDataSources = function(dataSourceName, callback) {
 	this.showBamDepth( regionStart, regionEnd, function() {
 		me.showVariants( regionStart, regionEnd, function() {
 			this.isDirty = false;
-			callback();
+			if (callback) {
+				callback();
+			}
 		});
 	});
+}
+
+VariantCard.prototype.loadVcfDataSource = function(dataSourceName, callback) {
+	var me = this;
+	this.name = dataSourceName;
+
+	if (window.gene == null) {
+		callback();
+		return;
+	}
+
+	if (!this.isDirty || !this.isViewable()) {
+		this.isDirty = false;
+		callback();
+		return;
+	}
+
+	this.showDataSources(dataSourceName);
+
+	this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+	selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
+	this.zoomRegionChart.regionStart(+window.gene.start);
+	this.zoomRegionChart.regionEnd(+window.gene.end);
+	this.zoomRegionChart(selection);
 
 
+	me.showVariants( regionStart, regionEnd, function() {
+		this.isDirty = false;
+		if (callback) {
+			callback();
+		}
+	});
+	
+}
+VariantCard.prototype.loadBamDataSource = function(dataSourceName, callback) {
+	var me = this;
+	this.name = dataSourceName;
 
+	if (window.gene == null) {
+		callback();
+		return;
+	}
+
+	if (!this.isDirty || !this.isViewable()) {
+		this.isDirty = false;
+		callback();
+		return;
+	}
+
+	this.showDataSources(dataSourceName);
+
+	this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+	selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
+	this.zoomRegionChart.regionStart(+window.gene.start);
+	this.zoomRegionChart.regionEnd(+window.gene.end);
+	this.zoomRegionChart(selection);
+
+
+	this.showBamDepth( regionStart, regionEnd, function() {
+		this.isDirty = false;
+		if (callback) {
+			callback();
+		}
+	});
 }
 
 VariantCard.prototype.getBamName = function() {
@@ -566,8 +652,8 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find('#vcf-chart-label').addClass("hide");
 		this.cardSelector.find('#vcf-count').css("display", "none");		
-		this.cardSelector.find(".vcfloader").css("display", "block");
 		this.cardSelector.find('#vcf-name').addClass("hide");		
+		this.cardSelector.find(".vcfloader").css("display", "block");
 		this.cardSelector.find('.vcfloader .loader-label').text("Loading Data for " + window.gene.gene_name)
 
 		$("#feature-matrix").addClass("hide");
@@ -739,6 +825,11 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		this.cardSelector.find('#bam-chart-label').removeClass("hide");
 		this.cardSelector.find('#button-find-missing-variants').css("visibility", "visible");
 
+		if (this.cardSelector.find('.vcfloader .loader-label').text().indexOf("Loading Data for") == 0) {
+			this.cardSelector.find(".vcfloader").css("display", "none");
+		}
+
+
 
 		this.bamDepthChart.xStart(regionStart);
 		this.bamDepthChart.xEnd(regionEnd);
@@ -747,8 +838,8 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
-		this.cardSelector.find('#zoom-region-chart').css("margin-top", "20px");
-		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-90px");
+		this.cardSelector.find('#zoom-region-chart').css("margin-top", "5px");
+		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-100px");
 
 
 	}
@@ -880,6 +971,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 	if (this.isViewable()) {
 		this.vcfAfData = null;
 		this.cardSelector.find('#af').addClass("hide");		
+		/*
 		this.discoverVcfRefName( function() {
 			var regionParm = {'name': me.getVcfRefName(window.gene.chr), 
 							  'start': regionStart ? regionStart : window.gene.start, 
@@ -897,6 +989,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 			});
 
 		});
+		*/
 	}
 
 }
@@ -1009,8 +1102,8 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 
 }
 
-VariantCard.prototype.showFeatureMatrix = function() {
-	window.showFeatureMatrix(this, this.vcfData, regionStart, regionEnd);
+VariantCard.prototype.showFeatureMatrix = function(showInheritance) {
+	window.showFeatureMatrix(this, this.vcfData, regionStart, regionEnd, showInheritance);
 }
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
@@ -1102,7 +1195,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				}
 				// We need to inject in the contig header for downstream servers to function properly
 				if (rec.indexOf("#CHROM") == 0 && !contigHdrRecFound) {
-					fbRecs.push("##contig=<ID=" + refName + ">");
+					fbRecs.push("##contig=<ID=" + me.getBamRefName(refName) + ">");
 				}
 				fbRecs.push(rec);
 			});

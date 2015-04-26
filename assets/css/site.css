@@ -1,4 +1,4 @@
-
+  
 
 body {
   font-family: 'Quattrocento Sans', sans-serif;
@@ -372,6 +372,7 @@ section {
 }
 #gene-name {
   color: #6898A8;
+  font-size: 16px;
 }
 #gene-region-info {
   padding-left: 10px;
@@ -735,8 +736,8 @@ header {
 
 
 #zoom-region-chart {
-    margin-top: -10px;
-    margin-bottom: 10px;
+    margin-top: -34px;
+    margin-bottom: 0px;
     padding-left: 0px;
     padding-right: 0px;
 }

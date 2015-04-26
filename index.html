@@ -76,6 +76,85 @@
   <!-- handlebar templates  -->
   <!--                      -->
 
+  <script id="sample-data-template" type="text/x-handlebars-template">
+          <div id="sample-data-panel">
+            <div id="add-name" class="fullview" style="display:table">
+              <span id="sample-data-label" class="card-label" style="margin-top: 8px;margin-right: 30px;">PROBAND</span>
+              <div style="display:table-cell;width:100%">
+                <input id="datasource-name" class="form-control input-sm" placeholder="Enter name" type="text"/>
+              </div>
+            </div>
+
+            <div id="add-bam-track" class="fullview" style="display:table">
+
+              <div class="btn-toolbar" style="width: 100px;">
+                <div class="btn-group" style="display:inline;margin-top: 15px;">
+
+                    <button type="button"
+                    class="icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                      Alignments
+                      <span class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu" role="menu">
+                      <li style="color:  rgb(51, 51, 51);">
+                           <div id="bam-file-selector-item" class="file">
+                              <input type="file" name="files[]" id="bam-file-upload" multiple="">
+                              <label class="file-button" for="bam-file-upload">Choose BAM File</label>
+                          </div>
+                      </li>
+                      <li>
+                          <a id="display-bam-url-item" href="#">Enter URL for BAM</a>
+                      </li>    
+                     
+                    </ul>
+                </div>
+              </div>
+              
+
+              <div style="display:table-cell;width:100%;vertical-align:middle;">
+                  <input  id="bam-url-input" type="text" class="form-control input-sm" value="" placeholder="http://..."/>
+                  <input id="bam-file-info" type="text" value="" readonly="" style="background-color: #FFFFFF"
+                  class="form-control input-sm empty hide"/>
+              </div>
+
+            </div>
+
+
+            <div id="add-vcf-track" class="fullview" style="display:table">
+                
+                <div class="btn-toolbar" style="width: 100px;">
+                  <div class="btn-group" style="display:  inline;margin-top: 15px;">
+
+                    <button type="button" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                      Variants<span class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu" role="menu">
+                      <li style="color:  rgb(51, 51, 51);">
+                          <div class="file"  id="vcf-file-selector-item">
+                              <input type="file" name="files[]" id="vcf-file-upload" multiple="">
+                              <label class="file-button" for="vcf-file-upload">Choose VCF File</label>
+                          </div>
+                      </li>
+                      <li>
+                          <a id="display-vcf-url-item"  href="#">Enter URL for VCF</a>
+                      </li>    
+                    </ul>
+                  </div>
+                </div>
+
+                <div style="display:table-cell;width:100%;vertical-align:middle;">
+                  <input  id="url-input" type="text" value="" class="form-control input-sm empty" placeholder="http://...">
+                  <input id="vcf-file-info" type="text" value="" readonly=""  style="background-color: #FFFFFF" class="form-control input-sm empty hide">
+                </div>
+            </div>     
+
+
+          </div>
+
+  </script>
+
 
 
   <!--                       -->
@@ -189,7 +268,7 @@
                   </div> 
 
                   <div >
-                    <div id="bam-chart-label" class="chart-label hide" style="margin-top: 22px;margin-bottom: -17px;">Coverage
+                    <div id="bam-chart-label" class="chart-label hide" style="margin-top: 24px;margin-bottom: -17px;">Coverage
                     </div>
                     <div id="bam-depth">
                     </div>
@@ -568,12 +647,12 @@
 
     	<section id="app-title-section">
     	   <a id='home' href="/"><span class="iobioapp">gene</span><span class="iobio">.iobio</span></a>
-            <span id="bloodhound" style="margin-left: 130px;">
+            <span id="bloodhound">
                 <input class="typeahead shadow-z-1" style="margin-top: 10px" type="text" placeholder="Enter Gene Name">
             </span>
 
              <button id="datasource-button"
-               class="btn btn-default btn-raised icon-button" data-toggle="modal" 
+               class="hide btn btn-default btn-raised icon-button" data-toggle="modal" 
                data-target="#datasource-dialog">
                <i class="mdi-action-settings" ></i>
                Data Sources
@@ -584,13 +663,19 @@
       </section>
 
       <div id="transcript-card" class="shadow-z-1 hide" style="background:white;padding-top:10px;">
-        <a id="transcript-link" class="card-label"   data-toggle="collapse" onclick="onCollapseTranscriptPanel()" 
-           href="#transcript-panel" 
-           aria-expanded="true" style="float:left;margin-left:13px;width:130px" >
-          Gene
-          <span class="caret"></span>
-        </a>
-        <div class="btn-toolbar" 
+        <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;width:130px">GENE</span>
+
+        <span style="float:right;margin-right:10px">
+          <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+            <i class="mdi-content-remove"></i>
+          </a>
+          <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+            <i class="mdi-image-crop-din"></i>
+          </a>
+       </span>
+
+
+        <div class="btn-toolbar fullview" 
            style="display: inline-block;float: left;margin-left: 10px;padding-top: 0px; margin-top: -12px;">
            <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
                 <button id="transcript-dropdown-button" type="button"  
@@ -610,18 +695,19 @@
           <span id="gene-name"></span>  
           <span id="gene-region-info"></span>
         </div>
-        <div id="transcript-panel" class="collapse in" aria-expanded="true">
+        <div id="transcript-panel" class="fullview" >
           <div id="gene-track" class="track hide">           
               <div id="gene-viz" class="track-chart"></div>               
           </div>
         </div>
       </div>
 
+
     </div>  
 
 
     <div id="track-section" style="padding-top:228px;">
-      <div id="add-datasource-container">
+      <div id="add-datasource-container" class="hide">
         <button id="add-datasource-button"
            class="btn btn-default btn-raised icon-button" data-toggle="modal" 
            data-target="#datasource-dialog">
@@ -631,18 +717,74 @@
         </button>
       </div>
 
+      <div id="data-card" class="track shadown-z-1 hide">
+
+        <div style="width:100%;clear:both;">
+
+          <div id="toolbar" >
+            <span class="card-label" >SAMPLES</span>
+
+            <span style="float:right">
+              <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                <i class="mdi-content-remove"></i>
+              </a>
+              <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                <i class="mdi-image-crop-din"></i>
+              </a>
+           </span>
+
+
+            <div class="fullview" style="text-align:center;width: 100%;margin-top: -25px;">
+              <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)">
+                <i class="mdi-social-person"></i>
+                Single
+              </button>
+              <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)">
+                <i class="mdi-social-share"></i>
+                Trio
+              </button>
+            </div>
+          </div>
+
+
+          <div id="proband-data" style="float:left;margin-right:20px;width:32%">
+            <input id="card-index" class="hide" value="0" type="text">
+            <input id="datasource-relationship" class="hide" value="proband" type="text"/>
+          </div>
+
+          <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
+            <input id="card-index" class="hide" value="1" type="text">
+            <input id="datasource-relationship" class="hide" value="mother" type="text"/>
+          </div>
+
+          <div id="father-data" class="hide" style="float:left;width:32%">
+            <input id="card-index" class="hide" value="2" type="text">
+            <input id="datasource-relationship" class="hide" value="father" type="text"/>
+          </div>
+
+
+
+        </div>
+
+
+      </div>
+
 
       <div id="filter-and-rank-card">
 
         <div id="filter-track"  class="track-expand shadow-z-1 hide">
-            <div>
-              <a id="filter-link"  class="card-label" href="#filter-panel"  data-toggle="collapse" aria-expanded="true" >
-                Filter Variants<span class="caret"></span>
+            <span class="card-label">Filter Variants</span>
+
+            <span style="float:right;padding-top:4px">
+              <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                <i class="mdi-content-remove"></i>
               </a>
-            </div>
+              <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                <i class="mdi-image-crop-din"></i>
+              </a>
+           </span>
     
-            <div id="filter-panel"  
-              class="collapse in" aria-expanded="true">
+            <div id="filter-panel" class="fullview">
             </div> 
         </div>  
 
@@ -650,11 +792,18 @@
 
         <div id="matrix-track"  class="track-expand shadow-z-1 hide">
             <div>
-              <a style="float:left;padding-top:7px" id="matrix-link"  class="card-label" href="#matrix-panel"  data-toggle="collapse" aria-expanded="true" >
-                Rank Variants<span class="caret"></span>
-              </a>
+              <span class="card-label">Rank Variants</span>
 
-             <div style="display:inline;margin-top: -6px;color: rgb(132,132,132);margin-left: 20px;font-size:11px;">
+              <span style="float:right;padding-top:4px">
+                <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                  <i class="mdi-content-remove"></i>
+                </a>
+                <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                  <i class="mdi-image-crop-din"></i>
+                </a>
+             </span>
+
+             <div class="fullview" style="display:inline;margin-top: -6px;color: rgb(132,132,132);margin-left: 20px;font-size:11px;">
                 Top 20
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
@@ -662,7 +811,7 @@
                   </label>
                 </div>
               </div>
-             <div style="display:inline;margin-top: -6px;color: rgb(132,132,132);font-size:11px;">
+             <div class="fullview" style="display:inline;margin-top: -6px;color: rgb(132,132,132);font-size:11px;">
                 Top 100
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
@@ -670,7 +819,7 @@
                   </label>
                 </div>
               </div>
-             <div style="display:inline;margin-top: -6px;color: rgb(132,132,132);font-size:11px;">
+             <div class="fullview" style="display:inline;margin-top: -6px;color: rgb(132,132,132);font-size:11px;">
                 All
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
@@ -682,7 +831,7 @@
                     <span class="loader-label" >Accessing ClinVar</span>
                     <img src="assets/images/loading-squares.gif">
               </span>
-              <span class="inheritance loader" style="display: inline;float: right;margin-top: 0px;">
+              <span class="inheritance loader" class="hide" style="float: right;margin-top: 0px;">
                     <span class="loader-label" >Determining Inheritance Mode</span>
                     <img src="assets/images/loading-squares.gif">
               </span>
@@ -693,7 +842,7 @@
 
     
             <div id="matrix-panel"  style="clear:both;margin-top:10px;"
-              class="collapse in" aria-expanded="true">
+              class="fullview" aria-expanded="true">
                 <div class="loader">
                     <span class="loader-label"></span>
                     <img src="assets/images/loading-squares.gif"/>
