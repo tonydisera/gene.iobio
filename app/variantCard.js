@@ -219,13 +219,13 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    	
 				    })			    
 				    .on('d3mouseover', function(d) {
-				    	if (me.bamData) {
-							me.bamDepthChart.showCircle()(d.start);
-				    	}
+				    	me.showCoverageCircle(d);
+				    	window.showCircleRelatedVariants(d, me);
 					})
 					.on('d3mouseout', function() {
-						if (me.bamData){
-							me.bamDepthChart.hideCircle()();
+						me.hideCoverageCircle();
+						if (me.getRelationship() == 'proband') {
+							window.hideCircleRelatedVariants();
 						}
 					});
 					
@@ -582,16 +582,28 @@ VariantCard.prototype.getRelationship = function() {
 }
 
 VariantCard.prototype.showVariantCircle = function(variant) {
+	// Check the fb called variants first.  If present, circle and don't
+	// show X for missing variant on vcf variant chart.
+	var matchingVariantFound = false;
+	if (this.fbChart != null && this.fbData != null && this.fbData.features.length > 0) {
+		var container = this.d3CardSelector.selectAll('#fb-variants svg');
+		matchingVariantFound = this.fbChart.showCircle()(variant, container, false);
+	}
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
-		this.vcfChart.showCircle()(variant, container);
+		matchingVariantFound = this.vcfChart.showCircle()(variant, container, !matchingVariantFound);
 	}
+	
 }
 
 VariantCard.prototype.hideVariantCircle = function(variant) {
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
 		this.vcfChart.hideCircle()(container);
+	}
+	if (this.fbChart != null && this.fbData != null && this.fbData.features.length > 0) {
+		var container = this.d3CardSelector.selectAll('#fb-variants svg');
+		this.fbChart.hideCircle()(container);
 	}
 }
 
@@ -1270,15 +1282,9 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					   	});
 					   	me.vcfData.maxLevel = maxLevel;
 
-
-
-
 				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
 						me.fbData.maxLevel = maxLevel + 1;
 
-						if (me.getRelationship() == 'proband') {
-				  			//window.cullVariantFilters();
-				  		}
 				  		
 						me.cardSelector.find('.vcfloader .loader-label').text("Loading chart");
 

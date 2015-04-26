@@ -63,7 +63,7 @@ function variantD3() {
      }
   }
 
-  var showCircle = function(d, svgContainer) {
+  var showCircle = function(d, svgContainer, indicateMissingVariant) {
     // Find the matching variant
     var matchingVariant = null;
     svgContainer.selectAll(".variant").each( function (variant,i) {
@@ -89,7 +89,7 @@ function variantD3() {
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 2);
               
-    } else {
+    } else if (indicateMissingVariant) {
       var mousex = d3.round(x(d.start));
       var mousey = height - verticalPadding;
       
@@ -102,6 +102,7 @@ function variantD3() {
 
 
     }
+    return matchingVariant;
   };
 
  
