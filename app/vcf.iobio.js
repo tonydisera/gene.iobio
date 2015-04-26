@@ -534,7 +534,7 @@ var effectCategories = [
     }       
     var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(encodeURI(tabixUrl)) );
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-    var afOnlyUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(encodeURI(tabixUrl)) ); 
+    //var afOnlyUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(encodeURI(tabixUrl)) ); 
 
     var url = null;
     if (afMax) {
@@ -544,8 +544,8 @@ var effectCategories = [
       var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(afUrl));
       url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
     } else {
-      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afOnlyUrl));
-//      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
+      //url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afOnlyUrl));
+      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
     }
 
     console.log(url);

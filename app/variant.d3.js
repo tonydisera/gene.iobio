@@ -100,6 +100,7 @@ function variantD3() {
             .duration(200)
             .style("opacity", 1);
 
+
     }
   };
 
@@ -362,8 +363,8 @@ function variantD3() {
           })
           .attr('class', function(d) { return clazz(d); })    
           .attr("transform", function(d) { 
-            var xCoord = x(d.start);
-            var yCoord = showTransition ? 0 : height - ((d.level + 1) * (variantHeight + verticalPadding));
+            var xCoord = x(d.start) + 2;
+            var yCoord = showTransition ? 0 : height - ((d.level + 1) * (variantHeight + verticalPadding)) + 3;
             var tx = "translate(" + xCoord + "," + yCoord + ")"; 
             return tx;
            });
@@ -450,9 +451,9 @@ function variantD3() {
                      .size(symbolSize)();
               }) 
               .attr("transform", function(d) { 
-                  var xCoord = x(d.start);
-                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding));
-                  var tx = "translate(" + xCoord + "," + yCoord + ")"; 
+                  var xCoord = x(d.start) + 2;
+                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding)) + 3;
+                  var tx = "translate(" + xCoord +  "," + yCoord + ")"; 
                   return tx;
               });
 
@@ -466,8 +467,8 @@ function variantD3() {
                      .size(symbolSize)();
               })
               .attr("transform", function(d) { 
-                  var xCoord = x(d.start);
-                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding));
+                  var xCoord = x(d.start) + 2;
+                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding)) + 3;
                   var tx = "translate(" + xCoord + "," + yCoord + ")"; 
                   return tx;
               });
@@ -482,8 +483,8 @@ function variantD3() {
                      .size(symbolSize)();
               })
               .attr("transform", function(d) { 
-                  var xCoord = x(d.start);
-                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding));
+                  var xCoord = x(d.start) + 2;
+                  var yCoord = height - ((d.level + 1) * (variantHeight + verticalPadding)) + 3;
                   var tx = "translate(" + xCoord + "," + yCoord + ")"; 
                   return tx;
               });                 
@@ -518,7 +519,8 @@ function variantD3() {
       var garrow = svg.selectAll("g.arrow").data([0])
                       .enter().append("g")
                       .attr("class", "arrow")
-                      .attr("transform", "translate(0,0)");
+                      .attr("transform", "translate(2,0)");
+      /*
       garrow.append('polygon')
           .attr("class", "arrow")
           .attr("points", "0,8 4,2 8,8")
@@ -529,7 +531,24 @@ function variantD3() {
           .attr("x2", 4)
           .attr("y1", 8)
           .attr("y2", 50)
+          .style("opacity", 0);   
+     */  
+
+      garrow.append('line')
+          .attr("class", "arrow arrow-line")
+          .attr("x1", 8)
+          .attr("x2", -2)
+          .attr("y1", 8)
+          .attr("y2", 0)
           .style("opacity", 0);      
+      garrow.append('line')
+          .attr("class", "arrow arrow-line")
+          .attr("x1", 8)
+          .attr("x2", -2)
+          .attr("y1", 0)
+          .attr("y2", 8)
+          .style("opacity", 0);      
+
 
       
       dispatch.d3rendered();
