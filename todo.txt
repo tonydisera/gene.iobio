@@ -1,12 +1,9 @@
 Quick must have fixes
 -----------------------------------
-- FB variant filtered out MYLK2 CH20 30409363 a->g (qualit score 8)
-- Bam area chart - wrong y scale (see AIRE low coverage)
+- Browsers Safari,Firefox
 
 - Clin var filters: split out likely pathogenic, likely benign
 - Hover over variant should circle coverage in mom and dad
-- Use X instead of arrow for missing variant
-- OK button on data card minimizes card
 - Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
 - Transcript dropdown gets munged.
 - Show fb count separately 

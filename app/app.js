@@ -1695,6 +1695,7 @@ function showCircleRelatedVariants(variant, sourceVariantCard) {
 			variantCard.hideVariantCircle();
 			if (sourceVariantCard == null || sourceVariantCard != variantCard) {
 				variantCard.showVariantCircle(variant);
+				variantCard.showCoverageCircle(variant);
 			}
 		}
 	});
@@ -1705,6 +1706,7 @@ function hideCircleRelatedVariants() {
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.getRelationship() != 'proband' && variantCard.isViewable()) {
 			variantCard.hideVariantCircle();
+			variantCard.hideCoverageCircle();
 		}
 	});
 }

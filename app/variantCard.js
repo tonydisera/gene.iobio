@@ -195,15 +195,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    	
 				    })			    
 				    .on('d3mouseover', function(d) {
-				    	if (me.bamData) {
-							me.bamDepthChart.showCircle()(d.start);
-				    	}
+				    	me.showCoverageCircle(d);
 				    	window.showCircleRelatedVariants(d, me);
 					})
 					.on('d3mouseout', function() {
-						if (me.bamData){
-							me.bamDepthChart.hideCircle()();
-						}
+						me.hideCoverageCircle();
 						if (me.getRelationship() == 'proband') {
 							window.hideCircleRelatedVariants();
 						}
@@ -597,6 +593,18 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
 		this.vcfChart.hideCircle()(container);
 	}
+}
+
+VariantCard.prototype.showCoverageCircle = function(variant) {
+	if (this.bamData) {
+		this.bamDepthChart.showCircle()(variant.start);
+    }
+}
+
+VariantCard.prototype.hideCoverageCircle = function() {
+	if (this.bamData){
+		this.bamDepthChart.hideCircle()();
+	}	
 }
 
 VariantCard.prototype.shrinkCard = function(shrink) {
