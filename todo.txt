@@ -1,6 +1,5 @@
 Quick must have fixes
 -----------------------------------
-- Clin var filters: split out likely pathogenic, likely benign
 - Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
 - Transcript dropdown gets munged.
 

@@ -217,6 +217,7 @@ function geneD3() {
           .attr('class', 'transcript')
           .attr("id", function(d,i) { return 'transcript_' +  d.transcript_id.split(".").join("_"); })
           .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
+      transcript.exit().remove();
       
 
       transcript.selectAll(".reference").remove();
