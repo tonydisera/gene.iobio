@@ -3,7 +3,6 @@ Quick must have fixes
 - Clin var filters: split out likely pathogenic, likely benign
 - Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
 - Transcript dropdown gets munged.
-- Display missing variants count in separate badge
 
 Blockers
 -----------------------------------------------------------
@@ -20,22 +19,16 @@ Blockers
 
 - take out extra x-axis when both bam and vcf are shown in variant card
 
-
 - Inject #contig in header for afserver (for remote files)
 
 
 important
 -------------------------------------------
-- Bam chart doesn't scale on x the same as transcript chart and variant chart
-
-- Display applied filters in variant card (by badge)
-
 - How to deal with comparisons on multi-allelic genotypes
 
 - Mode of inheritance - dominant (present in affected, cannot be present in unaffected)
 
 - Affected/Unaffected status on datasources dialog
-
 
 - Add Variant Prioritization (VVP)
 

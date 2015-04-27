@@ -22,6 +22,18 @@ a.card-label, a.card-label:hover, a.card-label:focus {
   text-decoration: none;
 }
 
+.badge-label {
+ color: rgba(104, 152, 168, 1);
+}
+
+#variant-badges a:hover, #variant-badges a:focus {
+  background: white;
+}
+
+#variant-badges .nav>li>a:hover, #variant-badges .nav>li>a:focus {
+  text-decoration: none;
+  background-color: white;
+}
 
 a, a:hover, a:focus {
   color: rgba(104, 152, 168, 1) !important;
@@ -167,6 +179,8 @@ a, a:hover, a:focus {
   background: #eee;
 }
 
+
+
 #recessive-symbol .parent .left {
   stroke: darkorange;
 }
@@ -190,6 +204,18 @@ a, a:hover, a:focus {
   stroke: #BFC83F;
 }
 
+/* Trio button in data card */
+#trio-symbol .parent .left {
+  stroke: #6898A8;
+}
+
+#trio-symbol .parent .right {
+  stroke: #6898A8;
+}
+#trio-symbol .proband .left,
+#trio-symbol .proband .right {
+  stroke: #6898A8;
+}
 
 
 

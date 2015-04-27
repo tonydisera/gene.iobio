@@ -73,10 +73,14 @@ var showClinVarSymbol = function (selection) {
 
 	         	if (selection.datum().clazz == 'clinvar_path') {
 	         		return "#ad494A";
+	         	} else if (selection.datum().clazz == 'clinvar_lpath') {
+	         		return "#C07778";
 	         	} else if (selection.datum().clazz == 'clinvar_uc') {
 	         		return "rgba(231, 186, 82, 1)";
 	         	} else if (selection.datum().clazz == 'clinvar_benign') {
 	         		return "rgba(181, 207, 107, 1)";
+	         	} else if (selection.datum().clazz == 'clinvar_lbenign') {
+	         		return "rgba(156, 194, 49, 1)";
 	         	} else if (selection.datum().clazz == 'clinvar_other') {
 	         		return "rgb(189, 189, 189)";
 	         	} else if (selection.datum().clazz == 'clinvar_cd') {
@@ -225,10 +229,10 @@ var showImpactSymbol = function(selection) {
 }
 var clinvarMap     = {  
 						'pathogenic'            : {value: 1, clazz: 'clinvar_path', symbolFunction: showClinVarSymbol},
-                        'likely_pathogenic'     : {value: 2, clazz: 'clinvar_path', symbolFunction: showClinVarSymbol},
+                        'likely_pathogenic'     : {value: 2, clazz: 'clinvar_lpath', symbolFunction: showClinVarSymbol},
                         'uncertain_significance': {value: 3, clazz: 'clinvar_uc', symbolFunction: showClinVarSymbol},
                         'benign'                : {value: 4, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
-                        'likely_benign'         : {value: 5, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
+                        'likely_benign'         : {value: 5, clazz: 'clinvar_lbenign', symbolFunction: showClinVarSymbol},
                         'drug_response'         : {value: 6, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'confers_sensivity'     : {value: 7, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'risk_factor'           : {value: 8, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
@@ -1844,7 +1848,7 @@ function setFeatureMatrixSource(theVcfData) {
 }
 
 function fillFeatureMatrixWithClinvar(clinVars) {	
-	var recs = sourceVcfData.features;
+	var recs = sourceVcfData.features.sort(orderVariantsByPosition);
 	var clinVarIds = clinVars.uids;
 
 	for( var vcfIter = 0, clinIter = 0; vcfIter < recs.length && clinIter < clinVarIds.length; null) {

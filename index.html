@@ -174,10 +174,8 @@
 
             <ul class="nav nav-pills hide" id="variant-badges" style="float:left;margin-left:30px;margin-top:-2px">
               <li>
-                <a href="javascript:void(0)"  style="padding-top:0px">
-                    Variants
+                    <span class="badge-label">Variants</span>
                     <span id="vcf-variant-count" class="badge"></span>
-                </a>
               </li>
 
               <li>
@@ -457,17 +455,17 @@
             <svg id="zygosity-scheme" width="60" height="15" transform="translate(0,0)" class="">
               <text class="name" x="0" y="10">Zygosity</text>
             </svg>
-            <svg id="het" class="zygosity" width="75" height="14" transform="translate(0,0)" >
+            <svg id="het" class="zygosity" width="75" height="15" transform="translate(0,0)" >
               <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Heterozygous</text>       
                <rect class="filter-symbol het" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
             </svg>
 
-            <svg id="hom" class="zygosity" width="75" height="14" transform="translate(0,0)">
+            <svg id="hom" class="zygosity" width="75" height="15" transform="translate(0,0)">
               <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Homozygous</text>       
                <rect class="filter-symbol hom" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
             </svg>
 
-            <svg id="gt_unknown" class="zygosity" width="75" height="14" transform="translate(0,0)">
+            <svg id="gt_unknown" class="zygosity" width="75" height="15" transform="translate(0,0)">
               <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">No Genotype</text>       
                <rect class="filter-symbol gt_unknown" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
             </svg>
@@ -483,25 +481,25 @@
             <text class="name" x="0" y="10">ExAC</text>
           </svg>
           
-          <svg id="afexac_unique" class="afexaclevel" width="50" height="12" transform="translate(0,0)">
+          <svg id="afexac_unique" class="afexaclevel" width="54" height="14" transform="translate(0,0)">
             <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">unknown</text>
             <g class=" afexac_unique">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
             </g>
           </svg>
-          <svg id="afexac_uberrare" class="afexaclevel" width="50" height="12" transform="translate(0,0)">
+          <svg id="afexac_uberrare" class="afexaclevel" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>
             <g class=" afexac_uberrare">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
             </g>
           </svg>
-          <svg id="afexac_superrare" class="afexaclevel" width="50" height="12" transform="translate(0,0)">
+          <svg id="afexac_superrare" class="afexaclevel" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .1%</text>
             <g class=" afexac_superrare">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(203, 174, 95);"></use>
             </g>
           </svg>
-          <svg id="afexac_rare" class="afexaclevel" width="50" height="12" transform="translate(0,0)">
+          <svg id="afexac_rare" class="afexaclevel" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; 1%</text>
             <g class=" afexac_rare">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
@@ -527,25 +525,25 @@
             <text class="name" x="0" y="10">1000G</text>
           </svg>
 
-          <svg id="af1000g_unique" class="af1000glevel nocolor" width="50" height="12" transform="translate(0,0)">
+          <svg id="af1000g_unique" class="af1000glevel nocolor" width="54" height="14" transform="translate(0,0)">
             <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">unknown</text>
             <g class=" af1000g_unique">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
             </g>
           </svg>
-          <svg id="af1000g_uberrare" class="af1000glevel nocolor" width="50" height="12" transform="translate(0,0)">
+          <svg id="af1000g_uberrare" class="af1000glevel nocolor" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>
             <g class=" af1000g_uberrare">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
             </g>
           </svg>
-          <svg id="af1000g_superrare" class="af1000glevel nocolor" width="50" height="12" transform="translate(0,0)">
+          <svg id="af1000g_superrare" class="af1000glevel nocolor" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .1%</text>
             <g class=" af1000g_superrare">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(203, 174, 95);"></use>
             </g>
           </svg>
-          <svg id="af1000g_rare" class="af1000glevel nocolor" width="50" height="12" transform="translate(0,0)">
+          <svg id="af1000g_rare" class="af1000glevel nocolor" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; 1%</text>
             <g class=" af1000g_rare">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
@@ -591,7 +589,7 @@
 
 
       <!-- clinvar -->
-      <div style="float:left;width:84px;">
+      <div style="float:left;width:94px;">
           <svg id="clinvar-scheme" class="" width="90" height="15" transform="translate(0,0)">
               <text class="name" x="0" y="10">ClinVar</text>
           </svg>
@@ -601,12 +599,27 @@
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Benign</text>
           </svg>
+
+          <svg id="clinvar_lbenign" class="clinvar" width="84" height="15" transform="translate(0,0)">
+            <g class="clinvar_lbenign" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: rgba(156, 194, 49, 1);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Likely Benign</text>
+          </svg>
           
-          <svg id="clinvar_path" class="clinvar" width="84" height="15" transform="translate(0,0)">
+          
+          <svg id="clinvar_path" class="clinvar" width="86" height="15" transform="translate(0,0)">
             <g class="clinvar_path" transform="translate(0,-2)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: #ad494A;"></use>
             </g>
-            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Pathologic</text>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Pathogenic</text>
+          </svg>
+
+          <svg id="clinvar_lpath" class="clinvar" width="94" height="15" transform="translate(0,0)">
+            <g class="clinvar_lpath" transform="translate(0,-2)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill: #C07778;"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Likely Pathogenic</text>
           </svg>
           
           <svg id="clinvar_uc" class="clinvar" width="84" height="15" transform="translate(0,0)">
@@ -759,13 +772,18 @@
 
 
             <div class="fullview" style="text-align:center;width: 100%;margin-top: -25px;">
-              <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)">
+              <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)" style="padding-bottom: 5px;">
                 <i class="mdi-social-person"></i>
                 Single
               </button>
-              <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)">
-                <i class="mdi-social-share"></i>
-                Trio
+              <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" style="padding-top: 0px;padding-bottom: 0px;">
+                <svg style="width: 27px;height: 24px; ">
+                  <g transform="translate(0,2)">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#trio-symbol" style="pointer-events: none;">
+                    </use>
+                  </g>              
+                </svg>
+                 <div style="float: right;margin-top: 5px;margin-left: 4px;">Trio</div>
               </button>
             </div>
           </div>
@@ -1083,6 +1101,49 @@
   </symbol>
 
   <symbol id="denovo-symbol" width="30" height="30" viewBox="0 0 40 40">
+
+    <line x1="13" x2="22" y1="10" y2="10" fill="none" stroke-width="1" stroke="grey"></line>
+    <line x1="19" x2="19" y1="10" y2="18" fill="none" stroke-width="1" stroke="grey"></line>
+
+    <g transform="translate(2,0)" class="parent">
+      <path d="M 7 14 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="left">
+      </path>
+      
+      <g transform="translate(14, 21), rotate(180)"> 
+          <path d="M 7 15 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="right">
+        </path>
+      </g>
+    </g>
+
+    <g class="parent">
+      <g transform="translate(38,-5)">
+        <g transform="rotate(90)">
+          <path d="M 10,10 C 10,3  19,3 19,10" stroke-width="2" fill="none" class="left">
+          </path>
+        </g>
+      </g>
+      
+      <g transform="translate(18,24)">
+         <g transform="rotate(270)">
+            <path d="M 10,10 C 10,3  19,3 19,10" stroke-width="2" fill="none" class="right">
+            </path>
+         </g>
+      </g>
+    </g>  
+
+    <g class="proband" transform="translate(12, 13)">
+      <path d="M 7 14 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="left">
+      </path>
+      
+      <g transform="translate(15, 21), rotate(180)"> 
+          <path d="M 7 15 l -4 0 l 0 -8 l 4 0" stroke-width="2" fill="none" class="right">
+          </path>
+      </g>
+    </g>
+
+  </symbol>
+  
+  <symbol id="trio-symbol" width="30" height="30" viewBox="0 0 40 40">
 
     <line x1="13" x2="22" y1="10" y2="10" fill="none" stroke-width="1" stroke="grey"></line>
     <line x1="19" x2="19" y1="10" y2="18" fill="none" stroke-width="1" stroke="grey"></line>
