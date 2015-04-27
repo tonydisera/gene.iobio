@@ -231,17 +231,17 @@ var clinvarMap     = {
 						'pathogenic'            : {value: 1, clazz: 'clinvar_path', symbolFunction: showClinVarSymbol},
                         'likely_pathogenic'     : {value: 2, clazz: 'clinvar_lpath', symbolFunction: showClinVarSymbol},
                         'uncertain_significance': {value: 3, clazz: 'clinvar_uc', symbolFunction: showClinVarSymbol},
-                        'benign'                : {value: 4, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
-                        'likely_benign'         : {value: 5, clazz: 'clinvar_lbenign', symbolFunction: showClinVarSymbol},
+                        'benign'                : {value: 100, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
+                        'likely_benign'         : {value: 101, clazz: 'clinvar_lbenign', symbolFunction: showClinVarSymbol},
                         'drug_response'         : {value: 6, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'confers_sensivity'     : {value: 7, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'risk_factor'           : {value: 8, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'other'                 : {value: 9, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'association'           : {value: 10, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'protective'            : {value: 11, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'conflicting_data_from_submitters': {value: 12, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},
-                        'not_provided'          : {value: 13, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'none'                  : {value: 14, clazz: ''}
+                        'protective'            : {value: 111, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'conflicting_data_from_submitters': {value: 121, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},
+                        'not_provided'          : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'none'                  : {value: 141, clazz: ''}
                      };
 var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH',     symbolFunction: showImpactSymbol},    
                         MODERATE: {value: 2, clazz: 'impact_MODERATE', symbolFunction: showImpactSymbol},  
@@ -2108,7 +2108,13 @@ function fillFeatureMatrix(theVcfData) {
 	  // loop, that means all features of a and b match
 	  // so return 0;
 	  for (var i = 0; i < matrixRows.length; i++) {
-	  	if (a.features[i].rank < b.features[i].rank) {
+	  	if (a.features[i].rank > 99  && b.features[i].rank > 99) {
+	  		// In this case, we don't consider the rank and will look at the next feature for ordering
+	  	} else if (a.features[i].rank > 99) {
+	  		return 1;
+	  	} else if (b.features[i].rank > 99) {
+	  		return -1;
+	  	} else if (a.features[i].rank < b.features[i].rank) {
 	  		return -1;
 	  	} else if (a.features[i].rank > b.features[i].rank) {
 			return 1;

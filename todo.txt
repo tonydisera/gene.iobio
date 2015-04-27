@@ -1,7 +1,6 @@
 Quick must have fixes
 -----------------------------------
 - Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
-- Transcript dropdown gets munged.
 
 Blockers
 -----------------------------------------------------------
