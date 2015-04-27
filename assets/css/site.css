@@ -1,4 +1,4 @@
-  
+
 
 body {
   font-family: 'Quattrocento Sans', sans-serif;
@@ -979,7 +979,7 @@ header {
   fill: rgb(53, 134, 192);
 }
 .impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, 
-.type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar:hover {
+.type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
