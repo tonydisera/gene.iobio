@@ -270,8 +270,8 @@ var af1000gMap      = [ {min: -1.1, max: +0,     value: +2,  clazz: 'af1000g_uni
 
 
 var matrixRows = [
-	{name:'Impact'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
-	{name:'ClinVar'             ,order:1, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: clinvarMap },
+	{name:'ClinVar'             ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: clinvarMap },
+	{name:'Impact'              ,order:1, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
 	{name:'Inheritance'         ,order:2, index:2, match: 'exact', attribute: 'inheritance', map: inheritanceMap},
 	{name:'AF (1000G)'          ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: af1000gMap},
 	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afExacMap}
