@@ -140,6 +140,10 @@ var effectCategories = [
   exports.isFile = function() {
     return sourceType != null && sourceType == SOURCE_TYPE_FILE;
   }
+
+  exports.hasFileOrUrl = function() {
+    return vcfURL != null || vcfFile !=null;
+  }
   exports.openVcfUrl = function(url) {
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;

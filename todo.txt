@@ -1,9 +1,10 @@
-Quick must have fixes
------------------------------------
-- Clinvar first row in matrix (sort so that only pathogenic, likely pathogenic are considered?)
 
 Blockers
 -----------------------------------------------------------
+- Add google analytics
+
+- When deletion, add one to start position when querying clinvar
+
 - Sam pileup stream gets truncated when concurrent streams.
 
  - VCF coverage (in genotype field) isn't matching circled bam depth on
