@@ -294,13 +294,13 @@ var formatRegion = d3.format(",");
 var variantCards = [];
 var variantCardDefaultUrls = {
 	proband: 'http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz',
-	mother:  'http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz',
-	father:  'http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz'
+	mother:  'http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz',
+	father:  'http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz'
 };
 var variantCardDefaultBamUrls = {
 	proband: 'http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam',
-	mother: 'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam',
-	father: 'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam'
+	mother:  'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam',
+	father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
 };
 
 // The smaller the region, the wider we can
