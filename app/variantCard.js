@@ -794,7 +794,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		// A gene has been selected.  Read the bam file to obtain
 		// the read converage.
 		var refName = this.getBamRefName(window.gene.chr);
-	 	this.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, 
+	 	this.bam.getCoverageForRegionChunked(refName, window.gene.start, window.gene.end, 
 	 		0, 
 	 		function(data) {
 	 			if (data == null) {
