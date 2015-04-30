@@ -352,6 +352,15 @@ section {
     float: left;
 }
 
+.beta {
+  background: #B6071C;
+  border-radius: 3px;
+  padding: 2px 8px 2px 8px;
+  color: white;
+  font-size: 19px;
+
+}
+
 .iobioapp {
     font-size: 34px;
     color: #6898A8;
