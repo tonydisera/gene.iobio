@@ -1697,10 +1697,8 @@ function showCircleRelatedVariants(variant, sourceVariantCard) {
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
 			variantCard.hideVariantCircle();
-			if (sourceVariantCard == null || sourceVariantCard != variantCard) {
-				variantCard.showVariantCircle(variant);
-				variantCard.showCoverageCircle(variant);
-			}
+			variantCard.showVariantCircle(variant);
+			variantCard.showCoverageCircle(variant);
 		}
 	});
 
