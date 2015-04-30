@@ -613,17 +613,17 @@ var Bam = Class.extend({
 
 
       // Break the regions down into manageable chunks
-      var chunkCoverage = function(refName, start, end, chunkSize, allCoverageRecs, index, chunkedCallback) {
+      var chunkCoverage = function(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, chunkedCallback) {
           var chunkStart = start + (index*chunkSize);
           if (chunkStart <= end) {
             var chunkEnd   = chunkStart + chunkSize;
             if (chunkEnd > end) {
               chunkEnd = end;              
             }
-            me._getCoverageForRegionImpl(refName, chunkStart, chunkEnd, 0, function(coverageRecs) {
+            me._getCoverageForRegionImpl(refName, chunkStart, chunkEnd, maxPoints, function(coverageRecs) {
               allCoverageRecs = allCoverageRecs.concat(coverageRecs);
               index++;
-              chunkCoverage(refName, start, end, chunkSize, allCoverageRecs, index, chunkedCallback);
+              chunkCoverage(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, chunkedCallback);
             });
           } else {
             chunkedCallback(allCoverageRecs);
@@ -632,7 +632,7 @@ var Bam = Class.extend({
 
       var allCoverageRecs = [];
       var index = 0;
-      chunkCoverage(refName, start, end, chunkSize, allCoverageRecs, index, function(theCoverageRecs) {
+      chunkCoverage(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, function(theCoverageRecs) {
         // Now we have all of the coverage records.  Time to reduce the array down.
         if (maxPoints && maxPoints > 0) {
           var factor = d3.round(theCoverageRecs.length / maxPoints);

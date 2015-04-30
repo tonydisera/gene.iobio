@@ -508,6 +508,7 @@ section {
     text-align: center;
     margin-top: 0px !important;
     display:none;
+    margin-bottom: 10px !important;
 }
 
 .variant-card #bam-track .loader {

@@ -173,7 +173,7 @@
   <!--                       -->
   <script id="variant-card-template" type="text/x-handlebars-template">
 
-      <div class="variant-card track-expand shadow-z-1 hide" style="background-color:white;">
+      <div class="variant-card track-expand shadow-z-1 hide" style="padding-bottom:10px;background-color:white;">
 
 
           <div style="text-align:center;margin-top: 6px">
@@ -783,20 +783,16 @@
 
 
             <div class="fullview" style="text-align:center;width: 100%;margin-top: -25px;">
-              <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)" style="padding-bottom: 5px;">
+              <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
                 <i class="mdi-social-person"></i>
                 Single
               </button>
-              <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" style="padding-top: 0px;padding-bottom: 0px;">
+              <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                style="padding-top: 2px;padding-bottom:1px;">
                 <div style="float:left;">
-                  <svg style="width: 27px;height: 24px; ">
-                    <g transform="translate(0,2)">
-                      <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#trio-symbol" width="30" height="31" style="pointer-events: none;">
-                      </use>
-                    </g>              
-                  </svg>
+                  <img src="assets/images/1f46a-Family.48.blue.png" style="height:27px"/>
                 </div>
-                 <div style="float: right;margin-top: 5px;margin-left: 4px;">Trio</div>
+                 <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
               </button>
             </div>
           </div>

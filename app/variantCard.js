@@ -630,6 +630,8 @@ VariantCard.prototype.shrinkCard = function(shrink) {
 	this.d3CardSelector.select('#zoom-region-chart').classed("hide", shrink);
 	this.d3CardSelector.select('#bam-track').classed("hide", shrink);
 
+	this.cardSelector.css("padding-bottom", shrink ? "4px" : "10px");
+
 }
 
 VariantCard.prototype.minimizeCard = function(minimize) {
@@ -639,6 +641,7 @@ VariantCard.prototype.minimizeCard = function(minimize) {
 	this.d3CardSelector.select('#variant-right-labels').classed("hide", minimize);
 
 	this.d3CardSelector.select('#variant-panel-' + this.cardIndex).classed("hide", minimize);
+	this.cardSelector.css("padding-bottom", minimize ? "4px" : "10px");
 }
 
 /* 
