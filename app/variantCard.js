@@ -1002,7 +1002,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 			   	    callbackDataLoaded();
 		   	    }
 			},
-			me.getRelationship() == 'proband' ? window.fillFeatureMatrixWithClinvar : null);	
+			me.refreshVariantsWithClinvar.bind(me));	
 
 		});
 
@@ -1151,6 +1151,87 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	var filteredVcfData = this.filterVariants(this.vcfData);
 	
 	fillFeatureMatrix(filteredVcfData);
+}
+
+VariantCard.prototype.refreshVariantsWithClinvar = function(clinVars) {	
+	var me = this;
+	var recs = this.vcfData.features.sort(orderVariantsByPosition);
+	var clinVarIds = clinVars.uids;
+
+	for( var vcfIter = 0, clinIter = 0; vcfIter < recs.length && clinIter < clinVarIds.length; null) {
+		var uid = clinVarIds[clinIter];
+		var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start;
+		
+		// compare curr variant and curr clinVar record
+		if (recs[vcfIter].start == clinVarStart) {			
+			// add clinVar info to variant
+			me.addClinVarInfoToVariant(recs[vcfIter], clinVars[uid]);
+			vcfIter++;
+			clinIter++;
+		} else if (recs[vcfIter].start < clinVarStart) {						
+			vcfIter++;
+		} else {
+			clinIter++;
+		}
+	}
+	$("#matrix-track .clinvar.loader").css("display", "none");
+
+	fillFeatureMatrix(this.vcfData);
+}
+
+VariantCard.prototype.addClinVarInfoToVariant = function(variant, clinvar) {		
+	variant.clinVarUid = clinvar.uid;
+
+	if (!variant.clinVarAccession) {
+		variant.clinVarAccession = clinvar.accession;
+	}
+
+	var clinSigObject = variant.clinVarClinicalSignificance;
+	if (clinSigObject == null) {
+		variant.clinVarClinicalSignificance = {"none": "Y"};
+	}
+
+	var clinSigToken = clinvar.clinical_significance.description;
+	if (clinSigToken != "") {		
+		// Replace space with underlink
+		clinSigToken = clinSigToken.split(" ").join("_").toLowerCase();
+		variant.clinVarClinicalSignificance[clinSigToken] = 'Y';
+
+		// Get the clinvar "classification" for the highest ranked clinvar 
+		// designation. (e.g. "pathologic" trumps "benign");
+		var mapEntry = clinvarMap[clinSigToken];
+		if (mapEntry != null) {
+			if (variant.clinvarRank == null || 
+				mapEntry.value < variant.clinvarRank) {
+				variant.clinvarRank = mapEntry.value;
+				variant.clinvar = mapEntry.clazz;
+			}
+		}		
+	}
+
+
+
+	var phenotype = variant.clinVarPhenotype;
+	if (phenotype == null) {
+		variant.clinVarPhenotype = {};
+	}
+
+	var phTokens = clinvar.trait_set.map(function(d) { return d.trait_name; }).join ('; ')
+	if (phTokens != "") {
+		var tokens = phTokens.split("; ");
+		tokens.forEach(function(phToken) {
+			// Replace space with underlink
+			phToken = phToken.split(" ").join("_");
+			variant.clinVarPhenotype[phToken.toLowerCase()] = 'Y';
+		});
+	}
+
+	// if (variant.ncbiId) {
+	// 	variant.ncbiId = clinvar.ncbiId;
+	// }
+	// if (!variant.hgvsG) {
+	// 	variant.hgvsG = clinvar.hgvsG;
+	// }	
 }
 
 VariantCard.prototype.fillFreebayesChart = function(data, regionStart, regionEnd) {
