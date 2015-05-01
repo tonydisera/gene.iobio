@@ -1001,9 +1001,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 				  		me.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 				  	else
 				  		me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
-				  	if (me.getRelationship() == 'proband') {
-				  		window.enableVariantFilters(true);
-				  	}
+				  	
+				  	window.enableVariantFilters(true);
+				  	
 		   	    }
 		   	    if (callbackDataLoaded) {
 			   	    callbackDataLoaded();
@@ -1142,10 +1142,6 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 	   	}
 	}
 
-	if (this.getRelationship() == 'proband') {
-  		window.enableInheritanceFilters(this.vcfData);
-  		window.enableClinvarFilters(this.vcfData);
-  	}
 
 
 }
@@ -1181,6 +1177,9 @@ VariantCard.prototype.refreshVariantsWithClinvar = function(clinVars) {
 			clinIter++;
 		}
 	}
+	window.enableClinvarFilters(this.vcfData);
+
+	this.showVariants(regionStart, regionEnd);
 	if (this.getRelationship() == 'proband') {
 		$("#matrix-track .clinvar.loader").css("display", "none");
 		fillFeatureMatrix(this.vcfData);

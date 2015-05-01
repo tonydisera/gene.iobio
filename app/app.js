@@ -122,7 +122,7 @@ var showAfExacSymbol = function(selection) {
 	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'afexac_unique') {
-	         		return "11";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -137,7 +137,7 @@ var showAfExacSymbol = function(selection) {
 	         })
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'afexac_unique') {
-	         		return "11";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -184,7 +184,7 @@ var showAf1000gSymbol = function(selection) {
 	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "10";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
@@ -199,7 +199,7 @@ var showAf1000gSymbol = function(selection) {
 	         })
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "10";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
@@ -1721,7 +1721,7 @@ function showCircleRelatedVariants(variant, sourceVariantCard) {
 
 function hideCircleRelatedVariants() {
 	variantCards.forEach( function(variantCard) {
-		if (variantCard.getRelationship() != 'proband' && variantCard.isViewable()) {
+		if (variantCard.isViewable()) {
 			variantCard.hideVariantCircle();
 			variantCard.hideCoverageCircle();
 		}
@@ -1823,6 +1823,9 @@ function compareVariantsToPedigree(theVcfData, callback) {
 		        			}
 						});
 		        		$("#matrix-panel .loader-label").text("Ranking variants");
+
+		        		enableInheritanceFilters(theVcfData);
+  						
 
 			        	callback(theVcfData);
 			        }, 
@@ -2013,9 +2016,9 @@ function fillFeatureMatrix(theVcfData) {
 
     // We have new properties to filter on, so refresh the proband variant chart.
 	variantCards.forEach(function(variantCard) {
-		if (variantCard.getRelationship() == 'proband') {
-			variantCard.fillVariantChart(theVcfData, regionStart, regionEnd, true);
-		}
+		//if (variantCard.getRelationship() == 'proband') {
+		//	variantCard.refreshVariantChartWithClinvar(regionStart, regionEnd);
+		//}
 	});
 
 	
@@ -2102,6 +2105,7 @@ function tooltipRowNoLabel(value) {
 }
 
 function enableClinvarFilters(theVcfData) {
+	
 	var clinvarMap = {};
 	theVcfData.features.forEach( function(variant) {
 		if (variant.clinvar != null && variant.clinvar != '' && variant.clinvar != 'none') {
@@ -2113,6 +2117,13 @@ function enableClinvarFilters(theVcfData) {
 		var clinvarPresent = clinvarMap[clinvar];
 		d3.select(this).classed("inactive", clinvarPresent == null);
 	});
+/*
+	d3.selectAll(".clinvar").each( function(d,i) {
+		var clinvar = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-variants .variant.' + clinvar)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+*/
 
 }
 
