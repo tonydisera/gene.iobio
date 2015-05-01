@@ -884,12 +884,21 @@ function initFilterTrack() {
 			filterVariants();
 	    }
 	});
+	// listen for go button on af range
+	$('#af-go-button').on('click', function() {
+		filterVariants();
+	});
 	// listen for enter key on min coverage
 	$('#coverage-min').on('keydown', function() {
 		if(event.keyCode == 13) {
 			filterVariants();
 	    }
 	});
+	// listen for go button on coverage
+	$('#coverage-go-button').on('click', function() {
+		filterVariants();
+	});
+
 
 
 	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar")
