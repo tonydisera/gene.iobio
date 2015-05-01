@@ -1404,9 +1404,10 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 				    	me.fillFreebayesChart(me.fbData, window.gene.start, window.gene.end);
 
-				    	if ( me.getRelationship() == 'proband') {
-	   						window.showFeatureMatrix(this, me.vcfData, regionStart, regionEnd);
-						}
+				    	
+						// Figure out inheritance 
+						promiseFullTrio();
+
 
 						
 				    });
