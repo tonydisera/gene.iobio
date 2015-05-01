@@ -100,7 +100,7 @@ var showAfExacSymbol = function(selection) {
 
 
 	         	if (selection.datum().clazz == 'afexac_unique') {
-	         		return "rgb(215,48,39)";
+	         		return "none";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "rgb(252,141,89)";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -113,9 +113,16 @@ var showAfExacSymbol = function(selection) {
 	         		return "rgb(69,117,180)";
 	         	}
 	         })
+	         .style("stroke", function(d,i) {
+	         	if (selection.datum().clazz == 'afexac_unique') {
+	         		return "black";
+	         	} else {
+	         		return "none";
+	         	}
+	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'afexac_unique') {
-	         		return "10";
+	         		return "11";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -130,7 +137,7 @@ var showAfExacSymbol = function(selection) {
 	         })
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'afexac_unique') {
-	         		return "10";
+	         		return "11";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -155,7 +162,7 @@ var showAf1000gSymbol = function(selection) {
 
 
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "rgb(215,48,39)";
+	         		return "none";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "rgb(252,141,89)";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
@@ -166,6 +173,13 @@ var showAf1000gSymbol = function(selection) {
 	         		return "rgb(145,191,219)";
 	         	} else if (selection.datum().clazz == 'af1000g_common') {
 	         		return "rgb(69,117,180)";
+	         	}
+	         })
+	         .style("stroke", function(d,i) {
+	         	if (selection.datum().clazz == 'af1000g_unique') {
+	         		return "black";
+	         	} else {
+	         		return "none";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
@@ -254,14 +268,14 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
 // For af range, value must be > min and <= max
-var afExacMap      = [ {min: -1.1,  max: +0,     value: +2,  clazz: 'afexac_unique',     symbolFunction: showAfExacSymbol},	
+var afExacMap      = [ {min: -1.1,  max: +0,     value: +99,  clazz: 'afexac_unique',     symbolFunction: showAfExacSymbol},	
                        {min: +0,    max: +.0001, value: +3,  clazz: 'afexac_uberrare',   symbolFunction: showAfExacSymbol},	
                        {min: +0,    max: +.001,  value: +4,  clazz: 'afexac_superrare',  symbolFunction: showAfExacSymbol},	
                        {min: +0,    max: +.01,   value: +5,  clazz: 'afexac_rare',       symbolFunction: showAfExacSymbol},	
                        {min: +.01,  max: +.05,   value: +6,  clazz: 'afexac_uncommon',   symbolFunction: showAfExacSymbol},	
                        {min: +.05,  max: +1,     value: +7,  clazz: 'afexac_common',     symbolFunction: showAfExacSymbol},	
                       ];
-var af1000gMap      = [ {min: -1.1, max: +0,     value: +2,  clazz: 'af1000g_unique',     symbolFunction: showAf1000gSymbol},	
+var af1000gMap      = [ {min: -1.1, max: +0,     value: +99,  clazz: 'af1000g_unique',     symbolFunction: showAf1000gSymbol},	
                        {min: +0,    max: +.0001, value: +3,  clazz: 'af1000g_uberrare',   symbolFunction: showAf1000gSymbol},	
                        {min: +0,    max: +.001,  value: +4,  clazz: 'af1000g_superrare',  symbolFunction: showAf1000gSymbol},	
                        {min: +0,    max: +.01,   value: +5,  clazz: 'af1000g_rare',       symbolFunction: showAf1000gSymbol},	
