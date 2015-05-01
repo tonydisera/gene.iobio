@@ -87,6 +87,7 @@ var showClinVarSymbol = function (selection) {
 	         		return "rgb(150, 150, 150)";
 	         	}
 	         });
+
 };
 var showAfExacSymbol = function(selection) {
 	selection.append("g")
@@ -277,7 +278,7 @@ var matrixRows = [
 	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afExacMap}
 ];
 
-var featureUnknown = 99;
+var featureUnknown = 199;
 
 var vcf1000G= null;
 var vcfExAC = null;
@@ -1952,7 +1953,7 @@ function fillFeatureMatrix(theVcfData) {
 	var sortedFeatures = featureVcfData.features.sort(function (a, b) {
 	  var featuresA = "";
 	  var featuresB = "";
-	  
+
 	  // The features have been initialized in the same order as
 	  // the matrix column order. In each interation,
 	  // exit with -1 or 1 if we have non-matching values;
@@ -1961,7 +1962,7 @@ function fillFeatureMatrix(theVcfData) {
 	  // loop, that means all features of a and b match
 	  // so return 0;
 	  for (var i = 0; i < matrixRows.length; i++) {
-	  	if (a.features[i].rank > 99  && b.features[i].rank > 99) {
+		if (a.features[i].rank > 99  && b.features[i].rank > 99) {
 	  		// In this case, we don't consider the rank and will look at the next feature for ordering
 	  	} else if (a.features[i].rank > 99) {
 	  		return 1;
