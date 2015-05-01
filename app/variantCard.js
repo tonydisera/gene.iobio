@@ -671,6 +671,13 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 		this.cardSelector.find('#button-find-missing-variants').css("visibility", "hidden");
 
 
+    	me.cardSelector.find('#variant-badges').addClass("hide");
+    	me.cardSelector.find('#displayed-variant-count').text("");
+    	me.cardSelector.find('#vcf-variant-count').text("");
+    	me.cardSelector.find('#missing-variant-count').text("");
+    	me.cardSelector.find('#missing-variant-count-label').text("Find Missing Variants");
+
+
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find('#vcf-chart-label').addClass("hide");
@@ -1174,9 +1181,11 @@ VariantCard.prototype.refreshVariantsWithClinvar = function(clinVars) {
 			clinIter++;
 		}
 	}
-	$("#matrix-track .clinvar.loader").css("display", "none");
+	if (this.getRelationship() == 'proband') {
+		$("#matrix-track .clinvar.loader").css("display", "none");
+		fillFeatureMatrix(this.vcfData);
+	}
 
-	fillFeatureMatrix(this.vcfData);
 }
 
 VariantCard.prototype.addClinVarInfoToVariant = function(variant, clinvar) {		
