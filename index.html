@@ -203,6 +203,8 @@
                     <span id="zygosity-flag" class="filter-flag hide label label-primary">Zygosity</span>
                     <span id="afexaclevel-flag" class="filter-flag hide label label-primary">AF ExAC</span>
                     <span id="af1000glevel-flag" class="filter-flag hide label label-primary">AF 1000G</span>
+                    <span id="afexacrange-flag" class="hide label label-primary">AF ExAC range</span>
+                    <span id="af1000grange-flag" class="hide label label-primary">AF 1000G range</span>
                     <span id="inheritance-flag" class="filter-flag hide label label-primary">Inheritance</span>
                     <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
                     <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
@@ -491,11 +493,10 @@
           <svg id="afexac-scheme" class="current" width="50" height="15" transform="translate(0,0)">
             <text class="name" x="0" y="10">ExAC</text>
           </svg>
-          
           <svg id="afexac_unique" class="afexaclevel" width="54" height="14" transform="translate(0,0)">
-            <text class="name" x="12" y="9" style="fill-opacity: 1;font-size: 10px;">unknown</text>
+            <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">private</text>
             <g class=" afexac_unique">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill:none;stroke:black"></use>
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
             </g>
           </svg>
           <svg id="afexac_uberrare" class="afexaclevel" width="50" height="14" transform="translate(0,0)">
@@ -526,8 +527,14 @@
             <g class=" af_common">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
             </g>
-            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">&gt; 5%</text></svg>
-       
+            <text class="name" style="fill-opacity: 1;font-size: 10px;" x="20" y="10">&gt; 5%</text>
+          </svg>
+          <svg id="afexac_unique_nc" class="afexaclevel" width="86" height="16" transform="translate(0,0)">
+            <text class="name" x="12" y="9" style="fill-opacity: 1;font-size: 10px;">n/a (noncoding)</text>
+            <g class=" afexac_unique_nc">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill:none;stroke:black"></use>
+            </g>
+          </svg>
         
 
         </div>
@@ -537,10 +544,10 @@
           </svg>
 
           <svg id="af1000g_unique" class="af1000glevel nocolor" width="54" height="14" transform="translate(0,0)">
-            <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">unknown</text>
+            <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">private</text>
             <g class=" af1000g_unique">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill:none;stroke:black;"></use>
-            </g>
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
+\            </g>
           </svg>
           <svg id="af1000g_uberrare" class="af1000glevel nocolor" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>

@@ -881,11 +881,13 @@ var effectCategories = [
             // Determine the format of the genotype fields
             var gtTokens = {};
             var idx = 0;
-            var tokens = rec.format.split(":");
-            tokens.forEach(function(token) {
-              gtTokens[token] = idx;
-              idx++;
-            })
+            if (rec.format && rec.format != '') {
+              var tokens = rec.format.split(":");
+              tokens.forEach(function(token) {
+                gtTokens[token] = idx;
+                idx++;
+              })
+            }
 
 
             // Parse the svtype and snpEff annotations from the info field

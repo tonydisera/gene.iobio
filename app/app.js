@@ -38,6 +38,7 @@ var regionEnd = null;
 var gene = '';
 var loadedUrl = false;
 var selectedTranscript = null;
+var selectedTranscriptCodingRegions = [];
 var transcriptChart =  null;
 var transcriptViewMode = "single";
 var transcriptMenuChart = null;
@@ -76,13 +77,13 @@ var showClinVarSymbol = function (selection) {
 	         	} else if (selection.datum().clazz == 'clinvar_lpath') {
 	         		return "#C07778";
 	         	} else if (selection.datum().clazz == 'clinvar_uc') {
-	         		return "rgba(231, 186, 82, 1)";
+	         		return "rgba(231,186,82,1)";
 	         	} else if (selection.datum().clazz == 'clinvar_benign') {
-	         		return "rgba(181, 207, 107, 1)";
+	         		return "rgba(181,207,107,1)";
 	         	} else if (selection.datum().clazz == 'clinvar_lbenign') {
-	         		return "rgba(156, 194, 49, 1)";
+	         		return "rgba(156,194,49,1)";
 	         	} else if (selection.datum().clazz == 'clinvar_other') {
-	         		return "rgb(189, 189, 189)";
+	         		return "rgb(189,189,189)";
 	         	} else if (selection.datum().clazz == 'clinvar_cd') {
 	         		return "rgb(150, 150, 150)";
 	         	}
@@ -99,14 +100,16 @@ var showAfExacSymbol = function(selection) {
 	         .style("fill", function(d,i) {
 
 
-	         	if (selection.datum().clazz == 'afexac_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique_nc') {
 	         		return "none";
+	         	} else if (selection.datum().clazz == 'afexac_unique') {
+	         		return "rgb(215,48,39)";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "rgb(252,141,89)";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "rgb(203, 174, 95);";
+	         		return "rgb(203,174,95)";
 	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "rgb(158, 186, 194)";
+	         		return "rgb(158,186,194)";
 	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
 	         		return "rgb(145,191,219)";
 	         	} else if (selection.datum().clazz == 'afexac_common') {
@@ -114,15 +117,17 @@ var showAfExacSymbol = function(selection) {
 	         	}
 	         })
 	         .style("stroke", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique_nc') {
 	         		return "black";
 	         	} else {
 	         		return "none";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique_nc') {
 	         		return "12";
+	         	} else if (selection.datum().clazz == 'afexac_unique') {
+	         		return "11";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -136,8 +141,10 @@ var showAfExacSymbol = function(selection) {
 	         	}
 	         })
 	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique') {
+	         	if (selection.datum().clazz == 'afexac_unique_nc') {
 	         		return "12";
+	         	} else if (selection.datum().clazz == 'afexac_unique') {
+	         		return "11";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
@@ -162,29 +169,22 @@ var showAf1000gSymbol = function(selection) {
 
 
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "none";
+	         		return "rgb(215,48,39)";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "rgb(252,141,89)";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "rgb(203, 174, 95);";
+	         		return "rgb(203,174,95)";
 	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "rgb(158, 186, 194)";
+	         		return "rgb(158,186,194)";
 	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
 	         		return "rgb(145,191,219)";
 	         	} else if (selection.datum().clazz == 'af1000g_common') {
 	         		return "rgb(69,117,180)";
 	         	}
 	         })
-	         .style("stroke", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "black";
-	         	} else {
-	         		return "none";
-	         	}
-	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "12";
+	         		return "11";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
@@ -199,7 +199,7 @@ var showAf1000gSymbol = function(selection) {
 	         })
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "12";
+	         		return "11";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
@@ -268,17 +268,18 @@ var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
                      };
 // For af range, value must be > min and <= max
-var afExacMap      = [ {min: -1.1,  max: +0,     value: +99,  clazz: 'afexac_unique',     symbolFunction: showAfExacSymbol},	
-                       {min: +0,    max: +.0001, value: +3,  clazz: 'afexac_uberrare',   symbolFunction: showAfExacSymbol},	
-                       {min: +0,    max: +.001,  value: +4,  clazz: 'afexac_superrare',  symbolFunction: showAfExacSymbol},	
-                       {min: +0,    max: +.01,   value: +5,  clazz: 'afexac_rare',       symbolFunction: showAfExacSymbol},	
-                       {min: +.01,  max: +.05,   value: +6,  clazz: 'afexac_uncommon',   symbolFunction: showAfExacSymbol},	
-                       {min: +.05,  max: +1,     value: +7,  clazz: 'afexac_common',     symbolFunction: showAfExacSymbol},	
+var afExacMap      = [ {min: -100.1, max: -100,   value: +99, clazz: 'afexac_unique_nc', symbolFunction: showAfExacSymbol},	
+                       {min: -1.1,   max: +0,     value: +3,  clazz: 'afexac_unique',    symbolFunction: showAfExacSymbol},	
+                       {min: +0,     max: +.0001, value: +3,  clazz: 'afexac_uberrare',   symbolFunction: showAfExacSymbol},	
+                       {min: +.0001, max: +.001,  value: +4,  clazz: 'afexac_superrare',  symbolFunction: showAfExacSymbol},	
+                       {min: +.001,  max: +.01,   value: +5,  clazz: 'afexac_rare',       symbolFunction: showAfExacSymbol},	
+                       {min: +.01,   max: +.05,   value: +6,  clazz: 'afexac_uncommon',   symbolFunction: showAfExacSymbol},	
+                       {min: +.05,   max: +1,     value: +7,  clazz: 'afexac_common',     symbolFunction: showAfExacSymbol},	
                       ];
-var af1000gMap      = [ {min: -1.1, max: +0,     value: +99,  clazz: 'af1000g_unique',     symbolFunction: showAf1000gSymbol},	
+var af1000gMap      = [ {min: -1.1, max: +0,     value: +2,  clazz: 'af1000g_unique',     symbolFunction: showAf1000gSymbol},	
                        {min: +0,    max: +.0001, value: +3,  clazz: 'af1000g_uberrare',   symbolFunction: showAf1000gSymbol},	
-                       {min: +0,    max: +.001,  value: +4,  clazz: 'af1000g_superrare',  symbolFunction: showAf1000gSymbol},	
-                       {min: +0,    max: +.01,   value: +5,  clazz: 'af1000g_rare',       symbolFunction: showAf1000gSymbol},	
+                       {min: +.0001,max: +.001,  value: +4,  clazz: 'af1000g_superrare',  symbolFunction: showAf1000gSymbol},	
+                       {min: +.001, max: +.01,   value: +5,  clazz: 'af1000g_rare',       symbolFunction: showAf1000gSymbol},	
                        {min: +.01,  max: +.05,   value: +6,  clazz: 'af1000g_uncommon',   symbolFunction: showAf1000gSymbol},	
                        {min: +.05,  max: +1,     value: +7,  clazz: 'af1000g_common',     symbolFunction: showAf1000gSymbol},	
                       ];                      
@@ -367,6 +368,8 @@ function init() {
 				regionEnd   = d3.round(brush.extent()[1]);
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
+					cacheCodingRegions();
+
 				}
 			} else {
 				regionStart = window.gene.start;
@@ -396,6 +399,8 @@ function init() {
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
+	    	cacheCodingRegions();
+
 	    	showTranscripts();
 
 			variantCards.forEach(function(variantCard) {
@@ -820,6 +825,7 @@ function onCloseTranscriptMenuEvent() {
 	if (selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
 		d3.selectAll("#gene-viz .transcript").remove();
 	 	selectedTranscript = transcriptMenuChart.selectedTranscript();
+	 	cacheCodingRegions();
 	 	loadTracksForGene();
 	 }
 }
@@ -840,6 +846,15 @@ function getCanonicalTranscript() {
 		}
 	})
 	return canonical;
+}
+
+function cacheCodingRegions() {
+	selectedTranscriptCodingRegions.length = 0;
+	window.selectedTranscript.features.forEach( function(feature) {
+		if (feature.feature_type == 'CDS' || feature.feature_type == 'UTR') {
+			selectedTranscriptCodingRegions.push({start: feature.start, end: feature.end});
+		}
+	});
 }
 
 
@@ -876,16 +891,29 @@ function initFilterTrack() {
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
 		if(event.keyCode == 13) {
+			// We are filtering on range, so clear out the af level filters
+			resetAfFilters("af1000glevel");
+			resetAfFilters("afexaclevel");
+
 			filterVariants();
 	    }
 	});
 	$('#af-amount-end').on('keydown', function() {
 		if(event.keyCode == 13) {
+			// We are filtering on range, so clear out the af level filters
+			resetAfFilters("af1000glevel");
+			resetAfFilters("afexaclevel");
+
+
 			filterVariants();
 	    }
 	});
 	// listen for go button on af range
 	$('#af-go-button').on('click', function() {
+		// We are filtering on range, so clear out the af level filters
+			resetAfFilters("af1000glevel");
+			resetAfFilters("afexaclevel");
+
 		filterVariants();
 	});
 	// listen for enter key on min coverage
@@ -951,6 +979,14 @@ function initFilterTrack() {
 	  		})
 	  	}
 
+	  	// If af level clicked on, reset af range filter
+	  	if (d3.select(this).attr("class").indexOf("af1000glevel") || 
+	  		d3.select(this).attr("class").indexOf("afexaclevel")) {
+	  		if (on) {
+				resetAfRange();
+	  		}
+	  	}
+
 
 	  	// Remove from or add to list of clicked ids
 	  	window.clickedAnnotIds[d3.select(this).attr("id")] = on;
@@ -983,7 +1019,7 @@ function initFilterTrack() {
 	  d3.selectAll('#effect-scheme')
 	    .on("click", function(d) {
 	    	d3.select('#impact-scheme').classed("current", false);
-	    	d3.select('#effect-scheme' ).classed("current", true);
+	    	d3.select('#effect-scheme').classed("current", true);
 
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
@@ -1006,6 +1042,12 @@ function initFilterTrack() {
 	    	d3.selectAll(".afexaclevel").classed("nocolor", false);
 	    	d3.selectAll(".af1000glevel").classed("nocolor", true);
 
+	    	// De-select an af1000g filters
+	    	resetAfFilters("af1000glevel");
+	    	resetAfRange();
+	   
+	    	filterVariants();
+
 	    });
 	   d3.selectAll('#af1000g-scheme')
 	    .on("click", function(d) {
@@ -1015,8 +1057,38 @@ function initFilterTrack() {
 	    	d3.selectAll(".afexaclevel").classed("nocolor", true);
 	    	d3.selectAll(".af1000glevel").classed("nocolor", false);
 
+	    	resetAfFilters("afexaclevel");
+	    	resetAfRange();
+
+	    	filterVariants();
 	    });
 	  
+}
+
+function resetAfRange() {
+	$('#af-amount-start').val("0");
+	$('#af-amount-end').val("100");	
+
+	$("#af1000grange-flag").addClass("hide");
+	$("#afexacrange-flag").addClass("hide");
+
+
+}
+
+function resetAfFilters(scheme) {
+
+
+	// De-select af level filters
+	d3.selectAll("." + scheme).classed("current", false);
+
+	d3.selectAll("." + scheme).each(function(d,i) {
+		var id = d3.select(this).attr("id");
+		window.clickedAnnotIds[id] = false;
+  		window.annotsToInclude[id] = {'key':   scheme, 
+									  'value': id,  
+									  'state': false};
+
+	});
 }
 
 function filterVariants() {
@@ -1386,6 +1458,8 @@ function showTranscripts(regionStart, regionEnd) {
 		// For now, let's just grab the first one in the list.
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
+			cacheCodingRegions();
+
 		}
 	}
 

@@ -975,10 +975,21 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 
 		        me.cardSelector.find('#vcf-variant-count').text(me.vcfData.features.length);
 
-
+		        // Post processing:
 		        // We have the af1000g and afexac, so now determine the level for filtering
-		        // by range
+		        // by range.  
 		        me.vcfData.features.forEach(function(variant) {
+		        	// For ExAC levels, differentiate between af not found and in 
+		        	// coding region (level = private) and af not found and intronic (non-coding) 
+		        	// region (level = unknown)
+		        	if (variant.afExAC == 0) {
+			        	window.selectedTranscriptCodingRegions.forEach(function(codingRegion) {
+			        		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			
+			        		} else {
+			        			variant.afExAC = -100;
+			        		}
+			        	});
+		        	}
 
 					afExacMap.forEach( function(rangeEntry) {
 						if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
@@ -1339,7 +1350,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				me.cardSelector.find(".vcfloader .loader-label").text("Annotating variants with snpEFF in realtime")
 
 				// Annotate the fb variants
-				me.vcf.annotateVcfRecords(fbRecs, refName, window.gene.start, window.gene.end, 
+				me.vcf.annotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene.start, window.gene.end, 
 					window.gene.strand, window.selectedTranscript, function(data){
 
 				   	data.features.forEach( function(feature) {
@@ -1466,6 +1477,10 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 
 	var data = dataToFilter ? dataToFilter : this.vcfData;
 
+	if (data == null || data.features == null || data.features.length == 0) {
+		return;
+	}
+
 	if ($('#afexac-scheme').attr('class').indexOf("current") >= 0) {
 		afField = "afExAC";
 	} else {
@@ -1478,6 +1493,20 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		afLowerVal  = +$('#af-amount-start').val() / 100;
 		afUpperVal  = +$('#af-amount-end').val() / 100;
 	} 
+
+	if (afLowerVal != null && afUpperVal != null) {
+		if (afLowerVal <= 0 && afUpperVal == 1) {
+			// We are not filtering on af if the range is 0-1
+			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").addClass("hide");
+		} else {
+			// We are filtering on af range.  show the filter flag
+			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").removeClass("hide");
+			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
+		}
+	} else {
+		me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").addClass("hide");
+	}
+
 
 	var coverageMin = null;
 	if ($('#coverage-min') != '') {
@@ -1502,13 +1531,7 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 			if (afLowerVal <= 0 && afUpperVal == 1) {
 				meetsAf = true;
 			} else {
-				if (afField == "afExAC") {
-					me.cardSelector.find("#afexaclevel-flag").removeClass("hide");
-				} else {
-					me.cardSelector.find("#af1000glevel-flag").removeClass("hide");
-				}
-				me.cardSelector.find("#displayed-variant-count").removeClass("hide");
-
+				
 				meetsAf =  (variantAf >= afLowerVal && variantAf <= afUpperVal);
 			}
 		} else {
