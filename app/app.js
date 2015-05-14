@@ -1344,6 +1344,8 @@ function loadTracksForGene(bypassVariantCards) {
 	window.vcf1000GData = null;
 	window.vcfExACData = null;
 
+	$("#region-flag").addClass("hide");
+
 	$('#data-card').removeClass("hide");
 	$('#transcript-card').removeClass("hide");
 
