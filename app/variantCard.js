@@ -22,8 +22,6 @@ function VariantCard() {
 	this.cardIndex = null;
 	this.name = null;
 	this.dirty = false;
-
-
 }
 
 VariantCard.prototype.isLoaded = function() {
@@ -193,15 +191,30 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .tooltipHTML(variantTooltipHTML)
 				    .on("d3rendered", function() {
 				    	
-				    })			    
+				    })
+				    .on('d3click', function(d) {
+				    	if (d != clickedVariant) {
+					    	clickedVariant = d;
+					    	me.showCoverageCircle(d);
+					    	window.showCircleRelatedVariants(d, me);
+				    	} else {
+				    		clickedVariant = null;
+							me.hideCoverageCircle();
+							window.hideCircleRelatedVariants();
+				    	}
+					})			    
 				    .on('d3mouseover', function(d) {
-				    	me.showCoverageCircle(d);
-				    	window.showCircleRelatedVariants(d, me);
+				    	if (clickedVariant == null) {
+					    	me.showCoverageCircle(d);
+					    	window.showCircleRelatedVariants(d, me);
+				    	}
 					})
 					.on('d3mouseout', function() {
-						me.hideCoverageCircle();
-						if (me.getRelationship() == 'proband') {
-							window.hideCircleRelatedVariants();
+						if (clickedVariant == null) {
+							me.hideCoverageCircle();
+							if (me.getRelationship() == 'proband') {
+								window.hideCircleRelatedVariants();
+							}
 						}
 					});
 
@@ -581,17 +594,17 @@ VariantCard.prototype.getRelationship = function() {
 	return this.relationship;
 }
 
-VariantCard.prototype.showVariantCircle = function(variant) {
+VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	// Check the fb called variants first.  If present, circle and don't
 	// show X for missing variant on vcf variant chart.
 	var matchingVariantFound = false;
 	if (this.fbChart != null && this.fbData != null && this.fbData.features.length > 0) {
 		var container = this.d3CardSelector.selectAll('#fb-variants svg');
-		matchingVariantFound = this.fbChart.showCircle()(variant, container, false);
+		matchingVariantFound = this.fbChart.showCircle()(variant, container, false, clickedVariant != null && this == sourceVariantCard);
 	}
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
-		matchingVariantFound = this.vcfChart.showCircle()(variant, container, !matchingVariantFound);
+		matchingVariantFound = this.vcfChart.showCircle()(variant, container, !matchingVariantFound, clickedVariant != null && this == sourceVariantCard);
 	}
 	
 }
@@ -975,35 +988,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 
 		        me.cardSelector.find('#vcf-variant-count').text(me.vcfData.features.length);
 
-		        // Post processing:
-		        // We have the af1000g and afexac, so now determine the level for filtering
-		        // by range.  
-		        me.vcfData.features.forEach(function(variant) {
-		        	// For ExAC levels, differentiate between af not found and in 
-		        	// coding region (level = private) and af not found and intronic (non-coding) 
-		        	// region (level = unknown)
-		        	if (variant.afExAC == 0) {
-			        	window.selectedTranscriptCodingRegions.forEach(function(codingRegion) {
-			        		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			
-			        		} else {
-			        			variant.afExAC = -100;
-			        		}
-			        	});
-		        	}
-
-					afExacMap.forEach( function(rangeEntry) {
-						if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
-							variant.afexaclevel = rangeEntry.clazz;
-						}
-					});
-					af1000gMap.forEach( function(rangeEntry) {
-						if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
-							variant.af1000glevel = rangeEntry.clazz;
-						}
-					});
-
-
-				});
+		        // We have the AFs from 1000G and ExAC.  Now set the level so that variants
+		        // can be filtered by range.
+		        me.determineVariantAfLevels(me.vcfData);
 
 		   	    if (me.isViewable()) {
 			   	    me.cardSelector.find('.vcfloader .loader-label').text("Loading variant chart");
@@ -1050,6 +1037,40 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		});
 		*/
 	}
+
+}
+
+VariantCard.prototype.determineVariantAfLevels = function(theVcfData) {
+	var me = this;
+    // Post processing:
+    // We have the af1000g and afexac, so now determine the level for filtering
+    // by range.  
+    theVcfData.features.forEach(function(variant) {
+    	// For ExAC levels, differentiate between af not found and in 
+    	// coding region (level = private) and af not found and intronic (non-coding) 
+    	// region (level = unknown)
+    	if (variant.afExAC == 0) {
+        	window.selectedTranscriptCodingRegions.forEach(function(codingRegion) {
+        		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			
+        		} else {
+        			variant.afExAC = -100;
+        		}
+        	});
+    	}
+
+		afExacMap.forEach( function(rangeEntry) {
+			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
+				variant.afexaclevel = rangeEntry.clazz;
+			}
+		});
+		af1000gMap.forEach( function(rangeEntry) {
+			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
+				variant.af1000glevel = rangeEntry.clazz;
+			}
+		});
+
+
+	});
 
 }
 
@@ -1329,6 +1350,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 			// Parse string into records
 			var fbRecs = [];
+			
 			var contigHdrRecFound = false;
 			var recs = data.split("\n");
 			recs.forEach( function(rec) {
@@ -1341,6 +1363,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				}
 				fbRecs.push(rec);
 			});
+
 
 
 			
@@ -1358,6 +1381,9 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				   	});
 
 					me.fbData = data;
+
+		        	me.determineVariantAfLevels(me.fbData);
+
 					
         			// Flag the variants as called by Freebayes and add unique to vcf
         			// set

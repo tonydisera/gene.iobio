@@ -708,18 +708,38 @@ header {
     margin-top: 10px; 
 }
 
-#bam-depth .circle, #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
-  stroke:  #E73F22;
+#bam-depth .circle, 
+#vcf-variants .circle, 
+#fb-variants .circle, 
+#vcf-variants .arrow-line, 
+#fb-variants .arrow-line {
+  stroke: rgba(221, 109, 109, 1);
+  stroke-width: 2;
   fill: none;
-  stroke-width: 2;
 }
-#vcf-variants .arrow, #fb-variants .arrow {
-  fill: #E73F22;
+
+#vcf-variants .circle.emphasize, 
+#fb-variants .circle.emphasize, 
+#vcf-variants .arrow-line.emphasize, 
+#fb-variants .arrow-line.emphasize  {
+  stroke:  rgba(221, 109, 109, 1);
+  fill: none ;
+  stroke-width: 3 ;
+}
+#vcf-variants .arrow, 
+#fb-variants .arrow {
+  fill:  rgba(221, 109, 109, 1);
   stroke-width: 2;
-  stroke: #E73F22;
+  stroke:  rgba(221, 109, 109, 1);
+}
+#vcf-variants .arrow.emphasize, 
+#fb-variants .arrow.emphasize {
+  fill:  rgba(221, 109, 109, 1);
+  stroke-width: 3;
+  stroke: rgba(221, 109, 109, 1);
 }
 #bam-depth .circle-label {
-   fill: #E73F22;
+   fill:  rgba(221, 109, 109, 1);
    font-size: 10px;
    font-weight: bold;
 }

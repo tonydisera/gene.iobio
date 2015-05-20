@@ -53,6 +53,7 @@ var annotsToInclude = new Object();
 var afMin = null;
 var afMax = null;
 var coverageMin = 10;
+var clickedVariant = null;
 
 
 
@@ -1797,7 +1798,7 @@ function showCircleRelatedVariants(variant, sourceVariantCard) {
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
 			variantCard.hideVariantCircle();
-			variantCard.showVariantCircle(variant);
+			variantCard.showVariantCircle(variant, sourceVariantCard);
 			variantCard.showCoverageCircle(variant);
 		}
 	});

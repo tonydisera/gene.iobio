@@ -1,5 +1,5 @@
 function variantD3() {
-   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3mouseover", "d3mouseout");
+   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3click", "d3mouseover", "d3mouseout");
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},
@@ -63,7 +63,7 @@ function variantD3() {
      }
   }
 
-  var showCircle = function(d, svgContainer, indicateMissingVariant) {
+  var showCircle = function(d, svgContainer, indicateMissingVariant, emphasize) {
     // Find the matching variant
     var matchingVariant = null;
     svgContainer.selectAll(".variant").each( function (variant,i) {
@@ -88,6 +88,8 @@ function variantD3() {
             .style("opacity", 1);
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 2);
+
+      circle.classed("emphasize", emphasize)
               
     } else if (indicateMissingVariant) {
       var mousex = d3.round(x(d.start));
@@ -100,7 +102,8 @@ function variantD3() {
             .duration(200)
             .style("opacity", 1);
 
-
+      
+      svgContainer.select(".circle").classed("emphasize", false);
     }
     return matchingVariant;
   };
@@ -375,6 +378,9 @@ function variantD3() {
       
 
       g.selectAll('.variant')
+           .on("click", function(d) {
+              dispatch.d3click(d);
+           })
            .on("mouseover", function(d) {  
               var tooltip = container.select('.tooltip');
               tooltip.transition()        
