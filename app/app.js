@@ -10,7 +10,7 @@ var gene_engine = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   local: [],
-  limit: 10
+  limit: 20
 });
 
 // the variant filter panel
@@ -33,6 +33,7 @@ var zoomRegionChart = null;
 // when there is not an active selection.
 var regionStart = null;
 var regionEnd = null;
+var GENE_REGION_BUFFER = 1000;
 
 // Transcript data and chart
 var gene = '';
@@ -61,6 +62,8 @@ var clickedVariant = null;
 var featureVcfData = null;
 var sourceVcfData = null;
 var featureMatrix  = null;
+
+
 
 var showClinVarSymbol = function (selection) {
 	selection.append("g")
@@ -344,6 +347,10 @@ function init() {
 
     // Iniitalize the 'samples' data card.
     initDataCard();
+
+
+    // Initialize page guide
+	tl.pg.init({ 'auto_refresh': true, 'custom_open_button': '.open_page_guide'}); 
 	
 
 	// Set up the gene search widget
@@ -591,21 +598,27 @@ function loadGeneFromUrl() {
 	var gene = getUrlParameter('gene');
 	if (gene != undefined) {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+	} else {
+		$('#tourWelcome').addClass("open");
+
 	}
 }
 
 function loadUrlSources() {
-	loadTracksForGene(true);
 
-	// get all bam and vcf url params in hash
 	var bam  = getUrlParameter(/bam*/);
 	var vcf  = getUrlParameter(/vcf*/);	
 	var rel  = getUrlParameter(/rel*/);
 	var dsname = getUrlParameter(/name*/);	
 
+	loadTracksForGene(true);
+
+	// get all bam and vcf url params in hash
+
 	if ((bam != null && Object.keys(bam).length > 1) || (vcf != null && Object.keys(vcf).length > 1)) {
 		toggleSampleTrio(true);
 	} 
+
 
 	if (bam != null) {
 		Object.keys(bam).forEach(function(urlParameter) {
@@ -880,7 +893,7 @@ function initFilterTrack() {
 	var filterCardSelector = $('#filter-track');
 	filterCardSelector.find('#expand-button').on('click', function() {
 		filterCardSelector.find('.fullview').removeClass("hide");
-		filterCardSelector.css('min-width', "615px");
+		filterCardSelector.css('min-width', "665px");
 	});
 	filterCardSelector.find('#minimize-button').on('click', function() {
 		filterCardSelector.find('.fullview').addClass("hide");
@@ -1064,6 +1077,12 @@ function initFilterTrack() {
 	    	filterVariants();
 	    });
 	  
+}
+
+function adjustGeneRegionBuffer() {
+	GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
+	$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});
+
 }
 
 function resetAfRange() {
@@ -1289,10 +1308,22 @@ function loadGeneWidget() {
 		    	moveDataSourcesButton();
 		    	window.selectedTranscript = null;
 
+		    	
+
 		    	if (data.loadFromUrl) {
+		    		var bam  = getUrlParameter(/bam*/);
+					var vcf  = getUrlParameter(/vcf*/);	
+
+					if (bam == null && vcf == null) {
+						$('#tourWelcome').addClass("open");
+					}
+
 		    		// Autoload data specified in url
-					loadUrlSources();	
+					loadUrlSources();						
 		    	} else {
+	
+					$('#tourWelcome').removeClass("open");
+					
 			    	// Set all of the variant cards as "dirty"
 			    	variantCards.forEach(function(variantCard) {
 			    		variantCard.setDirty();
@@ -1302,6 +1333,7 @@ function loadGeneWidget() {
 			    	updateUrl('gene', window.gene.gene_name);
 			    	if(data.callback != undefined) data.callback();
 
+					//tl.pg.refreshVisibleSteps();
 		    	}
 		    	
 
@@ -1370,6 +1402,12 @@ function loadTracksForGene(bypassVariantCards) {
 
     $('#gene-name').text(window.gene.gene_name);   
     $('#gene-region-info').text(window.gene.chr + ' ' + window.gene.regionStart + "-" + window.gene.regionEnd);
+
+    // Open up gene region to include upstream and downstream region;
+	window.gene.start = window.gene.start < GENE_REGION_BUFFER ? 0 : window.gene.start - GENE_REGION_BUFFER;
+	// TODO: Don't go past length of reference
+	window.gene.end   = window.gene.end + GENE_REGION_BUFFER;
+		    	
 
 
    	// This will be the view finder, allowing the user to select
@@ -1840,6 +1878,7 @@ function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd, s
 		fillFeatureMatrix(theVcfData);
 	}
 
+	
 }
 
 
@@ -2160,7 +2199,7 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Zygosity', variant.zygosity == "gt_unknown" ? "(No genotype)" : variant.zygosity)
 		+ tooltipRow('GMAF', variant.gMaf)
 		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('AF ExAC', variant.afExAC, true)
+		+ tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, true)
 		+ tooltipRow('AF 1000G', variant.af1000G, true)
 		+ tooltipRow('ClinVar uid', variant.clinVarUid)
 		// + tooltipRow('ClinVar #', variant.clinVarAccession)
@@ -2253,7 +2292,7 @@ function enableVariantFilters(fullRefresh) {
 	});
 	d3.selectAll(".afexaclevel").each( function(d,i) {
 		var afexaclevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + afexaclevel)[0].length;
+		var count = d3.selectAll('#vcf-variants .variant.' + afexaclevel + ',' + '#fb-variants .variant.' + afexaclevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".af1000glevel").each( function(d,i) {

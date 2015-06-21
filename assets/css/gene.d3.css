@@ -33,6 +33,10 @@
   font-size: 13px; fill: 
   rgb(120,120,120); 
 }
+#zoom-region-chart.ibo-gene .cds.danger, #zoom-region-chart.ibo-gene .utr.danger { 
+  fill: rgba(226, 37, 37, .6);
+  stroke: rgba(226,37,37,.6);
+}
 #transcript-menu-item.ibo-gene .transcript.selected .name { 
   font-style: bold;
   fill: black;

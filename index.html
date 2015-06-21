@@ -74,13 +74,13 @@
   <link href="http://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet">
 
 
+  <!-- page guide stylesheet -->
+  <link rel="stylesheet" href="assets/css/pageguide.css">
+
 
   <!-- site stylesheets -->
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
   <link rel="stylesheet" href="assets/css/site.css" />
-
-
-
 
   <!--                      -->
   <!-- handlebar templates  -->
@@ -89,7 +89,7 @@
   <script id="sample-data-template" type="text/x-handlebars-template">
           <div id="sample-data-panel">
             <div id="add-name" class="fullview" style="display:table">
-              <div id="sample-data-label" class="card-label" style="margin-top: 8px;width:105px;">PROBAND</div>
+              <div id="sample-data-label" class="card-label" style=";width:105px;">PROBAND</div>
               <div style="display:table-cell;width:100%">
                 <input id="datasource-name" class="form-control input-sm" placeholder="Enter name" type="text"/>
               </div>
@@ -97,8 +97,8 @@
 
             <div id="add-vcf-track" class="fullview" style="display:table">
                 
-                <div class="btn-toolbar" style="width:105px;">
-                  <div class="btn-group" style="display:  inline;margin-top: 15px;">
+                <div class="btn-toolbar tour_element_3" style="width:105px;">
+                  <div class="btn-group" style="display:  inline;" >
 
                     <button type="button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <i class="mdi-device-now-widgets" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
@@ -126,8 +126,8 @@
             </div>     
             <div id="add-bam-track" class="fullview" style="display:table">
 
-              <div class="btn-toolbar" style="width:105px;" >
-                <div class="btn-group" style="display:inline;margin-top: 15px;">
+              <div class="btn-toolbar tour_element_4" style="width:105px;" >
+                <div class="btn-group" style="display:inline;">
 
                     <button type="button" style="width:95px;font-size:11px;padding-top: 2px;padding-bottom: 1px;"
                     class="icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -162,6 +162,9 @@
             </div>
 
 
+
+
+
           </div>
 
   </script>
@@ -173,7 +176,7 @@
   <!--                       -->
   <script id="variant-card-template" type="text/x-handlebars-template">
 
-      <div class="variant-card track-expand shadow-z-1 hide" style="padding-bottom:10px;background-color:white;">
+      <div class="variant-card track-expand shadow-z-1 hide" style="padding-bottom:0px;background-color:white;">
 
 
           <div style="text-align:center;margin-top: 6px">
@@ -190,7 +193,7 @@
               </li>
 
               <li>
-                <a href="javascript:void(0)" id="button-find-missing-variants" style="padding-top:0px">
+                <a href="javascript:void(0)" id="button-find-missing-variants" style="padding-top:0px" class="tour_element_7">
                     <i class="mdi-action-find-in-page"></i>
                     <span id="missing-variant-count-label">Find missing variants</span>
                     <span id="missing-variant-count" class="badge"></span>
@@ -268,7 +271,7 @@
 
           <div id="variant-panel" style="clear:both;">
  
-            <div id="vcf-track" class="track hide" >
+            <div id="vcf-track" class="track hide tour_element_5" >
                      
               <div class="track-chart">
                   <div>
@@ -305,7 +308,7 @@
                   <div >
                     <div id="bam-chart-label" class="chart-label hide" style="margin-top: 24px;margin-bottom: -17px;">Coverage
                     </div>
-                    <div id="bam-depth">
+                    <div id="bam-depth" class="tour_element_6">
                     </div>
                   </div>
 
@@ -325,32 +328,55 @@
   <script id='track-legend-template' type="text/x-handlebars-template">    
     <div>
       <!-- impact -->
-      <div style="float:left;;width:60px">
-        <svg id="impact-scheme" class="current" width="40" height="15" transform="translate(0,0)">
-          <text class="name" x="0" y="10">Impact</text>
+      <div style="float:left;;width:97px">
+        <svg id="impact-scheme" class="current" width="97" height="28" transform="translate(0,0)">
+          <text class="name" x="0" y="10">snpEFF</text>
+          <text class="name" x="0" y="22">Impact</text>
         </svg>
-        <svg id="HIGH" class="impact" width="40" height="14" transform="translate(0,0)">
+        <svg id="HIGH" class="impact" width="97" height="14" transform="translate(0,0)">
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">High</text>
           <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
         </svg>
-        <svg id="MODERATE" class="impact" width="60" height="14" transform="translate(0,0)">
+        <svg id="MODERATE" class="impact" width="97" height="14" transform="translate(0,0)">
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Moderate</text>
           <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
         </svg>
-        <svg id="MODIFIER" class="impact" width="60" height="14" transform="translate(0,0)">
+        <svg id="MODIFIER" class="impact" width="97" height="14" transform="translate(0,0)">
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Modifier</text>
           <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
         </svg>
-        <svg id="LOW" class="impact" width="40" height="14" transform="translate(0,0)">
+        <svg id="LOW" class="impact" width="97" height="14" transform="translate(0,0)">
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Low</text>
           <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
         </svg>
+        <div style="padding-top:14px;" class="todo">
+          <!-- PolyPhen -->
+          <svg id="polyphen-scheme" class="" width="93" height="25" transform="translate(0,0)">
+            <text class="name" x="0" y="10">PolyPhen</text>
+            <text class="name" x="0" y="22">Classification</text>
+          </svg>
+          <svg id="DAMAGE" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Probably Damaging</text>
+            <rect class="filter-symbol  polyphen_DAMAGE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="POSSDAMAGE" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Possibly Damaging</text>
+            <rect class="filter-symbol  polyphen_POSSDAMAGE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="BENIGN" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Benign</text>
+            <rect class="filter-symbol  polyphen_BENIGN" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+
+        </div>
+        
       </div>
 
       <!-- effect -->
-      <div id="effect-filter-box" style="float:left;width:82px;">
-        <svg id="effect-scheme" width="40" height="15" transform="translate(0,0)" class="">
-          <text class="name" x="0" y="10">Effect</text>
+      <div id="effect-filter-box" style="float:left;width:82px;padding-left:5px;">
+        <svg id="effect-scheme" width="40" height="28" transform="translate(0,0)" class="">
+          <text class="name" x="0" y="10">snpEFF</text>
+          <text class="name" x="0" y="22">Effect</text>
         </svg>
         <svg id="frameshift" class="effectCategory nocolor" width="65" height="14" transform="translate(0,0)">
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Frameshift</text>
@@ -368,7 +394,7 @@
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop gained</text>
           <rect class="filter-symbol  effect_stop_gained" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
         </svg>
-        <a id="more-effect-link" href="#more-effect" data-toggle="collapse" aria-expanded="false" class="collapsed">
+        <a id="more-effect-link" href="#more-effect" style="display:block;margin-top:-4px;"data-toggle="collapse" aria-expanded="false" class="collapsed">
                     more...            
         </a>
         <span id="more-effect" aria-expanded="false" class="collapse" style="height: 0px;">
@@ -431,11 +457,28 @@
           <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">No Effect</text>
           <rect class="filter-symbol  effect_NOEFFECT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
           </svg> 
-        </span>       
+        </span>    
+        <div style="padding-top:32px;" class="todo" >
+          <!-- SIFT -->
+          <svg id="sift-scheme" class="" width="93" height="25" transform="translate(0,0)">
+            <text class="name" x="0" y="10">SIFT</text>
+            <text class="name" x="0" y="22">Classification</text>
+          </svg>
+          <svg id="DAMAGE" class="sift nocolor" width="93" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Damaging</text>
+            <rect class="filter-symbol  sift_DAMAGE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="TOLERATE" class="sift nocolor" width="93" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Tolerated</text>
+            <rect class="filter-symbol  sift_TOLERATE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+
+        </div>
+   
       </div>
 
       <!-- type -->
-      <div style="float:left;;width:60px">
+      <div style="padding-top:12px;float:left;;width:60px">
 
         <svg id="type-scheme" width="35" height="15" transform="translate(0,0)" class="">
           <text class="name" x="0" y="10">Type</text>
@@ -461,10 +504,26 @@
             </path>
           </g>
         </svg>
+
+        <div style="padding-top:25px" class="todo">
+          <svg id="regulatory-scheme" class="" width="80" height="16" transform="translate(0,0)">
+            <text class="name" x="0" y="10">Promoters</text>
+          </svg>
+          <svg id="TSS" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">TSS</text>
+            <rect class="filter-symbol  regulatory_TSS" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+          <svg id="FLANK" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Promoter Flank</text>
+            <rect class="filter-symbol  regulatory_FLANK" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+          </svg>
+
+        </div>
+
       </div>
 
       <!-- zygosity -->
-      <div style="width: 85px;float: left;">
+      <div style="padding-top:12px;width: 85px;float: left;">
             <svg id="zygosity-scheme" width="60" height="15" transform="translate(0,0)" class="">
               <text class="name" x="0" y="10">Zygosity</text>
             </svg>
@@ -485,7 +544,7 @@
       </div>
 
       <!-- allele frequency-->      
-        <div style="float:left;width:120px">
+        <div style="float:left;width:127px">
            <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
             <text class="name" x="0" y="10">Allele Frequency</text>
           </svg>
@@ -547,7 +606,7 @@
             <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 10px;">private</text>
             <g class=" af1000g_unique">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,39);"></use>
-\            </g>
+            </g>
           </svg>
           <svg id="af1000g_uberrare" class="af1000glevel nocolor" width="50" height="14" transform="translate(0,0)">
             <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 10px;">&lt; .01%</text>
@@ -582,12 +641,24 @@
         
 
         </div>
+         <!-- allele freq range -->
+          <div style="float:left;">
+            <input  type="text"  id="af-amount-start" value="0"                           
+             style="width: 35px;font-size: 10px;margin-bottom: 1px;"/>
+            -
+            <input type="text"  id="af-amount-end" value="100" 
+            style="width: 35px;font-size: 10px;margin-bottom: 1px;"/>
+            %
+            <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">           
+            Go
+            </a>
+          </div>
 
       </div>
 
       <!-- inheritance -->
-      <div style="float:left;width:90px;">
-          <svg id="inheritance-scheme" class="" width="90" height="15" transform="translate(0,0)">
+      <div style="padding-top:12px;float:left;width:90px;">
+          <svg id="inheritance-scheme" class="" width="90" height="17" transform="translate(0,0)">
               <text class="name" x="0" y="10">Inheritance</text>
           </svg>
            <svg id="denovo" class="inheritance" width="90" height="20" transform="translate(0,0)">
@@ -603,12 +674,23 @@
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Recessive</text></svg>
           </svg>
+
+            <!-- coverage -->  
+          <div style="float:left;padding-top:20px" >
+            <span style="font-size:11px;">Coverage (min)</span>
+            <input type="text" id="coverage-min" value="" style="width:20px;font-size: 10px;margin-bottom:1px">
+            X
+            <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">           
+            Go
+            </a>
+          </div>
+
       </div>
 
 
       <!-- clinvar -->
-      <div style="float:left;width:94px;">
-          <svg id="clinvar-scheme" class="" width="90" height="15" transform="translate(0,0)">
+      <div style="padding-top:12px;float:left;width:94px;">
+          <svg id="clinvar-scheme" class="" width="90" height="18" transform="translate(0,0)">
               <text class="name" x="0" y="10">ClinVar</text>
           </svg>
           <svg id="clinvar_benign" class="clinvar" width="84" height="15" transform="translate(0,0)">
@@ -667,34 +749,7 @@
 
     <div>
 
-    <!-- Last row in filter panel -->
-    <div style="clear:both; margin-bottom:4px;">
-
-           <!-- coverage -->  
-          <div style="float:left;" >
-            <span style="font-size:11px;">Coverage (min)</span>
-            <input type="text" id="coverage-min" value="" style="width:50px;font-size: 11px;margin-bottom:1px">
-            X
-            <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:6px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">           
-            Go
-            </a>
-          </div>
-
-         <!-- allele freq range -->
-          <div style="float:left;padding-left:100px">
-            <input  type="text"  id="af-amount-start" value="0"                           
-             style="width: 45px;font-size: 11px;margin-bottom: 1px;"/>
-            -
-            <input type="text"  id="af-amount-end" value="100" 
-            style="width: 45px;font-size: 11px;margin-bottom: 1px;"/>
-            %
-            <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:6px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">           
-            Go
-            </a>
-          </div>
-            
-    </div>
-
+   
   </script>
     
 </head>
@@ -707,25 +762,92 @@
     <div id="nav-section" class="shadow-z-1">
 
     	<section id="app-title-section">
-    	   <a id='home' href="/"><span class="iobioapp"><span class='beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
-            <span id="bloodhound">
-                <input class="typeahead" style="margin-top: 10px" type="text" placeholder="Enter Gene Name">
-            </span>
+    	   <a id='home' href="/"><span class="iobioapp"><span class=' beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
 
-             <button id="datasource-button"
-               class="hide btn btn-default btn-raised icon-button" data-toggle="modal" 
-               data-target="#datasource-dialog">
-               <i class="mdi-action-settings" ></i>
-               Data Sources
-            </button>
-           <a href="http://iobio.io" class="iobioproject">
+           <a href="javascript:void(0)" class="open_page_guide" 
+              style="float: left;margin-top: 20px;margin-left: 10px;">
+             <i class="mdi-maps-directions"></i>
+             Start tour
+           </a>                
+                <!-- gene list dropdown button -->
+                <!--
+              <div class="todo">
+                <div class="btn-toolbar" class="todo" style="width:105px;display:inline-block;">
+                  <div class="btn-group" class="todo" style="display:  inline;margin-top: 15px;">
+
+                    <button type="button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
+                      Gene list <span class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="">Upload</a></li>
+                      <li><a href="">Phenomizer</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            -->
+
+            <span id="bloodhound" >
+                <input class="typeahead tour_element_1" style="margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" placeholder="Enter Gene Name">
+            </span>           
+
+            <!-- gene bubbles for navigation -->
+            <div class="todo">
+                <!-- APOE, APOB, LDLR, CETP, LRPAP1 -->
+                <div style="display:inline-block;padding-top:10px" >
+                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">APOE</div>
+                  <div><a href="javascript:void(0)" class="btn btn-success btn-fab btn-raised mdi-action-done"></a></div>
+                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
+                    <i class="mdi-content-clear"></i>
+                  </a>
+                </div>
+                <div style="display:inline-block;padding-top:10px" >
+                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">APOB</div>
+                  <div><a href="javascript:void(0)" class="btn btn-success btn-fab btn-raised mdi-action-done"></a></div>
+                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
+                    <i class="mdi-content-clear"></i>
+                  </a>
+                </div>
+                <div style="display:inline-block;padding-top:10px" >
+                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">LDLR</div>
+                  <div><a href="javascript:void(0)" class="btn btn-danger btn-fab btn-raised mdi-content-flag"></a></div>
+                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
+                    <i class="mdi-content-clear"></i>
+                  </a>
+                </div>
+                <div style="display:inline-block;padding-top:10px" >
+                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">CETP</div>
+                  <div><a href="javascript:void(0)" class="btn btn-default btn-fab btn-raised mdi-navigation-refresh"></a></div>
+                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
+                    <i class="mdi-content-clear"></i>
+                  </a>                  
+                </div>
+                <div style="display:inline-block;padding-top:10px" >
+                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">LRPAP1</div>
+                  <div><a href="javascript:void(0)" class="btn btn-default btn-fab btn-raised mdi-navigation-refresh"></a></div>
+                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
+                    <i class="mdi-content-clear"></i>
+                  </a>                  
+                </div>
+            </div>
+
+           <a href="http://iobio.io" class="iobioproject">           
             an iobio project
            </a>   
       </section>
 
-      <div id="transcript-card" class="shadow-z-1 hide" style="background:white;padding-top:10px;">
-        <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;width:130px">GENE</span>
+    
 
+   
+
+      <div id="transcript-card" class="hide" style="background:white;padding-top:10px;">
+        <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;margin-right:3px;">
+          <span id="gene-name"></span>  
+        
+        </span>
+          
         <span style="float:right;margin-right:14px">
           <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
             <i class="mdi-content-remove"></i>
@@ -736,9 +858,10 @@
        </span>
 
 
+        <span style="float:left;padding-left:10px;padding-top: 3px;padding-right:3px;color: rgb(132,132,132);">Transcript</span>  
         <div class="btn-toolbar fullview" 
-           style="display: inline-block;float: left;margin-left: 10px;padding-top: 0px; margin-top: -12px;">
-           <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
+           style="display: inline-block;float: left;margin-left: 0px;padding-top: 0px; margin-top: -12px;">
+           <div id="transcript-btn-group" class="btn-group hide tour_element_10" style="display:  inline;">
                 <button id="transcript-dropdown-button" type="button"  
                 style="width:150px;font-size:11px"
                 class="btn btn-default dropdown-toggle icon-button-sm" 
@@ -752,12 +875,13 @@
                 </ul>
             </div>
         </div>    
-        <div id="region-track">
-          <span id="gene-name"></span>  
+        <div id="region-track" >
           <span id="gene-region-info"></span>
+          <span style="padding-left: 10px">+  -</span>
+          <input id="gene-region-buffer-input" class="tour_element_12" onchange="adjustGeneRegionBuffer()" type="text" value="1000" style="width: 40px;font-size: 13px;margin-bottom:2px">
         </div>
         <div id="transcript-panel" class="fullview" >
-          <div id="gene-track" class="track hide">           
+          <div id="gene-track" class="track hide tour_element_2 tour_element_11">           
               <div id="gene-viz" class="track-chart"></div>               
           </div>
         </div>
@@ -778,71 +902,84 @@
         </button>
       </div>
 
-      <div id="data-card" class="track shadown-z-1 hide">
+      <div id="data-card" class="track shadow-z-1 hide" >
 
         <div style="width:100%;clear:both;">
 
-          <div id="toolbar" >
-            <span class="card-label" >SAMPLES</span>
 
-            <span style="float:right">
-              <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                <i class="mdi-content-remove"></i>
-              </a>
-              <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                <i class="mdi-image-crop-din"></i>
-              </a>
-           </span>
+              <div id="toolbar" >
+                <span class="card-label" >SAMPLES</span>
+
+                <span style="float:right">
+                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="mdi-content-remove"></i>
+                  </a>
+                  <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="mdi-image-crop-din"></i>
+                  </a>
+               </span>
 
 
-            <div class="fullview" style="text-align:center;width: 100%;margin-top: -25px;">
-              <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-                <i class="mdi-social-person"></i>
-                Single
-              </button>
-              <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                style="padding-top: 2px;padding-bottom:1px;">
-                <div style="float:left;">
-                  <img src="assets/images/1f46a-Family.48.blue.png" style="height:27px"/>
+                <div class="fullview" style="text-align:center;width: 100%;margin-top: -25px;">
+                  <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised tour_element_2_5" onclick="toggleSampleTrio(false)"  >
+                    <i class="mdi-social-person"></i>
+                    Single
+                  </button>
+                  <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <div style="float:left;">
+                      <img src="assets/images/1f46a-Family.48.blue.png" style="height:27px"/>
+                    </div>
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+                  </button>
+                  <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <div style="float:left;">
+                      <img src="assets/images/pedigree.png" style="height:22px"/>
+                    </div>
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+                  </button>
+                  <button id="other-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <i class="mdi-editor-format-align-justify"></i>                
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
+                  </button>
+                  <button id="ok-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" 
+                    style="padding-top: 2px;   padding-bottom: 3px;margin-left: 20px;">
+                    <i class="mdi-action-done"></i>
+                    Done
+                  </button>
                 </div>
-                 <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-              </button>
-            </div>
-          </div>
+              </div>
 
 
-          <div id="proband-data" style="float:left;margin-right:20px;width:60%">
-            <input id="card-index" class="hide" value="0" type="text">
-            <input id="datasource-relationship" class="hide" value="proband" type="text"/>
-          </div>
+              <div id="proband-data" style="float:left;margin-right:20px;width:60%">
+                <input id="card-index" class="hide" value="0" type="text">
+                <input id="datasource-relationship" class="hide" value="proband" type="text"/>
+              </div>
 
-          <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
-            <input id="card-index" class="hide" value="1" type="text">
-            <input id="datasource-relationship" class="hide" value="mother" type="text"/>
-          </div>
+              <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
+                <input id="card-index" class="hide" value="1" type="text">
+                <input id="datasource-relationship" class="hide" value="mother" type="text"/>
+              </div>
 
-          <div id="father-data" class="hide" style="float:left;width:32%">
-            <input id="card-index" class="hide" value="2" type="text">
-            <input id="datasource-relationship" class="hide" value="father" type="text"/>
-          </div>
+              <div id="father-data" class="hide" style="float:left;width:32%">
+                <input id="card-index" class="hide" value="2" type="text">
+                <input id="datasource-relationship" class="hide" value="father" type="text"/>
+              </div>
 
-          <div class="fullview" style="clear:both;text-align:center;width: 100%;">
-            <button id="ok-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised">
-              <i class="mdi-action-done"></i>
-              Done
-            </button>
-          </div>
+          </div>   
 
-
+          
+          
         </div>
-
 
       </div>
 
 
       <div id="filter-and-rank-card">
 
-        <div id="filter-track"  class="track-expand shadow-z-1 hide">
+        <div id="filter-track"  class="track-expand shadow-z-1 hide tour_element_8">
             <span class="card-label">Filter Variants</span>
 
             <span style="float:right;padding-top:4px">
@@ -860,7 +997,7 @@
 
         <div style="display:table-cell;min-width:8px"></div>
 
-        <div id="matrix-track"  class="track-expand shadow-z-1 hide">
+        <div id="matrix-track"  class="track-expand shadow-z-1 hide tour_element_9">
             <div>
               <span class="card-label">Rank Variants</span>
 
@@ -898,7 +1035,7 @@
                 </div>
               </div>
               <span class="clinvar loader" style="display: inline;float: right;margin-top: 0px;">
-                    <span class="loader-label" >Accessing ClinVar</span>
+                    <span id="clinvar_loader" class="loader-label" >Accessing ClinVar</span>
                     <img src="assets/images/loading-squares.gif">
               </span>
               <span class="inheritance loader" class="hide" style="float: right;margin-top: 0px;">
@@ -924,8 +1061,65 @@
         </div>
       </div>
 
+      <div id="variant-control-panel"  class="todo" style="background:white;padding-right:10px;padding-top:5px;margin-top: 7px;padding-left: 10px;height: 43px;" class=" shadow-z-1">
 
-      <div id="proband-variant-card">
+        <div id="toolbar" style="width:100%"  >
+                <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
+
+
+                <a href="javascript:void(0)" id="button-find-missing-variants" class="btn btn-default btn-raised icon-button " style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;width:150px;" >
+                    <i style="font-size:18px;" class="mdi-action-find-in-page"></i>
+                    <span id="missing-variant-count-label">Find missing variants</span>
+                </a>
+
+
+                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;">
+                  <i class="mdi-action-settings"></i>
+                </a>
+
+
+                <a href="javascript:void(0)" id="button-find-missing-variants" class="btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;">
+                     <i  style="font-size:18px;" class="mdi-action-settings-ethernet"></i>
+                    <span id="missing-variant-count-label">Exons + Introns</span>
+                </a>
+
+                <a href="javascript:void(0)" id="button-find-missing-variants" class="btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:-4px;padding-top:2px;padding-bottom:2px;">
+                     <i  style="font-size:18px;" class="mdi-action-view-column"></i>
+                    <span id="missing-variant-count-label">Exons only</span>
+                </a>
+
+                
+
+
+                <span style="float:right">
+                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="mdi-content-remove"></i>
+                  </a>
+                  <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="mdi-image-crop-din"></i>
+                  </a>
+               </span>
+
+          </div>
+          <div style="text-align: left;padding-left:560px;width:100%;margin-top: -45px;">
+             <div class="btn-toolbar" style="margin-left:20px;display:inline-block;">
+                  <div class="btn-group" style="display:  inline;;">
+
+                    <button type="button" style="font-size:11px;padding-top: 2px;padding-bottom: 2px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <i class="mdi-action-bookmark" style="font-size:18px;padding-right:0px;padding-top:2px;padding-left:2px"></i>
+                      <span style="font-size:12px">Variant Bookmarks</span><span style="padding-left:2px" class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="">Manage</a></li>
+                    </ul>
+                  </div>
+                </div>
+          </div>
+      </div>
+
+
+      <div id="proband-variant-card"  >
       </div>
 
 
@@ -934,148 +1128,113 @@
 
 
     </div>
- 
+
+
+<div id="tourWelcome" class="customPageGuideWelcome">
+  <h3>Welcome to gene.iobio</h3>
+  <p>An app for discovering disease-causing variants</p>
+  <div class="modal-button-container">
+            <button class="open_page_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_start">Start Tour</button>
+            <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore">Got it</button>
+  </div>
 </div>
 
+ 
 
+<div id="tourPanelWrapper" class="hide">
+  <div id="tourPanel"> 
+     
+  </div>
+</div>
 
+<ul id="tlyPageGuide" data-tourtitle="gene.iobio tour">
+  <li class="tlypageguide_left" data-tourtarget=".tour_element_1">
+    <div>
+      Type in the gene name BRCA2.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget=".tour_element_2">
+    <div>
+      This shows gene model for the canonical transcript.
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget=".tour_element_2_5">
+    <div>
+      Select 'Single' when to view one sample's variants.  Select 'Trio' to analyze affect child, unaffected mother, and unaffected father.  
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget=".tour_element_3">
+    <div>
+      This is where you specify the variant file for the Proband.  Select 'Load from URL' and the variant file for Platinum data set NA12878 will load.
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget=".tour_element_4">
+    <div>
+      This is where you specify the alignment (bam) file for the Proband (optional).   Select 'Load from URL' and the alignment file for the Platinum data set NA12878 will load.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget=".tour_element_5">
+    <div>
+      The variants for the gene are annotated using snpEff to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical signifigance.  All of this processing occurs in real-time.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget=".tour_element_6">
+    <div>
+      When an alignment file is specified, the base coverage chart is displayed, allowing the user to spot regions of insufficient sequence coverage.
+    </div>
+  </li>
+  <li class="tlypageguide_bottom" data-tourtarget=".tour_element_7">
+    <div>
+      Push the Find Missing Variants link to call variants using the Freebayes caller.  New variants discovered with this call will be displayed above the loaded variants.
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget=".tour_element_8">
+    <div>
+      The variants can be filtered by mousing over a specific label.  To apply multiple filters, click on mutiple labels to toggle on or off.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget=".tour_element_9">
+    <div>
+      The variants are ranked according to different criteria.  The criteria can be rearranged by clicking on the arrow.  Click on the column to see the variant in the variant chart (next card down)
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget=".tour_element_10">
+    <div>
+      You can select another transcript from this dropdown.
+    </div>
+  </li>
+  <li class="tlypageguide_bottom" data-tourtarget=".tour_element_11">
+    <div>
+      Drag and drop to select a region to zoom into.  To zoom back out, click anywhere
+      on the gene model.
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget=".tour_element_12">
+    <div>
+      Adjust this value to display more or less of the upstream and downstream region of the gene.
+    </div>
+  </li>
+</ul>
 
-<div id="datasource-dialog" class="modal fade" tabindex="-1">
-
-
-      <div class="modal-dialog" style="width: 800px">
-    
-        <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" style="display: inline;float: left;">Enter Data Sources</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="float: right;">x
-              </button>
-            </div>
-
-            <div class="modal-body" style="margin-top: 20px;">                
-
-              <div style="padding-top: 20px;padding-bottom: 10px;clear: both;">
-                <span style="float:left;width: 45px;padding-top: 5px;text-align: left;padding-right: 18px; font-size:20px">Gene<sup>*</sup></span>
-                <div id="bloodhound" style="float:right;width: 92%;">
-                  <input class="typeahead shadow-z-1" type="text" style="width:100%" placeholder="Search By Gene Name">
-                </div>                
-              </div>
-              <div style="clear:both; margin-top: 70px;">
-                <fieldset style="border: 1px solid rgb(220,220,220);text-align:left;padding: 5px 15px;">
-                  <legend style="width: 60px;font-size:12px;color:(190,190,190);text-align:center">Optional</legend> 
-                  <div id="variant-card-buttons" class="btn-group">
-                     <button id="add-variant-card-button" type="btn btn-raised" class="btn btn-default btn-raised" onclick="addVariantCard()">
-                        <i class="mdi-content-add"></i>
-                        New
-                      </button>
-                  </div>          
-
-                  <div style="padding-top: 5px;padding-bottom: 10px;clear: both; width:92%">
-                      <div style="float:left">
-                        <span style="float:left;width: 155px;padding-top: 10px;text-align: right;padding-right: 18px;">Relationship</span>
-                        <div class="material-dropdown" style="float: left;width: 210px">
-                          <select id='datasource-relationship' class="form-control" placeholder="Proband" onchange="setDataSourceRelationship()">                            
-                            <option value="proband">Proband</option>
-                            <option value="none" class='disabled'>None</option>
-                            <option value="mother" class='disabled'>Mother</option>
-                            <option value="father" class='disabled'>Father</option>                            
-                          </select>                                                    
-                        </div>
-                      </div>
-                      <div style="float:right">
-                        <span style="float:left;width: 80px;padding-top: 10px;text-align: right;padding-right: 18px;">Name</span>
-                        <div style="float: left;width: 210px;">
-                          <input id="datasource-name" class="form-control input-sm" onchange="setDataSourceName()" type="text"/>
-                        </div>
-                      </div>
-                  </div>
-
-
-                  <div id="add-bam-track">
-
-                    <div class="btn-toolbar" style="clear:both;float:left;width: 160px;">
-                      <div class="btn-group" style="display:inline;margin-top: 15px;">
-
-                          <button type="button" style="padding: 8px !important;width: 140px;" 
-                          class="btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            Alignment File 
-                            <span class="caret"></span>
-                          </button>
-
-                          <ul class="dropdown-menu" role="menu">
-                            <li style="color:  rgb(51, 51, 51);">
-                                 <div class="file" onclick="onBamFileButtonClicked()">
-                                    <input type="file" name="files[]" id="bam-file-upload" 
-                                    onchange="onBamFilesSelected(event)" multiple="">
-                                    <label class="file-button" for="bam-file-upload">Choose BAM File</label>
-                                </div>
-                            </li>
-                            <li>
-                                <a onclick="displayBamUrlBox()" href="#">Enter URL for BAM</a>
-                            </li>    
-                           
-                          </ul>
-                      </div>
-                    </div>
-                    
-
-                    <div style="float: left;width: 70%;margin-top:25px;">
-                        <input onchange="onBamUrlEntered()" id="bam-url-input" type="text" class="form-control input-sm" value="" placeholder="http://..."/>
-                        <input id="bam-file-info" type="text" value="" readonly="" 
-                        class="form-control input-sm empty hide"/>
-                    </div>
-
-                  </div>
-
-
-                  <div id="add-vcf-track" style="clear:both;">
-                      
-                      <div class="btn-toolbar" style="float: left; width: 160px;">
-                        <div class="btn-group" style="display:  inline;margin-top: 15px;">
-
-                          <button type="button" style="padding: 8px !important;width: 140px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            Variant File <span class="caret"></span>
-                          </button>
-
-                          <ul class="dropdown-menu" role="menu">
-                            <li style="color:  rgb(51, 51, 51);">
-                                <div class="file" onclick="onVcfFileButtonClicked()">
-                                    <input type="file" name="files[]" id="vcf-file-upload" multiple="" onchange="onVcfFilesSelected(event)">
-                                    <label class="file-button" for="vcf-file-upload">Choose VCF File</label>
-                                </div>
-                            </li>
-                            <li>
-                                <a onclick="displayUrlBox()" href="#">Enter URL for VCF</a>
-                            </li>    
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div style="float: left;width: 70%;margin-top:25px;">
-                        <input onchange="onVcfUrlEntered()" id="url-input" type="text" value="" class="form-control input-sm empty" placeholder="http://...">
-                        <input id="vcf-file-info" type="text" value="" readonly="" class="form-control input-sm empty hide">
-                      </div>
-                  </div>                       
-                  <input id="card-index" class="hide" value="0" type="text">
-                </fieldset>
-              </div>
-            </div>
-
-            <div class="modal-footer" 
-            style="display: block;clear: both;margin-bottom: 0px;padding-bottom: 10px;padding-top: 20px;">
-              <button class="btn btn-raised default" onclick="loadNewDataSources()">
-                <i class="mdi-navigation-check"></i> Ok
-              </button>
-              <button class="btn btn-raised " data-dismiss="modal">
-                <i class="mdi-navigation-close"></i> Cancel
-              </button>
-            </div>
-
-        </div>
-
-      </div>
  
 </div>
+    <div id="footer" class="footer text-center" >
+      <div class="poweredbyheader">gene.iobio is powered by</div>
+      <div>
+        <a class="poweredby" href="http://snpeff.sourceforge.net/">snpEff</a>
+        <a class="poweredby" href="http://uswest.ensembl.org/info/docs/tools/vep/index.html?redirect=nop">Variant Effect Predictor</a>
+        <a class="poweredby" href="http://compbio.charite.de/phenomizer/">Phenomizer</a>
+        <a class="poweredby" href="http://genetics.bwh.harvard.edu/pph/index.html">PolyPhen</a>
+        <a class="poweredby" href="http://sift.jcvi.org/">SIFT</a>
+
+        <a class="poweredby" href="https://github.com/ekg/freebayes">FreeBayes</a>
+        <a class="poweredby" href="http://www.ncbi.nlm.nih.gov/clinvar/">ClinVar</a>
+        <a class="poweredby" href="http://omictools.com/vt-normalize-s8519.html">VT</a>
+        <a class="poweredby" href="http://samtools.sourceforge.net/">samtools</a>
+        <a class="poweredby" href="https://github.com/pezmaster31/bamtools">bamtools</a>
+        <a class="poweredby" href="https://github.com/ekg/vcflib">vcflib</a>
+    </div>
+</body>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   
@@ -1188,6 +1347,7 @@
         .style("opacity", 0);
 </script>    
 
+
 <script src="app/histogram.d3.js"></script>
 <script src="app/line.d3.js"></script>
 <script src="app/gene.d3.js"></script>
@@ -1201,7 +1361,7 @@
 <script>
   $(".material-dropdown select").dropdown();
 </script>
-
+<script src="assets/js/pageguide.min.js"></script>
 
  </div>
 </body>

@@ -825,7 +825,6 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 	 			}
 				me.bamData = data;
 
-
 				me.cardSelector.find("#bam-track .loader-label").text("Loading Coverage Chart")
 
 				if (regionStart && regionEnd) {
@@ -896,7 +895,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 		this.cardSelector.find('#zoom-region-chart').css("margin-top", "5px");
-		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-100px");
+		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-90px");
 
 
 	}
@@ -1359,7 +1358,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				}
 				// We need to inject in the contig header for downstream servers to function properly
 				if (rec.indexOf("#CHROM") == 0 && !contigHdrRecFound) {
-					fbRecs.push("##contig=<ID=" + me.getBamRefName(refName) + ">");
+					//fbRecs.push("##contig=<ID=" + me.getBamRefName(refName) + ">");
 				}
 				fbRecs.push(rec);
 			});
@@ -1396,8 +1395,9 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					// we added last round.					
 					me.vcfData.features = me.vcfData.features.filter( function(d) {
 						return d.consensus != 'unique2';
-					});		
-
+					});	
+						
+					window.enableVariantFilters(true);
 
 
 					me.cardSelector.find('.vcfloader .loader-label').text("Comparing call sets");
