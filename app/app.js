@@ -836,12 +836,15 @@ function initTranscriptControls() {
 }
 
 function onCloseTranscriptMenuEvent() {
-	if (selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
-		d3.selectAll("#gene-viz .transcript").remove();
-	 	selectedTranscript = transcriptMenuChart.selectedTranscript();
-	 	cacheCodingRegions();
-	 	loadTracksForGene();
-	 }
+	if (selectedTranscript != null) {
+		if (selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
+			d3.selectAll("#gene-viz .transcript").remove();
+		 	selectedTranscript = transcriptMenuChart.selectedTranscript();
+		 	cacheCodingRegions();
+		 	loadTracksForGene();
+		 }		
+	}
+
 }
 
 function getCanonicalTranscript() {
@@ -849,26 +852,40 @@ function getCanonicalTranscript() {
 	var maxCdsLength = 0;
 	window.gene.transcripts.forEach(function(transcript) {
 		var cdsLength = 0;
-		transcript.features.forEach(function(feature) {
-			if (feature.feature_type == 'CDS') {
-				cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
-			}
-		})
-		if (cdsLength > maxCdsLength) {
-			maxCdsLength = cdsLength;
-			canonical = transcript;
+		if (transcript.features != null) {
+			transcript.features.forEach(function(feature) {
+				if (feature.feature_type == 'CDS') {
+					cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
+				}
+			})
+			if (cdsLength > maxCdsLength) {
+				maxCdsLength = cdsLength;
+				canonical = transcript;
+			}			
 		}
-	})
+
+	});
+
+	if (canonical == null) {
+		// If we didn't find the canonical (transcripts didn't have features), just
+		// grab the first transcript to use as the canonical one.
+		if (gene.transcripts != null && gene.transcripts.length > 0)
+		canonical = gene.transcripts[0];
+	}
 	return canonical;
 }
 
 function cacheCodingRegions() {
 	selectedTranscriptCodingRegions.length = 0;
-	window.selectedTranscript.features.forEach( function(feature) {
-		if (feature.feature_type == 'CDS' || feature.feature_type == 'UTR') {
-			selectedTranscriptCodingRegions.push({start: feature.start, end: feature.end});
-		}
-	});
+
+	if (window.selectedTranscript != null && window.selectedTranscript.features != null) {
+		window.selectedTranscript.features.forEach( function(feature) {
+			if (feature.feature_type == 'CDS' || feature.feature_type == 'UTR') {
+				selectedTranscriptCodingRegions.push({start: feature.start, end: feature.end});
+			}
+		});		
+	}
+
 }
 
 
