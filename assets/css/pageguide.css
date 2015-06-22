@@ -322,11 +322,11 @@
   pointer-events: none;
 }
 .tlyPageGuideStepIndex {
-  background: rgba(240, 103, 103, 0.3);
-  -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.4);
-  -o-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.4);
+  background: rgba(240, 103, 103, 0.1);
+  -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
+  -o-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
   -webkit-transition: min-height, max-height 0.1s ease-in-out;
   -moz-transition: min-height, max-height 0.1s ease-in-out;
   -o-transition: min-height, max-height 0.1s ease-in-out;
@@ -371,7 +371,7 @@
   bottom: -65px;
 }
 .tlyPageGuideStepIndex.tlypageguide_bottom:after {
-  border-bottom: 15px solid rgba(240, 103, 103, 0.3);
+  border-bottom: 15px solid rgba(240, 103, 103, 0.1);
   border-right: 15px solid transparent;
   left: 0;
   top: -15px;
@@ -380,7 +380,7 @@
   right: -65px;
 }
 .tlyPageGuideStepIndex.tlypageguide_right:after {
-  border-top: 15px solid rgba(240, 103, 103, 0.3);
+  border-top: 15px solid rgba(240, 103, 103, 0.1);
   border-left: 15px solid transparent;
   left: -15px;
   top: 0;
@@ -389,7 +389,7 @@
   left: -65px;
 }
 .tlyPageGuideStepIndex.tlypageguide_left:after {
-  border-top: 15px solid rgba(240, 103, 103, 0.3);
+  border-top: 15px solid rgba(240, 103, 103, 0.1);
   border-right: 15px solid transparent;
   right: -15px;
   top: 0;
@@ -398,7 +398,7 @@
   top: -60px;
 }
 .tlyPageGuideStepIndex.tlypageguide_top:after {
-  border-top: 15px solid rgba(240, 103, 103, 0.3);
+  border-top: 15px solid rgba(240, 103, 103, 0.1);
   border-right: 15px solid transparent;
   bottom: -15px;
   left: 0;
