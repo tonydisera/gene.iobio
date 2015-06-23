@@ -89,7 +89,7 @@ var showClinVarSymbol = function (selection) {
 	         	} else if (selection.datum().clazz == 'clinvar_other') {
 	         		return "rgb(189,189,189)";
 	         	} else if (selection.datum().clazz == 'clinvar_cd') {
-	         		return "rgb(150, 150, 150)";
+	         		return "rgb(111, 182, 180)";
 	         	}
 	         });
 
@@ -252,15 +252,16 @@ var clinvarMap     = {
                         'uncertain_significance': {value: 3, clazz: 'clinvar_uc', symbolFunction: showClinVarSymbol},
                         'benign'                : {value: 100, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
                         'likely_benign'         : {value: 101, clazz: 'clinvar_lbenign', symbolFunction: showClinVarSymbol},
-                        'drug_response'         : {value: 6, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'confers_sensivity'     : {value: 7, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'risk_factor'           : {value: 8, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'other'                 : {value: 9, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'association'           : {value: 10, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'protective'            : {value: 111, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
                         'conflicting_data_from_submitters': {value: 121, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},
-                        'not_provided'          : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'none'                  : {value: 141, clazz: ''}
+						'conflicting_interpretations_of_pathogenicity':  {value: 121, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},                       
+                        'drug_response'         : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'confers_sensivity'     : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'risk_factor'           : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'other'                 : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'association'           : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'protective'            : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'not_provided'          : {value: 141, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
+                        'none'                  : {value: 151, clazz: ''}
                      };
 var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH',     symbolFunction: showImpactSymbol},    
                         MODERATE: {value: 2, clazz: 'impact_MODERATE', symbolFunction: showImpactSymbol},  
