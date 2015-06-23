@@ -622,7 +622,7 @@ var effectCategories = [
 
           // Get the Clinvar variants, passing in the vcf recs that came back from snpEff.
           if (callbackClinvar) {
-            me.getClinvarRecords(annotatedRecs, regionStart, regionEnd, callbackClinvar);
+            me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar);
           }
         });
     });
@@ -678,14 +678,14 @@ var effectCategories = [
 
 
       if (callbackClinvar) {
-        me.getClinvarRecords(annotatedRecs, regionStart, regionEnd, callbackClinvar);
+        me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar);
       }
     });
 
   }
 
   // NEW
-  exports.getClinvarRecords = function(records, regionStart, regionEnd, callback) {
+  exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback) {
     var me = this;
 
     // Multiallelic input vcf records were assigned a number submission
@@ -693,7 +693,8 @@ var effectCategories = [
     // clinvar records number
     var sourceIndex = -1;
     var clinvarIndex = 0;
-    var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term="
+    var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
+    url += "(" + refName + "[Chromosome]" + " AND ";
     // clinvarToSourceMap = new Object();
     records.forEach(function(record) {
       if (record.charAt(0) == "#") {
@@ -743,7 +744,7 @@ var effectCategories = [
       }
     });
 
-    url = url.slice(0,url.length-1) + '[c37]'
+    url = url.slice(0,url.length-1) + '[c37])'
 
 
     var clinvarVariants = null;

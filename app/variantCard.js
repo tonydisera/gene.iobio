@@ -1659,9 +1659,6 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 	return vcfDataFiltered;
 }
 
-VariantCard.prototype.getClinvarRecords = function(theVcfData, regionStart, regionEnd, callback) {
-	this.vcf.getClinvarRecords(theVcfData, window.gene.start, window.gene.end, callback);
-}
 
 
 VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, compareAttribute, matchAttribute, matchCallback ) {
