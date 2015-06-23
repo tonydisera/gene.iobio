@@ -1195,11 +1195,17 @@ VariantCard.prototype.refreshVariantsWithClinvar = function(clinVars) {
 	for( var vcfIter = 0, clinIter = 0; vcfIter < recs.length && clinIter < clinVarIds.length; null) {
 		var uid = clinVarIds[clinIter];
 		var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start;
+		var clinVarAlt   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].alt;
+		var clinVarRef   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].ref;
+
 		
 		// compare curr variant and curr clinVar record
-		if (recs[vcfIter].start == clinVarStart) {			
-			// add clinVar info to variant
-			me.addClinVarInfoToVariant(recs[vcfIter], clinVars[uid]);
+		if (recs[vcfIter].clinvarStart == clinVarStart) {			
+			// add clinVar info to variant if it matches
+			if (recs[vcfIter].clinvarAlt == clinVarAlt &&
+				recs[vcfIter].clinvarRef == clinVarRef) {
+				me.addClinVarInfoToVariant(recs[vcfIter], clinVars[uid]);
+			}
 			vcfIter++;
 			clinIter++;
 		} else if (recs[vcfIter].start < clinVarStart) {						
@@ -1230,23 +1236,27 @@ VariantCard.prototype.addClinVarInfoToVariant = function(variant, clinvar) {
 		variant.clinVarClinicalSignificance = {"none": "Y"};
 	}
 
-	var clinSigToken = clinvar.clinical_significance.description;
-	if (clinSigToken != "") {		
-		// Replace space with underlink
-		clinSigToken = clinSigToken.split(" ").join("_").toLowerCase();
-		variant.clinVarClinicalSignificance[clinSigToken] = 'Y';
+	var clinSigString = clinvar.clinical_significance.description;
+	var clinSigTokens = clinSigString.split(", ");
+	clinSigTokens.forEach( function(clinSigToken) {
+		if (clinSigToken != "") {		
+			// Replace space with underlink
+			clinSigToken = clinSigToken.split(" ").join("_").toLowerCase();
+			variant.clinVarClinicalSignificance[clinSigToken] = 'Y';
 
-		// Get the clinvar "classification" for the highest ranked clinvar 
-		// designation. (e.g. "pathologic" trumps "benign");
-		var mapEntry = clinvarMap[clinSigToken];
-		if (mapEntry != null) {
-			if (variant.clinvarRank == null || 
-				mapEntry.value < variant.clinvarRank) {
-				variant.clinvarRank = mapEntry.value;
-				variant.clinvar = mapEntry.clazz;
-			}
-		}		
-	}
+			// Get the clinvar "classification" for the highest ranked clinvar 
+			// designation. (e.g. "pathologic" trumps "benign");
+			var mapEntry = clinvarMap[clinSigToken];
+			if (mapEntry != null) {
+				if (variant.clinvarRank == null || 
+					mapEntry.value < variant.clinvarRank) {
+					variant.clinvarRank = mapEntry.value;
+					variant.clinvar = mapEntry.clazz;
+				}
+			}		
+		}
+
+	});
 
 
 

@@ -706,6 +706,8 @@ var effectCategories = [
           var ref    = fields[3];
           var alt    = fields[4];
 
+         
+
           if (pos == null || ref == null || alt == null) {
 
           } else {
@@ -718,7 +720,24 @@ var effectCategories = [
             //   clinvarIndex++;
             //   clinvarToSourceMap[clinvarIndex] = sourceIndex;
             // });            
-            url += pos + ',' 
+
+            // Get rid of the left most anchor base for insertions and
+            // deletions for accessing clinvar 
+            var clinvarStart = +pos;
+            if (alt == '.') {
+
+            } else if (ref == '.') {
+
+            } else if (ref.length > alt.length) {
+              // deletion
+              clinvarStart++;
+            } else if (alt.length > ref.length) {
+              // insertion
+              clinvarStart++;
+            } 
+
+
+            url += clinvarStart + ',' 
           }
           
       }
@@ -1060,6 +1079,27 @@ var effectCategories = [
               }
             }
 
+            // Get rid of the left most anchor base for insertions and
+            // deletions for accessing clinvar 
+            var clinvarStart = +rec.pos;
+            var clinvarRef = rec.ref;
+            var clinvarAlt = alt; 
+            if (clinvarAlt == '.') {
+              clinvarAlt = '-';
+            } else if (clinvarRef == '.') {
+              clinvarRef = '-';
+            } else if (clinvarRef.length > clinvarAlt.length) {
+              // deletion
+              clinvarStart++;
+              clinvarAlt = clinvarAlt.length == 1 ? "-" : clinvarAlt.substr(1,clinvarAlt.length-1);
+              clinvarRef = clinvarRef.substr(1,clinvarRef.length-1);
+            } else if (clinvarAlt.length > clinvarRef.length) {
+              // insertion
+              clinvarStart++;
+              clinvarRef = clinvarRef.length == 1 ? "-" : clinvarRef.substr(1,clinvarRef.length-1);
+              clinvarAlt = clinvarAlt.substr(1,clinvarAlt.length-1);
+            } 
+
             variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
               'strand': regionStrand, 
               'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
@@ -1079,7 +1119,10 @@ var effectCategories = [
               'af1000glevel': '',
               'afexaclevel:': '',
               'af1000G': af1000G,
-              'afExAC': afExAC} );
+              'afExAC': afExAC,
+              'clinvarStart': clinvarStart,
+              'clinvarRef': clinvarRef,
+              'clinvarAlt': clinvarAlt} );
 
             if (rec.pos < variantRegionStart ) {
               variantRegionStart = rec.pos;
