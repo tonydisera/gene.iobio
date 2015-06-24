@@ -687,6 +687,23 @@ var effectCategories = [
   // NEW
   exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback) {
     var me = this;
+    var batchSize = 100;
+    // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
+    // repeating until all variants have been processed.
+    var numberOfBatches = d3.round(records.length / batchSize);
+    for( var i = 0; i < numberOfBatches; i++) {
+      var start = i * batchSize;
+      var end = start + batchSize;
+      var batchOfRecords = records.slice(start, end <= records.length ? end : records.length);
+      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback);
+    }
+
+  }  
+
+  // NEW
+  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback) {
+    var me = this;
+
 
     // Multiallelic input vcf records were assigned a number submission
     // index.  Create a map that ties the vcf record number to the
