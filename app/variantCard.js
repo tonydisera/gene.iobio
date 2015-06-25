@@ -642,11 +642,13 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	var matchingVariantFound = false;
 	if (this.fbChart != null && this.fbData != null && this.fbData.features.length > 0) {
 		var container = this.d3CardSelector.selectAll('#fb-variants svg');
-		matchingVariantFound = this.fbChart.showCircle()(variant, container, false, clickedVariant != null && this == sourceVariantCard);
+		var parentContainer = this.d3CardSelector.selectAll('#fb-variants');
+		matchingVariantFound = this.fbChart.showCircle()(variant, container, parentContainer, false, clickedVariant != null && this == sourceVariantCard);
 	}
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
-		matchingVariantFound = this.vcfChart.showCircle()(variant, container, !matchingVariantFound, clickedVariant != null && this == sourceVariantCard);
+		var parentContainer = this.d3CardSelector.selectAll('#vcf-variants');
+		matchingVariantFound = this.vcfChart.showCircle()(variant, container, parentContainer, !matchingVariantFound, clickedVariant != null && this == sourceVariantCard);
 	}
 	
 }
@@ -654,11 +656,13 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 VariantCard.prototype.hideVariantCircle = function(variant) {
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
-		this.vcfChart.hideCircle()(container);
+		var parentContainer = this.d3CardSelector.selectAll('#vcf-variants');
+		this.vcfChart.hideCircle()(container, parentContainer);
 	}
 	if (this.fbChart != null && this.fbData != null && this.fbData.features.length > 0) {
 		var container = this.d3CardSelector.selectAll('#fb-variants svg');
-		this.fbChart.hideCircle()(container);
+		var parentContainer = this.d3CardSelector.selectAll('#fb-variants');
+		this.fbChart.hideCircle()(container, parentContainer);
 	}
 }
 

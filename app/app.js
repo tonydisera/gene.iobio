@@ -2285,6 +2285,11 @@ function variantTooltipHTML(variant, rowIndex) {
 	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
 	var refalt = variant.ref + "->" + variant.alt;
 
+	var clinvarUrl = "";
+	if (variant.clinVarUid != null && variant.clinVarUid != '') {
+		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
+		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
+	}
 	
 	return (
 		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
@@ -2301,7 +2306,7 @@ function variantTooltipHTML(variant, rowIndex) {
 		+ tooltipRow('Inheritance',  variant.inheritance)
 		+ tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, true)
 		+ tooltipRow('AF 1000G', variant.af1000G, true)
-		+ tooltipRow('ClinVar uid', variant.clinVarUid)
+		+ tooltipRow('ClinVar uid', clinvarUrl )
 		// + tooltipRow('ClinVar #', variant.clinVarAccession)
 		// + tooltipRow('NCBI ID', variant.ncbiId)
 		// + tooltipRow('HGVS g', variant.hgvsG)

@@ -63,7 +63,7 @@ function variantD3() {
      }
   }
 
-  var showCircle = function(d, svgContainer, indicateMissingVariant, emphasize) {
+  var showCircle = function(d, svgContainer, parentContainer, indicateMissingVariant, emphasize) {
     // Find the matching variant
     var matchingVariant = null;
     svgContainer.selectAll(".variant").each( function (variant,i) {
@@ -89,7 +89,46 @@ function variantD3() {
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 2);
 
-      circle.classed("emphasize", emphasize)
+      circle.classed("emphasize", emphasize);
+
+      if (parentContainer) {
+
+        var tooltip = parentContainer.select('.tooltip');
+        tooltip.transition()        
+               .duration(1000)      
+               .style("opacity", 0);  
+
+        tooltip.transition()        
+               .duration(1000)      
+               .style("opacity", .9);  
+        
+        tooltip.html(tooltipHTML(d));
+
+        var h = tooltip[0][0].offsetHeight;
+        //var w = tooltip[0][0].offsetWidth;
+        var w = 300;
+
+        if (d3.event.pageX < w) {
+          tooltip.style("width", w + "px")
+                 .style("left", (d3.event.pageX) + "px") 
+                 .style("text-align", 'left')    
+                 .style("top", (d3.event.pageY - h) + "px");   
+
+        } else {
+
+          tooltip.style("width", w + "px")
+                 .style("left", (d3.event.pageX - w) + "px") 
+                 .style("text-align", 'left')    
+                 .style("top", (d3.event.pageY - h) + "px");   
+        }
+
+        if (emphasize) {
+          tooltip.style("pointer-events", "all");
+        } else {
+          tooltip.style("pointer-events", "none");          
+        }
+      }
+
               
     } else if (indicateMissingVariant) {
       var mousex = d3.round(x(d.start));
@@ -110,14 +149,22 @@ function variantD3() {
 
  
 
-  var hideCircle = function(svgContainer) {
+  var hideCircle = function(svgContainer, parentContainer) {
     svgContainer.select(".circle").transition()        
                 .duration(500)      
                 .style("opacity", 0); 
     svgContainer.select("g.arrow").selectAll('.arrow').transition()
                 .duration(500)
                 .style("opacity", 0);
+    if (parentContainer) {
+      parentContainer.select('.tooltip').transition()        
+                   .duration(500)      
+                   .style("opacity", 0);
+
+    }
   }
+
+
 
       
       
@@ -382,38 +429,9 @@ function variantD3() {
               dispatch.d3click(d);
            })
            .on("mouseover", function(d) {  
-              var tooltip = container.select('.tooltip');
-              tooltip.transition()        
-                     .duration(1000)      
-                     .style("opacity", .9);  
-              
-              tooltip.html(tooltipHTML(d));
-
-              var h = tooltip[0][0].offsetHeight;
-              //var w = tooltip[0][0].offsetWidth;
-              var w = 300;
-
-              if (d3.event.pageX < w) {
-                tooltip.style("width", w + "px")
-                       .style("left", (d3.event.pageX) + "px") 
-                       .style("text-align", 'left')    
-                       .style("top", (d3.event.pageY - h) + "px");   
-
-              } else {
-
-                tooltip.style("width", w + "px")
-                       .style("left", (d3.event.pageX - w) + "px") 
-                       .style("text-align", 'left')    
-                       .style("top", (d3.event.pageY - h) + "px");   
-              }
-
-              
               dispatch.d3mouseover(d); 
             })                  
            .on("mouseout", function(d) {       
-              container.select('.tooltip').transition()        
-                 .duration(500)      
-                 .style("opacity", 0);   
               dispatch.d3mouseout(); 
             });           
 
