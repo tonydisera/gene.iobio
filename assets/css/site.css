@@ -35,6 +35,11 @@ body {
 }
 
 
+.dropdown-menu>li>a {
+  color: #333 !important;
+}
+
+
 
 
 /* Sticky footer styles

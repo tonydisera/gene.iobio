@@ -114,7 +114,10 @@
                       </li>
                       <li>
                           <a id="display-vcf-url-item"  href="#">Enter URL for VCF</a>
-                      </li>    
+                      </li>  
+                      <li>
+                          <a id="clear-vcf" href="javascript:void(0)">Clear</a>
+                      </li>  
                     </ul>
                   </div>
                 </div>
@@ -123,6 +126,7 @@
                   <input  id="url-input" type="text" value="" class="form-control input-sm empty" placeholder="http://...">
                   <input id="vcf-file-info" type="text" value="" readonly=""  style="background-color: #FFFFFF" class="form-control input-sm empty hide">
                 </div>
+
             </div>     
             <div id="add-bam-track" class="fullview" style="display:table">
 
@@ -147,7 +151,9 @@
                       <li>
                           <a id="display-bam-url-item" href="#">Enter URL for BAM</a>
                       </li>    
-                     
+                     <li>
+                          <a id="clear-bam" href="javascript:void(0)">Clear</a>
+                      </li>  
                     </ul>
                 </div>
               </div>
@@ -789,7 +795,7 @@
               </div>
             -->
 
-            <span id="bloodhound" >
+            <span id="bloodhound" style="margin-left:-170px" >
                 <input class="typeahead tour_element_1" style="margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" placeholder="Enter Gene Name">
             </span>           
 

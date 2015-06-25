@@ -515,12 +515,20 @@ function initDataCard() {
 	    panelSelector.find('#bam-file-upload').on('change', function() {
 	    	onBamFilesSelected(event, panelSelector);
 	    });
+	     panelSelector.find('#clear-bam').on('click', function() {
+	    	clearBamUrl(panelSelector);
+	    });
+
 	    panelSelector.find('#url-input').on('change', function() {
 	    	onVcfUrlEntered(panelSelector);
 	    });
 	    panelSelector.find('#display-vcf-url-item').on('click', function() {
 	    	displayUrlBox(panelSelector);
 	    });
+	    panelSelector.find('#clear-vcf').on('click', function() {
+	    	clearUrl(panelSelector);
+	    });
+
 	    panelSelector.find('#vcf-file-selector-item').on('click', function() {
 	    	onVcfFileButtonClicked(panelSelector);
 	    });
@@ -576,6 +584,28 @@ function toggleSampleTrio(show) {
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
 		$('#proband-data').css("width", "60%");
+		var motherCard = null;
+		var fatherCard = null;
+		variantCards.forEach( function(variantCard) {
+			if (variantCard.getRelationship() == 'mother') {
+				motherCard = variantCard;
+				clearUrl($('#mother-data'));
+				clearBamUrl($('#mother-data'));
+				motherCard.hide();
+				removeUrl("vcf1");
+				removeUrl("bam1");
+			} else if (variantCard.getRelationship() == 'father') {
+				fatherCard = variantCard;
+				clearUrl($('#father-data'));
+				clearBamUrl($('#father-data'));
+				fatherCard.hide();
+				removeUrl("vcf2");
+				removeUrl("bam2");
+			}
+		});
+		
+
+
 	}
 
 
@@ -1166,6 +1196,26 @@ function updateUrl(paramName, value) {
 	window.history.pushState({'index.html' : 'bar'},null,'?'+search.join('&'));	
 }
 
+function removeUrl(paramName) {
+	var params = {};
+	// turn params into hash, but leave out the specified parameter
+	window.location.search.split('&').forEach(function(param){
+		if (param.indexOf(paramName) == 0) {
+
+		} else if (param != '') {
+			param = param.split('?').length == 1 ? param : param.split('?')[1];
+			var fields = param.split('=');
+			params[fields[0]] = fields[1];
+		}
+	});
+	var search = [];
+	Object.keys(params).forEach(function(key) {
+		search.push(key + '=' + params[key]);
+	})
+	window.history.pushState({'index.html' : 'bar'},null,'?'+search.join('&'));	
+}
+
+
 function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
@@ -1692,6 +1742,21 @@ function displayBamUrlBox(panelSelector) {
 
 }
 
+function clearBamUrl(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+
+	var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+
+	displayBamUrlBox(panelSelector);
+	panelSelector.find("#bam-url-input").val("");
+	onBamUrlEntered(panelSelector);
+
+}
+
 function displayUrlBox(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
@@ -1708,6 +1773,22 @@ function displayUrlBox(panelSelector) {
     panelSelector.find('#vcf-file-info').addClass('hide');
     panelSelector.find('#vcf-file-info').val('');
     onVcfUrlEntered(panelSelector);
+}
+
+function clearUrl(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+
+	var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+
+	displayUrlBox(panelSelector);
+	panelSelector.find("#url-input").val("");
+	onVcfUrlEntered(panelSelector);
+
+
 }
 function onVcfFileButtonClicked(panelSelector) {	
 	if (!panelSelector) {
