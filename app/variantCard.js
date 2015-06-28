@@ -234,15 +234,30 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .tooltipHTML(variantTooltipHTML)
 				    .on("d3rendered", function() {
 				    	
-				    })			    
+				    })	
+				    .on('d3click', function(d) {
+				    	if (d != clickedVariant) {
+					    	clickedVariant = d;
+					    	me.showCoverageCircle(d);
+					    	window.showCircleRelatedVariants(d, me);
+				    	} else {
+				    		clickedVariant = null;
+							me.hideCoverageCircle();
+							window.hideCircleRelatedVariants();
+				    	}
+					})				    
 				    .on('d3mouseover', function(d) {
-				    	me.showCoverageCircle(d);
-				    	window.showCircleRelatedVariants(d, me);
+				    	if (clickedVariant == null) {
+					    	me.showCoverageCircle(d);
+					    	window.showCircleRelatedVariants(d, me);
+				    	}
 					})
 					.on('d3mouseout', function() {
-						me.hideCoverageCircle();
-						if (me.getRelationship() == 'proband') {
-							window.hideCircleRelatedVariants();
+						if (clickedVariant == null) {
+							me.hideCoverageCircle();
+							if (me.getRelationship() == 'proband') {
+								window.hideCircleRelatedVariants();
+							}
 						}
 					});
 					
