@@ -2238,11 +2238,12 @@ function fillFeatureMatrix(theVcfData) {
 
     this.featureMatrix(selection, {showColumnLabels: false});
 
-    // We have new properties to filter on, so refresh the proband variant chart.
+    // We have new properties to filter on (for inheritance), so refresh the 
+    //proband variant chart.
 	variantCards.forEach(function(variantCard) {
-		//if (variantCard.getRelationship() == 'proband') {
-		//	variantCard.refreshVariantChartWithClinvar(regionStart, regionEnd);
-		//}
+		if (variantCard.getRelationship() == 'proband') {
+			variantCard.showVariants(regionStart, regionEnd);
+		}
 	});
 
 	
@@ -2347,13 +2348,6 @@ function enableClinvarFilters(theVcfData) {
 		var clinvarPresent = clinvarMap[clinvar];
 		d3.select(this).classed("inactive", clinvarPresent == null);
 	});
-/*
-	d3.selectAll(".clinvar").each( function(d,i) {
-		var clinvar = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + clinvar)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-*/
 
 }
 
