@@ -1490,7 +1490,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				    	// Add the unique freebayes variants to vcf data to include 
 				    	// in feature matrix
 				    	me.fbData.features.forEach( function(feature) {
-					   		me.vcfData.features.push(feature);
+					   		me.vcfData.features.push($.extend({}, feature));
 					   	});
 					   	// Figure out max level (lost for some reason)
 					   	var maxLevel = 1;
