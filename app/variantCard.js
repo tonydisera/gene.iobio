@@ -713,7 +713,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 	this.bamData = null;
 
 	if (this.isViewable()) {
-		clearFilters();
+		filterCard.clearFilters();
 
 		this.vcfChart.clazz(classifyClazz);
 
@@ -1058,7 +1058,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 					  	else
 					  		me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
 					  	
-					  	window.enableVariantFilters(true);
+					  	filterCard.enableVariantFilters(true);
 					  	
 			   	    }
 			   	    if (callbackDataLoaded) {
@@ -1118,12 +1118,12 @@ VariantCard.prototype.determineVariantAfLevels = function(theVcfData) {
         	});
     	}
 
-		afExacMap.forEach( function(rangeEntry) {
+		matrixCard.afExacMap.forEach( function(rangeEntry) {
 			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
 				variant.afexaclevel = rangeEntry.clazz;
 			}
 		});
-		af1000gMap.forEach( function(rangeEntry) {
+		matrixCard.af1000gMap.forEach( function(rangeEntry) {
 			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
 				variant.af1000glevel = rangeEntry.clazz;
 			}
@@ -1228,7 +1228,7 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
    	// Fill in the feature matrix for the proband variant card.
    	if (!bypassFeatureMatrix) {
 	   	if ( this.getRelationship() == 'proband') {
-	   		window.setFeatureMatrixSource(data);
+	   		window.matrixCard.setFeatureMatrixSource(data);
 	   	}
 	}
 
@@ -1237,13 +1237,13 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 }
 
 VariantCard.prototype.showFeatureMatrix = function(showInheritance) {
-	window.showFeatureMatrix(this, this.vcfData, regionStart, regionEnd, showInheritance);
+	window.matrixCard.showFeatureMatrix(this, this.vcfData, regionStart, regionEnd, showInheritance);
 }
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	var filteredVcfData = this.filterVariants(this.vcfData);
 	
-	fillFeatureMatrix(filteredVcfData);
+	window.matrixCard.fillFeatureMatrix(filteredVcfData);
 }
 
 VariantCard.prototype.refreshVariantsWithClinvar = function(clinVars) {	
@@ -1273,12 +1273,12 @@ VariantCard.prototype.refreshVariantsWithClinvar = function(clinVars) {
 			clinIter++;
 		}
 	}
-	window.enableClinvarFilters(this.vcfData);
+	filterCard.enableClinvarFilters(this.vcfData);
 
 	this.showVariants(regionStart, regionEnd);
 	if (this.getRelationship() == 'proband') {
 		$("#matrix-track .clinvar.loader").css("display", "none");
-		fillFeatureMatrix(this.vcfData);
+		window.matrixCard.fillFeatureMatrix(this.vcfData);
 	}
 
 }
@@ -1305,7 +1305,7 @@ VariantCard.prototype.addClinVarInfoToVariant = function(variant, clinvar) {
 
 			// Get the clinvar "classification" for the highest ranked clinvar 
 			// designation. (e.g. "pathologic" trumps "benign");
-			var mapEntry = clinvarMap[clinSigToken];
+			var mapEntry = matrixCard.clinvarMap[clinSigToken];
 			if (mapEntry != null) {
 				if (variant.clinvarRank == null || 
 					mapEntry.value < variant.clinvarRank) {
@@ -1466,7 +1466,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 						return d.consensus != 'unique2';
 					});	
 						
-					window.enableVariantFilters(true);
+					filterCard.enableVariantFilters(true);
 
 
 					me.cardSelector.find('.vcfloader .loader-label').text("Comparing call sets");
@@ -1516,7 +1516,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 						
 				    });
-				}, window.fillFeatureMatrixWithClinvar);
+				}, me.refreshVariantsWithClinvar.bind(me));
 			}
 			
 		});
@@ -1652,8 +1652,8 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
 		var matchCount = 0;
 		var evalAttributes = {};
-		for (key in annotsToInclude) {
-			var annot = annotsToInclude[key];
+		for (key in filterCard.annotsToInclude) {
+			var annot = filterCard.annotsToInclude[key];
 			if (annot.state) {
 				if (evalAttributes[annot.key] == null) {
 					evalAttributes[annot.key] = 0;
@@ -1663,7 +1663,7 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 
 				var annotValue = d[annot.key] ? d[annot.key] : '';				
 				var match = false;
-				if (isDictionary(annotValue)) {
+				if (matrixCard.isDictionary(annotValue)) {
 					for (avKey in annotValue) {
 						if (avKey.toLowerCase() == annot.value.toLowerCase()) {
 							match = true;

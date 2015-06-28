@@ -18,16 +18,6 @@ var trackLegendTemplate = Handlebars.compile($('#track-legend-template').html())
 var variantCardTemplate = Handlebars.compile($('#variant-card-template').html());
 var sampleDataTemplate  = Handlebars.compile($('#sample-data-template').html());
 
-// A view finder, showing a single transcript which
-// is a union of all transcripts.  This chart
-// allows the user to select a sub-region of the
-// gene and view all of the tracks at this zoomed in
-// level.
-var viewFinderChart = null;
-
-// The x-axis for the zoomed-in region (the region
-// selected in the view finder.)
-var zoomRegionChart = null;
 
 // The selected (sub-) region of the gene.  Null
 // when there is not an active selection.
@@ -46,266 +36,16 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 
-// filters
+// filter card
+var filterCard = new FilterCard();
 
-// Filters
-clickedAnnotIds = new Object();
-var annotsToInclude = new Object();
-var afMin = null;
-var afMax = null;
-var coverageMin = 10;
+
+// matrix card
+var matrixCard = new MatrixCard();
+
+
+// clicked variant
 var clickedVariant = null;
-
-
-
-// feature matrix (ranked variants)
-var featureVcfData = null;
-var sourceVcfData = null;
-var featureMatrix  = null;
-
-
-
-var showClinVarSymbol = function (selection) {
-	selection.append("g")
-	         .attr("transform", "translate(7,7)")
-	         .append("use")
-	         .attr("xlink:href", "#clinvar-symbol")
-	         .attr("width", "16")
-	         .attr("height", "16")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (selection.datum().clazz == 'clinvar_path') {
-	         		return "#ad494A";
-	         	} else if (selection.datum().clazz == 'clinvar_lpath') {
-	         		return "#C07778";
-	         	} else if (selection.datum().clazz == 'clinvar_uc') {
-	         		return "rgba(231,186,82,1)";
-	         	} else if (selection.datum().clazz == 'clinvar_benign') {
-	         		return "rgba(181,207,107,1)";
-	         	} else if (selection.datum().clazz == 'clinvar_lbenign') {
-	         		return "rgba(156,194,49,1)";
-	         	} else if (selection.datum().clazz == 'clinvar_other') {
-	         		return "rgb(189,189,189)";
-	         	} else if (selection.datum().clazz == 'clinvar_cd') {
-	         		return "rgb(111, 182, 180)";
-	         	}
-	         });
-
-};
-var showAfExacSymbol = function(selection) {
-	selection.append("g")
-	         .attr("class", selection.datum().clazz)
-	         .attr("transform", "translate(7,7)")
-	         .append("use")
-	         .attr("xlink:href", "#af-symbol")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "none";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "rgb(203,174,95)";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "rgb(158,186,194)";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "rgb(69,117,180)";
-	         	}
-	         })
-	         .style("stroke", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "black";
-	         	} else {
-	         		return "none";
-	         	}
-	         })
-	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "11";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "16";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "20";
-	         	}
-	         })
-	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "11";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "16";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "20";
-	         	}
-	         });
-};
-var showAf1000gSymbol = function(selection) {
-	selection.append("g")
-	         .attr("class", selection.datum().clazz)
-	         .attr("transform", "translate(7,7)")
-	         .append("use")
-	         .attr("xlink:href", "#af-symbol")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "rgb(203,174,95)";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "rgb(158,186,194)";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "rgb(69,117,180)";
-	         	}
-	         })
-	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "11";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "16";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "20";
-	         	}
-	         })
-	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "11";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "16";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "20";
-	         	}
-	         });
-};
-var showRecessiveSymbol = function (selection) {
-	selection.append("g")
-	         .attr("transform", "translate(0,3)")
-	         .append("use")
-	         .attr("xlink:href", '#recessive-symbol')
-	         .style("pointer-events", "none");
-
-};
-var showDeNovoSymbol = function (selection) {
-	selection.append("g")
-	         .attr("transform", "translate(0,3)")
-	         .append("use")
-	         .attr("xlink:href", '#denovo-symbol')
-	         .style("pointer-events", "none");
-	
-};
-var showNoInheritSymbol = function (selection) {
-	
-};
-var showImpactSymbol = function(selection) {
-	selection.append("g")
-	         .attr("transform", "translate(9,9)")
-	         .append("rect")
-	         .attr("width", 10)
-	         .attr("height", 10)
-	         .attr("class", "filter-symbol " + selection.datum().clazz)
-	         .style("pointer-events", "none");
-
-}
-var clinvarMap     = {  
-						'pathogenic'            : {value: 1, clazz: 'clinvar_path', symbolFunction: showClinVarSymbol},
-                        'likely_pathogenic'     : {value: 2, clazz: 'clinvar_lpath', symbolFunction: showClinVarSymbol},
-                        'uncertain_significance': {value: 3, clazz: 'clinvar_uc', symbolFunction: showClinVarSymbol},
-                        'benign'                : {value: 100, clazz: 'clinvar_benign', symbolFunction: showClinVarSymbol},
-                        'likely_benign'         : {value: 101, clazz: 'clinvar_lbenign', symbolFunction: showClinVarSymbol},
-                        'conflicting_data_from_submitters': {value: 121, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  {value: 121, clazz: 'clinvar_cd', symbolFunction: showClinVarSymbol},                       
-                        'drug_response'         : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'confers_sensivity'     : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'risk_factor'           : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'other'                 : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'association'           : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'protective'            : {value: 131, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'not_provided'          : {value: 141, clazz: 'clinvar_other', symbolFunction: showClinVarSymbol},
-                        'none'                  : {value: 151, clazz: ''}
-                     };
-var impactMap      = {  HIGH:     {value: 1, clazz: 'impact_HIGH',     symbolFunction: showImpactSymbol},    
-                        MODERATE: {value: 2, clazz: 'impact_MODERATE', symbolFunction: showImpactSymbol},  
-                        MODIFIER: {value: 3, clazz: 'impact_MODIFIER', symbolFunction: showImpactSymbol},
-                        LOW:      {value: 4, clazz: 'impact_LOW',      symbolFunction: showImpactSymbol}
-                     };
-var inheritanceMap = {  denovo:    {value: 1, clazz: 'denovo',    symbolFunction: showDeNovoSymbol},  
-                        recessive: {value: 2, clazz: 'recessive', symbolFunction: showRecessiveSymbol},
-                        none:      {value: 3, clazz: 'noinherit', symbolFunction: showNoInheritSymbol}
-                     };
-// For af range, value must be > min and <= max
-var afExacMap      = [ {min: -100.1, max: -100,   value: +99, clazz: 'afexac_unique_nc', symbolFunction: showAfExacSymbol},	
-                       {min: -1.1,   max: +0,     value: +3,  clazz: 'afexac_unique',    symbolFunction: showAfExacSymbol},	
-                       {min: +0,     max: +.0001, value: +3,  clazz: 'afexac_uberrare',   symbolFunction: showAfExacSymbol},	
-                       {min: +.0001, max: +.001,  value: +4,  clazz: 'afexac_superrare',  symbolFunction: showAfExacSymbol},	
-                       {min: +.001,  max: +.01,   value: +5,  clazz: 'afexac_rare',       symbolFunction: showAfExacSymbol},	
-                       {min: +.01,   max: +.05,   value: +6,  clazz: 'afexac_uncommon',   symbolFunction: showAfExacSymbol},	
-                       {min: +.05,   max: +1,     value: +7,  clazz: 'afexac_common',     symbolFunction: showAfExacSymbol},	
-                      ];
-var af1000gMap      = [ {min: -1.1, max: +0,     value: +2,  clazz: 'af1000g_unique',     symbolFunction: showAf1000gSymbol},	
-                       {min: +0,    max: +.0001, value: +3,  clazz: 'af1000g_uberrare',   symbolFunction: showAf1000gSymbol},	
-                       {min: +.0001,max: +.001,  value: +4,  clazz: 'af1000g_superrare',  symbolFunction: showAf1000gSymbol},	
-                       {min: +.001, max: +.01,   value: +5,  clazz: 'af1000g_rare',       symbolFunction: showAf1000gSymbol},	
-                       {min: +.01,  max: +.05,   value: +6,  clazz: 'af1000g_uncommon',   symbolFunction: showAf1000gSymbol},	
-                       {min: +.05,  max: +1,     value: +7,  clazz: 'af1000g_common',     symbolFunction: showAf1000gSymbol},	
-                      ];                      
-
-
-var matrixRows = [
-	{name:'ClinVar'             ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: clinvarMap },
-	{name:'Impact'              ,order:1, index:0, match: 'exact', attribute: 'impact',      map: impactMap},
-	{name:'Inheritance'         ,order:2, index:2, match: 'exact', attribute: 'inheritance', map: inheritanceMap},
-	{name:'AF (1000G)'          ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: af1000gMap},
-	{name:'AF (ExAC)'           ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: afExacMap}
-];
-
-var featureUnknown = 199;
-
-var vcf1000G= null;
-var vcfExAC = null;
-var vcf1000GData = null;
-var vcfExACData = null;
-var vcf1000GUrl = "http://s3.amazonaws.com/vcf.files/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz";
-var vcfExACUrl  = "http://s3.amazonaws.com/vcf.files/ExAC.r0.2.sites.vep.vcf.gz";
 
 
 // Format the start and end positions with commas
@@ -418,74 +158,17 @@ function init() {
 
 	    });
 
-	featureMatrix = featureMatrixD3()
-					    .margin({top: 0, right: 40, bottom: 4, left: 24})
-					    .cellSize(30)
-					    .columnLabelHeight(100)
-					    .rowLabelWidth(100)
-					    .tooltipHTML(variantTooltipHTML)
-					    .on('d3click', function(variant) {
-					    	variantCards.forEach(function(variantCard) {
-					    		variantCard.highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
-					    	});
-					    })
-					     .on('d3mouseover', function(variant) {
-					    	variantCards.forEach(function(variantCard) {
-					    		variantCard.showVariantCircle(variant);
-					    	});
-					    })
-					    .on('d3mouseout', function() {
-					    	variantCards.forEach(function(variantCard) {
-					    		variantCard.hideVariantCircle();
-					    	});
-					    })
-					    .on('d3rowup', function(i) {
-					    	var column = null;
-					    	var columnPrev = null;
-					    	matrixRows.forEach(function(col) {
-					    		if (col.order == i) {
-					    			column = col;
-					    		} else if (col.order == i - 1) {
-					    			columnPrev = col;
-					    		}
-					    	});
-					    	if (column && columnPrev) {
-					    		column.order = column.order - 1;
-					    		columnPrev.order = columnPrev.order + 1;
-					    	}
-					    	fillFeatureMatrix();
-					    	
-					    })
-					    .on('d3rowdown', function(i) {
-					    	var column = null;
-					    	var columnNext = null;
-					    	matrixRows.forEach(function(col) {
-					    		if (col.order == i) {
-					    			column = col;
-					    		} else if (col.order == i + 1) {
-					    			columnNext = col;
-					    		}
-					    	});
-					    	if (column && columnNext) {
-					    		column.order = column.order + 1;
-					    		columnNext.order = columnNext.order - 1;
-					    	}
-					    	fillFeatureMatrix();
-
-					    });
-
-	var matrixCardSelector = $('#matrix-track');
-	matrixCardSelector.find('#expand-button').on('click', function() {
-		matrixCardSelector.find('.fullview').removeClass("hide");
-	});
-	matrixCardSelector.find('#minimize-button').on('click', function() {
-		matrixCardSelector.find('.fullview').addClass("hide");
-	});
 
 
+	 // Initialize Matrix card
+	 matrixCard = new MatrixCard();
+	 matrixCard.init();
 
-	// Initialize variant legend
-	initFilterTrack();
+
+	 // Initialize the Filter card
+	 filterCard = new FilterCard();
+	 filterCard.init();
+
 
 	// Initialize transcript view buttons
 	initTranscriptControls();
@@ -683,98 +366,6 @@ function loadUrlSources() {
 
 	}
 
-
-}
-
-
-function loadUrlSourcesOrig() {
-	var gene = getUrlParameter('gene');
-	if (gene != undefined) {
-		// move data source button
-		moveDataSourcesButton();
-		// load gene
-		// For some reason, this trigger event is fired twice, so keep track of whether it
-		// has already been fired so that we don't load data sources twice.
-		var loadCount = 0;
-		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, callback:function(){
-				if (loadCount == 0) {
-					// run after gene has been loaded
-					// initialize variant cards
-					initVariantCards();
-					var addVC = false;
-
-					// load bam and vcf sources
-					// get all bam and vcf url params in hash
-					var bam  = getUrlParameter(/bam*/);
-					var vcf  = getUrlParameter(/vcf*/);	
-					var rel  = getUrlParameter(/rel*/);
-					var dsname = getUrlParameter(/name*/);	
-					// load all bams and vcfs that have a bam pair
-					if (bam != undefined) {
-						Object.keys(bam).forEach(function(name) {
-							if (addVC) addVariantCard();
-							else addVC = true;
-							$('#bam-url-input').val(bam[name])
-							onBamUrlEntered();
-
-							// check if there is a corresponding vcf file
-							var vcfName = 'vcf' + name.replace('bam','');
-							if( vcf && vcf[vcfName] != undefined ) {
-								$('#url-input').val(vcf[vcfName]);
-								delete vcf[vcfName];
-								onVcfUrlEntered();
-							}
-												
-							
-							variantCards.forEach( function(variantCard) {							
-									variantCard.showDataSources(variantCard.getName());						
-							});				
-						})
-					}		
-					// load vcfs that don't have a bam pair
-					if (vcf != undefined) {						
-						Object.keys(vcf).forEach(function(name) {
-							if (addVC) addVariantCard();
-							else addVC = true;
-							$('#url-input').val(vcf[name]);
-							onVcfUrlEntered();
-							
-							variantCards.forEach( function(variantCard) {							
-								variantCard.showDataSources(variantCard.getName());						
-							});				
-						});
-					}
-					if ( rel != undefined) {
-						var cardIndex = 0;
-						Object.keys(rel).forEach(function(idx) {
-							$('#card-index').val(cardIndex);
-							$('#datasource-relationship').val(rel[idx]);
-							setDataSourceRelationship();
-							cardIndex++;
-						});
-						variantCards.forEach( function(variantCard) {							
-							variantCard.showDataSources(variantCard.getName());						
-						});		
-					}
-					if ( dsname != undefined) {
-						var cardIndex = 0;
-						Object.keys(dsname).forEach(function(idx) {
-							$('#card-index').val(cardIndex);
-							$('#datasource-name').val(decodeURI(dsname[idx]));
-							setDataSourceName();
-							cardIndex++;
-						});
-						variantCards.forEach( function(variantCard) {							
-							variantCard.showDataSources(variantCard.getName());						
-						});							
-					}
-					loadCount++;
-
-				}
-
-			}
-		});		
-	}
 }
 
 function selectVariantCard(cardIndex) {
@@ -920,263 +511,12 @@ function cacheCodingRegions() {
 }
 
 
-function clearFilters() {
-	clickedAnnotIds = [];
-	annotsToInclude = [];
-	d3.selectAll('#filter-track .impact').classed('current', false);
-	d3.selectAll('#filter-track .effect').classed('current', false);
-	d3.selectAll('#filter-track .type').classed('current', false);
-	d3.selectAll('#filter-track .zygosity').classed('current', false);
-	$('af-amount-start').val(0);
-	$('af-amount-end').val(100);
-	$('coverage-min').val('');
-}
-
-
-function initFilterTrack() {
-
-	// Init panel based on handlebards template
-	$('#filter-panel').html(trackLegendTemplate());
-
-	var filterCardSelector = $('#filter-track');
-	filterCardSelector.find('#expand-button').on('click', function() {
-		filterCardSelector.find('.fullview').removeClass("hide");
-		filterCardSelector.css('min-width', "665px");
-	});
-	filterCardSelector.find('#minimize-button').on('click', function() {
-		filterCardSelector.find('.fullview').addClass("hide");
-		filterCardSelector.css('min-width', "185px");
-	});
-
-
-
-	// listen for enter key on af amount input range
-	$('#af-amount-start').on('keydown', function() {
-		if(event.keyCode == 13) {
-			// We are filtering on range, so clear out the af level filters
-			resetAfFilters("af1000glevel");
-			resetAfFilters("afexaclevel");
-
-			filterVariants();
-	    }
-	});
-	$('#af-amount-end').on('keydown', function() {
-		if(event.keyCode == 13) {
-			// We are filtering on range, so clear out the af level filters
-			resetAfFilters("af1000glevel");
-			resetAfFilters("afexaclevel");
-
-
-			filterVariants();
-	    }
-	});
-	// listen for go button on af range
-	$('#af-go-button').on('click', function() {
-		// We are filtering on range, so clear out the af level filters
-			resetAfFilters("af1000glevel");
-			resetAfFilters("afexaclevel");
-
-		filterVariants();
-	});
-	// listen for enter key on min coverage
-	$('#coverage-min').on('keydown', function() {
-		if(event.keyCode == 13) {
-			filterVariants();
-	    }
-	});
-	// listen for go button on coverage
-	$('#coverage-go-button').on('click', function() {
-		filterVariants();
-	});
-
-
-
-	d3.selectAll(".type, .impact, .effectCategory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar")
-	  .on("mouseover", function(d) {  	  	
-		var id = d3.select(this).attr("id");
-
-		d3.selectAll(".variant")
-		   .style("opacity", .1);
-
-	    d3.selectAll(".variant")
-	      .filter( function(d,i) {
-	      	var theClasses = d3.select(this).attr("class");
-	    	if (theClasses.indexOf(id) >= 0) {
-	    		return true;
-	    	} else {
-	    		return false;
-	    	}
-	      })
-	      .style("opacity", 1);
-	  })
-	  .on("mouseout", function(d) {
-	  	d3.selectAll(".variant")
-		   .style("opacity", 1);
-	  })
-	  .on("click", function(d) {
-	  	var on = null;
-	  	if (d3.select(this).attr("class").indexOf("current") >= 0) {
-	  		on = false;
-	  	} else {
-	  		on = true;
-	  	}
-	  	var schemeClass = d3.select(this).attr("class");
-	  	// strip out extraneous 'no color' and 'current' class
-	  	// so that we are left with the attribute name of the
-	  	// annotation we will be filtering on.
-	  	if (schemeClass.indexOf('nocolor') >= 0) {
-	  		var tokens = schemeClass.split(' ');
-	  		tokens.forEach(function(clazz) {
-	  			if (clazz != 'nocolor') {
-	  				schemeClass = clazz;
-	  			}
-	  		})
-	  	}
-	  	if (schemeClass.indexOf('current') >= 0) {
-	  		var tokens = schemeClass.split(' ');
-	  		tokens.forEach(function(clazz) {
-	  			if (clazz != 'current') {
-	  				schemeClass = clazz;
-	  			}
-	  		})
-	  	}
-
-	  	// If af level clicked on, reset af range filter
-	  	if (d3.select(this).attr("class").indexOf("af1000glevel") || 
-	  		d3.select(this).attr("class").indexOf("afexaclevel")) {
-	  		if (on) {
-				resetAfRange();
-	  		}
-	  	}
-
-
-	  	// Remove from or add to list of clicked ids
-	  	window.clickedAnnotIds[d3.select(this).attr("id")] = on;
-	  	window.annotsToInclude[d3.select(this).attr("id")] = {'key':   schemeClass , 
-	  														  'value': d3.select(this).attr("id"),  
-	  														  'state': on};
-
-	  	d3.select(this).classed("current", on);
-	  	filterVariants();
-	  });
-
-	  d3.selectAll('#impact-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#impact-scheme').classed("current", true);
-	    	d3.select('#effect-scheme' ).classed("current", false);
-
-	    	d3.selectAll(".impact").classed("nocolor", false);
-	    	d3.selectAll(".effectCategory").classed("nocolor", true);
-
-			variantCards.forEach(function(variantCard) {
-				variantCard.variantClass(classifyByImpact);
-		    	if (variantCard.getCardIndex() == 0) {
-		    		filterVariants();
-				}
-
-			});
-
-
-	    });
-	  d3.selectAll('#effect-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#impact-scheme').classed("current", false);
-	    	d3.select('#effect-scheme').classed("current", true);
-
-
-	    	d3.selectAll(".impact").classed("nocolor", true);
-	    	d3.selectAll(".effectCategory").classed("nocolor", false);
-
-			variantCards.forEach(function(variantCard) {
-		    	variantCard.variantClass(classifyByEffect);
-		    	if (variantCard.getCardIndex() == 0) {
-		    		filterVariants();
-				}
-			});
-
-
-	    });
-	   d3.selectAll('#afexac-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#afexac-scheme' ).classed("current", true);
-	    	d3.select('#af1000g-scheme' ).classed("current", false);
-
-	    	d3.selectAll(".afexaclevel").classed("nocolor", false);
-	    	d3.selectAll(".af1000glevel").classed("nocolor", true);
-
-	    	// De-select an af1000g filters
-	    	resetAfFilters("af1000glevel");
-	    	resetAfRange();
-	   
-	    	filterVariants();
-
-	    });
-	   d3.selectAll('#af1000g-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#afexac-scheme' ).classed("current", false);
-	    	d3.select('#af1000g-scheme' ).classed("current", true);
-
-	    	d3.selectAll(".afexaclevel").classed("nocolor", true);
-	    	d3.selectAll(".af1000glevel").classed("nocolor", false);
-
-	    	resetAfFilters("afexaclevel");
-	    	resetAfRange();
-
-	    	filterVariants();
-	    });
-	  
-}
-
 function adjustGeneRegionBuffer() {
 	GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
 	$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});
 
 }
 
-function resetAfRange() {
-	$('#af-amount-start').val("0");
-	$('#af-amount-end').val("100");	
-
-	$("#af1000grange-flag").addClass("hide");
-	$("#afexacrange-flag").addClass("hide");
-
-
-}
-
-function resetAfFilters(scheme) {
-
-
-	// De-select af level filters
-	d3.selectAll("." + scheme).classed("current", false);
-
-	d3.selectAll("." + scheme).each(function(d,i) {
-		var id = d3.select(this).attr("id");
-		window.clickedAnnotIds[id] = false;
-  		window.annotsToInclude[id] = {'key':   scheme, 
-									  'value': id,  
-									  'state': false};
-
-	});
-}
-
-function filterVariants() {
-	variantCards.forEach( function(variantCard) {
-		if (variantCard.isViewable()) {
-			var filteredVcfData = variantCard.filterVariants();
-	  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
-
-	  		if (variantCard.getRelationship() == 'proband') {
-	  			var filteredFBData = variantCard.filterFreebayesVariants();
-	  			if (filteredFBData != null) {
-		  			variantCard.fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
-	  			}
-	  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
-			}
-		}
-
-	});
-
-}
 
 function updateUrl(paramName, value) {
 	var params = {};
@@ -1241,85 +581,7 @@ function getUrlParameter(sParam) {
     	return hits;
 }
 
-function classifyByImpact(d) {
-	var impacts = "";
-	var colorimpacts = "";
-	var effects = "";
-	
-	for (key in d.impact) {
-	  impacts += " " + key;
-	  colorimpacts += " " + 'impact_'+key;
-	}
-	for (key in d.effectCategory) {
-	  effects += " " + key;
-	}
-	
-	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.afexaclevel + ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + impacts + effects + ' ' + d.consensus + ' ' + colorimpacts; 
-}
-function classifyByEffect(d) { 
-	var effects = "";
-	var coloreffects = "";
-	var impacts = "";
-	
-    for (key in d.effectCategory) {
-      effects += " " + key;
-      coloreffects += " " + 'effect_'+key;
-    }
-    for (key in d.impact) {
-      impacts += " " + key;
-    }
-    
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + impacts + ' ' + d.consensus + ' ' + coloreffects; 
-}
 
-function applyVariantFilters() {
-
-	// Find out if there are any filters set
-  	var filtersApply = false;
-  	for (key in clickedAnnotIds) {
-		var on = clickedAnnotIds[key];
-		if (on ) {
-			filtersApply = true;
-		}
-	}
-
-	// If there existing filters set, take
-	// opacity of previous hover down to .1
-	if (filtersApply) {
-
-	  	d3.selectAll(".variant")
-	  	   .filter( function(d,i) {
-	    	var theClasses = d3.select(this).attr("class");
-	    	var theParentClasses = d3.select(this.parentNode).attr("class");
-	    	
-	    	var aClickedId = false;
-    		if (theParentClasses.indexOf("impact" ) >= 0 
-    			|| theParentClasses.indexOf("effect") >= 0 
-    			|| theParentClasses.indexOf("zygosity") >= 0 ) {
-    			return false;
-    		} else {
-		    	for (key in clickedAnnotIds) {
-	    			var on = clickedAnnotIds[key];
-	    			if (on && theClasses.indexOf(key) >= 0) {
-	    				aClickedId = true;
-	    			}
-	    		}
-	    		if (aClickedId) {
-	    			false
-	    		} else {
-		    		return true;
-	    		}
-    		}
-	      })
-	      .style("opacity", .1);
-	     
-
-	// Otherwise, if no filters exist, everything
-	// is set back to opacity of 1.
-	} else {
-    	d3.selectAll(".variant").style("opacity", 1);
-	}
-}
 
 function loadGeneWidget() {
 	// kicks off the loading/processing of `local` and `prefetch`
@@ -1442,8 +704,6 @@ function loadTracksForGene(bypassVariantCards) {
 
 	regionStart = null;
 	regionEnd = null;
-	window.vcf1000GData = null;
-	window.vcfExACData = null;
 
 	$("#region-flag").addClass("hide");
 
@@ -1502,7 +762,7 @@ function loadTracksForGene(bypassVariantCards) {
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
 	 	variantCards.forEach(function(variantCard) {
-			variantCard.loadTracksForGene(classifyByImpact,  function() {
+			variantCard.loadTracksForGene(filterCard.classifyByImpact,  function() {
 					promiseFullTrio();
 			});
 		});
@@ -1518,7 +778,7 @@ function loadTracksForGeneNextVariantCard(variantCards, index) {
 	if (index < variantCards.length) {
 		var variantCard = variantCards[index];
 
-		variantCard.loadTracksForGene(classifyByImpact, function() {
+		variantCard.loadTracksForGene(filterCard.classifyByImpact, function() {
 			index++;
 			loadTracksForGeneNextVariantCard(variantCards, index);
 		})
@@ -1951,34 +1211,6 @@ function hideCircleRelatedVariants() {
 	});
 }
 
-function showFeatureMatrix(theVariantCard, theVcfData, regionStart, regionEnd, showInheritance) {
-
-	var windowWidth = $(window).width();
-	var filterPanelWidth = $('#filter-track').width();
-	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-
-	//$("#matrix-track .inheritance.loader").css("display", "inline");
-	$("#matrix-panel .loader").css("display", "block");
-	$("#feature-matrix").addClass("hide");
-
-	sourceVcfData = theVcfData;
-
-	if (showInheritance) {
-		// we need to compare the proband variants to mother and father variants to determine
-		// the inheritance mode.  After this completes, we are ready to show the
-		// feature matrix.
-
-		window.compareVariantsToPedigree(theVcfData, function() {
-			//$("#matrix-track .inheritance.loader").css("display", "none");
-			fillFeatureMatrix(theVcfData);
-
-		});
-	} else {
-		fillFeatureMatrix(theVcfData);
-	}
-
-	
-}
 
 
 
@@ -2048,7 +1280,7 @@ function compareVariantsToPedigree(theVcfData, callback) {
 						});
 		        		$("#matrix-panel .loader-label").text("Ranking variants");
 
-		        		enableInheritanceFilters(theVcfData);
+		        		filterCard.enableInheritanceFilters(theVcfData);
   						
 
 			        	callback(theVcfData);
@@ -2083,171 +1315,8 @@ function compareVariantsToPedigree(theVcfData, callback) {
 
 }
 
-function setFeatureMatrixSource(theVcfData) {
-	sourceVcfData = theVcfData;
-}
 
 
-
-function fillFeatureMatrix(theVcfData) {
-	var windowWidth = $(window).width();
-	var filterPanelWidth = $('#filter-track').width();
-	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-	
-	// Set the width so that scrolling works properly
-	$('#feature-matrix').css('min-width', $('#matrix-panel').width());
-
-
-
-	if (theVcfData != null) {
-		featureVcfData = {};
-		featureVcfData.features = [];
-		theVcfData.features.forEach(function(variant) {
-			featureVcfData.features.push($.extend({}, variant));
-		});
-	}
-
-	// Sort the matrix columns
-	matrixRows = matrixRows.sort(function(a, b) {
-		if (a.order == b.order) {
-			return 0;
-		} else if (a.order < b.order) {
-			return -1;
-		} else {
-			return 1;
-		}
-	});
-	
-	// Fill all features used in feature matrix for each variant
-	featureVcfData.features.forEach( function(variant) {
-		var features = [];
-		for (var i = 0; i < matrixRows.length; i++) {
-			features.push(null);
-		}
-
-		matrixRows.forEach( function(matrixRow) {
-			var rawValue = variant[matrixRow.attribute];
-			var theValue    = null;
-			var mappedValue = null;
-			var mappedClazz = null;
-			var symbolFunction = null;
-			// Don't fill in clinvar for now
-			if (matrixRow.attribute == 'clinvar') {
-				rawValue = 'N';
-			} 
-			if (rawValue != null && rawValue != "") {
-				if (matrixRow.match == 'exact') {
-					// We are going to get the mapped value through exact match,
-					// so this will involve a simple associative array lookup.
-					// Some features (like impact) are multi-value and are stored in a
-					// an associative array.  In this case, we loop through the feature
-					// values, keeping the lowest (more important) mapped value.
-					if (isDictionary(rawValue)) {
-						// Iterate through the objects in the associative array.
-						// Keep the lowest mapped value
-						for (val in rawValue) {
-							var entry = matrixRow.map[val];
-							if (entry != null && (mappedValue == null || entry.value < mappedValue)) {
-								mappedValue = entry.value;
-								mappedClazz = entry.clazz;
-								symbolFunction = entry.symbolFunction;
-								theValue = val;
-							}
-						}
-					} else {
-						mappedValue = matrixRow.map[rawValue].value;
-						mappedClazz = matrixRow.map[rawValue].clazz;
-						symbolFunction = matrixRow.map[rawValue].symbolFunction;
-						theValue = rawValue;
-
-					}
-				} else if (matrixRow.match == 'range') {
-					// If this feature is a range, get the mapped value be testing if the
-					// value is within a min-max range.
-					if (isNumeric(rawValue)) {
-						theValue = d3.format(",.3%")(+rawValue);
-						matrixRow.map.forEach( function(rangeEntry) {
-							if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-								mappedValue = rangeEntry.value;
-								mappedClazz = rangeEntry.clazz;
-								symbolFunction = rangeEntry.symbolFunction;
-							}
-						});
-					}
-				}
-
-			} else {
-				rawValue = '';
-				mappedClazz = '';
-			}
-			features[matrixRow.order] = { 
-				                    'value': theValue, 
-				                    'rank': (mappedValue ? mappedValue : featureUnknown), 
-				                    'clazz': mappedClazz,
-				                    'symbolFunction': symbolFunction
-				                  };
-		});
-
-		variant.features = features;
-	});
-	// Sort the variants by the criteria that matches
-	var sortedFeatures = featureVcfData.features.sort(function (a, b) {
-	  var featuresA = "";
-	  var featuresB = "";
-
-	  // The features have been initialized in the same order as
-	  // the matrix column order. In each interation,
-	  // exit with -1 or 1 if we have non-matching values;
-	  // otherwise, go to next iteration.  After iterating
-	  // through every column, if we haven't exited the
-	  // loop, that means all features of a and b match
-	  // so return 0;
-	  for (var i = 0; i < matrixRows.length; i++) {
-		if (a.features[i].rank > 99  && b.features[i].rank > 99) {
-	  		// In this case, we don't consider the rank and will look at the next feature for ordering
-	  	} else if (a.features[i].rank > 99) {
-	  		return 1;
-	  	} else if (b.features[i].rank > 99) {
-	  		return -1;
-	  	} else if (a.features[i].rank < b.features[i].rank) {
-	  		return -1;
-	  	} else if (a.features[i].rank > b.features[i].rank) {
-			return 1;
-		} else {
-		}
-	  }
-	  return 0;
-	});
-
-	// Get the top 20 variants
-	var topFeatures = null;
-	if($('#matrixCheckboxAll').prop('checked')) {
-		topFeatures = sortedFeatures.slice(0, sortedFeatures.length)
-	} else if ($('#matrixCheckboxTop100').prop('checked')){
-		topFeatures = sortedFeatures.slice(0, 100 );
-	} else if ($('#matrixCheckboxTop20').prop('checked')){
-		topFeatures = sortedFeatures.slice(0, 20 );
-	}
-	
-	$("#feature-matrix").removeClass("hide");
-	$("#matrix-panel .loader").css("display", "none");
-
-	// Load the chart with the new data
-	featureMatrix.matrixRows(matrixRows);
-	var selection = d3.select("#feature-matrix").data([topFeatures]);  
-
-    this.featureMatrix(selection, {showColumnLabels: false});
-
-    // We have new properties to filter on (for inheritance), so refresh the 
-    //proband variant chart.
-	variantCards.forEach(function(variantCard) {
-		if (variantCard.getRelationship() == 'proband') {
-			variantCard.showVariants(regionStart, regionEnd);
-		}
-	});
-
-	
-}
 
 function variantTooltipHTML(variant, rowIndex) {
 
@@ -2335,139 +1404,24 @@ function tooltipRowNoLabel(value) {
 	}
 }
 
-function enableClinvarFilters(theVcfData) {
-	
-	var clinvarMap = {};
-	theVcfData.features.forEach( function(variant) {
-		if (variant.clinvar != null && variant.clinvar != '' && variant.clinvar != 'none') {
-			clinvarMap[variant.clinvar] = 'Y';
+function filterVariants() {
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.isViewable()) {
+			var filteredVcfData = variantCard.filterVariants();
+	  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
+
+	  		if (variantCard.getRelationship() == 'proband') {
+	  			var filteredFBData = variantCard.filterFreebayesVariants();
+	  			if (filteredFBData != null) {
+		  			variantCard.fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
+	  			}
+	  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
+			}
 		}
-	});
-	d3.selectAll(".clinvar").each( function(d,i) {
-		var clinvar = d3.select(this).attr("id");
-		var clinvarPresent = clinvarMap[clinvar];
-		d3.select(this).classed("inactive", clinvarPresent == null);
+
 	});
 
 }
-
-function enableInheritanceFilters(theVcfData) {
-	var inheritanceMap = {};
-	theVcfData.features.forEach( function(variant) {
-		if (variant.inheritance != null && variant.inheritance != '' && variant.inheritance != 'none') {
-			inheritanceMap[variant.inheritance] = 'Y';
-		}
-	});
-	d3.selectAll(".inheritance").each( function(d,i) {
-		var inheritance = d3.select(this).attr("id");
-		var inheritancePresent = inheritanceMap[inheritance];
-		d3.select(this).classed("inactive", inheritancePresent == null);
-	});
-}
-
-
-
-function enableVariantFilters(fullRefresh) {
-
-	d3.selectAll(".impact").each( function(d,i) {
-		var impact = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + impact)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".type").each( function(d,i) {
-		var type = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + type)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".zygosity").each( function(d,i) {
-		var zygosity = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + zygosity)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".effectCategory").each( function(d,i) {
-		var effect = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + effect)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".afexaclevel").each( function(d,i) {
-		var afexaclevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + afexaclevel + ',' + '#fb-variants .variant.' + afexaclevel)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".af1000glevel").each( function(d,i) {
-		var af1000glevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + af1000glevel)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-
-
-	if (fullRefresh) {
-		// First, move all elements out of the 'more' section
-		$('#effect-filter-box #more-effect svg').each(function() {
-	    	$(this).insertBefore($('#effect-filter-box #more-effect-link'));
-	    });
-	    // Now move only inactive elements into the 'more section'
-	    $('#effect-filter-box .inactive').each(function() {
-	    	$(this).prependTo($('#effect-filter-box #more-effect'));
-	    });
-	    // If we have more that 6 active elements, keep the
-	    // first 6 where they are and move the remaining to the 
-	    // 'more' section.  If we 6 or less active elements,
-	    // just hide the 'more' link.
-	    var allCount = d3.selectAll("#effect-filter-box .effectCategory")[0].length;
-	    var inactiveCount = d3.selectAll("#effect-filter-box .effectCategory.inactive")[0].length;
-	    var activeCount = allCount - inactiveCount;
-	    if (activeCount >= 4) {
-	    	$('#effect-filter-box #more-effect-link').removeClass('hide');
-	    	// Keep six active elements where they are.  The remainder should go in the 
-	    	// 'more' section
-	    	var activeElements = $('#effect-filter-box > .effectCategory');
-	    	for (var i = 4; i < activeCount; i++) {
-	    		var activeElement = activeElements[i];
-	    		$('#effect-filter-box #more-effect').append($(activeElement));
-	    	}
-
-	    } else {
-	    	$('#effect-filter-box #more-effect-link').addClass('hide');
-
-	    }
-	}
-}
-
-function toggleMatrixCheckbox(element) {
-
-	if (element.id == 'matrixCheckboxAll') {
-		$('#matrixCheckboxTop20').prop("checked", false);
-		$('#matrixCheckboxTop100').prop("checked", false);
-	} else if (element.id == 'matrixCheckboxTop100') {
-		$('#matrixCheckboxTop20').prop("checked", false);
-		$('#matrixCheckboxAll').prop("checked", false);
-	} else {
-		$('#matrixCheckboxAll').prop("checked", false);
-		$('#matrixCheckboxTop100').prop("checked", false);
-	}
-	fillFeatureMatrix();
-}
-
-function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function isDictionary(obj) {
-  if(!obj) {
-  	return false;
-  } 
-  if(Array.isArray(obj)) {
-  	return false;
-  }
-  if (obj.constructor != Object) {
-  	return false;
-  }
-  return true;
-}
-
-
-
 
 
 

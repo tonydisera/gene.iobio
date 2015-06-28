@@ -1020,7 +1020,7 @@
                 Top 20
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
-                    <input id="matrixCheckboxTop20" type="checkbox" checked onchange="toggleMatrixCheckbox(this)">
+                    <input id="matrixCheckboxTop20" type="checkbox" checked onchange="matrixCard.toggleMatrixCheckbox(this)">
                   </label>
                 </div>
               </div>
@@ -1028,7 +1028,7 @@
                 Top 100
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
-                    <input id="matrixCheckboxTop100" type="checkbox" onchange="toggleMatrixCheckbox(this)">
+                    <input id="matrixCheckboxTop100" type="checkbox" onchange="matrixCard.toggleMatrixCheckbox(this)">
                   </label>
                 </div>
               </div>
@@ -1036,7 +1036,7 @@
                 All
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
-                    <input id="matrixCheckboxAll" type="checkbox" onchange="toggleMatrixCheckbox(this)">
+                    <input id="matrixCheckboxAll" type="checkbox" onchange="matrixCard.toggleMatrixCheckbox(this)">
                   </label>
                 </div>
               </div>
@@ -1362,6 +1362,8 @@
 <script src="app/featureMatrix.d3.js"></script>
 <script src="app/bam.iobio.js"></script>
 <script type="text/javascript" src="app/vcf.iobio.js"></script>
+<script src="app/matrixCard.js"></script>
+<script src="app/filterCard.js"></script>
 <script src="app/variantCard.js"></script>  
 <script src="app/app.js"></script>	
 <script src="assets/js/jquery.dropdown.js"></script>
