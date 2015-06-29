@@ -523,15 +523,18 @@ MatrixCard.prototype.showRecessiveSymbol = function (selection) {
 	         .attr("transform", "translate(0,3)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
+	         .attr("width", "30")
+	         .attr("height", "30")
 	         .style("pointer-events", "none");
-
 };
 
-MatrixCard.prototype.sshowDeNovoSymbol = function (selection) {
+MatrixCard.prototype.showDeNovoSymbol = function (selection) {
 	selection.append("g")
 	         .attr("transform", "translate(0,3)")
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
+	         .attr("width", "30")
+	         .attr("height", "30")
 	         .style("pointer-events", "none");
 	
 };

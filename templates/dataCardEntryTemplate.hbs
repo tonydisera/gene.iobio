@@ -1,0 +1,85 @@
+<div id="sample-data-panel">
+  <div id="add-name" class="fullview" style="display:table">
+    <div id="sample-data-label" class="card-label" style=";width:105px;">PROBAND</div>
+    <div style="display:table-cell;width:100%">
+      <input id="datasource-name" class="form-control input-sm" placeholder="Enter name" type="text"/>
+    </div>
+  </div>
+
+  <div id="add-vcf-track" class="fullview" style="display:table">
+      
+      <div class="btn-toolbar tour_element_3" style="width:105px;">
+        <div class="btn-group" style="display:  inline;" >
+
+          <button type="button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <i class="mdi-device-now-widgets" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
+            Variants <span class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu" role="menu">
+            <li style="color:  rgb(51, 51, 51);">
+                <div class="file"  id="vcf-file-selector-item">
+                    <input type="file" name="files[]" id="vcf-file-upload" multiple="">
+                    <label class="file-button" for="vcf-file-upload">Choose VCF File</label>
+                </div>
+            </li>
+            <li>
+                <a id="display-vcf-url-item"  href="#">Enter URL for VCF</a>
+            </li>  
+            <li>
+                <a id="clear-vcf" href="javascript:void(0)">Clear</a>
+            </li>  
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:table-cell;width:100%;vertical-align:middle;">
+        <input  id="url-input" type="text" value="" class="form-control input-sm empty" placeholder="http://...">
+        <input id="vcf-file-info" type="text" value="" readonly=""  style="background-color: #FFFFFF" class="form-control input-sm empty hide">
+      </div>
+
+  </div>     
+  <div id="add-bam-track" class="fullview" style="display:table">
+
+    <div class="btn-toolbar tour_element_4" style="width:105px;" >
+      <div class="btn-group" style="display:inline;">
+
+          <button type="button" style="width:95px;font-size:11px;padding-top: 2px;padding-bottom: 1px;"
+          class="icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+
+            <i class="mdi-editor-format-align-center" style="font-size:16px;"></i>
+            Alignments 
+            <span class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu" role="menu">
+            <li style="color:  rgb(51, 51, 51);">
+                 <div id="bam-file-selector-item" class="file">
+                    <input type="file" name="files[]" id="bam-file-upload" multiple="">
+                    <label class="file-button" for="bam-file-upload">Choose BAM File</label>
+                </div>
+            </li>
+            <li>
+                <a id="display-bam-url-item" href="#">Enter URL for BAM</a>
+            </li>    
+           <li>
+                <a id="clear-bam" href="javascript:void(0)">Clear</a>
+            </li>  
+          </ul>
+      </div>
+    </div>
+    
+
+    <div style="display:table-cell;width:100%;vertical-align:middle;">
+        <input  id="bam-url-input" type="text" class="form-control input-sm" value="" placeholder="http://..."/>
+        <input id="bam-file-info" type="text" value="" readonly="" style="background-color: #FFFFFF"
+        class="form-control input-sm empty hide"/>
+    </div>
+
+  </div>
+
+
+
+
+
+</div>

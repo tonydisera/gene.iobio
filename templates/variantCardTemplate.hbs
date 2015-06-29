@@ -1,0 +1,141 @@
+<div class="variant-card track-expand shadow-z-1 hide" style="padding-bottom:0px;background-color:white;">
+
+
+  <div style="text-align:center;margin-top: 6px">
+    <span id="card-relationship-label"  class="card-label" style="float:left;text-align:left;width:90px;margin-top:-2px;">
+      Sample
+    </span>
+                
+    <span class="card-label" id="variant-card-label" style="float: left;margin-left: 5px;margin-top:-2px;"></span>
+
+    <ul class="nav nav-pills hide" id="variant-badges" style="float:left;margin-left:30px;margin-top:-2px">
+      <li>
+            <span class="badge-label">Variants</span>
+            <span id="vcf-variant-count" class="badge"></span>
+      </li>
+
+      <li>
+        <a href="javascript:void(0)" id="button-find-missing-variants" style="padding-top:0px" class="tour_element_7">
+            <i class="mdi-action-find-in-page"></i>
+            <span id="missing-variant-count-label">Find missing variants</span>
+            <span id="missing-variant-count" class="badge"></span>
+        </a>
+      </li>
+      <li style="padding-left:10px;" >
+            <span id="effectCategory-flag" class="filter-flag hide label label-primary">Effect</span>
+            <span id="impact-flag"class="filter-flag hide label label-primary">Impact</span>
+            <span id="type-flag" class="filter-flag hide label label-primary">Type</span>
+            <span id="zygosity-flag" class="filter-flag hide label label-primary">Zygosity</span>
+            <span id="afexaclevel-flag" class="filter-flag hide label label-primary">AF ExAC</span>
+            <span id="af1000glevel-flag" class="filter-flag hide label label-primary">AF 1000G</span>
+            <span id="afexacrange-flag" class="hide label label-primary">AF ExAC range</span>
+            <span id="af1000grange-flag" class="hide label label-primary">AF 1000G range</span>
+            <span id="inheritance-flag" class="filter-flag hide label label-primary">Inheritance</span>
+            <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
+            <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
+            <span id="region-flag" class="hide label label-info">Zoom into region</span>
+            <span id="displayed-variant-count" class="badge hide"></span>
+      </li>
+
+   </ul>
+
+
+    <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+      <i class="mdi-content-remove"></i>
+    </a>
+    <a href="javascript:void(0)" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
+      <i class="mdi-image-crop-7-5"></i>
+    </a>
+    <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+      <i class="mdi-image-crop-din"></i>
+    </a>
+
+    <div id="variant-right-labels" style="float:right">
+      <a id="af-link" class="hide"  
+        data-toggle="collapse" 
+        style="font-size: 12px;vertical-align: top;padding-right:20px" 
+        href="#af" 
+        aria-expanded="false" aria-controls="collapseExample">
+        Allele Frequency
+      </a>
+      <a id="vcf-file-info-link"   class="hide"
+        data-toggle="collapse" 
+        style="font-size: 12px;vertical-align: top;margin-top: 0px;padding-right:20px" 
+        href="#vcf-file-info" aria-expanded="false" >
+        data source info
+      </a>
+    </div>
+
+
+
+  </div>
+  
+  <div class="loader vcfloader">
+    <span class="loader-label"></span>
+    <img src="assets/images/loading-squares.gif"/>
+  </div> 
+
+  <div style="text-align:center;clear:both;">
+      <div id="af" class="collapse" style="float:right;font-size: 10px;margin-top:-16px">
+        <div>
+          <svg id="vcf-af-chart"/>
+        </div>
+      </div> 
+      <span id="vcf-file-info" class="collapse" style="float:right;margin-top:-16px;text-align:right">
+        <div id="bam-name" style="font-size: 12px; padding-right: 10px;">
+        </div>
+        <span id="vcf-name" class="hide" style="font-size: 12px;padding-right:10px;"></span>
+      </span>
+  </div>
+
+
+    
+
+  <div id="variant-panel" style="clear:both;">
+
+    <div id="vcf-track" class="track hide tour_element_5" >
+             
+      <div class="track-chart">
+          <div>
+            <div  id="fb-chart-label" class="chart-label hide" style="margin-bottom: -10px;">
+              Missing Variants called
+            </div>
+            <div id="fb-variants">
+            </div>
+            <hr id="fb-separator" class="hide" style="margin-top: 0px;margin-bottom: 0px;">
+          </div>
+          <div >
+            <div id="vcf-chart-label" class="chart-label hide" 
+             style="margin-top: 4px;margin-bottom: -30px;">
+              Variants loaded
+            </div>
+            <div id="vcf-variants">
+            </div>
+          </div>
+      </div>
+    </div>
+
+
+    <div id="zoom-region-chart"  class="track"></div>
+
+
+    <div id="bam-track" class="track hide">
+      <div id="bam-depth-track" class="track-chart">
+
+          <div class="loader">
+            <span class="loader-label"></span>
+            <img src="assets/images/loading-squares.gif"/>
+          </div> 
+
+          <div >
+            <div id="bam-chart-label" class="chart-label hide" style="margin-top: 24px;margin-bottom: -17px;">Coverage
+            </div>
+            <div id="bam-depth" class="tour_element_6">
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

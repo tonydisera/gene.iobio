@@ -13,10 +13,10 @@ var gene_engine = new Bloodhound({
   limit: 20
 });
 
-// the variant filter panel
-var trackLegendTemplate = Handlebars.compile($('#track-legend-template').html());	
-var variantCardTemplate = Handlebars.compile($('#variant-card-template').html());
-var sampleDataTemplate  = Handlebars.compile($('#sample-data-template').html());
+// Handlebar templates
+var dataCardEntryTemplate = null;
+var filterCardTemplate = null;
+var variantCardTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -70,12 +70,45 @@ var widthFactors = [
 
 
 $(document).ready(function(){
-	init();
+
+	// Compile handlebar templates, when all are loaded
+	// call init();
+	$.get('templates/dataCardEntryTemplate.hbs', function (data) {
+    
+	    dataCardEntryTemplate = Handlebars.compile(data);
+	    promiseTemplatesLoaded(init);
+
+	}, 'html');
+
+	$.get('templates/filterCardTemplate.hbs', function (data) {
+    
+	    filterCardTemplate = Handlebars.compile(data);
+	    promiseTemplatesLoaded(init);
+
+	}, 'html');
+
+	$.get('templates/variantCardTemplate.hbs', function (data) {
+    
+	    variantCardTemplate = Handlebars.compile(data);
+	    promiseTemplatesLoaded(init);
+
+	}, 'html');
+
+	
 });
+
+
+function promiseTemplatesLoaded(callback) {
+
+	if (dataCardEntryTemplate != null && filterCardTemplate != null && variantCardTemplate != null) {
+		callback();
+	}
+}
 
 
 function init() {
 	var me = this;
+
 
 	// Initialize material bootstrap
     $.material.init();

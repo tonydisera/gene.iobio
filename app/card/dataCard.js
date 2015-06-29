@@ -54,19 +54,19 @@ DataCard.prototype.init = function() {
 	    });
 	}
 
-	$('#proband-data').append(sampleDataTemplate());
+	$('#proband-data').append(dataCardEntryTemplate());
 	listenToEvents($('#proband-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 
 
-	$('#mother-data').append(sampleDataTemplate());
+	$('#mother-data').append(dataCardEntryTemplate());
 	$('#mother-data #sample-data-label').text("MOTHER");
 	listenToEvents($('#mother-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
 
-	$('#father-data').append(sampleDataTemplate());
+	$('#father-data').append(dataCardEntryTemplate());
 	$('#father-data #sample-data-label').text("FATHER");
 	listenToEvents($('#father-data'));
 	addVariantCard();
