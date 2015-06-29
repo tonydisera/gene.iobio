@@ -36,6 +36,9 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 
+// data card
+var dataCard = new DataCard();
+
 // filter card
 var filterCard = new FilterCard();
 
@@ -53,16 +56,6 @@ var formatRegion = d3.format(",");
 
 // variant card
 var variantCards = [];
-var variantCardDefaultUrls = {
-	proband: 'http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz',
-	mother:  'http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz',
-	father:  'http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz'
-};
-var variantCardDefaultBamUrls = {
-	proband: 'http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam',
-	mother:  'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam',
-	father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
-};
 
 // The smaller the region, the wider we can
 // make the rect of each variant
@@ -84,20 +77,20 @@ $(document).ready(function(){
 function init() {
 	var me = this;
 
+	// Initialize material bootstrap
     $.material.init();
 
-    // Iniitalize the 'samples' data card.
-    initDataCard();
-
-
-    // Initialize page guide
+    // Initialize app tour
 	tl.pg.init({ 'auto_refresh': true, 'custom_open_button': '.open_page_guide'}); 
-	
 
+	// Initialize data card
+	dataCard = new DataCard();
+	dataCard.init();
+
+	
 	// Set up the gene search widget
 	loadGeneWidget();
 	$('#bloodhound .typeahead').focus();
-
 
 	
 	// Create transcript chart
@@ -173,83 +166,9 @@ function init() {
 	// Initialize transcript view buttons
 	initTranscriptControls();
 
-	initDataSourceDialog();
-
 	loadGeneFromUrl();
 }
 
-
-function initDataCard() {
-
-	var listenToEvents = function(panelSelector) {
-	    panelSelector.find('#datasource-name').on('change', function() {
-	    	setDataSourceName(panelSelector); 
-	    });
-
-	    panelSelector.find('#bam-url-input').on('change', function() {
-	    	onBamUrlEntered(panelSelector);
-	    });
-	    panelSelector.find('#display-bam-url-item').on('click', function() {
-	    	displayBamUrlBox(panelSelector);
-	    });
-	    panelSelector.find('#bam-file-selector-item').on('click', function() {
-	    	onBamFileButtonClicked(panelSelector);
-	    });
-	    panelSelector.find('#bam-file-upload').on('change', function() {
-	    	onBamFilesSelected(event, panelSelector);
-	    });
-	     panelSelector.find('#clear-bam').on('click', function() {
-	    	clearBamUrl(panelSelector);
-	    });
-
-	    panelSelector.find('#url-input').on('change', function() {
-	    	onVcfUrlEntered(panelSelector);
-	    });
-	    panelSelector.find('#display-vcf-url-item').on('click', function() {
-	    	displayUrlBox(panelSelector);
-	    });
-	    panelSelector.find('#clear-vcf').on('click', function() {
-	    	clearUrl(panelSelector);
-	    });
-
-	    panelSelector.find('#vcf-file-selector-item').on('click', function() {
-	    	onVcfFileButtonClicked(panelSelector);
-	    });
-	    panelSelector.find('#vcf-file-upload').on('change', function() {
-	    	onVcfFilesSelected(event, panelSelector);
-	    });
-	}
-
-	$('#proband-data').append(sampleDataTemplate());
-	listenToEvents($('#proband-data'));
-	addVariantCard();
-	setDataSourceRelationship($('#proband-data'));
-
-
-	$('#mother-data').append(sampleDataTemplate());
-	$('#mother-data #sample-data-label').text("MOTHER");
-	listenToEvents($('#mother-data'));
-	addVariantCard();
-	setDataSourceRelationship($('#mother-data'));
-
-	$('#father-data').append(sampleDataTemplate());
-	$('#father-data #sample-data-label').text("FATHER");
-	listenToEvents($('#father-data'));
-	addVariantCard();
-	setDataSourceRelationship($('#father-data'));
-
-	var dataCardSelector = $('#data-card');
-	dataCardSelector.find('#expand-button').on('click', function() {
-		dataCardSelector.find('.fullview').removeClass("hide");
-	});
-	dataCardSelector.find('#minimize-button').on('click', function() {
-		dataCardSelector.find('.fullview').addClass("hide");
-	});
-	dataCardSelector.find('#ok-button').on('click', function() {
-		dataCardSelector.find('.fullview').addClass("hide");
-	});
-
-}
 
 function onCollapseTranscriptPanel() {
 	transcriptCollapse = !transcriptCollapse;
@@ -295,18 +214,6 @@ function toggleSampleTrio(show) {
 }
 
 
-function initDataSourceDialog() {
-	// listen for data sources open event
-	$( "#datasource-dialog" ).on('shown.bs.modal', function (e) {
-		initVariantCards();
-
-  	});
-}
-
-function moveDataSourcesButton() {
-	$('#add-datasource-button').css('display', 'none');
-	$('#datasource-button').css('visibility', 'visible');
-}
 
 function loadGeneFromUrl() {
 	var gene = getUrlParameter('gene');
@@ -341,7 +248,7 @@ function loadUrlSources() {
 			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 			var panelSelector    = $(panelSelectorStr);
 			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
-			onBamUrlEntered(panelSelector);
+			dataCard.onBamUrlEntered(panelSelector);
 		});
 	}
 	if (vcf != null) {
@@ -351,7 +258,7 @@ function loadUrlSources() {
 			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 			var panelSelector    = $(panelSelectorStr);
 			panelSelector.find('#url-input').val(vcf[urlParameter]);
-			onVcfUrlEntered(panelSelector);
+			dataCard.onVcfUrlEntered(panelSelector);
 		});
 	}
 	if (dsname != null) {
@@ -361,7 +268,7 @@ function loadUrlSources() {
 			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 			var panelSelector    = $(panelSelectorStr);
 			panelSelector.find('#datasource-name').val(dsname[urlParameter]);
-			setDataSourceName(panelSelector);
+			dataCard.setDataSourceName(panelSelector);
 		});
 
 	}
@@ -635,7 +542,6 @@ function loadGeneWidget() {
 		    	window.gene = response[0];		    
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
-		    	moveDataSourcesButton();
 		    	window.selectedTranscript = null;
 
 		    	
@@ -893,193 +799,8 @@ function addVariantCard() {
 
 	variantCard.init($(cardSelectorString), d3CardSelector, cardIndex);
 
-
-	$('#datasource-dialog #card-index').val(cardIndex);
-
-
-	$('#datasource-dialog #datasource-name').val(defaultName);
-	$('#datasource-dialog #bam-file-info').addClass("hide");
-	$('#datasource-dialog #bam-url-input').addClass("hide");
-	$('#datasource-dialog #vcf-file-info').addClass("hide");
-	$('#datasource-dialog #url-input').addClass("hide");
-	$('#datasource-dialog #bam-file-info').val("");
-	$('#datasource-dialog #bam-url-input').val("");
-	$('#datasource-dialog #vcf-file-info').val("");
-	$('#datasource-dialog #url-input').val("");
-
-	$('#datasource-dialog #bam-file-upload').val("");
-	$('#datasource-dialog #vcf-file-upload').val("");
-
-
-    $('#variant-card-buttons')
-         .append($("<a></a>")
-         .attr("id", "variant-card-button-" + cardIndex)
-         .attr("href", "javascript:void(0)")
-         .attr("onclick", 'selectVariantCard("'+ cardIndex + '")')
-         .attr("class", "btn btn-default")
-         .text(defaultName));
-
-    if (cardIndex > 0) {
-    	$('#datasource-dialog .material-dropdown li').removeClass('disabled')
-    	$('#datasource-dialog .material-dropdown li[value="proband"]').addClass('disabled')
-    	$('.material-dropdown li[value="none"]').click();	
-    } else {
-    	$('.material-dropdown li[value="proband"]').click();	
-    }
 }
 
-
-function onBamFileButtonClicked(panelSelector) {	
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	panelSelector.find('#bam-file-info').removeClass("hide");
-
-	panelSelector.find('#bam-url-input').addClass('hide');
-	panelSelector.find('#bam-url-input').val('');
-}
-
-function onBamFilesSelected(event, panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	var cardIndex = panelSelector.find('#card-index').val();
-
-	var variantCard = variantCards[+cardIndex];
-
-	setDataSourceName(panelSelector);
-	setDataSourceRelationship(panelSelector);
-
-	variantCard.onBamFilesSelected(event, function(bamFileName) {
-		panelSelector.find('#bam-file-info').removeClass('hide');
-		panelSelector.find('#bam-file-info').val(bamFileName);
-		variantCard.loadBamDataSource(variantCard.getName());
-	});
-	variantCard.setDirty();
-
-
-}
-
-
-function onBamUrlEntered(panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	var bamUrlInput = panelSelector.find('#bam-url-input');
-	bamUrlInput.removeClass("hide");
-
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	setDataSourceName(panelSelector);
-	setDataSourceRelationship(panelSelector);
-
-	variantCard.onBamUrlEntered(bamUrlInput.val());	
-	variantCard.loadBamDataSource(variantCard.getName());
-	variantCard.setDirty();
-
-	updateUrl('bam' + cardIndex, bamUrlInput.val());
-
-}
-
-function displayBamUrlBox(panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	panelSelector.find('#bam-file-info').addClass('hide');
-    panelSelector.find('#bam-file-info').val('');
-    panelSelector.find('#bam-url-input').removeClass("hide");
-    panelSelector.find("#bam-url-input").focus();
-
-    var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	if (panelSelector.find('#bam-url-input').val() == '') {
-	    panelSelector.find('#bam-url-input').val(variantCardDefaultBamUrls[variantCard.getRelationship()]);
-	}
-    onBamUrlEntered(panelSelector);
-	
-
-}
-
-function clearBamUrl(panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-
-	displayBamUrlBox(panelSelector);
-	panelSelector.find("#bam-url-input").val("");
-	onBamUrlEntered(panelSelector);
-
-}
-
-function displayUrlBox(panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	if (panelSelector.find('#url-input').val() == '') {
-	    panelSelector.find('#url-input').val(variantCardDefaultUrls[variantCard.getRelationship()]);
-	}
-	panelSelector.find("#url-input").removeClass('hide');
-    panelSelector.find("#url-input").focus();
-    panelSelector.find('#vcf-file-info').addClass('hide');
-    panelSelector.find('#vcf-file-info').val('');
-    onVcfUrlEntered(panelSelector);
-}
-
-function clearUrl(panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-
-	displayUrlBox(panelSelector);
-	panelSelector.find("#url-input").val("");
-	onVcfUrlEntered(panelSelector);
-
-
-}
-function onVcfFileButtonClicked(panelSelector) {	
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	panelSelector.find('#vcf-file-info').removeClass("hide");
-
-	panelSelector.find('#url-input').addClass('hide');
-	panelSelector.find('#url-input').val('');
-}
-
-function onVcfFilesSelected(event, panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	setDataSourceName(panelSelector);
-	setDataSourceRelationship(panelSelector);
-
-	variantCard.onVcfFilesSelected(event, function(vcfFileName) {
-		panelSelector.find('#vcf-file-info').removeClass('hide');
-		panelSelector.find('#vcf-file-info').val(vcfFileName);
-		variantCard.loadVcfDataSource(variantCard.getName(), function() {
-			promiseFullTrio();
-
-		});
-	});
-	variantCard.setDirty();
-}
 
 function promiseFullTrio() {
 	var loaded = {};
@@ -1094,102 +815,6 @@ function promiseFullTrio() {
 
 }
 
-function onVcfUrlEntered(panelSelector) {
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	setDataSourceName(panelSelector);
-	setDataSourceRelationship(panelSelector);
-
-
-	var vcfUrl = panelSelector.find('#url-input').val();
-
-	variantCard.onVcfUrlEntered(vcfUrl);
-	updateUrl('vcf'+cardIndex, vcfUrl);
-	variantCard.loadVcfDataSource(variantCard.getName(),  function() {
-		promiseFullTrio();
-	});
-	variantCard.setDirty();
-}
-
-
-function setDataSourceName(panelSelector) {	
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	var dsName = panelSelector.find('#datasource-name').val();
-	variantCard.setName(dsName);
-	variantCard.showDataSources(dsName);
-	
-	//	$('#variant-card-button-' + cardIndex ).text(dsName);
-	updateUrl('name' + cardIndex, dsName);
-
-}
-
-function setDataSourceRelationship(panelSelector) {		
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	var dsRelationship = panelSelector.find('#datasource-relationship').val();
-	variantCard.setRelationship(dsRelationship);	
-	updateUrl('rel' + cardIndex, dsRelationship);
-}
-
-function loadNewDataSources() {
-	// check if gene is selected
-	if(window.gene && window.gene != "") {
-		$('#datasource-dialog').modal('hide');
-		loadDataSources();	
-		// set search box back to no border
-		$('#datasource-dialog .twitter-typeahead').css('border', 'none');		
-	}
-	else {
-		$('#datasource-dialog .twitter-typeahead').css('border', '1px solid red');
-	}
-	
-}
-
-function loadDataSources() {	
-	// hide add data button
-	$('#add-datasource-container').css('display', 'none');
-
-	var index = 0;
-	loadNextVariantCard(variantCards, index);
-
-}
-
-function loadNextVariantCard(variantCards, index) {
-	if (index < variantCards.length) {
-		var variantCard = variantCards[index];
-
-		variantCard.loadDataSources(variantCard.getName(), function() {
-			index++;
-			loadNextVariantCard(variantCards, index);
-		})
-	} else {
-		// Now that we have loaded all of the "viewable" cards,
-		// figure out inheritance
-		var probandVariantCard = null;
-		variantCards.forEach( function (variantCard) {
-			if (variantCard.getRelationship() == 'proband') {
-				probandVariantCard = variantCard;
-			}
-		});
-		if (probandVariantCard) {
-			probandVariantCard.showFeatureMatrix();
-		}
-	}
-}
 
 function showCircleRelatedVariants(variant, sourceVariantCard) {
 	variantCards.forEach( function(variantCard) {
