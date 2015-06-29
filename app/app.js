@@ -275,62 +275,6 @@ function loadUrlSources() {
 
 }
 
-function selectVariantCard(cardIndex) {
-	$('#datasource-dialog #card-index').val(+cardIndex);
-	$('#variant-card-buttons a.selected').removeClass("selected");
-	$('#variant-card-button-' + +cardIndex).addClass("selected");
-	initDataSourceFields();
-
-}
-
-function initVariantCards() {
-	if (variantCards.length == 0) {
-		addVariantCard();
-		$('#datasource-dialog #card-index').val(0);
-
-	} else {
-		$('#variant-card-buttons').removeClass("hide");
-	}
-	
-	initDataSourceFields();
-}
-
-function initDataSourceFields() {
-	var cardIndex = $('#datasource-dialog #card-index').val();
-	var variantCard = variantCards[+cardIndex];
-
-	$('#datasource-dialog .material-dropdown li').removeClass('disabled')
-	if (cardIndex > 0) {
-    	$('#datasource-dialog .material-dropdown li[value="proband"]').addClass('disabled')    	
-    } else {    	
-    	$('#datasource-dialog .material-dropdown li[value!="proband"]').addClass('disabled')    	
-    }
-
-
-	if (variantCard.getBamName().indexOf("http") == 0) {
-		$('#datasource-dialog #bam-file-info').addClass("hide");
-		$('#datasource-dialog #bam-url-input').removeClass("hide");
-		$('#datasource-dialog #bam-url-input').val(variantCard.getBamName());
-	} else {
-		$('#datasource-dialog #bam-url-input').addClass("hide");
-		$('#datasource-dialog #bam-file-info').removeClass("hide");
-		$('#datasource-dialog #bam-file-info').val(variantCard.getBamName());
-	}
-
-	if (variantCard.getVcfName().indexOf("http") == 0) {
-		$('#datasource-dialog #vcf-file-info').addClass("hide");
-		$('#datasource-dialog #url-input').removeClass("hide");
-		$('#datasource-dialog #url-input').val(variantCard.getVcfName());
-	} else {
-		$('#datasource-dialog #url-input').addClass("hide");
-		$('#datasource-dialog #vcf-file-info').removeClass("hide");
-		$('#datasource-dialog #vcf-file-info').val(variantCard.getVcfName());
-	}	
-	$('#datasource-dialog #datasource-name').val(variantCard.getName());
-	var rel = variantCard.getRelationship();	
-	$('.material-dropdown li[value="' + rel + '"]').click();	
-}
-
 function initTranscriptControls() {
 
 
