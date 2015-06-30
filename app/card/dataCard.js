@@ -9,6 +9,7 @@ function DataCard() {
 		mother:  'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam',
 		father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
 	};
+	this.mode = 'single';
 
 }
 

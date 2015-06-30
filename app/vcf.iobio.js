@@ -475,16 +475,16 @@ var effectCategories = [
     
   }
   // NEW
-  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar) {
+  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded) {
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar);
+      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded);
     } else {
-      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar);
+      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded);
     }
   }
  
   // NEW
-  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar) {
+  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -520,7 +520,7 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
         me.annotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, 
-          selectedTranscript, callback, callbackClinvar);
+          selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded);
 
 
     });
@@ -528,7 +528,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar) {
+  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded) {
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
@@ -622,7 +622,7 @@ var effectCategories = [
 
           // Get the Clinvar variants, passing in the vcf recs that came back from snpEff.
           if (callbackClinvar) {
-            me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar);
+            me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded);
           }
         });
     });
@@ -630,7 +630,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar) {
+  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded) {
     var me = this;
 
 
@@ -669,8 +669,7 @@ var effectCategories = [
                            'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
-      }, 
-      callbackClinvar);
+      });
 
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
@@ -678,14 +677,14 @@ var effectCategories = [
 
 
       if (callbackClinvar) {
-        me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar);
+        me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded);
       }
     });
 
   }
 
   // NEW
-  exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback) {
+  exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback, callbackLoaded) {
     var me = this;
     var batchSize = 100;
     // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
@@ -695,13 +694,16 @@ var effectCategories = [
       var start = i * batchSize;
       var end = start + batchSize;
       var batchOfRecords = records.slice(start, end <= records.length ? end : records.length);
-      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback);
+      var isFinal = false;
+      if (i == numberOfBatches - 1) {
+        isFinal = true;
+      }
+      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback, callbackLoaded, isFinal);
     }
-
   }  
 
   // NEW
-  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback) {
+  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, isFinal) {
     var me = this;
 
 
@@ -781,7 +783,8 @@ var effectCategories = [
               console.log("No data returned from clinvar request " + summaryUrl);
               sumData.result = {uids: []};
               callback(sumData.result );
-
+              finalCallback();
+              
             } else {
               var sorted = sumData.result.uids.sort(function(a,b){ 
                 var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
@@ -792,7 +795,12 @@ var effectCategories = [
                   return -1; 
               })
               sumData.result.uids = sorted
-              callback( sumData.result );
+              if (callback) {
+                callback( sumData.result );
+              }
+              if (isFinal) {
+                finalCallback();
+              }
 
             }
           })

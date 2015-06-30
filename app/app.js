@@ -212,10 +212,12 @@ function onCollapseTranscriptPanel() {
 
 function toggleSampleTrio(show) {
 	if (show) {
+		dataCard.mode = 'trio';
 		$('#mother-data').removeClass("hide");
 		$('#father-data').removeClass("hide");
 		$('#proband-data').css("width", "32%");
 	} else {
+		dataCard.mode = 'single';
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
 		$('#proband-data').css("width", "60%");
@@ -636,12 +638,6 @@ function loadTracksForGene(bypassVariantCards) {
 	// chart is not rendered.
 	showTranscripts();
 	
-	// This will recursively (a sequentially) call 
-	// loadTracksForGenes on each variant card.
-	// When done, we will fill the feature matrix for
-	// the proband variant card.
-	//var index = 0;
-	//loadTracksForGeneNextVariantCard(variantCards, index);
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
 	 	variantCards.forEach(function(variantCard) {
@@ -656,29 +652,6 @@ function loadTracksForGene(bypassVariantCards) {
 	
 }
 
-
-function loadTracksForGeneNextVariantCard(variantCards, index) {
-	if (index < variantCards.length) {
-		var variantCard = variantCards[index];
-
-		variantCard.loadTracksForGene(filterCard.classifyByImpact, function() {
-			index++;
-			loadTracksForGeneNextVariantCard(variantCards, index);
-		})
-	} else {
-		// Now that we have loaded all of the "viewable" cards,
-		// figure out inheritance
-		var probandVariantCard = null;
-		variantCards.forEach( function (variantCard) {
-			if (variantCard.getRelationship() == 'proband') {
-				probandVariantCard = variantCard;
-			}
-		});
-		if (probandVariantCard && probandVariantCard.isLoaded()) {
-			probandVariantCard.showFeatureMatrix();
-		}
-	}
-}
 
 
 function showTranscripts(regionStart, regionEnd) {
@@ -786,11 +759,68 @@ function promiseFullTrio() {
 			loaded[vc.getRelationship()] = vc;
 		}
 	});
-	if (loaded.proband != null & loaded.mother  != null && loaded.father != null) {
-		loaded.proband.showFeatureMatrix(true);
+
+	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null) {
+		var windowWidth = $(window).width();
+		var filterPanelWidth = $('#filter-track').width();
+		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+		$("#matrix-panel .loader").css("display", "block");
+		$("#feature-matrix").addClass("hide");
+
+		// we need to compare the proband variants to mother and father variants to determine
+		// the inheritance mode.  After this completes, we are ready to show the
+		// feature matrix.
+		compareVariantsToPedigree(function() {
+			
+			promiseFullFeaturedTrio();
+
+		});
+	} else if (dataCard.mode == 'single' && loaded.proband != null) {
+
+		promiseFullFeaturedTrio();
+
 	}
 
 }
+
+function promiseFullFeaturedTrio() {
+	var loaded = {};
+	variantCards.forEach(function(vc) {
+		if (vc.isLoaded()) {
+			loaded[vc.getRelationship()] = vc;
+		}
+	});
+
+	var ready = false;
+	if (dataCard.mode == 'trio' && 
+		loaded.proband != null && loaded.proband.isFullyLoaded() &&
+		loaded.mother  != null && loaded.mother.isFullyLoaded() &&
+		loaded.father  != null && loaded.father.isFullyLoaded()) {
+		
+		loaded.proband.showVariants(regionStart, regionEnd);
+		loaded.mother.showVariants(regionStart, regionEnd);
+		loaded.father.showVariants(regionStart, regionEnd);
+
+		loaded.proband.showCalledVariants(regionStart, regionEnd);
+		loaded.mother.showCalledVariants(regionStart, regionEnd);
+		loaded.father.showCalledVariants(regionStart, regionEnd);
+
+
+		ready = true;
+	} else if (dataCard.mode == 'single' && 
+		       loaded.proband != null && loaded.proband.isFullyLoaded()) {
+		loaded.proband.showVariants(regionStart, regionEnd);
+
+		loaded.proband.showCalledVariants(regionStart, regionEnd);
+		ready = true;
+	}
+
+	if (ready) {
+		loaded.proband.fillFeatureMatrix(regionStart, regionEnd);
+	}
+
+}
+
 
 
 function showCircleRelatedVariants(variant, sourceVariantCard) {
@@ -836,25 +866,34 @@ function orderVariantsByPosition(a, b) {
 }
 
 
-function compareVariantsToPedigree(theVcfData, callback) {
-	theVcfData.features.forEach(function(variant) {
-		variant.compareMother = null;
-		variant.compareFather = null;
-		variant.inheritance = 'none';
-	});
+function compareVariantsToPedigree(callback) {
+	var probandVariantCard = null;
 	var motherVariantCard = null;
 	var fatherVariantCard = null;
 	variantCards.forEach( function(variantCard) {
-		if (variantCard.getRelationship() == 'mother') {
-			motherVariantCard= variantCard;
+		if (variantCard.getRelationship() == 'proband') {
+			probandVariantCard = variantCard; 
+		} else if (variantCard.getRelationship() == 'mother') {
+			motherVariantCard = variantCard;
 		} else if (variantCard.getRelationship() == 'father') {
 			fatherVariantCard = variantCard;
 		}
 	});
+
+	var theVcfData = probandVariantCard.getVcfData();
+
 	if (motherVariantCard == null || fatherVariantCard == null) {
+
 		callback(theVcfData);
 
 	} else {
+
+		theVcfData.features.forEach(function(variant) {
+			variant.compareMother = null;
+			variant.compareFather = null;
+			variant.inheritance = 'none';
+		});
+
 	
 		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
 
@@ -884,6 +923,10 @@ function compareVariantsToPedigree(theVcfData, callback) {
 
 		        		filterCard.enableInheritanceFilters(theVcfData);
   						
+  						if (theVcfData.loadState == null) {
+  							theVcfData.loadState = {};
+  						}
+  						theVcfData.loadState['inheritance'] = true;
 
 			        	callback(theVcfData);
 			        }, 

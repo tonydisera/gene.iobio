@@ -131,6 +131,7 @@ MatrixCard.prototype.init = function() {
 
 }
 
+/*
 MatrixCard.prototype.showFeatureMatrix = function(theVariantCard, theVcfData, regionStart, regionEnd, showInheritance) {
 	var me = this;
 
@@ -159,6 +160,7 @@ MatrixCard.prototype.showFeatureMatrix = function(theVariantCard, theVcfData, re
 	}
 	
 }
+*/
 
 
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
@@ -314,11 +316,11 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
-	variantCards.forEach(function(variantCard) {
+	/*variantCards.forEach(function(variantCard) {
 		if (variantCard.getRelationship() == 'proband') {
 			variantCard.showVariants(regionStart, regionEnd);
 		}
-	});
+	});*/
 
 	
 }
