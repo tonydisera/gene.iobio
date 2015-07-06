@@ -2,6 +2,8 @@ lineD3 = function module() {
 
   var dispatch = d3.dispatch("d3brush", "d3rendered");
 
+  var debug = false;
+
   var KIND_LINE = "line";
   var KIND_AREA = "area";
 
@@ -53,7 +55,9 @@ lineD3 = function module() {
 
    
       var circleText = formatCircleText(posx, theDepth ? theDepth : depthy);
-      circleText += ' ' + posx + ':' + depthy + ' ' + invertedx + ':' + invertedy;
+      if (debug) {
+        circleText += ' ' + posx + ':' + depthy + ' ' + invertedx + ':' + invertedy;
+      }
 
       var label = container.select(".circle-label");
       label.transition()
