@@ -82,6 +82,8 @@ DataCard.prototype.init = function() {
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {
 		dataCardSelector.find('.fullview').addClass("hide");
+		window.loadTracksForGene();
+
 	});
 
 }
@@ -132,9 +134,9 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector) {
 	this.setDataSourceName(panelSelector);
 	this.setDataSourceRelationship(panelSelector);
 
+	variantCard.setDirty();
 	variantCard.onBamUrlEntered(bamUrlInput.val());	
 	variantCard.loadBamDataSource(variantCard.getName());
-	variantCard.setDirty();
 
 	window.updateUrl('bam' + cardIndex, bamUrlInput.val());
 
@@ -254,10 +256,10 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 	variantCard.onVcfUrlEntered(vcfUrl);
 	window.updateUrl('vcf'+cardIndex, vcfUrl);
+	variantCard.setDirty();
 	variantCard.loadVcfDataSource(variantCard.getName(),  function() {
 		promiseFullTrio();
 	});
-	variantCard.setDirty();
 }
 
 

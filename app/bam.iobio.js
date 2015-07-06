@@ -24,6 +24,10 @@ var Bam = Class.extend({
       
       // set iobio servers
       this.iobio = {}
+      
+      this.iobio.coverage = "ws://localhost:8047";
+      this.iobio.samtoolslocal = "ws://localhost:8060";
+      
       this.iobio.bamtools = "ws://bamtools.iobio.io";
       this.iobio.samtools = "ws://samtools.iobio.io";
       this.iobio.bamReadDepther = "ws://bamReadDepther.iobio.io";
@@ -77,23 +81,29 @@ var Bam = Class.extend({
       return this._getBamRegionsUrl([ {'name':name,'start':start,'end':end} ]);
    },
    
-   _getBamRegionsUrl: function(regions) {
+   _getBamRegionsUrl: function(regions, golocal) {
+      var samtools = null;
+      if (golocal) {
+        samtools = this.iobio.samtoolslocal;
+      } else {
+        samtools = this.iobio.samtools;
+      }
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = this.iobio.samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary";
+         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary";
       } else {
          // creates a url for a new bam that is sliced from an old bam
          // open connection to iobio webservice that will request this data, since connections can only be opened from browser
          var me = this;
          var connectionID = this._makeid();
-         var client = BinaryClient(this.iobio.samtools + '?id=', {'connectionID' : connectionID} );
+         var client = BinaryClient(samtools + '?id=', {'connectionID' : connectionID} );
          client.on('open', function(stream){
             var stream = client.createStream({event:'setID', 'connectionID':connectionID});
             stream.end();
          })
       
-         var url = this.iobio.samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client?&id="+connectionID);
+         var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client?&id="+connectionID);
          var ended = 0;
          var me = this;
          // send data to samtools when it asks for it         
@@ -111,6 +121,7 @@ var Bam = Class.extend({
       }
       return encodeURI(url);
    },
+
    
    _generateExomeBed: function(id) {
       var bed = "";
@@ -602,11 +613,118 @@ var Bam = Class.extend({
     })
    },
 
-   getCoverageForRegion: function(refName, start, end, maxPoints, callback) {
-     this._getCoverageForRegionImpl(refName, start, end, maxPoints, callback);
+
+   /*
+   *  This method will return coverage as point data.  It takes the reference name along
+   *  with the region start and end.  Optionally, the caller can provide an array of
+   *  region objects to get the coverage at exact positions.  Also, this method takes an
+   *  optional argument of maxPoints that will specify how many data points should be returned
+   *  for the region.  If not specified, all data points are returned.  The callback method
+   *  will send back to arrays; one for the coverage points, reduced down to the maxPoints, and
+   *  the second for coverage of specific positions.  The latter can then be matched to vcf records
+   *  , for example, to obtain the coverage for each variant.
+   */
+   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback) {
+      var me = this;
+      this.transformRefName(refName, function(trRefName){        
+
+        // set the ref name for every region and find the lower and upper bound (start, end)
+        // of all regions;
+        
+        var regionsArg = "";
+        regions.forEach( function(region) {
+          region.name = trRefName;
+          if (region.name && region.start && region.end) {
+            if (regionsArg.length == 0) {
+              regionsArg += " -r ";
+            } else {
+              regionsArg += ",";
+            }
+            regionsArg += region.name + ":" + region.start +  ":" + region.end;
+          }
+        }); 
+        var maxPointsArg = "";
+        if (maxPoints) {
+          maxPointsArg = " -m " + maxPoints;
+        } else {
+          maxPointsArg = " -m 0"
+        }
+        var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
+        console.log(me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + regionsArg);
+
+        var url = encodeURI( me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+
+        var client = BinaryClient(me.iobio.coverage);
+        
+        var samData = "";
+        var samRecs = [];
+        var parseByLine = false;
+        client.on('open', function(stream){
+            var stream = client.createStream({event:'run', params : {'url':url}});
+
+            stream.on('data', function(data, options) {
+               if (data == undefined) {
+                return; 
+               } 
+             
+                samData += data;
+            });
+
+            stream.on('end', function() {
+                if (samData != "") {
+                  var coverage = null;
+                  var coverageForPoints = [];
+                  var coverageForRegion = [];
+                  var lines = samData.split('\n');
+                  lines.forEach(function(line) {
+                    if (line.indexOf("#specific_points") == 0) {
+                      coverage = coverageForPoints;
+                    } else if (line.indexOf("#reduced_points") == 0 ) {
+                      coverage = coverageForRegion;
+                    } else {                      
+                      var fields = line.split('\t');
+                      var pos = -1;
+                      var depth = -1;
+                      if (fields[0] != null && fields[0] != '') {
+                        var pos   = +fields[0];
+                      }
+                      if (fields[1] != null && fields[1] != '') {
+                        var depth = +fields[1];
+                      }
+                      if (coverage){
+                        if (pos > -1  && depth > -1) {
+                          coverage.push([pos, depth]);
+                        }
+                      }
+                    }
+                  });
+                  callback(coverageForRegion, coverageForPoints);
+
+                } else {
+                  callback([]);
+                }
+            });
+
+            stream.on("error", function(error) {
+              console.log("encountered stream error: " + error);
+            });
+
+        });
+      });
    },
 
-   getCoverageForRegionChunked: function(refName, start, end, maxPoints, callback) {
+
+
+
+
+
+
+   //
+   //
+   // TO BE DEPRECATED ONCE COVERAGE SERVICE IS DEPLOYED TO PRODUCTION
+   //
+   //
+   getCoverageForRegionChunkedDEPRECATED: function(refName, start, end, maxPoints, callback) {
       console.log("getCoverage for region " + refName + " " + start + "-" + end);
       var me = this;
       var chunkSize = 50000;
@@ -620,7 +738,7 @@ var Bam = Class.extend({
             if (chunkEnd > end) {
               chunkEnd = end;              
             }
-            me._getCoverageForRegionImpl(refName, chunkStart, chunkEnd, maxPoints, function(coverageRecs) {
+            me._getCoverageForRegionImplDEPRECATED(refName, chunkStart, chunkEnd, maxPoints, function(coverageRecs) {
               allCoverageRecs = allCoverageRecs.concat(coverageRecs);
               index++;
               chunkCoverage(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, chunkedCallback);
@@ -647,7 +765,7 @@ var Bam = Class.extend({
    },
 
    // NEW
-   _getCoverageForRegionImpl: function(refName, start, end, maxPoints, callback) {
+   _getCoverageForRegionImplDEPRECATED: function(refName, start, end, maxPoints, callback) {
       var me = this;
       this.transformRefName(refName, function(trRefName){        
         var regionParm = ' ' + trRefName + ":" + start + "-" + end;
@@ -680,10 +798,10 @@ var Bam = Class.extend({
 
             stream.on('end', function() {
               if (parseByLine) {
-                me._parseSamPileupRecords(null, samRecs, start, end, maxPoints, callback);
+                me._parseSamPileupRecordsDEPRECATED(null, samRecs, start, end, maxPoints, callback);
               } else {
                  if (samData != "") {
-                   me._parseSamPileupRecords(samData, null, start, end, maxPoints, callback);
+                   me._parseSamPileupRecordsDEPRECATED(samData, null, start, end, maxPoints, callback);
                   } else {
                   callback([]);
                 }
@@ -699,7 +817,7 @@ var Bam = Class.extend({
    },
 
       // NEW
-   _parseSamPileupRecords: function(data, samRecs, start, end, maxPoints, callback) {
+   _parseSamPileupRecordsDEPRECATED: function(data, samRecs, start, end, maxPoints, callback) {
       var me = this;
       if (samRecs == null) {
         samRecs = [];
@@ -737,6 +855,18 @@ var Bam = Class.extend({
       }
 
     },
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

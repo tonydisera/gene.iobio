@@ -556,7 +556,7 @@ var effectCategories = [
       var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(afUrl));
       url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
     } else {
-      //url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afOnlyUrl));
+      //url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vtUrl));
       url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
     }
 

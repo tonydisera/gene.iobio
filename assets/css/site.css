@@ -115,6 +115,10 @@ a, a:hover, a:focus {
   color: rgba(104, 152, 168, 1) !important;
 }
 
+.tooltip a, .tooltip a:hover, .tooltip a:focus {
+  color: rgba(131, 219, 249, 1) !important;
+}
+
 #variant-card-buttons a.selected {
   font-weight: bold;
 }
@@ -314,6 +318,7 @@ a, a:hover, a:focus {
   z-index:2;
   right:0px;
   background-color: rgb(238, 238, 238);
+  margin-bottom: 8px;
 }
 
 section {
@@ -376,7 +381,7 @@ section {
     padding-bottom: 4px;
     padding-left: 10px;
     padding-right: 10px;
-    margin-top: 8px;
+    margin-top: 0px;
     margin-bottom: 8px;
 
     
@@ -487,7 +492,7 @@ section {
   text-align: center;
   margin-bottom: 0px;
   padding-bottom: 0px;
-  margin-right: 300px;
+  margin-right: 320px;
   color: rgb(132, 132, 132);
   font-size: 14px;
 }
@@ -497,7 +502,7 @@ section {
   float:left;
 }
 #gene-region-info {
-  padding-left: 10px;
+  padding-left: 0px;
 }
 #gene-region-start {
 }
@@ -586,35 +591,41 @@ section {
 
 
 
-.loader {
-    text-align: center;
-    margin-top: 40px;
-    display:none;
+.loader img {
+  height: 22px;
+  width: 22px;
 }
+.loader {
+  text-align: center;
+  background-color: white;
+  display: table;
+  padding-right:2px;
+  padding-left:2px
+  margin-top: 40px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.loader-label {
+  color: rgb(111,111,111);
+  font-size: 14px;    
+}
+
 .variant-card .vcfloader {
-    text-align: center;
-    margin-top: 0px !important;
-    display:none;
-    margin-bottom: 10px !important;
+  text-align: center;  
+  background-color: white;
+  display: table;
+  padding-right:2px;
+  padding-left:2px
+  margin-top: 0px;
+  margin-botton:10px;
 }
 
 .variant-card #bam-track .loader {
-    text-align: center;
     margin-top: -0px !important;
     margin-bottom: 5px !important;
-    margin-right: 0px;
-    display:none;
 }
 
-.loader img {
-    height:12px; 
-    width: 80px;
-}
-.loader-label {
-  color: rgb(132, 132, 132);
-  font-size:18px;   
-  font-family: Quicksand;
-}
+
 
 .stats-box { 
     display:        flex;
@@ -795,6 +806,7 @@ header {
     text-align: left; 
     margin-top: 10px; 
 }
+
 
 #bam-depth .circle, 
 #vcf-variants .circle, 

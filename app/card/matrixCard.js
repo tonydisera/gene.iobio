@@ -131,38 +131,6 @@ MatrixCard.prototype.init = function() {
 
 }
 
-/*
-MatrixCard.prototype.showFeatureMatrix = function(theVariantCard, theVcfData, regionStart, regionEnd, showInheritance) {
-	var me = this;
-
-	var windowWidth = $(window).width();
-	var filterPanelWidth = $('#filter-track').width();
-	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-
-	//$("#matrix-track .inheritance.loader").css("display", "inline");
-	$("#matrix-panel .loader").css("display", "block");
-	$("#feature-matrix").addClass("hide");
-
-	this.sourceVcfData = theVcfData;
-
-	if (showInheritance) {
-		// we need to compare the proband variants to mother and father variants to determine
-		// the inheritance mode.  After this completes, we are ready to show the
-		// feature matrix.
-
-		window.compareVariantsToPedigree(theVcfData, function() {
-			//$("#matrix-track .inheritance.loader").css("display", "none");
-			me.fillFeatureMatrix(theVcfData);
-
-		});
-	} else {
-		me.fillFeatureMatrix(theVcfData);
-	}
-	
-}
-*/
-
-
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
 
@@ -306,7 +274,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	}
 	
 	$("#feature-matrix").removeClass("hide");
-	$("#matrix-panel .loader").css("display", "none");
+	$("#matrix-panel .loader").addClass("hide");
 
 	// Load the chart with the new data
 	this.featureMatrix.matrixRows(this.matrixRows);

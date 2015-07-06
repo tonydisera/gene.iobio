@@ -28,7 +28,7 @@ lineD3 = function module() {
   var formatCircleText = function(pos, depth) {
         return pos + ',' + depth;
   }
-  var showCircle = function(start) {
+  var showCircle = function(start, theDepth) {
     // Find the closest position in the data
     d = null;
     if (theData) {
@@ -48,8 +48,12 @@ lineD3 = function module() {
       var posx = d3.round(pos(d));
       var depthy = d3.round(depth(d));
 
+      var invertedx = x.invert(mousex); 
+      var invertedy = y.invert(mousey); 
+
    
-      var circleText = formatCircleText(posx, depthy);
+      var circleText = formatCircleText(posx, theDepth ? theDepth : depthy);
+      circleText += ' ' + posx + ':' + depthy + ' ' + invertedx + ':' + invertedy;
 
       var label = container.select(".circle-label");
       label.transition()
@@ -285,6 +289,7 @@ lineD3 = function module() {
           .y(function(d) { return y(depth(d)); });
 
       var area;
+
 
       if (kind == KIND_AREA) {
         area = d3.svg.area()

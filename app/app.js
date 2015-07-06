@@ -267,6 +267,8 @@ function loadUrlSources() {
 	var rel  = getUrlParameter(/rel*/);
 	var dsname = getUrlParameter(/name*/);	
 
+	// Initialize transcript chart and variant cards, but hold off on displaying 
+	// the variant cards.
 	loadTracksForGene(true);
 
 	// get all bam and vcf url params in hash
@@ -306,6 +308,10 @@ function loadUrlSources() {
 			dataCard.setDataSourceName(panelSelector);
 		});
 
+	}
+
+	if (vcf != null || bam != null) {
+		loadTracksForGene();
 	}
 
 }
@@ -637,13 +643,13 @@ function loadTracksForGene(bypassVariantCards) {
 	// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 	// chart is not rendered.
 	showTranscripts();
+
+	filterCard.disableFilters();
 	
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
 	 	variantCards.forEach(function(variantCard) {
-			variantCard.loadTracksForGene(filterCard.classifyByImpact,  function() {
-					promiseFullTrio();
-			});
+			variantCard.loadTracksForGene(filterCard.classifyByImpact);
 		});
 	}
 	
@@ -764,7 +770,8 @@ function promiseFullTrio() {
 		var windowWidth = $(window).width();
 		var filterPanelWidth = $('#filter-track').width();
 		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-		$("#matrix-panel .loader").css("display", "block");
+		$("#matrix-panel .loader").removeClass("hide");
+		$(".inheritance.loader").removeClass("hide");
 		$("#feature-matrix").addClass("hide");
 
 		// we need to compare the proband variants to mother and father variants to determine
@@ -772,51 +779,18 @@ function promiseFullTrio() {
 		// feature matrix.
 		compareVariantsToPedigree(function() {
 			
-			promiseFullFeaturedTrio();
+			$(".inheritance.loader").addClass("hide");
+			loaded.proband.promiseFullFeatured();
 
 		});
 	} else if (dataCard.mode == 'single' && loaded.proband != null) {
+		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+		$("#matrix-panel .loader").removeClass("hide");
+		$("#feature-matrix").addClass("hide");
+		$(".inheritance.loader").addClass("hide");
 
-		promiseFullFeaturedTrio();
+		loaded.proband.promiseFullFeatured();
 
-	}
-
-}
-
-function promiseFullFeaturedTrio() {
-	var loaded = {};
-	variantCards.forEach(function(vc) {
-		if (vc.isLoaded()) {
-			loaded[vc.getRelationship()] = vc;
-		}
-	});
-
-	var ready = false;
-	if (dataCard.mode == 'trio' && 
-		loaded.proband != null && loaded.proband.isFullyLoaded() &&
-		loaded.mother  != null && loaded.mother.isFullyLoaded() &&
-		loaded.father  != null && loaded.father.isFullyLoaded()) {
-		
-		loaded.proband.showVariants(regionStart, regionEnd);
-		loaded.mother.showVariants(regionStart, regionEnd);
-		loaded.father.showVariants(regionStart, regionEnd);
-
-		loaded.proband.showCalledVariants(regionStart, regionEnd);
-		loaded.mother.showCalledVariants(regionStart, regionEnd);
-		loaded.father.showCalledVariants(regionStart, regionEnd);
-
-
-		ready = true;
-	} else if (dataCard.mode == 'single' && 
-		       loaded.proband != null && loaded.proband.isFullyLoaded()) {
-		loaded.proband.showVariants(regionStart, regionEnd);
-
-		loaded.proband.showCalledVariants(regionStart, regionEnd);
-		ready = true;
-	}
-
-	if (ready) {
-		loaded.proband.fillFeatureMatrix(regionStart, regionEnd);
 	}
 
 }
@@ -923,10 +897,7 @@ function compareVariantsToPedigree(callback) {
 
 		        		filterCard.enableInheritanceFilters(theVcfData);
   						
-  						if (theVcfData.loadState == null) {
-  							theVcfData.loadState = {};
-  						}
-  						theVcfData.loadState['inheritance'] = true;
+  						probandVariantCard.setLoadState('inheritance');
 
 			        	callback(theVcfData);
 			        }, 
@@ -997,7 +968,8 @@ function variantTooltipHTML(variant, rowIndex) {
 		}
 		phenotypeDisplay += key;
 	}      
-	var coord = variant.start + (variant.end > variant.start+1 ?  ' - ' + variant.end : "");
+	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
+	var coord = gene.chr + ":" + variant.start;
 	var refalt = variant.ref + "->" + variant.alt;
 
 	var clinvarUrl = "";
@@ -1005,49 +977,80 @@ function variantTooltipHTML(variant, rowIndex) {
 		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
 		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
 	}
+
+	var coverage = variant.bamDepth != null && variant.bamDepth != '' ? variant.bamDepth : null;
+	var coverageReported = variant.genotypeDepth != null && variant.genotypeDepth != '' ? variant.genotypeDepth : null;
+	if (coverage && coverageReported) {
+		if (coverage != coverageReported) {
+			coverage = coverage + ' (computed)      ' + coverageReported + ' (reported)';
+		}
+	} else if (coverage) {
+		coverage = coverage + ' (computed)';
+
+	} else if (coverageReported) {
+		coverage = coverageReported + ' (reported)';
+	}
+
+	var zygosity = "";
+	if (variant.zygosity.toLowerCase() == 'het') {
+		zygosity = "Heterozygous";
+	} else if (variant.zygosity.toLowerCase() == 'hom') {
+		zygosity = "Homozygous";
+	}
+	
 	
 	return (
-		  tooltipRowNoLabel(variant.type + ' ' + coord + ' ' + refalt)
-		+ tooltipRow('Impact', impactDisplay)
+		  tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord)
+
+		+ tooltipRow('Zygosity',  zygosity, "5px")
+		+ tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
+
+		+ tooltipRow('Impact', impactDisplay, "3px")
 		+ tooltipRow('Effect', effectDisplay)
-		+ tooltipRow('ClinVar', clinSigDisplay)
+
+		+ tooltipRow('ClinVar', clinSigDisplay, "3px")
 		+ tooltipRow('Phenotype', phenotypeDisplay)
-		+ tooltipRow('Qual', variant.qual) 
-		+ tooltipRow('Filter', variant.filter) 
-		+ tooltipRow('Depth (VCF)', variant.genotypeDepth) 
-		+ tooltipRow('Genotype', variant.genotypeForAlt)
-		+ tooltipRow('Zygosity', variant.zygosity == "gt_unknown" ? "(No genotype)" : variant.zygosity)
-		+ tooltipRow('GMAF', variant.gMaf)
-		+ tooltipRow('Inheritance',  variant.inheritance)
-		+ tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, true)
-		+ tooltipRow('AF 1000G', variant.af1000G, true)
 		+ tooltipRow('ClinVar uid', clinvarUrl )
-		// + tooltipRow('ClinVar #', variant.clinVarAccession)
+
 		// + tooltipRow('NCBI ID', variant.ncbiId)
 		// + tooltipRow('HGVS g', variant.hgvsG)
+
+		+ tooltipRow('Qual', variant.qual, (variant.qual || variant.filter ? "3px" : "")) 
+		+ tooltipRow('Filter', variant.filter) 
+
+		+ tooltipRow('Coverage', coverage, "3px") 
+
+		//+ tooltipRow('GMAF', variant.gMaf)
+		+ tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "3px", true)
+		+ tooltipRow('AF 1000G', variant.af1000G, null, true)
 	);                    
 
 }
 
-function tooltipRow(label, value, alwaysShow) {
+function tooltipBlankRow() {
+	return '<div class="row">'
+	  + '<div class="col-md-12">' + '&nbsp;' + '</div>'
+	  + '</div>';
+}
+
+function tooltipHeaderRow(value1, value2, value3) {
+	return '<div class="row">'
+	      + '<div class="col-md-12" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 + '</div>'
+	      + '</div>';	
+}
+
+function tooltipRow(label, value, paddingTop, alwaysShow) {
 	if (alwaysShow || (value && value != '')) {
-		return '<div class="row">'
-		      + '<div class="col-md-4">' + label + '</div>'
-		      + '<div class="col-md-8">' + value + '</div>'
+		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
+		return '<div class="row"' + style + '>'
+		      + '<div class="col-md-4" style="text-align:right">' + label + '</div>'
+		      + '<div class="col-md-8">' + value.toLowerCase() + '</div>'
 		      + '</div>';
 	} else {
 		return "";
 	}
 }
-function tooltipRowNoLabel(value) {
-	if (value && value != '') {
-		return '<div class="row" style="text-align:center">'
-		      + '<div class="col-md-12">' + value + '</div>'
-		      + '</div>';
-	} else {
-		return "";
-	}
-}
+
 
 function filterVariants() {
 	variantCards.forEach( function(variantCard) {

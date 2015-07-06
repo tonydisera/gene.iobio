@@ -91,7 +91,7 @@
     <div id="nav-section" class="shadow-z-1">
 
     	<section id="app-title-section">
-    	   <a id='home' href="/"><span class="iobioapp"><span class=' beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
+    	   <a id='home' href="/"><span class="iobioapp"><span class='hide beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
 
            <a href="javascript:void(0)" class="open_page_guide" 
               style="float: left;margin-top: 20px;margin-left: 10px;">
@@ -118,7 +118,7 @@
               </div>
             -->
 
-            <span id="bloodhound" style="margin-left:-170px" >
+            <span id="bloodhound" style="margin-left:-130px" >
                 <input class="typeahead tour_element_1" style="margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" placeholder="Enter Gene Name">
             </span>           
 
@@ -223,7 +223,7 @@
     <div id="track-section" style="padding-top:228px;">
       
 
-      <div id="data-card" class="track shadow-z-1 hide" >
+      <div id="data-card" class="track shadow-z-1 hide" style="margin-top:8px;" >
 
         <div style="width:100%;clear:both;">
 
@@ -265,11 +265,6 @@
                     <i class="mdi-editor-format-align-justify"></i>                
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
                   </button>
-                  <button id="ok-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" 
-                    style="padding-top: 2px;   padding-bottom: 3px;margin-left: 20px;">
-                    <i class="mdi-action-done"></i>
-                    Done
-                  </button>
                 </div>
               </div>
 
@@ -289,6 +284,14 @@
                 <input id="datasource-relationship" class="hide" value="father" type="text"/>
               </div>
 
+              <div class="fullview" style="clear:both;text-align:center">
+                <button id="ok-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" 
+                style="padding-left:60px;padding-right:60px">
+                  <i class="mdi-file-cloud-done"></i>
+                  Load
+                </button>
+              </div>
+
           </div>   
 
           
@@ -298,7 +301,7 @@
       </div>
 
 
-      <div id="filter-and-rank-card">
+      <div id="filter-and-rank-card" class="hide">
 
         <div id="filter-track"  class="track-expand shadow-z-1 hide tour_element_8">
             <span class="card-label">Filter Variants</span>
@@ -355,14 +358,6 @@
                   </label>
                 </div>
               </div>
-              <span class="clinvar loader" style="display: inline;float: right;margin-top: 0px;">
-                    <span id="clinvar_loader" class="loader-label" >Accessing ClinVar</span>
-                    <img src="assets/images/loading-squares.gif">
-              </span>
-              <span class="inheritance loader" class="hide" style="float: right;margin-top: 0px;">
-                    <span class="loader-label" >Determining Inheritance Mode</span>
-                    <img src="assets/images/loading-squares.gif">
-              </span>
 
 
 
@@ -372,8 +367,13 @@
             <div id="matrix-panel"  style="clear:both;margin-top:20px;"
               class="fullview" aria-expanded="true">
                 <div class="loader">
-                    <span class="loader-label"></span>
-                    <img src="assets/images/loading-squares.gif"/>
+                    <span class="loader-label">Ranking variants</span>
+                    <img src="assets/images/wheel.gif"/>
+                </div>
+
+                <div class="inheritance loader" class="hide" style="float: right;margin-top: 0px;">
+                      <span class="loader-label" >Determining Inheritance Mode</span>
+                      <img src="assets/images/wheel.gif">
                 </div>
 
               <div id="feature-matrix" style="overflow-x: auto;">
@@ -382,7 +382,7 @@
         </div>
       </div>
 
-      <div id="variant-control-panel"  class="todo" style="background:white;padding-right:10px;padding-top:5px;margin-top: 7px;padding-left: 10px;height: 43px;" class=" shadow-z-1">
+      <div id="variant-control-panel"  class="todo" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;padding-left: 10px;height: 43px;" class=" shadow-z-1">
 
         <div id="toolbar" style="width:100%"  >
                 <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>

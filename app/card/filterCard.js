@@ -244,6 +244,35 @@ FilterCard.prototype.resetAfFilters = function(scheme) {
 	});
 }
 
+FilterCard.prototype.disableFilters = function() {
+	d3.selectAll(".impact").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".type").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".zygosity").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".effectCategory").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".afexaclevel").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".af1000glevel").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".inheritance").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".clinvar").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+
+	$("#af-range-filter").addClass("hide");
+	$("#coverage-filter").addClass("hide");
+}
 
 FilterCard.prototype.enableClinvarFilters = function(theVcfData) {
 	
@@ -273,6 +302,10 @@ FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
 		var inheritancePresent = inheritanceVariantMap[inheritance];
 		d3.select(this).classed("inactive", inheritancePresent == null);
 	});
+}
+
+FilterCard.prototype.enableCoverageFilters = function() {
+	$("#coverage-filter").removeClass("hide");
 }
 
 
@@ -309,6 +342,8 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		var count = d3.selectAll('#vcf-variants .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
+	$("#af-range-filter").removeClass("hide");
+
 
 
 	if (fullRefresh) {

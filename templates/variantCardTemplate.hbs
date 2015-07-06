@@ -1,21 +1,21 @@
-<div class="variant-card track-expand shadow-z-1 hide" style="padding-bottom:0px;background-color:white;">
+<div class="variant-card track-expand shadow-z-1 hide" style="min-height: 32px;padding-bottom:0px;background-color:white;">
 
 
-  <div style="text-align:center;margin-top: 6px">
-    <span id="card-relationship-label"  class="card-label" style="float:left;text-align:left;width:90px;margin-top:-2px;">
+  <div style="text-align:center;margin-top: 6px;margin-bottom: 6px;">
+    <span id="card-relationship-label"  class="card-label" style="float:left;text-align:left;width:90px;margin-top:2px;">
       Sample
     </span>
                 
-    <span class="card-label" id="variant-card-label" style="float: left;margin-left: 5px;margin-top:-2px;"></span>
+    <span class="card-label" id="variant-card-label" style="float: left;margin-left: 5px;margin-top:2px;"></span>
 
-    <ul class="nav nav-pills hide" id="variant-badges" style="float:left;margin-left:30px;margin-top:-2px">
+    <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:30px;margin-top:2px">
       <li>
             <span class="badge-label">Variants</span>
             <span id="vcf-variant-count" class="badge"></span>
       </li>
 
       <li>
-        <a href="javascript:void(0)" id="button-find-missing-variants" style="padding-top:0px" class="tour_element_7">
+        <a href="javascript:void(0)" id="button-find-missing-variants" style="visibility:hidden;padding-top:0px" class="tour_element_7">
             <i class="mdi-action-find-in-page"></i>
             <span id="missing-variant-count-label">Find missing variants</span>
             <span id="missing-variant-count" class="badge"></span>
@@ -37,8 +37,18 @@
             <span id="displayed-variant-count" class="badge hide"></span>
       </li>
 
-   </ul>
+    </ul>
 
+    <div style="display: inline;width: 100%;text-align: center;clear: both;margin-left: -350px;">
+      <div class="loader vcfloader hide"  style="display: inline;">
+        <span class="loader-label"></span>
+        <img src="assets/images/wheel.gif">
+      </div>
+      <div class="loader covloader hide" style="display: inline;padding-left: 20px;">
+        <span class="loader-label"></span>      
+        <img src="assets/images/wheel.gif">
+      </div>
+    </div>
 
     <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="mdi-content-remove"></i>
@@ -50,31 +60,13 @@
       <i class="mdi-image-crop-din"></i>
     </a>
 
-    <div id="variant-right-labels" style="float:right">
-      <a id="af-link" class="hide"  
-        data-toggle="collapse" 
-        style="font-size: 12px;vertical-align: top;padding-right:20px" 
-        href="#af" 
-        aria-expanded="false" aria-controls="collapseExample">
-        Allele Frequency
-      </a>
-      <a id="vcf-file-info-link"   class="hide"
-        data-toggle="collapse" 
-        style="font-size: 12px;vertical-align: top;margin-top: 0px;padding-right:20px" 
-        href="#vcf-file-info" aria-expanded="false" >
-        data source info
-      </a>
-    </div>
+   
 
 
 
   </div>
   
-  <div class="loader vcfloader">
-    <span class="loader-label"></span>
-    <img src="assets/images/loading-squares.gif"/>
-  </div> 
-
+ 
     
 
   <div id="variant-panel" style="clear:both;">
@@ -106,17 +98,13 @@
 
 
     <div id="bam-track" class="track hide">
-      <div id="bam-depth-track" class="track-chart">
+      <div class="track-chart">
 
-          <div class="loader">
-            <span class="loader-label"></span>
-            <img src="assets/images/loading-squares.gif"/>
-          </div> 
-
+      
           <div >
-            <div id="bam-chart-label" class="chart-label hide" style="margin-top: 24px;margin-bottom: -17px;">Coverage
+            <div id="bam-chart-label" class="chart-label" style="visibility:hidden;margin-top: 24px;margin-bottom: -17px;">Coverage
             </div>
-            <div id="bam-depth" class="tour_element_6">
+            <div id="bam-depth" class="tour_element_6" style="visibility:hidden">
             </div>
           </div>
 
