@@ -9,7 +9,7 @@
 //    1. the bgzipped vcf (.vcf.gz) 
 //    2. its corresponding tabix file (.vcf.gz.tbi).  
 //
-//  The variant summary data come in 3 main forms:  
+//  The variant summary data come in 3 main fforms:  
 //    1. reference names and lengths 
 //    2. variant density (point data), 
 //    3. vcf stats (variant types, tstv ration allele frequency, mutation spectrum,
@@ -783,7 +783,9 @@ var effectCategories = [
               console.log("No data returned from clinvar request " + summaryUrl);
               sumData.result = {uids: []};
               callback(sumData.result );
-              finalCallback();
+              if (isFinal) {
+                finalCallback();
+              }
               
             } else {
               var sorted = sumData.result.uids.sort(function(a,b){ 
@@ -867,6 +869,7 @@ var effectCategories = [
       var buffer = "";
       client.on('open', function(){
         var stream = client.createStream({event:'run', params : {'url':afUrl}});
+        
         
         //
         // listen for stream data (the output) event. 
