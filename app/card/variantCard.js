@@ -941,22 +941,6 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		var factor = d3.round(data.length / 1000);
         var reducedData = this.bam.reducePoints(data, factor, function(d) {return d[0]}, function(d) {return d[1]});
 
-	    // Add 0 depth to the first and last element so that the area calculated is correct
-	    // (Workaround for d3 bug - http://stackoverflow.com/questions/14342289/d3-js-area-chart-is-not-rendering-right)
-      	/*var row = $.extend({}, reducedData[0]);
-      	row[0] = row[0] - 1;
-      	row[1] = 0;
-      	reducedData.unshift(row);
-
-      	row = $.extend({}, reducedData[reducedData.length - 1]);
-      	row[0] = row[0] - 1;
-      	row[1] = 0;
-      	reducedData.push(row);
-      	*/
-      	console.log(reducedData[0][0] + ':' + reducedData[0][1]);
-      	console.log(reducedData[reducedData.length-1][0] + ':' + reducedData[reducedData.length-1][1]);
-
-
 		this.bamDepthChart.xStart(regionStart);
 		this.bamDepthChart.xEnd(regionEnd);
 
