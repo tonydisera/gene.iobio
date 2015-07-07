@@ -25,9 +25,7 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {}
       
-      this.iobio.coverage = "ws://localhost:8047";
-      this.iobio.samtoolslocal = "ws://localhost:8060";
-      
+      this.iobio.coverage = "ws://elb-east-1-prod.iobio.io/coverage/";
       this.iobio.bamtools = "ws://bamtools.iobio.io";
       this.iobio.samtools = "ws://samtools.iobio.io";
       this.iobio.bamReadDepther = "ws://bamReadDepther.iobio.io";
@@ -84,7 +82,7 @@ var Bam = Class.extend({
    _getBamRegionsUrl: function(regions, golocal) {
       var samtools = null;
       if (golocal) {
-        samtools = this.iobio.samtoolslocal;
+        samtools = this.iobio.samtools;
       } else {
         samtools = this.iobio.samtools;
       }

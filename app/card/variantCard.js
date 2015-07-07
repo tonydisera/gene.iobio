@@ -1,4 +1,4 @@
-// Create a variantCard class
+ // Create a variantCard class
 // Constructor
 function VariantCard() {
 
@@ -890,7 +890,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		}
 
 		// Get the coverage data for the gene region
-		/*  COMMENTED OUT UNTIL NEW COVERAGE.IOBIO SERVICE DEPLOYED TO PRODUCTION
+		//  COMMENTED OUT UNTIL NEW COVERAGE.IOBIO SERVICE DEPLOYED TO PRODUCTION
 	 	me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
 	 	  function(coverageForRegion, coverageForPoints) {
 
@@ -904,13 +904,14 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 				showCoverage();
 			}
 		});
-		*/
+		
 		// DEPRECATED CODE TO BE REPLACED WITH CALLS TO COVERAGE.IOBIO
+		/*
 		me.bam.getCoverageForRegionChunkedDEPRECATED(refName, window.gene.start, window.gene.end, 5000, 
 	 	  function(coverageForRegion) {
 	 	  	me.bamData = coverageForRegion;
 	 	  	showCoverage();
-		});
+		}); */
 
 	}
 
