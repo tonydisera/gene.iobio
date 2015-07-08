@@ -323,10 +323,11 @@ function initTranscriptControls() {
 	transcriptCardSelector.find('#expand-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').removeClass("hide");
 		transcriptCardSelector.find('#gene-name').css("margin-left", "0");
+		transcriptCardSelector.find('#gene-name').css("margin-right", "0");
 	});
 	transcriptCardSelector.find('#minimize-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').addClass("hide");
-		transcriptCardSelector.find('#gene-name').css("margin-left", "190px");
+		transcriptCardSelector.find('#gene-name').css("margin-right", "230px");
 	});
 
 
