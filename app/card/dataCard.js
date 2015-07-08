@@ -81,10 +81,9 @@ DataCard.prototype.init = function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {
-		dataCardSelector.find('.fullview').addClass("hide");
 		window.loadTracksForGene();
-
 	});
+
 
 }
 
@@ -170,6 +169,9 @@ DataCard.prototype.clearBamUrl = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
+	window.removeUrl('bam'+cardIndex);
+
+
 
 	this.displayBamUrlBox(panelSelector);
 	panelSelector.find("#bam-url-input").val("");
@@ -203,10 +205,9 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-
-	this.displayUrlBox(panelSelector);
+	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
-	this.onVcfUrlEntered(panelSelector);
+	variantCard.clearVcf();
 
 
 }

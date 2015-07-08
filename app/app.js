@@ -218,24 +218,28 @@ function toggleSampleTrio(show) {
 		$('#proband-data').css("width", "32%");
 	} else {
 		dataCard.mode = 'single';
+		$('#proband-data').css("width", "60%");
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
-		$('#proband-data').css("width", "60%");
 		var motherCard = null;
 		var fatherCard = null;
 		variantCards.forEach( function(variantCard) {
 			if (variantCard.getRelationship() == 'mother') {
 				motherCard = variantCard;
-				clearUrl($('#mother-data'));
-				clearBamUrl($('#mother-data'));
+				motherCard.clearVcf();
 				motherCard.hide();
+				$('#mother-data').find('#vcf-file-info').val('');
+				$('#mother-data').find('#vcf-url-input').val('');
+				//dataCard.displayUrlBox($('#mother-data'));
 				removeUrl("vcf1");
 				removeUrl("bam1");
 			} else if (variantCard.getRelationship() == 'father') {
 				fatherCard = variantCard;
-				clearUrl($('#father-data'));
-				clearBamUrl($('#father-data'));
+				fatherCard.clearVcf();
 				fatherCard.hide();
+				$('#father-data').find('#vcf-file-info').val('');
+				$('#father-data').find('#vcf-url-input').val('');
+				//dataCard.displayUrlBox($('#father-data'));
 				removeUrl("vcf2");
 				removeUrl("bam2");
 			}
@@ -247,8 +251,6 @@ function toggleSampleTrio(show) {
 
 
 }
-
-
 
 function loadGeneFromUrl() {
 	var gene = getUrlParameter('gene');
@@ -528,7 +530,6 @@ function loadGeneWidget() {
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
 		    	window.selectedTranscript = null;
-
 		    	
 
 		    	if (data.loadFromUrl) {
@@ -619,8 +620,22 @@ function loadTracksForGene(bypassVariantCards) {
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
 
+    $('#gene-chr').text(window.gene.chr);
     $('#gene-name').text(window.gene.gene_name);   
-    $('#gene-region-info').text(window.gene.chr + ' ' + window.gene.regionStart + "-" + window.gene.regionEnd);
+    $('#gene-region').text(window.gene.regionStart + "-" + window.gene.regionEnd);
+
+	if (window.gene.gene_type == 'pseudogene') {
+		$('#pseudogene').removeClass("hide");
+	} else {
+		$('#pseudogene').addClass("hide");
+	}
+
+	if (window.gene.strand == '-') {
+		$('#minus_strand').removeClass("hide");
+	} else {
+		$('#minus_strand').addClass("hide");
+	}
+
 
     // Open up gene region to include upstream and downstream region;
 	window.gene.start = window.gene.start < GENE_REGION_BUFFER ? 0 : window.gene.start - GENE_REGION_BUFFER;
@@ -649,7 +664,11 @@ function loadTracksForGene(bypassVariantCards) {
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
 	 	variantCards.forEach(function(variantCard) {
-			variantCard.loadTracksForGene(filterCard.classifyByImpact);
+	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
+				variantCard.hide();
+			} else {
+		 		variantCard.loadTracksForGene(filterCard.classifyByImpact);
+			}
 		});
 	}
 	

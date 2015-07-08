@@ -487,6 +487,15 @@ section {
 }
 
 
+#pseudogene {
+  text-align: center;
+  padding-right: 5px;
+  font-style: italic;
+  margin-top: -6px;
+  font-weight: bold;
+  margin-bottom: -10px;
+  background-color: white;
+}
 
 #region-track {
   text-align: center;
@@ -531,7 +540,7 @@ section {
 
 #bam-track {
   margin-bottom: 0px ;
-  margin-top: -20px ;
+  margin-top: -40px ;
   margin-left: 0px;
   margin-right: 0px;
   padding: 0px;
@@ -617,7 +626,7 @@ section {
   padding-right:2px;
   padding-left:2px
   margin-top: 0px;
-  margin-botton:10px;
+  margin-bottom:10px;
 }
 
 .variant-card #bam-track .loader {
@@ -891,10 +900,11 @@ header {
 
 
 #zoom-region-chart {
-    margin-top: -24px;
-    margin-bottom: 0px;
     padding-left: 0px;
     padding-right: 0px;
+    margin-top: -30px; 
+    margin-bottom: 0px;
+    padding-bottom: 0px;
 }
 #zoom-region-ref-name {
 }
