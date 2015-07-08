@@ -171,7 +171,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							regionEnd   = window.gene.end;
 						}
 					    me.onBrush(brush);
-						if (this.getRelationship() == 'proband') {
+						if (me.getRelationship() == 'proband') {
 							me.fillFeatureMatrix(regionStart, regionEnd);
 						}
 

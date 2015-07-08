@@ -68,7 +68,7 @@ MatrixCard.prototype.init = function() {
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
 				    .cellSize(30)
-				    .columnLabelHeight(100)
+				    .columnLabelHeight(42)
 				    .rowLabelWidth(100)
 				    .tooltipHTML(variantTooltipHTML)
 				    .on('d3click', function(variant) {
@@ -280,7 +280,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.matrixRows);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: false});
+    this.featureMatrix(selection, {showColumnLabels: true});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.

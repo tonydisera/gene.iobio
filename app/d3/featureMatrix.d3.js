@@ -118,7 +118,7 @@ function featureMatrixD3() {
             .attr("transform", function(d) {
               return "rotate(-65)" ;
             })
-            .text( function(d) {  return d.type + " " + d.start + " " + d.ref + "->" + d.alt });
+            .text( function(d) {  return d.type });
 
       }
 
