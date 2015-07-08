@@ -1,4 +1,4 @@
-// Create a variantCard class
+ // Create a variantCard class
 // Constructor
 function VariantCard() {
 
@@ -153,10 +153,29 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .width(1000)
 				    .margin({top: 20, right: 4, bottom: 0, left: 4})
 				    .showXAxis(false)
-				    .showBrush(false)
+				    .showBrush(true)
 				    .trackHeight(16)
 				    .cdsHeight(12)
-		    		.showLabel(false);
+		    		.showLabel(false)
+					.on("d3brush", function(brush) {
+				    	if (!brush.empty()) {
+							regionStart = d3.round(brush.extent()[0]);
+							regionEnd   = d3.round(brush.extent()[1]);
+							if (!selectedTranscript) {
+								selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
+								cacheCodingRegions();
+
+							}
+						} else {
+							regionStart = window.gene.start;
+							regionEnd   = window.gene.end;
+						}
+					    me.onBrush(brush);
+						if (this.getRelationship() == 'proband') {
+							me.fillFeatureMatrix(regionStart, regionEnd);
+						}
+
+					});	
 
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
@@ -363,8 +382,8 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 		this.cardSelector.find("#bam-track").addClass("hide");
 		this.cardSelector.find(".covloader").addClass("hide");
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
-		this.cardSelector.find('#zoom-region-chart').css("margin-top", "-20px");
-		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "0px");
+		//this.cardSelector.find('#zoom-region-chart').css("margin-top", "-20px");
+		//this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "0px");
 
 		this.cardSelector.find("#fb-chart-label").addClass("hide");
 		this.cardSelector.find("#fb-separator").addClass("hide");
@@ -426,6 +445,19 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 
 }
 
+VariantCard.prototype.clearVcf = function() {
+	this.vcfData = null;
+	this.vcfUrlEntered = false;
+	this.setDirty(false);
+	this.cardSelector.find('#vcf-track').addClass("hide");
+	this.cardSelector.find('#vcf-variants').css("display", "none");
+	this.cardSelector.find(".vcfloader").addClass("hide");
+	this.cardSelector.find('#vcf-variant-card-label').text("");
+	this.cardSelector.find('#vcf-variant-count').text("");
+
+
+}
+
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 	var me = this;
 	this.vcfData = null;
@@ -438,7 +470,7 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
 			this.cardSelector.find('#vcf-variants').css("display", "none");
 			this.cardSelector.find(".vcfloader").removeClass("hide");
 			this.cardSelector.find('.vcfloader .loader-label').text("Accessing variant file");
-		 	this.cardSelector.find('#vcf-name').text(vcfUrl);
+		 
 		}
 	   
 	    this.vcf.openVcfUrl(vcfUrl);
@@ -755,7 +787,6 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find('#vcf-chart-label').addClass("hide");
 		this.cardSelector.find('#vcf-name').addClass("hide");		
-		this.cardSelector.find(".vcfloader").removeClass("hide");
 
 		$("#feature-matrix").addClass("hide");
 
@@ -890,7 +921,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		}
 
 		// Get the coverage data for the gene region
-		/*  COMMENTED OUT UNTIL NEW COVERAGE.IOBIO SERVICE DEPLOYED TO PRODUCTION
+		//  COMMENTED OUT UNTIL NEW COVERAGE.IOBIO SERVICE DEPLOYED TO PRODUCTION
 	 	me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
 	 	  function(coverageForRegion, coverageForPoints) {
 
@@ -904,13 +935,14 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 				showCoverage();
 			}
 		});
-		*/
+		
 		// DEPRECATED CODE TO BE REPLACED WITH CALLS TO COVERAGE.IOBIO
+		/*
 		me.bam.getCoverageForRegionChunkedDEPRECATED(refName, window.gene.start, window.gene.end, 5000, 
 	 	  function(coverageForRegion) {
 	 	  	me.bamData = coverageForRegion;
 	 	  	showCoverage();
-		});
+		}); */
 
 	}
 
@@ -940,22 +972,6 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		var factor = d3.round(data.length / 1000);
         var reducedData = this.bam.reducePoints(data, factor, function(d) {return d[0]}, function(d) {return d[1]});
 
-	    // Add 0 depth to the first and last element so that the area calculated is correct
-	    // (Workaround for d3 bug - http://stackoverflow.com/questions/14342289/d3-js-area-chart-is-not-rendering-right)
-      	/*var row = $.extend({}, reducedData[0]);
-      	row[0] = row[0] - 1;
-      	row[1] = 0;
-      	reducedData.unshift(row);
-
-      	row = $.extend({}, reducedData[reducedData.length - 1]);
-      	row[0] = row[0] - 1;
-      	row[1] = 0;
-      	reducedData.push(row);
-      	*/
-      	console.log(reducedData[0][0] + ':' + reducedData[0][1]);
-      	console.log(reducedData[reducedData.length-1][0] + ':' + reducedData[reducedData.length-1][1]);
-
-
 		this.bamDepthChart.xStart(regionStart);
 		this.bamDepthChart.xEnd(regionEnd);
 
@@ -967,8 +983,8 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
-		this.cardSelector.find('#zoom-region-chart').css("margin-top", "5px");
-		this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-90px");
+		//this.cardSelector.find('#zoom-region-chart').css("margin-top", "5px");
+		//this.cardSelector.find('#zoom-region-chart').css("margin-bottom", "-90px");
 
 
 	}

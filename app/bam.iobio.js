@@ -25,9 +25,7 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {}
       
-      this.iobio.coverage = "ws://localhost:8047";
-      this.iobio.samtoolslocal = "ws://localhost:8060";
-      
+      this.iobio.coverage = "ws://coverage.iobio.io";
       this.iobio.bamtools = "ws://bamtools.iobio.io";
       this.iobio.samtools = "ws://samtools.iobio.io";
       this.iobio.bamReadDepther = "ws://bamReadDepther.iobio.io";
@@ -84,7 +82,7 @@ var Bam = Class.extend({
    _getBamRegionsUrl: function(regions, golocal) {
       var samtools = null;
       if (golocal) {
-        samtools = this.iobio.samtoolslocal;
+        samtools = this.iobio.samtools;
       } else {
         samtools = this.iobio.samtools;
       }
@@ -636,7 +634,7 @@ var Bam = Class.extend({
           region.name = trRefName;
           if (region.name && region.start && region.end) {
             if (regionsArg.length == 0) {
-              regionsArg += " -r ";
+              regionsArg += " -p ";
             } else {
               regionsArg += ",";
             }
@@ -649,10 +647,11 @@ var Bam = Class.extend({
         } else {
           maxPointsArg = " -m 0"
         }
+        var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
         console.log(me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + regionsArg);
 
-        var url = encodeURI( me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+        var url = encodeURI( me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
         var client = BinaryClient(me.iobio.coverage);
         
@@ -698,6 +697,9 @@ var Bam = Class.extend({
                       }
                     }
                   });
+                  console.log("first point " + coverageForRegion[0][0]);
+                  console.log("last point " + coverageForRegion[coverageForRegion.length-1][0]);
+                  console.log(coverageForRegion.length);
                   callback(coverageForRegion, coverageForPoints);
 
                 } else {
