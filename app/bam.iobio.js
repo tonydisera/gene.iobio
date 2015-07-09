@@ -649,7 +649,6 @@ var Bam = Class.extend({
         }
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
-        console.log(me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + regionsArg);
 
         var url = encodeURI( me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
