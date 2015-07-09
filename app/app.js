@@ -999,7 +999,7 @@ function variantTooltipHTML(variant, rowIndex) {
 		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
 	}
 
-	var coverage = variant.bamDepth != null && variant.bamDepth != '' ? variant.bamDepth : null;
+	var coverage = variant.bamDepth != null && variant.bamDepth != '' ? variant.bamDepth.toString() : null;
 	var coverageReported = variant.genotypeDepth != null && variant.genotypeDepth != '' ? variant.genotypeDepth : null;
 	if (coverage && coverageReported) {
 		if (coverage != coverageReported) {
