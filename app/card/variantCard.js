@@ -902,9 +902,12 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		me.showBamProgress("Calculating coverage");
 
 		var regions = [];
+		me.flagDupStartPositions(me.vcfData.features);
 		if (me.vcfData) {
 			me.vcfData.features.forEach( function(variant) {
-				regions.push({name: refName, start: variant.start - 1, end: variant.start });
+				if (!variant.dup) {
+					regions.push({name: refName, start: variant.start - 1, end: variant.start });
+				}
 			});
 		}
 
@@ -1300,6 +1303,23 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	window.matrixCard.fillFeatureMatrix(filteredVcfData);
 }
 
+VariantCard.prototype.flagDupStartPositions = function(variants) {
+	// Flag variants with same start position as this will throw off comparisons
+ 	for (var i =0; i < variants.length - 1; i++) {
+        var variant = variants[i];
+        var nextVariant = variants[i+1];
+        if (i == 0) {
+          variant.dup = false;
+        }
+        nextVariant.dup = false;
+
+        if (variant.start == nextVariant.start) {
+        	nextVariant.dup = true;
+	    }
+	}
+	
+}
+
 VariantCard.prototype.refreshVariantsWithCoverage = function(coverage, callback) {
 	var me = this;
 	var vcfIter = 0;
@@ -1307,24 +1327,38 @@ VariantCard.prototype.refreshVariantsWithCoverage = function(coverage, callback)
 	var recs = this.vcfData.features;
 
 	me.cardSelector.find(".vcfloader .loader-label").text("Calculating coverage for variants");
-	
-	for( var vcfIter = 0, covIter = 0; vcfIter < recs.length && covIter < coverage.length; null) {
-		var coverageRow = coverage[covIter];
-		var coverageStart = coverageRow[0];
-		var coverageDepth = coverageRow[1];
 
-		// compare curr variant and curr clinVar record
-		if (recs[vcfIter].start == coverageStart) {			
-			recs[vcfIter].bamDepth = +coverageDepth;
+	
+    me.flagDupStartPositions(recs);
+	
+	for( var vcfIter = 0, covIter = 0; vcfIter < recs.length; null) {
+		// Bypass duplicates
+		if (recs[vcfIter].dup) {
+			recs[vcfIter].bamDepth = recs[vcfIter-1].bamDepth;
 			vcfIter++;
-			covIter++;
-		} else if (recs[vcfIter].start < coverageStart) {	
-			recs[vcfIter].bamDepth = "";
-			vcfIter++;
-		} else {
-			console.log("no variant corresponds to coverage at " + coverageStart);
-			covIter++;
 		}
+      	if (covIter >= coverage.length) {
+      		recs[vcfIter].bamDepth = "";
+      		vcfIter++;
+      	} else {
+			var coverageRow = coverage[covIter];
+			var coverageStart = coverageRow[0];
+			var coverageDepth = coverageRow[1];
+
+			// compare curr variant and curr clinVar record
+			if (recs[vcfIter].start == coverageStart) {			
+				recs[vcfIter].bamDepth = +coverageDepth;
+				vcfIter++;
+				covIter++;
+			} else if (recs[vcfIter].start < coverageStart) {	
+				recs[vcfIter].bamDepth = "";
+				vcfIter++;
+			} else {
+				console.log("no variant corresponds to coverage at " + coverageStart);
+				covIter++;
+			}
+
+      	}
 	}
 	callback();
 
