@@ -789,6 +789,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		this.cardSelector.find('#vcf-name').addClass("hide");		
 
 		$("#feature-matrix").addClass("hide");
+		$("#feature-matrix-note").addClass("hide");
 
 
 		// Load the read coverage and variant charts.  If a bam hasn't been

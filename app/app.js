@@ -793,6 +793,7 @@ function promiseFullTrio() {
 		$("#matrix-panel .loader").removeClass("hide");
 		$(".inheritance.loader").removeClass("hide");
 		$("#feature-matrix").addClass("hide");
+		$("#feature-matrix-note").addClass("hide");
 
 		// we need to compare the proband variants to mother and father variants to determine
 		// the inheritance mode.  After this completes, we are ready to show the

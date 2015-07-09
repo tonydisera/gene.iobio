@@ -274,6 +274,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	}
 	
 	$("#feature-matrix").removeClass("hide");
+	$("#feature-matrix-note").removeClass("hide");
 	$("#matrix-panel .loader").addClass("hide");
 
 	// Load the chart with the new data
