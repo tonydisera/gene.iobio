@@ -73,7 +73,7 @@ function geneD3() {
        var innerHeight = geneD3_height - margin.top - margin.bottom;
 
        // set svg element
-       var container = d3.select(this).classed('ibo-gene', true);      
+       var container = d3.select(this).classed('ibo-gene', true);    
 
       // Update the x-scale.
       if (regionStart && regionEnd) {
@@ -98,13 +98,11 @@ function geneD3() {
       // Select the svg element, if it exists.
       var svg = container.selectAll("svg").data([0]);
 
-    
-
       svg.enter()
         .append("svg")
         .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
-        .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
-
+        .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom)
+       
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       if (geneD3_widthPercent && geneD3_heightPercent) {
@@ -116,7 +114,6 @@ function geneD3() {
       d3.select(this).selectAll("svg")
         .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
         .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
-
 
 
       // Otherwise, create the skeletal chart.      
@@ -193,15 +190,17 @@ function geneD3() {
       if (geneD3_showBrush) {
         var brushHeight = geneD3_height + 20;
         var brushY = -20;
-        g.selectAll("g.x.brush").remove();
-        g.selectAll("g.x.brush").data([0]).enter().append("g")
+        var theBrush = g.selectAll("g.x.brush").data([0]);
+        theBrush.enter().append("g")
             .attr("class", "x brush")
             .call(brush)
             .selectAll("rect")
             .attr("y", brushY)
             .attr("height", brushHeight);
+        theBrush.exit().remove();
+
            
-        }    
+      }    
 
       // add tooltip div
       var tooltip = container.selectAll(".tooltip").data([0])

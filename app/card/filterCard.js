@@ -359,6 +359,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	    // first 6 where they are and move the remaining to the 
 	    // 'more' section.  If we 6 or less active elements,
 	    // just hide the 'more' link.
+	    /*
 	    var allCount = d3.selectAll("#effect-filter-box .effectCategory")[0].length;
 	    var inactiveCount = d3.selectAll("#effect-filter-box .effectCategory.inactive")[0].length;
 	    var activeCount = allCount - inactiveCount;
@@ -373,9 +374,10 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	    	}
 
 	    } else {
+	    	*/
 	    	$('#effect-filter-box #more-effect-link').addClass('hide');
 
-	    }
+	    //}
 	}
 }
 
