@@ -65,7 +65,6 @@ function variantD3() {
 
   var showCircle = function(d, svgContainer, parentContainer, indicateMissingVariant, emphasize) {
     // Find the matching variant
-    console.log("showing circle for variant " + d.type + '  ' + d.start + ' ' + d.ref + ' ' + d.alt);
     var matchingVariant = null;
     svgContainer.selectAll(".variant").each( function (variant,i) {
        if (d.start == variant.start 

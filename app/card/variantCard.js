@@ -28,6 +28,14 @@ VariantCard.prototype.isLoaded = function() {
 	return this.vcf != null && this.vcfData != null;
 }
 
+VariantCard.prototype.isReadyToLoad = function() {
+	if (this.vcf != null && (this.vcfUrlEntered || this.vcfFileOpened)) {
+		return true;
+	} else if (this.bam != null && (this.bamUrlEntered || this.bamFileOpened)) {
+		return true;
+	}
+}
+
 // class methods
 
 VariantCard.prototype.getVcfData = function() {
@@ -404,42 +412,21 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 
 VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 	var me = this;
-	this.vcfFileOpened = true;
 	this.vcfData = null;
 
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
-		this.cardSelector.find(".vcfloader").removeClass("hide");
-		this.cardSelector.find('.vcfloader .loader-label').text("Accessing variant file");
+		this.cardSelector.find(".vcfloader").addClass("hide");
 	}
 
 	this.vcf.openVcfFile( event, function(vcfFile) {
 
+		me.vcfFileOpened = true;
+		me.vcfUrlEntered = false;
 		me.cardSelector.find('#vcf-name').text(vcfFile.name);
+		callback(vcfFile.name);
 		me.getVcfRefName = null;
-		me.vcf.getReferenceNames(function(refNames) {
-
-			// Figure out if whe need to strip 'ch' or 'chr' from ref name to
-			// match to bam reference names
-			refNames.forEach(function(refName) {				
-				if (me.getVcfRefName == null) {
-			 		if (refName == window.gene.chr) {
-			 			me.getVcfRefName = me.getRefName;
-			 			if (callback) {
-				 			callback(vcfFile.name);
-			 			}
-			 		} else if (refName == me.stripRefName(gene.chr)) {
-			 			me.getVcfRefName = me.stripRefName;
-			 			if (callback) {
-				 			callback(vcfFile.name);
-			 			}
-			 		}
-
-				}
-			});
-			
-		});
 
 	});
 
@@ -458,28 +445,40 @@ VariantCard.prototype.clearVcf = function() {
 
 }
 
-VariantCard.prototype.onVcfUrlEntered = function(vcfUrl) {
+VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 	var me = this;
 	this.vcfData = null;
 
 	if (vcfUrl == null || vcfUrl == '') {
+		this.vcfUrlEntered = false;
 
 	} else {
 		if (this.isViewable()) {
 			this.cardSelector.find('#vcf-track').removeClass("hide");
 			this.cardSelector.find('#vcf-variants').css("display", "none");
-			this.cardSelector.find(".vcfloader").removeClass("hide");
-			this.cardSelector.find('.vcfloader .loader-label').text("Accessing variant file");
+			this.cardSelector.find(".vcfloader").addClass("hide");
 		 
 		}
 	   
 	    this.vcf.openVcfUrl(vcfUrl);
 	    this.vcfUrlEntered = true;
+	    this.vcfFileOpened = false;
+
+
 
 	}
-	
+	callback(vcfUrl);
     this.getVcfRefName = null;
 
+}
+
+VariantCard.prototype.isValidVcf = function() {
+	var me = this;
+	this.discoverVcfRefName( function() {
+		me.vcf.getSamples(me.getVcfRefName(window.gene.chr), window.gene.start, window.gene.end, function(samples) {
+			console.log(samples);
+		});
+	});
 }
 
 
@@ -902,13 +901,16 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		me.showBamProgress("Calculating coverage");
 
 		var regions = [];
-		me.flagDupStartPositions(me.vcfData.features);
-		if (me.vcfData) {
-			me.vcfData.features.forEach( function(variant) {
-				if (!variant.dup) {
-					regions.push({name: refName, start: variant.start - 1, end: variant.start });
-				}
-			});
+		if (me.vcfData != null) {
+			me.flagDupStartPositions(me.vcfData.features);
+			if (me.vcfData) {
+				me.vcfData.features.forEach( function(variant) {
+					if (!variant.dup) {
+						regions.push({name: refName, start: variant.start - 1, end: variant.start });
+					}
+				});
+			}
+
 		}
 
 		var showCoverage = function() {
@@ -925,8 +927,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		}
 
 		// Get the coverage data for the gene region
-		//  COMMENTED OUT UNTIL NEW COVERAGE.IOBIO SERVICE DEPLOYED TO PRODUCTION
-	 	me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
+		me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
 	 	  function(coverageForRegion, coverageForPoints) {
 
 			me.bamData = coverageForRegion;
@@ -1156,10 +1157,13 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 }
 
 VariantCard.prototype.setLoadState = function(taskName) {
-	if (this.vcfData.loadState == null) {
-		this.vcfData.loadState = {};
+	if (this.vcfData != null) {
+		if (this.vcfData.loadState == null) {
+			this.vcfData.loadState = {};
+		}
+		this.vcfData.loadState[taskName] = true;
+
 	}
-	this.vcfData.loadState[taskName] = true;
 }
 
 VariantCard.prototype.determineVariantAfLevels = function(theVcfData) {

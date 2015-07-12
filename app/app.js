@@ -248,7 +248,7 @@ function toggleSampleTrio(show) {
 
 
 	}
-
+	enableLoadButton();
 
 }
 
@@ -815,6 +815,32 @@ function promiseFullTrio() {
 	}
 
 }
+
+function enableLoadButton() {
+	var enable = false;
+
+	var cards = {};
+	variantCards.forEach(function(vc) {
+		cards[vc.getRelationship()] = vc;
+	});
+
+
+	if (dataCard.mode == 'single') {
+		if (cards['proband'].isReadyToLoad()) {
+			enable = true;
+		}
+	} else if (dataCard.mode == 'trio') {
+		if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
+			enable = true;
+		}
+	}
+	if (enable) {
+		$('#data-card').find('#ok-button').removeClass("disabled");
+	} else {
+		$('#data-card').find('#ok-button').addClass("disabled");
+	}
+}
+
 
 
 

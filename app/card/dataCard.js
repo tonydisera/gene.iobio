@@ -81,6 +81,7 @@ DataCard.prototype.init = function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {
+
 		window.loadTracksForGene();
 	});
 
@@ -112,7 +113,7 @@ DataCard.prototype.onBamFilesSelected = function(event, panelSelector) {
 	variantCard.onBamFilesSelected(event, function(bamFileName) {
 		panelSelector.find('#bam-file-info').removeClass('hide');
 		panelSelector.find('#bam-file-info').val(bamFileName);
-		variantCard.loadBamDataSource(variantCard.getName());
+		enableLoadButton();
 	});
 	variantCard.setDirty();
 
@@ -138,6 +139,7 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector) {
 	variantCard.loadBamDataSource(variantCard.getName());
 
 	window.updateUrl('bam' + cardIndex, bamUrlInput.val());
+	enableLoadButton();
 
 }
 
@@ -208,6 +210,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
 	variantCard.clearVcf();
+	window.enableLoadButton();
 
 
 }
@@ -234,10 +237,8 @@ DataCard.prototype.onVcfFilesSelected = function(event, panelSelector) {
 	variantCard.onVcfFilesSelected(event, function(vcfFileName) {
 		panelSelector.find('#vcf-file-info').removeClass('hide');
 		panelSelector.find('#vcf-file-info').val(vcfFileName);
-		variantCard.loadVcfDataSource(variantCard.getName(), function() {
-			promiseFullTrio();
 
-		});
+		window.enableLoadButton();
 	});
 	variantCard.setDirty();
 }
@@ -255,11 +256,11 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 	var vcfUrl = panelSelector.find('#url-input').val();
 
-	variantCard.onVcfUrlEntered(vcfUrl);
-	window.updateUrl('vcf'+cardIndex, vcfUrl);
-	variantCard.setDirty();
-	variantCard.loadVcfDataSource(variantCard.getName(),  function() {
-		promiseFullTrio();
+	variantCard.onVcfUrlEntered(vcfUrl, function() {
+		window.updateUrl('vcf'+cardIndex, vcfUrl);
+		variantCard.setDirty();
+		window.enableLoadButton();
+		
 	});
 }
 

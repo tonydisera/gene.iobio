@@ -706,6 +706,13 @@ var effectCategories = [
   exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, isFinal) {
     var me = this;
 
+    // Strip the ref name.
+    if (refName.indexOf("chr") == 0) {
+      tokens = refName.split("chr");
+      if (tokens.length > 1) {
+        refName = tokens[1];
+      }
+    }
 
     // Multiallelic input vcf records were assigned a number submission
     // index.  Create a map that ties the vcf record number to the
@@ -892,11 +899,104 @@ var effectCategories = [
       client.on("error", function(error) {
         console.log("error while running af server " + error);
       });
+  }
 
 
-     
+  
+  // NEW
+  exports.getSamples = function(refName, callback) {
+    if (sourceType == SOURCE_TYPE_URL) {
+      this._getRemoteSamples(refName, function(samples) {
+        callback(samples);
+      });
+    } else {
+      this._getLocalSamples(refName, regionStrand);
+    }
 
   }
+   
+
+
+  // NEW
+  exports._getRemoteSamples = function(refName, callback) {
+    var me = this;
+    var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
+    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + '&protocol=http';
+    var url = encodeURI(tabixUrl);
+
+    // Connect to the snpEff server    
+    var client = BinaryClient(tabixServer);
+    
+    var bufferedData = "";
+
+    client.on('open', function(stream){
+
+        // Run the command
+        var stream = client.createStream({event:'run', params : {'url':url}});
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           bufferedData += data;
+        });
+
+        // Whenall of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          var samples = [];
+          samples.length = 0;
+          var recs = bufferedData.split("\n");      
+          var finished = false;   
+          for (var i = 0; !finished; i++) {
+            if (i >= recs.length) {
+              finished = true;
+            } else {
+              var rec = recs[i];
+              if (rec.indexOf("#CHROM") == 0) {
+                var fields = rec.split("\t");
+                var samples = [];
+                for (var i = 9; i < fields.length; i++) {
+                  samples.push(fields[i]);
+                } 
+                finished = true;       
+              } else if (rec.indexOf('#') == -1) {
+                finished = true;
+              }
+
+            }
+          }
+          callback(samples);
+        });
+    });
+     
+  }
+
+  // NEW
+  exports._getLocalSamples = function(refName, callback) {
+   var me = this;
+
+    var headerRecords = [];
+    vcfReader.getHeader( function(header) {
+      headerRecords = header.split("\n");
+      headerRecords.forEach(function(record) {
+        if (record.indexOf("#CHROM") == 0) {
+          var fields = rec.split("\t");
+          var samples = [];
+          for (var i = 9; i < fields.length; i++) {
+            samples.push(fields[i]);
+          }
+        } 
+      });
+      callback(samples);
+    });
+
+  }
+
+
 
   exports.getHumanRefNames = function(refName) {
     if (refName.indexOf("chr") == 0) {
@@ -1072,31 +1172,27 @@ var effectCategories = [
             });
 
             var gtNumber = altIdx + 1;
-            var genotypeForAlt = null;
-            var genotypeDepth = null;
+            var genotypeForSample = null;
+            var genotypeDepthForSample = null;
             var zygosity = null;
             var phased = null;
-            //TODO: Need to send in which sample we are evaluating
-            // For now, just loop through until we find a genotype for
-            // this alt
-            var x = 0;
-            genotypes.forEach(function(gt) {
-              if (gt.indexOf(gtNumber) >= 0) {
-                  genotypeForAlt = gt;  
-                  genotypeDepth = genotypeDepths[x];              
-              }
-              x++;
-            });
-            if (genotypeForAlt) {
+            // For now, just grab the first genotype.
+            // TODO:  For multi-sample vcf, user should
+            // specify which sample is applicable.
+            var gtIndex = 0;
+            genotypeForSample = genotypes[gtIndex];
+            gentotypeDepthForSample = genotypeDepths[gtIndex];
+
+            if (genotypeForSample) {
               var delim = null;
-              if (genotypeForAlt.indexOf("|") > 0) {
+              if (genotypeForSample.indexOf("|") > 0) {
                 delim = "|";
                 phased = true;
               } else {
                 delim = "/";
                 phased = false;
               }
-              var tokens = genotypeForAlt.split(delim);
+              var tokens = genotypeForSample.split(delim);
               if (tokens.length == 2) {
                 if (tokens[0] == tokens[1]) {
                   zygosity = "HOM";
@@ -1136,8 +1232,8 @@ var effectCategories = [
               'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
               'af': af, 'combinedDepth': combinedDepth,             
               'genotypes': genotypes, 
-              'genotypeForAlt': genotypeForAlt, 
-              'genotypeDepth' : genotypeDepth,
+              'genotype': genotypeForSample, 
+              'genotypeDepth' : genotypeDepthForSample,
               'zygosity': zygosity ? zygosity : 'gt_unknown', 
               'phased': phased,
               'effect': effects, 
