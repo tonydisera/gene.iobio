@@ -1051,6 +1051,7 @@ function variantTooltipHTML(variant, rowIndex) {
 
 		+ tooltipRow('Zygosity',  zygosity, "5px")
 		+ tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
+		+ tooltipRow('Genotype',  variant.genotype)
 
 		+ tooltipRow('Impact', impactDisplay, "3px")
 		+ tooltipRow('Effect', effectDisplay)

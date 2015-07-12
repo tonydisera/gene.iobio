@@ -1176,9 +1176,15 @@ var effectCategories = [
             var genotypeDepthForSample = null;
             var zygosity = null;
             var phased = null;
-            // For now, just grab the first genotype.
-            // TODO:  For multi-sample vcf, user should
-            // specify which sample is applicable.
+
+            // For now, just grab the first sample's genotype.
+            // Only keep the alt if we have a genotype that matches.
+            // For example 
+            // A->G    0|1 keep
+            // A->G,C  0|1 keep A->G, but bypass A->C
+            // A->G,C  0|2 bypass A->G, keep A->C
+            // A->G,C  1|2 keep A->G, keep A->C
+            var keepAlt = false;
             var gtIndex = 0;
             genotypeForSample = genotypes[gtIndex];
             gentotypeDepthForSample = genotypeDepths[gtIndex];
@@ -1194,13 +1200,16 @@ var effectCategories = [
               }
               var tokens = genotypeForSample.split(delim);
               if (tokens.length == 2) {
-                if (tokens[0] == tokens[1]) {
-                  zygosity = "HOM";
-                  homCount++;
-                } else {
-                  zygosity = "HET";
-                  hetCount++;
-                }
+                if (tokens[0] == gtNumber || tokens[1] == gtNumber) {
+                  keepAlt = true;
+                  if (tokens[0] == tokens[1]) {
+                    zygosity = "HOM";
+                    homCount++;
+                  } else {
+                    zygosity = "HET";
+                    hetCount++;
+                  }
+                } 
               }
             }
 
@@ -1225,32 +1234,35 @@ var effectCategories = [
               clinvarAlt = clinvarAlt.substr(1,clinvarAlt.length-1);
             } 
 
-            variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
-              'strand': regionStrand, 
-              'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
-              'id': rec.id, 'ref': rec.ref, 
-              'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
-              'af': af, 'combinedDepth': combinedDepth,             
-              'genotypes': genotypes, 
-              'genotype': genotypeForSample, 
-              'genotypeDepth' : genotypeDepthForSample,
-              'zygosity': zygosity ? zygosity : 'gt_unknown', 
-              'phased': phased,
-              'effect': effects, 
-              'effectCategory': effectCats, 
-              'impact': impacts, 
-              'consensus': rec.consensus,
-              'inheritance': '',
-              'af1000glevel': '',
-              'afexaclevel:': '',
-              'af1000G': af1000G,
-              'afExAC': afExAC,
-              'clinvarStart': clinvarStart,
-              'clinvarRef': clinvarRef,
-              'clinvarAlt': clinvarAlt} );
+            if (keepAlt) {
+              variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
+                'strand': regionStrand, 
+                'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
+                'id': rec.id, 'ref': rec.ref, 
+                'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
+                'af': af, 'combinedDepth': combinedDepth,             
+                'genotypes': genotypes, 
+                'genotype': genotypeForSample, 
+                'genotypeDepth' : genotypeDepthForSample,
+                'zygosity': zygosity ? zygosity : 'gt_unknown', 
+                'phased': phased,
+                'effect': effects, 
+                'effectCategory': effectCats, 
+                'impact': impacts, 
+                'consensus': rec.consensus,
+                'inheritance': '',
+                'af1000glevel': '',
+                'afexaclevel:': '',
+                'af1000G': af1000G,
+                'afExAC': afExAC,
+                'clinvarStart': clinvarStart,
+                'clinvarRef': clinvarRef,
+                'clinvarAlt': clinvarAlt} );
 
-            if (rec.pos < variantRegionStart ) {
-              variantRegionStart = rec.pos;
+              if (rec.pos < variantRegionStart ) {
+                variantRegionStart = rec.pos;
+              }
+
             }
 
             altIdx++;
