@@ -86,15 +86,15 @@ vcfiobio = function module() {
 */
 
   
-  var vcfstatsAliveServer    = "ws://nv-blue.iobio.io/vcfstatsalive";
-  var tabixServer            = "ws://nv-blue.iobio.io/tabix";
-  var vcfReadDeptherServer   = "ws://nv-blue.iobio.io/vcfdepther";
-  var snpEffServer           = "ws://nv-blue.iobio.io/snpeff";
-  var snpSiftServer          = "ws://nv-blue.iobio.io/snpsift";
-  var vtServer               = "ws://nv-blue.iobio.io/vt";
-  var clinvarServer          = "ws://nv-blue.iobio.io/clinvar";
-  var afServer               = "ws://nv-blue.iobio.io/af";
-  var contigAppenderServer   = "ws://nv-blue.iobio.io/ctgapndr";
+  var vcfstatsAliveServer    = "wss://nv-blue.iobio.io/vcfstatsalive";
+  var tabixServer            = "wss://nv-blue.iobio.io/tabix";
+  var vcfReadDeptherServer   = "wss://nv-blue.iobio.io/vcfdepther";
+  var snpEffServer           = "wss://nv-blue.iobio.io/snpeff";
+  var snpSiftServer          = "wss://nv-blue.iobio.io/snpsift";
+  var vtServer               = "wss://nv-blue.iobio.io/vt";
+  var clinvarServer          = "wss://nv-blue.iobio.io/clinvar";
+  var afServer               = "wss://nv-blue.iobio.io/af";
+  var contigAppenderServer   = "wss://nv-blue.iobio.io/ctgapndr";
 
   var vcfURL;
   var vcfReader;

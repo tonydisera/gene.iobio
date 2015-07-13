@@ -40,18 +40,18 @@ var Bam = Class.extend({
 
      
 
-      this.iobio.coverage = "ws://nv-blue.iobio.io/coverage";
-      this.iobio.bamtools = "ws://nv-blue.iobio.io/bamtools";
+      this.iobio.coverage = "wss://nv-blue.iobio.io/coverage";
+      this.iobio.bamtools = "wss://nv-blue.iobio.io/bamtools";
       
-      this.iobio.samtools = "ws://nv-blue.iobio.io/samtools";
+      this.iobio.samtools = "wss://nv-blue.iobio.io/samtools";
       
-      this.iobio.bamReadDepther = "ws://nv-blue.iobio.io/bamReadDepther";
-      this.iobio.bamMerger = "ws://nv-blue.iobio.io/bammerger";      
-      this.iobio.bamstatsAlive = "ws://nv-blue.iobio.io/bamstatsalive"
-      this.iobio.freebayes = "ws://nv-blue.iobio.io/freebayes";
-      this.iobio.bcftools = "ws://nv-blue.iobio.io/bcftools";
-      this.iobio.vcflib = "ws://nv-blue.iobio.io/vcflib";
-      this.iobio.vt = "ws://nv-blue.iobio.io/vt";
+      this.iobio.bamReadDepther = "wss://nv-blue.iobio.io/bamReadDepther";
+      this.iobio.bamMerger = "wss://nv-blue.iobio.io/bammerger";      
+      this.iobio.bamstatsAlive = "wss://nv-blue.iobio.io/bamstatsalive"
+      this.iobio.freebayes = "wss://nv-blue.iobio.io/freebayes";
+      this.iobio.bcftools = "wss://nv-blue.iobio.io/bcftools";
+      this.iobio.vcflib = "wss://nv-blue.iobio.io/vcflib";
+      this.iobio.vt = "wss://nv-blue.iobio.io/vt";
 
       
 
