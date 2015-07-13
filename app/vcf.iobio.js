@@ -1240,7 +1240,8 @@ var effectCategories = [
                 'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
                 'id': rec.id, 'ref': rec.ref, 
                 'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
-                'af': af, 'combinedDepth': combinedDepth,             
+                'af': af,
+                'combinedDepth': combinedDepth,             
                 'genotypes': genotypes, 
                 'genotype': genotypeForSample, 
                 'genotypeDepth' : genotypeDepthForSample,
@@ -1253,8 +1254,8 @@ var effectCategories = [
                 'inheritance': '',
                 'af1000glevel': '',
                 'afexaclevel:': '',
-                'af1000G': af1000G,
-                'afExAC': afExAC,
+                'af1000G': me.parseAf(altIdx, af1000G),
+                'afExAC': me.parseAf(altIdx, afExAC),
                 'clinvarStart': clinvarStart,
                 'clinvarRef': clinvarRef,
                 'clinvarAlt': clinvarAlt} );
@@ -1299,6 +1300,20 @@ var effectCategories = [
 
       return results;
   };
+
+  // If af returned from af is for multi-allelic variants, we need to parse out the
+  // correct af from the comma separated string.
+  exports.parseAf = function(altIdx, af) {
+      // Handle multi-allelics
+      if (af.indexOf(",") > 0) {
+        var aftokens = af.split(",");
+        var theAf = aftokens[+altIdx];
+        return theAf; 
+      } else {
+        return af;
+      }
+  };
+
 
   exports.parseAnnotForAlt = function(value, altIdx) {
     var annotValue = "";
