@@ -24,7 +24,8 @@ var Bam = Class.extend({
       
       // set iobio servers
       this.iobio = {}
-      
+
+/*      
       this.iobio.coverage = "ws://coverage.iobio.io";
       this.iobio.bamtools = "ws://bamtools.iobio.io";
       this.iobio.samtools = "ws://samtools.iobio.io";
@@ -35,6 +36,23 @@ var Bam = Class.extend({
       this.iobio.bcftools = "ws://bcftools.iobio.io";
       this.iobio.vcflib = "ws://vcflib.iobio.io";
       this.iobio.vt = "ws://vt.iobio.io";
+*/
+
+     
+
+      this.iobio.coverage = "ws://nv-blue.iobio.io/coverage";
+      this.iobio.bamtools = "ws://nv-blue.iobio.io/bamtools.iobio.io";
+      
+      this.iobio.samtools = "ws://samtools.iobio.io";
+      
+      this.iobio.bamReadDepther = "ws://nv-blue.iobio.io/bamReadDepther";
+      this.iobio.bamMerger = "ws://nv-blue.iobio.io/bammerger";      
+      this.iobio.bamstatsAlive = "ws://nv-blue.iobio.io/bamstatsalive"
+      this.iobio.freebayes = "ws://nv-blue.iobio.io/freebayes";
+      this.iobio.bcftools = "ws://nv-blue.iobio.io/bcftools";
+      this.iobio.vcflib = "ws://nv-blue.iobio.io/vcflib";
+      this.iobio.vt = "ws://nv-blue.iobio.io/vt";
+
       
 
 //      this.iobio.bamtools = "ws://localhost:8061";

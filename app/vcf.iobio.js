@@ -73,6 +73,7 @@ vcfiobio = function module() {
   //var snpEffServer           = "ws://localhost:8040";
   //var clinvarServer          = "ws://localhost:8040";
 
+/*
   var vcfstatsAliveServer    = "ws://vcfstatsalive.iobio.io";
   var tabixServer            = "ws://tabix.iobio.io";
   var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
@@ -82,6 +83,18 @@ vcfiobio = function module() {
   var clinvarServer          = "ws://clinvar.iobio.io";
   var afServer               = "ws://af.iobio.io";
   var contigAppenderServer   = "ws://ctgapndr.iobio.io";
+*/
+
+  
+  var vcfstatsAliveServer    = "ws://nv-blue.iobio.io/vcfstatsalive";
+  var tabixServer            = "ws://nv-blue.iobio.io/tabix";
+  var vcfReadDeptherServer   = "ws://nv-blue.iobio.io/vcfdepther";
+  var snpEffServer           = "ws://nv-blue.iobio.io/snpeff";
+  var snpSiftServer          = "ws://nv-blue.iobio.io/snpsift";
+  var vtServer               = "ws://nv-blue.iobio.io/vt";
+  var clinvarServer          = "ws://nv-blue.iobio.io/clinvar";
+  var afServer               = "ws://nv-blue.iobio.io/af";
+  var contigAppenderServer   = "ws://nv-blue.iobio.io/ctgapndr";
 
   var vcfURL;
   var vcfReader;
