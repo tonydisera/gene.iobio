@@ -849,7 +849,7 @@ function showCircleRelatedVariants(variant, sourceVariantCard) {
 		if (variantCard.isViewable()) {
 			variantCard.hideVariantCircle();
 			variantCard.showVariantCircle(variant, sourceVariantCard);
-			variantCard.showCoverageCircle(variant);
+			variantCard.showCoverageCircle(variant, sourceVariantCard);
 		}
 	});
 

@@ -199,7 +199,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							.pos( function(d) { return d[0] })
 					   		.depth( function(d) { return d[1] })
 					   		.formatCircleText( function(pos, depth) {
-					   			return parseInt(depth) + 'x' ;
+					   			return depth + 'x' ;
 					   		});
 
 
@@ -676,6 +676,25 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	
 }
 
+VariantCard.prototype.getMatchingVariant = function(variant) {
+	var matchingVariant = null;
+	if (this.vcfData && this.vcfData.features) {
+
+		this.vcfData.features.forEach( function( v ) {
+			if (v.start == variant.start 
+	          && v.end == variant.end 
+	          && v.ref == variant.ref 
+	          && v.alt == variant.alt 
+	          && v.type.toLowerCase() == variant.type.toLowerCase()) {
+	          matchingVariant = v;
+	       }
+		});
+	}
+	return matchingVariant;
+}
+
+
+
 VariantCard.prototype.hideVariantCircle = function(variant) {
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
@@ -689,9 +708,18 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 	}
 }
 
-VariantCard.prototype.showCoverageCircle = function(variant) {
+VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) {
 	if (this.bamData) {
-		this.bamDepthChart.showCircle()(variant.start, variant.bamDepth);
+		var bamDepth = null;
+		if (sourceVariantCard == this) {
+			bamDepth = variant.bamDepth;
+		} else {
+			var matchingVariant = this.getMatchingVariant(variant)
+			if (matchingVariant != null) {
+				bamDepth = matchingVariant.bamDepth;
+			}
+		}
+		this.bamDepthChart.showCircle()(variant.start, bamDepth);
     }
 }
 
