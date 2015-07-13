@@ -41,9 +41,9 @@ var Bam = Class.extend({
      
 
       this.iobio.coverage = "ws://nv-blue.iobio.io/coverage";
-      this.iobio.bamtools = "ws://nv-blue.iobio.io/bamtools.iobio.io";
+      this.iobio.bamtools = "ws://nv-blue.iobio.io/bamtools";
       
-      this.iobio.samtools = "ws://samtools.iobio.io";
+      this.iobio.samtools = "ws://nv-blue.iobio.io/samtools";
       
       this.iobio.bamReadDepther = "ws://nv-blue.iobio.io/bamReadDepther";
       this.iobio.bamMerger = "ws://nv-blue.iobio.io/bammerger";      
