@@ -493,15 +493,15 @@ VariantCard.prototype.discoverVcfRefName = function(callback) {
 				 			callback();
 				 		}
 					}
-					if (!foundRef && me.getVcfRefName == null) {
-						me.cardSelector.find('#vcf-track').addClass("hide");
-						me.cardSelector.find(".vcfloader").addClass("hide");
-						$('#filter-track').addClass("hide");
-					    $('#matrix-track').addClass("hide");
-		
-						filterCard.clearFilters();
-					}
 		    	});
+				if (!foundRef && me.getVcfRefName == null) {
+					me.cardSelector.find('#vcf-track').addClass("hide");
+					me.cardSelector.find(".vcfloader").addClass("hide");
+					$('#filter-track').addClass("hide");
+				    $('#matrix-track').addClass("hide");
+	
+					filterCard.clearFilters();
+				}
 
 			});
 
@@ -778,6 +778,8 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.cardSelector.find('#fb-separator').addClass("hide");
 	this.d3CardSelector.select('#fb-variants svg').remove();
 	this.cardSelector.find("#multiple-sample-warning").addClass("hide");
+	this.cardSelector.find('#no-variants-warning').addClass("hide");
+
 
 	if (this.isViewable()) {
 		filterCard.clearFilters();
@@ -1117,7 +1119,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 
 		if (this.isViewable()) {
 			me.cardSelector.find(".vcfloader").removeClass("hide");
-		    this.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using snpEff");
+		    this.cardSelector.find('.vcfloader .loader-label').text("Accessing variant file");
 		}
 
 
@@ -1125,6 +1127,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		// A gene has been selected.  Read the variants for the gene region.
 		this.discoverVcfRefName( function() {
 
+		    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using snpEff");
 			me.cardSelector.find('#vcf-variants').css("display", "none");
 			
 
@@ -1146,6 +1149,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 				    me.cardSelector.find("#vcf-track").addClass("hide");
 				    me.cardSelector.find("#vcf-variant-count").text("");
 				    me.cardSelector.find("#button-find-missing-variants").css("visibility", "hidden");
+				    me.cardSelector.find('.vcfloader').addClass("hide");
+				    me.cardSelector.find('#no-variants-warning').removeClass("hide");
+
 		
 				} else {
 					// We have the AFs from 1000G and ExAC.  Now set the level so that variants
