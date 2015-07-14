@@ -27,6 +27,9 @@ DataCard.prototype.init = function() {
 	    panelSelector.find('#display-bam-url-item').on('click', function() {
 	    	me.displayBamUrlBox(panelSelector);
 	    });
+	    panelSelector.find('#display-platinum-bam-url-item').on('click', function() {
+	    	me.displayPlatinumBamUrlBox(panelSelector);
+	    });
 	    panelSelector.find('#bam-file-selector-item').on('click', function() {
 	    	me.onBamFileButtonClicked(panelSelector);
 	    });
@@ -42,6 +45,9 @@ DataCard.prototype.init = function() {
 	    });
 	    panelSelector.find('#display-vcf-url-item').on('click', function() {
 	    	me.displayUrlBox(panelSelector);
+	    });
+	    panelSelector.find('#display-platinum-vcf-url-item').on('click', function() {
+	    	me.displayPlatinumUrlBox(panelSelector);
 	    });
 	    panelSelector.find('#clear-vcf').on('click', function() {
 	    	me.clearUrl(panelSelector);
@@ -155,10 +161,25 @@ DataCard.prototype.displayBamUrlBox = function(panelSelector) {
     var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	if (panelSelector.find('#bam-url-input').val() == '') {
-	    panelSelector.find('#bam-url-input').val(this.defaultBamUrls[variantCard.getRelationship()]);
-	}
+	
     this.onBamUrlEntered(panelSelector);
+	
+
+}
+DataCard.prototype.displayPlatinumBamUrlBox = function(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	panelSelector.find('#bam-file-info').addClass('hide');
+    panelSelector.find('#bam-file-info').val('');
+    panelSelector.find('#bam-url-input').removeClass("hide");
+    panelSelector.find("#bam-url-input").focus();
+
+    var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+	panelSelector.find('#bam-url-input').val(this.defaultBamUrls[variantCard.getRelationship()]);
+	this.onBamUrlEntered(panelSelector);
 	
 
 }
@@ -189,16 +210,28 @@ DataCard.prototype.displayUrlBox = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	if (panelSelector.find('#url-input').val() == '') {
-	    panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
-	}
+	
 	panelSelector.find("#url-input").removeClass('hide');
     panelSelector.find("#url-input").focus();
     panelSelector.find('#vcf-file-info').addClass('hide');
     panelSelector.find('#vcf-file-info').val('');
     this.onVcfUrlEntered(panelSelector);
 }
+DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
 
+	var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+	
+	panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
+	panelSelector.find("#url-input").removeClass('hide');
+    panelSelector.find("#url-input").focus();
+    panelSelector.find('#vcf-file-info').addClass('hide');
+    panelSelector.find('#vcf-file-info').val('');
+    this.onVcfUrlEntered(panelSelector);
+}
 DataCard.prototype.clearUrl = function(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
