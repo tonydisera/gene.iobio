@@ -668,7 +668,7 @@ function loadTracksForGene(bypassVariantCards) {
 	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
 				variantCard.hide();
 			} else {
-		 		variantCard.loadTracksForGene(filterCard.classifyByImpact);
+			 	variantCard.loadTracksForGene(filterCard.classifyByImpact);
 			}
 		});
 	}
@@ -840,6 +840,12 @@ function enableLoadButton() {
 		$('#data-card').find('#ok-button').addClass("disabled");
 	}
 }
+
+function disableLoadButton() {
+	$('#data-card').find('#ok-button').addClass("disabled");
+	
+}
+
 
 
 
