@@ -491,81 +491,90 @@
 <ul id="tlyPageGuide" data-tourtitle="gene.iobio tour">
   <li class="tlypageguide_left" data-tourtarget=".tour_element_1">
     <div>
-      Type in the gene name BRCA2.
+      Type in the gene name BRCA2 and select from the drop down list.
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_2">
     <div>
-      This shows gene model for the canonical transcript.
+      This shows the gene model for the canonical transcript.
     </div>
   </li>
   <li class="tlypageguide_bottom" data-tourtarget=".tour_element_2_5">
     <div>
-      Select 'Single' to view one sample's variants.  
+      Select 'Single' to view variants for a single sample.
     </div>
   </li>
     <li class="tlypageguide_bottom" data-tourtarget="#trio-button">
     <div>
-     Select 'Trio' to analyze affected child, unaffected mother, and unaffected father.  
+     Select 'Trio' to analyze an affected child with an unaffected mother and father.
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_3">
     <div>
-      This is where you specify the variant file for the Proband.  Select 'Platinum Trio' under Sample datasets. The variant file for Platinum data set NA12878 will load.
+      This is where the 'Proband' variant file is selected.  Select 'Platinum Trio' under 'Sample datasets' and variant file for NA12878 from the Illumina Platinum data set will be selected.
       <br> When loading your own dataset, select 'Enter URL for VCF' if the data is hosted from a website. You need to specify the URL for the gzipped vcf (.vcf.gz).  The tabix file (.vcf.gz.tbi) must exist in the same web directory.   
       <br>Select 'Choose VCF File' if your variant file resides on your file system.  You must select both the gzipped vcf (.vcf.gz) and the tabix (.vcf.gz.tbi) files at the same time.
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_4">
     <div>
-      This is where you specify the alignment (bam) file for the Proband (optional).   Select 'Platinum Trio' under Sample datasets. The alignment file for the Platinum data set NA12878 will load.  
+      This is where the 'Proband' alignment file is optionally selected. Select  Select 'Platinum Trio' under 'Sample datasets' and the alignment file for NA12878 will be selected.
 
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget="#data-card #ok-button">
     <div>
-      Click the 'Load' button when you have specified the datasets.
+      Click 'Load' to load all of the selected data into the app.
+    </div>
+  </li>
+  <li class="tlypageguide_left" data-tourtarget="#data-card #minimize-button">
+    <div>
+      Click the minimize button to hide the data selection card and increase the space available for analysis.
+    </div>
+  </li>
+  <li class="tlypageguide_bottom" data-tourtarget="#data-card #expand-button">
+    <div>
+      Click the maximize button to show the full view for the data selection card.
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_5">
     <div>
-      The variants for the gene are annotated using snpEff to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical signifigance.  All of this processing occurs in real-time.
+      The variants for the gene are annotated using snpEff to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_6">
     <div>
-      When an alignment file is specified, the base coverage chart is displayed, allowing the user to spot regions of insufficient sequence coverage.
+      When an alignment file is specified, the base coverage chart is displayed, allowing the user to identify regions of abnormal or unexpected sequence coverage.
     </div>
   </li>
   <li class="tlypageguide_bottom" data-tourtarget=".tour_element_7">
     <div>
-      Push the Find Missing Variants link to call variants using the Freebayes caller.  New variants discovered with this call will be displayed above the loaded variants.
+      Push the Find Missing Variants button to call variants using Freebayes. Variants not present in the VCF file will be displayed above the loaded variants. 
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_8">
     <div>
-      The variants can be filtered by mousing over a specific label.  To apply multiple filters, click on mutiple labels to toggle on or off.
+      The variants can be filtered by mousing over a specific label.  To apply multiple filters, click on multiple labels to toggle on or off.
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_9">
     <div>
-      The variants are ranked according to different criteria.  The criteria can be rearranged by clicking on the arrow.  Click on the column to see the variant in the variant chart (next card down)
+      The variants are ranked according to different criteria. These criteria can be reordered by clicking on their respective arrows. Click on a column to see the variant in the variant chart below.
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_10">
     <div>
-      You can select another transcript from this dropdown.
+      Other transcript for this gene can be selected from this dropdown.
     </div>
   </li>
   <li class="tlypageguide_bottom" data-tourtarget=".tour_element_11">
     <div>
-      Drag and drop to select a region to zoom into.  To zoom back out, click anywhere
-      on the gene model.
+     Drag and drop to select a region to zoom into. To zoom back out, click anywhere on the gene model.
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_12">
     <div>
-      Adjust this value to display more or less of the upstream and downstream region of the gene.
+      Adjust this value to display modify the size of displayed DNA upstream and downstream of the gene.
     </div>
   </li>
 </ul>
