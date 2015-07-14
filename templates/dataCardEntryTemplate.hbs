@@ -26,9 +26,15 @@
             <li>
                 <a id="display-vcf-url-item"  href="#">Enter URL for VCF</a>
             </li>  
+            <li role="presentation" class="divider"></li>
+
+            <li class="disabled" style="text-align: center;color: grey;font-size: 12px;font-style: italic;">  
+              Sample Datasets
+            </li>
             <li>
                 <a id="display-platinum-vcf-url-item"  href="#">Platinum Trio</a>
             </li>  
+            <li role="presentation" class="divider"></li>
             <li>
                 <a id="clear-vcf" href="javascript:void(0)">Clear</a>
             </li>  
@@ -37,7 +43,7 @@
       </div>
 
       <div style="display:table-cell;width:100%;vertical-align:middle;">
-        <input  id="url-input" type="text" value="" class="form-control input-sm empty" placeholder="http://...">
+        <input  id="url-input" type="text" value="" class="form-control input-sm empty hide" placeholder="http://...vcf.gz">
         <input id="vcf-file-info" type="text" value="" readonly=""  style="background-color: #FFFFFF" class="form-control input-sm empty hide">
       </div>
 
@@ -64,10 +70,16 @@
             </li>
             <li>
                 <a id="display-bam-url-item" href="#">Enter URL for BAM</a>
+            </li>
+            <li role="presentation" class="divider"></li>
+
+            <li class="disabled" style="text-align: center;color: grey;font-size: 12px;font-style: italic;">  
+              Sample Datasets
             </li>    
             <li>
                 <a id="display-platinum-bam-url-item" href="#">Platinum Trio</a>
             </li>    
+             <li role="presentation" class="divider"></li>
            <li>
                 <a id="clear-bam" href="javascript:void(0)">Clear</a>
             </li>  
@@ -77,7 +89,7 @@
     
 
     <div style="display:table-cell;width:100%;vertical-align:middle;">
-        <input  id="bam-url-input" type="text" class="form-control input-sm" value="" placeholder="http://..."/>
+        <input  id="bam-url-input" type="text" class="form-control input-sm hide" value="" placeholder="http://...bam"/>
         <input id="bam-file-info" type="text" value="" readonly="" style="background-color: #FFFFFF"
         class="form-control input-sm empty hide"/>
     </div>

@@ -287,6 +287,7 @@ function loadUrlSources() {
 			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 			var panelSelector    = $(panelSelectorStr);
 			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
+			panelSelector.find('#bam-url-input').removeClass("hide");
 			dataCard.onBamUrlEntered(panelSelector);
 		});
 	}
@@ -297,6 +298,7 @@ function loadUrlSources() {
 			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 			var panelSelector    = $(panelSelectorStr);
 			panelSelector.find('#url-input').val(vcf[urlParameter]);
+			panelSelector.find('#url-input').removeClass("hide");
 			dataCard.onVcfUrlEntered(panelSelector);
 		});
 	}

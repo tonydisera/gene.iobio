@@ -22,6 +22,12 @@ body {
   visibility: hidden !important;
 }
 
+.dropdown-menu .divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
 
 .tlypageguide_shadow {
   background-color: rgba(255, 255, 255, 0);

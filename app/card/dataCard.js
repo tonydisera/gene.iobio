@@ -160,6 +160,9 @@ DataCard.prototype.displayBamUrlBox = function(panelSelector) {
     panelSelector.find('#bam-url-input').removeClass("hide");
     panelSelector.find("#bam-url-input").focus();
 
+    // Blank out the URL
+	panelSelector.find("#bam-url-input").val("");
+
     var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
@@ -212,7 +215,9 @@ DataCard.prototype.displayUrlBox = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	
+	// Blank out the URL
+	panelSelector.find("#url-input").val("");
+
 	panelSelector.find("#url-input").removeClass('hide');
     panelSelector.find("#url-input").focus();
     panelSelector.find('#vcf-file-info').addClass('hide');
