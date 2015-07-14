@@ -472,15 +472,6 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 
 }
 
-VariantCard.prototype.isValidVcf = function() {
-	var me = this;
-	this.discoverVcfRefName( function() {
-		me.vcf.getSamples(me.getVcfRefName(window.gene.chr), window.gene.start, window.gene.end, function(samples) {
-			console.log(samples);
-		});
-	});
-}
-
 
 VariantCard.prototype.discoverVcfRefName = function(callback) {
 	var me = this;
@@ -786,6 +777,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.cardSelector.find('#fb-chart-label').addClass("hide");
 	this.cardSelector.find('#fb-separator').addClass("hide");
 	this.d3CardSelector.select('#fb-variants svg').remove();
+	this.cardSelector.find("#multiple-sample-warning").addClass("hide");
 
 	if (this.isViewable()) {
 		filterCard.clearFilters();
@@ -817,6 +809,10 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 		$("#feature-matrix").addClass("hide");
 		$("#feature-matrix-note").addClass("hide");
+
+		this.cardSelector.find(".vcfloader").removeClass("hide");
+		this.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")
+
 
 
 		// Load the read coverage and variant charts.  If a bam hasn't been
@@ -1120,6 +1116,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 	} else {
 
 		if (this.isViewable()) {
+			me.cardSelector.find(".vcfloader").removeClass("hide");
 		    this.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using snpEff");
 		}
 
@@ -1129,7 +1126,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		this.discoverVcfRefName( function() {
 
 			me.cardSelector.find('#vcf-variants').css("display", "none");
-			me.cardSelector.find(".vcfloader").removeClass("hide");
+			
 
 
 			me.vcf.getVariants(me.getVcfRefName(window.gene.chr), 
@@ -1310,6 +1307,12 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
     $('#filter-and-rank-card').removeClass("hide");
     $('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
+
+    if (data.sampleCount && data.sampleCount > 1) {
+    	this.cardSelector.find("#multiple-sample-warning").removeClass("hide");
+    } else {
+    	this.cardSelector.find("#multiple-sample-warning").addClass("hide");
+    }
     
 	    
    	this.d3CardSelector.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
@@ -1884,12 +1887,13 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 	var vcfDataFiltered = {	count: data.count,
 							countMatch: data.countMatch,
 							countUnique: data.countUnique,
+							sampleCount : data.sampleCount,
 							end: regionEnd,
 							features: filteredFeatures,
 							maxLevel: maxLevel + 1,
 							name: data.name,
 							start: regionStart,
-							strand: data.strand,
+							strand: data.strand,							
 							variantRegionStart: regionStart
 						};
 	return vcfDataFiltered;
