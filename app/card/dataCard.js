@@ -103,6 +103,8 @@ DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {
 
 	panelSelector.find('#bam-url-input').addClass('hide');
 	panelSelector.find('#bam-url-input').val('');
+
+	window.disableLoadButton();
 }
 
 DataCard.prototype.onBamFilesSelected = function(event, panelSelector) {
@@ -255,6 +257,8 @@ DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
 
 	panelSelector.find('#url-input').addClass('hide');
 	panelSelector.find('#url-input').val('');
+
+	window.disableLoadButton();
 }
 
 DataCard.prototype.onVcfFilesSelected = function(event, panelSelector) {
