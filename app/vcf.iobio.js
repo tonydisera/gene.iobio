@@ -1200,7 +1200,7 @@ var effectCategories = [
             var keepAlt = false;
             var gtIndex = 0;
             genotypeForSample = genotypes[gtIndex];
-            gentotypeDepthForSample = genotypeDepths[gtIndex];
+            genotypeDepthForSample = genotypeDepths[gtIndex];
 
             if (genotypeForSample) {
               var delim = null;
