@@ -549,10 +549,11 @@ var effectCategories = [
       refFile = "./data/references_hg19/" + refName + ".fa";
     } else {
       refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }       
+    }    
     
     // TODO - Need to generalize to grab reference names for species instead of hardcoding
     var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
+
 
     // normalize variants
     var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(contigAppenderUrl));
@@ -572,8 +573,6 @@ var effectCategories = [
       //url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vtUrl));
       url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
     }
-
-    console.log(url);
 
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
@@ -919,11 +918,9 @@ var effectCategories = [
   // NEW
   exports.getSamples = function(refName, callback) {
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteSamples(refName, function(samples) {
-        callback(samples);
-      });
+      this._getRemoteSamples(refName, callback);     
     } else {
-      this._getLocalSamples(refName, regionStrand);
+      this._getLocalSamples(refName, callback);
     }
 
   }
@@ -934,7 +931,7 @@ var effectCategories = [
   exports._getRemoteSamples = function(refName, callback) {
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + '&protocol=http';
+    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + '&encoding=binary';
     var url = encodeURI(tabixUrl);
 
     // Connect to the snpEff server    
@@ -993,12 +990,12 @@ var effectCategories = [
    var me = this;
 
     var headerRecords = [];
+    var samples = [];
     vcfReader.getHeader( function(header) {
       headerRecords = header.split("\n");
       headerRecords.forEach(function(record) {
         if (record.indexOf("#CHROM") == 0) {
-          var fields = rec.split("\t");
-          var samples = [];
+          var fields = record.split("\t");
           for (var i = 9; i < fields.length; i++) {
             samples.push(fields[i]);
           }
@@ -1034,6 +1031,7 @@ var effectCategories = [
 
       var homCount = 0;
       var hetCount = 0;
+      var sampleCount = -1;
 
       var variants = [];
       variants.length = 0;
@@ -1190,6 +1188,7 @@ var effectCategories = [
             var zygosity = null;
             var phased = null;
 
+
             // For now, just grab the first sample's genotype.
             // Only keep the alt if we have a genotype that matches.
             // For example 
@@ -1199,10 +1198,15 @@ var effectCategories = [
             // A->G,C  1|2 keep A->G, keep A->C
             var keepAlt = false;
             var gtIndex = 0;
+            if (sampleCount == -1) {
+              sampleCount = genotypes.length;
+            }
             genotypeForSample = genotypes[gtIndex];
             genotypeDepthForSample = genotypeDepths[gtIndex];
 
-            if (genotypeForSample) {
+            if (genotypeForSample == null) {
+              keepAlt = true;
+            } else {
               var delim = null;
               if (genotypeForSample.indexOf("|") > 0) {
                 delim = "|";
@@ -1285,30 +1289,11 @@ var effectCategories = [
 
       });
 
-      // Sort variants by start ascending, end descending
-      /*
-      variants = variants.sort(function(a,b) {
-        if ( a.start < b.start ) {
-          return -1;
-        } else if (a.start > b.start) {
-          return 1;
-        } else {
-          if (a.end < b.end) {
-            return 1;
-          } else if (a.end > b.end) {
-            return -1;
-          } else {
-            return 0;
-          }
-        }
-      });
-      */      
-
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
       var results = {'start': +regionStart, 'end': +regionEnd, 'strand': regionStrand, 
         'variantRegionStart': variantRegionStart, 'name': 'vcf track', 
-        'homCount': homCount, 'hetCount': hetCount,
+        'homCount': homCount, 'hetCount': hetCount, 'sampleCount' : sampleCount,
         'features': variants};
 
       return results;
