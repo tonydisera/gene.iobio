@@ -25,24 +25,26 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {}
 
-/*      
-      this.iobio.coverage = "ws://coverage.iobio.io";
-      this.iobio.bamtools = "ws://bamtools.iobio.io";
-      this.iobio.samtools = "ws://samtools.iobio.io";
-      this.iobio.bamReadDepther = "ws://bamReadDepther.iobio.io";
-      this.iobio.bamMerger = "ws://bammerger.iobio.io";      
-      this.iobio.bamstatsAlive = "ws://bamstatsalive.iobio.io"
-      this.iobio.freebayes = "ws://freebayes.iobio.io";
-      this.iobio.bcftools = "ws://bcftools.iobio.io";
-      this.iobio.vcflib = "ws://vcflib.iobio.io";
-      this.iobio.vt = "ws://vt.iobio.io";
-*/
-
-      this.iobio.samtools = "ws://samtools.iobio.io";
       
+      this.iobio.coverage = "wss://coverage.iobio.io";
+      this.iobio.bamtools = "wss://bamtools.iobio.io";
+      this.iobio.samtools = "wss://samtools.iobio.io";
+      this.iobio.bamReadDepther = "wss://bamReadDepther.iobio.io";
+      this.iobio.bamMerger = "wss://bammerger.iobio.io";      
+      this.iobio.bamstatsAlive = "wss://bamstatsalive.iobio.io"
+      this.iobio.freebayes = "wss://freebayes.iobio.io";
+      this.iobio.bcftools = "wss://bcftools.iobio.io";
+      this.iobio.vcflib = "wss://vcflib.iobio.io";
+      this.iobio.vt = "wss://vt.iobio.io";
+
+
+
+//      this.iobio.samtools = "ws://samtools.iobio.io";
+  
+  /*    
       this.iobio.coverage = "wss://nv-blue.iobio.io/coverage";
       this.iobio.bamtools = "wss://nv-blue.iobio.io/bamtools";
-      //this.iobio.samtools = "wss://nv-blue.iobio.io/samtools";
+      this.iobio.samtools = "wss://nv-blue.iobio.io/samtools";
       this.iobio.bamReadDepther = "wss://nv-blue.iobio.io/bamReadDepther";
       this.iobio.bamMerger = "wss://nv-blue.iobio.io/bammerger";      
       this.iobio.bamstatsAlive = "wss://nv-blue.iobio.io/bamstatsalive"
@@ -51,7 +53,7 @@ var Bam = Class.extend({
       this.iobio.vcflib = "wss://nv-blue.iobio.io/vcflib";
       this.iobio.vt = "wss://nv-blue.iobio.io/vt";
 
-      
+    */  
 
 //      this.iobio.bamtools = "ws://localhost:8061";
 //     this.iobio.samtools = "ws://localhost:8060";
