@@ -514,13 +514,40 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 	
 };
 
+MatrixCard.prototype.getSymbol = function(d,i) {
+	 
+};
+
 MatrixCard.prototype.showImpactSymbol = function(selection) {
-	selection.append("g")
-	         .attr("transform", "translate(9,9)")
-	         .append("rect")
-	         .attr("width", 10)
-	         .attr("height", 10)
-	         .attr("class", "filter-symbol " + selection.datum().clazz)
-	         .style("pointer-events", "none");
+	var me = this;
+	var type = d3.select(selection.node().parentNode).datum().type;
+	if (type == 'snp') {
+		selection.append("g")
+		         .attr("transform", "translate(9,9)")
+		         .append("rect")
+		         .attr("width", 10)
+		         .attr("height", 10)
+		         .attr("class", "filter-symbol " + selection.datum().clazz)
+		         .style("pointer-events", "none");		
+	} else {
+		selection
+		  .append("g")
+		  .attr("transform", "translate(14,14)")
+		  .append('path')
+          .attr("d", function(d,i) { 
+          	return d3.svg
+                     .symbol()
+                     .type( function(d,i) {
+                     	if (type.toUpperCase() == 'DEL') {
+						    return 'triangle-up';
+						} else if (type.toUpperCase() == 'INS') {
+						    return  'circle';
+						} else if (type.toUpperCase() == 'COMPLEX') {
+						    return 'diamond';
+						}
+                     })();
+          })
+          .attr("class", "filter-symbol " + selection.datum().clazz);
+	}
 
 }
