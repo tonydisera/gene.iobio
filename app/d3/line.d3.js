@@ -54,7 +54,7 @@ lineD3 = function module() {
       var invertedy = y.invert(mousey); 
 
       if (theDepth == null) {
-        theDepth = "approx " + depthy.toString();
+        theDepth = depthy.toString();
       }
       var circleText = formatCircleText(posx, theDepth);
       if (debug) {
