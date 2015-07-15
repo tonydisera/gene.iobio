@@ -38,13 +38,11 @@ var Bam = Class.extend({
       this.iobio.vt = "ws://vt.iobio.io";
 */
 
-     
-
+      this.iobio.samtools = "ws://samtools.iobio.io";
+      
       this.iobio.coverage = "wss://nv-blue.iobio.io/coverage";
       this.iobio.bamtools = "wss://nv-blue.iobio.io/bamtools";
-      
-      this.iobio.samtools = "wss://nv-blue.iobio.io/samtools";
-      
+      //this.iobio.samtools = "wss://nv-blue.iobio.io/samtools";
       this.iobio.bamReadDepther = "wss://nv-blue.iobio.io/bamReadDepther";
       this.iobio.bamMerger = "wss://nv-blue.iobio.io/bammerger";      
       this.iobio.bamstatsAlive = "wss://nv-blue.iobio.io/bamstatsalive"
