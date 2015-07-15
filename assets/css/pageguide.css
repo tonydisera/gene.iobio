@@ -264,12 +264,12 @@
 .customPageGuideWelcome button,
 .tlyPageGuideWelcome button,
 #tlyPageGuideWelcome button {
-  background: rgba(255, 233, 143, 0.95);
+  background: rgba(132, 170, 181, 0.95);
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  color: rgb(132,132,132);
+  color: white;
   font-size: 22px;
   border: 0;
   overflow: hidden;
