@@ -85,6 +85,7 @@ vcfiobio = function module() {
   var contigAppenderServer   = "ws://ctgapndr.iobio.io";
 */
 
+  //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
   
   var vcfstatsAliveServer    = "wss://nv-blue.iobio.io/vcfstatsalive";
   var tabixServer            = "wss://nv-blue.iobio.io/tabix";
@@ -562,18 +563,9 @@ var effectCategories = [
     // get allele frequencies from 1000G and ExAC
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
-    var url = null;
-    if (afMax) {
-      //var filterString = "'(AF<0.001)'";
-      //filterString = "'((AF>" + afMin + ")&(AF<" + afMax + "))'";
-      filterString = "'(AF<" + afMax + ")'";
-      var snpSiftUrl = encodeURI(snpSiftServer + '?cmd=filter -f - ' +  filterString + ' ' + encodeURIComponent(afUrl));
-      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(snpSiftUrl));
-    } else {
-      //url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vtUrl));
-      url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
-    }
-
+    //var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vtUrl));
+    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
+    
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
     
@@ -842,19 +834,22 @@ var effectCategories = [
       // open connection to iobio webservice that will request this data, since connections can only be opened from browser
       var me = this;
       var connectionID = this._makeid();
-      var clientSnpEff = BinaryClient(snpEffServer + '?id=', {'connectionID' : connectionID} );
-      clientSnpEff.on('open', function(stream){
-        var stream = clientSnpEff.createStream({event:'setID', 'connectionID':connectionID});
+      //var clientSnpEff = BinaryClient(snpEffServer + '?id=', {'connectionID' : connectionID} );
+      var clientContig = BinaryClient(contigAppenderServer + '?id=', {'connectionID' : connectionID} );
+      clientContig.on('open', function(stream){
+        var stream = clientContig.createStream({event:'setID', 'connectionID':connectionID});
         stream.end();
       })
 
       
-      var snpEffUrl = encodeURI( snpEffServer + "?protocol=websocket&cmd=" + encodeURIComponent("http://client?&id="+connectionID));
+      //var snpEffUrl = encodeURI( snpEffServer + "?protocol=websocket&cmd=" + encodeURIComponent("http://client?&id="+connectionID));
+      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client?&id="+connectionID));
 
       //
       // stream the vcf records to snpEffClient
       //
-      clientSnpEff.on("stream", function(stream) {
+      //clientSnpEff.on("stream", function(stream) {
+      clientContig.on("stream", function(stream) {
 
         records.forEach( function(record) {
           stream.write(record + "\n");
@@ -864,7 +859,8 @@ var effectCategories = [
 
       });
       
-      clientSnpEff.on("error", function(error) {
+//      clientSnpEff.on("error", function(error) {
+      clientContig.on("error", function(error) {
         console.log("error while streaming vcf records " + error);
       });
 
@@ -875,19 +871,21 @@ var effectCategories = [
         refFile = "./data/references/hs_ref_chr" + refName + ".fa";
       }       
       // TODO - Need to generalize to grab reference names for species instead of hardcoding
-      var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(snpEffUrl));
+      //var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(snpEffUrl));
 
       // Normalize the variants (e.g. AAA->AAG becomes A->AG)
       var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(contigAppenderUrl) );
       //var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(snpEffUrl) );
-
+      
       // Get Allele Frequencies from 1000G and ExAC
       var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
-      var client = BinaryClient(afServer);
+      var snpEffUrl = encodeURI( snpEffServer + "?cmd= " + encodeURIComponent(afUrl));
+
+      var client = BinaryClient(snpEffServer);
       var buffer = "";
       client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':afUrl}});
+        var stream = client.createStream({event:'run', params : {'url':snpEffUrl}});
         
         
         //
