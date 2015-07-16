@@ -789,10 +789,10 @@ var effectCategories = [
             if (sumData.result == null) {
               if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
                 sumData.esummaryresult.forEach( function(message) {
-                  console.log(message);
+                  //console.log(message);
                 });
               }
-              console.log("No data returned from clinvar request " + summaryUrl);
+              //console.log("No data returned from clinvar request " + summaryUrl);
               sumData.result = {uids: []};
               callback(sumData.result );
               if (isFinal) {
@@ -904,7 +904,7 @@ var effectCategories = [
       });
       
       client.on("error", function(error) {
-        console.log("error while running af server " + error);
+        console.log("error while annotating vcf records " + error);
       });
   }
 

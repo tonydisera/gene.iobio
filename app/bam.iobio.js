@@ -714,9 +714,6 @@ var Bam = Class.extend({
                       }
                     }
                   });
-                  console.log("first point " + coverageForRegion[0][0]);
-                  console.log("last point " + coverageForRegion[coverageForRegion.length-1][0]);
-                  console.log(coverageForRegion.length);
                   callback(coverageForRegion, coverageForPoints);
 
                 } else {
