@@ -1235,13 +1235,27 @@ VariantCard.prototype.determineVariantAfLevels = function(theVcfData) {
 
 VariantCard.prototype._pileupVariants = function(theChart, features, start, end) {
 	var me = this;
+	var theFeatures = null;
 	features.forEach(function(v) {
 		v.level = 0;
 	});
 
+	if (theChart == this.vcfChart) {
+		// ignore fb variants in pileup
+		theFeatures = features.filter( function(variant) {
+			if (variant.fbCalled != null && variant.fbCalled == 'Y') {
+				return false;
+			} else {
+				return true;
+			}
+		})
+	} else {
+		theFeatures = features;
+	}
+
 	theChart.lowestWidth(4);
 	var posToPixelFactor = Math.round((end - start) / this.vcfChart.width());
-	var maxLevel = this.vcf.pileupVcfRecords(features, window.gene.start, posToPixelFactor, this.vcfChart.lowestWidth() + 1);
+	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, this.vcfChart.lowestWidth() + 1);
 
 
 	if ( maxLevel > 30) {
@@ -1262,7 +1276,7 @@ VariantCard.prototype._pileupVariants = function(theChart, features, start, end)
 		  		v.level = 0;
 			});
 			var factor = posToPixelFactor / (i * 2);
-			maxLevel = me.vcf.pileupVcfRecords(features, start, factor, theChart.lowestWidth() + 1);
+			maxLevel = me.vcf.pileupVcfRecords(theFeatures, start, factor, theChart.lowestWidth() + 1);
 			if (maxLevel <= 50) {
 				i = posToPixelFactor;
 				break;
