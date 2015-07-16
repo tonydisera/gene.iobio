@@ -1278,6 +1278,10 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 		bypassFeatureMatrix = false;
 	}
 
+	if (data == null || data.features == null) {
+		return;
+	}
+
 
 	$('#vcf-legend').css("display", "block");		
 	this.cardSelector.find('#vcf-chart-label').removeClass("hide");		
