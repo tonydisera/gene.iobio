@@ -66,7 +66,7 @@
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  border-left: 1px solid rgb(132,132,132);
+  border-left: 1px solid #fff;
   display: block;
   height: 33px;
   line-height: 16px;
@@ -124,12 +124,12 @@
   overflow-y: auto;
 }
 #tlyPageGuideWrapper #tlyPageGuideMessages span {
-  background: rgba(255, 233, 143, 0.95);
+  background: rgba(240, 103, 103, 0.95);
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  color: rgb(132,132,132);
+  color: #fff;
   display: block;
   font-size: 32px;
   height: 46px;
@@ -148,18 +148,18 @@
   position: relative;
 }
 #tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_text a {
-  color: rgb(132,132,132);
+  color: #fff;
 }
 #tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_text a:hover {
-  color: rgb(132,132,132);
+  color: #fff;
 }
 #tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_close {
-  background: rgb(255, 236, 159);
+  background: rgb(240, 103, 103);
   -webkit-border-radius: 0 0 3px 3px;
   -moz-border-radius: 0 0 3px 3px;
   -o-border-radius: 0 0 3px 3px;
   border-radius: 0 0 3px 3px;
-  color: rgb(132,132,132);
+  color: #fff;
   display: block;
   font-size: 11px;
   height: 24px;
@@ -202,8 +202,8 @@
   -moz-box-shadow: 6px 4px 5px 0 rgba(0, 0, 0, 0.4);
   -o-box-shadow: 6px 4px 5px 0 rgba(0, 0, 0, 0.4);
   box-shadow: 6px 4px 5px 0 rgba(0, 0, 0, 0.4);
-  background: rgba(255, 233, 143, 0.9);
-  color: rgb(132,132,132);
+  background: rgba(240, 103, 103, 0.9);
+  color: #fff;
   right: 0 !important;
 }
 .tlypageguide-open #tlyPageGuideWrapper .tlypageguide_toggle.tlyPageGuideToggleActive a {
@@ -236,7 +236,7 @@
   max-height: 80%;
   background: rgba(0, 0, 0, 0.85);
   padding: 15px 20px;
-  color: rgb(132,132,132);
+  color: #fff;
   font-size: 16px;
   line-height: 22px;
   -webkit-box-shadow: 0 0 9px 4px rgba(0, 0, 0, 0.4);
@@ -264,7 +264,7 @@
 .customPageGuideWelcome button,
 .tlyPageGuideWelcome button,
 #tlyPageGuideWelcome button {
-  background: rgba(132, 170, 181, 0.95);
+  background: rgba(240, 103, 103, 0.95);
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -o-border-radius: 3px;
@@ -285,7 +285,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgb(132,132,132);
+  background: #fff;
   z-index: 9998;
   filter: alpha(opacity=0);
   -moz-opacity: 0;
@@ -315,7 +315,7 @@
 .tlypageguide_shadow {
   position: absolute;
   display: none;
-  background-color: rgba(255, 233, 143, 0.1);
+  background-color: rgba(240, 103, 103, 0.1);
   -webkit-box-shadow: 0 0 1px 1px rgba(147, 0, 119, 0.25);
   -moz-box-shadow: 0 0 1px 1px rgba(147, 0, 119, 0.25);
   -o-box-shadow: 0 0 1px 1px rgba(147, 0, 119, 0.25);
@@ -323,7 +323,7 @@
   pointer-events: none;
 }
 .tlyPageGuideStepIndex {
-  background: rgba(255, 233, 143, 0.1);
+  background: rgba(240, 103, 103, 0.1);
   -webkit-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
   -o-box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.2);
@@ -347,7 +347,7 @@
   min-height: 15px;
   max-height: 46px;
   pointer-events: all;
-  color: rgb(132,132,132);
+  color: #fff;
   font-size: 32px;
   text-decoration: none;
   width: 50px;
@@ -372,7 +372,7 @@
   bottom: -65px;
 }
 .tlyPageGuideStepIndex.tlypageguide_bottom:after {
-  border-bottom: 15px solid rgba(255, 233, 143, 0.1);
+  border-bottom: 15px solid rgba(240, 103, 103, 0.1);
   border-right: 15px solid transparent;
   left: 0;
   top: -15px;
@@ -381,7 +381,7 @@
   right: -65px;
 }
 .tlyPageGuideStepIndex.tlypageguide_right:after {
-  border-top: 15px solid rgba(255, 233, 143, 0.1);
+  border-top: 15px solid rgba(240, 103, 103, 0.1);
   border-left: 15px solid transparent;
   left: -15px;
   top: 0;
@@ -390,7 +390,7 @@
   left: -65px;
 }
 .tlyPageGuideStepIndex.tlypageguide_left:after {
-  border-top: 15px solid rgba(255, 233, 143, 0.1);
+  border-top: 15px solid rgba(240, 103, 103, 0.1);
   border-right: 15px solid transparent;
   right: -15px;
   top: 0;
@@ -399,30 +399,30 @@
   top: -60px;
 }
 .tlyPageGuideStepIndex.tlypageguide_top:after {
-  border-top: 15px solid rgba(255, 233, 143, 0.1);
+  border-top: 15px solid rgba(240, 103, 103, 0.1);
   border-right: 15px solid transparent;
   bottom: -15px;
   left: 0;
 }
 .tlyPageGuideStepIndex:hover {
-  background: rgba(255, 233, 143, 0.95);
+  background: rgba(240, 103, 103, 0.95);
 }
 .tlyPageGuideStepIndex:hover.tlypageguide_bottom:after {
-  border-bottom: 15px solid rgba(255, 233, 143, 0.95);
+  border-bottom: 15px solid rgba(240, 103, 103, 0.95);
 }
 .tlyPageGuideStepIndex:hover.tlypageguide_right:after,
 .tlyPageGuideStepIndex:hover.tlypageguide_left:after,
 .tlyPageGuideStepIndex:hover.tlypageguide_top:after {
-  border-top: 15px solid rgba(255, 233, 143, 0.95);
+  border-top: 15px solid rgba(240, 103, 103, 0.95);
 }
 .tlypageguide-active .tlyPageGuideStepIndex {
-  background: rgba(255, 233, 143, 0.95);
+  background: rgba(240, 103, 103, 0.95);
 }
 .tlypageguide-active .tlyPageGuideStepIndex.tlypageguide_bottom:after {
-  border-bottom: 15px solid rgba(255, 233, 143, 0.95);
+  border-bottom: 15px solid rgba(240, 103, 103, 0.95);
 }
 .tlypageguide-active .tlyPageGuideStepIndex.tlypageguide_right:after,
 .tlypageguide-active .tlyPageGuideStepIndex.tlypageguide_left:after,
 .tlypageguide-active .tlyPageGuideStepIndex.tlypageguide_top:after {
-  border-top: 15px solid rgba(255, 233, 143, 0.95);
+  border-top: 15px solid rgba(240, 103, 103, 0.95);
 }

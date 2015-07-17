@@ -99,7 +99,7 @@
            <a href="javascript:void(0)" class="open_page_guide" 
               style="float: left;margin-top: 20px;margin-left: 10px;">
              <i class="mdi-maps-directions"></i>
-             Start tour
+             Tour
            </a>                
                 <!-- gene list dropdown button -->
                 <!--
@@ -466,22 +466,30 @@
 
       <div id="other-variant-cards">
       </div>
-
-
+ 
     </div>
 
 
 <div id="tourWelcome" class="customPageGuideWelcome">
+  <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
+        float: right;
+        background-color: transparent !important;
+        font-size: 17px;
+        margin-top: -10px;
+    ">X</button>
+
   <h3>Welcome to gene.iobio</h3>
   <p>An app for interrogating disease-causing variants</p>
   <div class="modal-button-container">
-            <button class="open_page_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_start">Start Tour</button>
-            <button class="getting_started_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore">Show Guide</button>
-            <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore">Close</button>
+            <button class="open_page_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_start">Tour</button>
+            <button class="screencast" onclick="$('#tourWelcome').removeClass('open');window.open('screencast.html','_screencast');" class="tlypageguide_ignore">Screencast</button>
+            <button class="use_cases" onclick="$('#tourWelcome').removeClass('open');window.open('usecases.html','_usecases');" class="tlypageguide_ignore">Use Cases</button>
+          
   </div>
 </div>
 
  
+
 
 <div id="tourPanelWrapper" class="hide">
   <div id="tourPanel"> 
