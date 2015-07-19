@@ -164,7 +164,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .showBrush(true)
 				    .trackHeight(16)
 				    .cdsHeight(12)
-		    		.showLabel(false)
+		    		.showLabel(false);
+		    		/*
 					.on("d3brush", function(brush) {
 				    	if (!brush.empty()) {
 							regionStart = d3.round(brush.extent()[0]);
@@ -182,8 +183,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						if (me.getRelationship() == 'proband') {
 							me.fillFeatureMatrix(regionStart, regionEnd);
 						}
-
 					});	
+                    */
 
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
