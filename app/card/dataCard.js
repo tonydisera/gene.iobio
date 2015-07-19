@@ -1,4 +1,9 @@
 function DataCard() {
+	this.defaultNames = {
+		proband: 'NA12878',
+		mother:  'NA12892',
+		father:  'NA12891'
+	};
 	this.defaultUrls = {
 		proband: 'http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz',
 		mother:  'http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz',
@@ -233,6 +238,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
 	var variantCard = variantCards[+cardIndex];
 	
 	panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
+	panelSelector.find('#datasource-name').val(this.defaultNames[variantCard.getRelationship()]);
 	panelSelector.find("#url-input").removeClass('hide');
     panelSelector.find("#url-input").focus();
     panelSelector.find('#vcf-file-info').addClass('hide');
