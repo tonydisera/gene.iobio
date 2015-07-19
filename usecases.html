@@ -17,7 +17,64 @@
     </a>   
   </section>
 
-<div class="container">
+<div class="container" class="shadow-z-1" style="background-color:white;margin-top:10px;">
+
+  <div class="usecases" style="width:810px; margin: 0px auto 35px auto;font-size:16px; text-align:justify;padding-top:30px;">
+    
+      <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=&vcf1=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&name2=&vcf2=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam" target="_app"><h2>Platinum Trio</h2></a><span>Here the platinum trio has been modified to show specific scenarios that can be investigated with gene.iobio. See the genes below to see each scenario.</span></li>
+        <ul style="list-style-type: none;">
+          <li><h3>RAI1</h3> 
+            <span class="inline">
+              Simple view of a <strong>recessive variant</strong>, pathogenic in clinvar. 
+              <div style="padding:5px;">
+              
+                <img src="assets/images/usecases/trio_rai1.png" width="300px" style="float:left;padding-right:10px;"/>
+                <span>Notice that the first variant in the Ranked list is categorized as Pathogenic by ClinVar.  Looking at the variants, notice that one variant shows in red, analyzed by snpEff and marked as a High Impact variant.  Hovering over the variant, notice that the Mother and Father variants are circled. Both Mother and Father variants are heterozygous.
+                </span>
+
+              </div>
+           </span>
+      </li >
+        <li style="clear:both;"><h3>MYLK2</h3>
+          <div class="inline">
+            Here a variant is given a low quality and filtered out due to being called with background samples. 
+            <img src="assets/images/usecases/trio_mylk2_a.png" width="300px" align="left"/>
+            Click <strong>'call missing variants'</strong> and this variant is discovered.
+            
+            <br style="clear:both;">
+          
+            <img src="assets/images/usecases/trio_mylk2_b.png" width="300px" align="left" style="padding-top:20px;" />
+            <div style="padding-top:20px;">
+             Note that the quality of the call is ~100 in this view since the variant was called in isolation and doesn't suffer from a background of all reference alleles. An argument for a comparison of background/individual calling and getting a good balance for rare/private variants.
+            </div>
+           
+          </div>
+
+        </li>
+        <li style="clear:both;"><h3>AIRE</h3>
+          <div class="inline" >
+            Here <strong>low coverage</strong> in the Proband is in the same region that both Mother and Father have variants.
+            <img src="assets/images/usecases/aire.png" width="300px" align="left" style="padding-top:20px;" />
+            <div class="inline" style="padding-top:20px;">You can see a het variant present in both parents, but there is a dip in the coverage at this location in the proband. Zoom in on the exon to see the low coverage. The variant is a pathogenic variant and is a het in both parents. This could be a hom alt variant in the proband leading to a recessive disorder, but due to the lack of coverage, we cannot make the call.
+            </div>
+            </div>
+        </li>
+        <li style="clear:both;"><h3>PDGFB</h3>
+          <div class="inline">This is a deletion that is intronic in the canonical transcript. 
+            From the transcript drop-down menu, <strong>select the third transcript (ENST00000381551.4).</strong> 
+            <br>
+            <img src="assets/images/usecases/pdgfb_a.png" width="600px" align="center" style="padding-top:20px;padding-bottom:20px;" />
+            <br>
+
+            <span>This transcript has an additional exon in which the deletion now falls and is upgraded from a modifier intron variant to a high impact frameshift variant.</span>
+            <br>
+            <img src="assets/images/usecases/pdgfb_b.png" width="800px" align="center" style="padding-top:20px;" />
+
+          </div>
+        </li>  
+        </ul>
+  
+  </div>
 </div>
 
 </div>
