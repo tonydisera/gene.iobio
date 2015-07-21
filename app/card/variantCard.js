@@ -2088,24 +2088,20 @@ VariantCard.prototype.variantTooltipHTML = function(variant) {
 		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
 	}
 
-	var coverage = variant.bamDepth != null && variant.bamDepth != '' ? variant.bamDepth.toString() : null;
-	var coverageReported = variant.genotypeDepth != null && variant.genotypeDepth != '' ? variant.genotypeDepth : null;
-	if (coverage && coverageReported) {
-		if (coverage != coverageReported) {
-			coverage = coverage + ' (computed)      ' + coverageReported + ' (reported)';
-		}
-	} else if (coverage) {
-		coverage = coverage + ' (computed)';
-
-	} else if (coverageReported) {
-		coverage = coverageReported + ' (reported)';
-	}
 
 	var zygosity = "";
 	if (variant.zygosity.toLowerCase() == 'het') {
 		zygosity = "Heterozygous";
 	} else if (variant.zygosity.toLowerCase() == 'hom') {
 		zygosity = "Homozygous";
+	}
+
+	var bamDepth = null;
+	var vcfDepth = null;
+	if (variant.bamDepth != null && variant.bamDepth != '') {
+		bamDepth = variant.bamDepth.toString();
+	} else if (variant.genotypeDepth != null && variant.genotypeDepth != '') {
+		vcfDepth = variant.genotypeDepth.toString();
 	}
 	
 	
@@ -2129,7 +2125,8 @@ VariantCard.prototype.variantTooltipHTML = function(variant) {
 		+ me.tooltipRow('Qual', variant.qual, (variant.qual || variant.filter ? "3px" : "")) 
 		+ me.tooltipRow('Filter', variant.filter) 
 
-		+ me.tooltipRow('Coverage', coverage, "3px") 
+		+ me.tooltipRow('Coverage (alignments)', bamDepth, "3px") 
+		+ me.tooltipRow('Coverage (variants)', vcfDepth, "3px") 
 
 		//+ tooltipRow('GMAF', variant.gMaf)
 		+ me.tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "3px", true)
@@ -2188,8 +2185,8 @@ VariantCard.prototype.tooltipRow = function(label, value, paddingTop, alwaysShow
 	if (alwaysShow || (value && value != '')) {
 		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
 		return '<div class="row"' + style + '>'
-		      + '<div class="col-md-4" style="text-align:right">' + label + '</div>'
-		      + '<div class="col-md-8">' + value.toLowerCase() + '</div>'
+		      + '<div class="col-md-5" style="text-align:right">' + label + '</div>'
+		      + '<div class="col-md-7">' + value.toLowerCase() + '</div>'
 		      + '</div>';
 	} else {
 		return "";
