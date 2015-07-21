@@ -329,9 +329,24 @@ function featureMatrixD3() {
       g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  
               var colObject = d3.select(this.parentNode.parentNode).datum();
-              dispatch.d3mouseover(colObject ); 
+
+              var column = d3.select(this.parentNode.parentNode);
+              column.classed("active", true);
+
+              // Get screen coordinates of column.  We will use this to position the
+              // tooltip above the column.
+              var matrix = column.node()
+                         .getScreenCTM()
+                         .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
+              colObject.screenX = window.pageXOffset + matrix.e + margin.left;
+              colObject.screenY = window.pageYOffset + matrix.f + margin.top;
+
+              dispatch.d3mouseover(colObject); 
             })                  
-           .on("mouseout", function(d) {       
+           .on("mouseout", function(d) {      
+              var column = d3.select(this.parentNode.parentNode);
+              column.classed("active", false);
+
               dispatch.d3mouseout(); 
             })
             .on("click", function(d, i) {                

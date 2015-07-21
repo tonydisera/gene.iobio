@@ -705,7 +705,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	});
    
 
-    if (d3.event.pageX < w) {
+    if (x < w) {
       tooltip.style("width", w + "px")
              .style("left", x + "px") 
              .style("text-align", 'left')    
@@ -1033,14 +1033,7 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 			}
 		});
 		
-		// DEPRECATED CODE TO BE REPLACED WITH CALLS TO COVERAGE.IOBIO
-		/*
-		me.bam.getCoverageForRegionChunkedDEPRECATED(refName, window.gene.start, window.gene.end, 5000, 
-	 	  function(coverageForRegion) {
-	 	  	me.bamData = coverageForRegion;
-	 	  	showCoverage();
-		}); */
-
+		
 	}
 
 
@@ -1112,7 +1105,8 @@ VariantCard.prototype.promiseFullFeatured = function() {
 	if (this.vcfData != null &&
 		this.vcfData.features != null &&
 		this.vcfData.loadState != null &&
-		this.vcfData.loadState['clinvar'] == true) {
+		this.vcfData.loadState['clinvar'] == true &&
+		(!this.isBamLoaded() || this.vcfData.loadState['coverage'] == true)) {
 		
 		// If the variants have been loaded and annotated with clinvar, and the inheritance
 		// mode has been determined, show the feature matrix.
@@ -2043,7 +2037,7 @@ VariantCard.prototype.getWidthFactor = function(regionStart, regionEnd) {
 }
 
 
-VariantCard.prototype.variantTooltipHTML = function(variant) {
+VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	var me = this;
 
 	var effectDisplay = "";
@@ -2131,7 +2125,7 @@ VariantCard.prototype.variantTooltipHTML = function(variant) {
 		//+ tooltipRow('GMAF', variant.gMaf)
 		+ me.tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "3px", true)
 		+ me.tooltipRow('AF 1000G', variant.af1000G, null, true)
-		+ me.unpinRow()
+		+ me.unpinRow(pinMessage)
 	);                    
 
 }
@@ -2156,7 +2150,10 @@ VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
 }
 
 
-VariantCard.prototype.unpinRow = function() {
+VariantCard.prototype.unpinRow = function(pinMessage) {
+	if (pinMessage == null) {
+		pinMessage = 'Click on variant to lock tooltip';
+	}
 	if (window.clickedVariant) {
 		return '<div style="text-align:right">'
 			      + '<a  id="unpin" href="javascript:void(0)">unlock</a>'
@@ -2164,7 +2161,7 @@ VariantCard.prototype.unpinRow = function() {
 
 	} else {
 		return '<div style="text-align:right" >'			     
-			      + '<em>Click on variant to lock tooltip</em></div>'
+			      + '<em>' + pinMessage + '</em></div>'
 			 + '</div>';	
 	}
 }

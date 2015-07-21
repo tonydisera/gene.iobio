@@ -153,23 +153,26 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	 .duration(1000)      
 	 .style("opacity", .9);  
 
-	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant));
+	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to isolate variant"));
 
 	var h = tooltip[0][0].offsetHeight;
 	var w = 300;
 
-	if (d3.event.pageX < w) {
+	var x = variant.screenX;
+	var y = variant.screenY;
+
+	if (x < w) {
 		tooltip.style("width", w + "px")
-		       .style("left", (d3.event.pageX) + "px") 
+		       .style("left", x + "px") 
 		       .style("text-align", 'left')    
-		       .style("top", (d3.event.pageY - h) + "px");   
+		       .style("top", (y - h) + "px");   
 
 	} else {
 
 		tooltip.style("width", w + "px")
-		       .style("left", (d3.event.pageX - w) + "px") 
+		       .style("left", (x - w) + "px") 
 		       .style("text-align", 'left')    
-		       .style("top", (d3.event.pageY - h) + "px");   
+		       .style("top", (y - h) + "px");   
 	}	
 }
 

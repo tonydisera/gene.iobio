@@ -202,8 +202,14 @@ a, a:hover, a:focus {
 
 #feature-matrix rect.cellbox:hover {
   cursor: pointer;
-  font-weight: bold;
+  font-weight: bold;  
 }
+
+
+#feature-matrix .col.active rect.cellbox {
+  fill: rgb(242, 242, 242);
+}
+
 
 #feature-matrix rect.colbox {
   fill:none;
@@ -217,6 +223,8 @@ a, a:hover, a:focus {
   opacity: 1;
   pointer-events: none;
 }
+
+
 
 #feature-matrix text {
   font-size: 10px;
