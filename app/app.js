@@ -189,7 +189,8 @@ function init() {
 	 // Initialize Matrix card
 	 matrixCard = new MatrixCard();
 	 matrixCard.init();
-
+	 // Set the tooltip generator now that we have a variant card instance
+	 matrixCard.setTooltipGenerator(getProbandVariantCard().variantTooltipHTML);
 
 	 // Initialize the Filter card
 	 filterCard = new FilterCard();
@@ -200,6 +201,16 @@ function init() {
 	initTranscriptControls();
 
 	loadGeneFromUrl();
+}
+
+function getProbandVariantCard() {
+	var probandCard = null;
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.getRelationship() == 'proband') {
+			probandCard = variantCard;
+		}
+	});
+	return probandCard;
 }
 
 
@@ -767,6 +778,7 @@ function addVariantCard() {
 	if (cardIndex == 0) {
 		$('#proband-variant-card').append(variantCardTemplate());  
 		cardSelectorString = "#proband-variant-card .variant-card:eq(" + cardIndex + ")" ;
+
 	} else {
 		$('#other-variant-cards').append(variantCardTemplate());  
 		cardSelectorString = "#other-variant-cards .variant-card:eq(" + (+cardIndex - 1) + ")" ;
@@ -860,7 +872,6 @@ function showCircleRelatedVariants(variant, sourceVariantCard) {
 			variantCard.showCoverageCircle(variant, sourceVariantCard);
 		}
 	});
-
 }
 
 function hideCircleRelatedVariants() {
@@ -871,6 +882,7 @@ function hideCircleRelatedVariants() {
 		}
 	});
 }
+
 
 
 
@@ -988,124 +1000,6 @@ function compareVariantsToPedigree(callback) {
 
 
 
-
-function variantTooltipHTML(variant, rowIndex) {
-
-	var effectDisplay = "";
-	for (var key in variant.effect) {
-	if (effectDisplay.length > 0) {
-	  	effectDisplay += ", ";
-	}
-		// Strip out "_" from effect
-		var tokens = key.split("_");
-		effectDisplay += tokens.join(" ");
-	}    
-	var impactDisplay = "";
-	for (var key in variant.impact) {
-		if (impactDisplay.length > 0) {
-		  	impactDisplay += ", ";
-		}
-		impactDisplay += key;
-	} 
-	var clinSigDisplay = "";
-	for (var key in variant.clinVarClinicalSignificance) {
-		if (key != 'none') {
-			if (clinSigDisplay.length > 0) {
-			  	clinSigDisplay += ", ";
-			}
-			clinSigDisplay += key;
-		}
-	}
-	var phenotypeDisplay = "";
-	for (var key in variant.clinVarPhenotype) {
-		if (phenotypeDisplay.length > 0) {
-		  	phenotypeDisplay += ", ";
-		}
-		phenotypeDisplay += key;
-	}      
-	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
-	var coord = gene.chr + ":" + variant.start;
-	var refalt = variant.ref + "->" + variant.alt;
-
-	var clinvarUrl = "";
-	if (variant.clinVarUid != null && variant.clinVarUid != '') {
-		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
-		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
-	}
-
-	var coverage = variant.bamDepth != null && variant.bamDepth != '' ? variant.bamDepth.toString() : null;
-	var coverageReported = variant.genotypeDepth != null && variant.genotypeDepth != '' ? variant.genotypeDepth : null;
-	if (coverage && coverageReported) {
-		if (coverage != coverageReported) {
-			coverage = coverage + ' (computed)      ' + coverageReported + ' (reported)';
-		}
-	} else if (coverage) {
-		coverage = coverage + ' (computed)';
-
-	} else if (coverageReported) {
-		coverage = coverageReported + ' (reported)';
-	}
-
-	var zygosity = "";
-	if (variant.zygosity.toLowerCase() == 'het') {
-		zygosity = "Heterozygous";
-	} else if (variant.zygosity.toLowerCase() == 'hom') {
-		zygosity = "Homozygous";
-	}
-	
-	
-	return (
-		  tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord)
-
-		+ tooltipRow('Zygosity',  zygosity, "5px")
-		+ tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
-		+ tooltipRow('Genotype',  variant.genotype)
-
-		+ tooltipRow('Impact', impactDisplay, "3px")
-		+ tooltipRow('Effect', effectDisplay)
-
-		+ tooltipRow('ClinVar', clinSigDisplay, "3px")
-		+ tooltipRow('Phenotype', phenotypeDisplay)
-		+ tooltipRow('ClinVar uid', clinvarUrl )
-
-		// + tooltipRow('NCBI ID', variant.ncbiId)
-		// + tooltipRow('HGVS g', variant.hgvsG)
-
-		+ tooltipRow('Qual', variant.qual, (variant.qual || variant.filter ? "3px" : "")) 
-		+ tooltipRow('Filter', variant.filter) 
-
-		+ tooltipRow('Coverage', coverage, "3px") 
-
-		//+ tooltipRow('GMAF', variant.gMaf)
-		+ tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "3px", true)
-		+ tooltipRow('AF 1000G', variant.af1000G, null, true)
-	);                    
-
-}
-
-function tooltipBlankRow() {
-	return '<div class="row">'
-	  + '<div class="col-md-12">' + '&nbsp;' + '</div>'
-	  + '</div>';
-}
-
-function tooltipHeaderRow(value1, value2, value3) {
-	return '<div class="row">'
-	      + '<div class="col-md-12" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 + '</div>'
-	      + '</div>';	
-}
-
-function tooltipRow(label, value, paddingTop, alwaysShow) {
-	if (alwaysShow || (value && value != '')) {
-		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
-		return '<div class="row"' + style + '>'
-		      + '<div class="col-md-4" style="text-align:right">' + label + '</div>'
-		      + '<div class="col-md-8">' + value.toLowerCase() + '</div>'
-		      + '</div>';
-	} else {
-		return "";
-	}
-}
 
 
 function filterVariants() {

@@ -328,39 +328,10 @@ function featureMatrixD3() {
      
       g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  
-              var tooltip = container.select('.tooltip');
-              tooltip.transition()        
-                 .duration(1000)      
-                 .style("opacity", .9);  
-
               var colObject = d3.select(this.parentNode.parentNode).datum();
-              
-
-              tooltip.html(tooltipHTML(colObject));
-
-              var h = tooltip[0][0].offsetHeight;
-              var w = 300;
-
-              if (d3.event.pageX < w) {
-                tooltip.style("width", w + "px")
-                       .style("left", (d3.event.pageX) + "px") 
-                       .style("text-align", 'left')    
-                       .style("top", (d3.event.pageY - h) + "px");   
-
-              } else {
-
-                tooltip.style("width", w + "px")
-                       .style("left", (d3.event.pageX - w) + "px") 
-                       .style("text-align", 'left')    
-                       .style("top", (d3.event.pageY - h) + "px");   
-              }
-              
               dispatch.d3mouseover(colObject ); 
             })                  
            .on("mouseout", function(d) {       
-              container.select('.tooltip').transition()        
-                 .duration(500)      
-                 .style("opacity", 0);   
               dispatch.d3mouseout(); 
             })
             .on("click", function(d, i) {                

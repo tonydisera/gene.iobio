@@ -63,7 +63,7 @@ function variantD3() {
      }
   }
 
-  var showCircle = function(d, svgContainer, parentContainer, indicateMissingVariant, emphasize) {
+  var showCircle = function(d, svgContainer, indicateMissingVariant, emphasize) {
     // Find the matching variant
     var matchingVariant = null;
     svgContainer.selectAll(".variant").each( function (variant,i) {
@@ -91,43 +91,14 @@ function variantD3() {
 
       circle.classed("emphasize", emphasize);
 
-      if (parentContainer) {
 
-        var tooltip = parentContainer.select('.tooltip');
-        tooltip.transition()        
-               .duration(1000)      
-               .style("opacity", 0);  
+      var matrix = circle.node()
+                         .getScreenCTM()
+                         .translate(+circle.node().getAttribute("cx"),+circle.node().getAttribute("cy"));
 
-        tooltip.transition()        
-               .duration(1000)      
-               .style("opacity", .9);  
-        
-        tooltip.html(tooltipHTML(d));
+      matchingVariant.screenX = window.pageXOffset + matrix.e + margin.left;
+      matchingVariant.screenY = window.pageYOffset + matrix.f + margin.top;
 
-        var h = tooltip[0][0].offsetHeight;
-        //var w = tooltip[0][0].offsetWidth;
-        var w = 300;
-
-        if (d3.event.pageX < w) {
-          tooltip.style("width", w + "px")
-                 .style("left", (d3.event.pageX) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - h) + "px");   
-
-        } else {
-
-          tooltip.style("width", w + "px")
-                 .style("left", (d3.event.pageX - w) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - h) + "px");   
-        }
-
-        if (emphasize) {
-          tooltip.style("pointer-events", "all");
-        } else {
-          tooltip.style("pointer-events", "none");          
-        }
-      }
 
               
     } else if (indicateMissingVariant) {
@@ -723,6 +694,8 @@ function variantD3() {
     tooltipHTML = _;
     return chart;
   }
+
+
   chart.showCircle = function(_) {
     if (!arguments.length) return showCircle;
     showCircle = _;

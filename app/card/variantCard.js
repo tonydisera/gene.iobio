@@ -161,30 +161,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .width(1000)
 				    .margin({top: 20, right: 4, bottom: 0, left: 4})
 				    .showXAxis(false)
-				    .showBrush(true)
+				    .showBrush(false)
 				    .trackHeight(16)
 				    .cdsHeight(12)
 		    		.showLabel(false);
-		    		/*
-					.on("d3brush", function(brush) {
-				    	if (!brush.empty()) {
-							regionStart = d3.round(brush.extent()[0]);
-							regionEnd   = d3.round(brush.extent()[1]);
-							if (!selectedTranscript) {
-								selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
-								cacheCodingRegions();
 
-							}
-						} else {
-							regionStart = window.gene.start;
-							regionEnd   = window.gene.end;
-						}
-					    me.onBrush(brush);
-						if (me.getRelationship() == 'proband') {
-							me.fillFeatureMatrix(regionStart, regionEnd);
-						}
-					});	
-                    */
 
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
@@ -212,7 +193,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .variantHeight(6)
 				    .verticalPadding(2)
 				    .showBrush(false)
-				    .tooltipHTML(variantTooltipHTML)
+				    .tooltipHTML(this.variantTooltipHTML)
 				    .on("d3rendered", function() {
 				    	
 				    })
@@ -222,9 +203,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					    	me.showCoverageCircle(d);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
-				    		clickedVariant = null;
-							me.hideCoverageCircle();
-							window.hideCircleRelatedVariants();
+				    		me.unpin();
 				    	}
 					})			    
 				    .on('d3mouseover', function(d) {
@@ -236,10 +215,9 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					.on('d3mouseout', function() {
 						if (clickedVariant == null) {
 							me.hideCoverageCircle();
-							if (me.getRelationship() == 'proband') {
-								window.hideCircleRelatedVariants();
-							}
+							window.hideCircleRelatedVariants();
 						}
+
 					});
 
 		// The 'missing variants' chart, variants that freebayes found that were not in orginal
@@ -251,7 +229,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .variantHeight(6)
 				    .verticalPadding(2)
 				    .showBrush(false)
-				    .tooltipHTML(variantTooltipHTML)
+				    .tooltipHTML(this.variantTooltipHTML)
 				    .on("d3rendered", function() {
 				    	
 				    })	
@@ -261,23 +239,20 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					    	me.showCoverageCircle(d);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
-				    		clickedVariant = null;
-							me.hideCoverageCircle();
-							window.hideCircleRelatedVariants();
+				    		me.unpin();
 				    	}
 					})				    
 				    .on('d3mouseover', function(d) {
-				    	if (clickedVariant == null) {
+						if (clickedVariant == null) {
 					    	me.showCoverageCircle(d);
 					    	window.showCircleRelatedVariants(d, me);
 				    	}
+
 					})
 					.on('d3mouseout', function() {
-						if (clickedVariant == null) {
+						if (clickedVariant == null) {					    
 							me.hideCoverageCircle();
-							if (me.getRelationship() == 'proband') {
-								window.hideCircleRelatedVariants();
-							}
+							window.hideCircleRelatedVariants();
 						}
 					});
 					
@@ -323,6 +298,12 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 
 };
+
+VariantCard.prototype.unpin = function() {
+	clickedVariant = null;
+	this.hideCoverageCircle();
+	window.hideCircleRelatedVariants();	
+}
 
 VariantCard.prototype.onBamFilesSelected = function(event, callback) {
 	var me = this;
@@ -652,20 +633,102 @@ VariantCard.prototype.getRelationship = function() {
 }
 
 VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
+	var me = this;
 	// Check the fb called variants first.  If present, circle and don't
 	// show X for missing variant on vcf variant chart.
-	var matchingVariantFound = false;
+	var matchingVariant = null;
 	if (this.fbChart != null && this.fbData != null && this.fbData.features.length > 0) {
 		var container = this.d3CardSelector.selectAll('#fb-variants svg');
-		var parentContainer = this.d3CardSelector.selectAll('#fb-variants');
-		matchingVariantFound = this.fbChart.showCircle()(variant, container, parentContainer, false, clickedVariant != null && this == sourceVariantCard);
+		var lock = clickedVariant != null && this == sourceVariantCard;
+				
+		matchingVariant = this.fbChart.showCircle()(variant, container, false, lock);
+
+		if (matchingVariant && sourceVariantCard) {
+			var tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
+			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
+		}
+		
 	}
 	if (this.vcfChart != null) {
-		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
-		var parentContainer = this.d3CardSelector.selectAll('#vcf-variants');
-		matchingVariantFound = this.vcfChart.showCircle()(variant, container, parentContainer, !matchingVariantFound, clickedVariant != null && this == sourceVariantCard);
+		var container = this.d3CardSelector.selectAll('#vcf-variants svg');;
+		var lock = clickedVariant != null && this == sourceVariantCard;
+
+		// Only show the X for missing variant if we didn't already find the variant in
+		// the fb variants
+		var indicateMissingVariant = matchingVariant == null ? true : false;
+	
+		matchingVariant = this.vcfChart.showCircle()(variant, container, indicateMissingVariant, lock);
+
+		if (matchingVariant && sourceVariantCard) {
+			var tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
+			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
+		}
+		
 	}
 	
+}
+
+VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
+	var x;
+	var y;
+
+	if (this == sourceVariantCard) {
+		x = d3.event.pageX;
+		y = d3.event.pageY;
+	} else {
+		x = variant.screenX;
+		y = variant.screenY;
+	}
+
+
+
+	var me = this;
+	tooltip.transition()        
+       .duration(1000)      
+       .style("opacity", 0);  
+
+    tooltip.transition()        
+           .duration(1000)      
+           .style("opacity", .9);  
+
+	 var w = 300;
+	 var h = tooltip[0][0].offsetHeight;
+
+    if (this == sourceVariantCard) {
+		tooltip.html(this.variantTooltipHTML(variant));
+    } else {
+    	tooltip.html(this.variantTooltipMinimalHTML(variant));
+    	w = 150;
+    }
+	tooltip.select("#unpin").on('click', function() {
+		me.unpin();
+	});
+   
+
+    if (d3.event.pageX < w) {
+      tooltip.style("width", w + "px")
+             .style("left", x + "px") 
+             .style("text-align", 'left')    
+             .style("top", (y - h) + "px");   
+
+    } else {
+
+      tooltip.style("width", w + "px")
+             .style("left", (x - w) + "px") 
+             .style("text-align", 'left')    
+             .style("top", (y - h) + "px");   
+    }
+
+    if (lock) {
+      tooltip.style("pointer-events", "all");
+    } else {
+      tooltip.style("pointer-events", "none");          
+    }
+
+    tooltip.on('click', function() {
+		me.unpin();
+	});
+
 }
 
 VariantCard.prototype.getMatchingVariant = function(variant) {
@@ -773,6 +836,8 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.vcfData = null;
 	this.fbData = null;
 	this.bamData = null;
+	this.clickedVariant = null;
+	window.hideCircleRelatedVariants();
 
 	// Clear out the freebayes charts in the variant card
 	this.cardSelector.find('#fb-chart-label').addClass("hide");
@@ -1768,6 +1833,10 @@ VariantCard.prototype.filterFreebayesVariants = function() {
 VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 	var me = this;
 
+	this.clickedVariant = null;
+	window.hideCircleRelatedVariants();
+
+
 	me.cardSelector.find(".filter-flag").addClass("hide");
 
 	// Only hide displayed variant count if we haven't already zoomed
@@ -1971,6 +2040,160 @@ VariantCard.prototype.getWidthFactor = function(regionStart, regionEnd) {
 		}
 	});
 	return widthFactor;
+}
+
+
+VariantCard.prototype.variantTooltipHTML = function(variant) {
+	var me = this;
+
+	var effectDisplay = "";
+	for (var key in variant.effect) {
+	if (effectDisplay.length > 0) {
+	  	effectDisplay += ", ";
+	}
+		// Strip out "_" from effect
+		var tokens = key.split("_");
+		effectDisplay += tokens.join(" ");
+	}    
+	var impactDisplay = "";
+	for (var key in variant.impact) {
+		if (impactDisplay.length > 0) {
+		  	impactDisplay += ", ";
+		}
+		impactDisplay += key;
+	} 
+	var clinSigDisplay = "";
+	for (var key in variant.clinVarClinicalSignificance) {
+		if (key != 'none') {
+			if (clinSigDisplay.length > 0) {
+			  	clinSigDisplay += ", ";
+			}
+			clinSigDisplay += key;
+		}
+	}
+	var phenotypeDisplay = "";
+	for (var key in variant.clinVarPhenotype) {
+		if (phenotypeDisplay.length > 0) {
+		  	phenotypeDisplay += ", ";
+		}
+		phenotypeDisplay += key;
+	}      
+	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
+	var coord = gene.chr + ":" + variant.start;
+	var refalt = variant.ref + "->" + variant.alt;
+
+	var clinvarUrl = "";
+	if (variant.clinVarUid != null && variant.clinVarUid != '') {
+		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
+		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
+	}
+
+	var coverage = variant.bamDepth != null && variant.bamDepth != '' ? variant.bamDepth.toString() : null;
+	var coverageReported = variant.genotypeDepth != null && variant.genotypeDepth != '' ? variant.genotypeDepth : null;
+	if (coverage && coverageReported) {
+		if (coverage != coverageReported) {
+			coverage = coverage + ' (computed)      ' + coverageReported + ' (reported)';
+		}
+	} else if (coverage) {
+		coverage = coverage + ' (computed)';
+
+	} else if (coverageReported) {
+		coverage = coverageReported + ' (reported)';
+	}
+
+	var zygosity = "";
+	if (variant.zygosity.toLowerCase() == 'het') {
+		zygosity = "Heterozygous";
+	} else if (variant.zygosity.toLowerCase() == 'hom') {
+		zygosity = "Homozygous";
+	}
+	
+	
+	return (
+		  me.tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord)
+
+		+ me.tooltipRow('Zygosity',  zygosity, "5px")
+		+ me.tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
+		+ me.tooltipRow('Genotype',  variant.genotype)
+
+		+ me.tooltipRow('Impact', impactDisplay, "3px")
+		+ me.tooltipRow('Effect', effectDisplay)
+
+		+ me.tooltipRow('ClinVar', clinSigDisplay, "3px")
+		+ me.tooltipRow('Phenotype', phenotypeDisplay)
+		+ me.tooltipRow('ClinVar uid', clinvarUrl )
+
+		// + tooltipRow('NCBI ID', variant.ncbiId)
+		// + tooltipRow('HGVS g', variant.hgvsG)
+
+		+ me.tooltipRow('Qual', variant.qual, (variant.qual || variant.filter ? "3px" : "")) 
+		+ me.tooltipRow('Filter', variant.filter) 
+
+		+ me.tooltipRow('Coverage', coverage, "3px") 
+
+		//+ tooltipRow('GMAF', variant.gMaf)
+		+ me.tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "3px", true)
+		+ me.tooltipRow('AF 1000G', variant.af1000G, null, true)
+		+ me.unpinRow()
+	);                    
+
+}
+
+VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
+	var me = this;
+
+	var zygosity = "";
+	if (variant.zygosity.toLowerCase() == 'het') {
+		zygosity = "Heterozygous";
+	} else if (variant.zygosity.toLowerCase() == 'hom') {
+		zygosity = "Homozygous";
+	}
+	
+	
+	return (
+		me.tooltipRow('Zygosity',  zygosity)
+		+ me.tooltipRow('Qual', variant.qual) 
+		+ me.tooltipRow('Filter', variant.filter) 
+	);                    
+
+}
+
+
+VariantCard.prototype.unpinRow = function() {
+	if (window.clickedVariant) {
+		return '<div style="text-align:right">'
+			      + '<a  id="unpin" href="javascript:void(0)">unlock</a>'
+			 + '</div>';	
+
+	} else {
+		return '<div style="text-align:right" >'			     
+			      + '<em>Click on variant to lock tooltip</em></div>'
+			 + '</div>';	
+	}
+}
+
+VariantCard.prototype.tooltipBlankRow = function() {
+	return '<div class="row">'
+	  + '<div class="col-md-12">' + '&nbsp;' + '</div>'
+	  + '</div>';
+}
+
+VariantCard.prototype.tooltipHeaderRow = function(value1, value2, value3) {
+	return '<div class="row">'
+	      + '<div class="col-md-12" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 + '</div>'
+	      + '</div>';	
+}
+
+VariantCard.prototype.tooltipRow = function(label, value, paddingTop, alwaysShow) {
+	if (alwaysShow || (value && value != '')) {
+		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
+		return '<div class="row"' + style + '>'
+		      + '<div class="col-md-4" style="text-align:right">' + label + '</div>'
+		      + '<div class="col-md-8">' + value.toLowerCase() + '</div>'
+		      + '</div>';
+	} else {
+		return "";
+	}
 }
 
 

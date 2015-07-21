@@ -63,25 +63,33 @@ function MatrixCard() {
 
 }
 
+MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
+	this.featureMatrix.tooltipHTML(tooltipFunction);
+
+}
+
 MatrixCard.prototype.init = function() {
 	var me = this;
+
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
 				    .cellSize(30)
 				    .columnLabelHeight(42)
 				    .rowLabelWidth(100)
-				    .tooltipHTML(variantTooltipHTML)
 				    .on('d3click', function(variant) {
+				    	me.showTooltip(variant);
 				    	variantCards.forEach(function(variantCard) {
 				    		variantCard.highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
 				    	});
 				    })
 				     .on('d3mouseover', function(variant) {
+				     	me.showTooltip(variant);
 				    	variantCards.forEach(function(variantCard) {
 				    		variantCard.showVariantCircle(variant);
 				    	});
 				    })
 				    .on('d3mouseout', function() {
+				    	me.hideTooltip();
 				    	variantCards.forEach(function(variantCard) {
 				    		variantCard.hideVariantCircle();
 				    	});
@@ -129,6 +137,40 @@ MatrixCard.prototype.init = function() {
 		matrixCardSelector.find('.fullview').addClass("hide");
 	});
 
+}
+
+MatrixCard.prototype.hideTooltip = function() {
+	var tooltip = d3.select('#matrix-track .tooltip');
+	tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0);   
+}
+
+
+MatrixCard.prototype.showTooltip = function(variant) {
+	var tooltip = d3.select('#matrix-track .tooltip');
+	tooltip.transition()        
+	 .duration(1000)      
+	 .style("opacity", .9);  
+
+	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant));
+
+	var h = tooltip[0][0].offsetHeight;
+	var w = 300;
+
+	if (d3.event.pageX < w) {
+		tooltip.style("width", w + "px")
+		       .style("left", (d3.event.pageX) + "px") 
+		       .style("text-align", 'left')    
+		       .style("top", (d3.event.pageY - h) + "px");   
+
+	} else {
+
+		tooltip.style("width", w + "px")
+		       .style("left", (d3.event.pageX - w) + "px") 
+		       .style("text-align", 'left')    
+		       .style("top", (d3.event.pageY - h) + "px");   
+	}	
 }
 
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
