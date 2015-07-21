@@ -638,10 +638,11 @@ function loadTracksForGene(bypassVariantCards) {
     $('#gene-name').text(window.gene.gene_name);   
     $('#gene-region').text(window.gene.regionStart + "-" + window.gene.regionEnd);
 
-	if (window.gene.gene_type == 'pseudogene') {
-		$('#pseudogene').removeClass("hide");
+	if (window.gene.gene_type == 'protein_coding') {
+		$('#non-protein-coding').addClass("hide");
 	} else {
-		$('#pseudogene').addClass("hide");
+		$('#non-protein-coding').removeClass("hide");
+		$('#non-protein-coding .label').text(window.gene.gene_type);
 	}
 
 	if (window.gene.strand == '-') {
