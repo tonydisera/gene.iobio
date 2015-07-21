@@ -379,7 +379,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 		this.cardSelector.find("#fb-separator").addClass("hide");
 		this.cardSelector.find("#fb-variants").addClass("hide");
 		this.cardSelector.find("#button-find-missing-variants").css("visibility", "hidden");
-		this.cardSelector.find("#missing-variant-count-label").html("Find missing variants");
+		this.cardSelector.find("#missing-variant-count-label").html("Call from alignments");
 		this.cardSelector.find("#missing-variant-count").html("");
 	} else {
 	    
@@ -867,7 +867,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
     	this.cardSelector.find('#displayed-variant-count').text("");
     	this.cardSelector.find('#vcf-variant-count').text("");
     	this.cardSelector.find('#missing-variant-count').text("");
-    	this.cardSelector.find('#missing-variant-count-label').text("Find Missing Variants");
+    	this.cardSelector.find('#missing-variant-count-label').text("Call from alignments");
 
 
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -1741,7 +1741,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				    		return d.consensus == 'unique2';
 				    	});
 				    	me.cardSelector.find('#missing-variant-count').text(me.fbData.features.length);
-				    	me.cardSelector.find('#missing-variant-count-label').text("Missing");
+				    	me.cardSelector.find('#missing-variant-count-label').text("Called");
 
 				    	// Add the unique freebayes variants to vcf data to include 
 				    	// in feature matrix
