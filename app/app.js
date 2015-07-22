@@ -166,7 +166,7 @@ function init() {
 
     transcriptMenuChart = geneD3()
 	    .width(600)
-	    .margin({top: 5, right: 5, bottom: 5, left: 120})
+	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(12)
@@ -179,7 +179,7 @@ function init() {
 	    	showTranscripts();
 
 			variantCards.forEach(function(variantCard) {
-		    	variantCard.showBamDepth();
+		    	variantCard.loadTracksForGene();
 			});
 
 	    });
@@ -366,10 +366,10 @@ function initTranscriptControls() {
 }
 
 function onCloseTranscriptMenuEvent() {
-	if (selectedTranscript != null) {
-		if (selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
+	if (transcriptMenuChart.selectedTranscript() != null ) {
+		if (selectedTranscript == null || selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
+			selectedTranscript = transcriptMenuChart.selectedTranscript();
 			d3.selectAll("#gene-viz .transcript").remove();
-		 	selectedTranscript = transcriptMenuChart.selectedTranscript();
 		 	cacheCodingRegions();
 		 	loadTracksForGene();
 		 }		
@@ -638,13 +638,14 @@ function loadTracksForGene(bypassVariantCards) {
     $('#gene-name').text(window.gene.gene_name);   
     $('#gene-region').text(window.gene.regionStart + "-" + window.gene.regionEnd);
 
-	if (window.gene.gene_type == 'protein_coding') {
-		$('#non-protein-coding').addClass("hide");
-	} else {
-		$('#non-protein-coding').removeClass("hide");
-		$('#non-protein-coding .label').text(window.gene.gene_type);
-	}
 
+	if (window.gene.gene_type == 'protein_coding') {
+		$('#non-protein-coding #gene-type-badge').addClass("hide");
+	} else {
+		$('#non-protein-coding #gene-type-badge').removeClass("hide");
+		$('#non-protein-coding #gene-type-badge').text(window.gene.gene_type);
+	}
+	
 	if (window.gene.strand == '-') {
 		$('#minus_strand').removeClass("hide");
 	} else {
@@ -667,12 +668,27 @@ function loadTracksForGene(bypassVariantCards) {
 		transcript = getCanonicalTranscript();
 	}
 
-
 	// Load the read coverage and variant charts.  If a bam hasn't been
 	// loaded, the read coverage chart and called variant charts are
 	// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 	// chart is not rendered.
 	showTranscripts();
+
+	// Show the badge for the transcript type if it is not protein coding and it is different
+	// than the gene type
+	if (window.selectedTranscript == null || window.selectedTranscript.transcript_type == 'protein_coding') {
+		$('#non-protein-coding #transcript-type-badge').addClass("hide");
+	} else {
+		if (window.gene.gene_type != window.selectedTranscript.transcript_type) {
+			$('#non-protein-coding #transcript-type-badge').removeClass("hide");
+			$('#non-protein-coding #transcript-type-badge').text(window.selectedTranscript.transcript_type + ' transcript');
+		} else {
+			$('#non-protein-coding #transcript-type-badge').addClass("hide");
+		}
+	}
+
+
+
 
 	filterCard.disableFilters();
 	

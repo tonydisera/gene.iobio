@@ -1,22 +1,24 @@
 
 
 
-.ibo-gene .cds, .ibo-gene .utr { 
+.ibo-gene .cds, .ibo-gene .exon, .ibo-gene .utr { 
   fill:   rgba(104, 152, 168, 0.6);
   stroke: rgba(104, 152, 168, 1);
 }
-#zoom-region-chart.ibo-gene .cds, #zoom-region-chart.ibo-gene .utr { 
+#zoom-region-chart.ibo-gene .cds, #zoom-region-chart.ibo-gene .exon, #zoom-region-chart.ibo-gene .utr { 
   fill:   rgba(104, 152, 168, 0.3);
   stroke: rgba(104, 152, 168, 0.8);
 }
 #transcript-menu-item.ibo-gene .transcript.selected .utr,
+#transcript-menu-item.ibo-gene .transcript.selected .exon,
 #transcript-menu-item.ibo-gene .transcript.selected .cds
 { 
-  fill: #BFC83F;
-  stroke: #BFC83F;
+  fill: rgba(47, 215, 176, 0.69);
+  stroke: rgba(104, 168, 151, 1);
 }
 #transcript-menu-item.ibo-gene .utr:hover,
 #transcript-menu-item.ibo-gene .cds:hover,
+#transcript-menu-item.ibo-gene .exon:hover,
 #transcript-menu-item.ibo-gene .reference:hover
 { 
   cursor: pointer;
@@ -33,6 +35,7 @@
   font-size: 13px; fill: 
   rgb(120,120,120); 
 }
+
 #zoom-region-chart.ibo-gene .cds.danger, #zoom-region-chart.ibo-gene .utr.danger { 
   fill: rgba(226, 37, 37, .6);
   stroke: rgba(226,37,37,.6);
@@ -44,6 +47,11 @@
 #transcript-menu-item.ibo-gene .name { 
   font-size: 11px; 
   fill: rgb(120,120,120); 
+}
+#transcript-menu-item.ibo-gene .type { 
+  font-size: 11px; 
+  fill: rgb(205, 71, 40);
+  font-style: italic;
 }
 #transcript-menu-item.ibo-gene .name:hover { 
   cursor: pointer;

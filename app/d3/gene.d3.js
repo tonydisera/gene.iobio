@@ -245,7 +245,7 @@ function geneD3() {
           });
 
 
-      transcript.selectAll(".name").remove();
+      transcript.selectAll(".name,.type").remove();
       if (geneD3_showLabel) {
         transcript.selectAll('.name').data(function(d) { return [[d.start, d.transcript_id]] })
                   .enter().append('text')
@@ -264,6 +264,23 @@ function geneD3() {
                     .on("mouseout", function(d) {
                       d3.select(this.parentNode).attr("class", "transcript");
                     });
+        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type]] })
+                  .enter().append('text')
+                    .attr('class', 'type')
+                    .attr('x', function(d) { return (geneD3_width - margin.left - margin.right) + 10 })
+                    .attr('y', 12 )
+                    .attr('text-anchor', 'top')
+                    .attr('alignment-baseline', 'left')
+                    .text(function(d) { return d[1] == 'protein_coding' ? '' : d[1]; })
+                    .on("mouseover", function(d) {
+                      d3.selectAll('.transcript.selected').attr("class", "transcript");
+                      d3.select(this.parentNode).attr("class", "transcript selected");
+                      selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
+                    })
+                    .on("mouseout", function(d) {
+                      d3.select(this.parentNode).attr("class", "transcript");
+                    });  
+
 
       }
       
@@ -272,13 +289,24 @@ function geneD3() {
         .enter().append('path')
           .attr('class', 'arrow')
           .attr('d', centerArrow);      
+
+      var filterFeatures = null;
+      if (transcript.datum().transcript_type == 'protein_coding') {
+        filterFeatures = function(d) {
+           var ft = d.feature_type.toLowerCase(); 
+           return  (ft == 'utr' || ft == 'cds');
+        };
+      } else {
+        filterFeatures = function(d) {
+           var ft = d.feature_type.toLowerCase(); 
+           return ft == 'exon';
+        };
+      }
       
       transcript.selectAll('.transcript rect').data(function(d) { 
-        return d['features'].filter( function(d) { 
-          var ft = d.feature_type.toLowerCase(); 
-          
-          return  (ft == 'utr' || ft == 'cds');
-        }) 
+        return d['features'].filter( function(d) {
+          return filterFeatures(d); 
+        });
       }).enter().append('rect')
           .attr('class', function(d) { return d.feature_type.toLowerCase();})          
           .attr('rx', borderRadius)
@@ -311,7 +339,7 @@ function geneD3() {
 
               // de-select the transcript   
               d3.select(this.parentNode).attr("class", "transcript");
-           })
+           });
           
 
     
@@ -337,7 +365,7 @@ function geneD3() {
         .text(function(d) { return d[1]; })                
         .style('fill-opacity', 1);
 
-      transcript.selectAll('.utr,.cds').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
+      transcript.selectAll('.utr,.cds,.exon').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
         .transition()        
           .duration(700)
           .attr('x', function(d) { return d3.round(x(d.start))})

@@ -13,6 +13,12 @@ body {
   */
 }
 
+.label-warning {
+  background-color: #DB4F36;
+  padding-bottom: 2px;
+}
+
+
 /* for use cases page */
 .usecases li {
   padding-top: 20px;
