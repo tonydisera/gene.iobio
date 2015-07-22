@@ -854,6 +854,13 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 		if (this.bam || this.vcf) {	      
 			this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+
+			// Workaround.  For some reason, d3 doesn't clean up previous transcript
+			// as expected.  So we will just force the svg to be removed so that we
+			// start with a clean slate to avoid the bug where switching between transcripts
+			// resulted in last transcripts features not clearing out.
+			this.d3CardSelector.select('#zoom-region-chart svg').remove();
+
 			selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
 			this.zoomRegionChart.regionStart(+window.gene.start);
 			this.zoomRegionChart.regionEnd(+window.gene.end);
@@ -1443,6 +1450,9 @@ VariantCard.prototype.refreshVariantsWithCoverage = function(coverage, callback)
 	var me = this;
 	var vcfIter = 0;
 	var covIter = 0;
+	if (this.vcfData == null) {
+		callback();
+	}
 	var recs = this.vcfData.features;
 
 	me.cardSelector.find(".vcfloader .loader-label").text("Calculating coverage for variants");
@@ -1781,6 +1791,7 @@ VariantCard.prototype.showCalledVariants = function(regionStart, regionEnd) {
 		this.fbData.features.forEach(function (fbVariant) {
 			if (fbVariant.source) {
 				fbVariant.inheritance                 = fbVariant.source.inheritance;
+				fbVariant.clinVarUid                  = fbVariant.source.clinVarUid;
 				fbVariant.clinVarClinicalSignificance = fbVariant.source.clinVarClinicalSignificance;
 				fbVariant.clinVarAccession            = fbVariant.source.clinVarAccession;
 				fbVariant.clinvarRank                 = fbVariant.source.clinvarRank;
