@@ -2073,15 +2073,16 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 			if (clinSigDisplay.length > 0) {
 			  	clinSigDisplay += ", ";
 			}
-			clinSigDisplay += key;
+			clinSigDisplay += key.split("_").join(" ");
 		}
 	}
 	var phenotypeDisplay = "";
 	for (var key in variant.clinVarPhenotype) {
 		if (phenotypeDisplay.length > 0) {
+
 		  	phenotypeDisplay += ", ";
 		}
-		phenotypeDisplay += key;
+		phenotypeDisplay += key.split("_").join(" ");
 	}      
 	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
 	var coord = gene.chr + ":" + variant.start;
