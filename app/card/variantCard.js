@@ -2115,7 +2115,7 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 
 		+ me.tooltipRow('Zygosity',  zygosity, "5px")
 		+ me.tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
-		+ me.tooltipRow('Genotype',  variant.genotype)
+		//+ me.tooltipRow('Genotype',  variant.genotype)
 
 		+ me.tooltipRow('Impact', impactDisplay, "3px")
 		+ me.tooltipRow('Effect', effectDisplay)
