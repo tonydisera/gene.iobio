@@ -85,13 +85,10 @@ body {
   background-color: #f5f5f5;
 }
 
-
 .card-label {
-  color: rgba(104, 152, 168, 1);
-  font-size: 14px;
+  color: rgba(81, 78, 69, 1);
+  font-size: 15px;
   text-transform: uppercase;
-  font-family: Quicksand;
-  font-weight: 700;
 }
 
 .btn.btn-fab {
@@ -538,9 +535,9 @@ section {
   font-size: 14px;
 }
 #gene-name {
-  color: #6898A8;
-  font-size: 16px;
+  font-size: 22px !important;
   float:left;
+  margin-top: -5px;
 }
 #gene-region-info {
   padding-left: 0px;
