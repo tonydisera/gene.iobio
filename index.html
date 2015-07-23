@@ -96,11 +96,14 @@
     	<section id="app-title-section">
     	   <a id='home' href="/"><span class="iobioapp"><span class='hide beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
 
+
+          <!--
            <a href="javascript:void(0)" class="open_page_guide" 
               style="float: left;margin-top: 20px;margin-left: 10px;">
              <i class="mdi-maps-directions"></i>
              Tour
-           </a>                
+           </a>   
+           -->             
                 <!-- gene list dropdown button -->
                 <!--
               <div class="todo">
@@ -121,7 +124,7 @@
               </div>
             -->
 
-            <span id="bloodhound" style="margin-left:-130px" >
+            <span id="bloodhound" style="margin-left:90px" >
                 <input class="typeahead tour_element_1" style="margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" placeholder="Enter Gene Name">
             </span>           
 
@@ -168,6 +171,24 @@
            <a href="http://iobio.io" class="iobioproject">           
             an iobio project
            </a>   
+
+          <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 40px;">
+            <div class="btn-group"  style="display:  inline;margin-top: 15px;">
+
+              <button type="button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Learn more <span class="caret"></span>
+              </button>
+
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="javascript:void(0)" class="open_page_guide">Tour</a>
+                </li>
+                <li><a href="javascript:void(0)"  onclick="$('#tourWelcome').removeClass('open');window.open('https://vimeo.com/133806813');">Screencasts</a>
+                </li>
+                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('usecases.html','_usecases');">Use Cases</a>
+                </li>
+              </ul>
+            </div>
+          </div>
       </section>
 
       <div id="non-protein-coding">
@@ -178,7 +199,7 @@
       <div id="transcript-card" class="hide" style="background:white;padding-top:10px;">
 
         <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;margin-right:3px;">
-          <span id="gene-name"></span>  
+          <span id="gene-name" class="heading"></span>  
         
         </span>
           
@@ -236,7 +257,7 @@
 
 
               <div id="toolbar" >
-                <span class="card-label" >SAMPLES</span>
+                <span class="card-label" style="display: inline-block;margin-top: 3px;">SAMPLES</span>
 
                 <span style="float:right">
                   <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
@@ -248,7 +269,7 @@
                </span>
 
 
-                <div class="fullview" style="text-align:center;width: 100%;margin-top: -25px;">
+                <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
                   <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised tour_element_2_5" onclick="toggleSampleTrio(false)"  >
                     <i class="mdi-social-person"></i>
                     Single
@@ -502,6 +523,7 @@
   <li class="tlypageguide_left" data-tourtarget=".tour_element_1">
     <div>
       Type in the gene name BRCA2 and select from the drop down list.
+      <br><strong><em>Click on next arrow > to continue to next step.</em></strong>
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_2">
@@ -550,6 +572,8 @@
   <li class="tlypageguide_top" data-tourtarget=".tour_element_5">
     <div>
       The variants for the gene are annotated using snpEff to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
+      Hover over the variants to see more information.  Click on a variant to lock, allowing links to be
+      clicked in the tooltip.  
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_6">
@@ -559,7 +583,7 @@
   </li>
   <li class="tlypageguide_bottom" data-tourtarget=".tour_element_7">
     <div>
-      Push the Find Missing Variants button to call variants using Freebayes. Variants not present in the VCF file will be displayed above the loaded variants. 
+      Push the 'Call from alignments' button to call variants using Freebayes. Variants not present in the VCF file will be displayed above the loaded variants. 
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_8">
@@ -569,7 +593,8 @@
   </li>
   <li class="tlypageguide_top" data-tourtarget=".tour_element_9">
     <div>
-      The variants are ranked according to different criteria. These criteria can be reordered by clicking on their respective arrows. Click on a column to see the variant in the variant chart below.
+      The variants are ranked according to different criteria. These criteria can be reordered by clicking on their respective arrows. Click on a column to see the variant in the variant chart below. Unclick
+      the column to toggle back to all variants.
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget=".tour_element_10">
