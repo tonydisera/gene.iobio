@@ -519,19 +519,7 @@ var effectCategories = [
 
     // Get the vcf records for this region
     vcfReader.getRecords(refName, regionStart, regionEnd, function(records) {
-        // Make sure #contig header rec is present
-        var contigHdrRecFound = false;
-        headerRecords.forEach(function(record) {
-              if (record.indexOf("##contig") == 0) {
-                contigHdrRecFound = true;
-              }
-              // We need to inject in the contig header for downstream servers to function properly
-              if (record.indexOf("#CHROM") == 0 && !contigHdrRecFound) {
-               // headerRecords.push("##contig=<ID=" + refName + ">");
-              }
-        });
-
-
+        
         var allRecs = headerRecords.concat(records);
 
         me.annotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, 
@@ -832,19 +820,20 @@ var effectCategories = [
   // NEW
   exports._annotateVcfRegion = function(records, refName, callback, callbackClinvar) {
       var me = this;
-      var connectionID = this._makeid();
+      /*var connectionID = this._makeid();
       var clientContig = BinaryClient(contigAppenderServer + '?id=', {'connectionID' : connectionID} );
       clientContig.on('open', function(stream){
         var stream = clientContig.createStream({event:'setID', 'connectionID':connectionID});
         stream.end();
-      })
+      })*/
 
       
-      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client?&id="+connectionID));
+      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client?&debug=true"));
 
       //
       // stream the vcf records to snpEffClient
       //
+      /*
       clientContig.on("stream", function(stream) {
       
 
@@ -858,10 +847,11 @@ var effectCategories = [
         stream.end();
 
       });
-      
+
       clientContig.on("error", function(error) {
         console.log("error while streaming vcf records " + error);
       });
+      */
 
 
       if (refName.indexOf('chr') == 0) {
@@ -883,7 +873,25 @@ var effectCategories = [
       var client = BinaryClient(snpEffServer);
       var buffer = "";
       client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':snpEffUrl}});
+        var stream = client.createStream({event:'run', params : {'url':snpEffUrl + '&debug=true'}});
+
+        // New local file streaming
+        stream.on('createClientConnection', function(connection) {
+          console.log('got create client request');
+          var ended = 0;
+          var dataClient = BinaryClient('ws://' + connection.serverAddress);
+          dataClient.on('open', function() {
+            var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+
+            records.forEach( function(record) {
+              if (record.trim() == "") {
+              } else {
+                dataStream.write(record + "\n");
+              }
+            });
+            dataStream.end();
+          )};
+        });
   
         //
         // listen for stream data (the output) event. 
@@ -1406,7 +1414,76 @@ var effectCategories = [
 
     var buffer = "";
     client.on('open', function(){
-      var stream = client.createStream({event:'run', params : {'url':url}});
+      var stream = client.createStream({event:'run', params : {'url':url + '&debug=true'}});
+
+      // New local file streaming
+      stream.on('createClientConnection', function(connection) {
+        console.log('got create client request');
+        var ended = 0;
+        var dataClient = BinaryClient('ws://' + connection.serverAddress);
+        dataClient.on('open', function() {
+          var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+
+          var onGetRecords = function(records) {
+            var me = this;
+            if (regionIndex == regions.length) {
+              // The executing code should never get there as we should exit the recursion in onGetRecords.
+            } else {
+
+              // Stream the vcf records we just parsed for a region in the vcf, one records at a time
+              if (records) {
+                for (var r = 0; r < records.length; r++) {              
+                  dataStream.write(records[r] + "\n");
+                }
+              } else {
+                // This is an error condition.  If vcfRecords can't return any
+                // records, we will hit this point in the code.
+                // Just log it for now and move on to the next region.
+                console.log("WARNING:  unable to create vcf records for region  " + regionIndex);
+              }
+
+              regionIndex++;
+
+              if (regionIndex > regions.length) {
+                return;
+              } else if (regionIndex == regions.length) {
+                // We have streamed all of the regions so now we will end the stream.
+                dataStream.end();
+                return;
+              } else {
+                // There are more regions to obtain vcf records for, so call getVcfRecords now
+                // that regionIndex has been incremented.
+                vcfReader.getRecords(regions[regionIndex].name, 
+                  regions[regionIndex].start, 
+                  regions[regionIndex].end, 
+                  onGetRecords);
+              }      
+
+            }
+          }
+
+          //vcfReader.getHeaderRecords( function(headerRecords) {
+          //  for (h = 0; h < headerRecords.length; h++) {
+          //    stream.write(headerRecords[h] + "\n");
+          //  }
+          //});
+          vcfReader.getHeader( function(header) {
+             dataStream.write(header + "\n");
+          });
+
+
+          // Now we recursively call vcfReader.getRecords (by way of callback function onGetRecords)
+          // so that we parse vcf records one region at a time, streaming the vcf records
+          // to the server.
+          vcfReader.getRecords(
+              regions[regionIndex].name, 
+              regions[regionIndex].start, 
+              regions[regionIndex].end, 
+              onGetRecords);
+
+        )};
+      });
+
       
       //
       // listen for stream data (the output) event. 
@@ -1435,6 +1512,7 @@ var effectCategories = [
     //
     // stream the vcf
     //
+    /*
     client.on("stream", function(stream) {
       // This is the callback function that will get invoked each time a set of vcf records is
       // returned from the binary parser for a given region.  
@@ -1503,6 +1581,7 @@ var effectCategories = [
     client.on("error", function(error) {
 
     });
+*/
 
   }
 

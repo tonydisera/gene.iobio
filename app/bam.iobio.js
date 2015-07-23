@@ -25,7 +25,7 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {}
 
-      
+      /*
       this.iobio.coverage = "wss://coverage.iobio.io";
       this.iobio.bamtools = "wss://bamtools.iobio.io";
       this.iobio.samtools = "wss://samtools.iobio.io";
@@ -36,24 +36,22 @@ var Bam = Class.extend({
       this.iobio.bcftools = "wss://bcftools.iobio.io";
       this.iobio.vcflib = "wss://vcflib.iobio.io";
       this.iobio.vt = "wss://vt.iobio.io";
+*/
 
 
-
-//      this.iobio.samtools = "ws://samtools.iobio.io";
   
-  /*    
-      this.iobio.coverage = "wss://nv-blue.iobio.io/coverage";
-      this.iobio.bamtools = "wss://nv-blue.iobio.io/bamtools";
-      this.iobio.samtools = "wss://nv-blue.iobio.io/samtools";
-      this.iobio.bamReadDepther = "wss://nv-blue.iobio.io/bamReadDepther";
-      this.iobio.bamMerger = "wss://nv-blue.iobio.io/bammerger";      
-      this.iobio.bamstatsAlive = "wss://nv-blue.iobio.io/bamstatsalive"
-      this.iobio.freebayes = "wss://nv-blue.iobio.io/freebayes";
-      this.iobio.bcftools = "wss://nv-blue.iobio.io/bcftools";
-      this.iobio.vcflib = "wss://nv-blue.iobio.io/vcflib";
-      this.iobio.vt = "wss://nv-blue.iobio.io/vt";
+      this.iobio.coverage = "wss://nv-green.iobio.io/coverage";
+      this.iobio.bamtools = "wss://nv-green.iobio.io/bamtools";
+      this.iobio.samtools = "wss://nv-green.iobio.io/samtools";
+      this.iobio.bamReadDepther = "wss://nv-green.iobio.io/bamReadDepther";
+      this.iobio.bamMerger = "wss://nv-green.iobio.io/bammerger";      
+      this.iobio.bamstatsAlive = "wss://nv-green.iobio.io/bamstatsalive"
+      this.iobio.freebayes = "wss://nv-green.iobio.io/freebayes";
+      this.iobio.bcftools = "wss://nv-green.iobio.io/bcftools";
+      this.iobio.vcflib = "wss://nv-green.iobio.io/vcflib";
+      this.iobio.vt = "wss://nv-green.iobio.io/vt";
 
-    */  
+      
 
 //      this.iobio.bamtools = "ws://localhost:8061";
 //     this.iobio.samtools = "ws://localhost:8060";
@@ -107,20 +105,21 @@ var Bam = Class.extend({
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary";
+         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary&debug=true";
       } else {
          // creates a url for a new bam that is sliced from an old bam
          // open connection to iobio webservice that will request this data, since connections can only be opened from browser
-         var me = this;
+         /*var me = this;
          var connectionID = this._makeid();
          var client = BinaryClient(samtools + '?id=', {'connectionID' : connectionID} );
          client.on('open', function(stream){
             var stream = client.createStream({event:'setID', 'connectionID':connectionID});
             stream.end();
          })
-      
-         var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client?&id="+connectionID);
-         var ended = 0;
+        */
+        var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client");
+        
+        /* var ended = 0;
          var me = this;
          // send data to samtools when it asks for it         
          client.on('stream', function(stream, options) {
@@ -134,6 +133,7 @@ var Bam = Class.extend({
                }, {noHeader:true});               
             }
          })
+          */
       }
       return encodeURI(url);
    },
@@ -573,7 +573,27 @@ var Bam = Class.extend({
          var url = encodeURI( me.iobio.bamstatsAlive + '?cmd=-u 3000 -r \'' + regStr + '\' ' + encodeURIComponent(me._getBamRegionsUrl(regions)));
          var buffer = "";
          client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url}});
+            var stream = client.createStream({event:'run', params : {'url':url + '&debug=true'}});
+
+            // New local file streaming
+            stream.on('createClientConnection', function(connection) {
+              console.log('got create client request');
+              var ended = 0;
+              var dataClient = BinaryClient('ws://' + connection.serverAddress);
+              dataClient.on('open', function() {
+                var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+                dataStream.write(me.header.toStr);            
+                for (var i=0; i < regions.length; i++) {
+                  var region = regions[i];
+                   me.convert('sam', region.name, region.start, region.end, function(data,e) {   
+                      dataStream.write(data);                   
+                      ended += 1;                  
+                      if ( regions.length == ended) dataStream.end();
+                   }, {noHeader:true});               
+                }                
+              })
+            });
+
             stream.on('data', function(data, options) {
                if (data == undefined) return;
                var success = true;
@@ -678,6 +698,26 @@ var Bam = Class.extend({
         client.on('open', function(stream){
             var stream = client.createStream({event:'run', params : {'url':url}});
 
+            // New local file streaming
+            stream.on('createClientConnection', function(connection) {
+              console.log('got create client request');
+              var ended = 0;
+              var dataClient = BinaryClient('ws://' + connection.serverAddress);
+              dataClient.on('open', function() {
+                var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+                dataStream.write(me.header.toStr);  
+                var theRegions = [spanningRegion];          
+                for (var i=0; i < theRegions.length; i++) {
+                  var region = theRegions[i];
+                   me.convert('sam', region.name, region.start, region.end, function(data,e) {   
+                      dataStream.write(data);                   
+                      ended += 1;                  
+                      if ( theRegions.length == ended) dataStream.end();
+                   }, {noHeader:true});               
+                }                
+              })
+            });
+
             stream.on('data', function(data, options) {
                if (data == undefined) {
                 return; 
@@ -729,165 +769,6 @@ var Bam = Class.extend({
       });
    },
 
-
-
-
-
-
-
-   //
-   //
-   // TO BE DEPRECATED ONCE COVERAGE SERVICE IS DEPLOYED TO PRODUCTION
-   //
-   //
-   getCoverageForRegionChunkedDEPRECATED: function(refName, start, end, maxPoints, callback) {
-      console.log("getCoverage for region " + refName + " " + start + "-" + end);
-      var me = this;
-      var chunkSize = 50000;
-
-
-      // Break the regions down into manageable chunks
-      var chunkCoverage = function(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, chunkedCallback) {
-          var chunkStart = start + (index*chunkSize);
-          if (chunkStart <= end) {
-            var chunkEnd   = chunkStart + chunkSize;
-            if (chunkEnd > end) {
-              chunkEnd = end;              
-            }
-            me._getCoverageForRegionImplDEPRECATED(refName, chunkStart, chunkEnd, maxPoints, function(coverageRecs) {
-              allCoverageRecs = allCoverageRecs.concat(coverageRecs);
-              index++;
-              chunkCoverage(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, chunkedCallback);
-            });
-          } else {
-            chunkedCallback(allCoverageRecs);
-          }
-      }
-
-      var allCoverageRecs = [];
-      var index = 0;
-      chunkCoverage(refName, start, end, chunkSize, maxPoints, allCoverageRecs, index, function(theCoverageRecs) {
-        // Now we have all of the coverage records.  Time to reduce the array down.
-        if (maxPoints && maxPoints > 0) {
-          var factor = d3.round(theCoverageRecs.length / maxPoints);
-          var baseCoverageReduced = me.reducePoints(theCoverageRecs, factor, function(d) {return d[0]}, function(d) {return d[1]});
-          callback(baseCoverageReduced);
-        } else {
-          callback(theCoverageRecs);
-        }
-      });
-
-
-   },
-
-   // NEW
-   _getCoverageForRegionImplDEPRECATED: function(refName, start, end, maxPoints, callback) {
-      var me = this;
-      this.transformRefName(refName, function(trRefName){        
-        var regionParm = ' ' + trRefName + ":" + start + "-" + end;
-        
-        var url = encodeURI( me.iobio.samtools + '?encoding=utf8&cmd= mpileup ' +  " " + encodeURIComponent(me._getBamUrl(trRefName,start,end)) );
-
-        var client = BinaryClient(me.iobio.samtools);
-        
-        var samData = "";
-        var samRecs = [];
-        var parseByLine = false;
-        client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url}});
-
-            stream.on('data', function(data, options) {
-               if (data == undefined) {
-                return; 
-               } 
-               if (parseByLine) {
-                  var fields = data.split('\t');
-                  var pos   = fields[1];
-                  var depth = fields[3];
-                  if (pos && depth) {
-                    samRecs.push( {'pos': +pos, 'depth': +depth});
-                  }
-               } else {
-                 samData += data;
-             }
-            });
-
-            stream.on('end', function() {
-              if (parseByLine) {
-                me._parseSamPileupRecordsDEPRECATED(null, samRecs, start, end, maxPoints, callback);
-              } else {
-                 if (samData != "") {
-                   me._parseSamPileupRecordsDEPRECATED(samData, null, start, end, maxPoints, callback);
-                  } else {
-                  callback([]);
-                }
-              }
-            });
-
-            stream.on("error", function(error) {
-              console.log("encountered stream error: " + error);
-            });
-
-        });
-      });
-   },
-
-      // NEW
-   _parseSamPileupRecordsDEPRECATED: function(data, samRecs, start, end, maxPoints, callback) {
-      var me = this;
-      if (samRecs == null) {
-        samRecs = [];
-        var lines = data.split('\n');
-        lines.forEach(function(line) {
-          var fields = line.split('\t');
-          var pos   = fields[1];
-          var depth = fields[3];
-          if (pos && depth) {
-            samRecs.push( {'pos': +pos, 'depth': +depth});
-          }
-        });
-        console.log("parsing samtools pileup recs " + lines.length + "  " + samRecs[0].pos + " - " + samRecs[samRecs.length-1].pos);
-      }
-
-      var baseCoverage = [];
-      baseCoverage.length = 0;  
-      var regionLength = end - start;
-      for (var i = 0; i < regionLength; i++) {
-        baseCoverage[i] = [start + i, 0];
-      }      
-      samRecs.forEach(function(samRec) {
-        var idx = samRec.pos - start;
-        coverageRec = baseCoverage[idx];
-        coverageRec = [samRec.pos, samRec.depth];
-        baseCoverage[idx] = coverageRec;
-      });
-
-      if (maxPoints && maxPoints > 0) {
-        var factor = d3.round(baseCoverage.length / maxPoints);
-        var baseCoverageReduced = me.reducePoints(baseCoverage, factor, function(d) {return d[0]}, function(d) {return d[1]});
-        callback(baseCoverageReduced);
-      } else {
-        callback(baseCoverage);
-      }
-
-    },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
    //
    //
@@ -963,7 +844,27 @@ var Bam = Class.extend({
     vcfRecs.length = null;
 
     client.on('open', function(){
-      stream = client.createStream({event:'run', params : {'url':url}});
+      stream = client.createStream({event:'run', params : {'url':url + '&debug=true'}});
+
+      // New local file streaming
+      stream.on('createClientConnection', function(connection) {
+        console.log('got create client request');
+        var ended = 0;
+        var dataClient = BinaryClient('ws://' + connection.serverAddress);
+        dataClient.on('open', function() {
+          var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+          dataStream.write(me.header.toStr); 
+          var regions =  [{'name':refName,'start':regionStart,'end':regionEnd} ];           
+          for (var i=0; i < regions.length; i++) {
+            var region = regions[i];
+             me.convert('sam', region.name, region.start, region.end, function(data,e) {   
+                dataStream.write(data);                   
+                ended += 1;                  
+                if ( regions.length == ended) dataStream.end();
+             }, {noHeader:true});               
+          }                
+        })
+      });
       
       //
       // listen for stream data (the output) event. 
@@ -995,74 +896,6 @@ var Bam = Class.extend({
       });
       
     });
-
-/*
-
-    if (this.sourceType == "file") {
-      //
-      // stream the bam
-      //
-      client.on("stream", function(stream) {
-
-        me.convert('sam', refName, regionStart, regionEnd, function(data,e) {
-          stream.write(data);
-          stream.end();
-        }, 
-        {noHeader:false});   
-
-
-        COMMENT OUT!!
-        // Open bai and bam file
-        var bamR = new readBinaryBAM(me.options.bai, me.bamUri, function(baiR) {
-
-          // Get bam front (head and refs)      
-          bamR.bamFront(function(){
-
-          var withReads = bamR.refsWithReads().map(function(x) {return x[1]});        
-          var refsNregions = samplingRegions(withReads, {}).regions;
-          var bamblks = [bamR.headUba];
-
-          var bgzfHdr = bgzf(bamR.headUba);
-          stream.write([bgzfHdr]); //Send header
-
-          var regcnt = 0;
-          var totcnt = bgzfHdr.length + EOFblk.length;
-
-          bamR.throttledRegions2BAM(
-            refsNregions,
-            function(bgzfblks, fn, regmap){
-              //Only send two regions
-              if (bamblks && regcnt < 2) {
-
-                stream.write(bgzfblks);
-                
-                totcnt = totcnt + bgzfblks.reduce(
-                  function(S, x){return S+x.length},0);
-                regcnt = regcnt + 1;
-                fn.call(this, regmap);    // Step next region
-              } else {
-                //stream.write(EOFblk);
-
-                console.log("FINISHED, total bytes sent:", totcnt);
-              }
-            });
-          }); 
-       
-
-        });
-           
-        
-        
-
-        client.on("error", function(error) {
-          console.log("error encountered in streamBam " + error);
-        });
-      });
-    }
-    */
-
-
-
 
    },  
 
