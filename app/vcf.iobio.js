@@ -73,7 +73,7 @@ vcfiobio = function module() {
   //var snpEffServer           = "ws://localhost:8040";
   //var clinvarServer          = "ws://localhost:8040";
 
-
+/*
   var vcfstatsAliveServer    = "wss://vcfstatsalive.iobio.io";
   var tabixServer            = "wss://tabix.iobio.io";
   //var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
@@ -84,20 +84,20 @@ vcfiobio = function module() {
   var clinvarServer          = "wss://clinvar.iobio.io";
   var afServer               = "wss://af.iobio.io";
   var contigAppenderServer   = "wss://ctgapndr.iobio.io";
-
+*/
 
   //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
-  /*
-  var vcfstatsAliveServer    = "wss://nv-blue.iobio.io/vcfstatsalive";
-  var tabixServer            = "wss://nv-blue.iobio.io/tabix";
-  var vcfReadDeptherServer   = "wss://nv-blue.iobio.io/vcfdepther";
-  var snpEffServer           = "wss://nv-blue.iobio.io/snpeff";
-  var snpSiftServer          = "wss://nv-blue.iobio.io/snpsift";
-  var vtServer               = "wss://nv-blue.iobio.io/vt";
-  var clinvarServer          = "wss://nv-blue.iobio.io/clinvar";
-  var afServer               = "wss://nv-blue.iobio.io/af";
-  var contigAppenderServer   = "wss://nv-blue.iobio.io/ctgapndr";
-*/
+  
+  var vcfstatsAliveServer    = "wss://nv-green.iobio.io/vcfstatsalive";
+  var tabixServer            = "wss://nv-green.iobio.io/tabix";
+  var vcfReadDeptherServer   = "wss://nv-green.iobio.io/vcfdepther";
+  var snpEffServer           = "wss://nv-green.iobio.io/snpeff";
+  var snpSiftServer          = "wss://nv-green.iobio.io/snpsift";
+  var vtServer               = "wss://nv-green.iobio.io/vt";
+  var clinvarServer          = "wss://nv-green.iobio.io/clinvar";
+  var afServer               = "wss://nv-green.iobio.io/af";
+  var contigAppenderServer   = "wss://nv-green.iobio.io/ctgapndr";
+
   var vcfURL;
   var vcfReader;
   var vcfFile;
