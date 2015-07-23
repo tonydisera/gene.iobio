@@ -13,8 +13,9 @@
 #transcript-menu-item.ibo-gene .transcript.selected .exon,
 #transcript-menu-item.ibo-gene .transcript.selected .cds
 { 
-  fill: rgba(47, 215, 176, 0.69);
+  /*fill: rgba(47, 215, 176, 0.69);*/
   stroke: rgba(104, 168, 151, 1);
+  fill: #0097cf
 }
 #transcript-menu-item.ibo-gene .utr:hover,
 #transcript-menu-item.ibo-gene .cds:hover,
