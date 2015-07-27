@@ -200,7 +200,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
 					    	clickedVariant = d;
-					    	me.showCoverageCircle(d);
+					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
 				    		me.unpin();
@@ -208,7 +208,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					})			    
 				    .on('d3mouseover', function(d) {
 				    	if (clickedVariant == null) {
-					    	me.showCoverageCircle(d);
+					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	}
 					})
@@ -236,7 +236,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
 					    	clickedVariant = d;
-					    	me.showCoverageCircle(d);
+					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
 				    		me.unpin();
@@ -244,7 +244,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					})				    
 				    .on('d3mouseover', function(d) {
 						if (clickedVariant == null) {
-					    	me.showCoverageCircle(d);
+					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	}
 
@@ -766,7 +766,7 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) {
 	if (this.bamData) {
 		var bamDepth = null;
-		if (sourceVariantCard == this) {
+		if (sourceVariantCard == this && variant.bamDepth != null && variant.bamDepth != '') {
 			bamDepth = variant.bamDepth;
 		} else {
 			var matchingVariant = this.getMatchingVariant(variant)
