@@ -890,7 +890,7 @@ var effectCategories = [
               }
             });
             dataStream.end();
-          )};
+          });
         });
   
         //
@@ -1481,7 +1481,7 @@ var effectCategories = [
               regions[regionIndex].end, 
               onGetRecords);
 
-        )};
+        });
       });
 
       
