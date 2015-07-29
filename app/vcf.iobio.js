@@ -86,8 +86,10 @@ vcfiobio = function module() {
   var contigAppenderServer   = "wss://ctgapndr.iobio.io";
 */
 
+
   //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
   
+  var clinvarIterCount       = 0;
   var vcfstatsAliveServer    = "wss://nv-green.iobio.io/vcfstatsalive";
   var tabixServer            = "wss://nv-green.iobio.io/tabix";
   var vcfReadDeptherServer   = "wss://nv-green.iobio.io/vcfdepther";
@@ -680,6 +682,7 @@ var effectCategories = [
   exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback, callbackLoaded) {
     var me = this;
     var batchSize = 100;
+    me.clinvarIterCount = 0;
     // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
     // repeating until all variants have been processed.
     var numberOfBatches = d3.round(records.length / batchSize);
@@ -687,16 +690,12 @@ var effectCategories = [
       var start = i * batchSize;
       var end = start + batchSize;
       var batchOfRecords = records.slice(start, end <= records.length ? end : records.length);
-      var isFinal = false;
-      if (i == numberOfBatches - 1) {
-        isFinal = true;
-      }
-      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback, callbackLoaded, isFinal);
+      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback, callbackLoaded, numberOfBatches);
     }
   }  
 
   // NEW
-  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, isFinal) {
+  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, numberOfBatches) {
     var me = this;
 
     // Strip the ref name.
@@ -774,6 +773,11 @@ var effectCategories = [
         var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
         $.ajax( summaryUrl )
           .done(function(sumData) { 
+            me.clinvarIterCount++;
+            var isFinal = false;
+            if (me.clinvarIterCount == numberOfBatches) {
+              isFinal = true;
+            }
             if (sumData.result == null) {
               if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
                 sumData.esummaryresult.forEach( function(message) {

@@ -688,6 +688,10 @@ function loadTracksForGene(bypassVariantCards) {
 	}
 
 
+	$("#matrix-panel .loader").removeClass("hide");
+	$("#feature-matrix").addClass("hide");
+	$("#feature-matrix-note").addClass("hide");
+
 
 
 	filterCard.disableFilters();
@@ -821,26 +825,22 @@ function promiseFullTrio() {
 		var windowWidth = $(window).width();
 		var filterPanelWidth = $('#filter-track').width();
 		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-		$("#matrix-panel .loader").removeClass("hide");
-		$(".inheritance.loader").removeClass("hide");
-		$("#feature-matrix").addClass("hide");
-		$("#feature-matrix-note").addClass("hide");
+
+
 
 		// we need to compare the proband variants to mother and father variants to determine
 		// the inheritance mode.  After this completes, we are ready to show the
 		// feature matrix.
 		compareVariantsToPedigree(function() {
 			
-			$(".inheritance.loader").addClass("hide");
 			loaded.proband.promiseFullFeatured();
 
 		});
 	} else if (dataCard.mode == 'single' && loaded.proband != null) {
+		var windowWidth = $(window).width();
+		var filterPanelWidth = $('#filter-track').width();
 		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-		$("#matrix-panel .loader").removeClass("hide");
-		$("#feature-matrix").addClass("hide");
-		$(".inheritance.loader").addClass("hide");
-
+		
 		loaded.proband.promiseFullFeatured();
 
 	}

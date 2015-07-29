@@ -1112,32 +1112,32 @@ VariantCard.prototype.promiseFullFeatured = function() {
 	if (this.vcfData != null &&
 		this.vcfData.features != null &&
 		this.vcfData.loadState != null &&
-		this.vcfData.loadState['clinvar'] == true &&
-		(!this.isBamLoaded() || this.vcfData.loadState['coverage'] == true)) {
-		
-		// If the variants have been loaded and annotated with clinvar, and the inheritance
-		// mode has been determined, show the feature matrix.
-		if (this.getRelationship() == 'proband' && 
-			(dataCard.mode == 'single' || this.vcfData.loadState['inheritance'] == true)) {
+	   (dataCard.mode == 'single' || this.vcfData.loadState['inheritance'] == true) &&
+		this.vcfData.loadState['clinvar'] == true ) {
 
-			// Only fill the feature matrix once
-			if (!this.vcfData.loadState['featurematrix']) {
-				this.fillFeatureMatrix(regionStart, regionEnd);
-				this.setLoadState('featurematrix');
-			}
-		}
-
-		// Show the freebayes variants if we have fb data
-		if (this.isBamLoaded()) {
-			this.showCalledVariants(regionStart, regionEnd);
+		// Show the feature matrix as soon as clinvar has be loaded
+		// for proband
+		if (this.getRelationship() == 'proband') {
+			this.fillFeatureMatrix(regionStart, regionEnd);
 		}
 		
 		// Show the variant chart if variants are fully annotated with clinvar, inheritance,
 		// and coverage (if bam loaded).
 		if (!this.isBamLoaded() || this.vcfData.loadState['coverage'] == true) {
+
 			this.endVariantProgress();
 			this.showVariants(regionStart, regionEnd);
 
+			// Show the freebayes variants if we have fb data
+			if (this.isBamLoaded()) {
+				this.showCalledVariants(regionStart, regionEnd);
+			}
+
+			// Refresh the feature matrix after clinvar AND the coverage has
+			// been loaded
+			if (this.getRelationship() == 'proband') {
+				this.fillFeatureMatrix(regionStart, regionEnd);
+			}
 		}
 	} 
 
