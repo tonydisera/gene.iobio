@@ -23,7 +23,7 @@
     
       <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=&vcf1=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&name2=&vcf2=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam" target="_app"><h2>Platinum Trio</h2></a><span>The example platinum trio data has been modified to provide specific scenarios that can be investigated with gene.iobio. Each of the genes below demonstrates a particular use case.</span></li>
         <ul style="list-style-type: none;">
-          <li><h3>RAI1</h3> 
+          <li><h3>RAI1 - recessive variant</h3> 
             <span class="inline">
               Simple view of a <strong>recessive variant</strong>, pathogenic in clinvar. 
               <div style="padding:5px;">
@@ -40,7 +40,7 @@
               </div>
            </span>
       </li >
-        <li style="clear:both;"><h3>MYLK2</h3>
+        <li style="clear:both;"><h3>MYLK2 - real-time variant calling</h3>
           <div class="inline">
             This gene is used to demonstrate real-time variant calling using the provided alignments. 
             <img src="assets/images/usecases/mylk2_a.png" width="275px" align="left" style="padding-right:5px;"/>
@@ -56,7 +56,7 @@
           </div>
 
         </li>
-        <li style="clear:both;"><h3>AIRE</h3>
+        <li style="clear:both;"><h3>AIRE - low coverage alignments</h3>
           <div class="inline" >
             Variants can be missed as a result of <strong>low coverage</strong> in the alignments.
             <img src="assets/images/usecases/aire.png" width="300px" align="left" style="padding-top:20px; padding-right:5px;" />
@@ -64,7 +64,7 @@
             </div>
             </div>
         </li>
-        <li style="clear:both;"><h3>PDGFB</h3>
+        <li style="clear:both;"><h3>PDGFB - alternative transcripts</h3>
           <div class="inline">By default, when a gene is loaded, the canonical transcript is displayed and the SnpEff annotations applied to the variants are applicable to this transcript. There are no variants in the 'Rank Variants' table that appear to be interesting. From the transcript drop-down menu, <strong>select the third transcript (ENST00000381551.4).</strong> 
             <br>
             <img src="assets/images/usecases/pdgfb_a.png" width="600px" align="center" style="padding-top:20px;padding-bottom:20px;" />
