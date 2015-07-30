@@ -24,6 +24,7 @@ var variantCardTemplate = null;
 var regionStart = null;
 var regionEnd = null;
 var GENE_REGION_BUFFER = 1000;
+var GENE_REGION_BUFFER_MAX = 50000;
 
 // Transcript data and chart
 var gene = '';
@@ -420,8 +421,12 @@ function cacheCodingRegions() {
 
 
 function adjustGeneRegionBuffer() {
-	GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
-	$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});
+	if (+$('#gene-region-buffer-input').val() > GENE_REGION_BUFFER_MAX) {
+		alert("Up to 50 kb upstream/downstream regions can be displayed.")
+	} else {
+		GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
+		$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});		
+	}
 
 }
 
