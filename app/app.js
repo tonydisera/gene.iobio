@@ -545,7 +545,12 @@ function loadGeneWidget() {
 
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];		    
+		    	window.gene = response[0];		
+
+		    	// Save off the original start and end before we adjust for upstream/downstream regions
+		    	window.gene.startOrig = window.gene.start;
+		    	window.gene.endOrig = window.gene.end;    
+		    	
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
 		    	window.selectedTranscript = null;
@@ -641,7 +646,7 @@ function loadTracksForGene(bypassVariantCards) {
 
     $('#gene-chr').text(window.gene.chr);
     $('#gene-name').text(window.gene.gene_name);   
-    $('#gene-region').text(window.gene.regionStart + "-" + window.gene.regionEnd);
+    $('#gene-region').text(window.gene.startOrig + "-" + window.gene.endOrig);
 
 
 	if (window.gene.gene_type == 'protein_coding') {
@@ -659,10 +664,12 @@ function loadTracksForGene(bypassVariantCards) {
 
 
     // Open up gene region to include upstream and downstream region;
-	window.gene.start = window.gene.start < GENE_REGION_BUFFER ? 0 : window.gene.start - GENE_REGION_BUFFER;
+	window.gene.start = window.gene.startOrig < GENE_REGION_BUFFER ? 0 : window.gene.startOrig - GENE_REGION_BUFFER;
 	// TODO: Don't go past length of reference
-	window.gene.end   = window.gene.end + GENE_REGION_BUFFER;
-		    	
+	window.gene.end   = window.gene.endOrig + GENE_REGION_BUFFER;
+
+	window.regionStart = window.gene.start;
+	window.regionEnd   = window.gene.end;
 
 
    	// This will be the view finder, allowing the user to select

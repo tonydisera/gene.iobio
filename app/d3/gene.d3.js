@@ -19,6 +19,7 @@ function geneD3() {
   var geneD3_showXAxis = true;
 
 
+
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110};
   var geneD3_width = 800,
@@ -40,8 +41,8 @@ function geneD3() {
       utrHeight = undefined,
       cdsHeight = undefined,
       arrowHeight = undefined,
-      regionStart = undefined,
-      regionEnd = undefined,      
+      geneD3_regionStart = undefined,
+      geneD3_regionEnd = undefined,      
       geneD3_geneD3_widthPercent = null,
       geneD3_geneD3_heightPercent = null,     
       showBrushLine = false;
@@ -76,8 +77,8 @@ function geneD3() {
        var container = d3.select(this).classed('ibo-gene', true);    
 
       // Update the x-scale.
-      if (regionStart && regionEnd) {
-        x.domain([regionStart, regionEnd]);
+      if (geneD3_regionStart && geneD3_regionEnd) {
+        x.domain([geneD3_regionStart, geneD3_regionEnd]);
       } else {
         x.domain([ d3.min(data, function(d) { 
                      return d3.min(d.features, function(f) { return parseInt(f.start); }) 
@@ -222,8 +223,8 @@ function geneD3() {
       transcript.selectAll(".reference").remove();
       transcript.selectAll('.reference')
         .data(function(d) { 
-          if (regionStart && regionEnd) {
-            return [[regionStart,regionEnd]];
+          if (geneD3_regionStart && geneD3_regionEnd) {
+            return [[geneD3_regionStart,geneD3_regionEnd]];
           } else {
             return [[d.start, d.end]] 
 
@@ -514,13 +515,13 @@ function geneD3() {
   };
 
   chart.regionStart = function(_) {
-    if (!arguments.length) return regionStart;
-    regionStart = _;
+    if (!arguments.length) return geneD3_regionStart;
+    geneD3_regionStart = _;
     return chart;
   };
   chart.regionEnd = function(_) {
-    if (!arguments.length) return regionEnd;
-    regionEnd = _;
+    if (!arguments.length) return geneD3_regionEnd;
+    geneD3_regionEnd = _;
     return chart;
   };
 

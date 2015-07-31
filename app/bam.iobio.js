@@ -54,7 +54,8 @@ var Bam = Class.extend({
       
 
 //      this.iobio.bamtools = "ws://localhost:8061";
-//     this.iobio.samtools = "ws://localhost:8060";
+//      this.iobio.samtools = "ws://localhost:8060";
+//      this.iobio.coverage = "ws://localhost:8047"
 //      this.iobio.bamReadDepther = "ws://localhost:8021";
 //      this.iobio.bamMerger = "ws://localhost:8030";      
 //      this.iobio.bamstatsAlive = "ws://localhost:7100"

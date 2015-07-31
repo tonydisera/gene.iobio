@@ -885,8 +885,10 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		$("#feature-matrix").addClass("hide");
 		$("#feature-matrix-note").addClass("hide");
 
-		this.cardSelector.find(".vcfloader").removeClass("hide");
-		this.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")
+		if (this.isVcfLoaded()) {
+			this.cardSelector.find(".vcfloader").removeClass("hide");
+			this.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
+		}
 
 
 
@@ -946,6 +948,10 @@ VariantCard.prototype.onBrush = function(brush) {
 
 VariantCard.prototype.isBamLoaded = function() {
 	return this.bam && (this.bamUrlEntered || (this.bamFileOpened && this.getBamRefName));
+}
+
+VariantCard.prototype.isVcfLoaded = function() {
+	return this.vcf && (this.vcfUrlEntered || this.vcfFileOpened);
 }
 
 
@@ -1015,6 +1021,9 @@ VariantCard.prototype.showBamDepth = function(regionStart, regionEnd, callbackDa
 		var showCoverage = function() {
 			me.endBamProgress();
 			me.fillBamChart(me.bamData, window.gene.start, window.gene.end);
+
+			me.cardSelector.find('#button-find-missing-variants').css("visibility", "visible");
+
 
 			filterCard.enableCoverageFilters();
 			me.setLoadState('coverage');
@@ -1702,9 +1711,11 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 				// Reset the featurematrix load state so that after freebayes variants are called and
 				// integrated into vcfData, we reload the feature matrix.
-				if (me.vcfData.loadState != null && me.vcfData.loadState['featurematrix']) {
-					me.vcfData.loadState['featurematrix'] = null;
-				}
+				if (me.isVcfLoaded()) {
+					if (me.vcfData.loadState != null && me.vcfData.loadState['featurematrix']) {
+						me.vcfData.loadState['featurematrix'] = null;
+					}					
+				} 
 
 				// Annotate the fb variants
 				me.vcf.annotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene.start, window.gene.end, 
@@ -1715,6 +1726,14 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				   	});
 
 					me.fbData = data;
+
+					if (!me.isVcfLoaded()) {
+						// If no variants are loaded, create a dummy vcfData with 0 features
+						me.vcfData = $.extend({}, me.fbData);
+						me.vcfData.features = [];
+						me.setLoadState('clinvar');
+						me.setLoadState('coverage');
+					}
 
 		        	me.determineVariantAfLevels(me.fbData);
 
@@ -1741,15 +1760,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);					
 					me.fbData.features  = me.fbData.features.sort(orderVariantsByPosition);
 
-
-					// Compare the variant sets, marking the variants as unique1 (only in vcf), 
-					// unique2 (only in freebayes set), or common (in both sets).				
-					me.vcf.compareVcfRecords(me.vcfData, me.fbData, function() {						
-
-				    	// Add unique freebayes variants to vcfData
-				    	me.fbData.features = me.fbData.features.filter(function(d) {
-				    		return d.consensus == 'unique2';
-				    	});
+					var processFreebayesData = function() {
 				    	me.cardSelector.find('#missing-variant-count').text(me.fbData.features.length);
 				    	me.cardSelector.find('#missing-variant-count-label').text("Called");
 
@@ -1772,8 +1783,27 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 				        maxLevel = me._pileupVariants(me.fbChart, me.fbData.features, gene.start, gene.end);
 						me.fbData.maxLevel = maxLevel + 1;
 
-						
-				    });
+					}
+
+
+					// Compare the variant sets, marking the variants as unique1 (only in vcf), 
+					// unique2 (only in freebayes set), or common (in both sets).	
+					if (me.isVcfLoaded()) {
+						me.vcf.compareVcfRecords(me.vcfData, me.fbData, function() {						
+
+					    	// Add unique freebayes variants to vcfData
+					    	me.fbData.features = me.fbData.features.filter(function(d) {
+					    		return d.consensus == 'unique2';
+					    	});
+
+					    	processFreebayesData();
+
+							
+					    });
+ 
+					} else {
+						processFreebayesData();
+					}			
 				}, me.refreshVariantsWithClinvar.bind(me), me.loadedClinvar.bind(me));
 			}
 			
