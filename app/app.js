@@ -115,7 +115,10 @@ function init() {
     $.material.init();
 
     // Initialize app tour
-	tl.pg.init({ 'auto_refresh': true, 'custom_open_button': '.open_page_guide'}); 
+	tl.pg.init({ 
+		'auto_refresh': true, 
+		'custom_open_button': '.open_page_guide'
+    }); 
 
 	// Initialize data card
 	dataCard = new DataCard();
@@ -265,13 +268,14 @@ function toggleSampleTrio(show) {
 }
 
 function loadGeneFromUrl() {
+	
 	var gene = getUrlParameter('gene');
 	if (gene != undefined) {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
 	} else {
 		$('#tourWelcome').addClass("open");
-
 	}
+	
 }
 
 function loadUrlSources() {

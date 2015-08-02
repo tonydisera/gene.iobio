@@ -39,6 +39,7 @@ body {
   visibility: hidden !important;
 }
 
+
 .dropdown-menu .divider {
   height: 1px;
   margin: 9px 0;
@@ -56,6 +57,12 @@ body {
   webkit-box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25);
   box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25);
 
+}
+
+#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close, 
+#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close:hover,
+#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close:focus {
+  color: white !important;
 }
 
 
