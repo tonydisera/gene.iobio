@@ -422,6 +422,7 @@ VariantCard.prototype.clearVcf = function() {
 	this.cardSelector.find('#vcf-variants').css("display", "none");
 	this.cardSelector.find(".vcfloader").addClass("hide");
 	this.cardSelector.find('#vcf-variant-card-label').text("");
+	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
 	this.cardSelector.find('#vcf-variant-count').text("");
 
 
@@ -872,6 +873,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 
     	this.cardSelector.find('#displayed-variant-count').text("");
+    	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	this.cardSelector.find('#vcf-variant-count').text("");
     	this.cardSelector.find('#missing-variant-count').text("");
     	this.cardSelector.find('#missing-variant-count-label').text("Call from alignments");
@@ -1223,6 +1225,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 					$('#filter-track').addClass("hide");
 				    $('#matrix-track').addClass("hide");
 				    me.cardSelector.find("#vcf-track").addClass("hide");
+				    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
 				    me.cardSelector.find("#vcf-variant-count").text("");
 				    me.cardSelector.find("#button-find-missing-variants").css("visibility", "hidden");
 				    me.cardSelector.find('.vcfloader').addClass("hide");
@@ -1233,7 +1236,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 					// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 				    // can be filtered by range.
 				    me.determineVariantAfLevels(me.vcfData);
-					
+						
+
+					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
 			        me.cardSelector.find('#vcf-variant-count').text(me.vcfData.features.length != null ? me.vcfData.features.length : "0");
 			        var filteredVcfData = me.filterVariants();
 

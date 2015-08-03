@@ -13,6 +13,10 @@ body {
   */
 }
 
+.label {
+  padding: 3px 6px 3px 6px !important;
+}
+
 .label-warning {
   background-color: #DB4F36;
   padding-bottom: 2px;
@@ -128,6 +132,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 
 .badge-label {
  color: rgba(104, 152, 168, 1);
+ font-size: 13px;
 }
 
 #variant-badges a:hover, #variant-badges a:focus {
@@ -184,7 +189,7 @@ a, a:hover, a:focus {
 .badge {
   display: inline-block;
   min-width: 10px;
-  padding: 3px 7px;
+  padding: 2px 7px 1px 7px !important;
   font-size: 12px;
   font-weight: 700;
   line-height: 1;

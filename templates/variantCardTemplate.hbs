@@ -2,23 +2,25 @@
 
 
   <div style="text-align:center;margin-top: 6px;margin-bottom: 6px;">
-    <span id="card-relationship-label"  class="card-label heading" style="float:left;text-align:left;width:90px;">
+    <span id="card-relationship-label"  class="card-label heading" style="float:left;text-align:left;width:70px;">
       Sample
     </span>
                 
-    <span class="card-label heading" id="variant-card-label" style="float: left;margin-left: 5px;"></span>
+    <span class="card-label heading" id="variant-card-label" style="float: left;margin-left: 5px;margin-right: 5px;width: 90px;text-align: left;"></span>
 
-    <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:30px;margin-top:2px">
-      <li>
-            <span class="badge-label">Variants</span>
+    
+    <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
+      <li>           
+            
+            <span id="vcf-variant-count-label" class="badge-label hide">Variants Loaded</span>
             <span id="vcf-variant-count" class="badge"></span>
       </li>
 
       <li>
         <a href="javascript:void(0)" id="button-find-missing-variants" style="visibility:hidden;padding-top:0px">
             <i class="mdi-action-find-in-page"></i>
-            <span id="missing-variant-count-label">Call from alignments</span>
-            <span id="missing-variant-count" class="badge"></span>
+            <span id="missing-variant-count-label" class="badge-label" style="margin-left:-3px;">Call from alignments</span>
+            <span id="missing-variant-count" style="margin-left:0px;" class="badge"></span>
         </a>
       </li>
       <li style="padding-left:10px;" >
