@@ -69,6 +69,8 @@ var widthFactors = [
 	{'regionStart': 30001, 'regionEnd': 90000000,  'factor': 1},
 ];
 
+var pageGuide = null;
+
 
 $(document).ready(function(){
 
@@ -115,9 +117,9 @@ function init() {
     $.material.init();
 
     // Initialize app tour
-	tl.pg.init({ 
+	pageGuide = tl.pg.init({ 
 		'auto_refresh': true, 
-		'custom_open_button': '.open_page_guide'
+		'custom_open_button': '.open_page_guide' 
     }); 
 
 	// Initialize data card
@@ -270,10 +272,16 @@ function toggleSampleTrio(show) {
 function loadGeneFromUrl() {
 	
 	var gene = getUrlParameter('gene');
+	var showTour = getUrlParameter('showTour');
 	if (gene != undefined) {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
 	} else {
-		$('#tourWelcome').addClass("open");
+		if (showTour != null && showTour == 'Y') {
+			pageGuide.open();
+		} else {
+			$('#tourWelcome').addClass("open");
+		}
+
 	}
 	
 }
@@ -583,7 +591,6 @@ function loadGeneWidget() {
 			    	updateUrl('gene', window.gene.gene_name);
 			    	if(data.callback != undefined) data.callback();
 
-					//tl.pg.refreshVisibleSteps();
 		    	}
 		    	
 

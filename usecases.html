@@ -1,8 +1,16 @@
 <html>
 <head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
-    <link rel="stylesheet" href="assets/css/site.css" />
+	<link rel="stylesheet" href="http://cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
+  <link rel="stylesheet" href="assets/css/site.css" />
+
+  <!-- fonts -->
+  <link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
+  
+
+  <script src="assets/js/jquery.1.11.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script> 
+
 
 </head>
 <body>
@@ -14,6 +22,22 @@
     <a href="http://iobio.io" class="iobioproject">           
       an iobio project
     </a>   
+   <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 40px;">
+      <div class="btn-group"  style="display:  inline;margin-top: 15px;">
+
+        <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          Learn more <span class="caret"></span>
+        </button>
+
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="javascript:void(0)" onclick="window.open('index.html?showTour=Y', '_geneiobio');" class="open_page_guide">Tour</a>
+          </li>
+          <li><a href="javascript:void(0)"  onclick="window.open('videos.html', '_screencasts');">Screencasts</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </section>
 
 <div class="container" class="shadow-z-1" style="background-color:white;margin-top:10px;">
@@ -83,5 +107,11 @@
 </div>
 
 </div>
+<script src="assets/js/jquery.dropdown.js"></script>
+<script>
+  $(".material-dropdown select").dropdown();
+</script>
+<script src="assets/js/pageguide.min.js"></script>
+
 </body>
 </html>
