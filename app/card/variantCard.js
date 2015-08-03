@@ -890,6 +890,8 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		if (this.isVcfLoaded()) {
 			this.cardSelector.find(".vcfloader").removeClass("hide");
 			this.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
+		} else {
+			$("#filter-and-rank-card").addClass("hide");
 		}
 
 
