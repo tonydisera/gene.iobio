@@ -1005,6 +1005,8 @@ function compareVariantsToPedigree(callback) {
 		        		filterCard.enableInheritanceFilters(theVcfData);
   						
   						probandVariantCard.setLoadState('inheritance');
+  						fatherVariantCard.setLoadState('inheritance');
+  						motherVariantCard.setLoadState('inheritance');
 
 			        	callback(theVcfData);
 			        }, 
