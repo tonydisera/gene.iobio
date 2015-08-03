@@ -97,16 +97,11 @@ var Bam = Class.extend({
    },
    
    _getBamRegionsUrl: function(regions, golocal) {
-      var samtools = null;
-      if (golocal) {
-        samtools = this.iobio.samtools;
-      } else {
-        samtools = this.iobio.samtools;
-      }
+      var samtools = this.iobio.samtools;
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary";
+         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&protocol=http&encoding=binary";
       } else {
          // creates a url for a new bam that is sliced from an old bam
          // open connection to iobio webservice that will request this data, since connections can only be opened from browser
@@ -688,8 +683,8 @@ var Bam = Class.extend({
         }
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
-
-        var url = encodeURI( me.iobio.coverage + '?encoding=utf8&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+        var protocol = this.sourceType == "url" ? '&protocol=http' : '';
+        var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
         var client = BinaryClient(me.iobio.coverage);
         
@@ -733,6 +728,10 @@ var Bam = Class.extend({
                   var coverageForPoints = [];
                   var coverageForRegion = [];
                   var lines = samData.split('\n');
+                  console.log('line count = ' + lines.length);
+                  for (var x = lines.length - 11; x < lines.length; x++) {
+                    console.log(lines[x]);
+                  }
                   lines.forEach(function(line) {
                     if (line.indexOf("#specific_points") == 0) {
                       coverage = coverageForPoints;
