@@ -832,7 +832,7 @@ var effectCategories = [
       })*/
 
       
-      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client?&debug=true"));
+      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
 
       //
       // stream the vcf records to snpEffClient
@@ -877,7 +877,7 @@ var effectCategories = [
       var client = BinaryClient(snpEffServer);
       var buffer = "";
       client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':snpEffUrl + '&debug=true'}});
+        var stream = client.createStream({event:'run', params : {'url':snpEffUrl}});
 
         // New local file streaming
         stream.on('createClientConnection', function(connection) {
@@ -1418,7 +1418,7 @@ var effectCategories = [
 
     var buffer = "";
     client.on('open', function(){
-      var stream = client.createStream({event:'run', params : {'url':url + '&debug=true'}});
+      var stream = client.createStream({event:'run', params : {'url':url}});
 
       // New local file streaming
       stream.on('createClientConnection', function(connection) {

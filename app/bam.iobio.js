@@ -106,7 +106,7 @@ var Bam = Class.extend({
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary&debug=true";
+         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&encoding=binary";
       } else {
          // creates a url for a new bam that is sliced from an old bam
          // open connection to iobio webservice that will request this data, since connections can only be opened from browser
@@ -574,7 +574,7 @@ var Bam = Class.extend({
          var url = encodeURI( me.iobio.bamstatsAlive + '?cmd=-u 3000 -r \'' + regStr + '\' ' + encodeURIComponent(me._getBamRegionsUrl(regions)));
          var buffer = "";
          client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url + '&debug=true'}});
+            var stream = client.createStream({event:'run', params : {'url':url}});
 
             // New local file streaming
             stream.on('createClientConnection', function(connection) {
@@ -845,7 +845,7 @@ var Bam = Class.extend({
     vcfRecs.length = null;
 
     client.on('open', function(){
-      stream = client.createStream({event:'run', params : {'url':url + '&debug=true'}});
+      stream = client.createStream({event:'run', params : {'url':url}});
 
       // New local file streaming
       stream.on('createClientConnection', function(connection) {
