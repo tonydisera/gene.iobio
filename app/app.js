@@ -74,7 +74,7 @@ var pageGuide = null;
 
 $(document).ready(function(){
 
-	if (detectIE() == true) {
+	if (detectIE() != false) {
 		alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
 	}
 
