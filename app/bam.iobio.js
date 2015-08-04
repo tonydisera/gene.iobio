@@ -573,7 +573,6 @@ var Bam = Class.extend({
 
             // New local file streaming
             stream.on('createClientConnection', function(connection) {
-              console.log('got create client request');
               var ended = 0;
               var dataClient = BinaryClient('ws://' + connection.serverAddress);
               dataClient.on('open', function() {
@@ -683,7 +682,7 @@ var Bam = Class.extend({
         }
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
-        var protocol = this.sourceType == "url" ? '&protocol=http' : '';
+        var protocol = me.sourceType == "url" ? '&protocol=http' : '';
         var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
         var client = BinaryClient(me.iobio.coverage);
@@ -696,7 +695,6 @@ var Bam = Class.extend({
 
             // New local file streaming
             stream.on('createClientConnection', function(connection) {
-              console.log('got create client request');
               var ended = 0;
               var dataClient = BinaryClient('ws://' + connection.serverAddress);
               dataClient.on('open', function() {
@@ -728,10 +726,6 @@ var Bam = Class.extend({
                   var coverageForPoints = [];
                   var coverageForRegion = [];
                   var lines = samData.split('\n');
-                  console.log('line count = ' + lines.length);
-                  for (var x = lines.length - 11; x < lines.length; x++) {
-                    console.log(lines[x]);
-                  }
                   lines.forEach(function(line) {
                     if (line.indexOf("#specific_points") == 0) {
                       coverage = coverageForPoints;
@@ -848,7 +842,6 @@ var Bam = Class.extend({
 
       // New local file streaming
       stream.on('createClientConnection', function(connection) {
-        console.log('got create client request');
         var ended = 0;
         var dataClient = BinaryClient('ws://' + connection.serverAddress);
         dataClient.on('open', function() {

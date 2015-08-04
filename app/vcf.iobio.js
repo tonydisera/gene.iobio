@@ -881,7 +881,6 @@ var effectCategories = [
 
         // New local file streaming
         stream.on('createClientConnection', function(connection) {
-          console.log('got create client request');
           var ended = 0;
           var dataClient = BinaryClient('ws://' + connection.serverAddress);
           dataClient.on('open', function() {
@@ -1422,7 +1421,6 @@ var effectCategories = [
 
       // New local file streaming
       stream.on('createClientConnection', function(connection) {
-        console.log('got create client request');
         var ended = 0;
         var dataClient = BinaryClient('ws://' + connection.serverAddress);
         dataClient.on('open', function() {
