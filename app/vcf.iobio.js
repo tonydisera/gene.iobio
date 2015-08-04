@@ -492,16 +492,16 @@ var effectCategories = [
     
   }
   // NEW
-  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded) {
+  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded);
+      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
     } else {
-      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded);
+      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
     }
   }
  
   // NEW
-  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded) {
+  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -533,7 +533,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded) {
+  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
@@ -617,7 +617,7 @@ var effectCategories = [
 
           // Get the Clinvar variants, passing in the vcf recs that came back from snpEff.
           if (callbackClinvar) {
-            me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded);
+            me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
           }
         });
     });
@@ -625,7 +625,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded) {
+  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
 
 
@@ -633,7 +633,7 @@ var effectCategories = [
     // For each vcf records, call snpEff to get the annotations.
     // Each vcf record returned will have an EFF field in the 
     // info field.
-    me._annotateVcfRegion(records, refName,function(annotatedData) {
+    me._annotateVcfRegion(records, refName, function(annotatedData) {
 
       var annotatedRecs = annotatedData.split("\n");
       var vcfObjects = [];
@@ -672,15 +672,20 @@ var effectCategories = [
 
 
       if (callbackClinvar) {
-        me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded);
+        me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
       }
-    });
+    }
+
+    );
 
   }
 
   // NEW
-  exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback, callbackLoaded) {
+  exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback, callbackLoaded, callbackBegin, callbackFailure) {
     var me = this;
+    if (callbackBegin) {
+      callbackBegin();
+    }
     var batchSize = 100;
     me.clinvarIterCount = 0;
     // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
@@ -690,12 +695,12 @@ var effectCategories = [
       var start = i * batchSize;
       var end = start + batchSize;
       var batchOfRecords = records.slice(start, end <= records.length ? end : records.length);
-      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback, callbackLoaded, numberOfBatches);
+      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback, callbackLoaded, callbackFailure, numberOfBatches);
     }
   }  
 
   // NEW
-  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, numberOfBatches) {
+  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, callbackFailure, numberOfBatches) {
     var me = this;
 
     // Strip the ref name.
@@ -812,10 +817,23 @@ var effectCategories = [
           })
           .fail(function() {
             console.log('Error: clinvar http request failed to get summary data');
+            if (callbackFailure) {
+              callbackFailure();
+            }
+            if (finalCallback) {
+              finalCallback();              
+            }
           })
       })
       .fail(function() {
         console.log('Error: clinvar http request failed to get IDs');
+        if (callbackFailure) {
+          callbackFailure();
+        }
+        if (finalCallback) {
+          finalCallback();              
+        }
+
       })
    
   }

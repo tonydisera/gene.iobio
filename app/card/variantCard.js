@@ -846,6 +846,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.d3CardSelector.select('#fb-variants svg').remove();
 	this.cardSelector.find("#multiple-sample-warning").addClass("hide");
 	this.cardSelector.find('#no-variants-warning').addClass("hide");
+	this.cardSelector.find('#clinvar-warning').addClass("hide");
 
 
 	if (this.isViewable()) {
@@ -1263,7 +1264,17 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 			
 
 			},
-			me.refreshVariantsWithClinvar.bind(me), me.loadedClinvar.bind(me));	
+			me.refreshVariantsWithClinvar.bind(me), 
+			me.loadedClinvar.bind(me),
+			function() {
+			 	me.cardSelector.find('.vcfloader').removeClass("hide");
+				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+				me.cardSelector.find('#clinvar-warning').addClass("hide");
+			},
+			function() {
+			 	me.cardSelector.find('.vcfloader').addClass("hide");
+			 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
+			});
 
 		});
 
@@ -1471,7 +1482,8 @@ VariantCard.prototype.refreshVariantsWithCoverage = function(coverage, callback)
 	}
 	var recs = this.vcfData.features;
 
-	me.cardSelector.find(".vcfloader .loader-label").text("Calculating coverage for variants");
+	me.cardSelector.find(".vcfloader").removeClass("hide");
+	me.cardSelector.find(".vcfloader .loader-label").text("Annotating variants with coverage");
 
 	
     me.flagDupStartPositions(recs);
@@ -1505,6 +1517,7 @@ VariantCard.prototype.refreshVariantsWithCoverage = function(coverage, callback)
 
       	}
 	}
+	me.cardSelector.find(".vcfloader").addClass("hide");
 	callback();
 
 
@@ -1811,7 +1824,18 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 					} else {
 						processFreebayesData();
 					}			
-				}, me.refreshVariantsWithClinvar.bind(me), me.loadedClinvar.bind(me));
+				}, 
+				me.refreshVariantsWithClinvar.bind(me), 
+				me.loadedClinvar.bind(me),
+				function() {
+				 	me.cardSelector.find('.vcfloader').removeClass("hide");
+					me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+					me.cardSelector.find('#clinvar-warning').addClass("hide");
+				},
+				function() {
+				 	me.cardSelector.find('.vcfloader').addClass("hide");
+				 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
+				});
 			}
 			
 		});
@@ -2057,6 +2081,15 @@ VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, c
 					feature[compareAttribute] = '';
 				});
 				me.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 								 	
+			 },
+			 function() {
+			 	me.cardSelector.find('.vcfloader').removeClass("hide");
+				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+				me.cardSelector.find('#clinvar-warning').addClass("hide");
+			 },
+			 function() {
+			 	me.cardSelector.find('.vcfloader').addClass("hide");
+			 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
 			 });
 		});
 		
