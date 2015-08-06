@@ -22,6 +22,7 @@ function VariantCard() {
 	this.cardIndex = null;
 	this.name = null;
 	this.dirty = false;
+	this.vcfRefNamesMap = {};
 }
 
 VariantCard.prototype.isLoaded = function() {
@@ -336,29 +337,8 @@ VariantCard.prototype.onBamFilesSelected = function(event, callback) {
 
 	this.bam = new Bam( bamFile, { bai: baiFile });
 
-	this.getBamRefName = null;
-	this.bam.getReferencesWithReads(function(ref) {
-
-		// Figure out if whe need to strip 'ch' or 'chr' from ref name to
-		// match to bam reference names
-		ref.forEach(function(ref) {
-			if (me.getBamRefName == null) {
-		 		if (ref.name == window.gene.chr) {
-		 			me.getBamRefName = me.getRefName;
-					if (callback) {
-						callback(bamFile.name);
-					}
-		 		} else if (ref.name == me.stripRefName(gene.chr)) {
-		 			me.getBamRefName = me.stripRefName;
-		 			if (callback) {
-						callback(bamFile.name);
-					}
-
-		 		}
-			}
-		});
-	
-	});
+	this.getBamRefName = this.stripRefName;
+	callback(bamFile.name);
 }
 
 VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
@@ -406,6 +386,7 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 
 		me.vcfFileOpened = true;
 		me.vcfUrlEntered = false;
+
 		me.cardSelector.find('#vcf-name').text(vcfFile.name);
 		callback(vcfFile.name);
 		me.getVcfRefName = null;
@@ -415,8 +396,10 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 }
 
 VariantCard.prototype.clearVcf = function() {
+
 	this.vcfData = null;
 	this.vcfUrlEntered = false;
+	this.vcfFileOpened = false;
 	this.setDirty(false);
 	this.cardSelector.find('#vcf-track').addClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "none");
@@ -455,16 +438,32 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 
 }
 
+VariantCard.prototype.displayRefNotFoundWarning = function() {
+	this.cardSelector.find('#vcf-track').addClass("hide");
+	this.cardSelector.find(".vcfloader").addClass("hide");
+	$('#filter-track').addClass("hide");
+	$('#matrix-track').addClass("hide");
+	this.cardSelector.find('#no-ref-found-warning #message').text("Unable to find reference " + window.gene.chr + " in vcf header.");
+	this.cardSelector.find('#no-ref-found-warning').removeClass("hide");
+
+	filterCard.clearFilters();	
+}
+
 
 VariantCard.prototype.discoverVcfRefName = function(callback) {
 	var me = this;
 	if (this.getVcfRefName != null) {
+		// If we can't find the ref name in the lookup map, show a warning.
+		if (this.vcfRefNamesMap[this.getVcfRefName(window.gene.chr)] == null) {
+			this.displayRefNotFoundWarning();
+		}
 		callback();
 	} else {
+		this.vcfRefNamesMap = {};
 		if (this.vcf.isFile()) {
 			this.vcf.getReferenceNames(function(refNames) {
 				var foundRef = false;
-				refNames.forEach( function(refName) {
+				refNames.forEach( function(refName) {					
 		    		if (me.getVcfRefName == null) {
 				 		if (refName == window.gene.chr) {
 				 			me.getVcfRefName = me.getRefName;
@@ -477,13 +476,17 @@ VariantCard.prototype.discoverVcfRefName = function(callback) {
 				 		}
 					}
 		    	});
+		    	// Load up a lookup table.  We will use this for validation when
+		    	// a new gene is loaded to make sure the ref exists.
+		    	if (foundRef) {
+		    		refNames.forEach( function(refName) {
+		    			var theRefName = me.getVcfRefName(refName);
+		    			me.vcfRefNamesMap[theRefName] = refName; 
+		    		});
+		    	}
+		    	// If we didn't find the matching ref name, show a warning.
 				if (!foundRef && me.getVcfRefName == null) {
-					me.cardSelector.find('#vcf-track').addClass("hide");
-					me.cardSelector.find(".vcfloader").addClass("hide");
-					$('#filter-track').addClass("hide");
-				    $('#matrix-track').addClass("hide");
-	
-					filterCard.clearFilters();
+					me.displayRefNotFoundWarning();
 				}
 
 			});
@@ -505,13 +508,16 @@ VariantCard.prototype.discoverVcfRefName = function(callback) {
 				 		}
 					}
 		    	});
+		    	// Load up a lookup table.  We will use this for validation when
+		    	// a new gene is loaded to make sure the ref exists.
+		    	if (foundRef) {
+		    		refData.forEach( function(ref) {
+		    			var theRefName = me.getVcfRefName(ref.name);
+		    			me.vcfRefNamesMap[theRefName] = ref.name; 
+		    		});
+		    	}
 		    	if (!foundRef && me.getVcfRefName == null) {
-					me.cardSelector.find('#vcf-track').addClass("hide");
-					me.cardSelector.find(".vcfloader").addClass("hide");
-					$('#filter-track').addClass("hide");
-				    $('#matrix-track').addClass("hide");
-
-					filterCard.clearFilters();
+		    		me.displayRefNotFoundWarning();					
 				} 
 	    	});
 		} 		
@@ -840,6 +846,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.clickedVariant = null;
 	window.hideCircleRelatedVariants();
 
+
 	// Clear out the freebayes charts in the variant card
 	this.cardSelector.find('#fb-chart-label').addClass("hide");
 	this.cardSelector.find('#fb-separator').addClass("hide");
@@ -847,6 +854,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	this.cardSelector.find("#multiple-sample-warning").addClass("hide");
 	this.cardSelector.find('#no-variants-warning').addClass("hide");
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
+	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
 
 
 	if (this.isViewable()) {
@@ -1267,9 +1275,12 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 			me.refreshVariantsWithClinvar.bind(me), 
 			me.loadedClinvar.bind(me),
 			function() {
-			 	me.cardSelector.find('.vcfloader').removeClass("hide");
-				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-				me.cardSelector.find('#clinvar-warning').addClass("hide");
+				// Only show the 'Loading Clinvar' progress if we have variants.
+				if (me.vcfData != null && me.vcfData.features != null && me.vcfData.features.length > 0) {
+				 	me.cardSelector.find('.vcfloader').removeClass("hide");
+					me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+					me.cardSelector.find('#clinvar-warning').addClass("hide");					
+				}
 			},
 			function() {
 			 	me.cardSelector.find('.vcfloader').addClass("hide");
