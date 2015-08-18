@@ -72,11 +72,13 @@ vcfiobio = function module() {
   var catInputServer         = "ws://localhost:7063";
   //var snpEffServer           = "ws://localhost:8040";
   //var clinvarServer          = "ws://localhost:8040";
+  //var annotServer              = "ws://localhost:7077";
+  //var vepServer               = "ws://localhost:7078";
+  var vepServer               = "ws://nv-dev.iobio.io/vep/";
 
 /*
   var vcfstatsAliveServer    = "wss://vcfstatsalive.iobio.io";
   var tabixServer            = "wss://tabix.iobio.io";
-  //var vcfReadDeptherServer   = "ws://vcfreaddepther.iobio.io";
   var vcfReadDeptherServer   = "wss://vcfdepther.iobio.io";
   var snpEffServer           = "wss://snpeff.iobio.io";
   var snpSiftServer          = "wss://snpsift.iobio.io";
@@ -85,6 +87,7 @@ vcfiobio = function module() {
   var afServer               = "wss://af.iobio.io";
   var contigAppenderServer   = "wss://ctgapndr.iobio.io";
 */
+
 
 
   //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
@@ -98,6 +101,7 @@ vcfiobio = function module() {
   var vtServer               = "wss://nv-green.iobio.io/vt";
   var clinvarServer          = "wss://nv-green.iobio.io/clinvar";
   var afServer               = "wss://nv-green.iobio.io/af";
+  //var vepServer              = "wss://nv-green.iobio.io/vep";
   var contigAppenderServer   = "wss://nv-green.iobio.io/ctgapndr";
 
   var vcfURL;
@@ -549,13 +553,13 @@ var effectCategories = [
 
     // normalize variants
     var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(contigAppenderUrl));
-    //var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(encodeURI(tabixUrl)));
-
+    
     // get allele frequencies from 1000G and ExAC
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
-    //var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vtUrl));
-    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
+    var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
+
+    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
     
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
@@ -842,39 +846,8 @@ var effectCategories = [
   // NEW
   exports._annotateVcfRegion = function(records, refName, callback, callbackClinvar) {
       var me = this;
-      /*var connectionID = this._makeid();
-      var clientContig = BinaryClient(contigAppenderServer + '?id=', {'connectionID' : connectionID} );
-      clientContig.on('open', function(stream){
-        var stream = clientContig.createStream({event:'setID', 'connectionID':connectionID});
-        stream.end();
-      })*/
-
       
       var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
-
-      //
-      // stream the vcf records to snpEffClient
-      //
-      /*
-      clientContig.on("stream", function(stream) {
-      
-
-        records.forEach( function(record) {
-          if (record.trim() == "") {
-          } else {
-            stream.write(record + "\n");
-          }
-        });
-
-        stream.end();
-
-      });
-
-      clientContig.on("error", function(error) {
-        console.log("error while streaming vcf records " + error);
-      });
-      */
-
 
       if (refName.indexOf('chr') == 0) {
         refFile = "./data/references_hg19/" + refName + ".fa";
@@ -887,9 +860,12 @@ var effectCategories = [
       
       // Get Allele Frequencies from 1000G and ExAC
       var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-
+      
+      // Call VEP
+      var vepUrl = encodeURI( vepServer + "?cmd= " + encodeURIComponent(afUrl));
+      
       // Call snpEff service
-      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
+      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(vepUrl));
       
       
       var client = BinaryClient(snpEffServer);
@@ -1003,7 +979,7 @@ var effectCategories = [
             }
 
 
-            // Parse the svtype and snpEff annotations from the info field
+            // svtype and snpEff annotations from the info field
             var effects = new Object();
             var impacts = new Object();  
             var af = null;       
@@ -1011,7 +987,32 @@ var effectCategories = [
             var combinedDepth = null;
             var af1000G = '.';
             var afExAC = '.';
+            var rs = null;
             var annotTokens = rec.info.split(";");
+
+            // vep annotations from the info field
+            //Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature
+            // |BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|
+            // Protein_position|Amino_acids|Codons|Existing_variation|
+            // DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|SIFT|PolyPhen|
+            // HGVS_OFFSET|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
+            var vepConsequence = new Object(),  vepConsequenceIndex =1;
+            var vepImpact = new Object(),       vepImpactIndex = 2;
+            var vepFeatureType = new Object(),  vepFeatureTypeIndex = 5;
+            var vepFeature = new Object(),      vepFeatureIndex = 6;
+            var vepExon = new Object(),         vepExonIndex = 8;
+            var vepHGVSc = new Object(),        vepHGVScIndex = 10;
+            var vepHGVSp = new Object(),        vepHGVSpIndex = 11;
+            var vepAminoAcids = new Object(),   vepAminoAcidsIndex = 15;
+            var vepSIFT = new Object(),         vepSIFTIndex = 22;
+            var vepPolyPhen = new Object(),     vepPolyPhenIndex = 23;
+
+            var vepRegs = [];            
+            var vepRegBioTypeIndex = 7;
+            var vepRegMotifNameIndex = 25;
+            var vepRegMotifPosIndex = 26;
+            var vepRegMotifHiInfIndex = 27;
+
             // Iterate through the annotation fields, looking for the
             // annotation EFF
             annotTokens.forEach(function(annotToken) {
@@ -1019,6 +1020,8 @@ var effectCategories = [
                 af1000G = annotToken.substring(9, annotToken.length);                
               } else if (annotToken.indexOf("BGAF_EXAC=") == 0) {
                 afExAC = annotToken.substring(10, annotToken.length);
+              } else if (annotToken.indexOf("RS=") == 0) {
+                rs = annotToken.substring(3, annotToken.length);
               } else if (annotToken.indexOf("AF=") == 0) {
                 // TODO:  vcfstatsalive must look at af by alt.
                 // For now, just grab first af
@@ -1064,6 +1067,46 @@ var effectCategories = [
 
                   firstTime = false;
                 });
+              } else if (annotToken.indexOf("CSQ") == 0) {
+                // We have found the VEP annotation. Now split
+                // the CSQ string into its parts.  Each
+                // part represents the annotations for a given
+                // transcript.
+                annotToken = annotToken.substring(4, annotToken.length);
+                var transcriptTokens = annotToken.split(",");
+                transcriptTokens.forEach(function(transcriptToken) {                  
+                    var vepTokens   = transcriptToken.split("|");
+                    var feature     = vepTokens[vepFeatureIndex];
+                    var featureType = vepTokens[vepFeatureTypeIndex];
+
+                    // If the transcript is the selected transcript, parse
+                    // all of the vep fields.  We place these into maps
+                    // because we can have multiple vep consequences for
+                    // the same transcript.  
+                    // TODO:  Need to sort so that highest impact shows first
+                    //        and is used for filtering and ranking purposes.
+                    if (featureType == 'Transcript' && feature == selectedTranscriptID) {
+                      vepImpact[vepTokens[vepImpactIndex]] = vepTokens[vepImpactIndex];
+                      vepConsequence[vepTokens[vepConsequenceIndex]] = vepTokens[vepConsequenceIndex];
+                      vepExon[vepTokens[vepExonIndex]] = vepTokens[vepExonIndex];
+                      vepHGVSc[vepTokens[vepHGVScIndex]] = vepTokens[vepHGVScIndex];
+                      vepHGVSp[vepTokens[vepHGVSpIndex]] = vepTokens[vepHGVSpIndex];
+                      vepAminoAcids[vepTokens[vepAminoAcidsIndex]] = vepTokens[vepAminoAcidsIndex];
+                      vepSIFT[vepTokens[vepSIFTIndex]] = vepTokens[vepSIFTIndex];
+                      vepPolyPhen[vepTokens[vepPolyPhenIndex]] = vepTokens[vepPolyPhenIndex];
+                    } else if (featureType == 'RegulatoryFeature' || featureType == 'MotifFeature' ) {
+                      vepRegs.push( {
+                        'impact' :  vepTokens[vepImpactIndex],
+                        'consequence' : vepTokens[vepConsequenceIndex],
+                        'biotype': vepTokens[vepRegBioTypeIndex],
+                        'motifName' : vepTokens[vepRegMotifNameIndex],
+                        'motifPos'  : vepTokens[vepRegMotifPosIndex],
+                        'motifHiInf' : vepTokens[vepRegMotifHiInfIndex]
+                      });
+                    }
+
+                });
+
               }
 
             });
@@ -1204,9 +1247,21 @@ var effectCategories = [
                 'afexaclevel:': '',
                 'af1000G': me.parseAf(altIdx, af1000G),
                 'afExAC': me.parseAf(altIdx, afExAC),
+                'rsid' : (rs != null && rs != '' && rs != 0 ? rs : ''),
                 'clinvarStart': clinvarStart,
                 'clinvarRef': clinvarRef,
-                'clinvarAlt': clinvarAlt} );
+                'clinvarAlt': clinvarAlt,
+                'vepConsequence': vepConsequence,
+                'vepImpact': vepImpact,
+                'vepExon': vepExon,
+                'vepHGVSc':  vepHGVSc,
+                'vepHGVSp': vepHGVSp,
+                'vepAminoAcids': vepAminoAcids,
+                'vepSIFT': vepSIFT,
+                'vepPolyPhen':  vepPolyPhen,
+                'vepRegs':  vepRegs
+                } 
+              );
 
               if (rec.pos < variantRegionStart ) {
                 variantRegionStart = rec.pos;

@@ -44,6 +44,22 @@ body {
 }
 
 
+.tooltip-title {
+  font-size: 10px;
+}
+
+.tooltip-header {
+  overflow-wrap: break-word;
+  color: #CCC8C5;
+
+}
+
+.tooltip-value {
+  overflow-wrap: break-word;
+  padding-left: 0px;
+
+}
+
 .dropdown-menu .divider {
   height: 1px;
   margin: 9px 0;

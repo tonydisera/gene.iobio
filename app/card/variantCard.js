@@ -2175,7 +2175,6 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
 	}
 
-
 	var zygosity = "";
 	if (variant.zygosity.toLowerCase() == 'het') {
 		zygosity = "Heterozygous";
@@ -2190,36 +2189,134 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	} else if (variant.genotypeDepth != null && variant.genotypeDepth != '') {
 		vcfDepth = variant.genotypeDepth.toString();
 	}
+
+
+	var vepImpactDisplay = "";
+	for (var key in variant.vepImpact) {
+		if (vepImpactDisplay.length > 0) {
+		  	vepImpactDisplay += ", ";
+		}
+		vepImpactDisplay += key;
+	} 
+	var vepConsequenceDisplay = "";
+	for (var key in variant.vepConsequence) {
+		if (vepConsequenceDisplay.length > 0) {
+		  	vepConsequenceDisplay += ", ";
+		}
+		vepConsequenceDisplay += key.split("_").join(" ");
+	}     	
+	var vepHGVScDisplay = "";
+	for (var key in variant.vepHGVSc) {
+		if (vepHGVScDisplay.length > 0) {
+		  	vepHGVScDisplay += ", ";
+		}
+		vepHGVScDisplay += key;
+	}   
+	var vepHGVSpDisplay = "";
+	for (var key in variant.vepHGVSp) {
+		if (vepHGVSpDisplay.length > 0) {
+		  	vepHGVSpDisplay += ", ";
+		}
+		vepHGVSpDisplay += key;
+	}   
+	var vepSIFTDisplay = "";
+	for (var key in variant.vepSIFT) {
+		if (vepSIFTDisplay.length > 0) {
+		  	vepSIFTDisplay += ", ";
+		}
+		vepSIFTDisplay += key;
+	} 
+	var vepPolyPhenDisplay = "";
+	for (var key in variant.vepPolyPhen) {
+		if (vepPolyPhenDisplay.length > 0) {
+		  	vepPolyPhenDisplay += ", ";
+		}
+		vepPolyPhenDisplay += key;
+	} 
 	
+	var vepRegDisplay = "";
+	var vepRegMotifDisplay = "";
+	if (variant.vepRegs) {
+		for (var i = 0; i < variant.vepRegs.length; i++) {
+			if (vepRegDisplay.length > 0) {
+			  	vepRegDisplay += ", ";
+			}
+			var vr = variant.vepRegs[i];
+			var buf = (vr.consequence == 'regulatory_region_variant' ? '' : vr.consequence.split("_").join(" ")) + ' ' + vr.biotype.split("_").join(" ");
+			vepRegDisplay += buf;
+
+			if (vr.motifName != null && vr.motifName != '') {
+				var buf = vr.motifName 
+				          + (vr.motifPos != null ? ' at pos ' + vr.motifPos : "") 
+				          + (vr.motifHiInf == 'y' || vr.motifHiInf == 'Y' ? ' (High Information Pos in TFBP)' : "");
+				if (vepRegMotifDisplay.length > 0) {
+				  	vepRegMotifDisplay += ", ";
+				}
+				vepRegMotifDisplay += buf;
+			}
+		} 		
+	}
+
+	var dbSnpUrl = "";
+	variant.rsid.split(",").forEach( function(rsidToken) {
+		if (rsidToken != 0 && rsidToken != '') {
+			if (dbSnpUrl.length > 0) {
+				dbSnpUrl += ",";
+			}
+			var url = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + rsidToken;
+			dbSnpUrl +=  '<a href="' + url + '" target="_new"' + '>' + 'rs' + rsidToken + '</a>';
+		}
+	});
+
+	
+
+
+
+
 	
 	return (
 		  me.tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord)
 
-		+ me.tooltipRow('Zygosity',  zygosity, "5px")
+		+ me.tooltipRow('Zygosity',  zygosity, "4px")
 		+ me.tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
 		//+ me.tooltipRow('Genotype',  variant.genotype)
 
-		+ me.tooltipRow('Impact', impactDisplay, "3px")
-		+ me.tooltipRow('Effect', effectDisplay)
+		+ me.tooltipRow('snpEff Impact', impactDisplay, "5px")
+		+ me.tooltipRow('snpEff Effect', effectDisplay)
+		
+		+ me.tooltipRow('VEP Impact', vepImpactDisplay, "5px")
+		+ me.tooltipRow('VEP Consequence', vepConsequenceDisplay)	
+		+ me.tooltipRow('SIFT', vepSIFTDisplay)
+		+ me.tooltipRow('PolyPhen', vepPolyPhenDisplay)
+		+ me.tooltipRow('Regulatory', vepRegDisplay)
+		+ me.tooltipRow('Motif', vepRegMotifDisplay)
 
-		+ me.tooltipRow('ClinVar', clinSigDisplay, "3px")
+		+ me.tooltipRowURL('ClinVar uid', clinvarUrl, "5px" )
+		+ me.tooltipRow('Clinical Sign.', clinSigDisplay )
 		+ me.tooltipRow('Phenotype', phenotypeDisplay)
-		+ me.tooltipRow('ClinVar uid', clinvarUrl )
 
 		// + tooltipRow('NCBI ID', variant.ncbiId)
 		// + tooltipRow('HGVS g', variant.hgvsG)
 
-		+ me.tooltipRow('Qual', variant.qual, (variant.qual || variant.filter ? "3px" : "")) 
+		+ me.tooltipRow('Coverage', bamDepth, "5px") 
+		+ me.tooltipRow('Coverage (vcf)', vcfDepth, "5px") 
+		+ me.tooltipRow('Qual', variant.qual) 
 		+ me.tooltipRow('Filter', variant.filter) 
 
-		+ me.tooltipRow('Coverage (alignments)', bamDepth, "3px") 
-		+ me.tooltipRow('Coverage (variants)', vcfDepth, "3px") 
 
 		//+ tooltipRow('GMAF', variant.gMaf)
-		+ me.tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "3px", true)
+		+ me.tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "5px", true)
 		+ me.tooltipRow('AF 1000G', variant.af1000G, null, true)
+
+		+ me.tooltipRowURL("dbSNP id", dbSnpUrl, "5px")
+		+ me.tooltipRow('HGVSc', vepHGVScDisplay)
+		+ me.tooltipRow('HGVSp', vepHGVSpDisplay)
+
+
 		+ me.unpinRow(pinMessage)
-	);                    
+	);                  
+
+	        
 
 }
 
@@ -2248,12 +2345,12 @@ VariantCard.prototype.unpinRow = function(pinMessage) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
 	if (window.clickedVariant) {
-		return '<div style="text-align:right">'
+		return '<div style="text-align:right; padding-top: 4px;">'
 			      + '<a  id="unpin" href="javascript:void(0)">unlock</a>'
 			 + '</div>';	
 
 	} else {
-		return '<div style="text-align:right" >'			     
+		return '<div style="text-align:right; padding-top: 4px;" >'			     
 			      + '<em>' + pinMessage + '</em></div>'
 			 + '</div>';	
 	}
@@ -2267,7 +2364,7 @@ VariantCard.prototype.tooltipBlankRow = function() {
 
 VariantCard.prototype.tooltipHeaderRow = function(value1, value2, value3) {
 	return '<div class="row">'
-	      + '<div class="col-md-12" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 + '</div>'
+	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 + '</div>'
 	      + '</div>';	
 }
 
@@ -2275,8 +2372,20 @@ VariantCard.prototype.tooltipRow = function(label, value, paddingTop, alwaysShow
 	if (alwaysShow || (value && value != '')) {
 		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
 		return '<div class="row"' + style + '>'
-		      + '<div class="col-md-5" style="text-align:right">' + label + '</div>'
-		      + '<div class="col-md-7">' + value.toLowerCase() + '</div>'
+		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div class="col-md-7 tooltip-value">' + value.toLowerCase() + '</div>'
+		      + '</div>';
+	} else {
+		return "";
+	}
+}
+
+VariantCard.prototype.tooltipRowURL = function(label, value, paddingTop, alwaysShow) {
+	if (alwaysShow || (value && value != '')) {
+		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
+		return '<div class="row"' + style + '>'
+		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div class="col-md-7 tooltip-value">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";
