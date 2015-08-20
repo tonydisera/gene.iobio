@@ -15,6 +15,7 @@ function DataCard() {
 		father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
 	};
 	this.mode = 'single';
+	this.panelSelectorFilesSelected = null;
 
 }
 
@@ -35,11 +36,16 @@ DataCard.prototype.init = function() {
 	    panelSelector.find('#display-platinum-bam-url-item').on('click', function() {
 	    	me.displayPlatinumBamUrlBox(panelSelector);
 	    });
+	    // Workaround for problem where extra event on proband files button fired
+	    panelSelector.find("#bam-dropdown-button").on("click", function() {
+	    	me.panelSelectorFilesSelected = panelSelector;
+	    });
+
 	    panelSelector.find('#bam-file-selector-item').on('click', function() {
 	    	me.onBamFileButtonClicked(panelSelector);
 	    });
 	    panelSelector.find('#bam-file-upload').on('change', function() {
-	    	me.onBamFilesSelected(event, panelSelector);
+	    	me.onBamFilesSelected(event);
 	    });
 	    // This will ensure that if a same file selected consecutively
 	    // will file the 'change' event
@@ -66,8 +72,14 @@ DataCard.prototype.init = function() {
 	    panelSelector.find('#vcf-file-selector-item').on('click', function() {
 	    	me.onVcfFileButtonClicked(panelSelector);
 	    });
+	    // Workaround for problem where extra event on proband files button fired
+	    panelSelector.find("#vcf-dropdown-button").on("click", function() {
+	    	me.panelSelectorFilesSelected = panelSelector;
+	    });
+
+	   
 	    panelSelector.find('#vcf-file-upload').on('change', function() {
-	    	me.onVcfFilesSelected(event, panelSelector);
+	    	me.onVcfFilesSelected(event);
 	    });
 	    // This will ensure that if a same file selected consecutively
 	    // will file the 'change' event
@@ -121,29 +133,23 @@ DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {
 	window.disableLoadButton();
 }
 
-DataCard.prototype.onBamFilesSelected = function(event, panelSelector) {
+DataCard.prototype.onBamFilesSelected = function(event) {
 	var me = this;
 	$('#tourWelcome').removeClass("open");
 
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	var cardIndex = panelSelector.find('#card-index').val();
+	this.setDataSourceName(this.panelSelectorFilesSelected);
+	this.setDataSourceRelationship(this.panelSelectorFilesSelected);
 
-	var variantCard = variantCards[+cardIndex];
-
-	this.setDataSourceName(panelSelector);
-	this.setDataSourceRelationship(panelSelector);
+	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];	
 
 	variantCard.onBamFilesSelected(event, function(bamFileName) {
-		panelSelector.find('#bam-file-info').removeClass('hide');
-		panelSelector.find('#bam-file-info').val(bamFileName);
+		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
+		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
 		enableLoadButton();
 
 	});
 	variantCard.setDirty();
-
-
 
 }
 
@@ -287,25 +293,24 @@ DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
 	panelSelector.find('#url-input').addClass('hide');
 	panelSelector.find('#url-input').val('');
 
+	
 	window.disableLoadButton();
 }
 
-DataCard.prototype.onVcfFilesSelected = function(event, panelSelector) {
+DataCard.prototype.onVcfFilesSelected = function(event) {
 	var me = this;
-	if (!panelSelector) {
-		panelSelector = $('#datasource-dialog');
-	}
-	$('#tourWelcome').removeClass("open");
 	
-	var cardIndex = panelSelector.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];
+	$('#tourWelcome').removeClass("open");
 
-	this.setDataSourceName(panelSelector);
-	this.setDataSourceRelationship(panelSelector);
+	this.setDataSourceName(this.panelSelectorFilesSelected);
+	this.setDataSourceRelationship(this.panelSelectorFilesSelected);
+
+	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];	
 
 	variantCard.onVcfFilesSelected(event, function(vcfFileName) {
-		panelSelector.find('#vcf-file-info').removeClass('hide');
-		panelSelector.find('#vcf-file-info').val(vcfFileName);
+		me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
+		me.panelSelectorFilesSelected.find('#vcf-file-info').val(vcfFileName);
 		window.enableLoadButton();
 	});
 	variantCard.setDirty();
