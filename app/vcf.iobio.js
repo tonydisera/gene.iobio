@@ -1006,6 +1006,8 @@ var effectCategories = [
             var vepAminoAcids = new Object(),   vepAminoAcidsIndex = 15;
             var vepSIFT = new Object(),         vepSIFTIndex = 22;
             var vepPolyPhen = new Object(),     vepPolyPhenIndex = 23;
+            var sift = new Object();     // need a special variable for filtering purposes
+            var polyphen = new Object(); // need a special variant for filtering purposes
 
             var vepRegs = [];            
             var vepRegBioTypeIndex = 7;
@@ -1092,8 +1094,17 @@ var effectCategories = [
                       vepHGVSc[vepTokens[vepHGVScIndex]] = vepTokens[vepHGVScIndex];
                       vepHGVSp[vepTokens[vepHGVSpIndex]] = vepTokens[vepHGVSpIndex];
                       vepAminoAcids[vepTokens[vepAminoAcidsIndex]] = vepTokens[vepAminoAcidsIndex];
-                      vepSIFT[vepTokens[vepSIFTIndex]] = vepTokens[vepSIFTIndex];
-                      vepPolyPhen[vepTokens[vepPolyPhenIndex]] = vepTokens[vepPolyPhenIndex];
+
+                      var siftString = vepTokens[vepSIFTIndex];
+                      var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
+                      vepSIFT[siftDisplay] = siftDisplay;   
+                      sift['sift_'+ siftDisplay] = 'sift_' + siftDisplay;                   
+
+                      var polyphenString = vepTokens[vepPolyPhenIndex];
+                      var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
+                      vepPolyPhen[polyphenDisplay] = polyphenDisplay;
+                      polyphen['polyphen_' + polyphenDisplay] = 'polyphen_' + polyphenDisplay;
+
                     } else if (featureType == 'RegulatoryFeature' || featureType == 'MotifFeature' ) {
                       vepRegs.push( {
                         'impact' :  vepTokens[vepImpactIndex],
@@ -1240,6 +1251,7 @@ var effectCategories = [
                 'phased': phased,
                 'effect': effects, 
                 'effectCategory': effectCats, 
+                'effect' : effects,
                 'impact': impacts, 
                 'consensus': rec.consensus,
                 'inheritance': '',
@@ -1258,7 +1270,9 @@ var effectCategories = [
                 'vepHGVSp': vepHGVSp,
                 'vepAminoAcids': vepAminoAcids,
                 'vepSIFT': vepSIFT,
+                'sift' : sift,
                 'vepPolyPhen':  vepPolyPhen,
+                'polyphen' : polyphen, 
                 'vepRegs':  vepRegs
                 } 
               );

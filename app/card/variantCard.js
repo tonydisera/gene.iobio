@@ -1247,6 +1247,15 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 					// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 				    // can be filtered by range.
 				    me.determineVariantAfLevels(me.vcfData);
+
+				    me.vcfData.features.forEach( function(variant) {
+				    	for (effect in variant.effect) {
+				    		filterCard.snpEffEffects[effect] = effect;
+				    	}
+				    	for (vepConsequence in variant.vepConsequence) {
+				    		filterCard.vepConsequences[vepConsequence] = vepConsequence;
+				    	}
+				    });
 						
 
 					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");

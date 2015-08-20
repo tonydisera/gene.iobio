@@ -1,9 +1,14 @@
 <div>
   <!-- impact -->
-  <div style="float:left;;width:97px">
-    <svg id="impact-scheme" class="current" width="97" height="28" transform="translate(0,0)">
-      <text class="name" x="0" y="10">snpEFF</text>
-      <text class="name" x="0" y="22">Impact</text>
+  <div style="float:left;;width:75px;margin-top:-1px;">
+
+    <select id="select-annotation-scheme" onchange="filterCard.onSelectAnnotationScheme()" style="font-size:10px;">
+                    <option>snpEff</option>
+                    <option>VEP</option>                   
+    </select>
+
+    <svg id="impact-scheme" class="current" width="93" height="13" transform="translate(0,0)">
+      <text class="name" x="0" y="9">Impact</text>
     </svg>
     <svg id="HIGH" class="impact" width="97" height="14" transform="translate(0,0)">
       <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">High</text>
@@ -21,136 +26,61 @@
       <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Low</text>
       <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
     </svg>
-    <div style="padding-top:14px;" class="todo">
-      <!-- PolyPhen -->
-      <svg id="polyphen-scheme" class="" width="93" height="25" transform="translate(0,0)">
-        <text class="name" x="0" y="10">PolyPhen</text>
-        <text class="name" x="0" y="22">Classification</text>
-      </svg>
-      <svg id="DAMAGE" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Probably Damaging</text>
-        <rect class="filter-symbol  polyphen_DAMAGE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="POSSDAMAGE" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Possibly Damaging</text>
-        <rect class="filter-symbol  polyphen_POSSDAMAGE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="BENIGN" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Benign</text>
-        <rect class="filter-symbol  polyphen_BENIGN" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
+    <div id="effect-filter-box" style="padding-top:5px;">
+      <svg id="effect-scheme" width="71" height="25" transform="translate(0,0)" class="">
 
+        <text class="name" x="0" y="20">Effect</text>
+      </svg>
     </div>
     
   </div>
 
-  <!-- effect -->
-  <div id="effect-filter-box" style="float:left;width:82px;padding-left:5px;">
-    <svg id="effect-scheme" width="40" height="28" transform="translate(0,0)" class="">
-      <text class="name" x="0" y="10">snpEFF</text>
-      <text class="name" x="0" y="22">Effect</text>
-    </svg>
-    <svg id="frameshift" class="effectCategory nocolor" width="65" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Frameshift</text>
-      <rect class="filter-symbol  effect_frameshift" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-    </svg>
-    <svg id="stop_lost" class="effectCategory nocolor" width="55" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop lost</text>
-      <rect class="filter-symbol  effect_stop_lost" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-    </svg>
-    <svg id="start_lost" class="effectCategory nocolor" width="55" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Start lost</text>
-      <rect class="filter-symbol  effect_start_lost" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-    </svg>
-    <svg id="stop_gained" class="effectCategory nocolor" width="65" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Stop gained</text>
-      <rect class="filter-symbol  effect_stop_gained" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-    </svg>
-    <a id="more-effect-link" href="#more-effect" style="display:block;margin-top:-4px;"data-toggle="collapse" aria-expanded="false" class="collapsed">
-                more...            
-    </a>
-    <span id="more-effect" aria-expanded="false" class="collapse" style="height: 0px;">
-      <svg id="splice_acceptor" class="effectCategory nocolor" width="85" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice Acceptor</text>
-        <rect class="filter-symbol  effect_splice_acceptor" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="splice_donor" class="effectCategory nocolor" width="75" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice donor</text>
-        <rect class="filter-symbol  effect_splice_donor" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="splice" class="effectCategory nocolor" width="75" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Splice region</text>
-        <rect class="filter-symbol  effect_splice" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="exon_loss" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Exon loss</text>
-        <rect class="filter-symbol  effect_exon_loss" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="missense" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Missense</text>
-        <rect class="filter-symbol  effect_missense" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-
-      <svg id="utr" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">UTR</text>
-        <rect class="filter-symbol  effect_utr" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="synonymous" class="effectCategory nocolor" width="75" height="14" transform="translate(0,0)">
-          <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Synonymous</text>
-        <rect class="filter-symbol  effect_synonymous" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="rare_amino_acid" class="effectCategory nocolor" width="85" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Rare amino acid</text>
-        <rect class="filter-symbol  effect_rare_amino_acid" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg><svg id="chromosome" class="effectCategory nocolor" width="75" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Chromosome</text>
-        <rect class="filter-symbol  effect_coding" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg><svg id="indel" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Indel</text>
-        <rect class="filter-symbol  effect_indel" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="coding" class="effectCategory nocolor" width="50" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Coding</text>
-      <rect class="filter-symbol  effect_coding" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="regulatory" class="effectCategory nocolor" width="70" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Regulatory</text>
-      <rect class="filter-symbol  effect_regulatory" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="exon" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Exon</text>
-      <rect class="filter-symbol  effect_exon" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="other" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Other</text>
-      <rect class="filter-symbol  effect_other" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="NOEFFECT" class="effectCategory nocolor" width="60" height="14" transform="translate(0,0)">
-      <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">No Effect</text>
-      <rect class="filter-symbol  effect_NOEFFECT" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg> 
-    </span>    
-    <div style="padding-top:32px;" class="todo" >
+  <!-- SIFT & Polyphen -->
+  <div style="float:left;width:100px;padding-left:5px;">
+    <div style="" class="" >
       <!-- SIFT -->
-      <svg id="sift-scheme" class="" width="93" height="25" transform="translate(0,0)">
+      <svg id="sift-scheme" class="" width="93" height="30" style="font-size:12px;padding-top:2px;" transform="translate(0,0)">
         <text class="name" x="0" y="10">SIFT</text>
         <text class="name" x="0" y="22">Classification</text>
       </svg>
-      <svg id="DAMAGE" class="sift nocolor" width="93" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Damaging</text>
-        <rect class="filter-symbol  sift_DAMAGE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="TOLERATE" class="sift nocolor" width="93" height="14" transform="translate(0,0)">
+      <svg id="sift_tolerated" class="sift nocolor" width="93" height="14" transform="translate(0,0)">
         <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Tolerated</text>
-        <rect class="filter-symbol  sift_TOLERATE" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        <rect class="filter-symbol  sift_tolerated" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="sift_damaging" class="sift nocolor" width="93" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Damaging</text>
+        <rect class="filter-symbol  sift_damaging" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
       </svg>
 
     </div>
+    <div style="padding-top:40px;" class="" >
+  
+      <!-- PolyPhen -->
+      <svg id="polyphen-scheme" class="" width="93" height="27" style="font-size:12px;" transform="translate(0,0)">
+        <text class="name" x="0" y="10">PolyPhen</text>
+        <text class="name" x="0" y="22">Classification</text>
+      </svg>
+      <svg id="polyphen_benign" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Benign</text>
+        <rect class="filter-symbol  polyphen_benign" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="polyphen_possibly_damaging" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Possibly Damaging</text>
+        <rect class="filter-symbol  polyphen_possibly_damaging" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="polyphen_probably_damaging" class="polyphen nocolor" width="93" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Probably Damaging</text>
+        <rect class="filter-symbol  polyphen_probably_damaging" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
 
+    </div>
+     
+   
+   
   </div>
 
   <!-- type -->
-  <div style="padding-top:12px;float:left;;width:60px">
+  <div style="padding-top:13px;float:left;;width:60px">
 
     <svg id="type-scheme" width="35" height="15" transform="translate(0,0)" class="">
       <text class="name" x="0" y="10">Type</text>
@@ -195,7 +125,7 @@
   </div>
 
   <!-- zygosity -->
-  <div style="padding-top:12px;width: 85px;float: left;">
+  <div style="padding-top:13px;width: 85px;float: left;">
         <svg id="zygosity-scheme" width="60" height="15" transform="translate(0,0)" class="">
           <text class="name" x="0" y="10">Zygosity</text>
         </svg>
@@ -217,7 +147,7 @@
 
   <!-- allele frequency-->      
     <div style="float:left;width:127px">
-       <svg id="af-scheme" class="" width="120" height="15" transform="translate(0,0)">
+       <svg id="af-scheme" class="" width="120" height="16" transform="translate(0,0)">
         <text class="name" x="0" y="10">Allele Frequency</text>
       </svg>
     <div style="float:left;width:60px;margin-top:-5px">
@@ -329,7 +259,7 @@
   </div>
 
   <!-- inheritance -->
-  <div style="padding-top:12px;float:left;width:90px;">
+  <div style="padding-top:13px;float:left;width:90px;">
       <svg id="inheritance-scheme" class="" width="90" height="17" transform="translate(0,0)">
           <text class="name" x="0" y="10">Inheritance</text>
       </svg>
@@ -361,7 +291,7 @@
 
 
   <!-- clinvar -->
-  <div style="padding-top:12px;float:left;width:94px;">
+  <div style="padding-top:13px;float:left;width:94px;">
       <svg id="clinvar-scheme" class="" width="90" height="18" transform="translate(0,0)">
           <text class="name" x="0" y="10">ClinVar</text>
       </svg>

@@ -667,6 +667,9 @@ function loadTracksForGene(bypassVariantCards) {
 	regionStart = null;
 	regionEnd = null;
 
+	filterCard.snpEffEffects = new Object();
+	filterCard.vepConsequences = new Object();
+
 	$("#region-flag").addClass("hide");
 
 	$('#data-card').removeClass("hide");

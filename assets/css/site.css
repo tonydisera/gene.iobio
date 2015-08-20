@@ -1092,58 +1092,61 @@ header {
 }
 
 
-.effect_frameshift{
+.effect_frameshift_variant {
   fill: #A95959;
 } 
-.effect_missense{
+.effect_missense_variant{
   fill: rgb(13, 236, 210);
 } 
-.effect_splice_acceptor{
+.effect_splice_acceptor_variant{
   fill: rgb(150, 143, 236);
 } 
-.effect_splice_donor{
+.effect_splice_donor_variant{
   fill: #FFE216;
 } 
-.effect_regulatory{
+.effect_regulatory_variant{
   fill: #3d8901;
 } 
-.effect_splice{
+.effect_splice_variant{
   fill: rgb(234, 216, 90);
 }
-.effect_exon_loss{
+.effect_exon_loss_variant{
   fill: #0CBEA3;
 }
 .effect_other{
   fill: rgb(187, 187, 187);
 }
-.effect_indel {
+.effect_indel_variant {
   fill: #fb9a99;
 }
-.effect_utr {
+.effect_3_prime_UTR_variant {
   fill: #D5A8D7;
 }
-.effect_stop_lost {
+.effect_5_prime_UTR_variant {
+  fill: darkorange;
+}
+.effect_stop_lost_variant {
   fill: #F48E45;
 }
-.effect_start_lost {
+.effect_start_lost_variant {
   fill: #D07583;
 }
-.effect_stop_gained {
+.effect_stop_gained_variant {
   fill: #D0DB21;
 }
-.effect_rare_amino_acid{
+.effect_rare_amino_acid_variant{
   fill: rgb(234, 216, 90);
 }
-.effect_chromosome{
+.effect_chromosome_variant{
   fill: #b2df8a;
 } 
-.effect_coding{
+.effect_coding_variant{
   fill: #7BBA49;
 } 
-.effect_synonymous{
+.effect_synonymous_variant{
   fill: #ADC9E8;
 }
-.effect_exon{
+.effect_exon_variant {
   fill: rgb(150, 143, 236);
 } 
 .effect_other { 
@@ -1152,27 +1155,17 @@ header {
 .effect_NOEFFECT { 
   fill: #FAF5BE;
 }
-
-
-
-
-.sift_DAMAGE{
-  fill: #E0292B !important;
-} 
-.sift_TOLERATE{
-  fill: #F49A73 !important;
-} 
-
-
-.polyphen_DAMAGE{
-  fill: #E0292B !important;
-} 
-.polyphen_POSSDAMAGE{
-  fill: #F49A73 !important;
-} 
-.polyphen_BENIGN { 
-  fill: rgba(181, 207, 107, 0.65);
+.effect_upstream_gene_variant {
+  fill: darkgoldenrod;
 }
+.effect_downstream_gene_variant {
+  fill: darkkhaki;
+}
+.effect_intron_variant {
+  fill: lightyellow;
+}
+
+
 
 
 
@@ -1183,7 +1176,7 @@ header {
   padding: 1px;
 
 }
-.impact.nocolor rect, .effectCategory.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
+.impact.nocolor rect, .effect.nocolor rect, .effectCategory.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
   stroke: grey;
 }
@@ -1191,7 +1184,7 @@ header {
   opacity:  .2;
 }
 
-.impact:hover, .effectCategory:hover, .regulatory:hover, .polyphen:hover ,.sift:hover,.zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
+.impact:hover, .effect:hover, .effectCategory:hover, .regulatory:hover, .polyphen:hover ,.sift:hover,.zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -1200,7 +1193,7 @@ header {
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
-.impact.current:hover, .effectCategory.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
+.impact.current:hover, .effect.current:hover, .effectCategory.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
 .type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover {
   font-weight: bold;
   cursor: pointer;
