@@ -29,14 +29,14 @@ function MatrixCard() {
                      };
 	this.siftMap = {  
                         damaging:     {value: 1, clazz: 'sift_damaging', symbolFunction: this.showSiftSymbol},
-		                tolerated:    {value: 2, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
-                        none:         {value: 3, clazz: ''}
+		                tolerated:    {value: 102, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
+                        none:         {value: 103, clazz: ''}
                      };
 	this.polyphenMap = {  
                         probably_damaging:    {value: 1, clazz: 'polyphen_probably_damaging', symbolFunction: this.showPolyPhenSymbol},
 		                possibly_damaging:    {value: 2, clazz: 'polyphen_possibly_damaging', symbolFunction: this.showPolyPhenSymbol},  
-                        benign:               {value: 3, clazz: 'polyphen_benign',            symbolFunction:this.showPolyPhenSymbol},
-                        none:                 {value: 4, clazz: ''}
+                        benign:               {value: 103, clazz: 'polyphen_benign',            symbolFunction:this.showPolyPhenSymbol},
+                        none:                 {value: 104, clazz: ''}
                      };
 	this.inheritanceMap = {  
 		                denovo:    {value: 1, clazz: 'denovo',    symbolFunction: this.showDeNovoSymbol},  
@@ -63,13 +63,13 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact'       ,order:1, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Inheritance'  ,order:2, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'AF (1000G)'   ,order:3, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'AF (ExAC)'    ,order:4, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'SIFT'         ,order:5, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'PolyPhen'     ,order:6, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
+		{name:'ClinVar'      ,order:2, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Impact'       ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Inheritance'  ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'AF (1000G)'   ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'AF (ExAC)'    ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'PolyPhen'     ,order:0, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
 
 	this.featureUnknown = 199;
@@ -406,7 +406,7 @@ MatrixCard.prototype.showClinVarSymbol = function (selection) {
 	         	if (selection.datum().clazz == 'clinvar_path') {
 	         		return "#ad494A";
 	         	} else if (selection.datum().clazz == 'clinvar_lpath') {
-	         		return "#C07778";
+	         		return "#FB7737";
 	         	} else if (selection.datum().clazz == 'clinvar_uc') {
 	         		return "rgba(231,186,82,1)";
 	         	} else if (selection.datum().clazz == 'clinvar_benign') {
@@ -426,7 +426,7 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 	selection.append("g")
 	         .attr("transform", "translate(7,7)")
 	         .append("use")
-	         .attr("xlink:href", "#flag-symbol")
+	         .attr("xlink:href", "#biohazard-symbol")
 	         .attr("width", "16")
 	         .attr("height", "16")
 	         .style("pointer-events", "none")
@@ -436,9 +436,9 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 	         	if (selection.datum().clazz == 'polyphen_probably_damaging') {
 	         		return "#ad494A";
 	         	} else if (selection.datum().clazz == 'polyphen_possibly_damaging') {
-	         		return "#C07778";
+	         		return "#FB7737";
 	         	} else if (selection.datum().clazz == 'polyphen_benign') {
-	         		return "rgba(231,186,82,1)";
+	         		return "rgba(181, 207, 107,1)";
 	         	} 
 	         });
 
@@ -446,11 +446,11 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 
 MatrixCard.prototype.showSiftSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(7,7)")
+	         .attr("transform", "translate(6,6)")
 	         .append("use")
-	         .attr("xlink:href", "#ribbon-symbol")
-	         .attr("width", "16")
-	         .attr("height", "16")
+	         .attr("xlink:href", "#danger-symbol")
+	         .attr("width", "18")
+	         .attr("height", "18")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -458,7 +458,7 @@ MatrixCard.prototype.showSiftSymbol = function (selection) {
 	         	if (selection.datum().clazz == 'sift_damaging') {
 	         		return "#ad494A";
 	         	} else if (selection.datum().clazz == 'sift_tolerated') {
-	         		return "rgba(231,186,82,1)";
+	         		return "rgba(181, 207, 107,1)";
 	         	} 
 	         });
 

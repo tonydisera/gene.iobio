@@ -1181,10 +1181,10 @@ header {
   stroke: grey;
 }
 .afexaclevel.nocolor , .af1000glevel.nocolor {
-  opacity:  .2;
+  display: none !important;
 }
 
-.impact:hover, .effect:hover, .effectCategory:hover, .regulatory:hover, .polyphen:hover ,.sift:hover,.zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
+.impact:hover, .effect:hover, .effectCategory:hover, .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -1215,7 +1215,7 @@ header {
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme {
   padding-top: 2px;
 }
-.impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .clinvar.inactive  {
+.impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive  {
   pointer-events: none;
   opacity: .4;
 }

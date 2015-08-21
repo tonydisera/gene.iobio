@@ -1006,8 +1006,9 @@ var effectCategories = [
             var vepAminoAcids = new Object(),   vepAminoAcidsIndex = 15;
             var vepSIFT = new Object(),         vepSIFTIndex = 22;
             var vepPolyPhen = new Object(),     vepPolyPhenIndex = 23;
-            var sift = new Object();     // need a special variable for filtering purposes
-            var polyphen = new Object(); // need a special variant for filtering purposes
+            var sift = new Object();     // need a special field for filtering purposes
+            var polyphen = new Object(); // need a special field for filtering purposes
+            var regulatory = new Object(); // need a special field for filtering purposes
 
             var vepRegs = [];            
             var vepRegBioTypeIndex = 7;
@@ -1114,6 +1115,11 @@ var effectCategories = [
                         'motifPos'  : vepTokens[vepRegMotifPosIndex],
                         'motifHiInf' : vepTokens[vepRegMotifHiInfIndex]
                       });
+                      var reg = vepTokens[vepConsequenceIndex]== 'regulatory_region_variant' ? vepTokens[vepRegBioTypeIndex] : vepTokens[vepConsequenceIndex];
+                      if (reg == "promoter") {
+                        reg = "the_promoter";
+                      }
+                      regulatory["reg_" + reg.toLowerCase()] = "reg_" + reg.toLowerCase();;
                     }
 
                 });
@@ -1273,7 +1279,8 @@ var effectCategories = [
                 'sift' : sift,
                 'vepPolyPhen':  vepPolyPhen,
                 'polyphen' : polyphen, 
-                'vepRegs':  vepRegs
+                'vepRegs':  vepRegs,
+                'regulatory' : regulatory
                 } 
               );
 
