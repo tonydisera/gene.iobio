@@ -232,6 +232,7 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .zygosity').classed('current', false);
 	d3.selectAll('#filter-track .sift').classed('current', false);
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
+	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	$('af-amount-start').val(0);
 	$('af-amount-end').val(100);
 	$('coverage-min').val('');
