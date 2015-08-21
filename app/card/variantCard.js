@@ -861,6 +861,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 		filterCard.clearFilters();
 
 		this.vcfChart.clazz(classifyClazz);
+		this.fbChart.clazz(classifyClazz);
 
 		if (this.bam || this.vcf) {	      
 			this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
@@ -1886,6 +1887,7 @@ VariantCard.prototype.showCalledVariants = function(regionStart, regionEnd) {
 
 VariantCard.prototype.variantClass = function(clazz) {
 	this.vcfChart.clazz(clazz);
+	this.fbChart.clazz(clazz);
 }
 
 VariantCard.prototype.getRefName = function(refName) {

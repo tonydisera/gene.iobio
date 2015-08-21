@@ -1092,79 +1092,146 @@ header {
 }
 
 
-.effect_frameshift_variant {
-  fill: #A95959;
-} 
-.effect_missense_variant{
-  fill: rgb(13, 236, 210);
-} 
-.effect_splice_acceptor_variant{
-  fill: rgb(150, 143, 236);
-} 
-.effect_splice_donor_variant{
-  fill: #FFE216;
-} 
-.effect_regulatory_variant{
-  fill: #3d8901;
-} 
-.effect_splice_variant{
-  fill: rgb(234, 216, 90);
+.effect_transcript_ablation {
+  fill: #ff0000;
 }
-.effect_exon_loss_variant{
-  fill: #0CBEA3;
-}
-.effect_other{
-  fill: rgb(187, 187, 187);
-}
-.effect_indel_variant {
-  fill: #fb9a99;
-}
-.effect_3_prime_UTR_variant {
-  fill: #D5A8D7;
-}
-.effect_5_prime_UTR_variant {
-  fill: darkorange;
-}
-.effect_stop_lost_variant {
-  fill: #F48E45;
-}
-.effect_start_lost_variant {
-  fill: #D07583;
-}
-.effect_stop_gained_variant {
-  fill: #D0DB21;
-}
-.effect_rare_amino_acid_variant{
-  fill: rgb(234, 216, 90);
-}
-.effect_chromosome_variant{
-  fill: #b2df8a;
-} 
-.effect_coding_variant{
-  fill: #7BBA49;
-} 
-.effect_synonymous_variant{
-  fill: #ADC9E8;
-}
-.effect_exon_variant {
-  fill: rgb(150, 143, 236);
-} 
-.effect_other { 
-  fill: rgb(187, 187, 187);
-}
-.effect_NOEFFECT { 
-  fill: #FAF5BE;
-}
-.effect_upstream_gene_variant {
-  fill: darkgoldenrod;
-}
-.effect_downstream_gene_variant {
-  fill: darkkhaki;
-}
-.effect_intron_variant {
-  fill: lightyellow;
+  
+.effect_splice_acceptor_variant {
+  fill: #FF581A;
 }
 
+.effect_splice_donor_variant {
+  fill: #FF581A;
+}
+
+.effect_stop_gained {
+  fill: #ff0000;
+}
+  
+.effect_frameshift_variant {
+  fill: #9400D3;
+}
+  
+.effect_stop_lost {
+  fill : #ff0000;
+}
+  
+.effect_start_lost {
+  fill: #ffd700;
+}
+  
+.effect_transcript_amplification {
+  fill: #ff69b4;
+}
+  
+.effect_inframe_insertion {
+  fill: #ff69b4;
+}
+  
+.effect_inframe_deletion {
+  fill :#ff69b4;
+}
+  
+.effect_missense_variant {
+  fill :#ffd700;
+}
+  
+.effect_protein_altering_variant {
+  fill :#FF0080;
+}
+  
+.effect_splice_region_variant {
+  fill: #ff7f50;
+}
+  
+.effect_incomplete_terminal_codon_variant {
+  fill :#ff00ff;
+}
+  
+.effect_stop_retained_variant {
+  fill: #76ee00;
+}
+
+
+.effect_synonymous_variant {
+  fill: #76ee00;
+}
+  
+.effect_coding_sequence_variant {
+  fill: #458b00;
+}
+  
+.effect_mature_miRNA_variant {
+  fill: :#458b00;
+}
+  
+.effect_5_prime_UTR_variant {
+  fill: #7ac5cd;
+}
+  
+.effect_3_prime_UTR_variant {
+  fill: #7ac5cd;
+}
+
+.effect_non_coding_transcript_exon_variant {
+  fill: #32cd32;
+}
+  
+.effect_intron_variant {
+  fill: #02599c;
+}
+  
+.effect_NMD_transcript_variant {
+  fill :#ff4500;
+}
+  
+.effect_non_coding_transcript_variant {
+  fill: #32cd32;
+}
+
+.effect_upstream_gene_variant {
+  fill: #a2b5cd;
+}
+  
+.effect_downstream_gene_variant { 
+  fill:#a2b5cd;
+}
+  
+.effect_TFBS_ablation {
+  fill: #a52a2a;
+}
+  
+.effect_TFBS_amplification {
+  fill:#a52a2a;
+}
+  
+.effect_TF_binding_site_variant {
+  fill: #a52a2a;
+}
+  
+.effect_regulatory_region_ablation {
+  fill: #a52a2a;
+}
+  
+.effect_regulatory_region_amplification {
+  fill: #a52a2a;
+}
+  
+.effect_feature_elongation {
+  fill: #7f7f7f;
+}
+  
+.effect_regulatory_region_variant {
+  fill: #a52a2a;
+}
+  
+.effect_feature_truncation {
+  fill: #7f7f7f;
+}
+  
+.effect_intergenic_variant {
+  fill: #636363;
+}
 
 
 
