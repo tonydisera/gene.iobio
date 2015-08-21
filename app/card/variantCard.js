@@ -1216,7 +1216,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		// A gene has been selected.  Read the variants for the gene region.
 		this.discoverVcfRefName( function() {
 
-		    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using snpEff");
+		    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using snpEff and VEP");
 			me.cardSelector.find('#vcf-variants').css("display", "none");
 			
 
@@ -1747,7 +1747,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			
 			
 			if (me.isViewable()) {
-				me.cardSelector.find(".vcfloader .loader-label").text("Determining functional impact of variants with snpEFF")
+				me.cardSelector.find(".vcfloader .loader-label").text("Determining functional impact of variants with snpEFF and VEP")
 
 				// Reset the featurematrix load state so that after freebayes variants are called and
 				// integrated into vcfData, we reload the feature matrix.
