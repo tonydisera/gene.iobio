@@ -1256,8 +1256,6 @@ var effectCategories = [
                 'zygosity': zygosity ? zygosity : 'gt_unknown', 
                 'phased': phased,
                 'effect': effects, 
-                'effectCategory': effectCats, 
-                'effect' : effects,
                 'impact': impacts, 
                 'consensus': rec.consensus,
                 'inheritance': '',

@@ -104,7 +104,6 @@ FilterCard.prototype.init = function() {
 
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
-	    	d3.selectAll(".effectCategory").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", false);
 
 			window.variantCards.forEach(function(variantCard) {

@@ -688,7 +688,7 @@ function loadTracksForGene(bypassVariantCards) {
 	d3.select('#impact-scheme').classed("current", true);
 	d3.select('#effect-scheme' ).classed("current", false);
 	d3.selectAll(".impact").classed("nocolor", false);
-	d3.selectAll(".effectCategory").classed("nocolor", true);
+	d3.selectAll(".effect").classed("nocolor", true);
 	
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);

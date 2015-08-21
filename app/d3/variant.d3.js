@@ -40,17 +40,7 @@ function variantD3() {
   }
 
   var clazz = function (d) { 
-    var impacts = "";
-    var colorimpacts = "";
-    var effects = "";
-    for (key in d.impact) {
-      impacts += " " + key;
-      colorimpacts += " " + 'impact_'+key;
-    }
-    for (key in d.effectCategory) {
-      effects += " " + key;
-    }
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + ' ' + impacts + effects + ' ' + d.consensus + colorimpacts ;
+    return variant;
   };
 
   function getSymbol(d,i) {

@@ -1176,7 +1176,7 @@ header {
   padding: 1px;
 
 }
-.impact.nocolor rect, .effect.nocolor rect, .effectCategory.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
+.impact.nocolor rect, .effect.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
   stroke: grey;
 }
@@ -1184,7 +1184,7 @@ header {
   display: none !important;
 }
 
-.impact:hover, .effect:hover, .effectCategory:hover, .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
+.impact:hover, .effect:hover,  .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
   
   cursor: pointer;
   border: solid thin white;
@@ -1193,7 +1193,7 @@ header {
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
-.impact.current:hover, .effect.current:hover, .effectCategory.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
+.impact.current:hover, .effect.current:hover,  .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
 .type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover {
   font-weight: bold;
   cursor: pointer;
@@ -1219,7 +1219,7 @@ header {
   pointer-events: none;
   opacity: .4;
 }
-.effectCategory.inactive {
+.effect.inactive {
   pointer-events: none;
   display: none;
 }
