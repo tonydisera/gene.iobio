@@ -425,13 +425,15 @@ FilterCard.prototype.classifyByImpact = function(d) {
 	var polyphen = "";
 	var regulatory = "";
 	
-	for (key in  (this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact)) {
-	  impacts += " " + key;
-	  colorimpacts += " " + 'impact_'+key;
-	}
-	for (key in (this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence)) {
-	  effects += " " + key;
-	}
+	var effectList = (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence);
+    for (key in effectList) {
+      effects += " " + key;
+    }
+    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    for (key in impactList) {
+      impacts += " " + key;
+      colorimpacts += " " + 'impact_'+key;
+    }
     for (key in d.sift) {
     	sift += " " + key;		
     }
@@ -453,11 +455,13 @@ FilterCard.prototype.classifyByEffect = function(d) {
 	var polyphen = "";
 	var regulatory = "";
 	
-    for (key in (this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence)) {
+	var effectList = (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence);
+    for (key in effectList) {
       effects += " " + key;
       coloreffects += " " + 'effect_'+key;
     }
-    for (key in  (this.annotationScheme == 'snpEff' ? d.impact : d.vepImpactff)) {
+    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    for (key in impactList) {
       impacts += " " + key;
     }
     for (key in d.sift) {

@@ -36,7 +36,7 @@
   </div>
 
   <!-- SIFT & Polyphen -->
-  <div style="float:left;width:110px;padding-left:5px;">
+  <div style="float:left;width:160px;padding-left:5px;">
     <div style="" class="" >
   
       <!-- PolyPhen -->
@@ -79,6 +79,18 @@
         </g>
         <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Tolerated</text>
       </svg>
+      <svg id="sift_tolerated_low_confidence" class="sift" width="134" height="15" transform="translate(0,0)">
+        <g class="sift_tolerated_low_confidence" transform="translate(0,0)" style="opacity: 1;">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="14" height="14" style="fill: rgba(231,186,82,1)"></use>
+        </g>
+        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Tolerated (low confidence)</text>
+      </svg>
+      <svg id="sift_damaging_low_confidence" class="polyphen" width="134" height="15" transform="translate(0,0)">
+        <g class="sift_damaging_low_confidence" transform="translate(0,0)" style="opacity: 1;">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="14" height="14" style="fill: #FB7737"></use>
+        </g>
+        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Damaging (low confidence)</text>
+      </svg>
       <svg id="sift_damaging" class="polyphen" width="98" height="15" transform="translate(0,0)">
         <g class="sift_damaging" transform="translate(0,0)" style="opacity: 1;">
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="14" height="14" style="fill: #ad494A"></use>
@@ -88,30 +100,20 @@
 
     </div>
 
-    <div style="padding-top:15px" class="">
-      <svg id="regulatory-scheme" class="" width="80" height="16" transform="translate(0,0)">
-        <text class="name" x="0" y="10">Regulatory</text>
-      </svg>
-      <svg id="reg_the_promoter" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Promoter</text>
-        <rect class="filter-symbol  reg_the_promoter" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="reg_promoter_flanking_region" class="regulatory nocolor" width="120" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Promoter flanking region</text>
-        <rect class="filter-symbol  reg_promoter_flanking_region" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-      <svg id="reg_tf_binding_site_variant" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
-        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">TF binding site</text>
-        <rect class="filter-symbol  reg_tf_binding_site_variant" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
-      </svg>
-
-    </div>
-
+   <!-- coverage -->  
+      <div id="coverage-filter" style="padding-top:15px" >
+        <span style="font-size:11px;">Coverage (min)</span>
+        <input type="text" id="coverage-min" value="" style="width:20px;font-size: 10px;margin-bottom:1px">
+        X
+        <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">           
+        Go
+        </a>
+      </div>
    
   </div>
 
   <!-- type -->
-  <div style="padding-top:13px;float:left;padding-left:10px;width:110px">
+  <div style="padding-top:13px;float:left;padding-left:10px;width:125px">
 
     <svg id="type-scheme" width="90" height="15" transform="translate(0,0)" class="">
       <text class="name" x="0" y="10">Type</text>
@@ -159,12 +161,31 @@
           </svg>
     </div>
 
+    <div style="padding-top:15px" class="">
+      <svg id="regulatory-scheme" class="" width="80" height="16" transform="translate(0,0)">
+        <text class="name" x="0" y="10">Regulatory</text>
+      </svg>
+      <svg id="reg_the_promoter" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Promoter</text>
+        <rect class="filter-symbol  reg_the_promoter" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="reg_promoter_flanking_region" class="regulatory nocolor" width="120" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Promoter flanking region</text>
+        <rect class="filter-symbol  reg_promoter_flanking_region" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="reg_tf_binding_site_variant" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">TF binding site</text>
+        <rect class="filter-symbol  reg_tf_binding_site_variant" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+
+    </div>
+
    
   </div>
 
   
   <!-- allele frequency-->      
-    <div style="float:left;width:127px">
+    <div style="float:left;width:137px">
        <svg id="af-scheme" class="" width="120" height="16" transform="translate(0,0)">
         <text class="name" x="0" y="10">Allele Frequency</text>
       </svg>
@@ -276,40 +297,10 @@
 
   </div>
 
-  <!-- inheritance -->
-  <div style="padding-top:13px;float:left;width:95px;">
-      <svg id="inheritance-scheme" class="" width="90" height="17" transform="translate(0,0)">
-          <text class="name" x="0" y="10">Inheritance</text>
-      </svg>
-       <svg id="denovo" class="inheritance" width="90" height="20" transform="translate(0,0)">
-        <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
-          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#denovo-symbol" width="27" height="27"></use>
-        </g>
-        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Denovo</text></svg>
-      </svg>
-
-      <svg id="recessive" class="inheritance" width="90" height="20" transform="translate(0,0)">
-        <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
-          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#recessive-symbol" width="27" height="27"></use>
-        </g>
-        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Recessive</text></svg>
-      </svg>
-
-        <!-- coverage -->  
-      <div id="coverage-filter" style="float:left;padding-top:20px" >
-        <span style="font-size:11px;">Coverage (min)</span>
-        <input type="text" id="coverage-min" value="" style="width:20px;font-size: 10px;margin-bottom:1px">
-        X
-        <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">           
-        Go
-        </a>
-      </div>
-
-  </div>
 
 
   <!-- clinvar -->
-  <div style="padding-top:13px;float:left;width:94px;">
+  <div style="padding-top:13px;float:left;width:94px;padding-left:10px;">
       <svg id="clinvar-scheme" class="" width="90" height="18" transform="translate(0,0)">
           <text class="name" x="0" y="10">ClinVar</text>
       </svg>
@@ -342,11 +333,11 @@
         <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Likely Pathogenic</text>
       </svg>
       
-      <svg id="clinvar_uc" class="clinvar" width="84" height="15" transform="translate(0,0)">
+      <svg id="clinvar_uc" class="clinvar" width="110" height="15" transform="translate(0,0)">
         <g class="clinvar_uc" transform="translate(0,-2)" style="opacity: 1;">
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="12" height="12" style="fill:rgba(231, 186, 82, 1);"></use>
         </g>
-        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Unknown signif </text>
+        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Unknown significance </text>
       </svg>
 
       <svg id="clinvar_cd" class="clinvar" width="84" height="15" transform="translate(0,0)">
@@ -362,6 +353,30 @@
         </g>
         <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="8">Other </text>
       </svg>
+
+
+    <!-- inheritance -->
+    <div style="padding-top:13px;">
+        <svg id="inheritance-scheme" class="" width="90" height="17" transform="translate(0,0)">
+            <text class="name" x="0" y="10">Inheritance</text>
+        </svg>
+         <svg id="denovo" class="inheritance" width="90" height="20" transform="translate(0,0)">
+          <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#denovo-symbol" width="27" height="27"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Denovo</text></svg>
+        </svg>
+
+        <svg id="recessive" class="inheritance" width="90" height="20" transform="translate(0,0)">
+          <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#recessive-symbol" width="27" height="27"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 10px;" x="30" y="10">Recessive</text></svg>
+        </svg>
+
+        
+    </div>
+
 
   </div> 
 
