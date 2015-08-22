@@ -7,17 +7,36 @@ function FilterCard() {
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
 	this.annotationScheme = "snpEff";
+	this.pathogenicityScheme = "clinvar";
+	this.afScheme = "exac";
 
 }
 
 
 FilterCard.prototype.onSelectAnnotationScheme = function() {
 	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
-	$('#effect-scheme .name').text(this.annotationScheme ==  'snpEff' ? 'Impact' : 'Consequence');
+	$('#effect-scheme .name').text(this.annotationScheme ==  'snpEff' ? 'Effect' : 'Consequence');
 	window.loadTracksForGene();
 
 }
 
+
+FilterCard.prototype.onSelectPathogenicityScheme = function() {
+	this.pathogenicityScheme = $( "#select-pathogenicity-scheme option:selected" ).text().toLowerCase();
+	
+	var filterCardSelector = $('#filter-track');
+	d3.selectAll("#filter-track .clinvar").classed("hide", this.pathogenicityScheme != "clinvar");
+	d3.selectAll("#filter-track .sift").classed("hide", this.pathogenicityScheme != "sift");
+	d3.selectAll("#filter-track .polyphen").classed("hide", this.pathogenicityScheme != "polyphen");
+}
+
+FilterCard.prototype.onSelectAFScheme = function() {
+	this.afScheme = $( "#select-af-scheme option:selected" ).text().toLowerCase();
+	
+	var filterCardSelector = $('#filter-track');
+	d3.selectAll("#filter-track .afexaclevel").classed("hide", this.afScheme != "exac");
+	d3.selectAll("#filter-track .af1000glevel").classed("hide", this.afScheme != "1000 genomes");
+}
 
 FilterCard.prototype.init = function() {
 	var me = this;

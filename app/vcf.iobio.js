@@ -1004,6 +1004,7 @@ var effectCategories = [
             var vepHGVSc = new Object(),        vepHGVScIndex = 10;
             var vepHGVSp = new Object(),        vepHGVSpIndex = 11;
             var vepAminoAcids = new Object(),   vepAminoAcidsIndex = 15;
+            var vepVariationIds = new Object(), vepExistingVariationIndex = 17;
             var vepSIFT = new Object(),         vepSIFTIndex = 22;
             var vepPolyPhen = new Object(),     vepPolyPhenIndex = 23;
             var sift = new Object();     // need a special field for filtering purposes
@@ -1095,6 +1096,7 @@ var effectCategories = [
                       vepHGVSc[vepTokens[vepHGVScIndex]] = vepTokens[vepHGVScIndex];
                       vepHGVSp[vepTokens[vepHGVSpIndex]] = vepTokens[vepHGVSpIndex];
                       vepAminoAcids[vepTokens[vepAminoAcidsIndex]] = vepTokens[vepAminoAcidsIndex];
+                      vepVariationIds[vepTokens[vepExistingVariationIndex]] = vepTokens[vepExistingVariationIndex];
 
                       var siftString = vepTokens[vepSIFTIndex];
                       var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
@@ -1273,6 +1275,7 @@ var effectCategories = [
                 'vepHGVSc':  vepHGVSc,
                 'vepHGVSp': vepHGVSp,
                 'vepAminoAcids': vepAminoAcids,
+                'vepVariationIds' : vepVariationIds,
                 'vepSIFT': vepSIFT,
                 'sift' : sift,
                 'vepPolyPhen':  vepPolyPhen,

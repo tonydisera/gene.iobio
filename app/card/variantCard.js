@@ -1939,7 +1939,7 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		return;
 	}
 
-	if ($('#afexac-scheme').attr('class').indexOf("current") >= 0) {
+	if (filterCard.afScheme == 'exac') {
 		afField = "afExAC";
 	} else {
 		afField = "af1000G";
@@ -2269,15 +2269,20 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	}
 
 	var dbSnpUrl = "";
-	variant.rsid.split(",").forEach( function(rsidToken) {
-		if (rsidToken != 0 && rsidToken != '') {
-			if (dbSnpUrl.length > 0) {
-				dbSnpUrl += ",";
-			}
-			var url = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + rsidToken;
-			dbSnpUrl +=  '<a href="' + url + '" target="_new"' + '>' + 'rs' + rsidToken + '</a>';
+	for (var key in variant.vepVariationIds) {
+		if (key != 0 && key != '') {
+			var tokens = key.split("&");
+			tokens.forEach( function(id) {
+				if (id.indexOf("rs") == 0) {
+					if (dbSnpUrl.length > 0) {
+						dbSnpUrl += ",";
+					}
+					var url = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + id;
+					dbSnpUrl +=  '<a href="' + url + '" target="_new"' + '>' + id + '</a>';					
+				}
+			});
 		}
-	});
+	};
 
 	
 

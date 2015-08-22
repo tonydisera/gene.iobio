@@ -88,7 +88,7 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
-				    .cellSize(30)
+				    .cellSize(27)
 				    .columnLabelHeight(42)
 				    .rowLabelWidth(100)
 				    .on('d3click', function(variant) {
@@ -396,7 +396,7 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 MatrixCard.prototype.showClinVarSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(7,7)")
+	         .attr("transform", "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
 	         .attr("width", "16")
@@ -426,7 +426,7 @@ MatrixCard.prototype.showClinVarSymbol = function (selection) {
 
 MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(7,7)")
+	         .attr("transform", "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
 	         .attr("width", "16")
@@ -448,11 +448,11 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 
 MatrixCard.prototype.showSiftSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(6,6)")
+	         .attr("transform", "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", "18")
-	         .attr("height", "18")
+	         .attr("width", "16")
+	         .attr("height", "16")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -472,7 +472,24 @@ MatrixCard.prototype.showSiftSymbol = function (selection) {
 MatrixCard.prototype.showAfExacSymbol = function(selection) {
 	selection.append("g")
 	         .attr("class", selection.datum().clazz)
-	         .attr("transform", "translate(7,7)")
+	         .attr("transform", function(d,i) {
+	         	if (selection.datum().clazz == 'afexac_unique_nc') {
+	         		return "translate(7,7)";
+	         	} else if (selection.datum().clazz == 'afexac_unique') {
+	         		return "translate(7,7)";
+	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
+	         		return "translate(6,6)";
+	         	} else if (selection.datum().clazz == 'afexac_superrare') {
+	         		return "translate(5,5)";
+	         	} else if (selection.datum().clazz == 'afexac_rare') {
+	         		return "translate(5,5)";
+	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
+	         		return "translate(4,4)";
+	         	} else if (selection.datum().clazz == 'afexac_common') {
+	         		return "translate(3,3)";
+	         	}
+	         	
+	         })
 	         .append("use")
 	         .attr("xlink:href", "#af-symbol")
 	         .style("pointer-events", "none")
@@ -541,14 +558,31 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 	selection.append("g")
 	         .attr("class", selection.datum().clazz)
-	         .attr("transform", "translate(7,7)")
+	          .attr("transform", function(d,i) {
+	         	if (selection.datum().clazz == 'af100g_unique_nc') {
+	         		return "translate(7,7)";
+	         	} else if (selection.datum().clazz == 'af1000g_unique') {
+	         		return "translate(7,7)";
+	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
+	         		return "translate(6,6)";
+	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
+	         		return "translate(5,5)";
+	         	} else if (selection.datum().clazz == 'af1000g_rare') {
+	         		return "translate(5,5)";
+	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
+	         		return "translate(4,4)";
+	         	} else if (selection.datum().clazz == 'af1000g_common') {
+	         		return "translate(3,3)";
+	         	}
+	         	
+	         })
 	         .append("use")
 	         .attr("xlink:href", "#af-symbol")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
 
-	         	if (selection.datum().clazz == 'af1000g_unique') {
+	         if (selection.datum().clazz == 'af1000g_unique') {
 	         		return "rgb(215,48,39)";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
 	         		return "rgb(252,141,89)";
@@ -596,21 +630,21 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(0,3)")
+	         .attr("transform", "translate(0,2)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", "30")
-	         .attr("height", "30")
+	         .attr("width", "27")
+	         .attr("height", "27")
 	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showDeNovoSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(0,3)")
+	         .attr("transform", "translate(0,2)")
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", "30")
-	         .attr("height", "30")
+	         .attr("width", "27")
+	         .attr("height", "27")
 	         .style("pointer-events", "none");
 	
 };
