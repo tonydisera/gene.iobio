@@ -121,6 +121,7 @@ DataCard.prototype.init = function() {
 }
 
 
+
 DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {	
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');

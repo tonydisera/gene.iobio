@@ -993,9 +993,10 @@ var effectCategories = [
             // vep annotations from the info field
             //Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature
             // |BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|
-            // Protein_position|Amino_acids|Codons|Existing_variation|
-            // DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|SIFT|PolyPhen|
-            // HGVS_OFFSET|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
+            // Protein_position|Amino_acids|Codons|            
+            // Existing_variation|DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|
+            // SIFT|PolyPhen|HGVS_OFFSET|CLIN_SIG|SOMATIC|PHENO|
+            // MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
             var vepConsequence = new Object(),  vepConsequenceIndex =1;
             var vepImpact = new Object(),       vepImpactIndex = 2;
             var vepFeatureType = new Object(),  vepFeatureTypeIndex = 5;
@@ -1013,9 +1014,9 @@ var effectCategories = [
 
             var vepRegs = [];            
             var vepRegBioTypeIndex = 7;
-            var vepRegMotifNameIndex = 25;
-            var vepRegMotifPosIndex = 26;
-            var vepRegMotifHiInfIndex = 27;
+            var vepRegMotifNameIndex = 28;
+            var vepRegMotifPosIndex = 29;
+            var vepRegMotifHiInfIndex = 30;
 
             // Iterate through the annotation fields, looking for the
             // annotation EFF

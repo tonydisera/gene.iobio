@@ -28,8 +28,8 @@ function MatrixCard() {
                         LOW:      {value: 4, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
                      };
 	this.siftMap = {  
-                        damaging:                 {value: 1, clazz: 'sift_damaging', symbolFunction: this.showSiftSymbol},
-                        damaging_low_confidence:  {value: 2, clazz: 'sift_damaging_low_confidence', symbolFunction: this.showSiftSymbol},
+                        deleterious:                 {value: 1, clazz: 'sift_deleterious', symbolFunction: this.showSiftSymbol},
+                        deleterious_low_confidence:  {value: 2, clazz: 'sift_deleterious_low_confidence', symbolFunction: this.showSiftSymbol},
 		                tolerated_low_confidence: {value: 3, clazz: 'sift_tolerated_low_confidence',symbolFunction: this.showSiftSymbol},  
 		                tolerated:    {value: 102, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
                         none:         {value: 103, clazz: ''}
@@ -457,9 +457,9 @@ MatrixCard.prototype.showSiftSymbol = function (selection) {
 	         .style("fill", function(d,i) {
 
 
-	         	if (selection.datum().clazz == 'sift_damaging') {
+	         	if (selection.datum().clazz == 'sift_deleterious') {
 	         		return "#ad494A";
-	         	} else if (selection.datum().clazz == 'sift_damaging_low_confidence') {
+	         	} else if (selection.datum().clazz == 'sift_deleterious_low_confidence') {
 	         		return "#FB7737";
 	         	} else if (selection.datum().clazz == 'sift_tolerated_low_confidence') {
 	         		return "rgba(231,186,82,1)";
