@@ -1217,7 +1217,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		// A gene has been selected.  Read the variants for the gene region.
 		this.discoverVcfRefName( function() {
 
-		    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using snpEff and VEP");
+		    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using SnpEff and VEP");
 			me.cardSelector.find('#vcf-variants').css("display", "none");
 			
 
@@ -1748,7 +1748,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			
 			
 			if (me.isViewable()) {
-				me.cardSelector.find(".vcfloader .loader-label").text("Determining functional impact of variants with snpEFF and VEP")
+				me.cardSelector.find(".vcfloader .loader-label").text("Determining functional impact of variants with SnpEFF and VEP")
 
 				// Reset the featurematrix load state so that after freebayes variants are called and
 				// integrated into vcfData, we reload the feature matrix.
@@ -2246,24 +2246,35 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	} 
 	
 	var vepRegDisplay = "";
+	for (var key in variant.regulatory) {
+		// Bypass motif-based features
+		if (key.indexOf("mot_") == 0) {
+			continue;
+ 		}
+ 		if (vepRegDisplay.length > 0) {
+		  	vepRegDisplay += ", ";
+		}
+		var value = variant.regulatory[key];
+		vepRegDisplay += value;
+	} 
 	var vepRegMotifDisplay = "";
 	if (variant.vepRegs) {
 		for (var i = 0; i < variant.vepRegs.length; i++) {
-			if (vepRegDisplay.length > 0) {
-			  	vepRegDisplay += ", ";
-			}
-			var vr = variant.vepRegs[i];
-			var buf = (vr.consequence == 'regulatory_region_variant' ? '' : vr.consequence.split("_").join(" ")) + ' ' + vr.biotype.split("_").join(" ");
-			vepRegDisplay += buf;
-
+			vr = variant.vepRegs[i];
 			if (vr.motifName != null && vr.motifName != '') {
-				var buf = vr.motifName 
-				          + (vr.motifPos != null ? ' at pos ' + vr.motifPos : "") 
-				          + (vr.motifHiInf == 'y' || vr.motifHiInf == 'Y' ? ' (High Information Pos in TFBP)' : "");
+				
 				if (vepRegMotifDisplay.length > 0) {
 				  	vepRegMotifDisplay += ", ";
 				}
-				vepRegMotifDisplay += buf;
+
+				var tokens = vr.motifName.split(":");
+				var baseMotifName;
+				if (tokens.length == 2) {
+					baseMotifName = tokens[1];
+				}
+
+				var regUrl = "http://jaspar.genereg.net/cgi-bin/jaspar_db.pl?ID=" + baseMotifName + "&rm=present&collection=CORE"
+				vepRegMotifDisplay += '<a href="' + regUrl + '" target="_motif">' + vr.motifName + '</a>';
 			}
 		} 		
 	}
@@ -2277,8 +2288,8 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 					if (dbSnpUrl.length > 0) {
 						dbSnpUrl += ",";
 					}
-					var url = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + id;
-					dbSnpUrl +=  '<a href="' + url + '" target="_new"' + '>' + id + '</a>';					
+					var url1 = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + id;
+					dbSnpUrl +=  '<a href="' + url1 + '" target="_dbsnp"' + '>' + id + '</a>';					
 				}
 			});
 		}
@@ -2297,15 +2308,15 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 		+ me.tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
 		//+ me.tooltipRow('Genotype',  variant.genotype)
 
-		+ me.tooltipRow('snpEff Impact', impactDisplay, "5px")
-		+ me.tooltipRow('snpEff Effect', effectDisplay)
+		+ me.tooltipRow('SnpEff Impact', impactDisplay, "5px")
+		+ me.tooltipRow('SnpEff Effect', effectDisplay)
 		
 		+ me.tooltipRow('VEP Impact', vepImpactDisplay, "5px")
 		+ me.tooltipRow('VEP Consequence', vepConsequenceDisplay)	
 		+ me.tooltipRow('SIFT', vepSIFTDisplay)
 		+ me.tooltipRow('PolyPhen', vepPolyPhenDisplay)
-		+ me.tooltipRow('Regulatory', vepRegDisplay)
-		+ me.tooltipRow('Motif', vepRegMotifDisplay)
+		+ me.tooltipRowURL('Regulatory', vepRegDisplay)
+		+ me.tooltipRowURL('Motif', vepRegMotifDisplay)
 
 		+ me.tooltipRowURL('ClinVar uid', clinvarUrl, "5px" )
 		+ me.tooltipRow('Clinical Sign.', clinSigDisplay )

@@ -65,17 +65,25 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'ClinVar'      ,order:2, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact'       ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Inheritance'  ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'AF (1000G)'   ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'AF (ExAC)'    ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'PolyPhen'     ,order:0, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
+		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Impact - SnpEff'       ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Inheritance Mode'  ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Allele Frequency - 1000G'   ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'    ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Pathogengicity - PolyPhen'     ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
 
 	this.featureUnknown = 199;
 
+}
+
+MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
+	this.matrixRows.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			row.name = newRowLabel;
+		}
+	});
 }
 
 MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
@@ -90,7 +98,7 @@ MatrixCard.prototype.init = function() {
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
 				    .cellSize(27)
 				    .columnLabelHeight(42)
-				    .rowLabelWidth(100)
+				    .rowLabelWidth(140)
 				    .on('d3click', function(variant) {
 				    	me.showTooltip(variant);
 				    	variantCards.forEach(function(variantCard) {

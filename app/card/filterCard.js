@@ -16,6 +16,7 @@ function FilterCard() {
 FilterCard.prototype.onSelectAnnotationScheme = function() {
 	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
 	$('#effect-scheme .name').text(this.annotationScheme ==  'snpEff' ? 'Effect' : 'Consequence');
+	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
 	window.loadTracksForGene();
 
 }

@@ -1118,11 +1118,20 @@ var effectCategories = [
                         'motifPos'  : vepTokens[vepRegMotifPosIndex],
                         'motifHiInf' : vepTokens[vepRegMotifHiInfIndex]
                       });
-                      var reg = vepTokens[vepConsequenceIndex]== 'regulatory_region_variant' ? vepTokens[vepRegBioTypeIndex] : vepTokens[vepConsequenceIndex];
+                      var reg = vepTokens[vepConsequenceIndex] == 'regulatory_region_variant' ? vepTokens[vepRegBioTypeIndex] : vepTokens[vepConsequenceIndex];
+                      var regKey = reg;
                       if (reg == "promoter") {
-                        reg = "the_promoter";
+                        regKey = "the_promoter";
+                      } 
+
+                      var valueUrl = "";
+                      if (feature != "" && feature != null) {
+                        var url = "http://grch37.ensembl.org/Homo_sapiens/Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
+                        valueUrl = '<a href="' + url + '" target="_reg">' + reg.split("_").join(" ").toLowerCase() + '</a>';
+                      } else {
+                        valueUrl = reg.split("_").join(" ").toLowerCase();
                       }
-                      regulatory["reg_" + reg.toLowerCase()] = "reg_" + reg.toLowerCase();;
+                      regulatory[(featureType == 'RegulatoryFeature' ? "reg_" : "mot_") + regKey.toLowerCase()] = valueUrl;
                     }
 
                 });

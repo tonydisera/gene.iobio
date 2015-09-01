@@ -6,7 +6,7 @@
       <text class="name" x="0" y="8">Impact</text>
     </svg>
     <select id="select-annotation-scheme" onchange="filterCard.onSelectAnnotationScheme()" style="font-size:10px;">
-                    <option>snpEff</option>
+                    <option>SnpEff</option>
                     <option>VEP</option>                   
     </select>
     <div style="padding-bottom:5px;"></div>
@@ -141,17 +141,17 @@
         </g>
         <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Tolerated (low confidence)</text>
       </svg>
-      <svg id="sift_deleterious_low_confidence" class="sift hide" width="134" height="15" transform="translate(0,0)">
+      <svg id="sift_deleterious_low_confidence" class="sift hide" width="139" height="15" transform="translate(0,0)">
         <g class="sift_deleterious_low_confidence" transform="translate(0,0)" style="opacity: 1;">
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="14" height="14" style="fill: #FB7737"></use>
         </g>
-        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Damaging (low confidence)</text>
+        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Deleterious (low confidence)</text>
       </svg>
       <svg id="sift_deleterious" class="sift hide" width="98" height="15" transform="translate(0,0)">
         <g class="sift_deleterious" transform="translate(0,0)" style="opacity: 1;">
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="14" height="14" style="fill: #ad494A"></use>
         </g>
-        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Damaging</text>
+        <text class="name" style="fill-opacity: 1;font-size: 10px;" x="15" y="11">Deleterious</text>
       </svg>
 
     </div>
@@ -278,10 +278,10 @@
   </div>
 
   <!-- type -->
-  <div style="padding-top:13px;float:left;padding-left:10px;width:105px">
+  <div style="float:left;padding-left:10px;width:105px">
 
-    <svg id="type-scheme" width="90" height="20" transform="translate(0,0)" class="">
-      <text class="name" x="0" y="15">Type</text>
+    <svg id="type-scheme" width="90" height="15" transform="translate(0,0)" class="">
+      <text class="name" x="0" y="10">Type</text>
     </svg>
 
     <svg id="snp" class="type" width="90" height="14" transform="translate(0,0)">
@@ -334,11 +334,11 @@
 
 
 
-  <div style="padding-top:13px;float:left;width:94px;padding-left:10px;">
+  <div style="float:left;width:94px;padding-left:10px;">
 
     <!-- inheritance -->
-        <svg id="inheritance-scheme" class="" width="90" height="20" transform="translate(0,0)">
-            <text class="name" x="0" y="15">Inheritance</text>
+        <svg id="inheritance-scheme" class="" width="94" height="15" transform="translate(0,0)">
+            <text class="name" x="0" y="10">Inheritance mode</text>
         </svg>
          <svg id="denovo" class="inheritance" width="90" height="20" transform="translate(0,0)">
           <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
@@ -367,9 +367,17 @@
         <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">Promoter flanking region</text>
         <rect class="filter-symbol  reg_promoter_flanking_region" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
       </svg>
-      <svg id="reg_tf_binding_site_variant" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
+      <svg id="reg_tf_binding_site" class="regulatory nocolor" width="80" height="14" transform="translate(0,0)">
         <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">TF binding site</text>
-        <rect class="filter-symbol  reg_tf_binding_site_variant" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+        <rect class="filter-symbol  reg_tf_binding_site" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="reg_ctcf_binding_site" class="regulatory nocolor" width="100" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">CTCF binding site</text>
+        <rect class="filter-symbol  reg_ctcf_binding_site" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
+      </svg>
+      <svg id="mot_tf_binding_site_variant" class="regulatory nocolor" width="90" height="14" transform="translate(0,0)">
+        <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">TF Motif feature</text>
+        <rect class="filter-symbol  mot_tf_binding_site_variant" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
       </svg>
 
     </div>
