@@ -332,10 +332,14 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 	var vcfUrl = panelSelector.find('#url-input').val();
 
-	variantCard.onVcfUrlEntered(vcfUrl, function() {
-		window.updateUrl('vcf'+cardIndex, vcfUrl);
-		variantCard.setDirty();
-		window.enableLoadButton();
+	variantCard.onVcfUrlEntered(vcfUrl, function(success) {
+		if (success) {
+			window.updateUrl('vcf'+cardIndex, vcfUrl);
+			variantCard.setDirty();
+			window.enableLoadButton();			
+		} else {
+			window.disableLoadButton();
+		}
 		
 	});
 }

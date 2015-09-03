@@ -414,27 +414,36 @@ VariantCard.prototype.clearVcf = function() {
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 	var me = this;
 	this.vcfData = null;
+	var success = true;
 
 	if (vcfUrl == null || vcfUrl == '') {
 		this.vcfUrlEntered = false;
+		success = false;
 
 	} else {
-		if (this.isViewable()) {
+		
+	   
+	    success = this.vcf.openVcfUrl(vcfUrl);
+	    if (success) {
+		    this.vcfUrlEntered = true;
+		    this.vcfFileOpened = false;	    	
+	    } else {
+	    	this.vcfUrlEntered = false;
+	    }
+
+
+
+	}
+	if (success) {
+    	if (this.isViewable()) {
 			this.cardSelector.find('#vcf-track').removeClass("hide");
 			this.cardSelector.find('#vcf-variants').css("display", "none");
 			this.cardSelector.find(".vcfloader").addClass("hide");
 		 
 		}
-	   
-	    this.vcf.openVcfUrl(vcfUrl);
-	    this.vcfUrlEntered = true;
-	    this.vcfFileOpened = false;
-
-
-
+	    this.getVcfRefName = null;		
 	}
-	callback(vcfUrl);
-    this.getVcfRefName = null;
+	callback(success);
 
 }
 

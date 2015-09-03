@@ -167,32 +167,43 @@ var effectCategories = [
     return vcfURL != null || vcfFile !=null;
   }
   exports.openVcfUrl = function(url) {
+    var success = true;
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;
     vcfFile = null;
     tabixFile = null;
+    if (url != null && url != '') {
+      if (!url.toLowerCase().endsWith(".vcf.gz")) {
+        showUrlFileFormatMessage();
+        success = false;
+      }
+
+    }
+    return success;
   }
 
   exports.openVcfFile = function(event, callback) {
     sourceType = SOURCE_TYPE_FILE;
     vcfURL = null;
-                
-    if (event.target.files.length != 2) {
-       alert('must select 2 files, both a .vcf.gz and .vcf.gz.tbi file');
-       return;
-    }
-
+   
     if (endsWith(event.target.files[0].name, ".vcf") ||
         endsWith(event.target.files[1].name, ".vcf")) {
       showFileFormatMessage();
       return;
     }
 
+
+    if (event.target.files.length != 2) {
+       showWrongNumberFilesMessage();
+       return;
+    }
+
+
     var fileType0 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[0].name);
     var fileType1 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[1].name);
 
     if (fileType0 == null || fileType0.length < 3 || fileType1 == 0 || fileType1.length <  3) {
-      alert('You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file');
+      showWrongNumberFilesMessage();
       return;
     }
 
@@ -214,6 +225,37 @@ var effectCategories = [
 
   } 
 
+  function showUrlFileFormatMessage() {
+
+
+    alertify.error("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
+        function (e) {
+        return;
+     });
+
+  }
+
+  function showWrongNumberFilesMessage() {
+    alertify.set(
+      { 
+        labels: {
+          cancel     : "Show me how",
+          ok         : "OK",
+        },  
+        buttonFocus:  "cancel"
+    });
+
+    alertify.confirm("You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file ", 
+        function (e) {
+        if (e) {
+            return;
+        } else {
+            window.open('http://iobio.io/2015/09/03/install-run-tabix/');
+        }
+     });
+
+  }
+
   function showFileFormatMessage() {
     alertify.set(
       { 
@@ -224,12 +266,12 @@ var effectCategories = [
         buttonFocus:  "cancel"
     });
 
-    alertify.confirm("You must select a compressed vcf file and its corresponding index file in order to run this app. ", 
+    alertify.confirm("You must select a compressed and indexed vcf file (.vcf.gz) and its corresponding index file (gz.vcf.tbi) in order to run this app. ", 
         function (e) {
         if (e) {
             return;
         } else {
-            window.location = 'help.html';
+            window.open('http://iobio.io/2015/09/03/install-run-tabix/');
         }
      });
   }
