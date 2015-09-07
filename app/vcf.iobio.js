@@ -72,9 +72,8 @@ vcfiobio = function module() {
   var catInputServer         = "ws://localhost:7063";
   //var snpEffServer           = "ws://localhost:8040";
   //var clinvarServer          = "ws://localhost:8040";
-  //var annotServer              = "ws://localhost:7077";
-  //var vepServer               = "ws://localhost:7078";
-  var vepServer               = "ws://nv-dev.iobio.io/vep/";
+  //var annotServer            = "ws://localhost:7077";
+  //var vepServer              = "ws://localhost:7078";
 
 /*
   var vcfstatsAliveServer    = "wss://vcfstatsalive.iobio.io";
@@ -101,7 +100,7 @@ vcfiobio = function module() {
   var vtServer               = "wss://nv-green.iobio.io/vt";
   var clinvarServer          = "wss://nv-green.iobio.io/clinvar";
   var afServer               = "wss://nv-green.iobio.io/af";
-  //var vepServer              = "wss://nv-green.iobio.io/vep";
+  var vepServer              = "wss://nv-blue.iobio.io/vep/";
   var contigAppenderServer   = "wss://nv-green.iobio.io/ctgapndr";
 
   var vcfURL;
