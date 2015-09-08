@@ -26,6 +26,8 @@ DataCard.prototype.init = function() {
 	    panelSelector.find('#datasource-name').on('change', function() {
 	    	me.setDataSourceName(panelSelector); 
 	    });
+	    
+
 
 	    panelSelector.find('#bam-url-input').on('change', function() {
 	    	me.onBamUrlEntered(panelSelector);
@@ -44,7 +46,7 @@ DataCard.prototype.init = function() {
 	    panelSelector.find('#bam-file-selector-item').on('click', function() {
 	    	me.onBamFileButtonClicked(panelSelector);
 	    });
-	    panelSelector.find('#bam-file-upload').on('change', function() {
+	    panelSelector.find('#bam-file-upload').on('change', function(event) {
 	    	me.onBamFilesSelected(event);
 	    });
 	    // This will ensure that if a same file selected consecutively
@@ -76,10 +78,10 @@ DataCard.prototype.init = function() {
 	    panelSelector.find("#vcf-dropdown-button").on("click", function() {
 	    	me.panelSelectorFilesSelected = panelSelector;
 	    });
-
 	   
-	    panelSelector.find('#vcf-file-upload').on('change', function() {
-	    	me.onVcfFilesSelected(event);
+	   
+	    panelSelector.find('#vcf-file-upload').on('change', function(event) {
+			me.onVcfFilesSelected(event);
 	    });
 	    // This will ensure that if a same file selected consecutively
 	    // will file the 'change' event
