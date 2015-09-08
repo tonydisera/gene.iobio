@@ -40,16 +40,16 @@ var Bam = Class.extend({
 
 
   
-      this.iobio.coverage = "wss://nv-green.iobio.io/coverage";
-      this.iobio.bamtools = "wss://nv-green.iobio.io/bamtools";
-      this.iobio.samtools = "wss://nv-green.iobio.io/samtools";
-      this.iobio.bamReadDepther = "wss://nv-green.iobio.io/bamReadDepther";
-      this.iobio.bamMerger = "wss://nv-green.iobio.io/bammerger";      
-      this.iobio.bamstatsAlive = "wss://nv-green.iobio.io/bamstatsalive"
-      this.iobio.freebayes = "wss://nv-green.iobio.io/freebayes";
-      this.iobio.bcftools = "wss://nv-green.iobio.io/bcftools";
-      this.iobio.vcflib = "wss://nv-green.iobio.io/vcflib";
-      this.iobio.vt = "wss://nv-green.iobio.io/vt";
+      this.iobio.coverage = "wss://services.iobio.io/coverage";
+      this.iobio.bamtools = "wss://services.iobio.io/bamtools";
+      this.iobio.samtools = "wss://services.iobio.io/samtools";
+      this.iobio.bamReadDepther = "wss://services.iobio.io/bamReadDepther";
+      this.iobio.bamMerger = "wss://services.iobio.io/bammerger";      
+      this.iobio.bamstatsAlive = "wss://services.iobio.io/bamstatsalive"
+      this.iobio.freebayes = "wss://services.iobio.io/freebayes";
+      this.iobio.bcftools = "wss://services.iobio.io/bcftools";
+      this.iobio.vcflib = "wss://services.iobio.io/vcflib";
+      this.iobio.vt = "wss://services.iobio.io/vt";
 
       
 

@@ -92,16 +92,16 @@ vcfiobio = function module() {
   //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
   
   var clinvarIterCount       = 0;
-  var vcfstatsAliveServer    = "wss://nv-green.iobio.io/vcfstatsalive";
-  var tabixServer            = "wss://nv-green.iobio.io/tabix";
-  var vcfReadDeptherServer   = "wss://nv-green.iobio.io/vcfdepther";
-  var snpEffServer           = "wss://nv-green.iobio.io/snpeff";
-  var snpSiftServer          = "wss://nv-green.iobio.io/snpsift";
-  var vtServer               = "wss://nv-green.iobio.io/vt";
-  var clinvarServer          = "wss://nv-green.iobio.io/clinvar";
-  var afServer               = "wss://nv-green.iobio.io/af";
-  var vepServer              = "wss://nv-blue.iobio.io/vep/";
-  var contigAppenderServer   = "wss://nv-green.iobio.io/ctgapndr";
+  var vcfstatsAliveServer    = "wss://services.iobio.io/vcfstatsalive";
+  var tabixServer            = "wss://services.iobio.io/tabix";
+  var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
+  var snpEffServer           = "wss://services.iobio.io/snpeff";
+  var snpSiftServer          = "wss://services.iobio.io/snpsift";
+  var vtServer               = "wss://services.iobio.io/vt";
+  var clinvarServer          = "wss://services.iobio.io/clinvar";
+  var afServer               = "wss://services.iobio.io/af";
+  var vepServer              = "wss://services.iobio.io/vep/";
+  var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
 
   var vcfURL;
   var vcfReader;
@@ -600,7 +600,7 @@ var effectCategories = [
 
     var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
 
-    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
+    var url = encodeURI( snpEffServer + '?debug=true&cmd= ' + encodeURIComponent(vepUrl));
     
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
@@ -619,6 +619,13 @@ var effectCategories = [
               return;
            } 
            annotatedData += data;
+        });
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('error', function(data, options) {
+           console.log(data);
         });
 
         // Whenall of the annotated vcf data has been returned, call
