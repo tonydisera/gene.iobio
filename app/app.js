@@ -141,7 +141,7 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: 4, bottom: 0, left: 4})
+	    .margin({top:20, right: 0, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(16)
@@ -149,6 +149,7 @@ function init() {
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 	    	if (!brush.empty()) {
+	    		$('#zoom-hint').text('To zoom out, click outside bounding box.');
 				regionStart = d3.round(brush.extent()[0]);
 				regionEnd   = d3.round(brush.extent()[1]);
 				if (!selectedTranscript) {
@@ -157,6 +158,7 @@ function init() {
 
 				}
 			} else {
+	    		$('#zoom-hint').text('To zoom into region, drag over gene model.');
 				regionStart = window.gene.start;
 				regionEnd   = window.gene.end;
 			}

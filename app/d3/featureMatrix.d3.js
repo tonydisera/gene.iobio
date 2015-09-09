@@ -85,7 +85,7 @@ function featureMatrixD3() {
         .attr("width", parseInt(width+margin.right))
         .attr("height", heightPercent)
         .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height))
-        .attr("preserveAspectRatio", "xMinYMid meet");
+        .attr("preserveAspectRatio", "none");
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.

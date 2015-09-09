@@ -13,6 +13,11 @@ body {
   */
 }
 
+.hint {
+  color: rgba(208, 66, 66, 0.95);
+  font-size: 12px;
+}
+
 .label {
   padding: 3px 6px 3px 6px !important;
 }
@@ -601,6 +606,8 @@ section {
   margin-top: 15px;
   margin-bottom: 0px;
   padding-bottom: 0px;
+  padding-left: 14px;
+  padding-right: 14px;
   clear: both;
 }
 
@@ -1279,7 +1286,7 @@ header {
 #impact-scheme, #effect-scheme, #regulatory-scheme {
   padding-top: 2px;
 }
-#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme {
+#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme {
   padding-top: 2px;
 }
 .impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive  {
@@ -1297,7 +1304,7 @@ header {
 }
 #impact-scheme .name, #effect-scheme .name, #compare-scheme .name, 
 #type-scheme .name, #zygosity-scheme .name,
-#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name,
+#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name, #regulatory-scheme .name,
 #afexac-scheme .name, #af1000g-scheme .name {
   fill-opacity: 1;
   font-size: 12px; 

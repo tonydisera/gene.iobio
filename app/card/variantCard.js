@@ -160,7 +160,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: 20, right: 4, bottom: 0, left: 4})
+				    .margin({top: 20, right: 0, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .showBrush(false)
 				    .trackHeight(16)
@@ -175,7 +175,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
-							.margin( {top: 10, right: 4, bottom: 20, left: 4} )
+							.margin( {top: 10, right: 0, bottom: 20, left: 4} )
 							.showXAxis(true)
 							.showYAxis(false)
 							.showTooltip(true)
@@ -189,7 +189,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 4, bottom: 16, left: 4})
+				    .margin({top: 0, right: 0, bottom: 16, left: 4})
 				    .showXAxis(true)
 				    .variantHeight(6)
 				    .verticalPadding(2)
@@ -225,7 +225,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// variant set from vcf
 		this.fbChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 4, bottom: 0, left: 4})
+				    .margin({top: 0, right: 0, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .variantHeight(6)
 				    .verticalPadding(2)
@@ -1106,7 +1106,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 
 		// Decide if we should show the x-axis.
 		this.bamDepthChart.showXAxis(!(this.vcf && this.vcf.hasFileOrUrl()));
-		this.bamDepthChart.margin(!(this.vcf && this.vcf.hasFileOrUrl()) ? {top: 10, right: 4, bottom: 20, left: 4} : {top: 10, right: 4, bottom: 0, left: 4} );
+		this.bamDepthChart.margin(!(this.vcf && this.vcf.hasFileOrUrl()) ? {top: 10, right: 0, bottom: 20, left: 4} : {top: 10, right: 0, bottom: 0, left: 4} );
 	
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");

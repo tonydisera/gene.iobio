@@ -109,7 +109,7 @@ function geneD3() {
       if (geneD3_widthPercent && geneD3_heightPercent) {
         d3.select(this).selectAll("svg")
           .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
-          .attr("preserveAspectRatio", "xMaxYMid meet");
+          .attr("preserveAspectRatio", "none");
       } 
 
       d3.select(this).selectAll("svg")

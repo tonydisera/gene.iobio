@@ -252,6 +252,9 @@
           <div id="gene-track" class="track hide">           
               <div id="gene-viz" class="track-chart"></div>               
           </div>
+          <span id="zoom-hint" class="hint todo" style="margin-top: -15px;display: block;text-align: center;">
+              To zoom into region, drag over gene model.
+          </span>
         </div>
       </div>
 
@@ -323,13 +326,14 @@
                 <input id="datasource-relationship" class="hide" value="father" type="text"/>
               </div>
 
-              <div class="fullview" style="clear:both;text-align:center">
-                <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" 
-                style="padding-left:45px;padding-right:50px;margin-left:-15px;">
+
+              <div class="fullview" style="clear:both;text-align:center;">
+                <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">
                   <i class="mdi-file-cloud-done"></i>
                   Load
                 </button>
               </div>
+                <span class="hint todo" style="float:left;margin-top:-40px;">Files must correspond to build GRCh37.</span>
 
           </div>   
 
@@ -424,7 +428,7 @@
                   </g>
                 </svg>
                 <span style="float:left;margin-top:-2px;color:  rgb(132,132,132);">
-                More likely causitive
+                More likely causative
                 </span>
               </div> 
             </div>

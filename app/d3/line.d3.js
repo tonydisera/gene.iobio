@@ -73,7 +73,7 @@ lineD3 = function module() {
       container.select(".circle-label")
                .attr( "x", function (d,i) {
                   var w = this.getBBox().width;
-                  var x = mousex + margin.left - (w/2);
+                  var x = mousex + margin.left - (w/2) + 2;
     
                   if (x + (w/2) > width) {
                     // If the circle label is too far to the right,
@@ -93,7 +93,7 @@ lineD3 = function module() {
       circle.transition()
             .duration(200)
             .style("opacity", 1);
-      circle.attr("cx", mousex + margin.left - 2)
+      circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top );
               
     }
@@ -164,7 +164,7 @@ lineD3 = function module() {
         .attr("width", widthPercent)
         .attr("height", heightPercent)
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
-        .attr("preserveAspectRatio", "xMaxYMid meet");
+        .attr("preserveAspectRatio", "none");
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
@@ -248,11 +248,11 @@ lineD3 = function module() {
 
         
       x = d3.scale.linear()
-          .range([0, width]);
+          .range([0, width - margin.left - margin.right]);
 
       var innerHeight = height - margin.top - margin.bottom;
       y = d3.scale.linear()
-          .range([height, 0]);
+          .range([innerHeight, 0]);
 
 
       if (xStart && xEnd) {

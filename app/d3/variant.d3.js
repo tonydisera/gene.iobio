@@ -259,7 +259,7 @@ function variantD3() {
         .attr("width", widthPercent)
         .attr("height", heightPercent)
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
-        .attr("preserveAspectRatio", "xMinYMid meet")
+        .attr("preserveAspectRatio", "none")
         .append("g")
         .attr("class", "group")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
