@@ -388,7 +388,12 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 		me.vcfUrlEntered = false;
 
 		me.cardSelector.find('#vcf-name').text(vcfFile.name);
-		callback(vcfFile.name);
+		
+		// Get the sample names from the vcf header
+	    me.vcf.getSampleNames( function(sampleNames) {
+	    	callback(vcfFile.name, sampleNames);
+	    });
+
 		me.getVcfRefName = null;
 
 	});
@@ -441,9 +446,16 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 			this.cardSelector.find(".vcfloader").addClass("hide");
 		 
 		}
-	    this.getVcfRefName = null;		
+	    this.getVcfRefName = null;	
+	    // Get the sample names from the vcf header
+	    this.vcf.getSampleNames( function(sampleNames) {
+	    	callback(success, sampleNames);
+	    });
+	} else {
+		callback(success);
+
 	}
-	callback(success);
+
 
 }
 

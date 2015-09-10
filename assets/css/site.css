@@ -169,6 +169,10 @@ a, a:hover, a:focus {
   color: rgba(104, 152, 168, 1) !important;
 }
 
+.chosen-container a {
+  color: rgb(132,132,132) !important;
+}
+
 .tooltip a, .tooltip a:hover, .tooltip a:focus {
   color: rgba(131, 219, 249, 1) !important;
 }

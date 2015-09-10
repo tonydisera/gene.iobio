@@ -8,7 +8,7 @@
 
   <div id="add-vcf-track" class="fullview" style="display:table">
       
-      <div id="add-vcf-track-toolbar" class="btn-toolbar" style="width:105px;">
+      <div id="add-vcf-track-toolbar" class="btn-toolbar" style="width:110px;">
         <div class="btn-group" style="display:  inline;" >
 
           <button type="button" id="vcf-dropdown-button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -47,10 +47,24 @@
         <input id="vcf-file-info" type="text" value="" readonly=""  style="background-color: #FFFFFF" class="form-control input-sm empty hide">
       </div>
 
-  </div>     
+  </div>    
+
+  <div class="vcf-sample loader hide" style="margin-left: 110px;">
+      <span class="loader-label" style="font-size:11px;">Accessing file header</span>
+      <img src="assets/images/wheel.gif" style="height:17px;width:17px;">
+  </div>
+      
+  <span id="vcf-sample-box" class="hide">
+      <span style="font-size: 11px;width: 100px;display: inline-block;color:rgb(132,132,132)">
+        Sample Identifier
+      </span>
+      <select id="vcf-sample-select" data-placeholder="Choose a sample..." class="chosen-select form-control">
+      </select>
+  </span>
+ 
   <div id="add-bam-track" class="fullview" style="display:table">
 
-    <div id="add-bam-track-toolbar" class="btn-toolbar" style="width:105px;" >
+    <div id="add-bam-track-toolbar" class="btn-toolbar" style="width:110px;" >
       <div class="btn-group" style="display:inline;">
 
           <button type="button" id="bam-dropdown-button" style="width:95px;font-size:11px;padding-top: 2px;padding-bottom: 1px;"
@@ -95,6 +109,8 @@
     </div>
 
   </div>
+
+
 
 
 

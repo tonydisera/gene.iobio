@@ -94,6 +94,7 @@ DataCard.prototype.init = function() {
 	listenToEvents($('#proband-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
+	$('#proband-data #vcf-sample-select').chosen({width: "150px;font-size:11px;"});
 
 
 	$('#mother-data').append(dataCardEntryTemplate());
@@ -101,12 +102,15 @@ DataCard.prototype.init = function() {
 	listenToEvents($('#mother-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
+	$('#mother-data #vcf-sample-select').chosen({width: "150px;"});
 
 	$('#father-data').append(dataCardEntryTemplate());
 	$('#father-data #sample-data-label').text("FATHER");
 	listenToEvents($('#father-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#father-data'));
+	$('#father-data #vcf-sample-select').chosen({width: "150px;"});
+
 
 	var dataCardSelector = $('#data-card');
 	dataCardSelector.find('#expand-button').on('click', function() {
@@ -305,15 +309,58 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	
 	$('#tourWelcome').removeClass("open");
 
+	// Show the file name 
+	me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
+	for (var i = 0; i < event.currentTarget.files.length; i++) {
+		var file = event.currentTarget.files[i];
+		if (!file.name.endsWith(".tbi")) {
+			me.panelSelectorFilesSelected.find('#vcf-file-info').val(file.name);
+		}
+	}
+	
+
 	this.setDataSourceName(this.panelSelectorFilesSelected);
 	this.setDataSourceRelationship(this.panelSelectorFilesSelected);
 
 	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];	
 
-	variantCard.onVcfFilesSelected(event, function(vcfFileName) {
+	me.panelSelectorFilesSelected.find('#vcf-sample-box').addClass('hide');
+	me.panelSelectorFilesSelected.find('.vcf-sample.loader').removeClass('hide');
+
+
+	variantCard.onVcfFilesSelected(event, function(vcfFileName, sampleNames) {
+		me.panelSelectorFilesSelected.find('#vcf-sample-box').removeClass('hide');
+		me.panelSelectorFilesSelected.find('.vcf-sample.loader').addClass('hide');
+
 		me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#vcf-file-info').val(vcfFileName);
+
+
+		// Populate the sample names in the dropdown
+		me.panelSelectorFilesSelected.find('#vcf-sample-select')
+							         .find('option').remove();
+
+		// Add a blank option if there is more than one sample in the vcf file
+		if (sampleNames.length > 1) {
+			me.panelSelectorFilesSelected.find('#vcf-sample-select')
+			                             .append($("<option></option>"));
+		}							         
+
+		// Populate the sample name in the dropdown
+		sampleNames.forEach( function(sampleName) {
+			me.panelSelectorFilesSelected.find('#vcf-sample-select')
+			                            .append($("<option></option>")
+	                                    .attr("value",sampleName)
+	                                    .text(sampleName)); 
+		});
+		me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+
+		// If there is only one sample in the vcf, select it
+		if (sampleNames.length == 1) {
+			me.panelSelectorFilesSelected.find('#vcf-sample-select').val(sampleNames[0]);
+		}
+
 		window.enableLoadButton();
 	});
 	variantCard.setDirty();
@@ -334,9 +381,41 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 	var vcfUrl = panelSelector.find('#url-input').val();
 
-	variantCard.onVcfUrlEntered(vcfUrl, function(success) {
+	panelSelector.find('#vcf-sample-box').addClass('hide');
+	panelSelector.find('.vcf-sample.loader').removeClass('hide');
+
+	window.updateUrl('vcf'+cardIndex, vcfUrl);
+	
+	variantCard.onVcfUrlEntered(vcfUrl, function(success, sampleNames) {
+		panelSelector.find('.vcf-sample.loader').addClass('hide');
+
 		if (success) {
-			window.updateUrl('vcf'+cardIndex, vcfUrl);
+			
+
+			// Populate the sample names in the dropdown
+			panelSelector.find('#vcf-sample-box').removeClass('hide');
+			panelSelector.find('#vcf-sample-select')
+							 .find('option').remove();
+
+			// Add a blank option if there is more than one sample in the vcf file
+			if (sampleNames.length > 1) {
+				panelSelector.find('#vcf-sample-select')
+				             .append($("<option></option>"));
+			}	
+			// Populate the sample names in the dropdown
+			sampleNames.forEach( function(sampleName) {
+				panelSelector.find('#vcf-sample-select')							 
+				             .append($("<option></option>")
+		                     .attr("value",sampleName)
+		                     .text(sampleName)); 
+			});
+			panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+
+			// If there is only one sample in the vcf, select it
+			if (sampleNames.length == 1) {
+				panelSelector.find('#vcf-sample-select').val(sampleNames[0]);
+			}
+
 			variantCard.setDirty();
 			window.enableLoadButton();			
 		} else {

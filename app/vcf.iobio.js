@@ -600,7 +600,7 @@ var effectCategories = [
 
     var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
 
-    var url = encodeURI( snpEffServer + '?debug=true&cmd= ' + encodeURIComponent(vepUrl));
+    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
     
     // Connect to the snpEff server    
     var client = BinaryClient(snpEffServer);
@@ -675,6 +675,91 @@ var effectCategories = [
     });
      
   }
+
+    // NEW
+  exports.getSampleNames = function(callback) {
+    if (sourceType == SOURCE_TYPE_URL) {
+      this._getRemoteSampleNames(callback);
+    } else {
+      this._getLocalSampleNames(callback);
+    }
+  }
+ 
+  // NEW
+  exports._getLocalSampleNames = function(callback) {
+    var me = this;
+
+    var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
+      var sampleNames = [];
+      sampleNames.length = 0;
+
+      var headerRecords = [];
+      vcfReader.getHeader( function(header) {
+         headerRecords = header.split("\n");
+         headerRecords.forEach(function(headerRec) {
+            if (headerRec.indexOf("#CHROM") == 0) {
+              var headerFields = headerRec.split("\t");
+              sampleNames = headerFields.slice(9);
+              callback(sampleNames);
+            }
+         });
+
+      });
+   });
+    
+    
+
+  }
+
+  // NEW
+  exports._getRemoteSampleNames = function(callback) {
+    var me = this;
+    var tabixUrl = encodeURI(tabixServer + "?cmd=-h " + vcfURL +  ' 1:1-1' + '&protocol=http&encoding=utf8');
+
+    // Connect to the tabix server    
+    var client = BinaryClient(tabixServer);
+    
+    var sampleNames = [];
+    var headerData = "";
+    
+    client.on('open', function(stream){
+
+      // Run the command
+      var stream = client.createStream({event:'run', params : {'url':tabixUrl}});
+
+      //
+      // listen for stream data (the output) event. 
+      //
+      stream.on('data', function(data, options) {
+         if (data == undefined) {
+            return;
+         } 
+         headerData += data;
+      });
+
+      //
+      // listen for stream data (the output) event. 
+      //
+      stream.on('error', function(data, options) {
+         console.log(data);
+      });
+
+      // When all of the data has been returned, parse the header
+      // records to get the sample names
+      stream.on('end', function() {
+        headerRecords = headerData.split("\n");
+        headerRecords.forEach(function(headerRec) {
+            if (headerRec.indexOf("#CHROM") == 0) {
+              var headerFields = headerRec.split("\t");
+              sampleNames = headerFields.slice(9);
+              callback(sampleNames);
+            }
+        });
+      });
+
+    });
+  }
+
 
   // NEW
   exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
