@@ -20,9 +20,10 @@ function VariantCard() {
 	this.cardSelector = null;
 	this.d3CardSelector = null;
 	this.cardIndex = null;
-	this.name = null;
+	this.name = "";
 	this.dirty = false;
 	this.vcfRefNamesMap = {};
+	this.sampleName = "";
 }
 
 VariantCard.prototype.isLoaded = function() {
@@ -57,6 +58,12 @@ VariantCard.prototype.setRelationship = function(theRelationship) {
 	} else {
 		return theRelationship;
 	}
+}
+
+VariantCard.prototype.setSampleName = function(sampleName) {
+	this.sampleName = sampleName;
+	this.cardSelector.find('#variant-card-label').text(this.name == this.sampleName ? this.name : this.sampleName + " " + this.name);
+
 }
 
 VariantCard.prototype.getCardIndex = function() {
@@ -375,6 +382,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
 	var me = this;
 	this.vcfData = null;
+	this.sampleName = null;
 
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -405,7 +413,9 @@ VariantCard.prototype.clearVcf = function() {
 	this.vcfData = null;
 	this.vcfUrlEntered = false;
 	this.vcfFileOpened = false;
+	this.sampleName = null;
 	this.setDirty(false);
+	this.vcf.clear();
 	this.cardSelector.find('#vcf-track').addClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "none");
 	this.cardSelector.find(".vcfloader").addClass("hide");
@@ -420,6 +430,7 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 	var me = this;
 	this.vcfData = null;
 	var success = true;
+	this.sampleName = null;
 
 	if (vcfUrl == null || vcfUrl == '') {
 		this.vcfUrlEntered = false;
@@ -556,7 +567,7 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 	}
 
    	this.cardSelector.find('#card-relationship-label').text(title);
-   	this.cardSelector.find('#variant-card-label').text(dataSourceName);
+   	this.cardSelector.find('#variant-card-label').text(this.name == this.sampleName ? this.name : this.sampleName + " " + this.name);
 
 }
 
@@ -1216,7 +1227,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		// variants based on the selected region
 		if (this.isViewable()) {
 			var filteredVcfData = this.filterVariants();
-			me.cardSelector.find('#displayed-variant-count').text(filteredVcfData.features.length != null ? filteredVcfData.features.length : "0");
+			me.cardSelector.find('#displayed-variant-count').text(filteredVcfData != null && filteredVcfData.features.length != null ? filteredVcfData.features.length : "0");
 			if (regionStart && regionEnd)
 	  			this.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 	  		else
@@ -1249,8 +1260,7 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 	                           window.gene.end, 
 	                           window.gene.strand, 
 	                           window.selectedTranscript,
-	                           this.afMin,
-	                           this.afMax,
+	                           me.sampleName,
 	                           function(data) {
 		        me.vcfData = data;
 
@@ -1782,7 +1792,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 				// Annotate the fb variants
 				me.vcf.annotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene.start, window.gene.end, 
-					window.gene.strand, window.selectedTranscript, function(data){
+					window.gene.strand, window.selectedTranscript, me.sampleName, function(data){
 
 				   	data.features.forEach( function(feature) {
 				   		feature.fbCalled = 'Y';
@@ -2116,8 +2126,7 @@ VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, c
 			 window.gene.end, 
 			 window.gene.strand, 
 			 window.selectedTranscript,
-			 0,
-			 1,
+			 me.sampleName,
 			 function(data) {
 			 	me.vcfData = data;
 			 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);

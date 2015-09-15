@@ -51,6 +51,7 @@ var Bam = Class.extend({
       this.iobio.vcflib = "wss://services.iobio.io/vcflib";
       this.iobio.vt = "wss://services.iobio.io/vt";
 
+
       
 
 //      this.iobio.bamtools = "ws://localhost:8061";

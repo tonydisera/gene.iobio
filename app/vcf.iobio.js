@@ -102,6 +102,8 @@ vcfiobio = function module() {
   var afServer               = "wss://services.iobio.io/af";
   var vepServer              = "wss://services.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
+  var vcfsubset              = "ws://nv-dev.iobio.io/vcfsubset/";
+  var vtsubset               = "ws://nv-dev.iobio.io/vtsubset/";
 
   var vcfURL;
   var vcfReader;
@@ -543,16 +545,16 @@ var effectCategories = [
     
   }
   // NEW
-  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
+  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
+      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
     } else {
-      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
+      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
     }
   }
  
   // NEW
-  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
+  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -576,7 +578,7 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
         me.annotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, 
-          selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded);
+          selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded);
 
 
     });
@@ -584,7 +586,8 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, afMin, afMax, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
+  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName,
+    callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
     var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
@@ -597,9 +600,17 @@ var effectCategories = [
     // TODO - Need to generalize to grab reference names for species instead of hardcoding
     var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
 
+    // If multi-sample vcf, select only the genotype field for the specified sample
+    var nextUrl = "";
+    if (sampleName != null && sampleName != "") {
+      nextUrl = encodeURI( vcfsubset + "?cmd= -c " + sampleName + " -e " + encodeURIComponent(contigAppenderUrl));
+//      nextUrl = encodeURI( vtsubset + "?cmd= " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+    } else {
+      nextUrl = contigAppenderUrl;
+    }
 
     // normalize variants
-    var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(contigAppenderUrl));
+    var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(nextUrl));
     
     // get allele frequencies from 1000G and ExAC
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
@@ -768,7 +779,7 @@ var effectCategories = [
 
 
   // NEW
-  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
+  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
 
 
@@ -776,7 +787,7 @@ var effectCategories = [
     // For each vcf records, call snpEff to get the annotations.
     // Each vcf record returned will have an EFF field in the 
     // info field.
-    me._annotateVcfRegion(records, refName, function(annotatedData) {
+    me._annotateVcfRegion(records, refName, sampleName, function(annotatedData) {
 
       var annotatedRecs = annotatedData.split("\n");
       var vcfObjects = [];
@@ -983,10 +994,18 @@ var effectCategories = [
 
 
   // NEW
-  exports._annotateVcfRegion = function(records, refName, callback, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, sampleName, callback, callbackClinvar) {
       var me = this;
       
       var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
+
+      // If multi-sample vcf, select only the genotype field for the specified sample
+      var nextUrl = "";
+      if (sampleName != null && sampleName != "") {
+        nextUrl = encodeURI( vtsubset + "?cmd=  " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+      } else {
+        nextUrl = contigAppenderUrl;
+      }
 
       if (refName.indexOf('chr') == 0) {
         refFile = "./data/references_hg19/" + refName + ".fa";
@@ -995,7 +1014,7 @@ var effectCategories = [
       }       
       
       // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-      var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(contigAppenderUrl) );
+      var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(nextUrl) );
       
       // Get Allele Frequencies from 1000G and ExAC
       var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));

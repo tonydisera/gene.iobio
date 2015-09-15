@@ -88,6 +88,11 @@ DataCard.prototype.init = function() {
 	    panelSelector.find('#vcf-file-upload').on('click', function() {
 	    	this.value = null;
 	    });
+
+	    // When the sample name dropdown is selected
+	    panelSelector.find('#vcf-sample-select').on('change', function(event,params) {
+	    	me.onVcfSampleSelected(panelSelector);
+	    });
 	}
 
 	$('#proband-data').append(dataCardEntryTemplate());
@@ -330,40 +335,50 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 
 	variantCard.onVcfFilesSelected(event, function(vcfFileName, sampleNames) {
-		me.panelSelectorFilesSelected.find('#vcf-sample-box').removeClass('hide');
 		me.panelSelectorFilesSelected.find('.vcf-sample.loader').addClass('hide');
 
 		me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#vcf-file-info').val(vcfFileName);
 
-
-		// Populate the sample names in the dropdown
-		me.panelSelectorFilesSelected.find('#vcf-sample-select')
-							         .find('option').remove();
-
-		// Add a blank option if there is more than one sample in the vcf file
+		// Only show the sample dropdown if the vcf file has more than one sample
 		if (sampleNames.length > 1) {
-			me.panelSelectorFilesSelected.find('#vcf-sample-select')
-			                             .append($("<option></option>"));
-		}							         
 
-		// Populate the sample name in the dropdown
-		sampleNames.forEach( function(sampleName) {
+			// Populate the sample names in the dropdown
+			me.panelSelectorFilesSelected.find('#vcf-sample-box').removeClass('hide');
 			me.panelSelectorFilesSelected.find('#vcf-sample-select')
-			                            .append($("<option></option>")
-	                                    .attr("value",sampleName)
-	                                    .text(sampleName)); 
-		});
-		me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+								         .find('option').remove();
 
-		// If there is only one sample in the vcf, select it
-		if (sampleNames.length == 1) {
-			me.panelSelectorFilesSelected.find('#vcf-sample-select').val(sampleNames[0]);
+			// Add a blank option if there is more than one sample in the vcf file
+			if (sampleNames.length > 1) {
+				me.panelSelectorFilesSelected.find('#vcf-sample-select')
+				                             .append($("<option></option>"));
+			}							         
+
+			// Populate the sample name in the dropdown
+			sampleNames.forEach( function(sampleName) {
+				me.panelSelectorFilesSelected.find('#vcf-sample-select')
+				                            .append($("<option></option>")
+		                                    .attr("value",sampleName)
+		                                    .text(sampleName)); 
+			});
+			me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+			window.disableLoadButton();
+		} else {
+			window.enableLoadButton();
 		}
 
-		window.enableLoadButton();
 	});
 	variantCard.setDirty();
+}
+
+DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
+	var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+	var sampleName = panelSelector.find('#vcf-sample-select option:selected').text();
+	variantCard.setSampleName(sampleName);
+	if (variantCard.isReadyToLoad()) {
+		window.enableLoadButton();
+	}
 }
 
 DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
@@ -391,33 +406,32 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 		if (success) {
 			
-
-			// Populate the sample names in the dropdown
-			panelSelector.find('#vcf-sample-box').removeClass('hide');
-			panelSelector.find('#vcf-sample-select')
-							 .find('option').remove();
-
-			// Add a blank option if there is more than one sample in the vcf file
+			// Only show the sample dropdown if there is more than one sample
 			if (sampleNames.length > 1) {
+				// Populate the sample names in the dropdown
+				panelSelector.find('#vcf-sample-box').removeClass('hide');
 				panelSelector.find('#vcf-sample-select')
-				             .append($("<option></option>"));
-			}	
-			// Populate the sample names in the dropdown
-			sampleNames.forEach( function(sampleName) {
-				panelSelector.find('#vcf-sample-select')							 
-				             .append($("<option></option>")
-		                     .attr("value",sampleName)
-		                     .text(sampleName)); 
-			});
-			panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+								 .find('option').remove();
 
-			// If there is only one sample in the vcf, select it
-			if (sampleNames.length == 1) {
-				panelSelector.find('#vcf-sample-select').val(sampleNames[0]);
+				// Add a blank option if there is more than one sample in the vcf file
+				if (sampleNames.length > 1) {
+					panelSelector.find('#vcf-sample-select')
+					             .append($("<option></option>"));
+				}	
+				// Populate the sample names in the dropdown
+				sampleNames.forEach( function(sampleName) {
+					panelSelector.find('#vcf-sample-select')							 
+					             .append($("<option></option>")
+			                     .attr("value",sampleName)
+			                     .text(sampleName)); 
+				});
+				panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+				window.disableLoadButton();
+			} else {
+				window.enableLoadButton();			
 			}
 
 			variantCard.setDirty();
-			window.enableLoadButton();			
 		} else {
 			window.disableLoadButton();
 		}

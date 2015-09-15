@@ -13,6 +13,10 @@ body {
   */
 }
 
+#vcf-sample-box .chosen-container {
+  font-size: 11px;
+}
+
 .hint {
   color: rgba(208, 66, 66, 0.95);
   font-size: 12px;
@@ -118,9 +122,13 @@ body {
 }
 
 .card-label {
-  color: rgba(81, 78, 69, 1);
+  color: rgba(132, 132, 132, 1);
   font-size: 15px;
   text-transform: uppercase;
+}
+
+#sample-data-label {
+  color: rgba(132, 132, 132, 1);  
 }
 
 .btn.btn-fab {
