@@ -165,6 +165,12 @@ var effectCategories = [
   exports.hasFileOrUrl = function() {
     return vcfURL != null || vcfFile !=null;
   }
+
+  exports.clear = function() {
+    vcfURL = null;
+    vcfFile = null;
+  }
+
   exports.openVcfUrl = function(url) {
     var success = true;
     sourceType = SOURCE_TYPE_URL;

@@ -75,11 +75,11 @@ lineD3 = function module() {
                   var w = this.getBBox().width;
                   var x = mousex + margin.left - (w/2) + 2;
     
-                  if (x + (w/2) > width) {
+                  if (x + (w/2) > innerWidth) {
                     // If the circle label is too far to the right,
                     // position it as far right as possible without
                     // truncating the text.
-                    x  = width - (w/2);
+                    x  = innerWidth - (w/2);
                   } else if (x - (w/2) < 0) {
                     // If the circle label is position out-of-bounds
                     // from the area, position the label to
@@ -156,20 +156,17 @@ lineD3 = function module() {
                   .selectAll("svg")
                   .data([data]);
 
-      
-  
-
       svg.enter()
         .append("svg")
         .attr("width", widthPercent)
         .attr("height", heightPercent)
-        .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom))
+        .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height))
         .attr("preserveAspectRatio", "none");
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
+         .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
 
       // add a circle and label
       var circle = svg.selectAll(".circle").data([0])
@@ -247,8 +244,9 @@ lineD3 = function module() {
            });     
 
         
+      var innerWidth = width - margin.left - margin.right;
       x = d3.scale.linear()
-          .range([0, width - margin.left - margin.right]);
+          .range([0, innerWidth]);
 
       var innerHeight = height - margin.top - margin.bottom;
       y = d3.scale.linear()
@@ -301,7 +299,7 @@ lineD3 = function module() {
         area = d3.svg.area()
           .interpolate("linear")
           .x(function(d) { return x(pos(d)); })
-          .y0(height)
+          .y0(innerHeight)
           .y1(function(d) { return y(depth(d)); });
       } 
 
@@ -312,7 +310,7 @@ lineD3 = function module() {
         svgGroup.selectAll("g.x").data([data]).enter()
           .append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
+          .attr("transform", "translate(0," + innerHeight + ")")
           .call(xAxis);        
       }
 
@@ -391,7 +389,7 @@ lineD3 = function module() {
 
       if (showBrush) {
         if (brushHeight == null ) {
-          brushHeight = height;
+          brushHeight = innerHeight;
           brushY = -6;
         } else {
           brushY = 0 - (brushHeight / 2);

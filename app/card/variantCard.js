@@ -1118,6 +1118,7 @@ VariantCard.prototype.fillBamChart = function(data, regionStart, regionEnd) {
 
 		// Decide if we should show the x-axis.
 		this.bamDepthChart.showXAxis(!(this.vcf && this.vcf.hasFileOrUrl()));
+		this.bamDepthChart.height(!(this.vcf && this.vcf.hasFileOrUrl()) ? 65 : 45 );
 		this.bamDepthChart.margin(!(this.vcf && this.vcf.hasFileOrUrl()) ? {top: 10, right: 2, bottom: 20, left: 4} : {top: 10, right: 2, bottom: 0, left: 4} );
 	
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
