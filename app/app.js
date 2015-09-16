@@ -885,6 +885,12 @@ function addVariantCard() {
 
 }
 
+function callVariants() {
+	variantCards.forEach(function(vc) {
+		vc.callVariants();
+	});
+}
+
 
 function promiseFullTrio() {
 	var loaded = {};

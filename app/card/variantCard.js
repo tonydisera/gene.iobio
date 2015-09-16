@@ -303,7 +303,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 		// listen for click event for finding missing variants
 		this.cardSelector.find('#button-find-missing-variants').on('click', function() {
-			me.callVariants.apply(me, []);
+			window.callVariants();
 		});
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
@@ -1521,6 +1521,10 @@ VariantCard.prototype.fillVariantChart = function(data, regionStart, regionEnd, 
 }
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
+	$('#filter-and-rank-card').removeClass("hide");
+    $('#filter-track').removeClass("hide");
+    $('#matrix-track').removeClass("hide");
+
 	var filteredVcfData = this.filterVariants(this.vcfData);
 	
 	window.matrixCard.fillFeatureMatrix(filteredVcfData);
@@ -1823,6 +1827,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 						me.vcfData.features = [];
 						me.setLoadState('clinvar');
 						me.setLoadState('coverage');
+						me.setLoadState('inheritance');
 					}
 
 		        	me.determineVariantAfLevels(me.fbData);
@@ -1893,6 +1898,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
  
 					} else {
 						processFreebayesData();
+						promiseFullTrio();
 					}			
 				}, 
 				me.refreshVariantsWithClinvar.bind(me), 
