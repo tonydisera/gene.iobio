@@ -127,6 +127,17 @@ body {
   text-transform: uppercase;
 }
 
+#variant-card-label {
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 2px;
+    width: 120px;
+    text-align: left;
+    color: rgba(104, 152, 168, 1);  
+}
+
+
 #sample-data-label {
   color: rgba(132, 132, 132, 1);  
 }

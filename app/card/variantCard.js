@@ -24,6 +24,7 @@ function VariantCard() {
 	this.dirty = false;
 	this.vcfRefNamesMap = {};
 	this.sampleName = "";
+	this.defaultSampleName = null;
 }
 
 VariantCard.prototype.isLoaded = function() {
@@ -63,7 +64,21 @@ VariantCard.prototype.setRelationship = function(theRelationship) {
 VariantCard.prototype.setSampleName = function(sampleName) {
 	this.sampleName = sampleName;
 	this.cardSelector.find('#variant-card-label').text(this.name == this.sampleName ? this.name : this.sampleName + " " + this.name);
+}
 
+
+VariantCard.prototype.getSampleName = function() {
+	return this.sampleName;
+}
+
+
+VariantCard.prototype.setDefaultSampleName = function(sampleName) {
+	this.defaultSampleName = sampleName;
+}
+
+
+VariantCard.prototype.getDefaultSampleName = function() {
+	return this.defaultSampleName;
 }
 
 VariantCard.prototype.getCardIndex = function() {
@@ -414,6 +429,8 @@ VariantCard.prototype.clearVcf = function() {
 	this.vcfUrlEntered = false;
 	this.vcfFileOpened = false;
 	this.sampleName = null;
+	window.removeUrl('sample'+this.cardIndex);
+	window.removeUrl('vcf'+this.cardIndex);
 	this.setDirty(false);
 	this.vcf.clear();
 	this.cardSelector.find('#vcf-track').addClass("hide");

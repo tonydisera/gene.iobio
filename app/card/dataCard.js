@@ -322,13 +322,18 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 			me.panelSelectorFilesSelected.find('#vcf-file-info').val(file.name);
 		}
 	}
-	
 
 	this.setDataSourceName(this.panelSelectorFilesSelected);
 	this.setDataSourceRelationship(this.panelSelectorFilesSelected);
 
 	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];	
+
+	// We cannot load a vcf local file from a URL (must be choosen by user), so we just
+	// need to clear out any previously selected vcf url.
+	window.removeUrl('vcf'+cardIndex);
+	window.removeUrl('sample'+cardIndex);
+	
 
 	me.panelSelectorFilesSelected.find('#vcf-sample-box').addClass('hide');
 	me.panelSelectorFilesSelected.find('.vcf-sample.loader').removeClass('hide');
@@ -362,8 +367,23 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 		                                    .text(sampleName)); 
 			});
 			me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+
+			// If we are loading from URL parameters and the sample name was specified, select this
+			// sample from dropdown
+			if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
+				me.panelSelectorFilesSelected.find('#vcf-sample-select').val(variantCard.getDefaultSampleName());
+				me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+
+				variantCard.setSampleName(variantCard.getDefaultSampleName());
+				variantCard.setDefaultSampleName(null);
+			}
+
 			window.disableLoadButton();
 		} else {
+			variantCard.setSampleName("");				
+			variantCard.setDefaultSampleName(null);
+			window.removeUrl('sample'+cardIndex);
+			
 			window.enableLoadButton();
 		}
 
@@ -371,17 +391,22 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	variantCard.setDirty();
 }
 
+
+
 DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 	var sampleName = panelSelector.find('#vcf-sample-select option:selected').text();
 	variantCard.setSampleName(sampleName);
+	
+	window.updateUrl('sample' + cardIndex, sampleName);
 	if (variantCard.isReadyToLoad()) {
 		window.enableLoadButton();
 	}
 }
 
 DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
+	var me = this;
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -426,8 +451,23 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 			                     .text(sampleName)); 
 				});
 				panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+
+				// If we are loading from URL parameters and the sample name was specified, select this
+				// sample from dropdown
+				if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
+					panelSelector.find('#vcf-sample-select').val(variantCard.getDefaultSampleName());
+					panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+
+					variantCard.setSampleName(variantCard.getDefaultSampleName());
+					variantCard.setDefaultSampleName(null);
+				}
+
 				window.disableLoadButton();
 			} else {
+				variantCard.setSampleName("");
+				variantCard.setDefaultSampleName(null);
+				window.removeUrl('sample'+cardIndex);
+
 				window.enableLoadButton();			
 			}
 

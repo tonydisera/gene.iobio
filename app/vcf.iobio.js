@@ -70,8 +70,7 @@ vcfiobio = function module() {
   //var vcfReadDeptherServer   = "ws://localhost:7062";
   var emailServer            = "ws://localhost:7068";
   var catInputServer         = "ws://localhost:7063";
-  //var snpEffServer           = "ws://localhost:8040";
-  //var clinvarServer          = "ws://localhost:8040";
+  //var snpEffServer           = "ws://localhost:8040";  
   //var annotServer            = "ws://localhost:7077";
   //var vepServer              = "ws://localhost:7078";
 
@@ -97,14 +96,15 @@ vcfiobio = function module() {
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
   var snpEffServer           = "wss://services.iobio.io/snpeff";
   var snpSiftServer          = "wss://services.iobio.io/snpsift";
-  var vtServer               = "wss://services.iobio.io/vt";
+  
+  //var vtServer               = "wss://services.iobio.io/vt";
+  var vtServer               = "ws://nv-dev.iobio.io/vt/";
+  
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
   var vepServer              = "wss://services.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
-  var vcfsubset              = "ws://nv-dev.iobio.io/vcfsubset/";
-  var vtsubset               = "ws://nv-dev.iobio.io/vtsubset/";
-
+ 
   var vcfURL;
   var vcfReader;
   var vcfFile;
@@ -183,6 +183,9 @@ var effectCategories = [
       if (!url.toLowerCase().endsWith(".vcf.gz")) {
         showUrlFileFormatMessage();
         success = false;
+      } else if (url.indexOf("https") == 0) {
+        showHttpsMessage();
+        success = false;
       }
 
     }
@@ -233,13 +236,17 @@ var effectCategories = [
   } 
 
   function showUrlFileFormatMessage() {
-
-
     alertify.error("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
         function (e) {
         return;
      });
+  }
 
+  function showHttpsMessage() {
+    alertify.error("https: not yet supported.  Please specify http: for your URL", 
+        function (e) {
+        return;
+     });
   }
 
   function showWrongNumberFilesMessage() {
@@ -603,8 +610,7 @@ var effectCategories = [
     // If multi-sample vcf, select only the genotype field for the specified sample
     var nextUrl = "";
     if (sampleName != null && sampleName != "") {
-      nextUrl = encodeURI( vcfsubset + "?cmd= -c " + sampleName + " -e " + encodeURIComponent(contigAppenderUrl));
-//      nextUrl = encodeURI( vtsubset + "?cmd= " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+      nextUrl = encodeURI( vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
     } else {
       nextUrl = contigAppenderUrl;
     }
@@ -1002,7 +1008,7 @@ var effectCategories = [
       // If multi-sample vcf, select only the genotype field for the specified sample
       var nextUrl = "";
       if (sampleName != null && sampleName != "") {
-        nextUrl = encodeURI( vtsubset + "?cmd=  " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+        nextUrl = encodeURI( vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
       } else {
         nextUrl = contigAppenderUrl;
       }

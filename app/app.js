@@ -329,6 +329,7 @@ function loadUrlSources() {
 	var vcf  = getUrlParameter(/vcf*/);	
 	var rel  = getUrlParameter(/rel*/);
 	var dsname = getUrlParameter(/name*/);	
+	var sample = getUrlParameter(/sample*/);	
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
@@ -371,6 +372,15 @@ function loadUrlSources() {
 			var panelSelector    = $(panelSelectorStr);
 			panelSelector.find('#datasource-name').val(dsname[urlParameter]);
 			dataCard.setDataSourceName(panelSelector);
+		});
+
+	}
+	if (sample != null) {
+		Object.keys(sample).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(6);
+			var variantCard = variantCards[+cardIndex];
+			var sampleName = sample[urlParameter];
+			variantCard.setDefaultSampleName(sampleName);
 		});
 
 	}
