@@ -102,7 +102,7 @@
 
  <div id="container">
 
-    <div id="nav-section" class="shadow-z-1">
+    <div id="nav-section" class="shadow-z-2">
 
     	<section id="app-title-section">
     	   <a id='home' href="/"><span class="iobioapp"><span class='hide beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
@@ -249,8 +249,8 @@
             </div>
         </div>    
         <div id="region-track" >
-          <span id="gene-chr"></span>
-          <span id="gene-region"></span>
+          <span id="gene-chr" class="card-label keep-case"></span>
+          <span id="gene-region" class="card-label keep-case"></span>
           <span id="minus_strand" class="hide" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
           <span style="padding-left: 15px">+  -</span>
           <input id="gene-region-buffer-input" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
@@ -272,7 +272,7 @@
     <div id="track-section" style="padding-top:228px;">
       
 
-      <div id="data-card" class="track shadow-z-1 hide" style="margin-top:8px;" >
+      <div id="data-card" class="track shadow-z-2 hide" style="margin-top:8px;" >
 
         <div style="width:100%;clear:both;">
 
@@ -298,7 +298,7 @@
                   <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
                     style="padding-top: 2px;padding-bottom:1px;">
                     <div style="float:left;">
-                      <img src="assets/images/1f46a-Family.48.blue.png" style="height:27px"/>
+                      <img src="assets/images/family.png" style="height:27px"/>
                     </div>
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
                   </button>
@@ -353,7 +353,7 @@
 
       <div id="filter-and-rank-card" class="hide">
 
-        <div id="filter-track"  class="track-expand shadow-z-1 hide">
+        <div id="filter-track"  class="track-expand shadow-z-2 hide">
             <span class="card-label">Filter Variants</span>
 
             <span style="float:right;padding-top:4px">
@@ -371,7 +371,7 @@
 
         <div style="display:table-cell;min-width:8px"></div>
 
-        <div id="matrix-track"  class="track-expand shadow-z-1 hide">
+        <div id="matrix-track"  class="track-expand shadow-z-2 hide">
             <div>
               <span class="card-label">Rank Variants</span>
 
@@ -442,7 +442,7 @@
         </div>
       </div>
 
-      <div id="variant-control-panel"  class="todo" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;padding-left: 10px;height: 43px;" class=" shadow-z-1">
+      <div id="variant-control-panel"  class="todo" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;padding-left: 10px;height: 43px;" class=" shadow-z-2">
 
         <div id="toolbar" style="width:100%"  >
                 <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
@@ -638,7 +638,7 @@
 
  
 </div>
-    <div id="footer" class="footer text-center shadow-z-1" >
+    <div id="footer" class="footer text-center shadow-z-2" >
       <div class="poweredbyheader">gene.iobio is powered by</div>
       <div>
         <a class="poweredby" href="http://snpeff.sourceforge.net/">SnpEff</a>

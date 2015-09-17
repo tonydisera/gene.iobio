@@ -578,7 +578,7 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 	this.name = dataSourceName;
 	$('#add-datasource-container').css('display', 'none');
 
-	var title = this.getRelationship().toUpperCase();
+	var title = this.getRelationship();
 	if (title == null || title == '' || title == 'NONE') {
 		title = 'Sample';
 	}

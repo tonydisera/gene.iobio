@@ -2,20 +2,17 @@
 
 
 .ibo-gene .cds, .ibo-gene .exon, .ibo-gene .utr { 
-  fill:   rgba(104, 152, 168, 0.6);
-  stroke: rgba(104, 152, 168, 1);
+    fill: rgba(93, 128, 157, 0.63);
+    stroke: rgb(93, 128, 157);
 }
-#zoom-region-chart.ibo-gene .cds, #zoom-region-chart.ibo-gene .exon, #zoom-region-chart.ibo-gene .utr { 
-  fill:   rgba(104, 152, 168, 0.3);
-  stroke: rgba(104, 152, 168, 0.8);
-}
+
 #transcript-menu-item.ibo-gene .transcript.selected .utr,
 #transcript-menu-item.ibo-gene .transcript.selected .exon,
 #transcript-menu-item.ibo-gene .transcript.selected .cds
 { 
   /*fill: rgba(47, 215, 176, 0.69);*/
   stroke: rgba(104, 168, 151, 1);
-  fill: #0097cf
+  fill: #0097cf;
 }
 #transcript-menu-item.ibo-gene .utr:hover,
 #transcript-menu-item.ibo-gene .cds:hover,

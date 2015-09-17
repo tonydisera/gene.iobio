@@ -45,6 +45,7 @@ body {
 
 .poweredby {
   margin-right: 10px;
+  color: white !important;
 }
 
 .todo {
@@ -118,23 +119,28 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
-  background-color: #f5f5f5;
+  background-color: #616161;
 }
 
 .card-label {
-  color: rgba(132, 132, 132, 1);
-  font-size: 15px;
+  color :rgba(239, 103, 45, 0.91) !important;
+  /*color: #DC6533 !important;*/
+  /* color: #DA622F !important; */
+  /*color: rgba(132, 132, 132, 1);*/
+  /*font-size: 15px;*/
   text-transform: uppercase;
+}
+
+.keep-case {
+  text-transform: none !important;
 }
 
 #variant-card-label {
     float: left;
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-top: 2px;
-    width: 120px;
+    margin-left: 2px;
+    margin-right: 1px;
     text-align: left;
-    color: rgba(104, 152, 168, 1);  
+    color: #5d809d;  
 }
 
 
@@ -162,7 +168,7 @@ body {
   color: green !important;
 }
 a.card-label, a.card-label:hover, a.card-label:focus {
-  color: rgba(104, 152, 168, 1);
+  color: #5d809d;
   font-size: 14px;
   text-transform: uppercase;
   font-family: Quicksand;
@@ -171,7 +177,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 
 .badge-label {
- color: rgba(104, 152, 168, 1);
+ color: #5d809d;
  font-size: 13px;
 }
 
@@ -185,7 +191,7 @@ a.card-label, a.card-label:hover, a.card-label:focus {
 }
 
 a, a:hover, a:focus {
-  color: rgba(104, 152, 168, 1) !important;
+  color: #5d809d !important;
 }
 
 .chosen-container a {
@@ -202,11 +208,11 @@ a, a:hover, a:focus {
 
 
 .form-control-wrapper .material-input:before {
-  background-color: rgba(104, 152, 168, 1) !important;
+  background-color: #5d809d !important;
 }
 
 .chart-label {
-  color:  #6898A8;
+  color:  #5d809d;
   margin-left:4px;
   font-size: 11px;
 }
@@ -371,15 +377,15 @@ a, a:hover, a:focus {
 
 /* Trio button in data card */
 #trio-symbol .parent .left {
-  stroke: #6898A8;
+  stroke: #5d809d;
 }
 
 #trio-symbol .parent .right {
-  stroke: #6898A8;
+  stroke: #5d809d;
 }
 #trio-symbol .proband .left,
 #trio-symbol .proband .right {
-  stroke: #6898A8;
+  stroke: #5d809d;
 }
 
 
@@ -520,8 +526,8 @@ section {
 }
 
 .poweredbyheader {
-    font-size: 18px;
-    color: rgb(132, 132, 132);
+    font-size: 16px;
+    color: #8CE3FF;
     font-family: Quicksand;
     margin-top:3px;
     margin-bottom: 5px;
@@ -546,7 +552,7 @@ section {
 
 .iobioapp {
     font-size: 34px;
-    color: #6898A8;
+    color: #5d809d;
     font-family: Quicksand;
     float: left;
 }
@@ -809,7 +815,7 @@ header {
 
 #url-input {
   padding: 6px 4px !important;
-  font-size:11px;
+  font-size:10px;
 }
 
 #bam-url-input-group {
@@ -821,7 +827,7 @@ header {
 
 #bam-url-input {
   padding: 6px 4px !important;
-  font-size:11px;
+  font-size:10px;
 }
 
 
@@ -1419,7 +1425,7 @@ header {
   float:     left;
   font-size: 22px;
   padding-right: 4px;
-  color: #6898A8 !important;
+  color: #5d809d !important;
   /* color: rgb(132, 132, 132) !important; */
 }
 
