@@ -754,11 +754,13 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		tooltip.html(this.variantTooltipHTML(variant));
     } else {
     	tooltip.html(this.variantTooltipMinimalHTML(variant));
-    	w = 150;
     }
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});
+
+	var selection = tooltip.select("#coverage-svg");
+	this.createAlleleCountSVG(selection, variant);
    
 
     if (x < w) {
@@ -786,6 +788,57 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	});
 
 }
+
+VariantCard.prototype.createAlleleCountSVG = function(container, variant) {
+
+	if (variant.genotypeAltCount.indexOf(",") >= 0) {
+		return +variant.genotypeDepth;
+	} 
+
+	var BAR_WIDTH = 150;
+	var totalCount = +variant.genotypeRefCount + +variant.genotypeAltCount;
+	var altPercent = +variant.genotypeAltCount / totalCount;
+	var altWidth = d3.round(altPercent * BAR_WIDTH);
+	var refWidth = BAR_WIDTH - altWidth;
+
+	container.select("svg").remove();
+	var svg = container
+	            .append("svg")
+	            .attr("width", BAR_WIDTH + 20)
+	            .attr("height", "25");
+	
+	svg.append("rect")
+	 .attr("x", "1")
+	 .attr("y", "1")
+	 .attr("height", 10)
+	 .attr("width",altWidth)
+	 .attr("class", "alt-count");
+	if (refWidth > 0) {
+		svg.append("rect")
+		 .attr("x", altWidth)
+		 .attr("y", "1")
+		 .attr("height", 10)
+		 .attr("width", refWidth)
+		 .attr("class", "ref-count");		
+	}
+	svg.append("text")
+	   .attr("x", BAR_WIDTH + 5)
+	   .attr("y", "9")
+	   .style("fill", "white")
+	   .text(totalCount);
+
+	 var g = svg.append("g")
+	            .attr("transform", "translate(0,10)");
+	 g.append("text")
+	   .attr("x", altWidth / 2)
+	   .attr("y", "9")
+	   .attr("text-anchor", "middle")
+	   .attr("class", "alt-count")
+	   .text(variant.genotypeAltCount);
+	
+	 
+}
+
 
 VariantCard.prototype.getMatchingVariant = function(variant) {
 	var matchingVariant = null;
@@ -2224,11 +2277,12 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	}
 	var phenotypeDisplay = "";
 	for (var key in variant.clinVarPhenotype) {
-		if (phenotypeDisplay.length > 0) {
-
-		  	phenotypeDisplay += ", ";
+		if (key != 'not_specified') {
+			if (phenotypeDisplay.length > 0) {
+			  	phenotypeDisplay += ", ";
+			}
+			phenotypeDisplay += key.split("_").join(" ");
 		}
-		phenotypeDisplay += key.split("_").join(" ");
 	}      
 	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
 	var coord = gene.chr + ":" + variant.start;
@@ -2237,7 +2291,7 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	var clinvarUrl = "";
 	if (variant.clinVarUid != null && variant.clinVarUid != '') {
 		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
-		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + variant.clinVarUid + '</a>';
+		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + clinSigDisplay + '</a>';
 	}
 
 	var zygosity = "";
@@ -2246,15 +2300,6 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	} else if (variant.zygosity.toLowerCase() == 'hom') {
 		zygosity = "Homozygous";
 	}
-
-	var bamDepth = null;
-	var vcfDepth = null;
-	if (variant.bamDepth != null && variant.bamDepth != '') {
-		bamDepth = variant.bamDepth.toString();
-	} else if (variant.genotypeDepth != null && variant.genotypeDepth != '') {
-		vcfDepth = variant.genotypeDepth.toString();
-	}
-
 
 	var vepImpactDisplay = "";
 	for (var key in variant.vepImpact) {
@@ -2350,56 +2395,33 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	};
 
 	
-
-
-
-
 	
 	return (
-		  me.tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord)
+		  me.tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord, dbSnpUrl)
+		+ me.tooltipHeaderRow(zygosity, '', '', '')
 
-		+ me.tooltipRow('Zygosity',  zygosity, "4px")
-		+ me.tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
-		//+ me.tooltipRow('Genotype',  variant.genotype)
-
-		+ me.tooltipRow('SnpEff Impact', impactDisplay, "5px")
-		+ me.tooltipRow('SnpEff Effect', effectDisplay)
-		
-		+ me.tooltipRow('VEP Impact', vepImpactDisplay, "5px")
-		+ me.tooltipRow('VEP Consequence', vepConsequenceDisplay)	
+		+ me.tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Impact &amp; Effect' : 'VEP Impact &amp; Effect'),  
+				        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay + ', ' + effectDisplay : vepImpactDisplay + ' ' + vepConsequenceDisplay),
+				        "5px")
 		+ me.tooltipRow('SIFT', vepSIFTDisplay)
 		+ me.tooltipRow('PolyPhen', vepPolyPhenDisplay)
 		+ me.tooltipRowURL('Regulatory', vepRegDisplay)
 		+ me.tooltipRowURL('Motif', vepRegMotifDisplay)
-
-		+ me.tooltipRowURL('ClinVar uid', clinvarUrl, "5px" )
-		+ me.tooltipRow('Clinical Sign.', clinSigDisplay )
-		+ me.tooltipRow('Phenotype', phenotypeDisplay)
-
-		// + tooltipRow('NCBI ID', variant.ncbiId)
-		// + tooltipRow('HGVS g', variant.hgvsG)
-
-		+ me.tooltipRow('Coverage', bamDepth, "5px") 
-		+ me.tooltipRow('Coverage (vcf)', vcfDepth, "5px") 
-		+ me.tooltipRow('Qual', variant.qual) 
-		+ me.tooltipRow('Filter', variant.filter) 
-
-
-		//+ tooltipRow('GMAF', variant.gMaf)
-		+ me.tooltipRow('AF ExAC', variant.afExAC == -100 ? "n/a" : variant.afExAC, "5px", true)
-		+ me.tooltipRow('AF 1000G', variant.af1000G, null, true)
-
-		+ me.tooltipRowURL("dbSNP id", dbSnpUrl, "5px")
+		+ me.tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
+		+ me.tooltipRow('ClinVar', clinvarUrl)
+		+ me.tooltipRow('', phenotypeDisplay)
+		+ me.tooltipRowAF('Allele Freq', (variant.afExAC == -100 ? "n/a" : variant.afExAC), variant.af1000G)
 		+ me.tooltipRow('HGVSc', vepHGVScDisplay)
 		+ me.tooltipRow('HGVSp', vepHGVSpDisplay)
-
-
+		+ me.tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter) 
+		+ me.tooltipRowAlleleCounts('Allele Counts') 
 		+ me.unpinRow(pinMessage)
 	);                  
 
 	        
 
 }
+
 
 VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
 	var me = this;
@@ -2414,8 +2436,9 @@ VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
 	
 	return (
 		me.tooltipRow('Zygosity',  zygosity)
-		+ me.tooltipRow('Qual', variant.qual) 
-		+ me.tooltipRow('Filter', variant.filter) 
+		+ me.tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter) 
+		+ me.tooltipRowAlleleCounts('Allele Counts') 
+
 	);                    
 
 }
@@ -2443,9 +2466,9 @@ VariantCard.prototype.tooltipBlankRow = function() {
 	  + '</div>';
 }
 
-VariantCard.prototype.tooltipHeaderRow = function(value1, value2, value3) {
+VariantCard.prototype.tooltipHeaderRow = function(value1, value2, value3, value4) {
 	return '<div class="row">'
-	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 + '</div>'
+	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
 
@@ -2471,6 +2494,21 @@ VariantCard.prototype.tooltipRowURL = function(label, value, paddingTop, alwaysS
 	} else {
 		return "";
 	}
+}
+
+VariantCard.prototype.tooltipRowAF = function(label, afExAC, af1000g) {
+	return '<div class="row">'
+		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div class="col-md-3 tooltip-value">' + 'ExAC: ' + afExAC  + '</div>'
+		      + '<div class="col-md-4 tooltip-value">' + '1000G: ' + af1000g + '</div>'
+		 + '</div>';
+}
+
+VariantCard.prototype.tooltipRowAlleleCounts = function(label) {
+	return '<div class="row">'
+		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div id="coverage-svg" class="col-md-7 tooltip-value">' + '</div>'
+		 + '</div>';
 }
 
 

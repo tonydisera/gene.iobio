@@ -2,9 +2,13 @@
   <!-- impact -->
   <div style="float:left;;width:90px;">
 
-    <svg id="impact-scheme" class="current" width="93" height="13" transform="translate(0,0)">
-      <text class="name" x="0" y="8">Impact</text>
-    </svg>
+    <div style="margin-bottom: 2px;margin-top: -2px;">
+      <a id="impact-scheme" href="javascript:(0)" class="current">
+        <i class="mdi-image-color-lens"></i>
+        Impact
+      </a>
+    </div>
+
     <select id="select-annotation-scheme" onchange="filterCard.onSelectAnnotationScheme()" style="font-size:10px;">
                     <option>SnpEff</option>
                     <option>VEP</option>                   
@@ -28,10 +32,12 @@
       <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>
     </svg>
     <div id="effect-filter-box" style="padding-top:0px;">
-      <svg id="effect-scheme" width="71" height="15" transform="translate(0,0)" class="">
-
-        <text class="name" x="0" y="10">Effect</text>
-      </svg>
+      <div style="margin-bottom: 1px;">
+        <a id="effect-scheme" href="javascript:(0)" >
+          <i class="mdi-image-color-lens"></i>
+          Effect
+        </a>
+      </div>
     </div>
     
   </div>
@@ -307,22 +313,27 @@
 
     <!-- zygosity -->
     <div style="padding-top:13px;">
-          <svg id="zygosity-scheme" width="60" height="18" transform="translate(0,0)" class="">
-            <text class="name" x="0" y="12">Zygosity</text>
-          </svg>
-          <svg id="het" class="zygosity" width="75" height="15" transform="translate(0,0)" >
+          <div style="margin-bottom: 1px;">
+            <a id="zygosity-scheme" href="javascript:(0)" >
+              <i class="mdi-image-color-lens"></i>
+              Zygosity
+            </a>
+          </div>
+          <svg id="het" class="zygosity nocolor" width="75" height="15" transform="translate(0,0)" >
             <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Heterozygous</text>       
-             <rect class="filter-symbol het" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
+             <rect class="filter-symbol zyg_het" rx="1" ry="1" x="1" width="6" y="2" height="6" 
+             </rect>
           </svg>
 
-          <svg id="hom" class="zygosity" width="75" height="15" transform="translate(0,0)">
+          <svg id="hom" class="zygosity nocolor" width="75" height="15" transform="translate(0,0)">
             <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">Homozygous</text>       
-             <rect class="filter-symbol hom" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
+             <rect class="filter-symbol zyg_hom" rx="1" ry="1" x="1" width="6" y="2" height="6"></rect>
           </svg>
 
           <svg id="gt_unknown" class="zygosity" width="75" height="15" transform="translate(0,0)">
             <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 10px;">No Genotype</text>       
-             <rect class="filter-symbol gt_unknown" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: lightgrey; stroke: grey; stroke-width: 1px;"></rect>
+             <rect class="filter-symbol gt_unknown nocolor" rx="1" ry="1" x="1" width="6" y="2" height="6" 
+             </rect>
           </svg>
     </div>
 

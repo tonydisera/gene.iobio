@@ -13,6 +13,9 @@ body {
   */
 }
 
+
+
+
 #vcf-sample-box .chosen-container {
   font-size: 11px;
 }
@@ -123,11 +126,7 @@ body {
 }
 
 .card-label {
-  color : #EF682F !important; 
-  /*color: #DC6533 !important;*/
-  /* color: #DA622F !important; */
-  /*color: rgba(132, 132, 132, 1);*/
-  /*font-size: 15px;*/
+  color: #81A966 !important;
   text-transform: uppercase;
 }
 
@@ -525,9 +524,23 @@ section {
   fill: none;
 }
 
+.tooltip rect.alt-count, 
+.tooltip rect.ref-count {
+  stroke: #B6B9B9;
+}
+.tooltip rect.ref-count {
+  fill:none;
+}
+.tooltip .alt-count {
+    fill: #8CE3FF;  
+}
+.tooltip .ref-count {
+    fill: #B6B9B9;
+}
+
 .poweredbyheader {
     font-size: 16px;
-    color: #8CE3FF;
+    color: #A2CC86 !important;
     font-family: Quicksand;
     margin-top:3px;
     margin-bottom: 5px;
@@ -671,6 +684,7 @@ section {
   min-width: 655px;
   margin-top: 0px;
   margin-bottom: 0px;
+
 }
 #matrix-track {
   overflow-x: scroll;
@@ -1269,6 +1283,21 @@ header {
   fill: #636363;
 }
 
+.effect_synonymous_variant {
+  fill: #76ee00;
+}
+  
+.effect_coding_sequence_variant {
+  fill: #458b00;
+}
+
+.zyg_hom {
+  fill: rgba(234,189,32,1);
+}
+  
+.zyg_het {
+  fill: rgba(239, 201, 73, .4);
+}
 
 
 
@@ -1279,7 +1308,7 @@ header {
   padding: 1px;
 
 }
-.impact.nocolor rect, .effect.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
+.impact.nocolor rect, .effect.nocolor rect,  .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
   stroke: grey;
 }
@@ -1312,9 +1341,20 @@ header {
   padding: 1px;
  
 }
-#impact-scheme, #effect-scheme, #regulatory-scheme {
+
+#impact-scheme, #effect-scheme, #regulatory-scheme, #zygosity-scheme {
   padding-top: 2px;
 }
+#impact-scheme, #effect-scheme, #zygosity-scheme {
+  color: rgb(102, 88, 92) !important;
+  text-decoration: none !important;  
+  font-size: 12px;
+
+}
+#impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current {
+  color: rgb(53, 134, 192) !important;
+}
+
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme {
   padding-top: 2px;
 }
@@ -1326,7 +1366,7 @@ header {
   pointer-events: none;
   display: none;
 }
-#impact-scheme.current, #effect-scheme.current, #af1000g-scheme.current, #afexac-scheme.current, #regulatory-scheme.current {
+#impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current, #af1000g-scheme.current, #afexac-scheme.current, #regulatory-scheme.current {
   font-weight: bold;
   border: none;
  

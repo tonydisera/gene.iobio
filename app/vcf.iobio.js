@@ -1332,6 +1332,8 @@ var effectCategories = [
             // Parse genotypes
             var genotypes = [];
             var genotypeDepths = [];
+            var genotypeAltCounts = [];
+            var genotypeRefCounts = [];
             rec.genotypes.forEach(function(genotype) {
               if (genotype == ".") {
 
@@ -1346,12 +1348,26 @@ var effectCategories = [
                 } else {
                   genotypeDepths.push(null);
                 }
+                var gtAltCountIndex = gtTokens["AO"];
+                if (gtAltCountIndex) {
+                  genotypeAltCounts.push(tokens[gtAltCountIndex]);
+                } else {
+                  genotypeAltCounts.push(null);
+                }
+                var gtRefCountIndex = gtTokens["RO"];
+                if (gtRefCountIndex) {
+                  genotypeRefCounts.push(tokens[gtRefCountIndex]);
+                } else {
+                  genotypeRefCounts.push(null);
+                }
               }
             });
 
             var gtNumber = altIdx + 1;
             var genotypeForSample = null;
             var genotypeDepthForSample = null;
+            var genotypeAltCountForSample = null;
+            var genotypeRefCountForSample = null;
             var zygosity = null;
             var phased = null;
 
@@ -1370,6 +1386,8 @@ var effectCategories = [
             }
             genotypeForSample = genotypes[gtIndex];
             genotypeDepthForSample = genotypeDepths[gtIndex];
+            genotypeAltCountForSample = genotypeAltCounts[gtIndex];
+            genotypeRefCountForSample = genotypeRefCounts[gtIndex];
 
             if (genotypeForSample == null) {
               keepAlt = true;
@@ -1429,6 +1447,8 @@ var effectCategories = [
                 'genotypes': genotypes, 
                 'genotype': genotypeForSample, 
                 'genotypeDepth' : genotypeDepthForSample,
+                'genotypeAltCount' : genotypeAltCountForSample,
+                'genotypeRefCount' : genotypeRefCountForSample,
                 'zygosity': zygosity ? zygosity : 'gt_unknown', 
                 'phased': phased,
                 'effect': effects, 

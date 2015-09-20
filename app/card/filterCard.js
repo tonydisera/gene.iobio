@@ -21,6 +21,10 @@ FilterCard.prototype.onSelectAnnotationScheme = function() {
 
 }
 
+FilterCard.prototype.getAnnotationScheme = function() {
+	return this.annotationScheme;
+}
+
 
 FilterCard.prototype.onSelectPathogenicityScheme = function() {
 	this.pathogenicityScheme = $( "#select-pathogenicity-scheme option:selected" ).text().toLowerCase();
@@ -103,9 +107,11 @@ FilterCard.prototype.init = function() {
 	    .on("click", function(d) {
 	    	d3.select('#impact-scheme').classed("current", true);
 	    	d3.select('#effect-scheme' ).classed("current", false);
+	    	d3.select('#zygosity-scheme').classed("current", false);
 
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
 				variantCard.variantClass(me.classifyByImpact);
@@ -117,14 +123,16 @@ FilterCard.prototype.init = function() {
 
 
 	    });
-	  d3.selectAll('#effect-scheme')
+	    d3.selectAll('#effect-scheme')
 	    .on("click", function(d) {
 	    	d3.select('#impact-scheme').classed("current", false);
 	    	d3.select('#effect-scheme').classed("current", true);
+	    	d3.select('#zygosity-scheme').classed("current", false);
 
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
+	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
 		    	variantCard.variantClass(me.classifyByEffect);
@@ -135,6 +143,26 @@ FilterCard.prototype.init = function() {
 
 
 	    });
+		d3.selectAll('#zygosity-scheme')
+	      .on("click", function(d) {
+	    	d3.select('#impact-scheme').classed("current", false);
+	    	d3.select('#effect-scheme').classed("current", false);
+	    	d3.select('#zygosity-scheme').classed("current", true);
+
+
+	    	d3.selectAll(".impact").classed("nocolor", true);
+	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".zygosity").classed("nocolor", false);
+
+			window.variantCards.forEach(function(variantCard) {
+		    	variantCard.variantClass(me.classifyByZygosity);
+		    	if (variantCard.getCardIndex() == 0) {
+		    		window.filterVariants();
+				}
+			});
+
+
+	    });	    
 	   d3.selectAll('#afexac-scheme')
 	    .on("click", function(d) {
 	    	d3.select('#afexac-scheme' ).classed("current", true);
@@ -495,6 +523,37 @@ FilterCard.prototype.classifyByEffect = function(d) {
     }
     
     return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+}
+
+
+FilterCard.prototype.classifyByZygosity = function(d) { 
+	var effects = "";
+	var impacts = "";
+	var sift = "";
+	var polyphen = "";
+	var regulatory = "";
+	var colorzygs = "";
+	
+	var effectList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepEffect);
+	for (key in effectList) {
+      effects += " " + key;
+      effects += " " + key;
+    }
+    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    for (key in impactList) {
+      impacts += " " + key;
+    }
+    for (key in d.sift) {
+    	sift += " " + key;		
+    }
+    for (key in d.polyphen) {
+    	polyphen += " " + key;		
+    }
+    for (key in d.regulatory) {
+    	regulatory += " " + key;		
+    }
+    
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
 
