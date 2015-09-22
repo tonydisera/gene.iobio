@@ -96,7 +96,7 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
-				    .cellSize(27)
+				    .cellSize(23)
 				    .columnLabelHeight(42)
 				    .rowLabelWidth(140)
 				    .on('d3click', function(variant) {
@@ -202,12 +202,16 @@ MatrixCard.prototype.showTooltip = function(variant) {
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
 
+	// MATRIX WIDTH - workaround for proper scrolling
 	var windowWidth = $(window).width();
-	var filterPanelWidth = $('#filter-track').width();
-	$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+	//var filterPanelWidth = $('#filter-track').width();
+	//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+	$('#matrix-panel').css("max-width", windowWidth - 30);
+	$('#matrix-panel').css("min-width", windowWidth - 30);
 	
 	// Set the width so that scrolling works properly
 	$('#feature-matrix').css('min-width', $('#matrix-panel').width());
+
 
 
 
@@ -407,8 +411,8 @@ MatrixCard.prototype.showClinVarSymbol = function (selection) {
 	         .attr("transform", "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
-	         .attr("width", "16")
-	         .attr("height", "16")
+	         .attr("width", "14")
+	         .attr("height", "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -437,8 +441,8 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 	         .attr("transform", "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", "16")
-	         .attr("height", "16")
+	         .attr("width", "14")
+	         .attr("height", "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -459,8 +463,8 @@ MatrixCard.prototype.showSiftSymbol = function (selection) {
 	         .attr("transform", "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", "16")
-	         .attr("height", "16")
+	         .attr("width", "14")
+	         .attr("height", "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -529,36 +533,36 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "12";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "11";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "16";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "20";
+	         		return "14";
 	         	}
 	         })
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "12";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "11";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "16";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "20";
+	         		return "14";
 	         	}
 	         });
 };
@@ -606,53 +610,53 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 	         })
 	         .attr("width", function(d,i) {
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "11";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "12";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "16";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "20";
+	         		return "14";
 	         	}
 	         })
 	         .attr("height", function(d,i) {
 	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "11";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "12";
+	         		return "9";
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "12";
+	         		return "10";
 	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "16";
+	         		return "12";
 	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "20";
+	         		return "14";
 	         	}
 	         });
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(0,2)")
+	         .attr("transform", "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", "27")
-	         .attr("height", "27")
+	         .attr("width", "25")
+	         .attr("height", "25")
 	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showDeNovoSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(0,2)")
+	         .attr("transform", "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", "27")
-	         .attr("height", "27")
+	         .attr("width", "25")
+	         .attr("height", "2")
 	         .style("pointer-events", "none");
 	
 };
@@ -668,22 +672,29 @@ MatrixCard.prototype.getSymbol = function(d,i) {
 MatrixCard.prototype.showImpactSymbol = function(selection) {
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
+	var symbolScale = d3.scale.linear()
+                    .domain([1,6])
+                    .range([10,40]);
+
+    var symbolSize = symbolScale(6);
+     
 	if (type == 'snp') {
 		selection.append("g")
-		         .attr("transform", "translate(9,9)")
+		         .attr("transform", "translate(7,7)")
 		         .append("rect")
-		         .attr("width", 10)
-		         .attr("height", 10)
+		         .attr("width", 8)
+		         .attr("height", 8)
 		         .attr("class", "filter-symbol " + selection.datum().clazz)
 		         .style("pointer-events", "none");		
 	} else {
 		selection
 		  .append("g")
-		  .attr("transform", "translate(14,14)")
+		  .attr("transform", "translate(11,11)")
 		  .append('path')
           .attr("d", function(d,i) { 
           	return d3.svg
                      .symbol()
+                     .size(symbolSize)
                      .type( function(d,i) {
                      	if (type.toUpperCase() == 'DEL') {
 						    return 'triangle-up';

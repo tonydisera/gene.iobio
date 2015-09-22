@@ -41,13 +41,15 @@ FilterCard.prototype.onSelectAFScheme = function() {
 	var filterCardSelector = $('#filter-track');
 	d3.selectAll("#filter-track .afexaclevel").classed("hide", this.afScheme != "exac");
 	d3.selectAll("#filter-track .af1000glevel").classed("hide", this.afScheme != "1000 genomes");
+	d3.selectAll("#filter-track .afexaclevel-panel").classed("hide", this.afScheme != "exac");
+	d3.selectAll("#filter-track .af1000glevel-panel").classed("hide", this.afScheme != "1000 genomes");
 }
 
 FilterCard.prototype.init = function() {
 	var me = this;
 
 	// Init panel based on handlebards template
-	$('#filter-panel').html(filterCardTemplate());
+	$('#slider-left').html(filterCardTemplate());
 
 	var filterCardSelector = $('#filter-track');
 	filterCardSelector.find('#expand-button').on('click', function() {

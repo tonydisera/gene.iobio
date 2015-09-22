@@ -36,6 +36,7 @@ var transcriptViewMode = "single";
 var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
+var firstTimeGeneLoaded = true;
 
 // data card
 var dataCard = new DataCard();
@@ -87,7 +88,7 @@ $(document).ready(function(){
 
 	}, 'html');
 
-	$.get('templates/filterCardTemplate.hbs', function (data) {
+	$.get('templates/filterSlidebarTemplate.hbs', function (data) {
     
 	    filterCardTemplate = Handlebars.compile(data);
 	    promiseTemplatesLoaded(init);
@@ -212,7 +213,97 @@ function init() {
 	// Initialize transcript view buttons
 	initTranscriptControls();
 
+	// endsWith implementation
+	if (typeof String.prototype.endsWith !== 'function') {
+	    String.prototype.endsWith = function(suffix) {
+	        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	    };
+	}
+
+	// Slide out panels
+	$('.main').click(function() {
+			$('.footer').removeClass("hide");
+			$('.slide-button').removeClass("hide");
+			$('#close-slide-left').addClass("hide");
+			$('#close-slide-top').addClass("hide");
+			$('#slider-left').addClass("hide");
+			$('#slider-top').addClass("hide");
+
+		
+			$('#slide-buttons').removeClass('slide-left');
+			$('#container').removeClass('slide-left');
+
+			$('#slide-buttons').removeClass('slide-top');
+			$('#track-section').removeClass('slide-top');
+	});
+	$('#close-slide-left').click(function() {
+			$('.footer').removeClass("hide");
+			$('.slide-button').removeClass("hide");
+			$('#close-slide-left').addClass("hide");
+			$('#close-slide-top').addClass("hide");
+			$('#slider-left').addClass("hide");
+			$('#slider-top').addClass("hide");
+
+		
+			$('#slide-buttons').removeClass('slide-left');
+			$('#container').removeClass('slide-left');
+
+			$('#slide-buttons').removeClass('slide-top');
+			$('#track-section').removeClass('slide-top');
+	});
+	$('#close-slide-top').click(function() {
+		closeSampleSlideDown();
+	});
+
+
 	loadGeneFromUrl();
+}
+
+function showSampleSlideDown() {
+	$('#data-card').removeClass("hide");
+	$('#slider-top').removeClass("hide");
+
+	var top = +$('#nav-section').height();
+	$('#slider-top').css('top', top);
+	var sliderTopHeight = +$('#slider-top').height();
+	$('#close-slide-top').css('top', (top + sliderTopHeight) - 8);
+
+
+	$('#slider-left').addClass("hide");
+	$('.footer').addClass("hide");
+	$('.slide-button').addClass("hide");
+	$('#close-slide-top').removeClass("hide");
+
+	$('#slide-buttons').toggleClass('slide-top');
+	$('#track-section').toggleClass('slide-top');
+
+}
+
+function closeSampleSlideDown() {
+	$('.footer').removeClass("hide");
+	$('.slide-button').removeClass("hide");
+	$('#close-slide-left').addClass("hide");
+	$('#close-slide-top').addClass("hide");
+	$('#slider-left').addClass("hide");
+	$('#slider-top').addClass("hide");
+
+
+	$('#slide-buttons').removeClass('slide-left');
+	$('#container').removeClass('slide-left');
+
+	$('#slide-buttons').removeClass('slide-top');
+	$('#track-section').removeClass('slide-top');
+}
+
+function showFilterSlideLeft() {
+	$('#slider-top').addClass("hide");
+	$('#slider-left').removeClass("hide");
+	$('.footer').addClass("hide");
+	$('.slide-button').addClass("hide");
+	$('#close-slide-left').removeClass("hide");
+
+	$('#slide-buttons').toggleClass('slide-left');
+	$('#container').toggleClass('slide-left');
 }
 
 /**
@@ -387,6 +478,8 @@ function loadUrlSources() {
 
 	if (vcf != null || bam != null) {
 		loadTracksForGene();
+	} else {
+		showSampleSlideDown();
 	}
 
 }
@@ -636,6 +729,13 @@ function loadGeneWidget() {
 			    	loadTracksForGene();
 			    	// add gene to url params
 			    	updateUrl('gene', window.gene.gene_name);
+
+
+					if (firstTimeGeneLoaded) {
+						showSampleSlideDown();
+						firstTimeGeneLoaded = false; 
+					}
+
 			    	if(data.callback != undefined) data.callback();
 
 		    	}
@@ -684,7 +784,7 @@ function loadTracksForGene(bypassVariantCards) {
 
 	$("#region-flag").addClass("hide");
 
-	$('#data-card').removeClass("hide");
+//	$('#data-card').removeClass("hide");
 	$('#transcript-card').removeClass("hide");
 
     $('#gene-track').removeClass("hide");
@@ -901,11 +1001,13 @@ function promiseFullTrio() {
 	});
 
 	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null) {
+
+		//  MATRIX WIDTH - workaround for proper scrolling
 		var windowWidth = $(window).width();
-		var filterPanelWidth = $('#filter-track').width();
-		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-
-
+		//var filterPanelWidth = $('#filter-track').width();
+		//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+		$('#matrix-panel').css("max-width", windowWidth - 30 );
+		$('#matrix-panel').css("min-width", windowWidth - 30 );
 
 		// we need to compare the proband variants to mother and father variants to determine
 		// the inheritance mode.  After this completes, we are ready to show the
@@ -1118,6 +1220,7 @@ function filterVariants() {
 	});
 
 }
+
 
 
 

@@ -92,12 +92,13 @@ vcfiobio = function module() {
   
   var clinvarIterCount       = 0;
   var vcfstatsAliveServer    = "wss://services.iobio.io/vcfstatsalive";
-  var tabixServer            = "wss://services.iobio.io/tabix";
+  //var tabixServer            = "wss://services.iobio.io/tabix";
+  var tabixServer            = "wss://nv-green.iobio.io/tabix";
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
   var snpEffServer           = "wss://services.iobio.io/snpeff";
   var snpSiftServer          = "wss://services.iobio.io/snpsift";
   
-  //var vtServer               = "wss://services.iobio.io/vt";
+  //var vtServer               = "wss://services.iobio.io/vt/";
   var vtServer               = "ws://nv-dev.iobio.io/vt/";
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
@@ -180,13 +181,13 @@ var effectCategories = [
     vcfFile = null;
     tabixFile = null;
     if (url != null && url != '') {
-      if (!url.toLowerCase().endsWith(".vcf.gz")) {
+      if (url.toLowerCase().endsWith(".vcf.gz") == false) {
         showUrlFileFormatMessage();
         success = false;
-      } else if (url.indexOf("https") == 0) {
+      } /*else if (url.indexOf("https") == 0) {
         showHttpsMessage();
         success = false;
-      }
+      }*/
 
     }
     return success;

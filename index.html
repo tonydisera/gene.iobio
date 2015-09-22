@@ -74,6 +74,8 @@
   <link rel="stylesheet" href="assets/css/alertify.core.css" />
   <link rel="stylesheet" href="assets/css/alertify.default.css" />
 
+  <!-- chosen type-ahead dropdown -->
+  <link rel="stylesheet" href="assets/css/slideout.css" />
 
   <!-- chosen type-ahead dropdown -->
   <link rel="stylesheet" href="assets/css/chosen.css" />
@@ -100,7 +102,110 @@
 
 <body>
 
- <div id="container">
+
+
+  <div id="slide-buttons" >
+    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -23px;top: 240px;">
+        <a id="samples-button"  onclick="showSampleSlideDown()" >Samples</a>
+    </div>
+
+    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -13px;top: 320px;">
+          <a id="filter-button"  onclick="showFilterSlideLeft()" >Filter</a>
+    </div>
+  </div>
+  
+  <div id="slider-left" class="hide fade-in shadow-z-2">
+  </div>
+  <div id="close-slide-left" class="close-button  shadow-z-2 fade-in hide">
+     X
+  </div>
+
+  <div id="slider-top" class="hide fade-in">
+    <div id="data-card" class="track shadow-z-2" style="margin-top:8px;" >
+
+          <div style="width:100%;clear:both;">
+
+
+                <div id="toolbar" >
+                  <span class="card-label" style="display: inline-block;margin-top: 3px;">SAMPLES</span>
+
+                  <span style="float:right">
+                    <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                      <i class="mdi-content-remove"></i>
+                    </a>
+                    <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                      <i class="mdi-image-crop-din"></i>
+                    </a>
+                 </span>
+
+
+                  <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
+                    <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
+                      <i class="mdi-social-person"></i>
+                      Single
+                    </button>
+                    <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                      style="padding-top: 2px;padding-bottom:1px;">
+                      <div style="float:left;">
+                        <img src="assets/images/family.png" style="height:27px"/>
+                      </div>
+                       <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+                    </button>
+                    <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                      style="padding-top: 2px;padding-bottom:1px;">
+                      <div style="float:left;">
+                        <img src="assets/images/pedigree.png" style="height:22px"/>
+                      </div>
+                       <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+                    </button>
+                    <button id="other-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                      style="padding-top: 2px;padding-bottom:1px;">
+                      <i class="mdi-editor-format-align-justify"></i>                
+                       <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
+                    </button>
+                  </div>
+                </div>
+
+
+                <div id="proband-data" style="float:left;margin-right:20px;width:60%">
+                  <input id="card-index" class="hide" value="0" type="text">
+                  <input id="datasource-relationship" class="hide" value="proband" type="text"/>
+                </div>
+
+                <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
+                  <input id="card-index" class="hide" value="1" type="text">
+                  <input id="datasource-relationship" class="hide" value="mother" type="text"/>
+                </div>
+
+                <div id="father-data" class="hide" style="float:left;width:32%">
+                  <input id="card-index" class="hide" value="2" type="text">
+                  <input id="datasource-relationship" class="hide" value="father" type="text"/>
+                </div>
+
+
+                <div class="fullview" style="clear:both;text-align:center;">
+                  <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">
+                    <i class="mdi-file-cloud-done"></i>
+                    Load
+                  </button>
+                </div>
+                  <span class="hint todo" style="float:left;margin-top:-40px;">Files must correspond to build GRCh37.</span>
+
+            </div>   
+
+            
+            
+          </div>
+
+        </div>
+  </div>
+  <div id="close-slide-top" class="close-button fade-in hide shadow-z-2">
+     X
+  </div>
+
+
+
+ <div id="container" class="push">
 
     <div id="nav-section" class="shadow-z-2">
 
@@ -269,111 +374,16 @@
     </div>  
 
 
-    <div id="track-section" style="padding-top:228px;">
+    <div id="track-section" class="push" style="padding-top:228px;">
       
 
-      <div id="data-card" class="track shadow-z-2 hide" style="margin-top:8px;" >
-
-        <div style="width:100%;clear:both;">
-
-
-              <div id="toolbar" >
-                <span class="card-label" style="display: inline-block;margin-top: 3px;">SAMPLES</span>
-
-                <span style="float:right">
-                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="mdi-content-remove"></i>
-                  </a>
-                  <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="mdi-image-crop-din"></i>
-                  </a>
-               </span>
-
-
-                <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
-                  <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-                    <i class="mdi-social-person"></i>
-                    Single
-                  </button>
-                  <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                    style="padding-top: 2px;padding-bottom:1px;">
-                    <div style="float:left;">
-                      <img src="assets/images/family.png" style="height:27px"/>
-                    </div>
-                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-                  </button>
-                  <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                    style="padding-top: 2px;padding-bottom:1px;">
-                    <div style="float:left;">
-                      <img src="assets/images/pedigree.png" style="height:22px"/>
-                    </div>
-                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-                  </button>
-                  <button id="other-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                    style="padding-top: 2px;padding-bottom:1px;">
-                    <i class="mdi-editor-format-align-justify"></i>                
-                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-                  </button>
-                </div>
-              </div>
-
-
-              <div id="proband-data" style="float:left;margin-right:20px;width:60%">
-                <input id="card-index" class="hide" value="0" type="text">
-                <input id="datasource-relationship" class="hide" value="proband" type="text"/>
-              </div>
-
-              <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
-                <input id="card-index" class="hide" value="1" type="text">
-                <input id="datasource-relationship" class="hide" value="mother" type="text"/>
-              </div>
-
-              <div id="father-data" class="hide" style="float:left;width:32%">
-                <input id="card-index" class="hide" value="2" type="text">
-                <input id="datasource-relationship" class="hide" value="father" type="text"/>
-              </div>
-
-
-              <div class="fullview" style="clear:both;text-align:center;">
-                <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">
-                  <i class="mdi-file-cloud-done"></i>
-                  Load
-                </button>
-              </div>
-                <span class="hint todo" style="float:left;margin-top:-40px;">Files must correspond to build GRCh37.</span>
-
-          </div>   
-
-          
-          
-        </div>
-
-      </div>
 
 
       <div id="filter-and-rank-card" class="hide">
 
-        <div id="filter-track"  class="track-expand shadow-z-2 hide">
-            <span class="card-label">Filter Variants</span>
-
-            <span style="float:right;padding-top:4px">
-              <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                <i class="mdi-content-remove"></i>
-              </a>
-              <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                <i class="mdi-image-crop-din"></i>
-              </a>
-           </span>
-    
-            <div id="filter-panel" class="fullview">
-            </div> 
-        </div>  
-
-        <div style="display:table-cell;min-width:8px"></div>
-
         <div id="matrix-track"  class="track-expand shadow-z-2 hide">
             <div>
-              <span class="card-label">Rank Variants</span>
+              <span class="card-label" style="margin-left:15px;">Rank Variants</span>
 
               <span style="float:right;padding-top:4px">
                 <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
@@ -414,7 +424,7 @@
             </div>
 
     
-            <div id="matrix-panel"  style="clear:both;margin-top:4px;"
+            <div id="matrix-panel"  style="clear:both;margin-top:4px;margin-left:5px;"
               class="fullview" aria-expanded="true">
                 <div class="loader">
                     <span class="loader-label">Ranking variants</span>
@@ -425,7 +435,7 @@
               <div id="feature-matrix" style="overflow-x: auto;">
               </div>
 
-              <div id="feature-matrix-note" class="hide" style="padding-left: 155px;font-size:12px;">
+              <div id="feature-matrix-note" class="hide" style="padding-left: 155px;font-size:12px;margin-top:-6px;">
                 <svg style="float:left;height: 10px;width:108px">
                   <g transform="translate(18,6)">
                     <line x1="0" y1="0" x2="80" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
@@ -506,7 +516,7 @@
 
       <div id="other-variant-cards">
       </div>
- 
+
     </div>
 
 

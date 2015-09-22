@@ -409,6 +409,8 @@ a, a:hover, a:focus {
   right:0px;
   background-color: rgb(238, 238, 238);
   margin-bottom: 8px;
+  /*min-height: 160px;
+  max-height: 160px;*/
 }
 
 section {
