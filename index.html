@@ -301,7 +301,7 @@
                       <img src="assets/images/family.png" style="height:27px"/>
                     </div>
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-                  </button>
+                  </button>            
                   <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
                     style="padding-top: 2px;padding-bottom:1px;">
                     <div style="float:left;">
@@ -333,6 +333,16 @@
                 <input id="datasource-relationship" class="hide" value="father" type="text"/>
               </div>
 
+              <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
+                <div id="unaffected-sibs-box" class="hide">
+                    <div id="sample-data-label">
+                      UNAFFECTED SIBS
+                    </div>
+                    <select id="unaffected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
+                      class="chosen-select">
+                    </select>
+                </div>
+              </div>
 
               <div class="fullview" style="clear:both;text-align:center;">
                 <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">

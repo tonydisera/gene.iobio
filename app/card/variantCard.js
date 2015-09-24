@@ -90,8 +90,7 @@ VariantCard.prototype.getCardIndex = function() {
  * visualized.
  */
 VariantCard.prototype.isViewable = function() {
-	//return this.relationship != 'mother' && this.relationship != 'father';
-	return true;
+	return this.relationship != 'sibling';
 }
 
 VariantCard.prototype.getRelationship = function() {
@@ -760,7 +759,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	});
 
 	var selection = tooltip.select("#coverage-svg");
-	this.createAlleleCountSVG(selection, variant);
+	this.createAlleleCountSVGTrio(selection, variant);
    
 
     if (x < w) {
@@ -789,23 +788,86 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 
 }
 
-VariantCard.prototype.createAlleleCountSVG = function(container, variant) {
+VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
+	container.select("div.proband-alt-count").remove();
+	container.append("div")
+	         .attr("class", "proband-alt-count tooltip-header col-md-5")
+	         .text("Proband Allele Count");
+	var column = container.append("div")
+	                      .attr("class", "proband-alt-count tooltip-value col-md-7")
+	
+	this.appendAlleleCountSVG(column, variant.genotypeAltCount, variant.genotypeRefCount, variant.genotypeDepth);
 
-	if (variant.genotypeAltCount.indexOf(",") >= 0) {
-		return +variant.genotypeDepth;
+	if (dataCard.mode == 'trio' && this.getRelationship() == 'proband') {
+		// Mother
+		container.select("div.mother-alt-count").remove();
+		container.append("div")
+		         .attr("class", "mother-alt-count tooltip-header col-md-5")
+		         .text("Mother");
+		column = container.append("div")
+		                      .attr("class", "mother-alt-count tooltip-value col-md-7")
+		this.appendAlleleCountSVG(column, variant.genotypeAltCountMother, variant.genotypeRefCountMother, variant.genotypeDepthMother);		
+
+		// Father
+		container.select("div.father-alt-count").remove();
+		container.append("div")
+	         .attr("class", "father-alt-count tooltip-header col-md-5")
+	         .text("Father");
+		column = container.append("div")
+	                      .attr("class", "father-alt-count tooltip-value col-md-7")
+		this.appendAlleleCountSVG(column, variant.genotypeAltCountFather, variant.genotypeRefCountFather, variant.genotypeDepthMother);
+	}
+}
+
+VariantCard.prototype.appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth) {
+	var BAR_WIDTH = 150;
+	if ((genotypeDepth == null || genotypeDepth == '') && genotypeAltCount == null) {
+		container.text("n/a");
+		return;
+	}
+
+	if (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0) {
+		container.select("svg").remove();
+		var svg = container
+	            .append("svg")
+	            .attr("width", BAR_WIDTH + 20)
+	            .attr("height", "11");
+		svg.append("rect")
+		   .attr("x", "1")
+  	  	   .attr("y", "1")
+  		   .attr("height", 10)
+		   .attr("width",BAR_WIDTH)
+		   .attr("class", "alt-count");
+		
+		svg.append("text")
+		   .attr("x", BAR_WIDTH + 5)
+		   .attr("y", "9")
+		   .style("fill", "white")
+		   .text(genotypeDepth);
+
+		var g = svg.append("g")
+		           .attr("transform", "translate(0,0)");
+		g.append("text")
+		    .attr("x", BAR_WIDTH / 2)
+		    .attr("y", "9")
+		    .attr("text-anchor", "middle")
+		    .attr("class", "alt-count")
+	   		.text("?");
+		return;
 	} 
 
-	var BAR_WIDTH = 150;
-	var totalCount = +variant.genotypeRefCount + +variant.genotypeAltCount;
-	var altPercent = +variant.genotypeAltCount / totalCount;
+	var totalCount = +genotypeRefCount + +genotypeAltCount;
+	var altPercent = +genotypeAltCount / totalCount;
 	var altWidth = d3.round(altPercent * BAR_WIDTH);
 	var refWidth = BAR_WIDTH - altWidth;
+
+	var separateLineForLabel = altWidth / 2 < 5;
 
 	container.select("svg").remove();
 	var svg = container
 	            .append("svg")
 	            .attr("width", BAR_WIDTH + 20)
-	            .attr("height", "25");
+	            .attr("height", separateLineForLabel ? "20" : "11");
 	
 	svg.append("rect")
 	 .attr("x", "1")
@@ -828,13 +890,13 @@ VariantCard.prototype.createAlleleCountSVG = function(container, variant) {
 	   .text(totalCount);
 
 	 var g = svg.append("g")
-	            .attr("transform", "translate(0,10)");
+	            .attr("transform", (separateLineForLabel ? "translate(5,10)" : "translate(0,0)"));
 	 g.append("text")
 	   .attr("x", altWidth / 2)
 	   .attr("y", "9")
 	   .attr("text-anchor", "middle")
 	   .attr("class", "alt-count")
-	   .text(variant.genotypeAltCount);
+	   .text(genotypeAltCount);
 	
 	 
 }
@@ -936,6 +998,19 @@ VariantCard.prototype.endBamProgress = function() {
 VariantCard.prototype.endVariantProgress = function() {
 	this.cardSelector.find(".vcfloader").addClass("hide");
 }
+
+
+/*
+ * Load variant data only (for unaffected sibs). 
+ * no variant card display
+ */
+VariantCard.prototype.loadVariantsOnly = function(callback) {
+	var me = this;
+	this.showVariants( regionStart, regionEnd, function() {
+		callback(me);
+	} );
+}
+
 
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
@@ -1320,9 +1395,10 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 		// A gene has been selected.  Read the variants for the gene region.
 		this.discoverVcfRefName( function() {
 
-		    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using SnpEff and VEP");
-			me.cardSelector.find('#vcf-variants').css("display", "none");
-			
+			if (me.isViewable()) {
+			    me.cardSelector.find('.vcfloader .loader-label').text("Determining functional impact using SnpEff and VEP");
+				me.cardSelector.find('#vcf-variants').css("display", "none");
+			}
 
 
 			me.vcf.getVariants(me.getVcfRefName(window.gene.chr), 
@@ -1336,14 +1412,16 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 
 		        if (me.vcfData == null || me.vcfData.features == null || me.vcfData.features.length == 0) {
 					
-					$('#filter-track').addClass("hide");
-				    $('#matrix-track').addClass("hide");
-				    me.cardSelector.find("#vcf-track").addClass("hide");
-				    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-				    me.cardSelector.find("#vcf-variant-count").text("");
-				    me.cardSelector.find("#button-find-missing-variants").css("visibility", "hidden");
-				    me.cardSelector.find('.vcfloader').addClass("hide");
-				    me.cardSelector.find('#no-variants-warning').removeClass("hide");
+					if (me.isViewable()) {
+						$('#filter-track').addClass("hide");
+					    $('#matrix-track').addClass("hide");
+					    me.cardSelector.find("#vcf-track").addClass("hide");
+					    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+					    me.cardSelector.find("#vcf-variant-count").text("");
+					    me.cardSelector.find("#button-find-missing-variants").css("visibility", "hidden");
+					    me.cardSelector.find('.vcfloader').addClass("hide");
+					    me.cardSelector.find('#no-variants-warning').removeClass("hide");						
+					}
 
 		
 				} else {
@@ -1361,42 +1439,51 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 				    });
 						
 
-					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-			        me.cardSelector.find('#vcf-variant-count').text(me.vcfData.features.length != null ? me.vcfData.features.length : "0");
-			        var filteredVcfData = me.filterVariants();
-
-		  			me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
-
-				    filterCard.enableVariantFilters(true);
+				    if (me.isViewable()) {
+						me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
+				        me.cardSelector.find('#vcf-variant-count').text(me.vcfData.features.length != null ? me.vcfData.features.length : "0");				    	
+				    }
+				    if (me.isViewable()) {
+				        var filteredVcfData = me.filterVariants();
+			  			me.fillVariantChart(filteredVcfData, window.gene.start, window.gene.end);
+					    filterCard.enableVariantFilters(true);
+				    }
 
 				    if (callbackDataLoaded) {
 						callbackDataLoaded();
 					}
 
-					if (me.isBamLoaded()) {
+					if (me.isBamLoaded() && me.isViewable()) {
 						me.cardSelector.find('#button-find-missing-variants').css("visibility", "visible");
 					}
 
 
-					promiseFullTrio();
+					if (me.getRelationship() != 'sibling') {
+						promiseFullTrio();
+					}
 
 				}
 			
 
 			},
-			me.refreshVariantsWithClinvar.bind(me), 
-			me.loadedClinvar.bind(me),
+			me.isViewable() ? me.refreshVariantsWithClinvar.bind(me) : null, 
+			me.isViewable() ? me.loadedClinvar.bind(me) : null,
 			function() {
-				// Only show the 'Loading Clinvar' progress if we have variants.
-				if (me.vcfData != null && me.vcfData.features != null && me.vcfData.features.length > 0) {
-				 	me.cardSelector.find('.vcfloader').removeClass("hide");
-					me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-					me.cardSelector.find('#clinvar-warning').addClass("hide");					
+				if (me.isViewable()) {
+					// Only show the 'Loading Clinvar' progress if we have variants.
+					if (me.vcfData != null && me.vcfData.features != null && me.vcfData.features.length > 0) {
+					 	me.cardSelector.find('.vcfloader').removeClass("hide");
+						me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+						me.cardSelector.find('#clinvar-warning').addClass("hide");					
+					}
+
 				}
 			},
 			function() {
-			 	me.cardSelector.find('.vcfloader').addClass("hide");
-			 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
+				if(me.isViewable()) {
+				 	me.cardSelector.find('.vcfloader').addClass("hide");
+				 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
+				 }
 			});
 
 		});
@@ -2191,7 +2278,7 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 
 
 
-VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, compareAttribute, matchAttribute, matchCallback ) {
+VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, compareAttribute, matchAttribute, matchCallback, noMatchCallback ) {
 	var me = this;
 
 	if (this.vcfData == null) {
@@ -2212,22 +2299,28 @@ VariantCard.prototype.compareVcfRecords = function(theVcfData, finishCallback, c
 				me.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 								 	
 			 },
 			 function() {
-			 	me.cardSelector.find('.vcfloader').removeClass("hide");
-				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-				me.cardSelector.find('#clinvar-warning').addClass("hide");
+			 	if (me.isViewable()) {
+				 	me.cardSelector.find('.vcfloader').removeClass("hide");
+					me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+					me.cardSelector.find('#clinvar-warning').addClass("hide");			 		
+			 	}
 			 },
 			 function() {
-			 	me.cardSelector.find('.vcfloader').addClass("hide");
-			 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
+			 	if (me.isViewable()) {
+				 	me.cardSelector.find('.vcfloader').addClass("hide");
+				 	me.cardSelector.find('#clinvar-warning').removeClass("hide");
+			 	}
 			 });
 		});
 		
 	} else {
 		this.vcfData.features = this.vcfData.features.sort(orderVariantsByPosition);
-		this.vcfData.features.forEach( function(feature) {
-			feature[compareAttribute] = '';
-		});
-		this.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback); 	
+		if (compareAttribute) {
+			this.vcfData.features.forEach( function(feature) {			
+				feature[compareAttribute] = '';
+			});			
+		}
+		this.vcf.compareVcfRecords(theVcfData, me.vcfData, finishCallback, compareAttribute, matchCallback, noMatchCallback); 	
 	}
 
 
@@ -2414,7 +2507,7 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 		+ me.tooltipRow('HGVSc', vepHGVScDisplay)
 		+ me.tooltipRow('HGVSp', vepHGVSpDisplay)
 		+ me.tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter) 
-		+ me.tooltipRowAlleleCounts('Allele Counts') 
+		+ me.tooltipRowAlleleCounts() 
 		+ me.unpinRow(pinMessage)
 	);                  
 
@@ -2437,9 +2530,8 @@ VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
 	return (
 		me.tooltipRow('Zygosity',  zygosity)
 		+ me.tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter) 
-		+ me.tooltipRowAlleleCounts('Allele Counts') 
-
-	);                    
+		);
+              
 
 }
 
@@ -2505,9 +2597,7 @@ VariantCard.prototype.tooltipRowAF = function(label, afExAC, af1000g) {
 }
 
 VariantCard.prototype.tooltipRowAlleleCounts = function(label) {
-	return '<div class="row">'
-		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
-		      + '<div id="coverage-svg" class="col-md-7 tooltip-value">' + '</div>'
+	return '<div class="row" id="coverage-svg">'
 		 + '</div>';
 }
 

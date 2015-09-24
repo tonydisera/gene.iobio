@@ -183,10 +183,7 @@ var effectCategories = [
       if (!url.toLowerCase().endsWith(".vcf.gz")) {
         showUrlFileFormatMessage();
         success = false;
-      } else if (url.indexOf("https") == 0) {
-        showHttpsMessage();
-        success = false;
-      }
+      } 
 
     }
     return success;
@@ -1577,7 +1574,7 @@ var effectCategories = [
   }
 
 
-  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr, onMatchCallback) {
+  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr, onMatchCallback, onNoMatchCallback) {
     var set1Label = 'unique1';
     var set2Label = 'unique2';
     var commonLabel = 'common';
@@ -1649,16 +1646,28 @@ var effectCategories = [
           idx2++;
         } else if (refAlt1 < refAlt2) {
           variant1[comparisonAttribute] = set1Label;
+          if (onNoMatchCallback) {
+            onNoMatchCallback(variant1, null);
+          }
           idx1++;
         } else {
           variant2[comparisonAttribute] = set2Label;
+          if (onNoMatchCallback) {
+            onNoMatchCallback(null, variant2);
+          }
           idx2++;
         }
       } else if (variant1.start < variant2.start) {
         variant1[comparisonAttribute] = set1Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(variant1, null);
+        }
         idx1++;
       } else if (variant2.start < variant1.start) {
         variant2[comparisonAttribute] = set2Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(null, variant2);
+        }
         idx2++;
       }
 
@@ -1672,12 +1681,18 @@ var effectCategories = [
       for(x = idx1; x < features1.length; x++) {
         var variant1 = features1[x];
         variant1[comparisonAttribute] = set1Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(variant1, null);
+        }
       }
     } 
     if (idx2 < features2.length) {
       for(x = idx2; x < features2.length; x++) {
         var variant2 = features2[x];
         variant2[comparisonAttribute] = set2Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(null, variant2);
+        }        
       }
     } 
 

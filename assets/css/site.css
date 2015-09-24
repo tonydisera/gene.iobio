@@ -33,6 +33,9 @@ body {
   background-color: #DB4F36;
   padding-bottom: 2px;
 }
+.label-primary {
+    background-color: #6D9652;
+}
 
 
 /* for use cases page */
@@ -64,6 +67,7 @@ body {
 .tooltip-header {
   overflow-wrap: break-word;
   color: #CCC8C5;
+  text-align:right;
 
 }
 
@@ -524,18 +528,18 @@ section {
   fill: none;
 }
 
-.tooltip rect.alt-count, 
-.tooltip rect.ref-count {
+ .tooltip rect.alt-count, 
+ .tooltip rect.ref-count {
   stroke: #B6B9B9;
+ }
+ .tooltip rect.ref-count {
+   fill:none;
+ }
+.tooltip rect.alt-count {
+    fill: rgb(103, 181, 50);
 }
-.tooltip rect.ref-count {
-  fill:none;
-}
-.tooltip .alt-count {
-    fill: #8CE3FF;  
-}
-.tooltip .ref-count {
-    fill: #B6B9B9;
+.tooltip text.alt-count {
+  fill: white;
 }
 
 .poweredbyheader {
@@ -1316,8 +1320,7 @@ header {
   display: none !important;
 }
 
-.impact:hover, .effect:hover,  .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover  {
-  
+.impact:hover, .effect:hover,  .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover  {  
   cursor: pointer;
   border: solid thin white;
   border-radius: 2px;
@@ -1326,7 +1329,7 @@ header {
   fill: rgb(53, 134, 192);
 }
 .impact.current:hover, .effect.current:hover,  .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
-.type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover {
+.type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
@@ -1355,10 +1358,10 @@ header {
   color: rgb(53, 134, 192) !important;
 }
 
-#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme {
+#type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme, #uasibs-scheme {
   padding-top: 2px;
 }
-.impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive  {
+.impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive  {
   pointer-events: none;
   opacity: .4;
 }
@@ -1366,14 +1369,14 @@ header {
   pointer-events: none;
   display: none;
 }
-#impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current, #af1000g-scheme.current, #afexac-scheme.current, #regulatory-scheme.current {
+#impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current, #af1000g-scheme.current, #afexac-scheme.current, #regulatory-scheme.current, #uasibs-scheme.current {
   font-weight: bold;
   border: none;
  
 }
 #impact-scheme .name, #effect-scheme .name, #compare-scheme .name, 
 #type-scheme .name, #zygosity-scheme .name,
-#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name, #regulatory-scheme .name,
+#inheritance-scheme .name, #af-scheme .name, #clinvar-scheme .name, #regulatory-scheme .name, #uasibs-scheme.name,
 #afexac-scheme .name, #af1000g-scheme .name {
   fill-opacity: 1;
   font-size: 12px; 

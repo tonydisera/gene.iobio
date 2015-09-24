@@ -55,8 +55,12 @@ var clickedVariant = null;
 // Format the start and end positions with commas
 var formatRegion = d3.format(",");
 
-// variant card
+// variant cardd
 var variantCards = [];
+
+// variant cards for unaffected sibs 
+var variantCardsUnaffectedSibs = [];
+var variantCardsUnaffectedSibsTransient = [];
 
 // The smaller the region, the wider we can
 // make the rect of each variant
@@ -270,11 +274,17 @@ function toggleSampleTrio(show) {
 		$('#mother-data').removeClass("hide");
 		$('#father-data').removeClass("hide");
 		$('#proband-data').css("width", "32%");
+		if ($('#proband-data').find('#vcf-sample-select option').length > 1) {
+			$('#unaffected-sibs-box').removeClass("hide");
+		} else {
+			$('#unaffected-sibs-box').addClass("hide");
+		}
 	} else {
 		dataCard.mode = 'single';
 		$('#proband-data').css("width", "60%");
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
+		$('#unaffected-sibs-box').addClass("hide");
 		var motherCard = null;
 		var fatherCard = null;
 		variantCards.forEach( function(variantCard) {
@@ -891,6 +901,27 @@ function callVariants() {
 	});
 }
 
+function loadUnaffectedSibs(unaffectedSibs) {
+	variantCardsUnaffectedSibs.length = 0;
+
+	if (unaffectedSibs) {
+		unaffectedSibs.forEach( function( unaffectedSibName) {
+			var variantCard = new VariantCard();			
+
+			variantCard.vcf            = getProbandVariantCard().vcf;
+			variantCard.vcfUrlEntered  = getProbandVariantCard().vcfUrlEntered;
+			variantCard.vcfFileOpened  = getProbandVariantCard().vcfFileOpened;	
+
+			variantCard.sampleName     = unaffectedSibName;
+			variantCard.setRelationship("sibling");
+			variantCard.setName(unaffectedSibName);
+
+			variantCardsUnaffectedSibs.push(variantCard);	
+		});		
+	}
+
+}
+
 
 function promiseFullTrio() {
 	var loaded = {};
@@ -914,6 +945,14 @@ function promiseFullTrio() {
 			
 			loaded.proband.promiseFullFeatured();
 
+			// Now compare the unaffected sibs to the variant to flag variants
+			// common to unaffected sibs + proband
+			variantCardsUnaffectedSibsTransient = [];
+			variantCardsUnaffectedSibs.forEach( function(vc) {
+				variantCardsUnaffectedSibsTransient.push(vc);
+			})
+			nextCompareToUnaffectedSib();
+
 		});
 	} else if (dataCard.mode == 'single' && loaded.proband != null) {
 		var windowWidth = $(window).width();
@@ -922,6 +961,39 @@ function promiseFullTrio() {
 		
 		loaded.proband.promiseFullFeatured();
 
+	}
+
+}
+
+function nextCompareToUnaffectedSib() {
+	if (variantCardsUnaffectedSibsTransient.length > 0) {
+		variantCard = variantCardsUnaffectedSibsTransient.shift();
+
+		variantCard.loadVariantsOnly( function(vc) {
+			compareVariantsToUnaffectedSibs(vc);
+			nextCompareToUnaffectedSib();
+		});		
+	} else {
+		getProbandVariantCard().vcfData.features.forEach( function(variant) {
+			 variant.uasibs = "na";
+			 if (variant.compareUnaffectedSib) {
+			 	 var matchesCount = 0;
+				 Object.keys(variant.compareUnaffectedSib).forEach( function(key) {
+				 	var match = variant.compareUnaffectedSib[key];
+					if (match == 'Y') {
+				 		matchesCount++;
+				 	}
+				 });
+				 if (matchesCount > 0 && matchesCount == Object.keys(variant.compareUnaffectedSib).length) {
+				 	variant.uasibs = "matches_all";
+				 } else if (matchesCount > 0) {
+				 	variant.uasibs = "matches_some";
+				 } else {
+				 	variant.uasibs = "matches_none";
+				 }		 	 
+			 } 
+		});
+		getProbandVariantCard().promiseFullFeatured();
 	}
 
 }
@@ -1029,6 +1101,15 @@ function compareVariantsToPedigree(callback) {
 			variant.compareMother = null;
 			variant.compareFather = null;
 			variant.inheritance = 'none';
+			variant.fatherZygosity = null;
+			variant.motherZygosity = null;
+			variant.genotypeAltCountFather = null;
+			variant.genotypeRefCountFather = null;
+			variant.genotypeDepthFather    = null;
+			variant.genotypeAltCountMother = null;
+			variant.genotypeRefCountMother = null;
+			variant.genotypeDepthMother    = null;
+
 		});
 
 	
@@ -1077,6 +1158,9 @@ function compareVariantsToPedigree(callback) {
 			    	// proband's variant for further sorting/display in the feature matrix.
 			        function(variantA, variantB) {
 			        	variantA.fatherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
+			        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
+			        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
+					    variantA.genotypeDepthFather    = variantB.genotypeDepthFather;
 			        });
 	    	}, 
 	    	// This is the attribute on variant a (proband) and variant b (mother)
@@ -1090,9 +1174,55 @@ function compareVariantsToPedigree(callback) {
 	    	// proband's variant for further sorting/display in the feature matrix.
 	    	function(variantA, variantB) {
 	    		variantA.motherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
+	    		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
+			    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
+			    variantA.genotypeDepthMother    = variantB.genotypeDepthMother;
 
 	    	});
 	}
+
+}
+
+function compareVariantsToUnaffectedSibs(vcUnaffectedSib, callback) {
+
+	var theVcfData = getProbandVariantCard().getVcfData();
+
+	theVcfData.features.forEach(function(variant) {
+		if (variant.compareUnaffectedSib) {
+			variant.compareUnaffectedSib[vcUnaffectedSib.name] = null;		
+		} else {
+			variant.compareUnaffectedSib = {};
+		}
+	});
+
+
+	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+
+	var idx = 0;
+	vcUnaffectedSib.compareVcfRecords(theVcfData,
+		// This is the function that is called after the variants have been compared
+		function() {
+		},
+		// This is the attribute on variant a (proband) and variant b (unaffected sib)
+        // that will store whether the variant is unique or matches.
+        null,
+        // This is the attribute on the proband variant that will store the
+        // zygosity in the case where the variant match
+        null,
+    	// This is the callback function called every time we find the same variant
+    	// in both sets. Here we take the father variant's zygosity and store it in the
+    	// proband's variant for further sorting/display in the feature matrix.
+        function(variantA, variantB) {
+        	variantA.compareUnaffectedSib[vcUnaffectedSib.name] = 'Y';
+        },
+        function(variantA, variantB) {
+        	if (variantA) {
+        		variantA.compareUnaffectedSib[vcUnaffectedSib.name] = "N";
+        	}
+        }
+     );			
+
+
 
 }
 
