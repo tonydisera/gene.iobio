@@ -71,8 +71,8 @@ function MatrixCard() {
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Not recessive in Sibs'        ,order:4, index:7, match: 'exact', attribute: 'ua',          map: this.uaMap},
-		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Not recessive in Unaff. Sibs',order:5, index:7, match: 'exact', attribute: 'ua',          map: this.uaMap},
+		{name:'Inheritance Mode'             ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
 		{name:'Allele Frequency - 1000G'     ,order:6, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
 		{name:'Allele Frequency - ExAC'      ,order:7, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
@@ -670,6 +670,16 @@ MatrixCard.prototype.showUnaffectedSymbol = function (selection) {
 	         .attr("width", "27")
 	         .attr("height", "27")
 	         .style("pointer-events", "none");
+
+	selection.append("line")
+	         .attr("x1", 5)
+	         .attr("y1", 5)
+	         .attr("x2", 20)
+	         .attr("y2", 20)
+	         .style("stroke-width", "2.5px")
+	         .style("stroke", "rgba(168, 170, 177, 0.81)");
+
+
 };
 
 MatrixCard.prototype.showNoInheritSymbol = function (selection) {

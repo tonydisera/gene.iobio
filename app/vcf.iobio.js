@@ -232,6 +232,30 @@ var effectCategories = [
 
   } 
 
+  exports.getVcfFile = function() {
+    return vcfFile;
+  }
+
+  exports.setVcfFile = function(file) {
+    vcfFile = file;
+  }
+
+  exports.getVcfURL = function() {
+    return vcfURL;
+  }
+
+  exports.setVcfURL = function(url) {
+    vcfURL = url;
+  }
+  
+  exports.getSourceType = function() {
+    return sourceType;
+  }
+
+  exports.setSourceType = function(st) {
+    sourceType = st;
+  }
+
   function showUrlFileFormatMessage() {
     alertify.error("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
         function (e) {

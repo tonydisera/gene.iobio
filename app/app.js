@@ -911,12 +911,18 @@ function loadUnaffectedSibs(unaffectedSibs) {
 			variantCard.vcf            = getProbandVariantCard().vcf;
 			variantCard.vcfUrlEntered  = getProbandVariantCard().vcfUrlEntered;
 			variantCard.vcfFileOpened  = getProbandVariantCard().vcfFileOpened;	
+			variantCard.getVcfRefName  = getProbandVariantCard().getVcfRefName;
+			variantCard.vcfRefNamesMap = getProbandVariantCard().vcfRefNamesMap;
 
 			variantCard.sampleName     = unaffectedSibName;
 			variantCard.setRelationship("sibling");
 			variantCard.setName(unaffectedSibName);
 
-			variantCardsUnaffectedSibs.push(variantCard);	
+			variantCardsUnaffectedSibs.push(variantCard);
+
+			variantCard.loadVariantsOnly(function(vc) {
+			});
+
 		});		
 	}
 
@@ -931,7 +937,18 @@ function promiseFullTrio() {
 		}
 	});
 
-	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null) {
+	var uaCount = 0;
+	variantCardsUnaffectedSibs.forEach(function(vc) {
+		if (vc.isLoaded()) {
+			uaCount++;
+		}
+	});
+	var uaSibsLoaded = false;
+	if (uaCount == variantCardsUnaffectedSibs.length) {
+		uaSibsLoaded = true;
+	}
+
+	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null && uaSibsLoaded) {
 		var windowWidth = $(window).width();
 		var filterPanelWidth = $('#filter-track').width();
 		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
@@ -969,10 +986,10 @@ function nextCompareToUnaffectedSib() {
 	if (variantCardsUnaffectedSibsTransient.length > 0) {
 		variantCard = variantCardsUnaffectedSibsTransient.shift();
 
-		variantCard.loadVariantsOnly( function(vc) {
-			compareVariantsToUnaffectedSibs(vc);
+		//variantCard.loadVariantsOnly( function(vc) {
+			compareVariantsToUnaffectedSibs(variantCard);
 			nextCompareToUnaffectedSib();
-		});		
+		//});		
 	} else {
 		getProbandVariantCard().vcfData.features.forEach( function(variant) {
 			 variant.ua = "none";
@@ -989,7 +1006,7 @@ function nextCompareToUnaffectedSib() {
 				 	}
 				 });
 
-				 if (matchesCount > 0 && matchesHomCount == 0) {
+				 if (matchesCount > 0 && matchesHomCount == 0 ) {
 				    variant.ua = "not_recessive_in_sibs";
 				 } 	 	 
 			 } 

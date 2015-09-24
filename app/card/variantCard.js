@@ -1458,9 +1458,9 @@ VariantCard.prototype.showVariants = function(regionStart, regionEnd, callbackDa
 					}
 
 
-					if (me.getRelationship() != 'sibling') {
+					//if (me.getRelationship() != 'sibling') {
 						promiseFullTrio();
-					}
+					//}
 
 				}
 			
