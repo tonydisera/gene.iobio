@@ -45,6 +45,10 @@ function MatrixCard() {
                         recessive: {value: 2, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
                      };
+	this.uaMap = {  
+		                not_recessive_in_sibs: {value: 1,   clazz: 'not_recessive_in_sibs', symbolFunction: this.showUnaffectedSymbol},  
+                        none:                  {value: 104, clazz: '',                      symbolFunction: ''}
+                 };
 	// For af range, value must be > min and <= max
 	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},	
                        {min: -1.1,   max: +0,     value: +3,  clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
@@ -66,12 +70,13 @@ function MatrixCard() {
 
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact - SnpEff'       ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Inheritance Mode'  ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Allele Frequency - 1000G'   ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'    ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Not recessive in Sibs'        ,order:4, index:7, match: 'exact', attribute: 'ua',          map: this.uaMap},
+		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Allele Frequency - 1000G'     ,order:6, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:7, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'     ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
+		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
 
 	this.featureUnknown = 199;
@@ -655,6 +660,16 @@ MatrixCard.prototype.showDeNovoSymbol = function (selection) {
 	         .attr("height", "27")
 	         .style("pointer-events", "none");
 	
+};
+
+MatrixCard.prototype.showUnaffectedSymbol = function (selection) {
+	selection.append("g")
+	         .attr("transform", "translate(0,2)")
+	         .append("use")
+	         .attr("xlink:href", '#recessive-symbol')
+	         .attr("width", "27")
+	         .attr("height", "27")
+	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showNoInheritSymbol = function (selection) {

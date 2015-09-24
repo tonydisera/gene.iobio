@@ -975,22 +975,23 @@ function nextCompareToUnaffectedSib() {
 		});		
 	} else {
 		getProbandVariantCard().vcfData.features.forEach( function(variant) {
-			 variant.uasibs = "na";
-			 if (variant.compareUnaffectedSib) {
+			 variant.ua = "none";
+			 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
 			 	 var matchesCount = 0;
-				 Object.keys(variant.compareUnaffectedSib).forEach( function(key) {
-				 	var match = variant.compareUnaffectedSib[key];
-					if (match == 'Y') {
+			 	 var matchesHomCount = 0;
+				 Object.keys(variant.uasibsZygosity).forEach( function(key) {
+				 	var sibZygosity = variant.uasibsZygosity[key];
+				 	if (sibZygosity != null && sibZygosity != 'none') {
 				 		matchesCount++;
+						if (sibZygosity.toLowerCase() == 'hom') {
+					 		matchesHomCount++;
+					 	} 
 				 	}
 				 });
-				 if (matchesCount > 0 && matchesCount == Object.keys(variant.compareUnaffectedSib).length) {
-				 	variant.uasibs = "matches_all";
-				 } else if (matchesCount > 0) {
-				 	variant.uasibs = "matches_some";
-				 } else {
-				 	variant.uasibs = "matches_none";
-				 }		 	 
+
+				 if (matchesCount > 0 && matchesHomCount == 0) {
+				    variant.ua = "not_recessive_in_sibs";
+				 } 	 	 
 			 } 
 		});
 		getProbandVariantCard().promiseFullFeatured();
@@ -1188,10 +1189,10 @@ function compareVariantsToUnaffectedSibs(vcUnaffectedSib, callback) {
 	var theVcfData = getProbandVariantCard().getVcfData();
 
 	theVcfData.features.forEach(function(variant) {
-		if (variant.compareUnaffectedSib) {
-			variant.compareUnaffectedSib[vcUnaffectedSib.name] = null;		
+		if (variant.uasibsZygosity) {
+			variant.uasibsZygosity[vcUnaffectedSib.name] = "none";		
 		} else {
-			variant.compareUnaffectedSib = {};
+			variant.uasibsZygosity = {};
 		}
 	});
 
@@ -1213,11 +1214,11 @@ function compareVariantsToUnaffectedSibs(vcUnaffectedSib, callback) {
     	// in both sets. Here we take the father variant's zygosity and store it in the
     	// proband's variant for further sorting/display in the feature matrix.
         function(variantA, variantB) {
-        	variantA.compareUnaffectedSib[vcUnaffectedSib.name] = 'Y';
+        	variantA.uasibsZygosity[vcUnaffectedSib.name] = variantB.zygosity;
         },
         function(variantA, variantB) {
         	if (variantA) {
-        		variantA.compareUnaffectedSib[vcUnaffectedSib.name] = "N";
+        		variantA.uasibsZygosity[vcUnaffectedSib.name] = "none";
         	}
         }
      );			
