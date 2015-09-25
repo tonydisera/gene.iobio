@@ -2247,7 +2247,11 @@ VariantCard.prototype.filterVariants = function(dataToFilter, theChart) {
 		for (key in evalAttributes) {
 			var count = evalAttributes[key];
 			if (count == 0) {
-				meetsAnnot = false;
+				if (key == 'inheritance' && me.getRelationship() != 'proband') {
+ 					// bypass filtering on inheritance if non-proband variant card
+ 				} else {
+					meetsAnnot = false;
+ 				}
 			}
 		}
 
