@@ -98,7 +98,8 @@ vcfiobio = function module() {
   var snpSiftServer          = "wss://services.iobio.io/snpsift";
   
   //var vtServer               = "wss://services.iobio.io/vt";
-  var vtServer               = "ws://nv-dev.iobio.io/vt/";
+//  var vtServer               = "ws://nv-dev.iobio.io/vt/";
+  var vtServer               = "wss://nv-green.iobio.io/vt/";
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
