@@ -997,18 +997,18 @@ function nextCompareToUnaffectedSib() {
 			 	 var matchesCount = 0;
 			 	 var matchesHomCount = 0;
 				 Object.keys(variant.uasibsZygosity).forEach( function(key) {
+				 	matchesCount++;
 				 	var sibZygosity = variant.uasibsZygosity[key];
-				 	if (sibZygosity != null && sibZygosity != 'none') {
-				 		matchesCount++;
-						if (sibZygosity.toLowerCase() == 'hom') {
-					 		matchesHomCount++;
-					 	} 
+				 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
+					 	matchesHomCount++;
 				 	}
 				 });
 
-				 if (matchesCount > 0 && matchesHomCount == 0 ) {
-				    variant.ua = "not_recessive_in_sibs";
-				 } 	 	 
+				 if (matchesHomCount > 0 ) {
+				 	variant.ua = "none";
+				 } else {
+				 	variant.ua = "not_recessive_in_sibs";
+				 }  	 	 
 			 } 
 		});
 		getProbandVariantCard().promiseFullFeatured();
