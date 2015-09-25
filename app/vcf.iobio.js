@@ -1369,9 +1369,12 @@ var effectCategories = [
                 } else {
                   genotypeDepths.push(null);
                 }
-                // GATK allele counts 
                 var gtAlleleCountIndex = gtTokens["AD"];
+                var gtAltCountIndex = gtTokens["AO"];
                 if (gtAlleleCountIndex) {
+                  //
+                  // GATK allele counts 
+                  //
                   var countTokens = tokens[gtAlleleCountIndex].split(",");
                   if (countTokens.length == 2) {
                     var refAlleleCount = countTokens[0];
@@ -1380,22 +1383,22 @@ var effectCategories = [
                     genotypeRefCounts.push(refAlleleCount);                    
                   } else {
                     genotypeAltCounts.push(null);
+                    genotypeRefCounts.push(null);
+                  }
+                } else if (gtAltCountIndex) {
+                  //
+                  // Freebayes allele counts   
+                  //               
+                  genotypeAltCounts.push(tokens[gtAltCountIndex]);
+                  var gtRefCountIndex = gtTokens["RO"];
+                  if (gtRefCountIndex) {
+                    genotypeRefCounts.push(tokens[gtRefCountIndex]);
+                  } else {
+                    genotypeRefCounts.push(null);
                   }
                 } else {
                   genotypeAltCounts.push(null);
-                }
-                // Freebayes allele counts
-                var gtAltCountIndex = gtTokens["AO"];
-                if (gtAltCountIndex) {
-                  genotypeAltCounts.push(tokens[gtAltCountIndex]);
-                } else {
-                  genotypeAltCounts.push(null);
-                }
-                var gtRefCountIndex = gtTokens["RO"];
-                if (gtRefCountIndex) {
-                  genotypeRefCounts.push(tokens[gtRefCountIndex]);
-                } else {
-                  genotypeRefCounts.push(null);
+                  genotypeRefCounts.push(null)
                 }
               }
             });
