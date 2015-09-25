@@ -390,6 +390,7 @@ function loadUrlSources() {
 			var cardIndex = urlParameter.substring(6);
 			var variantCard = variantCards[+cardIndex];
 			var sampleName = sample[urlParameter];
+			variantCard.setSampleName(sampleName);
 			variantCard.setDefaultSampleName(sampleName);
 		});
 
