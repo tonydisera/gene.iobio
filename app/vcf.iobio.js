@@ -247,7 +247,7 @@ var effectCategories = [
   exports.setVcfURL = function(url) {
     vcfURL = url;
   }
-  
+
   exports.getSourceType = function() {
     return sourceType;
   }
@@ -1369,6 +1369,22 @@ var effectCategories = [
                 } else {
                   genotypeDepths.push(null);
                 }
+                // GATK allele counts 
+                var gtAlleleCountIndex = gtTokens["AD"];
+                if (gtAlleleCountIndex) {
+                  var countTokens = tokens[gtAlleleCountIndex].split(",");
+                  if (countTokens.length == 2) {
+                    var refAlleleCount = countTokens[0];
+                    var altAlleleCount = countTokens[1];
+                    genotypeAltCounts.push(altAlleleCount);
+                    genotypeRefCounts.push(refAlleleCount);                    
+                  } else {
+                    genotypeAltCounts.push(null);
+                  }
+                } else {
+                  genotypeAltCounts.push(null);
+                }
+                // Freebayes allele counts
                 var gtAltCountIndex = gtTokens["AO"];
                 if (gtAltCountIndex) {
                   genotypeAltCounts.push(tokens[gtAltCountIndex]);

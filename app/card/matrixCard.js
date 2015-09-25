@@ -693,7 +693,7 @@ MatrixCard.prototype.getSymbol = function(d,i) {
 MatrixCard.prototype.showImpactSymbol = function(selection) {
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
-	if (type == 'snp') {
+	if (type.toUpperCase() == 'SNP') {
 		selection.append("g")
 		         .attr("transform", "translate(9,9)")
 		         .append("rect")

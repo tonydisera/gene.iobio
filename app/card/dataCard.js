@@ -420,9 +420,11 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 				variantCard.setSampleName(variantCard.getDefaultSampleName());
 				variantCard.setDefaultSampleName(null);
+				window.enableLoadButton();
+			} else {
+				window.disableLoadButton();
 			}
 
-			window.disableLoadButton();
 		} else {
 			variantCard.setSampleName("");				
 			variantCard.setDefaultSampleName(null);
@@ -514,9 +516,14 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 					variantCard.setSampleName(variantCard.getDefaultSampleName());
 					variantCard.setDefaultSampleName(null);
+					
+					window.enableLoadButton();
+
+				} else {
+					window.disableLoadButton();
+
 				}
 
-				window.disableLoadButton();
 			} else {
 				variantCard.setSampleName("");
 				variantCard.setDefaultSampleName(null);
