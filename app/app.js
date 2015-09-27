@@ -263,6 +263,12 @@ function init() {
 	loadGeneFromUrl();
 }
 
+function adjustDatacardSlider() {
+	var top = +$('#nav-section').height();
+	var sliderTopHeight = +$('#slider-top').height();
+	$('#close-slide-top').css('top', (top + sliderTopHeight) - 8);	
+}
+
 function showSampleSlideDown() {
 	$('#data-card').removeClass("hide");
 	$('#slider-top').removeClass("hide");
