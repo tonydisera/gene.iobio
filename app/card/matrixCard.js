@@ -45,6 +45,10 @@ function MatrixCard() {
                         recessive: {value: 2, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
                         none:      {value: 3, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
                      };
+	this.uaMap = {  
+		                not_recessive_in_sibs: {value: 1,   clazz: 'not_recessive_in_sibs', symbolFunction: this.showUnaffectedSymbol},  
+                        none:                  {value: 104, clazz: '',                      symbolFunction: ''}
+                 };
 	// For af range, value must be > min and <= max
 	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},	
                        {min: -1.1,   max: +0,     value: +3,  clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
@@ -66,13 +70,27 @@ function MatrixCard() {
 
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact - SnpEff'       ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Inheritance Mode'  ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Allele Frequency - 1000G'   ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'    ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Not recessive in Unaff. Sibs' ,order:5, index:7, match: 'exact', attribute: 'ua',          map: this.uaMap},
+		{name:'Inheritance Mode'             ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Allele Frequency - 1000G'     ,order:6, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:7, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'     ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
+		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
+
+	this.matrixRowsNoUa = [
+		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Inheritance Mode'             ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Allele Frequency - 1000G'     ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
+	];
+
+	this.filteredMatrixRows = null;
+
 
 	this.featureUnknown = 199;
 
@@ -120,7 +138,7 @@ MatrixCard.prototype.init = function() {
 				    .on('d3rowup', function(i) {
 				    	var column = null;
 				    	var columnPrev = null;
-				    	me.matrixRows.forEach(function(col) {
+				    	me.filteredMatrixRows.forEach(function(col) {
 				    		if (col.order == i) {
 				    			column = col;
 				    		} else if (col.order == i - 1) {
@@ -137,7 +155,7 @@ MatrixCard.prototype.init = function() {
 				    .on('d3rowdown', function(i) {
 				    	var column = null;
 				    	var columnNext = null;
-				    	me.matrixRows.forEach(function(col) {
+				    	me.filteredMatrixRows.forEach(function(col) {
 				    		if (col.order == i) {
 				    			column = col;
 				    		} else if (col.order == i + 1) {
@@ -202,6 +220,17 @@ MatrixCard.prototype.showTooltip = function(variant) {
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
 
+	// Figure out if we should show the unaffected sibs row
+	this.filteredMatrixRows = this.matrixRows;
+	this.matrixRows.forEach(function(mr) {
+		if (mr.attribute == 'ua') {
+			if (variantCardsUnaffectedSibs.length == 0) {
+				me.filteredMatrixRows = me.matrixRowsNoUa;
+			}
+		}
+	});
+	
+
 	// MATRIX WIDTH - workaround for proper scrolling
 	var windowWidth = $(window).width();
 	//var filterPanelWidth = $('#filter-track').width();
@@ -213,8 +242,6 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	$('#feature-matrix').css('min-width', $('#matrix-panel').width());
 
 
-
-
 	if (theVcfData != null) {
 		this.featureVcfData = {};
 		this.featureVcfData.features = [];
@@ -224,7 +251,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	}
 
 	// Sort the matrix columns
-	this.matrixRows = this.matrixRows.sort(function(a, b) {
+	this.filteredMatrixRows = this.filteredMatrixRows.sort(function(a, b) {
 		if (a.order == b.order) {
 			return 0;
 		} else if (a.order < b.order) {
@@ -237,11 +264,11 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	// Fill all features used in feature matrix for each variant
 	this.featureVcfData.features.forEach( function(variant) {
 		var features = [];
-		for (var i = 0; i < me.matrixRows.length; i++) {
+		for (var i = 0; i < me.filteredMatrixRows.length; i++) {
 			features.push(null);
 		}
 
-		me.matrixRows.forEach( function(matrixRow) {
+		me.filteredMatrixRows.forEach( function(matrixRow) {
 			var rawValue = variant[matrixRow.attribute];
 			var theValue    = null;
 			var mappedValue = null;
@@ -318,8 +345,12 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	  // through every column, if we haven't exited the
 	  // loop, that means all features of a and b match
 	  // so return 0;
-	  for (var i = 0; i < me.matrixRows.length; i++) {
-		if (a.features[i].rank > 99  && b.features[i].rank > 99) {
+	  for (var i = 0; i < me.filteredMatrixRows.length; i++) {
+	  	if (a.features[i] == null) {
+	  		return 1;
+	  	} else if (b.features[i] == null) {
+	  		return -1;
+	  	} else if (a.features[i].rank > 99  && b.features[i].rank > 99) {
 	  		// In this case, we don't consider the rank and will look at the next feature for ordering
 	  	} else if (a.features[i].rank > 99) {
 	  		return 1;
@@ -350,7 +381,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	$("#matrix-panel .loader").addClass("hide");
 
 	// Load the chart with the new data
-	this.featureMatrix.matrixRows(this.matrixRows);
+	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([topFeatures]);  
 
     this.featureMatrix(selection, {showColumnLabels: true});
@@ -661,6 +692,26 @@ MatrixCard.prototype.showDeNovoSymbol = function (selection) {
 	
 };
 
+MatrixCard.prototype.showUnaffectedSymbol = function (selection) {
+	selection.append("g")
+	         .attr("transform", "translate(0,2)")
+	         .append("use")
+	         .attr("xlink:href", '#recessive-symbol')
+	         .attr("width", "27")
+	         .attr("height", "27")
+	         .style("pointer-events", "none");
+
+	selection.append("line")
+	         .attr("x1", 5)
+	         .attr("y1", 5)
+	         .attr("x2", 20)
+	         .attr("y2", 20)
+	         .style("stroke-width", "2.5px")
+	         .style("stroke", "rgba(168, 170, 177, 0.81)");
+
+
+};
+
 MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 	
 };
@@ -678,7 +729,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
 
     var symbolSize = symbolScale(6);
      
-	if (type == 'snp') {
+	if (type.toUpperCase() == 'SNP') {
 		selection.append("g")
 		         .attr("transform", "translate(7,7)")
 		         .append("rect")

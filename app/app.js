@@ -56,8 +56,12 @@ var clickedVariant = null;
 // Format the start and end positions with commas
 var formatRegion = d3.format(",");
 
-// variant card
+// variant cardd
 var variantCards = [];
+
+// variant cards for unaffected sibs 
+var variantCardsUnaffectedSibs = [];
+var variantCardsUnaffectedSibsTransient = [];
 
 // The smaller the region, the wider we can
 // make the rect of each variant
@@ -361,11 +365,17 @@ function toggleSampleTrio(show) {
 		$('#mother-data').removeClass("hide");
 		$('#father-data').removeClass("hide");
 		$('#proband-data').css("width", "32%");
+		if ($('#proband-data').find('#vcf-sample-select option').length > 1) {
+			$('#unaffected-sibs-box').removeClass("hide");
+		} else {
+			$('#unaffected-sibs-box').addClass("hide");
+		}
 	} else {
 		dataCard.mode = 'single';
 		$('#proband-data').css("width", "60%");
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
+		$('#unaffected-sibs-box').addClass("hide");
 		var motherCard = null;
 		var fatherCard = null;
 		variantCards.forEach( function(variantCard) {
@@ -471,6 +481,7 @@ function loadUrlSources() {
 			var cardIndex = urlParameter.substring(6);
 			var variantCard = variantCards[+cardIndex];
 			var sampleName = sample[urlParameter];
+			variantCard.setSampleName(sampleName);
 			variantCard.setDefaultSampleName(sampleName);
 		});
 
@@ -991,6 +1002,33 @@ function callVariants() {
 	});
 }
 
+function loadUnaffectedSibs(unaffectedSibs) {
+	variantCardsUnaffectedSibs.length = 0;
+
+	if (unaffectedSibs) {
+		unaffectedSibs.forEach( function( unaffectedSibName) {
+			var variantCard = new VariantCard();			
+
+			variantCard.vcf            = getProbandVariantCard().vcf;
+			variantCard.vcfUrlEntered  = getProbandVariantCard().vcfUrlEntered;
+			variantCard.vcfFileOpened  = getProbandVariantCard().vcfFileOpened;	
+			variantCard.getVcfRefName  = getProbandVariantCard().getVcfRefName;
+			variantCard.vcfRefNamesMap = getProbandVariantCard().vcfRefNamesMap;
+
+			variantCard.sampleName     = unaffectedSibName;
+			variantCard.setRelationship("sibling");
+			variantCard.setName(unaffectedSibName);
+
+			variantCardsUnaffectedSibs.push(variantCard);
+
+			variantCard.loadVariantsOnly(function(vc) {
+			});
+
+		});		
+	}
+
+}
+
 
 function promiseFullTrio() {
 	var loaded = {};
@@ -1000,7 +1038,22 @@ function promiseFullTrio() {
 		}
 	});
 
-	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null) {
+	var uaCount = 0;
+	variantCardsUnaffectedSibs.forEach(function(vc) {
+		if (vc.isLoaded()) {
+			uaCount++;
+		}
+	});
+	var uaSibsLoaded = false;
+	if (uaCount == variantCardsUnaffectedSibs.length) {
+		uaSibsLoaded = true;
+	}
+
+	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null && uaSibsLoaded) {
+		var windowWidth = $(window).width();
+		var filterPanelWidth = $('#filter-track').width();
+		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+
 
 		//  MATRIX WIDTH - workaround for proper scrolling
 		var windowWidth = $(window).width();
@@ -1016,6 +1069,14 @@ function promiseFullTrio() {
 			
 			loaded.proband.promiseFullFeatured();
 
+			// Now compare the unaffected sibs to the variant to flag variants
+			// common to unaffected sibs + proband
+			variantCardsUnaffectedSibsTransient = [];
+			variantCardsUnaffectedSibs.forEach( function(vc) {
+				variantCardsUnaffectedSibsTransient.push(vc);
+			})
+			nextCompareToUnaffectedSib();
+
 		});
 	} else if (dataCard.mode == 'single' && loaded.proband != null) {
 		var windowWidth = $(window).width();
@@ -1024,6 +1085,40 @@ function promiseFullTrio() {
 		
 		loaded.proband.promiseFullFeatured();
 
+	}
+
+}
+
+function nextCompareToUnaffectedSib() {
+	if (variantCardsUnaffectedSibsTransient.length > 0) {
+		variantCard = variantCardsUnaffectedSibsTransient.shift();
+
+		//variantCard.loadVariantsOnly( function(vc) {
+			compareVariantsToUnaffectedSibs(variantCard);
+			nextCompareToUnaffectedSib();
+		//});		
+	} else {
+		getProbandVariantCard().vcfData.features.forEach( function(variant) {
+			 variant.ua = "none";
+			 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
+			 	 var matchesCount = 0;
+			 	 var matchesHomCount = 0;
+				 Object.keys(variant.uasibsZygosity).forEach( function(key) {
+				 	matchesCount++;
+				 	var sibZygosity = variant.uasibsZygosity[key];
+				 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
+					 	matchesHomCount++;
+				 	}
+				 });
+
+				 if (matchesHomCount > 0 ) {
+				 	variant.ua = "none";
+				 } else {
+				 	variant.ua = "not_recessive_in_sibs";
+				 }  	 	 
+			 } 
+		});
+		getProbandVariantCard().promiseFullFeatured();
 	}
 
 }
@@ -1131,6 +1226,15 @@ function compareVariantsToPedigree(callback) {
 			variant.compareMother = null;
 			variant.compareFather = null;
 			variant.inheritance = 'none';
+			variant.fatherZygosity = null;
+			variant.motherZygosity = null;
+			variant.genotypeAltCountFather = null;
+			variant.genotypeRefCountFather = null;
+			variant.genotypeDepthFather    = null;
+			variant.genotypeAltCountMother = null;
+			variant.genotypeRefCountMother = null;
+			variant.genotypeDepthMother    = null;
+
 		});
 
 	
@@ -1179,6 +1283,9 @@ function compareVariantsToPedigree(callback) {
 			    	// proband's variant for further sorting/display in the feature matrix.
 			        function(variantA, variantB) {
 			        	variantA.fatherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
+			        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
+			        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
+					    variantA.genotypeDepthFather    = variantB.genotypeDepthFather;
 			        });
 	    	}, 
 	    	// This is the attribute on variant a (proband) and variant b (mother)
@@ -1192,9 +1299,55 @@ function compareVariantsToPedigree(callback) {
 	    	// proband's variant for further sorting/display in the feature matrix.
 	    	function(variantA, variantB) {
 	    		variantA.motherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
+	    		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
+			    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
+			    variantA.genotypeDepthMother    = variantB.genotypeDepthMother;
 
 	    	});
 	}
+
+}
+
+function compareVariantsToUnaffectedSibs(vcUnaffectedSib, callback) {
+
+	var theVcfData = getProbandVariantCard().getVcfData();
+
+	theVcfData.features.forEach(function(variant) {
+		if (variant.uasibsZygosity) {
+			variant.uasibsZygosity[vcUnaffectedSib.name] = "none";		
+		} else {
+			variant.uasibsZygosity = {};
+		}
+	});
+
+
+	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+
+	var idx = 0;
+	vcUnaffectedSib.compareVcfRecords(theVcfData,
+		// This is the function that is called after the variants have been compared
+		function() {
+		},
+		// This is the attribute on variant a (proband) and variant b (unaffected sib)
+        // that will store whether the variant is unique or matches.
+        null,
+        // This is the attribute on the proband variant that will store the
+        // zygosity in the case where the variant match
+        null,
+    	// This is the callback function called every time we find the same variant
+    	// in both sets. Here we take the father variant's zygosity and store it in the
+    	// proband's variant for further sorting/display in the feature matrix.
+        function(variantA, variantB) {
+        	variantA.uasibsZygosity[vcUnaffectedSib.name] = variantB.zygosity;
+        },
+        function(variantA, variantB) {
+        	if (variantA) {
+        		variantA.uasibsZygosity[vcUnaffectedSib.name] = "none";
+        	}
+        }
+     );			
+
+
 
 }
 

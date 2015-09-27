@@ -19,99 +19,103 @@ function DataCard() {
 
 }
 
+DataCard.prototype.listenToEvents = function(panelSelector) {
+	var me = this;
+
+    panelSelector.find('#datasource-name').on('change', function() {
+    	me.setDataSourceName(panelSelector); 
+    });
+    
+    panelSelector.find('#bam-url-input').on('change', function() {
+    	me.onBamUrlEntered(panelSelector);
+    });
+    panelSelector.find('#display-bam-url-item').on('click', function() {
+    	me.displayBamUrlBox(panelSelector);
+    });
+    panelSelector.find('#display-platinum-bam-url-item').on('click', function() {
+    	me.displayPlatinumBamUrlBox(panelSelector);
+    });
+    // Workaround for problem where extra event on proband files button fired
+    panelSelector.find("#bam-dropdown-button").on("click", function() {
+    	me.panelSelectorFilesSelected = panelSelector;
+    });
+
+    panelSelector.find('#bam-file-selector-item').on('click', function() {
+    	me.onBamFileButtonClicked(panelSelector);
+    });
+    panelSelector.find('#bam-file-upload').on('change', function(event) {
+    	me.onBamFilesSelected(event);
+    });
+    // This will ensure that if a same file selected consecutively
+    // will file the 'change' event
+    panelSelector.find('#bam-file-upload').on('click', function() {
+    	this.value = null;
+    });
+     panelSelector.find('#clear-bam').on('click', function() {
+    	me.clearBamUrl(panelSelector);
+    });
+
+    panelSelector.find('#url-input').on('change', function() {
+    	me.onVcfUrlEntered(panelSelector);
+    });
+    panelSelector.find('#display-vcf-url-item').on('click', function() {
+    	me.displayUrlBox(panelSelector);
+    });
+    panelSelector.find('#display-platinum-vcf-url-item').on('click', function() {
+    	me.displayPlatinumUrlBox(panelSelector);
+    });
+    panelSelector.find('#clear-vcf').on('click', function() {
+    	me.clearUrl(panelSelector);
+    });
+
+    panelSelector.find('#vcf-file-selector-item').on('click', function() {
+    	me.onVcfFileButtonClicked(panelSelector);
+    });
+    // Workaround for problem where extra event on proband files button fired
+    panelSelector.find("#vcf-dropdown-button").on("click", function() {
+    	me.panelSelectorFilesSelected = panelSelector;
+    });
+   
+   
+    panelSelector.find('#vcf-file-upload').on('change', function(event) {
+		me.onVcfFilesSelected(event);
+    });
+    // This will ensure that if a same file selected consecutively
+    // will file the 'change' event
+    panelSelector.find('#vcf-file-upload').on('click', function() {
+    	this.value = null;
+    });
+
+    // When the sample name dropdown is selected
+    panelSelector.find('#vcf-sample-select').on('change', function(event,params) {
+    	me.onVcfSampleSelected(panelSelector);
+    });
+
+
+}
+
 
 DataCard.prototype.init = function() {
 	var me = this;
-	var listenToEvents = function(panelSelector) {
-	    panelSelector.find('#datasource-name').on('change', function() {
-	    	me.setDataSourceName(panelSelector); 
-	    });
-	    
-
-
-	    panelSelector.find('#bam-url-input').on('change', function() {
-	    	me.onBamUrlEntered(panelSelector);
-	    });
-	    panelSelector.find('#display-bam-url-item').on('click', function() {
-	    	me.displayBamUrlBox(panelSelector);
-	    });
-	    panelSelector.find('#display-platinum-bam-url-item').on('click', function() {
-	    	me.displayPlatinumBamUrlBox(panelSelector);
-	    });
-	    // Workaround for problem where extra event on proband files button fired
-	    panelSelector.find("#bam-dropdown-button").on("click", function() {
-	    	me.panelSelectorFilesSelected = panelSelector;
-	    });
-
-	    panelSelector.find('#bam-file-selector-item').on('click', function() {
-	    	me.onBamFileButtonClicked(panelSelector);
-	    });
-	    panelSelector.find('#bam-file-upload').on('change', function(event) {
-	    	me.onBamFilesSelected(event);
-	    });
-	    // This will ensure that if a same file selected consecutively
-	    // will file the 'change' event
-	    panelSelector.find('#bam-file-upload').on('click', function() {
-	    	this.value = null;
-	    });
-	     panelSelector.find('#clear-bam').on('click', function() {
-	    	me.clearBamUrl(panelSelector);
-	    });
-
-	    panelSelector.find('#url-input').on('change', function() {
-	    	me.onVcfUrlEntered(panelSelector);
-	    });
-	    panelSelector.find('#display-vcf-url-item').on('click', function() {
-	    	me.displayUrlBox(panelSelector);
-	    });
-	    panelSelector.find('#display-platinum-vcf-url-item').on('click', function() {
-	    	me.displayPlatinumUrlBox(panelSelector);
-	    });
-	    panelSelector.find('#clear-vcf').on('click', function() {
-	    	me.clearUrl(panelSelector);
-	    });
-
-	    panelSelector.find('#vcf-file-selector-item').on('click', function() {
-	    	me.onVcfFileButtonClicked(panelSelector);
-	    });
-	    // Workaround for problem where extra event on proband files button fired
-	    panelSelector.find("#vcf-dropdown-button").on("click", function() {
-	    	me.panelSelectorFilesSelected = panelSelector;
-	    });
-	   
-	   
-	    panelSelector.find('#vcf-file-upload').on('change', function(event) {
-			me.onVcfFilesSelected(event);
-	    });
-	    // This will ensure that if a same file selected consecutively
-	    // will file the 'change' event
-	    panelSelector.find('#vcf-file-upload').on('click', function() {
-	    	this.value = null;
-	    });
-
-	    // When the sample name dropdown is selected
-	    panelSelector.find('#vcf-sample-select').on('change', function(event,params) {
-	    	me.onVcfSampleSelected(panelSelector);
-	    });
-	}
 
 	$('#proband-data').append(dataCardEntryTemplate());
-	listenToEvents($('#proband-data'));
+	this.listenToEvents($('#proband-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 	$('#proband-data #vcf-sample-select').chosen({width: "150px;font-size:11px;"});
+	$('#unaffected-sibs-select').chosen({width: "300px;font-size:11px;"});
 
 
 	$('#mother-data').append(dataCardEntryTemplate());
 	$('#mother-data #sample-data-label').text("MOTHER");
-	listenToEvents($('#mother-data'));
+	this.listenToEvents($('#mother-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
 	$('#mother-data #vcf-sample-select').chosen({width: "150px;"});
 
 	$('#father-data').append(dataCardEntryTemplate());
 	$('#father-data #sample-data-label').text("FATHER");
-	listenToEvents($('#father-data'));
+	this.listenToEvents($('#father-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#father-data'));
 	$('#father-data #vcf-sample-select').chosen({width: "150px;"});
@@ -126,11 +130,41 @@ DataCard.prototype.init = function() {
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
 		closeSampleSlideDown();
+
+		var unaffectedSibs = $("#unaffected-sibs-select").chosen().val();
+		window.loadUnaffectedSibs(unaffectedSibs);
+
 		window.loadTracksForGene();		
 	});
 
 
 }
+
+/*
+DataCard.prototype.addUnaffectedSib = function() {
+	var cardIndex = 3;
+	var name = 'unaffected-sib-data-' + cardIndex;
+	var sibHtml = 
+	    '<div id="' 
+	    + name 
+	    + '"  style="float:left;width:32%">  '
+	    + '   <input id="card-index" class="hide" value="' 
+		+ cardIndex
+		+ '"   type="text">'
+		+ '   <input id="datasource-relationship" class="hide" value="sibling" type="text"/>'
+	    + '</div>';
+
+	$('#unaffected-sibs').append(sibHtml);
+	$('#' + name).append(dataCardEntryTemplate());
+	
+	this.listenToEvents($('#' + name));
+	addVariantCard();
+	$('#' + name +  ' #sample-data-label').text("UNAFFECTED SIB");
+	this.setDataSourceRelationship('#' + name);
+	$('#' + name + ' #vcf-sample-select').chosen({width: "150px;font-size:11px;"});
+	
+}
+*/
 
 
 
@@ -337,6 +371,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	
 
 	me.panelSelectorFilesSelected.find('#vcf-sample-box').addClass('hide');
+	$('#unaffected-sibs-box').addClass('hide');
 	me.panelSelectorFilesSelected.find('.vcf-sample.loader').removeClass('hide');
 
 
@@ -351,13 +386,18 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 			// Populate the sample names in the dropdown
 			me.panelSelectorFilesSelected.find('#vcf-sample-box').removeClass('hide');
+			if (me.mode == 'trio') {
+				$('#unaffected-sibs-box').removeClass('hide');
+			}
 			me.panelSelectorFilesSelected.find('#vcf-sample-select')
 								         .find('option').remove();
+			$('#unaffected-sibs-select').find('option').remove();								         
 
 			// Add a blank option if there is more than one sample in the vcf file
 			if (sampleNames.length > 1) {
 				me.panelSelectorFilesSelected.find('#vcf-sample-select')
 				                             .append($("<option></option>"));
+				$('#unaffected-sibs-select').append($("<option></option>"));				                             
 			}							         
 
 			// Populate the sample name in the dropdown
@@ -366,8 +406,12 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 				                            .append($("<option></option>")
 		                                    .attr("value",sampleName)
 		                                    .text(sampleName)); 
+				$('#unaffected-sibs-select').append($("<option></option>")
+		                                    .attr("value",sampleName)
+		                                    .text(sampleName)); 		                                    
 			});
 			me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+			$('#unaffected-sibs-select').trigger("chosen:updated");
 
 			// If we are loading from URL parameters and the sample name was specified, select this
 			// sample from dropdown
@@ -377,9 +421,11 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 				variantCard.setSampleName(variantCard.getDefaultSampleName());
 				variantCard.setDefaultSampleName(null);
+				window.enableLoadButton();
+			} else {
+				window.disableLoadButton();
 			}
 
-			window.disableLoadButton();
 		} else {
 			variantCard.setSampleName("");				
 			variantCard.setDefaultSampleName(null);
@@ -437,12 +483,17 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 				// Populate the sample names in the dropdown
 				panelSelector.find('#vcf-sample-box').removeClass('hide');
 				panelSelector.find('#vcf-sample-select')
-								 .find('option').remove();
+						     .find('option').remove();
+				if (me.mode == 'trio') {
+					$('#unaffected-sibs-box').removeClass('hide');
+				}
+				$('#unaffected-sibs-select').find('option').remove();
 
 				// Add a blank option if there is more than one sample in the vcf file
 				if (sampleNames.length > 1) {
 					panelSelector.find('#vcf-sample-select')
 					             .append($("<option></option>"));
+					$('#unaffected-sibs-select').append($("<option></option>"));
 				}	
 				// Populate the sample names in the dropdown
 				sampleNames.forEach( function(sampleName) {
@@ -450,8 +501,13 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 					             .append($("<option></option>")
 			                     .attr("value",sampleName)
 			                     .text(sampleName)); 
+					$('#unaffected-sibs-select')							 
+					             .append($("<option></option>")
+			                     .attr("value",sampleName)
+			                     .text(sampleName)); 
 				});
 				panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+				$('#unaffected-sibs-select').trigger("chosen:updated");
 
 				// If we are loading from URL parameters and the sample name was specified, select this
 				// sample from dropdown
@@ -461,9 +517,14 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 					variantCard.setSampleName(variantCard.getDefaultSampleName());
 					variantCard.setDefaultSampleName(null);
+					
+					window.enableLoadButton();
+
+				} else {
+					window.disableLoadButton();
+
 				}
 
-				window.disableLoadButton();
 			} else {
 				variantCard.setSampleName("");
 				variantCard.setDefaultSampleName(null);

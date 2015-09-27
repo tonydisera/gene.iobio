@@ -121,83 +121,95 @@
   </div>
 
   <div id="slider-top" class="hide fade-in">
-    <div id="data-card" class="track shadow-z-2" style="margin-top:8px;" >
 
-          <div style="width:100%;clear:both;">
+      <div id="data-card" class="track shadow-z-2 hide" style="margin-top:8px;" >
 
-
-                <div id="toolbar" >
-                  <span class="card-label" style="display: inline-block;margin-top: 3px;">SAMPLES</span>
-
-                  <span style="float:right">
-                    <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                      <i class="mdi-content-remove"></i>
-                    </a>
-                    <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                      <i class="mdi-image-crop-din"></i>
-                    </a>
-                 </span>
+        <div style="width:100%;clear:both;">
 
 
-                  <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
-                    <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-                      <i class="mdi-social-person"></i>
-                      Single
-                    </button>
-                    <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                      style="padding-top: 2px;padding-bottom:1px;">
-                      <div style="float:left;">
-                        <img src="assets/images/family.png" style="height:27px"/>
-                      </div>
-                       <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-                    </button>
-                    <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                      style="padding-top: 2px;padding-bottom:1px;">
-                      <div style="float:left;">
-                        <img src="assets/images/pedigree.png" style="height:22px"/>
-                      </div>
-                       <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-                    </button>
-                    <button id="other-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                      style="padding-top: 2px;padding-bottom:1px;">
-                      <i class="mdi-editor-format-align-justify"></i>                
-                       <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-                    </button>
-                  </div>
-                </div>
+              <div id="toolbar" >
+                <span class="card-label" style="display: inline-block;margin-top: 3px;">SAMPLES</span>
+
+                <span style="float:right">
+                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="mdi-content-remove"></i>
+                  </a>
+                  <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="mdi-image-crop-din"></i>
+                  </a>
+               </span>
 
 
-                <div id="proband-data" style="float:left;margin-right:20px;width:60%">
-                  <input id="card-index" class="hide" value="0" type="text">
-                  <input id="datasource-relationship" class="hide" value="proband" type="text"/>
-                </div>
-
-                <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
-                  <input id="card-index" class="hide" value="1" type="text">
-                  <input id="datasource-relationship" class="hide" value="mother" type="text"/>
-                </div>
-
-                <div id="father-data" class="hide" style="float:left;width:32%">
-                  <input id="card-index" class="hide" value="2" type="text">
-                  <input id="datasource-relationship" class="hide" value="father" type="text"/>
-                </div>
-
-
-                <div class="fullview" style="clear:both;text-align:center;">
-                  <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">
-                    <i class="mdi-file-cloud-done"></i>
-                    Load
+                <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
+                  <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
+                    <i class="mdi-social-person"></i>
+                    Single
+                  </button>
+                  <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <div style="float:left;">
+                      <img src="assets/images/family.png" style="height:27px"/>
+                    </div>
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+                  </button>            
+                  <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <div style="float:left;">
+                      <img src="assets/images/pedigree.png" style="height:22px"/>
+                    </div>
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+                  </button>
+                  <button id="other-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <i class="mdi-editor-format-align-justify"></i>                
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
                   </button>
                 </div>
-                  <span class="hint todo" style="float:left;margin-top:-40px;">Files must correspond to build GRCh37.</span>
+              </div>
 
-            </div>   
 
-            
-            
-          </div>
+              <div id="proband-data" style="float:left;margin-right:20px;width:60%">
+                <input id="card-index" class="hide" value="0" type="text">
+                <input id="datasource-relationship" class="hide" value="proband" type="text"/>
+              </div>
 
+              <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
+                <input id="card-index" class="hide" value="1" type="text">
+                <input id="datasource-relationship" class="hide" value="mother" type="text"/>
+              </div>
+
+              <div id="father-data" class="hide" style="float:left;width:32%">
+                <input id="card-index" class="hide" value="2" type="text">
+                <input id="datasource-relationship" class="hide" value="father" type="text"/>
+              </div>
+
+              <div class="fullview todo" style="clear:both;text-align:left;padding-top:10px;">
+                <div id="unaffected-sibs-box" class="hide">
+                    <div id="sample-data-label">
+                      UNAFFECTED SIBS
+                    </div>
+                    <select id="unaffected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
+                      class="chosen-select">
+                    </select>
+                </div>
+              </div>
+
+              <div class="fullview" style="clear:both;text-align:center;">
+                <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">
+                  <i class="mdi-file-cloud-done"></i>
+                  Load
+                </button>
+              </div>
+                <span class="hint todo" style="float:left;margin-top:-40px;">Files must correspond to build GRCh37.</span>
+
+          </div>   
+
+          
+          
         </div>
+
+      </div>
+
   </div>
   <div id="close-slide-top" class="close-button fade-in hide shadow-z-2">
      X
@@ -376,8 +388,6 @@
 
     <div id="track-section" class="push" style="padding-top:228px;">
       
-
-
 
       <div id="filter-and-rank-card" class="hide">
 

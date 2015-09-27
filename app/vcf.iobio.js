@@ -92,14 +92,11 @@ vcfiobio = function module() {
   
   var clinvarIterCount       = 0;
   var vcfstatsAliveServer    = "wss://services.iobio.io/vcfstatsalive";
-  //var tabixServer            = "wss://services.iobio.io/tabix";
-  var tabixServer            = "wss://nv-green.iobio.io/tabix";
+  var tabixServer            = "wss://services.iobio.io/tabix";
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
   var snpEffServer           = "wss://services.iobio.io/snpeff";
-  var snpSiftServer          = "wss://services.iobio.io/snpsift";
-  
-  //var vtServer               = "wss://services.iobio.io/vt/";
-  var vtServer               = "ws://nv-dev.iobio.io/vt/";
+  var snpSiftServer          = "wss://services.iobio.io/snpsift";  
+  var vtServer               = "wss://services.iobio.io/vt";
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
@@ -235,6 +232,30 @@ var effectCategories = [
     callback(vcfFile);
 
   } 
+
+  exports.getVcfFile = function() {
+    return vcfFile;
+  }
+
+  exports.setVcfFile = function(file) {
+    vcfFile = file;
+  }
+
+  exports.getVcfURL = function() {
+    return vcfURL;
+  }
+
+  exports.setVcfURL = function(url) {
+    vcfURL = url;
+  }
+
+  exports.getSourceType = function() {
+    return sourceType;
+  }
+
+  exports.setSourceType = function(st) {
+    sourceType = st;
+  }
 
   function showUrlFileFormatMessage() {
     alertify.error("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
@@ -1349,17 +1370,36 @@ var effectCategories = [
                 } else {
                   genotypeDepths.push(null);
                 }
+                var gtAlleleCountIndex = gtTokens["AD"];
                 var gtAltCountIndex = gtTokens["AO"];
-                if (gtAltCountIndex) {
+                if (gtAlleleCountIndex) {
+                  //
+                  // GATK allele counts 
+                  //
+                  var countTokens = tokens[gtAlleleCountIndex].split(",");
+                  if (countTokens.length == 2) {
+                    var refAlleleCount = countTokens[0];
+                    var altAlleleCount = countTokens[1];
+                    genotypeAltCounts.push(altAlleleCount);
+                    genotypeRefCounts.push(refAlleleCount);                    
+                  } else {
+                    genotypeAltCounts.push(null);
+                    genotypeRefCounts.push(null);
+                  }
+                } else if (gtAltCountIndex) {
+                  //
+                  // Freebayes allele counts   
+                  //               
                   genotypeAltCounts.push(tokens[gtAltCountIndex]);
+                  var gtRefCountIndex = gtTokens["RO"];
+                  if (gtRefCountIndex) {
+                    genotypeRefCounts.push(tokens[gtRefCountIndex]);
+                  } else {
+                    genotypeRefCounts.push(null);
+                  }
                 } else {
                   genotypeAltCounts.push(null);
-                }
-                var gtRefCountIndex = gtTokens["RO"];
-                if (gtRefCountIndex) {
-                  genotypeRefCounts.push(tokens[gtRefCountIndex]);
-                } else {
-                  genotypeRefCounts.push(null);
+                  genotypeRefCounts.push(null)
                 }
               }
             });
@@ -1578,7 +1618,7 @@ var effectCategories = [
   }
 
 
-  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr, onMatchCallback) {
+  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr, onMatchCallback, onNoMatchCallback) {
     var set1Label = 'unique1';
     var set2Label = 'unique2';
     var commonLabel = 'common';
@@ -1650,16 +1690,28 @@ var effectCategories = [
           idx2++;
         } else if (refAlt1 < refAlt2) {
           variant1[comparisonAttribute] = set1Label;
+          if (onNoMatchCallback) {
+            onNoMatchCallback(variant1, null);
+          }
           idx1++;
         } else {
           variant2[comparisonAttribute] = set2Label;
+          if (onNoMatchCallback) {
+            onNoMatchCallback(null, variant2);
+          }
           idx2++;
         }
       } else if (variant1.start < variant2.start) {
         variant1[comparisonAttribute] = set1Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(variant1, null);
+        }
         idx1++;
       } else if (variant2.start < variant1.start) {
         variant2[comparisonAttribute] = set2Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(null, variant2);
+        }
         idx2++;
       }
 
@@ -1673,12 +1725,18 @@ var effectCategories = [
       for(x = idx1; x < features1.length; x++) {
         var variant1 = features1[x];
         variant1[comparisonAttribute] = set1Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(variant1, null);
+        }
       }
     } 
     if (idx2 < features2.length) {
       for(x = idx2; x < features2.length; x++) {
         var variant2 = features2[x];
         variant2[comparisonAttribute] = set2Label;
+        if (onNoMatchCallback) {
+            onNoMatchCallback(null, variant2);
+        }        
       }
     } 
 

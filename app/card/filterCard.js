@@ -62,6 +62,10 @@ FilterCard.prototype.init = function() {
 	});
 
 
+	$('#select-annotation-scheme').chosen({width: "65px;font-size:10px;", disable_search_threshold: 10});
+	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;", disable_search_threshold: 10});
+	$('#select-af-scheme').chosen({width: "110px;font-size:10px;", disable_search_threshold: 10});
+
 
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
@@ -117,11 +121,8 @@ FilterCard.prototype.init = function() {
 
 			window.variantCards.forEach(function(variantCard) {
 				variantCard.variantClass(me.classifyByImpact);
-		    	if (variantCard.getCardIndex() == 0) {
-		    		window.filterVariants();
-				}
-
 			});
+		    window.filterVariants();
 
 
 	    });
@@ -137,12 +138,10 @@ FilterCard.prototype.init = function() {
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
-		    	variantCard.variantClass(me.classifyByEffect);
-		    	if (variantCard.getCardIndex() == 0) {
-		    		window.filterVariants();
-				}
-			});
-
+		    	variantCard.variantClass(me.classifyByEffect);		    	
+		  	});
+			window.filterVariants();
+		
 
 	    });
 		d3.selectAll('#zygosity-scheme')
@@ -158,10 +157,8 @@ FilterCard.prototype.init = function() {
 
 			window.variantCards.forEach(function(variantCard) {
 		    	variantCard.variantClass(me.classifyByZygosity);
-		    	if (variantCard.getCardIndex() == 0) {
-		    		window.filterVariants();
-				}
 			});
+		    window.filterVariants();
 
 
 	    });	    
@@ -200,7 +197,7 @@ FilterCard.prototype.init = function() {
 
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
-	d3.selectAll(".type, .impact, .effect, .sift, .polyphen, .regulatory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar")
+	d3.selectAll(".type, .impact, .effect, .sift, .polyphen, .regulatory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar, .uasibs")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -283,6 +280,7 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .sift').classed('current', false);
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
+	d3.selectAll('#filter-track .uasibs').classed('current', false);
 	$('af-amount-start').val(0);
 	$('af-amount-end').val(100);
 	$('coverage-min').val('');
@@ -494,7 +492,7 @@ FilterCard.prototype.classifyByImpact = function(d) {
     	regulatory += " " + key;		
     }
 	
-	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + d.afexaclevel + ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory + ' ' + d.afexaclevel + ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 
 FilterCard.prototype.classifyByEffect = function(d) { 
@@ -524,7 +522,7 @@ FilterCard.prototype.classifyByEffect = function(d) {
     	regulatory += " " + key;		
     }
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 
@@ -555,7 +553,7 @@ FilterCard.prototype.classifyByZygosity = function(d) {
     	regulatory += " " + key;		
     }
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
 
