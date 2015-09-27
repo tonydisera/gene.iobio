@@ -60,6 +60,10 @@ FilterCard.prototype.init = function() {
 	});
 
 
+	$('#select-annotation-scheme').chosen({width: "65px;font-size:10px;", disable_search_threshold: 10});
+	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;", disable_search_threshold: 10});
+	$('#select-af-scheme').chosen({width: "110px;font-size:10px;", disable_search_threshold: 10});
+
 
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {

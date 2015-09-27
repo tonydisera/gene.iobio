@@ -14,7 +14,21 @@ body {
 }
 
 
+.chosen-container-single .chosen-single {
+  border-radius: 0px;
+  line-height: 20px;
+  height:      20px;
+  background: none;
+  box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12);
+  border: none;
+}
 
+.chosen-container-single .chosen-drop {
+  border-radius: 0px;
+}
+.chosen-container-single .chosen-single div b {
+    background: url('chosen-sprite.png') no-repeat 0px 0px;
+}
 
 #vcf-sample-box .chosen-container {
   font-size: 11px;
