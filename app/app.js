@@ -960,6 +960,8 @@ function promiseFullTrio() {
 		// the inheritance mode.  After this completes, we are ready to show the
 		// feature matrix.
 		compareVariantsToPedigree(function() {
+
+			getMaxAlleleCount(loaded.proband.getVcfData());
 			
 			loaded.proband.promiseFullFeatured();
 
@@ -976,6 +978,8 @@ function promiseFullTrio() {
 		var windowWidth = $(window).width();
 		var filterPanelWidth = $('#filter-track').width();
 		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+
+		getMaxAlleleCount(loaded.proband.getVcfData());
 		
 		loaded.proband.promiseFullFeatured();
 
@@ -1068,6 +1072,25 @@ function hideCircleRelatedVariants() {
 			variantCard.hideCoverageCircle();
 		}
 	});
+}
+
+
+function getMaxAlleleCount(theVcfData) {
+	var maxAlleleCount = 0;
+	var setMaxAlleleCount = function(refCount, altCount) {
+		if (refCount != null && altCount != null) {
+			if ((+refCount + +altCount) > maxAlleleCount) {
+				maxAlleleCount = +refCount + +altCount;
+			}
+		}
+	};
+
+	theVcfData.features.forEach(function(variant) {
+		setMaxAlleleCount(variant.genotypeRefCount, variant.genotypeAltCount);
+		setMaxAlleleCount(variant.genotypeRefCountMother, variant.genotypeAltCountMother);
+		setMaxAlleleCount(variant.genotypeRefCountFather, variant.genotypeAltCountFather);
+	});
+	theVcfData.maxAlleleCount = maxAlleleCount;
 }
 
 
