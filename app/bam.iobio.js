@@ -40,7 +40,8 @@ var Bam = Class.extend({
 
 
   
-      this.iobio.coverage = "wss://services.iobio.io/coverage";
+      this.iobio.coverage = "ws:nv-dev.iobio.io/coverage/";
+      //this.iobio.coverage = "wss://services.iobio.io/coverage";
       this.iobio.bamtools = "wss://services.iobio.io/bamtools";
       //this.iobio.samtools = "wss://nv-green.iobio.io/samtools";
       this.iobio.samtools = "wss://services.iobio.io/samtools";
@@ -132,6 +133,20 @@ var Bam = Class.extend({
             }
          })
           */
+      }
+      return encodeURI(url);
+   },
+
+   
+    _getBamPileupUrl: function(region, golocal) {     
+      var samtools = this.iobio.samtools;
+      if ( this.sourceType == "url") {
+         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
+         var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
+      } else {
+        
+        var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
+       
       }
       return encodeURI(url);
    },
@@ -685,7 +700,8 @@ var Bam = Class.extend({
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
         var protocol = me.sourceType == "url" ? '&protocol=http' : '';
-        var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+        var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
+        //var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
         var client = BinaryClient(me.iobio.coverage);
         

@@ -820,13 +820,15 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 }
 
 VariantCard.prototype.appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth) {
-	var BAR_WIDTH = 150;
+	var MAX_BAR_WIDTH = 150;
+	var BAR_WIDTH = 0;
 	if ((genotypeDepth == null || genotypeDepth == '') && genotypeAltCount == null) {
 		container.text("n/a");
 		return;
 	}
 
 	if (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0) {
+		BAR_WIDTH = MAX_BAR_WIDTH * (genotypeDepth / getProbandVariantCard().getVcfData().maxAlleleCount);
 		container.select("svg").remove();
 		var svg = container
 	            .append("svg")
@@ -857,6 +859,7 @@ VariantCard.prototype.appendAlleleCountSVG = function(container, genotypeAltCoun
 	} 
 
 	var totalCount = +genotypeRefCount + +genotypeAltCount;
+	BAR_WIDTH = MAX_BAR_WIDTH * (totalCount / getProbandVariantCard().getVcfData().maxAlleleCount);
 	var altPercent = +genotypeAltCount / totalCount;
 	var altWidth = d3.round(altPercent * BAR_WIDTH);
 	var refWidth = BAR_WIDTH - altWidth;

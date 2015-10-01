@@ -95,7 +95,7 @@ vcfiobio = function module() {
   var tabixServer            = "wss://services.iobio.io/tabix";
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
   var snpEffServer           = "wss://services.iobio.io/snpeff";
-  var snpSiftServer          = "wss://services.iobio.io/snpsift";  
+  var snpSiftServer          = "wss://services.iobio.io/snpsift";
   var vtServer               = "wss://services.iobio.io/vt";
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
