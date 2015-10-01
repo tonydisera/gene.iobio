@@ -701,7 +701,7 @@ section {
 }
 #filter-track {
   display: table-cell;
-  min-width: 655px;
+  min-width: 260px;
   margin-top: 0px;
   margin-bottom: 0px;
 
@@ -734,6 +734,10 @@ section {
   display: none;
 }
 
+#vcf-sample-box.hide {
+  visibility: hidden;
+  display: block !important;
+}
 
 
 .loader img {
@@ -1338,9 +1342,6 @@ header {
 
 .impact:hover, .effect:hover,  .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover  {  
   cursor: pointer;
-  border: solid thin white;
-  border-radius: 2px;
-  padding: 1px;
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
@@ -1367,7 +1368,7 @@ header {
 #impact-scheme, #effect-scheme, #zygosity-scheme {
   color: rgb(102, 88, 92) !important;
   text-decoration: none !important;  
-  font-size: 12px;
+  font-size: 11px;
 
 }
 #impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current {

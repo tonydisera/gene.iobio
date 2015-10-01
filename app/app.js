@@ -226,57 +226,51 @@ function init() {
 
 	// Slide out panels
 	$('.main').click(function() {
-			$('.footer').removeClass("hide");
-			$('.slide-button').removeClass("hide");
-			$('#close-slide-left').addClass("hide");
-			$('#close-slide-top').addClass("hide");
-			$('#slider-left').addClass("hide");
-			$('#slider-top').addClass("hide");
-
-		
-			$('#slide-buttons').removeClass('slide-left');
-			$('#container').removeClass('slide-left');
-
-			$('#slide-buttons').removeClass('slide-top');
-			$('#track-section').removeClass('slide-top');
 	});
 	$('#close-slide-left').click(function() {
-			$('.footer').removeClass("hide");
-			$('.slide-button').removeClass("hide");
-			$('#close-slide-left').addClass("hide");
-			$('#close-slide-top').addClass("hide");
-			$('#slider-left').addClass("hide");
-			$('#slider-top').addClass("hide");
-
-		
-			$('#slide-buttons').removeClass('slide-left');
-			$('#container').removeClass('slide-left');
-
-			$('#slide-buttons').removeClass('slide-top');
-			$('#track-section').removeClass('slide-top');
+		closeFilterSlideLeft();
 	});
 	$('#close-slide-top').click(function() {
 		closeSampleSlideDown();
 	});
 
+	
 
 	loadGeneFromUrl();
 }
 
+// Function from David Walsh: http://davidwalsh.name/css-animation-callback
+function whichTransitionEvent(){
+  var t,
+      el = document.createElement("fakeelement");
+
+  var transitions = {
+    "transition"      : "transitionend",
+    "OTransition"     : "oTransitionEnd",
+    "MozTransition"   : "transitionend",
+    "WebkitTransition": "webkitTransitionEnd"
+  }
+
+  for (t in transitions){
+    if (el.style[t] !== undefined){
+      return transitions[t];
+    }
+  }
+}
+
+
 function adjustDatacardSlider() {
 	var top = +$('#nav-section').height();
 	var sliderTopHeight = +$('#slider-top').height();
-	$('#close-slide-top').css('top', (top + sliderTopHeight) - 8);	
+	$('#slider-top').css('top', top);	
+	$('#close-slide-top').css('top', (top + sliderTopHeight) - 37);	
+	//$('#track-section').css('padding-top', (top + sliderTopHeight) + 5);	
 }
 
 function showSampleSlideDown() {
+	
 	$('#data-card').removeClass("hide");
 	$('#slider-top').removeClass("hide");
-
-	var top = +$('#nav-section').height();
-	$('#slider-top').css('top', top);
-	var sliderTopHeight = +$('#slider-top').height();
-	$('#close-slide-top').css('top', (top + sliderTopHeight) - 8);
 
 
 	$('#slider-left').addClass("hide");
@@ -286,6 +280,17 @@ function showSampleSlideDown() {
 
 	$('#slide-buttons').toggleClass('slide-top');
 	$('#track-section').toggleClass('slide-top');
+
+
+	adjustDatacardSlider();
+
+
+	var transitionEvent = whichTransitionEvent();
+	$('#track-section').one(transitionEvent, function(event) {
+		//var h = $("#nav-section").height();
+		//var sliderTopHeight = +$('#slider-top').height();
+		//$('#track-section').css("padding-top", (h + sliderTopHeight) + "px");
+	});
 
 }
 
@@ -306,14 +311,61 @@ function closeSampleSlideDown() {
 }
 
 function showFilterSlideLeft() {
+
+
 	$('#slider-top').addClass("hide");
 	$('#slider-left').removeClass("hide");
 	$('.footer').addClass("hide");
 	$('.slide-button').addClass("hide");
 	$('#close-slide-left').removeClass("hide");
 
+
+	resizeCardWidths();
+
 	$('#slide-buttons').toggleClass('slide-left');
 	$('#container').toggleClass('slide-left');
+
+	var transitionEvent = whichTransitionEvent();
+	$('.slide-left').one(transitionEvent, function(event) {
+		var h = $("#nav-section").height();
+		$('#track-section').css("padding-top", h + "px");
+	});
+
+}
+
+function resizeCardWidths() {
+	var windowWidth = $(window).width();
+	var sliderWidth    = 0;
+	if ($('#slider-left').hasClass("hide") == false) {
+		sliderWidth = +$('#slider-left').width();
+	}
+	$('#container').css('width', windowWidth - sliderWidth - 10);
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - 35);
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - 35);
+}
+
+function closeFilterSlideLeft() {
+	$('.footer').removeClass("hide");
+	$('.slide-button').removeClass("hide");
+	$('#close-slide-left').addClass("hide");
+	$('#close-slide-top').addClass("hide");
+	$('#slider-left').addClass("hide");
+	$('#slider-top').addClass("hide");
+
+	$('#slide-buttons').removeClass('slide-left');
+	$('#container').removeClass('slide-left');
+
+	$('#slide-buttons').removeClass('slide-top');
+	$('#track-section').removeClass('slide-top');	
+
+	resizeCardWidths();
+
+	var transitionEvent = whichTransitionEvent();
+	$('#container').one(transitionEvent, function(event) {
+		var h = $("#nav-section").height();
+		$('#track-section').css("padding-top", h + "px");
+	});
+
 }
 
 /**
@@ -1058,15 +1110,15 @@ function promiseFullTrio() {
 	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null && uaSibsLoaded) {
 		var windowWidth = $(window).width();
 		var filterPanelWidth = $('#filter-track').width();
-		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+//		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
 
 		//  MATRIX WIDTH - workaround for proper scrolling
 		var windowWidth = $(window).width();
 		//var filterPanelWidth = $('#filter-track').width();
 		//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-		$('#matrix-panel').css("max-width", windowWidth - 30 );
-		$('#matrix-panel').css("min-width", windowWidth - 30 );
+//		$('#matrix-panel').css("max-width", windowWidth - 30 );
+//		$('#matrix-panel').css("min-width", windowWidth - 30 );
 
 		// we need to compare the proband variants to mother and father variants to determine
 		// the inheritance mode.  After this completes, we are ready to show the
@@ -1089,7 +1141,7 @@ function promiseFullTrio() {
 	} else if (dataCard.mode == 'single' && loaded.proband != null) {
 		var windowWidth = $(window).width();
 		var filterPanelWidth = $('#filter-track').width();
-		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+//		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
 		getMaxAlleleCount(loaded.proband.getVcfData());
 		

@@ -3,12 +3,12 @@
   font-family: 'Quattrocento Sans', sans-serif;
 }
 .panel-title {
-  font-size: 12px;
+  font-size: 11px;
 }
 .panel-body {
-    padding-top: 5px;
+    padding-top: 2px;
     padding-right: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 1px;
     padding-left: 5px;
     font-size:11px;
     text-align: center;
@@ -18,9 +18,9 @@
 }
 .panel>.panel-heading, .panel-default>.panel-heading {
     background-color: rgba(236, 236, 236, 0.46);    
-    padding-top: 2px;
+    padding-top: 1px;
     padding-right: 2px;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     padding-left: 4px;
     border-bottom: 1px solid transparent;
     border-top-left-radius: 3px;
@@ -52,14 +52,13 @@
 .close-button {
    background-color: #5983A7;
    color: white;
-   padding-top: 4px;
-   padding-bottom: 4px;
-   padding-left: 12px;
-   padding-right: 12px;
+   width: 30px;
+   height:30px;
    z-index: 100;
    font-size: 20px;
-   cursor: hand;
    cursor: pointer;
+   text-align: center;
+   vertical-align: middle;
 }
 .close-button:hover {
     color: #BDFB98 !important;
@@ -106,16 +105,15 @@
 }
 #close-slide-left {
   position: fixed;
-  left: 250px;
+  left: 220px;
   top: 0px;  
 }
 
 #slider-top {
   position: fixed;
-  top: 165px;
+  top: 180px;
   left: 0;
   width: 100%;
-  min-height: 215px;
   transition: width 0.6s ease;
   -webkit-transition: width 0.6s ease;
   -moz-transition: width 0.6s ease;
@@ -128,8 +126,8 @@
 #close-slide-top {
   position: fixed;
   left: 0px;
-  top: 389px;
-  z-index:9;
+  top: 361px;
+  z-index:11;
 
 }
 
@@ -144,11 +142,11 @@
   z-index: 1;
 }
 .slide-top {
-  transform: translate(0, 225px);
-  -webkit-transform: translate(0px, 225px);
-  -moz-transform: translate(0px, 225px);
-  -ms-transform: translate(0px, 225px);
-  -o-transform: translate(0px, 225px);
+  transform: translate(0, 250px);
+  -webkit-transform: translate(0px, 250px);
+  -moz-transform: translate(0px, 250px);
+  -ms-transform: translate(0px, 250px);
+  -o-transform: translate(0px, 250px);
 }
 .slide-left {
   transform: translate(255px, 0);

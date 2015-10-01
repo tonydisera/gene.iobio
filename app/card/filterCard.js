@@ -54,11 +54,11 @@ FilterCard.prototype.init = function() {
 	var filterCardSelector = $('#filter-track');
 	filterCardSelector.find('#expand-button').on('click', function() {
 		filterCardSelector.find('.fullview').removeClass("hide");
-		filterCardSelector.css('min-width', "665px");
+		//filterCardSelector.css('min-width', "665px");
 	});
 	filterCardSelector.find('#minimize-button').on('click', function() {
 		filterCardSelector.find('.fullview').addClass("hide");
-		filterCardSelector.css('min-width', "185px");
+		//filterCardSelector.css('min-width', "185px");
 	});
 
 
@@ -439,9 +439,9 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 
 		if (count > 0) {
 
-			var svgElem = '<svg id="' + key + '" class="effect ' + nocolor + '" width="80" height="14" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>' +
+			var svgElem = '<svg id="' + key + '" class="effect ' + nocolor + '" width="80" height="12" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
+        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';
       		$('#effect-filter-box').append(svgElem);
 		}

@@ -231,16 +231,16 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	});
 	
 
+/*
 	// MATRIX WIDTH - workaround for proper scrolling
 	var windowWidth = $(window).width();
-	//var filterPanelWidth = $('#filter-track').width();
-	//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 	$('#matrix-panel').css("max-width", windowWidth - 30);
 	$('#matrix-panel').css("min-width", windowWidth - 30);
 	
 	// Set the width so that scrolling works properly
 	$('#feature-matrix').css('min-width', $('#matrix-panel').width());
-
+*/
+	resizeCardWidths();
 
 	if (theVcfData != null) {
 		this.featureVcfData = {};
