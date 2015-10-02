@@ -6,9 +6,9 @@
   font-size: 11px;
 }
 .panel-body {
-    padding-top: 2px;
+    padding-top: 1px;
     padding-right: 5px;
-    padding-bottom: 1px;
+    padding-bottom: 0px;
     padding-left: 5px;
     font-size:11px;
     text-align: center;
