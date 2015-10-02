@@ -118,15 +118,18 @@ MatrixCard.prototype.init = function() {
 				    .columnLabelHeight(42)
 				    .rowLabelWidth(140)
 				    .on('d3click', function(variant) {
+				    	
 				    	me.showTooltip(variant);
 				    	variantCards.forEach(function(variantCard) {
 				    		variantCard.highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
+				    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
 				    	});
 				    })
 				     .on('d3mouseover', function(variant) {
 				     	me.showTooltip(variant);
 				    	variantCards.forEach(function(variantCard) {
 				    		variantCard.showVariantCircle(variant);
+				    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
 				    	});
 				    })
 				    .on('d3mouseout', function() {
@@ -196,11 +199,17 @@ MatrixCard.prototype.showTooltip = function(variant) {
 
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to isolate variant"));
 
+	var selection = tooltip.select("#coverage-svg");
+	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant);
+   
+
 	var h = tooltip[0][0].offsetHeight;
 	var w = 300;
 
 	var x = variant.screenX;
 	var y = variant.screenY;
+
+
 
 	if (x < w) {
 		tooltip.style("width", w + "px")
