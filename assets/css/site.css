@@ -699,13 +699,12 @@ section {
 }
 #filter-track {
   display: table-cell;
-  min-width: 655px;
+  min-width: 657px;
   margin-top: 0px;
   margin-bottom: 0px;
 
 }
-#matrix-track {
-  overflow-x: scroll;
+#matrix-track {  
   width: 100%;
   display: table-cell;
 }
