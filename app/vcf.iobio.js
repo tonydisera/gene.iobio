@@ -807,7 +807,7 @@ var effectCategories = [
     }
 
     // normalize variants
-    var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(nextUrl));
+    var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
     
     // get allele frequencies from 1000G and ExAC
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
@@ -1243,7 +1243,7 @@ var effectCategories = [
       }       
       
       // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-      var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(nextUrl) );
+      var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
       
       // Get Allele Frequencies from 1000G and ExAC
       var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
@@ -1343,16 +1343,36 @@ var effectCategories = [
           }
           var altIdx = 0;
           alts.forEach(function(alt) {
-            var len = alt.length;
-            var type = 'SNP';
-            if (rec.ref == '.' || alt.length > rec.ref.length ) {
-              type = 'INS';
-              len = alt.length - rec.ref.length;
-            } else if (rec.alt == '.' || alt.length < rec.ref.length) {
-              type = 'DEL';
-              len = rec.ref.length - alt.length;
+            var len = null;
+            var type = null;
+            var end = null;
+
+            if (alt.indexOf("<") == 0 && alt.indexOf(">") > 0) {
+              var annotTokens = rec.info.split(";");
+              annotTokens.forEach(function(annotToken) {
+                if (annotToken.indexOf("SVLEN=") == 0) {
+                  len = Math.abs(+annotToken.substring(6, annotToken.length));       
+                } else if (annotToken.indexOf("SVTYPE=") == 0) {
+                  type = annotToken.substring(7, annotToken.length);       
+                }
+              });
+              rec.ref = '';
+              alt = '';
+              end = +rec.pos + len;
+
+            } else {
+              len = alt.length;
+              type = 'SNP';
+              if (rec.ref == '.' || alt.length > rec.ref.length ) {
+                type = 'INS';
+                len = alt.length - rec.ref.length;
+              } else if (rec.alt == '.' || alt.length < rec.ref.length) {
+                type = 'DEL';
+                len = rec.ref.length - alt.length;
+              }
+              end = +rec.pos + len;
+
             }
-            var end = +rec.pos + len;
 
             // Determine the format of the genotype fields
             var gtTokens = {};
