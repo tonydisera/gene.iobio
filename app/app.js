@@ -63,6 +63,8 @@ var variantCards = [];
 var variantCardsUnaffectedSibs = [];
 var variantCardsUnaffectedSibsTransient = [];
 
+var fulfilledTrioPromise = false;
+
 // The smaller the region, the wider we can
 // make the rect of each variant
 var widthFactors = [
@@ -85,37 +87,33 @@ $(document).ready(function(){
 
 	// Compile handlebar templates, when all are loaded
 	// call init();
-	$.get('templates/dataCardEntryTemplate.hbs', function (data) {
-    
-	    dataCardEntryTemplate = Handlebars.compile(data);
-	    promiseTemplatesLoaded(init);
+	var promises = [];
+	promises.push(promiseLoadTemplate('templates/dataCardEntryTemplate.hbs').then(function(compiledTemplate) {
+		dataCardEntryTemplate = compiledTemplate;
+	}));
+	promises.push(promiseLoadTemplate('templates/filterSlidebarTemplate.hbs').then(function(compiledTemplate) {
+		filterCardTemplate = compiledTemplate;
+	}));
+	promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
+		variantCardTemplate = compiledTemplate;
+	}));
 
-	}, 'html');
-
-	$.get('templates/filterSlidebarTemplate.hbs', function (data) {
-    
-	    filterCardTemplate = Handlebars.compile(data);
-	    promiseTemplatesLoaded(init);
-
-	}, 'html');
-
-	$.get('templates/variantCardTemplate.hbs', function (data) {
-    
-	    variantCardTemplate = Handlebars.compile(data);
-	    promiseTemplatesLoaded(init);
-
-	}, 'html');
+	Promise.all(promises).then(function() {
+		init();
+	});
 
 	
 });
 
-
-function promiseTemplatesLoaded(callback) {
-
-	if (dataCardEntryTemplate != null && filterCardTemplate != null && variantCardTemplate != null) {
-		callback();
-	}
+function promiseLoadTemplate(templateName) {
+	return new Promise( function(resolve, reject) {
+		$.get(templateName, function (data) {    
+		    resolve(Handlebars.compile(data));
+		}, 'html');
+	});
+	
 }
+
 
 
 function init() {
@@ -847,6 +845,7 @@ function loadTracksForGene(bypassVariantCards) {
 
 	regionStart = null;
 	regionEnd = null;
+	fulfilledTrioPromise = false;
 
 	filterCard.snpEffEffects = new Object();
 	filterCard.vepConsequences = new Object();
@@ -951,6 +950,8 @@ function loadTracksForGene(bypassVariantCards) {
 	
 
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
+
+
 	
 }
 
@@ -1055,8 +1056,9 @@ function addVariantCard() {
 }
 
 function callVariants() {
+	fulfilledTrioPromise = false;
 	variantCards.forEach(function(vc) {
-		vc.callVariants();
+		vc.callVariants(regionStart, regionEnd);
 	});
 }
 
@@ -1087,68 +1089,141 @@ function loadUnaffectedSibs(unaffectedSibs) {
 
 }
 
+/**
+ *  Every time app gets variant data back, th app determines (via promise) if we have
+ *  the full trio of returned.  When this occurs, the app will compare the 
+ *  proband variants to mother and father to flag recessive and de nove modes of
+ *  inheritance.  Then the app will compare the proband variants to unaffected sibs
+ *  to determine of any recessive variants on the proband are hom-ref or het-alt on the
+ *  unaffected sibs.  These recessive variants on the proband are flagged, indicating
+ *  that these variants are more likely to be causative.  (If any of the unaffected sibs
+ *  reported the same recessive variant, the variant would unlikely be causative.)
+ *  We also determine the max allele count across all variants in the trio so that
+ *  the tooltip can show a scaled allele count bar, with the max width set to the
+ *  highest total (alt + ref) allele count.
+ *
+ */
+function determineInheritance(promise) {	
+	var thePromise = null;
+	if (promise == null) {
+		thePromise = promiseFullTrio;
+	} else {
+		thePromise = promise;
+	}
+	thePromise().then( function(probandVariantCard) {
+		if (!fulfilledTrioPromise) {
+			fulfilledTrioPromise = true;
+			if (dataCard.mode == 'trio') {
+				var windowWidth = $(window).width();
+				var filterPanelWidth = $('#filter-track').width();
+				//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+
+				// we need to compare the proband variants to mother and father variants to determine
+				// the inheritance mode.  After this completes, we are ready to show the
+				// feature matrix.
+				compareVariantsToPedigree(function() {
+
+					determineMaxAlleleCount(probandVariantCard.getVcfData());
+					
+					probandVariantCard.onVariantDataChange();
+
+					determineUnaffectedSibStatus();
+
+					probandVariantCard.onVariantDataChange();
+
+				});
+			} else {
+				var windowWidth = $(window).width();
+				var filterPanelWidth = $('#filter-track').width();
+				$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+
+				determineMaxAlleleCount(probandVariantCard.getVcfData());
+				
+				probandVariantCard.onVariantDataChange();			
+			}
+		}
+
+
+	},
+	function(error) {
+		// no need to deal with error since these are just the times
+		// when we didn't yet have a full trio.
+	});
+
+
+}
+
+
 
 function promiseFullTrio() {
-	var loaded = {};
-	variantCards.forEach(function(vc) {
-		if (vc.isLoaded()) {
-			loaded[vc.getRelationship()] = vc;
-		}
-	});
-
-	var uaCount = 0;
-	variantCardsUnaffectedSibs.forEach(function(vc) {
-		if (vc.isLoaded()) {
-			uaCount++;
-		}
-	});
-	var uaSibsLoaded = false;
-	if (uaCount == variantCardsUnaffectedSibs.length) {
-		uaSibsLoaded = true;
-	}
-
-	if (dataCard.mode == 'trio' && loaded.proband != null && loaded.mother  != null && loaded.father != null && uaSibsLoaded) {
-		var windowWidth = $(window).width();
-		var filterPanelWidth = $('#filter-track').width();
-//		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-
-
-		//  MATRIX WIDTH - workaround for proper scrolling
-		var windowWidth = $(window).width();
-		//var filterPanelWidth = $('#filter-track').width();
-		//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-//		$('#matrix-panel').css("max-width", windowWidth - 30 );
-//		$('#matrix-panel').css("min-width", windowWidth - 30 );
-
-		// we need to compare the proband variants to mother and father variants to determine
-		// the inheritance mode.  After this completes, we are ready to show the
-		// feature matrix.
-		compareVariantsToPedigree(function() {
-
-			getMaxAlleleCount(loaded.proband.getVcfData());
-			
-			loaded.proband.promiseFullFeatured();
-
-			// Now compare the unaffected sibs to the variant to flag variants
-			// common to unaffected sibs + proband
-			variantCardsUnaffectedSibsTransient = [];
-			variantCardsUnaffectedSibs.forEach( function(vc) {
-				variantCardsUnaffectedSibsTransient.push(vc);
-			})
-			nextCompareToUnaffectedSib();
-
+	return new Promise( function(resolve, reject) {
+		var loaded = {};
+		variantCards.forEach(function(vc) {
+			if (vc.isLoaded()) {
+				loaded[vc.getRelationship()] = vc;
+			}
 		});
-	} else if (dataCard.mode == 'single' && loaded.proband != null) {
-		var windowWidth = $(window).width();
-		var filterPanelWidth = $('#filter-track').width();
-//		$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
-		getMaxAlleleCount(loaded.proband.getVcfData());
+		var uaCount = 0;
+		variantCardsUnaffectedSibs.forEach(function(vc) {
+			if (vc.isLoaded()) {
+				uaCount++;
+			}
+		});
+
+		var uaSibsLoaded = false;
+		if (uaCount == variantCardsUnaffectedSibs.length) {
+			uaSibsLoaded = true;
+		}
+
+		if (dataCard.mode == 'trio' && loaded.proband != null
+		    && loaded.mother  != null && loaded.father != null 
+		    && uaSibsLoaded) {
+			resolve(loaded.proband);
+		} else if (dataCard.mode == 'single' && loaded.proband != null) {
+			// Not sure if this is still needed for filter slide bar ?????
+			var windowWidth = $(window).width();
+		    var filterPanelWidth = $('#filter-track').width();
+
+			resolve(loaded.proband);
+		} else {
+			reject();
+		}
+	});
+
+}
+
+function promiseFullTrioCalledVariants() {
+	return new Promise( function(resolve, reject) {
+		var loaded = {};
+		variantCards.forEach(function(vc) {
+			if (vc.isLoaded() && vc.fbData != null) {
+				loaded[vc.getRelationship()] = vc;
+			}
+		});
 		
-		loaded.proband.promiseFullFeatured();
+		if (dataCard.mode == 'trio' && loaded.proband != null
+		    && loaded.mother  != null && loaded.father != null) {
+			resolve(loaded.proband);
+		} else if (dataCard.mode == 'single' && loaded.proband != null) {
+			resolve(loaded.proband);
+		} else {
+			reject();
+		}
+	});
 
-	}
+}
 
+function determineUnaffectedSibStatus() {
+	// Now compare the unaffected sibs to the variant to flag variants
+	// common to unaffected sibs + proband
+	variantCardsUnaffectedSibsTransient = [];
+	variantCardsUnaffectedSibs.forEach( function(vc) {
+		variantCardsUnaffectedSibsTransient.push(vc);
+	})
+	nextCompareToUnaffectedSib();
+
+	loadUnaffectedSibsStatus();
 }
 
 function nextCompareToUnaffectedSib() {
@@ -1156,32 +1231,34 @@ function nextCompareToUnaffectedSib() {
 		variantCard = variantCardsUnaffectedSibsTransient.shift();
 
 		//variantCard.loadVariantsOnly( function(vc) {
-			compareVariantsToUnaffectedSibs(variantCard);
-			nextCompareToUnaffectedSib();
+			promiseComparedToUnaffectedSib(variantCard).then( function() {
+				nextCompareToUnaffectedSib();
+			});
 		//});		
-	} else {
-		getProbandVariantCard().vcfData.features.forEach( function(variant) {
-			 variant.ua = "none";
-			 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
-			 	 var matchesCount = 0;
-			 	 var matchesHomCount = 0;
-				 Object.keys(variant.uasibsZygosity).forEach( function(key) {
-				 	matchesCount++;
-				 	var sibZygosity = variant.uasibsZygosity[key];
-				 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
-					 	matchesHomCount++;
-				 	}
-				 });
+	} 
+}
 
-				 if (matchesHomCount > 0 ) {
-				 	variant.ua = "none";
-				 } else {
-				 	variant.ua = "not_recessive_in_sibs";
-				 }  	 	 
-			 } 
-		});
-		getProbandVariantCard().promiseFullFeatured();
-	}
+function loadUnaffectedSibsStatus() {
+	getProbandVariantCard().vcfData.features.forEach( function(variant) {
+		 variant.ua = "none";
+		 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
+		 	 var matchesCount = 0;
+		 	 var matchesHomCount = 0;
+			 Object.keys(variant.uasibsZygosity).forEach( function(key) {
+			 	matchesCount++;
+			 	var sibZygosity = variant.uasibsZygosity[key];
+			 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
+				 	matchesHomCount++;
+			 	}
+			 });
+
+			 if (matchesHomCount > 0 ) {
+			 	variant.ua = "none";
+			 } else {
+			 	variant.ua = "not_recessive_in_sibs";
+			 }  	 	 
+		 } 
+	});
 
 }
 
@@ -1239,7 +1316,7 @@ function hideCircleRelatedVariants() {
 }
 
 
-function getMaxAlleleCount(theVcfData) {
+function determineMaxAlleleCount(theVcfData) {
 	var maxAlleleCount = 0;
 	var setMaxAlleleCount = function(refCount, altCount) {
 		if (refCount != null && altCount != null) {
@@ -1297,136 +1374,148 @@ function compareVariantsToPedigree(callback) {
 
 	var theVcfData = probandVariantCard.getVcfData();
 
+	// Only continue with comparison if mother and father
+	// variant cards are present
 	if (motherVariantCard == null || fatherVariantCard == null) {
+		callback(theVcfData);
+		return;
+	} 
+
+	// Clear out the inheritance, mother/father zygosity, mother/father genotype fields 
+	// stored in proband variants
+	theVcfData.features.forEach(function(variant) {
+		variant.compareMother = null;
+		variant.compareFather = null;
+		variant.inheritance = 'none';
+		variant.fatherZygosity = null;
+		variant.motherZygosity = null;
+		variant.genotypeAltCountFather = null;
+		variant.genotypeRefCountFather = null;
+		variant.genotypeDepthFather    = null;
+		variant.genotypeAltCountMother = null;
+		variant.genotypeRefCountMother = null;
+		variant.genotypeDepthMother    = null;
+
+	});
+
+	// Sort the variants
+	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+
+	// Compare the proband's variants to the mother's variants
+	motherVariantCard.promiseCompareVariants(
+		theVcfData,
+	    // This is the attribute on variant a (proband) and variant b (mother)
+		// that will store whether the variant is unique or matches.
+    	'compareMother',
+    	// This is the attribute on the proband variant that will store the
+		// mother's zygosity in the case where the variant match
+		'motherZygosity',
+    	// This is the callback function called every time we find the same variant
+    	// in both sets. Here we take the mother variant's af and store it in the
+    	// proband's variant for further sorting/display in the feature matrix.
+    	function(variantA, variantB) {
+    		variantA.motherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
+    		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
+		    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
+		    variantA.genotypeDepthMother    = variantB.genotypeDepthMother;
+		}
+	).then( function() {
+
+		 // Compare the proband variants to the father's variants
+		 return fatherVariantCard.promiseCompareVariants(
+		 	theVcfData, 
+	       	 // This is the attribute on variant a (proband) and variant b (father)
+	        // that will store whether the variant is unique or matches.
+	        'compareFather',
+	        // This is the attribute on the proband variant that will store the
+	        // father's zygosity in the case where the variant match
+	        'fatherZygosity',
+	    	// This is the callback function called every time we find the same variant
+	    	// in both sets. Here we take the father variant's zygosity and store it in the
+	    	// proband's variant for further sorting/display in the feature matrix.
+	        function(variantA, variantB) {
+	        	variantA.fatherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
+	        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
+	        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
+			    variantA.genotypeDepthFather    = variantB.genotypeDepthFather;
+	        });  	
+
+	}, function(error) {
+		console.log("error occured when comparing proband variants to mother?");
+	}).then( function() {
+		// This is the function that is called after the proband variants have been compared
+	    // to the father variant set. 
+	    
+		// Fill in the af level on each variant.  Use the af in the vcf if
+		// present, otherwise, use the 1000g af if present, otherwise use
+		// the ExAC af.
+		theVcfData.features.forEach(function(variant) {
+			if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
+				&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
+				&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
+				variant.inheritance = 'recessive';
+			} else if (variant.compareMother == 'unique1' && variant.compareFather == 'unique1') {
+				variant.inheritance = 'denovo';
+			}
+		});
+		$("#matrix-panel .loader-label").text("Ranking variants");
+
+		filterCard.enableInheritanceFilters(theVcfData);
+			
+			probandVariantCard.setLoadState('inheritance');
+			fatherVariantCard.setLoadState('inheritance');
+			motherVariantCard.setLoadState('inheritance');
 
 		callback(theVcfData);
-
-	} else {
-
-		theVcfData.features.forEach(function(variant) {
-			variant.compareMother = null;
-			variant.compareFather = null;
-			variant.inheritance = 'none';
-			variant.fatherZygosity = null;
-			variant.motherZygosity = null;
-			variant.genotypeAltCountFather = null;
-			variant.genotypeRefCountFather = null;
-			variant.genotypeDepthFather    = null;
-			variant.genotypeAltCountMother = null;
-			variant.genotypeRefCountMother = null;
-			variant.genotypeDepthMother    = null;
-
-		});
-
-	
-		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
-
-	    motherVariantCard.compareVcfRecords(theVcfData,
-	    	// This is the function that is called after all the proband variants have been compared
-	    	// to the mother variant set.  In this case, we now move on to comparing the
-	    	// father variant set to the proband variant set.
-	    	function() {
-		        fatherVariantCard.compareVcfRecords(theVcfData, 
-		        	// This is the function that is called after the proband variants have been compared
-		        	// to the father variant set. 
-		        	function(){
-
-		        		// Fill in the af level on each variant.  Use the af in the vcf if
-		        		// present, otherwise, use the 1000g af if present, otherwise use
-		        		// the ExAC af.
-		        		theVcfData.features.forEach(function(variant) {
-		        			if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
-		        				&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
-		        				&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
-		        				variant.inheritance = 'recessive';
-		        			} else if (variant.compareMother == 'unique1' && variant.compareFather == 'unique1') {
-		        				variant.inheritance = 'denovo';
-		        			}
-						});
-		        		$("#matrix-panel .loader-label").text("Ranking variants");
-
-		        		filterCard.enableInheritanceFilters(theVcfData);
-  						
-  						probandVariantCard.setLoadState('inheritance');
-  						fatherVariantCard.setLoadState('inheritance');
-  						motherVariantCard.setLoadState('inheritance');
-
-			        	callback(theVcfData);
-			        }, 
-			        // This is the attribute on variant a (proband) and variant b (father)
-			        // that will store whether the variant is unique or matches.
-			        'compareFather',
-			        // This is the attribute on the proband variant that will store the
-			        // father's zygosity in the case where the variant match
-			        'fatherZygosity',
-			    	// This is the callback function called every time we find the same variant
-			    	// in both sets. Here we take the father variant's zygosity and store it in the
-			    	// proband's variant for further sorting/display in the feature matrix.
-			        function(variantA, variantB) {
-			        	variantA.fatherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
-			        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
-			        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
-					    variantA.genotypeDepthFather    = variantB.genotypeDepthFather;
-			        });
-	    	}, 
-	    	// This is the attribute on variant a (proband) and variant b (mother)
-			// that will store whether the variant is unique or matches.
-	    	'compareMother',
-	    	// This is the attribute on the proband variant that will store the
-			// mother's zygosity in the case where the variant match
-			'motherZygosity',
-	    	// This is the callback function called every time we find the same variant
-	    	// in both sets. Here we take the mother variant's af and store it in the
-	    	// proband's variant for further sorting/display in the feature matrix.
-	    	function(variantA, variantB) {
-	    		variantA.motherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
-	    		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
-			    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
-			    variantA.genotypeDepthMother    = variantB.genotypeDepthMother;
-
-	    	});
-	}
+	},
+	function(error) {
+		console.log("error occured after comparison of proband to mother and father");
+		
+	});
 
 }
 
-function compareVariantsToUnaffectedSibs(vcUnaffectedSib, callback) {
+function promiseComparedToUnaffectedSib(vcUnaffectedSib) {
 
-	var theVcfData = getProbandVariantCard().getVcfData();
+	return new Promise( function(resolve, reject) {
+		var theVcfData = getProbandVariantCard().getVcfData();
 
-	theVcfData.features.forEach(function(variant) {
-		if (variant.uasibsZygosity) {
-			variant.uasibsZygosity[vcUnaffectedSib.name] = "none";		
-		} else {
-			variant.uasibsZygosity = {};
-		}
+		theVcfData.features.forEach(function(variant) {
+			if (variant.uasibsZygosity) {
+				variant.uasibsZygosity[vcUnaffectedSib.name] = "none";		
+			} else {
+				variant.uasibsZygosity = {};
+			}
+		});
+
+		theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
+
+		var idx = 0;
+		vcUnaffectedSib.promiseCompareVariants(
+			theVcfData,			
+			// This is the attribute on variant a (proband) and variant b (unaffected sib)
+	        // that will store whether the variant is unique or matches.
+	        null,
+	        // This is the attribute on the proband variant that will store the
+	        // zygosity in the case where the variant match
+	        null,
+	    	// This is the callback function called every time we find the same variant
+	    	// in both sets. Here we take the father variant's zygosity and store it in the
+	    	// proband's variant for further sorting/display in the feature matrix.
+	        function(variantA, variantB) {
+	        	variantA.uasibsZygosity[vcUnaffectedSib.name] = variantB.zygosity;
+	        },
+	        function(variantA, variantB) {
+	        	if (variantA) {
+	        		variantA.uasibsZygosity[vcUnaffectedSib.name] = "none";
+	        	}
+	        }
+	     ).then( function() {
+	     	resolve();
+	     });
+
 	});
 
-
-	theVcfData.features = theVcfData.features.sort(orderVariantsByPosition);
-
-	var idx = 0;
-	vcUnaffectedSib.compareVcfRecords(theVcfData,
-		// This is the function that is called after the variants have been compared
-		function() {
-		},
-		// This is the attribute on variant a (proband) and variant b (unaffected sib)
-        // that will store whether the variant is unique or matches.
-        null,
-        // This is the attribute on the proband variant that will store the
-        // zygosity in the case where the variant match
-        null,
-    	// This is the callback function called every time we find the same variant
-    	// in both sets. Here we take the father variant's zygosity and store it in the
-    	// proband's variant for further sorting/display in the feature matrix.
-        function(variantA, variantB) {
-        	variantA.uasibsZygosity[vcUnaffectedSib.name] = variantB.zygosity;
-        },
-        function(variantA, variantB) {
-        	if (variantA) {
-        		variantA.uasibsZygosity[vcUnaffectedSib.name] = "none";
-        	}
-        }
-     );			
 
 
 
@@ -1439,16 +1528,17 @@ function compareVariantsToUnaffectedSibs(vcUnaffectedSib, callback) {
 function filterVariants() {
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
-			var filteredVcfData = variantCard.filterVariants();
-	  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);
 
-	  		if (variantCard.getRelationship() == 'proband') {
-	  			var filteredFBData = variantCard.filterFreebayesVariants();
-	  			if (filteredFBData != null) {
-		  			variantCard.fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
-	  			}
-	  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
-			}
+			var filteredVcfData = variantCard.filterVariants();
+	  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);				
+	  		
+  			var filteredFBData = variantCard.filterFreebayesVariants();
+  			if (filteredFBData != null) {
+	  			variantCard.fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
+  			}
+  			if (variantCard.getRelationship() == 'proband') {
+		  		variantCard.fillFeatureMatrix(regionStart, regionEnd);
+  			}
 		}
 
 	});
