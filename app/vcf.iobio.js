@@ -178,7 +178,7 @@ var effectCategories = [
     vcfFile = null;
     tabixFile = null;
     if (url != null && url != '') {
-      if (!url.toLowerCase().endsWith(".vcf.gz")) {
+      if (endsWith(url.toLowerCase(), ".vcf.gz") == false) {
         showUrlFileFormatMessage();
         success = false;
       } 
