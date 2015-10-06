@@ -189,7 +189,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];	
 
-	variantCard.onBamFilesSelected(event, function(bamFileName) {
+	variantCard.onBamFilesSelected(event).then(function(bamFileName) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
 		enableLoadButton();

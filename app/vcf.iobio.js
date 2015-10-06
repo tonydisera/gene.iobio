@@ -570,6 +570,178 @@ var effectCategories = [
     }
     
   }
+  
+  // NEW
+  exports.promiseGetVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName) {
+    var me = this;
+    return new Promise( function(resolve, reject) {
+
+      if (sourceType == SOURCE_TYPE_URL) {
+        me._getRemoteVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, 
+          function(annotatedData, data) {
+            if (annotatedData && data) {
+              resolve([annotatedData, data]);
+            } else {
+              reject();
+            }
+          });
+      } else {
+        me._getLocalVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName,
+          function(annotatedData, data) {
+            if (annotatedData && data) {
+              resolve([annotatedData, data]);
+            } else {
+              reject();
+            }
+          });
+      }
+
+    });
+  }
+
+  // NEW
+  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback) {
+    var me = this;
+
+    // The variant region may span more than the specified region.
+    // We will be keeping track of variant depth by relative position
+    // of the region start, so to prevent a negative index, we will
+    // keep track of the region start based on the variants.
+    var variantRegionStart = regionStart;
+
+    var vcfObjects = [];
+    vcfObjects.length = 0;
+
+    var headerRecords = [];
+    vcfReader.getHeader( function(header) {
+       headerRecords = header.split("\n");
+
+    });
+
+    // Get the vcf records for this region
+    vcfReader.getRecords(refName, regionStart, regionEnd, function(records) {
+        
+        var allRecs = headerRecords.concat(records);
+
+        me.promiseAnnotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName)
+        .then( function(data) {
+            callback(data[0], data[1]);
+        }, function(error) {
+          console.log("_getLocalVariantsImpl() error - " + error);
+        });
+
+
+    });
+
+
+
+  }
+
+  // NEW
+  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback) {
+    var me = this;
+
+    var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
+    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
+    if (refName.indexOf('chr') == 0) {
+      refFile = "./data/references_hg19/" + refName + ".fa";
+    } else {
+      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+    }    
+    
+    // TODO - Need to generalize to grab reference names for species instead of hardcoding
+    var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
+
+    // If multi-sample vcf, select only the genotype field for the specified sample
+    var nextUrl = "";
+    if (sampleName != null && sampleName != "") {
+      nextUrl = encodeURI( vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+    } else {
+      nextUrl = contigAppenderUrl;
+    }
+
+    // normalize variants
+    var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(nextUrl));
+    
+    // get allele frequencies from 1000G and ExAC
+    var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
+
+    var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
+
+    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
+    
+    // Connect to the snpEff server    
+    var client = BinaryClient(snpEffServer);
+    
+    var annotatedData = "";
+    client.on('open', function(stream){
+
+        // Run the command
+        var stream = client.createStream({event:'run', params : {'url':url}});
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           annotatedData += data;
+        });
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('error', function(data, options) {
+           console.log(data);
+        });
+
+        // Whenall of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          var annotatedRecs = annotatedData.split("\n");
+          var vcfObjects = [];
+          var contigHdrRecFound = false;
+
+          annotatedRecs.forEach(function(record) {
+            if (record.charAt(0) == "#") {
+              // bypass header rec
+            } else {
+
+              // Parse the vcf record into its fields
+              var fields = record.split('\t');
+              var pos    = fields[1];
+              var id     = fields[2];
+              var ref    = fields[3];
+              var alt    = fields[4];
+              var qual   = fields[5];
+              var filter = fields[6];
+              var info   = fields[7];
+              var format = fields[8];
+              var genotypes = [];
+              for (var i = 9; i < fields.length; i++) {
+                genotypes.push(fields[i]);
+              }
+
+              // Turn vcf record into a JSON object and add it to an array
+              var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                               'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+              vcfObjects.push(vcfObject);
+            }
+          });
+
+           // Parse the vcf object into a variant object that is visualized by the client.
+          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+
+          callback(annotatedRecs, results);          
+
+        }); // end - stream.end()
+    });  // end - client.open()
+
+  
+  }
+
+
   // NEW
   exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     if (sourceType == SOURCE_TYPE_URL) {
@@ -804,6 +976,54 @@ var effectCategories = [
 
 
   // NEW
+  exports.promiseAnnotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName) {
+    var me = this;
+
+    return new Promise( function(resolve, reject) {
+      // For each vcf records, call snpEff to get the annotations.
+      // Each vcf record returned will have an EFF field in the 
+      // info field.
+      me._annotateVcfRegion(records, refName, sampleName, function(annotatedData) {
+
+        var annotatedRecs = annotatedData.split("\n");
+        var vcfObjects = [];
+
+        annotatedRecs.forEach(function(record) {
+          if (record.charAt(0) == "#") {
+            // Bypass header
+          } else {
+
+            // Parse the vcf record into its fields
+            var fields = record.split('\t');
+            var pos    = fields[1];
+            var id     = fields[2];
+            var ref    = fields[3];
+            var alt    = fields[4];
+            var qual   = fields[5];
+            var filter = fields[6];
+            var info   = fields[7];
+            var format = fields[8];
+            var genotypes = [];
+            for (var i = 9; i < fields.length; i++) {
+              genotypes.push(fields[i]);
+            }
+
+
+            // Turn vcf record into a JSON object and add it to an array
+            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                             'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
+            vcfObjects.push(vcfObject);
+          }
+        });
+
+        // Parse the vcf object into a variant object that is visualized by the client.
+        var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+        resolve([annotatedRecs, results]);
+      });
+    });
+  }
+
+  // NEW
   exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
     var me = this;
 
@@ -858,162 +1078,146 @@ var effectCategories = [
     );
 
   }
-
-  // NEW
-  exports.getClinvarRecords = function(records, refName, regionStart, regionEnd, callback, callbackLoaded, callbackBegin, callbackFailure) {
+    // NEW
+  exports.promiseGetClinvarRecords = function(variants, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
     var me = this;
-    if (callbackBegin) {
-      callbackBegin();
-    }
-    var batchSize = 100;
-    me.clinvarIterCount = 0;
-    // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
-    // repeating until all variants have been processed.
-    var numberOfBatches = d3.round(records.length / batchSize);
-    for( var i = 0; i < numberOfBatches; i++) {
-      var start = i * batchSize;
-      var end = start + batchSize;
-      var batchOfRecords = records.slice(start, end <= records.length ? end : records.length);
-      me.getClinvarRecordsImpl(batchOfRecords, refName, regionStart, regionEnd, callback, callbackLoaded, callbackFailure, numberOfBatches);
-    }
+    
+    return new Promise( function(resolve, reject) {
+      var batchSize = 100;
+      me.clinvarIterCount = 0;
+      // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
+      // repeating until all variants have been processed.
+      var numberOfBatches = d3.round(variants.length / batchSize);
+      if (numberOfBatches == 0) {
+        numberOfBatches = 1;
+      }
+      for( var i = 0; i < numberOfBatches; i++) {
+        var start = i * batchSize;
+        var end = start + batchSize;
+        var batchOfVariants = variants.slice(start, end <= variants.length ? end : variants.length);
+        
+        me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
+        .then(  function() {
+          resolve();
+        }, function(error) {
+          reject();
+        });
+      }
+
+    });
   }  
 
   // NEW
-  exports.getClinvarRecordsImpl = function(records, refName, regionStart, regionEnd, callback, finalCallback, callbackFailure, numberOfBatches) {
+  exports.promiseGetClinvarRecordsImpl = function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
     var me = this;
 
-    // Strip the ref name.
-    if (refName.indexOf("chr") == 0) {
-      tokens = refName.split("chr");
-      if (tokens.length > 1) {
-        refName = tokens[1];
-      }
-    }
+    return new Promise( function(resolve, reject) {
 
-    // Multiallelic input vcf records were assigned a number submission
-    // index.  Create a map that ties the vcf record number to the
-    // clinvar records number
-    var sourceIndex = -1;
-    var clinvarIndex = 0;
-    var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
-    url += "(" + refName + "[Chromosome]" + " AND ";
-    // clinvarToSourceMap = new Object();
-    records.forEach(function(record) {
-      if (record.charAt(0) == "#") {
-          // Bypass header
-      } else {
+      // Multiallelic input vcf records were assigned a number submission
+      // index.  Create a map that ties the vcf record number to the
+      // clinvar records number
+      var sourceIndex = -1;
+      var clinvarIndex = 0;
+      var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
+      url += "(" + refName + "[Chromosome]" + " AND ";
+      // clinvarToSourceMap = new Object();
+      variants.forEach(function(variant) {
+       
+        var pos    = variant.start;
+        var ref    = variant.ref;
+        var alt    = variant.alt;
 
-          // Parse the vcf record into its fields
-          var fields = record.split('\t');
-          var pos    = fields[1];
-          var ref    = fields[3];
-          var alt    = fields[4];
+        if (pos == null || ref == null || alt == null) {
 
-         
+        } else {
+          // sourceIndex++;
+          // // Figure out if this is multiallelic and increment
+          // // the index accordinging.  
 
-          if (pos == null || ref == null || alt == null) {
+          // var altTokens = alt.split(",");
+          // altTokens.forEach(function(altToken) {
+          //   clinvarIndex++;
+          //   clinvarToSourceMap[clinvarIndex] = sourceIndex;
+          // });            
 
-          } else {
-            // sourceIndex++;
-            // // Figure out if this is multiallelic and increment
-            // // the index accordinging.  
+          // Get rid of the left most anchor base for insertions and
+          // deletions for accessing clinvar 
+          var clinvarStart = +pos;
+          if (alt == '.') {
 
-            // var altTokens = alt.split(",");
-            // altTokens.forEach(function(altToken) {
-            //   clinvarIndex++;
-            //   clinvarToSourceMap[clinvarIndex] = sourceIndex;
-            // });            
+          } else if (ref == '.') {
 
-            // Get rid of the left most anchor base for insertions and
-            // deletions for accessing clinvar 
-            var clinvarStart = +pos;
-            if (alt == '.') {
+          } else if (ref.length > alt.length) {
+            // deletion
+            clinvarStart++;
+          } else if (alt.length > ref.length) {
+            // insertion
+            clinvarStart++;
+          } 
 
-            } else if (ref == '.') {
-
-            } else if (ref.length > alt.length) {
-              // deletion
-              clinvarStart++;
-            } else if (alt.length > ref.length) {
-              // insertion
-              clinvarStart++;
-            } 
-
-
-            url += clinvarStart + ',' 
-          }
-          
-      }
-    });
-
-    url = url.slice(0,url.length-1) + '[c37])'
-
-
-    var clinvarVariants = null;
-    $.ajax( url )
-      .done(function(data) {        
-        var webenv = data["esearchresult"]["webenv"];
-        var queryKey = data["esearchresult"]["querykey"];
-        var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
-        $.ajax( summaryUrl )
-          .done(function(sumData) { 
-            me.clinvarIterCount++;
-            var isFinal = false;
-            if (me.clinvarIterCount == numberOfBatches) {
-              isFinal = true;
-            }
-            if (sumData.result == null) {
-              if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
-                sumData.esummaryresult.forEach( function(message) {
-                  //console.log(message);
-                });
-              }
-              //console.log("No data returned from clinvar request " + summaryUrl);
-              sumData.result = {uids: []};
-              callback(sumData.result );
-              if (isFinal) {
-                finalCallback();
-              }
-              
-            } else {
-              var sorted = sumData.result.uids.sort(function(a,b){ 
-                var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                if ( aStart > bStart) 
-                  return 1; 
-                else 
-                  return -1; 
-              })
-              sumData.result.uids = sorted
-              if (callback) {
-                callback( sumData.result );
-              }
-              if (isFinal) {
-                finalCallback();
-              }
-
-            }
-          })
-          .fail(function() {
-            console.log('Error: clinvar http request failed to get summary data');
-            if (callbackFailure) {
-              callbackFailure();
-            }
-            if (finalCallback) {
-              finalCallback();              
-            }
-          })
-      })
-      .fail(function() {
-        console.log('Error: clinvar http request failed to get IDs');
-        if (callbackFailure) {
-          callbackFailure();
+          url += clinvarStart + ',' 
         }
-        if (finalCallback) {
-          finalCallback();              
-        }
+      });
 
-      })
+      url = url.slice(0,url.length-1) + '[c37])'
+
+      var clinvarVariants = null;
+      $.ajax( url )
+        .done(function(data) {        
+          var webenv = data["esearchresult"]["webenv"];
+          var queryKey = data["esearchresult"]["querykey"];
+          var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
+          $.ajax( summaryUrl )
+            .done(function(sumData) { 
+              me.clinvarIterCount++;
+              var isFinal = false;
+              if (me.clinvarIterCount == numberOfBatches) {
+                isFinal = true;
+              }
+              if (sumData.result == null) {
+                if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
+                  sumData.esummaryresult.forEach( function(message) {
+                    //console.log(message);
+                  });
+                }
+                //console.log("No data returned from clinvar request " + summaryUrl);
+                sumData.result = {uids: []};
+                clinvarLoadVariantsFunction(sumData.result);
+                if (isFinal) {
+                  resolve();
+                }
+                
+              } else {
+                var sorted = sumData.result.uids.sort(function(a,b){ 
+                  var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                  var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                  if ( aStart > bStart) 
+                    return 1; 
+                  else 
+                    return -1; 
+                })
+                sumData.result.uids = sorted
+                if (clinvarLoadVariantsFunction) {
+                  clinvarLoadVariantsFunction(sumData.result);
+                }
+                if (isFinal) {
+                  resolve();
+                }
+
+              }
+            })
+            .fail(function() {
+              console.log('Error: clinvar http request failed to get summary data');
+              reject('Error: clinvar http request failed to get summary data');
+            })
+        })
+        .fail(function() {
+          console.log('Error: clinvar http request failed to get IDs');
+          reject('Error: clinvar http request failed to get IDs');
+
+        })
+      });
+
    
   }
 
@@ -1615,7 +1819,8 @@ var effectCategories = [
   }
 
 
-  exports.compareVcfRecords = function(variants1, variants2,  callback, comparisonAttr, onMatchCallback, onNoMatchCallback) {
+  exports.compareVcfRecords = function(variants1, variants2, comparisonAttr, onMatchFunction, onNoMatchFunction) {
+    
     var set1Label = 'unique1';
     var set2Label = 'unique2';
     var commonLabel = 'common';
@@ -1680,34 +1885,34 @@ var effectCategories = [
           variant1[comparisonAttribute] =  commonLabel;
           variant2[comparisonAttribute] =  commonLabel;
 
-          if (onMatchCallback) {
-            onMatchCallback(variant1, variant2);
+          if (onMatchFunction) {
+            onMatchFunction(variant1, variant2);
           }
           idx1++;
           idx2++;
         } else if (refAlt1 < refAlt2) {
           variant1[comparisonAttribute] = set1Label;
-          if (onNoMatchCallback) {
-            onNoMatchCallback(variant1, null);
+          if (onNoMatchFunction) {
+            onNoMatchFunction(variant1, null);
           }
           idx1++;
         } else {
           variant2[comparisonAttribute] = set2Label;
-          if (onNoMatchCallback) {
-            onNoMatchCallback(null, variant2);
+          if (onNoMatchFunction) {
+            onNoMatchFunction(null, variant2);
           }
           idx2++;
         }
       } else if (variant1.start < variant2.start) {
         variant1[comparisonAttribute] = set1Label;
-        if (onNoMatchCallback) {
-            onNoMatchCallback(variant1, null);
+        if (onNoMatchFunction) {
+            onNoMatchFunction(variant1, null);
         }
         idx1++;
       } else if (variant2.start < variant1.start) {
         variant2[comparisonAttribute] = set2Label;
-        if (onNoMatchCallback) {
-            onNoMatchCallback(null, variant2);
+        if (onNoMatchFunction) {
+            onNoMatchFunction(null, variant2);
         }
         idx2++;
       }
@@ -1722,8 +1927,8 @@ var effectCategories = [
       for(x = idx1; x < features1.length; x++) {
         var variant1 = features1[x];
         variant1[comparisonAttribute] = set1Label;
-        if (onNoMatchCallback) {
-            onNoMatchCallback(variant1, null);
+        if (onNoMatchFunction) {
+            onNoMatchFunction(variant1, null);
         }
       }
     } 
@@ -1731,13 +1936,13 @@ var effectCategories = [
       for(x = idx2; x < features2.length; x++) {
         var variant2 = features2[x];
         variant2[comparisonAttribute] = set2Label;
-        if (onNoMatchCallback) {
-            onNoMatchCallback(null, variant2);
+        if (onNoMatchFunction) {
+            onNoMatchFunction(null, variant2);
         }        
       }
     } 
 
-    callback();
+
 
   };
 

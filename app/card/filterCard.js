@@ -390,32 +390,32 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 
 	d3.selectAll(".impact").each( function(d,i) {
 		var impact = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + impact)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".type").each( function(d,i) {
 		var type = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + type)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + type)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".zygosity").each( function(d,i) {
 		var zygosity = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + zygosity)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + zygosity)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".sift").each( function(d,i) {
 		var sift = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + sift)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + sift)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".polyphen").each( function(d,i) {
 		var polyphen = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + polyphen)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + polyphen)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".regulatory").each( function(d,i) {
 		var reg = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + reg)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + reg)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 
@@ -424,7 +424,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	var values = this.annotationScheme == 'snpEff' ? this.snpEffEffects : this.vepConsequences;
 	var field  = this.annotationScheme == 'snpEff' ? 'effect' : 'vepConsequence';
 	for (key in values) {
-		var count = d3.selectAll('#vcf-variants .variant')
+		var count = d3.selectAll('#vcf-track .variant')
 		              .filter( function(d,i) {
 		              	var match = false; 
 		              	for (ef in d[field]) {
@@ -447,12 +447,12 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	this.initFilterListeners();
 	d3.selectAll(".afexaclevel").each( function(d,i) {
 		var afexaclevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + afexaclevel + ',' + '#fb-variants .variant.' + afexaclevel)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + afexaclevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".af1000glevel").each( function(d,i) {
 		var af1000glevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + af1000glevel)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	$("#af-range-filter").removeClass("hide");
