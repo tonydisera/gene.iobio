@@ -2384,6 +2384,10 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
 	var coord = gene.chr + ":" + variant.start;
 	var refalt = variant.ref + "->" + variant.alt;
+	if (variant.ref == '' && variant.alt == '') {
+		refalt = '(' + variant.len + ' bp)';
+	}
+
 
 	var clinvarUrl = "";
 	if (variant.clinVarUid != null && variant.clinVarUid != '') {

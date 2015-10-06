@@ -705,7 +705,6 @@ section {
 
 }
 #matrix-track {
-  overflow-x: scroll;
   width: 100%;
   display: table-cell;
 }
