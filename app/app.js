@@ -28,6 +28,7 @@ var GENE_REGION_BUFFER_MAX = 50000;
 
 // Transcript data and chart
 var gene = '';
+var geneNames = [];
 var loadedUrl = false;
 var selectedTranscript = null;
 var selectedTranscriptCodingRegions = [];
@@ -96,6 +97,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
 		variantCardTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/geneBadgeTemplate.hbs').then(function(compiledTemplate) {
+		geneBadgeTemplate = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		init();
@@ -131,6 +135,28 @@ function init() {
 	// Initialize data card
 	dataCard = new DataCard();
 	dataCard.init();
+
+	// Stop event propogation to get genes dropdown
+	// so that clicks in text area for copy/paste
+	// don't cause dropdown to close
+	$('#get-genes-dropdown ul li#copy-paste-li').on('click', function(event){
+	    //The event won't be propagated to the document NODE and 
+	    // therefore events delegated to document won't be fired
+	    event.stopPropagation();
+	});
+
+	// Detect when get genes dropdown opens so that
+	// we can prime the textarea with the genes already
+	// selected
+	$('#get-genes-dropdown').click(function () {
+	    if($(this).hasClass('open')) {
+	        // dropdown just closed
+	    } else {
+	    	// dropdown will open
+	    	initCopyPasteGenes();
+	    }
+	});
+
 
 	
 	// Set up the gene search widget
@@ -487,6 +513,176 @@ function cacheCodingRegions() {
 
 }
 
+function initCopyPasteGenes() {
+	if (geneNames.length == 0 || geneNames == null) {
+		$('#genes-to-copy').val("");
+	} else {
+		$('#genes-to-copy').val(geneNames.join(", "));
+	}
+}
+
+function copyPasteGenes() {
+	var geneNameList = $('#genes-to-copy').val().split(" ").join("").split(",");
+
+	geneNames = [];
+	geneNameList.forEach( function(geneName) {
+		if (geneName.trim().length > 0) {
+			geneNames.push(geneName.trim().toUpperCase());
+		}
+	});
+
+	// Remove gene badges not specified in the text area
+	var geneBadgesToRemove = [];
+	$('#gene-badge-container #gene-badge').each( function(index, value) {
+		var badge =  $(this);
+		var badgeGeneName = badge.find('#gene-badge-name').text();
+		
+		// If this badge does not correspond to a name in the gene list,
+		// flag it to be removed		
+		if (geneNames.indexOf(badgeGeneName) < 0) {
+			geneBadgesToRemove.push(badgeGeneName);
+		}
+
+	});
+	geneBadgesToRemove.forEach( function(geneName) {
+		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+		$(selector).parent().remove();
+	});
+
+
+
+	if (geneNames.length > 0) {
+		$('#gene-badge-container').css("margin-top", "2px");
+	} else {
+		$('#gene-badge-container').css("margin-top", "10px");		
+	}
+
+	// Create a gene badge for each gene name in the comma separated list.
+	for(var i = 0; i < geneNames.length; i++) {
+		var name = geneNames[i];	
+		// Only add the gene badge if it does not already exist
+		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
+		if ($(existingBadge).length == 0) {
+			$('#gene-badge-container').append(geneBadgeTemplate());
+
+			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
+			$(newBadgeSelector).find('#gene-badge-name').text(name);
+
+			// If this is the first gene in the list, show the checked glyph; otherwise
+			// all other badges get the refresh glyph.
+			if (i == 0) {
+				$(newBadgeSelector).find('#gene-badge-circle').addClass("btn-success");
+				$(newBadgeSelector).find('#gene-badge-circle').addClass("mdi-action-done");
+			} else {
+				$(newBadgeSelector).find('#gene-badge-circle').addClass("btn-default");
+				$(newBadgeSelector).find('#gene-badge-circle').addClass("mdi-navigation-refresh");
+			}
+		}
+
+	}
+	// Select the first gene in the list
+	if (geneNames.length > 0) {
+		selectGene(geneNames[0]);
+	}
+
+	$('#get-genes-dropdown .btn-group').removeClass('open');
+}
+
+
+function removeGeneBadge(badgeElement) {
+	var theGeneName = $(badgeElement).parent().find("#gene-badge-name").text();
+	var index = geneNames.indexOf(theGeneName);
+	if (index >= 0) {
+		geneNames.splice(index, 1);
+		$(badgeElement).parent().remove();
+	}
+
+}
+
+function addGeneBadge(geneName) {
+	var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+	if ($(selector).length == 0) {
+		$('#gene-badge-container').append(geneBadgeTemplate());
+		$("#gene-badge-container #gene-badge:last-child").find('#gene-badge-name').text(geneName);
+		$(selector).parent().find('#gene-badge-circle').addClass("btn-success");
+		$(selector).parent().find('#gene-badge-circle').addClass("mdi-action-done");
+
+		geneNames.push(geneName);
+
+		$("#gene-badge.selected").removeClass("selected");
+		$(selector).parent().addClass("selected");
+	
+	}
+
+}
+
+function setGeneBadgeDangerCount(dangerCounts) {
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent();
+	geneBadge.find('#gene-badge-circle').removeClass('btn-success');
+	geneBadge.find('#gene-badge-circle').removeClass('mdi-action-done');
+	geneBadge.find('#gene-badge-circle').removeClass('btn-default');
+	geneBadge.find('#gene-badge-circle').removeClass('mdi-navigation-refresh');
+
+	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_HIGH");
+	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_MODERATE");
+	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_MODIFIER");
+	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_LOW");
+
+	var done = false;
+	for (impactClass in dangerCounts) {
+		if (dangerCounts[impactClass] != 0 && !done) {
+			geneBadge.find('#gene-badge-circle #gene-badge-danger-count').addClass('impact_' + impactClass);
+			geneBadge.find('#gene-badge-circle #gene-badge-danger-count').text(dangerCounts[impactClass]);
+			done = true;
+		}
+	}
+}
+
+function selectGeneBadge(badgeElement) {
+	var theGeneName = $(badgeElement).parent().parent().find("#gene-badge-name").text();
+
+	var badgeDangerCount = $(badgeElement).parent().parent().find('#gene-badge-danger-count').text();
+
+	if (badgeDangerCount == null || badgeDangerCount == '') {
+		$(badgeElement).parent().parent().find('#gene-badge-circle').addClass('btn-success');
+		$(badgeElement).parent().parent().find('#gene-badge-circle').addClass('mdi-action-done');
+	}
+	selectGene(theGeneName);
+}
+
+function selectGene(geneName) {
+	$('.typeahead.tt-input').val(geneName);
+
+	$("#gene-badge.selected").removeClass("selected");
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent();
+	geneBadge.addClass("selected");
+
+
+	var url = geneiobio_server + 'api/gene/' + geneName;
+	
+	$.ajax({
+	    url: url,
+	    jsonp: "callback",
+	    type: "GET",
+	    dataType: "jsonp",
+	    success: function( response ) {
+
+	    	// We have successfully return the gene model data.
+	    	// Load all of the tracks for the gene's region.
+	    	window.gene = response[0];		
+
+	    	// Save off the original start and end before we adjust for upstream/downstream regions
+	    	window.gene.startOrig = window.gene.start;
+	    	window.gene.endOrig = window.gene.end;  
+	    	window.selectedTranscript = null;
+
+	    	updateUrl('gene', window.gene.gene_name);
+
+	    	loadTracksForGene();
+	    }
+	 });
+}
+
 
 function adjustGeneRegionBuffer() {
 	if (+$('#gene-region-buffer-input').val() > GENE_REGION_BUFFER_MAX) {
@@ -615,6 +811,9 @@ function loadGeneWidget() {
 		    	// Load all of the tracks for the gene's region.
 		    	window.gene = response[0];		
 
+		    	// Add the gene badge
+		    	addGeneBadge(window.gene.gene_name);					
+			    	
 		    	// Save off the original start and end before we adjust for upstream/downstream regions
 		    	window.gene.startOrig = window.gene.start;
 		    	window.gene.endOrig = window.gene.end;    
@@ -633,15 +832,13 @@ function loadGeneWidget() {
 					}
 
 		    		// Autoload data specified in url
-					loadUrlSources();						
+					loadUrlSources();
+
+					enableCallVariantsButton();						
 		    	} else {
 	
 					$('#tourWelcome').removeClass("open");
 					
-			    	// Set all of the variant cards as "dirty"
-			    	variantCards.forEach(function(variantCard) {
-			    		variantCard.setDirty();
-			    	});
 			    	loadTracksForGene();
 			    	// add gene to url params
 			    	updateUrl('gene', window.gene.gene_name);
@@ -785,7 +982,11 @@ function loadTracksForGene(bypassVariantCards) {
 	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
 				variantCard.hide();
 			} else {
-			 	variantCard.loadTracksForGene(filterCard.classifyByImpact);
+			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function(dangerCounts) {
+			 		if (variantCard.getRelationship() == 'proband') {
+			 			setGeneBadgeDangerCount(dangerCounts);
+			 		}
+			 	});
 			}
 		});
 	}
@@ -877,7 +1078,6 @@ function addVariantCard() {
 
 	var cardIndex = variantCards.length - 1;
 	var defaultName = " ";
-	variantCard.setName(defaultName);
 
 	// TODO:  Should really test to make sure that first card is proband, but
 	var cardSelectorString = null;
@@ -894,6 +1094,8 @@ function addVariantCard() {
 
 
 	variantCard.init($(cardSelectorString), d3CardSelector, cardIndex);
+	variantCard.setName(defaultName);
+
 
 }
 
@@ -902,6 +1104,21 @@ function callVariants() {
 	variantCards.forEach(function(vc) {
 		vc.callVariants(regionStart, regionEnd);
 	});
+}
+
+function enableCallVariantsButton() {
+	var bamCount = 0;
+	variantCards.forEach( function (vc) {
+		if (vc.isBamLoaded()) {
+			bamCount++;
+		} 
+	});
+	if (bamCount > 0) {
+		$('#button-find-missing-variants').removeClass("hide");
+	} else {
+		$('#button-find-missing-variants').addClass("hide");
+	}
+
 }
 
 function loadUnaffectedSibs(unaffectedSibs) {
@@ -965,7 +1182,7 @@ function determineInheritance(promise) {
 				// feature matrix.
 				compareVariantsToPedigree(function() {
 
-					determineMaxAlleleCount(probandVariantCard.getVcfData());
+					probandVariantCard.determineMaxAlleleCount();
 					
 					probandVariantCard.onVariantDataChange();
 
@@ -979,7 +1196,7 @@ function determineInheritance(promise) {
 				var filterPanelWidth = $('#filter-track').width();
 				$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
-				determineMaxAlleleCount(probandVariantCard.getVcfData());
+				probandVariantCard.determineMaxAlleleCount();
 				
 				probandVariantCard.onVariantDataChange();			
 			}
@@ -1033,7 +1250,7 @@ function promiseFullTrioCalledVariants() {
 	return new Promise( function(resolve, reject) {
 		var loaded = {};
 		variantCards.forEach(function(vc) {
-			if (vc.isLoaded() && vc.fbData != null) {
+			if (vc.isLoaded() && vc.variantsHaveBeenCalled()) {
 				loaded[vc.getRelationship()] = vc;
 			}
 		});
@@ -1059,43 +1276,19 @@ function determineUnaffectedSibStatus() {
 	})
 	nextCompareToUnaffectedSib();
 
-	loadUnaffectedSibsStatus();
+	getProbandVariantCard().determineUnaffectedSibsStatus();
 }
 
 function nextCompareToUnaffectedSib() {
 	if (variantCardsUnaffectedSibsTransient.length > 0) {
 		variantCard = variantCardsUnaffectedSibsTransient.shift();
 
-		//variantCard.loadVariantsOnly( function(vc) {
+		variantCard.loadVariantsOnly( function(vc) {
 			promiseComparedToUnaffectedSib(variantCard).then( function() {
 				nextCompareToUnaffectedSib();
 			});
-		//});		
+		});		
 	} 
-}
-
-function loadUnaffectedSibsStatus() {
-	getProbandVariantCard().vcfData.features.forEach( function(variant) {
-		 variant.ua = "none";
-		 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
-		 	 var matchesCount = 0;
-		 	 var matchesHomCount = 0;
-			 Object.keys(variant.uasibsZygosity).forEach( function(key) {
-			 	matchesCount++;
-			 	var sibZygosity = variant.uasibsZygosity[key];
-			 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
-				 	matchesHomCount++;
-			 	}
-			 });
-
-			 if (matchesHomCount > 0 ) {
-			 	variant.ua = "none";
-			 } else {
-			 	variant.ua = "not_recessive_in_sibs";
-			 }  	 	 
-		 } 
-	});
-
 }
 
 function enableLoadButton() {
@@ -1152,26 +1345,6 @@ function hideCircleRelatedVariants() {
 }
 
 
-function determineMaxAlleleCount(theVcfData) {
-	var maxAlleleCount = 0;
-	var setMaxAlleleCount = function(refCount, altCount) {
-		if (refCount != null && altCount != null) {
-			if ((+refCount + +altCount) > maxAlleleCount) {
-				maxAlleleCount = +refCount + +altCount;
-			}
-		}
-	};
-
-	theVcfData.features.forEach(function(variant) {
-		setMaxAlleleCount(variant.genotypeRefCount, variant.genotypeAltCount);
-		setMaxAlleleCount(variant.genotypeRefCountMother, variant.genotypeAltCountMother);
-		setMaxAlleleCount(variant.genotypeRefCountFather, variant.genotypeAltCountFather);
-	});
-	theVcfData.maxAlleleCount = maxAlleleCount;
-}
-
-
-
 
 
 function orderVariantsByPosition(a, b) {
@@ -1208,7 +1381,7 @@ function compareVariantsToPedigree(callback) {
 		}
 	});
 
-	var theVcfData = probandVariantCard.getVcfData();
+	var theVcfData = probandVariantCard.model.getVcfData();
 
 	// Only continue with comparison if mother and father
 	// variant cards are present
@@ -1314,7 +1487,7 @@ function compareVariantsToPedigree(callback) {
 function promiseComparedToUnaffectedSib(vcUnaffectedSib) {
 
 	return new Promise( function(resolve, reject) {
-		var theVcfData = getProbandVariantCard().getVcfData();
+		var theVcfData = getProbandVariantCard().model.getVcfData();
 
 		theVcfData.features.forEach(function(variant) {
 			if (variant.uasibsZygosity) {
@@ -1365,13 +1538,9 @@ function filterVariants() {
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
 
-			var filteredVcfData = variantCard.filterVariants();
-	  		variantCard.fillVariantChart(filteredVcfData, regionStart, regionEnd);				
-	  		
-  			var filteredFBData = variantCard.filterFreebayesVariants();
-  			if (filteredFBData != null) {
-	  			variantCard.fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
-  			}
+			variantCard.filterVariants();
+  			variantCard.filterCalledVariants();
+  			
   			if (variantCard.getRelationship() == 'proband') {
 		  		variantCard.fillFeatureMatrix(regionStart, regionEnd);
   			}

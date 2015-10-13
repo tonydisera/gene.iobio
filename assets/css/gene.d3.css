@@ -34,8 +34,7 @@
 }
 
 #zoom-region-chart.ibo-gene .cds.danger, #zoom-region-chart.ibo-gene .utr.danger { 
-  fill: rgba(226, 37, 37, .6);
-  stroke: rgba(226,37,37,.6);
+  fill:  rgba(224, 11, 11, 0.6);
 }
 #transcript-menu-item.ibo-gene .transcript.selected .name { 
   font-style: bold;

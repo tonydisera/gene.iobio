@@ -1,15 +1,27 @@
 function FilterCard() {
 	this.clickedAnnotIds = new Object();
 	this.annotsToInclude = new Object();
-	this.afMin = null;
-	this.afMax = null;
-	this.coverageMin = 10;
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
 	this.annotationScheme = "snpEff";
 	this.pathogenicityScheme = "clinvar";
 	this.afScheme = "exac";
 
+}
+
+FilterCard.prototype.getFilterObject = function() {
+	var afMin = $('#af-amount-start').val() != '' ? +$('#af-amount-start').val() / 100 : null;
+	var afMax = $('#af-amount-end').val()   != '' ? +$('#af-amount-end').val()   / 100 : null;
+
+	var filterObject = {
+		'coverageMin': +$('#coverage-min').val(),
+		'afMin': afMin,
+		'afMax': afMax,
+		'afScheme' : this.afScheme,
+		'annotsToInclude': this.annotsToInclude
+    };
+
+    return filterObject;
 }
 
 
@@ -349,7 +361,10 @@ FilterCard.prototype.disableFilters = function() {
 	$("#coverage-filter").addClass("hide");
 }
 
-FilterCard.prototype.enableClinvarFilters = function(theVcfData) {
+FilterCard.prototype.enableClinvarFilters = function(theVcfData) {	
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
 	
 	var clinvarVariantMap = {};
 	theVcfData.features.forEach( function(variant) {

@@ -133,6 +133,8 @@ DataCard.prototype.init = function() {
 		var unaffectedSibs = $("#unaffected-sibs-select").chosen().val();
 		window.loadUnaffectedSibs(unaffectedSibs);
 
+		window.enableCallVariantsButton();
+
 		window.loadTracksForGene();		
 	});
 
@@ -195,7 +197,6 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 		enableLoadButton();
 
 	});
-	variantCard.setDirty();
 
 }
 
@@ -215,9 +216,8 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector) {
 	this.setDataSourceName(panelSelector);
 	this.setDataSourceRelationship(panelSelector);
 
-	variantCard.setDirty();
 	variantCard.onBamUrlEntered(bamUrlInput.val());	
-	variantCard.loadBamDataSource(variantCard.getName());
+	variantCard.setName(variantCard.getName());
 
 	window.updateUrl('bam' + cardIndex, bamUrlInput.val());
 	enableLoadButton();
@@ -434,7 +434,6 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 		}
 
 	});
-	variantCard.setDirty();
 }
 
 
@@ -532,7 +531,6 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 				window.enableLoadButton();			
 			}
 
-			variantCard.setDirty();
 		} else {
 			window.disableLoadButton();
 		}

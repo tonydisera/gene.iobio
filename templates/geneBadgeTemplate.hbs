@@ -1,0 +1,24 @@
+<div id="gene-badge" style="display:inline-block;margin-right:7px;">
+	<div id="gene-badge-name" style="font-size:10px;padding-top:0px;margin-bottom:-2px">
+		<!-- gene name goes here -->
+	</div>
+	<div>
+	    <!-- Add one of these classes:  
+	          1. when no high/moderate impact variants: mdi-action-done        + btn-success
+	          2. when gene hasn't been loaded:          mdi-navigation-refresh + btn-default
+	     -->
+		<a id="gene-badge-circle" href="javascript:void(0)" 
+			onclick="selectGeneBadge(this)"
+			class="btn btn-fab btn-raised">
+	        <div id="gene-badge-danger-count">
+	           <!-- high, moderate impact count goes here -->
+		    </div>		
+		</a>
+	</div>
+	<a id="gene-badge-remove" href="javascript:void(0)" 
+	 	onclick="removeGeneBadge(this)"
+		class="btn btn-flatbtn-default" 
+		style="padding: 0;margin: 0;color: grey !important;font-size: 13px;line-height: .3;">
+	  <i class="mdi-content-clear"></i>
+	</a>
+</div>
