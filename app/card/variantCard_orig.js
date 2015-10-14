@@ -384,7 +384,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 		this.cardSelector.find("#fb-chart-label").addClass("hide");
 		this.cardSelector.find("#fb-separator").addClass("hide");
 		this.cardSelector.find("#fb-variants").addClass("hide");
-		this.cardSelector.find("#button-find-missing-variants").css("visibility", "hidden");
+		this.cardSelector.find("#button-find-missing-variants").addClass("hide");
 		this.cardSelector.find("#missing-variant-count-label").html("Call from alignments");
 		this.cardSelector.find("#missing-variant-count").html("");
 	} else {

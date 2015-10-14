@@ -780,6 +780,11 @@ section {
   display: block !important;
 }
 
+#button-find-missing-variants.hide {
+  visibility: hidden;
+  display: block !important;
+}
+
 
 .loader img {
   height: 22px;

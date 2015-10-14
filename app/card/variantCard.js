@@ -457,6 +457,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 	this.cardSelector.find('#no-variants-warning').addClass("hide");
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
+	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
 
 	if (this.isViewable()) {
 		filterCard.clearFilters();
@@ -777,7 +778,16 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 		  			// Enable the variant filters 
 				    filterCard.enableClinvarFilters(data);
+
+				    // Indicate that we have refreshed variants
 					me.onVariantDataChange();
+
+					// Show the 'Call from alignments' button if we a bam file/url was specified
+					if (me.isBamLoaded() && me.isViewable()) {
+						me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
+					} else {
+						me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
+					}	 				
 
 					window.refreshGeneBadges();
 
@@ -791,7 +801,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 				if (me.isViewable()) {
 					$('#filter-track').addClass("hide");
 				    $('#matrix-track').addClass("hide");
-				    $('#variant-control-track').addClass("hide");
+				    // todo $('#variant-control-track').addClass("hide");
 				    me.cardSelector.find("#vcf-track").addClass("hide");
 				    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
 				    me.cardSelector.find("#vcf-variant-count").text("");
@@ -851,7 +861,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
     $('#filter-and-rank-card').removeClass("hide");
     $('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
-    $('#variant-control-track').removeClass("hide");
+    // todo $('#variant-control-track').removeClass("hide");
 
    	this.d3CardSelector.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
 
@@ -872,7 +882,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 	this.cardSelector.find(".vcfloader").addClass("hide");
 	$('#filter-track').addClass("hide");
 	$('#matrix-track').addClass("hide");
-	$('#variant-control-track').addClass("hide");
+	// todo $('#variant-control-track').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning #message').text("Unable to find reference " + window.gene.chr + " in vcf header.");
 	this.cardSelector.find('#no-ref-found-warning').removeClass("hide");
 
@@ -884,7 +894,7 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	$('#filter-and-rank-card').removeClass("hide");
     $('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
-	$('#variant-control-track').removeClass("hide");
+	// todo $('#variant-control-track').removeClass("hide");
 
 	var filteredVcfData = this.model.isVcfLoaded() ? 
 	       this.filterVariants() 

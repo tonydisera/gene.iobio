@@ -311,8 +311,8 @@
 
             <!-- Buttons for editting gene list, done editting gene list -->
             <div id="manage-gene-list-buttons" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 3px;padding-right: 10px;">
-              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(true)" style="color:red !important;text-decoration:none !important">Edit</a>
-              <a class="hide" id="done-manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(false)" style="color:red !important;text-decoration: none !important;">Done</a>
+              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(true)" style="text-decoration:none !important">Edit</a>
+              <a class="hide" id="done-manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(false)" style="text-decoration: none !important;">Done</a>
             </div>
 
           </div>
@@ -396,7 +396,7 @@
                 Top 20
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
-                    <input id="matrixCheckboxTop20" type="checkbox" checked onchange="matrixCard.toggleMatrixCheckbox(this)">
+                    <input id="matrixCheckboxTop20" type="checkbox"  onchange="matrixCard.toggleMatrixCheckbox(this)">
                   </label>
                 </div>
               </div>
@@ -404,7 +404,7 @@
                 Top 100
                 <div class="checkbox checkbox-material-grey-400">
                   <label>
-                    <input id="matrixCheckboxTop100" type="checkbox" onchange="matrixCard.toggleMatrixCheckbox(this)">
+                    <input id="matrixCheckboxTop100" type="checkbox" checked onchange="matrixCard.toggleMatrixCheckbox(this)">
                   </label>
                 </div>
               </div>
@@ -450,7 +450,7 @@
         </div>
       </div>
 
-      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;height: 43px;" class="hide shadow-z-2">
+      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;height: 43px;" class="hide todo shadow-z-2">
 
         <div id="toolbar" style="width:100%"  >
                 <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
