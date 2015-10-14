@@ -85,14 +85,15 @@ body {
 }
 
 #gene-badge-danger-count {  
-  font-size: 12px;
-  padding-bottom: 6px;
+  font-size: 10px;
+  /*padding-bottom: 6px;*/
 }
 
 .btn.btn-fab {
   box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12);
 }
-#gene-badge.selected #gene-badge-circle{
+/*#gene-badge.selected #gene-badge-circle,*/
+#gene-badge.selected #gene-badge-button{
   box-shadow: 0 6px 10px rgba(0,0,0,.23),0 10px 30px rgba(0,0,0,.19); 
 }
 #gene-badge.selected #gene-badge-name,
@@ -100,6 +101,19 @@ body {
 #gene-badge.selected #gene-badge-remove i.mdi-content-clear
 {
   font-weight: bold; 
+}
+#gene-badge.visited #gene-badge-name {
+  color: #5d809d !important;
+}
+
+#gene-badge-container #gene-badge-remove .mdi-content-clear {
+  color: #E0292B !important;
+}
+#gene-badge-container #gene-badge-remove {
+  visibility: hidden;
+}
+#gene-badge-container.manage #gene-badge-remove {
+  visibility: visible;
 }
 
 .tooltip-title {
@@ -1173,10 +1187,12 @@ header {
 .impact_HIGH{
   fill: #E0292B !important;
   color: #E0292B !important;
+  font-weight: bold;
 } 
 .impact_MODERATE{
   fill: #F49A73 !important;
   color: #F49A73 !important;
+  font-weight: bold;
 } 
 .impact_MODIFIER{
   fill: rgba(244, 217, 155, 1);

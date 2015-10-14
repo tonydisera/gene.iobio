@@ -78,6 +78,10 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
+VariantCard.prototype.summarizeDanger = function() {
+	return this.model.summarizeDanger();
+}
+
 VariantCard.prototype.hide = function() {
 	this.cardSelector.addClass("hide");
 }
@@ -508,10 +512,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 		// loaded, the read coverage chart and called variant charts are
 		// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 		// chart is not rendered.
-		me._showVariants( regionStart, regionEnd, function() {
-			if (callback) {
-				callback(me.model.getDangerCounts());
-			}
+		me._showVariants( regionStart, regionEnd, function() {			
 			me._showBamDepth( regionStart, regionEnd, function() {
 			});
 		});
@@ -777,6 +778,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 		  			// Enable the variant filters 
 				    filterCard.enableClinvarFilters(data);
 					me.onVariantDataChange();
+
+					window.refreshGeneBadges();
 
 			    }
 

@@ -97,7 +97,7 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
 		variantCardTemplate = compiledTemplate;
 	}));
-	promises.push(promiseLoadTemplate('templates/geneBadgeTemplate.hbs').then(function(compiledTemplate) {
+	promises.push(promiseLoadTemplate('templates/geneButtonTemplate.hbs').then(function(compiledTemplate) {
 		geneBadgeTemplate = compiledTemplate;
 	}));
 
@@ -144,6 +144,14 @@ function init() {
 	    // therefore events delegated to document won't be fired
 	    event.stopPropagation();
 	});
+	// Enter in copy/paste textarea should function as submit
+	$('#get-genes-dropdown ul li#copy-paste-li').keyup(function(event){
+
+		if((event.which== 13) && ($(event.target)[0]== $("textarea#genes-to-copy")[0])) {
+			event.stopPropagation();
+			copyPasteGenes();
+		}
+	});
 
 	// Detect when get genes dropdown opens so that
 	// we can prime the textarea with the genes already
@@ -154,6 +162,10 @@ function init() {
 	    } else {
 	    	// dropdown will open
 	    	initCopyPasteGenes();
+	    	setTimeout(function() {
+			  $('#genes-to-copy').focus();
+			}, 0);
+	    	
 	    }
 	});
 
@@ -522,7 +534,22 @@ function initCopyPasteGenes() {
 }
 
 function copyPasteGenes() {
-	var geneNameList = $('#genes-to-copy').val().split(" ").join("").split(",");
+	var genesString = $('#genes-to-copy').val();
+	// trim newline at very end
+	genesString = genesString.replace(/\s*$/, "");
+	var geneNameList = null;
+	if (genesString.indexOf("\n") > 0) {
+		geneNameList = genesString.split("\n");
+	} else if (genesString.indexOf("\t") > 0 ) {
+		geneNameList = genesString.split("\t");
+	} else if (genesString.indexOf(",") > 0) {
+		geneNameList = genesString.split(" ").join("").split(",");
+	} else if (genesString.indexOf(" ") > 0) {
+		geneNameList = genesString.split(" ");
+	} else {
+		geneNameList = [];
+		geneNameList.push(genesString.trim());
+	}
 
 	geneNames = [];
 	geneNameList.forEach( function(geneName) {
@@ -546,15 +573,17 @@ function copyPasteGenes() {
 	});
 	geneBadgesToRemove.forEach( function(geneName) {
 		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
-		$(selector).parent().remove();
+		//$(selector).parent().remove();
+		$(selector).parent().parent().remove();
 	});
 
 
 
 	if (geneNames.length > 0) {
-		$('#gene-badge-container').css("margin-top", "2px");
+		$('#gene-badge-container #manage-gene-list').removeClass("hide");
 	} else {
-		$('#gene-badge-container').css("margin-top", "10px");		
+		$('#gene-badge-container #manage-gene-list').addClass("hide");
+		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
 	}
 
 	// Create a gene badge for each gene name in the comma separated list.
@@ -563,6 +592,7 @@ function copyPasteGenes() {
 		// Only add the gene badge if it does not already exist
 		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
 		if ($(existingBadge).length == 0) {
+			//$('#manage-gene-list-buttons').before(geneBadgeTemplate());
 			$('#gene-badge-container').append(geneBadgeTemplate());
 
 			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
@@ -571,11 +601,11 @@ function copyPasteGenes() {
 			// If this is the first gene in the list, show the checked glyph; otherwise
 			// all other badges get the refresh glyph.
 			if (i == 0) {
-				$(newBadgeSelector).find('#gene-badge-circle').addClass("btn-success");
-				$(newBadgeSelector).find('#gene-badge-circle').addClass("mdi-action-done");
+				//$(newBadgeSelector).find('#gene-badge-circle').addClass("btn-success");
+				//$(newBadgeSelector).find('#gene-badge-circle').addClass("mdi-action-done");
 			} else {
-				$(newBadgeSelector).find('#gene-badge-circle').addClass("btn-default");
-				$(newBadgeSelector).find('#gene-badge-circle').addClass("mdi-navigation-refresh");
+				//$(newBadgeSelector).find('#gene-badge-circle').addClass("btn-default");
+				//$(newBadgeSelector).find('#gene-badge-circle').addClass("mdi-navigation-refresh");
 			}
 		}
 
@@ -584,6 +614,12 @@ function copyPasteGenes() {
 	if (geneNames.length > 0) {
 		selectGene(geneNames[0]);
 	}
+	if (geneNames.length > 1) {
+		$('#gene-badge-container').removeClass("hide");
+	} else {
+		$('#gene-badge-container').addClass("hide");		
+	}
+
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');
 }
@@ -595,6 +631,16 @@ function removeGeneBadge(badgeElement) {
 	if (index >= 0) {
 		geneNames.splice(index, 1);
 		$(badgeElement).parent().remove();
+
+		if (geneNames.length == 0) {
+			$('#gene-badge-container #done-manage-gene-list').addClass("hide");
+		}
+		if (geneNames.length > 1) {
+			$('#gene-badge-container').removeClass("hide");
+		} else {
+			$('#gene-badge-container').addClass("hide");			
+		}
+
 	}
 
 }
@@ -602,50 +648,104 @@ function removeGeneBadge(badgeElement) {
 function addGeneBadge(geneName) {
 	var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
 	if ($(selector).length == 0) {
+		//$('#manage-gene-list-buttons').before(geneBadgeTemplate());
 		$('#gene-badge-container').append(geneBadgeTemplate());
 		$("#gene-badge-container #gene-badge:last-child").find('#gene-badge-name').text(geneName);
-		$(selector).parent().find('#gene-badge-circle').addClass("btn-success");
-		$(selector).parent().find('#gene-badge-circle').addClass("mdi-action-done");
+		//$(selector).parent().find('#gene-badge-circle').addClass("btn-success");
+		//$(selector).parent().find('#gene-badge-circle').addClass("mdi-action-done");		
+
+		$(selector).parent().find('#gene-badge-circle').addClass("mdi-navigation-refresh");
 
 		geneNames.push(geneName);
 
 		$("#gene-badge.selected").removeClass("selected");
-		$(selector).parent().addClass("selected");
+		//$(selector).parent().addClass("selected");
+		$(selector).parent().parent().addClass("selected");
+
+		$('#gene-badge-container #manage-gene-list').removeClass("hide");
 	
+	}
+	if (geneNames.length > 1) {
+		$('#gene-badge-container').removeClass("hide");
+	} else {
+		$('#gene-badge-container').addClass("hide");		
 	}
 
 }
 
-function setGeneBadgeDangerCount(dangerCounts) {
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent();
+function refreshGeneBadges() {
+	var dangerObject = getProbandVariantCard().summarizeDanger();
+	setGeneBadgeGlyps(dangerObject);
+			 	
+}
+
+function setGeneBadgeGlyps(dangerObject) {
+//	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent();
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent().parent();
 	geneBadge.find('#gene-badge-circle').removeClass('btn-success');
 	geneBadge.find('#gene-badge-circle').removeClass('mdi-action-done');
 	geneBadge.find('#gene-badge-circle').removeClass('btn-default');
 	geneBadge.find('#gene-badge-circle').removeClass('mdi-navigation-refresh');
 
-	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_HIGH");
-	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_MODERATE");
-	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_MODIFIER");
-	geneBadge.find('#gene-badge-circle #gene-badge-danger-count').removeClass("impact_LOW");
+	geneBadge.find('#gene-badge-danger-count').removeClass("impact_HIGH");
+	geneBadge.find('#gene-badge-danger-count').removeClass("impact_MODERATE");
+	geneBadge.find('#gene-badge-danger-count').removeClass("impact_MODIFIER");
+	geneBadge.find('#gene-badge-danger-count').removeClass("impact_LOW");
+	geneBadge.find('#gene-badge-button svg').remove();
 
-	var done = false;
-	for (impactClass in dangerCounts) {
-		if (dangerCounts[impactClass] != 0 && !done) {
-			geneBadge.find('#gene-badge-circle #gene-badge-danger-count').addClass('impact_' + impactClass);
-			geneBadge.find('#gene-badge-circle #gene-badge-danger-count').text(dangerCounts[impactClass]);
-			done = true;
+	geneBadge.addClass("visited");		
+	
+	var doneWithImpact = false;
+	for (dangerKey in dangerObject) {
+		if (dangerKey == 'HIGH' || dangerKey == 'MODERATE') {
+			if (dangerObject[dangerKey] != 0 && !doneWithImpact) {
+				//geneBadge.find('#gene-badge-danger-count').addClass('impact_' + dangerKey);
+				//geneBadge.find('#gene-badge-danger-count').text(dangerObject[dangerKey]);	
+				geneBadge.find('#gene-badge-symbols').append(
+				"<svg height=\"12\" width=\"14\"> <g transform=\"translate(1,3)\"> <rect width=\"7\" height=\"7\" class=\"filter-symbol " + "impact_" + dangerKey + "\" style=\"pointer-events: none;\"></rect></g></svg"
+				);
+				doneWithImpact = true;
+			}						
+		} else if (dangerKey == 'CLINVAR') {
+			var clinvarLevel = dangerObject[dangerKey];
+			if (clinvarLevel != null) {
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,1)', clazz: clinvarLevel}]);
+				matrixCard.showClinVarSymbol(selection);				
+			}
+
+		} else if (dangerKey == 'SIFT') {
+			var siftLevel = dangerObject[dangerKey];
+			if (siftLevel != null) {
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"sift-badge\" height=\"12\" width=\"14\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[0]).data([{width:11, height:11, transform: 'translate(0,1)', clazz: siftLevel}]);
+				matrixCard.showSiftSymbol(selection);				
+			}
+
+		} else if (dangerKey == 'POLYPHEN') {			
+			var polyphenLevel = dangerObject[dangerKey];
+			if (polyphenLevel != null) {
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"14\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[0]).data([{width:10, height:10, transform: 'translate(0,2)', clazz: polyphenLevel}]);
+				matrixCard.showPolyPhenSymbol(selection);				
+			}
+
 		}
 	}
 }
 
 function selectGeneBadge(badgeElement) {
-	var theGeneName = $(badgeElement).parent().parent().find("#gene-badge-name").text();
+	//var badge = $(badgeElement).parent().parent();
+	var badge = $(badgeElement).parent();
+	var theGeneName = badge.find("#gene-badge-name").text();
 
-	var badgeDangerCount = $(badgeElement).parent().parent().find('#gene-badge-danger-count').text();
+	var badgeDangerCount = badge.find('#gene-badge-danger-count').text();
 
 	if (badgeDangerCount == null || badgeDangerCount == '') {
-		$(badgeElement).parent().parent().find('#gene-badge-circle').addClass('btn-success');
-		$(badgeElement).parent().parent().find('#gene-badge-circle').addClass('mdi-action-done');
+		//badge.find('#gene-badge-circle').addClass('btn-success');		
+		//badge.find('#gene-badge-circle').addClass('mdi-action-done');
+
+		badge.find('#gene-badge-circle').addClass('mdi-navigation-refresh');
 	}
 	selectGene(theGeneName);
 }
@@ -654,7 +754,8 @@ function selectGene(geneName) {
 	$('.typeahead.tt-input').val(geneName);
 
 	$("#gene-badge.selected").removeClass("selected");
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent();
+	//var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent();
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
 	geneBadge.addClass("selected");
 
 
@@ -667,20 +768,45 @@ function selectGene(geneName) {
 	    dataType: "jsonp",
 	    success: function( response ) {
 
-	    	// We have successfully return the gene model data.
-	    	// Load all of the tracks for the gene's region.
-	    	window.gene = response[0];		
+	    	if (response[0].hasOwnProperty('gene_name')) {
+		    	// We have successfully return the gene model data.
+		    	// Load all of the tracks for the gene's region.
+		    	window.gene = response[0];		
 
-	    	// Save off the original start and end before we adjust for upstream/downstream regions
-	    	window.gene.startOrig = window.gene.start;
-	    	window.gene.endOrig = window.gene.end;  
-	    	window.selectedTranscript = null;
+		    	// Save off the original start and end before we adjust for upstream/downstream regions
+		    	window.gene.startOrig = window.gene.start;
+		    	window.gene.endOrig = window.gene.end;  
+		    	window.selectedTranscript = null;
 
-	    	updateUrl('gene', window.gene.gene_name);
+		    	updateUrl('gene', window.gene.gene_name);
 
-	    	loadTracksForGene();
+		    	loadTracksForGene();
+	    	} else {
+	    		alertify.error("Gene " + geneName + " not found.  Removing from list.", 
+				      		    function (e) {
+				     			});
+			    var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+				//$(selector).parent().remove();
+				$(selector).parent().parent().remove();
+				var index = geneNames.indexOf(geneName);
+				geneNames.splice(index, 1);
+
+	    	}
+
 	    }
 	 });
+}
+
+function manageGeneList(manage) {
+	if (manage) {
+		$('#gene-badge-container').addClass('manage');
+		$('#manage-gene-list').addClass('hide');
+		$('#done-manage-gene-list').removeClass('hide');		
+	} else {
+		$('#gene-badge-container').removeClass('manage');
+		$('#manage-gene-list').removeClass('hide');
+		$('#done-manage-gene-list').addClass('hide');		
+	}
 }
 
 
@@ -983,9 +1109,9 @@ function loadTracksForGene(bypassVariantCards) {
 				variantCard.hide();
 			} else {
 			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function(dangerCounts) {
-			 		if (variantCard.getRelationship() == 'proband') {
-			 			setGeneBadgeDangerCount(dangerCounts);
-			 		}
+			 		//if (variantCard.getRelationship() == 'proband') {
+			 		//	setGeneBadgeDangerCount(dangerCounts);
+			 		//}
 			 	});
 			}
 		});
@@ -1082,6 +1208,7 @@ function addVariantCard() {
 	// TODO:  Should really test to make sure that first card is proband, but
 	var cardSelectorString = null;
 	if (cardIndex == 0) {
+		
 		$('#proband-variant-card').append(variantCardTemplate());  
 		cardSelectorString = "#proband-variant-card .variant-card:eq(" + cardIndex + ")" ;
 

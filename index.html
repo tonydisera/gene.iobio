@@ -139,6 +139,7 @@
                         <textarea style="width:230px;height:100px" id="genes-to-copy"></textarea>
                         <div style="text-align:right">
                           <button id="get-genes-copy-paste-button" 
+                          type="submit"
                           onclick="copyPasteGenes()" 
                           class="icon-button-sm btn btn-default btn-raised" 
                           style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
@@ -147,6 +148,7 @@
                         </div>
                       </div>
                     </li>
+
 
                     <li class="todo hide "><a href="">Upload</a></li>
                     <li class="todo hide"><a href="">Phenomizer</a></li>
@@ -190,7 +192,13 @@
 
 
           <!-- gene badges for navigation -->
-          <div id="gene-badge-container" style="margin-top:10px;">
+          <div id="gene-badge-container" class="hide" style="margin-top:10px;">
+
+            <!-- Buttons for editting gene list, done editting gene list -->
+            <div id="manage-gene-list-buttons" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 3px;padding-right: 10px;">
+              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(true)" style="color:red !important;text-decoration:none !important">Edit</a>
+              <a class="hide" id="done-manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(false)" style="color:red !important;text-decoration: none !important;">Done</a>
+            </div>
 
           </div>
 

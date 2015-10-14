@@ -71,22 +71,68 @@ VariantModel.prototype.getVariantCount = function() {
 	return this.vcfData.features.length != null ? this.vcfData.features.length : "0";
 }
 
-VariantModel.prototype.getDangerCounts = function() {
-	dangerCounts = {HIGH: 0, MODERATE: 0, MODIFIER: 0, LOW: 0};
+VariantModel.prototype.summarizeDanger = function() {
+	dangerCounts = {HIGH: 0, MODERATE: 0, MODIFIER: 0, LOW: 0, CLINVAR: null, SIFT: null, POLYPHEN: null};
 	if (this.vcfData == null || this.vcfData.features.length == null) {
 		return dangerCounts;
 	}
+	var siftClasses = {};
+	var polyphenClasses = {};
+	var clinvarClasses = {};
 	this.vcfData.features.forEach( function(variant) {
-		if (variant.impact['HIGH'] != null) {
+		if (variant.impact['HIGH'] != null  && matrixCard.impactMap['HIGH'].badge == true) {
 			dangerCounts.HIGH++; 
-		} else if (variant.impact['MODERATE'] != null) {
+		} else if (variant.impact['MODERATE'] != null  && matrixCard.impactMap['MODERATE'].badge == true) {
 			dangerCounts.MODERATE++; 
-		} else if (variant.impact['MODIFIER'] != null) {
+		} else if (variant.impact['MODIFIER'] != null  && matrixCard.impactMap['MODIFIER'].badge == true) {
 			dangerCounts.MODIFIER++; 
-		} else if (variant.impact['LOW'] != null) {
+		} else if (variant.impact['LOW'] != null  && matrixCard.impactMap['LOW'].badge == true) {
 			dangerCounts.LOW++; 
 		} 
+
+		for (key in variant.vepSIFT) {
+			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge == true) {
+				var clazz = matrixCard.siftMap[key].clazz;
+				var order = matrixCard.siftMap[key].value;
+	    		siftClasses[clazz] = order ;						
+			}
+	    }
+	    for (key in variant.vepPolyPhen) {
+	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge == true) {
+				var clazz = matrixCard.polyphenMap[key].clazz;
+				var order = matrixCard.polyphenMap[key].value;
+	    		polyphenClasses[clazz] = order ;			    		
+	    	}
+	    }
+	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
+	    	for (key in variant.clinVarClinicalSignificance) {
+		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge == true) {
+				    var clazz = matrixCard.clinvarMap[key].clazz;
+					var order = matrixCard.clinvarMap[key].value;
+					clinvarClasses[clazz] = order ;	    		    		
+		    	}
+
+	    	}
+	    }
+
 	});
+
+	var getLowestClazz = function(clazzes) {
+		var lowestOrder = +9999;
+		var lowestClazz = null;
+		for (clazz in clazzes) {
+			var order = clazzes[clazz];
+			if (order < lowestOrder) {
+				lowestOrder = order;
+				lowestClazz = clazz;
+			}
+		}
+		return lowestClazz;
+	}
+	dangerCounts.CLINVAR = getLowestClazz(clinvarClasses);
+	dangerCounts.SIFT = getLowestClazz(siftClasses);
+	dangerCounts.POLYPHEN = getLowestClazz(polyphenClasses);
+
 	return dangerCounts;
 }
 
