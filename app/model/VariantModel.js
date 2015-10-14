@@ -489,7 +489,7 @@ VariantModel.prototype.getMatchingVariant = function(variant) {
  */
 VariantModel.prototype.loadVariantsOnly = function(callback) {
 	var me = this;
-	this.getVariants( regionStart, regionEnd, function() {
+	this.promiseGetVariants( regionStart, regionEnd, function() {
 		callback(me);
 	} );
 }
@@ -597,6 +597,28 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function() {
 		} else {
 			reject();
 		}
+
+	});
+
+}
+
+VariantModel.prototype.promiseGetVariantsOnly = function() {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+
+		me.vcf.promiseGetVariants(
+		   me.getVcfRefName(window.gene.chr), 
+		   window.gene.start, 
+	       window.gene.end, 
+	       window.gene.strand, 
+	       window.selectedTranscript,
+	       me.sampleName 
+	    ).then( function(data) {
+	    	var annotatedRecs = data[0];
+	    	me.vcfData = data[1];
+	    	resolve(me.vcfData);
+		});
 
 	});
 

@@ -35,7 +35,9 @@ VariantCard.prototype.setRelationship = function(theRelationship) {
 VariantCard.prototype.setSampleName = function(sampleName) {
 	this.model.setSampleName(sampleName);
 	var cardLabel = this.model.getName() == sampleName ? this.model.getName() : sampleName + " " + this.model.getName();
-	this.cardSelector.find('#variant-card-label').text(cardLabel);
+	if (this.isViewable()) {
+		this.cardSelector.find('#variant-card-label').text(cardLabel);
+	}
 }
 
 VariantCard.prototype.getSampleName = function() {
@@ -55,7 +57,7 @@ VariantCard.prototype.getCardIndex = function() {
 }
 
 VariantCard.prototype.isViewable = function() {
-	return this.relationship != 'sibling';
+	return this.model.relationship != 'sibling';
 }
 
 VariantCard.prototype.isReadyToLoad = function() {
@@ -431,7 +433,9 @@ VariantCard.prototype.endVariantProgress = function() {
  * no variant card display
  */
 VariantCard.prototype.loadVariantsOnly = function(callback) {
-	this.model.loadVariantsOnly(callback);
+	this.model.promiseGetVariantsOnly().then( function(data) {
+		callback();
+	});
 }
 
 
@@ -733,8 +737,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
    	    }
 	} else {
 
-		me.cardSelector.find('.vcfloader').removeClass("hide");
-		me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");
+		if (me.isViewable()) {
+			me.cardSelector.find('.vcfloader').removeClass("hide");
+			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");			
+		}
 
 		//  The user has entered a gene.  Get the annotated variants.
 		this.model.promiseGetVariants(regionStart, regionEnd,

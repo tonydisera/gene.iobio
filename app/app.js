@@ -1405,16 +1405,20 @@ function loadUnaffectedSibs(unaffectedSibs) {
 
 	if (unaffectedSibs) {
 		unaffectedSibs.forEach( function( unaffectedSibName) {
-			var variantCard = new VariantCard();			
+			var variantCard = new VariantCard();	
 
-			variantCard.vcf            = getProbandVariantCard().vcf;
-			variantCard.vcfUrlEntered  = getProbandVariantCard().vcfUrlEntered;
-			variantCard.vcfFileOpened  = getProbandVariantCard().vcfFileOpened;	
-			variantCard.getVcfRefName  = getProbandVariantCard().getVcfRefName;
-			variantCard.vcfRefNamesMap = getProbandVariantCard().vcfRefNamesMap;
+			variantCard.model          = new VariantModel();	
 
-			variantCard.sampleName     = unaffectedSibName;
+
+			variantCard.model.vcf            = getProbandVariantCard().model.vcf;
+			variantCard.model.vcfUrlEntered  = getProbandVariantCard().model.vcfUrlEntered;
+			variantCard.model.vcfFileOpened  = getProbandVariantCard().model.vcfFileOpened;	
+			variantCard.model.getVcfRefName  = getProbandVariantCard().model.getVcfRefName;
+			variantCard.model.vcfRefNamesMap = getProbandVariantCard().model.vcfRefNamesMap;
+
+
 			variantCard.setRelationship("sibling");
+			variantCard.setSampleName(unaffectedSibName);
 			variantCard.setName(unaffectedSibName);
 
 			variantCardsUnaffectedSibs.push(variantCard);
