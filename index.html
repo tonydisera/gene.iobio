@@ -121,7 +121,6 @@
   </div>
 
   <div id="slider-top" class="hide fade-in">
-
       <div id="data-card" class="track shadow-z-2 hide" style="margin-top:8px;" >
 
         <div style="width:100%;clear:both;">
@@ -152,14 +151,14 @@
                     </div>
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
                   </button>            
-                  <button id="pedigree-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
                     style="padding-top: 2px;padding-bottom:1px;">
                     <div style="float:left;">
                       <img src="assets/images/pedigree.png" style="height:22px"/>
                     </div>
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
                   </button>
-                  <button id="other-button" type="btn btn-raised" class="todo icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
                     style="padding-top: 2px;padding-bottom:1px;">
                     <i class="mdi-editor-format-align-justify"></i>                
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
@@ -183,7 +182,7 @@
                 <input id="datasource-relationship" class="hide" value="father" type="text"/>
               </div>
 
-              <div class="fullview todo" style="clear:both;text-align:left;padding-top:10px;">
+              <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
                 <div id="unaffected-sibs-box" class="hide">
                     <div id="sample-data-label">
                       UNAFFECTED SIBS
@@ -209,7 +208,6 @@
         </div>
 
       </div>
-
   </div>
   <div id="close-slide-top" class="close-button fade-in hide shadow-z-2">
      X
@@ -222,85 +220,67 @@
     <div id="nav-section" class="shadow-z-2">
 
     	<section id="app-title-section">
-    	   <a id='home' href="/"><span class="iobioapp"><span class='hide beta'>beta</span> gene</span><span class="iobio">.iobio</span></a>
+    	     <a id='home' href="/">
+            <span class="iobioapp"><span class='hide beta'>beta</span> gene</span><span class="iobio">.iobio</span>
+           </a>
 
+          <div style="display:inline-block;">
 
-          <!--
-           <a href="javascript:void(0)" class="open_page_guide" 
-              style="float: left;margin-top: 20px;margin-left: 10px;">
-             <i class="mdi-maps-directions"></i>
-             Tour
-           </a>   
-           -->             
-                <!-- gene list dropdown button -->
-                <!--
-              <div class="todo">
-                <div class="btn-toolbar" class="todo" style="width:105px;display:inline-block;">
-                  <div class="btn-group" class="todo" style="display:  inline;margin-top: 15px;">
+            <!-- Non protein-coding gene badges -->
+            <div id="non-protein-coding" style="float:left;">
+              <span id="gene-type-badge" class="hide label label-warning" style="font-size:11px;">Pseudogene</span>   
+              <span id="transcript-type-badge" class="hide label label-warning" style="font-size:11px;"></span>                  
+            </div>
 
-                    <button type="button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
-                      Gene list <span class="caret"></span>
-                    </button>
-
-                    <ul class="dropdown-menu" role="menu">
-                      <li><a href="">Upload</a></li>
-                      <li><a href="">Phenomizer</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            -->
-
-            <span id="bloodhound" style="margin-left:90px" >
+            <!-- Gene search -->
+            <span id="bloodhound">
                 <input id="enter-gene-name" class="typeahead" style="margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" placeholder="Enter Gene Name">
             </span>           
 
-            <!-- gene bubbles for navigation -->
-            <div class="todo">
-                <!-- APOE, APOB, LDLR, CETP, LRPAP1 -->
-                <div style="display:inline-block;padding-top:10px" >
-                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">APOE</div>
-                  <div><a href="javascript:void(0)" class="btn btn-success btn-fab btn-raised mdi-action-done"></a></div>
-                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
-                    <i class="mdi-content-clear"></i>
-                  </a>
-                </div>
-                <div style="display:inline-block;padding-top:10px" >
-                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">APOB</div>
-                  <div><a href="javascript:void(0)" class="btn btn-success btn-fab btn-raised mdi-action-done"></a></div>
-                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
-                    <i class="mdi-content-clear"></i>
-                  </a>
-                </div>
-                <div style="display:inline-block;padding-top:10px" >
-                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">LDLR</div>
-                  <div><a href="javascript:void(0)" class="btn btn-danger btn-fab btn-raised mdi-content-flag"></a></div>
-                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
-                    <i class="mdi-content-clear"></i>
-                  </a>
-                </div>
-                <div style="display:inline-block;padding-top:10px" >
-                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">CETP</div>
-                  <div><a href="javascript:void(0)" class="btn btn-default btn-fab btn-raised mdi-navigation-refresh"></a></div>
-                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
-                    <i class="mdi-content-clear"></i>
-                  </a>                  
-                </div>
-                <div style="display:inline-block;padding-top:10px" >
-                  <div style="font-size:10px;padding-top:0px;margin-bottom:-2px">LRPAP1</div>
-                  <div><a href="javascript:void(0)" class="btn btn-default btn-fab btn-raised mdi-navigation-refresh"></a></div>
-                  <a href="javascript:void(0)" class="btn btn-flat btn-default" style="padding: 0;margin: 0;color: grey !important;">
-                    <i class="mdi-content-clear"></i>
-                  </a>                  
-                </div>
-            </div>
+            <!-- get genes dropdown button -->
+            <div id="get-genes-dropdown" class="" style="margin-right:30px;width:95px;float:right;">
+              <div class="btn-toolbar">
+                <div class="btn-group"  style="display:inline;margin-top: 15px;">
 
-           <a href="http://iobio.io" class="iobioproject">           
+                  <button type="button"  style="font-size:11px;width:90px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                  <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
+                    Get Genes <span class="caret"></span>
+                  </button>
+
+                  <ul class="dropdown-menu " role="menu">
+                    <li id="copy-paste-li">
+                      <div style="padding-left:20px;padding-right:20px;padding-top:3px;padding-bottom:3px;">
+                        <div>Copy/Paste</div>
+                        <textarea style="width:230px;height:100px" id="genes-to-copy"></textarea>
+                        <div style="text-align:right">
+                          <button id="get-genes-copy-paste-button" 
+                          type="submit"
+                          onclick="copyPasteGenes()" 
+                          class="icon-button-sm btn btn-default btn-raised" 
+                          style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+
+
+                    <li class="todo hide "><a href="">Upload</a></li>
+                    <li class="todo hide"><a href="">Phenomizer</a></li>
+                  </ul>
+                </div>
+              </div>
+           </div>
+
+          </div>
+
+          <!-- iobio project link -->
+          <a href="http://iobio.io" class="iobioproject">           
             an iobio project
-           </a>   
+          </a>   
 
-          <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 40px;">
+          <!-- Learn more dropdown button -->
+          <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 10px;">
             <div class="btn-group"  style="display:  inline;margin-top: 15px;">
 
               <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -324,14 +304,23 @@
               </ul>
             </div>
           </div>
+
+
+          <!-- gene badges for navigation -->
+          <div id="gene-badge-container" class="hide" style="margin-top:4px;">
+
+            <!-- Buttons for editting gene list, done editting gene list -->
+            <div id="manage-gene-list-buttons" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 3px;padding-right: 10px;">
+              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(true)" style="color:red !important;text-decoration:none !important">Edit</a>
+              <a class="hide" id="done-manage-gene-list" href="javascript:void(0)" onclick="manageGeneList(false)" style="color:red !important;text-decoration: none !important;">Done</a>
+            </div>
+
+          </div>
+
       </section>
 
-      <div id="non-protein-coding">
-        <span id="gene-type-badge" class="hide label label-warning" style="font-size:11px;">Pseudogene</span>   
-        <span id="transcript-type-badge" class="hide label label-warning" style="font-size:11px;"></span> <span id="dummy-placeholder" class="invisible label label-warning" style="font-size:11px;">INVISIBLE</span>   
-      </div>
 
-      <div id="transcript-card" class="hide" style="background:white;padding-top:10px;">
+      <div id="transcript-card" class="hide" style="background:white;">
 
         <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;margin-right:3px;">
           <span id="gene-name" class="heading"></span>  
@@ -387,7 +376,7 @@
 
 
     <div id="track-section" class="push" style="margin-top:5px;">
-      
+
       <div id="filter-and-rank-card" class="hide">
 
         <div id="matrix-track"  class="track-expand shadow-z-2 hide">
@@ -461,29 +450,33 @@
         </div>
       </div>
 
-      <div id="variant-control-panel"  class="todo" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;padding-left: 10px;height: 43px;" class=" shadow-z-2">
+      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;height: 43px;" class="hide shadow-z-2">
 
         <div id="toolbar" style="width:100%"  >
                 <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
 
 
-                <a href="javascript:void(0)" id="button-find-missing-variants" class="btn btn-default btn-raised icon-button " style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;width:150px;" >
+                <a href="javascript:void(0)" 
+                  id="button-find-missing-variants" 
+                  class="hide btn btn-default btn-raised icon-button" 
+                  style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;width:150px;"
+                  onclick="callVariants()">
                     <i style="font-size:18px;" class="mdi-action-find-in-page"></i>
-                    <span id="missing-variant-count-label">Find missing variants</span>
+                    Call from alignments
                 </a>
 
 
-                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;">
+                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;" class="todo">
                   <i class="mdi-action-settings"></i>
                 </a>
 
 
-                <a href="javascript:void(0)" id="button-find-missing-variants" class="btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;">
+                <a href="javascript:void(0)" id="button-exons-introns" class="todo btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;">
                      <i  style="font-size:18px;" class="mdi-action-settings-ethernet"></i>
                     <span id="missing-variant-count-label">Exons + Introns</span>
                 </a>
 
-                <a href="javascript:void(0)" id="button-find-missing-variants" class="btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:-4px;padding-top:2px;padding-bottom:2px;">
+                <a href="javascript:void(0)" id="button-exons-only" class="todo btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:-4px;padding-top:2px;padding-bottom:2px;">
                      <i  style="font-size:18px;" class="mdi-action-view-column"></i>
                     <span id="missing-variant-count-label">Exons only</span>
                 </a>
@@ -491,21 +484,14 @@
                 
 
 
-                <span style="float:right">
-                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="mdi-content-remove"></i>
-                  </a>
-                  <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="mdi-image-crop-din"></i>
-                  </a>
-               </span>
+               
 
           </div>
-          <div style="text-align: left;padding-left:560px;width:100%;margin-top: -45px;">
+          <div class="todo hide" style="text-align: left;padding-left:560px;width:100%;margin-top: -45px;">
              <div class="btn-toolbar" style="margin-left:20px;display:inline-block;">
                   <div class="btn-group" style="display:  inline;;">
 
-                    <button type="button" style="font-size:11px;padding-top: 2px;padding-bottom: 2px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <button type="button" style="font-size:11px;padding-top: 2px;padding-bottom: 2px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <i class="mdi-action-bookmark" style="font-size:18px;padding-right:0px;padding-top:2px;padding-left:2px"></i>
                       <span style="font-size:12px">Variant Bookmarks</span><span style="padding-left:2px" class="caret"></span>
                     </button>
@@ -662,17 +648,16 @@
       <div>
         <a class="poweredby" href="http://snpeff.sourceforge.net/">SnpEff</a>
         <a class="poweredby"  href="http://uswest.ensembl.org/info/docs/tools/vep/index.html?redirect=nop">Variant Effect Predictor</a>
-        <a class="poweredby todo" href="http://compbio.charite.de/phenomizer/">Phenomizer</a>
-        <a class="poweredby " href="http://genetics.bwh.harvard.edu/pph/index.html">PolyPhen</a>
-        <a class="poweredby " href="http://sift.jcvi.org/">SIFT</a>
+        <a class="poweredby todo hide" href="http://compbio.charite.de/phenomizer/">Phenomizer</a>
+        <a class="poweredby" href="http://genetics.bwh.harvard.edu/pph/index.html">PolyPhen</a>
+        <a class="poweredby" href="http://sift.jcvi.org/">SIFT</a>
 
         <a class="poweredby" href="https://github.com/ekg/freebayes">FreeBayes</a>
         <a class="poweredby" href="http://www.ncbi.nlm.nih.gov/clinvar/">ClinVar</a>
-        <a class="poweredby todo"  href="http://omictools.com/vt-normalize-s8519.html">VT</a>
         <a class="poweredby" href="http://samtools.sourceforge.net/">samtools</a>
         <a class="poweredby" href="https://github.com/pezmaster31/bamtools">bamtools</a>
         <a class="poweredby" href="https://github.com/ekg/vcflib">vcflib</a>
-        <a class="poweredby" href="http://genome.sph.umich.edu/wiki/Vt">Vt</a>
+        <a class="poweredby" href="http://genome.sph.umich.edu/wiki/Vt">VT</a>
 
     </div>
     <div style="padding-top:10px"></div>
@@ -845,6 +830,8 @@
 
 <script src="app/bam.iobio.js"></script>
 <script src="app/vcf.iobio.js"></script>
+
+<script src="app/model/variantModel.js"></script>  
 
 <script src="app/card/dataCard.js"></script>
 <script src="app/card/matrixCard.js"></script>

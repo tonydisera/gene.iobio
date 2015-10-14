@@ -69,10 +69,52 @@ body {
 }
 
 .todo {
-  display: none !important;
   visibility: hidden !important;
 }
 
+#get-genes-copy-paste-button.btn.btn-raised {
+    box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12) !important;
+    transition: box-shadow .28s cubic-bezier(.4,0,.2,1);
+}
+#copy-paste-li {
+      color: rgb(132,132,132) !important;
+      font-size: 11px;
+}
+#get-genes-copy-paste-button {
+      font-size: 11px;  
+}
+
+#gene-badge-danger-count {  
+  font-size: 10px;
+  /*padding-bottom: 6px;*/
+}
+
+.btn.btn-fab {
+  box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12);
+}
+/*#gene-badge.selected #gene-badge-circle,*/
+#gene-badge.selected #gene-badge-button{
+  box-shadow: 0 6px 10px rgba(0,0,0,.23),0 10px 30px rgba(0,0,0,.19); 
+}
+#gene-badge.selected #gene-badge-name,
+#gene-badge.selected #gene-badge-danger-count,
+#gene-badge.selected #gene-badge-remove i.mdi-content-clear
+{
+  font-weight: bold; 
+}
+#gene-badge.visited #gene-badge-name {
+  color: #5d809d !important;
+}
+
+#gene-badge-container #gene-badge-remove .mdi-content-clear {
+  color: #E0292B !important;
+}
+#gene-badge-container #gene-badge-remove {
+  visibility: hidden;
+}
+#gene-badge-container.manage #gene-badge-remove {
+  visibility: visible;
+}
 
 .tooltip-title {
   font-size: 10px;
@@ -601,7 +643,7 @@ section {
 #app-title-section {
   text-align: center;
   background: white;
-  padding-bottom: 10px !important; 
+  padding-bottom: 7px !important; 
 }
 
 
@@ -620,14 +662,14 @@ section {
 
 
 #non-protein-coding {
-  text-align: center;
-  padding-right: 5px;
-  font-style: italic;
-  margin-top: -6px;
-  font-weight: bold;
-  margin-bottom: -10px;
-  background-color: white;
+  text-align: right;
+  padding-right: 10px;
+  width: 200px;
+  padding-top: 10px;
 }
+#non-protein-coding.hidden {
+  visibility: hidden;
+} 
 
 #region-track {
   text-align: center;
@@ -1147,17 +1189,24 @@ header {
   fill: rgb(120,120,120);
 }
 
+
 .impact_HIGH{
   fill: #E0292B !important;
+  color: #E0292B !important;
+  font-weight: bold;
 } 
 .impact_MODERATE{
   fill: #F49A73 !important;
+  color: #F49A73 !important;
+  font-weight: bold;
 } 
 .impact_MODIFIER{
   fill: rgba(244, 217, 155, 1);
+  color: rgba(244, 217, 155, 1);
 }
 .impact_LOW { 
   fill: rgba(181, 207, 107, 0.65);
+  color: rgba(181, 207, 107, 0.65);
 }
 .impact_NOIMPACT { 
   fill: #FAF5BE ;
@@ -1501,7 +1550,8 @@ header {
 }
 
 #bloodhound .typeahead { 
-  min-width: 250px;
+  min-width: 170px;
+  max-width: 170px;
   font-size: 18px; 
   vertical-align: middle !important;
 }
@@ -1586,7 +1636,7 @@ header {
 }
 
 .tt-dropdown-menu {
-    width: 522px;
+    width: 170px;
     margin-top: 2px;
     padding: 8px 0;
     background-color: #fff;

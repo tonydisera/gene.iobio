@@ -6,64 +6,64 @@ function MatrixCard() {
 
 
 	this.clinvarMap     = {  
-						'pathogenic'            : {value: 1, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
-                        'likely_pathogenic'     : {value: 2, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
-                        'uncertain_significance': {value: 3, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
-                        'benign'                : {value: 100, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
-                        'likely_benign'         : {value: 101, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
-                        'conflicting_data_from_submitters': {value: 121, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  {value: 121, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
-                        'drug_response'         : {value: 131, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'confers_sensivity'     : {value: 131, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'risk_factor'           : {value: 131, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'other'                 : {value: 131, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'association'           : {value: 131, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'protective'            : {value: 131, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'not_provided'          : {value: 141, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'none'                  : {value: 151, clazz: ''}
+						'pathogenic'            : {value: 1,   badge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
+                        'likely_pathogenic'     : {value: 2,   badge: true, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
+                        'uncertain_significance': {value: 3,   badge: true, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
+                        'benign'                : {value: 100, badge: false, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
+                        'likely_benign'         : {value: 101, badge: false, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
+                        'conflicting_data_from_submitters': {value: 121, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
+						'conflicting_interpretations_of_pathogenicity':  {value: 121, badge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
+                        'drug_response'         : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'confers_sensivity'     : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'risk_factor'           : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'other'                 : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'association'           : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'protective'            : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'not_provided'          : {value: 141, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'none'                  : {value: 151, badge: false, clazz: ''}
                      };
-	this.impactMap = {  HIGH:     {value: 1, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
-                        MODERATE: {value: 2, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
-                        MODIFIER: {value: 3, clazz: 'impact_MODIFIER', symbolFunction: this.showImpactSymbol},
-                        LOW:      {value: 4, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
+	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
+                        MODERATE: {value: 2, badge: false, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
+                        MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showImpactSymbol},
+                        LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
                      };
 	this.siftMap = {  
-                        deleterious:                 {value: 1, clazz: 'sift_deleterious', symbolFunction: this.showSiftSymbol},
-                        deleterious_low_confidence:  {value: 2, clazz: 'sift_deleterious_low_confidence', symbolFunction: this.showSiftSymbol},
-		                tolerated_low_confidence: {value: 3, clazz: 'sift_tolerated_low_confidence',symbolFunction: this.showSiftSymbol},  
-		                tolerated:    {value: 102, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
-                        none:         {value: 103, clazz: ''}
+                        deleterious:                 {value: 1, badge: true, clazz: 'sift_deleterious', symbolFunction: this.showSiftSymbol},
+                        deleterious_low_confidence:  {value: 2, badge: true, clazz: 'sift_deleterious_low_confidence', symbolFunction: this.showSiftSymbol},
+		                tolerated_low_confidence: {value: 3, badge: false, clazz: 'sift_tolerated_low_confidence',symbolFunction: this.showSiftSymbol},  
+		                tolerated:    {value: 102, badge: false, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
+                        none:         {value: 103, badge: false, clazz: ''}
                      };
 	this.polyphenMap = {  
-                        probably_damaging:    {value: 1, clazz: 'polyphen_probably_damaging', symbolFunction: this.showPolyPhenSymbol},
-		                possibly_damaging:    {value: 2, clazz: 'polyphen_possibly_damaging', symbolFunction: this.showPolyPhenSymbol},  
-                        benign:               {value: 103, clazz: 'polyphen_benign',            symbolFunction:this.showPolyPhenSymbol},
-                        none:                 {value: 104, clazz: ''}
+                        probably_damaging:    {value: 1, badge: true, clazz: 'polyphen_probably_damaging', symbolFunction: this.showPolyPhenSymbol},
+		                possibly_damaging:    {value: 2, badge: true, clazz: 'polyphen_possibly_damaging', symbolFunction: this.showPolyPhenSymbol},  
+                        benign:               {value: 103, badge: false, clazz: 'polyphen_benign',            symbolFunction:this.showPolyPhenSymbol},
+                        none:                 {value: 104, badge: false, clazz: ''}
                      };
 	this.inheritanceMap = {  
-		                denovo:    {value: 1, clazz: 'denovo',    symbolFunction: this.showDeNovoSymbol},  
-                        recessive: {value: 2, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
-                        none:      {value: 3, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
+		                denovo:    {value: 1, badge: true, clazz: 'denovo',    symbolFunction: this.showDeNovoSymbol},  
+                        recessive: {value: 2, badge: true, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
+                        none:      {value: 3, badge: false, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
                      };
 	this.uaMap = {  
-		                not_recessive_in_sibs: {value: 1,   clazz: 'not_recessive_in_sibs', symbolFunction: this.showUnaffectedSymbol},  
-                        none:                  {value: 104, clazz: '',                      symbolFunction: ''}
+		                not_recessive_in_sibs: {value: 1,   badge: true, clazz: 'not_recessive_in_sibs', symbolFunction: this.showUnaffectedSymbol},  
+                        none:                  {value: 104, badge: false, clazz: '',                      symbolFunction: ''}
                  };
 	// For af range, value must be > min and <= max
-	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},	
-                       {min: -1.1,   max: +0,     value: +3,  clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
-                       {min: +0,     max: +.0001, value: +3,  clazz: 'afexac_uberrare',   symbolFunction: this.showAfExacSymbol},	
-                       {min: +.0001, max: +.001,  value: +4,  clazz: 'afexac_superrare',  symbolFunction: this.showAfExacSymbol},	
-                       {min: +.001,  max: +.01,   value: +5,  clazz: 'afexac_rare',       symbolFunction: this.showAfExacSymbol},	
-                       {min: +.01,   max: +.05,   value: +6,  clazz: 'afexac_uncommon',   symbolFunction: this.showAfExacSymbol},	
-                       {min: +.05,   max: +1,     value: +7,  clazz: 'afexac_common',     symbolFunction: this.showAfExacSymbol},	
+	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, badge: false, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},	
+                       {min: -1.1,   max: +0,     value: +3,  badge: false, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
+                       {min: +0,     max: +.0001, value: +3,  badge: false, clazz: 'afexac_uberrare',   symbolFunction: this.showAfExacSymbol},	
+                       {min: +.0001, max: +.001,  value: +4,  badge: false, clazz: 'afexac_superrare',  symbolFunction: this.showAfExacSymbol},	
+                       {min: +.001,  max: +.01,   value: +5,  badge: false, clazz: 'afexac_rare',       symbolFunction: this.showAfExacSymbol},	
+                       {min: +.01,   max: +.05,   value: +6,  badge: false, clazz: 'afexac_uncommon',   symbolFunction: this.showAfExacSymbol},	
+                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'afexac_common',     symbolFunction: this.showAfExacSymbol},	
                       ];
-	this.af1000gMap= [ {min: -1.1, max: +0,     value: +2,  clazz: 'af1000g_unique',     symbolFunction: this.showAf1000gSymbol},	
-                       {min: +0,    max: +.0001, value: +3,  clazz: 'af1000g_uberrare',   symbolFunction: this.showAf1000gSymbol},	
-                       {min: +.0001,max: +.001,  value: +4,  clazz: 'af1000g_superrare',  symbolFunction: this.showAf1000gSymbol},	
-                       {min: +.001, max: +.01,   value: +5,  clazz: 'af1000g_rare',       symbolFunction: this.showAf1000gSymbol},	
-                       {min: +.01,  max: +.05,   value: +6,  clazz: 'af1000g_uncommon',   symbolFunction: this.showAf1000gSymbol},	
-                       {min: +.05,  max: +1,     value: +7,  clazz: 'af1000g_common',     symbolFunction: this.showAf1000gSymbol},	
+	this.af1000gMap= [ {min: -1.1, max: +0,     value: +2,   badge: false, clazz: 'af1000g_unique',     symbolFunction: this.showAf1000gSymbol},	
+                       {min: +0,    max: +.0001, value: +3,  badge: false, clazz: 'af1000g_uberrare',   symbolFunction: this.showAf1000gSymbol},	
+                       {min: +.0001,max: +.001,  value: +4,  badge: false, clazz: 'af1000g_superrare',  symbolFunction: this.showAf1000gSymbol},	
+                       {min: +.001, max: +.01,   value: +5,  badge: false, clazz: 'af1000g_rare',       symbolFunction: this.showAf1000gSymbol},	
+                       {min: +.01,  max: +.05,   value: +6,  badge: false, clazz: 'af1000g_uncommon',   symbolFunction: this.showAf1000gSymbol},	
+                       {min: +.05,  max: +1,     value: +7,  badge: false, clazz: 'af1000g_common',     symbolFunction: this.showAf1000gSymbol},	
                       ];                      
 
 
@@ -402,7 +402,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			variantCard.showVariants(regionStart, regionEnd);
 		}
 	});*/
-
+	
 	
 }
 
@@ -448,11 +448,11 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 MatrixCard.prototype.showClinVarSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(5,5)")
+	         .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
-	         .attr("width", "14")
-	         .attr("height", "14")
+	         .attr("width", selection.datum().hasOwnProperty("width") ? selection.datum().width : "14")
+	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -478,11 +478,11 @@ MatrixCard.prototype.showClinVarSymbol = function (selection) {
 
 MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(5,5)")
+	         .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", "14")
-	         .attr("height", "14")
+	         .attr("width", selection.datum().hasOwnProperty("width") ? selection.datum().width : "14")
+	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
@@ -500,11 +500,11 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
 
 MatrixCard.prototype.showSiftSymbol = function (selection) {
 	selection.append("g")
-	         .attr("transform", "translate(5,5)")
+	         .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)")
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", "14")
-	         .attr("height", "14")
+	         .attr("width", selection.datum().hasOwnProperty("width") ? selection.datum().width : "14")
+	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
