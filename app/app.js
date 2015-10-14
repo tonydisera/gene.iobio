@@ -353,8 +353,19 @@ function toggleSampleTrio(show) {
 }
 
 function loadGeneFromUrl() {
-	
+	// Get the gene parameger
 	var gene = getUrlParameter('gene');
+
+	// Get the gene list from the url.  Add the gene badges, selecting
+	// the gene that was passed in the url parameter
+	var genes = getUrlParameter("genes");
+	if (genes != null && genes.length > 0) {
+		geneNames = genes.split(",");
+		$('#genes-to-copy').val(genes);
+		copyPasteGenes(gene);
+	}
+
+	// Load the gene
 	var showTour = getUrlParameter('showTour');
 	if (gene != undefined) {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
@@ -375,7 +386,9 @@ function loadUrlSources() {
 	var vcf  = getUrlParameter(/vcf*/);	
 	var rel  = getUrlParameter(/rel*/);
 	var dsname = getUrlParameter(/name*/);	
-	var sample = getUrlParameter(/sample*/);	
+	var sample = getUrlParameter(/sample*/);
+
+
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
@@ -533,7 +546,7 @@ function initCopyPasteGenes() {
 	}
 }
 
-function copyPasteGenes() {
+function copyPasteGenes(geneNameToSelect) {
 	var genesString = $('#genes-to-copy').val();
 	// trim newline at very end
 	genesString = genesString.replace(/\s*$/, "");
@@ -610,18 +623,32 @@ function copyPasteGenes() {
 		}
 
 	}
-	// Select the first gene in the list
-	if (geneNames.length > 0) {
+	// If we are loading from the url, just add the class 'selected' to the gene specified in the 
+	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
+	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
+		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
+		geneBadge.addClass("selected");
+		geneBadge.find('#gene-badge-circle').addClass('mdi-navigation-refresh');
+	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		selectGene(geneNames[0]);
 	}
+
+	_onGeneBadgeUpdate();
+
+	$('#get-genes-dropdown .btn-group').removeClass('open');
+}
+
+function _onGeneBadgeUpdate() {
+	// Only show the gene badges if there is more than one gene in the list
 	if (geneNames.length > 1) {
 		$('#gene-badge-container').removeClass("hide");
 	} else {
 		$('#gene-badge-container').addClass("hide");		
 	}
 
+	// Update the url with the gene list
+	updateUrl('genes', geneNames.join(","));
 
-	$('#get-genes-dropdown .btn-group').removeClass('open');
 }
 
 
@@ -632,14 +659,8 @@ function removeGeneBadge(badgeElement) {
 		geneNames.splice(index, 1);
 		$(badgeElement).parent().remove();
 
-		if (geneNames.length == 0) {
-			$('#gene-badge-container #done-manage-gene-list').addClass("hide");
-		}
-		if (geneNames.length > 1) {
-			$('#gene-badge-container').removeClass("hide");
-		} else {
-			$('#gene-badge-container').addClass("hide");			
-		}
+		_onGeneBadgeUpdate();
+
 
 	}
 
@@ -665,21 +686,17 @@ function addGeneBadge(geneName) {
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
 	
 	}
-	if (geneNames.length > 1) {
-		$('#gene-badge-container').removeClass("hide");
-	} else {
-		$('#gene-badge-container').addClass("hide");		
-	}
+	_onGeneBadgeUpdate();
 
 }
 
 function refreshGeneBadges() {
 	var dangerObject = getProbandVariantCard().summarizeDanger();
-	setGeneBadgeGlyps(dangerObject);
+	_setGeneBadgeGlyphs(dangerObject);
 			 	
 }
 
-function setGeneBadgeGlyps(dangerObject) {
+function _setGeneBadgeGlyphs(dangerObject) {
 //	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent();
 	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent().parent();
 	geneBadge.find('#gene-badge-circle').removeClass('btn-success');
@@ -694,6 +711,7 @@ function setGeneBadgeGlyps(dangerObject) {
 	geneBadge.find('#gene-badge-button svg').remove();
 
 	geneBadge.addClass("visited");		
+	geneBadge.addClass("selected");		
 	
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {
@@ -1109,9 +1127,6 @@ function loadTracksForGene(bypassVariantCards) {
 				variantCard.hide();
 			} else {
 			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function(dangerCounts) {
-			 		//if (variantCard.getRelationship() == 'proband') {
-			 		//	setGeneBadgeDangerCount(dangerCounts);
-			 		//}
 			 	});
 			}
 		});
