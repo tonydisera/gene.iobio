@@ -864,6 +864,8 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
 	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
+	resizeCardWidths();
+
     $('#filter-and-rank-card').removeClass("hide");
     $('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
