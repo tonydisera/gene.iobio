@@ -412,7 +412,7 @@ a, a:hover, a:focus {
 
 
 #recessive-symbol .parent .left {
-  stroke: darkorange;
+  stroke: #FB7737;
 }
 #recessive-symbol .parent .right {
   stroke: grey;
@@ -420,7 +420,7 @@ a, a:hover, a:focus {
 }
 #recessive-symbol .proband .left,
 #recessive-symbol .proband .right {
-  stroke: darkorange;
+  stroke: #FB7737;
 }
 
 #denovo-symbol .parent .left {
@@ -431,7 +431,7 @@ a, a:hover, a:focus {
 }
 #denovo-symbol .proband .left,
 #denovo-symbol .proband .right {
-  stroke: #BFC83F;
+  stroke: #E0292B;
 }
 
 /* Trio button in data card */

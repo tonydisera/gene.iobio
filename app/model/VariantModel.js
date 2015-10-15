@@ -624,7 +624,31 @@ VariantModel.prototype.promiseGetVariantsOnly = function() {
 
 }
 
-VariantModel.prototype.promiseGetAnnotatedVariants = function(onVcfData) {
+VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onVcfData) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+
+		// A gene has been selected.  Read the variants for the gene region.
+		me._promiseVcfRefName().then( function() {
+			me._promiseGetAndAnnotateVariants(onVcfData).then( function(data) {
+		    	me.vcfData = data;
+
+				resolve(me.vcfData);
+
+		    }, function(error) {
+		    	reject(error);
+		    });
+		}, function(error) {
+			reject("missing reference")
+		});
+
+
+	});
+
+}
+
+VariantModel.prototype._promiseGetAndAnnotateVariants = function(onVcfData) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -641,22 +665,43 @@ VariantModel.prototype.promiseGetAnnotatedVariants = function(onVcfData) {
 	    	var annotatedRecs = data[0];
 	    	me.vcfData = data[1];
 
-	    	if (onVcfData) {
-	    		onVcfData();
-	    	}
+		    if (me.vcfData != null && me.vcfData.features != null && me.vcfData.features.length > 0) {
 
-	    	if (me.getRelationship() != 'sibling') {
-		    	// Now get clinvar annotations
-		    	return me.vcf.promiseGetClinvarRecords(
-		    		me.vcfData.features, 
-		    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
-		    		me._refreshVariantsWithClinvar.bind(me));
+		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
+			    // can be filtered by range.
+			    me._determineVariantAfLevels(me.vcfData);
+
+			    // Show the snpEff effects / vep consequences in the filter card
+			    me._populateEffectFilters(me.vcfData.features);
+
+			    // Invoke callback now that we have annotated variants
+		    	if (onVcfData) {
+		    		onVcfData();
+		    	}
+		    	
+		    	// Determine inheritance (once full trio is loaded)
+				determineInheritance();
+
+		    	// Get the clinvar records (for proband, mom, data)
+		    	if (me.getRelationship() != 'sibling') {
+			    	return me.vcf.promiseGetClinvarRecords(
+			    		me.vcfData.features, 
+			    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
+			    		me._refreshVariantsWithClinvar.bind(me));
+
+		    	} else {
+		    		// We bypass getting clinvar records for unaffected siblings
+		    		return new Promise( function(resolve, reject) {
+		    			resolve();
+		    		});
+		    	}	
+
 
 	    	} else {
-	    		return new Promise( function(resolve, reject) {
-	    			resolve();
-	    		});
-	    	}			
+	    		reject("problem when getting variants - null set returned.");
+	    	}
+
+		
 	    }, 
 	    function(error) {
 	    	// If error when getting clinvar records	    	
@@ -679,43 +724,6 @@ VariantModel.prototype.promiseGetAnnotatedVariants = function(onVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onVcfData) {
-	var me = this;
-
-	return new Promise( function(resolve, reject) {
-
-		// A gene has been selected.  Read the variants for the gene region.
-		me._promiseVcfRefName().then( function() {
-			me.promiseGetAnnotatedVariants(onVcfData).then( function(data) {
-		    	me.vcfData = data;
-
-		        if (me.vcfData != null && me.vcfData.features != null && me.vcfData.features.length > 0) {
-					// We have the AFs from 1000G and ExAC.  Now set the level so that variants
-				    // can be filtered by range.
-				    me._determineVariantAfLevels(me.vcfData);
-
-				    // Show the snpEff effects / vep consequences in the filter card
-				    me._populateEffectFilters(me.vcfData.features);
-
-					determineInheritance();
-
-					resolve(me.vcfData);
-
-				} else {
-					reject('Error getting annotated variants');
-				}
-
-		    }, function(error) {
-		    	reject(error);
-		    });
-		}, function(error) {
-			reject("missing reference")
-		});
-
-
-	});
-
-}
 
 VariantModel.prototype.determineUnaffectedSibsStatus = function() {
 	this.vcfData.features.forEach( function(variant) {

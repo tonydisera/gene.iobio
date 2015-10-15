@@ -696,7 +696,7 @@ MatrixCard.prototype.showDeNovoSymbol = function (selection) {
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
 	         .attr("width", "25")
-	         .attr("height", "2")
+	         .attr("height", "25")
 	         .style("pointer-events", "none");
 	
 };
