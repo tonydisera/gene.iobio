@@ -1364,12 +1364,12 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) {
 	if (this.model.getBamData() != null) {
 		var bamDepth = null;
-		if (sourceVariantCard == this && variant.bamDepth != null && variant.bamDepth != '') {
-			bamDepth = variant.bamDepth;
+		if (sourceVariantCard == this && variant.genotypeDepth != null && variant.genotypeDepth != '') {
+			bamDepth = variant.genotypeDepth;
 		} else {
 			var matchingVariant = this.model.getMatchingVariant(variant);
 			if (matchingVariant != null) {
-				bamDepth = matchingVariant.bamDepth;
+				bamDepth = matchingVariant.genotypeDepth;
 			}
 		}
 		this.bamDepthChart.showCircle()(variant.start, bamDepth);
