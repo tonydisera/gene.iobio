@@ -714,7 +714,7 @@ VariantModel.prototype._getCacheKey = function(dataKind) {
 VariantModel.prototype._cacheData = function(data, dataKind) {
 	var me = this;
 	if (localStorage) {
-		
+		var success = true;
 		var dataString = JSON.stringify(data);
 
     	stringCompress = new StringCompress();
@@ -722,12 +722,35 @@ VariantModel.prototype._cacheData = function(data, dataKind) {
     	var dataStringCompressed = null;
     	try {
     		dataStringCompressed = stringCompress.deflate(dataString);
-    	} catch (e) {
-    		console.log("an error occurred when compressing vcf data for key " + me._getCacheKey());
+    	} catch (e) {    		
+	   		console.log("an error occurred when compressing vcf data for key " + me._getCacheKey());
+	   		success = false;
     	}
 
-      	localStorage.setItem(this._getCacheKey(dataKind), dataStringCompressed);
-      	return true;
+    	if (success) {
+	    	try {
+		      	localStorage.setItem(this._getCacheKey(dataKind), dataStringCompressed);
+	    	} catch(e) {
+				if (e == QUOTA_EXCEEDED_ERR) {
+	    			// TODO - keep track of times that genes were cached and delete the
+	    			// oldest entry(ies).  Need to delete enough to store the current 
+	    			// data that needs to be cached.
+	    			console.log("local storage quota exceeded.  clearing local storage to continue.")
+	    			localStorage.clear();
+	    			try {
+				      	localStorage.setItem(this._getCacheKey(dataKind), dataStringCompressed);
+	    			} catch(e) {
+			    		console.log("an error occurred when attempting to store into local storage (2nd attempt).  Cache key is " + me._getCacheKey() + ". Exception is " + e);
+			    		success = false;
+	    			}
+	    		} else { 
+			    	console.log("an error occurred when attempting to store into local storage.  Cache key is " + me._getCacheKey() + ". Exception is " + e);
+			    	success = false;
+	    		}   		
+	    	}    		
+    	}
+
+      	return success;
     } else {
     	return false;
     }
