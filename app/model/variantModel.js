@@ -164,7 +164,13 @@ VariantModel.prototype.reduceBamData = function(theBamData, numberOfPoints) {
 }
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
+	var fbData = this._getCachedData("fbData");
+	if (fbData != null) {
+		this.fbData = fbData;
+	}
 	if (theRegionStart && theRegionEnd) {
+		// Check the local cache first to see
+		// if we already have the freebayes variants
 		var variants = this.fbData.features.filter(function(d) {
 							return (d.start >= theRegionStart && d.start <= theRegionEnd);
 					   });	
@@ -539,13 +545,14 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 	}
 
 	// Get the coverage data for the gene region
-	me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
- 	  function(coverageForRegion, coverageForPoints) {
-
-		me.bamData = coverageForRegion;
+	// First the gene vcf data has been cached, just return
+	// it.  (No need to retrieve the variants from the iobio service.)
+	var coverageData = me._getCachedData("bamData");
+	if (coverageData != null && coverageData != '') {
+		me.bamData = coverageData;
 
 		if (regions.length > 0) {
-			me._refreshVariantsWithCoverage(coverageForPoints, function() {				
+			me._refreshVariantsWithCoverage(me.bamData, function() {				
 				if (callbackDataLoaded) {
 			   	    callbackDataLoaded(me.bamData);
 		   	    }
@@ -555,7 +562,28 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 		   	    callbackDataLoaded(me.bamData);
 	   	    }
 		}
-	});
+
+	} else {
+		me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
+	 	  function(coverageForRegion, coverageForPoints) {
+
+			me.bamData = coverageForRegion;
+
+			me._cacheData(me.bamData, "bamData");
+
+			if (regions.length > 0) {
+				me._refreshVariantsWithCoverage(coverageForPoints, function() {				
+					if (callbackDataLoaded) {
+				   	    callbackDataLoaded(me.bamData);
+			   	    }
+				});				
+			} else {
+				if (callbackDataLoaded) {
+			   	    callbackDataLoaded(me.bamData, "bamData");
+		   	    }
+			}
+		});
+	}
 
 
 
@@ -616,7 +644,8 @@ VariantModel.prototype.promiseGetVariantsOnly = function() {
 	       me.sampleName 
 	    ).then( function(data) {
 	    	var annotatedRecs = data[0];
-	    	me.vcfData = data[1];
+	    	me.vcfData = data[1];	    	
+
 	    	resolve(me.vcfData);
 		});
 
@@ -629,23 +658,98 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 
 	return new Promise( function(resolve, reject) {
 
-		// A gene has been selected.  Read the variants for the gene region.
-		me._promiseVcfRefName().then( function() {
-			me._promiseGetAndAnnotateVariants(onVcfData).then( function(data) {
-		    	me.vcfData = data;
+		// First the gene vcf data has been cached, just return
+		// it.  (No need to retrieve the variants from the iobio service.)
+		var vcfData = me._getCachedData("vcfData");
+		if (vcfData != null && vcfData != '') {
+			me.vcfData = vcfData;
+			me._populateEffectFilters(me.vcfData.features);
 
-				resolve(me.vcfData);
+		    // Invoke callback now that we have annotated variants
+	    	if (onVcfData) {
+	    		onVcfData();
+	    	}
+	    	
+	    	// Determine inheritance (once full trio is loaded)
+			determineInheritance();
 
-		    }, function(error) {
-		    	reject(error);
-		    });
-		}, function(error) {
-			reject("missing reference")
-		});
+			resolve(me.vcfData);
+		} else {
+			// We don't have the variants for the gene in cache, 
+			// so call the iobio services to retreive the variants for the gene region 
+			// and annotate them.
+			me._promiseVcfRefName().then( function() {
+				me._promiseGetAndAnnotateVariants(onVcfData).then( function(data) {
+			    	me.vcfData = data;
+
+			    	// Cache the data
+			    	me._cacheData(me.vcfData, "vcfData");
+			    	
+
+					resolve(me.vcfData);
+
+			    }, function(error) {
+			    	reject(error);
+			    });
+			}, function(error) {
+				reject("missing reference")
+			});
+
+		}
+
 
 
 	});
 
+}
+
+VariantModel.prototype._getCacheKey = function(dataKind) {
+	return this.getRelationship() 
+		+ (this.sampleName != null ? "-" + this.sampleName : "")
+		+ "-" + gene.gene_name 
+		+ "-" + selectedTranscript.transcript_id 
+		+ "-" + dataKind;
+}
+
+VariantModel.prototype._cacheData = function(data, dataKind) {
+	var me = this;
+	if (localStorage) {
+		
+		var dataString = JSON.stringify(data);
+
+    	stringCompress = new StringCompress();
+
+    	var dataStringCompressed = null;
+    	try {
+    		dataStringCompressed = stringCompress.deflate(dataString);
+    	} catch (e) {
+    		console.log("an error occurred when compressing vcf data for key " + me._getCacheKey());
+    	}
+
+      	localStorage.setItem(this._getCacheKey(dataKind), dataStringCompressed);
+      	return true;
+    } else {
+    	return false;
+    }
+}
+
+VariantModel.prototype._getCachedData = function(dataKind) {
+	var me = this;
+
+	var data = null;
+	if (localStorage) {
+      	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind));
+      	if (dataCompressed != null) {
+			var dataString = null;
+			try {
+				dataString = stringCompress.inflate(dataCompressed);
+			} catch(e) {
+				console.log("an error occureed when uncompressing vcf data for key " + me._getCacheKey());
+			}
+			data =  JSON.parse(dataString);      		
+      	} 
+	} 
+	return data;
 }
 
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(onVcfData) {
@@ -1027,134 +1131,166 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 			resolve();
 		} else {
 
-			var refName = window.gene.chr;
-			me.fbData = null;
-			if (!me.isVcfLoaded()) {
-				me.vcfData = null;
-			}
+			// Check the local cache first to see
+			// if we already have the freebayes variants
+			var fbData = me._getCachedData("fbData");
+			if (fbData != null) {
+				me.fbData = fbData;
 
-			// Call Freebayes variants
-			me.bam.getFreebayesVariants(refName, 
-				window.gene.start, 
-				window.gene.end, 
-				window.gene.strand, 
-				function(data) {
+				// Show populate the effect filters for the freebayes variants
+				me._populateEffectFilters(me.fbData.features);
 
-				if (data == null || data.length == 0) {
-					reject();
+				// Once all variant cards have freebayes variants,
+				// the app will determine in the inheritance mode
+				// for the freebayes variants
+				determineInheritance(promiseFullTrioCalledVariants);
+
+				if (onVariantsAnnotated) {
+					onVariantsAnnotated(me.fbData);
 				}
 
-				// Parse string into records
-				var fbRecs = [];
-				var recs = data.split("\n");
-				recs.forEach( function(rec) {
-					fbRecs.push(rec);
-				});
-				
+				resolve(me.fbData);
 
-				// Reset the featurematrix load state so that after freebayes variants are called and
-				// integrated into vcfData, we reload the feature matrix.
-				if (me.isVcfLoaded()) {
-					if (me.vcfData.loadState != null && me.vcfData.loadState['featurematrix']) {
-						me.vcfData.loadState['featurematrix'] = null;
-					}					
-				} 
 
-				if (onVariantsCalled) {
-					onVariantsCalled();
+			} else {
+				// We haven't cached the freebayes variants yet,
+				// so call variants now.
+				var refName = window.gene.chr;
+				me.fbData = null;
+				if (!me.isVcfLoaded()) {
+					me.vcfData = null;
 				}
 
-				// Annotate the fb variants
-				me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene.start, window.gene.end, 
-					window.gene.strand, window.selectedTranscript, me.sampleName)
-			    .then( function(data) {
+				// Call Freebayes variants
+				me.bam.getFreebayesVariants(refName, 
+					window.gene.start, 
+					window.gene.end, 
+					window.gene.strand, 
+					function(data) {
 
-			    	var annotatedRecs = data[0];
-			    	me.fbData = data[1];
-
-			    	// Flag the called variants
-				   	me.fbData.features.forEach( function(feature) {
-				   		feature.fbCalled = 'Y';
-				   	});
-
-					// We may have called variants that are slightly outside of the region of interest.
-					// Filter these out.
-					if (window.regionStart != null && window.regionEnd != null ) {	
-						me.fbData.features = me.fbData.features.filter( function(d) {
-							meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
-							return meetsRegion;
-						});
-					}	
-
-			    	// We are done getting the clinvar data for called variants.
-			    	// Now merge called data with variant set and display.
-					// Prepare vcf and fb data for comparisons
-					me._prepareVcfAndFbData();
-
-					// Determine allele freq levels
-		        	me._determineVariantAfLevels(me.fbData);
-
-		        	// Filter the freebayes variants to only keep the ones
-		        	// not present in the vcf variant set.
-					me._determineUniqueFreebayesVariants();
-
-
-		        	// Show the snpEff effects / vep consequences in the filter card
-					me._populateEffectFilters(me.fbData.features);
-
-					// Once all variant cards have freebayes variants,
-					// the app will determine in the inheritance mode
-					// for the freebayes variants
-					determineInheritance(promiseFullTrioCalledVariants);
-
-					if (onVariantsAnnotated) {
-						onVariantsAnnotated(me.fbData);
+					if (data == null || data.length == 0) {
+						reject();
 					}
+
+					// Parse string into records
+					var fbRecs = [];
+					var recs = data.split("\n");
+					recs.forEach( function(rec) {
+						fbRecs.push(rec);
+					});
 					
-					// Now get the clinvar data		    	
-		    		return me.vcf.promiseGetClinvarRecords(
-					    		me.fbData.features, 
-					    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
-					    		me._refreshVariantsWithClinvar.bind(me));
+
+					// Reset the featurematrix load state so that after freebayes variants are called and
+					// integrated into vcfData, we reload the feature matrix.
+					if (me.isVcfLoaded()) {
+						if (me.vcfData.loadState != null && me.vcfData.loadState['featurematrix']) {
+							me.vcfData.loadState['featurematrix'] = null;
+						}					
+					} 
+
+					if (onVariantsCalled) {
+						onVariantsCalled();
+					}
+
+					// Annotate the fb variants
+					me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene.start, window.gene.end, 
+						window.gene.strand, window.selectedTranscript, me.sampleName)
+				    .then( function(data) {
+
+				    	var annotatedRecs = data[0];
+				    	me.fbData = data[1];
+
+				    	// Flag the called variants
+					   	me.fbData.features.forEach( function(feature) {
+					   		feature.fbCalled = 'Y';
+					   	});
+
+						// We may have called variants that are slightly outside of the region of interest.
+						// Filter these out.
+						if (window.regionStart != null && window.regionEnd != null ) {	
+							me.fbData.features = me.fbData.features.filter( function(d) {
+								meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+								return meetsRegion;
+							});
+						}	
+
+				    	// We are done getting the clinvar data for called variants.
+				    	// Now merge called data with variant set and display.
+						// Prepare vcf and fb data for comparisons
+						me._prepareVcfAndFbData();
+
+						// Determine allele freq levels
+			        	me._determineVariantAfLevels(me.fbData);
+
+			        	// Filter the freebayes variants to only keep the ones
+			        	// not present in the vcf variant set.
+						me._determineUniqueFreebayesVariants();
 
 
+			        	// Show the snpEff effects / vep consequences in the filter card
+						me._populateEffectFilters(me.fbData.features);
 
-			    }, function(error) {
-			    	reject('Error occurred when getting clinvar records:' + error);
-			    })
-			    .then (function() {
+						// Once all variant cards have freebayes variants,
+						// the app will determine in the inheritance mode
+						// for the freebayes variants
+						determineInheritance(promiseFullTrioCalledVariants);
 
-					// The variant records in vcfData have updated clinvar and inheritance info.
-					// Reflect me new info in the freebayes variants.
-					me.fbData.features.forEach(function (fbVariant) {
-						if (fbVariant.source) {
-							fbVariant.inheritance                 = fbVariant.source.inheritance;
-
-							fbVariant.clinVarUid                  = fbVariant.source.clinVarUid;
-							fbVariant.clinVarClinicalSignificance = fbVariant.source.clinVarClinicalSignificance;
-							fbVariant.clinVarAccession            = fbVariant.source.clinVarAccession;
-							fbVariant.clinvarRank                 = fbVariant.source.clinvarRank;
-							fbVariant.clinvar                     = fbVariant.source.clinvar;
-							fbVariant.clinVarPhenotype            = fbVariant.source.clinVarPhenotype;
-
-							fbVariant.genotypeRefCountMother      = fbVariant.source.genotypeRefCountMother;
-							fbVariant.genotypeAltCountMother      = fbVariant.source.genotypeAltCountMother;
-							fbVariant.genotypeDepthMother         = fbVariant.source.genotypeDepthMother;
-							fbVariant.genotypeRefCountFather      = fbVariant.source.genotypeRefCountFather;
-							fbVariant.genotypeAltCountFather      = fbVariant.source.genotypeAltCountFather;
-							fbVariant.genotypeDepthFather         = fbVariant.source.genotypeDepthFather;
-							fbVariant.uasibsZygosity              = fbVariant.source.uasibsZygosity;
+						if (onVariantsAnnotated) {
+							onVariantsAnnotated(me.fbData);
 						}
 						
-					});	    	
-					resolve(me.fbData);
-			
-			    	
-			    }, function(error) {
-			    	reject('An error occurred when getting clinvar recs for called variants: ' + error);
-			    });
-			
-			});			
+						// Now get the clinvar data		    	
+			    		return me.vcf.promiseGetClinvarRecords(
+						    		me.fbData.features, 
+						    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
+						    		me._refreshVariantsWithClinvar.bind(me));
+
+
+
+				    }, function(error) {
+				    	reject('Error occurred when getting clinvar records:' + error);
+				    })
+				    .then (function() {
+
+						// The variant records in vcfData have updated clinvar and inheritance info.
+						// Reflect me new info in the freebayes variants.
+						me.fbData.features.forEach(function (fbVariant) {
+							if (fbVariant.source) {
+								fbVariant.inheritance                 = fbVariant.source.inheritance;
+
+								fbVariant.clinVarUid                  = fbVariant.source.clinVarUid;
+								fbVariant.clinVarClinicalSignificance = fbVariant.source.clinVarClinicalSignificance;
+								fbVariant.clinVarAccession            = fbVariant.source.clinVarAccession;
+								fbVariant.clinvarRank                 = fbVariant.source.clinvarRank;
+								fbVariant.clinvar                     = fbVariant.source.clinvar;
+								fbVariant.clinVarPhenotype            = fbVariant.source.clinVarPhenotype;
+
+								fbVariant.genotypeRefCountMother      = fbVariant.source.genotypeRefCountMother;
+								fbVariant.genotypeAltCountMother      = fbVariant.source.genotypeAltCountMother;
+								fbVariant.genotypeDepthMother         = fbVariant.source.genotypeDepthMother;
+								fbVariant.genotypeRefCountFather      = fbVariant.source.genotypeRefCountFather;
+								fbVariant.genotypeAltCountFather      = fbVariant.source.genotypeAltCountFather;
+								fbVariant.genotypeDepthFather         = fbVariant.source.genotypeDepthFather;
+								fbVariant.uasibsZygosity              = fbVariant.source.uasibsZygosity;
+							}
+							
+						});	 
+
+						// Cache the freebayes variants.
+						me._cacheData(me.fbData, "fbData");
+
+						resolve(me.fbData);
+				
+				    	
+				    }, function(error) {
+				    	reject('An error occurred when getting clinvar recs for called variants: ' + error);
+				    });
+				
+				});							
+
+			}
+
+
 		}
 
 	});

@@ -123,6 +123,11 @@ function promiseLoadTemplate(templateName) {
 function init() {
 	var me = this;
 
+	// Clear the local cache
+ 	if (localStorage) {
+       localStorage.clear(); 		
+ 	}
+
 
 	// Initialize material bootstrap
     $.material.init();

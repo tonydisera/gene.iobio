@@ -130,6 +130,12 @@ DataCard.prototype.init = function() {
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
 		closeSampleSlideDown();
+		
+		// Clear the cache
+		if (localStorage) {
+	       localStorage.clear(); 		
+	 	}
+
 
 		var unaffectedSibs = $("#unaffected-sibs-select").chosen().val();
 		window.loadUnaffectedSibs(unaffectedSibs);
@@ -192,11 +198,10 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];	
 
-	variantCard.onBamFilesSelected(event).then(function(bamFileName) {
+	variantCard.onBamFilesSelected(event, function(bamFileName) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
 		enableLoadButton();
-
 	});
 
 }

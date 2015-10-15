@@ -1,4 +1,3 @@
-// Create a variantCard class
 // Constructor
 function VariantCard() {
 
@@ -292,8 +291,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 };
 
 
-VariantCard.prototype.promiseBamFilesSelected = function(event) {
-	return this.model.promiseBamFilesSelected(event);
+VariantCard.prototype.onBamFilesSelected = function(event, callback) {
+	this.model.promiseBamFilesSelected(event).then( function(fileName) {
+		callback(fileName);
+	});
 }
 
 VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
