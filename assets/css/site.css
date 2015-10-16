@@ -124,12 +124,20 @@ body {
   overflow-wrap: break-word;
   color: #CCC8C5;
   text-align:right;
+  width: 100px;
+  float:left;
 
+}
+
+.tooltip-row {
+  width:300px;
 }
 
 .tooltip-value {
   overflow-wrap: break-word;
-  padding-left: 0px;
+  padding-left: 10px;
+  float:right;
+  width: 190px;
 
 }
 

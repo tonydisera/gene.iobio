@@ -1233,10 +1233,10 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 	container.select("div.proband-alt-count").remove();
 	container.append("div")
-	         .attr("class", "proband-alt-count tooltip-header col-md-5")
+	         .attr("class", "proband-alt-count tooltip-header")
 	         .text("Proband Allele Count");
 	var column = container.append("div")
-	                      .attr("class", "proband-alt-count tooltip-value col-md-7")
+	                      .attr("class", "proband-alt-count tooltip-value")
 	
 	this._appendAlleleCountSVG(column, variant.genotypeAltCount, variant.genotypeRefCount, variant.genotypeDepth);
 
@@ -1244,19 +1244,19 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 		// Mother
 		container.select("div.mother-alt-count").remove();
 		container.append("div")
-		         .attr("class", "mother-alt-count tooltip-header col-md-5")
+		         .attr("class", "mother-alt-count tooltip-header")
 		         .text("Mother");
 		column = container.append("div")
-		                      .attr("class", "mother-alt-count tooltip-value col-md-7")
+		                      .attr("class", "mother-alt-count tooltip-value")
 		this._appendAlleleCountSVG(column, variant.genotypeAltCountMother, variant.genotypeRefCountMother, variant.genotypeDepthMother);		
 
 		// Father
 		container.select("div.father-alt-count").remove();
 		container.append("div")
-	         .attr("class", "father-alt-count tooltip-header col-md-5")
+	         .attr("class", "father-alt-count tooltip-header")
 	         .text("Father");
 		column = container.append("div")
-	                      .attr("class", "father-alt-count tooltip-value col-md-7")
+	                      .attr("class", "father-alt-count tooltip-value")
 		this._appendAlleleCountSVG(column, variant.genotypeAltCountFather, variant.genotypeRefCountFather, variant.genotypeDepthMother);
 	}
 }
@@ -1618,9 +1618,9 @@ VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value
 VariantCard.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow) {
 	if (alwaysShow || (value && value != '')) {
 		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
-		return '<div class="row"' + style + '>'
-		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
-		      + '<div class="col-md-7 tooltip-value">' + value.toLowerCase() + '</div>'
+		return '<div class="tooltip-row"' + style + '>'
+		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div class="tooltip-value">' + value.toLowerCase() + '</div>'
 		      + '</div>';
 	} else {
 		return "";
@@ -1630,9 +1630,9 @@ VariantCard.prototype._tooltipRow = function(label, value, paddingTop, alwaysSho
 VariantCard.prototype._tooltipRowURL = function(label, value, paddingTop, alwaysShow) {
 	if (alwaysShow || (value && value != '')) {
 		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
-		return '<div class="row"' + style + '>'
-		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
-		      + '<div class="col-md-7 tooltip-value">' + value + '</div>'
+		return '<div class="tooltip-row"' + style + '>'
+		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div class="tooltip-value">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";
@@ -1640,15 +1640,14 @@ VariantCard.prototype._tooltipRowURL = function(label, value, paddingTop, always
 }
 
 VariantCard.prototype._tooltipRowAF = function(label, afExAC, af1000g) {
-	return '<div class="row">'
-		      + '<div class="col-md-5 tooltip-header" style="text-align:right">' + label + '</div>'
-		      + '<div class="col-md-3 tooltip-value">' + 'ExAC: ' + afExAC  + '</div>'
-		      + '<div class="col-md-4 tooltip-value">' + '1000G: ' + af1000g + '</div>'
+	return '<div class="tooltip-row">'
+		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
+		      + '<div class="tooltip-value">' + 'ExAC: ' + afExAC  + '&nbsp;&nbsp;&nbps;1000G: ' + af1000g + '</div>'
 		 + '</div>';
 }
 
 VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
-	return '<div class="row" id="coverage-svg">'
+	return '<div class="tooltip-row" id="coverage-svg">'
 		 + '</div>';
 }
 
