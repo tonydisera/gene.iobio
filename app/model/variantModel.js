@@ -721,9 +721,13 @@ VariantModel.prototype._cacheData = function(data, dataKind) {
 
     	var dataStringCompressed = null;
     	try {
-    		dataStringCompressed = stringCompress.deflate(dataString);
+    		//dataStringCompressed = stringCompress.deflate(dataString);
+
+    		console.log("before compression=" + dataString.length);
+			dataStringCompressed = LZString.compressToUTF16(dataString);
+    		console.log("after compression=" + dataStringCompressed.length);
     	} catch (e) {    		
-	   		console.log("an error occurred when compressing vcf data for key " + me._getCacheKey());
+	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey());
 	   		success = false;
     	}
 
@@ -765,7 +769,8 @@ VariantModel.prototype._getCachedData = function(dataKind) {
       	if (dataCompressed != null) {
 			var dataString = null;
 			try {
-				dataString = stringCompress.inflate(dataCompressed);
+				//dataString = stringCompress.inflate(dataCompressed);
+				 dataString = LZString.decompressFromUTF16(dataCompressed);
 			} catch(e) {
 				console.log("an error occureed when uncompressing vcf data for key " + me._getCacheKey());
 			}
