@@ -1262,7 +1262,7 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 }
 
 VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth) {
-	var MAX_BAR_WIDTH = 150;
+	var MAX_BAR_WIDTH = 170;
 	var BAR_WIDTH = 0;
 	if ((genotypeDepth == null || genotypeDepth == '') && genotypeAltCount == null) {
 		container.text("n/a");
@@ -1592,14 +1592,15 @@ VariantCard.prototype._unpinRow = function(pinMessage) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
 	if (window.clickedVariant) {
-		return '<div style="text-align:right; padding-top: 4px;">'
-			      + '<a  id="unpin" href="javascript:void(0)">unlock</a>'
-			 + '</div>';	
+		return '<div class="row">'
+		  + '<div class="col-md-12" style="text-align:right;">' + '<a  id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+		  + '</div>';
+		
 
 	} else {
-		return '<div style="text-align:right; padding-top: 4px;" >'			     
-			      + '<em>' + pinMessage + '</em></div>'
-			 + '</div>';	
+		return '<div class="row">'
+		  + '<div class="col-md-12" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
+		  + '</div>';
 	}
 }
 
