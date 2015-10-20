@@ -670,9 +670,6 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 	    		onVcfData();
 	    	}
 	    	
-	    	// Determine inheritance (once full trio is loaded)
-			determineInheritance();
-
 			resolve(me.vcfData);
 		} else {
 			// We don't have the variants for the gene in cache, 
@@ -812,7 +809,11 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(onVcfData) {
 		    	}
 		    	
 		    	// Determine inheritance (once full trio is loaded)
-				determineInheritance();
+				promiseDetermineInheritance().then(function() {
+
+				}, function(error) {
+					console.log("an error occurred when determine inheritance. " + error);
+				})
 
 		    	// Get the clinvar records (for proband, mom, data)
 		    	if (me.getRelationship() != 'sibling') {
@@ -1168,10 +1169,9 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 				// Show populate the effect filters for the freebayes variants
 				me._populateEffectFilters(me.fbData.features);
 
-				// Once all variant cards have freebayes variants,
-				// the app will determine in the inheritance mode
-				// for the freebayes variants
-				determineInheritance(promiseFullTrioCalledVariants);
+				if (onVariantsCalls) {
+					onVariantsCalled();
+				}
 
 				if (onVariantsAnnotated) {
 					onVariantsAnnotated(me.fbData);
@@ -1261,7 +1261,25 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						// Once all variant cards have freebayes variants,
 						// the app will determine in the inheritance mode
 						// for the freebayes variants
-						determineInheritance(promiseFullTrioCalledVariants);
+						promiseDetermineInheritance(promiseFullTrioCalledVariants).then(function() {
+							// The variant records in vcfData have updated clinvar and inheritance info.
+							// Reflect me new info in the freebayes variants.
+							me.fbData.features.forEach(function (fbVariant) {
+								if (fbVariant.source) {
+									fbVariant.genotypeRefCountMother      = fbVariant.source.genotypeRefCountMother;
+									fbVariant.genotypeAltCountMother      = fbVariant.source.genotypeAltCountMother;
+									fbVariant.genotypeDepthMother         = fbVariant.source.genotypeDepthMother;
+									fbVariant.genotypeRefCountFather      = fbVariant.source.genotypeRefCountFather;
+									fbVariant.genotypeAltCountFather      = fbVariant.source.genotypeAltCountFather;
+									fbVariant.genotypeDepthFather         = fbVariant.source.genotypeDepthFather;
+									fbVariant.uasibsZygosity              = fbVariant.source.uasibsZygosity;
+								}
+								
+							});	 
+
+						}, function(error) {
+							console.log("a problem in determining inhheritance occurred after calling variants. " + error);
+						});
 
 						if (onVariantsAnnotated) {
 							onVariantsAnnotated(me.fbData);
@@ -1284,22 +1302,12 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						// Reflect me new info in the freebayes variants.
 						me.fbData.features.forEach(function (fbVariant) {
 							if (fbVariant.source) {
-								fbVariant.inheritance                 = fbVariant.source.inheritance;
-
 								fbVariant.clinVarUid                  = fbVariant.source.clinVarUid;
 								fbVariant.clinVarClinicalSignificance = fbVariant.source.clinVarClinicalSignificance;
 								fbVariant.clinVarAccession            = fbVariant.source.clinVarAccession;
 								fbVariant.clinvarRank                 = fbVariant.source.clinvarRank;
 								fbVariant.clinvar                     = fbVariant.source.clinvar;
 								fbVariant.clinVarPhenotype            = fbVariant.source.clinVarPhenotype;
-
-								fbVariant.genotypeRefCountMother      = fbVariant.source.genotypeRefCountMother;
-								fbVariant.genotypeAltCountMother      = fbVariant.source.genotypeAltCountMother;
-								fbVariant.genotypeDepthMother         = fbVariant.source.genotypeDepthMother;
-								fbVariant.genotypeRefCountFather      = fbVariant.source.genotypeRefCountFather;
-								fbVariant.genotypeAltCountFather      = fbVariant.source.genotypeAltCountFather;
-								fbVariant.genotypeDepthFather         = fbVariant.source.genotypeDepthFather;
-								fbVariant.uasibsZygosity              = fbVariant.source.uasibsZygosity;
 							}
 							
 						});	 

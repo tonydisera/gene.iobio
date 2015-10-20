@@ -222,10 +222,41 @@
 
     	<section id="app-title-section">
     	     <a id='home' href="/">
-            <span class="iobioapp"><span class='hide beta'>beta</span> gene</span><span class="iobio">.iobio</span>
+            <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
            </a>
 
-          <div style="display:inline-block;">
+          <!-- iobio project link -->
+          <a href="http://iobio.io" class="iobioproject">           
+            an iobio project
+          </a>   
+
+          <!-- Learn more dropdown button -->
+          <div class="btn-toolbar" id="learn-more-dropdown-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 10px;">
+            <div class="btn-group"  style="display:  inline;margin-top: 15px;">
+
+              <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Learn more <span class="caret"></span>
+              </button>
+
+              <ul class="dropdown-menu" role="menu" style="font-size:11px;">
+                <li><a href="javascript:void(0)" class="open_page_guide">Tour</a>
+                </li>
+                <li><a href="javascript:void(0)"  onclick="$('#tourWelcome').removeClass('open');window.open('videos.html', '_screencasts');">Screencasts</a>
+                </li>
+                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('usecases.html','_usecases');">Use Cases</a>
+
+                <li role="presentation" class="divider"></li>
+                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/03/install-run-tabix/','_helptopics');">Input Variant files</a>
+
+                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/07/vep-in-gene-iobio/','_helptopics');">VEP, SIFT/Polyphen, Regulatory annotations</a>
+
+                  
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="gene-search-bar" style="display:inline-block;">
 
             <!-- Non protein-coding gene badges -->
             <div id="non-protein-coding" style="float:left;">
@@ -234,12 +265,13 @@
             </div>
 
             <!-- Gene search -->
-            <span id="bloodhound">
-                <input id="enter-gene-name" class="typeahead" style="margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" placeholder="Enter Gene Name">
+            <span id="bloodhound" >
+                <input id="enter-gene-name" class="typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
+                placeholder="Enter Gene Name">
             </span>           
 
             <!-- get genes dropdown button -->
-            <div id="get-genes-dropdown" class="" style="margin-right:30px;width:95px;float:right;">
+            <div id="get-genes-dropdown" class="" style="width:95px;float:right;">
               <div class="btn-toolbar">
                 <div class="btn-group"  style="display:inline;margin-top: 15px;">
 
@@ -275,36 +307,6 @@
 
           </div>
 
-          <!-- iobio project link -->
-          <a href="http://iobio.io" class="iobioproject">           
-            an iobio project
-          </a>   
-
-          <!-- Learn more dropdown button -->
-          <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 10px;">
-            <div class="btn-group"  style="display:  inline;margin-top: 15px;">
-
-              <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                Learn more <span class="caret"></span>
-              </button>
-
-              <ul class="dropdown-menu" role="menu" style="font-size:11px;">
-                <li><a href="javascript:void(0)" class="open_page_guide">Tour</a>
-                </li>
-                <li><a href="javascript:void(0)"  onclick="$('#tourWelcome').removeClass('open');window.open('videos.html', '_screencasts');">Screencasts</a>
-                </li>
-                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('usecases.html','_usecases');">Use Cases</a>
-
-                <li role="presentation" class="divider"></li>
-                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/03/install-run-tabix/','_helptopics');">Input Variant files</a>
-
-                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/07/vep-in-gene-iobio/','_helptopics');">VEP, SIFT/Polyphen, Regulatory annotations</a>
-
-                  
-                </li>
-              </ul>
-            </div>
-          </div>
 
 
           <!-- gene badges for navigation -->
@@ -323,24 +325,36 @@
 
       <div id="transcript-card" class="hide" style="background:white;">
 
-        <span id="transcript-link" class="card-label" style="float:left;margin-left:13px;margin-right:3px;">
-          <span id="gene-name" class="heading"></span>  
-        
-        </span>
-          
-        <span style="float:right;margin-right:14px">
-          <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-            <i class="mdi-content-remove"></i>
-          </a>
-          <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-            <i class="mdi-image-crop-din"></i>
-          </a>
-       </span>
 
 
-        <span class="fullview" style="float:left;padding-left:10px;padding-top: 3px;padding-right:3px;color: rgb(132,132,132);">Transcript</span>  
+        <div id="region-track"  style="clear:both;margin-left: 20px;">
+            <a id="gene-name" target="_genecards" class="card-label heading " data-toggle="tooltip" data-placement="right" >TET3</a>
+            <span id="gene-chr" class=" card-label keep-case">chr2</span>
+            <span id="gene-region" class=" card-label keep-case">74229840-74335303</span>
+            <span id="minus_strand" class="hide " style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+            <span  class="fullview" style="padding-left: 15px">+  -</span>
+            <input id="gene-region-buffer-input" class="fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+
+
+             <span style="float:right;margin-right:14px">
+                <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                  <i class="mdi-content-remove"></i>
+                </a>
+                <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
+                  <i class="mdi-image-crop-din"></i>
+                </a>
+            </span>
+
+        </div>
+
+
+
+
+        <div class="fullview" style="margin-top:-25px">
+        <span class="fullview" style="float:left;padding-left:20px;padding-right:3px;color: rgb(132,132,132);">Transcript</span>  
+
         <div class="btn-toolbar fullview" 
-           style="display: inline-block;float: left;margin-left: 0px;padding-top: 0px; margin-top: -12px;">
+           style="display: inline-block;float: left;margin-top:-15px;margin-left: 0px;padding-top: 0px; ">
            <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
                 <button id="transcript-dropdown-button" type="button"  
                 style="width:150px;font-size:11px"
@@ -354,14 +368,10 @@
                   </li>
                 </ul>
             </div>
-        </div>    
-        <div id="region-track" >
-          <span id="gene-chr" class="card-label keep-case"></span>
-          <span id="gene-region" class="card-label keep-case"></span>
-          <span id="minus_strand" class="hide" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-          <span style="padding-left: 15px">+  -</span>
-          <input id="gene-region-buffer-input" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
-        </div>
+        </div> 
+        </div>   
+
+
         <div id="transcript-panel" class="fullview" >
           <div id="gene-track" class="track hide">           
               <div id="gene-viz" class="track-chart"></div>               
@@ -842,7 +852,7 @@
 
 <script src="app/app.js"></script>	
 
-<script src="assets/js/jquery.dropdown.js"></script>
+
 <script>
   $(".material-dropdown select").dropdown();
 </script>

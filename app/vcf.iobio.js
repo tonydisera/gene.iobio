@@ -1223,8 +1223,7 @@ var effectCategories = [
 
    
   }
-
-
+  
   // NEW
   exports._annotateVcfRegion = function(records, refName, sampleName, callback, callbackClinvar) {
       var me = this;

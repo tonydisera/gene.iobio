@@ -518,7 +518,18 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 		// loaded, the read coverage chart and called variant charts are
 		// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 		// chart is not rendered.
-		me._showVariants( regionStart, regionEnd, function() {			
+		me._showVariants( regionStart, regionEnd, function() {	
+
+			// Determine inheritance (once full trio is loaded)
+			/*promiseDetermineInheritance().then( function() {
+				filterCard.enableInheritanceFilters(me.model.getVcfData());
+				me.onVariantDataChange();
+			}, function(error) {
+				console.log("error when determining inheritance. " + error);
+			});
+			*/
+
+				
 			me._showBamDepth( regionStart, regionEnd, function() {
 			});
 		});
@@ -760,7 +771,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 					// have vcf data, the variant chart will be filled
 					me._showVariants();	
 					filterCard.enableVariantFilters(true);
-								
+						
 				}
 				if (onVcfData) {
 				    onVcfData();
@@ -964,29 +975,43 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			// After variants have been been called from alignments...
 	    	me.cardSelector.find('.vcfloader').removeClass("hide");
 			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");
+
 		},
 		function(data) {
-			// After variants have been called from alignments and annotated from snpEff/VEP...
-			// Show the called variant count
-			me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
-			me.cardSelector.find('#missing-variant-count').removeClass("hide");
-			me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
 
-			// Show loading clinvar progress....
-	    	me.cardSelector.find('.vcfloader').removeClass("hide");
-			me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-			me.cardSelector.find('#clinvar-warning').addClass("hide");
+			// After variants have been annotated with clinvar...
+			// Once all variant cards have freebayes variants,
+			// the app will determine in the inheritance mode
+			// for the freebayes variants
+			//promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+				//me.model.loadTrioInfoForCalledVariants();
 
-			// Show the called variants
-			me._fillFreebayesChart(data, regionStart, regionEnd);
+				// After variants have been called from alignments and annotated from snpEff/VEP...
+				// Show the called variant count
+				me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
 
-			// Enable the variant filters based on the new union of 
-			// vcf variants + called variants
-			filterCard.enableVariantFilters(true);
+				// Show loading clinvar progress....
+		    	me.cardSelector.find('.vcfloader').removeClass("hide");
+				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+				me.cardSelector.find('#clinvar-warning').addClass("hide");
+
+				// Show the called variants
+				me._fillFreebayesChart(me.fbData, regionStart, regionEnd);
+
+				// Enable the variant filters based on the new union of 
+				// vcf variants + called variants
+				filterCard.enableVariantFilters(true);
+				filterCard.enableInheritanceFilters(me.model.getVcfData());
+
+			//}, function(error) {
+			//	console.log("error when determining inheritance for called variants. " + error);
+			//});
+
+			
 
 	}).then( function(data) {
-
-		// After variants have been annotated with clinvar...
 
 		// Hide the clinvar loader
 		me.cardSelector.find('.vcfloader').addClass("hide");
@@ -1262,9 +1287,9 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 }
 
 VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth) {
-	var MAX_BAR_WIDTH = 170;
+	var MAX_BAR_WIDTH = 150;
 	var BAR_WIDTH = 0;
-	if ((genotypeDepth == null || genotypeDepth == '') && genotypeAltCount == null) {
+	if ((genotypeDepth == null || genotypeDepth == '') && (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0)) {
 		container.text("n/a");
 		return;
 	}

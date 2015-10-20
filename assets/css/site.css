@@ -131,14 +131,15 @@ body {
 
 .tooltip-row {
   width:300px;
+  clear:both;
 }
 
 .tooltip-value {
   overflow-wrap: break-word;
   padding-left: 10px;
   float:right;
-  width: 190px;
-
+  width: 180px;
+  margin-right: 5px;
 }
 
 .dropdown-menu .divider {
@@ -233,14 +234,6 @@ body {
 
 .btn.btn-success.btn-fab {
   color: green !important;
-}
-a.card-label, a.card-label:hover, a.card-label:focus {
-  color: #5d809d;
-  font-size: 14px;
-  text-transform: uppercase;
-  font-family: Quicksand;
-  font-weight: 700;
-  text-decoration: none;
 }
 
 .badge-label {
@@ -475,7 +468,7 @@ a, a:hover, a:focus {
   width:100%;
   z-index:2;
   right:0px;
-  background-color: rgb(238, 238, 238);
+  background-color: white;
   margin-bottom: 8px;
   /*min-height: 160px;
   max-height: 160px;*/
@@ -631,6 +624,7 @@ section {
   color: white;
   font-size: 19px;
 
+
 }
 
 .iobioapp {
@@ -683,18 +677,17 @@ section {
   text-align: center;
   margin-bottom: 0px;
   padding-bottom: 0px;
-  margin-right: 390px;
+  margin-top:5px;
   color: rgb(132, 132, 132);
   font-size: 14px;
 }
 #gene-name {
-  font-size: 20px !important;
-  float:left;
-  margin-top: -5px;
-  width: 120px;
+  font-size: 16px !important;
+  color: #5d809d;
+  font-weight:bold;
 }
 #gene-region-info {
-  padding-left: 0px;
+  padding-left: 10px;
 }
 #gene-region-start {
 }
@@ -1673,5 +1666,43 @@ header {
 
 .tt-suggestion p {
     margin: 0;
+}
+
+/* For mobile phones  */
+@media screen and (max-device-width:1030px), screen and (max-width:1030px) {
+  #gene-search-bar {
+    margin-left: 50px;
+  }
+}
+/* For mobile phones  */
+@media screen and (max-device-width:800px), screen and (max-width:800px) {
+  .iobio {
+      font-size: 22px !important;
+  }
+
+  .iobioapp {
+      font-size: 22px !important;
+  }
+
+  .iobioproject {
+     font-size:16px;
+  }
+
+  #learn-more-dropdown {
+  }
+
+  #gene-search-bar {
+    display: block !important;
+    clear:both !important;
+    width: 600px;
+    text-align: center !important;
+  }
+
+  #region-track {
+    margin-left: 125px !important;
+  }
+
+
+
 }
 
