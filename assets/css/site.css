@@ -72,15 +72,18 @@ body {
   visibility: hidden !important;
 }
 
-#get-genes-copy-paste-button.btn.btn-raised {
+#get-genes-copy-paste-button.btn.btn-raised,
+#phenolyzer-go-button.btn.btn-raised {
     box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12) !important;
     transition: box-shadow .28s cubic-bezier(.4,0,.2,1);
 }
-#copy-paste-li {
+#copy-paste-li,
+#phenolyzer-li {
       color: rgb(132,132,132) !important;
       font-size: 11px;
 }
-#get-genes-copy-paste-button {
+#get-genes-copy-paste-button,
+#phenolyzer-go-button {
       font-size: 11px;  
 }
 

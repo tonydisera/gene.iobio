@@ -103,7 +103,27 @@
   background-color: white;
   /*z-index: 1;*/
 }
+#slider-left-phenolyzer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  transition: width 0.6s ease;
+  -webkit-transition: width 0.6s ease;
+  -moz-transition: width 0.6s ease;
+  -ms-transition: width 0.6s ease;
+  -o-transition: width 0.6s ease;
+  overflow: auto;
+  background-color: white;
+  /*z-index: 1;*/
+}
 #close-slide-left {
+  position: fixed;
+  left: 220px;
+  top: 0px;  
+}
+#close-slide-left-phenolyzer {
   position: fixed;
   left: 220px;
   top: 0px;  

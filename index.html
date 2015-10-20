@@ -106,11 +106,15 @@
 
 
   <div id="slide-buttons" >
-    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -23px;top: 240px;">
+    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -31px;top: 210px;">
+        <a id="phenolyzer-slide-button"  onclick="showPhenolyzerSlideLeft()" >Phenolyzer</a>
+    </div>
+
+    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -23px;top: 300px;">
         <a id="samples-button"  onclick="showSampleSlideDown()" >Samples</a>
     </div>
 
-    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -13px;top: 320px;">
+    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -13px;top: 380px;">
           <a id="filter-button"  onclick="showFilterSlideLeft()" >Filter</a>
     </div>
   </div>
@@ -118,6 +122,12 @@
   <div id="slider-left" class="hide fade-in shadow-z-2">
   </div>
   <div id="close-slide-left" class="close-button  shadow-z-2 fade-in hide">
+     X
+  </div>
+
+  <div id="slider-left-phenolyzer" class="hide fade-in shadow-z-2">
+  </div>
+  <div id="close-slide-left-phenolyzer" class="close-button  shadow-z-2 fade-in hide">
      X
   </div>
 
@@ -270,6 +280,11 @@
                 placeholder="Enter Gene Name">
             </span>           
 
+            <!-- loader gif for phenolyzer -->
+            <div class="phenolyzer loader hide" style="float:right;padding-top: 17px;">
+                <img src="assets/images/wheel.gif"/>
+            </div>
+
             <!-- get genes dropdown button -->
             <div id="get-genes-dropdown" class="" style="width:95px;float:right;">
               <div class="btn-toolbar">
@@ -289,6 +304,22 @@
                           <button id="get-genes-copy-paste-button" 
                           type="submit"
                           onclick="copyPasteGenes()" 
+                          class="icon-button-sm btn btn-default btn-raised" 
+                          style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+
+                    <li id="phenolyzer-li">
+                      <div style="padding-left:20px;padding-right:20px;padding-top:3px;padding-bottom:3px;">
+                        <div>Phenolyzer</div>
+                        <textarea style="width:230px;height:30px" id="phenolyzer-search-terms"></textarea>
+                        <div style="text-align:right">
+                          <button id="phenolyzer-go-button" 
+                          type="submit"
+                          onclick="getPhenolyzerGenes()" 
                           class="icon-button-sm btn btn-default btn-raised" 
                           style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
                             Done
