@@ -13,6 +13,24 @@ body {
   */
 }
 
+#phenolyzer-results rect {
+    fill: rgba(93, 128, 157, 1);
+    stroke: rgb(93, 128, 157);
+}
+#phenolyzer-results rect.selected {
+    fill: #81A966;
+}
+#phenolyzer-results rect.hover {  
+}
+#phenolyzer-results text.name {
+      fill: rgb(132,132,132) !important;
+      font-size: 12px;
+}
+#phenolyzer-results text.score {
+      fill: rgb(132,132,132) !important;
+      font-size: 11px;
+}
+
 
 .chosen-container-single .chosen-single {
   border-radius: 0px;
