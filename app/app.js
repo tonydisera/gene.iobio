@@ -298,13 +298,12 @@ function init() {
 	});
 
 	// for testing phenolyzer bar chart
-	/*
+	
 	phenolyzerGenes = [
 	{geneName: 'RAI1', score: +.93, selected: "true"}, 
 	{geneName:'BRCA2', score: +.50, selected: "true"}, 
 	{geneName: 'BRCA1', score: +.33 }];
 	showPhenolyzerSlideLeft();
-	*/
 	
 
 	loadGeneFromUrl();
@@ -413,11 +412,12 @@ function showPhenolyzerSlideLeft() {
 
 
 	var geneBarChart = verticalBarChartD3()
-						  .margin( {left:60, right: 10, top: 10, botton: 10} )
+						  .margin( {left:10, right: 10, top: 0, bottom: 0} )
 	                      .xValue( function(d){ return +d.score })
 						  .yValue( function(d){ return d.geneName })
-						  .width(180)
+						  .width(160)
 						  .barHeight(15)
+						  .labelWidth(60)
 						  .gap(4)
 						  .on('d3click', function(phenolyzerGene) {
 						  	if (phenolyzerGene.selected) {

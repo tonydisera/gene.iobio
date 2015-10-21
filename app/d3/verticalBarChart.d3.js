@@ -6,6 +6,7 @@
 	var margin = {top: 10, right: 10, bottom: 10, left: 50},
 		width = 200,
 		barHeight = 20,
+		labelWidth = 100,
 		gap = 2,
 		defaults = {},
 
@@ -52,10 +53,10 @@
 			var svg = svgData.enter()
 					    .append('svg')
 					    .attr('class', 'chart')
-					    .attr('width',  margin.left + width + 40)
+					    .attr('width',  margin.left + width + labelWidth + 20)
 					    .attr('height', (barHeight + gap * 2) * data.length + 30)
 					    .append("g")
-					    .attr("transform", "translate(10, 20)");
+					    .attr("transform", "translate(" + margin.left +", " + margin.top + ")");
 
  		    // def for drop shadow
 			// filters go in defs element
@@ -71,7 +72,7 @@
 				 .attr("class", function(d) { 
 				 	return d.selected ? "selected" : "";
 				 })
-				 .attr("x", margin.left)
+				 .attr("x", labelWidth)
 				 .attr("y", function(d, i) { 
 				 	return i*(barHeight + gap * 2);
 				 })
@@ -114,7 +115,7 @@
 			svg.selectAll("text.score")
 				 .data(data)
 				 .enter().append("text")
-				 .attr("x", function(d) { return x(d.score) + margin.left + 10; })
+				 .attr("x", function(d) { return x(d.score) +  labelWidth + 10; })
 				 .attr("y", function(d, i){ return i*(barHeight + gap * 2) + (barHeight / 2); } )
 				 .attr("dx", -5)
 				 .attr("dy", ".36em")
@@ -207,6 +208,11 @@
 	    return chart;
 	};
 
+	chart.labelWidth = function(_) {
+	    if (!arguments.length) return labelWidth;
+	    labelWidth = _;
+	    return chart;
+	};
 	  
 	chart.brush = function(_) {
 	    if (!arguments.length) return brush;
