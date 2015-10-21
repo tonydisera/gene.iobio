@@ -298,12 +298,13 @@ function init() {
 	});
 
 	// for testing phenolyzer bar chart
-	
+	/*
 	phenolyzerGenes = [
 	{geneName: 'RAI1', score: +.93, selected: "true"}, 
 	{geneName:'BRCA2', score: +.50, selected: "true"}, 
 	{geneName: 'BRCA1', score: +.33 }];
 	showPhenolyzerSlideLeft();
+	*/
 	
 
 	loadGeneFromUrl();
