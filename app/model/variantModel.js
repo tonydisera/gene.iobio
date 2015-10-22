@@ -768,10 +768,10 @@ VariantModel.prototype._getCachedData = function(dataKind) {
 			try {
 				//dataString = stringCompress.inflate(dataCompressed);
 				 dataString = LZString.decompressFromUTF16(dataCompressed);
+	 			 data =  JSON.parse(dataString);      		
 			} catch(e) {
-				console.log("an error occureed when uncompressing vcf data for key " + me._getCacheKey());
+				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey());
 			}
-			data =  JSON.parse(dataString);      		
       	} 
 	} 
 	return data;
@@ -1029,28 +1029,33 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(coverage, callbac
 			recs[vcfIter].bamDepth = recs[vcfIter-1].bamDepth;
 			vcfIter++;
 		}
-      	if (covIter >= coverage.length) {
-      		recs[vcfIter].bamDepth = "";
-      		vcfIter++;
-      	} else {
-			var coverageRow = coverage[covIter];
-			var coverageStart = coverageRow[0];
-			var coverageDepth = coverageRow[1];
+		if (vcfIter >= recs.length) {
 
-			// compare curr variant and curr clinVar record
-			if (recs[vcfIter].start == coverageStart) {			
-				recs[vcfIter].bamDepth = +coverageDepth;
-				vcfIter++;
-				covIter++;
-			} else if (recs[vcfIter].start < coverageStart) {	
-				recs[vcfIter].bamDepth = "";
-				vcfIter++;
-			} else {
-				console.log("no variant corresponds to coverage at " + coverageStart);
-				covIter++;
-			}
+		} else {
+	      	if (covIter >= coverage.length) {
+	      		recs[vcfIter].bamDepth = "";
+	      		vcfIter++;      			
+		  	} else {
+				var coverageRow = coverage[covIter];
+				var coverageStart = coverageRow[0];
+				var coverageDepth = coverageRow[1];
 
-      	}
+				// compare curr variant and curr clinVar record
+				if (recs[vcfIter].start == coverageStart) {			
+					recs[vcfIter].bamDepth = +coverageDepth;
+					vcfIter++;
+					covIter++;
+				} else if (recs[vcfIter].start < coverageStart) {	
+					recs[vcfIter].bamDepth = "";
+					vcfIter++;
+				} else {
+					//console.log("no variant corresponds to coverage at " + coverageStart);
+					covIter++;
+				}
+
+	      	}			
+		}
+
 	}
 	callback();
 
