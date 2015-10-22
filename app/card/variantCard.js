@@ -815,7 +815,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 				if (error == "missing reference") {
 					me._displayRefNotFoundWarning();
 					me.cardSelector.find('.vcfloader').addClass("hide");
+				} else {
+					console.log(error);
 				}
+				/*
 				if (me.isViewable()) {
 					$('#filter-track').addClass("hide");
 				    $('#matrix-track').addClass("hide");
@@ -825,7 +828,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 				    me.cardSelector.find("#vcf-variant-count").text("");
 				    me.cardSelector.find('.vcfloader').addClass("hide");
 				    me.cardSelector.find('#no-variants-warning').removeClass("hide");	
-				}
+				}*/
+
 			});
 	}
 }
