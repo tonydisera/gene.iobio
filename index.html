@@ -106,15 +106,15 @@
 
 
   <div id="slide-buttons" >
-    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -31px;top: 210px;">
-        <a id="phenolyzer-slide-button"  onclick="showPhenolyzerSlideLeft()" >Phenolyzer</a>
+    <div id="phenolyzer-slide-button" class="slide-button shadow-z-2 hide"  style="position: fixed;left: -31px;top: 210px;">
+        <a  onclick="showPhenolyzerSlideLeft()" >Phenolyzer</a>
     </div>
 
-    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -23px;top: 300px;">
+    <div class="slide-button shadow-z-2"  style="position: fixed;left: -23px;top: 300px;">
         <a id="samples-button"  onclick="showSampleSlideDown()" >Samples</a>
     </div>
 
-    <div class="slide-button shadow-z-2" class="slide-button" style="position: fixed;left: -13px;top: 380px;">
+    <div class="slide-button shadow-z-2"  style="position: fixed;left: -13px;top: 380px;">
           <a id="filter-button"  onclick="showFilterSlideLeft()" >Filter</a>
     </div>
   </div>
@@ -279,12 +279,6 @@
                 <input id="enter-gene-name" class="typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
                 placeholder="Enter Gene Name">
             </span>           
-
-            <!-- loader gif for phenolyzer -->
-            <div class="phenolyzer loader hide" style="float:right;padding-top: 17px;">
-                <span style="font-size:11px;" class="loader-label">Running Phenolyzer...</span>
-                <img src="assets/images/wheel.gif"/>
-            </div>
 
             <!-- get genes dropdown button -->
             <div id="get-genes-dropdown" class="" style="width:95px;float:right;">

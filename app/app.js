@@ -31,6 +31,7 @@ var GENE_REGION_BUFFER_MAX = 50000;
 // Transcript data and chart
 var gene = '';
 var geneNames = [];
+var phenolyzerGenes = [];
 var geneAnnots = {};
 var loadedUrl = false;
 var selectedTranscript = null;
@@ -297,6 +298,10 @@ function init() {
 		closeSampleSlideDown();
 	});
 
+
+	$('#slider-left-phenolyzer').html(phenolyzerTemplate());
+
+
 	// for testing phenolyzer bar chart
 	/*
 	phenolyzerGenes = [
@@ -408,28 +413,32 @@ function showFilterSlideLeft() {
 
 function showPhenolyzerSlideLeft() {
 
+	closePhenolyzerSlideLeft(); 
+	closeFilterSlideLeft(); 
 
-	$('#slider-left-phenolyzer').html(phenolyzerTemplate());
+	$('#phenolyzer-slide-button').removeClass("hide");
 
+	if (phenolyzerGenes && phenolyzerGenes.length > 0) {
+		var geneBarChart = verticalBarChartD3()
+							  .margin( {left:10, right: 10, top: 0, bottom: 0} )
+		                      .xValue( function(d){ return +d.score })
+							  .yValue( function(d){ return d.geneName })
+							  .width(160)
+							  .barHeight(15)
+							  .labelWidth(60)
+							  .gap(4)
+							  .on('d3click', function(phenolyzerGene) {
+							  	if (phenolyzerGene.selected) {
+							  		addGeneBadge(phenolyzerGene.geneName, true);
+							  	} else {
+							  		removeGeneBadgeByName(phenolyzerGene.geneName);
+							  	}
+							  });
 
-	var geneBarChart = verticalBarChartD3()
-						  .margin( {left:10, right: 10, top: 0, bottom: 0} )
-	                      .xValue( function(d){ return +d.score })
-						  .yValue( function(d){ return d.geneName })
-						  .width(160)
-						  .barHeight(15)
-						  .labelWidth(60)
-						  .gap(4)
-						  .on('d3click', function(phenolyzerGene) {
-						  	if (phenolyzerGene.selected) {
-						  		addGeneBadge(phenolyzerGene.geneName, true);
-						  	} else {
-						  		removeGeneBadgeByName(phenolyzerGene.geneName);
-						  	}
-						  });
+		var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
+		geneBarChart(selection, {shadowOnHover:true});		
+	}
 
-	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
-	geneBarChart(selection, {shadowOnHover:true});
 
 
 
@@ -905,48 +914,68 @@ function getPhenolyzerGenes() {
 	updateUrl('genes', geneNames.join(","));
 
 	$('.phenolyzer.loader').removeClass("hide");
+	$("#phenolyzer-timeout-message").addClass("hide");
+	$('#phenolyzer-heading').addClass("hide");
+
 	var searchTerms = $('#phenolyzer-search-terms').val();
+	$("#phenolyzer-search-term").text(searchTerms);	
 	var url = phenolyzerServer + '?cmd=' + searchTerms.split(" ").join("_");
 
-	closePhenolyzerSlideLeft(); 
-	closeFilterSlideLeft(); 
-
    	phenolyzerGenes = [];
-	$.ajax( url ).done(function(data) {      
-		$('.phenolyzer.loader').addClass("hide");
-		var geneNamesString = "";
-		var count = 0;
-		data.split("\n").forEach( function(rec) {
-			var fields = rec.split("\t");
-			if (fields.length > 2) {
-				var geneName  		         = fields[1];
-				if (count < 30) {
-					var rank                 = fields[0];
-					var score                = fields[3];
-					var haploInsuffScore     = fields[5];
-					var geneIntoleranceScore = fields[6];
-					var selected             = count <= 10 ? true : false;
-					phenolyzerGenes.push({rank: rank, geneName: geneName, score: score, haploInsuffScore: haploInsuffScore, geneIntoleranceScore: geneIntoleranceScore, selected: selected});					
-				}				
-				count++;
+	
+	showPhenolyzerSlideLeft();
 
+	$.ajax( {
+			url: url,
+			error: function (xhr, ajaxOptions, thrownError) {
+				closePhenolyzerSlideLeft(); 
+				$('.phenolyzer.loader').addClass("hide");
+				alert("An error occurred in Phenolyzer iobio services. " + thrownError);
 			}
-		});
-		closePhenolyzerSlideLeft(); 
-		closeFilterSlideLeft(); 
+		}
+	  )
+	 .done(function(data) { 
+	 	if (data == "") {
+			
+			showPhenolyzerSlideLeft();
+			$('.phenolyzer.loader').addClass("hide");
+			$("#phenolyzer-timeout-message").removeClass("hide");
+	 	}  else {
+			$('.phenolyzer.loader').addClass("hide");
+			$('#phenolyzer-heading').removeClass("hide");
+			var geneNamesString = "";
+			var count = 0;
+			data.split("\n").forEach( function(rec) {
+				var fields = rec.split("\t");
+				if (fields.length > 2) {
+					var geneName  		         = fields[1];
+					if (count < 30) {
+						var rank                 = fields[0];
+						var score                = fields[3];
+						var haploInsuffScore     = fields[5];
+						var geneIntoleranceScore = fields[6];
+						var selected             = count <= 9 ? true : false;
+						phenolyzerGenes.push({rank: rank, geneName: geneName, score: score, haploInsuffScore: haploInsuffScore, geneIntoleranceScore: geneIntoleranceScore, selected: selected});					
+					}				
+					count++;
 
-		showPhenolyzerSlideLeft();
-		// Just show top 10 for now
-		var selectedGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
-		var genesString = "";
-		selectedGenes.forEach( function(g) {
-			if (genesString.length > 0) {
-				genesString += ",";
-			}
-			genesString += g.geneName;
-		})
-		$('#genes-to-copy').val(genesString);
-		copyPasteGenes();
+				}
+			});
+			
+			showPhenolyzerSlideLeft();
+			// Just show top 10 for now
+			var selectedGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
+			var genesString = "";
+			selectedGenes.forEach( function(g) {
+				if (genesString.length > 0) {
+					genesString += ",";
+				}
+				genesString += g.geneName;
+			})
+			$('#genes-to-copy').val(genesString);
+			copyPasteGenes();	 		
+	 	}  
+
 	});
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');

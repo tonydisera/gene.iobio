@@ -61,7 +61,7 @@
  		    // def for drop shadow
 			// filters go in defs element
 			var defs = svg.selectAll("defs");
-			if (defs[0].length == 0) {
+			if (defs.length == 0 || defs[0].length == 0) {
 				defs = svg.append("defs");
 				chart.createDropShadowFilter(defs);					    
 			}

@@ -14,11 +14,12 @@ body {
 }
 
 #phenolyzer-results rect {
-    fill: rgba(93, 128, 157, 1);
-    stroke: rgb(93, 128, 157);
+    fill: rgb(204, 204, 204);
+    stroke: rgb(146, 150, 158);
 }
 #phenolyzer-results rect.selected {
-    fill: #81A966;
+    fill: rgb(137, 167, 191);
+    stroke: grey;
 }
 #phenolyzer-results rect.hover {  
 }
