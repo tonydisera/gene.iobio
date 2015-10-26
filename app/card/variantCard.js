@@ -1291,7 +1291,7 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 }
 
 VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth) {
-	var MAX_BAR_WIDTH = 150;
+	var MAX_BAR_WIDTH = 140;
 	var BAR_WIDTH = 0;
 	if ((genotypeDepth == null || genotypeDepth == '') && (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0)) {
 		container.text("n/a");
@@ -1309,7 +1309,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 		   .attr("x", "1")
   	  	   .attr("y", "1")
   		   .attr("height", 10)
-		   .attr("width",BAR_WIDTH)
+		   .attr("width",BAR_WIDTH + 10)
 		   .attr("class", "alt-count");
 		
 		svg.append("text")
@@ -1635,7 +1635,7 @@ VariantCard.prototype._unpinRow = function(pinMessage) {
 
 VariantCard.prototype._tooltipBlankRow = function() {
 	return '<div class="row">'
-	  + '<div class="col-md-12">' + '&nbsp;' + '</div>'
+	  + '<div class="col-md-12">' + '  ' + '</div>'
 	  + '</div>';
 }
 
@@ -1672,7 +1672,7 @@ VariantCard.prototype._tooltipRowURL = function(label, value, paddingTop, always
 VariantCard.prototype._tooltipRowAF = function(label, afExAC, af1000g) {
 	return '<div class="tooltip-row">'
 		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
-		      + '<div class="tooltip-value">' + 'ExAC: ' + afExAC  + '&nbsp;&nbsp;&nbps;1000G: ' + af1000g + '</div>'
+		      + '<div class="tooltip-value">' + 'ExAC: ' + afExAC  + '    1000G: ' + af1000g + '</div>'
 		 + '</div>';
 }
 
