@@ -79,16 +79,18 @@ VariantModel.prototype.summarizeDanger = function() {
 	var siftClasses = {};
 	var polyphenClasses = {};
 	var clinvarClasses = {};
+	var impactClasses = {};
 	this.vcfData.features.forEach( function(variant) {
-		if (variant.impact['HIGH'] != null  && matrixCard.impactMap['HIGH'].badge == true) {
-			dangerCounts.HIGH++; 
-		} else if (variant.impact['MODERATE'] != null  && matrixCard.impactMap['MODERATE'].badge == true) {
-			dangerCounts.MODERATE++; 
-		} else if (variant.impact['MODIFIER'] != null  && matrixCard.impactMap['MODIFIER'].badge == true) {
-			dangerCounts.MODIFIER++; 
-		} else if (variant.impact['LOW'] != null  && matrixCard.impactMap['LOW'].badge == true) {
-			dangerCounts.LOW++; 
-		} 
+		for (key in variant.impact) {
+			if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {				
+	    		var types = impactClasses[key];
+	    		if (types == null) {
+	    			types = {};
+	    		}
+	    		types[variant.type] = variant.type;
+	    		impactClasses[key] = types;	
+			}
+	    }
 
 		for (key in variant.vepSIFT) {
 			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge == true) {
@@ -129,6 +131,7 @@ VariantModel.prototype.summarizeDanger = function() {
 		}
 		return lowestClazz;
 	}
+	dangerCounts.IMPACT = impactClasses;
 	dangerCounts.CLINVAR = getLowestClazz(clinvarClasses);
 	dangerCounts.SIFT = getLowestClazz(siftClasses);
 	dangerCounts.POLYPHEN = getLowestClazz(polyphenClasses);

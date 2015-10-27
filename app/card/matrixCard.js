@@ -23,7 +23,7 @@ function MatrixCard() {
                         'none'                  : {value: 151, badge: false, clazz: ''}
                      };
 	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
-                        MODERATE: {value: 2, badge: false, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
+                        MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
                         MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showImpactSymbol},
                         LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
                      };
@@ -750,6 +750,48 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
 		selection
 		  .append("g")
 		  .attr("transform", "translate(11,11)")
+		  .append('path')
+          .attr("d", function(d,i) { 
+          	return d3.svg
+                     .symbol()
+                     .size(symbolSize)
+                     .type( function(d,i) {
+                     	if (type.toUpperCase() == 'DEL') {
+						    return 'triangle-up';
+						} else if (type.toUpperCase() == 'INS') {
+						    return  'circle';
+						} else if (type.toUpperCase() == 'COMPLEX') {
+						    return 'diamond';
+						}
+                     })();
+          })
+          .attr("class", "filter-symbol " + selection.datum().clazz);
+	}
+
+}
+
+
+MatrixCard.prototype.showImpactBadge = function(selection) {
+	var me = this;
+	var type = selection.datum().type;
+	var symbolScale = d3.scale.linear()
+                    .domain([1,6])
+                    .range([10,40]);
+
+    var symbolSize = symbolScale(6);
+     
+	if (type.toUpperCase() == 'SNP') {
+		selection.append("g")
+		          .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,3)")
+		         .append("rect")
+		         .attr("width", 8)
+		         .attr("height", 8)
+		         .attr("class", "filter-symbol " + selection.datum().clazz)
+		         .style("pointer-events", "none");		
+	} else {
+		selection
+		  .append("g")
+		  .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,6)")
 		  .append('path')
           .attr("d", function(d,i) { 
           	return d3.svg

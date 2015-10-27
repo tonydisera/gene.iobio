@@ -1082,13 +1082,17 @@ function _setGeneBadgeGlyphs(dangerObject) {
 	
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {
-		if (dangerKey == 'HIGH' || dangerKey == 'MODERATE') {
-			if (dangerObject[dangerKey] != 0 && !doneWithImpact) {
-				geneBadge.find('#gene-badge-symbols').append(
-				"<svg height=\"12\" width=\"14\"> <g transform=\"translate(1,3)\"> <rect width=\"7\" height=\"7\" class=\"filter-symbol " + "impact_" + dangerKey + "\" style=\"pointer-events: none;\"></rect></g></svg"
-				);
-				doneWithImpact = true;
-			}						
+		if (dangerKey == 'IMPACT') {
+			var impactClasses = dangerObject[dangerKey];
+			for (impactClass in impactClasses) {
+				var types = impactClasses[impactClass];
+				for (type in types) {
+					var theClazz = 'impact_' + impactClass;				
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"14\">");
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[0]).data([{width:10, height:10,clazz: theClazz, type:  type}]);
+					matrixCard.showImpactBadge(selection);									
+				}
+			}
 		} else if (dangerKey == 'CLINVAR') {
 			var clinvarLevel = dangerObject[dangerKey];
 			if (clinvarLevel != null) {
