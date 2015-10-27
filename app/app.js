@@ -33,6 +33,7 @@ var gene = '';
 var geneNames = [];
 var phenolyzerGenes = [];
 var geneAnnots = {};
+var geneToLatestTranscript = {};
 var loadedUrl = false;
 var selectedTranscript = null;
 var selectedTranscriptCodingRegions = [];
@@ -252,6 +253,7 @@ function init() {
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
+	    	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 	    	cacheCodingRegions();
 
 	    	showTranscripts();
@@ -770,6 +772,7 @@ function onCloseTranscriptMenuEvent() {
 	if (transcriptMenuChart.selectedTranscript() != null ) {
 		if (selectedTranscript == null || selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
 			selectedTranscript = transcriptMenuChart.selectedTranscript();
+			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 			d3.selectAll("#gene-viz .transcript").remove();
 		 	cacheCodingRegions();
 		 	loadTracksForGene();
@@ -1124,7 +1127,7 @@ function _setGeneBadgeGlyphs(dangerObject) {
 function selectGeneBadge(badgeElement) {
 	//var badge = $(badgeElement).parent().parent();
 	var badge = $(badgeElement).parent();
-	var theGeneName = badge.find("#gene-badge-name").text();	
+	var theGeneName = badge.find("#gene-badge-name").text();		
 	selectGene(theGeneName);
 
 }
@@ -1160,7 +1163,7 @@ function selectGene(geneName) {
 		    	// Save off the original start and end before we adjust for upstream/downstream regions
 		    	window.gene.startOrig = window.gene.start;
 		    	window.gene.endOrig = window.gene.end;  
-		    	window.selectedTranscript = null;
+		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
 
 		    	updateUrl('gene', window.gene.gene_name);
 
@@ -1353,7 +1356,7 @@ function loadGeneWidget() {
 		    	
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
-		    	window.selectedTranscript = null;
+		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
 		    	
 
 		    	if (data.loadFromUrl) {
@@ -1625,6 +1628,7 @@ function showTranscripts(regionStart, regionEnd) {
 		// For now, let's just grab the first one in the list.
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
+			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 			cacheCodingRegions();
 
 		}
