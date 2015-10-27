@@ -1456,7 +1456,7 @@ function loadTracksForGene(bypassVariantCards) {
 
     $('#gene-chr').text(window.gene.chr);
     $('#gene-name').text(window.gene.gene_name);   
-    $('#gene-region').text(window.gene.startOrig + "-" + window.gene.endOrig);
+    $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
 
 
 	if (window.gene.gene_type == 'protein_coding') {
@@ -1535,6 +1535,19 @@ function loadTracksForGene(bypassVariantCards) {
 
 
 	
+}
+
+function addCommas(nStr)
+{
+	nStr += '';
+	x = nStr.split('.');
+	x1 = x[0];
+	x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
 }
 
 function promiseGetGeneAnnotation(geneName) {
