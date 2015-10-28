@@ -806,6 +806,7 @@ function getCanonicalTranscript() {
 		if (gene.transcripts != null && gene.transcripts.length > 0)
 		canonical = gene.transcripts[0];
 	}
+	canonical.isCanonical = true;
 	return canonical;
 }
 
@@ -1647,17 +1648,22 @@ function showTranscripts(regionStart, regionEnd) {
 
     if (transcriptViewMode == "single") {
     	transcripts = [selectedTranscript];
-    	var cache = $('#transcript-dropdown-button').children();
-   		$('#transcript-dropdown-button').text(selectedTranscript.transcript_id).append(cache);
-   		getTranscriptSelector(selectedTranscript).attr("class", "transcript selected");
 	} 
 
 
 	selection = d3.select("#gene-viz").datum(transcripts);    
 	transcriptChart(selection);
 
+	d3.selectAll("#transcript-menu-item .transcript").remove();
 	selection = d3.select("#transcript-menu-item").datum(window.gene.transcripts);
 	transcriptMenuChart(selection);
+
+    if (transcriptViewMode == "single") {
+    	var cache = $('#transcript-dropdown-button').children();
+   		$('#transcript-dropdown-button').text(selectedTranscript.transcript_id).append(cache);
+   		d3.select('#transcript-menu-item .transcript.current').classed("current", false);
+   		getTranscriptSelector(selectedTranscript).attr("class", "transcript current");
+	} 
 
 	d3.select("#gene-viz .x.axis .tick text").style("text-anchor", "start");
 

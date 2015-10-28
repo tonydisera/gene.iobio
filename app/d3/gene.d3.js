@@ -237,12 +237,12 @@ function geneD3() {
           .attr('y1', trackHeight/2)
           .attr('y2', trackHeight/2)
           .on("mouseover", function(d) {
-            d3.selectAll('.transcript.selected').attr("class", "transcript");
-            d3.select(this.parentNode).attr("class", "transcript selected");
+            d3.selectAll('.transcript.selected').classed("selected", false);
+            d3.select(this.parentNode).classed("selected", true);
             selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
           })
           .on("mouseout", function(d) {
-            d3.select(this.parentNode).attr("class", "transcript");
+            d3.select(this.parentNode).classed("selected", false);
           });
 
 
@@ -255,31 +255,36 @@ function geneD3() {
                     .attr('y', 0 )
                     .attr('text-anchor', 'top')
                     .attr('alignment-baseline', 'left')
-                    .text(function(d) { return d[1]; })
+                    .text(function(d) { 
+                      return d[1]; 
+                    })
                     .style('fill-opacity', 0)
                     .on("mouseover", function(d) {
-                      d3.selectAll('.transcript.selected').attr("class", "transcript");
-                      d3.select(this.parentNode).attr("class", "transcript selected");
+                      d3.selectAll('.transcript.selected').classed("selected", false);
+                      d3.select(this.parentNode).classed("selected", true);
                       selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
                     })
                     .on("mouseout", function(d) {
-                      d3.select(this.parentNode).attr("class", "transcript");
+                      d3.select(this.parentNode).classed("selected", false);
                     });
-        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type]] })
+        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type, (d.isCanonical ? ' CANONICAL' : '')]] })
                   .enter().append('text')
                     .attr('class', 'type')
                     .attr('x', function(d) { return (geneD3_width - margin.left - margin.right) + 10 })
                     .attr('y', 12 )
                     .attr('text-anchor', 'top')
                     .attr('alignment-baseline', 'left')
-                    .text(function(d) { return d[1] == 'protein_coding' ? '' : d[1]; })
+                    .text(function(d) { 
+                      var type =  (d[1] == 'protein_coding' ? '' : d[1]); 
+                      return type + ' ' + d[2];
+                    })
                     .on("mouseover", function(d) {
-                      d3.selectAll('.transcript.selected').attr("class", "transcript");
-                      d3.select(this.parentNode).attr("class", "transcript selected");
+                      d3.selectAll('.transcript.selected').classed("selected", false);
+                      d3.select(this.parentNode).classed("selected", true);
                       selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
                     })
                     .on("mouseout", function(d) {
-                      d3.select(this.parentNode).attr("class", "transcript");
+                      d3.select(this.parentNode).classed("selected", false);
                     });  
 
 
@@ -328,8 +333,9 @@ function geneD3() {
                  .style("top", (d3.event.pageY - 24) + "px");    
 
               // select the transcript  
-              d3.selectAll('.transcript.selected').attr("class", "transcript");
-              d3.select(this.parentNode).attr("class", "transcript selected");
+              d3.selectAll('.transcript.selected').classed("selected", false);
+              d3.select(this.parentNode).classed("selected", true);
+
               selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
            })                  
            .on("mouseout", function(d) {   
@@ -339,7 +345,7 @@ function geneD3() {
                  .style("opacity", 0);   
 
               // de-select the transcript   
-              d3.select(this.parentNode).attr("class", "transcript");
+              d3.select(this.parentNode).classed("selected", false);
            });
           
 
