@@ -71,16 +71,17 @@ VariantModel.prototype.getVariantCount = function() {
 	return this.vcfData.features.length != null ? this.vcfData.features.length : "0";
 }
 
-VariantModel.prototype.summarizeDanger = function() {
+VariantModel.prototype.summarizeDanger = function(data) {
+	var theVcfData = data != null ? data : this.vcfData;
 	dangerCounts = {HIGH: 0, MODERATE: 0, MODIFIER: 0, LOW: 0, CLINVAR: null, SIFT: null, POLYPHEN: null};
-	if (this.vcfData == null || this.vcfData.features.length == null) {
+	if (theVcfData == null || theVcfData.features.length == null) {
 		return dangerCounts;
 	}
 	var siftClasses = {};
 	var polyphenClasses = {};
 	var clinvarClasses = {};
 	var impactClasses = {};
-	this.vcfData.features.forEach( function(variant) {
+	theVcfData.features.forEach( function(variant) {
 		for (key in variant.impact) {
 			if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {				
 	    		var types = impactClasses[key];
@@ -131,7 +132,21 @@ VariantModel.prototype.summarizeDanger = function() {
 		}
 		return lowestClazz;
 	}
-	dangerCounts.IMPACT = impactClasses;
+
+	var getLowestImpact = function(impactClasses) {
+		if (impactClasses.HIGH != null) {
+			return {HIGH: impactClasses.HIGH};
+		} else if (impactClasses.MODERATE != null) {
+			return {MODERATE: impactClasses.MODERATE};
+		} else if (impactClasses.MODIFIER != null) {
+			return {MODIFIER: impactClasses.MODIFIER};
+		} else if (impactClasses.LOW != null) {
+			return {LOW: impactClasses.LOW};
+		} else {
+			return {};
+		}
+	}
+	dangerCounts.IMPACT = getLowestImpact(impactClasses);
 	dangerCounts.CLINVAR = getLowestClazz(clinvarClasses);
 	dangerCounts.SIFT = getLowestClazz(siftClasses);
 	dangerCounts.POLYPHEN = getLowestClazz(polyphenClasses);
@@ -167,7 +182,7 @@ VariantModel.prototype.reduceBamData = function(theBamData, numberOfPoints) {
 }
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
-	var fbData = this._getCachedData("fbData");
+	var fbData = this._getCachedData("fbData", window.gene.gene_name, window.selectedTranscript);
 	if (fbData != null) {
 		this.fbData = fbData;
 	}
@@ -376,13 +391,14 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 }
 
 
-VariantModel.prototype._promiseVcfRefName = function() {
+VariantModel.prototype._promiseVcfRefName = function(ref) {
 	var me = this;
+	var theRef = ref != null ? ref : window.gene.chr;
 	return new Promise( function(resolve, reject) {
 
 		if (me.getVcfRefName != null) {
 			// If we can't find the ref name in the lookup map, show a warning.
-			if (me.vcfRefNamesMap[me.getVcfRefName(window.gene.chr)] == null) {
+			if (me.vcfRefNamesMap[me.getVcfRefName(theRef)] == null) {
 				reject();
 			} else {
 				resolve();
@@ -394,10 +410,10 @@ VariantModel.prototype._promiseVcfRefName = function() {
 					var foundRef = false;
 					refNames.forEach( function(refName) {					
 			    		if (me.getVcfRefName == null) {
-					 		if (refName == window.gene.chr) {
+					 		if (refName == theRef) {
 					 			me.getVcfRefName = me._getRefName;
 					 			foundRef = true;
-					 		} else if (refName == me._stripRefName(gene.chr)) {
+					 		} else if (refName == me._stripRefName(theRef)) {
 					 			me.getVcfRefName = me._stripRefName;
 					 			foundRef = true;
 					 		}
@@ -425,10 +441,10 @@ VariantModel.prototype._promiseVcfRefName = function() {
 					var foundRef = false;
 			    	refData.forEach( function(ref) {
 			    		if (me.getVcfRefName == null) {
-					 		if (ref.name == window.gene.chr) {
+					 		if (ref.name == theRef) {
 					 			me.getVcfRefName = me._getRefName;
 					 			foundRef = true;
-					 		} else if (ref.name == me._stripRefName(gene.chr)) {
+					 		} else if (ref.name == me._stripRefName(theRef)) {
 					 			me.getVcfRefName = me._stripRefName;
 					 			foundRef = true;
 					 		}
@@ -550,7 +566,7 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 	// Get the coverage data for the gene region
 	// First the gene vcf data has been cached, just return
 	// it.  (No need to retrieve the variants from the iobio service.)
-	var coverageData = me._getCachedData("bamData");
+	var coverageData = me._getCachedData("bamData", window.gene.gene_name, window.selectedTranscript);
 	if (coverageData != null && coverageData != '') {
 		me.bamData = coverageData;
 
@@ -572,7 +588,7 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 
 			me.bamData = coverageForRegion;
 
-			me._cacheData(me.bamData, "bamData");
+			me._cacheData(me.bamData, "bamData", window.gene.gene_name);
 
 			if (regions.length > 0) {
 				me._refreshVariantsWithCoverage(coverageForPoints, function() {				
@@ -663,7 +679,7 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 
 		// First the gene vcf data has been cached, just return
 		// it.  (No need to retrieve the variants from the iobio service.)
-		var vcfData = me._getCachedData("vcfData");
+		var vcfData = me._getCachedData("vcfData", window.gene.gene_name, window.selectedTranscript);
 		if (vcfData != null && vcfData != '') {
 			me.vcfData = vcfData;
 			me._populateEffectFilters(me.vcfData.features);
@@ -679,11 +695,18 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 			// so call the iobio services to retreive the variants for the gene region 
 			// and annotate them.
 			me._promiseVcfRefName().then( function() {
-				me._promiseGetAndAnnotateVariants(onVcfData).then( function(data) {
+				me._promiseGetAndAnnotateVariants(
+					me.getVcfRefName(window.gene.chr),
+					window.gene.start, 
+			        window.gene.end, 
+			        window.gene.strand, 
+			        window.selectedTranscript,
+			        onVcfData)
+				.then( function(data) {
 			    	me.vcfData = data;
 
 			    	// Cache the data
-			    	me._cacheData(me.vcfData, "vcfData");
+			    	me._cacheData(me.vcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
 			    	
 
 					resolve(me.vcfData);
@@ -703,15 +726,56 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 
 }
 
-VariantModel.prototype._getCacheKey = function(dataKind) {
+VariantModel.prototype.isCached = function(geneName, transcript) {
+	var key = this._getCacheKey("vcfData", geneName, transcript);
+	return localStorage.getItem(key) != null;
+}
+
+VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end, strand, transcript) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+
+		// Is the data already cached?  If so, we are done
+		var vcfData = me._getCachedData("vcfData", geneName, transcript);
+		if (vcfData != null && vcfData != '') {			
+			resolve(vcfData);
+		} else {
+			// We don't have the variants for the gene in cache, 
+			// so call the iobio services to retreive the variants for the gene region 
+			// and annotate them.
+			me._promiseVcfRefName(ref).then( function() {
+				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), start, end, strand, transcript)
+				.then( function(data) {
+			    	// Cache the data
+			    	me._cacheData(data, "vcfData", geneName, transcript);
+
+					resolve(data);
+
+			    }, function(error) {
+			    	reject(error);
+			    });
+			}, function(error) {
+				reject("missing reference")
+			});
+
+		}
+
+
+
+	});
+
+}
+
+VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 	return this.getRelationship() 
 		+ (this.sampleName != null ? "-" + this.sampleName : "")
-		+ "-" + gene.gene_name 
-		+ "-" + selectedTranscript.transcript_id 
+		+ "-" + (geneName != null ? geneName : gene.gene_name) 
+		+ (transcript != null ? "-" + transcript.transcript_id : "")
 		+ "-" + dataKind;
 }
 
-VariantModel.prototype._cacheData = function(data, dataKind) {
+VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
 	var me = this;
 	if (localStorage) {
 		var success = true;
@@ -723,17 +787,17 @@ VariantModel.prototype._cacheData = function(data, dataKind) {
     	try {
     		//dataStringCompressed = stringCompress.deflate(dataString);
 
-    		console.log("before compression=" + dataString.length);
+    		//console.log("before compression=" + dataString.length);
 			dataStringCompressed = LZString.compressToUTF16(dataString);
-    		console.log("after compression=" + dataStringCompressed.length);
+    		//console.log("after compression=" + dataStringCompressed.length);
     	} catch (e) {    		
-	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey());
+	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
 	   		success = false;
     	}
 
     	if (success) {
 	    	try {
-		      	localStorage.setItem(this._getCacheKey(dataKind), dataStringCompressed);
+		      	localStorage.setItem(this._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    	} catch(e) {
 				if (e == QUOTA_EXCEEDED_ERR) {
 	    			// TODO - keep track of times that genes were cached and delete the
@@ -742,7 +806,7 @@ VariantModel.prototype._cacheData = function(data, dataKind) {
 	    			console.log("local storage quota exceeded.  clearing local storage to continue.")
 	    			localStorage.clear();
 	    			try {
-				      	localStorage.setItem(this._getCacheKey(dataKind), dataStringCompressed);
+				      	localStorage.setItem(this._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    			} catch(e) {
 			    		console.log("an error occurred when attempting to store into local storage (2nd attempt).  Cache key is " + me._getCacheKey() + ". Exception is " + e);
 			    		success = false;
@@ -760,12 +824,12 @@ VariantModel.prototype._cacheData = function(data, dataKind) {
     }
 }
 
-VariantModel.prototype._getCachedData = function(dataKind) {
+VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript) {
 	var me = this;
 
 	var data = null;
 	if (localStorage) {
-      	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind));
+      	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind, geneName, transcript));
       	if (dataCompressed != null) {
 			var dataString = null;
 			try {
@@ -773,24 +837,24 @@ VariantModel.prototype._getCachedData = function(dataKind) {
 				 dataString = LZString.decompressFromUTF16(dataCompressed);
 	 			 data =  JSON.parse(dataString);      		
 			} catch(e) {
-				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey());
+				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey(dataKind, geneName, transcript));
 			}
       	} 
 	} 
 	return data;
 }
 
-VariantModel.prototype._promiseGetAndAnnotateVariants = function(onVcfData) {
+VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end, strand, transcript, onVcfData) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
 
 		me.vcf.promiseGetVariants(
-		   me.getVcfRefName(window.gene.chr), 
-		   window.gene.start, 
-	       window.gene.end, 
-	       window.gene.strand, 
-	       window.selectedTranscript,
+		   me.getVcfRefName(ref), 
+		   start, 
+	       end, 
+	       strand, 
+	       transcript,
 	       me.sampleName 
 	    ).then( function(data) {
 
@@ -822,7 +886,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(onVcfData) {
 		    	if (me.getRelationship() != 'sibling') {
 			    	return me.vcf.promiseGetClinvarRecords(
 			    		me.vcfData.features, 
-			    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
+			    		me._stripRefName(ref), start, end, 
 			    		me._refreshVariantsWithClinvar.bind(me));
 
 		    	} else {
@@ -1170,7 +1234,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 			// Check the local cache first to see
 			// if we already have the freebayes variants
-			var fbData = me._getCachedData("fbData");
+			var fbData = me._getCachedData("fbData", window.gene.gene_name, window.selectedTranscript);
 			if (fbData != null) {
 				me.fbData = fbData;
 
@@ -1321,7 +1385,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						});	 
 
 						// Cache the freebayes variants.
-						me._cacheData(me.fbData, "fbData");
+						me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
 
 						resolve(me.fbData);
 				
