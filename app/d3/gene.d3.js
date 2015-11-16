@@ -267,7 +267,7 @@ function geneD3() {
                     .on("mouseout", function(d) {
                       d3.select(this.parentNode).classed("selected", false);
                     });
-        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type, (d.isCanonical ? ' CANONICAL' : '')]] })
+        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type, (d.isCanonical ? ' CANONICAL' : ''), (d.xref != null ? "(" + d.xref + ")": '')]] })
                   .enter().append('text')
                     .attr('class', 'type')
                     .attr('x', function(d) { return (geneD3_width - margin.left - margin.right) + 10 })
@@ -275,8 +275,8 @@ function geneD3() {
                     .attr('text-anchor', 'top')
                     .attr('alignment-baseline', 'left')
                     .text(function(d) { 
-                      var type =  (d[1] == 'protein_coding' ? '' : d[1]); 
-                      return type + ' ' + d[2];
+                      var type =  (d[1] == 'protein_coding' || d[1] == 'mRNA' ? '' : d[1]); 
+                      return type + ' ' + d[2] + ' ' + d[3];
                     })
                     .on("mouseover", function(d) {
                       d3.selectAll('.transcript.selected').classed("selected", false);
