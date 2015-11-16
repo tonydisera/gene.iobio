@@ -1,8 +1,9 @@
 //
 // Global Variables
 //
-//var geneiobio_server = "http://localhost:3000/";
-var geneiobio_server = "http://geneinfo.iobio.io/";
+var geneiobio_server = "http://localhost:3000/";
+//var geneiobio_server = "http://geneinfo.iobio.io/";
+//var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
 var phenolyzerServer = "http://nv-dev.iobio.io/phenolyzer/"
 
 
@@ -287,6 +288,9 @@ function init() {
 	    };
 	}
 
+	$('#select-gene-source').chosen({width: "width:110px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
+
+
 	// Slide out panels
 	$('.main').click(function() {
 	});
@@ -436,7 +440,7 @@ function showPhenolyzerSlideLeft() {
 							  		removeGeneBadgeByName(phenolyzerGene.geneName);
 							  	}
 							  });
-
+		d3.select('#phenolyzer-results svg').remove();
 		var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 		geneBarChart(selection, {shadowOnHover:true});		
 	}
@@ -737,15 +741,15 @@ function initTranscriptControls() {
 		transcriptCardSelector.find('#gene-name').css("margin-right", "0");
 		transcriptCardSelector.css("margin-top", "0");
 		var windowWidth = $(window).width();
-		if (windowWidth <= 800) {
-			transcriptCardSelector.find('#region-track').css("cssText", "margin-left: 125px !important;");
-		}
+		//if (windowWidth <= 800) {
+		//	transcriptCardSelector.find('#region-track').css("cssText", "margin-left: 125px !important;");
+		//}
 	});
 	transcriptCardSelector.find('#minimize-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').addClass("hide");
 		transcriptCardSelector.find('#gene-name').css("margin-right", "0");
 		transcriptCardSelector.css("margin-top", "-10px");
-		transcriptCardSelector.find('#region-track').css("cssText", "margin-left: 0px !important;");
+		//transcriptCardSelector.find('#region-track').css("cssText", "margin-left: 0px !important;");
 	});
 
 
@@ -768,6 +772,8 @@ function initTranscriptControls() {
     });
 }
 
+
+
 function onCloseTranscriptMenuEvent() {
 	if (transcriptMenuChart.selectedTranscript() != null ) {
 		if (selectedTranscript == null || selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
@@ -781,10 +787,90 @@ function onCloseTranscriptMenuEvent() {
 
 }
 
-function getCanonicalTranscript() {
+function getCanonicalTranscript(theGeneObject) {
+	var geneObject = theGeneObject != null ? theGeneObject : window.gene;
+	var canonical;	
+
+	if (geneObject.transcripts == null || geneObject.transcripts.length == 0) {		
+		return null;
+	}
+	geneObject.transcripts.forEach(function(transcript) {
+		transcript.isCanonical = false;
+		var cdsLength = 0;
+		if (transcript.features != null) {
+			transcript.features.forEach(function(feature) {
+				if (feature.feature_type == 'CDS') {
+					cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
+				}
+			})			
+			transcript.cdsLength = cdsLength;			
+		} else {
+			transcript.cdsLength = +0;
+		}
+
+	});
+	var sortedTranscripts = geneObject.transcripts.slice().sort(function(a, b) {
+		var aLevel = +2;
+		var bLevel = +2;
+		if (a.level != '.' && a.level != '') {
+			aLevel = +a.level;
+		} else if (a.transcript_id.indexOf("NM_") == 0 ) {
+			aLevel = +0;
+		} 
+		if (b.level != '.' && b.level != '') {
+			bLevel = +b.level;
+		} else if (b.transcript_id.indexOf("NM_") == 0 ) {
+			bLevel = +0;
+		} 
+
+
+		var aSource = +2;
+		var bSource = +2;
+		if (a.annotation_source == 'HAVANA' || a.annotation_source == 'BestRefSeq' ) {
+			aSource = +0;
+		} else if (a.annotation_source == 'ENSEMBL') {
+			aSource = +1;
+		} 
+		if (b.annotation_source == 'HAVANA' || b.annotation_source == 'BestRefSeq' ) {
+			bSource = +0;
+		} else if (b.annotation_source == 'ENSEMBL') {
+			bSource = +1;
+		} 
+
+		a.sort = aLevel + ' ' + aSource + ' ' + a.cdsLength;
+		b.sort = bLevel + ' ' + bSource + ' ' + b.cdsLength;
+
+		if (aLevel == bLevel) {
+			if (aSource == bSource) {
+				if (+a.cdsLength == +b.cdsLength) {
+					return 0;
+				} else if (+a.cdsLength > +b.cdsLength) {
+					return -1;
+				} else {
+					return 1;
+				}
+			} else if ( aSource < bSource ) {
+				return -1;
+			} else {
+				return 1;
+			}
+		} else if (aLevel < bLevel) {
+			return -1;
+		} else {
+			return 1;
+		}
+	});
+	canonical = sortedTranscripts[0];
+	canonical.isCanonical = true;
+	return canonical;
+}
+
+
+function getCanonicalTranscriptOld(theGeneObject) {
+	var geneObject = theGeneObject != null ? theGeneObject : window.gene;
 	var canonical;
 	var maxCdsLength = 0;
-	window.gene.transcripts.forEach(function(transcript) {
+	geneObject.transcripts.forEach(function(transcript) {
 		var cdsLength = 0;
 		if (transcript.features != null) {
 			transcript.features.forEach(function(feature) {
@@ -795,7 +881,8 @@ function getCanonicalTranscript() {
 			if (cdsLength > maxCdsLength) {
 				maxCdsLength = cdsLength;
 				canonical = transcript;
-			}			
+			}
+			transcript.cdsLength = cdsLength;			
 		}
 
 	});
@@ -803,8 +890,8 @@ function getCanonicalTranscript() {
 	if (canonical == null) {
 		// If we didn't find the canonical (transcripts didn't have features), just
 		// grab the first transcript to use as the canonical one.
-		if (gene.transcripts != null && gene.transcripts.length > 0)
-		canonical = gene.transcripts[0];
+		if (geneObject.transcripts != null && geneObject.transcripts.length > 0)
+		canonical = geneObject.transcripts[0];
 	}
 	canonical.isCanonical = true;
 	return canonical;
@@ -821,6 +908,96 @@ function cacheCodingRegions() {
 		});		
 	}
 
+}
+
+
+function cacheGenes() {
+	var genesToCache = [];
+	geneNames.forEach(function(geneName) {
+		if (geneName != window.gene.gene_name) {
+			genesToCache.push(geneName);
+		}
+	})
+
+	cacheNextGene(genesToCache);
+
+}
+
+function cacheNextGene(genesToCache) {
+	if (genesToCache.length == 0) {
+		return;
+	}
+
+	var geneName = genesToCache[0];
+	genesToCache.shift();
+
+	var url = geneiobio_server + 'api/gene/' + geneName;
+	var geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+	url += "?source=" + geneSource;
+		
+	$.ajax({
+	    url: url,
+	    jsonp: "callback",
+	    type: "GET",
+	    dataType: "jsonp",
+	    success: function( response ) {
+
+	    	if (response[0].hasOwnProperty('gene_name')) {
+
+		    	var geneObject = response[0];
+		    	var transcript = getCanonicalTranscript(geneObject);
+			    _geneBadgeLoading(geneObject.gene_name, true);
+
+		    	variantCards.forEach(function(variantCard) {
+
+		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
+			    		variantCard.promiseCacheVariants(
+			    			geneObject.gene_name,
+			    			geneObject.chr,
+			    			geneObject.start, 
+						 	geneObject.end, 
+						 	geneObject.strand, 
+						 	transcript)
+			    		.then( function(vcfData) {
+			    			if (isCachedForCards(geneObject.gene_name, transcript)) {
+
+			    				var dangerObject = getProbandVariantCard().summarizeDanger(vcfData);
+			    				_geneBadgeLoading(geneObject.gene_name, false);
+								_setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
+
+			    				cacheNextGene(genesToCache);
+			    			}
+
+			    		}, function(error) {
+			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + error);
+			    			_geneBadgeLoading(geneObject.gene_name, false);
+			    			cacheNextGene(genesToCache);
+			    		});
+
+		    		}
+
+
+
+		    	});	
+		    }
+		}
+	});
+				
+
+}
+
+function isCachedForCards(geneName, transcript) {
+	var count = 0;
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.isCached(geneName, transcript)) {
+			count++;
+		}
+	});
+	if (dataCard.mode == 'single') {
+		return count == 1;
+	} else {
+		return count == variantCards.length;
+	}
 }
 
 function initCopyPasteGenes() {
@@ -910,7 +1087,7 @@ function copyPasteGenes(geneNameToSelect) {
 
 	_onGeneBadgeUpdate();
 
-	$('#get-genes-dropdown .btn-group').removeClass('open');
+	$('#get-genes-dropdown .btn-group').removeClass('open');	
 }
 
 function getPhenolyzerGenes() {
@@ -924,7 +1101,7 @@ function getPhenolyzerGenes() {
 	var searchTerms = $('#phenolyzer-search-terms').val();
 	$("#phenolyzer-search-term").text(searchTerms);	
 	var url = phenolyzerServer + '?cmd=' + searchTerms.split(" ").join("_");
-
+	d3.select('#phenolyzer-results svg').remove();
    	phenolyzerGenes = [];
 	
 	showPhenolyzerSlideLeft();
@@ -1063,12 +1240,21 @@ function addGeneBadge(geneName, bypassSelecting) {
 
 function refreshGeneBadges() {
 	var dangerObject = getProbandVariantCard().summarizeDanger();
-	_setGeneBadgeGlyphs(dangerObject);
+	_setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 			 	
 }
 
-function _setGeneBadgeGlyphs(dangerObject) {
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + gene.gene_name + "')").parent().parent();
+function _geneBadgeLoading(geneName, show) {
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	if (show) {
+		geneBadge.find('.gene-badge-loader').removeClass("hide");
+	} else {
+		geneBadge.find('.gene-badge-loader').addClass("hide");		
+	}
+}
+
+function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
 	geneBadge.find('#gene-badge-circle').removeClass('btn-success');
 	geneBadge.find('#gene-badge-circle').removeClass('mdi-action-done');
 	geneBadge.find('#gene-badge-circle').removeClass('btn-default');
@@ -1081,19 +1267,23 @@ function _setGeneBadgeGlyphs(dangerObject) {
 	geneBadge.find('#gene-badge-danger-count').removeClass("impact_LOW");
 	geneBadge.find('#gene-badge-button svg').remove();
 
-	geneBadge.addClass("visited");		
-	geneBadge.addClass("selected");		
+	geneBadge.addClass("visited");	
+	if (select) {
+		geneBadge.addClass("selected");		
+	}	
 	
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {
 		if (dangerKey == 'IMPACT') {
 			var impactClasses = dangerObject[dangerKey];
+			var symbolIndex = 0;
 			for (impactClass in impactClasses) {
 				var types = impactClasses[impactClass];
 				for (type in types) {
 					var theClazz = 'impact_' + impactClass;				
 					geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"14\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[0]).data([{width:10, height:10,clazz: theClazz, type:  type}]);
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[symbolIndex]).data([{width:10, height:10,clazz: theClazz, type:  type}]);
+					symbolIndex++;
 					matrixCard.showImpactBadge(selection);									
 				}
 			}
@@ -1148,6 +1338,8 @@ function selectGene(geneName) {
 
 
 	var url = geneiobio_server + 'api/gene/' + geneName;
+	var geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+	url += "?source=" + geneSource;
 	
 	$.ajax({
 	    url: url,
@@ -1335,6 +1527,9 @@ function loadGeneWidget() {
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
 		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
+		var geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+		url += "?source=" + geneSource;
+
 
 		
 		$.ajax({
@@ -1467,7 +1662,7 @@ function loadTracksForGene(bypassVariantCards) {
     $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
 
 
-	if (window.gene.gene_type == 'protein_coding') {
+	if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
 		$('#non-protein-coding #gene-type-badge').addClass("hide");
 	} else {
 		$('#non-protein-coding #gene-type-badge').removeClass("hide");
@@ -1506,7 +1701,9 @@ function loadTracksForGene(bypassVariantCards) {
 
 	// Show the badge for the transcript type if it is not protein coding and it is different
 	// than the gene type
-	if (window.selectedTranscript == null || window.selectedTranscript.transcript_type == 'protein_coding') {
+	if (window.selectedTranscript == null || window.selectedTranscript.transcript_type == 'protein_coding'
+	 || window.selectedTranscript.transcript_type == 'mRNA'
+	 || window.selectedTranscript.transcript_type == 'transcript') {
 		$('#non-protein-coding #transcript-type-badge').addClass("hide");
 	} else {
 		if (window.gene.gene_type != window.selectedTranscript.transcript_type) {
@@ -1532,7 +1729,8 @@ function loadTracksForGene(bypassVariantCards) {
 	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
 				variantCard.hide();
 			} else {
-			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function(dangerCounts) {
+			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function() {
+			 		cacheGenes();
 			 	});
 			}
 		});
@@ -1603,7 +1801,7 @@ function promiseGetGeneAnnotation(geneName) {
 function showTranscripts(regionStart, regionEnd) {
 
 	var transcripts = null;
-
+	
 
 	if (regionStart && regionEnd) {
 		transcriptChart.regionStart(regionStart);
@@ -1615,7 +1813,7 @@ function showTranscripts(regionStart, regionEnd) {
 			if (d.end < regionStart && d.start > regionEnd ) {
 				return false;
 			} else {				
-				return true;
+				return false;
 			}
 		});
 

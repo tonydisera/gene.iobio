@@ -339,7 +339,7 @@
 
 
 
-        <div id="region-track"  style="clear:both;margin-left: 20px;">
+        <div id="region-track"  style="clear:both;">
             <a id="gene-name" target="_genecards" class="card-label heading " data-toggle="tooltip" data-placement="right" >TET3</a>
             <span id="gene-chr" class=" card-label keep-case">chr2</span>
             <span id="gene-region" class=" card-label keep-case">74229840-74335303</span>
@@ -362,25 +362,28 @@
 
 
 
-        <div class="fullview" style="margin-top:-25px">
-        <span class="fullview" style="float:left;padding-left:20px;padding-right:3px;color: rgb(132,132,132);">Transcript</span>  
+        <div class="fullview" style="margin-top:-25px"> 
 
-        <div class="btn-toolbar fullview" 
-           style="display: inline-block;float: left;margin-top:-15px;margin-left: 0px;padding-top: 0px; ">
-           <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
-                <button id="transcript-dropdown-button" type="button"  
-                style="width:150px;font-size:11px"
-                class="btn btn-default dropdown-toggle icon-button-sm" 
-                data-toggle="dropdown" aria-expanded="false" >
-                  Choose Transcript 
-                  <span class="caret" style="margin-left:4px;"></span>
-                </button>
-                <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
-                  <li id="transcript-menu-item">
-                  </li>
-                </ul>
-            </div>
-        </div> 
+          <select class="fullview" id="select-gene-source" onchange="{geneToLatestTranscript={};selectGene(window.gene.gene_name);}">
+                <option>Gencode Transcript</option>
+                <option>RefSeq Transcript</option>                   
+           </select>        
+          <div class="btn-toolbar fullview" 
+             style="display: inline-block;float: left;margin-top:-15px;margin-left: 0px;padding-top: 0px; ">
+             <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
+                  <button id="transcript-dropdown-button" type="button"  
+                  style="width:150px;font-size:11px"
+                  class="btn btn-default dropdown-toggle icon-button-sm" 
+                  data-toggle="dropdown" aria-expanded="false" >
+                    Choose Transcript 
+                    <span class="caret" style="margin-left:4px;"></span>
+                  </button>
+                  <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
+                    <li id="transcript-menu-item">
+                    </li>
+                  </ul>
+              </div>
+          </div> 
         </div>   
 
 
