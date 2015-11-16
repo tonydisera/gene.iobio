@@ -79,8 +79,16 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
-VariantCard.prototype.summarizeDanger = function() {
-	return this.model.summarizeDanger();
+VariantCard.prototype.summarizeDanger = function(data) {
+	return this.model.summarizeDanger(data);
+}
+
+VariantCard.prototype.promiseCacheVariants = function(geneName, ref, start, end, strand, transcript) {
+	return this.model.promiseCacheVariants(geneName, ref, start, end, strand, transcript);
+}
+
+VariantCard.prototype.isCached = function(geneName, transcript) {
+	return this.model.isCached(geneName, transcript);
 }
 
 VariantCard.prototype.hide = function() {
@@ -520,17 +528,10 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 		// chart is not rendered.
 		me._showVariants( regionStart, regionEnd, function() {	
 
-			// Determine inheritance (once full trio is loaded)
-			/*promiseDetermineInheritance().then( function() {
-				filterCard.enableInheritanceFilters(me.model.getVcfData());
-				me.onVariantDataChange();
-			}, function(error) {
-				console.log("error when determining inheritance. " + error);
-			});
-			*/
-
-				
 			me._showBamDepth( regionStart, regionEnd, function() {
+				if (callback) {
+					callback();
+				}
 			});
 		});
 
