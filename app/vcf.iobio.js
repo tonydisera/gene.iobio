@@ -91,6 +91,7 @@ vcfiobio = function module() {
   //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
   
   var clinvarIterCount       = 0;
+  /*
   var vcfstatsAliveServer    = "wss://services.iobio.io/vcfstatsalive";
   var tabixServer            = "wss://services.iobio.io/tabix";
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
@@ -100,9 +101,27 @@ vcfiobio = function module() {
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
-  var vepServer              = "wss://services.iobio.io/vep/";
+  //var vepServer              = "wss://services.iobio.io/vep/";
+  var vepServer              = "ws://nv-dev.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
+*/
  
+
+  
+  var vcfstatsAliveServer    = "wss://nv-blue.iobio.io/vcfstatsalive";
+  var tabixServer            = "wss://nv-blue.iobio.io/tabix";
+  var vcfReadDeptherServer   = "wss://nv-blue.iobio.io/vcfdepther";
+  var snpEffServer           = "wss://nv-blue.iobio.io/snpeff";
+  var snpSiftServer          = "wss://nv-blue.iobio.io/snpsift";
+  var vtServer               = "wss://nv-blue.iobio.io/vt";
+  
+  var clinvarServer          = "wss://nv-blue.iobio.io/clinvar";
+  var afServer               = "wss://nv-blue.iobio.io/af";
+  var vepServer              = "ws://nv-dev.iobio.io/vep/";  
+  //var vepServer              = "wss://nv-blue.iobio.io/vep/";
+ var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
+
+
   var vcfURL;
   var vcfReader;
   var vcfFile;
@@ -670,7 +689,7 @@ var effectCategories = [
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
     var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
-
+    
     var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
     
     // Connect to the snpEff server    
@@ -705,10 +724,14 @@ var effectCategories = [
           var annotatedRecs = annotatedData.split("\n");
           var vcfObjects = [];
           var contigHdrRecFound = false;
+          var vepFields = {};
 
           annotatedRecs.forEach(function(record) {
             if (record.charAt(0) == "#") {
-              // bypass header rec
+              // Figure out how the vep fields positions
+              if (record.indexOf("INFO=<ID=CSQ") > 0) {
+                vepFields = me.parseHeaderFieldForVep(record);                
+              }
             } else {
 
               // Parse the vcf record into its fields
@@ -734,7 +757,7 @@ var effectCategories = [
           });
 
            // Parse the vcf object into a variant object that is visualized by the client.
-          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
 
           callback(annotatedRecs, results);          
 
@@ -742,6 +765,23 @@ var effectCategories = [
     });  // end - client.open()
 
   
+  }
+
+  exports.parseHeaderFieldForVep = function(record) {
+    var vepFields = {};
+    var tokens = record.split("Format: ");
+    if (tokens.length == 2) {
+      var format = tokens[1];
+      var fields = format.split("|");
+      for(var idx = 0; idx < fields.length; idx++) {
+        var fieldName = fields[idx];
+        if (fieldName.indexOf("\"") == fieldName.length-1) {
+          fieldName = fieldName.trim("\"");
+        }
+        vepFields[fieldName] = idx;
+      }    
+    }
+    return vepFields;
   }
 
 
@@ -851,10 +891,14 @@ var effectCategories = [
           var annotatedRecs = annotatedData.split("\n");
           var vcfObjects = [];
           var contigHdrRecFound = false;
+          var vepFields = {};
 
           annotatedRecs.forEach(function(record) {
             if (record.charAt(0) == "#") {
-              // bypass header rec
+              // Figure out how the vep fields positions
+              if (record.indexOf("INFO=<ID=CSQ") > 0) {
+                vepFields = me.parseHeaderFieldForVep(record);                
+              }
             } else {
 
               // Parse the vcf record into its fields
@@ -880,7 +924,7 @@ var effectCategories = [
           });
 
            // Parse the vcf object into a variant object that is visualized by the client.
-          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
           callback(results);
           
 
@@ -990,10 +1034,14 @@ var effectCategories = [
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
+        var vepFields = {};
 
         annotatedRecs.forEach(function(record) {
           if (record.charAt(0) == "#") {
-            // Bypass header
+            // Figure out how the vep fields positions
+            if (record.indexOf("INFO=<ID=CSQ") > 0) {
+              vepFields = me.parseHeaderFieldForVep(record);                
+            }
           } else {
 
             // Parse the vcf record into its fields
@@ -1020,7 +1068,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+        var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1039,10 +1087,14 @@ var effectCategories = [
 
       var annotatedRecs = annotatedData.split("\n");
       var vcfObjects = [];
+      var vepFields = {};
 
       annotatedRecs.forEach(function(record) {
         if (record.charAt(0) == "#") {
-          // Bypass header
+            // Figure out how the vep fields positions
+            if (record.indexOf("INFO=<ID=CSQ") > 0) {
+              vepFields = me.parseHeaderFieldForVep(record);                
+            }
         } else {
 
           // Parse the vcf record into its fields
@@ -1069,7 +1121,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript);
+      var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
       callback(results);
 
 
@@ -1313,7 +1365,7 @@ var effectCategories = [
   }
 
 
-  exports.parseVcfRecords = function(vcfRecs, regionStart, regionEnd, regionStrand, selectedTranscript) {
+  exports.parseVcfRecords = function(vcfRecs, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields) {
       var me = this;
       var nameTokens = selectedTranscript.transcript_id.split('.');
       var selectedTranscriptID = nameTokens.length > 0 ? nameTokens[0] : selectedTranscript;
@@ -1406,17 +1458,17 @@ var effectCategories = [
             // Existing_variation|DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|
             // SIFT|PolyPhen|HGVS_OFFSET|CLIN_SIG|SOMATIC|PHENO|
             // MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
-            var vepConsequence = new Object(),  vepConsequenceIndex =1;
-            var vepImpact = new Object(),       vepImpactIndex = 2;
-            var vepFeatureType = new Object(),  vepFeatureTypeIndex = 5;
-            var vepFeature = new Object(),      vepFeatureIndex = 6;
-            var vepExon = new Object(),         vepExonIndex = 8;
-            var vepHGVSc = new Object(),        vepHGVScIndex = 10;
-            var vepHGVSp = new Object(),        vepHGVSpIndex = 11;
-            var vepAminoAcids = new Object(),   vepAminoAcidsIndex = 15;
-            var vepVariationIds = new Object(), vepExistingVariationIndex = 17;
-            var vepSIFT = new Object(),         vepSIFTIndex = 22;
-            var vepPolyPhen = new Object(),     vepPolyPhenIndex = 23;
+            var vepConsequence = new Object();
+            var vepImpact = new Object();
+            var vepFeatureType = new Object();
+            var vepFeature = new Object();
+            var vepExon = new Object();
+            var vepHGVSc = new Object();
+            var vepHGVSp = new Object();
+            var vepAminoAcids = new Object();
+            var vepVariationIds = new Object();
+            var vepSIFT = new Object();
+            var vepPolyPhen = new Object();
             var sift = new Object();     // need a special field for filtering purposes
             var polyphen = new Object(); // need a special field for filtering purposes
             var regulatory = new Object(); // need a special field for filtering purposes
@@ -1488,10 +1540,14 @@ var effectCategories = [
                 // transcript.
                 annotToken = annotToken.substring(4, annotToken.length);
                 var transcriptTokens = annotToken.split(",");
+                //Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|GVSp
+                //|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation
+                //|DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|REFSEQ_MATCH|SIFT|PolyPhen|HGVS_OFFSET
+                //|CLIN_SIG|SOMATIC|PHENO|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
                 transcriptTokens.forEach(function(transcriptToken) {                  
                     var vepTokens   = transcriptToken.split("|");
-                    var feature     = vepTokens[vepFeatureIndex];
-                    var featureType = vepTokens[vepFeatureTypeIndex];
+                    var feature     = vepTokens[vepFields.Feature];
+                    var featureType = vepTokens[vepFields.Feature_type];
 
                     // If the transcript is the selected transcript, parse
                     // all of the vep fields.  We place these into maps
@@ -1499,35 +1555,40 @@ var effectCategories = [
                     // the same transcript.  
                     // TODO:  Need to sort so that highest impact shows first
                     //        and is used for filtering and ranking purposes.
-                    if (featureType == 'Transcript' && feature == selectedTranscriptID) {
-                      vepImpact[vepTokens[vepImpactIndex]] = vepTokens[vepImpactIndex];
-                      vepConsequence[vepTokens[vepConsequenceIndex]] = vepTokens[vepConsequenceIndex];
-                      vepExon[vepTokens[vepExonIndex]] = vepTokens[vepExonIndex];
-                      vepHGVSc[vepTokens[vepHGVScIndex]] = vepTokens[vepHGVScIndex];
-                      vepHGVSp[vepTokens[vepHGVSpIndex]] = vepTokens[vepHGVSpIndex];
-                      vepAminoAcids[vepTokens[vepAminoAcidsIndex]] = vepTokens[vepAminoAcidsIndex];
-                      vepVariationIds[vepTokens[vepExistingVariationIndex]] = vepTokens[vepExistingVariationIndex];
+                    if (featureType == 'Transcript' && (feature == selectedTranscriptID || feature == selectedTranscript.transcript_id)) {
+                      vepImpact[vepTokens[vepFields.IMPACT]] = vepTokens[vepFields.IMPACT];
 
-                      var siftString = vepTokens[vepSIFTIndex];
+                      var consequence = vepTokens[vepFields.Consequence];
+                      consequence.split("&").forEach( function(token) {
+                        vepConsequence[token] = token;
+                      })
+
+                      vepExon[vepTokens[vepFields.EXON]] = vepTokens[vepFields.EXON];
+                      vepHGVSc[vepTokens[vepFields.HGVSc]] = vepTokens[vepFields.HGVSc];
+                      vepHGVSp[vepTokens[vepFields.HGVSp]] = vepTokens[vepFields.HGVSp];
+                      vepAminoAcids[vepTokens[vepFields.Amino_acids]] = vepTokens[vepFields.Amino_acids];
+                      vepVariationIds[vepTokens[vepFields.Existing_variation]] = vepTokens[vepFields.Existing_variation];
+
+                      var siftString = vepTokens[vepFields.SIFT];
                       var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
                       vepSIFT[siftDisplay] = siftDisplay;   
                       sift['sift_'+ siftDisplay] = 'sift_' + siftDisplay;                   
 
-                      var polyphenString = vepTokens[vepPolyPhenIndex];
+                      var polyphenString = vepTokens[vepFields.PolyPhen];
                       var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
                       vepPolyPhen[polyphenDisplay] = polyphenDisplay;
                       polyphen['polyphen_' + polyphenDisplay] = 'polyphen_' + polyphenDisplay;
 
                     } else if (featureType == 'RegulatoryFeature' || featureType == 'MotifFeature' ) {
                       vepRegs.push( {
-                        'impact' :  vepTokens[vepImpactIndex],
-                        'consequence' : vepTokens[vepConsequenceIndex],
-                        'biotype': vepTokens[vepRegBioTypeIndex],
-                        'motifName' : vepTokens[vepRegMotifNameIndex],
-                        'motifPos'  : vepTokens[vepRegMotifPosIndex],
-                        'motifHiInf' : vepTokens[vepRegMotifHiInfIndex]
+                        'impact' :  vepTokens[vepFields.IMPACT],
+                        'consequence' : vepTokens[vepFields.Consequence],
+                        'biotype': vepTokens[vepFields.BIOTYPE],
+                        'motifName' : vepTokens[vepFields.MOTIF_NAME],
+                        'motifPos'  : vepTokens[vepFields.MOTIF_POS],
+                        'motifHiInf' : vepTokens[vepFields.HIGH_INF_POS]
                       });
-                      var reg = vepTokens[vepConsequenceIndex] == 'regulatory_region_variant' ? vepTokens[vepRegBioTypeIndex] : vepTokens[vepConsequenceIndex];
+                      var reg = vepTokens[vepFields.Consequence] == 'regulatory_region_variant' ? vepTokens[vepFields.BIOTYPE] : vepTokens[vepFields.Consequence];
                       var regKey = reg;
                       if (reg == "promoter") {
                         regKey = "the_promoter";
