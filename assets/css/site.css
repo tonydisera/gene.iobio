@@ -702,6 +702,7 @@ section {
   margin-top:5px;
   color: rgb(132, 132, 132);
   font-size: 14px;
+  margin-left: 100px;
 }
 #gene-name {
   font-size: 16px !important;
@@ -1236,7 +1237,7 @@ header {
   fill: rgba(181, 207, 107, 0.65);
   color: rgba(181, 207, 107, 0.65);
 }
-.impact_NOIMPACT { 
+.impact_NOIMPACT, .impact_none, .effect_none { 
   fill: #FAF5BE ;
   stroke: #807D7D;
 }
@@ -1246,7 +1247,7 @@ header {
   fill: #ff0000;
 }
   
-.effect_splice_acceptor_variant {
+.effect_splice_acceptor_variant  {
   fill: #FF581A;
 }
 
@@ -1286,7 +1287,7 @@ header {
   fill :#ffd700;
 }
   
-.effect_protein_altering_variant {
+.effect_protein_altering_variant  {
   fill :#FF0080;
 }
   
@@ -1294,14 +1295,9 @@ header {
   fill: #ff7f50;
 }
   
-.effect_incomplete_terminal_codon_variant {
+.effect_incomplete_terminal_codon_variant  {
   fill :#ff00ff;
-}
-  
-.effect_stop_retained_variant {
-  fill: #76ee00;
-}
-
+}   
 
 .effect_synonymous_variant {
   fill: #76ee00;
@@ -1371,7 +1367,7 @@ header {
   fill: #7f7f7f;
 }
   
-.effect_regulatory_region_variant {
+.effect_regulatory_region_variant  {
   fill: #a52a2a;
 }
   
@@ -1390,6 +1386,10 @@ header {
 .effect_coding_sequence_variant {
   fill: #458b00;
 }
+ 
+.effect_exon_variant {
+  fill: #458b00;
+}
 
 .zyg_hom {
   fill: rgba(234,189,32,1);
@@ -1403,12 +1403,12 @@ header {
 
 
 /* LEGEND */
-.impact, .effect, .type, .zygosity {
+.impact, .effect, .vepConsequence, .type, .zygosity {
   border: solid thin white;
   padding: 1px;
 
 }
-.impact.nocolor rect, .effect.nocolor rect,  .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
+.impact.nocolor rect, .effect.nocolor rect,  .vepConsequence.nocolor rect,  .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
   stroke: grey;
 }
@@ -1416,12 +1416,12 @@ header {
   display: none !important;
 }
 
-.impact:hover, .effect:hover,  .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover  {  
+.impact:hover, .effect:hover,  .vepConsequence:hover, .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover  {  
   cursor: pointer;
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
-.impact.current:hover, .effect.current:hover,  .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
+.impact.current:hover, .effect.current:hover, .vepConsequence.current:hover,   .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
 .type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover {
   font-weight: bold;
   cursor: pointer;
@@ -1458,7 +1458,7 @@ header {
   pointer-events: none;
   opacity: .4;
 }
-.effect.inactive {
+.effect.inactive, .vepConsequence.inactive {
   pointer-events: none;
   display: none;
 }
@@ -1690,10 +1690,11 @@ header {
     margin: 0;
 }
 
+
 /* For mobile phones  */
 @media screen and (max-device-width:1030px), screen and (max-width:1030px) {
-  #gene-search-bar {
-    margin-left: 50px;
+  #region-track {
+    margin-left: 200px !important;
   }
 }
 /* For mobile phones  */
@@ -1718,10 +1719,11 @@ header {
     clear:both !important;
     width: 600px;
     text-align: center !important;
+    
   }
 
   #region-track {
-    margin-left: 125px !important;
+    margin-left: 200px !important;
   }
 
 
