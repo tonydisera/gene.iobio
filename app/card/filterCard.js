@@ -27,7 +27,8 @@ FilterCard.prototype.getFilterObject = function() {
 
 FilterCard.prototype.onSelectAnnotationScheme = function() {
 	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
-	$('#effect-scheme .name').text(this.annotationScheme ==  'snpEff' ? 'Effect' : 'Consequence');
+	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
+	this.displayEffectFilters();
 	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
 	window.loadTracksForGene();
 
@@ -129,6 +130,7 @@ FilterCard.prototype.init = function() {
 
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".vepConsequence").classed("nocolor", true);
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
@@ -147,6 +149,7 @@ FilterCard.prototype.init = function() {
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
+	    	d3.selectAll(".vepConsequence").classed("nocolor", false);
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
@@ -165,6 +168,7 @@ FilterCard.prototype.init = function() {
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".vepConsequence").classed("nocolor", true);
 	    	d3.selectAll(".zygosity").classed("nocolor", false);
 
 			window.variantCards.forEach(function(variantCard) {
@@ -209,7 +213,7 @@ FilterCard.prototype.init = function() {
 
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
-	d3.selectAll(".type, .impact, .effect, .sift, .polyphen, .regulatory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar, .uasibs")
+	d3.selectAll(".type, .impact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar, .uasibs")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -287,6 +291,7 @@ FilterCard.prototype.clearFilters = function() {
 	this.annotsToInclude = [];
 	d3.selectAll('#filter-track .impact').classed('current', false);
 	d3.selectAll('#filter-track .effect').classed('current', false);
+	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
 	d3.selectAll('#filter-track .type').classed('current', false);
 	d3.selectAll('#filter-track .zygosity').classed('current', false);
 	d3.selectAll('#filter-track .sift').classed('current', false);
@@ -436,31 +441,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		d3.select(this).classed("inactive", count == 0);
 	});
 
-	$('#effect-filter-box .effect').remove();
-	var nocolor = $('#effect-filter-box #effect-scheme').hasClass("current") ? "" : "nocolor";
-	var values = this.annotationScheme == 'snpEff' ? this.snpEffEffects : this.vepConsequences;
-	var field  = this.annotationScheme == 'snpEff' ? 'effect' : 'vepConsequence';
-	for (key in values) {
-		var count = d3.selectAll('#vcf-track .variant')
-		              .filter( function(d,i) {
-		              	var match = false; 
-		              	for (ef in d[field]) {
-		              		if (ef == key) {
-		              			match = true;
-		              		}
-		              	}
-		              	return match;
-		              })[0].length;
-
-		if (count > 0) {
-
-			var svgElem = '<svg id="' + key + '" class="effect ' + nocolor + '" width="80" height="12" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
-      					  '</svg>';
-      		$('#effect-filter-box').append(svgElem);
-		}
-	};
+	this.displayEffectFilters();
 	this.initFilterListeners();
 	d3.selectAll(".afexaclevel").each( function(d,i) {
 		var afexaclevel = d3.select(this).attr("id");
@@ -476,6 +457,36 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 
 }
 
+FilterCard.prototype.displayEffectFilters = function() {
+	var me = this;
+	$('#effect-filter-box .effect').remove();
+	$('#effect-filter-box .vepConsequence').remove();
+	var nocolor = $('#effect-filter-box #effect-scheme').hasClass("current") ? "" : "nocolor";
+	var values = this.annotationScheme.toLowerCase() == 'snpeff' ? this.snpEffEffects : this.vepConsequences;
+	var field  = this.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
+	for (key in values) {
+		var count = d3.selectAll('#vcf-track .variant')
+		              .filter( function(d,i) {
+		              	var match = false; 
+		              	for (ef in d[field]) {
+		              		if (ef == key) {
+		              			match = true;
+		              		}
+		              	}
+		              	return match;
+		              })[0].length;
+
+		if (count > 0) {
+
+			var svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="120" height="12" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
+        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
+      					  '</svg>';
+      		$('#effect-filter-box').append(svgElem);
+		}
+	};	
+}
+
 FilterCard.prototype.capitalizeFirstLetter = function(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -487,15 +498,29 @@ FilterCard.prototype.classifyByImpact = function(d) {
 	var sift = "";
 	var polyphen = "";
 	var regulatory = "";
-	
-	var effectList = (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence);
-    for (key in effectList) {
-      effects += " " + key;
+
+	// this is not FilterCard because we are calling class function within d3 
+	var annotationScheme = filterCard.annotationScheme;
+
+	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);	
+	for (key in effectList) {
+      if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
+      	var tokens = key.split("&");
+      	tokens.forEach( function(token) {
+	      effects += " " + token;
+    		
+      	});
+      } else {
+	      effects += " " + key;	      
+      }
     }
-    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
     for (key in impactList) {
       impacts += " " + key;
       colorimpacts += " " + 'impact_'+key;
+    }
+    if (colorimpacts == "") {
+    	colorimpacts = "impact_none";
     }
     for (key in d.sift) {
     	sift += " " + key;		
@@ -517,13 +542,28 @@ FilterCard.prototype.classifyByEffect = function(d) {
 	var sift = "";
 	var polyphen = "";
 	var regulatory = "";
+
+	// this is not FilterCard because we are calling class function within d3 
+	var annotationScheme = filterCard.annotationScheme;
 	
-	var effectList = (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence);
+	
+	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);
     for (key in effectList) {
-      effects += " " + key;
-      coloreffects += " " + 'effect_'+key;
+      if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
+      	var tokens = key.split("&");
+      	tokens.forEach( function(token) {
+      	  effects += " " + token;
+	      coloreffects += " effect_" + token;      		
+      	});
+      } else {
+      	  effects += " " + key;
+	      coloreffects += " effect_" + key;
+      }
     }
-    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    if (coloreffects == "") {
+    	coloreffects = "effect_none";
+    }
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
     for (key in impactList) {
       impacts += " " + key;
     }
@@ -548,13 +588,23 @@ FilterCard.prototype.classifyByZygosity = function(d) {
 	var polyphen = "";
 	var regulatory = "";
 	var colorzygs = "";
+
+	// this is not FilterCard because we are calling class function within d3 
+	var annotationScheme = filterCard.annotationScheme;
 	
-	var effectList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepEffect);
+	
+	var effectList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepEffect);
 	for (key in effectList) {
-      effects += " " + key;
-      effects += " " + key;
+      if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
+      	var tokens = key.split("&");
+      	tokens.forEach( function(token) {
+	      effects += " " + token;	     
+      	});
+      } else {
+	      effects += " " + key;
+      }
     }
-    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
     for (key in impactList) {
       impacts += " " + key;
     }
