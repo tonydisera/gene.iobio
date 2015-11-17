@@ -31,6 +31,7 @@ FilterCard.prototype.onSelectAnnotationScheme = function() {
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	this.displayEffectFilters();
 	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 	window.loadTracksForGene();
 
 }
