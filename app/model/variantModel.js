@@ -654,13 +654,15 @@ VariantModel.prototype.promiseGetVariantsOnly = function() {
 
 	return new Promise( function(resolve, reject) {
 
+
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(window.gene.chr), 
 		   window.gene.start, 
 	       window.gene.end, 
 	       window.gene.strand, 
 	       window.selectedTranscript,
-	       me.sampleName 
+	       me.sampleName,
+	       window.geneSource == 'refseq' ? true : false
 	    ).then( function(data) {
 	    	var annotatedRecs = data[0];
 	    	me.vcfData = data[1];	    	
@@ -849,13 +851,22 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 
 	return new Promise( function(resolve, reject) {
 
+
+		// If this is the refseq gene model, set the annotation
+		// scheme on the filter card to 'VEP' since snpEff will
+		// be bypassed at this time.
+		if (window.geneSource == 'refseq') {
+			filterCard.setAnnotationScheme("VEP");
+		}
+		
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(ref), 
 		   start, 
 	       end, 
 	       strand, 
 	       transcript,
-	       me.sampleName 
+	       me.sampleName,
+	       window.geneSource == 'refseq' ? true : false
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];
@@ -1628,7 +1639,8 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 					 window.gene.end, 
 					 window.gene.strand, 
 					 window.selectedTranscript,
-					 me.sampleName)
+					 me.sampleName,
+					 window.geneSource == 'refseq' ? true : false)
 				.then( function(data) {
 					var annotatedRecs = data[0];
 			    	me.vcfData = data[1];

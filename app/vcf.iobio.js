@@ -594,12 +594,12 @@ var effectCategories = [
   }
   
   // NEW
-  exports.promiseGetVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName) {
+  exports.promiseGetVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq) {
     var me = this;
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, 
+        me._getRemoteVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, 
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -608,7 +608,7 @@ var effectCategories = [
             }
           });
       } else {
-        me._getLocalVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName,
+        me._getLocalVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -622,7 +622,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback) {
+  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -645,7 +645,7 @@ var effectCategories = [
         
         var allRecs = headerRecords.concat(records);
 
-        me.promiseAnnotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName)
+        me.promiseAnnotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -660,7 +660,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback) {
+  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback) {
     var me = this;
 
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
@@ -688,12 +688,22 @@ var effectCategories = [
     // get allele frequencies from 1000G and ExAC
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
-    var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
+    var snpEffUrl = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
+
+    // Skip snpEff if RefSeq transcript set
+    var nextUrl;
+    var vepArgs = "";
+    if (isRefSeq) {
+      nextUrl = afUrl;
+      vepArgs = " --refseq ";
+    } else {
+      nextUrl = snpEffUrl;
+    }
     
-    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
+    var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
     
-    // Connect to the snpEff server    
-    var client = BinaryClient(snpEffServer);
+    // Connect to the vep server    
+    var client = BinaryClient(vepServer);
     
     var annotatedData = "";
     client.on('open', function(stream){
@@ -785,158 +795,6 @@ var effectCategories = [
   }
 
 
-  // NEW
-  exports.getVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
-    if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
-    } else {
-      this._getLocalVariants(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
-    }
-  }
- 
-  // NEW
-  exports._getLocalVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
-    var me = this;
-
-    // The variant region may span more than the specified region.
-    // We will be keeping track of variant depth by relative position
-    // of the region start, so to prevent a negative index, we will
-    // keep track of the region start based on the variants.
-    var variantRegionStart = regionStart;
-
-    var vcfObjects = [];
-    vcfObjects.length = 0;
-
-    var headerRecords = [];
-    vcfReader.getHeader( function(header) {
-       headerRecords = header.split("\n");
-
-    });
-
-    // Get the vcf records for this region
-    vcfReader.getRecords(refName, regionStart, regionEnd, function(records) {
-        
-        var allRecs = headerRecords.concat(records);
-
-        me.annotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, 
-          selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded);
-
-
-    });
-
-  }
-
-  // NEW
-  exports._getRemoteVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName,
-    callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
-    var me = this;
-    var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
-    if (refName.indexOf('chr') == 0) {
-      refFile = "./data/references_hg19/" + refName + ".fa";
-    } else {
-      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }    
-    
-    // TODO - Need to generalize to grab reference names for species instead of hardcoding
-    var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
-
-    // If multi-sample vcf, select only the genotype field for the specified sample
-    var nextUrl = "";
-    if (sampleName != null && sampleName != "") {
-      nextUrl = encodeURI( vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
-    } else {
-      nextUrl = contigAppenderUrl;
-    }
-
-    // normalize variants
-    var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
-    
-    // get allele frequencies from 1000G and ExAC
-    var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-
-    var vepUrl = encodeURI( vepServer + '?cmd= ' + encodeURIComponent(afUrl));
-
-    var url = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(vepUrl));
-    
-    // Connect to the snpEff server    
-    var client = BinaryClient(snpEffServer);
-    
-    var annotatedData = "";
-    client.on('open', function(stream){
-
-        // Run the command
-        var stream = client.createStream({event:'run', params : {'url':url}});
-
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('data', function(data, options) {
-           if (data == undefined) {
-              return;
-           } 
-           annotatedData += data;
-        });
-
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('error', function(data, options) {
-           console.log(data);
-        });
-
-        // Whenall of the annotated vcf data has been returned, call
-        // the callback function.
-        stream.on('end', function() {
-          var annotatedRecs = annotatedData.split("\n");
-          var vcfObjects = [];
-          var contigHdrRecFound = false;
-          var vepFields = {};
-
-          annotatedRecs.forEach(function(record) {
-            if (record.charAt(0) == "#") {
-              // Figure out how the vep fields positions
-              if (record.indexOf("INFO=<ID=CSQ") > 0) {
-                vepFields = me.parseHeaderFieldForVep(record);                
-              }
-            } else {
-
-              // Parse the vcf record into its fields
-              var fields = record.split('\t');
-              var pos    = fields[1];
-              var id     = fields[2];
-              var ref    = fields[3];
-              var alt    = fields[4];
-              var qual   = fields[5];
-              var filter = fields[6];
-              var info   = fields[7];
-              var format = fields[8];
-              var genotypes = [];
-              for (var i = 9; i < fields.length; i++) {
-                genotypes.push(fields[i]);
-              }
-
-              // Turn vcf record into a JSON object and add it to an array
-              var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                               'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
-              vcfObjects.push(vcfObject);
-            }
-          });
-
-           // Parse the vcf object into a variant object that is visualized by the client.
-          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
-          callback(results);
-          
-
-          // Get the Clinvar variants, passing in the vcf recs that came back from snpEff.
-          if (callbackClinvar) {
-            me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
-          }
-        });
-    });
-     
-  }
-
     // NEW
   exports.getSampleNames = function(callback) {
     if (sourceType == SOURCE_TYPE_URL) {
@@ -1023,14 +881,14 @@ var effectCategories = [
 
 
   // NEW
-  exports.promiseAnnotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName) {
+  exports.promiseAnnotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the 
       // info field.
-      me._annotateVcfRegion(records, refName, sampleName, function(annotatedData) {
+      me._annotateVcfRegion(records, refName, sampleName, isRefSeq, function(annotatedData) {
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
@@ -1074,65 +932,6 @@ var effectCategories = [
     });
   }
 
-  // NEW
-  exports.annotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, callback, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure) {
-    var me = this;
-
-
-
-    // For each vcf records, call snpEff to get the annotations.
-    // Each vcf record returned will have an EFF field in the 
-    // info field.
-    me._annotateVcfRegion(records, refName, sampleName, function(annotatedData) {
-
-      var annotatedRecs = annotatedData.split("\n");
-      var vcfObjects = [];
-      var vepFields = {};
-
-      annotatedRecs.forEach(function(record) {
-        if (record.charAt(0) == "#") {
-            // Figure out how the vep fields positions
-            if (record.indexOf("INFO=<ID=CSQ") > 0) {
-              vepFields = me.parseHeaderFieldForVep(record);                
-            }
-        } else {
-
-          // Parse the vcf record into its fields
-          var fields = record.split('\t');
-          var pos    = fields[1];
-          var id     = fields[2];
-          var ref    = fields[3];
-          var alt    = fields[4];
-          var qual   = fields[5];
-          var filter = fields[6];
-          var info   = fields[7];
-          var format = fields[8];
-          var genotypes = [];
-          for (var i = 9; i < fields.length; i++) {
-            genotypes.push(fields[i]);
-          }
-
-
-          // Turn vcf record into a JSON object and add it to an array
-          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                           'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
-          vcfObjects.push(vcfObject);
-        }
-      });
-
-      // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
-      callback(results);
-
-
-      if (callbackClinvar) {
-        me.getClinvarRecords(annotatedRecs, refName, regionStart, regionEnd, callbackClinvar, callbackClinvarLoaded, callbackClinvarBegin, callbackClinvarFailure);
-      }
-    }
-
-    );
-
-  }
     // NEW
   exports.promiseGetClinvarRecords = function(variants, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
     var me = this;
@@ -1277,7 +1076,7 @@ var effectCategories = [
   }
   
   // NEW
-  exports._annotateVcfRegion = function(records, refName, sampleName, callback, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, sampleName, callback, isRefSeq, callbackClinvar) {
       var me = this;
       
       var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
@@ -1301,18 +1100,26 @@ var effectCategories = [
       
       // Get Allele Frequencies from 1000G and ExAC
       var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-      
-      // Call VEP
-      var vepUrl = encodeURI( vepServer + "?cmd= " + encodeURIComponent(afUrl));
-      
+            
       // Call snpEff service
       var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(vepUrl));
+
+      // Bypass snpEff if the transcript set is RefSeq
+      var vepArgs = "";
+      if (isRefSeq) {
+        nextUrl = afUrl;
+        vepArgs = " --refseq "
+      } else {
+        nextUrl = snpEffUrl;
+      }
       
+      // Call VEP
+      var vepUrl = encodeURI( vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
       
-      var client = BinaryClient(snpEffServer);
+      var client = BinaryClient(vepServer);
       var buffer = "";
       client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':snpEffUrl}});
+        var stream = client.createStream({event:'run', params : {'url':vepUrl}});
 
         // New local file streaming
         stream.on('createClientConnection', function(connection) {

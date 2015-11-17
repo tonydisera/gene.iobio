@@ -35,6 +35,7 @@ var geneNames = [];
 var phenolyzerGenes = [];
 var geneAnnots = {};
 var geneToLatestTranscript = {};
+var geneSource = "gencode";
 var loadedUrl = false;
 var selectedTranscript = null;
 var selectedTranscriptCodingRegions = [];
@@ -932,7 +933,7 @@ function cacheNextGene(genesToCache) {
 	genesToCache.shift();
 
 	var url = geneiobio_server + 'api/gene/' + geneName;
-	var geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+	geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
 	url += "?source=" + geneSource;
 		
 	$.ajax({
@@ -1338,7 +1339,7 @@ function selectGene(geneName) {
 
 
 	var url = geneiobio_server + 'api/gene/' + geneName;
-	var geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+	geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
 	url += "?source=" + geneSource;
 	
 	$.ajax({
@@ -1527,7 +1528,7 @@ function loadGeneWidget() {
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
 		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
-		var geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+		geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
 		url += "?source=" + geneSource;
 
 

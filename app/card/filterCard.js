@@ -38,6 +38,13 @@ FilterCard.prototype.getAnnotationScheme = function() {
 	return this.annotationScheme;
 }
 
+FilterCard.prototype.setAnnotationScheme = function(scheme) {
+	this.annotationScheme = scheme;
+    $('#select-annotation-scheme').val(scheme);	
+	$('#select-annotation-scheme').trigger("chosen:updated");	
+}
+
+
 
 FilterCard.prototype.onSelectPathogenicityScheme = function() {
 	this.pathogenicityScheme = $( "#select-pathogenicity-scheme option:selected" ).text().toLowerCase();
