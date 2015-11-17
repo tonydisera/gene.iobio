@@ -98,7 +98,7 @@ function featureMatrixD3() {
 
       // Generate the column headers
       svg.selectAll("g.colhdr").remove();
-        if (options.showColumnLabels) {
+      if (options.showColumnLabels) {
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
           .append("g")

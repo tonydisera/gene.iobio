@@ -102,6 +102,24 @@ MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 			row.name = newRowLabel;
 		}
 	});
+	this.matrixRowsNoUa.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			row.name = newRowLabel;
+		}
+	});
+}
+
+MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
+	this.matrixRows.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			row.attribute = newRowAttribute;
+		}
+	});
+	this.matrixRowsNoUa.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			row.attribute = newRowAttribute;
+		}
+	});
 }
 
 MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {

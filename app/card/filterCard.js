@@ -27,6 +27,7 @@ FilterCard.prototype.getFilterObject = function() {
 
 FilterCard.prototype.onSelectAnnotationScheme = function() {
 	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
+
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	this.displayEffectFilters();
 	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
@@ -42,6 +43,11 @@ FilterCard.prototype.setAnnotationScheme = function(scheme) {
 	this.annotationScheme = scheme;
     $('#select-annotation-scheme').val(scheme);	
 	$('#select-annotation-scheme').trigger("chosen:updated");	
+
+	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
+	this.displayEffectFilters();
+	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 }
 
 
