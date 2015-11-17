@@ -127,6 +127,9 @@ body {
 #gene-badge.visited #gene-badge-name {
   color: #5d809d !important;
 }
+#gene-badge:hover #gene-badge-remove {
+  visibility: visible !important;
+}
 
 #gene-badge-container #gene-badge-remove .mdi-content-clear {
   color: #E0292B !important;

@@ -1729,8 +1729,7 @@ function loadTracksForGene(bypassVariantCards) {
 	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
 				variantCard.hide();
 			} else {
-			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function() {
-			 		cacheGenes();
+			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function() {			 		
 			 	});
 			}
 		});
