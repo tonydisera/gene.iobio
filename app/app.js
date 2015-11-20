@@ -156,6 +156,18 @@ function init() {
 		'custom_open_button': '.open_page_guide' 
     }); 
 
+    // Slide out panels
+	$('#select-gene-source').chosen({width: "140px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
+	$('#select-side-bar').chosen({width: "200px;", disable_search_threshold: 10});
+	$('#slider-left-content').html(filterCardTemplateHTML);		
+	$('#slider-left-content').append(phenolyzerTemplateHTML);
+	$('#slider-left-content').append(bookmarkTemplateHTML);
+	$('#slider-left-content').append(examineTemplateHTML);
+	$('#close-slide-left').click(function() {
+		closeSlideLeft();
+	});
+
+
 	// Initialize data card
 	dataCard = new DataCard();
 	dataCard.init();
@@ -297,21 +309,7 @@ function init() {
 	    };
 	}
 
-	$('#select-gene-source').chosen({width: "140px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
-	$('#select-side-bar').chosen({width: "200px;", disable_search_threshold: 10});
 
-	$('#slider-left-content').html(filterCardTemplateHTML);		
-	$('#slider-left-content').append(phenolyzerTemplateHTML);
-	$('#slider-left-content').append(bookmarkTemplateHTML);
-	$('#slider-left-content').append(examineTemplateHTML);
-
-
-	// Slide out panels
-	$('.main').click(function() {
-	});
-	$('#close-slide-left').click(function() {
-		closeSlideLeft();
-	});
 	
 	// for testing phenolyzer bar chart
 	/*
