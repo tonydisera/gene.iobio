@@ -84,30 +84,37 @@
 
   <div id="variant-panel" style="clear:both;">
      <div id="multiple-sample-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 570px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+      >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong>The variant file contains multiple samples. Defaulting to first sample in file.
     </div>
     <div id="no-variants-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 570px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> No variants found.  Make sure that the variant file is a valid URL or file.
                                     <br>The variant file must be gzipped compressed (.vcf.gz) and accompanied with a tabix (.vcf.gz.tbi) file.
     </div>
     <div id="no-ref-found-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 570px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> <span id="message"></span>
     </div>
     <div id="clinvar-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 300px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> Error accessing ClinVar.
     </div>
+    <div id="error-warning" class="hide alert alert-dismissable alert-info" 
+      >
+
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Warning:  </strong> <span id="message"></span>
+    </div>
+
 
     <div id="vcf-track" class="track hide" >
              

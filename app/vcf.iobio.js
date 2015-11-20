@@ -91,7 +91,7 @@ vcfiobio = function module() {
   //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
   
   var clinvarIterCount       = 0;
-  /*
+
   var vcfstatsAliveServer    = "wss://services.iobio.io/vcfstatsalive";
   var tabixServer            = "wss://services.iobio.io/tabix";
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
@@ -101,25 +101,9 @@ vcfiobio = function module() {
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
-  //var vepServer              = "wss://services.iobio.io/vep/";
-  var vepServer              = "ws://nv-dev.iobio.io/vep/";
+  var vepServer              = "wss://services.iobio.io/vep/";
+  //var vepServer              = "ws://nv-dev.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
-*/
- 
-
-  
-  var vcfstatsAliveServer    = "wss://nv-blue.iobio.io/vcfstatsalive";
-  var tabixServer            = "wss://nv-blue.iobio.io/tabix";
-  var vcfReadDeptherServer   = "wss://nv-blue.iobio.io/vcfdepther";
-  var snpEffServer           = "wss://nv-blue.iobio.io/snpeff";
-  var snpSiftServer          = "wss://nv-blue.iobio.io/snpsift";
-  var vtServer               = "wss://nv-blue.iobio.io/vt";
-  
-  var clinvarServer          = "wss://nv-blue.iobio.io/clinvar";
-  var afServer               = "wss://nv-blue.iobio.io/af";
-  var vepServer              = "ws://nv-dev.iobio.io/vep/";  
-  //var vepServer              = "wss://nv-blue.iobio.io/vep/";
- var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
 
 
   var vcfURL;
@@ -622,7 +606,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback) {
+  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -650,6 +634,9 @@ var effectCategories = [
             callback(data[0], data[1]);
         }, function(error) {
           console.log("_getLocalVariantsImpl() error - " + error);
+          if (errorCallback) {
+            errorCallback("_getLocalVariantsImpl() error - " + error);
+          }
         });
 
 
@@ -660,7 +647,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback) {
+  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback, errorCallback) {
     var me = this;
 
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
@@ -726,6 +713,9 @@ var effectCategories = [
         //
         stream.on('error', function(data, options) {
            console.log(data);
+           if (errorCallback) {
+            errorCallback(data);
+           }
         });
 
         // Whenall of the annotated vcf data has been returned, call

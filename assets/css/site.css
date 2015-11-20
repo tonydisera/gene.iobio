@@ -13,6 +13,22 @@ body {
   */
 }
 
+.alert {
+    width: 570px;
+    background-color: rgb(249, 237, 184);
+    border: solid 1px rgb(237, 201, 103);
+    color: rgb(132, 132, 132);
+    text-align: center;
+    font-size: 12px;
+    padding: 6px;
+}
+
+.alert-dismissable .close, .alert-dismissible .close {
+    position: relative;
+    top: -2px !important;
+    right: 0 !important;
+}
+
 #phenolyzer-results rect {
     fill: rgb(204, 204, 204);
     stroke: rgb(146, 150, 158);
@@ -32,7 +48,17 @@ body {
       font-size: 11px;
 }
 
-
+#select_side_bar_chosen.chosen-container-single .chosen-single {
+    line-height: 30px !important;
+    height: 30px !important;
+    width: 200px;
+    font-size:14px;
+    color: #81A966;
+    background-color:white;
+}
+#select_side_bar_chosen.chosen-container-single .chosen-single div {
+  top: 5px !important;
+}
 .chosen-container-single .chosen-single {
   border-radius: 0px;
   line-height: 20px;
@@ -41,6 +67,7 @@ body {
   box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12);
   border: none;
 }
+
 
 .chosen-container-single .chosen-drop {
   border-radius: 0px;
@@ -640,6 +667,7 @@ section {
     color: rgb(132, 132, 132);
     font-family: Quicksand;
     float: left;
+    margin-top: -8px;
 }
 
 .beta {
@@ -657,6 +685,8 @@ section {
     color: #5d809d;
     font-family: Quicksand;
     float: left;
+    margin-top: -8px;
+    margin-left: 25px;
 }
 
 .iobioproject {
@@ -665,6 +695,7 @@ section {
     font-family: Quicksand;
     line-height: 45px;
     float: right;
+   
 }
 
 #app-title-section {
@@ -689,10 +720,8 @@ section {
 
 
 #non-protein-coding {
-  text-align: right;
-  padding-right: 10px;
-  width: 200px;
-  padding-top: 10px;
+  text-align: center;
+  padding-bottom:4px;
 }
 #non-protein-coding.hidden {
   visibility: hidden;
@@ -802,10 +831,6 @@ section {
   display: none;
 }
 
-#vcf-sample-box.hide {
-  visibility: hidden;
-  display: block !important;
-}
 
 #button-find-missing-variants.hide {
   visibility: hidden;
@@ -1720,7 +1745,7 @@ header {
   #gene-search-bar {
     display: block !important;
     clear:both !important;
-    width: 600px;
+    width: 400px;
     text-align: center !important;
     
   }

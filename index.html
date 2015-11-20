@@ -105,78 +105,90 @@
 
 
 
-  <div id="slider-left" class="hide fade-in shadow-z-2">
+  <div id="slider-left" class="hide fade-in shadow-z-2" style="text-align:center">
+      <select id="select-side-bar" onchange="onChangeSidebar()" style="margin-left:4px;font-size:10px;">
+        <option>Filter Variants</option>
+        <option>Phenolyzer Genes</option>                   
+        <option>Bookmarked Variants</option>                   
+        <option>Examine Variant</option>                   
+      </select>
+    <div id="slider-left-content" style="margin-top:10px;">
+    </div>
   </div>
-  <div id="close-slide-left" class="close-button  shadow-z-2 fade-in hide">
-     X
+ <div id="slide-buttons" >
+  <div id="side-slide-button" onclick="showSlideLeft()" class="slide-button shadow-z-2">   
+      <i class="mdi-navigation-chevron-right" style="font-size: 30px;color: gray;font-weight: bold;"></i>
+  </div>
+  <div id="close-slide-left" class="close-button shadow-z-2 fade-in hide">
+        <i class="mdi-navigation-chevron-left" style="font-size: 30px;color: gray;font-weight: bold;"></i>
   </div>
 
-  <div id="slider-left-phenolyzer" class="hide fade-in shadow-z-2">
-  </div>
-  <div id="close-slide-left-phenolyzer" class="close-button  shadow-z-2 fade-in hide">
-     X
-  </div>
+</div>
+
 
   <div id="slider-top" class="hide fade-in">
-      <div id="data-card" class="track shadow-z-2 hide" style="margin-top:8px;" >
 
-        <div style="width:100%;clear:both;">
-
-
-              <div id="toolbar" >
-                <span class="card-label" style="display: inline-block;margin-top: 3px;">SAMPLES</span>
-
-                <span style="float:right">
-                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="mdi-content-remove"></i>
-                  </a>
-                  <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="mdi-image-crop-din"></i>
-                  </a>
-               </span>
+  </div>
+  <div id="close-slide-top" class="close-button fade-in hide shadow-z-2">
+     X
+  </div>
 
 
-                <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
-                  <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-                    <i class="mdi-social-person"></i>
-                    Single
-                  </button>
-                  <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                    style="padding-top: 2px;padding-bottom:1px;">
-                    <div style="float:left;">
-                      <img src="assets/images/family.png" style="height:27px"/>
-                    </div>
-                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-                  </button>            
-                  <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                    style="padding-top: 2px;padding-bottom:1px;">
-                    <div style="float:left;">
-                      <img src="assets/images/pedigree.png" style="height:22px"/>
-                    </div>
-                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-                  </button>
-                  <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                    style="padding-top: 2px;padding-bottom:1px;">
-                    <i class="mdi-editor-format-align-justify"></i>                
-                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-                  </button>
+
+<!-- Data Modal -->
+<div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel">
+  <div id="data-card" class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Data</h4>
+
+        <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
+          <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
+            <i class="mdi-social-person"></i>
+            Single
+          </button>
+          <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+            style="padding-top: 2px;padding-bottom:1px;">
+            <div style="float:left;">
+              <img src="assets/images/family.png" style="height:27px"/>
+            </div>
+             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+          </button>            
+          <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+            style="padding-top: 2px;padding-bottom:1px;">
+            <div style="float:left;">
+              <img src="assets/images/pedigree.png" style="height:22px"/>
+            </div>
+             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+          </button>
+          <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+            style="padding-top: 2px;padding-bottom:1px;">
+            <i class="mdi-editor-format-align-justify"></i>                
+             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
+          </button>
+        </div>
+
+      </div>
+      <div class="modal-body" style="padding-top:12px;padding-bottom:0px">
+          <div  >
+
+
+              <div>
+                <div id="proband-data" style="float:left;min-width:500px;width:60%">
+                  <input id="card-index" class="hide" value="0" type="text">
+                  <input id="datasource-relationship" class="hide" value="proband" type="text"/>
                 </div>
-              </div>
 
+                <div id="mother-data" class="hide" style="float:left;margin-top:30px;min-width:500px;width:32%">
+                  <input id="card-index" class="hide" value="1" type="text">
+                  <input id="datasource-relationship" class="hide" value="mother" type="text"/>
+                </div>
 
-              <div id="proband-data" style="float:left;margin-right:20px;width:60%">
-                <input id="card-index" class="hide" value="0" type="text">
-                <input id="datasource-relationship" class="hide" value="proband" type="text"/>
-              </div>
-
-              <div id="mother-data" class="hide" style="float:left;margin-right:20px;width:32%">
-                <input id="card-index" class="hide" value="1" type="text">
-                <input id="datasource-relationship" class="hide" value="mother" type="text"/>
-              </div>
-
-              <div id="father-data" class="hide" style="float:left;width:32%">
-                <input id="card-index" class="hide" value="2" type="text">
-                <input id="datasource-relationship" class="hide" value="father" type="text"/>
+                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:30px;min-width:500px;">
+                  <input id="card-index" class="hide" value="2" type="text">
+                  <input id="datasource-relationship" class="hide" value="father" type="text"/>
+                </div>
               </div>
 
               <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
@@ -190,26 +202,24 @@
                 </div>
               </div>
 
-              <div class="fullview" style="clear:both;text-align:center;">
-                <button id="ok-button" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised" style="clear:both;padding-left:45px;padding-right:50px;margin-left:-15px;">
-                  <i class="mdi-file-cloud-done"></i>
-                  Load
-                </button>
-              </div>
-                <span class="hint todo" style="float:left;margin-top:-40px;">Files must correspond to build GRCh37.</span>
-
           </div>   
 
           
-          
-        </div>
+
 
       </div>
-  </div>
-  <div id="close-slide-top" class="close-button fade-in hide shadow-z-2">
-     X
-  </div>
 
+      <div class="modal-footer">
+          <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
+          <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
+            <i class="mdi-file-cloud-done"></i>
+            Load
+          </button>
+          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
  <div id="container" class="push" style="margin-top:-5px !important;">
@@ -252,13 +262,14 @@
             </div>
           </div>
 
+          
           <div id="gene-search-bar" style="display:inline-block;">
+            <!-- Button data modal -->
+            <button type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="margin-right:60px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
+              <i class="mdi-file-folder-open" style="font-size:18px;"></i>
+              Data
+            </button>
 
-            <!-- Non protein-coding gene badges -->
-            <div id="non-protein-coding" style="float:left;">
-              <span id="gene-type-badge" class="hide label label-warning" style="font-size:11px;">Pseudogene</span>   
-              <span id="transcript-type-badge" class="hide label label-warning" style="font-size:11px;"></span>                  
-            </div>
 
             <!-- Gene search -->
             <span id="bloodhound" >
@@ -271,9 +282,9 @@
               <div class="btn-toolbar">
                 <div class="btn-group"  style="display:inline;margin-top: 15px;">
 
-                  <button type="button"  style="font-size:11px;width:90px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                  <button type="button"  style="font-size:11px;width:100px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                   <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
-                    Get Genes <span class="caret"></span>
+                    Define Genes <span class="caret"></span>
                   </button>
 
                   <ul class="dropdown-menu " role="menu">
@@ -323,6 +334,13 @@
 
           <!-- gene badges for navigation -->
           <div id="gene-badge-container" class="hide" style="margin-top:4px;">
+
+
+            <!-- Non protein-coding gene badges -->
+            <div id="non-protein-coding">
+              <span id="gene-type-badge" class="hide label label-warning" style="font-size:11px;">Pseudogene</span>   
+              <span id="transcript-type-badge" class="hide label label-warning" style="font-size:11px;"></span>                  
+            </div>
 
             <!-- Buttons for editting gene list, done editting gene list -->
             <div id="cache-genes-button" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 3px;padding-right: 10px;">
@@ -667,21 +685,7 @@
 </ul>
 
  
-<div id="slide-buttons" >
-  <div id="phenolyzer-slide-button" class="slide-button shadow-z-2 hide"  style="position: fixed;left: -31px;top: 220px;">
-      <a  onclick="showPhenolyzerSlideLeft()" >Phenolyzer</a>
-  </div>
 
-  <div class="slide-button shadow-z-2"  style="position: fixed;left: -23px;top: 310px;">
-      <a id="samples-button"  onclick="showSampleSlideDown()" >Samples</a>
-  </div>
-
-  <div class="slide-button shadow-z-2"  style="position: fixed;left: -13px;top: 380px;">
-        <a id="filter-button"  onclick="showFilterSlideLeft()" >Filter</a>
-  </div>
-</div>
-  
-</div>
     <div id="footer" class="footer text-center shadow-z-2" >
       <div class="poweredbyheader">gene.iobio is powered by</div>
       <div>

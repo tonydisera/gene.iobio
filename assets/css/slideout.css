@@ -1,11 +1,11 @@
 /* Bootstrap accordion */
-.panel-title {
+#slider-left .panel-title {
   font-family: 'Quattrocento Sans', sans-serif;
 }
-.panel-title {
+#slider-left .panel-title {
   font-size: 11px;
 }
-.panel-body {
+#slider-left .panel-body {
     padding-top: 5px;
     padding-right: 5px;
     padding-bottom: 2px;
@@ -13,11 +13,11 @@
     font-size:11px;
     text-align: center;
 }
-.panel-group .panel {
-    background-color: rgba(255, 255, 255, 0.46);
+#slider-left .panel-group .panel {
+    background-color: white;
 }
-.panel>.panel-heading, .panel-default>.panel-heading {
-    background-color: rgba(236, 236, 236, 0.46);    
+#slider-left .panel>.panel-heading, .panel-default>.panel-heading {
+    background-color: white;    
     padding-top: 1px;
     padding-right: 2px;
     padding-bottom: 1px;
@@ -27,7 +27,19 @@
     border-top-right-radius: 3px;
 }
 
+#slider-left .panel-group .panel-heading+.panel-collapse>.panel-body, .panel-group .panel-heading+.panel-collapse>.list-group {
+    border-top: 0;
+}
+#slider-left .panel>.panel-heading, .panel-default>.panel-heading {
+    background-color: white !important;
+}
 
+#slider-left .panel {
+    border-bottom-width: 1px !important;
+    border-bottom-color: #EAEAE3 !important;
+    border-style: solid !important;
+    box-shadow: none !important;
+}
 
 /* Slide out panels */
 .side-button, .side-button:hover, .side-button:focus {
@@ -41,7 +53,8 @@
 }
 
 .slide-button a {
-    color: white !important;
+    color: gray !important;
+    background-color: white !important;
     cursor: hand;
     cursor: pointer;
 }
@@ -75,18 +88,21 @@
   -ms-transition: all 0.6s ease;
   -o-transition: all 0.6s ease;
   min-height: 75px;
-  z-index: 2;
+  z-index: 20;
 }
 .slide-button {
   position: fixed;
-  background-color: #5983A7;
   color: white;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  padding-left: 10px;
-  padding-right: 10px;
-  transform: rotate(90deg);  
-  -webkit-transform: rotate(90deg);
+  box-shadow: 2px -2px 10px 2px rgba(0,0,0,.16) !important;
+  border-bottom-right-radius: 5px 5px;
+  border-top-right-radius: 5px 5px;
+  position: fixed;
+  left: -2px;
+  top: -2px;
+  padding-top: 2px;
+  vertical-align: middle;
+  background-color: white;
+  height: 35px;
 }
 #slider-left {
   position: fixed;
@@ -101,32 +117,19 @@
   -o-transition: width 0.6s ease;
   overflow: auto;
   background-color: white;
-  /*z-index: 1;*/
 }
-#slider-left-phenolyzer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  height: 100%;
-  transition: width 0.6s ease;
-  -webkit-transition: width 0.6s ease;
-  -moz-transition: width 0.6s ease;
-  -ms-transition: width 0.6s ease;
-  -o-transition: width 0.6s ease;
-  overflow: auto;
-  background-color: white;
-  /*z-index: 1;*/
-}
+
 #close-slide-left {
   position: fixed;
-  left: 220px;
-  top: 0px;  
-}
-#close-slide-left-phenolyzer {
-  position: fixed;
-  left: 220px;
-  top: 0px;  
+  left: 250px;
+  top: 0px;   
+  background-color: white !important; 
+  box-shadow: 8px 5px 10px 1px rgba(0,0,0,.10) !important;
+  border-bottom-right-radius: 5px 5px;
+  border-top-right-radius: 5px 5px;
+  height: 35px;
+  vertical-align: middle;
+  padding-top: 3px;
 }
 
 #slider-top {

@@ -76,7 +76,7 @@ FilterCard.prototype.init = function() {
 	var me = this;
 
 	// Init panel based on handlebards template
-	$('#slider-left').html(filterCardTemplate());
+	//$('#slider-left-content').html(filterCardTemplateHTML);
 
 	var filterCardSelector = $('#filter-track');
 	filterCardSelector.find('#expand-button').on('click', function() {

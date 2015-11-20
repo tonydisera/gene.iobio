@@ -470,6 +470,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 	this.cardSelector.find('#no-variants-warning').addClass("hide");
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
+	this.cardSelector.find('#error-warning').addClass("hide");
 	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
 
 	if (this.isViewable()) {
@@ -813,23 +814,24 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			    }
 
 			}, function(error) {
+				window.refreshGeneBadges();
+				me.cardSelector.find('.vcfloader').addClass("hide");
+				
 				if (error == "missing reference") {
 					me._displayRefNotFoundWarning();
-					me.cardSelector.find('.vcfloader').addClass("hide");
 				} else {
 					console.log(error);
+					if (me.isViewable()) {
+					   $('#matrix-track').addClass("hide");
+					    me.cardSelector.find("#vcf-track").addClass("hide");
+					    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+					    me.cardSelector.find("#vcf-variant-count").text("");
+					    me.cardSelector.find('.vcfloader').addClass("hide");
+					    me.cardSelector.find('#error-warning #message').text(error);
+					    me.cardSelector.find('#error-warning').removeClass("hide");	
+					}
 				}
-				/*
-				if (me.isViewable()) {
-					$('#filter-track').addClass("hide");
-				    $('#matrix-track').addClass("hide");
-				    // todo $('#variant-control-track').addClass("hide");
-				    me.cardSelector.find("#vcf-track").addClass("hide");
-				    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-				    me.cardSelector.find("#vcf-variant-count").text("");
-				    me.cardSelector.find('.vcfloader').addClass("hide");
-				    me.cardSelector.find('#no-variants-warning').removeClass("hide");	
-				}*/
+				
 
 			});
 	}
@@ -884,7 +886,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	resizeCardWidths();
 
     $('#filter-and-rank-card').removeClass("hide");
-    $('#filter-track').removeClass("hide");
+    //$('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
     // todo $('#variant-control-track').removeClass("hide");
 
@@ -905,7 +907,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 VariantCard.prototype._displayRefNotFoundWarning = function() {
 	this.cardSelector.find('#vcf-track').addClass("hide");
 	this.cardSelector.find(".vcfloader").addClass("hide");
-	$('#filter-track').addClass("hide");
+	//$('#filter-track').addClass("hide");
 	$('#matrix-track').addClass("hide");
 	// todo $('#variant-control-track').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning #message').text("Unable to find reference " + window.gene.chr + " in vcf header.");
@@ -917,7 +919,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	$('#filter-and-rank-card').removeClass("hide");
-    $('#filter-track').removeClass("hide");
+    //$('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
 	// todo $('#variant-control-track').removeClass("hide");
 
@@ -1207,6 +1209,10 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		y = variant.screenY;
 	}
 
+	if (!$("#slider-left").hasClass("hide")) {
+		x += 40;
+	}
+
 
 
 	var me = this;
@@ -1233,20 +1239,39 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	var selection = tooltip.select("#coverage-svg");
 	this.createAlleleCountSVGTrio(selection, variant);
    
+	var windowWidth = $(window).width();
 
-    if (x < w) {
-      tooltip.style("width", w + "px")
-             .style("left", x + "px") 
-             .style("text-align", 'left')    
-             .style("top", (y - h) + "px");   
+	if (!$("#slider-left").hasClass("hide")) {
+		if ((x + w) > windowWidth) {
+	       tooltip.style("width", w + "px")
+	             .style("left", x + "px") 
+	             .style("text-align", 'left')    
+	             .style("top", (y - h) + "px");   
 
-    } else {
 
-      tooltip.style("width", w + "px")
-             .style("left", (x - w) + "px") 
-             .style("text-align", 'left')    
-             .style("top", (y - h) + "px");   
-    }
+		} else {
+ 			tooltip.style("width", w + "px")
+	             .style("left", (x - w) + "px") 
+	             .style("text-align", 'left')    
+	             .style("top", (y - h) + "px");   
+		}
+	} else {
+	    if (x < w) {
+			cond = 2;
+	      tooltip.style("width", w + "px")
+	             .style("left", x + "px") 
+	             .style("text-align", 'left')    
+	             .style("top", (y - h) + "px");   
+
+	    } else {
+	    	cond = 3;
+	      tooltip.style("width", w + "px")
+	             .style("left", (x - w) + "px") 
+	             .style("text-align", 'left')    
+	             .style("top", (y - h) + "px");   
+	    }
+
+	}
 
     if (lock) {
       tooltip.style("pointer-events", "all");

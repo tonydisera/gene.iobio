@@ -122,6 +122,17 @@ MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
 	});
 }
 
+MatrixCard.prototype.getRowAttribute = function(searchTerm) {
+	var attribute = "";
+	this.matrixRows.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			attribute = row.attribute;
+		}
+	});	
+	return attribute;
+}
+
+
 MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 	this.featureMatrix.tooltipHTML(tooltipFunction);
 

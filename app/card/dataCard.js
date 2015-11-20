@@ -129,7 +129,7 @@ DataCard.prototype.init = function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
-		closeSampleSlideDown();
+		
 		
 		// Clear the cache
 		if (localStorage) {

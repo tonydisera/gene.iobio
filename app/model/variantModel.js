@@ -82,7 +82,8 @@ VariantModel.prototype.summarizeDanger = function(data) {
 	var clinvarClasses = {};
 	var impactClasses = {};
 	theVcfData.features.forEach( function(variant) {
-		for (key in variant.impact) {
+		var impactAttribute = matrixCard.getRowAttribute("Impact");
+		for (key in variant[impactAttribute]) {
 			if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {				
 	    		var types = impactClasses[key];
 	    		if (types == null) {
@@ -685,6 +686,14 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 		if (vcfData != null && vcfData != '') {
 			me.vcfData = vcfData;
 			me._populateEffectFilters(me.vcfData.features);
+
+			// Determine inheritance (once full trio is loaded)
+			promiseDetermineInheritance().then(function() {
+
+			}, function(error) {
+				console.log("an error occurred when determine inheritance. " + error);
+			})
+
 
 		    // Invoke callback now that we have annotated variants
 	    	if (onVcfData) {

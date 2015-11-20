@@ -17,9 +17,11 @@ var gene_engine = new Bloodhound({
 
 // Handlebar templates
 var dataCardEntryTemplate = null;
-var filterCardTemplate = null;
 var variantCardTemplate = null;
-var phenolyzerTemplate = null;
+var filterCardTemplateHTML = null;
+var phenolyzerTemplateHTML = null;
+var bookmarkTemplateHTML = null;
+var examineTemplateHTML = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -100,7 +102,7 @@ $(document).ready(function(){
 		dataCardEntryTemplate = compiledTemplate;
 	}));
 	promises.push(promiseLoadTemplate('templates/filterSlidebarTemplate.hbs').then(function(compiledTemplate) {
-		filterCardTemplate = compiledTemplate;
+		filterCardTemplateHTML = compiledTemplate();
 	}));
 	promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
 		variantCardTemplate = compiledTemplate;
@@ -109,7 +111,13 @@ $(document).ready(function(){
 		geneBadgeTemplate = compiledTemplate;
 	}));
 	promises.push(promiseLoadTemplate('templates/phenolyzerTemplate.hbs').then(function(compiledTemplate) {
-		phenolyzerTemplate = compiledTemplate;
+		phenolyzerTemplateHTML = compiledTemplate();
+	}));
+	promises.push(promiseLoadTemplate('templates/bookmarkCardTemplate.hbs').then(function(compiledTemplate) {
+		bookmarkTemplateHTML = compiledTemplate();
+	}));
+	promises.push(promiseLoadTemplate('templates/examineCardTemplate.hbs').then(function(compiledTemplate) {
+		examineTemplateHTML = compiledTemplate;
 	}));
 
 	Promise.all(promises).then(function() {
@@ -289,26 +297,22 @@ function init() {
 	    };
 	}
 
-	$('#select-gene-source').chosen({width: "width:110px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
+	$('#select-gene-source').chosen({width: "140px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
+	$('#select-side-bar').chosen({width: "200px;", disable_search_threshold: 10});
+
+	$('#slider-left-content').html(filterCardTemplateHTML);		
+	$('#slider-left-content').append(phenolyzerTemplateHTML);
+	$('#slider-left-content').append(bookmarkTemplateHTML);
+	$('#slider-left-content').append(examineTemplateHTML);
 
 
 	// Slide out panels
 	$('.main').click(function() {
 	});
 	$('#close-slide-left').click(function() {
-		closeFilterSlideLeft();
+		closeSlideLeft();
 	});
-	$('#close-slide-left-phenolyzer').click(function() {
-		closePhenolyzerSlideLeft();
-	});
-	$('#close-slide-top').click(function() {
-		closeSampleSlideDown();
-	});
-
-
-	$('#slider-left-phenolyzer').html(phenolyzerTemplate());
-
-
+	
 	// for testing phenolyzer bar chart
 	/*
 	phenolyzerGenes = [
@@ -350,64 +354,50 @@ function adjustDatacardSlider() {
 	//$('#track-section').css('padding-top', (top + sliderTopHeight) + 5);	
 }
 
-function showSampleSlideDown() {
-	
-	$('#data-card').removeClass("hide");
-	$('#slider-top').removeClass("hide");
-
-
-	$('#slider-left').addClass("hide");
-	$('.footer').addClass("hide");
-	$('.slide-button').addClass("hide");
-	$('#close-slide-top').removeClass("hide");
-
-	$('#slide-buttons').toggleClass('slide-top');
-	$('#track-section').toggleClass('slide-top');
-
-
-	adjustDatacardSlider();
-
-
-	var transitionEvent = whichTransitionEvent();
-	$('#track-section').one(transitionEvent, function(event) {
-		//var h = $("#nav-section").height();
-		//var sliderTopHeight = +$('#slider-top').height();
-		//$('#track-section').css("padding-top", (h + sliderTopHeight) + "px");
-	});
+function onChangeSidebar() {
+	var sidebar = $( "#select-side-bar option:selected" ).text().toLowerCase().split(" transcript")[0];	
+	if (sidebar == "filter variants") {
+		$('#slider-left-content #filter-track').toggleClass("hide", false);	
+		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
+		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
+		$('#slider-left-content #examine-card').toggleClass("hide", true);			
+	} else if (sidebar == "phenolyzer genes") {
+		$('#slider-left-content #filter-track').toggleClass("hide", true);	
+		$('#slider-left-content #phenolyzer-card').toggleClass("hide", false);	
+		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
+		$('#slider-left-content #examine-card').toggleClass("hide", true);					
+	} else if (sidebar == "bookmarked variants") {
+		$('#slider-left-content #filter-track').toggleClass("hide", true);	
+		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
+		$('#slider-left-content #bookmark-card').toggleClass("hide", false);	
+		$('#slider-left-content #examine-card').toggleClass("hide", true);			
+	} else if (sidebar == "examine variant") {
+		$('#slider-left-content #filter-track').toggleClass("hide", true);	
+		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
+		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
+		$('#slider-left-content #examine-card').toggleClass("hide", false);			
+	}
 
 }
 
-function closeSampleSlideDown() {
-	$('.footer').removeClass("hide");
-	$('.slide-button').removeClass("hide");
-	$('#close-slide-left').addClass("hide");
-	$('#close-slide-left-phenolyzer').addClass("hide");
-	$('#close-slide-top').addClass("hide");
-	$('#slider-left').addClass("hide");
-	$('#slider-left-phenolyzer').addClass("hide");
-	$('#slider-top').addClass("hide");
+function showDataDialog() {
+	$('#dataModal').modal('show')
 
-
-	$('#slide-buttons').removeClass('slide-left');
-	$('#container').removeClass('slide-left');
-
-	$('#slide-buttons').removeClass('slide-top');
-	$('#track-section').removeClass('slide-top');
 }
 
-function showFilterSlideLeft() {
+
+function showSlideLeft() {
 
 
 	$('#slider-top').addClass("hide");
 	$('#slider-left').removeClass("hide");
 	$('.footer').addClass("hide");
-	$('.slide-button').addClass("hide");
+	$('#side-slide-button').addClass("hide");
 	$('#close-slide-left').removeClass("hide");
 
 
 	resizeCardWidths();
 
-	$('#slide-buttons').toggleClass('slide-left');
 	$('#container').toggleClass('slide-left');
 
 	var transitionEvent = whichTransitionEvent();
@@ -418,12 +408,14 @@ function showFilterSlideLeft() {
 
 }
 
+
 function showPhenolyzerSlideLeft() {
+	closeSlideLeft();
+ 	$('#select-side-bar').val('Phenolyzer Genes');	
+	$('#select-side-bar').trigger("chosen:updated");	
+	onChangeSidebar();
+	showSlideLeft();
 
-	closePhenolyzerSlideLeft(); 
-	closeFilterSlideLeft(); 
-
-	$('#phenolyzer-slide-button').removeClass("hide");
 
 	if (phenolyzerGenes && phenolyzerGenes.length > 0) {
 		var geneBarChart = verticalBarChartD3()
@@ -446,28 +438,6 @@ function showPhenolyzerSlideLeft() {
 		geneBarChart(selection, {shadowOnHover:true});		
 	}
 
-
-
-
-
-	$('#slider-top').addClass("hide");
-	$('#slider-left-phenolyzer').removeClass("hide");
-	$('.footer').addClass("hide");
-	$('.slide-button').addClass("hide");
-	$('#close-slide-left-phenolyzer').removeClass("hide");
-
-
-	resizeCardWidths();
-
-	$('#slide-buttons').toggleClass('slide-left');
-	$('#container').toggleClass('slide-left');
-
-	var transitionEvent = whichTransitionEvent();
-	$('.slide-left').one(transitionEvent, function(event) {
-		var h = $("#nav-section").height();
-		$('#track-section').css("padding-top", h + "px");
-	});
-
 }
 
 
@@ -477,15 +447,13 @@ function resizeCardWidths() {
 	if ($('#slider-left').hasClass("hide") == false) {
 		sliderWidth = +$('#slider-left').width();
 	}
-	if ($('#slider-left-phenolyzer').hasClass("hide") == false) {
-		sliderWidth = +$('#slider-left').width();
-	}
+	
 	$('#container').css('width', windowWidth - sliderWidth - 10);
 	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - 35);
 	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - 35);
 }
 
-function closeFilterSlideLeft() {
+function closeSlideLeft() {
 	$('.footer').removeClass("hide");
 	$('.slide-button').removeClass("hide");
 	$('#close-slide-left').addClass("hide");
@@ -509,29 +477,6 @@ function closeFilterSlideLeft() {
 
 }
 
-function closePhenolyzerSlideLeft() {
-	$('.footer').removeClass("hide");
-	$('.slide-button').removeClass("hide");
-	$('#close-slide-left-phenolyzer').addClass("hide");
-	$('#close-slide-top').addClass("hide");
-	$('#slider-left-phenolyzer').addClass("hide");
-	$('#slider-top').addClass("hide");
-
-	$('#slide-buttons').removeClass('slide-left');
-	$('#container').removeClass('slide-left');
-
-	$('#slide-buttons').removeClass('slide-top');
-	$('#track-section').removeClass('slide-top');	
-
-	resizeCardWidths();
-
-	var transitionEvent = whichTransitionEvent();
-	$('#container').one(transitionEvent, function(event) {
-		var h = $("#nav-section").height();
-		$('#track-section').css("padding-top", h + "px");
-	});
-
-}
 
 
 /**
@@ -987,6 +932,16 @@ function cacheNextGene(genesToCache) {
 
 }
 
+function hasDataSources() {
+	var hasDataSource = false;
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.isLoaded() || variantCard.isBamLoaded()) {
+			hasDataSource = true;
+		}
+	});
+	return hasDataSource;
+}
+
 function isCachedForCards(geneName, transcript) {
 	var count = 0;
 	variantCards.forEach( function(variantCard) {
@@ -1081,7 +1036,9 @@ function copyPasteGenes(geneNameToSelect) {
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
 		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
 		geneBadge.addClass("selected");
-		geneBadge.find('.gene-badge-loader').removeClass('hide');
+		if (hasDataSources()) {
+			geneBadge.find('.gene-badge-loader').removeClass('hide');
+		}
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		selectGene(geneNames[0]);
 	}
@@ -1092,6 +1049,8 @@ function copyPasteGenes(geneNameToSelect) {
 }
 
 function getPhenolyzerGenes() {
+	showPhenolyzerSlideLeft();
+
 	geneNames.length = 0;
 	updateUrl('genes', geneNames.join(","));
 
@@ -1105,24 +1064,25 @@ function getPhenolyzerGenes() {
 	d3.select('#phenolyzer-results svg').remove();
    	phenolyzerGenes = [];
 	
-	showPhenolyzerSlideLeft();
+	
 
 	$.ajax( {
 			url: url,
 			error: function (xhr, ajaxOptions, thrownError) {
-				closePhenolyzerSlideLeft(); 
+				closeSlideLeft(); 
 				$('.phenolyzer.loader').addClass("hide");
 				alert("An error occurred in Phenolyzer iobio services. " + thrownError);
 			}
 		}
 	  )
 	 .done(function(data) { 
-	 	if (data == "") {
-			
+
+	 	if (data == "") {			
 			showPhenolyzerSlideLeft();
 			$('.phenolyzer.loader').addClass("hide");
 			$("#phenolyzer-timeout-message").removeClass("hide");
 	 	}  else {
+	 		showPhenolyzerSlideLeft();
 			$('.phenolyzer.loader').addClass("hide");
 			$('#phenolyzer-heading').removeClass("hide");
 			var geneNamesString = "";
@@ -1227,7 +1187,9 @@ function addGeneBadge(geneName, bypassSelecting) {
 		geneNames.push(geneName);
 
 		if (!bypassSelecting) {
-			$(selector).parent().find('.gene-badge-loader').removeClass("hide");
+			if (hasDataSources()) {
+				$(selector).parent().find('.gene-badge-loader').removeClass("hide");
+			}
 			$("#gene-badge.selected").removeClass("selected");		
 			$(selector).parent().parent().addClass("selected");			
 		}
@@ -1248,7 +1210,9 @@ function refreshGeneBadges() {
 function _geneBadgeLoading(geneName, show) {
 	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
 	if (show) {
-		geneBadge.find('.gene-badge-loader').removeClass("hide");
+		if (hasDataSources()) {
+			geneBadge.find('.gene-badge-loader').removeClass("hide");
+		}
 	} else {
 		geneBadge.find('.gene-badge-loader').addClass("hide");		
 	}
@@ -1335,7 +1299,9 @@ function selectGene(geneName) {
 	$(".gene-badge-loader").each( function(index, value) {
 		$(this).addClass("hide");
 	});
-	geneBadge.find('.gene-badge-loader').removeClass('hide');
+	if (hasDataSources()) {
+		geneBadge.find('.gene-badge-loader').removeClass('hide');
+	}
 
 
 	var url = geneiobio_server + 'api/gene/' + geneName;
@@ -1362,6 +1328,11 @@ function selectGene(geneName) {
 		    	updateUrl('gene', window.gene.gene_name);
 
 		    	updateGeneInfoLink(window.gene.gene_name);
+
+				if (firstTimeGeneLoaded) {
+					showDataDialog();
+					firstTimeGeneLoaded = false; 
+				}
 
 		    	loadTracksForGene();
 	    	} else {
@@ -1557,8 +1528,13 @@ function loadGeneWidget() {
 		    	
 
 		    	if (data.loadFromUrl) {
+
 		    		var bam  = getUrlParameter(/bam*/);
 					var vcf  = getUrlParameter(/vcf*/);	
+
+					if (vcf != null && vcf.length > 0) {
+						firstTimeGeneLoaded = false;
+					}
 
 					if (bam == null && vcf == null) {
 						$('#tourWelcome').addClass("open");
@@ -1584,7 +1560,7 @@ function loadGeneWidget() {
 
 
 					if (firstTimeGeneLoaded) {
-						showSampleSlideDown();
+						showDataDialog();
 						firstTimeGeneLoaded = false; 
 					}
 
