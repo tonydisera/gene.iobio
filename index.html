@@ -558,7 +558,7 @@
     </div>
 
 
-<div id="tourWelcome" class="customPageGuideWelcome">
+<div id="tourWelcome" class="customPageGuideWelcome" style="text-align:center;height:200px;">
   <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
         float: right;
         background-color: transparent !important;
@@ -568,10 +568,12 @@
 
   <h3>Welcome to gene.iobio</h3>
   <p>An app for interrogating disease-causing variants</p>
-  <div class="modal-button-container">
-            <button class="open_page_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_start">Tour</button>
-            <button class="screencasts" onclick="window.open('videos.html');" class="tlypageguide_ignore">Screencasts</button>
-            <button class="use_cases" onclick="window.open('usecases.html','_usecases');" class="tlypageguide_ignore">Use Cases</button>
+  <div class="modal-button-container" style="text-align: center;margin-top: 20px;">
+    <button class="open_page_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_start">Tour</button>
+    <button class="screencasts" style="margin-left:5px;" onclick="window.open('videos.html');" class="tlypageguide_ignore">Screencasts</button>
+    <div style="padding-top:10px">
+      <button  onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add Data</button>
+    </div>
           
   </div>
 </div>
