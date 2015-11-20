@@ -1244,7 +1244,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	if (!$("#slider-left").hasClass("hide")) {
 		if ((x + w) > windowWidth) {
 	       tooltip.style("width", w + "px")
-	             .style("left", x + "px") 
+	             .style("left", x - (w*2) + "px") 
 	             .style("text-align", 'left')    
 	             .style("top", (y - h) + "px");   
 
