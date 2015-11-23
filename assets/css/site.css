@@ -13,6 +13,10 @@ body {
   */
 }
 
+.drop-shadow-filter {
+    filter: url('#drop-shadow');
+}
+
 .alert {
     width: 570px;
     background-color: rgb(249, 237, 184);

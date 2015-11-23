@@ -1,9 +1,9 @@
 //
 // Global Variables
 //
-var geneiobio_server = "http://localhost:3000/";
+//var geneiobio_server = "http://localhost:3000/";
 //var geneiobio_server = "http://geneinfo.iobio.io/";
-//var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
+var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
 var phenolyzerServer = "http://nv-dev.iobio.io/phenolyzer/"
 
 
@@ -1327,7 +1327,7 @@ function selectGene(geneName) {
 
 		    	updateGeneInfoLink(window.gene.gene_name);
 
-				if (firstTimeGeneLoaded) {
+				if (firstTimeGeneLoaded && !hasDataSources()) {
 					showDataDialog();
 					firstTimeGeneLoaded = false; 
 				}
@@ -1557,7 +1557,7 @@ function loadGeneWidget() {
 
 
 
-					if (firstTimeGeneLoaded) {
+					if (firstTimeGeneLoaded && !hasDataSources()) {
 						showDataDialog();
 						firstTimeGeneLoaded = false; 
 					}

@@ -80,10 +80,6 @@
 				 	return x(xValue(d)); 
 				 })
 				 .attr("height", barHeight)
-				 .style("filter", function(d,i) {
-				 	var shadow = options.shadowOnHover && d.selected;			 		
-	 				return shadow ?  "url(#drop-shadow)" : "none";		            	
-				 })
 				 .on("mouseover", function(d) {       
 		            d3.select(this).classed("hover", true);     
 		            if (options.shadowOnHover) {
@@ -93,9 +89,7 @@
 				 .on("mouseout", function(d) {       
 		            d3.select(this).classed("hover", false);        
 		            if (options.shadowOnHover) {
-		            	if (d3.select(this).attr("class").indexOf("selected") < 0) {
-	 						d3.select(this).style("filter", "none");		            	
-		            	}
+	 					d3.select(this).style("filter", "none");		            	
 		            }   
 		         })
 		         .on("click", function(d) {
@@ -132,6 +126,8 @@
 				 .attr("text-anchor", "start")
 				 .attr('class', 'name')
 				 .text(function(d) {return yValue(d)});	
+
+			
 
 		});
 	}
