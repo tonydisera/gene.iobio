@@ -35,8 +35,10 @@ var GENE_REGION_BUFFER_MAX = 50000;
 var gene = '';
 var geneNames = [];
 var phenolyzerGenes = [];
+var geneObjects = {};
 var geneAnnots = {};
 var geneToLatestTranscript = {};
+var genesToCache = [];
 var geneSource = "gencode";
 var loadedUrl = false;
 var selectedTranscript = null;
@@ -142,9 +144,7 @@ function init() {
 	var me = this;
 
 	// Clear the local cache
- 	if (localStorage) {
-       localStorage.clear(); 		
- 	}
+ 	clearCache();
 
 
 	// Initialize material bootstrap
@@ -591,6 +591,7 @@ function loadGeneFromUrl() {
 	var showTour = getUrlParameter('showTour');
 	if (gene != undefined) {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+		_geneBadgeLoading(gene, true, true);
 	} else {
 		if (showTour != null && showTour == 'Y') {
 			pageGuide.open();
@@ -670,7 +671,7 @@ function loadUrlSources() {
 	if (vcf != null || bam != null) {
 		loadTracksForGene();
 	} else {
-		showSampleSlideDown();
+		showDataDialog();
 	}
 
 }
@@ -856,7 +857,10 @@ function cacheCodingRegions() {
 
 
 function cacheGenes() {
-	var genesToCache = [];
+	if (genesToCache != null && genesToCache.length > 0) {
+		return;
+	}
+	genesToCache = [];
 	geneNames.forEach(function(geneName) {
 		if (geneName != window.gene.gene_name) {
 			genesToCache.push(geneName);
@@ -867,13 +871,14 @@ function cacheGenes() {
 
 }
 
+
 function cacheNextGene(genesToCache) {
 	if (genesToCache.length == 0) {
 		return;
 	}
 
 	var geneName = genesToCache[0];
-	genesToCache.shift();
+	
 
 	var url = geneiobio_server + 'api/gene/' + geneName;
 	geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
@@ -889,9 +894,13 @@ function cacheNextGene(genesToCache) {
 	    	if (response[0].hasOwnProperty('gene_name')) {
 
 		    	var geneObject = response[0];
+		    	adjustGeneRegion(geneObject);
 		    	var transcript = getCanonicalTranscript(geneObject);
+		    	window.geneObjects[geneObject.gene_name] = geneObject;
 			    _geneBadgeLoading(geneObject.gene_name, true);
 
+
+			    
 		    	variantCards.forEach(function(variantCard) {
 
 		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
@@ -904,23 +913,29 @@ function cacheNextGene(genesToCache) {
 						 	transcript)
 			    		.then( function(vcfData) {
 			    			if (isCachedForCards(geneObject.gene_name, transcript)) {
-
-			    				var dangerObject = getProbandVariantCard().summarizeDanger(vcfData);
+			    				vc = getProbandVariantCard();
+			    				var probandVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
+			    				var dangerObject = vc.summarizeDanger(probandVcfData);
 			    				_geneBadgeLoading(geneObject.gene_name, false);
 								_setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 
-			    				cacheNextGene(genesToCache);
+								if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
+									genesToCache.shift();
+				    				cacheNextGene(genesToCache);									
+								}
 			    			}
 
 			    		}, function(error) {
-			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + error);
-			    			_geneBadgeLoading(geneObject.gene_name, false);
-			    			cacheNextGene(genesToCache);
+			    			if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
+				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + error);
+				    			_geneBadgeLoading(geneObject.gene_name, false);
+
+				    			genesToCache.shift();
+					    		cacheNextGene(genesToCache);					
+			    			}
 			    		});
 
 		    		}
-
-
 
 		    	});	
 		    }
@@ -933,7 +948,7 @@ function cacheNextGene(genesToCache) {
 function hasDataSources() {
 	var hasDataSource = false;
 	variantCards.forEach( function(variantCard) {
-		if (variantCard.isLoaded() || variantCard.isBamLoaded()) {
+		if (variantCard.hasDataSources()) {
 			hasDataSource = true;
 		}
 	});
@@ -1199,16 +1214,21 @@ function addGeneBadge(geneName, bypassSelecting) {
 
 }
 
-function refreshGeneBadges() {
-	var dangerObject = getProbandVariantCard().summarizeDanger();
+function refreshCurrentGeneBadge() {
+	vc = getProbandVariantCard();
+	var probandVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	var dangerObject = vc.summarizeDanger(probandVcfData);
 	_setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
-			 	
 }
 
-function _geneBadgeLoading(geneName, show) {
+function hideGeneBadgeLoading(geneName) {
+	_geneBadgeLoading(geneName, false);
+}
+
+function _geneBadgeLoading(geneName, show, force) {
 	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
 	if (show) {
-		if (hasDataSources()) {
+		if (force || hasDataSources()) {
 			geneBadge.find('.gene-badge-loader').removeClass("hide");
 		}
 	} else {
@@ -1234,6 +1254,7 @@ function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
 	if (select) {
 		geneBadge.addClass("selected");		
 	}	
+
 	
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {
@@ -1316,18 +1337,17 @@ function selectGene(geneName) {
 	    	if (response[0].hasOwnProperty('gene_name')) {
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];		
+		    	window.gene = response[0];
+		    	adjustGeneRegion(window.gene);	
 
-		    	// Save off the original start and end before we adjust for upstream/downstream regions
-		    	window.gene.startOrig = window.gene.start;
-		    	window.gene.endOrig = window.gene.end;  
 		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
+		    	window.geneObjects[window.gene.gene_name] = window.gene;	
 
 		    	updateUrl('gene', window.gene.gene_name);
 
 		    	updateGeneInfoLink(window.gene.gene_name);
 
-				if (firstTimeGeneLoaded && !hasDataSources()) {
+				if (!hasDataSources()) {
 					showDataDialog();
 					firstTimeGeneLoaded = false; 
 				}
@@ -1383,6 +1403,19 @@ function manageGeneList(manage) {
 }
 
 
+function clearCache() {
+	if (localStorage) {
+		localStorage.clear();
+	}
+	
+	window.geneObjects = {};
+	window.geneAnnots = {};
+	window.gene = null;
+	window.selectedTranscript = null;
+	window.genesToCache = [];
+}
+
+
 function adjustGeneRegionBuffer() {
 	if (+$('#gene-region-buffer-input').val() > GENE_REGION_BUFFER_MAX) {
 		alert("Up to 50 kb upstream/downstream regions can be displayed.")
@@ -1390,6 +1423,22 @@ function adjustGeneRegionBuffer() {
 		GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
 		$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});		
 	}
+	clearCache();
+
+}
+
+
+function adjustGeneRegion(geneObject) {
+	if (geneObject.startOrig == null) {
+		geneObject.startOrig = geneObject.start;
+	}
+	if (geneObject.endOrig == null) {
+		geneObject.endOrig = geneObject.end;
+	}
+	// Open up gene region to include upstream and downstream region;
+	geneObject.start = geneObject.startOrig < GENE_REGION_BUFFER ? 0 : geneObject.startOrig - GENE_REGION_BUFFER;
+	// TODO: Don't go past length of reference
+	geneObject.end   = geneObject.endOrig + GENE_REGION_BUFFER;
 
 }
 
@@ -1511,14 +1560,14 @@ function loadGeneWidget() {
 
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];		
+		    	window.gene = response[0];	
+		    	adjustGeneRegion(window.gene);	
 
 		    	// Add the gene badge
 		    	addGeneBadge(window.gene.gene_name);					
 			    	
-		    	// Save off the original start and end before we adjust for upstream/downstream regions
-		    	window.gene.startOrig = window.gene.start;
-		    	window.gene.endOrig = window.gene.end;    
+		    	    
+		    	window.geneObjects[window.gene.gene_name] = window.gene;
 		    	
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
@@ -1651,10 +1700,6 @@ function loadTracksForGene(bypassVariantCards) {
 	}
 
 
-    // Open up gene region to include upstream and downstream region;
-	window.gene.start = window.gene.startOrig < GENE_REGION_BUFFER ? 0 : window.gene.startOrig - GENE_REGION_BUFFER;
-	// TODO: Don't go past length of reference
-	window.gene.end   = window.gene.endOrig + GENE_REGION_BUFFER;
 
 	window.regionStart = window.gene.start;
 	window.regionEnd   = window.gene.end;
@@ -1968,11 +2013,11 @@ function promiseDetermineInheritance(promise) {
 
 						probandVariantCard.determineMaxAlleleCount();
 						
-						probandVariantCard.onVariantDataChange();
+						probandVariantCard.refreshVariantChartAndMatrix();
 
 						determineUnaffectedSibStatus();
 
-						probandVariantCard.onVariantDataChange();
+						probandVariantCard.refreshVariantChartAndMatrix();
 
 						resolve();
 
@@ -1995,7 +2040,7 @@ function promiseDetermineInheritance(promise) {
 		function(error) {
 			// no need to deal with error since these are just the times
 			// when we didn't yet have a full trio.
-			reject(error);
+			
 		});
 	});
 	
@@ -2178,7 +2223,7 @@ function compareVariantsToPedigree(callback) {
 		}
 	});
 
-	var theVcfData = probandVariantCard.model.getVcfData();
+	var theVcfData = probandVariantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
 	// Only continue with comparison if mother and father
 	// variant cards are present

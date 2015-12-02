@@ -533,13 +533,85 @@ function variantD3() {
           .attr("x2", -2)
           .attr("y1", 0)
           .attr("y2", 8)
-          .style("opacity", 0);      
+          .style("opacity", 0);    
 
-
+      // Add grouping for bookmarks
+      svg.select("g.bookmarks").remove();
+      svg.append("g")
+         .attr("class", "bookmarks");
       
       dispatch.d3rendered();
  
     });
+
+  }
+
+  chart.addBookmark = function(svg, variant) {
+    /*
+    <g transform="translate(358.5,55)">
+      <rect x="1" y="0" width="8" height="8" style="fill:none;stroke: black;stroke-width:1.5px"></rect>
+      <g transform="translate(-3,-10)">
+        <line x1="4" x2="4" y1="-9" y2="10" style="stroke: black;stroke-width:1.5px"></line>
+        <g transform="translate(12,-9),rotate(90)">
+          <polygon class="del" points="0,8 4,2 8,8" style="fill: black; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+        </g>
+      </g>
+    </g>
+    */
+
+    // Find the matching variant
+    var matchingVariant = null;
+    svg.selectAll(".variant").each( function (d,i) {
+       if (d.start == variant.start 
+          && d.end == variant.end 
+          && d.ref == variant.ref 
+          && d.alt == variant.alt 
+          && d.type.toLowerCase() == variant.type.toLowerCase()) {
+          matchingVariant = variant;
+       }
+    });
+    if (!matchingVariant) {
+      return;
+    }
+
+    // Get the x, y for the variant's position
+    var mousex = d3.round(x(matchingVariant.start));
+    var mousey = height - ((matchingVariant.level + 1) * (variantHeight + verticalPadding));      
+
+    var xpos = 0;
+    var ypos = mousey-2;
+    if (variant.type.toUpperCase() == "DEL" || variant.type.toUpperCase() == "COMPLEX") {
+      xpos =  mousex;
+    } else if (variant.type.toUpperCase() == "INS") {
+      xpos =  mousex-.5;
+    }else {
+      xpos =  mousex+.5;
+    }
+
+    var group = svg.select("g.bookmarks")
+       .append("g")
+       .attr("class", "bookmark")
+       .attr("transform", "translate(" + xpos + "," +  ypos + ")" );
+
+    group.append("rect")
+         .attr("x", 1)
+         .attr("y", 0)
+         .attr("width", 10)
+         .attr("height", 10);
+
+    var flagGroup = group.append("g")
+       .attr("transform", "translate(-3,-10)");
+
+    flagGroup.append("line")
+             .attr("x1", 4)
+             .attr("x2", 4)
+             .attr("y1", -9)
+             .attr("y2", "10");
+    flagGroup.append("g")
+             .attr("transform", "translate(12,-9),rotate(90)")
+             .append("polygon")
+             .attr("points", "0,8 4,2 8,8");
+    return chart;
 
   }
  

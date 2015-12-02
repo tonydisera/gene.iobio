@@ -132,9 +132,7 @@ DataCard.prototype.init = function() {
 		
 		
 		// Clear the cache
-		if (localStorage) {
-	       localStorage.clear(); 		
-	 	}
+		clearCache();
 
 
 		var unaffectedSibs = $("#unaffected-sibs-select").chosen().val();

@@ -757,7 +757,7 @@ var effectCategories = [
           });
 
            // Parse the vcf object into a variant object that is visualized by the client.
-          var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
+          var results = me.parseVcfRecords(vcfObjects, refName, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
 
           callback(annotatedRecs, results);          
 
@@ -916,14 +916,14 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me.parseVcfRecords(vcfObjects, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
+        var results = me.parseVcfRecords(vcfObjects, refName, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields);
         resolve([annotatedRecs, results]);
       });
     });
   }
 
     // NEW
-  exports.promiseGetClinvarRecords = function(variants, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecords = function(theVcfData, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
     var me = this;
     
     return new Promise( function(resolve, reject) {
@@ -931,18 +931,18 @@ var effectCategories = [
       me.clinvarIterCount = 0;
       // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
       // repeating until all variants have been processed.
-      var numberOfBatches = d3.round(variants.length / batchSize);
+      var numberOfBatches = d3.round(theVcfData.features.length / batchSize);
       if (numberOfBatches == 0) {
         numberOfBatches = 1;
       }
       for( var i = 0; i < numberOfBatches; i++) {
         var start = i * batchSize;
         var end = start + batchSize;
-        var batchOfVariants = variants.slice(start, end <= variants.length ? end : variants.length);
+        var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
         
         me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
         .then(  function() {
-          resolve();
+          resolve(theVcfData);
         }, function(error) {
           reject();
         });
@@ -1066,7 +1066,7 @@ var effectCategories = [
   }
   
   // NEW
-  exports._annotateVcfRegion = function(records, refName, sampleName, callback, isRefSeq, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, sampleName, isRefSeq, callback, callbackClinvar) {
       var me = this;
       
       var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
@@ -1092,7 +1092,7 @@ var effectCategories = [
       var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
             
       // Call snpEff service
-      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(vepUrl));
+      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
 
       // Bypass snpEff if the transcript set is RefSeq
       var vepArgs = "";
@@ -1162,7 +1162,7 @@ var effectCategories = [
   }
 
 
-  exports.parseVcfRecords = function(vcfRecs, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields) {
+  exports.parseVcfRecords = function(vcfRecs, refName, regionStart, regionEnd, regionStrand, selectedTranscript, vepFields) {
       var me = this;
       var nameTokens = selectedTranscript.transcript_id.split('.');
       var selectedTranscriptID = nameTokens.length > 0 ? nameTokens[0] : selectedTranscript;
@@ -1437,6 +1437,10 @@ var effectCategories = [
             var genotypeDepths = [];
             var genotypeAltCounts = [];
             var genotypeRefCounts = [];
+            var genotypeAltForwardCounts = [];
+            var genotypeAltReverseCounts = [];
+            var genotypeRefForwardCounts = [];
+            var genotypeRefReverseCounts = [];
             rec.genotypes.forEach(function(genotype) {
               if (genotype == ".") {
 
@@ -1482,6 +1486,41 @@ var effectCategories = [
                   genotypeAltCounts.push(null);
                   genotypeRefCounts.push(null)
                 }
+                var strandAlleleCountIndex = gtTokens["SAC"]; // GATK
+                var strandRefForwardIndex = gtTokens["SRF"]; // Freebayes
+                var strandRefReverseIndex = gtTokens["SRR"]; // Freebayes
+                var strandAltForwardIndex = gtTokens["SAF"]; // Freebayes
+                var strandAltReverseIndex = gtTokens["SAR"]; // Freebayes
+                if (strandAlleleCountIndex) {
+                  //
+                  // GATK Strand allele counts, comma separated
+                  //
+                  var countTokens = tokens[strandAlleleCountIndex].split(",");
+                  if (countTokens.length == 4) {                    
+                    genotypeRefForwardCounts.push(tokens[0]);                    
+                    genotypeRefReverseCounts.push(tokens[1]);                    
+                    genotypeAltForwardCounts.push(tokens[2]);                    
+                    genotypeAltReverseCounts.push(tokens[3]);                    
+                  } else {
+                    genotypeRefForwardCounts.push(null);                    
+                    genotypeRefReverseCounts.push(null);                    
+                    genotypeAltForwardCounts.push(null);                    
+                    genotypeAltReverseCounts.push(null);        
+                  }
+                } else if (strandRefForwardIndex && strandRefReverseIndex && strandAltForwardIndex && strandAltReverseIndex ) {
+                  //
+                  // Freebayes Strand bias counts (SRF, SRR, SAF, SAR)
+                  //
+                  genotypeRefForwardCounts.push(tokens[strandRefForwardIndex]);
+                  genotypeRefReverseCounts.push(tokens[strandRefReverseIndex]);                    
+                  genotypeAltForwardCounts.push(tokens[strandAltForwardIndex]);                    
+                  genotypeAltReverseCounts.push(tokens[strandAltReverseIndex]);        
+                } else {
+                  genotypeRefForwardCounts.push(null);                    
+                  genotypeRefReverseCounts.push(null);                    
+                  genotypeAltForwardCounts.push(null);                    
+                  genotypeAltReverseCounts.push(null);        
+                }
               }
             });
 
@@ -1490,6 +1529,10 @@ var effectCategories = [
             var genotypeDepthForSample = null;
             var genotypeAltCountForSample = null;
             var genotypeRefCountForSample = null;
+            var genotypeAltForwardCountForSample = null;
+            var genotypeAltReverseCountForSample = null;
+            var genotypeRefForwardCountForSample = null;
+            var genotypeRefReverseCountForSample = null;
             var zygosity = null;
             var phased = null;
 
@@ -1510,6 +1553,10 @@ var effectCategories = [
             genotypeDepthForSample = genotypeDepths[gtIndex];
             genotypeAltCountForSample = genotypeAltCounts[gtIndex];
             genotypeRefCountForSample = genotypeRefCounts[gtIndex];
+            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtIndex];
+            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtIndex];
+            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtIndex];
+            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtIndex];
 
             if (genotypeForSample == null) {
               keepAlt = true;
@@ -1571,6 +1618,10 @@ var effectCategories = [
                 'genotypeDepth' : genotypeDepthForSample,
                 'genotypeAltCount' : genotypeAltCountForSample,
                 'genotypeRefCount' : genotypeRefCountForSample,
+                'genotypeAltForwardCount' : genotypeAltForwardCountForSample,
+                'genotypeAltReverseCount' : genotypeAltReverseCountForSample,
+                'genotypeRefForwardCount' : genotypeRefForwardCountForSample,
+                'genotypeRefReverseCount' : genotypeRefReverseCountForSample,
                 'zygosity': zygosity ? zygosity : 'gt_unknown', 
                 'phased': phased,
                 'effect': effects, 
@@ -1615,7 +1666,7 @@ var effectCategories = [
 
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
-      var results = {'start': +regionStart, 'end': +regionEnd, 'strand': regionStrand, 
+      var results = {'ref': refName, 'start': +regionStart, 'end': +regionEnd, 'strand': regionStrand, 'transcript': selectedTranscript,
         'variantRegionStart': variantRegionStart, 'name': 'vcf track', 
         'homCount': homCount, 'hetCount': hetCount, 'sampleCount' : sampleCount,
         'features': variants};

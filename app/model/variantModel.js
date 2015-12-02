@@ -8,10 +8,13 @@ function VariantModel() {
 	this.fbData = null;	
 	this.bamData = null;
 
+	this.vcfUrlEntered = false;
+	this.vcfFileOpened = false;
+	this.getVcfRefName = null;
+
 	this.bamUrlEntered = false;
 	this.bamFileOpened = false;
 	this.getBamRefName = null;
-	this.getVcfRefName = null;
 
 	this.name = "";
 	this.vcfRefNamesMap = {};
@@ -20,19 +23,19 @@ function VariantModel() {
 }
 
 
-VariantModel.prototype.setLoadState = function(taskName) {
-	if (this.vcfData != null) {
-		if (this.vcfData.loadState == null) {
-			this.vcfData.loadState = {};
+VariantModel.prototype.setLoadState = function(theVcfData, taskName) {
+	if (theVcfData != null) {
+		if (theVcfData.loadState == null) {
+			theVcfData.loadState = {};
 		}
-		this.vcfData.loadState[taskName] = true;
-
+		theVcfData.loadState[taskName] = true;
 	}
 }
 
 VariantModel.prototype.isLoaded = function() {
 	return this.vcf != null && this.vcfData != null;
 }
+
 
 VariantModel.prototype.isReadyToLoad = function() {
 	return this.isVcfReadyToLoad() || this.isBamReadyToLoad();
@@ -63,18 +66,72 @@ VariantModel.prototype.hasCalledVariants = function() {
 	return this.fbData != null && this.fbData.features != null && this.fbData.features.length > 0;
 }
 
-VariantModel.prototype.getVcfData = function() {
-	return this.vcfData;
-}
+VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
+	var me = this;
+	var data = null;
+	
+	if (me.vcfData != null) {
+		if (me.getVcfRefName(geneObject.chr) == me.vcfData.ref &&
+			geneObject.start == me.vcfData.start &&
+			geneObject.end == me.vcfData.end &&
+			geneObject.strand == me.vcfData.strand) {
+			data = me.vcfData;
+		}		
+	} 
 
+	if (data == null) {
+		// Find in cache
+		data = this._getCachedData("vcfData", geneObject.gene_name, selectedTranscript);
+		if (data != null && data != '') {
+			me.vcfData = data;
+			//me._populateEffectFilters(me.vcfData.features);
+
+			// Determine inheritance (once full trio is loaded)
+			/*
+			promiseDetermineInheritance().then(function() {
+
+			}, function(error) {
+				console.log("an error occurred when determine inheritance. " + error);
+			});
+			*/
+		}
+	} 
+	return data;
+}
+VariantModel.prototype.getBamDataForGene = function(geneObject) {
+	var me = this;
+	var data = null;
+	
+	if (me.bamData != null) {
+		if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
+			geneObject.start == me.bamData.start &&
+			geneObject.end == me.bamData.end) {
+			data = me.bamData;
+		}		
+	} 
+
+	if (data == null) {
+		// Find in cache
+		data = this._getCachedData("bamData", geneObject.gene_name, null);
+		if (data != null && data != '') {
+			me.bamData = data;
+		}
+	} 
+	return data ? data.coverage : null;
+}
 VariantModel.prototype.getVariantCount = function() {
-	return this.vcfData.features.length != null ? this.vcfData.features.length : "0";
+	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+	if (theVcfData == null || theVcfData.features == null) {
+		return "0";
+	} else {
+		return theVcfData.features.length != null ? theVcfData.features.length : "0";
+	}
 }
 
-VariantModel.prototype.summarizeDanger = function(data) {
-	var theVcfData = data != null ? data : this.vcfData;
+VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	dangerCounts = {HIGH: 0, MODERATE: 0, MODIFIER: 0, LOW: 0, CLINVAR: null, SIFT: null, POLYPHEN: null};
 	if (theVcfData == null || theVcfData.features.length == null) {
+		console.log("unable to summarize danger due to null data");
 		return dangerCounts;
 	}
 	var siftClasses = {};
@@ -159,20 +216,18 @@ VariantModel.prototype.getCalledVariantCount = function() {
 	return this.fbData.features.length != null ? this.fbData.features.length : "0";
 }
 
-VariantModel.prototype.getBamData = function() {
-	return this.bamData;
-}
 
-VariantModel.prototype.filterBamDataByRegion = function(regionStart, regionEnd) {
-	return this.bamData.filter(function(d) { 
+
+VariantModel.prototype.filterBamDataByRegion = function(coverage, regionStart, regionEnd) {
+	return coverage.filter(function(d) { 
 		return (d[0] >= regionStart && d[0] <= regionEnd);
 	}); 	
 }
 
 
-VariantModel.prototype.reduceBamData = function(theBamData, numberOfPoints) {
-	var factor = d3.round(theBamData.length / numberOfPoints);
-	return this.bam.reducePoints(theBamData, 
+VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
+	var factor = d3.round(coverageData.length / numberOfPoints);
+	return this.bam.reducePoints(coverageData, 
 		                         factor, 
 		                         function(d) {
 		                         	return d[0]
@@ -410,15 +465,15 @@ VariantModel.prototype._promiseVcfRefName = function(ref) {
 				me.vcf.getReferenceNames(function(refNames) {
 					var foundRef = false;
 					refNames.forEach( function(refName) {					
-			    		if (me.getVcfRefName == null) {
-					 		if (refName == theRef) {
-					 			me.getVcfRefName = me._getRefName;
-					 			foundRef = true;
-					 		} else if (refName == me._stripRefName(theRef)) {
-					 			me.getVcfRefName = me._stripRefName;
-					 			foundRef = true;
-					 		}
-						}
+			    		
+				 		if (refName == theRef) {
+				 			me.getVcfRefName = me._getRefName;
+				 			foundRef = true;
+				 		} else if (refName == me._stripRefName(theRef)) {
+				 			me.getVcfRefName = me._stripRefName;
+				 			foundRef = true;
+				 		}
+	
 			    	});
 			    	// Load up a lookup table.  We will use me for validation when
 			    	// a new gene is loaded to make sure the ref exists.
@@ -441,15 +496,13 @@ VariantModel.prototype._promiseVcfRefName = function(ref) {
 				me.vcf.loadRemoteIndex(null, function(refData) {
 					var foundRef = false;
 			    	refData.forEach( function(ref) {
-			    		if (me.getVcfRefName == null) {
-					 		if (ref.name == theRef) {
-					 			me.getVcfRefName = me._getRefName;
-					 			foundRef = true;
-					 		} else if (ref.name == me._stripRefName(theRef)) {
-					 			me.getVcfRefName = me._stripRefName;
-					 			foundRef = true;
-					 		}
-						}
+				 		if (ref.name == theRef) {
+				 			me.getVcfRefName = me._getRefName;
+				 			foundRef = true;
+				 		} else if (ref.name == me._stripRefName(theRef)) {
+				 			me.getVcfRefName = me._stripRefName;
+				 			foundRef = true;
+				 		}
 			    	});
 			    	// Load up a lookup table.  We will use me for validation when
 			    	// a new gene is loaded to make sure the ref exists.
@@ -492,10 +545,15 @@ VariantModel.prototype._stripRefName = function(refName) {
 
 
 VariantModel.prototype.getMatchingVariant = function(variant) {
-	var matchingVariant = null;
-	if (this.vcfData && this.vcfData.features) {
+	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+	if (theVcfData == null) {
+		return null;
+	}
 
-		this.vcfData.features.forEach( function( v ) {
+	var matchingVariant = null;
+	if (theVcfData && theVcfData.features) {
+
+		theVcfData.features.forEach( function( v ) {
 			if (v.start == variant.start 
 	          && v.end == variant.end 
 	          && v.ref == variant.ref 
@@ -534,7 +592,7 @@ VariantModel.prototype.wipeGeneData = function () {
 
 
 
-VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDataLoaded) {	
+VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callbackDataLoaded) {	
 	var me = this;
 
 
@@ -548,14 +606,15 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 
 	// A gene has been selected.  Read the bam file to obtain
 	// the read converage.
-	var refName = this.getBamRefName(window.gene.chr);
+	var refName = this.getBamRefName(gene.chr);
+	var theVcfData = this.getVcfDataForGene(gene, selectedTranscript);	
 
 
 	var regions = [];
-	if (me.vcfData != null) {
-		me.flagDupStartPositions(me.vcfData.features);
-		if (me.vcfData) {
-			me.vcfData.features.forEach( function(variant) {
+	if (theVcfData != null) {
+		me.flagDupStartPositions(theVcfData.features);
+		if (theVcfData) {
+			theVcfData.features.forEach( function(variant) {
 				if (!variant.dup) {
 					regions.push({name: refName, start: variant.start - 1, end: variant.start });
 				}
@@ -567,39 +626,44 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 	// Get the coverage data for the gene region
 	// First the gene vcf data has been cached, just return
 	// it.  (No need to retrieve the variants from the iobio service.)
-	var coverageData = me._getCachedData("bamData", window.gene.gene_name, window.selectedTranscript);
-	if (coverageData != null && coverageData != '') {
-		me.bamData = coverageData;
+	var data = me._getCachedData("bamData", gene.gene_name);
+	if (data != null && data != '') {
+		me.bamData = data;
 
 		if (regions.length > 0) {
-			me._refreshVariantsWithCoverage(me.bamData, function() {				
+			me._refreshVariantsWithCoverage(theVcfData, data.coverage, function() {				
 				if (callbackDataLoaded) {
-			   	    callbackDataLoaded(me.bamData);
+			   	    callbackDataLoaded(data.coverage);
 		   	    }
 			});				
 		} else {
 			if (callbackDataLoaded) {
-		   	    callbackDataLoaded(me.bamData);
+		   	    callbackDataLoaded(data.coverage);
 	   	    }
 		}
 
 	} else {
-		me.bam.getCoverageForRegion(refName, window.gene.start, window.gene.end, regions, 5000, 
+		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 5000, 
 	 	  function(coverageForRegion, coverageForPoints) {
+	 	  	if (coverageForRegion != null) {
+				me.bamData = {gene: gene.gene_name,
+					          ref: refName, 
+					          start: gene.start, 
+					          end: gene.end, 
+					          coverage: coverageForRegion};
 
-			me.bamData = coverageForRegion;
-
-			me._cacheData(me.bamData, "bamData", window.gene.gene_name);
+				me._cacheData(me.bamData, "bamData", gene.gene_name);	 	  		
+	 	  	}
 
 			if (regions.length > 0) {
-				me._refreshVariantsWithCoverage(coverageForPoints, function() {				
+				me._refreshVariantsWithCoverage(theVcfData, coverageForPoints, function() {				
 					if (callbackDataLoaded) {
-				   	    callbackDataLoaded(me.bamData);
+				   	    callbackDataLoaded(coverageForRegion);
 			   	    }
 				});				
 			} else {
 				if (callbackDataLoaded) {
-			   	    callbackDataLoaded(me.bamData, "bamData");
+			   	    callbackDataLoaded(coverageForRegion, "bamData");
 		   	    }
 			}
 		});
@@ -611,14 +675,14 @@ VariantModel.prototype.getBamDepth = function(regionStart, regionEnd, callbackDa
 
 
 
-VariantModel.prototype.promiseAnnotated = function() {
+VariantModel.prototype.promiseAnnotated = function(theVcfData) {
 	var me = this;
 	return new Promise( function(resolve, reject) {
-		if (me.vcfData != null &&
-			me.vcfData.features != null &&
-			me.vcfData.loadState != null &&
-		   (dataCard.mode == 'single' || me.vcfData.loadState['inheritance'] == true) &&
-			me.vcfData.loadState['clinvar'] == true ) {
+		if (theVcfData != null &&
+			theVcfData.features != null &&
+			theVcfData.loadState != null &&
+		   (dataCard.mode == 'single' || theVcfData.loadState['inheritance'] == true) &&
+			theVcfData.loadState['clinvar'] == true ) {
 
 			resolve();
 
@@ -630,15 +694,15 @@ VariantModel.prototype.promiseAnnotated = function() {
 
 }
 
-VariantModel.prototype.promiseAnnotatedAndCoverage = function() {
+VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 	var me = this;
 	return new Promise( function(resolve, reject) {
-		if (me.vcfData != null &&
-			me.vcfData.features != null &&
-			me.vcfData.loadState != null &&
-		   (dataCard.mode == 'single' || me.vcfData.loadState['inheritance'] == true) &&
-			me.vcfData.loadState['clinvar'] == true  &&
-			(!me.isBamLoaded() || me.vcfData.loadState['coverage'] == true)) {
+		if (theVcfData != null &&
+			theVcfData.features != null &&
+			theVcfData.loadState != null &&
+		   (dataCard.mode == 'single' || theVcfData.loadState['inheritance'] == true) &&
+			theVcfData.loadState['clinvar'] == true  &&
+			(!me.isBamLoaded() || theVcfData.loadState['coverage'] == true)) {
 
 			resolve();
 
@@ -675,24 +739,26 @@ VariantModel.prototype.promiseGetVariantsOnly = function() {
 
 }
 
-VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onVcfData) {
+VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, regionStart, regionEnd, onVcfData) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
 
 		// First the gene vcf data has been cached, just return
 		// it.  (No need to retrieve the variants from the iobio service.)
-		var vcfData = me._getCachedData("vcfData", window.gene.gene_name, window.selectedTranscript);
+		var vcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
 		if (vcfData != null && vcfData != '') {
 			me.vcfData = vcfData;
 			me._populateEffectFilters(me.vcfData.features);
 
 			// Determine inheritance (once full trio is loaded)
+			/*
 			promiseDetermineInheritance().then(function() {
 
 			}, function(error) {
 				console.log("an error occurred when determine inheritance. " + error);
 			})
+*/
 
 
 		    // Invoke callback now that we have annotated variants
@@ -705,22 +771,38 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 			// We don't have the variants for the gene in cache, 
 			// so call the iobio services to retreive the variants for the gene region 
 			// and annotate them.
-			me._promiseVcfRefName().then( function() {
+			me._promiseVcfRefName(theGene.chr).then( function() {
 				me._promiseGetAndAnnotateVariants(
-					me.getVcfRefName(window.gene.chr),
-					window.gene.start, 
-			        window.gene.end, 
-			        window.gene.strand, 
-			        window.selectedTranscript,
+					me.getVcfRefName(theGene.chr),
+					theGene.start, 
+			        theGene.end, 
+			        theGene.strand, 
+			        theTranscript,
 			        onVcfData)
 				.then( function(data) {
-			    	me.vcfData = data;
-
-			    	// Cache the data
-			    	me._cacheData(me.vcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
 			    	
+			    	// Associate the correct gene with the data
+			    	var theGeneObject = null;
+			    	for( var key in window.geneObjects) {
+			    		var geneObject = geneObjects[key];
+			    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+			    			geneObject.start == data.start &&
+			    			geneObject.end == data.end &&
+			    			geneObject.strand == data.strand) {
+			    			theGeneObject = geneObject;
+			    			data.gene = theGeneObject;
+			    		}
+			    	}
+			    	if (theGeneObject) {
+				    	// Cache the data
+				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+				    	me.vcfData = data;		    	
+						resolve(me.vcfData);
 
-					resolve(me.vcfData);
+			    	} else {
+			    		alert("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
+			    		reject();
+			    	}
 
 			    }, function(error) {
 			    	reject(error);
@@ -739,7 +821,8 @@ VariantModel.prototype.promiseGetVariants = function(regionStart, regionEnd, onV
 
 VariantModel.prototype.isCached = function(geneName, transcript) {
 	var key = this._getCacheKey("vcfData", geneName, transcript);
-	return localStorage.getItem(key) != null;
+	var data = localStorage.getItem(key);
+	return data != null;
 }
 
 VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end, strand, transcript) {
@@ -758,10 +841,26 @@ VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end
 			me._promiseVcfRefName(ref).then( function() {
 				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), start, end, strand, transcript)
 				.then( function(data) {
-			    	// Cache the data
-			    	me._cacheData(data, "vcfData", geneName, transcript);
-
-					resolve(data);
+					// Associate the correct gene with the data
+			    	var theGeneObject = null;
+			    	for( var key in window.geneObjects) {
+			    		var geneObject = geneObjects[key];
+			    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+			    			geneObject.start == data.start &&
+			    			geneObject.end == data.end &&
+			    			geneObject.strand == data.strand) {
+			    			theGeneObject = geneObject;
+			    			data.gene = theGeneObject;
+			    		}
+			    	}
+			    	if (theGeneObject) {
+				    	// Cache the data
+				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+						resolve(data);				    	
+				    } else {
+				    	reject("Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end);
+				    }
+			    	
 
 			    }, function(error) {
 			    	reject(error);
@@ -844,7 +943,7 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
       	if (dataCompressed != null) {
 			var dataString = null;
 			try {
-				//dataString = stringCompress.inflate(dataCompressed);
+				//dataString = stringCdompress.inflate(dataCompressed);
 				 dataString = LZString.decompressFromUTF16(dataCompressed);
 	 			 data =  JSON.parse(dataString);      		
 			} catch(e) {
@@ -879,40 +978,44 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];
-	    	me.vcfData = data[1];
+	    	var theVcfData = data[1];
 
-		    if (me.vcfData != null && me.vcfData.features != null && me.vcfData.features.length > 0) {
+		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 			    // can be filtered by range.
-			    me._determineVariantAfLevels(me.vcfData);
+			    me._determineVariantAfLevels(theVcfData );
 
 			    // Show the snpEff effects / vep consequences in the filter card
-			    me._populateEffectFilters(me.vcfData.features);
+			    me._populateEffectFilters(theVcfData.features);
 
 			    // Invoke callback now that we have annotated variants
+			    me.vcfData = theVcfData;
 		    	if (onVcfData) {
-		    		onVcfData();
+		    		onVcfData(theVcfData);
 		    	}
 		    	
 		    	// Determine inheritance (once full trio is loaded)
+		    	/*
 				promiseDetermineInheritance().then(function() {
 
 				}, function(error) {
 					console.log("an error occurred when determine inheritance. " + error);
 				})
+				*/
 
 		    	// Get the clinvar records (for proband, mom, data)
+		    	// 
 		    	if (me.getRelationship() != 'sibling') {
 			    	return me.vcf.promiseGetClinvarRecords(
-			    		me.vcfData.features, 
+			    		theVcfData, 
 			    		me._stripRefName(ref), start, end, 
-			    		me._refreshVariantsWithClinvar.bind(me));
+			    		me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {
 		    		// We bypass getting clinvar records for unaffected siblings
 		    		return new Promise( function(resolve, reject) {
-		    			resolve();
+		    			resolve(theVcfData);
 		    		});
 		    	}	
 
@@ -928,10 +1031,10 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 	    	console.log("an error occurred when getting clinvar records " + error);
 	    	reject();
 
-	    }).then( function() {
+	    }).then( function(data) {
 	    	// We are done getting clinvar records.
-	    	me.setLoadState('clinvar');
-	    	resolve(me.vcfData);
+	    	me.setLoadState(data, 'clinvar');
+	    	resolve(data);
 	    }, 
 	    function(error) {
 	    	console.log("an error occurred after getting clinvar records " + error);
@@ -970,7 +1073,8 @@ VariantModel.prototype.determineUnaffectedSibsStatus = function() {
 }
 
 VariantModel.prototype.determineMaxAlleleCount = function() {
-	if (this.vcfData == null || this.vcfData.features == null) {
+	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+	if (theVcfData == null || theVcfData.features == null) {
 		return;
 	}
 
@@ -983,12 +1087,12 @@ VariantModel.prototype.determineMaxAlleleCount = function() {
 		}
 	};
 
-	this.vcfData.features.forEach(function(variant) {
+	theVcfData.features.forEach(function(variant) {
 		setMaxAlleleCount(variant.genotypeRefCount, variant.genotypeAltCount);
 		setMaxAlleleCount(variant.genotypeRefCountMother, variant.genotypeAltCountMother);
 		setMaxAlleleCount(variant.genotypeRefCountFather, variant.genotypeAltCountFather);
 	});
-	this.vcfData.maxAlleleCount = maxAlleleCount;	
+	theVcfData.maxAlleleCount = maxAlleleCount;	
 }
 
 VariantModel.prototype._populateEffectFilters  = function(variants) {
@@ -1099,14 +1203,14 @@ VariantModel.prototype.flagDupStartPositions = function(variants) {
 	
 }
 
-VariantModel.prototype._refreshVariantsWithCoverage = function(coverage, callback) {
+VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, coverage, callback) {
 	var me = this;
 	var vcfIter = 0;
 	var covIter = 0;
-	if (this.vcfData == null) {
+	if (theVcfData == null) {
 		callback();
 	}
-	var recs = this.vcfData.features;
+	var recs = theVcfData.features;
 	
     me.flagDupStartPositions(recs);
 	
@@ -1144,14 +1248,18 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(coverage, callbac
 		}
 
 	}
+	this.setLoadState(theVcfData, 'coverage');
 	callback();
 
 
 }
 
-VariantModel.prototype._refreshVariantsWithClinvar = function(clinVars) {	
+VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVars) {	
 	var me = this;
 	var clinVarIds = clinVars.uids;
+	if (theVcfData == null) {
+		return;
+	}
 
 	var loadClinvarProperties = function(recs) {
 		for( var vcfIter = 0, covIter = 0; vcfIter < recs.length && covIter < clinVarIds.length; null) {
@@ -1178,9 +1286,9 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(clinVars) {
 		}
 	}
 
-	// Load the clinvar info for the variants loaded from the vcf
-	var recs = this.vcfData.features.sort(orderVariantsByPosition);
-	loadClinvarProperties(recs);
+	// Load the clinvar info for the variants loaded from the vcf	
+	var sortedFeatures = theVcfData.features.sort(orderVariantsByPosition);
+	loadClinvarProperties(sortedFeatures);
 
 }
 
@@ -1261,7 +1369,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 				// Show populate the effect filters for the freebayes variants
 				me._populateEffectFilters(me.fbData.features);
 
-				if (onVariantsCalls) {
+				if (onVariantsCalled) {
 					onVariantsCalled();
 				}
 
@@ -1356,8 +1464,9 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						promiseDetermineInheritance(promiseFullTrioCalledVariants).then(function() {
 							// The variant records in vcfData have updated clinvar and inheritance info.
 							// Reflect me new info in the freebayes variants.
-							me.fbData.features.forEach(function (fbVariant) {
+							getProbandVariantCard().model.fbData.features.forEach(function (fbVariant) {
 								if (fbVariant.source) {
+									fbVariant.inheritance                 = fbVariant.source.inheritance;
 									fbVariant.genotypeRefCountMother      = fbVariant.source.genotypeRefCountMother;
 									fbVariant.genotypeAltCountMother      = fbVariant.source.genotypeAltCountMother;
 									fbVariant.genotypeDepthMother         = fbVariant.source.genotypeDepthMother;
@@ -1376,12 +1485,15 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						if (onVariantsAnnotated) {
 							onVariantsAnnotated(me.fbData);
 						}
+
+						var theVcfData = me.getVcfDataForGene(window.gene, window.selectedTranscript);
 						
-						// Now get the clinvar data		    	
+						// Now get the clinvar data	
+						// ??	    	
 			    		return me.vcf.promiseGetClinvarRecords(
-						    		me.fbData.features, 
+						    		me.fbData, 
 						    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
-						    		me._refreshVariantsWithClinvar.bind(me));
+						    		me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 
 
@@ -1427,6 +1539,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 } 
 
 
+
 VariantModel.prototype._prepareVcfAndFbData = function() {
 	var me = this;
 	// Deal with case where no variants were called
@@ -1434,9 +1547,9 @@ VariantModel.prototype._prepareVcfAndFbData = function() {
 		// If no variants are loaded, create a dummy vcfData with 0 features
 		me.vcfData = $.extend({}, me.fbData);
 		me.vcfData.features = [];
-		me.setLoadState('clinvar');
-		me.setLoadState('coverage');
-		me.setLoadState('inheritance');
+		me.setLoadState(me.vcfData, 'clinvar');
+		me.setLoadState(me.vcfData, 'coverage');
+		me.setLoadState(me.vcfData, 'inheritance');
 	}
 	// Flag the variants as called by Freebayes and add unique to vcf
 	// set

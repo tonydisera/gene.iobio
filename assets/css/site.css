@@ -13,10 +13,6 @@ body {
   */
 }
 
-.drop-shadow-filter {
-    filter: url('#drop-shadow');
-}
-
 .alert {
     width: 570px;
     background-color: rgb(249, 237, 184);
@@ -1002,6 +998,23 @@ header {
   visibility:hidden;
   cursor: pointer;
 } 
+
+
+.bookmark rect {
+  fill: none;
+  stroke: black;
+  stroke-width: 2;
+  opacity: .5;
+}
+.bookmark line {
+  stroke: black;
+  stroke-width:1.5;
+  opacity: .5;
+}
+.bookmark polygon {
+  fill:black; 
+  opacity: .5;
+}
 
 .arrow_box {
     position: relative;
