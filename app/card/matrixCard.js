@@ -404,23 +404,13 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	  return 0;
 	});
 
-	// Get the top 20 variants
-	var topFeatures = null;
-	if($('#matrixCheckboxAll').prop('checked')) {
-		topFeatures = sortedFeatures.slice(0, sortedFeatures.length)
-	} else if ($('#matrixCheckboxTop100').prop('checked')){
-		topFeatures = sortedFeatures.slice(0, 100 );
-	} else if ($('#matrixCheckboxTop20').prop('checked')){
-		topFeatures = sortedFeatures.slice(0, 20 );
-	}
-	
 	$("#feature-matrix").removeClass("hide");
 	$("#feature-matrix-note").removeClass("hide");
 	$("#matrix-panel .loader").addClass("hide");
 
 	// Load the chart with the new data
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
-	var selection = d3.select("#feature-matrix").data([topFeatures]);  
+	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
     this.featureMatrix(selection, {showColumnLabels: true});
 
@@ -441,20 +431,7 @@ MatrixCard.prototype.setFeatureMatrixSource = function(theVcfData) {
 
 
 
-MatrixCard.prototype.toggleMatrixCheckbox = function(element) {
 
-	if (element.id == 'matrixCheckboxAll') {
-		$('#matrixCheckboxTop20').prop("checked", false);
-		$('#matrixCheckboxTop100').prop("checked", false);
-	} else if (element.id == 'matrixCheckboxTop100') {
-		$('#matrixCheckboxTop20').prop("checked", false);
-		$('#matrixCheckboxAll').prop("checked", false);
-	} else {
-		$('#matrixCheckboxAll').prop("checked", false);
-		$('#matrixCheckboxTop100').prop("checked", false);
-	}
-	this.fillFeatureMatrix();
-}
 
 MatrixCard.prototype.isNumeric = function(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);

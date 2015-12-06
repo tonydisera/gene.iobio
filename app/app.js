@@ -22,6 +22,7 @@ var filterCardTemplateHTML = null;
 var phenolyzerTemplateHTML = null;
 var bookmarkTemplateHTML = null;
 var examineTemplateHTML = null;
+var recallTemplateHTML = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -121,6 +122,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/examineCardTemplate.hbs').then(function(compiledTemplate) {
 		examineTemplateHTML = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
+		recallTemplateHTML = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		init();
@@ -156,13 +160,19 @@ function init() {
 		'custom_open_button': '.open_page_guide' 
     }); 
 
+
+	// For 'show variants' card
+	$('#select-color-scheme').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	$('#select-intron-display').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	
+
     // Slide out panels
 	$('#select-gene-source').chosen({width: "140px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
-	$('#select-side-bar').chosen({width: "200px;", disable_search_threshold: 10});
 	$('#slider-left-content').html(filterCardTemplateHTML);		
 	$('#slider-left-content').append(phenolyzerTemplateHTML);
 	$('#slider-left-content').append(bookmarkTemplateHTML);
 	$('#slider-left-content').append(examineTemplateHTML);
+	$('#slider-left-content').append(recallTemplateHTML);
 	$('#close-slide-left').click(function() {
 		closeSlideLeft();
 	});
@@ -352,28 +362,43 @@ function adjustDatacardSlider() {
 	//$('#track-section').css('padding-top', (top + sliderTopHeight) + 5);	
 }
 
-function onChangeSidebar() {
-	var sidebar = $( "#select-side-bar option:selected" ).text().toLowerCase().split(" transcript")[0];	
-	if (sidebar == "filter variants") {
+function changeSidebar(sidebar) {
+	$('.sidebar-button').removeClass('selected');
+	if (sidebar == "Filter") {
 		$('#slider-left-content #filter-track').toggleClass("hide", false);	
 		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
-	} else if (sidebar == "phenolyzer genes") {
+		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#button-show-filters').toggleClass('selected', true);			
+	} else if (sidebar == "Phenolyzer") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
 		$('#slider-left-content #phenolyzer-card').toggleClass("hide", false);	
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);					
-	} else if (sidebar == "bookmarked variants") {
+		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#button-show-phenolyzer').toggleClass('selected', true);		
+	} else if (sidebar == "Bookmarks") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
 		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
 		$('#slider-left-content #bookmark-card').toggleClass("hide", false);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
-	} else if (sidebar == "examine variant") {
+		$('#slider-left-content #recall-card').toggleClass("hide", true);		
+		$('#button-show-bookmarks').toggleClass('selected', true);		
+	} else if (sidebar == "Examine") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
 		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", false);			
+		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#button-show-examine').toggleClass('selected', true);			
+	} else if (sidebar == "Recall") {
+		$('#slider-left-content #filter-track').toggleClass("hide", true);	
+		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
+		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
+		$('#slider-left-content #examine-card').toggleClass("hide", true);			
+		$('#slider-left-content #recall-card').toggleClass("hide", false);	
+		$('#button-find-missing-variants').toggleClass('selected', true);			
 	}
 
 }
@@ -406,12 +431,16 @@ function showSlideLeft() {
 
 }
 
+function showSidebar(view) {
+	closeSlideLeft(); 	
+	changeSidebar(view);
+	showSlideLeft();
+}
+
 
 function showPhenolyzerSlideLeft() {
 	closeSlideLeft();
- 	$('#select-side-bar').val('Phenolyzer Genes');	
-	$('#select-side-bar').trigger("chosen:updated");	
-	onChangeSidebar();
+	changeSidebar('Phenolyzer');
 	showSlideLeft();
 
 
@@ -2029,7 +2058,7 @@ function promiseDetermineInheritance(promise) {
 
 					probandVariantCard.determineMaxAlleleCount();
 					
-					probandVariantCard.onVariantDataChange();	
+					probandVariantCard.refreshVariantChartAndMatrix();	
 
 					resolve();		
 				}

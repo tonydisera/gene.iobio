@@ -65,6 +65,9 @@
 	<link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
 
 
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
   <!-- jquery ui -->
 	<link rel="stylesheet" href="assets/css/jquery-ui.css" />	
 
@@ -107,13 +110,50 @@
 
 
   <div id="slider-left" class="hide fade-in shadow-z-2" style="text-align:center">
-      <select id="select-side-bar" onchange="onChangeSidebar()" style="margin-left:4px;font-size:10px;">
-        <option>Filter Variants</option>
-        <option>Phenolyzer Genes</option>                   
-        <option>Bookmarked Variants</option>                   
-        <option>Examine Variant</option>                   
-      </select>
-    <div id="slider-left-content" style="margin-top:10px;">
+
+    <div style="background-color:white;margin-bottom:5px;padding-bottom:5px;" class="shadow-z-2" >
+
+
+                <a href="javascript:void(0)" id="button-show-filters" class="sidebar-button selected btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Filter')">     
+                  <i class="material-icons" style="font-size: 18px;">donut_small</i>          
+                      Filter
+                </a>
+
+
+                <a href="javascript:void(0)" id="button-show-bookmarks" class="sidebar-button btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Bookmarks')">       
+                 <i class="material-icons" style="font-size: 18px;">bookmark</i>                
+                    Bookmarks 
+                </a>
+
+
+                <a href="javascript:void(0)" id="button-show-examine" class="sidebar-button btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Examine')">       
+                 <i class="material-icons" style="font-size: 18px;">my_location</i>                
+                    Examine
+                </a>
+
+                <a href="javascript:void(0)" 
+                  id="button-find-missing-variants" 
+                  class="sidebar-button hide btn btn-default btn-raised icon-button " 
+                  style="margin-bottom:0px;margin-left:4px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px;"
+                  onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Recall');callVariants()">
+                    <i style="font-size:18px;" class="mdi-action-find-in-page"></i>
+                    Call from alignments
+                </a>
+
+
+
+                <a href="javascript:void(0)" id="button-show-phenolyzer" class="sidebar-button btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Phenolyzer')">       
+                 <i class="material-icons" style="font-size: 18px;">format_list_numbered</i>                
+                    Phenolyzer
+                </a>
+
+
+    </div>
+
+
+
+     
+    <div id="slider-left-content" class="shadow-z-2" style="height:100%;background-color:white;padding-top:5px;">
     </div>
   </div>
  <div id="slide-buttons" >
@@ -423,50 +463,14 @@
 
       <div id="filter-and-rank-card" class="hide">
 
+
         <div id="matrix-track"  class="track-expand shadow-z-2 hide">
-            <div>
+            
               <span class="card-label" style="margin-left:15px;">Rank Variants</span>
 
-              <span style="float:right;padding-top:4px">
-                <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                  <i class="mdi-content-remove"></i>
-                </a>
-                <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-                  <i class="mdi-image-crop-din"></i>
-                </a>
-             </span>
-
-             <div class="fullview" style="display:inline;margin-top: -6px;color: rgb(132,132,132);margin-left: 20px;font-size:11px;">
-                Top 20
-                <div class="checkbox checkbox-material-grey-400">
-                  <label>
-                    <input id="matrixCheckboxTop20" type="checkbox"  onchange="matrixCard.toggleMatrixCheckbox(this)">
-                  </label>
-                </div>
-              </div>
-             <div class="fullview" style="display:inline;margin-top: -6px;color: rgb(132,132,132);font-size:11px;">
-                Top 100
-                <div class="checkbox checkbox-material-grey-400">
-                  <label>
-                    <input id="matrixCheckboxTop100" type="checkbox" checked onchange="matrixCard.toggleMatrixCheckbox(this)">
-                  </label>
-                </div>
-              </div>
-             <div class="fullview" style="display:inline;margin-top: -6px;color: rgb(132,132,132);font-size:11px;">
-                All
-                <div class="checkbox checkbox-material-grey-400">
-                  <label>
-                    <input id="matrixCheckboxAll" type="checkbox" onchange="matrixCard.toggleMatrixCheckbox(this)">
-                  </label>
-                </div>
-              </div>
-
-
-
-            </div>
 
     
-            <div id="matrix-panel"  style="clear:both;margin-top:4px;margin-left:5px;"
+            <div id="matrix-panel"  style="clear:both;margin-top:-14px;margin-left:5px;"
               class="fullview" aria-expanded="true">
                 <div class="loader">
                     <span class="loader-label">Ranking variants</span>
@@ -494,7 +498,7 @@
         </div>
       </div>
 
-      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;height: 43px;" class="hide todo shadow-z-2">
+      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;" class="hide todo shadow-z-2">
 
         <div id="toolbar" style="width:100%"  >
                 <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
@@ -503,49 +507,49 @@
                 <a href="javascript:void(0)" 
                   id="button-find-missing-variants" 
                   class="hide btn btn-default btn-raised icon-button" 
-                  style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;width:150px;"
+                  style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;"
                   onclick="callVariants()">
                     <i style="font-size:18px;" class="mdi-action-find-in-page"></i>
-                    Call from alignments
+                    Re-call variants
                 </a>
-
-
-                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;" class="todo">
+                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;" class="hide">
                   <i class="mdi-action-settings"></i>
                 </a>
 
 
-                <a href="javascript:void(0)" id="button-exons-introns" class="todo btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:20px;padding-top:2px;padding-bottom:2px;">
-                     <i  style="font-size:18px;" class="mdi-action-settings-ethernet"></i>
-                    <span id="missing-variant-count-label">Exons + Introns</span>
+                <a href="javascript:void(0)" id="button-show-filter-card" class=" btn btn-default btn-raised icon-button" style="margin-left:10px;margin-top:4px;padding-top:2px;padding-bottom:2px;" onclick="showFilterSlideLeft()">     
+                  <i class="material-icons" style="font-size: 18px;">donut_small</i>          
+                      Filter
                 </a>
 
-                <a href="javascript:void(0)" id="button-exons-only" class="todo btn btn-default btn-raised icon-button" style="margin-top:4px;margin-left:-4px;padding-top:2px;padding-bottom:2px;">
-                     <i  style="font-size:18px;" class="mdi-action-view-column"></i>
-                    <span id="missing-variant-count-label">Exons only</span>
+
+                <a href="javascript:void(0)" id="button-show-bookmarks-variant" class=" btn btn-default btn-raised icon-button" style="margin-left:10px;margin-top:4px;padding-top:2px;padding-bottom:2px;" onclick="showBookmarkSlideLeft()">       
+                 <i class="material-icons" style="font-size: 18px;">bookmark</i>                
+                    Bookmarks 
                 </a>
+         
 
-                
 
 
-               
+
+                <span style="margin-left:20px;">                  
+                    <select id="select-intron-display" onchange="" >
+                          <option>Exons + Introns</option>
+                          <option>Exons Only</option>                   
+                     </select>
+                </span>
+
+                 <span style="margin-left:20px;">                  
+                    <select id="select-color-scheme" onchange="" >
+                          <option>Color by Impact</option>
+                          <option>Color by Effect</option>                   
+                          <option>Color by Hom / Het</option>                   
+                     </select>
+                </span>
+
 
           </div>
-          <div class="todo hide" style="text-align: left;padding-left:560px;width:100%;margin-top: -45px;">
-             <div class="btn-toolbar" style="margin-left:20px;display:inline-block;">
-                  <div class="btn-group" style="display:  inline;;">
 
-                    <button type="button" style="font-size:11px;padding-top: 2px;padding-bottom: 2px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <i class="mdi-action-bookmark" style="font-size:18px;padding-right:0px;padding-top:2px;padding-left:2px"></i>
-                      <span style="font-size:12px">Variant Bookmarks</span><span style="padding-left:2px" class="caret"></span>
-                    </button>
-
-                    <ul class="dropdown-menu" role="menu">
-                      <li><a href="">Manage</a></li>
-                    </ul>
-                  </div>
-                </div>
-          </div>
       </div>
 
 

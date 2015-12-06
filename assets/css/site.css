@@ -29,6 +29,11 @@ body {
     right: 0 !important;
 }
 
+.sidebar-button.selected  {
+   box-shadow: 0 6px 10px rgba(0,0,0,.23),0 10px 30px rgba(0,0,0,.19);
+   font-weight: bold !important;
+} 
+
 #phenolyzer-results rect {
     fill: rgb(204, 204, 204);
     stroke: rgb(146, 150, 158);
@@ -832,10 +837,6 @@ section {
 }
 
 
-#button-find-missing-variants.hide {
-  visibility: hidden;
-  display: block !important;
-}
 
 
 .loader img {
