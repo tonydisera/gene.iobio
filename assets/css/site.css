@@ -175,14 +175,15 @@ body {
 
 .tooltip-title {
   font-size: 10px;
+  color: #000000;
 }
 
 .tooltip-header {
   overflow-wrap: break-word;
-  color: #CCC8C5;
   text-align:right;
   width: 100px;
   float:left;
+  color: rgb(132,132,132);
 
 }
 
@@ -197,6 +198,7 @@ body {
   float:right;
   width: 180px;
   margin-right: 5px;
+  color: #000000;
 }
 
 .dropdown-menu .divider {
@@ -316,7 +318,7 @@ a, a:hover, a:focus {
 }
 
 .tooltip a, .tooltip a:hover, .tooltip a:focus {
-  color: rgba(131, 219, 249, 1) !important;
+  color: #4E961D !important;
 }
 
 #variant-card-buttons a.selected {
@@ -699,7 +701,9 @@ section {
     color: rgb(118, 99, 99);
     font-family: Quicksand;
     line-height: 45px;
-    float: right;
+    float: left;
+    margin-top: -5px;
+    margin-left: 5px;
    
 }
 
@@ -1205,13 +1209,17 @@ header {
 .tooltip {   
   position: absolute;           
   z-index:20;
-  color:white;
+  background-color: white;
+  color: rgb(132,132,132);
   padding: 4px 6px 4px 6px;             
-  font-size: 9px;        
-  background: rgb(80,80,80);   
-  border: 0px;      
+  font-size: 9px;          
   border-radius: 4px;           
-  pointer-events: none;         
+  pointer-events: none;   
+  text-align: left;
+  top: 371px;
+  pointer-events: all;
+  border: 1px outset rgb(213, 213, 213);
+  opacity: 1;      
 }
 
 
