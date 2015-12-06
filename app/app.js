@@ -50,6 +50,7 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 var firstTimeGeneLoaded = true;
+var firstTimeShowVariants = true;
 
 // data card
 var dataCard = new DataCard();

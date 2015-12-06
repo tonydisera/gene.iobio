@@ -983,6 +983,10 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
     //$('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
 	// todo $('#variant-control-track').removeClass("hide");
+	if (firstTimeShowVariants) {
+		showSidebar("Filter");
+		firstTimeShowVariants = false;
+	}
 
 	var filteredVcfData = this.model.isVcfLoaded() ? 
 	       this.filterVariants() 

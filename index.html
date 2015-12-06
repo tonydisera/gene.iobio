@@ -278,14 +278,14 @@
           </a>   
 
           <!-- Learn more dropdown button -->
-          <div class="btn-toolbar" id="learn-more-dropdown-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 10px;">
+          <div class="btn-toolbar" id="learn-more-dropdown-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 20px;">
             <div class="btn-group"  style="display:  inline;margin-top: 15px;">
 
               <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 Learn more <span class="caret"></span>
               </button>
 
-              <ul class="dropdown-menu" role="menu" style="font-size:11px;">
+              <ul class="dropdown-menu" role="menu" style="min-width:120px;max-width:120px;font-size:11px;">
                 <li><a href="javascript:void(0)" class="open_page_guide">Tour</a>
                 </li>
                 <li><a href="javascript:void(0)"  onclick="$('#tourWelcome').removeClass('open');window.open('videos.html', '_screencasts');">Screencasts</a>
@@ -295,7 +295,7 @@
                 <li role="presentation" class="divider"></li>
                 <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/03/install-run-tabix/','_helptopics');">Input Variant files</a>
 
-                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/07/vep-in-gene-iobio/','_helptopics');">VEP, SIFT/Polyphen, Regulatory annotations</a>
+                <li><a href="javascript:void(0)" onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/2015/09/07/vep-in-gene-iobio/','_helptopics');">VEP, SIFT/Polyphen</a>
 
                   
                 </li>
@@ -305,18 +305,19 @@
 
           
           <div id="gene-search-bar" style="display:inline-block;">
-            <!-- Button data modal -->
-            <button type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="margin-right:60px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
-              <i class="mdi-file-folder-open" style="font-size:18px;"></i>
-              Data
-            </button>
 
 
             <!-- Gene search -->
             <span id="bloodhound" >
                 <input id="enter-gene-name" class="typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
                 placeholder="Enter Gene Name">
-            </span>           
+            </span>     
+
+            <!-- Button data modal -->
+            <button type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
+              <i class="mdi-file-folder-open" style="font-size:18px;"></i>
+              Data
+            </button>
 
             <!-- get genes dropdown button -->
             <div id="get-genes-dropdown" class="" style="width:95px;float:right;">
@@ -368,6 +369,9 @@
                 </div>
               </div>
            </div>
+
+         
+
 
           </div>
 
