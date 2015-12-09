@@ -452,76 +452,109 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 
 
-MatrixCard.prototype.showClinVarSymbol = function (selection) {
+MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
+	var width = "14";
+	var height = "14";
+	var transform =  "translate(5,5)";
+	var clazz = null;
+	if (options) {
+		if (options.width) {
+			width = options.width;
+		}
+		if (options.height) {
+			height = options.height;
+		}
+		if (options.transform) {
+			transform = options.transform;
+		}
+		if (options.clazz) {
+			clazz = options.clazz;
+		}
+	} else {
+		if (selection.datum().width) {
+			width = selection.datum().width;
+		}
+		if (selection.datum().height) {
+			height = selection.datum().height;
+		}
+		if (selection.datum().transform) {
+			transform = selection.datum().transform;
+		}
+		if (selection.datum().clazz) {
+			clazz = selection.datum().clazz;
+		}
+	}
+
 	selection.append("g")
-	         .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)")
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
-	         .attr("width", selection.datum().hasOwnProperty("width") ? selection.datum().width : "14")
-	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
+	         .attr("width", width)
+	         .attr("height", height)
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
 
-	         	if (selection.datum().clazz == 'clinvar_path') {
+	         	if (clazz == 'clinvar_path') {
 	         		return "#ad494A";
-	         	} else if (selection.datum().clazz == 'clinvar_lpath') {
+	         	} else if (clazz == 'clinvar_lpath') {
 	         		return "#FB7737";
-	         	} else if (selection.datum().clazz == 'clinvar_uc') {
+	         	} else if (clazz == 'clinvar_uc') {
 	         		return "rgba(231,186,82,1)";
-	         	} else if (selection.datum().clazz == 'clinvar_benign') {
+	         	} else if (clazz == 'clinvar_benign') {
 	         		return "rgba(181,207,107,1)";
-	         	} else if (selection.datum().clazz == 'clinvar_lbenign') {
+	         	} else if (clazz == 'clinvar_lbenign') {
 	         		return "rgba(156,194,49,1)";
-	         	} else if (selection.datum().clazz == 'clinvar_other') {
+	         	} else if (clazz == 'clinvar_other') {
 	         		return "rgb(189,189,189)";
-	         	} else if (selection.datum().clazz == 'clinvar_cd') {
+	         	} else if (clazz == 'clinvar_cd') {
 	         		return "rgb(111, 182, 180)";
 	         	}
 	         });
 
 };
 
-MatrixCard.prototype.showPolyPhenSymbol = function (selection) {
+MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)")
+	         .attr("transform", options ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)"))
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", selection.datum().hasOwnProperty("width") ? selection.datum().width : "14")
-	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
+	         .attr("width", options ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
+	         .attr("height", options ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "14"))
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
+	         	var clazz = options ? options.clazz : selection.datum().clazz;
 
-
-	         	if (selection.datum().clazz == 'polyphen_probably_damaging') {
+	         	if (clazz == 'polyphen_probably_damaging') {
 	         		return "#ad494A";
-	         	} else if (selection.datum().clazz == 'polyphen_possibly_damaging') {
+	         	} else if (clazz == 'polyphen_possibly_damaging') {
 	         		return "#FB7737";
-	         	} else if (selection.datum().clazz == 'polyphen_benign') {
+	         	} else if (clazz == 'polyphen_benign') {
 	         		return "rgba(181, 207, 107,1)";
 	         	} 
 	         });
 
 };
 
-MatrixCard.prototype.showSiftSymbol = function (selection) {
+MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)")
+	         .attr("transform", options ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)"))
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", selection.datum().hasOwnProperty("width") ? selection.datum().width : "14")
+	         .attr("width", options ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
 	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
+				var clazz = options ? options.clazz : selection.datum().clazz;
 
-	         	if (selection.datum().clazz == 'sift_deleterious') {
+	         	if (clazz == 'sift_deleterious') {
 	         		return "#ad494A";
-	         	} else if (selection.datum().clazz == 'sift_deleterious_low_confidence') {
+	         	} else if (clazz == 'sift_deleterious_low_confidence') {
 	         		return "#FB7737";
-	         	} else if (selection.datum().clazz == 'sift_tolerated_low_confidence') {
+	         	} else if (clazz == 'sift_tolerated_low_confidence') {
 	         		return "rgba(231,186,82,1)";
-	         	} else if (selection.datum().clazz == 'sift_tolerated') {
+	         	} else if (clazz == 'sift_tolerated') {
 	         		return "rgba(181, 207, 107,1)";
 	         	} 
 	         });
@@ -686,34 +719,34 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 	         });
 };
 
-MatrixCard.prototype.showRecessiveSymbol = function (selection) {
+MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", "translate(0,0)")
+	         .attr("transform", options ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", "25")
-	         .attr("height", "25")
+	         .attr("width", options ? options.width : "25")
+	         .attr("height", options ? options.height : "25")
 	         .style("pointer-events", "none");
 };
 
-MatrixCard.prototype.showDeNovoSymbol = function (selection) {
+MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", "translate(0,0)")
+	         .attr("transform", options ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", "25")
-	         .attr("height", "25")
+	         .attr("width", options ? options.width : "25")
+	         .attr("height", options ? options.height : "25")
 	         .style("pointer-events", "none");
 	
 };
 
-MatrixCard.prototype.showUnaffectedSymbol = function (selection) {
+MatrixCard.prototype.showUnaffectedSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", "translate(0,2)")
+	         .attr("transform", options ? options.transform : "translate(0,2)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", "27")
-	         .attr("height", "27")
+	         .attr("width", options ? options.width : "27")
+	         .attr("height", options ? options.height : "27")
 	         .style("pointer-events", "none");
 
 	selection.append("line")
@@ -777,9 +810,21 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
 }
 
 
-MatrixCard.prototype.showImpactBadge = function(selection) {
+MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz) {
 	var me = this;
-	var type = selection.datum().type;
+	var type = null;
+	var transform1 = "translate(1,3)";
+	var tranform2 = "translate(5,6)";
+	var clazz = null;
+	if (variant) {
+		type = variant.type;
+		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
+	} else {
+		type = selection.datum().type;
+		transform1 = selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,3)";
+		transform2 =  selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,6)";
+		clazz = selection.datum().clazz;
+	}
 	var symbolScale = d3.scale.linear()
                     .domain([1,6])
                     .range([10,40]);
@@ -788,16 +833,16 @@ MatrixCard.prototype.showImpactBadge = function(selection) {
      
 	if (type.toUpperCase() == 'SNP') {
 		selection.append("g")
-		          .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,3)")
+		          .attr("transform", transform1)
 		         .append("rect")
 		         .attr("width", 8)
 		         .attr("height", 8)
-		         .attr("class", "filter-symbol " + selection.datum().clazz)
+		         .attr("class", "filter-symbol " + clazz)
 		         .style("pointer-events", "none");		
 	} else {
 		selection
 		  .append("g")
-		  .attr("transform", selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,6)")
+		  .attr("transform", transform2)
 		  .append('path')
           .attr("d", function(d,i) { 
           	return d3.svg
@@ -813,7 +858,7 @@ MatrixCard.prototype.showImpactBadge = function(selection) {
 						}
                      })();
           })
-          .attr("class", "filter-symbol " + selection.datum().clazz);
+          .attr("class", "filter-symbol " + clazz);
 	}
 
 }

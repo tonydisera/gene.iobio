@@ -1,3 +1,39 @@
 <div id="bookmark-card">
+	<div >
+  	    <div id="import-bookmarks-dropdown" class="" style="margin-top:-15px;width:135px;float:left;">
+          <div class="btn-toolbar">
+            <div class="btn-group"  style="display:inline;margin-top: 15px;">
 
+              <button type="button"  style="font-size:11px;width:125px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
+                Import bookmarks <span class="caret"></span>
+              </button>
+
+              <ul class="dropdown-menu " role="menu">
+                <li id="copy-paste-li">
+                  <div style="padding-left:20px;padding-right:20px;padding-top:3px;padding-bottom:3px;">
+                    <div>Copy/Paste</div>
+                    <textarea style="width:180px;height:100px" id="bookmarks-to-import"></textarea>
+                    <div style="text-align:right">
+                      <button id="add-bookmarks-button" 
+                      type="submit"
+                      onclick="bookmarkCard.importBookmarks()" 
+                      class="icon-button-sm btn btn-default btn-raised" 
+                      style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+       </div>
+	</div>
+
+
+	<div id="bookmark-panel" style="clear:both;">
+	</div>
+
+	
 </div>

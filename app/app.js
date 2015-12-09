@@ -52,6 +52,9 @@ var transcriptCollapse = true;
 var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
 
+
+var bookmarkCard = new BookmarkCard();
+
 // data card
 var dataCard = new DataCard();
 
@@ -183,6 +186,7 @@ function init() {
 	dataCard = new DataCard();
 	dataCard.init();
 
+
 	// Stop event propogation to get genes dropdown
 	// so that clicks in text area for copy/paste
 	// don't cause dropdown to close
@@ -309,6 +313,10 @@ function init() {
 	 filterCard = new FilterCard();
 	 filterCard.init();
 
+	 // Initialize the bookmark card
+	 bookmarkCard = new BookmarkCard();
+	 bookmarkCard.init();
+
 
 	// Initialize transcript view buttons
 	initTranscriptControls();
@@ -386,6 +394,7 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
 		$('#slider-left-content #recall-card').toggleClass("hide", true);		
 		$('#button-show-bookmarks').toggleClass('selected', true);		
+		window.bookmarkCard.showBookmarks();
 	} else if (sidebar == "Examine") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
 		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
@@ -1337,7 +1346,7 @@ function selectGeneBadge(badgeElement) {
 
 }
 
-function selectGene(geneName) {
+function selectGene(geneName, callbackVariantsDisplayed) {
 	$('.typeahead.tt-input').val(geneName);
 	
 	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
@@ -1382,7 +1391,8 @@ function selectGene(geneName) {
 					firstTimeGeneLoaded = false; 
 				}
 
-		    	loadTracksForGene();
+
+		    	loadTracksForGene(false, null, callbackVariantsDisplayed);
 	    	} else {
 	    		alertify.error("Gene " + geneName + " not found.  Removing from list.", 
 				      		    function (e) {
@@ -1679,7 +1689,7 @@ function loadGeneWidget() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-function loadTracksForGene(bypassVariantCards) {
+function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVariantsDisplayed) {
 
 	regionStart = null;
 	regionEnd = null;
@@ -1779,8 +1789,17 @@ function loadTracksForGene(bypassVariantCards) {
 	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
 				variantCard.hide();
 			} else {
-			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, function() {			 		
-			 	});
+			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, 
+			 		function(theVariantCard) {		
+				 		if (callbackDataLoaded) {
+				 			callbackDataLoaded(theVariantCard);
+				 		}	 		
+				 	},
+			 		function(theVariantCard) {
+			 			if (callbackVariantsDisplayed) {
+				 			callbackVariantsDisplayed(theVariantCard);
+				 		}	 		
+			 		});
 			}
 		});
 	}
@@ -2420,6 +2439,14 @@ function filterVariants() {
 
 	});
 
+}
+
+
+function bookmarkVariant() {
+	if (clickedVariant) {
+		this.bookmarkCard.bookmarkVariant(clickedVariant);
+		this.bookmarkCard.showBookmarks();
+	}
 }
 
 

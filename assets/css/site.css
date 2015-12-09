@@ -123,6 +123,18 @@ body {
   visibility: hidden !important;
 }
 
+#bookmark-card {
+  padding: 5px;
+}
+
+#bookmark-card .bookmark {
+  font-size: 10px;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  padding-top: 4px;
+}
+
 #get-genes-copy-paste-button.btn.btn-raised,
 #phenolyzer-go-button.btn.btn-raised {
     box-shadow: 0 1px 6px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.12) !important;
@@ -648,13 +660,13 @@ section {
 
  .tooltip rect.alt-count, 
  .tooltip rect.ref-count {
-  stroke: #B6B9B9;
+  stroke: black;
  }
  .tooltip rect.ref-count {
    fill:none;
  }
 .tooltip rect.alt-count {
-    fill: rgb(103, 181, 50);
+    fill: rgb(93, 128, 157);
 }
 .tooltip text.alt-count {
   fill: white;
@@ -1005,18 +1017,20 @@ header {
 } 
 
 
-.bookmark rect {
+#vcf-track .bookmark rect {
   fill: none;
   stroke: black;
   stroke-width: 2;
   opacity: .5;
 }
-.bookmark line {
+
+#vcf-track .bookmark line {
   stroke: black;
   stroke-width:1.5;
   opacity: .5;
 }
-.bookmark polygon {
+
+#vcf-track .bookmark polygon {
   fill:black; 
   opacity: .5;
 }
@@ -1219,7 +1233,8 @@ header {
   top: 371px;
   pointer-events: all;
   border: 1px outset rgb(213, 213, 213);
-  opacity: 1;      
+  opacity: 1;   
+  box-shadow: 0 3px 10px rgba(0,0,0,.23),0 3px 10px rgba(0,0,0,.16);   
 }
 
 

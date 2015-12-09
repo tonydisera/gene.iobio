@@ -464,7 +464,7 @@ VariantCard.prototype.clearWarnings = function() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
+VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataLoaded, callbackVariantsDisplayed) {
 	var me = this;
 	
 	// Reset any previous locked variant
@@ -535,15 +535,19 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callback) {
 		// loaded, the read coverage chart and called variant charts are
 		// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 		// chart is not rendered.
-		me._showVariants( regionStart, regionEnd, function() {	
-
-			me._showBamDepth( regionStart, regionEnd, function() {
-				if (callback) {
-					callback();
-				}
-			});
-		});
-
+		me._showVariants( regionStart, 
+			regionEnd, 
+			function() {	
+				me._showBamDepth( regionStart, regionEnd );
+				if (callbackDataLoaded) {
+					callbackDataLoaded(me);
+				};
+			},
+			function() {
+			  	if (callbackVariantsDisplayed) {
+			  		callbackVariantsDisplayed(me);
+			  	}
+			 });
 
 	}
 }
@@ -737,7 +741,25 @@ VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData) {
 }
 
 
-VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData) {
+
+VariantCard.prototype.getBookmarkedVariant = function(variantProxy) {
+	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	if (theVcfData == null) {
+		return null;
+	}
+	var theVariant = null;
+	theVcfData.features.forEach( function (d) {
+       if (d.start == variantProxy.start 
+          && d.ref == variantProxy.ref 
+          && d.alt == variantProxy.alt) {
+          theVariant = d;
+       }
+    });	
+    return theVariant;
+}
+
+
+VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData, onVariantsDisplayed) {
 	var me = this;
 
 	if (!this.model.isVcfReadyToLoad()) {
@@ -788,6 +810,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 										   regionStart ? regionStart : window.gene.start, 
 										   regionEnd ? regionEnd : window.gene.end);
 				}	
+
+				if (onVariantsDisplayed) {
+					onVariantsDisplayed();
+				}
 
 			}, function(error) {
 				console.log("an error occurred when determine inheritance. " + error);
@@ -1262,9 +1288,6 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 			var tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
 			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
 
-			if (lock) {
-				//this.vcfChart.addBookmark(container, variant);
-			}
 		}
 		
 	}
@@ -1361,31 +1384,38 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 
 VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant) {
 	container.select("div.proband-alt-count").remove();
-	container.append("div")
-	         .attr("class", "proband-alt-count tooltip-header")
-	         .text("Proband Allele Count");
-	var column = container.append("div")
-	                      .attr("class", "proband-alt-count tooltip-value")
+	var row = container.append("div")
+	                   .attr("class", "proband-alt-count tooltip-row");
+	row.append("div")
+	   .attr("class", "proband-alt-count tooltip-header")
+	   .text("Proband Allele Count");
+	var column = row.append("div")
+	                .attr("class", "proband-alt-count tooltip-value");
 	
 	this._appendAlleleCountSVG(column, variant.genotypeAltCount, variant.genotypeRefCount, variant.genotypeDepth);
 
 	if (dataCard.mode == 'trio' && this.getRelationship() == 'proband') {
 		// Mother
 		container.select("div.mother-alt-count").remove();
-		container.append("div")
-		         .attr("class", "mother-alt-count tooltip-header")
-		         .text("Mother");
-		column = container.append("div")
-		                      .attr("class", "mother-alt-count tooltip-value")
+		row = container.append("div")
+	                   .attr("class", "mother-alt-count tooltip-row");		
+
+		row.append("div")
+		   .attr("class", "mother-alt-count tooltip-header")
+		   .text("Mother");
+		column = row.append("div")
+		            .attr("class", "mother-alt-count tooltip-value")
 		this._appendAlleleCountSVG(column, variant.genotypeAltCountMother, variant.genotypeRefCountMother, variant.genotypeDepthMother);		
 
 		// Father
 		container.select("div.father-alt-count").remove();
-		container.append("div")
-	         .attr("class", "father-alt-count tooltip-header")
-	         .text("Father");
-		column = container.append("div")
-	                      .attr("class", "father-alt-count tooltip-value")
+		row = container.append("div")
+	                   .attr("class", "father-alt-count tooltip-row");	
+		row.append("div")
+	       .attr("class", "father-alt-count tooltip-header")
+	       .text("Father");
+		column = row.append("div")
+	                .attr("class", "father-alt-count tooltip-value")
 		this._appendAlleleCountSVG(column, variant.genotypeAltCountFather, variant.genotypeRefCountFather, variant.genotypeDepthMother);
 	}
 }
@@ -1404,7 +1434,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 		var svg = container
 	            .append("svg")
 	            .attr("width", BAR_WIDTH + 20)
-	            .attr("height", "11");
+	            .attr("height", "12");
 		svg.append("rect")
 		   .attr("x", "1")
   	  	   .attr("y", "1")
@@ -1415,7 +1445,6 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 		svg.append("text")
 		   .attr("x", BAR_WIDTH + 5)
 		   .attr("y", "9")
-		   .style("fill", "white")
 		   .text(genotypeDepth);
 
 		var g = svg.append("g")
@@ -1441,7 +1470,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	var svg = container
 	            .append("svg")
 	            .attr("width", BAR_WIDTH + 20)
-	            .attr("height", separateLineForLabel ? "20" : "11");
+	            .attr("height", separateLineForLabel ? "21" : "12");
 	
 	svg.append("rect")
 	 .attr("x", "1")
@@ -1460,7 +1489,6 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	svg.append("text")
 	   .attr("x", BAR_WIDTH + 5)
 	   .attr("y", "9")
-	   .style("fill", "white")
 	   .text(totalCount);
 
 	 var g = svg.append("g")
@@ -1730,8 +1758,10 @@ VariantCard.prototype._unpinRow = function(pinMessage) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
 	if (window.clickedVariant) {
-		return '<div class="row">'
-		  + '<div class="col-md-12" style="text-align:right;">' + '<a  id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+		return '<div class="row" style="margin-bottom: -2px;margin-top: 18px !important;font-size: 11px;">'
+		  + '<div class="col-md-4" style="text-align:left;">' +  '<a href="javascript:void(0)">Examine </a>' +  '</div>'
+		  + '<div class="col-md-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
+		  + '<div class="col-md-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
 		  + '</div>';
 		
 
@@ -1786,8 +1816,23 @@ VariantCard.prototype._tooltipRowAF = function(label, afExAC, af1000g) {
 }
 
 VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
-	return '<div class="tooltip-row" id="coverage-svg">'
+	return '<div  id="coverage-svg">'
 		 + '</div>';
+}
+
+VariantCard.prototype.bookmarkVariant = function(variant) {
+	var container = null;
+	if (variant.fbCalled == 'Y') {
+		container = this.d3CardSelector.selectAll('#fb-variants svg');
+		this.fbChart.addBookmark(container, variant);
+	} else {
+		container = this.d3CardSelector.selectAll('#vcf-variants svg');
+		this.vcfChart.addBookmark(container, variant);
+	}
+}
+
+VariantCard.prototype.unpin = function() {
+	this._unpin();
 }
 
 
@@ -1796,4 +1841,5 @@ VariantCard.prototype._unpin = function() {
 	this.hideCoverageCircle();
 	window.hideCircleRelatedVariants();	
 }
+
 
