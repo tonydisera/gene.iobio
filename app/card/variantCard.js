@@ -1826,9 +1826,14 @@ VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
 		 + '</div>';
 }
 
-VariantCard.prototype.addBookmarkFlag = function(variant, key) {
+VariantCard.prototype.addBookmarkFlag = function(variant, key, isCurrent) {
 	if (variant == null) {
 		return;
+	}
+
+	// Remove the current indicator from the bookmark flag
+	if (isCurrent) {
+		this.d3CardSelector.selectAll('#vcf-track .bookmark.current').classed("current", false);
 	}
 
 	var container = null;
@@ -1850,6 +1855,10 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key) {
 			container = this.d3CardSelector.selectAll('#vcf-variants svg');
 			this.vcfChart.addBookmark(container, variant, key);
 		}
+	}
+
+	if (isCurrent) {
+		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);
 	}
 }
 

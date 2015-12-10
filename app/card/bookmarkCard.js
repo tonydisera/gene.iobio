@@ -135,7 +135,7 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().unpin();
-			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key));			
+			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);			
 		}
 	}
 }
@@ -164,7 +164,7 @@ BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant
 	
 	// Flag the bookmarked variant
 	if (variant) {
-		variantCard.addBookmarkFlag(variant, me.compressKey(bookmarkKey));
+		variantCard.addBookmarkFlag(variant, me.compressKey(bookmarkKey), true);
 	}
 
 	// Now flag all other bookmarked variants in the same gene
@@ -174,7 +174,7 @@ BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant
 			var theBookmarkEntry = me.bookmarkedVariants[key];
 			var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject);
 			if (theVariant != null && theVariant != variant) {
-				variantCard.addBookmarkFlag(theVariant, me.compressKey(key));
+				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);
 			}
 		}
 	}

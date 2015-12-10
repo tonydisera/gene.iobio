@@ -1024,15 +1024,29 @@ header {
   opacity: .5;
 }
 
+#vcf-track .bookmark.current rect {
+  stroke: rgb(215, 48, 39);
+  opacity: 1;
+}
+
 #vcf-track .bookmark line {
   stroke: black;
   stroke-width:1.5;
   opacity: .5;
 }
 
+#vcf-track .bookmark.current line {
+  stroke: rgb(215, 48, 39);
+  opacity: 1;
+}
+
 #vcf-track .bookmark polygon {
   fill:black; 
   opacity: .5;
+}
+#vcf-track .bookmark.current polygon {
+  fill: rgb(215, 48, 39);; 
+  opacity: 1;
 }
 
 .arrow_box {
