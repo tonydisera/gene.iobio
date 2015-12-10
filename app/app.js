@@ -1258,6 +1258,7 @@ function refreshCurrentGeneBadge() {
 	var probandVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	var dangerObject = vc.summarizeDanger(probandVcfData);
 	_setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+	bookmarkCard.refreshBookmarkList();
 }
 
 function hideGeneBadgeLoading(geneName) {
@@ -1796,6 +1797,10 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 				 		}	 		
 				 	},
 			 		function(theVariantCard) {
+			 			if (theVariantCard.getRelationship() == 'proband') {
+			 				var h = $("#nav-section").height();
+							$('#track-section').css("padding-top", h + "px");
+			 			}
 			 			if (callbackVariantsDisplayed) {
 				 			callbackVariantsDisplayed(theVariantCard);
 				 		}	 		

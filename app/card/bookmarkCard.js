@@ -1,5 +1,6 @@
 function BookmarkCard() {
 	this.bookmarkedVariants = {};
+	this.bookmarkedGenes = {};
 }
 
 BookmarkCard.prototype.init = function() {
@@ -69,9 +70,21 @@ BookmarkCard.prototype.importBookmarks = function() {
 			}
 
 		}
-		showSidebar("Bookmarks");
-		me.refreshBookmarkList();
-	})
+	});
+
+	showSidebar("Bookmarks");
+	me.refreshBookmarkList();
+
+	// Add all of the genes to the gene list so that gene badges are created.
+	var genesBuffer = "";
+	for (var geneName in me.bookmarkedGenes) {
+		if (genesBuffer.length > 0) {
+			genesBuffer += ",";
+		}
+		genesBuffer += geneName;
+	}			
+	$('#genes-to-copy').val(genesBuffer);			
+	copyPasteGenes(genesBuffer);			
 
 
 
@@ -88,8 +101,8 @@ BookmarkCard.prototype.reviseCoord = function(bookmarkEntry, gene) {
 
 	// TODO: If gene is reverse strand, change ref alt to compliment
 	if (gene.strand == "-") {
-		revisedBookmarkEntry.alt = me.reverseBases(bookmarkEntry.alt);
-		revisedBookmarkEntry.ref = me.reverseBases(bookmarkEntry.ref);
+		//revisedBookmarkEntry.alt = me.reverseBases(bookmarkEntry.alt);
+		//revisedBookmarkEntry.ref = me.reverseBases(bookmarkEntry.ref);
 	}
 
 	// TODO:  Normalize since variants are normalized
@@ -118,20 +131,9 @@ BookmarkCard.prototype.reverseBases = function(bases) {
 
 BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	var me = this;
-	if (variant) {
-		var rsId = null;
-		for (var key in variant.vepVariationIds) {
-			if (key != 0 && key != '') {
-				var tokens = key.split("&");
-				tokens.forEach( function(id) {
-					if (id.indexOf("rs") == 0) {
-						rsId = id;
-					}
-				});
-			}
-		}
+	if (variant) {		
 
-		var key = this.getBookmarkKey(gene.gene_name,  gene.chr, variant.start, variant.ref, variant.alt, rsId);
+		var key = this.getBookmarkKey(gene.gene_name,  gene.chr, variant.start, variant.ref, variant.alt);
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().unpin();
@@ -140,11 +142,10 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	}
 }
 
-BookmarkCard.prototype.getBookmarkKey = function(geneName, chrom, start, ref, alt, rsId) {
+BookmarkCard.prototype.getBookmarkKey = function(geneName, chrom, start, ref, alt) {
 	return geneName + ": " 
          + chrom + " " + start  
-         + " " + ref + "->" + alt
-         + (rsId ? " "+rsId : "");
+         + " " + ref + "->" + alt;         
 }
 
 BookmarkCard.prototype.compressKey = function(bookmarkKey) {
@@ -156,11 +157,6 @@ BookmarkCard.prototype.compressKey = function(bookmarkKey) {
 
 BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant, bookmarkKey) {
 	var me = this;
-
-	addGeneBadge(geneObject.gene_name, true);										
-	refreshCurrentGeneBadge();
-
-	
 	
 	// Flag the bookmarked variant
 	if (variant) {
@@ -181,9 +177,9 @@ BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant
 
 	// Now that we have resolved the bookmark entries for a gene, refresh the
 	// bookmark list so that the glyphs show for each resolved bookmark.
-	me.refreshBookmarkList();									
+	me.refreshBookmarkList();
 
-
+	
 }
 
 BookmarkCard.prototype.resolveBookmarkedVariant = function(key, bookmarkEntry, geneObject) {
@@ -202,34 +198,121 @@ BookmarkCard.prototype.resolveBookmarkedVariant = function(key, bookmarkEntry, g
 	return variant;
 }
 
+BookmarkCard.prototype.sortBookmarksByGene = function() {
+	var me = this;
+    var tuples = [];
+
+    for (var key in me.bookmarkedVariants) {
+    	tuples.push([key, me.bookmarkedVariants[key]]);
+	}
+
+    tuples.sort(function(a, b) { 
+    	var keyA = a[0];
+    	var keyB = b[0];
+    	var geneA = keyA.split(": ")[0];
+    	var geneB = keyB.split(": ")[0];
+    	
+    	return geneA < geneB ? 1 : geneA > geneB ? -1 : 0;
+    });
+
+    var length = tuples.length;
+    var sortedBookmarks = {};
+    me.bookmarkedGenes = {};
+    while (length--) {
+    	var key   = tuples[length][0];
+    	var value = tuples[length][1];
+    	var geneName = key.split(": ")[0];
+    	
+    	sortedBookmarks[key] = value;
+
+    	var keys = me.bookmarkedGenes[geneName];
+    	if (keys == null) {
+    		keys = [];
+    	}
+    	keys.push(key);
+    	me.bookmarkedGenes[geneName] = keys;
+    }
+
+    me.bookmarkedVariants = sortedBookmarks;
+}
+
+BookmarkCard.prototype.getRsId = function(variant) {
+	var rsId = null;
+	if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {
+		for (var key in variant.vepVariationIds) {
+			if (key != 0 && key != '') {
+				var tokens = key.split("&");
+				tokens.forEach( function(id) {
+					if (id.indexOf("rs") == 0) {
+						rsId = id;
+					}
+				});
+			}
+		}			
+	}
+	return rsId;
+}
+
 BookmarkCard.prototype.refreshBookmarkList = function() {
 	var me = this;
 	var container = d3.select('#bookmark-card #bookmark-panel');
-	container.selectAll('.bookmark').remove();
+	container.selectAll('.bookmark-gene').remove();
 
-	
-	container.selectAll(".bookmark")
-	         .data(d3.entries(this.bookmarkedVariants))
+	// Sort bookmarks by gene, then start position
+	me.sortBookmarksByGene();
+
+	container.selectAll(".bookmark-gene")
+	         .data(d3.entries(this.bookmarkedGenes))
 	         .enter()
+	         .append("div")
+	         .attr("class", "bookmark-gene")
 	         .append("a")
-	         .attr("class", "bookmark")
-	         .on('click', function(entry,i) {
-	         	var geneName = entry.key.split(": ")[0];
-				var bookmarkEntry = entry.value;
-				var key = entry.key;
-
-				if (window.gene.gene_name != geneName) {
-					window.selectGene(geneName, function(variantCard) {
-						if (variantCard.getRelationship() == 'proband') {
-							var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-							me.flagBookmarks(variantCard, window.gene, variant, key);
-						}
-					});
-				} else {
-					var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
-					me.flagBookmarks(getProbandVariantCard(), window.gene, variant, key);
-				}
+	         .attr("class", "bookmark-gene")
+	         .text(function(entry,i) {
+	         	var geneName = entry.key;
+	         	var entryKeys = entry.value;
+	         	var parts = entryKeys[0].split(": ");
+	         	var chr = parts[1].split(" ")[0];
+	         	return  geneName + " " + chr;
 	         });
+
+	container.selectAll("div.bookmark-gene")
+	         .each( function(entry, i) {
+	         	var geneContainer = d3.select(this);
+
+	         	var keys = entry.value;
+	         	var bookmarkedVariantsForGene = {};
+	         	keys.forEach( function(key) {
+	         		bookmarkedVariantsForGene[key] = me.bookmarkedVariants[key];
+	         	});
+
+         		geneContainer.selectAll(".bookmark")
+			         .data(d3.entries(bookmarkedVariantsForGene))
+			         .enter()
+			         .append("a")
+			         .attr("class", "bookmark")
+			         .on('click', function(entry,i) {
+			         	var geneName = entry.key.split(": ")[0];
+						var bookmarkEntry = entry.value;
+						var key = entry.key;
+
+
+						if (window.gene.gene_name != geneName) {
+							window.selectGene(geneName, function(variantCard) {
+								if (variantCard.getRelationship() == 'proband') {
+									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
+									me.flagBookmarks(variantCard, window.gene, variant, key);
+								}
+							});
+						} else {
+							var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
+							me.flagBookmarks(getProbandVariantCard(), window.gene, variant, key);
+						}
+			         });
+	        });
+			
+	
+
 
 	container.selectAll(".bookmark")
 	 		 .append("span")
@@ -240,8 +323,15 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         .attr("class", "variant-label");
 	        
 	container.selectAll(".bookmark span.variant-label")
-	         .text(function(entry,i) {	         	
-	         	return entry.key;
+	         .text(function(entry,i) {	
+	         	var key = entry.key;
+	         	var bookmarkEntry = entry.value;
+
+	         	var rsId = me.getRsId(bookmarkEntry);
+
+				// Strip off gene name and chr
+				var tokens = key.split(": ")[1].split(" ");
+	         	return tokens[1] + " " + tokens[2] + (rsId ? " " + rsId : "");
 	         });
 
 

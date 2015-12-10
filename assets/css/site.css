@@ -133,6 +133,21 @@ body {
   display: block;
   text-align: left;
   padding-top: 4px;
+  margin-left: 10px;
+}
+
+#bookmark-card div.bookmark-gene {
+  margin-bottom: 5px;
+
+}
+
+#bookmark-card a.bookmark-gene {
+    font-size: 11px;
+    cursor: pointer;
+    display: block;
+    text-align: left;
+    padding-top: 4px;
+    margin-bottom: -5px;
 }
 
 #get-genes-copy-paste-button.btn.btn-raised,
