@@ -135,7 +135,7 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().unpin();
-			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);			
+			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), true);			
 		}
 	}
 }
@@ -250,7 +250,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			    var selection = d3.select(this);
 	         	var variant = entry.value;	         
 	         	if (variant.impact) {
-		         	for (var impact in variant.impact) {
+		         	for (var impact in variant.impact) {		         		
 	         			var svg = selection.append("svg")
 									       .attr("class", "impact-badge")
 									       .attr("height", 12)
@@ -260,27 +260,33 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 		         	}	         		
 	         	}
 	         	if (variant.clinVarClinicalSignificance) {
+	         		var lowestValue = 9999;
+	         		var lowestClazz = null; 
 	         		for (var clinvar in variant.clinVarClinicalSignificance) {
 	         			if (matrixCard.clinvarMap[clinvar]) {
-			         		var clazz = matrixCard.clinvarMap[clinvar].clazz;
-			         		var badge = matrixCard.clinvarMap[clinvar].badge;
-			         		if (badge) {
-								var options = {width:10, height:10, transform: 'translate(0,1)', clazz: clazz};
-								var svg = selection.append("svg")
-											       .attr("class", "clinvar-badge")
-											       .attr("height", 12)
-											       .attr("width", 14);
-						        matrixCard.showClinVarSymbol(svg, options);	         		
-			         		}
+	         				if (matrixCard.clinvarMap[clinvar].value < lowestValue) {
+	         					lowestValue = matrixCard.clinvarMap[clinvar].value;
+	         					lowestClazz = matrixCard.clinvarMap[clinvar].clazz;
+	         				}
+	         				
 	         			}
 	         		}
+	         		if (lowestClazz != null && lowestClazz != '') {
+						var options = {width:10, height:10, transform: 'translate(0,1)', clazz: lowestClazz};
+						var svg = selection.append("svg")
+									       .attr("class", "clinvar-badge")
+									       .attr("height", 12)
+									       .attr("width", 14);
+				        matrixCard.showClinVarSymbol(svg, options);	         		
+         			}
+
 	         	}
 	         	if (variant.vepSIFT) {
 					for (var sift in variant.vepSIFT) {
 						if (matrixCard.siftMap[sift]) {
 			         		var clazz = matrixCard.siftMap[sift].clazz;
 			         		var badge = matrixCard.siftMap[sift].badge;
-			         		if (badge) {
+			         		if (clazz != '') {
 								var options = {width:11, height:11, transform: 'translate(0,1)', clazz: clazz};
 								var svg = selection.append("svg")
 									        .attr("class", "sift-badge")
@@ -297,7 +303,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 						if (matrixCard.polyphenMap[polyphen]) {
 			         		var clazz = matrixCard.polyphenMap[polyphen].clazz;
 			         		var badge = matrixCard.polyphenMap[polyphen].badge;
-			         		if (badge) {
+			         		if (clazz != '') {
 								var options = {width:10, height:10, transform: 'translate(0,2)', clazz: clazz};
 								var svg = selection.append("svg")
 									        .attr("class", "polyphen-badge")
