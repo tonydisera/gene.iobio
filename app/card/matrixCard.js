@@ -814,7 +814,7 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 	var me = this;
 	var type = null;
 	var transform1 = "translate(1,3)";
-	var tranform2 = "translate(5,6)";
+	var transform2 = "translate(5,6)";
 	var clazz = null;
 	if (variant) {
 		type = variant.type;

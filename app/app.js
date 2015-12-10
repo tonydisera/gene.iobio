@@ -394,7 +394,7 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
 		$('#slider-left-content #recall-card').toggleClass("hide", true);		
 		$('#button-show-bookmarks').toggleClass('selected', true);		
-		window.bookmarkCard.showBookmarks();
+		window.bookmarkCard.refreshBookmarkList();
 	} else if (sidebar == "Examine") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
 		$('#slider-left-content #phenolyzer-card').toggleClass("hide", true);	
@@ -2039,7 +2039,7 @@ function loadUnaffectedSibs(unaffectedSibs) {
  *  highest total (alt + ref) allele count.
  *
  */
-function promiseDetermineInheritance(promise) {	
+function promiseDetermineInheritance(promise, onVariantsDisplayed) {	
 	return new Promise( function(resolve, reject) {
 		var thePromise = null;
 		if (promise == null) {
@@ -2066,7 +2066,7 @@ function promiseDetermineInheritance(promise) {
 
 						determineUnaffectedSibStatus();
 
-						probandVariantCard.refreshVariantChartAndMatrix();
+						probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);
 
 						resolve();
 
@@ -2078,7 +2078,7 @@ function promiseDetermineInheritance(promise) {
 
 					probandVariantCard.determineMaxAlleleCount();
 					
-					probandVariantCard.refreshVariantChartAndMatrix();	
+					probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);	
 
 					resolve();		
 				}
@@ -2445,7 +2445,7 @@ function filterVariants() {
 function bookmarkVariant() {
 	if (clickedVariant) {
 		this.bookmarkCard.bookmarkVariant(clickedVariant);
-		this.bookmarkCard.showBookmarks();
+		this.bookmarkCard.refreshBookmarkList();
 	}
 }
 

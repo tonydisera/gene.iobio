@@ -694,7 +694,7 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd) {
 
 
 
-VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData) {
+VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData, onVariantsDisplayed) {
 	var me = this;
 
 	if (theVcfData == null) {
@@ -725,7 +725,7 @@ VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData) {
  	    .then(function() {
 
 			me.endVariantProgress();
-			me._showVariants(regionStart, regionEnd);
+			me._showVariants(regionStart, regionEnd, null, onVariantsDisplayed);
 
 
 			// Refresh the feature matrix after clinvar AND the coverage has
@@ -792,7 +792,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			}	
 
 
-			promiseDetermineInheritance().then(function() {
+			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
 				var filteredVcfData = this.filterVariants(theVcfData);
 				me.cardSelector.find('#displayed-variant-count').text(filteredVcfData != null && filteredVcfData.features.length != null ? filteredVcfData.features.length : "0");
 				
@@ -852,7 +852,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 					// don't have clinvar annotations nor coverage
 					// Here we call this method again and since we
 					// have vcf data, the variant chart will be filled
-					me._showVariants();	
+					me._showVariants(regionStart ? regionStart : window.gene.start, 
+									 regionEnd ? regionEnd : window.gene.end,
+									 onVcfData,
+									 onVariantsDisplayed);	
 					filterCard.enableVariantFilters(true);
 						
 				}
@@ -875,7 +878,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 		  			// Here we call this method again and since we
 					// have vcf data, the variant chart will be filled
-		  			me._showVariants();
+		  			me._showVariants(regionStart ? regionStart : window.gene.start, 
+									 regionEnd ? regionEnd : window.gene.end,
+									 onVcfData,
+									 onVariantsDisplayed);
 
 		  			// Enable the variant filters 
 		  			if (me.getRelationship() == 'proband') {
@@ -883,7 +889,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 				    }
 
 				    // Indicate that we have refreshed variants
-					me.refreshVariantChartAndMatrix(data);
+					me.refreshVariantChartAndMatrix(data, onVariantsDisplayed);
 
 					// Show the 'Call from alignments' button if we a bam file/url was specified
 					if (me.isBamLoaded() && me.isViewable()) {
@@ -1820,14 +1826,30 @@ VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
 		 + '</div>';
 }
 
-VariantCard.prototype.bookmarkVariant = function(variant) {
+VariantCard.prototype.addBookmarkFlag = function(variant, key) {
+	if (variant == null) {
+		return;
+	}
+
 	var container = null;
 	if (variant.fbCalled == 'Y') {
-		container = this.d3CardSelector.selectAll('#fb-variants svg');
-		this.fbChart.addBookmark(container, variant);
+		// Check to see if the bookmark flag for this variant already exists
+		var isEmpty = this.d3CardSelector.selectAll("#fb-variants svg .bookmark#" + key).empty();
+
+		// If the flag isn't present, add it to the freebayes variant
+		if (isEmpty) {
+			container = this.d3CardSelector.selectAll('#fb-variants svg');
+			this.fbChart.addBookmark(container, variant, key);
+		}
 	} else {
-		container = this.d3CardSelector.selectAll('#vcf-variants svg');
-		this.vcfChart.addBookmark(container, variant);
+		// Check to see if the bookmark flag for this variant already exists
+		var isEmpty = this.d3CardSelector.selectAll("#vcf-variants svg .bookmark#" + key).empty();
+
+		// If the flag isn't present, add it to the vcf variant
+		if (isEmpty) {
+			container = this.d3CardSelector.selectAll('#vcf-variants svg');
+			this.vcfChart.addBookmark(container, variant, key);
+		}
 	}
 }
 

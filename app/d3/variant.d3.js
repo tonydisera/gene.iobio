@@ -546,18 +546,7 @@ function variantD3() {
 
   }
 
-  chart.addBookmark = function(svg, variant) {
-    /*
-    <g transform="translate(358.5,55)">
-      <rect x="1" y="0" width="8" height="8" style="fill:none;stroke: black;stroke-width:1.5px"></rect>
-      <g transform="translate(-3,-10)">
-        <line x1="4" x2="4" y1="-9" y2="10" style="stroke: black;stroke-width:1.5px"></line>
-        <g transform="translate(12,-9),rotate(90)">
-          <polygon class="del" points="0,8 4,2 8,8" style="fill: black; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
-        </g>
-      </g>
-    </g>
-    */
+  chart.addBookmark = function(svg, variant, key) {
 
     // Find the matching variant
     var matchingVariant = null;
@@ -591,6 +580,7 @@ function variantD3() {
     var group = svg.select("g.bookmarks")
        .append("g")
        .attr("class", "bookmark")
+       .attr("id", key ? key : "")
        .attr("transform", "translate(" + xpos + "," +  ypos + ")" );
 
     group.append("rect")

@@ -70,7 +70,7 @@ BookmarkCard.prototype.importBookmarks = function() {
 
 		}
 		showSidebar("Bookmarks");
-		me.showBookmarks();
+		me.refreshBookmarkList();
 	})
 
 
@@ -101,22 +101,23 @@ BookmarkCard.prototype.reverseBases = function(bases) {
 	var reversedBases = "";
 	for (var i = 0; i < bases.length; i++) {
     	var base = bases.charAt(i);
-    	var reverseBase = null;
+    	var rb = null;
     	if (base == 'A') {
-    		reverseBase = 'T';
+    		rb = 'T';
     	} else if (base == 'T') {
-    		reverseBase = 'A';
+    		rb = 'A';
     	} else if (base == 'C') {
-    		reverseBase = 'G';
+    		rb = 'G';
     	} else if (base == 'G') {
-    		reverseBase = 'C';
+    		rb = 'C';
     	}
-    	reverseBases += reverseBase;
+    	reversedBases += rb;
     }
-    return reverseBases;
+    return reversedBases;
 }
 
 BookmarkCard.prototype.bookmarkVariant = function(variant) {
+	var me = this;
 	if (variant) {
 		var rsId = null;
 		for (var key in variant.vepVariationIds) {
@@ -134,7 +135,7 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().unpin();
-			getProbandVariantCard().bookmarkVariant(variant);			
+			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key));			
 		}
 	}
 }
@@ -146,7 +147,62 @@ BookmarkCard.prototype.getBookmarkKey = function(geneName, chrom, start, ref, al
          + (rsId ? " "+rsId : "");
 }
 
-BookmarkCard.prototype.showBookmarks = function() {
+BookmarkCard.prototype.compressKey = function(bookmarkKey) {
+	bookmarkKey = bookmarkKey.split(": ").join("-");
+	bookmarkKey = bookmarkKey.split("->").join("-");
+	bookmarkKey = bookmarkKey.split(" ").join("-");
+	return bookmarkKey;
+}
+
+BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant, bookmarkKey) {
+	var me = this;
+
+	addGeneBadge(geneObject.gene_name, true);										
+	refreshCurrentGeneBadge();
+
+	
+	
+	// Flag the bookmarked variant
+	if (variant) {
+		variantCard.addBookmarkFlag(variant, me.compressKey(bookmarkKey));
+	}
+
+	// Now flag all other bookmarked variants in the same gene
+	for (var key in me.bookmarkedVariants) {
+		var theGeneName = key.split(": ")[0];
+		if (theGeneName == geneObject.gene_name) {
+			var theBookmarkEntry = me.bookmarkedVariants[key];
+			var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject);
+			if (theVariant != null && theVariant != variant) {
+				variantCard.addBookmarkFlag(theVariant, me.compressKey(key));
+			}
+		}
+	}
+
+	// Now that we have resolved the bookmark entries for a gene, refresh the
+	// bookmark list so that the glyphs show for each resolved bookmark.
+	me.refreshBookmarkList();									
+
+
+}
+
+BookmarkCard.prototype.resolveBookmarkedVariant = function(key, bookmarkEntry, geneObject) {
+	var me = this;
+
+	var variant = null;
+	if (bookmarkEntry.hasOwnProperty("isProxy")) {
+		variant = getProbandVariantCard().getBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject));
+		if (variant) {
+			me.bookmarkedVariants[key] = variant;
+			bookmarkEntry = variant;									
+		} 
+	} else {
+		variant = bookmarkEntry;
+	}
+	return variant;
+}
+
+BookmarkCard.prototype.refreshBookmarkList = function() {
 	var me = this;
 	var container = d3.select('#bookmark-card #bookmark-panel');
 	container.selectAll('.bookmark').remove();
@@ -165,38 +221,13 @@ BookmarkCard.prototype.showBookmarks = function() {
 				if (window.gene.gene_name != geneName) {
 					window.selectGene(geneName, function(variantCard) {
 						if (variantCard.getRelationship() == 'proband') {
-							var variant = null;
-							if (bookmarkEntry.hasOwnProperty("isProxy")) {
-								variant = getProbandVariantCard().getBookmarkedVariant(me.reviseCoord(bookmarkEntry, window.gene));
-								if (variant) {
-									me.bookmarkedVariants[key] = variant;
-									entry.value = variant;
-									me.showBookmarks();	
-								} 
-								addGeneBadge(geneName, true);										
-								refreshCurrentGeneBadge();
-							} else {
-								variant = bookmarkEntry;
-							}
-							variantCard.bookmarkVariant(variant);
+							var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
+							me.flagBookmarks(variantCard, window.gene, variant, key);
 						}
 					});
 				} else {
-					var variant = null;
-					if (bookmarkEntry.hasOwnProperty("isProxy")) {
-						variant = getProbandVariantCard().getBookmarkedVariant(me.reviseCoord(bookmarkEntry, window.gene));
-						if (variant) {
-							me.bookmarkedVariants[key] = variant;
-							entry.value = variant;
-							me.showBookmarks();									
-						}
-						addGeneBadge(geneName, true);	
-						refreshCurrentGeneBadge();
-
-					} else {
-						variant = bookmarkEntry;
-					}
-					getProbandVariantCard().bookmarkVariant(variant);
+					var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
+					me.flagBookmarks(getProbandVariantCard(), window.gene, variant, key);
 				}
 	         });
 
@@ -295,8 +326,5 @@ BookmarkCard.prototype.showBookmarks = function() {
 	         		}
 	         	}
 	         });
-
-	
-
 
 }
