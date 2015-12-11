@@ -1826,14 +1826,18 @@ VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
 		 + '</div>';
 }
 
-VariantCard.prototype.addBookmarkFlag = function(variant, key, isCurrent) {
+VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 	if (variant == null) {
 		return;
 	}
 
 	// Remove the current indicator from the bookmark flag
-	if (isCurrent) {
-		this.d3CardSelector.selectAll('#vcf-track .bookmark.current').classed("current", false);
+	this.d3CardSelector.selectAll('#vcf-track .bookmark.current').classed("current", false);
+
+	// If we are just flagging one bookmarked variants, get rid of all previously shown flags
+	// for this gene
+	if (singleFlag) {
+		this.d3CardSelector.selectAll('#vcf-track .bookmark').remove();
 	}
 
 	var container = null;
@@ -1857,7 +1861,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, isCurrent) {
 		}
 	}
 
-	if (isCurrent) {
+	if (singleFlag) {
 		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);
 	}
 }

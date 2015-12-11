@@ -152,6 +152,7 @@ BookmarkCard.prototype.compressKey = function(bookmarkKey) {
 	bookmarkKey = bookmarkKey.split(": ").join("-");
 	bookmarkKey = bookmarkKey.split("->").join("-");
 	bookmarkKey = bookmarkKey.split(" ").join("-");
+	bookmarkKey = bookmarkKey.split(".").join("-");
 	return bookmarkKey;
 }
 
@@ -163,17 +164,22 @@ BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant
 		variantCard.addBookmarkFlag(variant, me.compressKey(bookmarkKey), true);
 	}
 
-	// Now flag all other bookmarked variants in the same gene
-	for (var key in me.bookmarkedVariants) {
-		var theGeneName = key.split(": ")[0];
-		if (theGeneName == geneObject.gene_name) {
-			var theBookmarkEntry = me.bookmarkedVariants[key];
-			var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject);
-			if (theVariant != null && theVariant != variant) {
-				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);
-			}
-		}
-	}
+	// Now that we have resolved the bookmark entries for a gene, refresh the
+	// bookmark list so that the glyphs show for each resolved bookmark.
+	me.refreshBookmarkList();
+
+	
+}
+
+BookmarkCard.prototype.flagBookmarksForGene = function(variantCard, geneObject, bookmarkKeys) {
+	var me = this;
+	
+	// Now flag all other bookmarked variants for a gene
+	bookmarkKeys.forEach( function(key) {		
+		var theBookmarkEntry = me.bookmarkedVariants[key];
+		var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject);
+		variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);
+	});
 
 	// Now that we have resolved the bookmark entries for a gene, refresh the
 	// bookmark list so that the glyphs show for each resolved bookmark.
@@ -274,7 +280,22 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	var parts = entryKeys[0].split(": ");
 	         	var chr = parts[1].split(" ")[0];
 	         	return  geneName + " " + chr;
-	         });
+	         })
+	         .on('click', function(entry,i) {
+				var geneName = entry.key;
+				var bookmarkKeys = entry.value;
+
+
+				if (window.gene.gene_name != geneName) {
+					window.selectGene(geneName, function(variantCard) {
+						if (variantCard.getRelationship() == 'proband') {
+							me.flagBookmarksForGene(variantCard, window.gene, bookmarkKeys);
+						}
+					});
+				} else {
+					me.flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys);
+				}
+			});
 
 	container.selectAll("div.bookmark-gene")
 	         .each( function(entry, i) {
