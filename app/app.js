@@ -794,6 +794,24 @@ function getCanonicalTranscript(theGeneObject) {
 
 	});
 	var sortedTranscripts = geneObject.transcripts.slice().sort(function(a, b) {
+		var aType = +2;
+		var bType = +2;
+		if (a.hasOwnProperty("transcript_type") && a.transcript_type == 'protein_coding') {
+			aType = +0;
+		} else if (a.hasOwnProperty("gene_type") && a.gene_type == "gene")  {
+			aType = +0;
+		} else {
+			aType = +1;
+		}
+		if (b.hasOwnProperty("transcript_type") && b.transcript_type == 'protein_coding') {
+			bType = +0;
+		} else if (b.hasOwnProperty("gene_type") && b.gene_type == "gene")  {
+			bType = +0;
+		} else {
+			bType = +1;
+		}
+
+
 		var aLevel = +2;
 		var bLevel = +2;
 		if (a.level != '.' && a.level != '') {
@@ -821,24 +839,30 @@ function getCanonicalTranscript(theGeneObject) {
 			bSource = +1;
 		} 
 
-		a.sort = aLevel + ' ' + aSource + ' ' + a.cdsLength;
-		b.sort = bLevel + ' ' + bSource + ' ' + b.cdsLength;
+		a.sort = aType + ' ' + aLevel + ' ' + aSource + ' ' + a.cdsLength;
+		b.sort = bType + ' ' + bLevel + ' ' + bSource + ' ' + b.cdsLength;
 
-		if (aLevel == bLevel) {
-			if (aSource == bSource) {
-				if (+a.cdsLength == +b.cdsLength) {
-					return 0;
-				} else if (+a.cdsLength > +b.cdsLength) {
+		if (aType == bType) {
+			if (aLevel == bLevel) {
+				if (aSource == bSource) {
+					if (+a.cdsLength == +b.cdsLength) {
+						return 0;
+					} else if (+a.cdsLength > +b.cdsLength) {
+						return -1;
+					} else {
+						return 1;
+					}
+				} else if ( aSource < bSource ) {
 					return -1;
 				} else {
 					return 1;
 				}
-			} else if ( aSource < bSource ) {
+			} else if (aLevel < bLevel) {
 				return -1;
 			} else {
 				return 1;
 			}
-		} else if (aLevel < bLevel) {
+		} else if (aType < bType) {
 			return -1;
 		} else {
 			return 1;
