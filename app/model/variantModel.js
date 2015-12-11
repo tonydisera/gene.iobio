@@ -751,6 +751,10 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			me.vcfData = vcfData;
 			me._populateEffectFilters(me.vcfData.features);
 
+			// Flag any bookmarked variants
+		    bookmarkCard.determineVariantBookmarks(vcfData, theGene);
+
+
 			// Determine inheritance (once full trio is loaded)
 			/*
 			promiseDetermineInheritance().then(function() {
@@ -794,6 +798,9 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			    		}
 			    	}
 			    	if (theGeneObject) {
+			    		// Flag any bookmarked variants
+					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+
 				    	// Cache the data
 				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
 				    	me.vcfData = data;		    	
@@ -854,6 +861,9 @@ VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end
 			    		}
 			    	}
 			    	if (theGeneObject) {
+			    		// Flag any bookmarked variants
+					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+
 				    	// Cache the data
 				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
 						resolve(data);				    	
@@ -985,6 +995,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 			    // can be filtered by range.
 			    me._determineVariantAfLevels(theVcfData );
+
 
 			    // Show the snpEff effects / vep consequences in the filter card
 			    me._populateEffectFilters(theVcfData.features);
@@ -1745,7 +1756,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 						};
 	return vcfDataFiltered;
 }
-
 
 
 VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttribute, matchAttribute, matchFunction, noMatchFunction ) {

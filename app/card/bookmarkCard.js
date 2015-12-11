@@ -156,6 +156,22 @@ BookmarkCard.prototype.compressKey = function(bookmarkKey) {
 	return bookmarkKey;
 }
 
+BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject) {
+	var me = this;
+	if (vcfData && vcfData.features) {
+		var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
+		if (bookmarkKeys && bookmarkKeys.length > 0) {
+			bookmarkKeys.forEach( function(bookmarkKey) {
+				var bookmarkEntry = me.bookmarkedVariants[bookmarkKey];
+				var variant = me.resolveBookmarkedVariant(bookmarkKey, bookmarkEntry, geneObject);
+				if (variant) {
+					variant.isBookmark = 'Y';
+				}
+			});
+		}
+	}
+}
+
 BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant, bookmarkKey) {
 	var me = this;
 	

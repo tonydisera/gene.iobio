@@ -45,6 +45,10 @@ function MatrixCard() {
                         recessive: {value: 2, badge: true, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
                         none:      {value: 3, badge: false, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
                      };
+	this.bookmarkMap = {  
+		                Y: {value: 1, badge: true,  clazz: 'bookmark',  symbolFunction: this.showBookmarkSymbol},  
+                        N: {value: 2, badge: false, clazz: '',          symbolFunction: this.showBookmarkSymbol}
+                     };
 	this.uaMap = {  
 		                not_recessive_in_sibs: {value: 1,   badge: true, clazz: 'not_recessive_in_sibs', symbolFunction: this.showUnaffectedSymbol},  
                         none:                  {value: 104, badge: false, clazz: '',                      symbolFunction: ''}
@@ -69,22 +73,24 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
+		{name:'Bookmark'                     ,order:3, index:8, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Not recessive in Unaff. Sibs' ,order:5, index:7, match: 'exact', attribute: 'ua',          map: this.uaMap},
-		{name:'Inheritance Mode'             ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Allele Frequency - 1000G'     ,order:6, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:7, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Impact - SnpEff'              ,order:4, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Not recessive in Unaff. Sibs' ,order:6, index:7, match: 'exact', attribute: 'ua',          map: this.uaMap},
+		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Allele Frequency - 1000G'     ,order:7, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:8, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
 		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
 
 	this.matrixRowsNoUa = [
+		{name:'Bookmark'                     ,order:3, index:7, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Inheritance Mode'             ,order:4, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Allele Frequency - 1000G'     ,order:5, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:6, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Impact - SnpEff'              ,order:4, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Allele Frequency - 1000G'     ,order:6, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:7, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
 		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
@@ -767,6 +773,42 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 MatrixCard.prototype.getSymbol = function(d,i) {
 	 
 };
+
+MatrixCard.prototype.showBookmarkSymbol = function(selection) {
+	var me = this;
+    
+     /*
+     <g class="bookmark current">
+     	<g transform="translate(-3,-10)">
+     		<line x1="4" x2="4" y1="-9" y2="10"></line>
+     		<g transform="translate(12,-9),rotate(90)">
+     			<polygon points="0,8 4,2 8,8"></polygon>
+     		</g>
+     	</g>
+     </g>
+     */
+
+	if (selection.datum().clazz != '') {
+		var group = selection.append("g")
+		                     .attr("transform", "translate(7,4)");
+		group.append("line")
+	         .attr("x1", 4)
+	         .attr("x2", 4)
+	         .attr("y1", 0)
+	         .attr("y2", 14)
+	         .style("pointer-events", "none")
+	         .style("stroke", "rgba(0, 0, 0, 0.6)")
+	         .style("stroke-width", "1.5");
+	    group.append("g")
+	         .attr("transform", "translate(12,0),rotate(90)")	
+	         .append("polygon")
+	         .attr("points", "0,8 4,2 8,8")
+	         .style("fill", "rgba(0, 0, 0, 0.6)");
+
+	}
+
+
+}
 
 MatrixCard.prototype.showImpactSymbol = function(selection) {
 	var me = this;
