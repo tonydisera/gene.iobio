@@ -222,7 +222,9 @@ MatrixCard.prototype.hideTooltip = function() {
 	var tooltip = d3.select('#matrix-track .tooltip');
 	tooltip.transition()        
            .duration(500)      
-           .style("opacity", 0);   
+           .style("opacity", 0)
+           .style("z-index", 0)
+           .style("pointer-events", "none");
 }
 
 
@@ -230,7 +232,9 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	var tooltip = d3.select('#matrix-track .tooltip');
 	tooltip.transition()        
 	 .duration(1000)      
-	 .style("opacity", .9);  
+	 .style("opacity", .9)
+	 .style("z-index", 20)
+	 .style("pointer-events", "all");
 
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to isolate variant"));
 

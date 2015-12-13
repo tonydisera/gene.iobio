@@ -1321,11 +1321,14 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	var me = this;
 	tooltip.transition()        
        .duration(1000)      
-       .style("opacity", 0);  
+       .style("opacity", 0);
+
 
     tooltip.transition()        
            .duration(1000)      
-           .style("opacity", .9);  
+           .style("opacity", .9)
+           .style("z-index", 20)
+           .style("pointer-events", "all");
 
 	 var w = 300;
 	 var h = tooltip[0][0].offsetHeight;
