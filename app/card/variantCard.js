@@ -1016,7 +1016,6 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
     $('#matrix-track').removeClass("hide");
 	// todo $('#variant-control-track').removeClass("hide");
 	if (firstTimeShowVariants) {
-		showSidebar("Filter");
 		firstTimeShowVariants = false;
 	}
 
@@ -1767,7 +1766,7 @@ VariantCard.prototype._unpinRow = function(pinMessage) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
 	if (window.clickedVariant) {
-		return '<div class="row" style="margin-bottom: -2px;margin-top: 18px !important;font-size: 11px;">'
+		return '<div class="row" style="margin-bottom: -2px;margin-top: 24px !important;font-size: 11px;">'
 		  + '<div class="col-md-4" style="text-align:left;">' +  '<a href="javascript:void(0)">Examine </a>' +  '</div>'
 		  + '<div class="col-md-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
 		  + '<div class="col-md-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'

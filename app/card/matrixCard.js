@@ -230,10 +230,10 @@ MatrixCard.prototype.hideTooltip = function() {
 
 MatrixCard.prototype.showTooltip = function(variant) {
 	var tooltip = d3.select('#matrix-track .tooltip');
+	tooltip.style("z-index", 20);
 	tooltip.transition()        
 	 .duration(1000)      
-	 .style("opacity", .9)
-	 .style("z-index", 20)
+	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
 
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to isolate variant"));

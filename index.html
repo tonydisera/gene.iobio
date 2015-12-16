@@ -109,71 +109,21 @@
 
 
 
-  <div id="slider-left" class="hide fade-in shadow-z-2" style="text-align:center">
 
-    <div style="background-color:white;margin-bottom:5px;padding-bottom:5px;" class="" >
-
-
-                <a href="javascript:void(0)" id="button-show-filters" class="sidebar-button selected btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Filter')">     
-                  <i class="material-icons" style="font-size: 18px;">donut_small</i>          
-                      Filter
-                </a>
-
-
-                <a href="javascript:void(0)" id="button-show-bookmarks" class="sidebar-button btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Bookmarks')">       
-                 <i class="material-icons" style="font-size: 18px;">bookmark</i>                
-                    Bookmarks 
-                </a>
-
-
-                <a href="javascript:void(0)" id="button-show-examine" class="sidebar-button btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Examine')">       
-                 <i class="material-icons" style="font-size: 18px;">my_location</i>                
-                    Examine
-                </a>
-
-                <a href="javascript:void(0)" 
-                  id="button-find-missing-variants" 
-                  class="sidebar-button hide btn btn-default btn-raised icon-button " 
-                  style="margin-bottom:0px;margin-left:4px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px;"
-                  onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Recall');callVariants()">
-                    <i style="font-size:18px;" class="mdi-action-find-in-page"></i>
-                    Call from alignments
-                </a>
-
-
-
-                <a href="javascript:void(0)" id="button-show-phenolyzer" class="sidebar-button btn btn-default btn-raised icon-button" style="margin-bottom:0px;padding-top:2px;padding-bottom:1px;padding-left: 1px;padding-right: 5px;font-size:11px" onclick="$('.sidebar-button').removeClass('selected');$(this).addClass('selected');showSidebar('Phenolyzer')">       
-                 <i class="material-icons" style="font-size: 18px;">format_list_numbered</i>                
-                    Phenolyzer
-                </a>
-
-
-    </div>
-
-
-
+  <div id="slider-left" class="hide fade-in " style="text-align:center">
      
-    <div id="slider-left-content"  style="height:100%;background-color:white;padding-top:5px;">
+    <div id="slider-left-content"  style="height:100%;width:215px;background-color:white;padding:5px;">
     </div>
   </div>
  <div id="slide-buttons" >
-  <div id="side-slide-button" onclick="showSlideLeft()" class="slide-button shadow-z-2">   
-      <i class="mdi-navigation-chevron-right" style="font-size: 30px;color: gray;font-weight: bold;"></i>
-  </div>
   <div id="close-slide-left" class="close-button shadow-z-2 fade-in hide">
-        <i class="mdi-navigation-chevron-left" style="font-size: 30px;color: gray;font-weight: bold;"></i>
+        <i class="mdi-navigation-close" style="font-size: 24px;color: gray;font-weight: bold;"></i>
   </div>
 
 </div>
 
 
-  <div id="slider-top" class="hide fade-in">
-
-  </div>
-  <div id="close-slide-top" class="close-button fade-in hide shadow-z-2">
-     X
-  </div>
-
+ 
 
 
 <!-- Data Modal -->
@@ -263,7 +213,7 @@
 </div>
 
 
- <div id="container" class="push" style="margin-top:-5px !important;">
+ <div id="container" class="push" style="margin-left:30px;margin-top:-5px !important;">
 
     <div id="nav-section" class="shadow-z-2">
 
@@ -697,7 +647,7 @@
 
  
 
-    <div id="footer" class="footer text-center shadow-z-2" >
+    <div id="footer" class="footer text-center" >
       <div class="poweredbyheader">gene.iobio is powered by</div>
       <div>
         <a class="poweredby" href="http://phenolyzer.usc.edu/">Phenolyzer</a>

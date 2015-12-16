@@ -24,6 +24,7 @@ var phenolyzerTemplateHTML = null;
 var bookmarkTemplateHTML = null;
 var examineTemplateHTML = null;
 var recallTemplateHTML = null;
+var iconbarTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -130,6 +131,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
 		recallTemplateHTML = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/iconbarTemplate.hbs').then(function(compiledTemplate) {
+		iconbarTemplate = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		init();
@@ -172,6 +176,7 @@ function init() {
 	
 
     // Slide out panels
+    $(iconbarTemplate()).insertBefore("#slider-left");
 	$('#select-gene-source').chosen({width: "140px;float:left;margin-left:20px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
 	$('#slider-left-content').html(filterCardTemplateHTML);		
 	$('#slider-left-content').append(phenolyzerTemplateHTML);
@@ -340,6 +345,7 @@ function init() {
 	showPhenolyzerSlideLeft();
 	*/
 	
+	$('.sidebar-button.selected').removeClass("selected");
 
 	loadGeneFromUrl();
 }
@@ -364,12 +370,9 @@ function whichTransitionEvent(){
 }
 
 
-function adjustDatacardSlider() {
+function readjustCards() {
 	var top = +$('#nav-section').height();
-	var sliderTopHeight = +$('#slider-top').height();
-	$('#slider-top').css('top', top);	
-	$('#close-slide-top').css('top', (top + sliderTopHeight) - 37);	
-	//$('#track-section').css('padding-top', (top + sliderTopHeight) + 5);	
+	d3.select('#track-section').style("padding-top", top + "px");
 }
 
 function changeSidebar(sidebar) {
@@ -423,21 +426,19 @@ function showDataDialog() {
 function showSlideLeft() {
 
 
-	$('#slider-top').addClass("hide");
 	$('#slider-left').removeClass("hide");
 	$('.footer').addClass("hide");
-	$('#side-slide-button').addClass("hide");
 	$('#close-slide-left').removeClass("hide");
 
 
 	resizeCardWidths();
 
 	$('#container').toggleClass('slide-left');
+	$('#nav-section').css("left", "0px");
 
 	var transitionEvent = whichTransitionEvent();
 	$('.slide-left').one(transitionEvent, function(event) {
-		var h = $("#nav-section").height();
-		$('#track-section').css("padding-top", h + "px");
+		readjustCards();
 	});
 
 }
@@ -486,31 +487,28 @@ function resizeCardWidths() {
 		sliderWidth = +$('#slider-left').width();
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - 10);
+	$('#container').css('width', windowWidth - sliderWidth - 40);
 	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - 35);
 	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - 35);
 }
 
 function closeSlideLeft() {
+	$('#nav-section').css("left", "36px");
 	$('.footer').removeClass("hide");
 	$('.slide-button').removeClass("hide");
 	$('#close-slide-left').addClass("hide");
-	$('#close-slide-top').addClass("hide");
 	$('#slider-left').addClass("hide");
-	$('#slider-top').addClass("hide");
 
 	$('#slide-buttons').removeClass('slide-left');
 	$('#container').removeClass('slide-left');
+	$('.sidebar-button.selected').removeClass("selected");
 
-	$('#slide-buttons').removeClass('slide-top');
-	$('#track-section').removeClass('slide-top');	
 
 	resizeCardWidths();
 
 	var transitionEvent = whichTransitionEvent();
 	$('#container').one(transitionEvent, function(event) {
-		var h = $("#nav-section").height();
-		$('#track-section').css("padding-top", h + "px");
+		readjustCards();
 	});
 
 }
@@ -558,13 +556,6 @@ function getProbandVariantCard() {
 	return probandCard;
 }
 
-
-function onCollapseTranscriptPanel() {
-	transcriptCollapse = !transcriptCollapse;
-	d3.select('#track-section').style("padding-top", transcriptCollapse ? transcriptPanelHeight + "px" : "89" + "px");
-	d3.select('#transcript-dropdown-button').classed("hide", !transcriptCollapse);
-
-}
 
 function toggleSampleTrio(show) {
 	if (show) {
@@ -1735,8 +1726,8 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	$('#transcript-btn-group').removeClass("hide");
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
-	var h = d3.select("#nav-section").node().offsetHeight;
-	d3.select('#track-section').style("padding-top", h + "px");
+
+	readjustCards();
 
 
 	d3.select('#impact-scheme').classed("current", true);
@@ -1823,8 +1814,7 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 				 	},
 			 		function(theVariantCard) {
 			 			if (theVariantCard.getRelationship() == 'proband') {
-			 				var h = $("#nav-section").height();
-							$('#track-section').css("padding-top", h + "px");
+			 				readjustCards();
 			 			}
 			 			if (callbackVariantsDisplayed) {
 				 			callbackVariantsDisplayed(theVariantCard);
@@ -2102,9 +2092,9 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 
 					});
 				} else {
-					var windowWidth = $(window).width();
-					var filterPanelWidth = $('#filter-track').width();
-					$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+					//var windowWidth = $(window).width();
+					//var filterPanelWidth = $('#filter-track').width();
+					//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
 					probandVariantCard.determineMaxAlleleCount();
 					

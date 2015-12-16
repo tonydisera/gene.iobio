@@ -29,10 +29,6 @@ body {
     right: 0 !important;
 }
 
-.sidebar-button.selected  {
-   box-shadow: 0 6px 10px rgba(0,0,0,.23),0 10px 30px rgba(0,0,0,.19);
-   font-weight: bold !important;
-} 
 
 #phenolyzer-results rect {
     fill: rgb(204, 204, 204);
@@ -274,6 +270,7 @@ body {
 .footer {
   position: absolute;
   bottom: 0;
+  left:0;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
@@ -551,9 +548,9 @@ a, a:hover, a:focus {
 
 #nav-section {
   position:fixed;
-  width:100%;
+  left: 36px;
   z-index:2;
-  right:0px;
+  right:5px;
   background-color: white;
   margin-bottom: 8px;
   /*min-height: 160px;
@@ -834,12 +831,11 @@ section {
   margin-top: 8px;
 }
 #filter-track {
-  display: table-cell;
-  min-width: 260px;
+  max-width: 214px;
   margin-top: 0px;
   margin-bottom: 0px;
-
 }
+
 #matrix-track {  
   width: 100%;
   display: table-cell;
