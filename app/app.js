@@ -2081,6 +2081,8 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					compareVariantsToPedigree(function() {
 
 						probandVariantCard.determineMaxAlleleCount();
+
+						probandVariantCard.populateEffectFilters();
 						
 						probandVariantCard.refreshVariantChartAndMatrix();
 
@@ -2097,6 +2099,8 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
 
 					probandVariantCard.determineMaxAlleleCount();
+
+					probandVariantCard.populateEffectFilters();
 					
 					probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);	
 

@@ -1106,6 +1106,11 @@ VariantModel.prototype.determineMaxAlleleCount = function() {
 	theVcfData.maxAlleleCount = maxAlleleCount;	
 }
 
+VariantModel.prototype.populateEffectFilters = function(variants) {
+	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+	this._populateEffectFilters(theVcfData.features);
+}
+
 VariantModel.prototype._populateEffectFilters  = function(variants) {
 	variants.forEach( function(variant) {
 		for (effect in variant.effect) {

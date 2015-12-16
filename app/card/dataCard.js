@@ -396,7 +396,6 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 								         .find('option').remove();
 			$('#unaffected-sibs-select').find('option').remove();								         
 
-			window.adjustDatacardSlider();
 
 			// Add a blank option if there is more than one sample in the vcf file
 			if (sampleNames.length > 1) {
@@ -435,7 +434,6 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 			variantCard.setSampleName("");				
 			variantCard.setDefaultSampleName(null);
 			window.removeUrl('sample'+cardIndex);
-			window.adjustDatacardSlider();
 			
 			window.enableLoadButton();
 		}
@@ -500,7 +498,6 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 					             .append($("<option></option>"));
 					$('#unaffected-sibs-select').append($("<option></option>"));
 				}	
-				window.adjustDatacardSlider();
 
 				// Populate the sample names in the dropdown
 				sampleNames.forEach( function(sampleName) {
@@ -536,7 +533,6 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 				variantCard.setSampleName("");
 				variantCard.setDefaultSampleName(null);
 				window.removeUrl('sample'+cardIndex);
-				window.adjustDatacardSlider();
 
 
 				window.enableLoadButton();			

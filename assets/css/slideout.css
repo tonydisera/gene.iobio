@@ -86,11 +86,18 @@
   -moz-transition: width 0.6s ease;
   -ms-transition: width 0.6s ease;
   -o-transition: width 0.6s ease;
-  overflow: auto;
   /*background-color: #616161;*/
   /*background-color: #68839A;*/
    background-color: #768898;
 
+}
+
+#slider-left-content {
+  height:100%;
+  width:215px;
+  background-color:white;
+  padding:5px;
+  overflow-y: scroll;
 }
 
 #close-slide-left {

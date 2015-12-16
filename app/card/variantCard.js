@@ -1244,6 +1244,10 @@ VariantCard.prototype.determineMaxAlleleCount = function() {
 	this.model.determineMaxAlleleCount();
 }
 
+VariantCard.prototype.populateEffectFilters = function() {
+	this.model.populateEffectFilters();
+}
+
 
 
 VariantCard.prototype.promiseCompareVariants = function(theVcfData, compareAttribute, 
