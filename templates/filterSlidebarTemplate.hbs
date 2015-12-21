@@ -1,5 +1,5 @@
 <div id="filter-track">
-
+ <div class="card-label">Filter Variants</div>
  <div class="panel-group" id="accordion" style="background-color:white;" role="tablist" 
 aria-multiselectable="true">
   <!-- SnpEff/VEP Impact and Effect -->
@@ -492,6 +492,34 @@ aria-multiselectable="true">
   </div>
 
 
+ <!-- Coverage -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading9">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse"  href="#collapse9" aria-expanded="true" aria-controls="collapse9">
+          Coverage (minimum)
+        </a>
+      </h4>
+    </div>
+    <div id="collapse9" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading9">
+      <div class="panel-body">
+
+        <!-- coverage -->  
+        <div id="coverage-filter" style="text-align:left;width:150px;" >
+          
+          <input type="text" id="coverage-min" value="" style="width:20px;font-size: 9px;margin-bottom:1px">
+          X
+          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+          Go
+          </a>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+
 
 
  <!-- Regulatory -->
@@ -532,34 +560,6 @@ aria-multiselectable="true">
               <rect class="filter-symbol  mot_tf_binding_site_variant" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
 
-        </div>
-
-
-      </div>
-    </div>
-  </div>
-
-
- <!-- Coverage -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="heading9">
-      <h4 class="panel-title">
-        <a role="button" data-toggle="collapse"  href="#collapse9" aria-expanded="true" aria-controls="collapse9">
-          Coverage (minimum)
-        </a>
-      </h4>
-    </div>
-    <div id="collapse9" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading9">
-      <div class="panel-body">
-
-        <!-- coverage -->  
-        <div id="coverage-filter" style="text-align:left;width:150px;" >
-          
-          <input type="text" id="coverage-min" value="" style="width:20px;font-size: 9px;margin-bottom:1px">
-          X
-          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
-          Go
-          </a>
         </div>
 
 

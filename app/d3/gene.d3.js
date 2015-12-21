@@ -267,7 +267,7 @@ function geneD3() {
                     .on("mouseout", function(d) {
                       d3.select(this.parentNode).classed("selected", false);
                     });
-        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type, (d.isCanonical ? ' CANONICAL' : ''), (d.xref != null ? "(" + d.xref + ")": '')]] })
+        transcript.selectAll('.type').data(function(d) { return [[d.start, d.transcript_type, (d.isCanonical ? ' CANONICAL' : ''), (d.xref != null ? "(" + d.xref + ")": ''),  d.sort]] })
                   .enter().append('text')
                     .attr('class', 'type')
                     .attr('x', function(d) { return (geneD3_width - margin.left - margin.right) + 10 })

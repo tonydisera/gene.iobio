@@ -129,7 +129,7 @@ VariantModel.prototype.getVariantCount = function() {
 }
 
 VariantModel.prototype.summarizeDanger = function(theVcfData) {
-	dangerCounts = {HIGH: 0, MODERATE: 0, MODIFIER: 0, LOW: 0, CLINVAR: null, SIFT: null, POLYPHEN: null};
+	dangerCounts = {};
 	if (theVcfData == null || theVcfData.features.length == null) {
 		console.log("unable to summarize danger due to null data");
 		return dangerCounts;
@@ -138,35 +138,58 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	var polyphenClasses = {};
 	var clinvarClasses = {};
 	var impactClasses = {};
+	var consequenceClasses = {};
 	theVcfData.features.forEach( function(variant) {
-		var impactAttribute = matrixCard.getRowAttribute("Impact");
-		for (key in variant[impactAttribute]) {
-			if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {				
+	    for (key in variant.highestImpactSnpeff ) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
 	    		var types = impactClasses[key];
 	    		if (types == null) {
 	    			types = {};
 	    		}
-	    		types[variant.type] = variant.type;
+	    		var effectObject = variant.highestImpactSnpeff[key];
+	    		types[variant.type] = effectObject; // key = effect, value = transcript id
 	    		impactClasses[key] = types;	
-			}
-	    }
 
-		for (key in variant.vepSIFT) {
+	    	}
+	    }
+	    for (key in variant.highestImpactVep ) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
+	    		var types = consequenceClasses[key];
+	    		if (types == null) {
+	    			types = {};
+	    		}
+	    		var consequenceObject = variant.highestImpactVep[key];
+	    		types[variant.type] = consequenceObject; // key = consequence, value = transcript id
+	    		consequenceClasses[key] = types;	
+
+	    	}
+	    }
+	    for (key in variant.highestSIFT) {
 			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge == true) {
 				var clazz = matrixCard.siftMap[key].clazz;
 				var order = matrixCard.siftMap[key].value;
-	    		siftClasses[clazz] = order ;						
+				var siftObject = {};
+				siftObject[key] = variant.highestSIFT[key];
+				var dangerSift = new Object();
+				dangerSift[clazz] = siftObject;
+				dangerCounts.SIFT = dangerSift;
 			}
 	    }
-	    for (key in variant.vepPolyPhen) {
+	    for (key in variant.highestPolyphen) {
 	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge == true) {
 				var clazz = matrixCard.polyphenMap[key].clazz;
 				var order = matrixCard.polyphenMap[key].value;
-	    		polyphenClasses[clazz] = order ;			    		
+				var polyphenObject = {};
+				polyphenObject[key] = variant.highestPolyphen[key];
+				var dangerPolyphen = new Object();
+				dangerPolyphen[clazz] = polyphenObject;
+				dangerCounts.POLYPHEN = dangerPolyphen;
 	    	}
 	    }
 	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
+	    //if (variant.hasOwnProperty('highestClinvar')) {
 	    	for (key in variant.clinVarClinicalSignificance) {
+	    	//for (key in variant.highestClinvar) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge == true) {
 				    var clazz = matrixCard.clinvarMap[key].clazz;
 					var order = matrixCard.clinvarMap[key].value;
@@ -205,9 +228,9 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 		}
 	}
 	dangerCounts.IMPACT = getLowestImpact(impactClasses);
+	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
 	dangerCounts.CLINVAR = getLowestClazz(clinvarClasses);
-	dangerCounts.SIFT = getLowestClazz(siftClasses);
-	dangerCounts.POLYPHEN = getLowestClazz(polyphenClasses);
+	
 
 	return dangerCounts;
 }

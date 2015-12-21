@@ -1182,6 +1182,14 @@ var effectCategories = [
       variants.length = 0;
 
 
+      var appendTranscript = function(theObject, key, theTranscriptId) {
+        var transcripts = theObject[key];
+        if (transcripts == null) {
+          transcripts = {};
+        } 
+        transcripts[theTranscriptId] = theTranscriptId;
+        theObject[key] = transcripts;
+      }
 
 
       vcfRecs.forEach(function(rec) {
@@ -1240,6 +1248,7 @@ var effectCategories = [
             // svtype and snpEff annotations from the info field
             var effects = new Object();
             var impacts = new Object();  
+            var allSnpeff = new Object();
             var af = null;       
             var typeAnnotated = null;
             var combinedDepth = null;
@@ -1255,6 +1264,9 @@ var effectCategories = [
             // Existing_variation|DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|
             // SIFT|PolyPhen|HGVS_OFFSET|CLIN_SIG|SOMATIC|PHENO|
             // MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
+            var allVep = new Object();
+            var allSIFT = new Object();
+            var allPolyphen = new Object();
             var vepConsequence = new Object();
             var vepImpact = new Object();
             var vepFeatureType = new Object();
@@ -1306,26 +1318,39 @@ var effectCategories = [
                   // If we passed in an applicable transcript, grab the snpEff
                   // annotations pertaining to it.  Otherwise, just grab the
                   // first snpEff annotations listed.
+                  
+                  //EFF= Effect ( Effect_Impact | Functional_Class | Codon_Change | Amino_Acid_Change| Amino_Acid_Length | 
+                  //              Gene_Name | Transcript_BioType | Gene_Coding | Transcript_ID | Exon_Rank  | 
+                  //              Genotype_Number [ | ERRORS | WARNINGS ] )
                   var keep = false; 
                   if (selectedTranscriptID && token.indexOf(selectedTranscriptID) > -1) {
                     keep = true;
                   } 
 
-                  
+                  var stop = token.indexOf("(");
+                  var theEffect = token.substring(0, stop);
+
+                  var remaining = token.substring(stop+1,token.length);
+                  var effectTokens = remaining.split("|");
+                  var theImpact = effectTokens[0];   
+                  var theTranscriptId = effectTokens[8]; 
+
+                  // Map all impact to effects so that we can determine
+                  // the highest impact/effects for this variant, across
+                  // ALL transcripts for this variant.
+                  var effectsObject = allSnpeff[theImpact];
+                  if (effectsObject == null) {
+                    effectsObject = {};
+                  }
+                  appendTranscript(effectsObject, theEffect, theTranscriptId);
+                  allSnpeff[theImpact] = effectsObject;
 
                   if (keep) {
                     // Parse out the effect 
-                    var stop = token.indexOf("(");
-                    var theEffect = token.substring(0, stop); 
                     effects[theEffect] = theEffect;
 
                     // Parse out the impact
-                    var remaining = token.substring(stop+1,token.length);
-                    var impactTokens = remaining.split("|");
-                    var theImpact = impactTokens[0];    
-                    if (impactTokens.length > 0) {
-                      impacts[theImpact] = theImpact;                  
-                    }
+                    impacts[theImpact] = theImpact;                  
                   }
 
                   firstTime = false;
@@ -1399,6 +1424,43 @@ var effectCategories = [
                         valueUrl = reg.split("_").join(" ").toLowerCase();
                       }
                       regulatory[(featureType == 'RegulatoryFeature' ? "reg_" : "mot_") + regKey.toLowerCase()] = valueUrl;
+                    } 
+                    if (featureType == 'Transcript') {
+                      var theTranscriptId = feature;
+                      // Keep track of all VEP impact and consequence so that we can determine the highest impact
+                      // variant across all transcripts
+                      var theImpact = vepTokens[vepFields.IMPACT];
+                      var theConsequences = vepTokens[vepFields.Consequence];
+                      var siftString = vepTokens[vepFields.SIFT];
+                      var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
+                      var siftScore = siftString != null && siftString != "" ? siftString.split("(")[1].split(")")[0] : 99;
+                      var polyphenString = vepTokens[vepFields.PolyPhen];
+                      var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
+                      var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : 99;
+                      
+
+
+                      var consequencesObject = allVep[theImpact];
+                      if (consequencesObject == null) {
+                        consequencesObject = {};
+                      }
+                      appendTranscript(consequencesObject, theConsequences, theTranscriptId);                      
+                      allVep[theImpact] = consequencesObject;
+
+                      var siftObject = allSIFT[siftScore];
+                      if (siftObject == null) {
+                        siftObject = {};
+                      }
+                      appendTranscript(siftObject, siftDisplay, theTranscriptId);
+                      allSIFT[siftScore] = siftObject;
+
+                      var polyphenObject = allPolyphen[polyphenScore];
+                      if (polyphenObject == null) {
+                        polyphenObject = {};
+                      }
+                      appendTranscript(polyphenObject, polyphenDisplay, theTranscriptId);
+                      allPolyphen[polyphenScore] = polyphenObject;
+                      
                     }
 
                 });
@@ -1605,7 +1667,77 @@ var effectCategories = [
               clinvarAlt = clinvarAlt.substr(1,clinvarAlt.length-1);
             } 
 
+            var cullTranscripts = function(transcriptObject, theTranscriptId) {
+              // If the current transcript is included in the list,
+              // we don't have to identify individual transcripts.
+              for (var key in transcriptObject) {
+                var transcripts = transcriptObject[key];
+                var found = false;
+                for (var transcriptId in transcripts) {
+                  if (theTranscriptId.indexOf(transcriptId) == 0) {
+                    found = true;
+                  }
+                }
+                if (found) {
+                  transcriptObject[key] = {};
+                }
+
+              }
+              return transcriptObject;
+            }
+
+            var getHighestImpact = function(theObject, cullFunction, theTranscriptId) {
+              var theEffects = theObject['HIGH'];
+              if (theEffects) {
+                return {HIGH: cullFunction(theEffects, theTranscriptId)};
+              } 
+              theEffects = theObject['MODERATE'];
+              if (theEffects) {
+                return {MODERATE: cullFunction(theEffects, theTranscriptId)};
+              } 
+              theEffects = theObject['MODIFIER'];
+              if (theEffects) {
+                return {MODIFIER: cullFunction(theEffects, theTranscriptId)};
+              } 
+              theEffects = theObject['LOW'];
+              if (theEffects) {
+                return {LOW: cullFunction(theEffects, theTranscriptId)};
+              } 
+              return {};
+            }
+
+            var getLowestScore = function(theObject, cullFunction, theTranscriptId) {
+              var minScore = 99;
+              for( score in theObject) {
+                if (+score < minScore) {
+                  minScore = +score;
+                }
+              }
+              // Now get other entries with the same SIFT/Polyphen category
+              var categoryObject = theObject[minScore];
+              for (var category in categoryObject) {
+                for (var theScore in theObject) {
+                  var theCategoryObject = theObject[theScore];
+                  if (+theScore != +minScore && theCategoryObject[category] != null) {
+                    var theTranscripts = theCategoryObject[category];
+                    for (var transcriptId in theTranscripts) {
+                      appendTranscript(categoryObject, category, transcriptId);
+                    }
+                  }
+                }
+
+              }
+              theObject[minScore] = cullFunction(categoryObject, theTranscriptId);
+              return theObject[minScore];
+            }
+
             if (keepAlt) {
+
+              var highestImpactSnpeff = getHighestImpact(allSnpeff, cullTranscripts, selectedTranscriptID);
+              var highestImpactVep = getHighestImpact(allVep, cullTranscripts, selectedTranscriptID);
+              var highestSIFT = getLowestScore(allSIFT, cullTranscripts, selectedTranscriptID);
+              var highestPolyphen = getLowestScore(allPolyphen, cullTranscripts, selectedTranscriptID);
+
               variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
                 'strand': regionStrand, 
                 'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
@@ -1626,6 +1758,10 @@ var effectCategories = [
                 'phased': phased,
                 'effect': effects, 
                 'impact': impacts, 
+                'highestImpactSnpeff': highestImpactSnpeff,
+                'highestImpactVep': highestImpactVep,
+                'highestSIFT': highestSIFT,
+                'highestPolyphen': highestPolyphen,
                 'consensus': rec.consensus,
                 'inheritance': '',
                 'af1000glevel': '',

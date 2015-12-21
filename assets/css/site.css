@@ -119,10 +119,6 @@ body {
   visibility: hidden !important;
 }
 
-#bookmark-card {
-  padding: 5px;
-}
-
 #bookmark-card .bookmark {
   font-size: 10px;
   cursor: pointer;
@@ -152,18 +148,13 @@ body {
     transition: box-shadow .28s cubic-bezier(.4,0,.2,1);
 }
 #copy-paste-li,
-#phenolyzer-li {
+#phenolyzer-search-box {
       color: rgb(132,132,132) !important;
       font-size: 11px;
 }
 #get-genes-copy-paste-button,
 #phenolyzer-go-button {
       font-size: 11px;  
-}
-
-#gene-badge-danger-count {  
-  font-size: 10px;
-  /*padding-bottom: 6px;*/
 }
 
 .btn.btn-fab {
@@ -179,11 +170,30 @@ body {
 {
   font-weight: bold; 
 }
+
+#gene-badge-loaded {
+  font-size: 14px;
+  color: green;
+  font-weight: bold;
+  padding-right: 1px;
+  float: left;
+  display: none;
+}
+#gene-badge.visited #gene-badge-loaded {
+  display: inline;
+}
+
 #gene-badge.visited #gene-badge-name {
   color: #5d809d !important;
 }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible !important;
+}
+
+#gene-badge-container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
 }
 
 #gene-badge-container #gene-badge-remove .mdi-content-clear {
@@ -270,11 +280,11 @@ body {
 .footer {
   position: absolute;
   bottom: 0;
-  left:0;
+  left:36px;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
-  background-color: #616161;
+  background-color: #5B7C98;
 }
 
 .card-label {
@@ -672,16 +682,16 @@ section {
 
  .tooltip rect.alt-count, 
  .tooltip rect.ref-count {
-  stroke: black;
+  stroke: black !important;
  }
  .tooltip rect.ref-count {
-   fill:none;
+   fill:none !important;
  }
 .tooltip rect.alt-count {
-    fill: rgb(93, 128, 157);
+    fill: rgb(93, 128, 157) !important;
 }
 .tooltip text.alt-count {
-  fill: white;
+  fill: white !important;
 }
 
 .poweredbyheader {
@@ -717,7 +727,6 @@ section {
     font-family: Quicksand;
     float: left;
     margin-top: -8px;
-    margin-left: 25px;
 }
 
 .iobioproject {
@@ -799,8 +808,6 @@ section {
   margin-top: 15px;
   margin-bottom: 0px;
   padding-bottom: 0px;
-  padding-left: 14px;
-  padding-right: 14px;
   clear: both;
 }
 

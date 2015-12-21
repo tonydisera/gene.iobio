@@ -116,7 +116,7 @@
     </div>
   </div>
  <div id="slide-buttons" >
-  <div id="close-slide-left" class="close-button shadow-z-2 fade-in hide">
+  <div id="close-slide-left" class="close-button fade-in hide">
         <i class="mdi-navigation-close" style="font-size: 24px;color: gray;font-weight: bold;"></i>
   </div>
 
@@ -265,64 +265,11 @@
 
             <!-- Button data modal -->
             <button type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
-              <i class="material-icons" style="font-size: 18px;">settings_applications</i>      
+              <i class="material-icons" style="font-size: 18px;">input</i>      
               Data
             </button>
 
-            <!-- get genes dropdown button -->
-            <div id="get-genes-dropdown" class="" style="width:95px;float:right;">
-              <div class="btn-toolbar">
-                <div class="btn-group"  style="display:inline;margin-top: 15px;">
-
-                  <button type="button"  style="font-size:11px;width:100px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                  <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
-                    Define Genes <span class="caret"></span>
-                  </button>
-
-                  <ul class="dropdown-menu " role="menu">
-                    <li id="copy-paste-li">
-                      <div style="padding-left:20px;padding-right:20px;padding-top:3px;padding-bottom:3px;">
-                        <div>Copy/Paste</div>
-                        <textarea style="width:230px;height:100px" id="genes-to-copy"></textarea>
-                        <div style="text-align:right">
-                          <button id="get-genes-copy-paste-button" 
-                          type="submit"
-                          onclick="copyPasteGenes()" 
-                          class="icon-button-sm btn btn-default btn-raised" 
-                          style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
-                            Done
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li id="phenolyzer-li">
-                      <div style="padding-left:20px;padding-right:20px;padding-top:3px;padding-bottom:3px;">
-                        <div>Phenolyzer</div>
-                        <textarea style="width:230px;height:30px" id="phenolyzer-search-terms"></textarea>
-                        <div style="text-align:right">
-                          <button id="phenolyzer-go-button" 
-                          type="submit"
-                          onclick="getPhenolyzerGenes()" 
-                          class="icon-button-sm btn btn-default btn-raised" 
-                          style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
-                            Done
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-
-
-                    <li class="todo hide "><a href="">Upload</a></li>
-                    <li class="todo hide"><a href="">Phenomizer</a></li>
-                  </ul>
-                </div>
-              </div>
-           </div>
-
-         
-
-
+  
           </div>
 
 
@@ -415,16 +362,13 @@
 
     <div id="track-section" class="push" style="margin-top:5px;">
 
-      <div id="filter-and-rank-card" class="hide">
-
-
         <div id="matrix-track"  class="track-expand shadow-z-2 hide">
             
-              <span class="card-label" style="margin-left:15px;">Rank Variants</span>
+              <span class="card-label" style="margin-left:5px;">Rank Variants</span>
 
 
     
-            <div id="matrix-panel"  style="clear:both;margin-top:-14px;margin-left:5px;"
+            <div id="matrix-panel"  style="clear:both;margin-top:-14px;"
               class="fullview" aria-expanded="true">
                 <div class="loader">
                     <span class="loader-label">Ranking variants</span>
@@ -432,7 +376,7 @@
                 </div>
 
 
-              <div id="feature-matrix" style="overflow-x: auto;">
+              <div id="feature-matrix" style="overflow-x: scroll;">
               </div>
 
               <div id="feature-matrix-note" class="hide" style="padding-left: 155px;font-size:12px;margin-top:-6px;">
@@ -843,6 +787,7 @@
 <script src="app/card/dataCard.js"></script>
 <script src="app/card/matrixCard.js"></script>
 <script src="app/card/filterCard.js"></script>
+<script src="app/card/genesCard.js"></script>
 <script src="app/card/bookmarkCard.js"></script>
 <script src="app/card/variantCard.js"></script>  
 

@@ -1,0 +1,67 @@
+<div id="genes-card" class="hide">
+    <div class="card-label" >Genes</div>
+
+    <div id="get-genes-dropdown" class="" style="margin-top:-15px;width: 125px;">
+      <div class="btn-toolbar">
+        <div class="btn-group" style="display:inline;">
+
+          <button type="button" style="font-size: 11px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <i class="mdi-action-assignment" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>Import Gene set<span style="margin-left:6px" class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu " role="menu">
+            <li id="copy-paste-li">
+              <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
+                <div>Copy/Paste</div>
+                <textarea style="width:200px;height:100px" id="genes-to-copy"></textarea>
+                <div style="text-align:right">
+                  <button id="get-genes-copy-paste-button" type="submit" onclick="copyPasteGenes()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
+                    Done
+                  </button>
+                </div>
+              </div>
+            </li>
+
+            <li class="todo hide "><a href="">Upload</a></li>
+            <li class="todo hide"><a href="">Phenomizer</a></li>
+          </ul>
+        </div>
+      </div>
+   </div>
+
+    <div id="phenolyzer-search-box" style="margin-top:10px;">
+      <div>
+        <div style="" class="badge-label">Phenolyzer</div>
+        <div style="margin-top: 5px;"class="">Enter phenotype</div><textarea style="width:205px;height:30px" id="phenolyzer-search-terms"></textarea>
+        <div style="text-align:right">
+          
+        <button id="phenolyzer-go-button" type="submit" onclick="getPhenolyzerGenes()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
+           Run
+        </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- loader gif for phenolyzer -->
+    <div class="phenolyzer loader hide" style="padding-top: 17px;">
+        <span class="loader-label">Running Phenolyzer...</span>
+        <img src="assets/images/wheel.gif"/>
+    </div>
+
+
+	<div id="phenolyzer-heading" class="hide">
+ 	 	<div style="color:rgb(132,132,132);width: 60px;float: left;margin-left: 10px;font-size:12px;">Gene</div>
+  		<div style="color:rgb(132,132,132);float: left;font-size:12px;">Phenolyzer score</div>
+  	</div>
+
+    <div id="phenolyzer-results" style="clear:both;padding-top:7px;">
+    </div>
+
+    <div id="phenolyzer-timeout-message" class="hide alert alert-dismissable alert-info" style="background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: left;margin-left: 10px;margin-right: 10px;">
+
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Warning:  </strong>The Phenolyzer services was unable to return results within 45 seconds.  Consider using a more exact search term.
+
+    </div>
+
+</div>
