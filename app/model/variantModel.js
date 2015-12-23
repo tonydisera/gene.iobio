@@ -580,18 +580,6 @@ VariantModel.prototype.getMatchingVariant = function(variant) {
 }
 
 
-/*
- * Load variant data only (for unaffected sibs). 
- * no variant card display
- */
-VariantModel.prototype.loadVariantsOnly = function(callback) {
-	var me = this;
-	this.promiseGetVariants( regionStart, regionEnd, function() {
-		callback(me);
-	} );
-}
-
-
 /* 
 * A gene has been selected. Clear out the model's state
 * in preparation for getting data.
@@ -727,28 +715,61 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariantsOnly = function() {
+VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
 
+		// First the gene vcf data has been cached, just return
+		// it.  (No need to retrieve the variants from the iobio service.)
+		var vcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
+		if (vcfData != null && vcfData != '') {
+			me.vcfData = vcfData;
+	    	
+			resolve(me.vcfData);
+		} else {			
+			me.vcf.promiseGetVariants(
+			   me.getVcfRefName(theGene.chr), 
+			   theGene.start, 
+		       theGene.end, 
+		       theGene.strand, 
+		       theTranscript,
+		       me.sampleName,
+		       window.geneSource == 'refseq' ? true : false
+		    ).then( function(data) {
+		    	var annotatedRecs = data[0];
+		    	var data = data[1];	
+		    	data.name = me.name;
+		    	data.relationship = me.relationship;    	
 
-		me.vcf.promiseGetVariants(
-		   me.getVcfRefName(window.gene.chr), 
-		   window.gene.start, 
-	       window.gene.end, 
-	       window.gene.strand, 
-	       window.selectedTranscript,
-	       me.sampleName,
-	       window.geneSource == 'refseq' ? true : false
-	    ).then( function(data) {
-	    	var annotatedRecs = data[0];
-	    	me.vcfData = data[1];	
-	    	me.vcfData.name = me.name;
-	    	me.vcfData.relationship = me.relationship;    	
+		    	// Associate the correct gene with the data
+		    	var theGeneObject = null;
+		    	for( var key in window.geneObjects) {
+		    		var geneObject = geneObjects[key];
+		    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+		    			geneObject.start == data.start &&
+		    			geneObject.end == data.end &&
+		    			geneObject.strand == data.strand) {
+		    			theGeneObject = geneObject;
+		    			data.gene = theGeneObject;
+		    		}
+		    	}
+		    	if (theGeneObject) {
+			    	// Cache the data
+			    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+			    	me.vcfData = data;		    	
+					resolve(me.vcfData);
 
-	    	resolve(me.vcfData);
-		});
+		    	} else {
+		    		alert("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
+		    		reject();
+		    	}
+
+
+		    	resolve(me.vcfData);
+			});
+		}
+
 
 	});
 

@@ -447,7 +447,7 @@ VariantCard.prototype.endVariantProgress = function() {
  * no variant card display
  */
 VariantCard.prototype.loadVariantsOnly = function(callback) {
-	this.model.promiseGetVariantsOnly().then( function(data) {
+	this.model.promiseGetVariantsOnly(window.gene, window.selectedTranscript).then( function(data) {
 		callback(data);
 	});
 }
