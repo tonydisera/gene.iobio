@@ -731,11 +731,11 @@ MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 
 MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(0,0)")
+	         .attr("transform", options ? options.transform : "translate(-1,0)")
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", options ? options.width : "25")
-	         .attr("height", options ? options.height : "25")
+	         .attr("width", options ? options.width : "26")
+	         .attr("height", options ? options.height : "26")
 	         .style("pointer-events", "none");
 	
 };
@@ -745,15 +745,15 @@ MatrixCard.prototype.showUnaffectedSymbol = function (selection, options) {
 	         .attr("transform", options ? options.transform : "translate(0,2)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options ? options.width : "27")
-	         .attr("height", options ? options.height : "27")
+	         .attr("width", options ? options.width : "25")
+	         .attr("height", options ? options.height : "25")
 	         .style("pointer-events", "none");
 
 	selection.append("line")
-	         .attr("x1", 5)
-	         .attr("y1", 5)
-	         .attr("x2", 20)
-	         .attr("y2", 20)
+	         .attr("x1", 3)
+	         .attr("y1", 3)
+	         .attr("x2", 19)
+	         .attr("y2", 19)
 	         .style("stroke-width", "2.5px")
 	         .style("stroke", "rgba(168, 170, 177, 0.81)");
 

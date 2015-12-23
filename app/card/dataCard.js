@@ -132,7 +132,7 @@ DataCard.prototype.init = function() {
 		
 		
 		// Clear the cache
-		clearCache();
+		//clearCache();
 
 
 		var unaffectedSibs = $("#unaffected-sibs-select").chosen().val();
@@ -141,6 +141,7 @@ DataCard.prototype.init = function() {
 		window.enableCallVariantsButton();
 
 		window.loadTracksForGene();		
+
 	});
 
 

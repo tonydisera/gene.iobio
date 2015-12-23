@@ -448,7 +448,7 @@ VariantCard.prototype.endVariantProgress = function() {
  */
 VariantCard.prototype.loadVariantsOnly = function(callback) {
 	this.model.promiseGetVariantsOnly().then( function(data) {
-		callback();
+		callback(data);
 	});
 }
 
@@ -1231,11 +1231,6 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		}
 	}
 	return filteredData;
-
-}
-
-VariantCard.prototype.determineUnaffectedSibsStatus = function() {
-	this.model.determineUnaffectedSibsStatus();
 
 }
 

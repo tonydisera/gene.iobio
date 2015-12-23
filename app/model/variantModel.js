@@ -84,16 +84,6 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 		data = this._getCachedData("vcfData", geneObject.gene_name, selectedTranscript);
 		if (data != null && data != '') {
 			me.vcfData = data;
-			//me._populateEffectFilters(me.vcfData.features);
-
-			// Determine inheritance (once full trio is loaded)
-			/*
-			promiseDetermineInheritance().then(function() {
-
-			}, function(error) {
-				console.log("an error occurred when determine inheritance. " + error);
-			});
-			*/
 		}
 	} 
 	return data;
@@ -753,7 +743,9 @@ VariantModel.prototype.promiseGetVariantsOnly = function() {
 	       window.geneSource == 'refseq' ? true : false
 	    ).then( function(data) {
 	    	var annotatedRecs = data[0];
-	    	me.vcfData = data[1];	    	
+	    	me.vcfData = data[1];	
+	    	me.vcfData.name = me.name;
+	    	me.vcfData.relationship = me.relationship;    	
 
 	    	resolve(me.vcfData);
 		});
@@ -776,16 +768,6 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 			// Flag any bookmarked variants
 		    bookmarkCard.determineVariantBookmarks(vcfData, theGene);
-
-
-			// Determine inheritance (once full trio is loaded)
-			/*
-			promiseDetermineInheritance().then(function() {
-
-			}, function(error) {
-				console.log("an error occurred when determine inheritance. " + error);
-			})
-*/
 
 
 		    // Invoke callback now that we have annotated variants
@@ -1029,15 +1011,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		    		onVcfData(theVcfData);
 		    	}
 		    	
-		    	// Determine inheritance (once full trio is loaded)
-		    	/*
-				promiseDetermineInheritance().then(function() {
-
-				}, function(error) {
-					console.log("an error occurred when determine inheritance. " + error);
-				})
-				*/
-
+		
 		    	// Get the clinvar records (for proband, mom, data)
 		    	// 
 		    	if (me.getRelationship() != 'sibling') {
@@ -1078,31 +1052,6 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 
 	});
 
-
-}
-
-
-VariantModel.prototype.determineUnaffectedSibsStatus = function() {
-	this.vcfData.features.forEach( function(variant) {
-		 variant.ua = "none";
-		 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
-		 	 var matchesCount = 0;
-		 	 var matchesHomCount = 0;
-			 Object.keys(variant.uasibsZygosity).forEach( function(key) {
-			 	matchesCount++;
-			 	var sibZygosity = variant.uasibsZygosity[key];
-			 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
-				 	matchesHomCount++;
-			 	}
-			 });
-
-			 if (matchesHomCount > 0 ) {
-			 	variant.ua = "none";
-			 } else {
-			 	variant.ua = "not_recessive_in_sibs";
-			 }  	 	 
-		 } 
-	});
 
 }
 

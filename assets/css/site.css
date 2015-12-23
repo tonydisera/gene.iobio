@@ -1,4 +1,4 @@
-
+∂denov
 
 body {
   font-family: 'Quattrocento Sans', sans-serif;
@@ -505,28 +505,44 @@ a, a:hover, a:focus {
 
 
 
+
+
+
 #recessive-symbol .parent .left {
-  stroke: #FB7737;
+  stroke: rgb(173, 73, 74);
+  stroke-width: 2.5;
 }
 #recessive-symbol .parent .right {
-  stroke: grey;
-  stroke-width: 1;
+  stroke: gray;
+  stroke-width: 2;
 }
 #recessive-symbol .proband .left,
 #recessive-symbol .proband .right {
-  stroke: #FB7737;
+  stroke: rgb(173, 73, 74);
+  stroke-width: 2.5;
 }
 
 #denovo-symbol .parent .left {
   stroke: grey;
+  stroke-width: 1.5;
 }
 #denovo-symbol .parent .right {
   stroke: grey;
+  stroke-width: 1.5;
 }
 #denovo-symbol .proband .left,
 #denovo-symbol .proband .right {
-  stroke: #E0292B;
+ /*stroke: rgb(111, 182, 180);*/
+ stroke:  #81A966 !important;
+ fill: none;
+  stroke-width: 3;
 }
+
+/* Trio button in data card */
+#trio-symbol .parent .left {
+  stroke: #5d809d;
+}
+
 
 /* Trio button in data card */
 #trio-symbol .parent .left {

@@ -4,8 +4,8 @@
 //var geneiobio_server = "http://localhost:3000/";
 //var geneiobio_server = "http://geneinfo.iobio.io/";
 var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
-//var phenolyzerServer = "http://nv-dev.iobio.io/phenolyzer/"
-var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
+var phenolyzerServer = "http://nv-dev.iobio.io/phenolyzer/"
+//var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
 
 
 // Engine for gene search suggestions
@@ -1247,9 +1247,10 @@ function addGeneBadge(geneName, bypassSelecting) {
 	if ($(selector).length == 0) {
 		$('#gene-badge-container').append(geneBadgeTemplate());
 		$("#gene-badge-container #gene-badge:last-child").find('#gene-badge-name').text(geneName);
-		d3.select(selector).data([geneName]);
-		d3.select(selector).on("mouseover", function(d,i) {
-			var geneAnnot = geneAnnots[d];
+		d3.select($(selector)).data([geneName]);
+		$(selector).mouseover(function() {
+			var geneName = d3.select(this).text();
+			var geneAnnot = geneAnnots[geneName];
 			d3.select(this.parentNode.parentNode).select("#gene-badge-button").attr('title', geneAnnot.description + " - " + geneAnnot.summary);						
 
 		});
@@ -1515,8 +1516,8 @@ function clearCache() {
 	
 	window.geneObjects = {};
 	window.geneAnnots = {};
-	window.gene = null;
-	window.selectedTranscript = null;
+	//window.gene = null;
+	//window.selectedTranscript = null;
 	window.genesToCache = [];
 }
 
@@ -2085,8 +2086,8 @@ function loadUnaffectedSibs(unaffectedSibs) {
 
 			variantCardsUnaffectedSibs.push(variantCard);
 
-			variantCard.loadVariantsOnly(function(vc) {
-			});
+			//variantCard.loadVariantsOnly(function(vc) {
+			//});
 
 		});		
 	}
@@ -2108,6 +2109,7 @@ function loadUnaffectedSibs(unaffectedSibs) {
  *
  */
 function promiseDetermineInheritance(promise, onVariantsDisplayed) {	
+
 	return new Promise( function(resolve, reject) {
 		var thePromise = null;
 		if (promise == null) {
@@ -2118,6 +2120,20 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 		thePromise().then( function(probandVariantCard) {
 			if (!fulfilledTrioPromise) {
 				fulfilledTrioPromise = true;
+
+				var probandVcfData = null;
+				var motherVcfData = null;
+				var fatherVcfData = null;
+				variantCards.forEach( function(variantCard) {
+					if (variantCard.getRelationship() == 'proband') {
+						probandVcfData = variantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript); 
+					} else if (variantCard.getRelationship() == 'mother') {
+						motherVcfData = variantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript); 
+					} else if (variantCard.getRelationship() == 'father') {
+						fatherVcfData = variantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript); 
+					}
+				});
+
 				if (dataCard.mode == 'trio') {
 					var windowWidth = $(window).width();
 					var filterPanelWidth = $('#filter-track').width();
@@ -2126,7 +2142,8 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
-					compareVariantsToPedigree(function() {
+					var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
+					trioModel.compareVariantsToMotherFather(function() {
 
 						probandVariantCard.determineMaxAlleleCount();
 
@@ -2134,18 +2151,16 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 						
 						probandVariantCard.refreshVariantChartAndMatrix();
 
-						determineUnaffectedSibStatus();
+						determineUnaffectedSibStatus(trioModel, function() {
+							probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);
 
-						probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);
+							resolve();
 
-						resolve();
+						});
+
 
 					});
 				} else {
-					//var windowWidth = $(window).width();
-					//var filterPanelWidth = $('#filter-track').width();
-					//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
-
 					probandVariantCard.determineMaxAlleleCount();
 
 					probandVariantCard.populateEffectFilters();
@@ -2187,10 +2202,11 @@ function promiseFullTrio() {
 			}
 		});
 
-		var uaSibsLoaded = false;
-		if (uaCount == variantCardsUnaffectedSibs.length) {
-			uaSibsLoaded = true;
-		}
+		//var uaSibsLoaded = false;
+		//if (uaCount == variantCardsUnaffectedSibs.length) {
+		//	uaSibsLoaded = true;
+		//}
+		var uaSibsLoaded = true;
 
 		if (dataCard.mode == 'trio' && loaded.proband != null
 		    && loaded.mother  != null && loaded.father != null 
@@ -2230,28 +2246,30 @@ function promiseFullTrioCalledVariants() {
 
 }
 
-function determineUnaffectedSibStatus() {
+function determineUnaffectedSibStatus(trioModel, onStatusUpdated) {
 	// Now compare the unaffected sibs to the variant to flag variants
 	// common to unaffected sibs + proband
 	variantCardsUnaffectedSibsTransient = [];
 	variantCardsUnaffectedSibs.forEach( function(vc) {
 		variantCardsUnaffectedSibsTransient.push(vc);
 	})
-	nextCompareToUnaffectedSib();
+	var unaffectedSibs = [];
+	nextLoadUnaffectedSib(trioModel, unaffectedSibs, onStatusUpdated);
 
-	getProbandVariantCard().determineUnaffectedSibsStatus();
 }
 
-function nextCompareToUnaffectedSib() {
+function nextLoadUnaffectedSib(trioModel, unaffectedSibs, onStatusUpdated) {
 	if (variantCardsUnaffectedSibsTransient.length > 0) {
 		variantCard = variantCardsUnaffectedSibsTransient.shift();
 
-		variantCard.loadVariantsOnly( function(vc) {
-			promiseComparedToUnaffectedSib(variantCard).then( function() {
-				nextCompareToUnaffectedSib();
-			});
+		variantCard.loadVariantsOnly( function(vcfData) {
+			unaffectedSibs.push(vcfData)
+			nextLoadUnaffectedSib(trioModel, unaffectedSibs, onStatusUpdated);
 		});		
-	} 
+	} else {
+		trioModel.determineUnaffectedSibsStatus(unaffectedSibs, onStatusUpdated);
+
+	}
 }
 
 function enableLoadButton() {
