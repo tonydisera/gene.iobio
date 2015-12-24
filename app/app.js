@@ -346,7 +346,7 @@ function whichTransitionEvent(){
 
 function readjustCards() {
 	var top = +$('#nav-section').height();
-	d3.select('#track-section').style("padding-top", top + "px");
+	d3.select('#track-section').style("padding-top", top+5 + "px");
 }
 
 function changeSidebar(sidebar) {
@@ -2018,9 +2018,7 @@ function showTranscripts(regionStart, regionEnd) {
 
 	d3.select("#gene-viz .x.axis .tick text").style("text-anchor", "start");
 
-	// update track starting position after transcripts have been rendered
-	var h = d3.select("#nav-section").node().offsetHeight;
-	d3.select('#track-section').style("padding-top", h + "px");
+	window.readjustCards();
 }
 
 function getTranscriptSelector(selectedTranscript) {
