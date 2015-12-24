@@ -45,6 +45,10 @@
     box-shadow: none !important;
 }
 
+#slider-left .card-label {
+  display:none;
+}
+
 
 .close-button {
    padding-top:3px;  
@@ -119,6 +123,8 @@
   width: 34px !important;
   white-space: normal !important;
   line-height: 13px !important;
+  /*background-color: #5C6B88 !important;*/
+  background-color: #4C6880 !important;
 
 }
 
@@ -142,28 +148,28 @@
 }
 
 .sidebar-button.selected {
-    background-color: white !important;
-    width: 37px !important;
+    background-color: #3773A7 !important;
+    color: white !important;
     font-weight: bold !important;
-    box-shadow: 0 6px 10px rgba(0,0,0,.32),0 10px 30px rgba(0,0,0,.32) !important;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.49),0 10px 30px rgba(0, 0, 0, 0.28) !important;
 }
 
 .sidebar-button.selected .label,
 .sidebar-button.selected .material-icons {
-    color: rgb(132,132,132) !important;
+    color: white !important;
 }
 
 .sidebar-button.selected .label {
-  font-weight: bold !important;
+  font-weight: normal !important;
 }
 
 #slider-icon-bar {
     position: fixed;
     left: 0px;
     top: 0px;
-    background-color: #616161;
+    /*background-color: #616161; */
      /*background-color: #68839A;*/
-    /* background-color: #768898;*/
+    background-color: #768898;
     width: 36px;
     height: 100%;  
 }

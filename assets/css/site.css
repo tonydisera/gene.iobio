@@ -288,7 +288,8 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
-  background-color: #5B7C98;
+  /*background-color: #5B7C98;*/
+  background-color: #4C6880 !important;
 }
 
 .card-label {
