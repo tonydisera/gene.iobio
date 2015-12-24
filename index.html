@@ -265,6 +265,15 @@
           <div id="gene-search-bar" style="display:inline-block;">
 
 
+            <!-- Non protein-coding gene badges -->
+            <div id="non-protein-coding"  style="float: left;padding-top: 10px;padding-right: 4px;">
+                <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+                  Pseudogene
+                </div>   
+                <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
+                </div>                  
+            </div>  
+
             <!-- Gene search -->
             <span id="bloodhound" >
                 <input id="enter-gene-name" class="typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
@@ -284,13 +293,7 @@
 
           <!-- gene badges for navigation -->
           <div id="gene-badge-container" class="hide" style="margin-top:4px;">
-
-
-            <!-- Non protein-coding gene badges -->
-            <div id="non-protein-coding">
-              <span id="gene-type-badge" class="hide label label-warning" style="font-size:11px;">Pseudogene</span>   
-              <span id="transcript-type-badge" class="hide label label-warning" style="font-size:11px;"></span>                  
-            </div>
+                
 
             <!-- Buttons for editting gene list, done editting gene list -->
             <div id="cache-genes-button" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 3px;padding-right: 10px;">
