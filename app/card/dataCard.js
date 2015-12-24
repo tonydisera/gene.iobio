@@ -91,7 +91,6 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     	me.onVcfSampleSelected(panelSelector);
     });
 
-
 }
 
 
@@ -103,7 +102,8 @@ DataCard.prototype.init = function() {
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 	$('#proband-data #vcf-sample-select').chosen({width: "150px;font-size:11px;"});
-	$('#unaffected-sibs-select').chosen({width: "300px;font-size:11px;"});
+	$('#unaffected-sibs-select').chosen({width: "270px;font-size:11px;"});
+	$('#affected-sibs-select').chosen({width: "270px;font-size:11px;"});
 
 
 	$('#mother-data').append(dataCardEntryTemplate());
@@ -134,9 +134,15 @@ DataCard.prototype.init = function() {
 		// Clear the cache
 		//clearCache();
 
-
-		var unaffectedSibs = $("#unaffected-sibs-select").chosen().val();
-		window.loadUnaffectedSibs(unaffectedSibs);
+		// Create variant cards for the affected and unaffected sibs.
+		// We will load the data later once the proband, mother, father
+		// data is loaded.
+		var affectedSibIds  = $("#affected-sibs-select").chosen().val();
+		var unaffectedSibIds = $("#unaffected-sibs-select").chosen().val();
+		window.loadSibs(affectedSibIds, 'affected');
+		window.loadSibs(unaffectedSibIds, 'unaffected');
+		window.updateUrl('affectedSibs',   affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
+		window.updateUrl('unaffectedSibs', unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
 
 		window.enableCallVariantsButton();
 
@@ -147,32 +153,24 @@ DataCard.prototype.init = function() {
 
 }
 
-/*
-DataCard.prototype.addUnaffectedSib = function() {
-	var cardIndex = 3;
-	var name = 'unaffected-sib-data-' + cardIndex;
-	var sibHtml = 
-	    '<div id="' 
-	    + name 
-	    + '"  style="float:left;width:32%">  '
-	    + '   <input id="card-index" class="hide" value="' 
-		+ cardIndex
-		+ '"   type="text">'
-		+ '   <input id="datasource-relationship" class="hide" value="sibling" type="text"/>'
-	    + '</div>';
+DataCard.prototype.initSibs = function() {
 
-	$('#unaffected-sibs').append(sibHtml);
-	$('#' + name).append(dataCardEntryTemplate());
-	
-	this.listenToEvents($('#' + name));
-	addVariantCard();
-	$('#' + name +  ' #sample-data-label').text("UNAFFECTED SIB");
-	this.setDataSourceRelationship('#' + name);
-	$('#' + name + ' #vcf-sample-select').chosen({width: "150px;font-size:11px;"});
-	
+    // Select the affected and unaffected sibs if provided in the url
+    var affectedSibIds = [];
+    window.variantCardsSibs.affected.forEach(function(vc) {
+    	affectedSibIds.push(vc.getName());
+    })
+    $('#data-card #affected-sibs-select').val(affectedSibIds);
+	$('#data-card #affected-sibs-select').trigger("chosen:updated");
+
+    var unaffectedSibIds = [];
+    window.variantCardsSibs.unaffected.forEach(function(vc) {
+    	unaffectedSibIds.push(vc.getName());
+    })
+    $('#data-card #unaffected-sibs-select').val(unaffectedSibIds);
+	$('#data-card #unaffected-sibs-select').trigger("chosen:updated");
+
 }
-*/
-
 
 
 DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {	
@@ -376,6 +374,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 	me.panelSelectorFilesSelected.find('#vcf-sample-box').addClass('hide');
 	$('#unaffected-sibs-box').addClass('hide');
+	$('#affected-sibs-box').addClass('hide');
 	me.panelSelectorFilesSelected.find('.vcf-sample.loader').removeClass('hide');
 
 
@@ -392,10 +391,12 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 			me.panelSelectorFilesSelected.find('#vcf-sample-box').removeClass('hide');
 			if (me.mode == 'trio') {
 				$('#unaffected-sibs-box').removeClass('hide');
+				$('#affected-sibs-box').removeClass('hide');
 			}
 			me.panelSelectorFilesSelected.find('#vcf-sample-select')
 								         .find('option').remove();
-			$('#unaffected-sibs-select').find('option').remove();								         
+			$('#unaffected-sibs-select').find('option').remove();	
+			$('#affected-sibs-select').find('option').remove();								         
 
 
 			// Add a blank option if there is more than one sample in the vcf file
@@ -403,6 +404,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 				me.panelSelectorFilesSelected.find('#vcf-sample-select')
 				                             .append($("<option></option>"));
 				$('#unaffected-sibs-select').append($("<option></option>"));				                             
+				$('#affected-sibs-select').append($("<option></option>"));				                             
 			}							         
 
 			// Populate the sample name in the dropdown
@@ -413,10 +415,13 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 		                                    .text(sampleName)); 
 				$('#unaffected-sibs-select').append($("<option></option>")
 		                                    .attr("value",sampleName)
-		                                    .text(sampleName)); 		                                    
+		                                    .text(sampleName));
+				$('#affected-sibs-select').append($("<option></option>")
+		                                    .attr("value",sampleName)
+		                                    .text(sampleName)); 			                                     		                                    
 			});
 			me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
-			$('#unaffected-sibs-select').trigger("chosen:updated");
+			me.initSibs();
 
 			// If we are loading from URL parameters and the sample name was specified, select this
 			// sample from dropdown
@@ -490,14 +495,17 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 						     .find('option').remove();
 				if (me.mode == 'trio') {
 					$('#unaffected-sibs-box').removeClass('hide');
+					$('#affected-sibs-box').removeClass('hide');
 				}
 				$('#unaffected-sibs-select').find('option').remove();
+				$('#affected-sibs-select').find('option').remove();
 
 				// Add a blank option if there is more than one sample in the vcf file
 				if (sampleNames.length > 1) {
 					panelSelector.find('#vcf-sample-select')
 					             .append($("<option></option>"));
 					$('#unaffected-sibs-select').append($("<option></option>"));
+					$('#affected-sibs-select').append($("<option></option>"));
 				}	
 
 				// Populate the sample names in the dropdown
@@ -510,9 +518,13 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 					             .append($("<option></option>")
 			                     .attr("value",sampleName)
 			                     .text(sampleName)); 
+					$('#affected-sibs-select')							 
+					             .append($("<option></option>")
+			                     .attr("value",sampleName)
+			                     .text(sampleName)); 			                   
 				});
 				panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
-				$('#unaffected-sibs-select').trigger("chosen:updated");
+				me.initSibs();
 
 				// If we are loading from URL parameters and the sample name was specified, select this
 				// sample from dropdown

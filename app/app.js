@@ -78,12 +78,12 @@ var clickedVariant = null;
 // Format the start and end positions with commas
 var formatRegion = d3.format(",");
 
-// variant cardd
+// variant card
 var variantCards = [];
 
-// variant cards for unaffected sibs 
-var variantCardsUnaffectedSibs = [];
-var variantCardsUnaffectedSibsTransient = [];
+// variant cards for unaffected and affected sibs 
+var variantCardsSibs = {'affected': [], 'unaffected': []};
+var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
@@ -539,8 +539,10 @@ function toggleSampleTrio(show) {
 		$('#proband-data').css("width", "32%");
 		if ($('#proband-data').find('#vcf-sample-select option').length > 1) {
 			$('#unaffected-sibs-box').removeClass("hide");
+			$('#affected-sibs-box').removeClass("hide");
 		} else {
 			$('#unaffected-sibs-box').addClass("hide");
+			$('#affected-sibs-box').addClass("hide");
 		}
 	} else {
 		dataCard.mode = 'single';
@@ -548,6 +550,7 @@ function toggleSampleTrio(show) {
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
 		$('#unaffected-sibs-box').addClass("hide");
+		$('#affected-sibs-box').addClass("hide");
 		var motherCard = null;
 		var fatherCard = null;
 		variantCards.forEach( function(variantCard) {
@@ -614,13 +617,14 @@ function loadUrlSources() {
 	var vcf  = getUrlParameter(/vcf*/);	
 	var rel  = getUrlParameter(/rel*/);
 	var dsname = getUrlParameter(/name*/);	
-	var sample = getUrlParameter(/sample*/);
-
-
+	var sample = getUrlParameter(/sample*/);	
+	var affectedSibsString = getUrlParameter("affectedSibs");
+	var unaffectedSibsString = getUrlParameter("unaffectedSibs");
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
 	loadTracksForGene(true);
+
 
 	// get all bam and vcf url params in hash
 
@@ -628,6 +632,16 @@ function loadUrlSources() {
 		toggleSampleTrio(true);
 	} 
 
+
+	// Now create variant cards for the affected and unaffected sibs
+	if (affectedSibsString) {
+		var affectedSibs = affectedSibsString.split(",");	
+		window.loadSibs(affectedSibs, 'affected');	
+	}
+	if (unaffectedSibsString) {
+		var unaffectedSibs = unaffectedSibsString.split(",");	
+		window.loadSibs(unaffectedSibs, 'unaffected');	
+	}
 
 	if (bam != null) {
 		Object.keys(bam).forEach(function(urlParameter) {
@@ -660,7 +674,6 @@ function loadUrlSources() {
 			panelSelector.find('#datasource-name').val(dsname[urlParameter]);
 			dataCard.setDataSourceName(panelSelector);
 		});
-
 	}
 	if (sample != null) {
 		Object.keys(sample).forEach(function(urlParameter) {
@@ -670,11 +683,14 @@ function loadUrlSources() {
 			variantCard.setSampleName(sampleName);
 			variantCard.setDefaultSampleName(sampleName);
 		});
-
 	}
+	
 
 	if (vcf != null || bam != null) {
-		loadTracksForGene();
+		loadTracksForGene( false, function() {
+
+
+		});
 	} else {
 		showDataDialog();
 	}
@@ -2063,11 +2079,11 @@ function enableCallVariantsButton() {
 
 }
 
-function loadUnaffectedSibs(unaffectedSibs) {
-	variantCardsUnaffectedSibs.length = 0;
+function loadSibs(sibs, affectedStatus) {
+	variantCardsSibs[affectedStatus] = [];
 
-	if (unaffectedSibs) {
-		unaffectedSibs.forEach( function( unaffectedSibName) {
+	if (sibs) {
+		sibs.forEach( function(sibName) {
 			var variantCard = new VariantCard();	
 
 			variantCard.model          = new VariantModel();	
@@ -2081,18 +2097,17 @@ function loadUnaffectedSibs(unaffectedSibs) {
 
 
 			variantCard.setRelationship("sibling");
-			variantCard.setSampleName(unaffectedSibName);
-			variantCard.setName(unaffectedSibName);
+			variantCard.setAffectedStatus(affectedStatus);
+			variantCard.setSampleName(sibName);
+			variantCard.setName(sibName);
 
-			variantCardsUnaffectedSibs.push(variantCard);
-
-			//variantCard.loadVariantsOnly(function(vc) {
-			//});
-
+			var cards = variantCardsSibs[affectedStatus];
+			cards.push(variantCard);
 		});		
 	}
 
 }
+
 
 /**
  *  Every time app gets variant data back, th app determines (via promise) if we have
@@ -2135,23 +2150,29 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 				});
 
 				if (dataCard.mode == 'trio') {
-					var windowWidth = $(window).width();
-					var filterPanelWidth = $('#filter-track').width();
-					//$('#matrix-panel').css("max-width", (windowWidth - filterPanelWidth) - 60);
+
+					probandVariantCard.determineMaxAlleleCount();
+
+					probandVariantCard.populateEffectFilters();
+						
+					probandVariantCard.refreshVariantChartAndMatrix();
+
+					$("#matrix-panel .loader").removeClass("hide");
+					$("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
 
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
 					var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 					trioModel.compareVariantsToMotherFather(function() {
-
-						probandVariantCard.determineMaxAlleleCount();
-
-						probandVariantCard.populateEffectFilters();
 						
 						probandVariantCard.refreshVariantChartAndMatrix();
 
-						determineUnaffectedSibStatus(trioModel, function() {
+						$("#matrix-panel .loader").removeClass("hide");
+						$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
+						determineSibStatus(trioModel, function() {
+							$("#matrix-panel .loader").addClass("hide");
+						    $("#matrix-panel .loader .loader-label").text("Ranking variants");
 							probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);
 
 							resolve();
@@ -2195,17 +2216,7 @@ function promiseFullTrio() {
 			}
 		});
 
-		var uaCount = 0;
-		variantCardsUnaffectedSibs.forEach(function(vc) {
-			if (vc.isLoaded()) {
-				uaCount++;
-			}
-		});
-
-		//var uaSibsLoaded = false;
-		//if (uaCount == variantCardsUnaffectedSibs.length) {
-		//	uaSibsLoaded = true;
-		//}
+		
 		var uaSibsLoaded = true;
 
 		if (dataCard.mode == 'trio' && loaded.proband != null
@@ -2246,29 +2257,46 @@ function promiseFullTrioCalledVariants() {
 
 }
 
-function determineUnaffectedSibStatus(trioModel, onStatusUpdated) {
+function determineSibStatus(trioModel, onStatusUpdated) {
+	var me = this;
 	// Now compare the unaffected sibs to the variant to flag variants
 	// common to unaffected sibs + proband
-	variantCardsUnaffectedSibsTransient = [];
-	variantCardsUnaffectedSibs.forEach( function(vc) {
-		variantCardsUnaffectedSibsTransient.push(vc);
+	variantCardsSibsTransient = [];
+	me.variantCardsSibs['unaffected'].forEach( function(vc) {
+		variantCardsSibsTransient.push(vc);
 	})
-	var unaffectedSibs = [];
-	nextLoadUnaffectedSib(trioModel, unaffectedSibs, onStatusUpdated);
+	var sibsData = [];
+	nextLoadSib(trioModel, 'unaffected', sibsData, function() {
+
+		// Now compare the affected sibs to the variant to flag variants
+		// common to unaffected sibs + proband
+		variantCardsSibsTransient = [];
+		me.variantCardsSibs['affected'].forEach( function(vc) {
+			variantCardsSibsTransient.push(vc);
+		})
+		sibsData = [];
+		sibsData.length = 0;
+
+		nextLoadSib(trioModel, 'affected', sibsData, function() {
+		 	onStatusUpdated();
+		});
+
+
+	});
 
 }
 
-function nextLoadUnaffectedSib(trioModel, unaffectedSibs, onStatusUpdated) {
-	if (variantCardsUnaffectedSibsTransient.length > 0) {
-		variantCard = variantCardsUnaffectedSibsTransient.shift();
+function nextLoadSib(trioModel, affectedStatus, sibsData, onStatusUpdated) {
+	if (variantCardsSibsTransient.length > 0) {
+		variantCard = variantCardsSibsTransient.shift();
 
 		variantCard.loadVariantsOnly( function(vcfData) {
-			unaffectedSibs.push(vcfData)
-			nextLoadUnaffectedSib(trioModel, unaffectedSibs, onStatusUpdated);
+			sibsData.push(vcfData)
+			nextLoadSib(trioModel, affectedStatus, sibsData, onStatusUpdated);
 		});		
 	} else {
-		trioModel.determineUnaffectedSibsStatus(unaffectedSibs, onStatusUpdated);
-
+		var sibsCount = window.variantCardsSibs[affectedStatus].length;
+		trioModel.determineSibsStatus(sibsData, affectedStatus, sibsCount, onStatusUpdated);
 	}
 }
 

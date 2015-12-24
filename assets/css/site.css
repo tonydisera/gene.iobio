@@ -509,8 +509,8 @@ a, a:hover, a:focus {
 
 
 #recessive-symbol .parent .left {
-  stroke: rgb(173, 73, 74);
-  stroke-width: 2.5;
+  stroke: #F49A73;
+  stroke-width: 2;
 }
 #recessive-symbol .parent .right {
   stroke: gray;
@@ -518,17 +518,17 @@ a, a:hover, a:focus {
 }
 #recessive-symbol .proband .left,
 #recessive-symbol .proband .right {
-  stroke: rgb(173, 73, 74);
-  stroke-width: 2.5;
+  stroke: #F49A73;
+  stroke-width: 3;
 }
 
 #denovo-symbol .parent .left {
   stroke: grey;
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 #denovo-symbol .parent .right {
   stroke: grey;
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 #denovo-symbol .proband .left,
 #denovo-symbol .proband .right {

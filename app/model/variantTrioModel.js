@@ -1,9 +1,9 @@
-function VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData, unaffectedSibsVcfData) {
+function VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData, sibsVcfData) {
 	this.probandVcfData = probandVcfData;
 	this.motherVcfData = motherVcfData;
 	this.fatherVcfData = fatherVcfData;
-	this.unaffectedSibsVcfData = unaffectedSibsVcfData;
-	this.variantCardsUnaffectedSibsTransient = [];
+	this.sibsVcfData = sibsVcfData;
+	this.sibsVcfDataTransient = [];
 }
 
 
@@ -256,36 +256,53 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 
 // TODO:  Need to load unaffected sibs vcf data (variantModel.loadVariantDataOnly) beforehand
-VariantTrioModel.prototype.determineUnaffectedSibsStatus = function(unaffectedSibsVcfData, onUpdate) {
+VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedStatus, sibsCount, onUpdate) {
 	var me = this;
-	me.unaffectedSibsVcfData = unaffectedSibsVcfData;
+	me.sibsVcfData = sibsVcfData;
 
 	me.probandVcfData.features = me.probandVcfData.features.sort(orderVariantsByPosition);
 
-	me.unaffectedSibsTransientVcfData = [];
-	me.unaffectedSibsVcfData.forEach( function(vcfData) {
-		me.unaffectedSibsTransientVcfData.push(vcfData);
+	me.sibsTransientVcfData = [];
+	me.sibsVcfData.forEach( function(vcfData) {
+		me.sibsTransientVcfData.push(vcfData);
 	})
 
-	me.nextCompareToUnaffectedSib(function() {
+	var sibZygosityAttr = affectedStatus + "_zygosity";
+	var affectedAttr    = affectedStatus + "Sibs";
+	me.nextCompareSib(affectedStatus, sibZygosityAttr, function() {
 
 		me.probandVcfData.features.forEach( function(variant) {
-			 variant.ua = "none";
-			 if (variant.inheritance != null && variant.inheritance.toLowerCase() == 'recessive' && variant.uasibsZygosity) {
+			 variant[affectedAttr] = "none";
+			 if (variant[sibZygosityAttr]) {
 			 	 var matchesCount = 0;
 			 	 var matchesHomCount = 0;
-				 Object.keys(variant.uasibsZygosity).forEach( function(key) {
-				 	matchesCount++;
-				 	var sibZygosity = variant.uasibsZygosity[key];
-				 	if (sibZygosity != null && sibZygosity.toLowerCase() == 'hom') {
-					 	matchesHomCount++;
+				 Object.keys(variant[sibZygosityAttr]).forEach( function(key) {
+				 	var sibZygosity = variant[sibZygosityAttr][key];
+					if (sibZygosity != null) {
+						if (sibZygosity.toLowerCase() != 'none') {
+						 	matchesCount++;
+						}
+					 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
+						 	matchesHomCount++;
+					 	}
 				 	}
 				 });
 
-				 if (matchesHomCount > 0 ) {
-				 	variant.ua = "none";
-				 } else {
-				 	variant.ua = "not_recessive_in_sibs";
+				 if (variant.inheritance.toLowerCase() == 'recessive'
+				 	&& matchesHomCount > 0 
+				 	&& matchesHomCount == sibsCount) { 
+				 	variant[affectedAttr] = "recessive_all";
+				 } else if (variant.inheritance.toLowerCase() == 'recessive'
+				 	      && matchesHomCount > 0 )  {
+				 	variant[affectedAttr] = "recessive_some";
+				 } else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
+				 	variant[affectedAttr] = "recessive_none";
+				 } else if (matchesCount > 0 && matchesCount == sibsCount) {
+				 	variant[affectedAttr] = "present_all";
+				 }  else if (matchesCount > 0) {
+				 	variant[affectedAttr] = "present_some"
+				 }  else {
+				 	variant[affectedAttr] = "present_none";
 				 }  	 	 
 			 } 
 		});
@@ -298,13 +315,12 @@ VariantTrioModel.prototype.determineUnaffectedSibsStatus = function(unaffectedSi
 
 }
 
-VariantTrioModel.prototype.nextCompareToUnaffectedSib = function(callback) {
+VariantTrioModel.prototype.nextCompareSib = function(affectedStatus, zygosityAttr, callback) {
 	var me = this;
-	if (me.unaffectedSibsTransientVcfData.length > 0) {
-		var vcfData = me.unaffectedSibsTransientVcfData.shift();
-
-		me.promiseCompareToUnaffectedSib(vcfData).then( function() {
-			me.nextCompareToUnaffectedSib(callback);
+	if (me.sibsTransientVcfData.length > 0) {
+		var vcfData = me.sibsTransientVcfData.shift();
+		me.promiseCompareToSib(vcfData, zygosityAttr).then( function() {
+			me.nextCompareSib(affectedStatus, zygosityAttr, callback);
 		});		
 	} else {
 		callback();
@@ -312,23 +328,23 @@ VariantTrioModel.prototype.nextCompareToUnaffectedSib = function(callback) {
 }
 
 
-VariantTrioModel.prototype.promiseCompareToUnaffectedSib = function(unaffectedSibVcfData) {
+VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, zygosityAttr) {
 	var me = this;
 	
 	return new Promise( function(resolve, reject) {
 
 		me.probandVcfData.features.forEach(function(variant) {
 			if (variant.uasibsZygosity) {
-				variant.uasibsZygosity[unaffectedSibVcfData.name] = "none";		
+				variant[zygosityAttr][unaffectedSibVcfData.name] = "none";		
 			} else {
-				variant.uasibsZygosity = {};
+				variant[zygosityAttr] = {};
 			}
 		});
 				
 		var idx = 0;
 		me.promiseCompareVariants(
 			me.probandVcfData,	
-			unaffectedSibVcfData,		
+			sibVcfData,		
 			// This is the attribute on variant a (proband) and variant b (unaffected sib)
 	        // that will store whether the variant is unique or matches.
 	        null,
@@ -339,11 +355,11 @@ VariantTrioModel.prototype.promiseCompareToUnaffectedSib = function(unaffectedSi
 	    	// in both sets. Here we take the father variant's zygosity and store it in the
 	    	// proband's variant for further sorting/display in the feature matrix.
 	        function(variantA, variantB) {
-	        	variantA.uasibsZygosity[unaffectedSibVcfData.name] = variantB.zygosity;
+	        	variantA[zygosityAttr][sibVcfData.name] = variantB.zygosity;
 	        },
 	        function(variantA, variantB) {
 	        	if (variantA) {
-	        		variantA.uasibsZygosity[unaffectedSibVcfData.name] = "none";
+	        		variantA[zygosityAttr][sibVcfData.name] = "none";
 	        	}
 	        }
 	     ).then( function() {

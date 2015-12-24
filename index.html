@@ -161,7 +161,7 @@
         </div>
 
       </div>
-      <div class="modal-body" style="padding-top:12px;padding-bottom:0px">
+      <div class="modal-body" style="padding-top:0px;padding-bottom:0px">
           <div  >
 
 
@@ -171,21 +171,29 @@
                   <input id="datasource-relationship" class="hide" value="proband" type="text"/>
                 </div>
 
-                <div id="mother-data" class="hide" style="float:left;margin-top:30px;min-width:500px;width:32%">
+                <div id="mother-data" class="hide" style="float:left;margin-top:20px;min-width:500px;width:32%">
                   <input id="card-index" class="hide" value="1" type="text">
                   <input id="datasource-relationship" class="hide" value="mother" type="text"/>
                 </div>
 
-                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:30px;min-width:500px;">
+                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:20px;min-width:500px;">
                   <input id="card-index" class="hide" value="2" type="text">
                   <input id="datasource-relationship" class="hide" value="father" type="text"/>
                 </div>
               </div>
 
               <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
-                <div id="unaffected-sibs-box" class="hide">
+                <div id="affected-sibs-box" style="float:left;" class="hide">
                     <div id="sample-data-label">
-                      UNAFFECTED SIBS
+                      AFFECTED SIBLINGS
+                    </div>
+                    <select id="affected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
+                      class="chosen-select">
+                    </select>
+                </div>
+                <div id="unaffected-sibs-box" style="float:left;margin-left:10px;padding-bottom:20px;" class="hide">
+                    <div id="sample-data-label">
+                      UNAFFECTED SIBLINGS
                     </div>
                     <select id="unaffected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
                       class="chosen-select">
@@ -200,7 +208,7 @@
 
       </div>
 
-      <div class="modal-footer">
+      <div class="modal-footer" style="clear-both">
           <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
           <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
             <i class="mdi-file-cloud-done"></i>
@@ -746,7 +754,7 @@
     </path>
     <path d="M5.112 12.427c0.864-0.565 1.939-0.994 3.122-1.256-0.235-0.278-0.449-0.588-0.633-0.922-0.475-0.863-0.726-1.813-0.726-2.748 0-1.344 0-2.614 0.478-3.653 0.464-1.008 1.299-1.633 2.488-1.867-0.264-1.195-0.968-1.98-2.841-1.98-3 0-3 2.015-3 4.5 0 1.548 0.898 3.095 2 3.716v0.825c-3.392 0.277-6 1.944-6 3.959h4.359c0.227-0.202 0.478-0.393 0.753-0.573z" >
     </path>
-  </svg>
+  </symbol>
 
   <symbol  id="arrow-symbol" viewBox="0 0 80.4 10" width="80" height="80">
     <g>
@@ -758,8 +766,14 @@
         </g>
       </g>
     </g>
-  </svg>
-  
+  </symbol>
+
+  <symbol id="checkmark-symbol" x="0px" y="0px" width="512px" height="512px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+
+    <polygon id="check-mark-icon" points="398.218,92.985 199.729,291.475 113.754,205.476 50,269.242 199.733,419.015 462,156.726 "/>
+
+  </symbol>
+
 </svg>
 
 

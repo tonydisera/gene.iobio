@@ -20,6 +20,8 @@ function VariantModel() {
 	this.vcfRefNamesMap = {};
 	this.sampleName = "";
 	this.defaultSampleName = null;
+	this.relationship = null;
+	this.affectedStatus = null;
 }
 
 
@@ -282,12 +284,13 @@ VariantModel.prototype.setName = function(theName) {
 }
 
 VariantModel.prototype.setRelationship = function(theRelationship) {
-	if (theRelationship) {
-		this.relationship = theRelationship;
-	} else {
-		return theRelationship;
-	}
+	this.relationship = theRelationship;	
 }
+
+VariantModel.prototype.setAffectedStatus = function(theAffectedStatus) {
+	this.affectedStatus = theAffectedStatus;
+}
+
 
 VariantModel.prototype.getRelationship = function() {
 	return this.relationship;
@@ -682,7 +685,7 @@ VariantModel.prototype.promiseAnnotated = function(theVcfData) {
 		if (theVcfData != null &&
 			theVcfData.features != null &&
 			theVcfData.loadState != null &&
-		   (dataCard.mode == 'single' || theVcfData.loadState['inheritance'] == true) &&
+		   //(dataCard.mode == 'single' || theVcfData.loadState['inheritance'] == true) &&
 			theVcfData.loadState['clinvar'] == true ) {
 
 			resolve();
@@ -727,50 +730,50 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 			me.vcfData = vcfData;
 	    	
 			resolve(me.vcfData);
-		} else {			
-			me.vcf.promiseGetVariants(
-			   me.getVcfRefName(theGene.chr), 
-			   theGene.start, 
-		       theGene.end, 
-		       theGene.strand, 
-		       theTranscript,
-		       me.sampleName,
-		       window.geneSource == 'refseq' ? true : false
-		    ).then( function(data) {
-		    	var annotatedRecs = data[0];
-		    	var data = data[1];	
-		    	data.name = me.name;
-		    	data.relationship = me.relationship;    	
+		} else {	
+			me._promiseVcfRefName(theGene.chr).then( function() {				
+				me.vcf.promiseGetVariants(
+				   me.getVcfRefName(theGene.chr), 
+				   theGene.start, 
+			       theGene.end, 
+			       theGene.strand, 
+			       theTranscript,
+			       me.sampleName,
+			       window.geneSource == 'refseq' ? true : false
+			    ).then( function(data) {
+			    	var annotatedRecs = data[0];
+			    	var data = data[1];	
+			    	data.name = me.name;
+			    	data.relationship = me.relationship;    	
 
-		    	// Associate the correct gene with the data
-		    	var theGeneObject = null;
-		    	for( var key in window.geneObjects) {
-		    		var geneObject = geneObjects[key];
-		    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
-		    			geneObject.start == data.start &&
-		    			geneObject.end == data.end &&
-		    			geneObject.strand == data.strand) {
-		    			theGeneObject = geneObject;
-		    			data.gene = theGeneObject;
-		    		}
-		    	}
-		    	if (theGeneObject) {
-			    	// Cache the data
-			    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
-			    	me.vcfData = data;		    	
-					resolve(me.vcfData);
+			    	// Associate the correct gene with the data
+			    	var theGeneObject = null;
+			    	for( var key in window.geneObjects) {
+			    		var geneObject = geneObjects[key];
+			    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+			    			geneObject.start == data.start &&
+			    			geneObject.end == data.end &&
+			    			geneObject.strand == data.strand) {
+			    			theGeneObject = geneObject;
+			    			data.gene = theGeneObject;
+			    		}
+			    	}
+			    	if (theGeneObject) {
+				    	// Cache the data
+				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+				    	me.vcfData = data;		    	
+						resolve(me.vcfData);
 
-		    	} else {
-		    		alert("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
-		    		reject();
-		    	}
+			    	} else {
+			    		alert("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
+			    		reject();
+			    	}
 
 
-		    	resolve(me.vcfData);
-			});
+			    	resolve(me.vcfData);
+				});		
+			});				
 		}
-
-
 	});
 
 }

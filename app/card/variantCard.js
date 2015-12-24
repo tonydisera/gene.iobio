@@ -31,6 +31,10 @@ VariantCard.prototype.setRelationship = function(theRelationship) {
 	this.model.setRelationship(theRelationship);
 }
 
+VariantCard.prototype.setAffectedStatus = function(theAffectedStatus) {
+	this.model.setAffectedStatus(theAffectedStatus);
+}
+
 VariantCard.prototype.setSampleName = function(sampleName) {
 	this.model.setSampleName(sampleName);
 	var cardLabel = this.model.getName() == sampleName ? this.model.getName() : sampleName + " " + this.model.getName();
