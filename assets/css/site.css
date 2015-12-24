@@ -14,9 +14,9 @@ body {
 }
 
 .alert {
-    width: 570px;
-    background-color: rgb(249, 237, 184);
-    border: solid 1px rgb(237, 201, 103);
+    width: 100%;
+    background-color: transparent;
+    border: solid 1px rgb(241, 227, 190);
     color: rgb(132, 132, 132);
     text-align: center;
     font-size: 12px;

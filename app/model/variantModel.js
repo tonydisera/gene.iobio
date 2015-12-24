@@ -1053,7 +1053,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 
 
 	    	} else {
-	    		reject("problem when getting variants - null set returned.");
+	    		reject("No variants");
 	    	}
 
 		
