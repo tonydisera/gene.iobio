@@ -24,6 +24,7 @@ var genesCardTemplateHTML = null;
 var bookmarkTemplateHTML = null;
 var examineTemplateHTML = null;
 var recallTemplateHTML = null;
+var helpTemplateHTML = null;
 var iconbarTemplate = null;
 
 
@@ -134,6 +135,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
 		recallTemplateHTML = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/helpCardTemplate.hbs').then(function(compiledTemplate) {
+		helpTemplateHTML = compiledTemplate;
+	}));
 	promises.push(promiseLoadTemplate('templates/iconbarTemplate.hbs').then(function(compiledTemplate) {
 		iconbarTemplate = compiledTemplate;
 	}));
@@ -185,6 +189,7 @@ function init() {
 	$('#slider-left-content').append(genesCardTemplateHTML);
 	$('#slider-left-content').append(bookmarkTemplateHTML);
 	$('#slider-left-content').append(examineTemplateHTML);
+	$('#slider-left-content').append(helpTemplateHTML);
 	$('#slider-left-content').append(recallTemplateHTML);
 	$('#close-slide-left').click(function() {
 		closeSlideLeft();
@@ -357,6 +362,7 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
 		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#slider-left-content #help-card').toggleClass("hide", true);	
 		$('#button-show-filters').toggleClass('selected', true);			
 	} else if (sidebar == "Phenolyzer") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
@@ -364,6 +370,7 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);					
 		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#slider-left-content #help-card').toggleClass("hide", true);	
 		$('#button-show-phenolyzer').toggleClass('selected', true);		
 	} else if (sidebar == "Bookmarks") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
@@ -371,6 +378,7 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #bookmark-card').toggleClass("hide", false);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
 		$('#slider-left-content #recall-card').toggleClass("hide", true);		
+		$('#slider-left-content #help-card').toggleClass("hide", true);	
 		$('#button-show-bookmarks').toggleClass('selected', true);		
 		window.bookmarkCard.refreshBookmarkList();
 	} else if (sidebar == "Examine") {
@@ -379,6 +387,7 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", false);			
 		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#slider-left-content #help-card').toggleClass("hide", true);	
 		$('#button-show-examine').toggleClass('selected', true);			
 	} else if (sidebar == "Recall") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
@@ -386,7 +395,16 @@ function changeSidebar(sidebar) {
 		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
 		$('#slider-left-content #examine-card').toggleClass("hide", true);			
 		$('#slider-left-content #recall-card').toggleClass("hide", false);	
+		$('#slider-left-content #help-card').toggleClass("hide", true);	
 		$('#button-find-missing-variants').toggleClass('selected', true);			
+	} else if (sidebar == "Help") {
+		$('#slider-left-content #filter-track').toggleClass("hide", true);	
+		$('#slider-left-content #genes-card').toggleClass("hide", true);	
+		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
+		$('#slider-left-content #examine-card').toggleClass("hide", true);			
+		$('#slider-left-content #recall-card').toggleClass("hide", true);	
+		$('#slider-left-content #help-card').toggleClass("hide", false);	
+		$('#button-show-help').toggleClass('selected', true);		
 	}
 
 }
@@ -1002,6 +1020,7 @@ function cacheNextGene(genesToCache) {
 				
 
 }
+
 
 function hasDataSources() {
 	var hasDataSource = false;

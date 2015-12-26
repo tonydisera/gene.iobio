@@ -49,6 +49,14 @@ body {
       font-size: 11px;
 }
 
+.help-link {
+  color: rgb(132,132,132) !important;
+  font-size: 12px;
+}
+#help-card div {
+  margin-top:10px;
+}
+
 #select_side_bar_chosen.chosen-container-single .chosen-single {
     line-height: 30px !important;
     height: 30px !important;
@@ -755,9 +763,8 @@ section {
     color: rgb(118, 99, 99);
     font-family: Quicksand;
     line-height: 45px;
-    float: left;
+    float: right;
     margin-top: -5px;
-    margin-left: 5px;
    
 }
 
@@ -1676,6 +1683,16 @@ header {
   line-height: 22px;
   font-size: 12px;
   color: rgb(132, 132, 132) !important;
+}
+
+.icon-button-extra-sm {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 4px;
+    padding-right: 3px;
+    line-height: 10px;
+    font-size: 12px;
+    color: rgb(132, 132, 132) !important;
 }
 
 .icon-button i,
