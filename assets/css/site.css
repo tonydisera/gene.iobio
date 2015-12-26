@@ -431,6 +431,11 @@ a, a:hover, a:focus {
   stroke-width: 2px;
 }
 
+#feature-matrix .colhdr text {
+    font-size: 9px;
+    pointer-events: none;
+}
+
 #feature-matrix rect.cellbox:hover {
   cursor: pointer;
   font-weight: bold;  

@@ -158,14 +158,42 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 }
 
+
+MatrixCard.prototype.getVariantLabel = function(d, i) {
+	var getRsId = function(variant) {
+		var rsId = null;
+		if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {
+			for (var key in variant.vepVariationIds) {
+				if (key != 0 && key != '') {
+					var tokens = key.split("&");
+					tokens.forEach( function(id) {
+						if (id.indexOf("rs") == 0) {
+							rsId = id;
+						}
+					});
+				}
+			}			
+		}
+		return rsId;		
+	}
+
+	var rsId = getRsId(d);
+	if (rsId != null) {
+		return rsId;
+	} else {
+		return d.type + ' ' + d.start;
+	}
+}
+
 MatrixCard.prototype.init = function() {
 	var me = this;
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
 				    .cellSize(23)
-				    .columnLabelHeight(42)
+				    .columnLabelHeight(62)
 				    .rowLabelWidth(140)
+				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	
 				    	me.showTooltip(variant);
@@ -260,7 +288,7 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	var w = 300;
 
 	var x = variant.screenX;
-	var y = variant.screenY;
+	var y = variant.screenY + 25;
 
 
 

@@ -15,6 +15,11 @@ function featureMatrixD3() {
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
   }
+
+  var columnLabel = function( d, i) {
+    return d.type;
+  }
+ 
  
   // variables 
   var heightPercent = "100%",
@@ -31,6 +36,7 @@ function featureMatrixD3() {
 
       
   function chart(selection, options) {
+    var me = this;
     // merge options and defaults
     options = $.extend(defaults,options);
 
@@ -118,7 +124,7 @@ function featureMatrixD3() {
             .attr("transform", function(d) {
               return "rotate(-65)" ;
             })
-            .text( function(d) {  return d.type });
+            .text( columnLabel );
 
       }
 
@@ -392,7 +398,15 @@ function featureMatrixD3() {
     });
 
   }
- 
+
+  chart.columnLabel = function(_) {
+    if (!arguments.length) {
+      return columnLabel;
+    } else {
+      columnLabel = _;
+      return chart;
+    }
+  }
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;
