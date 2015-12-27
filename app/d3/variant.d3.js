@@ -585,24 +585,23 @@ function variantD3() {
        .attr("id", key ? key : "")
        .attr("transform", "translate(" + xpos + "," +  ypos + ")" );
 
-    group.append("rect")
-         .attr("x", 1)
-         .attr("y", 0)
-         .attr("width", 10)
-         .attr("height", 10);
+
 
     var flagGroup = group.append("g")
-       .attr("transform", "translate(-3,-10)");
+       .attr("transform", "translate(-1,-5)");
 
     flagGroup.append("line")
              .attr("x1", 4)
              .attr("x2", 4)
-             .attr("y1", -9)
-             .attr("y2", "10");
+             .attr("y1", -2)
+             .attr("y2", "14");
     flagGroup.append("g")
-             .attr("transform", "translate(12,-9),rotate(90)")
-             .append("polygon")
-             .attr("points", "0,8 4,2 8,8");
+             .attr("transform", "translate(2,1),rotate(270)")
+             .append("use")
+             .attr("xlink:href", "#bookmark-symbol")
+             .attr("width", "12")
+             .attr("height", "12");
+
     return chart;
 
   }

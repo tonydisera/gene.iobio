@@ -161,11 +161,13 @@ BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject)
 	if (vcfData && vcfData.features) {
 		var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
 		if (bookmarkKeys && bookmarkKeys.length > 0) {
+			var bookmarkedVariants = [];
 			bookmarkKeys.forEach( function(bookmarkKey) {
 				var bookmarkEntry = me.bookmarkedVariants[bookmarkKey];
-				var variant = me.resolveBookmarkedVariant(bookmarkKey, bookmarkEntry, geneObject);
+				var variant = getProbandVariantCard().getBookmarkedVariant(bookmarkEntry, vcfData);
 				if (variant) {
 					variant.isBookmark = 'Y';
+					bookmarkedVariants.push(variant);
 				}
 			});
 		}

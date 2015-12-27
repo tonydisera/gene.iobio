@@ -124,7 +124,8 @@
   white-space: normal !important;
   line-height: 13px !important;
   /*background-color: #5C6B88 !important;*/
-  background-color: #4C6880 !important;
+  /*background-color: #4C6880 !important;*/
+  background-color: rgb(132,132,132) !important;
 
 }
 
@@ -169,7 +170,8 @@
     top: 0px;
     /*background-color: #616161; */
      /*background-color: #68839A;*/
-    background-color: #768898;
+    /*background-color: #768898;*/
+    background-color: #eee;
     width: 36px;
     height: 100%;  
 }

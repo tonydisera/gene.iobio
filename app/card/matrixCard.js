@@ -288,7 +288,7 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	var w = 300;
 
 	var x = variant.screenX;
-	var y = variant.screenY + 25;
+	var y = variant.screenY + 10;
 
 
 
@@ -309,6 +309,12 @@ MatrixCard.prototype.showTooltip = function(variant) {
 
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
+
+
+
+	// Flag any bookmarked variants
+    bookmarkCard.determineVariantBookmarks(theVcfData, window.gene);
+
 
 	// Figure out if we should show the unaffected sibs row
 	this.filteredMatrixRows = this.matrixRows;
@@ -850,34 +856,15 @@ MatrixCard.prototype.getSymbol = function(d,i) {
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	var me = this;
     
-     /*
-     <g class="bookmark current">
-     	<g transform="translate(-3,-10)">
-     		<line x1="4" x2="4" y1="-9" y2="10"></line>
-     		<g transform="translate(12,-9),rotate(90)">
-     			<polygon points="0,8 4,2 8,8"></polygon>
-     		</g>
-     	</g>
-     </g>
-     */
-
 	if (selection.datum().clazz != '') {
-		var group = selection.append("g")
-		                     .attr("transform", "translate(4,1)");
-		group.append("line")
-	         .attr("x1", 4)
-	         .attr("x2", 4)
-	         .attr("y1", 0)
-	         .attr("y2", 14)
-	         .style("pointer-events", "none")
-	         .style("stroke", "rgba(0, 0, 0, 0.6)")
-	         .style("stroke-width", "1.5");
-	    group.append("g")
-	         .attr("transform", "translate(12,0),rotate(90)")	
-	         .append("polygon")
-	         .attr("points", "0,8 4,2 8,8")
-	         .style("fill", "rgba(0, 0, 0, 0.6)");
-
+		selection.append("g")
+			 .attr("class", selection.datum().clazz)
+	         .attr("transform", "translate(3,3)")
+	         .append("use")
+	         .attr("xlink:href", '#bookmark-symbol')
+	         .attr("width",  "12")
+	         .attr("height", "12");
+	         
 	}
 
 

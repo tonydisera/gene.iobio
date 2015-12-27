@@ -88,6 +88,8 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 			me.vcfData = data;
 		}
 	} 
+
+
 	return data;
 }
 VariantModel.prototype.getBamDataForGene = function(geneObject) {

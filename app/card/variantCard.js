@@ -746,8 +746,8 @@ VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData, onVari
 
 
 
-VariantCard.prototype.getBookmarkedVariant = function(variantProxy) {
-	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data) {
+	theVcfData = data != null ? data : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData == null) {
 		return null;
 	}
