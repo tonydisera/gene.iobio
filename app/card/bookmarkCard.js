@@ -133,11 +133,12 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	var me = this;
 	if (variant) {		
 
-		var key = this.getBookmarkKey(gene.gene_name,  gene.chr, variant.start, variant.ref, variant.alt);
+		var key = this.getBookmarkKey(gene.gene_name, gene.chr, variant.start, variant.ref, variant.alt);
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().unpin();
-			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), true);			
+			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), true);
+			variant.isBookmark = 'Y';
 		}
 	}
 }

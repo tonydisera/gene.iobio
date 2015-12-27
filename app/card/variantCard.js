@@ -1016,9 +1016,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	$('#filter-and-rank-card').removeClass("hide");
-    //$('#filter-track').removeClass("hide");
     $('#matrix-track').removeClass("hide");
-	// todo $('#variant-control-track').removeClass("hide");
 	if (firstTimeShowVariants) {
 		firstTimeShowVariants = false;
 	}
@@ -1865,6 +1863,8 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 			this.vcfChart.addBookmark(container, variant, key);
 		}
 	}
+
+	this.fillFeatureMatrix();
 
 	if (singleFlag) {
 		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);
