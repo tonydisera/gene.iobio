@@ -428,7 +428,7 @@ a, a:hover, a:focus {
 #feature-matrix rect.cellbox {
   fill: white;
   stroke: rgb(230, 230, 230);
-  stroke-width: 2px;
+  stroke-width: 1px;
 }
 
 #feature-matrix .colhdr text {
