@@ -229,7 +229,7 @@ MatrixCard.prototype.init = function() {
 				    		column.order = column.order - 1;
 				    		columnPrev.order = columnPrev.order + 1;
 				    	}
-				    	me.fillFeatureMatrix();
+				    	getProbandVariantCard().fillFeatureMatrix();
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
@@ -246,7 +246,7 @@ MatrixCard.prototype.init = function() {
 				    		column.order = column.order + 1;
 				    		columnNext.order = columnNext.order - 1;
 				    	}
-				    	me.fillFeatureMatrix();
+				    	getProbandVariantCard().fillFeatureMatrix();
 
 				    });
 
