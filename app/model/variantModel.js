@@ -793,7 +793,9 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			me._populateEffectFilters(me.vcfData.features);
 
 			// Flag any bookmarked variants
-		    bookmarkCard.determineVariantBookmarks(vcfData, theGene);
+			if (me.getRelationship() == 'proband') {
+			    bookmarkCard.determineVariantBookmarks(vcfData, theGene);
+			}
 
 
 		    // Invoke callback now that we have annotated variants
@@ -830,7 +832,9 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			    	}
 			    	if (theGeneObject) {
 			    		// Flag any bookmarked variants
-					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+			    		if (me.getRelationship() == 'proband') {
+					    	bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+					    }
 
 				    	// Cache the data
 				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	

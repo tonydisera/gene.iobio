@@ -1,6 +1,8 @@
 function BookmarkCard() {
 	this.bookmarkedVariants = {};
 	this.bookmarkedGenes = {};
+	this.selectedBookmarkKey = null;
+
 }
 
 BookmarkCard.prototype.init = function() {
@@ -137,7 +139,7 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().unpin();
-			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), true);
+			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);
 			variant.isBookmark = 'Y';
 		}
 	}
@@ -162,46 +164,65 @@ BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject)
 	if (vcfData && vcfData.features) {
 		var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
 		if (bookmarkKeys && bookmarkKeys.length > 0) {
-			var bookmarkedVariants = [];
 			bookmarkKeys.forEach( function(bookmarkKey) {
 				var bookmarkEntry = me.bookmarkedVariants[bookmarkKey];
-				var variant = getProbandVariantCard().getBookmarkedVariant(bookmarkEntry, vcfData);
+				var theBookmarkEntry = bookmarkEntry.hasOwnProperty("isProxy") ? me.reviseCoord(bookmarkEntry, geneObject) : bookmarkEntry;
+				var variant = getProbandVariantCard().getBookmarkedVariant(theBookmarkEntry, vcfData);
 				if (variant) {
 					variant.isBookmark = 'Y';
-					bookmarkedVariants.push(variant);
+					me.bookmarkedVariants[bookmarkKey] = variant;
 				}
 			});
 		}
+		me.refreshBookmarkList();
 	}
 }
 
-BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject, variant, bookmarkKey) {
+
+
+/*
+ This method is called when a gene is selected and the variants are shown.
+*/
+BookmarkCard.prototype.flagBookmarks = function(variantCard, geneObject) {
+	var me = this;
+	var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
+	if (bookmarkKeys) {
+		me._flagBookmarksForGene(variantCard, geneObject, bookmarkKeys, true);
+	}
+
+}
+
+BookmarkCard.prototype._flagBookmark = function(variantCard, geneObject, variant, bookmarkKey) {
 	var me = this;
 	
 	// Flag the bookmarked variant
 	if (variant) {
+		variant.isBookmark = 'Y';
 		variantCard.addBookmarkFlag(variant, me.compressKey(bookmarkKey), true);
+
+		// Now that we have resolved the bookmark entries for a gene, refresh the
+		// bookmark list so that the glyphs show for each resolved bookmark.
+		me.refreshBookmarkList();
+
 	}
-
-	// Now that we have resolved the bookmark entries for a gene, refresh the
-	// bookmark list so that the glyphs show for each resolved bookmark.
-	me.refreshBookmarkList();
-
-	
 }
 
-BookmarkCard.prototype.flagBookmarksForGene = function(variantCard, geneObject, bookmarkKeys) {
+BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject, bookmarkKeys, displayVariantFlag) {
 	var me = this;
 	
 	// Now flag all other bookmarked variants for a gene
 	bookmarkKeys.forEach( function(key) {		
 		var theBookmarkEntry = me.bookmarkedVariants[key];
 		var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject);
-		variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);
+		theVariant.isBookmark = 'Y';
+		if (displayVariantFlag) {
+			variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
+		}
 	});
 
 	// Now that we have resolved the bookmark entries for a gene, refresh the
 	// bookmark list so that the glyphs show for each resolved bookmark.
+	//me.refreshBookmarkList();
 	me.refreshBookmarkList();
 
 	
@@ -234,10 +255,17 @@ BookmarkCard.prototype.sortBookmarksByGene = function() {
     tuples.sort(function(a, b) { 
     	var keyA = a[0];
     	var keyB = b[0];
+    	var startA = a[1].start;
+    	var startB = b[1].start;
+
     	var geneA = keyA.split(": ")[0];
     	var geneB = keyB.split(": ")[0];
-    	
-    	return geneA < geneB ? 1 : geneA > geneB ? -1 : 0;
+
+    	if (geneA == geneB) {
+    		return startA < startB ? 1 : startA > startB ? -1 : 0;
+    	} else {
+	    	return geneA < geneB ? 1 : geneA > geneB ? -1 : 0;
+    	}
     });
 
     var length = tuples.length;
@@ -301,19 +329,25 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	return  geneName + " " + chr;
 	         })
 	         .on('click', function(entry,i) {
+	         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+	         	d3.select(this).classed("current", true);
+
+	         	me.selectedBookmarkKey = entry.key;
+
 				var geneName = entry.key;
 				var bookmarkKeys = entry.value;
 
-
-				if (window.gene.gene_name != geneName) {
+				if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
 					window.selectGene(geneName, function(variantCard) {
 						if (variantCard.getRelationship() == 'proband') {
-							me.flagBookmarksForGene(variantCard, window.gene, bookmarkKeys);
+							//me._flagBookmarksForGene(variantCard, window.gene, bookmarkKeys);
 						}
 					});
 				} else {
-					me.flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys);
+					//me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys);
 				}
+				getProbandVariantCard().removeBookmarkFlags();
+				getProbandVariantCard().highlightBookmarkedVariants();
 			});
 
 	container.selectAll("div.bookmark-gene")
@@ -332,22 +366,30 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			         .append("a")
 			         .attr("class", "bookmark")
 			         .on('click', function(entry,i) {
+			         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+	         			d3.select(this).classed("current", true);
+
+	         			me.selectedBookmarkKey = entry.key;
+
 			         	var geneName = entry.key.split(": ")[0];
 						var bookmarkEntry = entry.value;
 						var key = entry.key;
 
 
-						if (window.gene.gene_name != geneName) {
+						if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
 							window.selectGene(geneName, function(variantCard) {
 								if (variantCard.getRelationship() == 'proband') {
 									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-									me.flagBookmarks(variantCard, window.gene, variant, key);
+									me._flagBookmark(variantCard, window.gene, variant, key);
 								}
 							});
 						} else {
 							var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
-							me.flagBookmarks(getProbandVariantCard(), window.gene, variant, key);
+							me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
 						}
+
+						getProbandVariantCard().highlightBookmarkedVariants();
+
 			         });
 	        });
 			
@@ -374,93 +416,100 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	return tokens[1] + " " + tokens[2] + (rsId ? " " + rsId : "");
 	         });
 
-
 	container.selectAll(".bookmark .variant-symbols")
-	         .each( function(entry, i) {
-			    var selection = d3.select(this);
-	         	var variant = entry.value;	         
-	         	if (variant.impact) {
-		         	for (var impact in variant.impact) {		         		
-	         			var svg = selection.append("svg")
-									       .attr("class", "impact-badge")
-									       .attr("height", 12)
-									       .attr("width", 14);
-			         	var impactClazz =  'impact_' + impact.toUpperCase();
-			         	matrixCard.showImpactBadge(svg, variant, impactClazz);	         		
-		         	}	         		
-	         	}
-	         	if (variant.clinVarClinicalSignificance) {
-	         		var lowestValue = 9999;
-	         		var lowestClazz = null; 
-	         		for (var clinvar in variant.clinVarClinicalSignificance) {
-	         			if (matrixCard.clinvarMap[clinvar]) {
-	         				if (matrixCard.clinvarMap[clinvar].value < lowestValue) {
-	         					lowestValue = matrixCard.clinvarMap[clinvar].value;
-	         					lowestClazz = matrixCard.clinvarMap[clinvar].clazz;
-	         				}
-	         				
-	         			}
-	         		}
-	         		if (lowestClazz != null && lowestClazz != '') {
-						var options = {width:10, height:10, transform: 'translate(0,1)', clazz: lowestClazz};
-						var svg = selection.append("svg")
-									       .attr("class", "clinvar-badge")
-									       .attr("height", 12)
-									       .attr("width", 14);
-				        matrixCard.showClinVarSymbol(svg, options);	         		
+         .each( function(entry, i) {
+		    var selection = d3.select(this);
+         	var variant = entry.value;	         
+         	if (variant.impact) {
+	         	for (var impact in variant.impact) {		         		
+         			var svg = selection.append("svg")
+								       .attr("class", "impact-badge")
+								       .attr("height", 12)
+								       .attr("width", 14);
+		         	var impactClazz =  'impact_' + impact.toUpperCase();
+		         	matrixCard.showImpactBadge(svg, variant, impactClazz);	         		
+	         	}	         		
+         	}
+         	if (variant.clinVarClinicalSignificance) {
+         		var lowestValue = 9999;
+         		var lowestClazz = null; 
+         		for (var clinvar in variant.clinVarClinicalSignificance) {
+         			if (matrixCard.clinvarMap[clinvar]) {
+         				if (matrixCard.clinvarMap[clinvar].value < lowestValue) {
+         					lowestValue = matrixCard.clinvarMap[clinvar].value;
+         					lowestClazz = matrixCard.clinvarMap[clinvar].clazz;
+         				}
+         				
          			}
+         		}
+         		if (lowestClazz != null && lowestClazz != '') {
+					var options = {width:10, height:10, transform: 'translate(0,1)', clazz: lowestClazz};
+					var svg = selection.append("svg")
+								       .attr("class", "clinvar-badge")
+								       .attr("height", 12)
+								       .attr("width", 14);
+			        matrixCard.showClinVarSymbol(svg, options);	         		
+     			}
 
-	         	}
-	         	if (variant.vepSIFT) {
-					for (var sift in variant.vepSIFT) {
-						if (matrixCard.siftMap[sift]) {
-			         		var clazz = matrixCard.siftMap[sift].clazz;
-			         		var badge = matrixCard.siftMap[sift].badge;
-			         		if (clazz != '') {
-								var options = {width:11, height:11, transform: 'translate(0,1)', clazz: clazz};
-								var svg = selection.append("svg")
-									        .attr("class", "sift-badge")
-									        .attr("height", 12)
-									        .attr("width", 14);
-						        matrixCard.showSiftSymbol(svg, options);	         		
-			         		}							
-						}
+         	}
+         	if (variant.vepSIFT) {
+				for (var sift in variant.vepSIFT) {
+					if (matrixCard.siftMap[sift]) {
+		         		var clazz = matrixCard.siftMap[sift].clazz;
+		         		var badge = matrixCard.siftMap[sift].badge;
+		         		if (clazz != '') {
+							var options = {width:11, height:11, transform: 'translate(0,1)', clazz: clazz};
+							var svg = selection.append("svg")
+								        .attr("class", "sift-badge")
+								        .attr("height", 12)
+								        .attr("width", 14);
+					        matrixCard.showSiftSymbol(svg, options);	         		
+		         		}							
+					}
 
-	         		}
-	         	}
-	         	if (variant.vepPolyPhen) {
-					for (var polyphen in variant.vepPolyPhen) {
-						if (matrixCard.polyphenMap[polyphen]) {
-			         		var clazz = matrixCard.polyphenMap[polyphen].clazz;
-			         		var badge = matrixCard.polyphenMap[polyphen].badge;
-			         		if (clazz != '') {
-								var options = {width:10, height:10, transform: 'translate(0,2)', clazz: clazz};
-								var svg = selection.append("svg")
-									        .attr("class", "polyphen-badge")
-									        .attr("height", 12)
-									        .attr("width", 14);
-						        matrixCard.showPolyPhenSymbol(svg, options);	         		
-			         		}
-						}
-	         		}
-	         	}
-	         	if (variant.inheritance) {
-	         		if (variant.inheritance == 'recessive') {
-						var svg = selection.append("svg")
-									        .attr("class", "inheritance-badge")
-									        .attr("height", 14)
-									        .attr("width", 16);
-						var options = {width: 18, height: 16, transform: "translate(-1,1)"};
-						matrixCard.showRecessiveSymbol(svg, options);										        
-	         		} else if (variant.inheritance == 'denovo') {
-						var svg = selection.append("svg")
-									        .attr("class", "inheritance-badge")
-									        .attr("height", 14)
-									        .attr("width", 16);
-						var options = {width: 18, height: 16, transform: "translate(-1,1)"};
-						matrixCard.showDeNovoSymbol(svg, options);				
-	         		}
-	         	}
-	         });
+         		}
+         	}
+         	if (variant.vepPolyPhen) {
+				for (var polyphen in variant.vepPolyPhen) {
+					if (matrixCard.polyphenMap[polyphen]) {
+		         		var clazz = matrixCard.polyphenMap[polyphen].clazz;
+		         		var badge = matrixCard.polyphenMap[polyphen].badge;
+		         		if (clazz != '') {
+							var options = {width:10, height:10, transform: 'translate(0,2)', clazz: clazz};
+							var svg = selection.append("svg")
+								        .attr("class", "polyphen-badge")
+								        .attr("height", 12)
+								        .attr("width", 14);
+					        matrixCard.showPolyPhenSymbol(svg, options);	         		
+		         		}
+					}
+         		}
+         	}
+         	if (variant.inheritance) {
+         		if (variant.inheritance == 'recessive') {
+					var svg = selection.append("svg")
+								        .attr("class", "inheritance-badge")
+								        .attr("height", 14)
+								        .attr("width", 16);
+					var options = {width: 18, height: 16, transform: "translate(-1,1)"};
+					matrixCard.showRecessiveSymbol(svg, options);										        
+         		} else if (variant.inheritance == 'denovo') {
+					var svg = selection.append("svg")
+								        .attr("class", "inheritance-badge")
+								        .attr("height", 14)
+								        .attr("width", 16);
+					var options = {width: 18, height: 16, transform: "translate(-1,1)"};
+					matrixCard.showDeNovoSymbol(svg, options);				
+         		}
+         	}
+         });
+
+		d3.selectAll('#bookmark-card #bookmark-panel a')
+		  .filter(function(d,i) {  
+		  	return d.key == me.selectedBookmarkKey; 
+		  })
+		  .classed("current", true);
+
 
 }
+

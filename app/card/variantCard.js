@@ -795,6 +795,11 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 									   regionEnd ? regionEnd : window.gene.end);
 			}	
 
+			var filteredVcfData = this.filterVariants(theVcfData);
+			me._fillVariantChart(filteredVcfData, 
+	  							 regionStart ? regionStart : window.gene.start, 
+	  							 regionEnd ? regionEnd : window.gene.end);
+
 
 			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
 				var filteredVcfData = this.filterVariants(theVcfData);
@@ -877,8 +882,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
 
-			        //var filteredVcfData = me.filterVariants();
-		  			//me._fillVariantChart(data, window.gene.start, window.gene.end);
 
 		  			// Here we call this method again and since we
 					// have vcf data, the variant chart will be filled
@@ -914,8 +917,24 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 	   	 		   window.hideGeneBadgeLoading(window.gene.gene_name);
    	    		}
 				
-				if (error == "missing reference") {
+				if (error && error == "missing reference") {
 					me._displayRefNotFoundWarning();
+				} else if (error && error.toLowerCase() == "no variants") {
+					if (me.isViewable()) {
+					   $('#matrix-track').addClass("hide");
+					    me.cardSelector.find("#vcf-track").addClass("hide");
+					    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+					    me.cardSelector.find("#vcf-variant-count").text("");
+					    me.cardSelector.find('.vcfloader').addClass("hide");
+					    me.cardSelector.find('#error-warning #message').text(error);
+					    me.cardSelector.find('#error-warning').removeClass("hide");	
+
+					    if (getProbandVariantCard().isLoaded()) {
+						    $("#matrix-panel .loader").addClass("hide");
+							getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+					    }
+					}
+
 				} else {
 					console.log(error);
 					if (me.isViewable()) {
@@ -996,6 +1015,8 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	   		window.matrixCard.setFeatureMatrixSource(data);
 	   	}
 	}
+
+	bookmarkCard.flagBookmarks(getProbandVariantCard(), window.gene);
 
 
 
@@ -1829,6 +1850,22 @@ VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
 		 + '</div>';
 }
 
+VariantCard.prototype.highlightBookmarkedVariants = function() {
+	d3.selectAll("#proband-variant-card .variant")
+		   .style("opacity", .3);
+
+	d3.selectAll("#proband-variant-card .variant")
+	      .filter( function(d,i) {
+	      	return d.hasOwnProperty("isBookmark") && d.isBookmark == 'Y';
+	      })
+	      .style("opacity", 1);
+}
+
+VariantCard.prototype.removeBookmarkFlags = function() {
+	// Remove the current indicator from the bookmark flag
+	this.d3CardSelector.selectAll('#vcf-track .bookmark').remove();
+}
+
 VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 	if (variant == null) {
 		return;
@@ -1864,7 +1901,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 		}
 	}
 
-	this.fillFeatureMatrix();
+	//this.fillFeatureMatrix();
 
 	if (singleFlag) {
 		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);

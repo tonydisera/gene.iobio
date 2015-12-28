@@ -191,7 +191,7 @@ MatrixCard.prototype.init = function() {
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
 				    .cellSize(18)
-				    .columnLabelHeight(62)
+				    .columnLabelHeight(67)
 				    .rowLabelWidth(140)
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
@@ -310,6 +310,9 @@ MatrixCard.prototype.showTooltip = function(variant) {
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
 
+	if (theVcfData == null) {
+		return;
+	}
 
 
 	// Flag any bookmarked variants

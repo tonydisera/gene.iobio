@@ -586,10 +586,26 @@ function variantD3() {
        .attr("transform", "translate(" + xpos + "," +  ypos + ")" );
 
 
+    var flagGroup = group.append("g")
+       .attr("transform", "translate(0,0)");
+    flagGroup.append("rect")
+             .attr("x", 1)
+             .attr("y", 0)
+             .attr("width", 10)
+             .attr("height", 10);
+    /*
+    flagGroup.append("g")
+             .attr("transform", "translate(1,0),rotate(90)")
+             .append("use")
+             .attr("xlink:href", "#bookmark-symbol")
+             .attr("width", "12")
+             .attr("height", "12");
+    */
 
+
+    /*
     var flagGroup = group.append("g")
        .attr("transform", "translate(-1,-5)");
-
     flagGroup.append("line")
              .attr("x1", 4)
              .attr("x2", 4)
@@ -601,6 +617,7 @@ function variantD3() {
              .attr("xlink:href", "#bookmark-symbol")
              .attr("width", "12")
              .attr("height", "12");
+    */
 
     return chart;
 

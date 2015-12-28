@@ -1437,6 +1437,7 @@ function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
 
 		}
 	}
+	readjustCards();
 }
 
 function selectGeneBadge(badgeElement) {

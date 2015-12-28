@@ -131,6 +131,23 @@ body {
   visibility: hidden !important;
 }
 
+#bookmark-card a {
+  margin-right: 5px;
+  word-break: break-all;
+}
+
+#bookmark-card a.current {
+    font-weight: bold;
+    background-color: #eee;
+    line-height: 12px;
+    padding-bottom: 2px;
+    padding-top: 2px !important;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    margin-right: 5px;
+    border: none !important;
+}
+
 #bookmark-card .bookmark {
   font-size: 10px;
   cursor: pointer;
