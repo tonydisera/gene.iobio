@@ -1870,7 +1870,11 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	} else {
 		if (window.gene.gene_type != window.selectedTranscript.transcript_type) {
 			$('#non-protein-coding #transcript-type-badge').removeClass("hide");
-			$('#non-protein-coding #transcript-type-badge').text(window.selectedTranscript.transcript_type + ' transcript');
+			var suffix = "";
+			if (window.selectedTranscript.transcript_type.indexOf("transcript") < 0) {
+				suffix = " transcript";
+			}
+			$('#non-protein-coding #transcript-type-badge').text(window.selectedTranscript.transcript_type + suffix);
 		} else {
 			$('#non-protein-coding #transcript-type-badge').addClass("hide");
 		}
