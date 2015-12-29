@@ -151,14 +151,21 @@ body {
 #bookmark-card .bookmark {
   font-size: 10px;
   cursor: pointer;
-  display: block;
+  display: inline-block;
+  float: left;
+  width: 170px;
   text-align: left;
   padding-top: 4px;
   margin-left: 10px;
 }
 
+#bookmark-card div.bookmar-box {
+  clear: both;
+}
+
 #bookmark-card div.bookmark-gene {
   margin-bottom: 5px;
+  clear: both;
 
 }
 
@@ -169,6 +176,15 @@ body {
     text-align: left;
     padding-top: 4px;
     margin-bottom: -5px;
+}
+
+#bookmark-card .favorite-indicator {
+  cursor: pointer;
+}
+
+#bookmark-card li {
+  color: rgb(132,132,132) !important;
+  font-size: 11px;
 }
 
 #get-genes-copy-paste-button.btn.btn-raised,

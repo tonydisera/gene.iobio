@@ -1362,7 +1362,7 @@ function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
 				for (type in types) {
 					var theClazz = 'impact_' + impactClass;	
 					var effectObject = types[type];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"14\">");
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"12\">");
 					var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[symbolIndex]).data([{width:10, height:10,clazz: theClazz, type:  type, effectObject: effectObject}]);
 					symbolIndex++;
 					matrixCard.showImpactBadge(selection);	
@@ -1391,11 +1391,13 @@ function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
 		} else if (dangerKey == 'SIFT') {
 			var dangerSift = dangerObject[dangerKey];
 			if (dangerSift != null) {
+				var symbolIndex = 0;
 				for (clazz in dangerSift) {
 					var siftObject = dangerSift[clazz];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"sift-badge\" height=\"12\" width=\"14\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[0]).data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz, siftObject: siftObject }]);
-					matrixCard.showSiftSymbol(selection);				
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[symbolIndex]).data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz, siftObject: siftObject }]);					
+					matrixCard.showSiftSymbol(selection);	
+					symbolIndex++;			
 					selection.on("mouseover", function(d,i) {
 						var maxSift = "SIFT ";
 						for (key in d.siftObject) {
@@ -1415,11 +1417,13 @@ function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
 		} else if (dangerKey == 'POLYPHEN') {			
 			var dangerPolyphen = dangerObject[dangerKey];
 			if (dangerPolyphen != null) {
+				var symbolIndex = 0;
 				for (clazz in dangerPolyphen) {
 					var polyphenObject = dangerPolyphen[clazz];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"14\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[0]).data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz, polyphenObject: polyphenObject}]);
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz, polyphenObject: polyphenObject}]);
 					matrixCard.showPolyPhenSymbol(selection);	
+					symbolIndex++;
 					selection.on("mouseover", function(d,i) {
 						var maxPolyphen = "PolyPhen ";
 						for (key in d.polyphenObject) {
@@ -1432,6 +1436,22 @@ function _setGeneBadgeGlyphs(geneName, dangerObject, select) {
 						d3.select(this.parentNode.parentNode.parentNode).select("#gene-badge-button").attr('title', maxPolyphen);						
 			
 					});								
+				}
+			}
+
+		} else if (dangerKey == 'INHERITANCE') {
+			var inheritanceClasses = dangerObject[dangerKey];
+			if (inheritanceClasses != null) {
+				var symbolIndex = 0;
+				for (key in inheritanceClasses) {
+					var inheritanceValue = inheritanceClasses[key];
+					var clazz = key;
+					var symbolFunction = matrixCard.inheritanceMap[inheritanceValue].symbolFunction;
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"12\" width=\"14\">");
+					var options = {width:18, height:20, transform: 'translate(-2,-2)'};
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: clazz}]);
+					symbolFunction(selection, options);	
+					symbolIndex++;			
 				}
 			}
 
@@ -2189,6 +2209,8 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					trioModel.compareVariantsToMotherFather(function() {
 						
 						probandVariantCard.refreshVariantChartAndMatrix();
+
+						refreshCurrentGeneBadge();
 
 						$("#matrix-panel .loader").removeClass("hide");
 						$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");

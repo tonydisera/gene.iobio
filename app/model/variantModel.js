@@ -133,6 +133,7 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	var clinvarClasses = {};
 	var impactClasses = {};
 	var consequenceClasses = {};
+	var inheritanceClasses = {};
 	theVcfData.features.forEach( function(variant) {
 	    for (key in variant.highestImpactSnpeff ) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
@@ -192,6 +193,10 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 
 	    	}
 	    }
+	    if (variant.inheritance != null && variant.inheritance != 'none' && variant.inheritance != '') {
+	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
+	    	inheritanceClasses[clazz] = variant.inheritance;
+	    }
 
 	});
 
@@ -224,6 +229,7 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	dangerCounts.IMPACT = getLowestImpact(impactClasses);
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
 	dangerCounts.CLINVAR = getLowestClazz(clinvarClasses);
+	dangerCounts.INHERITANCE = inheritanceClasses;
 	
 
 	return dangerCounts;
