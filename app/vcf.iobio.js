@@ -1740,6 +1740,7 @@ var effectCategories = [
 
               variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
                 'strand': regionStrand, 
+                'chrom': refName,
                 'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
                 'id': rec.id, 'ref': rec.ref, 
                 'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 

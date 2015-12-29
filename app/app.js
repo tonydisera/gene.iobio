@@ -2232,6 +2232,8 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					
 					probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);	
 
+					$("#matrix-panel .loader").addClass("hide");
+
 					resolve();		
 				}
 			}

@@ -182,9 +182,7 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	    	}
 	    }
 	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
-	    //if (variant.hasOwnProperty('highestClinvar')) {
 	    	for (key in variant.clinVarClinicalSignificance) {
-	    	//for (key in variant.highestClinvar) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge == true) {
 				    var clazz = matrixCard.clinvarMap[key].clazz;
 					var order = matrixCard.clinvarMap[key].value;

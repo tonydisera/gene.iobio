@@ -940,8 +940,8 @@ section {
 
 
 .loader img {
-  height: 22px;
-  width: 22px;
+  height: 16px;
+  width: 16px;
 }
 .loader {
   text-align: center;
@@ -955,7 +955,7 @@ section {
 }
 .loader-label {
   color: rgb(111,111,111);
-  font-size: 14px;    
+  font-size: 13px;    
 }
 
 .variant-card .vcfloader {
