@@ -490,6 +490,11 @@ function variantD3() {
             .call(xAxis);       
       }
 
+      // Add grouping for bookmarks
+      svg.select("g.bookmarks").remove();
+      svg.append("g")
+         .attr("class", "bookmarks");
+
 
 
       // add a circle and label
@@ -499,8 +504,10 @@ function variantD3() {
           .attr("class", "circle")
           .attr("cx", 0)
           .attr("cy", 0)
-          .attr("r", 6)                    
+          .attr("r", 7)                    
           .style("opacity", 0);
+
+      
       
       // add a arrow on the x-axis
       svg.selectAll("g.arrow").remove();
@@ -508,20 +515,7 @@ function variantD3() {
                       .enter().append("g")
                       .attr("class", "arrow")
                       .attr("transform", "translate(2,0)");
-      /*
-      garrow.append('polygon')
-          .attr("class", "arrow")
-          .attr("points", "0,8 4,2 8,8")
-          .style("opacity", 0);
-      garrow.append('line')
-          .attr("class", "arrow arrow-line")
-          .attr("x1", 4)
-          .attr("x2", 4)
-          .attr("y1", 8)
-          .attr("y2", 50)
-          .style("opacity", 0);   
-     */  
-
+ 
       garrow.append('line')
           .attr("class", "arrow arrow-line")
           .attr("x1", 8)
@@ -537,10 +531,7 @@ function variantD3() {
           .attr("y2", 8)
           .style("opacity", 0);    
 
-      // Add grouping for bookmarks
-      svg.select("g.bookmarks").remove();
-      svg.append("g")
-         .attr("class", "bookmarks");
+
       
       dispatch.d3rendered();
  
@@ -558,12 +549,14 @@ function variantD3() {
           && d.ref == variant.ref 
           && d.alt == variant.alt 
           && d.type.toLowerCase() == variant.type.toLowerCase()) {
-          matchingVariant = variant;
+          matchingVariant = d;
        }
     });
     if (!matchingVariant) {
       return;
     }
+
+    matchingVariant.isBookmark = 'Y';
 
     // Get the x, y for the variant's position
     var mousex = d3.round(x(matchingVariant.start));
@@ -587,12 +580,12 @@ function variantD3() {
 
 
     var flagGroup = group.append("g")
-       .attr("transform", "translate(0,0)");
+       .attr("transform", "translate(-1,-1)");
     flagGroup.append("rect")
              .attr("x", 1)
              .attr("y", 0)
-             .attr("width", 10)
-             .attr("height", 10);
+             .attr("width", 12)
+             .attr("height", 12);
     /*
     flagGroup.append("g")
              .attr("transform", "translate(1,0),rotate(90)")

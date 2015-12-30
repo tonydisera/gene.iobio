@@ -243,6 +243,7 @@ BookmarkCard.prototype.resolveBookmarkedVariant = function(key, bookmarkEntry, g
 		} 
 	} else {
 		variant = bookmarkEntry;
+		variant.isBookmark = "Y";
 	}
 	return variant;
 }

@@ -1322,10 +1322,24 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 }
 
 VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
+	var me = this;
+	if (lock) {
+		//showSidebar('Examine');
+	}
+	me._showTooltip(tooltip, variant, sourceVariantCard, lock);
+
+	//setTimeout( function() {
+	//	
+	//}, 3000);
+}
+
+VariantCard.prototype._showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
+	var me = this;
+	
 	var x;
 	var y;
 
-	if (this == sourceVariantCard) {
+	if (me == sourceVariantCard) {
 		x = d3.event.pageX;
 		y = d3.event.pageY;
 	} else {
@@ -1355,16 +1369,19 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	 var h = tooltip[0][0].offsetHeight;
 
     if (this == sourceVariantCard) {
-		tooltip.html(this.variantTooltipHTML(variant));
+		tooltip.html(me.variantTooltipHTML(variant));
     } else {
-    	tooltip.html(this.variantTooltipMinimalHTML(variant));
+    	tooltip.html(me.variantTooltipMinimalHTML(variant));
     }
 	tooltip.select("#unpin").on('click', function() {
 		me._unpin();
 	});
+	tooltip.select("#examine").on('click', function() {
+		showSidebar('Examine');
+	});
 
 	var selection = tooltip.select("#coverage-svg");
-	this.createAlleleCountSVGTrio(selection, variant);
+	me.createAlleleCountSVGTrio(selection, variant);
    
 	var windowWidth = $(window).width();
 
@@ -1373,14 +1390,14 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	       tooltip.style("width", w + "px")
 	             .style("left", x - (w*2) + "px") 
 	             .style("text-align", 'left')    
-	             .style("top", (y - h) + "px");   
+	             .style("top", (y - h - 10) + "px");   
 
 
 		} else {
  			tooltip.style("width", w + "px")
 	             .style("left", (x - w) + "px") 
 	             .style("text-align", 'left')    
-	             .style("top", (y - h) + "px");   
+	             .style("top", (y - h - 10) + "px");   
 		}
 	} else {
 	    if (x < w) {
@@ -1388,14 +1405,14 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	      tooltip.style("width", w + "px")
 	             .style("left", x + "px") 
 	             .style("text-align", 'left')    
-	             .style("top", (y - h) + "px");   
+	             .style("top", (y - h - 10) + "px");   
 
 	    } else {
 	    	cond = 3;
 	      tooltip.style("width", w + "px")
 	             .style("left", (x - w) + "px") 
 	             .style("text-align", 'left')    
-	             .style("top", (y - h) + "px");   
+	             .style("top", (y - h - 10) + "px");   
 	    }
 
 	}
@@ -1409,6 +1426,9 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
     tooltip.on('click', function() {
 		me._unpin();
 	});
+
+
+	
 
 }
 
@@ -1469,8 +1489,8 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 		   .attr("x", "1")
   	  	   .attr("y", "1")
   		   .attr("height", 10)
-		   .attr("width",BAR_WIDTH + 10)
-		   .attr("class", "alt-count");
+		   .attr("width",BAR_WIDTH)
+		   .attr("class", "ref-count");
 		
 		svg.append("text")
 		   .attr("x", BAR_WIDTH + 5)
@@ -1483,7 +1503,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 		    .attr("x", BAR_WIDTH / 2)
 		    .attr("y", "9")
 		    .attr("text-anchor", "middle")
-		    .attr("class", "alt-count")
+		    .attr("class", "ref-count")
 	   		.text("?");
 		return;
 	} 
@@ -1789,7 +1809,7 @@ VariantCard.prototype._unpinRow = function(pinMessage) {
 	}
 	if (window.clickedVariant) {
 		return '<div class="row" style="margin-bottom: -2px;margin-top: 24px !important;font-size: 11px;">'
-		  + '<div class="col-md-4" style="text-align:left;">' +  '<a href="javascript:void(0)">Examine </a>' +  '</div>'
+		  + '<div class="col-md-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Examine </a>' +  '</div>'
 		  + '<div class="col-md-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
 		  + '<div class="col-md-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
 		  + '</div>';
@@ -1797,7 +1817,7 @@ VariantCard.prototype._unpinRow = function(pinMessage) {
 
 	} else {
 		return '<div class="row">'
-		  + '<div class="col-md-12" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
+		  + '<div class="col-md-12 tooltip-footer" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
 		  + '</div>';
 	}
 }
@@ -1888,6 +1908,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 		// If the flag isn't present, add it to the freebayes variant
 		if (isEmpty) {
 			container = this.d3CardSelector.selectAll('#fb-variants svg');
+			variant.isBookmark = "Y";
 			this.fbChart.addBookmark(container, variant, key);
 		}
 	} else {
@@ -1897,6 +1918,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 		// If the flag isn't present, add it to the vcf variant
 		if (isEmpty) {
 			container = this.d3CardSelector.selectAll('#vcf-variants svg');
+			variant.isBookmark = "Y";
 			this.vcfChart.addBookmark(container, variant, key);
 		}
 	}

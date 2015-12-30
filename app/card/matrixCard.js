@@ -312,7 +312,7 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
 
-	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to isolate variant"));
+	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip"));
 
 	var selection = tooltip.select("#coverage-svg");
 	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant);

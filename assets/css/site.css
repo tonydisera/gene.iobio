@@ -159,7 +159,7 @@ body {
   margin-left: 10px;
 }
 
-#bookmark-card div.bookmar-box {
+#bookmark-card div.bookmark-box {
   clear: both;
 }
 
@@ -272,11 +272,15 @@ body {
 
 .tooltip-value {
   overflow-wrap: break-word;
-  padding-left: 10px;
   float:right;
   width: 180px;
   margin-right: 5px;
   color: #000000;
+}
+
+.tooltip-footer {
+  color: #376F9C !important;
+  margin-bottom: -5px;
 }
 
 .dropdown-menu .divider {
@@ -398,7 +402,9 @@ a, a:hover, a:focus {
 }
 
 .tooltip a, .tooltip a:hover, .tooltip a:focus {
-  color: #4E961D !important;
+  color: #376F9C !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
 }
 
 #variant-card-buttons a.selected {
@@ -755,7 +761,7 @@ section {
    fill:none !important;
  }
 .tooltip rect.alt-count {
-    fill: rgb(93, 128, 157) !important;
+    fill: #6A9C2F !important;
 }
 .tooltip text.alt-count {
   fill: white !important;
@@ -1104,17 +1110,20 @@ header {
 #vcf-track .bookmark rect {
   fill: none;
   stroke: #3773A7 ;
-  stroke-width: 2;
+  stroke-width: 4;
+  opacity: .7;
 }
 
 #vcf-track .bookmark line{
   stroke: #3773A7;
-  stroke-width: 2;
+  stroke-width: 4;
+  opacity: .7;
 }
 
 #vcf-track .bookmark g,
 #matrix-track g.bookmark {
   fill: #3773A7 ; 
+  opacity: .7;
 }
 
 
@@ -1180,7 +1189,7 @@ header {
 #vcf-variants .arrow-line, 
 #fb-variants .arrow-line {
   stroke: rgba(221, 109, 109, 1);
-  stroke-width: 2;
+  stroke-width: 3;
   fill: none;
 }
 
@@ -1190,18 +1199,18 @@ header {
 #fb-variants .arrow-line.emphasize  {
   stroke:  rgba(221, 109, 109, 1);
   fill: none ;
-  stroke-width: 3 ;
+  stroke-width: 4 ;
 }
 #vcf-variants .arrow, 
 #fb-variants .arrow {
   fill:  rgba(221, 109, 109, 1);
-  stroke-width: 2;
+  stroke-width: 4;
   stroke:  rgba(221, 109, 109, 1);
 }
 #vcf-variants .arrow.emphasize, 
 #fb-variants .arrow.emphasize {
   fill:  rgba(221, 109, 109, 1);
-  stroke-width: 3;
+  stroke-width: 4;
   stroke: rgba(221, 109, 109, 1);
 }
 #bam-depth .circle-label {
