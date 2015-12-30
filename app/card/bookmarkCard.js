@@ -256,16 +256,22 @@ BookmarkCard.prototype.sortBookmarksByGene = function() {
 	}
 
     tuples.sort(function(a, b) { 
-    	var keyA = a[0];
-    	var keyB = b[0];
-    	var startA = a[1].start;
-    	var startB = b[1].start;
+    	var keyA    = a[0];
+    	var keyB    = b[0];
+    	var startA  = a[1].start;
+    	var startB  = b[1].start;
+    	var refAltA = a[1].ref + "->" + a[1].alt;
+    	var refAltB = b[1].ref + "->" + b[1].alt;
 
     	var geneA = keyA.split(": ")[0];
     	var geneB = keyB.split(": ")[0];
 
     	if (geneA == geneB) {
-    		return startA < startB ? 1 : startA > startB ? -1 : 0;
+    		if (startA == startB) {
+				return refAltA < refAltB ? 1 : refAltA > refAltB ? -1 : 0;
+    		} else {
+	    		return startA < startB ? 1 : startA > startB ? -1 : 0;
+    		}
     	} else {
 	    	return geneA < geneB ? 1 : geneA > geneB ? -1 : 0;
     	}

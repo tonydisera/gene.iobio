@@ -345,7 +345,7 @@ function variantD3() {
 
       // snps
       track.selectAll('.variant').data(function(d) { 
-        return d['features'].filter( function(d) { return d.type.toUpperCase() == 'SNP'; }) ;
+        return d['features'].filter( function(d) { return d.type.toUpperCase() == 'SNP' || d.type.toUpperCase() == 'MNP'; }) ;
       }).enter().append('rect')
           .attr('class', function(d) { return clazz(d); })          
           .attr('rx', borderRadius)
@@ -413,7 +413,7 @@ function variantD3() {
             .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
 
 
-        track.selectAll('.variant.snp').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
+        track.selectAll('.variant.snp, .variant.mnp').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
             .transition()        
               .duration(1000)
               .attr('x', function(d) { 

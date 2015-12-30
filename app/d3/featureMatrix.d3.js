@@ -351,6 +351,8 @@ function featureMatrixD3() {
               colObject.screenY = window.pageYOffset + matrix.f + margin.top;
 
               dispatch.d3mouseover(colObject); 
+
+
             })                  
            .on("mouseout", function(d) {      
               var column = d3.select(this.parentNode.parentNode);
@@ -360,13 +362,16 @@ function featureMatrixD3() {
             })
             .on("click", function(d, i) {                
               var colObject = d3.select(this.parentNode.parentNode).datum();
-              var colIndex = Math.floor(i / matrixRowNames.length);               
+
+              var colIndex = Math.floor(i / matrixRowNames.length);  
               var on = !(d3.select(this.parentNode.parentNode).select(".colbox").attr("class").indexOf("current") > -1);
-              d3.select(this.parentNode.parentNode).select(".colbox").classed("current", on);
-              d3.select(this.parentNode.parentNode).classed("current", on);
-              var textDOM = container.selectAll('.x.axis .tick text')[0][colIndex];
-              d3.select(textDOM).classed("current", on);
-              dispatch.d3click(colObject);
+              d3.select(this.parentNode.parentNode.parentNode).select(".colbox.current").classed("current", false);             
+              if (on) {
+                d3.select(this.parentNode.parentNode).select(".colbox").classed("current", on);
+                dispatch.d3click(colObject);
+              } else {
+                dispatch.d3click();
+              }
             });
 
 

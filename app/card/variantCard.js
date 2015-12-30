@@ -104,7 +104,7 @@ VariantCard.prototype.hide = function() {
 	this.cardSelector.addClass("hide");
 }
 
-VariantCard.prototype.highlightVariants = function(variants) {
+VariantCard.prototype.isolateVariants = function(variants) {
 	if (variants != null && variants.length > 0) {
 		this.d3CardSelector.selectAll("#vcf-variants .variant")
 		    .style("opacity", .1);
@@ -1635,9 +1635,9 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	}
 
 	var zygosity = "";
-	if (variant.zygosity.toLowerCase() == 'het') {
+	if (variant.zygosity && variant.zygosity.toLowerCase() == 'het') {
 		zygosity = "Heterozygous";
-	} else if (variant.zygosity.toLowerCase() == 'hom') {
+	} else if (variant.zygosity && variant.zygosity.toLowerCase() == 'hom') {
 		zygosity = "Homozygous";
 	}
 
@@ -1737,7 +1737,7 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 	
 	
 	return (
-		  me._tooltipHeaderRow(variant.type.toUpperCase(), refalt, coord, dbSnpUrl)
+		  me._tooltipHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpUrl)
 		+ me._tooltipHeaderRow(zygosity, '', '', '')
 
 		+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Impact &amp; Effect' : 'VEP Impact &amp; Effect'),  

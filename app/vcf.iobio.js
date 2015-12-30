@@ -1212,7 +1212,10 @@ var effectCategories = [
                 if (annotToken.indexOf("SVLEN=") == 0) {
                   len = Math.abs(+annotToken.substring(6, annotToken.length));       
                 } else if (annotToken.indexOf("SVTYPE=") == 0) {
-                  type = annotToken.substring(7, annotToken.length);       
+                  type = annotToken.substring(7, annotToken.length);
+                  //if (type && type.toLowerCase() == 'mnp') {
+                  //  type = 'snp';
+                  //}       
                 }
               });
               rec.ref = '';

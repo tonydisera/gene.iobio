@@ -195,25 +195,38 @@ MatrixCard.prototype.init = function() {
 				    .rowLabelWidth(140)
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
+				    	if (variant ==  null) {
+				    		me._unpin();
+				    	} else {
+					    	if (variant != clickedVariant) {
+					    		clickedVariant = variant;
+						    	me.showTooltip(variant);
+						    	variantCards.forEach(function(variantCard) {
+						    		variantCard.showVariantCircle(variant);
+						    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
+						    	});
+					    	} else {
+					    		me._unpin();
+					    	}				    		
+				    	}
 				    	
-				    	me.showTooltip(variant);
-				    	variantCards.forEach(function(variantCard) {
-				    		variantCard.highlightVariants(d3.selectAll("#feature-matrix .col.current").data());
-				    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
-				    	});
 				    })
 				     .on('d3mouseover', function(variant) {
-				     	me.showTooltip(variant);
-				    	variantCards.forEach(function(variantCard) {
-				    		variantCard.showVariantCircle(variant);
-				    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
-				    	});
+				     	if (clickedVariant == null) {
+					     	me.showTooltip(variant);
+					    	variantCards.forEach(function(variantCard) {
+					    		variantCard.showVariantCircle(variant);
+					    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
+					    	});
+				     	}
 				    })
 				    .on('d3mouseout', function() {
-				    	me.hideTooltip();
-				    	variantCards.forEach(function(variantCard) {
-				    		variantCard.hideVariantCircle();
-				    	});
+				    	if (clickedVariant == null) {
+					    	me.hideTooltip();
+					    	variantCards.forEach(function(variantCard) {
+					    		variantCard.hideVariantCircle();
+					    	});				    		
+				    	}
 				    })
 				    .on('d3rowup', function(i) {
 				    	var column = null;
@@ -260,6 +273,25 @@ MatrixCard.prototype.init = function() {
 
 }
 
+MatrixCard.prototype._unpin = function() {
+	clickedVariant = null;
+
+	this.hideTooltip();
+
+	variantCards.forEach(function(variantCard) {
+		variantCard.hideCoverageCircle();
+	});
+
+}
+
+MatrixCard.prototype._isolateVariants = function() {
+	variantCards.forEach(function(variantCard) {
+		variantCard.isolateVariants(d3.selectAll("#feature-matrix .col.current").data());
+	});
+
+}
+
+
 MatrixCard.prototype.hideTooltip = function() {
 	var tooltip = d3.select('#matrix-track .tooltip');
 	tooltip.transition()        
@@ -271,6 +303,8 @@ MatrixCard.prototype.hideTooltip = function() {
 
 
 MatrixCard.prototype.showTooltip = function(variant) {
+	var me = this;
+
 	var tooltip = d3.select('#matrix-track .tooltip');
 	tooltip.style("z-index", 20);
 	tooltip.transition()        
@@ -283,6 +317,9 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	var selection = tooltip.select("#coverage-svg");
 	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant);
    
+	tooltip.select("#unpin").on('click', function() {
+		me._unpin();
+	});
 
 	var h = tooltip[0][0].offsetHeight;
 	var w = 300;
@@ -882,7 +919,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
 
     var symbolSize = symbolScale(6);
      
-	if (type.toUpperCase() == 'SNP') {
+	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
 		         .attr("transform", "translate(4,4)")
 		         .append("rect")
@@ -906,6 +943,8 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
 						    return  'circle';
 						} else if (type.toUpperCase() == 'COMPLEX') {
 						    return 'diamond';
+						} else {
+							return 'square';
 						}
                      })();
           })
