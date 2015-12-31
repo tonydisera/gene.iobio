@@ -67,6 +67,8 @@ var filterCard = new FilterCard();
 // genes card
 var genesCard = new GenesCard();
 
+// examine variant card
+var examineCard = new ExamineCard();
 
 // matrix card
 var matrixCard = new MatrixCard();
@@ -301,6 +303,10 @@ function init() {
 	 // Initialize the bookmark card
 	 bookmarkCard = new BookmarkCard();
 	 bookmarkCard.init();
+
+	 // Initialize examine card
+	 examineCard = new ExamineCard();
+	 examineCard.init();
 
 
 	// Initialize transcript view buttons
@@ -1055,6 +1061,9 @@ function initCopyPasteGenes() {
 }
 
 function copyPasteGenes(geneNameToSelect) {
+	// Clear the cache
+	clearCache();
+
 	var genesString = $('#genes-to-copy').val();
 	// trim newline at very end
 	genesString = genesString.replace(/\s*$/, "");

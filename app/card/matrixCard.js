@@ -196,36 +196,39 @@ MatrixCard.prototype.init = function() {
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
-				    		me._unpin();
+				    		me.unpin();
 				    	} else {
 					    	if (variant != clickedVariant) {
 					    		clickedVariant = variant;
-						    	me.showTooltip(variant);
+					    		me.showTooltip(variant, true);
 						    	variantCards.forEach(function(variantCard) {
 						    		variantCard.showVariantCircle(variant);
 						    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
 						    	});
+						    	
 					    	} else {
-					    		me._unpin();
+					    		me.unpin();
 					    	}				    		
 				    	}
 				    	
 				    })
 				     .on('d3mouseover', function(variant) {
 				     	if (clickedVariant == null) {
-					     	me.showTooltip(variant);
+				     		me.showTooltip(variant);
 					    	variantCards.forEach(function(variantCard) {
 					    		variantCard.showVariantCircle(variant);
 					    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
 					    	});
+					    	
 				     	}
 				    })
 				    .on('d3mouseout', function() {
 				    	if (clickedVariant == null) {
-					    	me.hideTooltip();
+				    		me.hideTooltip();
 					    	variantCards.forEach(function(variantCard) {
 					    		variantCard.hideVariantCircle();
 					    	});				    		
+					    	
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
@@ -273,8 +276,11 @@ MatrixCard.prototype.init = function() {
 
 }
 
-MatrixCard.prototype._unpin = function() {
-	clickedVariant = null;
+
+MatrixCard.prototype.unpin = function(saveClickedVariant) {
+	if (!saveClickedVariant) {
+		clickedVariant = null;
+	}
 
 	this.hideTooltip();
 
@@ -302,8 +308,18 @@ MatrixCard.prototype.hideTooltip = function() {
 }
 
 
-MatrixCard.prototype.showTooltip = function(variant) {
+MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var me = this;
+
+
+	if (lock && !$("#slider-left").hasClass("hide")) {
+		showSidebar("Examine");
+		examineCard.showVariant(variant);
+	}
+
+	if (lock) {
+		getProbandVariantCard().unpin(true);
+	}
 
 	var tooltip = d3.select('#matrix-track .tooltip');
 	tooltip.style("z-index", 20);
@@ -318,7 +334,11 @@ MatrixCard.prototype.showTooltip = function(variant) {
 	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant);
    
 	tooltip.select("#unpin").on('click', function() {
-		me._unpin();
+		me.unpin();
+	});
+	tooltip.select("#examine").on('click', function() {
+		showSidebar('Examine');
+		examineCard.showVariant(variant);
 	});
 
 	var h = tooltip[0][0].offsetHeight;
@@ -326,8 +346,6 @@ MatrixCard.prototype.showTooltip = function(variant) {
 
 	var x = variant.screenX;
 	var y = variant.screenY + 10;
-
-
 
 	if (x < w) {
 		tooltip.style("width", w + "px")

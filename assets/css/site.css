@@ -280,8 +280,48 @@ body {
 
 .tooltip-footer {
   color: #376F9C !important;
-  margin-bottom: -5px;
 }
+
+
+#examine-card {
+  font-size: 11px;
+}
+
+#examine-card .tooltip-title {
+  font-size: 11px;
+  color: #000000;
+}
+
+#examine-card .tooltip-header {
+  overflow-wrap: break-word;
+  text-align:right;
+  width: 55px;
+  display: inline-block !important;
+  float: none;
+  color: rgb(132,132,132);
+}
+
+#examine-card .tooltip-row {
+  width:300px;
+  clear:both;
+  margin-bottom: 7px;
+}
+
+#examine-card .tooltip-value {
+  overflow-wrap: break-word;
+  margin-left: 10px;
+  width: 130px;
+  margin-right: 5px;
+  display: inline-block !important;
+  float: none;
+  color: #000000;
+}
+
+#examine-card .tooltip-footer {
+  display: none !important; 
+}
+
+
 
 .dropdown-menu .divider {
   height: 1px;
@@ -753,17 +793,17 @@ section {
   fill: none;
 }
 
- .tooltip rect.alt-count, 
- .tooltip rect.ref-count {
+rect.alt-count, 
+rect.ref-count {
   stroke: black !important;
  }
- .tooltip rect.ref-count {
+rect.ref-count {
    fill:none !important;
  }
-.tooltip rect.alt-count {
+rect.alt-count {
     fill: #6A9C2F !important;
 }
-.tooltip text.alt-count {
+text.alt-count {
   fill: white !important;
 }
 

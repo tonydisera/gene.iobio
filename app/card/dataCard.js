@@ -132,7 +132,7 @@ DataCard.prototype.init = function() {
 		
 		
 		// Clear the cache
-		//clearCache();
+		clearCache();
 
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father

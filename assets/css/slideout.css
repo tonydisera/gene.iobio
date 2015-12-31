@@ -51,7 +51,7 @@
 
 
 .close-button {
-   padding-top:3px;  
+   padding-top:0px;  
    z-index: 100;
    font-size: 14px;
    cursor: pointer;
@@ -108,7 +108,7 @@
 
 #close-slide-left {
   position: fixed;
-  left: 225px;
+  left: 230px;
   top: 0px;   
 }
 

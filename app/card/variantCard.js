@@ -216,7 +216,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
-				    		me._unpin();
+				    		me.unpin();
 				    	}
 					})			    
 				    .on('d3mouseover', function(d) {
@@ -252,7 +252,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
-				    		me._unpin();
+				    		me.unpin();
 				    	}
 					})				    
 				    .on('d3mouseover', function(d) {
@@ -474,7 +474,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 	// Reset any previous locked variant
 	this.clickedVariant = null;
 	window.hideCircleRelatedVariants();
-	this._unpin();
+	this.unpin();
 
 	// Clear out the previous gene's data
 	this.model.wipeGeneData();
@@ -1321,31 +1321,30 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	
 }
 
+
+
 VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
 	var me = this;
-	if (lock) {
-		//showSidebar('Examine');
+
+	if (lock && !$("#slider-left").hasClass("hide")) {
+		showSidebar("Examine");
+		examineCard.showVariant(variant);
 	}
-	me._showTooltip(tooltip, variant, sourceVariantCard, lock);
 
-	//setTimeout( function() {
-	//	
-	//}, 3000);
-}
-
-VariantCard.prototype._showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
-	var me = this;
+	if (lock) {
+		matrixCard.unpin(true);
+	}
 	
 	var x;
 	var y;
 
-	if (me == sourceVariantCard) {
-		x = d3.event.pageX;
-		y = d3.event.pageY;
-	} else {
+	//if (me == sourceVariantCard) {
+	//	x = d3.event.pageX;
+	//	y = d3.event.pageY;
+	//} else {
 		x = variant.screenX;
 		y = variant.screenY;
-	}
+	//}
 
 	if (!$("#slider-left").hasClass("hide")) {
 		x += 40;
@@ -1374,10 +1373,11 @@ VariantCard.prototype._showTooltip = function(tooltip, variant, sourceVariantCar
     	tooltip.html(me.variantTooltipMinimalHTML(variant));
     }
 	tooltip.select("#unpin").on('click', function() {
-		me._unpin();
+		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
 		showSidebar('Examine');
+		examineCard.showVariant(variant);
 	});
 
 	var selection = tooltip.select("#coverage-svg");
@@ -1424,7 +1424,7 @@ VariantCard.prototype._showTooltip = function(tooltip, variant, sourceVariantCar
     }
 
     tooltip.on('click', function() {
-		me._unpin();
+		me.unpin();
 	});
 
 
@@ -1769,13 +1769,13 @@ VariantCard.prototype.variantTooltipHTML = function(variant, pinMessage) {
 		+ me._tooltipRowURL('Motif', vepRegMotifDisplay)
 		+ me._tooltipRow('Inheritance',  variant.inheritance == 'none' ? '' : variant.inheritance)
 		+ me._tooltipRow('ClinVar', clinvarUrl)
-		+ me._tooltipRow('', phenotypeDisplay)
+		+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 		+ me._tooltipRowAF('Allele Freq', (variant.afExAC == -100 ? "n/a" : variant.afExAC), variant.af1000G)
 		+ me._tooltipRow('HGVSc', vepHGVScDisplay)
 		+ me._tooltipRow('HGVSp', vepHGVSpDisplay)
 		+ me._tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter) 
 		+ me._tooltipRowAlleleCounts() 
-		+ me._unpinRow(pinMessage)
+		+ me._linksRow(pinMessage)
 	);                  
 
 	        
@@ -1803,20 +1803,28 @@ VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
 }
 
 
-VariantCard.prototype._unpinRow = function(pinMessage) {
+VariantCard.prototype._linksRow = function(pinMessage) {
 	if (pinMessage == null) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
+
+	var examineCol = "";
+	if ($("#slider-left").hasClass("hide")) {
+		  examineCol = '<div class="col-md-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Examine </a>' +  '</div>'
+	} else {
+		  examineCol = '<div class="col-md-4" style="text-align:left;"></div>'
+	}
+
 	if (window.clickedVariant) {
-		return '<div class="row" style="margin-bottom: -2px;margin-top: 24px !important;font-size: 11px;">'
-		  + '<div class="col-md-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Examine </a>' +  '</div>'
+		return '<div class="row tooltip-footer" style="margin-bottom: -2px;margin-top: 24px !important;font-size: 11px;">'
+		  + examineCol
 		  + '<div class="col-md-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
 		  + '<div class="col-md-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
 		  + '</div>';
 		
 
 	} else {
-		return '<div class="row">'
+		return '<div class="row tooltip-footer">'
 		  + '<div class="col-md-12 tooltip-footer" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
 		  + '</div>';
 	}
@@ -1930,13 +1938,12 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 	}
 }
 
-VariantCard.prototype.unpin = function() {
-	this._unpin();
-}
 
 
-VariantCard.prototype._unpin = function() {
-	clickedVariant = null;
+VariantCard.prototype.unpin = function(saveClickedVariant) {
+	if (!saveClickedVariant) {
+		clickedVariant = null;
+	}
 	this.hideCoverageCircle();
 	window.hideCircleRelatedVariants();	
 }
