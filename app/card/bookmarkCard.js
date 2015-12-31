@@ -87,7 +87,7 @@ BookmarkCard.prototype.importBookmarks = function() {
 		genesBuffer += geneName;
 	}			
 	$('#genes-to-copy').val(genesBuffer);			
-	copyPasteGenes(genesBuffer);			
+	genesCard.copyPasteGenes(genesBuffer);			
 
 
 
@@ -215,9 +215,12 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 	bookmarkKeys.forEach( function(key) {		
 		var theBookmarkEntry = me.bookmarkedVariants[key];
 		var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject);
-		theVariant.isBookmark = 'Y';
-		if (displayVariantFlag) {
-			variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
+		if (theVariant) {
+			theVariant.isBookmark = 'Y';
+			if (displayVariantFlag) {
+				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
+			}
+			
 		}
 	});
 
@@ -349,7 +352,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				var bookmarkKeys = entry.value;
 
 				if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
-					window.selectGene(geneName, function(variantCard) {
+					genesCard.selectGene(geneName, function(variantCard) {
 						if (variantCard.getRelationship() == 'proband') {
 							me._flagBookmarksForGene(variantCard, window.gene, bookmarkKeys, false);
 						}
@@ -390,7 +393,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 							var key = entry.key;
 
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
-								window.selectGene(geneName, function(variantCard) {
+								genesCard.selectGene(geneName, function(variantCard) {
 									if (variantCard.getRelationship() == 'proband') {
 										var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
 										me._flagBookmark(variantCard, window.gene, variant, key);

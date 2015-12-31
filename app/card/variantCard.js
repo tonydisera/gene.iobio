@@ -834,7 +834,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 	   	    onVcfData();
    	    }
    	    if (me.getRelationship() == 'proband') {
-	   	    window.hideGeneBadgeLoading(window.gene.gene_name);
+	   	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
    	    }
 
 	} else {
@@ -905,7 +905,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 						me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
 					}	 				
 			   	    if (me.getRelationship() == 'proband') {
-						window.refreshCurrentGeneBadge();
+						genesCard.refreshCurrentGeneBadge();
 					}
 
 			    }
@@ -914,7 +914,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 				me.cardSelector.find('.vcfloader').addClass("hide");
 
 				if (me.getRelationship() == 'proband') {
-	   	 		   window.hideGeneBadgeLoading(window.gene.gene_name);
+	   	 		   genesCard.hideGeneBadgeLoading(window.gene.gene_name);
    	    		}
 				
 				if (error && error == "missing reference") {
