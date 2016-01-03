@@ -272,9 +272,13 @@ body {
 }
 
 #gene-badge-container {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
+  display:      flex;
+  display:      -webkit-flex;
+  flex-flow:         row wrap;
+  -webkit-flex-flow: row wrap;
+  justify-content:         center;
+  -webkit-justify-content: center;
+
 }
 
 #gene-badge-container #gene-badge-remove i {
