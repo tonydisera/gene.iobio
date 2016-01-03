@@ -16,9 +16,14 @@
   <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
 
 
-  <!-- material design for bootstrap library -->
+  <!-- material design for bootstrap library
   <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/material.min.js"></script>
   <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/ripples.min.js"></script>
+   -->
+
+  <!-- Bootstrap Material Design -->
+  <script src="assets/js/material.js"></script>
+  <script src="assets/js/ripples.js"></script>
 
   <!-- alertify -->
   <script src="assets/js/alertify.min.js"></script> 
@@ -61,11 +66,6 @@
 
 
 
-	<!-- fonts -->
-	<link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
-
-
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 
   <!-- jquery ui -->
@@ -74,21 +74,29 @@
   <!-- bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 
+  <!-- fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
+
+
+
 
   <!-- alertify -->
   <link rel="stylesheet" href="assets/css/alertify.core.css" />
   <link rel="stylesheet" href="assets/css/alertify.default.css" />
 
-  <!-- chosen type-ahead dropdown -->
-  <link rel="stylesheet" href="assets/css/slideout.css" />
 
   <!-- chosen type-ahead dropdown -->
   <link rel="stylesheet" href="assets/css/chosen.css" />
  
-  <!-- material design for bootstrap  -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material-wfont.min.css">
+  <!-- material design for bootstrap  
   <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/ripples.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material-wfont.min.css">
+  -->
+  <link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
+  <link href="assets/css/ripples.min.css" rel="stylesheet">
+
   <link href="http://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet">
 
 
@@ -97,6 +105,7 @@
 
 
   <!-- site stylesheets -->
+  <link rel="stylesheet" href="assets/css/slideout.css" />
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
   <link rel="stylesheet" href="assets/css/site.css" />
 
@@ -117,7 +126,7 @@
   </div>
  <div id="slide-buttons" >
   <div id="close-slide-left" class="close-button fade-in hide">
-        <i class="mdi-navigation-close" style="font-size: 24px;color: gray;font-weight: bold;"></i>
+        <i class="material-icons" style="font-size: 24px;color: gray;font-weight: bold;">close</i>
   </div>
 
 </div>
@@ -130,7 +139,7 @@
 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel">
   <div id="data-card" class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="padding-top:10px;">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Data</h4>
 
@@ -166,17 +175,17 @@
 
 
               <div>
-                <div id="proband-data" style="float:left;min-width:500px;width:60%">
+                <div id="proband-data" style="float:left;min-width:500px;">
                   <input id="card-index" class="hide" value="0" type="text">
                   <input id="datasource-relationship" class="hide" value="proband" type="text"/>
                 </div>
 
-                <div id="mother-data" class="hide" style="float:left;margin-top:20px;min-width:500px;width:32%">
+                <div id="mother-data" class="hide" style="float:left;margin-top:10px;min-width:500px;">
                   <input id="card-index" class="hide" value="1" type="text">
                   <input id="datasource-relationship" class="hide" value="mother" type="text"/>
                 </div>
 
-                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:20px;min-width:500px;">
+                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:10px;min-width:500px;">
                   <input id="card-index" class="hide" value="2" type="text">
                   <input id="datasource-relationship" class="hide" value="father" type="text"/>
                 </div>
@@ -211,7 +220,7 @@
       <div class="modal-footer" style="clear-both">
           <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
           <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
-            <i class="mdi-file-cloud-done"></i>
+            <i class="material-icons">cloud_done</i>
             Load
           </button>
           <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
@@ -312,7 +321,7 @@
              <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
                   <button id="transcript-dropdown-button" type="button"  
                   style="width:150px;font-size:11px"
-                  class="btn btn-default dropdown-toggle icon-button-sm" 
+                  class="btn btn-raised btn-default dropdown-toggle icon-button-sm" 
                   data-toggle="dropdown" aria-expanded="false" >
                     Choose Transcript 
                     <span class="caret" style="margin-left:4px;"></span>
@@ -354,7 +363,7 @@
 
     <div id="track-section" class="push" style="margin-top:5px;">
 
-        <div id="matrix-track"  class="track-expand shadow-z-2 hide">
+        <div id="matrix-track"  class="track shadow-z-2 hide">
             
               <span class="card-label" style="margin-left:5px;">Rank Variants</span>
 

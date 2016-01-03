@@ -32,12 +32,14 @@ function MatrixCard() {
                         deleterious_low_confidence:  {value: 2, badge: true, clazz: 'sift_deleterious_low_confidence', symbolFunction: this.showSiftSymbol},
 		                tolerated_low_confidence: {value: 3, badge: false, clazz: 'sift_tolerated_low_confidence',symbolFunction: this.showSiftSymbol},  
 		                tolerated:    {value: 102, badge: false, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
+                        unknown:      {value: 103, badge: false, clazz: ''},
                         none:         {value: 103, badge: false, clazz: ''}
                      };
 	this.polyphenMap = {  
                         probably_damaging:    {value: 1, badge: true, clazz: 'polyphen_probably_damaging', symbolFunction: this.showPolyPhenSymbol},
 		                possibly_damaging:    {value: 2, badge: true, clazz: 'polyphen_possibly_damaging', symbolFunction: this.showPolyPhenSymbol},  
                         benign:               {value: 103, badge: false, clazz: 'polyphen_benign',            symbolFunction:this.showPolyPhenSymbol},
+                        unknown:              {value: 104, badge: false, clazz: ''},
                         none:                 {value: 104, badge: false, clazz: ''}
                      };
 	this.inheritanceMap = {  
@@ -160,23 +162,6 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	var getRsId = function(variant) {
-		var rsId = null;
-		if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {
-			for (var key in variant.vepVariationIds) {
-				if (key != 0 && key != '') {
-					var tokens = key.split("&");
-					tokens.forEach( function(id) {
-						if (id.indexOf("rs") == 0) {
-							rsId = id;
-						}
-					});
-				}
-			}			
-		}
-		return rsId;		
-	}
-
 	var rsId = getRsId(d);
 	if (rsId != null) {
 		return rsId;

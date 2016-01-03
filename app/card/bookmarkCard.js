@@ -146,6 +146,29 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	}
 }
 
+BookmarkCard.prototype.removeBookmark = function(key, variant) {
+	var me = this;
+	variant.isBookmark = 'N';
+	getProbandVariantCard().removeBookmarkFlag(variant, this.compressKey(key));
+
+
+	var geneName = key.split(": ")[0];
+	delete this.bookmarkedVariants[key];
+
+	var bookmarkKeys = me.bookmarkedGenes[geneName];
+	var index = bookmarkKeys.indexOf(key);
+	if (index >= 0) {
+		bookmarkKeys.splice(index, 1);
+	}
+	if (bookmarkKeys.length == 0) {
+		delete this.bookmarkedGenes[geneName];
+	}
+
+	this.refreshBookmarkList();
+
+
+}
+
 BookmarkCard.prototype.getBookmarkKey = function(geneName, chrom, start, ref, alt) {
 	return geneName + ": " 
          + chrom + " " + start  
@@ -220,7 +243,7 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 			if (displayVariantFlag) {
 				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
 			}
-			
+
 		}
 	});
 
@@ -302,27 +325,20 @@ BookmarkCard.prototype.sortBookmarksByGene = function() {
     me.bookmarkedVariants = sortedBookmarks;
 }
 
-BookmarkCard.prototype.getRsId = function(variant) {
-	var rsId = null;
-	if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {
-		for (var key in variant.vepVariationIds) {
-			if (key != 0 && key != '') {
-				var tokens = key.split("&");
-				tokens.forEach( function(id) {
-					if (id.indexOf("rs") == 0) {
-						rsId = id;
-					}
-				});
-			}
-		}			
-	}
-	return rsId;
-}
 
 BookmarkCard.prototype.refreshBookmarkList = function() {
 	var me = this;
 	var container = d3.select('#bookmark-card #bookmark-panel');
 	container.selectAll('.bookmark-gene').remove();
+
+	if (Object.keys(this.bookmarkedVariants).length > 0) {
+		$('#edit-bookmarks-box').removeClass("hide");
+	} else {
+		$('#edit-bookmarks-box').addClass("hide");
+		$('#bookmark-panel').removeClass("editmode");
+		$('#bookmark-card #done-edit-bookmarks').addClass("hide");
+		$('#bookmark-card #edit-bookmarks').removeClass("hide");
+	}
 
 	// Sort bookmarks by gene, then start position
 	me.sortBookmarksByGene();
@@ -423,14 +439,15 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	 container.selectAll(".bookmark-box")
 	 		 .append("span")
 	         .attr("class", "favorite-indicator")
-	         .style("float", "right");
+	         .style("float", "right")
+	         .style("padding-top", "4px");
 	        
 	container.selectAll(".bookmark span.variant-label")
 	         .text(function(entry,i) {	
 	         	var key = entry.key;
 	         	var bookmarkEntry = entry.value;
 
-	         	var rsId = me.getRsId(bookmarkEntry);
+	         	var rsId = getRsId(bookmarkEntry);
 
 				// Strip off gene name and chr
 				var tokens = key.split(": ")[1].split(" ");
@@ -530,10 +547,14 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          .each( function(entry, i) {
 		    var selection = d3.select(this);
          	var variant = entry.value;	         
+
+
+ 			// favorite badge
  			var svg = selection.append("svg")
 						       .attr("class", "favorite-badge")
 						       .attr("height", 15)
 						       .attr("width", 14);
+
 			svg.on('click', function(d,i) {
 
 					var selected = me.favorites.hasOwnProperty(d.key) && me.favorites[d.key] == true;
@@ -555,7 +576,17 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			   })
 			   .style("pointer-events", "none")
 			   .style("stroke", "rgb(132,132,132");
-			   
+		
+			// remove button
+			var removeIcon = selection.append("i")
+         	         .attr("class", "material-icons")
+         	         .attr("id", "remove-bookmark")
+         	         .text("close");  
+
+ 			removeIcon.on('click', function(d,i) {
+ 					me.removeBookmark(d.key, d.value);
+			   });
+
          });
 
 		d3.selectAll('#bookmark-card #bookmark-panel a')

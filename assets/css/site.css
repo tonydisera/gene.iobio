@@ -1,7 +1,7 @@
 ∂denov
 
 body {
-  font-family: 'Quattrocento Sans', sans-serif;
+  font-family: 'Quattrocento Sans', sans-serif !important;
   /* try this out 
   background-color: rgb(255, 255, 255);
   color: #66615b; 
@@ -13,6 +13,23 @@ body {
   */
 }
 
+.tooltip {
+  font-family: 'Quattrocento Sans', sans-serif !important;
+}
+
+.shadow-z-2 {
+    box-shadow: 0 3px 10px rgba(0,0,0,.23),0 3px 10px rgba(0,0,0,.16);
+}
+
+.btn.btn-default {
+    background-color: #fff ;
+}
+
+
+.btn.btn-raised {
+    background-color: #fff !important;
+}
+
 .alert {
     width: 100%;
     background-color: transparent;
@@ -21,6 +38,11 @@ body {
     text-align: center;
     font-size: 12px;
     padding: 6px;
+}
+.alert.alert-info {
+    background-color: transparent;
+    color: rgb(132,132,132);
+
 }
 
 .alert-dismissable .close, .alert-dismissible .close {
@@ -153,7 +175,7 @@ body {
   cursor: pointer;
   display: inline-block;
   float: left;
-  width: 170px;
+  width: 160px;
   text-align: left;
   padding-top: 4px;
   margin-left: 10px;
@@ -182,9 +204,22 @@ body {
   cursor: pointer;
 }
 
+
+
 #bookmark-card li {
   color: rgb(132,132,132) !important;
   font-size: 11px;
+}
+
+#bookmark-panel i#remove-bookmark  {
+    color: #E0292B !important;
+    font-weight: bold;
+    font-size: 13px;
+    display: none;
+}
+
+#bookmark-panel.editmode i#remove-bookmark {
+  display: inline;
 }
 
 #get-genes-copy-paste-button.btn.btn-raised,
@@ -211,7 +246,7 @@ body {
 }
 #gene-badge.selected #gene-badge-name,
 #gene-badge.selected #gene-badge-danger-count,
-#gene-badge.selected #gene-badge-remove i.mdi-content-clear
+#gene-badge.selected #gene-badge-remove i
 {
   font-weight: bold; 
 }
@@ -230,6 +265,7 @@ body {
 
 #gene-badge.visited #gene-badge-name {
   color: #5d809d !important;
+
 }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible !important;
@@ -241,8 +277,10 @@ body {
   justify-content: center;
 }
 
-#gene-badge-container #gene-badge-remove .mdi-content-clear {
+#gene-badge-container #gene-badge-remove i {
   color: #E0292B !important;
+  font-weight: bold;
+  font-size: 13px;
 }
 #gene-badge-container #gene-badge-remove {
   visibility: hidden;
@@ -254,14 +292,16 @@ body {
 .tooltip-title {
   font-size: 10px;
   color: #000000;
+  word-break: break-all;
 }
 
 .tooltip-header {
-  overflow-wrap: break-word;
+  overflow-wrap: break-all;
   text-align:right;
   width: 100px;
   float:left;
   color: rgb(132,132,132);
+  vertical-align: top;
 
 }
 
@@ -278,13 +318,61 @@ body {
   color: #000000;
 }
 
+.tooltip-header {
+  overflow-wrap: break-all;
+  text-align:right;
+  width: 100px;
+  float:left;
+  color: rgb(132,132,132);
+
+}
+
+.tooltip-header-small {
+  overflow-wrap: break-word;
+  text-align:left;
+  width: 40px;
+  float:left;
+  color: rgb(132,132,132);
+
+}
+.tooltip-allele-count-bar {
+  overflow-wrap: break-word;
+  float:left;
+  width: 180px;
+  color: #000000;
+}
+#examine-card .tooltip-allele-count-bar {
+  overflow-wrap: break-word;
+  float:left;
+  width: 105px;
+  color: #000000;
+}
+
+.tooltip-zygosity {
+    overflow-wrap: break-word;
+    float: left;
+    width: 30px;
+    color: black;
+    text-align: left;
+    padding-right: 2px;
+    padding-left: 2px;
+}
+.tooltip-subtitle {
+    font-size: 10px;
+    text-align: center;
+    color: rgb(132,132,132);
+    padding-top: 4px;
+    font-weight: bold;
+    padding-bottom: 1px;
+}
+
 .tooltip-footer {
   color: #376F9C !important;
 }
 
 
 #examine-card {
-  font-size: 11px;
+  font-size:10px;
 }
 
 #examine-card .tooltip-title {
@@ -295,29 +383,29 @@ body {
 #examine-card .tooltip-header {
   overflow-wrap: break-word;
   text-align:right;
-  width: 55px;
+  width: 80px;
   display: inline-block !important;
   float: none;
   color: rgb(132,132,132);
 }
 
 #examine-card .tooltip-row {
-  width:300px;
+  width:210px;
   clear:both;
-  margin-bottom: 7px;
+  margin-bottom: 3px;
 }
 
 #examine-card .tooltip-value {
   overflow-wrap: break-word;
   margin-left: 10px;
-  width: 130px;
+  width: 115px;
   margin-right: 5px;
   display: inline-block !important;
   float: none;
   color: #000000;
 }
 
-#examine-card .tooltip-footer {
+#examine-card .tooltip-footer #unpin{
   display: none !important; 
 }
 
@@ -441,10 +529,17 @@ a, a:hover, a:focus {
   color: rgb(132,132,132) !important;
 }
 
-.tooltip a, .tooltip a:hover, .tooltip a:focus {
+.tooltip a, .tooltip a:hover, .tooltip a:focus,
+#examine-card a, #examine-card  a:hover, #examine-card  a:focus {
   color: #376F9C !important;
   font-size: 11px !important;
   font-weight: bold !important;
+}
+
+#examine-card  a, .tooltip a:hover, .tooltip a:focus {
+    color: #376F9C !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
 }
 
 #variant-card-buttons a.selected {
@@ -806,6 +901,10 @@ rect.alt-count {
 text.alt-count {
   fill: white !important;
 }
+text.alt-count-under {
+  fill: black !important;
+}
+
 
 .poweredbyheader {
     font-size: 16px;
@@ -1161,7 +1260,8 @@ header {
 }
 
 #vcf-track .bookmark g,
-#matrix-track g.bookmark {
+#matrix-track g.bookmark,
+#examine-card g.bookmark {
   fill: #3773A7 ; 
   opacity: .7;
 }

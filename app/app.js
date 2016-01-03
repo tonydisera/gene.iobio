@@ -35,7 +35,7 @@ var regionEnd = null;
 var GENE_REGION_BUFFER = 1000;
 var GENE_REGION_BUFFER_MAX = 50000;
 
-// Transcript data and chart
+// Genes
 var gene = '';
 var geneNames = [];
 var phenolyzerGenes = [];
@@ -43,8 +43,11 @@ var geneObjects = {};
 var geneAnnots = {};
 var geneToLatestTranscript = {};
 var genesToCache = [];
-var geneSource = "gencode";
+
 var loadedUrl = false;
+
+
+// Transcript data and chart
 var selectedTranscript = null;
 var selectedTranscriptCodingRegions = [];
 var transcriptChart =  null;
@@ -52,6 +55,8 @@ var transcriptViewMode = "single";
 var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
+var geneSource = "gencode";
+
 var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
 
@@ -508,7 +513,6 @@ function toggleSampleTrio(show) {
 		dataCard.mode = 'trio';
 		$('#mother-data').removeClass("hide");
 		$('#father-data').removeClass("hide");
-		$('#proband-data').css("width", "32%");
 		if ($('#proband-data').find('#vcf-sample-select option').length > 1) {
 			$('#unaffected-sibs-box').removeClass("hide");
 			$('#affected-sibs-box').removeClass("hide");
@@ -518,7 +522,6 @@ function toggleSampleTrio(show) {
 		}
 	} else {
 		dataCard.mode = 'single';
-		$('#proband-data').css("width", "60%");
 		$('#mother-data').addClass("hide");
 		$('#father-data').addClass("hide");
 		$('#unaffected-sibs-box').addClass("hide");
@@ -1984,6 +1987,26 @@ function promiseComparedToUnaffectedSib(vcUnaffectedSib) {
 
 
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function getRsId(variant) {
+	var rsId = null;
+	if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {
+		for (var key in variant.vepVariationIds) {
+			if (key != 0 && key != '') {
+				var tokens = key.split("&");
+				tokens.forEach( function(id) {
+					if (id.indexOf("rs") == 0) {
+						rsId = id;
+					}
+				});
+			}
+		}			
+	}
+	return rsId;		
+}
 
 
 function filterVariants() {
