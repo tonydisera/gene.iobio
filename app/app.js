@@ -1263,13 +1263,12 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 
 	$("#region-flag").addClass("hide");
 
-//	$('#data-card').removeClass("hide");
 	$('#transcript-card').removeClass("hide");
 
     $('#gene-track').removeClass("hide");
     $('#view-finder-track').removeClass("hide");
-	//$('#datasource-button').css("visibility", "visible");
 	$('#transcript-btn-group').removeClass("hide");
+	$('#feature-matrix .tooltip').css("opacity", 0);
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
