@@ -121,11 +121,11 @@ body {
 }
 
 .label-warning {
-  padding-bottom: 2px;
-  background-color: transparent;
-  color: rgb(205, 71, 40);
-  font-weight: normal;
-  font-size: 11px;
+  padding-bottom: 2px !important;
+  background-color: transparent !important;
+  color: rgb(205, 71, 40) !important;
+  font-weight: normal !important;
+  font-size: 11px !important;
 }
 }
 .label-primary {
@@ -278,7 +278,6 @@ body {
   -webkit-flex-flow: row wrap;
   justify-content:         center;
   -webkit-justify-content: center;
-
 }
 
 #gene-badge-container #gene-badge-remove i {
