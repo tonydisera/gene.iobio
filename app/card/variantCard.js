@@ -1925,7 +1925,7 @@ VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value
 
 VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
 	return '<div class="row">'
-	      + '<div class="col-md-2 tooltip-title" style="text-align:left">' + value1  +'</div>'
+	      + '<div class="col-md-2 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-md-10 tooltip-title" style="text-align:left">' + value2 + '</div>'
 	      + '</div>';	
 }
