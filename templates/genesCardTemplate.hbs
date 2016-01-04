@@ -33,13 +33,28 @@
       <div>
         <div style="" class="badge-label">Phenolyzer</div>
         <div style="margin-top: 5px;"class="">Enter phenotype</div><textarea style="width:205px;height:30px" id="phenolyzer-search-terms"></textarea>
-        <div style="text-align:right">
-          
-        <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
-          <i class="material-icons" style="font-size:18px;padding-right:0px;">play_arrow</i>
-           Run
-        </button>
+        
+        <div style="font-size:10px;color:rgb(132,132,132);width: 150px;">This function is only for academic and non-profit use. 
+          <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
         </div>
+
+        <div style="text-align:right;margin-top:-25px">
+        
+          <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
+            <i class="material-icons" style="font-size:18px;padding-right:0px;">play_arrow</i>
+             Run
+          </button>
+        </div>
+
+        <div id="disclaimer" class="collapse" aria-expanded="false" style="">
+          By using the software, you acknowledge that you agree to the terms below:
+
+          For academic and non-profit use, you are free to fork, download, modify, distribute and use the software without restriction.
+
+          For commercial use, you are required to contact Stevens Institute of Innovation at USC directly to discuss licensing options.
+
+          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        </div>        
       </div>
     </div>
 
