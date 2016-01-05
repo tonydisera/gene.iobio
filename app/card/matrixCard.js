@@ -299,7 +299,11 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 	if (lock && !$("#slider-left").hasClass("hide")) {
 		showSidebar("Examine");
-		examineCard.showVariant(variant);
+		examineCard.showVariant(variant);		
+		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+        .then( function(refreshedVariant) {
+			examineCard.showVariant(refreshedVariant, true);
+        });
 	}
 
 	if (lock) {
@@ -322,8 +326,12 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		showSidebar('Examine');
+		showSidebar("Examine");
 		examineCard.showVariant(variant);
+		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+        .then( function(refreshedVariant) {
+			examineCard.showVariant(refreshedVariant, true);
+        });
 	});
 
 	var h = tooltip[0][0].offsetHeight;

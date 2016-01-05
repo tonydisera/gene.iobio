@@ -101,8 +101,8 @@ vcfiobio = function module() {
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
-  var vepServer              = "wss://services.iobio.io/vep/";
-  //var vepServer              = "ws://nv-dev.iobio.io/vep/";
+  //var vepServer              = "wss://services.iobio.io/vep/";
+  var vepServer              = "ws://nv-dev.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
 
 
@@ -578,12 +578,12 @@ var effectCategories = [
   }
   
   // NEW
-  exports.promiseGetVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq) {
+  exports.promiseGetVariants = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, 
+        me._getRemoteVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -592,7 +592,7 @@ var effectCategories = [
             }
           });
       } else {
-        me._getLocalVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq,
+        me._getLocalVariantsImpl(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -606,7 +606,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -629,7 +629,7 @@ var effectCategories = [
         
         var allRecs = headerRecords.concat(records);
 
-        me.promiseAnnotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq)
+        me.promiseAnnotateVcfRecords(allRecs, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -647,7 +647,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
     var me = this;
 
     var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
@@ -685,6 +685,12 @@ var effectCategories = [
       vepArgs = " --refseq ";
     } else {
       nextUrl = snpEffUrl;
+    }
+    if (hgvsNotation) {
+      vepArgs += " --hgvs ";
+    }
+    if (getRsId) {
+      vepArgs += "  --check_existing ";
     }
     
     var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
@@ -871,14 +877,14 @@ var effectCategories = [
 
 
   // NEW
-  exports.promiseAnnotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq) {
+  exports.promiseAnnotateVcfRecords = function(records, refName, regionStart, regionEnd, regionStrand, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the 
       // info field.
-      me._annotateVcfRegion(records, refName, sampleName, isRefSeq, function(annotatedData) {
+      me._annotateVcfRegion(records, refName, sampleName, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
@@ -1066,7 +1072,7 @@ var effectCategories = [
   }
   
   // NEW
-  exports._annotateVcfRegion = function(records, refName, sampleName, isRefSeq, callback, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, sampleName, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
       var me = this;
       
       var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
@@ -1101,6 +1107,12 @@ var effectCategories = [
         vepArgs = " --refseq "
       } else {
         nextUrl = snpEffUrl;
+      }
+      if (hgvsNotation) {
+        vepArgs += " --hgvs ";
+      }
+      if (getRsId) {
+        vepArgs += "  --check_existing ";
       }
       
       // Call VEP

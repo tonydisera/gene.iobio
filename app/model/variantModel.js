@@ -22,6 +22,9 @@ function VariantModel() {
 	this.defaultSampleName = null;
 	this.relationship = null;
 	this.affectedStatus = null;
+
+	this.GET_RSID = false;
+	this.GET_HGVS = false;
 }
 
 
@@ -724,6 +727,66 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
+VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+
+
+
+		if ( variant.extraAnnot ) {
+			resolve(variant);
+		} else {	
+			me._promiseVcfRefName(theGene.chr).then( function() {				
+				me.vcf.promiseGetVariants(
+				   me.getVcfRefName(theGene.chr), 
+				   variant.start, 
+			       variant.end, 
+			       theGene.strand, 
+			       theTranscript,
+			       me.sampleName,
+			       window.geneSource == 'refseq' ? true : false,
+			       true,
+			       true
+			    ).then( function(data) {
+			    	var theVcfData = data[1];	
+
+		    		// Now update the hgvs notation on the variant
+		    		var v = theVcfData.features[0];
+		    		var theVariants = me.vcfData.features.filter(function(d) {
+		    			if (d.start == v.start &&
+		    				d.alt == v.alt &&
+		    				d.ref == v.ref) {
+		    				return true;
+		    			} else {
+		    				return false;
+		    			}
+		    		});
+		    		if (theVariants && theVariants.length > 0) {
+			    		var theVariant = theVariants[0];
+	
+						// set the hgvs and rsid on the existing variant
+			    		theVariant.extraAnnot = true;
+			    		theVariant.vepHGVSc = v.vepHGVSc;
+			    		theVariant.vepHGVSp = v.vepHGVSp;
+			    		theVariant.vepVariationIds = v.vepVariationIds;
+
+				    	// re-cache the data
+				    	me._cacheData(me.vcfData, "vcfData", theGene, theTranscript);	
+
+				    	// return the annotated variant
+						resolve(theVariant);
+		    		} else {
+		    			reject("Cannot find variant to update HGVS notation");
+		    		}
+
+				});		
+			});				
+		}
+	});
+
+}
+
 VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript) {
 	var me = this;
 
@@ -1023,7 +1086,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 	       strand, 
 	       transcript,
 	       me.sampleName,
-	       window.geneSource == 'refseq' ? true : false
+	       window.geneSource == 'refseq' ? true : false,
+	       me.GET_HGVS,
+	       me.GET_RSID
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];

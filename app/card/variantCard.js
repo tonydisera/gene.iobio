@@ -1335,6 +1335,11 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	if (lock && !$("#slider-left").hasClass("hide")) {
 		showSidebar("Examine");
 		examineCard.showVariant(variant);
+		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+		        .then( function(refreshedVariant) {
+					examineCard.showVariant(refreshedVariant, true);
+		        });
+
 	}
 
 	if (lock) {
@@ -1382,8 +1387,12 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		showSidebar('Examine');
+		showSidebar("Examine");
 		examineCard.showVariant(variant);
+		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+		        .then( function(refreshedVariant) {
+					examineCard.showVariant(refreshedVariant, true);
+		        });
 	});
 
 	var selection = tooltip.select("#coverage-svg");
@@ -1820,7 +1829,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	if (type == 'tooltip') {
 		return (
-			  me._tooltipHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, ' ', dbSnpId ? '    (' + dbSnpId  + ')' : '')
+			  me._tooltipHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
 			+ me._tooltipHeaderRow(impactLabel,'', '', '')
 			+ inheritanceModeRow
 			+ siftPolyphenRow

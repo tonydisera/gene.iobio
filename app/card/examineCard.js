@@ -1,10 +1,26 @@
 function ExamineCard() {
+	this.examinedVariant = null;
 }
 
 ExamineCard.prototype.init = function() {
 }
 
-ExamineCard.prototype.showVariant = function(variant) {
+ExamineCard.prototype.showVariant = function(variant, isRefresh) {
+	// If this is a refresh (with the extra annotations, e.g. hgvs, rsid) check to see
+	// if the examine card is still on the same variant.  This will work around the async
+	// nature of the refresh in cases where the user has moved on to examining a new
+	// variant before the prior variant is refreshed with the extra annotations.
+	if (isRefresh) {
+		if (this.examinedVariant) {
+			if (this.examinedVariant.start != variant.start ||
+				this.examinedVariant.alt != variant.alt ||
+				this.examinedVariant.ref != variant.ref ) {
+				return;
+			}
+		}
+	}
+
+
 	$('#examine-card #examine-card-content').html(getProbandVariantCard().variantDetailHTML(variant));
 
 	if (variant.isBookmark) {
@@ -104,4 +120,7 @@ ExamineCard.prototype.showVariant = function(variant) {
 
 	var selection = d3.select("#examine-card #coverage-svg");
 	getProbandVariantCard().createAlleleCountSVGTrio(selection, variant, 95);
+
+	// keep track of the variant that is current being examined
+	this.examinedVariant = variant;
 }
