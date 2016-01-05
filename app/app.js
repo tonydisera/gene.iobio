@@ -1990,6 +1990,27 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function percentage(a) {
+	var pct = a * 100;
+	var places = 0;
+	if (pct < .001) {
+		places = 4;
+	} else if (pct < .01) {
+		places = 3;
+	} else if (pct < .1) {
+		places = 2
+	} else if (pct < 1) {
+		places = 1;
+	} else {
+		places = 0;
+	}
+	return round(pct, places) + "%";
+}
+
+function round(value, places) {
+  return +(Math.round(value + "e+" + places)  + "e-" + places);
+}
+
 function getRsId(variant) {
 	var rsId = null;
 	if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {

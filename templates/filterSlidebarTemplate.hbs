@@ -66,6 +66,262 @@ aria-multiselectable="true">
   </div>
 
 
+ 
+ <!-- Allele Frequency -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading4a" style="text-align:left;">
+      <h4a class="panel-title">
+        <a role="button" data-toggle="collapse"  href="#collapse4a" aria-expanded="true" aria-controls="collapse4a" style="margin-right:4px;">
+          Allele Freq
+        </a>
+          <select id="select-af-scheme" onchange="filterCard.onSelectAFScheme()" style="padding-left:4px;font-size:10px;">
+                          <option>ExAC</option>
+                          <option>1000 Genomes</option>                   
+          </select>
+      </h4a>
+    </div>
+    <div id="collapse4a" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading4a">
+      <div class="panel-body">
+
+        <div class="afexaclevel-panel" style="display:table">
+
+
+          <div  style="text-align:left;display:table-cell;width:120px;">
+            <svg id="afexac_unique" class="afexaclevels" width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">private</text>
+              <g class=" afexac_unique">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,49);"></use>
+              </g>
+            </svg>
+            <svg id="afexac_uberrare" class="afexaclevels" width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .01%</text>
+              <g class=" afexac_uberrare">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
+              </g>
+            </svg>
+            <svg id="afexac_superrare" class="afexaclevels" width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .1%</text>
+              <g class=" afexac_superrare">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(204, 174, 95);"></use>
+              </g>
+            </svg>
+           <svg id="afexac_rare" class="afexaclevels" width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; 1%</text>
+              <g class=" afexac_rare">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
+              </g>
+            </svg>            
+          </div>
+
+          <div  style="text-align:left;display:table-cell;width:75px;">
+            <svg id="afexac_uncommon" class="afexaclevels" width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">1-5%</text>
+              <g class=" afexac_uncommon">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
+              </g>
+            </svg>
+            <svg id="afexac_common" class="afexaclevels" width="60" height="18" transform="translate(0,0)">
+              <g class=" af_common">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
+              </g>
+              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">&gt; 5%</text>
+            </svg>
+            <svg id="afexac_unique_nc" class="afexaclevels" width="75" height="16" transform="translate(0,0)">
+              <text class="name" x="12" y="9" style="fill-opacity: 1;font-size: 9px;">n/a (noncoding)</text>
+              <g class=" afexac_unique_nc">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill:none;stroke:black"></use>
+              </g>
+            </svg>
+          </div>
+
+        </div>
+
+        <div class="af1000glevel-panel hide"style="display:table">
+
+          <div  style="text-align:left;display:table-cell;width:75px;">
+
+            <svg id="af1000g_unique" class="af1000glevels hide " width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">private</text>
+              <g class=" af1000g_unique">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,49);"></use>
+              </g>
+            </svg>
+            <svg id="af1000g_uberrare" class="af1000glevels hide " width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .01%</text>
+              <g class=" af1000g_uberrare">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
+              </g>
+            </svg>
+            <svg id="af1000g_superrare" class="af1000glevels hide " width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .1%</text>
+              <g class=" af1000g_superrare">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(204, 174, 95);"></use>
+              </g>
+            </svg>
+            <svg id="af1000g_rare" class="af1000glevels hide " width="60" height="14" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; 1%</text>
+              <g class=" af1000g_rare">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
+              </g>
+            </svg>
+          </div>
+
+          <div style="text-align:left;display:table-cell;width:75px;">
+
+            <svg id="af1000g_uncommon" class="af1000glevels hide " width="60" height="16" transform="translate(0,0)">
+              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">1-5%</text>
+              <g class=" af1000g_uncommon">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
+              </g>
+            </svg>
+            <svg id="af1000g_common" class="af1000glevels hide " width="60" height="18" transform="translate(0,0)">
+              <g class=" af1000g_common">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
+              </g>
+              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">&gt; 5%</text></svg>
+          </div>
+        </div> 
+        
+
+        <!-- allele freq range -->
+        <div id="af-range-filter" style="clear:both;text-align:left">
+          <input  type="text"  id="af-amount-start" value="0"                           
+           style="width: 45px;font-size: 9px;margin-bottom: 1px;"/>
+          -
+          <input type="text"  id="af-amount-end" value="100" 
+          style="width: 45px;font-size: 9px;margin-bottom: 1px;"/>
+          %
+          <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+          Go
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+
+ <!-- Inheritance -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading5">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse"  href="#collapse5" aria-expanded="true" aria-controls="collapse5">
+          Inheritance mode
+        </a>
+      </h4>
+    </div>
+    <div id="collapse5" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading5">
+      <div class="panel-body" style="display:table-cell;">
+
+
+        <!-- inheritance -->
+         <div style="text-align:left;display:table-cell;" >
+
+             
+               <svg id="denovo" class="inheritance" width="90" height="18" transform="translate(0,0)">
+                <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
+                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="20" height="20"></use>
+                </g>
+                <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Denovo</text></svg>
+              </svg>
+         </div>
+         <div style="text-align:left;display:table-cell">
+
+              <svg id="recessive" class="inheritance" width="90" height="18" transform="translate(0,0)">
+                <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
+                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="20" height="20"></use>
+                </g>
+                <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Recessive</text></svg>
+              </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+ <!-- Zygosity -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading7">
+      <h4 class="panel-title">
+
+          <a id="zygosity-scheme" href="javascript:(0)" >
+                  <i class="mdi-image-color-lens"></i>
+          </a>
+
+        <a role="button" data-toggle="collapse"  href="#collapse7" aria-expanded="true" aria-controls="collapse7">
+          Zygosity
+        </a>
+
+      </h4>
+    </div>
+    <div id="collapse7" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading7">
+      <div class="panel-body" style="display:table;">
+
+
+        <!-- zygosity -->
+        <div style="text-align:left;display:table-cell;padding-right: 0px;">
+              <div style="margin-bottom: 1px;">
+                
+              </div>
+              <svg id="het" class="zygosity nocolor" width="70" height="12" transform="translate(0,0)" >
+                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">Heterozygous</text>       
+                 <rect class="filter-symbol zyg_het" rx="1" ry="1" x="1"  width="5" y="0" height="5" 
+                 </rect>
+              </svg>
+        </div>
+        <div style="text-align:left;display:table-cell;padding-right: 0px;">
+
+              <svg id="hom" class="zygosity nocolor" width="70" height="12" transform="translate(0,0)">
+                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">Homozygous</text>       
+                 <rect class="filter-symbol zyg_hom" rx="1" ry="1" x="1" width="5" y="0" height="5"></rect>
+              </svg>
+        </div>
+        <div style="text-align:left;display:table-cell">
+
+              <svg id="gt_unknown" class="zygosity" width="50" height="12" transform="translate(0,0)">
+                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">unknown</text>       
+                 <rect class="filter-symbol gt_unknown nocolor" rx="1" ry="1" x="1"  width="5" y="0" height="5" 
+                 </rect>
+              </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+ <!-- Coverage -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading9">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse"  href="#collapse9" aria-expanded="true" aria-controls="collapse9">
+          Coverage (minimum)
+        </a>
+      </h4>
+    </div>
+    <div id="collapse9" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading9">
+      <div class="panel-body">
+
+        <!-- coverage -->  
+        <div id="coverage-filter" style="text-align:left;width:150px;" >
+          
+          <input type="text" id="coverage-min" value="" style="width:20px;font-size: 9px;margin-bottom:1px">
+          X
+          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+          Go
+          </a>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+
   <!-- ClinVar -->
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="heading2">
@@ -267,258 +523,6 @@ aria-multiselectable="true">
       </div>
     </div>
   </div>
-
-
-
- <!-- Zygosity -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="heading7">
-      <h4 class="panel-title">
-
-          <a id="zygosity-scheme" href="javascript:(0)" >
-                  <i class="mdi-image-color-lens"></i>
-          </a>
-
-        <a role="button" data-toggle="collapse"  href="#collapse7" aria-expanded="true" aria-controls="collapse7">
-          Zygosity
-        </a>
-
-      </h4>
-    </div>
-    <div id="collapse7" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading7">
-      <div class="panel-body" style="display:table;">
-
-
-        <!-- zygosity -->
-        <div style="text-align:left;display:table-cell;padding-right: 0px;">
-              <div style="margin-bottom: 1px;">
-                
-              </div>
-              <svg id="het" class="zygosity nocolor" width="70" height="12" transform="translate(0,0)" >
-                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">Heterozygous</text>       
-                 <rect class="filter-symbol zyg_het" rx="1" ry="1" x="1"  width="5" y="0" height="5" 
-                 </rect>
-              </svg>
-        </div>
-        <div style="text-align:left;display:table-cell;padding-right: 0px;">
-
-              <svg id="hom" class="zygosity nocolor" width="70" height="12" transform="translate(0,0)">
-                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">Homozygous</text>       
-                 <rect class="filter-symbol zyg_hom" rx="1" ry="1" x="1" width="5" y="0" height="5"></rect>
-              </svg>
-        </div>
-        <div style="text-align:left;display:table-cell">
-
-              <svg id="gt_unknown" class="zygosity" width="50" height="12" transform="translate(0,0)">
-                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">unknown</text>       
-                 <rect class="filter-symbol gt_unknown nocolor" rx="1" ry="1" x="1"  width="5" y="0" height="5" 
-                 </rect>
-              </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
- <!-- Inheritance -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="heading5">
-      <h4 class="panel-title">
-        <a role="button" data-toggle="collapse"  href="#collapse5" aria-expanded="true" aria-controls="collapse5">
-          Inheritance mode
-        </a>
-      </h4>
-    </div>
-    <div id="collapse5" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading5">
-      <div class="panel-body" style="display:table-cell;">
-
-
-        <!-- inheritance -->
-         <div style="text-align:left;display:table-cell;" >
-
-             
-               <svg id="denovo" class="inheritance" width="90" height="18" transform="translate(0,0)">
-                <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="20" height="20"></use>
-                </g>
-                <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Denovo</text></svg>
-              </svg>
-         </div>
-         <div style="text-align:left;display:table-cell">
-
-              <svg id="recessive" class="inheritance" width="90" height="18" transform="translate(0,0)">
-                <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="20" height="20"></use>
-                </g>
-                <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Recessive</text></svg>
-              </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-
- 
- <!-- Allele Frequency -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="heading4a" style="text-align:left;">
-      <h4a class="panel-title">
-        <a role="button" data-toggle="collapse"  href="#collapse4a" aria-expanded="true" aria-controls="collapse4a" style="margin-right:4px;">
-          Allele Frequency
-        </a>
-          <select id="select-af-scheme" onchange="filterCard.onSelectAFScheme()" style="padding-left:4px;font-size:10px;">
-                          <option>ExAC</option>
-                          <option>1000 Genomes</option>                   
-          </select>
-      </h4a>
-    </div>
-    <div id="collapse4a" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading4a">
-      <div class="panel-body">
-
-        <div class="afexaclevel-panel" style="display:table">
-
-
-          <div  style="text-align:left;display:table-cell;width:120px;">
-            <svg id="afexac_unique" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
-              <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">private</text>
-              <g class=" afexac_unique">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,49);"></use>
-              </g>
-            </svg>
-            <svg id="afexac_uberrare" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .01%</text>
-              <g class=" afexac_uberrare">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
-              </g>
-            </svg>
-            <svg id="afexac_superrare" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .1%</text>
-              <g class=" afexac_superrare">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(204, 174, 95);"></use>
-              </g>
-            </svg>
-           <svg id="afexac_rare" class="afexaclevel" width="120" height="12" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; 1%</text>
-              <g class=" afexac_rare">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
-              </g>
-            </svg>            
-          </div>
-
-          <div  style="text-align:left;display:table-cell;width:75px;">
-            <svg id="afexac_uncommon" class="afexaclevel" width="50" height="16" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">1-5%</text>
-              <g class=" afexac_uncommon">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
-              </g>
-            </svg>
-            <svg id="afexac_common" class="afexaclevel" width="50" height="18" transform="translate(0,0)">
-              <g class=" af_common">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
-              </g>
-              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">&gt; 5%</text>
-            </svg>
-            <svg id="afexac_unique_nc" class="afexaclevel" width="75" height="16" transform="translate(0,0)">
-              <text class="name" x="12" y="9" style="fill-opacity: 1;font-size: 9px;">n/a (noncoding)</text>
-              <g class=" afexac_unique_nc">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill:none;stroke:black"></use>
-              </g>
-            </svg>
-          </div>
-
-        </div>
-
-        <div class="af1000glevel-panel hide"style="display:table">
-
-          <div  style="text-align:left;display:table-cell;width:75px;">
-
-            <svg id="af1000g_unique" class="af1000glevel hide " width="75" height="12" transform="translate(0,0)">
-              <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">private</text>
-              <g class=" af1000g_unique">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="9" height="9" style="fill: rgb(215,48,49);"></use>
-              </g>
-            </svg>
-            <svg id="af1000g_uberrare" class="af1000glevel hide " width="50" height="12" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .01%</text>
-              <g class=" af1000g_uberrare">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="10" height="10" style="fill: rgb(252,141,89);"></use>
-              </g>
-            </svg>
-            <svg id="af1000g_superrare" class="af1000glevel hide " width="50" height="12" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; .1%</text>
-              <g class=" af1000g_superrare">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill: rgb(204, 174, 95);"></use>
-              </g>
-            </svg>
-            <svg id="af1000g_rare" class="af1000glevel hide " width="75" height="12" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">&lt; 1%</text>
-              <g class=" af1000g_rare">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(158, 186, 194);"></use>
-              </g>
-            </svg>
-          </div>
-
-          <div style="text-align:left;display:table-cell;width:75px;">
-
-            <svg id="af1000g_uncommon" class="af1000glevel hide " width="50" height="16" transform="translate(0,0)">
-              <text class="name" x="20" y="9" style="fill-opacity: 1;font-size: 9px;">1-5%</text>
-              <g class=" af1000g_uncommon">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="16" height="16" style="fill: rgb(145,191,219);"></use>
-              </g>
-            </svg>
-            <svg id="af1000g_common" class="af1000glevel hide " width="50" height="18" transform="translate(0,0)">
-              <g class=" af1000g_common">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(69,117,180)"></use>
-              </g>
-              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">&gt; 5%</text></svg>
-          </div>
-        </div> 
-        
-
-        <!-- allele freq range -->
-        <div id="af-range-filter" style="clear:both;text-align:left">
-          <input  type="text"  id="af-amount-start" value="0"                           
-           style="width: 45px;font-size: 9px;margin-bottom: 1px;"/>
-          -
-          <input type="text"  id="af-amount-end" value="100" 
-          style="width: 45px;font-size: 9px;margin-bottom: 1px;"/>
-          %
-          <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
-          Go
-          </a>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-
- <!-- Coverage -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="heading9">
-      <h4 class="panel-title">
-        <a role="button" data-toggle="collapse"  href="#collapse9" aria-expanded="true" aria-controls="collapse9">
-          Coverage (minimum)
-        </a>
-      </h4>
-    </div>
-    <div id="collapse9" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading9">
-      <div class="panel-body">
-
-        <!-- coverage -->  
-        <div id="coverage-filter" style="text-align:left;width:150px;" >
-          
-          <input type="text" id="coverage-min" value="" style="width:20px;font-size: 9px;margin-bottom:1px">
-          X
-          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
-          Go
-          </a>
-        </div>
-
-
-      </div>
-    </div>
-  </div>
-
 
 
 

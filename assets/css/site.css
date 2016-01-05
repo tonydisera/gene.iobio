@@ -1716,17 +1716,17 @@ header {
   fill: lightgrey !important;
   stroke: grey;
 }
-.afexaclevel.nocolor , .af1000glevel.nocolor {
+.afexaclevels.nocolor , .af1000glevels.nocolor {
   display: none !important;
 }
 
-.impact:hover, .effect:hover,  .vepConsequence:hover, .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevel:hover, .af1000glevel:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover  {  
+.impact:hover, .effect:hover,  .vepConsequence:hover, .regulatory:hover, .polyphen:hover ,.sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover  {  
   cursor: pointer;
   font-weight: bold;
   fill: rgb(53, 134, 192);
 }
 .impact.current:hover, .effect.current:hover, .vepConsequence.current:hover,   .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, 
-.type.current:hover, .afexaclevel.current:hover, .af1000glevel.current:hover,.inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover {
+.type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover,.inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid thin black;
@@ -1758,7 +1758,7 @@ header {
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme, #uasibs-scheme {
   padding-top: 2px;
 }
-.impact.inactive, .zygosity.inactive, .afexaclevel.inactive, .af1000glevel.inactive,.inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive  {
+.impact.inactive, .zygosity.inactive, .afexaclevels.inactive, .af1000glevels.inactive,.inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive  {
   pointer-events: none;
   opacity: .4;
 }

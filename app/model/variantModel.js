@@ -1213,14 +1213,19 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData) {
         	});
     	}
 
+    	variant.afexaclevels = {};
 		matrixCard.afExacMap.forEach( function(rangeEntry) {
 			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
 				variant.afexaclevel = rangeEntry.clazz;
+				variant.afexaclevels[rangeEntry.clazz] = rangeEntry.clazz;
 			}
 		});
+		
+		variant.af1000glevels = {};
 		matrixCard.af1000gMap.forEach( function(rangeEntry) {
 			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
 				variant.af1000glevel = rangeEntry.clazz;
+				variant.af1000glevels[rangeEntry.clazz] = rangeEntry.clazz;
 			}
 		});
 
