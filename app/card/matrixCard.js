@@ -319,6 +319,20 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip"));
 
+	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
+	for (impact in impactList) {
+		var theClazz = 'impact_' + impact;	
+		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
+		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
+		matrixCard.showImpactBadge(selection);	
+
+	}
+	if (variant.isBookmark) {
+		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"bookmark-badge\" height=\"16\" width=\"35\">");
+		var selection = tooltip.select('.bookmark-badge').data([{clazz: "bookmark"}]);
+		matrixCard.showBookmarkSymbol(selection);
+	}
+
 	var selection = tooltip.select("#coverage-svg");
 	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant);
    

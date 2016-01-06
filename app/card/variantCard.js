@@ -1399,18 +1399,18 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	me.createAlleleCountSVGTrio(selection, variant);
 
 
-	if (variant.isBookmark) {
-		$(tooltip[0]).find(".tooltip-title:eq(0)")[0].prepend("<svg class=\"bookmark-badge\" height=\"14\" width=\"15\">");
-		var selection = tooltip.select('.bookmark-badge').data([{clazz: "bookmark"}]);
-		matrixCard.showBookmarkSymbol(selection);
-	}
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title:eq(1)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
+		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
+	}
+	if (variant.isBookmark) {
+		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"bookmark-badge\" height=\"16\" width=\"35\">");
+		var selection = tooltip.select('.bookmark-badge').data([{clazz: "bookmark"}]);
+		matrixCard.showBookmarkSymbol(selection);
 	}
 	if (variant.inheritance && variant.inheritance != '') {
 		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
@@ -1420,6 +1420,30 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		var selection = tooltip.select('.inheritance-badge').data([{clazz: clazz}]);
 		symbolFunction(selection, options);		
 	}	
+
+	for (key in variant.vepSIFT) {
+		if (matrixCard.siftMap[key]) {
+			var clazz = matrixCard.siftMap[key].clazz;
+			if (clazz) {
+				$(tooltip[0]).find(".sift").prepend("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
+				var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
+				matrixCard.showSiftSymbol(selection);				
+			}			
+		}
+
+	}
+
+	for (key in variant.vepPolyPhen) {
+		if (matrixCard.polyphenMap[key]) {
+			var clazz = matrixCard.polyphenMap[key].clazz;
+			if (clazz) {
+				$(tooltip[0]).find(".polyphen").prepend("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
+				var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
+				matrixCard.showPolyPhenSymbol(selection);				
+			}
+		}
+	}
+
 
 
    
@@ -1836,8 +1860,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var sep = siftLabel != '' && polyphenLabel != '' ? ', ' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
-		 siftPolyphenRow = me._tooltipHeaderRow(siftLabel + sep + polyphenLabel, '', '', '')
-;
+		 siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen');
 	}
 
 	var clinvarRow = '';
@@ -1847,7 +1870,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	var clinvarPhenotypeRow = '';
 	if (phenotypeDisplay != '') {
-		clinvarPhenotypeRow = me._tooltipLongTextRow('', phenotypeDisplay);
+		clinvarPhenotypeRow = me._tooltipHeaderRow('ClinVar - ' + phenotypeDisplay);
 	}
 			
 	var dbSnpId = getRsId(variant);	
@@ -1858,9 +1881,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ me._tooltipHeaderRow(impactLabel, '', '', '')
 			+ inheritanceModeRow
 			+ siftPolyphenRow
-			+ me._tooltipShortTextRow('Allele Freq ExAC', (variant.afExAC == -100 ? null : percentage(variant.afExAC)))
-			+ me._tooltipShortTextRow('Allele Freq 1000G', percentage(variant.af1000G))
-			+ clinvarRow
+			+ me._tooltipShortTextRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), 
+									  'Allele Freq 1000G', percentage(variant.af1000G))
 			+ clinvarPhenotypeRow
 			+ me._tooltipRowAlleleCounts() 
 			+ me._linksRow(pinMessage)
@@ -1959,22 +1981,32 @@ VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value
 	      + '</div>';	
 }
 
-VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
+VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, class2) {
 	return '<div class="row">'
+	      +  '<div class="col-md-12 tooltip-title" style="text-align:center">' 
+	      +    "<span class='" + class1 + "'>" + value1 + '</span>' 
+	      +    "<span class='" + class2 + "'>" + value2 + '</span>' 
+	      +  '</div>'
+	      + '</div>';	
+}
+
+VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
+	return '<div class="row" style="padding-top:5px;">'
 	      + '<div class="col-md-2 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-md-10 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
-VariantCard.prototype._tooltipShortTextRow = function(value1, value2) {
-	if (value2 == null) {
-		return "";
-	} else {
-		return '<div class="row">'
-		      + '<div class="col-md-6 " style="text-align:right;word-break:normal">' + value1  +'</div>'
-		      + '<div class="col-md-6 " style="text-align:left;word-break:normal;color:black">' + value2 + '</div>'
-		      + '</div>';			
-	}
+VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, value4) {
+
+	return '<div class="row" style="padding-top:5px;padding-bottom:5px;">'
+	      + '<div class="col-md-4 " style="text-align:right;word-break:normal;padding-right:5px;">' + value1  +'</div>'
+	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;color:black;font-weight:bold;padding-left:0px;">' + value2 + '</div>'
+	      + '<div class="col-md-4 " style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
+	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;color:black;font-weight:bold;padding-left:0px">' + value4 + '</div>'
+	      + '</div>';			
+
 }
+
 
 
 VariantCard.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow) {

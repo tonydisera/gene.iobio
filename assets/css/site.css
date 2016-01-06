@@ -1264,7 +1264,8 @@ header {
 
 #vcf-track .bookmark g,
 #matrix-track g.bookmark,
-#examine-card g.bookmark {
+#examine-card g.bookmark,
+.tooltip g.bookmark {
   fill: #3773A7 ; 
   opacity: .7;
 }
@@ -1461,7 +1462,7 @@ header {
   background-color: white;
   color: rgb(132,132,132);
   padding: 4px 6px 4px 6px;             
-  font-size: 9px;          
+  font-size: 10px;          
   border-radius: 4px;           
   pointer-events: none;   
   text-align: left;
