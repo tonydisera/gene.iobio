@@ -16,12 +16,11 @@ BookmarkCard.prototype.init = function() {
 	    // therefore events delegated to document won't be fired
 	    event.stopPropagation();
 	});
-	// Enter in copy/paste textarea should function as submit
+	// Enter in copy/paste textarea should function as newline
 	$('#import-bookmarks-dropdown ul li#copy-paste-li').keyup(function(event){
 
 		if((event.which== 13) && ($(event.target)[0]== $("textarea#bookmarks-to-import")[0])) {
 			event.stopPropagation();
-			me.importBookmarks();
 		}
 	});	
 	// Detect when get genes dropdown opens so that
@@ -616,7 +615,9 @@ BookmarkCard.prototype.exportBookmarks = function(scope) {
 		}
 		var inheritance = entry.hasOwnProperty("isProxy") ? "" : entry.inheritance;
 		if (scope == "all" || isFavorite) {
-			output += entry.chrom + "\t" + entry.start + "\t" + entry.end + "\t" + entry.ref + "\t" + entry.alt + "\t" + geneName + "\t" + impact + "\t" + inheritance + "\n";
+			var start = entry.start--;
+			var end   = entry.end--;
+			output += entry.chrom + "\t" + start + "\t" + end+ "\t" + entry.ref + "\t" + entry.alt + "\t" + geneName + "\t" + impact + "\t" + inheritance + "\n";
 		}
 	}
 
