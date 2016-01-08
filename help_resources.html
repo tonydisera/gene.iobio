@@ -25,27 +25,49 @@
       an iobio project
     </a>   
 
-    <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 40px;">
-      <div class="btn-group"  style="display:  inline;margin-top: 15px;">
-
-        <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-          Learn more <span class="caret"></span>
-        </button>
-
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="javascript:void(0)" onclick="window.open('index.html?showTour=Y', '_geneiobio');" class="open_page_guide">Tour</a>
-          </li>
-          <li><a href="javascript:void(0)"  onclick="window.open('usecases.html', '_usecases');">Use Cases</a>
-          </li>
-        </ul>
-      </div>
-    </div>
 
   </section>
 
-<div class="container" class="shadow-z-1" style="margin-top:30px">
+<div class="container" class="shadow-z-1" style="">
+  <h1  style="text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Help Resources</h1>
 
-  <h1 class-'iobio' style="text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Screencasts</h1>
+  <h2 style="text-align:left;color:rgb(132, 132, 132);font-family:quicksand;font-size:24px;">Example datasets</h2>
+     
+     <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=AIRE" 
+     style="margin-left:20px;font-size:20px;font-family:quicksand;" target="_example_datasets">    
+      Platinum trio - whole genome sequencing
+     </a>
+     <br>
+     <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=NA19240&bam0=https://s3.amazonaws.com/iobio/1000gSV/NA19240.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&name1=NA19238&bam1=https://s3.amazonaws.com/iobio/1000gSV/NA19238.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&name2=NA19239&bam2=https://s3.amazonaws.com/iobio/1000gSV/NA19239.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&vcf0=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample0=NA19240&vcf1=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample1=NA19238&vcf2=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample2=NA19239&genes=RAI1,AIRE,PDGFB,MYLK2" 
+     style="margin-left:20px;font-size:20px;font-family:quicksand;" target="_example_datasets">    
+      Platinum trio - exome sequencing
+     </a>
+
+  <h1 style="margin-top:50px;text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Use Cases</h1>
+
+  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
+    <span style="width:400px;display:inline-block" >Recessive variant - RAI1</span>
+    <span style="font-size:16px;width:170px;display:inline-block"><a href="usecases#RAI1" target="_usecase">description</a></span>
+    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=vsnv6YU1gDc" target="_usecase">screencast</a></span>
+  </div>
+  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
+    <span style="width:400px;display:inline-block" >Realtime variant calling - MYLK2</span>
+    <span style="font-size:18px;width:170px;display:inline-block"><a href="usecases#MYLK2" target="_usecase">description</a></span>
+    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=l-YsG1C6TkI" target="_usecase">screencast</a></span>
+  </div>
+  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
+    <span style="width:400px;display:inline-block" >Low coverage variants - AIRE</span>
+    <span style="font-size:16px;width:170px;display:inline-block"><a href="usecases#AIRE" target="_usecase">description</a></span>
+    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=MxIyc23HGxc" target="_usecase">screencast</a></span>
+  </div>
+  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
+    <span style="width:400px;display:inline-block" >Alternate transcripts - PDGFB</span>
+    <span style="font-size:16px;width:170px;display:inline-block"><a href="usecases#PDGFB" target="_usecase">description</a></span>
+    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=k_nfrXgP-N0" target="_usecase">screencast</a></span>
+  </div>
+    
+
+  <h1 style="margin-top:50px;text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Screencasts</h1>
 
     <div class="videos">
       <ul>      

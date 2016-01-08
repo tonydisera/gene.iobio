@@ -72,11 +72,22 @@ body {
 }
 
 .help-link {
-  color: rgb(132,132,132) !important;
-  font-size: 12px;
+    font-size: 17px !important;
+    color: #5D809E !important;
+    font-family: Quicksand;
 }
+
+.help-info {
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: normal;
+    color: rgb(132,132,132);
+    font-family: Quicksand;
+    margin-top: 5px !important;
+}
+
 #help-card div {
-  margin-top:10px;
+  margin-bottom:30px;
 }
 
 #select_side_bar_chosen.chosen-container-single .chosen-single {
@@ -1904,7 +1915,7 @@ header {
  * video cards
  */
 
-.videos { margin-top: 70px;}
+.videos { margin-top: 15px;}
 .videos ul {
   list-style-type: none;
   overflow:hidden;
