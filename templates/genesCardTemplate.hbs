@@ -65,15 +65,31 @@
     </div>
 
 
-	<div id="phenolyzer-heading" class="hide">
- 	 	<div style="color:rgb(132,132,132);width: 60px;float: left;margin-left: 10px;font-size:12px;">Gene</div>
-  		<div style="color:rgb(132,132,132);float: left;font-size:12px;">Phenolyzer score</div>
-  	</div>
+	 <div id="phenolyzer-heading" class="hide">
 
-    <div id="phenolyzer-results" style="clear:both;padding-top:7px;">
+      <div style="font-size: 11px;margin-top: 10px;margin-bottom: 5px;margin-right: 5px;color: rgb(132,132,132);">
+  
+        <span style="float:left">select top</span>
+
+        <input id="phenolyzer-select-range-end" type="text" value="30" style="width: 25px;line-height: 11px;margin-left: 2px;">
+
+        <button onclick="genesCard.selectPhenolyzerGeneRange()" class="btn btn-raised btn-default icon-button-sm" style="font-size: 11px;line-height: 12px;margin-left: 4px;margin-top: 0px;margin-bottom: 0px;padding-top: 3px;padding-bottom: 3px;">Go</button>
+
+        <a href="javascript:void(0)" onclick="genesCard.deselectPhenolyzerGenes()" style="float: right;">deselect all</a>
+      </div>
+
+      <div style="margin-left:15px;" >
+          <div style="color:#5d809d;float: left;font-size:11px;">Rank</div>
+          <div style="color:#5d809d;width: 75px;float: left;margin-left: 25px;font-size:11px;">Gene</div>
+          <div style="color:#5d809d;float: left;font-size:12px;">Score</div>
+      </div>
+
     </div>
 
-    <div id="phenolyzer-timeout-message" class="hide alert alert-dismissable alert-info" style="background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: left;margin-left: 10px;margin-right: 10px;">
+    <div id="phenolyzer-results" style="clear:both;margin-left:15px;">
+    </div>
+
+    <div id="phenolyzer-timeout-message" class="hide alert alert-dismissable alert-info" style="background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: left;margin-left: 0px;margin-right: 10px;">
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong>The Phenolyzer services was unable to return results within 45 seconds.  Consider using a more exact search term.

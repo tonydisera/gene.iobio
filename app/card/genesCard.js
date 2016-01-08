@@ -1,4 +1,5 @@
 function GenesCard() {
+	this.geneBarChart = null;
 }
 
 GenesCard.prototype.init = function() {
@@ -171,16 +172,17 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 			$('#phenolyzer-heading').removeClass("hide");
 			var geneNamesString = "";
 			var count = 0;
+			var selectedEnd   = +$('#phenolyzer-select-range-end').val();
 			data.split("\n").forEach( function(rec) {
 				var fields = rec.split("\t");
 				if (fields.length > 2) {
 					var geneName  		         = fields[1];
-					if (count < 30) {
+					if (count < 300) {
 						var rank                 = fields[0];
 						var score                = fields[3];
 						var haploInsuffScore     = fields[5];
 						var geneIntoleranceScore = fields[6];
-						var selected             = count <= 9 ? true : false;
+						var selected             = count < selectedEnd ? true : false;
 						phenolyzerGenes.push({rank: rank, geneName: geneName, score: score, haploInsuffScore: haploInsuffScore, geneIntoleranceScore: geneIntoleranceScore, selected: selected});					
 					}				
 					count++;
@@ -189,23 +191,29 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 			});
 			
 			me.showGenesSlideLeft();
-			// Just show top 10 for now
-			var selectedGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
-			var genesString = "";
-			selectedGenes.forEach( function(g) {
-				if (genesString.length > 0) {
-					genesString += ",";
-				}
-				genesString += g.geneName;
-			})
-			$('#genes-to-copy').val(genesString);
-			me.copyPasteGenes();	 		
+			
+
+			me.refreshSelectedPhenolyzerGenes(); 		
 	 	}  
 
 	});
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');
 
+}
+
+GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
+	var me = this;
+	var selectedGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
+	var genesString = "";
+	selectedGenes.forEach( function(g) {
+		if (genesString.length > 0) {
+			genesString += ",";
+		}
+		genesString += g.geneName;
+	})
+	$('#genes-to-copy').val(genesString);
+	me.copyPasteGenes();		
 }
 
 GenesCard.prototype._onGeneBadgeUpdate = function() {
@@ -625,12 +633,12 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 
 
 	if (phenolyzerGenes && phenolyzerGenes.length > 0) {
-		var geneBarChart = verticalBarChartD3()
+		this.geneBarChart = geneListD3()
 							  .margin( {left:10, right: 10, top: 0, bottom: 0} )
 		                      .xValue( function(d){ return +d.score })
 							  .yValue( function(d){ return d.geneName })
 							  .width(120)
-							  .barHeight(15)
+							  .barHeight(10)
 							  .labelWidth(60)
 							  .gap(4)
 							  .on('d3click', function(phenolyzerGene) {
@@ -642,11 +650,38 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  });
 		d3.select('#phenolyzer-results svg').remove();
 		var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
-		geneBarChart(selection, {shadowOnHover:true});		
+		this.geneBarChart(selection, {shadowOnHover:true});		
 	}
 
 }
 
+GenesCard.prototype.selectPhenolyzerGeneRange = function() {
+	var start = 0;
+	var end   = +$('#phenolyzer-select-range-end').val();
+
+	for (var i = 0; i < phenolyzerGenes.length; i++) {
+		phenolyzerGenes[i].selected = false;
+	}
+	for (var i = start; i < end; i++) {
+		phenolyzerGenes[i].selected = true;
+	}
+
+	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
+	this.geneBarChart(selection, {shadowOnHover:false});	
+
+	this.refreshSelectedPhenolyzerGenes();
+}
+
+GenesCard.prototype.deselectPhenolyzerGenes = function() {
+	for (var i = 0; i < phenolyzerGenes.length; i++) {
+		phenolyzerGenes[i].selected = false;
+	}
+	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
+	this.geneBarChart(selection, {shadowOnHover:false});	
+
+	this.refreshSelectedPhenolyzerGenes();
+
+}
 
 
 
