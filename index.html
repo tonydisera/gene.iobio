@@ -463,7 +463,7 @@
     </div>
 
 
-<div id="tourWelcome" class="customPageGuideWelcome" style="text-align:center;height:200px;">
+<div id="tourWelcome" class="customPageGuideWelcome" style="text-align:center;height:170px;">
   <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
         float: right;
         background-color: transparent !important;
@@ -474,17 +474,15 @@
   <h3>Welcome to gene.iobio</h3>
   <p>An app for interrogating disease-causing variants</p>
   <div class="modal-button-container" style="text-align: center;margin-top: 20px;">
-    <button class="open_page_guide" onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_start">Tour</button>
-    <button class="screencasts" style="margin-left:5px;" onclick="window.open('videos.html');" class="tlypageguide_ignore">Screencasts</button>
-    <div style="padding-top:10px">
-      <button  onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add Data</button>
-    </div>
+    <button class="screencasts" style="margin-left:5px;" onclick="showSidebar('Help');" class="tlypageguide_ignore">Learn more</button>
+    <button  style="margin-left:10px" onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add your data</button>
           
   </div>
 </div>
 
  
-
+<div id="tour-placeholder">
+<div>
 
 <div id="tourPanelWrapper" class="hide">
   <div id="tourPanel"> 

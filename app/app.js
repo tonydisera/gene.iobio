@@ -26,6 +26,7 @@ var examineTemplateHTML = null;
 var recallTemplateHTML = null;
 var helpTemplateHTML = null;
 var iconbarTemplate = null;
+var tourTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -148,6 +149,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/iconbarTemplate.hbs').then(function(compiledTemplate) {
 		iconbarTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/tourTemplate.hbs').then(function(compiledTemplate) {
+		tourTemplate = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		init();
@@ -169,6 +173,8 @@ function promiseLoadTemplate(templateName) {
 
 function init() {
 	var me = this;
+
+	$('#tour-placeholder').append(tourTemplate());
 
 	// Clear the local cache
  	clearCache();
