@@ -186,7 +186,18 @@ function init() {
     // Initialize app tour
 	pageGuide = tl.pg.init({ 
 		'auto_refresh': true, 
-		'custom_open_button': '.open_page_guide' 
+		'custom_open_button': '.open_page_guide',
+		'track_events_cb': function(interactionName) {
+			
+		},
+		'handle_doc_switch': function(currentTour, prevTour) {
+			/*if (prevTour == '#add-data-button' 
+				|| prevTour == '#single-proband-button'
+				|| prevTour == '#add-vcf-track-toolbar'
+				|| prevTour == '"#add-bam-track-toolbar') {
+				//showDataDialog();
+			}*/
+		}
     }); 
 
 
@@ -673,7 +684,7 @@ function loadUrlSources() {
 
 		});
 	} else {
-		showDataDialog();
+		//showDataDialog();
 	}
 
 }
@@ -1017,8 +1028,8 @@ function clearCache() {
 		localStorage.clear();
 	}
 	
-	window.geneObjects = {};
-	window.geneAnnots = {};
+	//window.geneObjects = {};
+	//window.geneAnnots = {};
 	//window.gene = null;
 	//window.selectedTranscript = null;
 	window.genesToCache = [];
@@ -1216,7 +1227,7 @@ function loadGeneWidget() {
 
 
 					if (firstTimeGeneLoaded && !hasDataSources()) {
-						showDataDialog();
+						//showDataDialog();
 						firstTimeGeneLoaded = false; 
 					}
 

@@ -139,10 +139,14 @@ DataCard.prototype.init = function() {
 		// data is loaded.
 		var affectedSibIds  = $("#affected-sibs-select").chosen().val();
 		var unaffectedSibIds = $("#unaffected-sibs-select").chosen().val();
-		window.loadSibs(affectedSibIds, 'affected');
-		window.loadSibs(unaffectedSibIds, 'unaffected');
-		window.updateUrl('affectedSibs',   affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
-		window.updateUrl('unaffectedSibs', unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
+		if (affectedSibIds) {
+			window.loadSibs(affectedSibIds, 'affected');
+		}
+		if (unaffectedSibIds) {
+			window.loadSibs(unaffectedSibIds, 'unaffected');
+		}
+		window.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
+		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");			
 
 		window.enableCallVariantsButton();
 

@@ -16,41 +16,26 @@
       This shows the gene model for the canonical transcript.
     </div>
   </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#single-proband-button">
+  <li class="tlypageguide_bottom" data-tourtarget="#add-data-button">
     <div>
-      Select 'Single' to view variants for a single sample.  Select 'Trio' when performing trio analysis with variants from proband, mother, and father.  
-      <br>
-      In this tour, we will be analyzing the variants from a single sample, so press the 'Single' button.
+      Click on the 'Data' button to load your variant and alignment files.
+      <br><br>
+    </div>
+    <div>
+      1. Click on the 'Variants' dropdown and select 'Platinum Trio'.    
+      <br><br>
+    </div>
+    <div>
+      2. Click on the 'Alignments' dropdown and select 'Platinum Trio'.
+      <br><br>
+    </div>  
+     <div>
+      3. Click 'Load' to load all of the selected data into the app.
     </div>
   </li>
-  <li class="tlypageguide_right" data-tourtarget="#add-vcf-track-toolbar">
-    <div>
-      This is where the 'Proband' variant file is selected.  Select 'Platinum Trio' under 'Sample datasets' and variant file for NA12878 from the Illumina Platinum data set will be selected.
-      <br> When loading your own dataset, select 'Enter URL for VCF' if the data is hosted from a website. You need to specify the URL for the gzipped vcf (.vcf.gz).  The tabix file (.vcf.gz.tbi) must exist in the same web directory.   
-      <br>Select 'Choose VCF File' if your variant file resides on your file system.  You must select both the gzipped vcf (.vcf.gz) and the tabix (.vcf.gz.tbi) files at the same time.
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#add-bam-track-toolbar">
-    <div>
-      This is where the 'Proband' alignment file is optionally selected. Select  Select 'Platinum Trio' under 'Sample datasets' and the alignment file for NA12878 will be selected.
 
-    </div>
   </li>
-  <li class="tlypageguide_right" data-tourtarget="#data-card #ok-button">
-    <div>
-      Click 'Load' to load all of the selected data into the app.
-    </div>
-  </li>
-  <li class="tlypageguide_left" data-tourtarget="#data-card #minimize-button">
-    <div>
-      Click the minimize button to hide the data selection card and increase the space available for analysis.
-    </div>
-  </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#data-card #expand-button">
-    <div>
-      Click the maximize button to show the full view for the data selection card.
-    </div>
-  </li>
+  
   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
     <div>
       The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.

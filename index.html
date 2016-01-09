@@ -265,7 +265,7 @@
             </span>     
 
             <!-- Button data modal -->
-            <button type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
+            <button id="add-data-button" type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
               <i class="material-icons" style="font-size: 18px;">input</i>      
               Data
             </button>
@@ -474,7 +474,7 @@
   <h3>Welcome to gene.iobio</h3>
   <p>An app for interrogating disease-causing variants</p>
   <div class="modal-button-container" style="text-align: center;margin-top: 20px;">
-    <button class="screencasts" style="margin-left:5px;" onclick="showSidebar('Help');" class="tlypageguide_ignore">Learn more</button>
+    <button class="screencasts" style="margin-left:5px;" onclick="$('#tourWelcome').removeClass('open');showSidebar('Help');" class="tlypageguide_ignore">Learn more</button>
     <button  style="margin-left:10px" onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add your data</button>
           
   </div>
@@ -484,110 +484,6 @@
 <div id="tour-placeholder">
 <div>
 
-<div id="tourPanelWrapper" class="hide">
-  <div id="tourPanel"> 
-     
-  </div>
-</div>
-
-<ul id="tlyPageGuide" data-tourtitle="gene.iobio tour">
-  <li class="tlypageguide_left" data-tourtarget="#enter-gene-name">
-    <div>
-      Type in the gene name BRCA2 and select from the drop down list.
-      <br><strong><em>Click on next arrow > to continue to next step.</em></strong>
-    </div>
-  </li>
-  <li class="tlypageguide_top" data-tourtarget="#gene-track">
-    <div>
-      This shows the gene model for the canonical transcript.
-    </div>
-  </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#single-proband-button">
-    <div>
-      Select 'Single' to view variants for a single sample.  Select 'Trio' when performing trio analysis with variants from proband, mother, and father.  
-      <br>
-      In this tour, we will be analyzing the variants from a single sample, so press the 'Single' button.
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#add-vcf-track-toolbar">
-    <div>
-      This is where the 'Proband' variant file is selected.  Select 'Platinum Trio' under 'Sample datasets' and variant file for NA12878 from the Illumina Platinum data set will be selected.
-      <br> When loading your own dataset, select 'Enter URL for VCF' if the data is hosted from a website. You need to specify the URL for the gzipped vcf (.vcf.gz).  The tabix file (.vcf.gz.tbi) must exist in the same web directory.   
-      <br>Select 'Choose VCF File' if your variant file resides on your file system.  You must select both the gzipped vcf (.vcf.gz) and the tabix (.vcf.gz.tbi) files at the same time.
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#add-bam-track-toolbar">
-    <div>
-      This is where the 'Proband' alignment file is optionally selected. Select  Select 'Platinum Trio' under 'Sample datasets' and the alignment file for NA12878 will be selected.
-
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#data-card #ok-button">
-    <div>
-      Click 'Load' to load all of the selected data into the app.
-    </div>
-  </li>
-  <li class="tlypageguide_left" data-tourtarget="#data-card #minimize-button">
-    <div>
-      Click the minimize button to hide the data selection card and increase the space available for analysis.
-    </div>
-  </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#data-card #expand-button">
-    <div>
-      Click the maximize button to show the full view for the data selection card.
-    </div>
-  </li>
-  <li class="tlypageguide_top" data-tourtarget="#vcf-track">
-    <div>
-      The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
-      Hover over the variants to see more information.  Click on a variant to lock, allowing links to be
-      clicked in the tooltip.  
-    </div>
-  </li>
-  <li class="tlypageguide_top" data-tourtarget="#bam-depth">
-    <div>
-      When an alignment file is specified, the base coverage chart is displayed, allowing the user to identify regions of abnormal or unexpected sequence coverage.
-    </div>
-  </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#button-find-missing-variants">
-    <div>
-      Push the 'Call from alignments' button to call variants using Freebayes. Variants not present in the VCF file will be displayed above the loaded variants. 
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#filter-track">
-    <div>
-      The variants can be filtered by mousing over a specific label.  To apply multiple filters, click on multiple labels to toggle on or off.
-    </div>
-  </li>
-  <li class="tlypageguide_top" data-tourtarget="#matrix-track">
-    <div>
-      The variants are ranked according to different criteria. These criteria can be reordered by clicking on their respective arrows. Click on a column to see the variant in the variant chart below. Unclick
-      the column to toggle back to all variants.
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#transcript-btn-group">
-    <div>
-      Other transcripts for this gene can be selected from this dropdown.
-    </div>
-  </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#gene-track">
-    <div>
-     Drag and drop to select a region to zoom into. To zoom back out, click anywhere on the gene model.
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#transcript-btn-group">
-    <div>
-      Adjust this value to display modify the size of displayed DNA upstream and downstream of the gene.
-    </div>
-  </li>
-  <li class="tlypageguide_left" data-tourtarget="#learn-more-dropdown">
-    <div>
-      You can run the tour any time by selecting 'Tour' from the 'Learn more' dropdown.
-      <br>
-      This is the end of the tour.  <strong><em>Click the close button to end or click on next arrow > to re-run the tour.</em></strong>
-    </div>
-  </li>
-</ul>
 
  
 

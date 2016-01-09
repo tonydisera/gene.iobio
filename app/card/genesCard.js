@@ -524,7 +524,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 		    	me.updateGeneInfoLink(window.gene.gene_name);
 
 				if (!hasDataSources()) {
-					showDataDialog();
+					//showDataDialog();
 					firstTimeGeneLoaded = false; 
 				}
 
