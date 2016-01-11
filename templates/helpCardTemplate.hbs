@@ -3,8 +3,26 @@
 
 	<div style="margin-top:10px;margin-left:10px;">
 	    <div>
-	    	<a class="help-link open_page_guide" href="javascript:void(0)" >Tour</a>
-	    	<div class="help-info">A step-by-step guide to using gene.iobio</div>
+	    	<a class="help-link open_page_guide" onclick="closeSlideLeft()" href="javascript:void(0)" >Tour</a>
+	    	<div class="help-info">A step-by-step guide to using gene.iobio
+
+				<a class="help-link open_page_guide" id="show-overview-bookmarks-tour" 
+					onclick="closeSlideLeft()" href="javascript:void(0)" 
+					style="display: block;font-size: 13px !important;">
+				Overview
+				</a>
+				<a class="help-link " id="show-phenolyzer-tour" 
+					onclick="$('#tlyPageGuideBookmarksPhenolyzer').removeClass('hide');closeSlideLeft()" href="javascript:void(0)" 
+					style="display: block;font-size: 13px !important;">
+				Phenolyzer
+				</a>
+				<a class="help-link " id="show-bookmarks-tour" 
+					onclick="$('#tlyPageGuideBookmarks').removeClass('hide');closeSlideLeft()" href="javascript:void(0)" 
+					style="display: block;font-size: 13px !important;">
+				Bookmarks
+				</a>
+
+	    </div>
 	    </div>
 
 	    <div>

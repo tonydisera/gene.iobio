@@ -108,6 +108,8 @@ var widthFactors = [
 ];
 
 var pageGuide = null;
+var pageGuideBookmarks = null;
+var pageGuidePhenolyzer = null;
 
 
 $(document).ready(function(){
@@ -200,6 +202,29 @@ function init() {
 		}
     }); 
 
+    // Initialize bookmarks tour
+	pageGuideBookmarks = tl.pg.init({ 
+		'auto_refresh': true, 
+		'custom_open_button': '#show-bookmarks-tour',
+		'steps_element': '#tlyPageGuideBookmarks',
+		'track_events_cb': function(interactionName) {
+			
+		},
+		'handle_doc_switch': function(currentTour, prevTour) {
+		}
+    }); 
+
+    // Initialize phenolyzer tour
+	pageGuidePhenolyzer = tl.pg.init({ 
+		'auto_refresh': true, 
+		'custom_open_button': '#show-phenolyzer-tour',
+		'steps_element': '#tlyPageGuidePhenolyzer',
+		'track_events_cb': function(interactionName) {
+			
+		},
+		'handle_doc_switch': function(currentTour, prevTour) {
+		}
+    }); 
 
 	// For 'show variants' card
 	$('#select-color-scheme').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});

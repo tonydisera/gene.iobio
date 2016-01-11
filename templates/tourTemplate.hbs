@@ -31,6 +31,7 @@
     </div>  
      <div>
       3. Click 'Load' to load all of the selected data into the app.
+      <br><br>
     </div>
   </li>
 
@@ -39,23 +40,16 @@
   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
     <div>
       The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
-      Hover over the variants to see more information.  Click on a variant to lock, allowing links to be
-      clicked in the tooltip.  
+      Hover over the variants to see more information.  
+      <br><br>
+
     </div>
   </li>
+
+  
   <li class="tlypageguide_top" data-tourtarget="#bam-depth">
     <div>
       When an alignment file is specified, the base coverage chart is displayed, allowing the user to identify regions of abnormal or unexpected sequence coverage.
-    </div>
-  </li>
-  <li class="tlypageguide_bottom" data-tourtarget="#button-find-missing-variants">
-    <div>
-      Push the 'Call from alignments' button to call variants using Freebayes. Variants not present in the VCF file will be displayed above the loaded variants. 
-    </div>
-  </li>
-  <li class="tlypageguide_right" data-tourtarget="#filter-track">
-    <div>
-      The variants can be filtered by mousing over a specific label.  To apply multiple filters, click on multiple labels to toggle on or off.
     </div>
   </li>
   <li class="tlypageguide_top" data-tourtarget="#matrix-track">
@@ -64,6 +58,8 @@
       the column to toggle back to all variants.
     </div>
   </li>
+
+
   <li class="tlypageguide_right" data-tourtarget="#transcript-btn-group">
     <div>
       Other transcripts for this gene can be selected from this dropdown.
@@ -79,11 +75,241 @@
       Adjust this value to display modify the size of displayed DNA upstream and downstream of the gene.
     </div>
   </li>
-  <li class="tlypageguide_left" data-tourtarget="#learn-more-dropdown">
+
+
+  <li class="tlypageguide_bottom" data-tourtarget="#button-find-missing-variants">
     <div>
-      You can run the tour any time by selecting 'Tour' from the 'Learn more' dropdown.
-      <br>
-      This is the end of the tour.  <strong><em>Click the close button to end or click on next arrow > to re-run the tour.</em></strong>
+      Push the 'Call variants' button on icon bar. 
     </div>
   </li>
+  <li class="tlypageguide_bottom" data-tourtarget="#button-call-variants">
+    <div>
+      Push the 'Call from alignments' button to call variants using Freebayes. Variants not present in the VCF file will be displayed above the loaded variants. 
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget="#button-show-filters">
+    <div>
+      Push the 'Filter variants' button on the icon bar.
+    </div>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget="#filter-track svg#MODERATE">
+    <div>
+      The variants can be filtered by mousing over a specific label.  To apply multiple filters, click on multiple labels to toggle on or off.
+      <br><br>
+      Click on the Moderate impact.  
+    </div>
+  </li>
+
+  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #displayed-variant-count">
+    <div>
+      The proband variant card now shows one variant.
+      <br><br>
+      Click on a variant to lock the tooltip and examine the variant in more detail.
+    </div>
+  </li>
+  </li>
+
+
+  <li class="tlypageguide_top" data-tourtarget="#examine-card .row:eq(0)">
+    <div>
+      Variant details are shown here.
+      
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#examine-card a:contains('Bookmark')">
+    <div>     
+      Click on the 'Bookmark' link to bookmark this variant.
+    </div>
+  </li>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget="#button-show-bookmarks">
+    <div>
+      Click on the 'Bookmarks' to see a list of all bookmarked variants.
+    </div>
+  </li>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget="#bookmark-card #bookmark-panel">
+    <div>
+      All variants that are bookmarked are listed here.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#bookmark-card .favorite-indicator">
+    <div>
+      When reviewing a number of bookmarks, you can star the ones that are noteworthy.
+    </div>
+  </li>
+
+   <li class="tlypageguide_right" data-tourtarget="#button-show-phenolyzer">
+    <div>
+      Click on the 'Genes' button in the icon bar.
+    </div>
+  </li>
+   <li class="tlypageguide_right" data-tourtarget="#genes-card textarea">
+    <div>
+      Our application has integrated Phenolyzer, which produces a ranked gene list based on
+      a phenotype terms.
+      <br><br>
+      Enter the search term 'breast cancer'
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#genes-card #phenolyzer-go-button">
+    <div>
+      Press the 'Run' button.  In about a minute, phenolyzer will return a
+      ranked gene list.
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#genes-card #phenolyzer-results">
+    <div>
+      When the Phenolyzer run has finished, the ranked gene list will appear. 
+      By default, the top 30 genes are selected.  By checking a gene, it will appear as a 
+      gene button in the main navigation area.
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#gene-badge-button:eq(0)">
+    <div>
+      For each of the selected genes, a gene button will appear.
+      <br><br>
+      Notice that a checkmark will appear with the variants have been analyzed for the
+      gene.  
+      <br><br>
+      Badges will appear to the left of the gene, indicating the highest impact
+      variant or variants found that have a high SIFT or Polyphen score, a ClinVar
+      entry, or a denovo or recessive mode of inheritance.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#manage-gene-list">
+    <div>
+      To analyze all variants for each of the genes, click the 'Analyze all' link.  The
+      app will analyze each gene in the background.  When analysis is complete for
+      a gene, the green checkmark along with gene badges will appear.
+    </div>
+  </li>
+
+
+  <li class="tlypageguide_bottom" data-tourtarget="#button-show-help">
+    <div>
+      This completes the gene.iobio tour.  You can run the tour any time by 
+      selecting 'Tour' from the 'Learn more' dropdown.
+      <br>
+      <strong><em>Click the close button to end or click on next arrow > to re-run the tour.</em></strong>
+    </div>
+  </li>
+</ul>
+
+<ul id="tlyPageGuideBookmarks" class="hide" data-tourtitle="gene.iobio Bookmarks tour">
+
+  
+  <li class="tlypageguide_top" data-tourtarget="#feature-matrix">
+    <div>
+      You can bookmark variants by clicking on a variant column in the Ranked Variants card.
+      <br><br>
+      Bookmark a variant now by clicking on a column and then clicking on the 'Bookmark' link in the tooltip.
+      Do this a few times to bookmark multiple variants.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #vcf-chart-label">
+    <div>
+      You can also bookmark a variant by clicking on a variant and then clicking on the 'Bookmark' link in the
+      tooltip.  
+      <br><br>
+      Click on a variant and click on the 'Bookmark' link in the tooltip.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#examine-card a:contains('Bookmark')">
+    <div>     
+      Or you can click on the 'Bookmark' link here to bookmark variant you are inspecting.
+    </div>
+  </li>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget="#button-show-bookmarks">
+    <div>
+      To view the bookmarks, click on the 'Bookmarks' to see a list of all bookmarked variants.
+    </div>
+  </li>
+  </li>
+  <li class="tlypageguide_right" data-tourtarget="#bookmark-card #bookmark-panel">
+    <div>
+      All variants that are bookmarked are listed here.  You can click on a bookmark
+      link to show the variant in the main app area.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#bookmark-card .favorite-indicator">
+    <div>
+      When reviewing a number of bookmarks, you can star the ones that are noteworthy.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#bookmark-card #import-bookmarks-dropdown">
+    <div>
+      If you are using a variant priorization app like GEMINI and have a list of variants,
+      you can import them as bookmarks here.
+      <br><br>
+      1. Copy (ctrl+C) a tab-delimited list of variants.
+      <br><br>
+      2. Click on the 'Import' dropdown.
+      <br><br>
+      3. Paste (ctrl+V) your buffer into the text area.
+      <br><br>
+      4. Press the 'Done' button.
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#bookmark-card #export-bookmarks-dropdown">
+    <div>
+      You can export the bookmarked variants into a tab-delimited file by clicking
+      on the 'Export' dropdown.
+      <br><br>
+      The exported list will appear in a new tab in your browser window.  
+    </div>
+  </li>
+
+</ul>
+
+
+<ul id="tlyPageGuidePhenolyzer" class="hide" data-tourtitle="gene.iobio Phenolyzer tour">
+
+   <li class="tlypageguide_right" data-tourtarget="#button-show-phenolyzer">
+    <div>
+      Click on the 'Genes' button in the icon bar.
+    </div>
+  </li>
+   <li class="tlypageguide_right" data-tourtarget="#genes-card textarea">
+    <div>
+      Our application has integrated Phenolyzer, which produces a ranked gene list based on
+      a phenotype terms.
+      <br><br>
+      Enter the search term 'breast cancer'
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#genes-card #phenolyzer-go-button">
+    <div>
+      Press the 'Run' button.  In about a minute, phenolyzer will return a
+      ranked gene list.
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#genes-card #phenolyzer-results">
+    <div>
+      When the Phenolyzer run has finished, the ranked gene list will appear. 
+      By default, the top 30 genes are selected.  By checking a gene, it will appear as a 
+      gene button in the main navigation area.
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#gene-badge-button:eq(0)">
+    <div>
+      For each of the selected genes, a gene button will appear.
+      <br><br>
+      Notice that a checkmark will appear with the variants have been analyzed for the
+      gene.  
+      <br><br>
+      Badges will appear to the left of the gene, indicating the highest impact
+      variant or variants found that have a high SIFT or Polyphen score, a ClinVar
+      entry, or a denovo or recessive mode of inheritance.
+    </div>
+  </li>
+  <li class="tlypageguide_top" data-tourtarget="#manage-gene-list">
+    <div>
+      To analyze all variants for each of the genes, click the 'Analyze all' link.  The
+      app will analyze each gene in the background.  When analysis is complete for
+      a gene, the green checkmark along with gene badges will appear.
+    </div>
+  </li>
+
 </ul>
