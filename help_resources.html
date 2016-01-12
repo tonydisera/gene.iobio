@@ -12,7 +12,55 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script> 
   <link href="assets/js/video-js/video-js.css" rel="stylesheet">
   <script src="assets/js/video-js/video.js"></script>
+   <style>
+      h2 {
+        text-align:center;
+        color:rgb(132, 132, 132);
+        font-family:quicksand;
+        font-size:26px;
+        margin-top:60px;
+        padding-bottom:10px;
+        font-weight:normal;        
+      }
 
+       .example-datasets {
+          margin-left:20px;
+          font-size:20px;
+          font-family:quicksand;
+          display:inline-block;
+          width:450px;
+          text-align:left;        
+       }
+
+       div.use-case {
+          font-size:24px;
+          color:rgb(132, 132, 132);
+          font-family:quicksand;
+          text-align;      
+       }
+
+       div.use-case .name {
+          width:400px;
+          display:inline-block;
+          text-align:left;     
+          font-size:20px;  
+       }
+       div.use-case .description {
+          font-size:16px;
+          width:170px;
+          display:inline-block;        
+       }
+       div.use-case .screencast {
+          font-size:16px;
+          width:150px;
+          display:inline-block;        
+       }
+       div.use-case .link {
+          font-size:16px;
+          width:100px;
+          display:inline-block;        
+       }
+   </style>
 </head>
 <body style="background:white">
   <section id="app-title-section" style="height:60px;" class="shadow-z-1">
@@ -25,50 +73,66 @@
       an iobio project
     </a>   
 
+    <span style="text-align:center;color:rgb(132, 132, 132);font-size:30px;font-family:quicksand;padding-right:34px;margin-top:20px;padding-bottom:0px;color: #5d809d;">Help Resources</span>
 
   </section>
 
 <div class="container" class="shadow-z-1" style="">
-  <h1  style="text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Help Resources</h1>
-
-  <h2 style="text-align:left;color:rgb(132, 132, 132);font-family:quicksand;font-size:24px;">Example datasets</h2>
+ 
+  <h2 style="margin-top:30px;">Example datasets</h2>
      
-     <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=AIRE" 
-     style="margin-left:20px;font-size:20px;font-family:quicksand;" target="_example_datasets">    
-      Platinum trio - whole genome sequencing
-     </a>
-     <br>
-     <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=NA19240&bam0=https://s3.amazonaws.com/iobio/1000gSV/NA19240.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&name1=NA19238&bam1=https://s3.amazonaws.com/iobio/1000gSV/NA19238.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&name2=NA19239&bam2=https://s3.amazonaws.com/iobio/1000gSV/NA19239.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&vcf0=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample0=NA19240&vcf1=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample1=NA19238&vcf2=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample2=NA19239&genes=RAI1,AIRE,PDGFB,MYLK2" 
-     style="margin-left:20px;font-size:20px;font-family:quicksand;" target="_example_datasets">    
-      Platinum trio - exome sequencing
-     </a>
+     <div style="text-align:center">
+       <a class="example-datasets" href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=AIRE" 
+        target="_example_datasets">    
+        Platinum trio - whole genome sequencing
+       </a>
+       <br>
+       <a class="example-datasets" href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=NA19240&bam0=https://s3.amazonaws.com/iobio/1000gSV/NA19240.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&name1=NA19238&bam1=https://s3.amazonaws.com/iobio/1000gSV/NA19238.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&name2=NA19239&bam2=https://s3.amazonaws.com/iobio/1000gSV/NA19239.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam&vcf0=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample0=NA19240&vcf1=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample1=NA19238&vcf2=https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz&sample2=NA19239&genes=RAI1,AIRE,PDGFB,MYLK2" 
+       s>    
+        Platinum trio - exome sequencing
+       </a>
+    </div>
 
-  <h1 style="margin-top:50px;text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Use Cases</h1>
+    <h2>Use cases</h2>
+    <div style="text-align:center">
 
-  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
-    <span style="width:400px;display:inline-block" >Recessive variant - RAI1</span>
-    <span style="font-size:16px;width:170px;display:inline-block"><a href="usecases#RAI1" target="_usecase">description</a></span>
-    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=vsnv6YU1gDc" target="_usecase">screencast</a></span>
-  </div>
-  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
-    <span style="width:400px;display:inline-block" >Realtime variant calling - MYLK2</span>
-    <span style="font-size:18px;width:170px;display:inline-block"><a href="usecases#MYLK2" target="_usecase">description</a></span>
-    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=l-YsG1C6TkI" target="_usecase">screencast</a></span>
-  </div>
-  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
-    <span style="width:400px;display:inline-block" >Low coverage variants - AIRE</span>
-    <span style="font-size:16px;width:170px;display:inline-block"><a href="usecases#AIRE" target="_usecase">description</a></span>
-    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=MxIyc23HGxc" target="_usecase">screencast</a></span>
-  </div>
-  <div style="font-size:24px;color:rgb(132, 132, 132);font-family:quicksand">
-    <span style="width:400px;display:inline-block" >Alternate transcripts - PDGFB</span>
-    <span style="font-size:16px;width:170px;display:inline-block"><a href="usecases#PDGFB" target="_usecase">description</a></span>
-    <span style="font-size:16px;width:100px;display:inline-block"><a href="https://www.youtube.com/watch?v=k_nfrXgP-N0" target="_usecase">screencast</a></span>
-  </div>
+    <div class="use-case">
+      <span class="name">Recessive variant - RAI1</span>
+      <span class="description"><a href="usecases#RAI1" target="_usecase">description</a></span>
+      <span class="screencast"><a href="https://www.youtube.com/watch?v=vsnv6YU1gDc" target="_usecase">screencast</a></span>
+      <span class="link" ><a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=RAI1" target="_usecase">gene.iobio</a>
+      </span>   
+      
+    </div>
+    <div class="use-case">
+      <span class="name">Realtime variant calling - MYLK2</span>
+      <span class="description"><a href="usecases#MYLK2" target="_usecase">description</a></span>
+      <span class="screencast"><a href="https://www.youtube.com/watch?v=l-YsG1C6TkI" target="_usecase">screencast</a></span>
+      <span class="link"><a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=MYLK2" target="_usecase">gene.iobio</a>
+      </span>   
+
+    </div>
+    <div class="use-case">
+      <span class="name" >Low coverage variants - AIRE</span>
+      <span class="description"><a href="usecases#AIRE" target="_usecase">description</a></span>
+      <span class="screencast"><a href="https://www.youtube.com/watch?v=MxIyc23HGxc" target="_usecase">screencast</a></span>
+      <span class="link"><a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=AIRE" target="_usecase">gene.iobio</a>
+      </span>   
+
+    </div>
+    <div class="use-case">
+      <span class="name">Alternate transcripts - PDGFB</span>
+      <span class="description"><a href="usecases#PDGFB" target="_usecase">description</a></span>
+      <span class="screencast"><a href="https://www.youtube.com/watch?v=k_nfrXgP-N0" target="_usecase">screencast</a></span>
+      <span class="link"><a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&name0=NA12878&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=NA12892&vcf1=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam&name2=NA12891&vcf2=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&genes=RAI1,AIRE,PDGFB,MYLK2&gene=PDGFB" target="_usecase">gene.iobio</a>
+      </span>   
+
+    </div>
+    </div>
     
 
-  <h1 style="margin-top:50px;text-align:center;color:rgb(132, 132, 132);font-family:quicksand">Screencasts</h1>
-
+ <h2>Screencasts</h2>
+  
     <div class="videos">
       <ul>      
 
@@ -122,28 +186,7 @@
           </div>
         </li>            
       </ul>
-    </div>
-   
-    <!-- <div style="text-align:center;background-color:white;padding-top:5px;" class="shadow-z-1">
-          <h2>Running gene.iobio</h2>
-          <video id="video1"  class="video-js vjs-default-skin vjs-big-play-centered"  controls
-            preload="auto" width="1003" height="651" poster="assets/images/gene.iobio.png"
-            data-setup="{}">
-            <source src="https://s3.amazonaws.com/iobio/gene.iobio.howtorun.mp4" type='video/mp4'>
-            <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-          </video>
-    </div>
-
-    <div style="text-align:center;background-color:white;padding-top:5px;margin-top:15px;" class="shadow-z-1">
-          <h2>Analyzing your data in gene.iobio</h2>
-          <video id="video1"  class="video-js vjs-default-skin" style="margin: 0 auto;width:1003px;" controls
-            preload="auto"  width="1003" height="651" poster="assets/images/gene.iobio.png"
-            data-setup="{}">
-            <source src="https://s3.amazonaws.com/iobio/gene.iobio.1.0.data.analysis.mp4" type='video/mp4'>
-            <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
-          </video>
-
-    </div> -->
+    </div>   
 
   </div>
 </div>
