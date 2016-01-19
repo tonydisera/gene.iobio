@@ -205,7 +205,7 @@ body {
 #bookmark-card a.bookmark-gene {
     font-size: 11px;
     cursor: pointer;
-    display: block;
+    display: inline-block;
     text-align: left;
     padding-top: 4px;
     margin-bottom: -5px;
@@ -214,6 +214,46 @@ body {
 #bookmark-card .favorite-indicator {
   cursor: pointer;
 }
+
+#bookmark-card .phenotypes-container {
+  overflow-x: hidden;
+}
+
+#bookmark-card .phenotypes {
+  font-size:10px;
+  color: rgb(158,158,158);
+  margin-left: 5px;
+  margin-top: 5px;
+  overflow-x: hidden;
+  max-height: 80px;
+}
+#bookmark-card .phenotypes-container.expand .phenotypes{
+ max-height: none;
+}
+#bookmark-card .phenotypes-container .expander {
+    margin-left: 5px;
+    font-size: 11px;
+    display:none;
+}
+#bookmark-card .phenotypes-container.large .expander {
+    display:block
+}
+#bookmark-card .phenotypes-container .expander a#more {
+  display: inline;
+  cursor: pointer;
+}
+#bookmark-card .phenotypes-container .expander a#less {
+  display: none;
+  cursor: pointer;
+}
+#bookmark-card .phenotypes-container.expand .expander a#more {
+  display: none;
+}
+#bookmark-card .phenotypes-container.expand .expander a#less {
+  display: inline;
+}
+
+
 
 
 
@@ -767,6 +807,10 @@ a, a:hover, a:focus {
   stroke: #5d809d;
 }
 
+#phenotype-symbol {
+  fill: rgb(132,132,132);
+  stroke: rgb(132,132,132);
+}
 
 
 .blues_1{fill:rgb(247,251,255) !important}
@@ -1216,6 +1260,7 @@ header {
 #url-input {
   padding: 6px 4px !important;
   font-size:10px;
+  line-height: 2;
 }
 
 #bam-url-input-group {
@@ -1228,6 +1273,7 @@ header {
 #bam-url-input {
   padding: 6px 4px !important;
   font-size:10px;
+  line-height: 2;
 }
 
 

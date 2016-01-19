@@ -920,15 +920,41 @@ MatrixCard.prototype.getSymbol = function(d,i) {
 
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	var me = this;
+
+	var width = selection.datum().width ? selection.datum().width : 12;
+	var height = selection.datum().height ? selection.datum().width : 12;
+	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,1)";
     
 	if (selection.datum().clazz != '') {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
-	         .attr("transform", "translate(3,3)")
+	         .attr("transform", translate)
 	         .append("use")
 	         .attr("xlink:href", '#bookmark-symbol')
-	         .attr("width",  "12")
-	         .attr("height", "12");
+	         .attr("width",  width)
+	         .attr("height", height);
+	         
+	}
+
+
+}
+
+MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
+	var me = this;
+
+	var width = selection.datum().width ? selection.datum().width : 12;
+	var height = selection.datum().height ? selection.datum().width : 12;
+	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,1)";
+
+    
+	if (selection.datum().clazz != '') {
+		selection.append("g")
+			 .attr("class", selection.datum().clazz)
+	         .attr("transform", translate)
+	         .append("use")
+	         .attr("xlink:href", '#phenotype-symbol')
+	         .attr("width",  width)
+	         .attr("height", height);
 	         
 	}
 

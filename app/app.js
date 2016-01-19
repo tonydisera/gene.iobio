@@ -6,6 +6,7 @@
 var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
 var phenolyzerServer = "http://nv-dev.iobio.io/phenolyzer/"
 //var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
+var geneToPhenoServer = "http://nv-dev.iobio.io/genetopheno/";
 
 
 // Engine for gene search suggestions
@@ -42,6 +43,7 @@ var geneNames = [];
 var phenolyzerGenes = [];
 var geneObjects = {};
 var geneAnnots = {};
+var genePhenotypes = {};
 var geneToLatestTranscript = {};
 var genesToCache = [];
 
@@ -2051,6 +2053,16 @@ function percentage(a) {
 
 function round(value, places) {
   return +(Math.round(value + "e+" + places)  + "e-" + places);
+}
+
+function splitArray(a, n) {
+    var len = a.length,out = [], i = 0;
+    while (i < len) {
+        var size = Math.ceil((len - i) / n--);
+        out.push(a.slice(i, i + size));
+        i += size;
+    }
+    return out;
 }
 
 function getRsId(variant) {

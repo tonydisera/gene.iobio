@@ -75,19 +75,31 @@ BookmarkCard.prototype.importBookmarks = function() {
 	});
 
 	showSidebar("Bookmarks");
-	me.refreshBookmarkList();
+	
 
-	// Add all of the genes to the gene list so that gene badges are created.
+	// Get the phenotypes for each of the bookmarked genes
+	var promises = []
+	for (var geneName in me.bookmarkedGenes) {
+		var promise = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
+			Promise.all(promises).then(function() {
+				me.refreshBookmarkList();
+			});
+		});
+		promises.push(promise);
+	}	
+
+	// Invoke the copy/paste function so that gene buttons
+	// are created for each of the bookmarked genes.
 	var genesBuffer = "";
+	var promises = []
 	for (var geneName in me.bookmarkedGenes) {
 		if (genesBuffer.length > 0) {
 			genesBuffer += ",";
 		}
 		genesBuffer += geneName;
-	}			
+	}	
 	$('#genes-to-copy').val(genesBuffer);			
-	genesCard.copyPasteGenes(genesBuffer);			
-
+	genesCard.copyPasteGenes(genesBuffer);	
 
 
 	$('#import-bookmarks-dropdown .btn-group').removeClass('open');	
@@ -355,6 +367,9 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	var entryKeys = entry.value;
 	         	var parts = entryKeys[0].split(": ");
 	         	var chr = parts[1].split(" ")[0];
+	         	if (chr.indexOf("chr") < 0) {
+	         		chr = "chr " + chr;
+	         	}
 	         	return  geneName + " " + chr;
 	         })
 	         .on('click', function(entry,i) {
@@ -378,6 +393,9 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				getProbandVariantCard().removeBookmarkFlags();
 				getProbandVariantCard().highlightBookmarkedVariants();
 			});
+
+	me.addPhenotypeGlyphs(container);
+
 
 	container.selectAll("div.bookmark-gene")
 	         .each( function(entry, i) {
@@ -588,13 +606,156 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
          });
 
-		d3.selectAll('#bookmark-card #bookmark-panel a')
+		d3.selectAll('#bookmark-card a.bookmark-gene, #bookmark-card a.bookmark')
 		  .filter(function(d,i) {  
 		  	return d.key == me.selectedBookmarkKey; 
 		  })
 		  .classed("current", true);
 
 
+}
+
+BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
+	var me = this;
+
+	var tooltip = d3.select('#bookmark-gene-tooltip');
+	tooltip.style("z-index", 20);
+	tooltip.transition()        
+	 .duration(1000)      
+	 .style("opacity", .9)	
+	 .style("pointer-events", "all");
+
+	tooltip.html(html);
+	var h = tooltip[0][0].offsetHeight;
+	var w = width;
+
+	var x = screenX + 30;
+	var y = screenY;
+
+	if (window.outerHeight < y + h + 30) {
+		tooltip.style("width", w + "px")
+			       .style("left", x + "px") 
+			       .style("text-align", 'left')    
+			       .style("top", (y - h) + "px")
+			       .style("z-index", 200)
+			       .style("overflow-y", "hidden");
+			       
+
+	} else {
+		tooltip.style("width", w + "px")
+			       .style("left", x + "px") 
+			       .style("text-align", 'left')    
+			       .style("top", (y) + "px")
+			       .style("z-index", 200)
+			       .style("overflow-y", "hidden");
+
+	}
+
+
+}
+
+BookmarkCard.prototype.hideTooltip = function() {
+	var tooltip = d3.select('#bookmark-gene-tooltip');
+	tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0)
+           .style("z-index", 0)
+           .style("pointer-events", "none");
+}
+
+
+BookmarkCard.prototype._setPhenotypeGlyph = function(container, geneName) {
+	var me = this;
+	genesCard.promiseGetGenePhenotypes(geneName).then(function(data) {
+
+			var phenotypes = data[0];
+			var theGeneName = data[1];
+			if (theGeneName != null && phenotypes != null && phenotypes.length > 0) {
+				$(container.node()).append("<svg class=\"phenotype-badge\" height=\"16\" width=\"16\">");
+				var selection = container.select(".phenotype-badge").data([{width:12, height:12,clazz: 'phenotype', translate: 'translate(0,5)', phenotypes: phenotypes}]);
+				matrixCard.showPhenotypeSymbol(selection);	
+				selection.on("mouseover", function(d,i) {
+					
+					var symbol = d3.select(this);
+					var matrix = symbol.node()
+                         .getScreenCTM()
+                         .translate(+symbol.node().getAttribute("cx"),+symbol.node().getAttribute("cy"));
+		            var screenX = window.pageXOffset + matrix.e - 20;
+		            var screenY = window.pageYOffset + matrix.f + 5;
+		            
+					var htmlObject = genesCard.formatPhenotypesHTML(d.phenotypes);
+					me.showTooltip(htmlObject.html, screenX, screenY, htmlObject.width);	
+						
+				});
+				selection.on("mouseout", function(d,i) {
+					me.hideTooltip();
+				});	
+			}
+		});	
+}
+
+BookmarkCard.prototype.addPhenotypeGlyphs = function(container) {
+	var me = this;
+
+	var phenotypesContainer = container.selectAll("div.bookmark-gene")
+	    .append("span")
+	    .attr("class", "phenotypes");
+
+	phenotypesContainer.each( function(entry, i) {
+		var container = d3.select(this);
+		var geneName = entry.key;
+		me._setPhenotypeGlyph(container, geneName);
+
+	});
+}
+
+
+BookmarkCard.prototype.addPhenotypeList = function(container) {
+	     var phenotypesContainer = container.selectAll("div.bookmark-gene")
+	        .append("div")
+	        .attr("class", function(entry, i) {
+	        	var geneName = entry.key;
+	        	var html = "";
+	        	var phenotypes = genePhenotypes[geneName];
+	        	if (phenotypes == null || phenotypes.length == 0) {
+	        		return "phenotypes-container hide";
+	        	} else if (phenotypes.length > 6) {
+	        		return "phenotypes-container large";
+	        	}else {
+	        		return "phenotypes-container";
+	        	}
+	        });
+
+	     phenotypesContainer.append("div")
+	        .attr("class", "phenotypes")
+	        .html( function(entry,i) {
+	        	var geneName = entry.key;
+	        	var html = "";
+	        	var phenotypes = genePhenotypes[geneName];
+	        	if (phenotypes && phenotypes.length > 0) {
+	        		phenotypes.forEach(function(phenotype) {
+	        			
+	        			html += "<div>" + phenotype.hpo_term_name + "</div>";
+
+	        		});
+
+	        	}
+	        	return html;
+	        });
+	      var expander = phenotypesContainer.append("div")
+	                                        .attr("class", "expander");
+	      expander.append("a")
+	              .attr("id", "more")
+	              .text("more...")
+	              .on("click", function(entry, i) {
+	              	d3.select(this.parentNode.parentNode).classed("expand", true);
+	              });
+	      expander.append("a")
+	              .attr("id", "less")
+	              .text("less...")
+	              .on("click", function(entry, i) {
+	              	d3.select(this.parentNode.parentNode).classed("expand", false);
+	              });	
 }
 
 BookmarkCard.prototype.exportBookmarks = function(scope) {
