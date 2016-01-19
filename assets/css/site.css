@@ -159,6 +159,13 @@ body {
   margin-right: 10px;
   color: white !important;
 }
+.poweredby:visited {
+  color: white !important;
+}
+
+.poweredby:hover {
+  color: #96C774 !important;;
+}
 
 .todo {
   visibility: hidden !important;
