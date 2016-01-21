@@ -13,6 +13,10 @@ body {
   */
 }
 
+#filter-track a.chosen-single {
+  font-size: 10px !important;
+}
+
 .tooltip {
   font-family: 'Quattrocento Sans', sans-serif !important;
 }

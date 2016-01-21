@@ -127,6 +127,7 @@ $(document).ready(function(){
 		dataCardEntryTemplate = compiledTemplate;
 	}));
 	promises.push(promiseLoadTemplate('templates/filterSlidebarTemplate.hbs').then(function(compiledTemplate) {
+	//promises.push(promiseLoadTemplate('templates/filterCancerTemplate.hbs').then(function(compiledTemplate) {
 		filterCardTemplateHTML = compiledTemplate();
 	}));
 	promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
