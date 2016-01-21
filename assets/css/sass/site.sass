@@ -1,0 +1,963 @@
+@import variables
+
+
+body
+  font-family: $app-font, sans-serif !important
+
+#filter-track a.chosen-single
+  font-size: 10px !important
+
+.shadow-z-2
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16)
+
+.btn
+  &.btn-default
+    background-color: #fff
+
+  &.btn-raised
+    background-color: #fff !important
+
+.alert
+  width: 100%
+  background-color: transparent
+  border: none
+  color: $text-color
+  text-align: center
+  font-size: 12px
+  padding: 6px
+
+  &.alert-info
+    background-color: transparent
+    color: $text-color
+
+.alert-dismissable .close, .alert-dismissible .close
+  position: relative
+  top: -2px !important
+  right: 0 !important
+
+
+
+#select_side_bar_chosen.chosen-container-single .chosen-single
+  line-height: 30px !important
+  height: 30px !important
+  width: 200px
+  font-size: 14px
+  color: $heading-color
+  background-color: white
+
+  div
+    top: 5px !important
+
+.chosen-container-single
+  .chosen-single
+    border-radius: 0px
+    line-height: 20px
+    height: 20px
+    background: none
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12)
+    border: none
+
+  .chosen-drop
+    border-radius: 0px
+
+  .chosen-single div b
+    background: url('chosen-sprite.png') no-repeat 0px 0px
+
+
+.hint
+  color: rgba(208, 66, 66, 0.95)
+  font-size: 12px
+
+.label
+  padding: 3px 6px 3px 6px !important
+
+.label-warning
+  padding-bottom: 2px !important
+  background-color: transparent !important
+  color: rgb(205, 71, 40) !important
+  font-weight: normal !important
+  font-size: 11px !important
+
+.label-primary
+  background-color: #6D9652
+
+
+.poweredby
+  margin-right: 10px
+  color: white !important
+
+  &:visited
+    color: white !important
+
+  &:hover
+    color: #96C774 !important
+
+.todo
+  visibility: hidden !important
+
+
+.btn.btn-fab
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12)
+
+
+.dropdown-menu .divider
+  height: 1px
+  margin: 9px 0
+  overflow: hidden
+  background-color: #e5e5e5
+
+.tlypageguide_shadow
+  background-color: rgba(255, 255, 255, 0)
+  box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0)
+
+  &.tlypageguide-active
+    background-color: rgba(240, 103, 103, 0.2)
+    webkit-box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25)
+    box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25)
+
+#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close
+  color: white !important
+
+  &:hover, &:focus
+    color: white !important
+
+.dropdown-menu > li > a
+  color: #333 !important
+
+.tlypageguide_text
+  padding-bottom: 10px !important
+
+html
+  position: relative
+  min-height: 100%
+
+body
+  margin-bottom: 70px
+
+.footer
+  position: absolute
+  bottom: 0
+  left: 0px
+  width: 100%
+  height: 60px
+  background-color: #4C6880 !important
+
+.card-label
+  color: $heading-color !important
+  text-transform: uppercase
+
+.keep-case
+  text-transform: none !important
+
+#variant-card-label
+  float: left
+  margin-left: 2px
+  margin-right: 1px
+  text-align: left
+  color: $app-color
+
+#sample-data-label
+  color: $text-color
+
+a
+  color: $app-color !important
+
+  &:hover, &:focus
+    color: $app-color !important
+
+.chosen-container a
+  color: $text-color !important
+
+
+
+#variant-card-buttons a.selected
+  font-weight: bold
+
+.form-control-wrapper .material-input:before
+  background-color: $app-color !important
+
+.chart-label
+  color: $app-color
+  margin-left: 4px
+  font-size: 11px
+
+.togglebutton label
+  font-weight: 400
+  cursor: pointer
+  font-size: 11px
+
+.checkbox label .check
+  display: inline-block
+  width: 20px
+  height: 20px
+  border: 2px solid
+  border-radius: 2px
+  overflow: hidden
+  position: relative
+  top: 7px
+  left: -3px
+  margin-right: 11px
+
+.badge
+  display: inline-block
+  min-width: 10px
+  padding: 2px 7px 1px 7px !important
+  font-size: 12px
+  font-weight: 700
+  line-height: 1
+  color: $text-color
+  text-align: center
+  white-space: nowrap
+  border: $text-color
+  border-style: solid
+  vertical-align: baseline
+  background-color: rgb(255, 255, 255)
+  border-radius: 10px
+  border-width: 1px
+
+.material-dropdown
+  .form-control
+    background: white
+
+  li
+    &.disabled
+      color: rgb(210, 210, 210)
+      cursor: auto
+
+      &:hover
+        background: white
+
+    &:hover
+      background: rgb(200, 200, 200)
+
+#feature-matrix
+  rect.cellbox
+    fill: white
+    stroke: rgb(230, 230, 230)
+    stroke-width: 1px
+
+  .colhdr text
+    font-size: 9px
+    pointer-events: none
+
+  rect.cellbox:hover
+    cursor: pointer
+    font-weight: bold
+
+  .col.active rect.cellbox
+    fill: rgb(242, 242, 242)
+
+  rect.colbox
+    fill: none
+    opacity: 0
+    pointer-events: none
+
+    &.current
+      stroke: rgb(145, 145, 145) !important
+      stroke-width: 2px !important
+      opacity: 1
+      pointer-events: none
+
+  text
+    font-size: 10px
+    fill: rgb(120, 120, 120)
+    pointer-events: none
+
+  .axis .tick text.current
+    font-weight: bold !important
+    fill: black !important
+
+  .y.axis .tick
+    .up polygon, .down polygon
+      fill: rgb(186, 186, 186)
+      stroke: black
+      stroke-opacity: .55
+      stroke-width: 1px
+
+    text
+      &:hover, &.current, &.active
+        font-weight: bold
+        fill: $current-color
+
+    .up polygon:hover, .down polygon:hover
+      cursor: pointer
+
+    pointer-events: all
+
+    .up.faded, .down.faded
+      opacity: .3 !important
+
+.icon
+  width: 30px
+  height: 30px
+  background: #eee
+
+#nav-section
+  position: fixed
+  left: 36px
+  z-index: 2
+  right: 5px
+  background-color: white
+  margin-bottom: 8px
+
+section
+  text-align: left
+  padding-left: 10px
+  padding-right: 10px
+  clear: both
+
+#color-scheme
+  font-size: 11px
+  margin-bottom: 10px
+  color: rgb(102, 88, 92)
+
+.radio
+  label
+    cursor: pointer
+    padding-left: 30px
+    position: relative
+    padding-top: 2px
+    font-size: 11px
+
+  position: relative
+  display: inline
+  margin-top: 0px
+  margin-bottom: 0px
+
+.checkbox
+  position: relative
+  display: inline
+  margin-top: 0px
+  margin-bottom: 0px
+
+#container
+  margin-top: 0px
+  margin-bottom: 10px
+  margin-left: 4px
+  margin-right: 4px
+
+.hide
+  display: none !important
+
+.invisible
+  visibility: hidden
+
+.visible
+  visibility: visible
+
+.box-shadow
+  box-shadow: 2px 2px 9px 0px rgba(0, 0, 0, 0.15)
+
+.track
+  display: flex
+  display: -webkit-flex
+  flex-direction: row
+  -webkit-flex-direction: row
+  align-items: flex-start
+  background-color: white
+  padding-top: 4px
+  padding-bottom: 4px
+  padding-left: 10px
+  padding-right: 10px
+  margin-top: 0px
+  margin-bottom: 8px
+
+.track-info
+  order: 1
+  -webkit-order: 1
+  flex: 0 0 220px
+  -webkit-flex: 0 0 220px
+  color: rgb(120, 120, 120)
+  margin-right: 10px
+  font-size: 18px
+  max-width: 220px
+
+.track-expand
+  font-size: 14px
+  display: block
+  background-color: white
+  padding-top: 4px
+  padding-bottom: 4px
+  padding-left: 10px
+  padding-right: 10px
+  margin-top: 8px
+  margin-bottom: 8px
+
+.track-chart
+  order: 2
+  -webkit-order: 2
+  flex: 1 0 auto
+  -webkit-flex: 1 0 auto
+
+.bars .chartlabel
+  font-size: 8px
+  fill: white
+
+  &.missing
+    fill: none
+
+
+
+.poweredbyheader
+  font-size: 16px
+  color: #96C774  !important
+  font-family: $iobio-font
+  margin-top: 3px
+  margin-bottom: 3px
+
+.iobio
+  font-size: 34px
+  color: $text-color
+  font-family: $iobio-font
+  float: left
+  margin-top: -8px
+
+.beta
+  background: #F06767
+  border-radius: 3px
+  padding: 2px 8px 2px 8px
+  color: white
+  font-size: 19px
+
+.iobioapp
+  font-size: 34px
+  color: $app-color
+  font-family: $iobio-font
+  float: left
+  margin-top: -8px
+
+.iobioproject
+  font-size: 18px
+  color: rgb(118, 99, 99)
+  font-family: $iobio-font
+  line-height: 45px
+  float: right
+  margin-top: -5px
+
+#app-title-section
+  text-align: center
+  background: white
+  padding-bottom: 7px !important
+
+.chart rect
+  fill: rgb(49, 102, 147)
+
+.bar rect
+  opacity: .75
+  fill: rgb(49, 102, 147)
+
+  &.selected
+    fill: rgb(60, 159, 244)
+
+#non-protein-coding
+  text-align: center
+  padding-bottom: 4px
+
+  &.hidden
+    visibility: hidden
+
+#region-track
+  text-align: center
+  margin-bottom: 0px
+  padding-bottom: 0px
+  margin-top: 5px
+  color: $text-color
+  font-size: 14px
+  margin-left: 100px
+
+#gene-name
+  font-size: 16px !important
+  color: $app-color
+  font-weight: bold
+
+#gene-region-info
+  padding-left: 10px
+
+#gene-region-start
+
+#gene-region-end
+  padding-left: 5px
+
+#view-finder-track
+  align-items: center
+
+#view-finder-chart
+
+#region-chart .axis text
+  font-size: 15px
+  fill: rgb(120, 120, 120)
+
+#gene-track
+  padding-top: 0px
+  margin-top: 15px
+  margin-bottom: 0px
+  padding-bottom: 0px
+  clear: both
+
+#bam-track
+  margin-bottom: 0px
+  margin-top: -40px
+  margin-left: 0px
+  margin-right: 0px
+  padding: 0px
+  clear: both
+
+#vcf-track
+  padding: 0px
+  margin: 0px
+
+#track-legend
+  margin-top: 10px
+
+#vcf-count, #vcf-legend
+  display: none
+
+#filter-and-rank-card
+  display: table
+  margin-top: 8px
+
+#filter-track
+  max-width: 214px
+  margin-top: 0px
+  margin-bottom: 0px
+
+#matrix-track
+  width: 100%
+  display: table-cell
+
+#filter-panel
+  font-size: 11px
+  color: rgb(102, 88, 92)
+  fill: rgb(102, 88, 92)
+  margin-top: 2px
+  overflow-y: auto
+
+#fb-track
+
+#fb-legend, #fb-count, #st-track
+  display: none
+
+.loader
+  img
+    height: 16px
+    width: 16px
+
+  text-align: center
+  background-color: white
+  display: table
+  padding-right: 2px
+  padding-left: 2px
+  margin-top: 40px
+  margin-left: auto
+  margin-right: auto
+
+.loader-label
+  color: rgb(111, 111, 111)
+  font-size: 13px
+
+.variant-card
+  .vcfloader
+    text-align: center
+    background-color: white
+    display: table
+    padding-right: 2px
+    padding-left: 2px
+    margin-top: 0px
+    margin-bottom: 10px
+
+  #bam-track .loader
+    margin-top: -0px !important
+    margin-bottom: 5px !important
+
+.stats-box
+  display: flex
+  flex-direction: row
+  align-items: center
+
+.stats-chart
+  order: 1
+  -webkit-order: 1
+  flex: 0 0 180px
+  -webkit-flex: 0 0 180px
+
+.stats-label
+  margin-bottom: 0px
+
+.variant-count
+  order: 2
+  -webkit-order: 2
+  flex: 0 0 40px
+  -webkit-flex: 0 0 40px
+  font-size: 12px
+  margin-top: -8px
+  text-align: center
+
+.hollow-button
+  padding: 10px 27px
+  border: 1px solid #3d8901
+  font-size: 16px
+  color: #3d8901
+  top: 50%
+  background-color: white
+  text-decoration: none
+
+  &:hover
+    color: white
+    background-color: #3d8901
+
+.hollow-small-button
+  padding: 4px
+  border: 1px solid #3d8901
+  font-size: 12px
+  color: #3d8901
+  top: 50%
+  background-color: white
+  text-decoration: none
+  font-family: $iobio-font
+  margin-bottom: 4px
+
+  &:hover
+    color: white
+    background-color: #3d8901
+
+header
+  display: block
+  margin-bottom: 20px
+  font-size: 18px
+
+
+
+
+#matrix-track g.bookmark, #examine-card g.bookmark, .tooltip g.bookmark
+  fill: #3773A7
+  opacity: .7
+
+.arrow_box
+  position: relative
+  background: #ffffff
+  border: 2px solid grey
+  border-radius: 4px
+
+  &:after, &:before
+    bottom: 100%
+    border: solid transparent
+    content: " "
+    height: 0
+    width: 0
+    position: absolute
+    pointer-events: none
+
+  &:after
+    border-color: rgba(255, 255, 255, 0)
+    border-bottom-color: #ffffff
+    border-width: 20px
+    left: 78%
+    margin-left: -20px
+
+  &:before
+    border-color: rgba(45, 143, 193, 0)
+    border-bottom-color: grey
+    border-width: 23px
+    left: 78%
+    margin-left: -23px
+
+  input
+    border: none
+    outline: none
+    width: 87%
+    margin: 8px
+    color: grey
+    font: 400 18px
+
+  button
+    font: 28px
+    margin-top: 4px
+
+#add-track, #call-variants-button
+  visibility: hidden
+
+#bam-depth
+  text-align: left
+  margin-top: 10px
+
+  .circle
+    stroke: rgba(221, 109, 109, 1)
+    stroke-width: 3
+    fill: none
+
+#vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
+  stroke: rgba(221, 109, 109, 1)
+  stroke-width: 3
+  fill: none
+
+#vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
+  stroke: rgba(221, 109, 109, 1)
+  fill: none
+  stroke-width: 4
+
+#vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
+  fill: rgba(221, 109, 109, 1)
+  stroke-width: 4
+  stroke: rgba(221, 109, 109, 1)
+
+#bam-depth .circle-label
+  fill: rgba(221, 109, 109, 1)
+  font-size: 10px
+  font-weight: bold
+
+.bar
+  stroke: black
+  stroke-width: 1
+
+  &.missing
+    stroke: none
+    stroke-width: 0
+    stroke: none
+    fill: none
+    opacity: 0
+
+#bam-depth path.line
+  stroke: black
+  stroke-width: 1
+  fill: none
+  opacity: .5
+
+.area-chart-gradient-top
+  stop-color: grey
+  stop-opacity: 0.1
+
+.area-chart-gradient-bottom
+  stop-color: grey
+  stop-opacity: 0.6
+
+.axis text
+  font-size: 10px
+  fill: rgb(120, 120, 120)
+
+#zoom-region-chart
+  .axis text
+    font-size: 10px
+    fill: rgb(120, 120, 120)
+    font-style: italic
+
+  padding-left: 0px
+  padding-right: 0px
+  margin-top: -30px
+  margin-bottom: 0px
+  padding-bottom: 0px
+
+#zoom-region-ref-name
+
+#zoom-region-start
+  float: left
+  width: 80px
+  font-size: 12px
+  color: rgb(120, 120, 120)
+
+#zoom-region-end
+  float: right
+  width: 80px
+  font-size: 12px
+  color: rgb(120, 120, 120)
+
+.axis
+  line, path
+    fill: none
+    stroke: lightgrey
+    shape-rendering: crispEdges
+    stroke-width: 1px
+
+#gene-viz .axis
+  line, path
+    fill: none
+    stroke: lightgrey
+    shape-rendering: crispEdges
+    stroke-width: 3px
+
+#zoom-region-chart .axis
+  line, path
+    fill: none
+    stroke: lightgrey
+    shape-rendering: crispEdges
+    stroke-width: 3px
+
+.brush .extent
+  stroke: #000
+  fill-opacity: .125
+  shape-rendering: crispEdges
+
+
+.variant
+  opacity: 1
+  stroke: #000
+  stroke-width: 1px
+  stroke-opacity: .3
+
+.filter-symbol
+  stroke: #000 !important
+  stroke-width: 1px !important
+  stroke-opacity: .3 !important
+
+.ibo-variant
+  .reference
+    stroke: rgb(150, 150, 150)
+
+  .name
+    font-size: 18px
+    fill: rgb(120, 120, 120)
+
+  .arrow
+    stroke: rgb(150, 150, 150)
+    fill: none
+
+  .axis
+    path, line
+      fill: none
+      stroke: lightgrey
+      shape-rendering: crispEdges
+
+    font-size: 10px
+
+.brush-line, .dashed
+  stroke: rgb(150, 150, 150)
+  stroke-dasharray: 5,5
+
+.divider text
+  font-size: 12px
+  fill: rgb(120, 120, 120)
+
+
+.btn
+  text-transform: none
+
+
+#variant-card-buttons .btn
+  border-right: 1px solid rgb(235, 235, 235)
+  border-bottom: 1px solid white
+
+  &:last
+    border-right: 1px solid white
+
+  &:hover
+    border-bottom: 1px solid #009587
+
+.icon-button
+  padding-right: 10px
+  padding-left: 10px
+  padding-top: 6px
+  padding-bottom: 6px
+  line-height: 22px
+  font-size: 12px
+  color: $text-color !important
+
+.icon-button-sm
+  padding-top: 4px
+  padding-bottom: 4px
+  padding-left: 6px
+  padding-right: 6px
+  line-height: 22px
+  font-size: 12px
+  color: $text-color !important
+
+.icon-button-extra-sm
+  padding-top: 3px
+  padding-bottom: 3px
+  padding-left: 4px
+  padding-right: 3px
+  line-height: 10px
+  font-size: 12px
+  color: $text-color !important
+
+.icon-button i, .icon-button-sm i
+  float: left
+  font-size: 22px
+  padding-right: 4px
+  color: $app-color !important
+
+#button-find-missing-variants
+
+#bloodhound .typeahead
+  min-width: 170px
+  max-width: 170px
+  font-size: 18px
+  vertical-align: middle !important
+
+
+.results
+  text-align: left
+  color: $text-color
+
+.tt-input, .tt-hint
+  padding: 5px 8px !important
+  font-size: 18px !important
+  line-height: 24px
+  border: 1px solid #ccc !important
+  border-radius: 0px !important
+  outline: none !important
+
+.tt-input
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075)
+
+.tt-hint
+  color: #999
+
+.tt-dropdown-menu
+  width: 170px
+  margin-top: 2px
+  padding: 8px 0
+  background-color: #fff
+  border: 1px solid #ccc
+  border: 1px solid rgba(0, 0, 0, 0.2)
+  border-radius: 8px
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2)
+
+.tt-suggestion
+  padding: 3px 20px
+  font-size: 18px
+  line-height: 24px
+
+  &.tt-cursor
+    color: #fff
+    background-color: #0097cf
+
+  p
+    margin: 0
+
+
+@import slideout
+
+
+@import symbols
+
+@import datasource
+
+@import tooltip
+
+@import bookmarks
+
+@import genes
+
+@import info
+
+
+@media screen and (max-device-width: 1030px), screen and (max-width: 1030px)
+  #region-track
+    margin-left: 200px !important
+
+@media screen and (max-device-width: 800px), screen and (max-width: 800px)
+  .iobio, .iobioapp
+    font-size: 22px !important
+
+  .iobioproject
+    font-size: 16px
+
+  #learn-more-dropdown
+
+  #gene-search-bar
+    display: block !important
+    clear: both !important
+    width: 400px
+    text-align: center !important
+
+  #region-track
+    margin-left: 200px !important

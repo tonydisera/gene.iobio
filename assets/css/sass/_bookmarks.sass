@@ -1,0 +1,114 @@
+#bookmark-card
+  a
+    margin-right: 5px
+    word-break: break-all
+
+    &.current
+      font-weight: bold
+      background-color: #eee
+      line-height: 12px
+      padding-bottom: 2px
+      padding-top: 2px !important
+      margin-top: 1px
+      margin-bottom: 1px
+      margin-right: 5px
+      border: none !important
+
+  .bookmark
+    font-size: 10px
+    cursor: pointer
+    display: inline-block
+    float: left
+    width: 160px
+    text-align: left
+    padding-top: 4px
+    margin-left: 10px
+
+  div
+    &.bookmark-box
+      clear: both
+
+    &.bookmark-gene
+      margin-bottom: 5px
+      clear: both
+
+  a.bookmark-gene
+    font-size: 11px
+    cursor: pointer
+    display: inline-block
+    text-align: left
+    padding-top: 4px
+    margin-bottom: -5px
+
+  .favorite-indicator
+    cursor: pointer
+
+  .phenotypes-container
+    overflow-x: hidden
+
+  .phenotypes
+    font-size: 10px
+    color: rgb(158, 158, 158)
+    margin-left: 5px
+    margin-top: 5px
+    overflow-x: hidden
+    max-height: 80px
+
+  .phenotypes-container
+    &.expand .phenotypes
+      max-height: none
+
+    .expander
+      margin-left: 5px
+      font-size: 11px
+      display: none
+
+    &.large .expander
+      display: block
+
+    .expander a
+      &#more
+        display: inline
+        cursor: pointer
+
+      &#less
+        display: none
+        cursor: pointer
+
+    &.expand .expander a
+      &#more
+        display: none
+
+      &#less
+        display: inline
+
+  li
+    color: $text-color !important
+    font-size: 11px
+
+#bookmark-panel
+  i#remove-bookmark
+    color: #E0292B !important
+    font-weight: bold
+    font-size: 13px
+    display: none
+
+  &.editmode i#remove-bookmark
+    display: inline
+
+
+#vcf-track .bookmark
+  rect
+    fill: none
+    stroke: #3773A7
+    stroke-width: 4
+    opacity: .7
+
+  line
+    stroke: #3773A7
+    stroke-width: 4
+    opacity: .7
+
+  g
+    fill: #3773A7
+    opacity: .7    

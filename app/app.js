@@ -157,6 +157,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/tourTemplate.hbs').then(function(compiledTemplate) {
 		tourTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
+		svgGlyphsTemplate = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		init();
@@ -180,6 +183,7 @@ function init() {
 	var me = this;
 
 	$('#tour-placeholder').append(tourTemplate());
+	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
 
 	// Clear the local cache
  	clearCache();
