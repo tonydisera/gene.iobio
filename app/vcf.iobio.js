@@ -102,8 +102,8 @@ vcfiobio = function module() {
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
   var vepServer              = "wss://services.iobio.io/vep/";
-  //var vepServer              = "ws://nv-dev.iobio.io/vep/";
-  var vepServer              = "ws://nv-green.iobio.io/vep/";
+  var vepServer              = "ws://nv-dev.iobio.io/vep/";
+  //var vepServer              = "ws://nv-green.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
 
 
