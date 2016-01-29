@@ -100,16 +100,6 @@ function MatrixCard() {
 		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
 	];
 
-	this.matrixRowsNoUa = [
-		{name:'Bookmark'                     ,order:3, index:7, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact - SnpEff'              ,order:4, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Allele Frequency - 1000G'     ,order:6, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:7, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
-	];
 
 	this.filteredMatrixRows = null;
 
@@ -118,17 +108,35 @@ function MatrixCard() {
 
 }
 
+MatrixCard.prototype.removeRow = function(searchTerm, theMatrixRows) {
+	var delIdx = -1;
+	var idx = 0;
+	var removedOrder = -1;
+	theMatrixRows.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			delIdx = idx;
+			removedOrder = row.order;
+		}
+		idx++;
+	});
+
+	if (delIdx >= 0) {
+		theMatrixRows.splice(delIdx, 1);
+		theMatrixRows.forEach( function(row) {
+			if (+row.order > +removedOrder) {
+				row.order--;
+			}
+		});
+	} 
+}
+
 MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 	this.matrixRows.forEach( function (row) {
 		if (row.name.indexOf(searchTerm) >= 0) {
 			row.name = newRowLabel;
 		}
 	});
-	this.matrixRowsNoUa.forEach( function (row) {
-		if (row.name.indexOf(searchTerm) >= 0) {
-			row.name = newRowLabel;
-		}
-	});
+	
 }
 
 MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
@@ -137,11 +145,7 @@ MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
 			row.attribute = newRowAttribute;
 		}
 	});
-	this.matrixRowsNoUa.forEach( function (row) {
-		if (row.name.indexOf(searchTerm) >= 0) {
-			row.attribute = newRowAttribute;
-		}
-	});
+	
 }
 
 MatrixCard.prototype.getRowAttribute = function(searchTerm) {
@@ -382,14 +386,14 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 
 	// Figure out if we should show the unaffected sibs row
-	this.filteredMatrixRows = this.matrixRows;
-	this.matrixRows.forEach(function(mr) {
-		if (mr.attribute == 'unaffectedSibs') {
-			if (variantCardsSibs['unaffected'].length == 0) {
-				me.filteredMatrixRows = me.matrixRowsNoUa;
-			}
-		}
-	});
+
+	this.filteredMatrixRows = $.extend(true, [], this.matrixRows);	
+	if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
+		me.removeRow('Affected Siblings', me.filteredMatrixRows);
+	}
+	if (variantCardsSibs['unaffected'] == null || variantCardsSibs['unaffected'].length == 0) {
+		me.removeRow('Unaffected Siblings', me.filteredMatrixRows);
+	}
 	
 	resizeCardWidths();
 
