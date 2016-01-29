@@ -868,12 +868,12 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 	         .style("pointer-events", "none");
 
 	selection.append("line")
-	         .attr("x1", 3)
-	         .attr("y1", 3)
+	         .attr("x1", 2)
+	         .attr("y1", 2)
 	         .attr("x2", 15)
 	         .attr("y2", 15)
-	         .style("stroke-width", "1.5px")
-	         .style("stroke", "rgba(168, 170, 177, 0.81)");
+	         .style("stroke-width", "2px")
+	         .style("stroke", "rgb(144, 148, 169)");
 
 
 };
