@@ -192,6 +192,10 @@ a {
   border-radius: 10px;
   border-width: 1px; }
 
+.badge-label {
+  color: #5d809d;
+  font-size: 12px; }
+
 .material-dropdown .form-control {
   background: white; }
 .material-dropdown li.disabled {
@@ -839,7 +843,8 @@ header {
   font-size: 11px;
   text-align: left !important; }
   #slider-left .panel-title a {
-    font-size: 12px !important; }
+    font-size: 12px !important;
+    color: #848484 !important; }
 #slider-left .panel-body {
   padding-top: 5px;
   padding-right: 5px;
@@ -965,7 +970,7 @@ header {
     background-color: transparent !important;
     font-weight: 100; }
   .sidebar-button.selected {
-    background-color: #3773A7 !important;
+    background-color: #5d809d !important;
     color: white !important;
     font-weight: bold !important;
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.49), 0 10px 30px rgba(0, 0, 0, 0.28) !important; }
@@ -1059,8 +1064,8 @@ header {
   stroke: #5d809d; }
 
 #phenotype-symbol {
-  fill: #848484;
-  stroke: #848484; }
+  fill: #ABA2A2;
+  stroke: #ABA2A2; }
 
 .impact_HIGH {
   fill: #E0292B !important;
@@ -1584,7 +1589,7 @@ text.alt-count-under {
 
 #gene-badge-loaded {
   font-size: 14px;
-  color: green;
+  color: #81A966;
   font-weight: bold;
   padding-right: 1px;
   float: left;
@@ -1612,6 +1617,29 @@ text.alt-count-under {
       font-size: 13px; }
   #gene-badge-container.manage #gene-badge-remove {
     visibility: visible; }
+
+.help-link {
+  font-size: 17px !important;
+  color: #5d809d !important;
+  font-family: "Quicksand"; }
+
+.help-info {
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: normal;
+  color: #848484;
+  font-family: "Quicksand";
+  margin-top: 5px !important; }
+
+#help-card div {
+  margin-bottom: 30px; }
+
+.usecases li {
+  padding-top: 20px; }
+  .usecases li .inline {
+    color: #a0a0a0;
+    margin-left: 10px;
+    font-family: helvetica; }
 
 .videos {
   margin-top: 15px; }
@@ -1677,29 +1705,6 @@ text.alt-count-under {
     margin-top: 7px;
     margin-bottom: 16px; }
 
-.help-link {
-  font-size: 17px !important;
-  color: #5D809E !important;
-  font-family: "Quicksand"; }
-
-.help-info {
-  margin-left: 10px;
-  font-size: 12px;
-  font-weight: normal;
-  color: #848484;
-  font-family: "Quicksand";
-  margin-top: 5px !important; }
-
-#help-card div {
-  margin-bottom: 30px; }
-
-.usecases li {
-  padding-top: 20px; }
-  .usecases li .inline {
-    color: #a0a0a0;
-    margin-left: 10px;
-    font-family: helvetica; }
-
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {
     margin-left: 200px !important; } }
@@ -1718,5 +1723,23 @@ text.alt-count-under {
 
   #region-track {
     margin-left: 200px !important; } }
+.iobioapp {
+  font-size: 24px;
+  color: #5d809d;
+  margin-top: 0px; }
+
+.iobio {
+  font-size: 24px;
+  margin-top: 0px; }
+
+.iobioproject {
+  margin-left: 20px; }
+
+@media screen and (max-device-width: 800px), screen and (max-width: 800px) {
+  .iobio, .iobioapp {
+    font-size: 18px !important; }
+
+  .iobioproject {
+    font-size: 16px; } }
 
 /*# sourceMappingURL=site.css.map */
