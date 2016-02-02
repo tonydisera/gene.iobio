@@ -1604,7 +1604,13 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	var otherCount = totalCount - (+genotypeRefCount + +genotypeAltCount);
 
 	// proportion the widths of alt, other (for multi-allelic), and ref
-	BAR_WIDTH      = d3.round(MAX_BAR_WIDTH * (totalCount / getProbandVariantCard().getMaxAlleleCount()));
+	BAR_WIDTH      = d3.round((MAX_BAR_WIDTH) * (totalCount / getProbandVariantCard().getMaxAlleleCount()));
+	if (BAR_WIDTH == 0) {
+		BAR_WIDTH = 2;
+	}
+	if (BAR_WIDTH > PADDING + 6) {
+		BAR_WIDTH = BAR_WIDTH - PADDING;
+	}
 	var altPercent = +genotypeAltCount / totalCount;
 	var altWidth   = d3.round(altPercent * BAR_WIDTH);
 	var refPercent = +genotypeRefCount / totalCount;
@@ -1613,7 +1619,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 
 	// Force a separate line if the bar width is too narrow for count to fit inside or
 	// this is a multi-allelic.
-	var separateLineForLabel = (altWidth / 2 < 7) || (refWidth / 2 < 7) || (otherWidth > 0);
+	var separateLineForLabel = (altWidth / 2 < 7) || (otherWidth > 0);
 
 	container.select("svg").remove();
 	var svg = container
