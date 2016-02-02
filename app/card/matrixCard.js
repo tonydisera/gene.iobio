@@ -946,8 +946,8 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 	var me = this;
 
-	var width = selection.datum().width ? selection.datum().width : 12;
-	var height = selection.datum().height ? selection.datum().width : 12;
+	var width = selection.datum().width ? selection.datum().width : 13;
+	var height = selection.datum().height ? selection.datum().width : 13;
 	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,1)";
 
     

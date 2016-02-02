@@ -416,7 +416,6 @@ section {
   text-align: center;
   margin-bottom: 0px;
   padding-bottom: 0px;
-  margin-top: 5px;
   color: #848484;
   font-size: 14px;
   margin-left: 100px; }
@@ -424,7 +423,8 @@ section {
 #gene-name {
   font-size: 16px !important;
   color: #5d809d;
-  font-weight: bold; }
+  font-weight: bold;
+  margin-left: -100px; }
 
 #gene-region-info {
   padding-left: 10px; }

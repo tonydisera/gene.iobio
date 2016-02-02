@@ -187,9 +187,8 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
 	    	for (key in variant.clinVarClinicalSignificance) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge == true) {
-				    var clazz = matrixCard.clinvarMap[key].clazz;
-					var order = matrixCard.clinvarMap[key].value;
-					clinvarClasses[clazz] = order ;	    		    		
+				    var clinvarObject = matrixCard.clinvarMap[key];
+					clinvarClasses[key] = clinvarObject ;	    		    		
 		    	}
 
 	    	}
@@ -201,17 +200,22 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 
 	});
 
-	var getLowestClazz = function(clazzes) {
+	var getLowestClinvarClazz = function(clazzes) {
 		var lowestOrder = +9999;
 		var lowestClazz = null;
+		var dangerObject = null;
 		for (clazz in clazzes) {
-			var order = clazzes[clazz];
-			if (order < lowestOrder) {
-				lowestOrder = order;
+			var object = clazzes[clazz];
+			if (object.value < lowestOrder) {
+				lowestOrder = object.value;
 				lowestClazz = clazz;
 			}
 		}
-		return lowestClazz;
+		if (lowestClazz) {
+			dangerObject = {};
+			dangerObject[lowestClazz] =  clazzes[lowestClazz];
+		}
+		return dangerObject;
 	}
 
 	var getLowestImpact = function(impactClasses) {
@@ -227,9 +231,9 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 			return {};
 		}
 	}
-	dangerCounts.IMPACT = getLowestImpact(impactClasses);
+	dangerCounts.IMPACT      = getLowestImpact(impactClasses);
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
-	dangerCounts.CLINVAR = getLowestClazz(clinvarClasses);
+	dangerCounts.CLINVAR     = getLowestClinvarClazz(clinvarClasses);
 	dangerCounts.INHERITANCE = inheritanceClasses;
 	
 

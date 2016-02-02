@@ -246,17 +246,8 @@
           </a>   
 
           
-          <div id="gene-search-bar" style="display:inline-block;">
+          <div id="gene-search-bar" style="display:inline-block;margin-left:150px;">
 
-
-            <!-- Non protein-coding gene badges -->
-            <div id="non-protein-coding"  style="float: left;padding-top: 10px;padding-right: 4px;">
-                <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
-                  Pseudogene
-                </div>   
-                <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
-                </div>                  
-            </div>  
 
             <!-- Gene search -->
             <span id="bloodhound" >
@@ -315,6 +306,15 @@
 
 
 
+        <!-- Non protein-coding gene badges -->
+        <div id="non-protein-coding"  style="clear: both;padding-bottom: 0px;display: block;">
+            <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+              Pseudogene
+            </div>   
+            <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
+            </div>                  
+        </div>  
+
 
         <div class="fullview" style="margin-top:-25px"> 
           <div class="btn-toolbar fullview" 
@@ -341,7 +341,7 @@
              </select>        
           </div>
 
-          <button style="margin-top:0px;margin-left:4px;" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
+          <button style="margin-top:0px;margin-left:4px;float:left" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
             <i class="material-icons" style="font-size:15px;">settings</i>
           </button>
 

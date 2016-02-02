@@ -95,26 +95,11 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		// Only add the gene badge if it does not already exist
 		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
 		if ($(existingBadge).length == 0) {
-			$('#gene-badge-container').append(geneBadgeTemplate());
-
 			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
-			$(newBadgeSelector).find('#gene-badge-name').text(name);
-
-			d3.select($(existingBadge)).data([name]);
-			$(existingBadge).mouseover(function() {
-				var geneName = d3.select(this).text();
-				var geneAnnot = geneAnnots[geneName];
-				//d3.select(this.parentNode.parentNode).select("#gene-badge-button").attr('title', geneAnnot.description + " - " + geneAnnot.summary);						
-
-			});
-
-			me.promiseSetGeneAnnot($(newBadgeSelector), name);
-
-			me._setPhenotypeBadge(name);
-
+			me.addGeneBadge(name, true);
 		}
-
 	}
+
 	// If we are loading from the url, just add the class 'selected' to the gene specified in the 
 	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
@@ -287,21 +272,27 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	if ($(selector).length == 0) {
 		$('#gene-badge-container').append(geneBadgeTemplate());
 		$("#gene-badge-container #gene-badge:last-child").find('#gene-badge-name').text(geneName);
-		d3.select($(selector)).data([geneName]);
-		$(selector).mouseover(function() {
+		d3.select($(selector)[0]).data([geneName]);
+		d3.select($(selector)[0])
+		  .on("mouseover", function(d,i) {
 			var geneName = d3.select(this).text();
 			var geneAnnot = geneAnnots[geneName];
-			//d3.select(this.parentNode.parentNode).select("#gene-badge-button").attr('title', geneAnnot.description + " - " + geneAnnot.summary);						
 
-		});
-
-		var geneBadge = $("#gene-badge-container #gene-badge:last-child");
+			var x = d3.event.pageX;
+			var y = d3.event.pageY;
+            
+			me.showTooltip(me.formatGeneDescriptionHTML(geneAnnot.description, geneAnnot.summary), x, y, 300);
+		  })
+		  .on("mouseout", function(d,i) {
+		  	me.hideTooltip();
+		  });
 
 		me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge:last-child"), geneName);
-
 		me._setPhenotypeBadge(geneName);
 
-		geneNames.push(geneName);
+		if (geneNames.indexOf(geneName) < 0) {
+			geneNames.push(geneName);
+		}
 
 		if (!bypassSelecting) {
 			if (hasDataSources()) {
@@ -336,7 +327,7 @@ GenesCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 	var x = screenX ;
 	var y = screenY + 20;
 
-	if (window.outerWidth < x + w) {
+	if (window.outerWidth - 100 < x + w) {
 		tooltip.style("width", w + "px")
 			       .style("left", x - w + "px") 
 			       .style("text-align", 'left')    
@@ -373,8 +364,8 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 			var theGeneName = data[1];
 			if (theGeneName != null && phenotypes != null && phenotypes.length > 0) {
 				var geneBadge = $("#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')").parent();	
-				geneBadge.find("#gene-badge-phenotype-symbol").append("<svg class=\"phenotype-badge\" height=\"13\" width=\"13\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-phenotype-symbol .phenotype-badge')[0]).data([{width:12, height:12,clazz: 'phenotype', phenotypes: phenotypes}]);
+				geneBadge.find("#gene-badge-phenotype-symbol").append("<svg class=\"phenotype-badge\" height=\"14\" width=\"14\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-phenotype-symbol .phenotype-badge')[0]).data([{width:13, height:13,clazz: 'phenotype', phenotypes: phenotypes}]);
 				matrixCard.showPhenotypeSymbol(selection);	
 				selection.on("mouseover", function(d,i) {
 
@@ -461,25 +452,50 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 					symbolIndex++;
 					matrixCard.showImpactBadge(selection);	
 					selection.on("mouseover", function(d,i) {
-						var maxEffect = "";
-						for (key in d.effectObject) {
-							maxEffect += key + " ";
-							var transcriptObject = d.effectObject[key];
-							for (key in transcriptObject) {
-								maxEffect += key + " ";
-							}
-						}
-						d3.select(this.parentNode.parentNode.parentNode).select("#gene-badge-button").attr('title', maxEffect);						
-			
-					});
+									var maxEffect = "";
+									for (effectKey in d.effectObject) {
+										var transcriptObject = d.effectObject[effectKey];
+										if (Object.keys(transcriptObject).length > 0) {
+											for (key in transcriptObject) {
+												maxEffect += "<div>";
+												maxEffect += effectKey + " ";
+												maxEffect += "(located on non-canonical transcript " + key + ") ";
+												maxEffect += "</div>";
+											}
+										} else {
+												maxEffect += "<div>";
+												maxEffect += effectKey;
+												maxEffect += "</div>";
+										}
+									}
+									var x = d3.event.pageX;
+									var y = d3.event.pageY;
+
+									var annotScheme = filterCard.annotationScheme.toLowerCase() ==  'snpeff' ? 'SnpEff Effect' : 'VEP Consequence';
+									me.showTooltip(annotScheme + " " + maxEffect.split("_").join(" "), x, y, maxEffect.length > 70 ? 350 : 120);
+								})
+								.on("mouseout", function(d,i) {
+										me.hideTooltip();
+								});
 				}
 			}
 		} else if (dangerKey == 'CLINVAR') {
-			var clinvarLevel = dangerObject[dangerKey];
-			if (clinvarLevel != null) {
-				geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,1)', clazz: clinvarLevel}]);
-				matrixCard.showClinVarSymbol(selection);				
+			var dangerClinvar = dangerObject[dangerKey];
+			if (dangerClinvar) {
+				for (key in dangerClinvar) {
+					var clinvarObject = dangerClinvar[key];
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,1)', clinvarName: key, clinvarObject: clinvarObject, clazz: clinvarObject.clazz}]);
+					matrixCard.showClinVarSymbol(selection);		
+					selection.on("mouseover", function(d,i) {
+									var x = d3.event.pageX;
+									var y = d3.event.pageY;
+									me.showTooltip("ClinVar " + d.clinvarName.split("_").join(" "), x, y, 150);
+								})
+								.on("mouseout", function(d,i) {
+										me.hideTooltip();
+								});										
+				}				
 			}
 
 		} else if (dangerKey == 'SIFT') {
@@ -493,17 +509,21 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 					matrixCard.showSiftSymbol(selection);	
 					symbolIndex++;			
 					selection.on("mouseover", function(d,i) {
-						var maxSift = "SIFT ";
-						for (key in d.siftObject) {
-							maxSift += key + " ";
-							var transcriptObject = d.siftObject[key];
-							for (key in transcriptObject) {
-								maxSift += key + " ";
-							}
-						}
-						d3.select(this.parentNode.parentNode.parentNode).select("#gene-badge-button").attr('title', maxSift);						
-			
-					});
+									var maxSift = "SIFT ";
+									for (key in d.siftObject) {
+										maxSift += key + " ";
+										var transcriptObject = d.siftObject[key];
+										for (key in transcriptObject) {
+											maxSift += key + " ";
+										}
+									}
+									var x = d3.event.pageX;
+									var y = d3.event.pageY;
+									me.showTooltip(maxSift.split("_").join(" "), x, y, 150);
+								})
+								.on("mouseout", function(d,i) {
+										me.hideTooltip();
+								});
 
 				}
 			}
@@ -519,17 +539,21 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 					matrixCard.showPolyPhenSymbol(selection);	
 					symbolIndex++;
 					selection.on("mouseover", function(d,i) {
-						var maxPolyphen = "PolyPhen ";
-						for (key in d.polyphenObject) {
-							maxPolyphen += key + " ";
-							var transcriptObject = d.polyphenObject[key];
-							for (key in transcriptObject) {
-								maxPolyphen += key + " ";
-							}
-						}
-						d3.select(this.parentNode.parentNode.parentNode).select("#gene-badge-button").attr('title', maxPolyphen);						
-			
-					});								
+									var maxPolyphen = "PolyPhen ";
+									for (key in d.polyphenObject) {
+										maxPolyphen += key + " ";
+										var transcriptObject = d.polyphenObject[key];
+										for (key in transcriptObject) {
+											maxPolyphen += key + " ";
+										}
+									}
+									var x = d3.event.pageX;
+									var y = d3.event.pageY;
+									me.showTooltip(maxPolyphen.split("_").join(" "), x, y, 170);
+								})
+								.on("mouseout", function(d,i) {
+										me.hideTooltip();
+								});							
 				}
 			}
 
@@ -545,7 +569,16 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 					var options = {width:18, height:20, transform: 'translate(-2,-2)'};
 					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: clazz}]);
 					symbolFunction(selection, options);	
-					symbolIndex++;			
+					symbolIndex++;	
+					selection.on("mouseover", function(d,i) {
+
+									var x = d3.event.pageX;
+									var y = d3.event.pageY;
+									me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
+								})
+								.on("mouseout", function(d,i) {
+										me.hideTooltip();
+								});						
 				}
 			}
 
@@ -811,8 +844,21 @@ GenesCard.prototype.deselectPhenolyzerGenes = function() {
 
 }
 
+GenesCard.prototype.formatGeneDescriptionHTML = function(title, description) {
+	var html = "";
+	html += "<div style='text-align:center;'>NCBI summary</div>";
+	html += "<div style='text-align:center;padding-bottom:4px;'>";
+	html += "  <span style='font-weight:bold'>" + title + "</span>";
+	html += "</div>";
+	html += "<div style='text-align:left'>";
+	html += description;
+	html += "</div>";
+	return html;
+}
+
 GenesCard.prototype.formatPhenotypesHTML = function(phenotypes) {
 	var html = "";
+html += "<div style='font-weight:bold;text-align:center;padding-bottom:4px;'>HPO gene-to-phenotype</div>";
 	if (phenotypes.length < 20) {
 		phenotypes.forEach(function(phenotype) {
 			html += "<div style='max-width:200px'>";
