@@ -1335,7 +1335,7 @@ header {
 .tooltip-value {
   overflow-wrap: break-word;
   float: right;
-  width: 180px;
+  width: 220px;
   margin-right: 5px;
   color: #000000; }
 
@@ -1428,9 +1428,11 @@ text.alt-count {
 text.alt-count-under {
   fill: black !important; }
 text.other-count {
-  fill: white !important; }
+  fill: white !important;
+  font-style: italic !important; }
 text.other-count-under {
-  fill: #848484 !important; }
+  fill: #848484 !important;
+  font-style: italic !important; }
 
 #examine-card .tooltip-allele-count-bar {
   overflow-wrap: break-word;
@@ -1451,7 +1453,7 @@ text.other-count-under {
     float: none;
     color: #848484; }
   #examine-card .tooltip-row {
-    width: 210px;
+    width: 220px;
     clear: both;
     margin-bottom: 3px; }
   #examine-card .tooltip-value {
