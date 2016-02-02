@@ -273,10 +273,15 @@ a
 
   .y.axis .tick
     .up polygon, .down polygon
-      fill: rgb(186, 186, 186)
+      fill: $current-color
       stroke: black
       stroke-opacity: .55
+      stroke-width: 1.5px
+
+    .up.faded polygon, .down.faded polygon
+      fill: rgb(186, 186, 186)
       stroke-width: 1px
+      opacity: .3 !important
 
     text
       &:hover, &.current, &.active
@@ -288,8 +293,6 @@ a
 
     pointer-events: all
 
-    .up.faded, .down.faded
-      opacity: .3 !important
 
 .icon
   width: 30px

@@ -237,17 +237,19 @@ a {
 #feature-matrix .y.axis .tick {
   pointer-events: all; }
   #feature-matrix .y.axis .tick .up polygon, #feature-matrix .y.axis .tick .down polygon {
-    fill: #bababa;
+    fill: #3586c0;
     stroke: black;
     stroke-opacity: 0.55;
-    stroke-width: 1px; }
+    stroke-width: 1.5px; }
+  #feature-matrix .y.axis .tick .up.faded polygon, #feature-matrix .y.axis .tick .down.faded polygon {
+    fill: #bababa;
+    stroke-width: 1px;
+    opacity: 0.3 !important; }
   #feature-matrix .y.axis .tick text:hover, #feature-matrix .y.axis .tick text.current, #feature-matrix .y.axis .tick text.active {
     font-weight: bold;
     fill: #3586c0; }
   #feature-matrix .y.axis .tick .up polygon:hover, #feature-matrix .y.axis .tick .down polygon:hover {
     cursor: pointer; }
-  #feature-matrix .y.axis .tick .up.faded, #feature-matrix .y.axis .tick .down.faded {
-    opacity: 0.3 !important; }
 
 .icon {
   width: 30px;
