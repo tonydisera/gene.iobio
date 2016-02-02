@@ -1425,9 +1425,11 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		if (matrixCard.siftMap[key]) {
 			var clazz = matrixCard.siftMap[key].clazz;
 			if (clazz) {
-				$(tooltip[0]).find(".sift").prepend("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
-				var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
-				matrixCard.showSiftSymbol(selection);				
+				if (!tooltip.select(".sift").empty()) {
+					$(tooltip[0]).find(".sift").prepend("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
+					var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
+					matrixCard.showSiftSymbol(selection);				
+				}
 			}			
 		}
 
@@ -1437,9 +1439,11 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		if (matrixCard.polyphenMap[key]) {
 			var clazz = matrixCard.polyphenMap[key].clazz;
 			if (clazz) {
-				$(tooltip[0]).find(".polyphen").prepend("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
-				var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
-				matrixCard.showPolyPhenSymbol(selection);				
+				if (!tooltip.select(".polyphen").empty()) {
+					$(tooltip[0]).find(".polyphen").prepend("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
+					var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
+					matrixCard.showPolyPhenSymbol(selection);				
+				}
 			}
 		}
 	}
@@ -1547,7 +1551,7 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 			   .text(variant.fatherZygosity ? capitalizeFirstLetter(variant.fatherZygosity.toLowerCase()) : "");
 			column = row.append("div")
 		                .attr("class", "father-alt-count tooltip-allele-count-bar")
-			this._appendAlleleCountSVG(column, variant.genotypeAltCountFather, variant.genotypeRefCountFather, variant.genotypeDepthMother, barWidth);
+			this._appendAlleleCountSVG(column, variant.genotypeAltCountFather, variant.genotypeRefCountFather, variant.genotypeDepthFather, barWidth);
 
 	    }
 	}
@@ -1595,13 +1599,18 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 		return;
 	} 
 
-	var totalCount = +genotypeRefCount + +genotypeAltCount;
+	//var totalCount = +genotypeRefCount + +genotypeAltCount;
+	var totalCount = genotypeDepth;
+	var otherCount = totalCount -(+genotypeRefCount + +genotypeAltCount);
 	BAR_WIDTH = MAX_BAR_WIDTH * (totalCount / getProbandVariantCard().getMaxAlleleCount());
 	var altPercent = +genotypeAltCount / totalCount;
 	var altWidth = d3.round(altPercent * BAR_WIDTH);
-	var refWidth = BAR_WIDTH - altWidth;
+	//var refWidth = BAR_WIDTH - altWidth;
+	var refPercent = +genotypeRefCount / totalCount;
+	var refWidth = d3.round(refPercent * BAR_WIDTH);
+	var otherWidth = BAR_WIDTH - (altWidth+refWidth); 
 
-	var separateLineForLabel = altWidth / 2 < 7;
+	var separateLineForLabel = (altWidth / 2 < 7) || (refWidth / 2 < 7) || (otherWidth / 2 < 7);
 
 	container.select("svg").remove();
 	var svg = container
@@ -1615,27 +1624,54 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	 .attr("height", 10)
 	 .attr("width",altWidth)
 	 .attr("class", "alt-count");
+
+	if (otherWidth > 0) {
+		svg.append("rect")
+			 .attr("x", altWidth)
+			 .attr("y", "1")
+			 .attr("height", 10)
+			 .attr("width", otherWidth)
+			 .attr("class", "other-count");			
+	}
+	 
 	if (refWidth > 0) {
 		svg.append("rect")
-		 .attr("x", altWidth)
+		 .attr("x",  altWidth + otherWidth)
 		 .attr("y", "1")
 		 .attr("height", 10)
 		 .attr("width", refWidth)
 		 .attr("class", "ref-count");		
 	}
+
+	
+
 	svg.append("text")
 	   .attr("x", BAR_WIDTH + 5)
 	   .attr("y", "9")
 	   .text(totalCount);
 
-	 var g = svg.append("g")
-	            .attr("transform", (separateLineForLabel ? "translate(0,11)" : "translate(0,0)"));
+
+
+	var g = svg.append("g")
+	            .attr("transform", (separateLineForLabel ? "translate(-6,11)" : "translate(0,0)"));
 	 g.append("text")
-	   .attr("x", separateLineForLabel ? 0 : altWidth / 2)
+	   .attr("x", (altWidth / 2))
 	   .attr("y", "9")
 	   .attr("text-anchor", separateLineForLabel ? "start" : "middle")
 	   .attr("class", separateLineForLabel ? "alt-count-under" : "alt-count")
 	   .text(genotypeAltCount);
+
+ 	if (otherCount > 0) {
+		 g.append("text")
+		   .attr("x", altWidth  + (otherWidth / 2))
+		   .attr("y", "9")
+		   .attr("text-anchor", separateLineForLabel ? "start" : "middle")
+		   .attr("class", separateLineForLabel ? "other-count-under" : "other-count")
+		   .text(otherCount);
+	}	 
+
+
+	 
 	
 	 
 }
@@ -1851,13 +1887,13 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	                  ? effectDisplay 
 					  : vepConsequenceDisplay;
 
-	var siftLabel = vepSIFTDisplay != ''  && vepSIFTDisplay != 'unknown' && vepSIFTDisplay != 'tolerated'
-	                ? vepSIFTDisplay
+	var siftLabel = vepSIFTDisplay != ''  && vepSIFTDisplay != 'unknown' 
+	                ? 'SIFT ' + vepSIFTDisplay
 	                : "";
-	var polyphenLabel = vepPolyPhenDisplay != '' && vepPolyPhenDisplay != 'unknown' && vepPolyPhenDisplay != 'benign'
-	                    ? vepPolyPhenDisplay
+	var polyphenLabel = vepPolyPhenDisplay != '' && vepPolyPhenDisplay != 'unknown' 
+	                    ? 'PolyPhen ' + vepPolyPhenDisplay
 	                    : "";
-	var sep = siftLabel != '' && polyphenLabel != '' ? ', ' : ''
+	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
 		 siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen');

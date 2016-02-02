@@ -55,7 +55,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
     		variantA.motherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
     		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
 		    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
-		    variantA.genotypeDepthMother    = variantB.genotypeDepthMother;
+		    variantA.genotypeDepthMother    = variantB.genotypeDepth;
 		}
 	).then( function() {
 
@@ -76,7 +76,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	        	variantA.fatherZygosity = variantB.zygosity != null ? variantB.zygosity : '';
 	        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
 	        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
-			    variantA.genotypeDepthFather    = variantB.genotypeDepthFather;
+			    variantA.genotypeDepthFather    = variantB.genotypeDepth;
 	        });  	
 
 	}, function(error) {

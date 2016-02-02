@@ -1419,11 +1419,18 @@ rect.ref-count {
   fill: none !important; }
 rect.alt-count {
   fill: #6A9C2F !important; }
+rect.other-count {
+  stroke: black !important;
+  fill: #848484 !important; }
 
 text.alt-count {
   fill: white !important; }
 text.alt-count-under {
   fill: black !important; }
+text.other-count {
+  fill: white !important; }
+text.other-count-under {
+  fill: #848484 !important; }
 
 #examine-card .tooltip-allele-count-bar {
   overflow-wrap: break-word;

@@ -1513,6 +1513,7 @@ var effectCategories = [
             // Parse genotypes
             var genotypes = [];
             var genotypeDepths = [];
+            var genotypeFilteredDepths = [];
             var genotypeAltCounts = [];
             var genotypeRefCounts = [];
             var genotypeAltForwardCounts = [];
@@ -1529,9 +1530,9 @@ var effectCategories = [
 
                 gtDepthIndex = gtTokens["DP"];
                 if (gtDepthIndex) {
-                  genotypeDepths.push(tokens[gtDepthIndex]);
+                  genotypeFilteredDepths.push(tokens[gtDepthIndex]);
                 } else {
-                  genotypeDepths.push(null);
+                  genotypeFilteredDepths.push(null);
                 }
                 var gtAlleleCountIndex = gtTokens["AD"];
                 var gtAltCountIndex = gtTokens["AO"];
@@ -1540,26 +1541,50 @@ var effectCategories = [
                   // GATK allele counts 
                   //
                   var countTokens = tokens[gtAlleleCountIndex].split(",");
-                  if (countTokens.length == 2) {
+                  if (countTokens.length >= 2 ) {
                     var refAlleleCount = countTokens[0];
-                    var altAlleleCount = countTokens[1];
-                    genotypeAltCounts.push(altAlleleCount);
-                    genotypeRefCounts.push(refAlleleCount);                    
+                    var altAlleleCounts = countTokens.slice(1).join(",");
+
+                    var totalAllelicDepth = 0;
+                    countTokens.forEach(function(allelicDepth) {
+                      if (allelicDepth) {
+                        totalAllelicDepth += +allelicDepth;
+                      }
+                    })
+
+                    genotypeAltCounts.push(altAlleleCounts);
+                    genotypeRefCounts.push(refAlleleCount);    
+                    genotypeDepths.push(totalAllelicDepth);                
                   } else {
                     genotypeAltCounts.push(null);
                     genotypeRefCounts.push(null);
+                    genotypeDepths.push(null);
                   }
                 } else if (gtAltCountIndex) {
                   //
                   // Freebayes allele counts   
-                  //               
-                  genotypeAltCounts.push(tokens[gtAltCountIndex]);
+                  //           
+                  var totalAllelicDepth = 0; 
+
+                  var altCount = tokens[gtAltCountIndex];   
+                  genotypeAltCounts.push(altCount);
+
+                  var refCount = 0;
                   var gtRefCountIndex = gtTokens["RO"];
                   if (gtRefCountIndex) {
-                    genotypeRefCounts.push(tokens[gtRefCountIndex]);
+                    refCount = tokens[gtRefCountIndex];
+                    genotypeRefCounts.push(refCount);
+
+                    if (altCount && refCount) {
+                      totalAllelicDepth = altCount + refCount;
+                    }
                   } else {
                     genotypeRefCounts.push(null);
                   }
+
+                  genotypeDepths.push(totalAllelicDepth);
+
+                  
                 } else {
                   genotypeAltCounts.push(null);
                   genotypeRefCounts.push(null)
@@ -1615,7 +1640,6 @@ var effectCategories = [
             var phased = null;
 
 
-            // For now, just grab the first sample's genotype.
             // Only keep the alt if we have a genotype that matches.
             // For example 
             // A->G    0|1 keep
@@ -1623,18 +1647,14 @@ var effectCategories = [
             // A->G,C  0|2 bypass A->G, keep A->C
             // A->G,C  1|2 keep A->G, keep A->C
             var keepAlt = false;
-            var gtIndex = 0;
+
             if (sampleCount == -1) {
               sampleCount = genotypes.length;
             }
+            
+
+            var gtIndex = 0;
             genotypeForSample = genotypes[gtIndex];
-            genotypeDepthForSample = genotypeDepths[gtIndex];
-            genotypeAltCountForSample = genotypeAltCounts[gtIndex];
-            genotypeRefCountForSample = genotypeRefCounts[gtIndex];
-            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtIndex];
-            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtIndex];
-            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtIndex];
-            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtIndex];
 
             if (genotypeForSample == null) {
               keepAlt = true;
@@ -1661,6 +1681,17 @@ var effectCategories = [
                 } 
               }
             }
+
+            genotypeDepthForSample = genotypeDepths[gtIndex];
+            genotypeFilteredDepthForSample = genotypeFilteredDepths[gtIndex];
+            genotypeRefCountForSample = genotypeRefCounts[gtIndex];
+            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtIndex];
+            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtIndex];
+
+            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[gtIndex], ",");
+            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtIndex];
+            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtIndex];
+
 
             // Get rid of the left most anchor base for insertions and
             // deletions for accessing clinvar 
@@ -1765,6 +1796,7 @@ var effectCategories = [
                 'genotypes': genotypes, 
                 'genotype': genotypeForSample, 
                 'genotypeDepth' : genotypeDepthForSample,
+                'genotypeFilteredDepth' : genotypeFilteredDepthForSample,
                 'genotypeAltCount' : genotypeAltCountForSample,
                 'genotypeRefCount' : genotypeRefCountForSample,
                 'genotypeAltForwardCount' : genotypeAltForwardCountForSample,
@@ -1825,6 +1857,19 @@ var effectCategories = [
         'features': variants};
 
       return results;
+  };
+
+  exports.parseMultiAllelic = function(alleleIdx, genotypeValue, delim) {
+    if (genotypeValue == null || genotypeValue == "" || genotypeValue.indexOf(delim) < 0) {
+      return genotypeValue;
+    } else {
+      var tokens = genotypeValue.split(delim);
+      if (tokens.length >= alleleIdx) {
+        return tokens[alleleIdx];
+      } else {
+        return genotypeValue;
+      }
+    }
   };
 
   // If af returned from af is for multi-allelic variants, we need to parse out the
