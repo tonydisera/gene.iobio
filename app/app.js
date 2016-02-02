@@ -291,16 +291,12 @@ function init() {
 				regionEnd   = window.gene.end;
 			}
 
-			var probandVariantCard = null;
 			variantCards.forEach(function(variantCard) {
 		    	variantCard.onBrush(brush);
-		    	if (variantCard.getRelationship() == 'proband') {
-		    		probandVariantCard = variantCard;
-		    	}
-			});
-			if (probandVariantCard) {
-				probandVariantCard.fillFeatureMatrix(regionStart, regionEnd);
-			}
+		    });
+
+
+			getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
 
 		});	
 

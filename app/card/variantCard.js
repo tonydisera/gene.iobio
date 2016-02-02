@@ -841,8 +841,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 		if (me.isViewable()) {
 			me.cardSelector.find('.vcfloader').removeClass("hide");
-			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");			
+			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");
+			me.cardSelector.find("#region-flag").addClass("hide");			
 		}
+
 
 		//  The user has entered a gene.  Get the annotated variants.
 		var theGene =  $.extend({}, window.gene);
