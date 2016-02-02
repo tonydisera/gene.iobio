@@ -1051,6 +1051,16 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	window.matrixCard.fillFeatureMatrix(filteredVcfData);
 }
 
+VariantCard.prototype.sortFeatureMatrix = function() {
+
+	var filteredVcfData = this.model.isVcfLoaded() ? 
+	       this.filterVariants() 
+	     : this.filterCalledVariants();
+	
+	window.matrixCard.fillFeatureMatrix(filteredVcfData, true);
+}
+
+
 
 VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEnd) {
 	var me = this;

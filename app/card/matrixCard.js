@@ -234,7 +234,7 @@ MatrixCard.prototype.init = function() {
 				    		column.order = column.order - 1;
 				    		columnPrev.order = columnPrev.order + 1;
 				    	}
-				    	getProbandVariantCard().fillFeatureMatrix();
+				    	getProbandVariantCard().sortFeatureMatrix();
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
@@ -251,7 +251,7 @@ MatrixCard.prototype.init = function() {
 				    		column.order = column.order + 1;
 				    		columnNext.order = columnNext.order - 1;
 				    	}
-				    	getProbandVariantCard().fillFeatureMatrix();
+				    	getProbandVariantCard().sortFeatureMatrix();
 
 				    });
 
@@ -373,7 +373,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	}	
 }
 
-MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
+MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 	var me = this;
 
 	if (theVcfData == null) {
@@ -386,13 +386,14 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 
 	// Figure out if we should show the unaffected sibs row
-
-	this.filteredMatrixRows = $.extend(true, [], this.matrixRows);	
-	if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
-		me.removeRow('Affected Siblings', me.filteredMatrixRows);
-	}
-	if (variantCardsSibs['unaffected'] == null || variantCardsSibs['unaffected'].length == 0) {
-		me.removeRow('Unaffected Siblings', me.filteredMatrixRows);
+	if (partialRefresh == null || !partialRefresh) {
+		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);	
+		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
+			me.removeRow('Affected Siblings', me.filteredMatrixRows);
+		}
+		if (variantCardsSibs['unaffected'] == null || variantCardsSibs['unaffected'].length == 0) {
+			me.removeRow('Unaffected Siblings', me.filteredMatrixRows);
+		}
 	}
 	
 	resizeCardWidths();
