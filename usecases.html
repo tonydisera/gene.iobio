@@ -93,8 +93,26 @@
 
           </div>
         </li>  
-        </ul>
-  
+
+        <!-- PDHA1 variant found using 'lactic acidosis' phenotype in phenolyzer -->
+        <a name="PDHA1"></a>
+        <li style="clear:both;"><h3><a href="https://www.youtube.com/watch?v=MxIyc23HGxc">PDHA1 - phenotype driven analysis</a></h3>
+          <div class="inline">
+            Variant analysis can be directed using phenotype information using the <a href="http://phenolyzer.usc.edu">Phenolyzer</a> from Kai Wang's group at <a href="http://genomics.usc.edu/">USC</a>, which is integrated in gene.iobio. For example, consider a patient presenting with lactic acidosis. Which genes should be interrogated for this case?
+            <img src="assets/images/usecases/pdha1_a.png" width="250px" align="left" style="padding-top:10px; padding-right:5px;" />
+            <div class="inline" style="padding-top:20px">
+              From the left panel, select the 'Genes' button and in the Phenolyzer box, enter the phenotype (lactic acidosis) and press 'Run'. <a href="http://phenolyzer.usc.edu">Phenolyzer</a> is then run (note that this operation is only available for academic or non-profit use) and generates a ranked list of genes. By default, the top 30 ranked genes are added to the top gene.iobio panel and the top ranked gene (BCS1L) is automatically loaded and analyzed. 
+            </div>
+            <div class="inline" style="padding-top:20px">
+              There are no variants in this gene that appear interesting, so the next gene (TTPA) can be selected from the top list. Again, there are no variants that stand out as being important, so we move on to the next gene in the list - PDHA1 (as shown in the image below).
+            </div>
+            <img src="assets/images/usecases/pdha1_b.png" width="750px" align="left" style="padding-top:30px; padding-right:5px;" />
+            <div class="inline" style="padding-top:20px">
+              Now, in this gene, we see a missense, heterozygous <i>de novo</i> variant, that is not seen in either the 1000 Genomes or ExAC and is marked as <i>deleterious</i> by SIFT and <i>probably_damaging</i> by PolyPhen. This has a good chance of being the causative variant and it only took looking in three genes to find the variant.
+            </div>
+          </div>
+        </li>
+      </ul>
   </div>
 </div>
 
