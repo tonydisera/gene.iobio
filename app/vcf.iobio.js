@@ -938,7 +938,7 @@ var effectCategories = [
       me.clinvarIterCount = 0;
       // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
       // repeating until all variants have been processed.
-      var numberOfBatches = d3.round(theVcfData.features.length / batchSize);
+      var numberOfBatches = Math.ceil(theVcfData.features.length / batchSize);
       if (numberOfBatches == 0) {
         numberOfBatches = 1;
       }
