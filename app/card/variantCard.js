@@ -1003,10 +1003,10 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
 	resizeCardWidths();
 
-    $('#filter-and-rank-card').removeClass("hide");
-    //$('#filter-track').removeClass("hide");
-    $('#matrix-track').removeClass("hide");
-    // todo $('#variant-control-track').removeClass("hide");
+	if (this.getRelationship() == 'proband' && data.features.length > 0) {
+	    $('#filter-and-rank-card').removeClass("hide");
+	    $('#matrix-track').removeClass("hide");		
+	}
 
    	this.d3CardSelector.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
 
@@ -1038,6 +1038,15 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
+	// Don't show the feature matrix (rank card) if there are no variants for the proband
+	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	if (this.getRelationship() == 'proband' && theVcfData.features.length == 0) {
+		$('#filter-and-rank-card').addClass("hide");
+    	$('#matrix-track').addClass("hide");
+    	return;
+	}
+
+
 	$('#filter-and-rank-card').removeClass("hide");
     $('#matrix-track').removeClass("hide");
 	if (firstTimeShowVariants) {
@@ -1522,9 +1531,9 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 	                   .attr("class", "proband-alt-count tooltip-row");
 	row.append("div")
 	   .attr("class", "proband-alt-count tooltip-header-small")
-	   .html("<em>proband</em>");
+	   .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(me.getRelationship()) + "</span>");
 	row.append("div")
-		   .attr("class", "tooltip-zygosity")
+		   .attr("class", "tooltip-zygosity label " + variant.zygosity.toLowerCase())
 		   .text(variant.zygosity ? capitalizeFirstLetter(variant.zygosity.toLowerCase()) : "");
 	var column = row.append("div")
 	                .attr("class", "proband-alt-count tooltip-allele-count-bar");
@@ -1541,9 +1550,9 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 	    if ((variant.motherZygosity && variant.motherZygosity != '') || (variant.fatherZygosity && variant.fatherZygosity != null)) {
 			row.append("div")
 			   .attr("class", "mother-alt-count tooltip-header-small")
-			   .html("<em>mother</em>");
+			   .html("<span class='tooltip-subtitle'>Mother</span>");
 			row.append("div")
-			   .attr("class", "tooltip-zygosity")
+			   .attr("class", "tooltip-zygosity label " + (variant.motherZygosity != null ? variant.motherZygosity.toLowerCase() : ""))
 			   .text(variant.motherZygosity ? capitalizeFirstLetter(variant.motherZygosity.toLowerCase()) : "");
 			column = row.append("div")
 			            .attr("class", "mother-alt-count tooltip-allele-count-bar")
@@ -1555,9 +1564,9 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 		                   .attr("class", "father-alt-count tooltip-row");	
 			row.append("div")
 		       .attr("class", "father-alt-count tooltip-header-small")
-		       .html("<em>father</em>");
+		       .html("<span class='tooltip-subtitle'>Father</span>");
 			row.append("div")
-			   .attr("class", "tooltip-zygosity")
+			   .attr("class",  "tooltip-zygosity label " + (variant.fatherZygosity != null ? variant.fatherZygosity.toLowerCase() : ""))
 			   .text(variant.fatherZygosity ? capitalizeFirstLetter(variant.fatherZygosity.toLowerCase()) : "");
 			column = row.append("div")
 		                .attr("class", "father-alt-count tooltip-allele-count-bar")
@@ -1578,7 +1587,6 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 		   .attr("y", "14")
 		   .attr("anchor", "start")
 		   .attr("class", "tooltip-header-small")
-		   .style("font-weight", "bold")
 		   .text("Read Counts");	  	           		   
 
 	var g = svg.append("g")
@@ -2152,10 +2160,10 @@ VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
 VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, value4) {
 
 	return '<div class="row" style="padding-top:5px;padding-bottom:5px;">'
-	      + '<div class="col-md-4 " style="text-align:right;word-break:normal;padding-right:5px;">' + value1  +'</div>'
-	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;color:black;font-weight:bold;padding-left:0px;">' + value2 + '</div>'
-	      + '<div class="col-md-4 " style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
-	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;color:black;font-weight:bold;padding-left:0px">' + value4 + '</div>'
+	      + '<div class="col-md-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value1  +'</div>'
+	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;padding-left:0px;">' + value2 + '</div>'
+	      + '<div class="col-md-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
+	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;padding-left:0px">' + value4 + '</div>'
 	      + '</div>';			
 
 }

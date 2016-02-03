@@ -755,34 +755,40 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    ).then( function(data) {
 			    	var theVcfData = data[1];	
 
-		    		// Now update the hgvs notation on the variant
-		    		var v = theVcfData.features[0];
-		    		var theVariants = me.vcfData.features.filter(function(d) {
-		    			if (d.start == v.start &&
-		    				d.alt == v.alt &&
-		    				d.ref == v.ref) {
-		    				return true;
-		    			} else {
-		    				return false;
-		    			}
-		    		});
-		    		if (theVariants && theVariants.length > 0) {
-			    		var theVariant = theVariants[0];
-	
-						// set the hgvs and rsid on the existing variant
-			    		theVariant.extraAnnot = true;
-			    		theVariant.vepHGVSc = v.vepHGVSc;
-			    		theVariant.vepHGVSp = v.vepHGVSp;
-			    		theVariant.vepVariationIds = v.vepVariationIds;
+			    	if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
+			    		// Now update the hgvs notation on the variant
+			    		var v = theVcfData.features[0];
+			    		var theVariants = me.vcfData.features.filter(function(d) {
+			    			if (d.start == v.start &&
+			    				d.alt == v.alt &&
+			    				d.ref == v.ref) {
+			    				return true;
+			    			} else {
+			    				return false;
+			    			}
+			    		});
+			    		if (theVariants && theVariants.length > 0) {
+				    		var theVariant = theVariants[0];
+		
+							// set the hgvs and rsid on the existing variant
+				    		theVariant.extraAnnot = true;
+				    		theVariant.vepHGVSc = v.vepHGVSc;
+				    		theVariant.vepHGVSp = v.vepHGVSp;
+				    		theVariant.vepVariationIds = v.vepVariationIds;
 
-				    	// re-cache the data
-				    	me._cacheData(me.vcfData, "vcfData", theGene, theTranscript);	
+					    	// re-cache the data
+					    	me._cacheData(me.vcfData, "vcfData", theGene, theTranscript);	
 
-				    	// return the annotated variant
-						resolve(theVariant);
-		    		} else {
-		    			reject("Cannot find variant to update HGVS notation");
-		    		}
+					    	// return the annotated variant
+							resolve(theVariant);
+			    		} else {
+			    			console.log("Cannot find corresponding variant to update HGVS notation");
+			    			reject("Cannot find corresponding variant to update HGVS notation");
+			    		}			    		
+			    	} else {
+			    		console.log("Cannot get variant to update HGVS notation");
+			    		reject("Cannot get variant to update HGVS notation");
+			    	}
 
 				});		
 			});				
@@ -816,30 +822,39 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 			    ).then( function(data) {
 			    	var annotatedRecs = data[0];
 			    	var data = data[1];	
-			    	data.name = me.name;
-			    	data.relationship = me.relationship;    	
 
-			    	// Associate the correct gene with the data
-			    	var theGeneObject = null;
-			    	for( var key in window.geneObjects) {
-			    		var geneObject = geneObjects[key];
-			    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
-			    			geneObject.start == data.start &&
-			    			geneObject.end == data.end &&
-			    			geneObject.strand == data.strand) {
-			    			theGeneObject = geneObject;
-			    			data.gene = theGeneObject;
-			    		}
-			    	}
-			    	if (theGeneObject) {
-				    	// Cache the data
-				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
-				    	me.vcfData = data;		    	
-						resolve(me.vcfData);
+			    	if (data != null && data.features != null) {
+				    	data.name = me.name;
+				    	data.relationship = me.relationship;    	
 
+				    	// Associate the correct gene with the data
+				    	var theGeneObject = null;
+				    	for( var key in window.geneObjects) {
+				    		var geneObject = geneObjects[key];
+				    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+				    			geneObject.start == data.start &&
+				    			geneObject.end == data.end &&
+				    			geneObject.strand == data.strand) {
+				    			theGeneObject = geneObject;
+				    			data.gene = theGeneObject;
+				    		}
+				    	}
+				    	if (theGeneObject) {
+					    	// Cache the data if variants were retreived.  If no variants, don't
+					    	// cache so we can retry to make sure there wasn't a problem accessing
+					    	// variants.
+					    	if (data.features.length > 0) {
+						    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+					    	}
+					    	me.vcfData = data;		    	
+							resolve(me.vcfData);
+
+				    	} else {
+				    		console("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
+				    		reject();
+				    	}
 			    	} else {
-			    		alert("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
-			    		reject();
+			    		reject("No variants");
 			    	}
 
 
@@ -907,14 +922,17 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					    	bookmarkCard.determineVariantBookmarks(data, theGeneObject);
 					    }
 
-				    	// Cache the data
-				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+				    	// Cache the data (if there are variants)
+				    	if (data.features.length > 0) {
+					    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+				    	}
 				    	me.vcfData = data;		    	
 						resolve(me.vcfData);
 
 			    	} else {
-			    		alert("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
-			    		reject();
+			    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+			    		console(error);
+			    		reject(error);
 			    	}
 
 			    }, function(error) {
@@ -971,7 +989,7 @@ VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end
 					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
 
 				    	// Cache the data
-				    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
 						resolve(data);				    	
 				    } else {
 				    	reject("Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end);
@@ -1131,8 +1149,19 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		    	}	
 
 
+	    	} else if (theVcfData.features.length == 0) {
+
+			    // Invoke callback now that we have annotated variants
+			    me.vcfData = theVcfData;
+		    	if (onVcfData) {
+		    		onVcfData(theVcfData);
+		    	}
+		    	return new Promise( function(resolve, reject) {
+		    		resolve(theVcfData);
+		    	});
+
 	    	} else {
-	    		reject("No variants");
+	    		reject("_promiseGetAndAnnotateVariants() No variants");
 	    	}
 
 		
@@ -1173,12 +1202,28 @@ VariantModel.prototype.determineMaxAlleleCount = function() {
 		}
 	};
 
-	theVcfData.features.forEach(function(variant) {
-		setMaxAlleleCount(variant.genotypeDepth);
-		setMaxAlleleCount(variant.genotypeDepthMother);
-		setMaxAlleleCount(variant.genotypeDepthFather);
-	});
-	theVcfData.maxAlleleCount = maxAlleleCount;	
+	if (theVcfData.features.length > 0) {
+		theVcfData.features.forEach(function(variant) {
+			setMaxAlleleCount(variant.genotypeDepth);
+			setMaxAlleleCount(variant.genotypeDepthMother);
+			setMaxAlleleCount(variant.genotypeDepthFather);
+		});
+		theVcfData.maxAlleleCount = maxAlleleCount;			
+	} else if (dataCard.mode == 'trio') {
+		// If the gene doesn't have any variants for the proband, determine the
+		// max allele count by iterating through the mom and data variant
+		// cards to examine these features.
+		window.variantCards.forEach(function(variantCard) {
+			if (variantCard.getRelationship() == 'mother' || variantCard.getRelationship() == 'father') {
+				var data = variantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+				data.features.forEach(function(theVariant) {
+					setMaxAlleleCount(theVariant.genotypeDepth);
+				});
+			}
+		});
+		theVcfData.maxAlleleCount = maxAlleleCount;
+	}
+
 }
 
 VariantModel.prototype.populateEffectFilters = function(variants) {
@@ -1859,20 +1904,29 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 					 me.sampleName,
 					 window.geneSource == 'refseq' ? true : false)
 				.then( function(data) {
-					var annotatedRecs = data[0];
-			    	me.vcfData = data[1];
 
-				 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
-					me.vcfData.features.forEach( function(feature) {
-						feature[compareAttribute] = '';
-					});
-					me.vcf.compareVcfRecords(theVcfData, me.vcfData, compareAttribute, matchFunction, noMatchFunction); 	
-					resolve();							 	
+					if (data != null && data.features != null) {
+						var annotatedRecs = data[0];
+				    	me.vcfData = data[1];
+
+					 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
+						me.vcfData.features.forEach( function(feature) {
+							feature[compareAttribute] = '';
+						});
+						me.vcf.compareVcfRecords(theVcfData, me.vcfData, compareAttribute, matchFunction, noMatchFunction); 	
+						resolve();							 							
+					} else {
+						var error = 'promiseCompareVariants() has null data returned from promiseGetVariants';
+						console.log(error);
+						reject(error);
+					}
 				}, function(error) {
-					console.log('promiseCompareVariants() error: ' + error);
+					var message = 'error occurred when getting variants in promiseCompareVariants: ' + error;
+					console.log(message);
+					reject(message);
 				});
 			}, function(error) {
-				console.log("cannot find reference for gene");
+				console.log("missing reference");
 				reject("missing reference");
 			});
 		
