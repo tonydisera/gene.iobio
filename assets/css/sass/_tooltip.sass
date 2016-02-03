@@ -1,6 +1,5 @@
 .tooltip-title
   font-size: 10px
-  color: #000000
   word-break: break-all
 
 .tooltip-header
@@ -11,6 +10,9 @@
   color: $text-color
   vertical-align: top
 
+.tooltip-label
+  color: #848484
+
 .tooltip-row
   width: 300px
   clear: both
@@ -20,7 +22,7 @@
   float: right
   width: 220px
   margin-right: 5px
-  color: #000000
+
 
 .tooltip-header
   overflow-wrap: break-all
@@ -41,24 +43,29 @@
   overflow-wrap: break-word
   float: left
   width: 180px
-  color: #000000
-
+  
 
 .tooltip-zygosity
-  overflow-wrap: break-word
   float: left
-  width: 30px
-  color: black
-  text-align: left
-  padding-right: 2px
-  padding-left: 2px
+  font-size: 9px
+  font-weight: normal !important
+  padding-top: 2px !important
+  padding-bottom: 1px !important
+  padding-right: 2px !important
+  padding-left: 2px !important
+  background-color: #5E92BD !important
+  margin-right: 12px
+  margin-top: 0px !important
+
+.tooltip-zygosity
+  &.hom 
+    background-color: rgb(165, 48, 48) !important
 
 .tooltip-subtitle
   font-size: 10px
   text-align: center
   color: $text-color
   padding-top: 4px
-  font-weight: bold
   padding-bottom: 1px
 
 .tooltip-footer
@@ -101,6 +108,7 @@
 
 .tooltip
   font-family: $app-font, sans-serif !important
+  color: rgb(70,70,70) 
 
 rect
   &.alt-count
@@ -144,17 +152,19 @@ text
      
 
 #examine-card .tooltip-allele-count-bar
+  font-family: $app-font, sans-serif !important
   overflow-wrap: break-word
   float: left
   width: 105px
-  color: #000000
+   
 
 #examine-card
   font-size: 10px
+  color: rgb(70,70,70)
 
   .tooltip-title
     font-size: 11px
-    color: #000000
+   
 
   .tooltip-header
     overflow-wrap: break-word
@@ -176,7 +186,7 @@ text
     margin-right: 5px
     display: inline-block !important
     float: none
-    color: #000000
+    
 
   .tooltip-footer #unpin
     display: none !important

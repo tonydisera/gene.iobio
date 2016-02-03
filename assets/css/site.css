@@ -1319,7 +1319,6 @@ header {
 
 .tooltip-title {
   font-size: 10px;
-  color: #000000;
   word-break: break-all; }
 
 .tooltip-header {
@@ -1330,6 +1329,9 @@ header {
   color: #848484;
   vertical-align: top; }
 
+.tooltip-label {
+  color: #848484; }
+
 .tooltip-row {
   width: 300px;
   clear: both; }
@@ -1338,8 +1340,7 @@ header {
   overflow-wrap: break-word;
   float: right;
   width: 220px;
-  margin-right: 5px;
-  color: #000000; }
+  margin-right: 5px; }
 
 .tooltip-header {
   overflow-wrap: break-all;
@@ -1359,24 +1360,28 @@ header {
 .tooltip-allele-count-bar {
   overflow-wrap: break-word;
   float: left;
-  width: 180px;
-  color: #000000; }
+  width: 180px; }
 
 .tooltip-zygosity {
-  overflow-wrap: break-word;
   float: left;
-  width: 30px;
-  color: black;
-  text-align: left;
-  padding-right: 2px;
-  padding-left: 2px; }
+  font-size: 9px;
+  font-weight: normal !important;
+  padding-top: 2px !important;
+  padding-bottom: 1px !important;
+  padding-right: 2px !important;
+  padding-left: 2px !important;
+  background-color: #5E92BD !important;
+  margin-right: 12px;
+  margin-top: 0px !important; }
+
+.tooltip-zygosity.hom {
+  background-color: #a53030 !important; }
 
 .tooltip-subtitle {
   font-size: 10px;
   text-align: center;
   color: #848484;
   padding-top: 4px;
-  font-weight: bold;
   padding-bottom: 1px; }
 
 .tooltip-footer {
@@ -1413,7 +1418,8 @@ header {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16); }
 
 .tooltip {
-  font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
+  font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
+  color: #464646; }
 
 rect.alt-count {
   stroke: black !important; }
@@ -1443,16 +1449,16 @@ text.ref-count {
   fill: #848484 !important; }
 
 #examine-card .tooltip-allele-count-bar {
+  font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   overflow-wrap: break-word;
   float: left;
-  width: 105px;
-  color: #000000; }
+  width: 105px; }
 
 #examine-card {
-  font-size: 10px; }
+  font-size: 10px;
+  color: #464646; }
   #examine-card .tooltip-title {
-    font-size: 11px;
-    color: #000000; }
+    font-size: 11px; }
   #examine-card .tooltip-header {
     overflow-wrap: break-word;
     text-align: right;
@@ -1470,8 +1476,7 @@ text.ref-count {
     width: 115px;
     margin-right: 5px;
     display: inline-block !important;
-    float: none;
-    color: #000000; }
+    float: none; }
   #examine-card .tooltip-footer #unpin {
     display: none !important; }
 
