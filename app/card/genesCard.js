@@ -21,6 +21,22 @@ GenesCard.prototype.init = function() {
 	    }
 	});
 
+	// Stop event propogation to get genes dropdown
+	// so that clicks in text area for copy/paste
+	// don't cause dropdown to close
+	$('#get-genes-dropdown ul li#copy-paste-li').on('click', function(event){
+	    //The event won't be propagated to the document NODE and 
+	    // therefore events delegated to document won't be fired
+	    event.stopPropagation();
+	});
+	// Enter in copy/paste textarea should function as newline
+	$('#get-genes-dropdown ul li#copy-paste-li').keyup(function(event){
+
+		if((event.which== 13) && ($(event.target)[0]== $("textarea#genes-to-copy")[0])) {
+			event.stopPropagation();
+		}
+	});	
+
 }
 
 GenesCard.prototype.initCopyPasteGenes = function() {
