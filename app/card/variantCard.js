@@ -1516,15 +1516,13 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 	var me = this;
 	container.select("div.proband-alt-count").remove();
 	
-	container.append("div")
-	         .attr("class", "col-md-12 tooltip-subtitle")
-	         .text("Read counts");
+	me._appendReadCountHeading(container);
 
 	var row = container.append("div")
 	                   .attr("class", "proband-alt-count tooltip-row");
 	row.append("div")
 	   .attr("class", "proband-alt-count tooltip-header-small")
-	   .html("&nbsp;");
+	   .html("<em>proband</em>");
 	row.append("div")
 		   .attr("class", "tooltip-zygosity")
 		   .text(variant.zygosity ? capitalizeFirstLetter(variant.zygosity.toLowerCase()) : "");
@@ -1567,6 +1565,69 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 
 	    }
 	}
+}
+
+VariantCard.prototype._appendReadCountHeading = function(container) {
+	var svg = container.append("div")		
+		           	   .style("padding-top", "10px")
+				       .append("svg")
+				       .attr("width", 260)
+	           		   .attr("height", "21");
+	svg.append("text")
+		   .attr("x", "3")
+		   .attr("y", "14")
+		   .attr("anchor", "start")
+		   .attr("class", "tooltip-header-small")
+		   .style("font-weight", "bold")
+		   .text("Read Counts");	  	           		   
+
+	var g = svg.append("g")
+	           .attr("transform", "translate(70,0)");
+
+	g.append("text")
+		   .attr("x", "13")
+		   .attr("y", "9")
+		   .attr("class", "alt-count-under")
+		   .attr("anchor", "start")
+		   .text("alt");	           		   
+	g.append("text")
+		   .attr("x", "37")
+		   .attr("y", "9")
+		   .attr("class", "other-count-under")
+		   .attr("anchor", "start")
+		   .text("other");	           		   
+	g.append("text")
+		   .attr("x", "70")
+		   .attr("y", "9")
+		   .attr("class", "ref-count")
+		   .attr("anchor", "start")
+		   .text("ref");	
+	g.append("text")
+		   .attr("x", "94")
+		   .attr("y", "14")
+		   .attr("class", "ref-count")
+		   .attr("anchor", "start")
+		   .text("total");	  		              		   
+
+	g.append("rect")
+	   .attr("x", "1")
+	   .attr("y", "10")
+	   .attr("height", 4)
+	   .attr("width",30)
+	   .attr("class", "alt-count");
+	g.append("rect")
+	   .attr("x", "31")
+	   .attr("y", "10")
+	   .attr("height", 4)
+	   .attr("width",30)
+	   .attr("class", "other-count");
+	g.append("rect")
+	   .attr("x", "61")
+	   .attr("y", "10")
+	   .attr("height", 4)
+	   .attr("width",30)
+	   .attr("class", "ref-count");
+
 }
 
 VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth, barWidth) {
@@ -1617,10 +1678,10 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 
 	// proportion the widths of alt, other (for multi-allelic), and ref
 	BAR_WIDTH      = d3.round((MAX_BAR_WIDTH) * (totalCount / getProbandVariantCard().getMaxAlleleCount()));
-	if (BAR_WIDTH == 0) {
-		BAR_WIDTH = 2;
+	if (BAR_WIDTH < 10) {
+		BAR_WIDTH = 10;
 	}
-	if (BAR_WIDTH > PADDING + 6) {
+	if (BAR_WIDTH > PADDING + 10) {
 		BAR_WIDTH = BAR_WIDTH - PADDING;
 	}
 	var altPercent = +genotypeAltCount / totalCount;
@@ -1631,7 +1692,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 
 	// Force a separate line if the bar width is too narrow for count to fit inside or
 	// this is a multi-allelic.
-	var separateLineForLabel = (altWidth / 2 < 7) || (otherWidth > 0);
+	var separateLineForLabel = (altWidth > 0 && altWidth / 2 < 11) || (refWidth > 0 && refWidth / 2 < 11) || (otherWidth > 0);
 
 	container.select("svg").remove();
 	var svg = container
@@ -1676,6 +1737,8 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	var g = svg.append("g")
 	           .attr("transform", (separateLineForLabel ? "translate(-6,11)" : "translate(0,0)"));
 	var altX = d3.round(altWidth / 2);
+	var otherX = 0;
+	var refX = 0;
 	if (altX < 6) {
 		altX = 6;
 	}
@@ -1687,32 +1750,42 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	   .text(genotypeAltCount);
 
  	if (otherCount > 0) {
- 		var otherX = altWidth  + d3.round(otherWidth / 2);
+ 		otherX = altWidth  + d3.round(otherWidth / 2);
  		// Nudge the multi-allelic "other" count over to the right if it is
  		// too close to the alt count.
  		if (otherX - 11 < altX) {
- 			otherX = altX + 11;
- 		}
- 		var maLabel = otherCount + ' (multi-allelic)';
- 		if (otherX + 70 > MAX_BAR_WIDTH + PADDING) {
- 			var gNextLine = g.append("g")
- 			                 .attr("transform", "translate(-15,9)");
- 			svg.attr("height", 31);
- 			maLabel = otherCount;
- 			gNextLine.append("text")
-			         .attr("x", otherX)
-					 .attr("y", "9")
-					 .attr("text-anchor", "start")
-					 .attr("class", "other-count-under" )
-					 .text("(multi-allelic)");
- 		}
-		g.append("text")
+ 			otherX = altX + 10;
+ 		} 		
+ 		g.append("text")
 		   .attr("x", otherX)
 		   .attr("y", "9")
 		   .attr("text-anchor", separateLineForLabel ? "start" : "middle")
 		   .attr("class", separateLineForLabel ? "other-count-under" : "other-count")
-		   .text(maLabel);
+		   .text(otherCount);
+
+		var gNextLine = g.append("g")
+		                 .attr("transform", "translate(-15,9)");
+		svg.attr("height", 31);
+		gNextLine.append("text")
+		         .attr("x", otherX < 20 ? 20 : otherX)
+				 .attr("y", "9")
+				 .attr("text-anchor", "start")
+				 .attr("class", "other-count-under" )
+				 .text("(multi-allelic)");
 	}	 
+	if (genotypeRefCount > 0) {
+		refX = altWidth + otherWidth + d3.round(refWidth / 2);
+		if (refX - 11 < otherX || refX - 11 < altX) {
+			refX = refX + 10;
+		}
+		g.append("text")
+			   .attr("x", refX)
+			   .attr("y", "9")
+			   .attr("text-anchor", separateLineForLabel ? "start" : "middle")
+			   .attr("class", "ref-count")
+			   .text(genotypeRefCount);
+	}
+
 
 
 	 

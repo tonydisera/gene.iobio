@@ -1353,7 +1353,8 @@ header {
   text-align: left;
   width: 40px;
   float: left;
-  color: #848484; }
+  color: #848484;
+  fill: #848484; }
 
 .tooltip-allele-count-bar {
   overflow-wrap: break-word;
@@ -1425,6 +1426,9 @@ rect.other-count {
   stroke: black !important;
   fill: #848484 !important; }
 
+.tooltip-allele-count-bar text {
+  font-size: 9px !important; }
+
 text.alt-count {
   fill: white !important; }
 text.alt-count-under {
@@ -1435,6 +1439,8 @@ text.other-count {
 text.other-count-under {
   fill: #848484 !important;
   font-style: italic !important; }
+text.ref-count {
+  fill: #848484 !important; }
 
 #examine-card .tooltip-allele-count-bar {
   overflow-wrap: break-word;

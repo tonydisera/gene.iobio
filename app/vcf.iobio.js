@@ -1569,15 +1569,19 @@ var effectCategories = [
                   var altCount = tokens[gtAltCountIndex];   
                   genotypeAltCounts.push(altCount);
 
+                  var altCountTokens = altCount.split(",");
+                  altCountTokens.forEach(function(allelicDepth) {
+                    if (allelicDepth) {
+                        totalAllelicDepth += +allelicDepth;
+                    }
+                  })
+
                   var refCount = 0;
                   var gtRefCountIndex = gtTokens["RO"];
                   if (gtRefCountIndex) {
                     refCount = tokens[gtRefCountIndex];
                     genotypeRefCounts.push(refCount);
-
-                    if (altCount && refCount) {
-                      totalAllelicDepth = altCount + refCount;
-                    }
+                    totalAllelicDepth += +refCount;                    
                   } else {
                     genotypeRefCounts.push(null);
                   }

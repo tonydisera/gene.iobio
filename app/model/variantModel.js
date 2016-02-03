@@ -1165,18 +1165,18 @@ VariantModel.prototype.determineMaxAlleleCount = function() {
 	}
 
 	var maxAlleleCount = 0;
-	var setMaxAlleleCount = function(refCount, altCount) {
-		if (refCount != null && altCount != null) {
-			if ((+refCount + +altCount) > maxAlleleCount) {
-				maxAlleleCount = +refCount + +altCount;
+	var setMaxAlleleCount = function(depth) {
+		if (depth != null && depth != "") {
+			if ((+depth) > maxAlleleCount) {
+				maxAlleleCount = +depth;
 			}
 		}
 	};
 
 	theVcfData.features.forEach(function(variant) {
-		setMaxAlleleCount(variant.genotypeRefCount, variant.genotypeAltCount);
-		setMaxAlleleCount(variant.genotypeRefCountMother, variant.genotypeAltCountMother);
-		setMaxAlleleCount(variant.genotypeRefCountFather, variant.genotypeAltCountFather);
+		setMaxAlleleCount(variant.genotypeDepth);
+		setMaxAlleleCount(variant.genotypeDepthMother);
+		setMaxAlleleCount(variant.genotypeDepthFather);
 	});
 	theVcfData.maxAlleleCount = maxAlleleCount;	
 }
