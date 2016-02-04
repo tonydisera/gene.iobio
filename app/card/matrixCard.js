@@ -928,7 +928,7 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 
 	var width = selection.datum().width ? selection.datum().width : 12;
 	var height = selection.datum().height ? selection.datum().width : 12;
-	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,1)";
+	var translate = selection.datum().translate ? selection.datum().translate : "translate(2,2)";
     
 	if (selection.datum().clazz != '') {
 		selection.append("g")
