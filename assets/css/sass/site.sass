@@ -146,6 +146,9 @@ body
   color: $heading-color !important
   text-transform: uppercase
 
+.gene-card-label
+  color: $app-color !important
+
 .keep-case
   text-transform: none !important
 
@@ -160,10 +163,11 @@ body
   color: $text-color
 
 a
-  color: $app-color !important
+  color: $link-color !important
 
   &:hover, &:focus
-    color: $app-color !important
+    color: $link-color !important
+
 
 .chosen-container a
   color: $text-color !important
@@ -177,7 +181,7 @@ a
   background-color: $app-color !important
 
 .chart-label
-  color: $app-color
+  color: $text-color
   margin-left: 4px
   font-size: 11px
 
@@ -216,7 +220,7 @@ a
   border-width: 1px
 
 .badge-label
-  color: $app-color
+  color: $text-color
   font-size: 12px
 
 .material-dropdown
@@ -475,7 +479,6 @@ section
   font-size: 16px !important
   color: $app-color
   font-weight: bold
-  margin-left: -100px
 
 #gene-region-info
   padding-left: 10px

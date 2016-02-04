@@ -272,7 +272,9 @@
 
             <!-- Buttons for editting gene list, done editting gene list -->
             <div id="cache-genes-button" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 3px;padding-right: 10px;">
-              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheGenes()" style="text-decoration:none !important">Analyze all</a>
+              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheGenes()">
+                Analyze all
+              </a>
             </div>
 
           </div>
@@ -285,9 +287,9 @@
 
 
         <div id="region-track"  style="clear:both;">
-            <a id="gene-name" target="_genecards" class="card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-            <span id="gene-chr" class=" card-label keep-case">chr2</span>
-            <span id="gene-region" class=" card-label keep-case">74229840-74335303</span>
+            <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
+            <span id="gene-chr" class=" gene-card-label keep-case">chr2</span>
+            <span id="gene-region" class=" gene-card-label keep-case">74229840-74335303</span>
             <span id="minus_strand" class="hide " style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
             <span  class="fullview" style="padding-left: 15px">+  -</span>
             <input id="gene-region-buffer-input" class="fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">

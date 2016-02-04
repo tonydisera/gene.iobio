@@ -1583,10 +1583,10 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 				       .attr("width", 260)
 	           		   .attr("height", "21");
 	svg.append("text")
-		   .attr("x", "3")
+		   .attr("x", "0")
 		   .attr("y", "14")
-		   .attr("anchor", "start")
-		   .attr("class", "tooltip-header-small")
+		   .attr("anchor", "start")		 
+		   .attr("class", "tooltip-section-header")
 		   .text("Read Counts");	  	           		   
 
 	var g = svg.append("g")
