@@ -994,9 +994,14 @@ function cacheNextGene(genesToCache) {
 			    				vc = getProbandVariantCard();
 			    				var probandVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
 			    				var dangerObject = vc.summarizeDanger(probandVcfData);
-			    				genesCard._geneBadgeLoading(geneObject.gene_name, false);
-								genesCard._setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-
+								
+								genesCard._geneBadgeLoading(geneObject.gene_name, false);
+								if (probandVcfData.features.length == 0) {
+			    					genesCard._setGeneBadgeWarning(geneObject.gene_name);
+			    				} else {
+			    					genesCard._setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
+								}
+			    				
 								if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
 									genesToCache.shift();
 				    				cacheNextGene(genesToCache);									
@@ -1004,8 +1009,10 @@ function cacheNextGene(genesToCache) {
 			    			}
 
 			    		}, function(error) {
+			    			genesCard._setGeneBadgeError(geneObject.gene_name);			    				
 			    			if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
-				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + error);
+			    				var message = error.hasOwnProperty("message") ? error.message : error;
+				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
 				    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
 
 				    			genesToCache.shift();

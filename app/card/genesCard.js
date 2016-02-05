@@ -403,13 +403,22 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 		});	
 }
 
-GenesCard.prototype.refreshCurrentGeneBadge = function() {
+GenesCard.prototype.refreshCurrentGeneBadge = function(error) {
 	var me = this;
 
-	vc = getProbandVariantCard();
-	var probandVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	var dangerObject = vc.summarizeDanger(probandVcfData);
-	me._setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+	if (error && error.length > 0) {
+		me._setGeneBadgeError(window.gene.gene_name, true);
+	} else {
+		vc = getProbandVariantCard();
+		var probandVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+		if (probandVcfData.features.length == 0) {
+			me._setGeneBadgeWarning(window.gene.gene_name, true);
+		} else {
+			var dangerObject = vc.summarizeDanger(probandVcfData);
+			me._setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+
+		}
+	}
 	bookmarkCard.refreshBookmarkList();
 }
 
@@ -432,6 +441,28 @@ GenesCard.prototype._geneBadgeLoading = function(geneName, show, force) {
 	}
 }
 
+GenesCard.prototype._setGeneBadgeWarning = function(geneName, select) {
+	var me = this;
+
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	geneBadge.addClass("warning");	
+	geneBadge.addClass("visited");	
+	if (select) {
+		geneBadge.addClass("selected");		
+	}	
+	geneBadge.find("#gene-badge-warning").removeClass("hide");
+}
+
+GenesCard.prototype._setGeneBadgeError = function(geneName, select) {
+	var me = this;
+	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	geneBadge.addClass("error");	
+	geneBadge.addClass("visited");	
+	if (select) {
+		geneBadge.addClass("selected");		
+	}	
+}
+
 GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
 	var me = this;
 
@@ -452,6 +483,9 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 	if (select) {
 		geneBadge.addClass("selected");		
 	}	
+
+	geneBadge.removeClass("error");
+	geneBadge.removeClass("warning");
 	
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {

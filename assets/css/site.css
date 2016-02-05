@@ -1639,12 +1639,38 @@ text.ref-count {
   float: left;
   display: none; }
 
+#gene-badge-warning {
+  float: left;
+  font-size: 12px;
+  color: rgba(230, 126, 30, 0.84);
+  padding-top: 1px;
+  padding-right: 2px;
+  display: none; }
+
+#gene-badge-error {
+  float: left;
+  font-size: 12px;
+  color: rgba(204, 29, 7, 0.67);
+  padding-top: 1px;
+  padding-right: 2px;
+  display: none; }
+
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
 #gene-badge.visited #gene-badge-name {
   color: #5d809d !important; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible !important; }
+
+#gene-badge.visited.error #gene-badge-loaded {
+  display: none; }
+#gene-badge.visited.error #gene-badge-error {
+  display: inline; }
+
+#gene-badge.visited.warning #gene-badge-loaded {
+  display: none; }
+#gene-badge.visited.warning #gene-badge-warning {
+  display: inline; }
 
 #gene-badge-container {
   display: flex;

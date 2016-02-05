@@ -918,6 +918,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 				if (me.getRelationship() == 'proband') {
 	   	 		   genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+				   genesCard.refreshCurrentGeneBadge(error);
    	    		}
 				
 				if (error && error == "missing reference") {

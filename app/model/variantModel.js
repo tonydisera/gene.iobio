@@ -996,15 +996,21 @@ VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end
 					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
 						resolve(data);				    	
 				    } else {
-				    	reject("Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end);
+				    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
 				    }
 			    	
 
 			    }, function(error) {
-			    	reject(error);
+			    	reject({isValid: false, message: error});
 			    });
 			}, function(error) {
-				reject("missing reference")
+				var isValid = false;
+				// for caching, treat missing chrX as a normal case.
+				if (ref != null && ref.toUpperCase().indexOf("X")) {
+					isValid = true;
+				}
+
+				reject({isValid: isValid, message: "missing reference"});
 			});
 
 		}
@@ -1144,7 +1150,6 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		    	if (onVcfData) {
 		    		onVcfData(theVcfData);
 		    	}
-		    	
 		
 		    	// Get the clinvar records (for proband, mom, data)
 		    	// 
