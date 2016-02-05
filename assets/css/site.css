@@ -1,11 +1,18 @@
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
+.form-group label.control-label {
+  font-size: 16px !important;
+  color: #5d809d !important; }
+
 #filter-track a.chosen-single {
   font-size: 10px !important; }
 
 .shadow-z-2 {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16); }
+
+.shadow-z-1 {
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.12), 0px 1px 6px rgba(0, 0, 0, 0.12); }
 
 .btn.btn-default {
   background-color: #fff; }
@@ -1071,6 +1078,10 @@ header {
   fill: #ABA2A2;
   stroke: #ABA2A2; }
 
+rect.variant.homref {
+  opacity: 0 !important;
+  fill: none !important; }
+
 .impact_HIGH {
   fill: #E0292B !important;
   color: #E0292B !important;
@@ -1387,6 +1398,12 @@ header {
 .tooltip-zygosity.hom {
   background-color: #a53030 !important;
   color: white; }
+.tooltip-zygosity.homref {
+  background-color: #5D809D !important;
+  width: 35px !important;
+  color: white;
+  margin-left: -6px !important;
+  margin-right: 1px; }
 
 .tooltip-subtitle {
   font-size: 10px;
