@@ -116,12 +116,18 @@ VariantModel.prototype.getBamDataForGene = function(geneObject) {
 	} 
 	return data ? data.coverage : null;
 }
-VariantModel.prototype.getVariantCount = function() {
-	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+VariantModel.prototype.getVariantCount = function(data) {
+	var theVcfData = data != null ? data : this.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData == null || theVcfData.features == null) {
 		return "0";
 	} else {
-		return theVcfData.features.length != null ? theVcfData.features.length : "0";
+		var homRefCount = 0;
+		theVcfData.features.forEach(function(variant) {
+			if (variant.zygosity != null && variant.zygosity.toLowerCase() == "homref") {
+				homRefCount++;
+			}
+		});
+		return theVcfData.features.length - homRefCount;
 	}
 }
 
@@ -736,8 +742,6 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 	return new Promise( function(resolve, reject) {
 
-
-
 		if ( variant.extraAnnot ) {
 			resolve(variant);
 		} else {	
@@ -1100,6 +1104,15 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		if (window.geneSource == 'refseq') {
 			filterCard.setAnnotationScheme("VEP");
 		}
+
+
+		var sampleNames = me.sampleName;
+		if (sampleNames != null && sampleNames != "") {
+			if (me.relationship != 'proband') {
+				sampleNames += "," + getProbandVariantCard().getSampleName();
+			}			
+		}
+
 		
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(ref), 
@@ -1107,7 +1120,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 	       end, 
 	       strand, 
 	       transcript,
-	       me.sampleName,
+	       sampleNames,
 	       window.geneSource == 'refseq' ? true : false,
 	       me.GET_HGVS,
 	       me.GET_RSID

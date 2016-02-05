@@ -785,7 +785,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 		if (this.isViewable()) {
 			me.cardSelector.find('.vcfloader').addClass("hide");
 			me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-	        me.cardSelector.find('#vcf-variant-count').text(theVcfData.features.length);		
+	        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount(theVcfData));		
 			me.clearWarnings();		
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
@@ -803,7 +803,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
 				var filteredVcfData = this.filterVariants(theVcfData);
-				me.cardSelector.find('#displayed-variant-count').text(filteredVcfData != null && filteredVcfData.features.length != null ? filteredVcfData.features.length : "0");
+				me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
 				
 				filterCard.enableVariantFilters(true);
 				filterCard.enableClinvarFilters(theVcfData);
@@ -880,6 +880,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			    if (me.isViewable()) {
 			    	// Show the variant count
 					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
+					console.log(me.getRelationship() + " variant count = " + me.model.getVariantCount());
 			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());				    	
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
@@ -997,7 +998,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);    
     this.vcfChart(selection);
 
-	this.cardSelector.find('#displayed-variant-count').text(data.features.length);
+	this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(data));
 
 	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
@@ -1708,12 +1709,15 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 	            .attr("width", MAX_BAR_WIDTH + PADDING)
 	            .attr("height", separateLineForLabel ? "21" : "12");
 	
-	svg.append("rect")
-	 .attr("x", "1")
-	 .attr("y", "1")
-	 .attr("height", 10)
-	 .attr("width",altWidth)
-	 .attr("class", "alt-count");
+	if (altWidth > 0) {
+		svg.append("rect")
+		 .attr("x", "1")
+		 .attr("y", "1")
+		 .attr("height", 10)
+		 .attr("width",altWidth)
+		 .attr("class", "alt-count");
+
+	}
 
 	if (otherWidth > 0) {
 		svg.append("rect")
@@ -1742,20 +1746,24 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 
 
 
-	var g = svg.append("g")
-	           .attr("transform", (separateLineForLabel ? "translate(-6,11)" : "translate(0,0)"));
-	var altX = d3.round(altWidth / 2);
+	var altX = 0;
 	var otherX = 0;
 	var refX = 0;
-	if (altX < 6) {
-		altX = 6;
+	var g = svg.append("g")
+	           .attr("transform", (separateLineForLabel ? "translate(-6,11)" : "translate(0,0)"));
+	if (altWidth > 0) {
+		var altX = d3.round(altWidth / 2);
+		if (altX < 6) {
+			altX = 6;
+		}
+		 g.append("text")
+		   .attr("x", altX)
+		   .attr("y", "9")
+		   .attr("text-anchor", separateLineForLabel ? "start" : "middle")
+		   .attr("class", separateLineForLabel ? "alt-count-under" : "alt-count")
+		   .text(genotypeAltCount);
+
 	}
-	 g.append("text")
-	   .attr("x", altX)
-	   .attr("y", "9")
-	   .attr("text-anchor", separateLineForLabel ? "start" : "middle")
-	   .attr("class", separateLineForLabel ? "alt-count-under" : "alt-count")
-	   .text(genotypeAltCount);
 
  	if (otherCount > 0) {
  		otherX = altWidth  + d3.round(otherWidth / 2);
@@ -1781,7 +1789,7 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 				 .attr("class", "other-count-under" )
 				 .text("(multi-allelic)");
 	}	 
-	if (genotypeRefCount > 0) {
+	if (genotypeRefCount > 0  && (altWidth > 0 || otherWidth > 0)) {
 		refX = altWidth + otherWidth + d3.round(refWidth / 2);
 		if (refX - 11 < otherX || refX - 11 < altX) {
 			refX = refX + 10;

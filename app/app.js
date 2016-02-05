@@ -4,7 +4,7 @@
 //var geneiobio_server = "http://localhost:3000/";
 //var geneiobio_server = "http://geneinfo.iobio.io/";
 var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
-var phenolyzerServer = "http://nv-dev.iobio.io/phenolyzer/"
+var phenolyzerServer = "http://nv-green.iobio.io/phenolyzer/"
 //var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
 var geneToPhenoServer = "http://nv-dev.iobio.io/genetopheno/";
 

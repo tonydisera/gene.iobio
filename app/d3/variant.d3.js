@@ -62,7 +62,14 @@ function variantD3() {
           && d.ref == variant.ref 
           && d.alt == variant.alt 
           && d.type.toLowerCase() == variant.type.toLowerCase()) {
-          matchingVariant = variant;
+          
+          if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'homref') {
+            // we want to show an "x" for homozygous reference variants
+            // instead of a circle
+          } else {
+            matchingVariant = variant;
+          }
+
        }
     });
 

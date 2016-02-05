@@ -97,7 +97,8 @@ vcfiobio = function module() {
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
   var snpEffServer           = "wss://services.iobio.io/snpeff";
   var snpSiftServer          = "wss://services.iobio.io/snpsift";
-  var vtServer               = "wss://services.iobio.io/vt";
+//  var vtServer               = "wss://services.iobio.io/vt";
+  var vtServer               = "ws://nv-dev.iobio.io/vt/";
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
@@ -1682,7 +1683,10 @@ var effectCategories = [
                     zygosity = "HET";
                     hetCount++;
                   }
-                } 
+                } else if (tokens[0] == "0" && tokens[1] == "0" ) {
+                  keepAlt = true;
+                  zygosity = "HOMREF"
+                }
               }
             }
 
