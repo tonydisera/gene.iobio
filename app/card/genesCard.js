@@ -205,10 +205,33 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 
 }
 
+GenesCard.prototype.isPhenolyzerGene = function(geneName) {
+	var foundGenes = phenolyzerGenes.filter( function(phenGene) { 
+		return phenGene.selected && phenGene.geneName == geneName;
+	});
+	return foundGenes.length > 0;
+}
+
+GenesCard.prototype.highlightPhenolyzerGenes = function() {
+	var me = this;
+	$('#gene-badge-container #gene-badge').each( function(index, value) {
+		var badge =  $(this);
+		var badgeGeneName = badge.find('#gene-badge-name').text();
+		if (me.isPhenolyzerGene(badgeGeneName)) {
+			badge.addClass("phenolyzer");
+		} else {
+			badge.removeClass("phenolyzer");
+		}
+	});
+}
+
 GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 	var me = this;
 	var selectedGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
-	var genesString = "";
+
+	// Don't throw away the genes we already have loaded;
+	var genesString = Object.keys(geneObjects).join(",");
+
 	selectedGenes.forEach( function(g) {
 		if (genesString.length > 0) {
 			genesString += ",";
@@ -216,7 +239,8 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 		genesString += g.geneName;
 	})
 	$('#genes-to-copy').val(genesString);
-	me.copyPasteGenes();		
+	me.copyPasteGenes();	
+	me.highlightPhenolyzerGenes();	
 }
 
 GenesCard.prototype._onGeneBadgeUpdate = function() {
@@ -855,6 +879,7 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  .on('d3click', function(phenolyzerGene) {
 							  	if (phenolyzerGene.selected) {
 							  		me.addGeneBadge(phenolyzerGene.geneName, true);
+							  		me.highlightPhenolyzerGenes();
 							  	} else {
 							  		me.removeGeneBadgeByName(phenolyzerGene.geneName);
 							  	}
