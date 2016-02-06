@@ -2118,7 +2118,7 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 
 	var examineCol = "";
 	if ($("#slider-left").hasClass("hide")) {
-		  examineCol = '<div class="col-sm-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Examine </a>' +  '</div>'
+		  examineCol = '<div class="col-sm-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Inspect </a>' +  '</div>'
 	} else {
 		  examineCol = '<div class="col-sm-4" style="text-align:left;"></div>'
 	}
