@@ -367,6 +367,13 @@ GenesCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 	var x = screenX ;
 	var y = screenY + 20;
 
+	// If the tooltip, positioned at the cursor, is truncated
+	// because its width exceeds the window size, just position
+	// the tooltip in the middle of the window
+	if ((x + w + 100) > window.outerWidth) {
+		x = (window.outerWidth / 2) - (w / 2)
+	}
+
 	if (window.outerWidth - 100 < x + w) {
 		tooltip.style("width", w + "px")
 			       .style("left", x - w + "px") 

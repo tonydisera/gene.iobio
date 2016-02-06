@@ -2118,16 +2118,16 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 
 	var examineCol = "";
 	if ($("#slider-left").hasClass("hide")) {
-		  examineCol = '<div class="col-md-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Examine </a>' +  '</div>'
+		  examineCol = '<div class="col-sm-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Examine </a>' +  '</div>'
 	} else {
-		  examineCol = '<div class="col-md-4" style="text-align:left;"></div>'
+		  examineCol = '<div class="col-sm-4" style="text-align:left;"></div>'
 	}
 
 	if (window.clickedVariant) {
 		return '<div class="row tooltip-footer" style="margin-bottom: -2px;margin-top: 24px !important;font-size: 11px;">'
 		  + examineCol
-		  + '<div class="col-md-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
-		  + '<div class="col-md-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+		  + '<div class="col-sm-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
+		  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
 		  + '</div>';
 		
 
@@ -2167,17 +2167,17 @@ VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, clas
 
 VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
 	return '<div class="row" style="padding-top:5px;">'
-	      + '<div class="col-md-2 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-md-10 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '<div class="col-sm-2 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-10 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, value4) {
 
 	return '<div class="row" style="padding-top:5px;padding-bottom:5px;">'
-	      + '<div class="col-md-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value1  +'</div>'
-	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;padding-left:0px;">' + value2 + '</div>'
-	      + '<div class="col-md-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
-	      + '<div class="col-md-2 " style="text-align:left;word-break:normal;padding-left:0px">' + value4 + '</div>'
+	      + '<div class="col-sm-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value1  +'</div>'
+	      + '<div class="col-sm-2 " style="text-align:left;word-break:normal;padding-left:0px;">' + value2 + '</div>'
+	      + '<div class="col-sm-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
+	      + '<div class="col-sm-2 " style="text-align:left;word-break:normal;padding-left:0px">' + value4 + '</div>'
 	      + '</div>';			
 
 }
