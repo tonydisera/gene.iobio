@@ -880,7 +880,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			    if (me.isViewable()) {
 			    	// Show the variant count
 					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-					console.log(me.getRelationship() + " variant count = " + me.model.getVariantCount());
 			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());				    	
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
@@ -2040,7 +2039,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	var clinvarPhenotypeRow = '';
 	if (phenotypeDisplay != '') {
-		clinvarPhenotypeRow = me._tooltipHeaderRow('ClinVar - ' + phenotypeDisplay);
+		clinvarPhenotypeRow = me._tooltipHeaderLeftJustifyRow('ClinVar - ' + phenotypeDisplay);
 	}
 			
 	var dbSnpId = getRsId(variant);	
@@ -2148,6 +2147,12 @@ VariantCard.prototype._tooltipBlankRow = function() {
 VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value4) {
 	return '<div class="row">'
 	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '</div>';	
+}
+
+VariantCard.prototype._tooltipHeaderLeftJustifyRow = function(value1, value2, value3, value4) {
+	return '<div class="row">'
+	      + '<div class="col-md-12 tooltip-title" style="text-align:left">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
 
