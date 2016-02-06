@@ -1658,6 +1658,8 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					// feature matrix.
 					var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 					trioModel.compareVariantsToMotherFather(function() {
+
+						probandVariantCard.determineMaxAlleleCount();
 						
 						probandVariantCard.refreshVariantChartAndMatrix();
 
