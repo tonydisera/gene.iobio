@@ -382,6 +382,29 @@ function whichTransitionEvent(){
 }
 
 
+function showCoordinateFrame(x) {
+	var top = +$('#nav-section').outerHeight();
+	top    += +$('#matrix-track').outerHeight();
+	top    += 30;
+
+	var height = +$('#proband-variant-card').outerHeight();
+	height    += +$('#other-variant-cards').outerHeight();
+
+	if (!$("#slider-left").hasClass("hide")) {
+		x -= ($("#slider-left").width() + 36);
+	}
+
+	$('#coordinate-frame').css("top", top);
+	$('#coordinate-frame').css("height", height - 10);
+	$('#coordinate-frame').css("left", x - 13);
+	$('#coordinate-frame').css("opacity", 1);
+}
+
+function hideCoordinateFrame() {
+	$('#coordinate-frame').css("opacity", 0);
+}
+
+
 function readjustCards() {
 	var top = +$('#nav-section').height();
 	d3.select('#track-section').style("padding-top", top+5 + "px");

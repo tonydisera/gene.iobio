@@ -235,6 +235,8 @@ BookmarkCard.prototype._flagBookmark = function(variantCard, geneObject, variant
 		variant.isBookmark = 'Y';
 		variantCard.addBookmarkFlag(variant, me.compressKey(bookmarkKey), true);
 
+		matrixCard.highlightVariant(variant, true);
+
 		// Now that we have resolved the bookmark entries for a gene, refresh the
 		// bookmark list so that the glyphs show for each resolved bookmark.
 		me.refreshBookmarkList();

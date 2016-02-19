@@ -277,6 +277,13 @@ a
       opacity: 1
       pointer-events: none
 
+  .col.active
+
+    rect.colbox   
+      stroke: $current-color
+      stroke-width: 1px
+      opacity: 1
+
   text
     font-size: 10px
     fill: rgb(120, 120, 120)
@@ -576,6 +583,13 @@ section
   color: rgb(111, 111, 111)
   font-size: 13px
 
+#coordinate-frame 
+  border: $current-color solid 1px
+  width: 19px
+  position: absolute
+  pointer-events: none
+  opacity: 0
+
 .variant-card
   .vcfloader
     text-align: center
@@ -702,29 +716,28 @@ header
   margin-top: 10px
 
   .circle
-    stroke: rgba(221, 109, 109, 1)
-    stroke-width: 3
-    fill: none
+    stroke: none
+    fill: $current-color
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
-  stroke: rgba(221, 109, 109, 1)
+  stroke: $current-color
   stroke-width: 3
   fill: none
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
-  stroke: rgba(221, 109, 109, 1)
+  stroke: $current-color
   fill: none
   stroke-width: 4
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
-  fill: rgba(221, 109, 109, 1)
   stroke-width: 4
-  stroke: rgba(221, 109, 109, 1)
+  stroke: $current-color
 
 #bam-depth .circle-label
-  fill: rgba(221, 109, 109, 1)
-  font-size: 10px
+  fill: $current-color
+  font-size: 9px
   font-weight: bold
+  stroke: none
 
 .bar
   stroke: black
@@ -813,6 +826,11 @@ header
   stroke: #000
   stroke-width: 1px
   stroke-opacity: .3
+
+  &.current
+    stroke: #036DB7 !important
+    stroke-width: 1.5px !important
+    stroke-opacity: 1 !important
 
 .filter-symbol
   stroke: #000 !important

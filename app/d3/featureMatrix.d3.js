@@ -347,8 +347,8 @@ function featureMatrixD3() {
               var matrix = column.node()
                          .getScreenCTM()
                          .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
-              colObject.screenX = window.pageXOffset + matrix.e + margin.left;
-              colObject.screenY = window.pageYOffset + matrix.f + margin.top;
+              colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
+              colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
               dispatch.d3mouseover(colObject); 
 

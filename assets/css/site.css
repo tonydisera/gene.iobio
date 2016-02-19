@@ -237,6 +237,10 @@ a {
     stroke-width: 2px !important;
     opacity: 1;
     pointer-events: none; }
+#feature-matrix .col.active rect.colbox {
+  stroke: #3586c0;
+  stroke-width: 1px;
+  opacity: 1; }
 #feature-matrix text {
   font-size: 10px;
   fill: #787878;
@@ -515,6 +519,13 @@ section {
   color: #6f6f6f;
   font-size: 13px; }
 
+#coordinate-frame {
+  border: #3586c0 solid 1px;
+  width: 19px;
+  position: absolute;
+  pointer-events: none;
+  opacity: 0; }
+
 .variant-card .vcfloader {
   text-align: center;
   background-color: white;
@@ -628,29 +639,28 @@ header {
   text-align: left;
   margin-top: 10px; }
   #bam-depth .circle {
-    stroke: #dd6d6d;
-    stroke-width: 3;
-    fill: none; }
+    stroke: none;
+    fill: #3586c0; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
-  stroke: #dd6d6d;
+  stroke: #3586c0;
   stroke-width: 3;
   fill: none; }
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize {
-  stroke: #dd6d6d;
+  stroke: #3586c0;
   fill: none;
   stroke-width: 4; }
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize {
-  fill: #dd6d6d;
   stroke-width: 4;
-  stroke: #dd6d6d; }
+  stroke: #3586c0; }
 
 #bam-depth .circle-label {
-  fill: #dd6d6d;
-  font-size: 10px;
-  font-weight: bold; }
+  fill: #3586c0;
+  font-size: 9px;
+  font-weight: bold;
+  stroke: none; }
 
 .bar {
   stroke: black;
@@ -731,6 +741,10 @@ header {
   stroke: #000;
   stroke-width: 1px;
   stroke-opacity: 0.3; }
+  .variant.current {
+    stroke: #036DB7 !important;
+    stroke-width: 1.5px !important;
+    stroke-opacity: 1 !important; }
 
 .filter-symbol {
   stroke: #000 !important;
@@ -1473,6 +1487,66 @@ text.other-count-under {
 text.ref-count {
   fill: #717171 !important; }
 
+.tooltip.left-arrow:before {
+  position: absolute;
+  display: inline-block;
+  border-top: 7px solid transparent;
+  border-right: 7px solid #A7A5A5;
+  border-bottom: 7px solid transparent;
+  border-right-color: rgba(0, 0, 0, 0.2);
+  left: -7px;
+  top: 20px;
+  content: ""; }
+.tooltip.left-arrow:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 6px solid transparent;
+  border-right: 6px solid #FFFFFF;
+  border-bottom: 6px solid transparent;
+  left: -6px;
+  top: 21px;
+  content: ""; }
+
+.tooltip.arrow-down-left:before {
+  position: absolute;
+  display: inline-block;
+  border-top: 10px solid #A7A5A5;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.2);
+  bottom: -10px;
+  content: "";
+  left: 8px; }
+.tooltip.arrow-down-left:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 9px solid #FFFFFF;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  bottom: -8px;
+  content: "";
+  left: 10px; }
+
+.tooltip.arrow-down-right:before {
+  position: absolute;
+  display: inline-block;
+  border-top: 10px solid #A7A5A5;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.2);
+  bottom: -10px;
+  content: "";
+  right: 8px; }
+.tooltip.arrow-down-right:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 9px solid #FFFFFF;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  bottom: -8px;
+  content: "";
+  right: 10px; }
+
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   overflow-wrap: break-word;
@@ -1591,16 +1665,16 @@ text.ref-count {
 
 #vcf-track .bookmark rect {
   fill: none;
-  stroke: #3773A7;
-  stroke-width: 4;
-  opacity: 0.7; }
+  stroke: #1574C7;
+  stroke-width: 5;
+  opacity: 0.8; }
 #vcf-track .bookmark line {
-  stroke: #3773A7;
-  stroke-width: 4;
-  opacity: 0.7; }
+  stroke: #1574C7;
+  stroke-width: 5;
+  opacity: 0.8; }
 #vcf-track .bookmark g {
-  fill: #3773A7;
-  opacity: 0.7; }
+  fill: #1574C7;
+  opacity: 0.8; }
 
 #phenolyzer-results rect {
   fill: #cccccc;

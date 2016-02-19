@@ -69,20 +69,37 @@ function variantD3() {
           } else {
             matchingVariant = variant;
           }
+          
 
        }
     });
-
+/*
+    svgContainer.selectAll(".variant").classed("current", false);
+    svgContainer.selectAll(".variant")
+        .filter( function(variant,i) {
+          var found = false;
+          if (d.start == variant.start 
+              && d.end == variant.end 
+              && d.ref == variant.ref 
+              && d.alt == variant.alt 
+              && d.type.toLowerCase() == variant.type.toLowerCase()) {
+            found = true;
+          }         
+          return found;
+         })
+         .classed("current", true);
+*/
     // Get the x for this position
     if (matchingVariant) {
       var mousex = d3.round(x(matchingVariant.start));
       var mousey = height - ((matchingVariant.level + 1) * (variantHeight + verticalPadding));
       
 
+
       var circle = svgContainer.select(".circle");
       circle.transition()
             .duration(200)
-            .style("opacity", 1);
+            .style("opacity", .5);
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 2);
 
@@ -95,6 +112,7 @@ function variantD3() {
 
       matchingVariant.screenX = window.pageXOffset + matrix.e + margin.left;
       matchingVariant.screenY = window.pageYOffset + matrix.f + margin.top;
+      showCoordinateFrame(matchingVariant.screenX);
 
 
               
@@ -104,7 +122,7 @@ function variantD3() {
       
 
       var garrow = svgContainer.select("g.arrow");
-      garrow.attr("transform", "translate(" + (mousex + margin.left) + "," + (mousey + margin.top) + ")");
+      garrow.attr("transform", "translate(" + (mousex + margin.left) + "," + (mousey + margin.top - 6) + ")");
       garrow.selectAll('.arrow').transition()
             .duration(200)
             .style("opacity", 1);
@@ -112,6 +130,8 @@ function variantD3() {
       
       svgContainer.select(".circle").classed("emphasize", false);
     }
+
+
     return matchingVariant;
   };
 
@@ -587,12 +607,12 @@ function variantD3() {
 
 
     var flagGroup = group.append("g")
-       .attr("transform", "translate(-1,-1)");
+       .attr("transform", "translate(-3,-2)");
     flagGroup.append("rect")
              .attr("x", 1)
              .attr("y", 0)
-             .attr("width", 12)
-             .attr("height", 12);
+             .attr("width", 15)
+             .attr("height", 15);
     /*
     flagGroup.append("g")
              .attr("transform", "translate(1,0),rotate(90)")

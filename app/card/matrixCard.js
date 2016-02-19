@@ -286,6 +286,56 @@ MatrixCard.prototype._isolateVariants = function() {
 
 }
 
+MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
+	var me  = this;
+	var index = -1;
+	var i = 0;
+	d3.select("#feature-matrix").datum().forEach( function(variant) {
+		if (variant.start == theVariant.start &&
+			variant.alt == theVariant.alt &&
+			variant.end == theVariant.end) {
+			index = i;
+		}
+		i++;
+
+	})
+	me.clearSelections();
+	if (index >= 0) {
+		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
+		var column  = d3.select(colNode);
+		var colObject = column.datum();
+      	column.classed("active", true);
+
+
+      	if (showTooltip) {
+	      	// Get screen coordinates of column.  We will use this to position the
+	      	// tooltip above the column.
+	      	var matrix = column.node()
+	              			   .getScreenCTM()
+	            		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
+	      	colObject.screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
+	      	colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
+	
+	      	me.showTooltip(colObject, false);
+
+      	}
+
+	}
+
+}
+
+
+MatrixCard.prototype.clearSelections = function() {
+	d3.selectAll('#feature-matrix .col').classed("active", false);
+	d3.selectAll('#feature-matrix .cell').classed("active", false);
+	d3.selectAll('#feature-matrix .colbox').classed("current", false);
+
+	d3.selectAll('#feature-matrix .y.axis text').classed("active", false);
+	d3.selectAll('#feature-matrix .y.axis text').classed("current", false);
+	d3.selectAll('#feature-matrix .y.axis .up').classed("faded", true);
+	d3.selectAll('#feature-matrix .y.axis .down').classed("faded", true);
+}
+
 
 MatrixCard.prototype.hideTooltip = function() {
 	var tooltip = d3.select('#matrix-track .tooltip');
@@ -355,17 +405,24 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var h = tooltip[0][0].offsetHeight;
 	var w = 300;
 
-	var x = variant.screenX;
-	var y = variant.screenY + 10;
+	var x = variant.screenXMatrix;
+	var y = variant.screenYMatrix + 10;
+
+	if (!$("#slider-left").hasClass("hide")) {
+		x -= ($("#slider-left").width() + 36);
+	}
 
 	if (x < w) {
+		tooltip.classed("arrow-down-left", true);
+		tooltip.classed("arrow-down-right", false);
 		tooltip.style("width", w + "px")
-		       .style("left", x + "px") 
+		       .style("left", x - 33 + "px") 
 		       .style("text-align", 'left')    
 		       .style("top", (y - h) + "px");   
 
 	} else {
-
+		tooltip.classed("arrow-down-right", true);
+		tooltip.classed("arrow-down-left", false);
 		tooltip.style("width", w + "px")
 		       .style("left", (x - w) + "px") 
 		       .style("text-align", 'left')    

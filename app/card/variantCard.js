@@ -227,6 +227,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					})
 					.on('d3mouseout', function() {
 						if (clickedVariant == null) {
+							hideCoordinateFrame();
 							me.hideCoverageCircle();
 							window.hideCircleRelatedVariants();
 						}
@@ -1320,6 +1321,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 		if (matchingVariant && sourceVariantCard) {
 			var tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
 			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
+
 		}
 		
 	}
@@ -1367,29 +1369,15 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	if (lock) {
 		matrixCard.unpin(true);
 	}
+
+	matrixCard.clearSelections();
+	matrixCard.highlightVariant(variant);
 	
-	var x;
-	var y;
-
-	//if (me == sourceVariantCard) {
-	//	x = d3.event.pageX;
-	//	y = d3.event.pageY;
-	//} else {
-		x = variant.screenX;
-		y = variant.screenY;
-	//}
-
+	var x = variant.screenX;
+	var y = variant.screenY;
 	if (!$("#slider-left").hasClass("hide")) {
-		x += 40;
+		x -= ($("#slider-left").width() + 36);
 	}
-
-
-
-	var me = this;
-	tooltip.transition()        
-       .duration(1000)      
-       .style("opacity", 0);
-
 
     tooltip.transition()        
            .duration(1000)      
@@ -1397,9 +1385,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
            .style("z-index", 20)
            .style("pointer-events", "all");
 
-	 var w = 300;
-	 var h = tooltip[0][0].offsetHeight;
-
+	
     if (this == sourceVariantCard) {
 		tooltip.html(me.variantTooltipHTML(variant));
     } else {
@@ -1470,42 +1456,24 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		}
 	}
 
+ 	var w = 300;
+	var h = tooltip[0][0].offsetHeight;
+    if (x < w) {
+    	tooltip.classed("arrow-down-left", true);
+		tooltip.classed("arrow-down-right", false);
+		tooltip.style("width", w + "px")
+		       .style("left", x - 22 + "px") 
+		       .style("text-align", 'left')    
+		       .style("top", (y - h - 18) + "px");   
 
-
-   
-	var windowWidth = $(window).width();
-
-	if (!$("#slider-left").hasClass("hide")) {
-		if ((x + w) > windowWidth) {
-	       tooltip.style("width", w + "px")
-	             .style("left", x - (w*2) + "px") 
-	             .style("text-align", 'left')    
-	             .style("top", (y - h - 10) + "px");   
-
-
-		} else {
- 			tooltip.style("width", w + "px")
-	             .style("left", (x - w) + "px") 
-	             .style("text-align", 'left')    
-	             .style("top", (y - h - 10) + "px");   
-		}
-	} else {
-	    if (x < w) {
-			cond = 2;
-	      tooltip.style("width", w + "px")
-	             .style("left", x + "px") 
-	             .style("text-align", 'left')    
-	             .style("top", (y - h - 10) + "px");   
-
-	    } else {
-	    	cond = 3;
-	      tooltip.style("width", w + "px")
-	             .style("left", (x - w) + "px") 
-	             .style("text-align", 'left')    
-	             .style("top", (y - h - 10) + "px");   
-	    }
-
-	}
+    } else {
+	  tooltip.classed("arrow-down-left", false);
+	  tooltip.classed("arrow-down-right", true);
+      tooltip.style("width", w + "px")
+             .style("left", (x - w) + 16 + "px") 
+             .style("text-align", 'left')    
+             .style("top", (y - h - 18) + "px");   
+    }
 
     if (lock) {
       tooltip.style("pointer-events", "all");
@@ -1516,6 +1484,8 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
     tooltip.on('click', function() {
 		me.unpin();
 	});
+
+	
 
 
 	
@@ -1835,6 +1805,8 @@ VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) 
 			}
 		}
 		this.bamDepthChart.showCircle()(variant.start, bamDepth);
+
+
     }
 }
 
@@ -2221,8 +2193,12 @@ VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
 }
 
 VariantCard.prototype.highlightBookmarkedVariants = function() {
+	// This is too confusing because there is no easy way to reset
+	// to show all variants in full opacity.
+	// Until a better approach is implemented, just keep
+	// the opacity at 1 on all variants.
 	d3.selectAll("#proband-variant-card .variant")
-		   .style("opacity", .3);
+		   .style("opacity", 1);
 
 	d3.selectAll("#proband-variant-card .variant")
 	      .filter( function(d,i) {
