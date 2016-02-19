@@ -1551,10 +1551,10 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 
 VariantCard.prototype._appendReadCountHeading = function(container) {
 	var svg = container.append("div")		
-		           	   .style("padding-top", "10px")
+		           	   .style("padding-top", "5px")
 				       .append("svg")
 				       .attr("width", 260)
-	           		   .attr("height", "21");
+	           		   .attr("height", "15");
 	svg.append("text")
 		   .attr("x", "0")
 		   .attr("y", "14")
@@ -1593,19 +1593,19 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 	g.append("rect")
 	   .attr("x", "1")
 	   .attr("y", "10")
-	   .attr("height", 4)
+	   .attr("height", 3)
 	   .attr("width",30)
 	   .attr("class", "alt-count");
 	g.append("rect")
 	   .attr("x", "31")
 	   .attr("y", "10")
-	   .attr("height", 4)
+	   .attr("height", 3)
 	   .attr("width",30)
 	   .attr("class", "other-count");
 	g.append("rect")
 	   .attr("x", "61")
 	   .attr("y", "10")
-	   .attr("height", 4)
+	   .attr("height", 3)
 	   .attr("width",30)
 	   .attr("class", "ref-count");
 
@@ -2098,7 +2098,7 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 	}
 
 	if (window.clickedVariant) {
-		return '<div class="row tooltip-footer" style="margin-bottom: -2px;margin-top: 24px !important;font-size: 11px;">'
+		return '<div class="row tooltip-footer" style="margin-bottom: -2px;margin-top: 20px !important;font-size: 11px;">'
 		  + examineCol
 		  + '<div class="col-sm-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
 		  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'

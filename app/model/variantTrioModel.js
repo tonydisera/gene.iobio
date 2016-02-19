@@ -85,17 +85,19 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		// This is the function that is called after the proband variants have been compared
 	    // to the father variant set. 
 	    
-		// Fill in the af level on each variant.  Use the af in the vcf if
-		// present, otherwise, use the 1000g af if present, otherwise use
-		// the ExAC af.
+		// Fill in the inheritance mode. 
+		// 1. recessive mode if mom and dad are het and proband is hom
+		// 2  denovo proband has variant, but not present in mom and dad 
+		//    (homref parents are also the same as variant not being present)
 		me.probandVcfData.features.forEach(function(variant) {
 			if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
 				&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
 				&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
 				variant.inheritance = 'recessive';
-			} else if (variant.compareMother == 'unique1' && variant.compareFather == 'unique1') {
+			} else if ( (variant.compareMother == 'unique1' || (variant.compareMother == 'common' && variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref'))
+				     && (variant.compareFather == 'unique1' || (variant.compareFather == 'common' && variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref'))) {
 				variant.inheritance = 'denovo';
-			}
+			} 
 		});
 
 		getProbandVariantCard().setLoadState('inheritance');
@@ -141,10 +143,11 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 	    var features1 = variants1.features;
 	    var features2 = variants2.features;
 
-	    // Flag duplicates as this will throw off comparisons
-	    var ignoreDups = function(features) {
+	    // Flag duplicates as this will throw off comparisons.  Also bypass homrefs
+	    var flagDups = function(features) {
 	      for (var i =0; i < features.length - 1; i++) {
 	        var variant = features[i];
+
 	        var nextVariant = features[i+1];
 	        if (i == 0) {
 	          variant.dup = false;
@@ -161,8 +164,20 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 	        }
 	      }
 	    }
-	    ignoreDups(features1);
-	    ignoreDups(features2);
+
+	    var flagHomRefs = function(features) {
+	    	features.forEach(function(variant) {
+	    		if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'homref') {
+	        		variant.ignore = true;
+	        	} else {
+	        		variant.ignore == false;
+	        	}
+	    	});
+	    }
+	    flagDups(features1);
+	    flagDups(features2);
+	    //flagHomRefs(features1);
+	    //flagHomRefs(features2);
 
 
 	    // Iterate through the variants from the first set,
@@ -172,11 +187,15 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 	    var idx2 = 0;
 	    while (idx1 < features1.length && idx2 < features2.length) {
 	      // Bypass duplicates
-	      if (features1[idx1].dup) {
+	      if (features1[idx1].dup || features1[idx1].ignore) {
 	        idx1++;
 	      }
-	      if (features2[idx2].dup) {
+	      if (features2[idx2].dup || features2[idx2].ignore) {
 	        idx2++;
+	      }
+
+	      if (idx1 >= features1.length || idx2 >= features2.length) {
+	      	continue;
 	      }
 
 	      variant1 = features1[idx1];
