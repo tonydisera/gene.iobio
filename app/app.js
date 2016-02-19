@@ -1338,6 +1338,8 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 
 	$("#region-flag").addClass("hide");
 
+	$("#coordinate-frame").css("opacity", 0);
+
 	$('#transcript-card').removeClass("hide");
 
     $('#gene-track').removeClass("hide");
