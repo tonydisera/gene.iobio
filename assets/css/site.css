@@ -640,27 +640,32 @@ header {
   margin-top: 10px; }
   #bam-depth .circle {
     stroke: none;
-    fill: #3586c0; }
+    fill: #3586c0;
+    pointer-events: none; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
   stroke-width: 3;
-  fill: none; }
+  fill: none;
+  pointer-events: none; }
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize {
   stroke: #3586c0;
   fill: none;
-  stroke-width: 4; }
+  stroke-width: 4;
+  pointer-events: none; }
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize {
   stroke-width: 4;
-  stroke: #3586c0; }
+  stroke: #3586c0;
+  pointer-events: none; }
 
 #bam-depth .circle-label {
   fill: #3586c0;
   font-size: 9px;
   font-weight: bold;
-  stroke: none; }
+  stroke: none;
+  pointer-events: none; }
 
 .bar {
   stroke: black;
@@ -1092,7 +1097,7 @@ header {
   fill: #ABA2A2;
   stroke: #ABA2A2; }
 
-rect.variant.homref {
+.variant.homref {
   opacity: 0 !important;
   fill: none !important; }
 
@@ -1366,7 +1371,8 @@ rect.variant.homref {
 
 .tooltip-row {
   width: 300px;
-  clear: both; }
+  clear: both;
+  line-height: 11px !important; }
 
 .tooltip-value {
   overflow-wrap: break-word;
@@ -1439,6 +1445,9 @@ rect.variant.homref {
 .tooltip a:hover, .tooltip a:focus {
   color: #2E73AB !important;
   font-size: 11px !important; }
+
+.tooltip .row {
+  line-height: 11px !important; }
 
 .tooltip {
   position: absolute;

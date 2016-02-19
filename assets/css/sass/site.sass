@@ -718,26 +718,31 @@ header
   .circle
     stroke: none
     fill: $current-color
+    pointer-events: none
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
   stroke: $current-color
   stroke-width: 3
   fill: none
+  pointer-events: none
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
   stroke: $current-color
   fill: none
   stroke-width: 4
+  pointer-events: none
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
   stroke-width: 4
   stroke: $current-color
+  pointer-events: none
 
 #bam-depth .circle-label
   fill: $current-color
   font-size: 9px
   font-weight: bold
   stroke: none
+  pointer-events: none
 
 .bar
   stroke: black
