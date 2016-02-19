@@ -729,6 +729,8 @@ VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData, onVari
  	this.model.promiseAnnotatedAndCoverage(theVcfData)
  	    .then(function() {
 
+
+
 			me.endVariantProgress();
 			me._showVariants(regionStart, regionEnd, null, onVariantsDisplayed);
 
@@ -736,7 +738,7 @@ VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData, onVari
 			// Refresh the feature matrix after clinvar AND the coverage has
 			// been loaded
 			if (me.model.getRelationship() == 'proband') {
-				me.fillFeatureMatrix(regionStart, regionEnd);
+				me.fillFeatureMatrix(regionStart, regionEnd);				
 			}
 
  		},

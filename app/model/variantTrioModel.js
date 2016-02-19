@@ -98,6 +98,9 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 			}
 		});
 
+		getProbandVariantCard().setLoadState('inheritance');
+		filterCard.enableInheritanceFilters(me.probandVcfData);
+
 		callback(me.probandVcfData);
 	},
 	function(error) {
