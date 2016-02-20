@@ -395,7 +395,7 @@ function showCoordinateFrame(x) {
 	}
 
 	$('#coordinate-frame').css("top", top);
-	$('#coordinate-frame').css("height", height - 10);
+	$('#coordinate-frame').css("height", height - 20);
 	$('#coordinate-frame').css("left", x - 13);
 	$('#coordinate-frame').css("opacity", 1);
 }

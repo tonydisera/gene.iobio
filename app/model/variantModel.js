@@ -74,24 +74,31 @@ VariantModel.prototype.hasCalledVariants = function() {
 VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
 	var me = this;
 	var data = null;
+	// If only alignments have specified, but not variant files, we will need to use the
+	// getBamRefName function instead of the getVcfRefName function.
+	var theGetRefNameFunction = me.getVcfRefName != null ? me.getVcfRefName : me.getBamRefName;
+
+	if (theGetRefNameFunction) {
+		if (me.vcfData != null) {
+			if (theGetRefNameFunction(geneObject.chr) == me.vcfData.ref &&
+				geneObject.start == me.vcfData.start &&
+				geneObject.end == me.vcfData.end &&
+				geneObject.strand == me.vcfData.strand) {
+				data = me.vcfData;
+			}		
+		} 
+
+		if (data == null) {
+			// Find in cache
+			data = this._getCachedData("vcfData", geneObject.gene_name, selectedTranscript);
+			if (data != null && data != '') {
+				me.vcfData = data;
+			}
+		} 		
+	} else {
+		console.log("No function defined to parse ref name from file");
+	}
 	
-	if (me.vcfData != null) {
-		if (me.getVcfRefName(geneObject.chr) == me.vcfData.ref &&
-			geneObject.start == me.vcfData.start &&
-			geneObject.end == me.vcfData.end &&
-			geneObject.strand == me.vcfData.strand) {
-			data = me.vcfData;
-		}		
-	} 
-
-	if (data == null) {
-		// Find in cache
-		data = this._getCachedData("vcfData", geneObject.gene_name, selectedTranscript);
-		if (data != null && data != '') {
-			me.vcfData = data;
-		}
-	} 
-
 
 	return data;
 }

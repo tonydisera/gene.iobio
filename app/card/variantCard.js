@@ -1044,7 +1044,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (this.getRelationship() == 'proband' && theVcfData.features.length == 0) {
+	if (this.getRelationship() == 'proband' && theVcfData.features != null && theVcfData.features.length == 0) {
 		$('#filter-and-rank-card').addClass("hide");
     	$('#matrix-track').addClass("hide");
     	return;
