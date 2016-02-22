@@ -1459,7 +1459,10 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	}
 
  	var w = 300;
-	var h = tooltip[0][0].offsetHeight;
+	var h = d3.round(tooltip[0][0].offsetHeight);
+
+
+	/*
     if (x < w) {
     	tooltip.classed("arrow-down-left", true);
 		tooltip.classed("arrow-down-right", false);
@@ -1476,6 +1479,27 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
              .style("text-align", 'left')    
              .style("top", (y - h - 18) + "px");   
     }
+    */
+
+
+    if (x < w) {
+    	tooltip.classed("left-arrow", true);
+		tooltip.classed("right-arrow", false);
+		tooltip.style("width", w + "px")
+		       .style("left", d3.round(x+13) + "px") 
+		       .style("text-align", 'left')    
+		       .style("top", d3.round(y - h - 19) + "px");   
+
+    } else {
+	  tooltip.classed("left-arrow", false);
+	  tooltip.classed("right-arrow", true);
+      tooltip.style("width", w + "px")
+             .style("left", d3.round(x - w - 20) + "px") 
+             .style("text-align", 'left')    
+             .style("top", d3.round(y - h - 20) + "px");   
+    }
+
+
 
     if (lock) {
       tooltip.style("pointer-events", "all");

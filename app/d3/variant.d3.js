@@ -110,8 +110,8 @@ function variantD3() {
                          .getScreenCTM()
                          .translate(+circle.node().getAttribute("cx"),+circle.node().getAttribute("cy"));
 
-      matchingVariant.screenX = window.pageXOffset + matrix.e + margin.left;
-      matchingVariant.screenY = window.pageYOffset + matrix.f + margin.top;
+      matchingVariant.screenX = d3.round(window.pageXOffset + matrix.e + margin.left);
+      matchingVariant.screenY = d3.round(window.pageYOffset + matrix.f + margin.top);
       showCoordinateFrame(matchingVariant.screenX);
 
 
