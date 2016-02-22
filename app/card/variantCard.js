@@ -1507,9 +1507,9 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
       tooltip.style("pointer-events", "none");          
     }
 
-    tooltip.on('click', function() {
-		me.unpin();
-	});
+    //tooltip.on('click', function() {
+	//	me.unpin();
+	//});
 
 	
 

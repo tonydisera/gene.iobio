@@ -150,7 +150,7 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 		var key = this.getBookmarkKey(gene.gene_name, gene.chr, variant.start, variant.ref, variant.alt);
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
-			getProbandVariantCard().unpin();
+			//getProbandVariantCard().unpin();
 			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);
 			variant.isBookmark = 'Y';
 		}
@@ -778,9 +778,9 @@ BookmarkCard.prototype.exportBookmarks = function(scope) {
 		}
 		var inheritance = entry.hasOwnProperty("isProxy") ? "" : entry.inheritance;
 		if (scope == "all" || isFavorite) {
-			var start = entry.start--;
-			var end   = entry.end--;
-			output += entry.chrom + "\t" + start + "\t" + end+ "\t" + entry.ref + "\t" + entry.alt + "\t" + geneName + "\t" + impact + "\t" + inheritance + "\n";
+			var start = entry.start - 1;
+			var end   = entry.end - 1;
+			output += entry.chrom + "\t" + start + "\t" + end + "\t" + entry.ref + "\t" + entry.alt + "\t" + geneName + "\t" + impact + "\t" + inheritance + "\n";
 		}
 	}
 
