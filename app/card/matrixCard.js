@@ -344,6 +344,8 @@ MatrixCard.prototype.hideTooltip = function() {
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
+
+    hideCoordinateFrame();
 }
 
 
