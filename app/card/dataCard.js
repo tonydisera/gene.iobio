@@ -14,8 +14,34 @@ function DataCard() {
 		mother:  'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam',
 		father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
 	};
+
 	this.mode = 'single';
 	this.panelSelectorFilesSelected = null;
+
+}
+
+DataCard.prototype.loadDemoData = function() {
+
+	window.updateUrl('rel0', "proband");	
+	window.updateUrl('rel1', "mother");	
+	window.updateUrl('rel2', "father");	
+
+	window.updateUrl('name0', this.defaultNames.proband);	
+	window.updateUrl('vcf0',  this.defaultUrls.proband);	
+	window.updateUrl('bam0',  this.defaultBamUrls.proband);	
+
+	window.updateUrl('name1', this.defaultNames.mother);	
+	window.updateUrl('vcf1',  this.defaultUrls.mother);	
+	window.updateUrl('bam1',  this.defaultBamUrls.mother);	
+
+	window.updateUrl('name2', this.defaultNames.father);	
+	window.updateUrl('vcf2',  this.defaultUrls.father);	
+	window.updateUrl('bam2',  this.defaultBamUrls.father);	
+
+	window.updateUrl("gene", "RAI1");
+	window.updateUrl("genes", "RAI1,AIRE,MYLK2");
+
+	loadGeneFromUrl();
 
 }
 
