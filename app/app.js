@@ -654,6 +654,24 @@ function loadGeneFromUrl() {
 	
 }
 
+function reloadGeneFromUrl(alreadyLoaded) {
+	// Get the gene parameger
+	var gene = getUrlParameter('gene');
+
+	// Get the gene list from the url.  Add the gene badges, selecting
+	// the gene that was passed in the url parameter
+	var genes = getUrlParameter("genes");
+	if (genes != null && genes.length > 0) {
+		geneNames = genes.split(",");
+		$('#genes-to-copy').val(genes);
+		genesCard.copyPasteGenes(gene);
+	}
+
+	$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: !alreadyLoaded});
+	genesCard._geneBadgeLoading(gene, true, true);
+	
+}
+
 function loadUrlSources() {
 
 	var bam  = getUrlParameter(/bam*/);

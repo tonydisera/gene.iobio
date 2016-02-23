@@ -22,6 +22,17 @@ function DataCard() {
 
 DataCard.prototype.loadDemoData = function() {
 
+	var alreadyLoaded = false;
+	if (hasDataSources()) {
+		alreadyLoaded = true;
+	}
+
+	// Clear the cache
+	var affectedSibIds  = [];
+	var unaffectedSibIds = [];
+	window.loadSibs(affectedSibIds, 'affected');
+	window.loadSibs(unaffectedSibIds, 'unaffected');
+
 	window.updateUrl('rel0', "proband");	
 	window.updateUrl('rel1', "mother");	
 	window.updateUrl('rel2', "father");	
@@ -41,7 +52,7 @@ DataCard.prototype.loadDemoData = function() {
 	window.updateUrl("gene", "RAI1");
 	window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 
-	loadGeneFromUrl();
+	reloadGeneFromUrl(alreadyLoaded);
 
 }
 
