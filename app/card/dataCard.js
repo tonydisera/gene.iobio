@@ -47,6 +47,7 @@ DataCard.prototype.loadDemoData = function() {
 	if (hasDataSources()) {
 		alreadyLoaded = true;
 	}
+	this.mode = 'trio';
 
 	// Clear the cache
 	var affectedSibIds  = [];

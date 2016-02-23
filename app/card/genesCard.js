@@ -1,4 +1,4 @@
-function GenesCard() {
+ function GenesCard() {
 	this.geneBarChart = null;
 }
 
@@ -36,6 +36,18 @@ GenesCard.prototype.init = function() {
 			event.stopPropagation();
 		}
 	});	
+
+	$("#genes-card #color-selector").spectrum({
+		showPaletteOnly: true,
+	    showPalette:true,
+	    hideAfterPaletteSelect: true,
+	    color: '#3BA4CE',
+	    palette: [
+	        ['#3BA4CE', '#5D9647', '#B39C23',
+	        '#E4B3AD', '#C198CE'],
+	        ['#8D9CC5', '#83BBAF', '#D0D289', '#ECB2C7']
+	    ]
+	});
 
 }
 

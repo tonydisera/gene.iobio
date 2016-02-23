@@ -394,8 +394,10 @@ function showCoordinateFrame(x) {
 		x -= ($("#slider-left").width() + 36);
 	}
 
+	var margins = dataCard.mode == 'trio' ? 10 : 20;
+
 	$('#coordinate-frame').css("top", top);
-	$('#coordinate-frame').css("height", height - 20);
+	$('#coordinate-frame').css("height", height - margins);
 	$('#coordinate-frame').css("left", x - 13);
 	$('#coordinate-frame').css("opacity", 1);
 }
