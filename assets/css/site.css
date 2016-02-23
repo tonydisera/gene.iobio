@@ -680,18 +680,18 @@ header {
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
-  stroke-width: 3;
+  stroke-width: 2;
   fill: none;
   pointer-events: none; }
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize {
   stroke: #3586c0;
   fill: none;
-  stroke-width: 4;
+  stroke-width: 3;
   pointer-events: none; }
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize {
-  stroke-width: 4;
+  stroke-width: 3;
   stroke: #3586c0;
   pointer-events: none; }
 

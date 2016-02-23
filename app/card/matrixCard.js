@@ -213,6 +213,7 @@ MatrixCard.prototype.init = function() {
 				    })
 				    .on('d3mouseout', function() {
 				    	if (clickedVariant == null) {
+				    		hideCoordinateFrame();
 				    		me.hideTooltip();
 					    	variantCards.forEach(function(variantCard) {
 					    		variantCard.hideVariantCircle();
@@ -272,6 +273,8 @@ MatrixCard.prototype.unpin = function(saveClickedVariant) {
 	}
 
 	this.hideTooltip();
+
+	d3.select('#feature-matrix .colbox.current').classed('current', false);
 
 	variantCards.forEach(function(variantCard) {
 		variantCard.hideCoverageCircle();
@@ -345,7 +348,7 @@ MatrixCard.prototype.hideTooltip = function() {
            .style("z-index", 0)
            .style("pointer-events", "none");
 
-    hideCoordinateFrame();
+
 }
 
 

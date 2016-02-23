@@ -99,7 +99,7 @@ function variantD3() {
       var circle = svgContainer.select(".circle");
       circle.transition()
             .duration(200)
-            .style("opacity", .5);
+            .style("opacity", .6);
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 2);
 
@@ -531,7 +531,7 @@ function variantD3() {
           .attr("class", "circle")
           .attr("cx", 0)
           .attr("cy", 0)
-          .attr("r", 7)                    
+          .attr("r", 6)                    
           .style("opacity", 0);
 
       
