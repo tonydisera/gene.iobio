@@ -15,6 +15,27 @@ function DataCard() {
 		father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
 	};
 
+	this.exomeNames = {
+		proband: 'NA19240',
+		mother:  'NA19238',
+		father:  'NA19229'
+	};
+	this.exomeUrls = {
+		proband: 'https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz'
+	};
+	this.exomeBamUrls = {
+		proband: 'https://s3.amazonaws.com/iobio/1000gSV/NA19240.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam',
+		mother:  'https://s3.amazonaws.com/iobio/1000gSV/NA19238.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam',
+		father:  'https://s3.amazonaws.com/iobio/1000gSV/NA19239.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam'
+	};
+	this.exomeSampleNames = {
+		proband: 'NA19240',
+		mother:  'NA19238',
+		father:  'NA19239'
+	};
+
 	this.mode = 'single';
 	this.panelSelectorFilesSelected = null;
 
@@ -37,17 +58,20 @@ DataCard.prototype.loadDemoData = function() {
 	window.updateUrl('rel1', "mother");	
 	window.updateUrl('rel2', "father");	
 
-	window.updateUrl('name0', this.defaultNames.proband);	
-	window.updateUrl('vcf0',  this.defaultUrls.proband);	
-	window.updateUrl('bam0',  this.defaultBamUrls.proband);	
+	window.updateUrl('name0', this.exomeNames.proband);	
+	window.updateUrl('vcf0',  this.exomeUrls.proband);	
+	window.updateUrl('bam0',  this.exomeBamUrls.proband);	
+	window.updateUrl('sample0',  this.exomeSampleNames.proband);	
 
-	window.updateUrl('name1', this.defaultNames.mother);	
-	window.updateUrl('vcf1',  this.defaultUrls.mother);	
-	window.updateUrl('bam1',  this.defaultBamUrls.mother);	
+	window.updateUrl('name1', this.exomeNames.mother);	
+	window.updateUrl('vcf1',  this.exomeUrls.mother);	
+	window.updateUrl('bam1',  this.exomeBamUrls.mother);	
+	window.updateUrl('sample1',  this.exomeSampleNames.mother);	
 
-	window.updateUrl('name2', this.defaultNames.father);	
-	window.updateUrl('vcf2',  this.defaultUrls.father);	
-	window.updateUrl('bam2',  this.defaultBamUrls.father);	
+	window.updateUrl('name2', this.exomeNames.father);	
+	window.updateUrl('vcf2',  this.exomeUrls.father);	
+	window.updateUrl('bam2',  this.exomeBamUrls.father);	
+	window.updateUrl('sample2',  this.exomeSampleNames.father);	
 
 	window.updateUrl("gene", "RAI1");
 	window.updateUrl("genes", "RAI1,AIRE,MYLK2");
