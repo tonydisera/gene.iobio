@@ -1230,10 +1230,17 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		return;
 	}
 
+
 	this.clickedVariant = null;
 	window.hideCircleRelatedVariants();
 
 	me.cardSelector.find(".filter-flag").addClass("hide");
+
+	// Show a badge when the intronic variants have been removed
+	if (data.intronsExcludedCount != null && data.intronsExcludedCount > 0) {
+		me.cardSelector.find("#too-many-variants-flag").removeClass("hide");
+		me.cardSelector.find("#excluded-variant-count").text(data.intronsExcludedCount);
+	}
 
 	// Only hide displayed variant count if we haven't already zoomed
 	if (this.cardSelector.find("#region-flag.hide").length > 0) {
@@ -1278,6 +1285,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 			me.cardSelector.find("#" + annot.key + "-flag").addClass("hide");
 		}
 	}
+
 	return filteredData;
 
 }

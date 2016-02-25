@@ -851,6 +851,8 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		}
 				    	}
 				    	if (theGeneObject) {
+				    		_pruneIntronVariants(data);
+	
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
 					    	// variants.
@@ -928,6 +930,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			    		}
 			    	}
 			    	if (theGeneObject) {
+
 			    		// Flag any bookmarked variants
 			    		if (me.getRelationship() == 'proband') {
 					    	bookmarkCard.determineVariantBookmarks(data, theGeneObject);
@@ -1105,6 +1108,25 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 	return data;
 }
 
+VariantModel.prototype._pruneIntronVariants = function(data) {
+	if (data.features.length > 500) {
+		data.intronsExcludedCount = 0;
+		data.features = data.features.filter(function(variant) {
+			var keep = false;
+			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepEffect';
+			for (key in variant[effectField]) {
+				if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
+					keep = true;
+				}
+			}
+			if (!keep) {
+				data.intronsExcludedCount++;
+			}
+			return keep;
+		});
+	}	
+}
+
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end, strand, transcript, onVcfData) {
 	var me = this;
 
@@ -1143,6 +1165,10 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 	    	var theVcfData = data[1];
 
 		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
+		    				    		// If we have more than 500 variants, exclude intron variants
+
+				me._pruneIntronVariants(theVcfData);
+					
 
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 			    // can be filtered by range.
