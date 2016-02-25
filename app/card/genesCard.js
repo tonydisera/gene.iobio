@@ -2,8 +2,55 @@
 	this.geneBarChart = null;
 }
 
+GenesCard.prototype.split = function( val )  {
+	return val.split( /;\n*/ );
+}
+
+GenesCard.prototype.extractLast = function( term ) {
+	return this.split( term ).pop();
+}
+
 GenesCard.prototype.init = function() {
 	var me = this;
+
+
+	 // don't navigate away from the field on tab when selecting an item
+    $( "#phenolyzer-search-terms" )
+       .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        source: function( request, response ) {
+          $.getJSON( "http://nv-dev.iobio.io/hpo/hot/lookup", {
+            term: me.extractLast( request.term )
+          }, response );
+        },
+        search: function() {
+          // custom minLength
+          var term = me.extractLast( this.value );
+          if ( term.length < 2 ) {
+            return false;
+          }
+        },
+        focus: function() {
+          // prevent value inserted on focus
+          return false;
+        },
+        select: function( event, ui ) {
+          var terms = me.split( this.value );
+          // remove the current input
+          terms.pop();
+          // add the selected item
+          terms.push( ui.item.value );
+          // add placeholder to get the comma-and-space at the end
+          terms.push( "" );
+          this.value = terms.join( ";\n" );
+          return false;
+        }
+      });
 
 	// Detect when get genes dropdown opens so that
 	// we can prime the textarea with the genes already
@@ -148,7 +195,7 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 
 	var searchTerms = $('#phenolyzer-search-terms').val();
 	$("#phenolyzer-search-term").text(searchTerms);	
-	var url = phenolyzerServer + '?cmd=' + searchTerms.split(" ").join("_");
+	var url = phenolyzerServer + '?cmd=' + searchTerms.split("\n").join("");
 	d3.select('#phenolyzer-results svg').remove();
    	phenolyzerGenes = [];
 	
