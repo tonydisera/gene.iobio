@@ -213,12 +213,7 @@ MatrixCard.prototype.init = function() {
 				    })
 				    .on('d3mouseout', function() {
 				    	if (clickedVariant == null) {
-				    		hideCoordinateFrame();
-				    		me.hideTooltip();
-					    	variantCards.forEach(function(variantCard) {
-					    		variantCard.hideVariantCircle();
-					    	});				    		
-					    	
+				    		unpinAll();		    		
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
@@ -309,16 +304,28 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 		var colObject = column.datum();
       	column.classed("active", true);
 
-
+	
       	if (showTooltip) {
 	      	// Get screen coordinates of column.  We will use this to position the
-	      	// tooltip above the column.
+	      	// tooltip above the column and scroll left if necessary
 	      	var matrix = column.node()
 	              			   .getScreenCTM()
 	            		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
+	      	var screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
+	      	var screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
+
+	      	var featureMatrixWidth = +$("#feature-matrix")[0].offsetWidth;
+	      	if (screenXMatrix > featureMatrixWidth) {
+	      		$('#feature-matrix').scrollLeft(screenXMatrix - featureMatrixWidth);
+	      	} else {
+	      		$('#feature-matrix').scrollLeft(0);
+	      	}
+	     	matrix = column.node()
+	          			   .getScreenCTM()
+	        		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
 	      	colObject.screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
 	      	colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
-	
+
 	      	me.showTooltip(colObject, false);
 
       	}

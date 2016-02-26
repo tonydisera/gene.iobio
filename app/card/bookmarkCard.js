@@ -383,17 +383,18 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				var geneName = entry.key;
 				var bookmarkKeys = entry.value;
 
+				// Remove any locked tooltip, hide coordinate frame
+				unpinAll();
+
 				if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
 					genesCard.selectGene(geneName, function(variantCard) {
 						if (variantCard.getRelationship() == 'proband') {
-							me._flagBookmarksForGene(variantCard, window.gene, bookmarkKeys, false);
+							me._flagBookmarksForGene(variantCard, window.gene, bookmarkKeys, true);
 						}
 					});
 				} else {
-					me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, false);
-				}
-				getProbandVariantCard().removeBookmarkFlags();
-				getProbandVariantCard().highlightBookmarkedVariants();
+					me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+				}				
 			});
 
 	me.addPhenotypeGlyphs(container);
@@ -427,6 +428,10 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 							var bookmarkEntry = entry.value;
 							var key = entry.key;
 
+							// Remove any locked tooltip, hide coordinate frame
+							unpinAll();
+
+
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
 								genesCard.selectGene(geneName, function(variantCard) {
 									if (variantCard.getRelationship() == 'proband') {
@@ -439,8 +444,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 								me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
 							}
 
-							getProbandVariantCard().highlightBookmarkedVariants();
-
+							
 			            });
 	        });
 			

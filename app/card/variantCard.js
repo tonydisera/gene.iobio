@@ -1415,7 +1415,6 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	if (!$("#slider-left").hasClass("hide")) {
 		x -= ($("#slider-left").width() + 36);
 	}
-	console.log("tooltip x=" + x);
 
     tooltip.transition()        
            .duration(1000)      

@@ -393,14 +393,22 @@ function showCoordinateFrame(x) {
 	if (!$("#slider-left").hasClass("hide")) {
 		x -= ($("#slider-left").width() + 36);
 	}
-	console.log("coordinate frame x=" + x);
-
+	
 	var margins = dataCard.mode == 'trio' ? 10 : 20;
 
 	$('#coordinate-frame').css("top", top);
 	$('#coordinate-frame').css("height", height - margins);
 	$('#coordinate-frame').css("left", x - 13);
 	$('#coordinate-frame').css("opacity", 1);
+}
+
+function unpinAll() {
+	clickedVariant = null;
+	hideCoordinateFrame();
+	matrixCard.hideTooltip();
+	variantCards.forEach(function(variantCard) {
+		variantCard.hideVariantCircle();
+	});		
 }
 
 function hideCoordinateFrame() {
@@ -490,7 +498,7 @@ function showSlideLeft() {
 	var transitionEvent = whichTransitionEvent();
 	$('.slide-left').one(transitionEvent, function(event) {
 		readjustCards();
-		
+
 		if (clickedVariant) {
 			getProbandVariantCard().adjustTooltip(clickedVariant);
 		}
