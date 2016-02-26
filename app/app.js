@@ -4,7 +4,6 @@
 //var geneiobio_server = "http://localhost:3000/";
 //var geneiobio_server = "http://geneinfo.iobio.io/";
 var geneiobio_server = "http://nv-dev.iobio.io/geneinfo/";
-//var phenolyzerServer = "http://nv-green.iobio.io/phenolyzer/"
 var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
 var geneToPhenoServer = "http://nv-dev.iobio.io/genetopheno/";
 
@@ -390,9 +389,11 @@ function showCoordinateFrame(x) {
 	var height = +$('#proband-variant-card').outerHeight();
 	height    += +$('#other-variant-cards').outerHeight();
 
+
 	if (!$("#slider-left").hasClass("hide")) {
 		x -= ($("#slider-left").width() + 36);
 	}
+	console.log("coordinate frame x=" + x);
 
 	var margins = dataCard.mode == 'trio' ? 10 : 20;
 
@@ -489,14 +490,21 @@ function showSlideLeft() {
 	var transitionEvent = whichTransitionEvent();
 	$('.slide-left').one(transitionEvent, function(event) {
 		readjustCards();
+		
+		if (clickedVariant) {
+			getProbandVariantCard().adjustTooltip(clickedVariant);
+		}
+
 	});
 
 }
 
 function showSidebar(view) {
+
 	closeSlideLeft(); 	
 	changeSidebar(view);
 	showSlideLeft();
+
 }
 
 

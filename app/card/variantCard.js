@@ -1308,6 +1308,33 @@ VariantCard.prototype.promiseCompareVariants = function(theVcfData, compareAttri
 		matchAttribute, matchFunction, noMatchFunction);
 }
 
+VariantCard.prototype.adjustTooltip = function(variant) {
+	var me = this;
+	// Check the fb called variants first.  If present, circle and don't
+	// show X for missing variant on vcf variant chart.
+	var matchingVariant = null;
+	var tooltip = null;
+	if (this.fbChart != null && this.model.hasCalledVariants()) {
+		var container = this.d3CardSelector.selectAll('#fb-variants svg');
+		matchingVariant = this.fbChart.showCircle()(variant, container, false, true);
+		if (matchingVariant) {
+			tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
+		}
+		
+	}
+	if (this.vcfChart != null) {
+		var container = this.d3CardSelector.selectAll('#vcf-variants svg');;
+		matchingVariant = this.vcfChart.showCircle()(variant, container, false, true);
+		if (matchingVariant ) {
+			tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
+		}
+	}
+	if (tooltip) {
+		this.showTooltip(tooltip, matchingVariant, this, false);		
+	}
+
+}
+
 
 VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	var me = this;
@@ -1388,6 +1415,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	if (!$("#slider-left").hasClass("hide")) {
 		x -= ($("#slider-left").width() + 36);
 	}
+	console.log("tooltip x=" + x);
 
     tooltip.transition()        
            .duration(1000)      
