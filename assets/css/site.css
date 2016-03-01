@@ -138,6 +138,23 @@ body {
   height: 60px;
   background-color: #4C6880 !important; }
 
+.icon-credit {
+  font-size: 10px;
+  color: #eee;
+  margin-top: 3px; }
+  .icon-credit a {
+    color: #96C774 !important; }
+    .icon-credit a:hover {
+      color: #96C774 !important; }
+    .icon-credit a:focus {
+      color: #96C774 !important; }
+  .icon-credit #freepick-info a {
+    color: #96C774 !important; }
+    .icon-credit #freepick-info a:hover {
+      color: #96C774 !important; }
+    .icon-credit #freepick-info a:focus {
+      color: #96C774 !important; }
+
 .card-label {
   color: #5d809d !important;
   text-transform: uppercase; }
