@@ -55,9 +55,9 @@ BookmarkCard.prototype.importBookmarks = function() {
 	me.bookmarkedVariants = {};
 	var recs = bookmarksString.split("\n");
 	recs.forEach( function(rec) {
-		var fields = rec.split("\t");
+		var fields = rec.split(/\s+/);
 
-		if (fields.length >= 6) {
+		if (fields.length >= 5) {
 			var chrom    = fields[0];
 			var start    = +fields[1];
 			var end      = +fields[2];
