@@ -2111,7 +2111,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay)
 			+ me._tooltipRow('Qual', variant.qual) 
-			+ me._tooltipRow('Filter', variant.filter) 
+			+ me._tooltipRow('Filter', variant.recfilter) 
 			+ me._tooltipRowAlleleCounts() 
 			+ me._linksRow()
 		);                  

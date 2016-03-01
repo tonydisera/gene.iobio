@@ -890,6 +890,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 		if (vcfData != null && vcfData != '') {
 			me.vcfData = vcfData;
 			me._populateEffectFilters(me.vcfData.features);
+			me._populateRecFilters(me.vcfData.features);
 
 			// Flag any bookmarked variants
 			if (me.getRelationship() == 'proband') {
@@ -1178,6 +1179,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 			    // Show the snpEff effects / vep consequences in the filter card
 			    me._populateEffectFilters(theVcfData.features);
 
+			    // Determine the unique values in the VCF filter field 
+			    me._populateRecFilters(theVcfData.features);
+
 			    // Invoke callback now that we have annotated variants
 			    me.vcfData = theVcfData;
 		    	if (onVcfData) {
@@ -1290,6 +1294,12 @@ VariantModel.prototype._populateEffectFilters  = function(variants) {
 		for (vepConsequence in variant.vepConsequence) {
 			filterCard.vepConsequences[vepConsequence] = vepConsequence;
 		}
+	});	
+}
+
+VariantModel.prototype._populateRecFilters  = function(variants) {
+	variants.forEach( function(variant) {
+		filterCard.recFilters[variant.recfilter] = variant.recfilter;
 	});	
 }
 
@@ -1561,6 +1571,9 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 				// Show populate the effect filters for the freebayes variants
 				me._populateEffectFilters(me.fbData.features);
 
+			    // Determine the unique values in the VCF filter field 
+				me._populateRecFilters(me.fbData.features);
+
 				if (onVariantsCalled) {
 					onVariantsCalled();
 				}
@@ -1649,6 +1662,9 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 			        	// Show the snpEff effects / vep consequences in the filter card
 						me._populateEffectFilters(me.fbData.features);
+
+						// Determine the unique values in the VCF filter field 
+						me._populateRecFilters(me.fbData.features);
 
 						// Once all variant cards have freebayes variants,
 						// the app will determine in the inheritance mode

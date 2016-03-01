@@ -103,8 +103,8 @@ vcfiobio = function module() {
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
   var vepServer              = "wss://services.iobio.io/vep/";
-  var vepServer              = "ws://nv-dev.iobio.io/vep/";
-  //var vepServer              = "ws://nv-green.iobio.io/vep/";
+  //var vepServer              = "ws://nv-dev.iobio.io/vep/";
+  var vepServer              = "ws://nv-green.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
 
 
@@ -1798,7 +1798,7 @@ var effectCategories = [
                 'chrom': refName,
                 'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
                 'id': rec.id, 'ref': rec.ref, 
-                'alt': alt, 'qual': rec.qual, 'filter': rec.filter, 
+                'alt': alt, 'qual': rec.qual, 'recfilter': rec.filter, 
                 'af': af,
                 'combinedDepth': combinedDepth,             
                 'genotypes': genotypes, 

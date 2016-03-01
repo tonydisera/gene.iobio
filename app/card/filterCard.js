@@ -3,6 +3,7 @@ function FilterCard() {
 	this.annotsToInclude = new Object();
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
+	this.recFilters = new Object();
 	this.annotationScheme = "snpEff";
 	this.pathogenicityScheme = "clinvar";
 	this.afScheme = "exac";
@@ -225,7 +226,7 @@ FilterCard.prototype.init = function() {
 
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
-	d3.selectAll(".type, .impact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs")
+	d3.selectAll(".type, .impact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -454,6 +455,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	});
 
 	this.displayEffectFilters();
+	this.displayRecFilters();
 	this.initFilterListeners();
 	d3.selectAll(".afexaclevels").each( function(d,i) {
 		var afexaclevel = d3.select(this).attr("id");
@@ -476,7 +478,10 @@ FilterCard.prototype.displayEffectFilters = function() {
 	var nocolor = $('#effect-filter-box #effect-scheme').hasClass("current") ? "" : "nocolor";
 	var values = this.annotationScheme.toLowerCase() == 'snpeff' ? this.snpEffEffects : this.vepConsequences;
 	var field  = this.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
-	for (key in values) {
+
+	var effectKeys = Object.keys(values).sort();
+
+	effectKeys.forEach( function(key) {
 		var count = d3.selectAll('#vcf-track .variant')
 		              .filter( function(d,i) {
 		              	var match = false; 
@@ -496,7 +501,41 @@ FilterCard.prototype.displayEffectFilters = function() {
       					  '</svg>';
       		$('#effect-filter-box').append(svgElem);
 		}
-	};	
+	});	
+}
+
+FilterCard.prototype.displayRecFilters = function() {
+	var me = this;
+	$('#rec-filter-box .recfilter').remove();
+
+	var recFilterCount = 0;
+	var recFilterKeys = Object.keys(this.recFilters).sort();
+	
+	recFilterKeys.forEach(function(key) {
+		var count = d3.selectAll('#vcf-track .variant')
+		              .filter( function(d,i) {
+		              	var match = false; 
+		              	if (d.recfilter == key) {
+		              		match = true;
+		              	}
+		              	return match;
+		              })[0].length;
+
+		if (count > 0) {
+			recFilterCount++;
+			//var label = key == "." ? "(NOT PASSED)" : key;
+			label = key;
+			var svgElem = '<svg id="' + key + '" class="recfilter" width="120" height="12" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
+      					  '</svg>';
+      		$('#rec-filter-box').append(svgElem);
+      	}
+	});
+	if (recFilterCount > 0) {
+		$('#rec-filter-panel').removeClass("hide");
+	} else {
+		$('#rec-filter-panel').addClass("hide");		
+	}	
 }
 
 FilterCard.prototype.capitalizeFirstLetter = function(string) {
@@ -547,7 +586,7 @@ FilterCard.prototype.classifyByImpact = function(d) {
     var af1000g = Object.keys(d.af1000glevels).join(" ");
     var afexac = Object.keys(d.afexaclevels).join(" ");
 	
-	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory + 'recfilter_' + d.recfilter + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 
 FilterCard.prototype.classifyByEffect = function(d) { 
@@ -596,7 +635,7 @@ FilterCard.prototype.classifyByEffect = function(d) {
     var afexac = Object.keys(d.afexaclevels).join(" ");
 
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + 'recfilter_' + d.recfilter +  afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 
@@ -640,7 +679,7 @@ FilterCard.prototype.classifyByZygosity = function(d) {
     var afexac = Object.keys(d.afexaclevels).join(" ");
 
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + 'recfilter_' + d.recfilter +  afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
 
