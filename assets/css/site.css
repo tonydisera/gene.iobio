@@ -137,7 +137,8 @@ body {
 #versions {
   font-size: 10px;
   color: #848484;
-  padding-top: 5px; }
+  padding-top: 5px;
+  margin-bottom: 20px !important; }
   #versions div {
     margin-bottom: 0px !important;
     clear: both; }
