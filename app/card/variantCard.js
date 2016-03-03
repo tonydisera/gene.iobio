@@ -1276,14 +1276,36 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		me.cardSelector.find("#coverage-flag").removeClass("hide");
 		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 	}
+
+	// Iterate through the filters to see which badges to turn on in the variant card.
+	// First we need to gather all filters for the same field (for exampe, there might be
+	// a MODERATE and HIGH filter).  If any of the filters for the same
+	// field are turned on, we want to show the filter badge.
+	var annotStates = {};
 	for (key in filterObject.annotsToInclude) {
 		var annot = filterObject.annotsToInclude[key];
-		if (annot.state) {
-			me.cardSelector.find("#" + annot.key + "-flag").removeClass("hide");
+		var states = annotStates[annot.key];
+		if (states == null) {
+			states = {};
+		}
+		states[annot.state] = annot.state;
+		annotStates[annot.key] = states;
+	}
+	for (key in annotStates) {
+		var states = annotStates[key];
+		var filterOn = false;
+		for (state in states) {
+			if (state == "true") {
+				filterOn = true;
+			}
+		}
+		if (filterOn) {
+			me.cardSelector.find("#" + key + "-flag").removeClass("hide");
 			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		}  else {
-			me.cardSelector.find("#" + annot.key + "-flag").addClass("hide");
+			me.cardSelector.find("#" + key + "-flag").addClass("hide");
 		}
+
 	}
 
 	return filteredData;
