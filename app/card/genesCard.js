@@ -13,6 +13,8 @@ GenesCard.prototype.extractLast = function( term ) {
 GenesCard.prototype.init = function() {
 	var me = this;
 
+	var hpoUrl = hpoServer + "hot/lookup";
+
 
 	 // don't navigate away from the field on tab when selecting an item
     $( "#phenolyzer-search-terms" )
@@ -24,7 +26,7 @@ GenesCard.prototype.init = function() {
       })
       .autocomplete({
         source: function( request, response ) {
-          $.getJSON( "http://nv-dev.iobio.io/hpo/hot/lookup", {
+          $.getJSON( hpoUrl, {
             term: me.extractLast( request.term )
           }, response );
         },

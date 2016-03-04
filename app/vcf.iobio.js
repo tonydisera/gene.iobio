@@ -97,14 +97,11 @@ vcfiobio = function module() {
   var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
   var snpEffServer           = "wss://services.iobio.io/snpeff";
   var snpSiftServer          = "wss://services.iobio.io/snpsift";
-//  var vtServer               = "wss://services.iobio.io/vt";
-  var vtServer               = "ws://nv-dev.iobio.io/vt/";
+  var vtServer               = "wss://services.iobio.io/vt";
   
   var clinvarServer          = "wss://services.iobio.io/clinvar";
   var afServer               = "wss://services.iobio.io/af";
   var vepServer              = "wss://services.iobio.io/vep/";
-  //var vepServer              = "ws://nv-dev.iobio.io/vep/";
-  var vepServer              = "ws://nv-green.iobio.io/vep/";
   var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
 
 
