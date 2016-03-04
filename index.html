@@ -137,9 +137,25 @@
 
 </div>
 
+<!-- Disclaimer dialog -->
+<div class="modal fade" id="disclaimer-modal" tabindex="-1" role="dialog">
+  <div id="disclaimer-modal-content" class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="padding-top:10px;">
+        <h4>Disclaimer</h4>
+      </div>
+      <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
+     
+                The University of Utah makes no claims that iobio applications, including gene.iobio are approved for clinical use. All users of iobio applications including gene.iobio understand and accept that any information gained by using these applications, whether the information comes from visualization, processing, internal or external databases, or analysis, may not in any way be used for clinical purposes. The University of Utah makes no representation that iobio or gene.iobio is either safe or effective for any intended use for which research may currently be performed.
 
- 
-
+                iobio, or any iobio applications ARE TO BE USED FOR RESEARCH PURPOSES ONLY. USE FOR CLINICAL PURPOSES IS EXPRESSLY FORBIDDEN. Approval of iobio applications for clinical use has neither been applied for, nor received, in any country, including the United States of America.
+      </div>
+      <div class="modal-footer" style="clear-both">
+          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Data Modal -->
 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel">
@@ -241,9 +257,12 @@
     <div id="nav-section" class="shadow-z-2">
 
     	<section id="app-title-section">
-    	     <a id='home' href="/">
-            <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
-           </a>
+           <div style="float:left">
+      	      <a id='home' href="/">
+                <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
+              </a>
+              <a href="javascript:void(0)" id="app-disclaimer-link" onclick="$('#disclaimer-modal').modal('show')">Disclaimer</a>
+           </div>
 
           <!-- iobio project link -->
           <a href="http://iobio.io" class="iobioproject">           

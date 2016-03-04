@@ -130,6 +130,12 @@ html {
 body {
   margin-bottom: 70px; }
 
+#app-disclaimer-link {
+  font-size: 10px;
+  color: #717171 !important;
+  display: block;
+  text-align: left; }
+
 #app-disclaimer {
   font-size: 10px;
   color: #848484; }
@@ -475,7 +481,7 @@ section {
 #app-title-section {
   text-align: center;
   background: white;
-  padding-bottom: 7px !important; }
+  padding-bottom: 8px !important; }
 
 .chart rect {
   fill: #316693; }
