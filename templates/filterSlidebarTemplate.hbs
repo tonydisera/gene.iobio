@@ -1,6 +1,11 @@
-<div id="filter-track">
+<div id="filter-track" style="padding-top:5px;">
  <div class="card-label">Filter Variants</div>
- <div class="panel-group" id="accordion" style="background-color:white;" role="tablist" 
+
+ <a id="clear-filters-link" onclick="filterCard.clearFilters();filterVariants()">
+    Clear filters
+  </a>
+
+ <div class="panel-group" style="clear:both;" id="accordion" style="" role="tablist" 
 aria-multiselectable="true">
 
   <!-- VCF Record Filters -->
@@ -53,19 +58,19 @@ aria-multiselectable="true">
               </div>
 
               <div style="text-align:left;">
-                <svg id="HIGH" class="impact" width="77" height="12" transform="translate(0,0)">
+                <svg id="HIGH" class="impact" width="77" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">High</text>
                   <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
-                <svg id="MODERATE" class="impact" width="77" height="12" transform="translate(0,0)">
+                <svg id="MODERATE" class="impact" width="77" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">Moderate</text>
                   <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
-                <svg id="MODIFIER" class="impact" width="77" height="12" transform="translate(0,0)">
+                <svg id="MODIFIER" class="impact" width="77" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">Modifier</text>
                   <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
-                <svg id="LOW" class="impact" width="77" height="12" transform="translate(0,0)">
+                <svg id="LOW" class="impact" width="77" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">Low</text>
                   <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
@@ -286,30 +291,12 @@ aria-multiselectable="true">
 
         <!-- zygosity -->
         <div style="text-align:left;display:table-cell;padding-right: 0px;">
-              <div style="margin-bottom: 1px;">
-                
-              </div>
-              <svg id="het" class="zygosity nocolor" width="70" height="12" transform="translate(0,0)" >
-                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">Heterozygous</text>       
-                 <rect class="filter-symbol zyg_het" rx="1" ry="1" x="1"  width="5" y="0" height="5" 
-                 </rect>
-              </svg>
-        </div>
-        <div style="text-align:left;display:table-cell;padding-right: 0px;">
 
-              <svg id="hom" class="zygosity nocolor" width="70" height="12" transform="translate(0,0)">
-                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">Homozygous</text>       
-                 <rect class="filter-symbol zyg_hom" rx="1" ry="1" x="1" width="5" y="0" height="5"></rect>
-              </svg>
-        </div>
-        <div style="text-align:left;display:table-cell">
+          <div class="tooltip-zygosity nocolor filter-symbol zyg_hom hom zygosity " id="het">HOM</div>
+          <div class="tooltip-zygosity nocolor filter-symbol zyg_het het zygosity " id="hom">HET</div>
 
-              <svg id="gt_unknown" class="zygosity" width="50" height="12" transform="translate(0,0)">
-                <text class="name" x="11" y="6" style="fill-opacity: 1;font-size: 9px;">unknown</text>       
-                 <rect class="filter-symbol gt_unknown nocolor" rx="1" ry="1" x="1"  width="5" y="0" height="5" 
-                 </rect>
-              </svg>
         </div>
+
       </div>
     </div>
   </div>
@@ -339,6 +326,53 @@ aria-multiselectable="true">
           </a>
         </div>
 
+
+      </div>
+    </div>
+  </div>
+
+
+
+ <!-- Type -->
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading6">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse"  href="#collapse6" aria-expanded="true" aria-controls="collapse6">
+          Type
+        </a>
+      </h4>
+    </div>
+    <div id="collapse6" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading6">
+      <div class="panel-body" style="display:table;">
+
+
+        <!-- type -->
+        <div style="text-align:left;display:table-cell;width:70px;">
+          <svg id="snp" class="type" width="70" height="15" transform="translate(0,0)">
+            <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">SNP</text>
+            <rect class="filter-symbol snp" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+          </svg>
+          <svg id="ins" class="type" width="70" height="15" transform="translate(0,0)">
+            <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;"> Insertion</text>
+            <circle class="filter-symbol ins" cx="3.5" cy="5" r="4.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+          </svg>
+        </div>
+
+        <div style="text-align:left;display:table-cell;width:70px;">
+
+          <svg id="del" class="type" width="70" height="15" transform="translate(0,0)">
+            <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;">Deletion</text>       
+            <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+          </svg>
+
+          <svg id="complex" class="type" width="54" height="15" transform="translate(0,0)">
+            <g transform="translate(1,0)">
+              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Complex</text>       
+              <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
+              </path>
+            </g>
+          </svg>
+        </div>
 
       </div>
     </div>
@@ -435,23 +469,23 @@ aria-multiselectable="true">
         <div style="text-align:left;display:table;margin-top:-3px;">
 
           <!-- PolyPhen -->     
-          <div style="display:table-cell;width:98px;">
+          <div style="display:table-cell;width:92px;">
 
-              <svg id="polyphen_probably_damaging" class="polyphen " width="98" height="15" transform="translate(0,0)">
+              <svg id="polyphen_probably_damaging" class="polyphen " width="92" height="15" transform="translate(0,0)">
                 <g class="polyphen_probably_damaging" transform="translate(0,0)" style="opacity: 1;">
                   <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#biohazard-symbol" width="12" height="12" style="fill: #ad494A"></use>
                 </g>
                 <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Probably damaging</text>
               </svg>
    
-              <svg id="polyphen_possibly_damaging" class="polyphen " width="96" height="15" transform="translate(0,0)">
+              <svg id="polyphen_possibly_damaging" class="polyphen " width="92" height="15" transform="translate(0,0)">
                 <g class="polyphen_possibly_damaging" transform="translate(0,0)" style="opacity: 1;">
                   <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#biohazard-symbol" width="12" height="12" style="fill: #FB7737"></use>
                 </g>
                 <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Possibly damaging</text>
               </svg>
 
-              <svg id="polyphen_benign" class="polyphen " width="93" height="15" transform="translate(0,0)">
+              <svg id="polyphen_benign" class="polyphen " width="92" height="15" transform="translate(0,0)">
                 <g class="polyphen_benign" transform="translate(0,0)" style="opacity: 1;">
                   <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#biohazard-symbol" width="12" height="12" style="fill: rgba(181, 207, 107,1)"></use>
                 </g>
@@ -502,53 +536,6 @@ aria-multiselectable="true">
   </div>
 
 
- <!-- Type -->
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="heading6">
-      <h4 class="panel-title">
-        <a role="button" data-toggle="collapse"  href="#collapse6" aria-expanded="true" aria-controls="collapse6">
-          Type
-        </a>
-      </h4>
-    </div>
-    <div id="collapse6" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading6">
-      <div class="panel-body" style="display:table;">
-
-
-        <!-- type -->
-        <div style="text-align:left;display:table-cell;width:70px;">
-          <svg id="snp" class="type" width="70" height="13" transform="translate(0,0)">
-            <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">SNP</text>
-            <rect class="filter-symbol snp" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
-          </svg>
-          <svg id="ins" class="type" width="70" height="13" transform="translate(0,0)">
-            <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;"> Insertion</text>
-            <circle class="filter-symbol ins" cx="3.5" cy="5" r="4.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
-          </svg>
-        </div>
-
-        <div style="text-align:left;display:table-cell;width:70px;">
-
-          <svg id="del" class="type" width="70" height="13" transform="translate(0,0)">
-            <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;">Deletion</text>       
-            <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
-          </svg>
-
-          <svg id="complex" class="type" width="54" height="13" transform="translate(0,0)">
-            <g transform="translate(1,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Complex</text>       
-              <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
-              </path>
-            </g>
-          </svg>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-
-
  <!-- Regulatory -->
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="heading8">
@@ -575,9 +562,6 @@ aria-multiselectable="true">
               <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">TF binding site</text>
               <rect class="filter-symbol  reg_tf_binding_site" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
-          </div>
-          <div style="text-align:left;display:table-cell;width:78px;">
-
             <svg id="reg_ctcf_binding_site" class="regulatory nocolor" width="78" height="15" transform="translate(0,0)">
               <text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">CTCF binding site</text>
               <rect class="filter-symbol  reg_ctcf_binding_site" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
@@ -586,6 +570,7 @@ aria-multiselectable="true">
               <text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">TF Motif feature</text>
               <rect class="filter-symbol  mot_tf_binding_site_variant" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
+          
 
         </div>
 

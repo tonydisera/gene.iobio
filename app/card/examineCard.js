@@ -119,7 +119,7 @@ ExamineCard.prototype.showVariant = function(variant, isRefresh) {
 
 
 	var selection = d3.select("#examine-card #coverage-svg");
-	getProbandVariantCard().createAlleleCountSVGTrio(selection, variant, 95);
+	getProbandVariantCard().createAlleleCountSVGTrio(selection, variant, 90);
 
 	// keep track of the variant that is current being examined
 	this.examinedVariant = variant;

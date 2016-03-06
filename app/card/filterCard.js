@@ -88,7 +88,7 @@ FilterCard.prototype.init = function() {
 	});
 
 
-	$('#select-annotation-scheme').chosen({width: "70px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	$('#select-annotation-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 	$('#select-af-scheme').chosen({width: "115px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 
@@ -495,7 +495,7 @@ FilterCard.prototype.displayEffectFilters = function() {
 
 		if (count > 0) {
 
-			var svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="120" height="12" transform="translate(0,0)">' +
+			var svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
                           '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
         				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';

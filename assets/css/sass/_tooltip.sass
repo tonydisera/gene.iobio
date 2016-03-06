@@ -271,7 +271,7 @@ text
 
 #examine-card
   font-size: 10px
-  color: $tooltip-text-color
+  color: $sidebar-text-color
  
 
   .tooltip-title
@@ -281,13 +281,13 @@ text
   .tooltip-header
     overflow-wrap: break-word
     text-align: right
-    width: 80px
+    width: 50px
     display: inline-block !important
     float: none
-    color: $tooltip-label-color
+    color: $sidebar-label-color
 
   .tooltip-row
-    width: 220px
+    width: 190px
     clear: both
     margin-bottom: 3px
 
@@ -298,24 +298,48 @@ text
     margin-right: 5px
     display: inline-block !important
     float: none
+    color: $sidebar-text-color
     
 
   .tooltip-footer #unpin
     display: none !important
 
+  .tooltip-subtitle
+    color: $sidebar-text-color
 
- 
+  .tooltip-header-small
+    color: $sidebar-text-color
+
+  .tooltip-section-header
+    fill: $sidebar-text-color !important
+
+
+  .tooltip-allele-count-bar
+    text
+      fill:  $sidebar-text-color
+
+  text   
+    &.alt-count-under
+      fill: $sidebar-text-color !important  
+
+    &.other-count-under
+      fill: $sidebar-text-color !important 
+      font-style: italic !important  
+
+    &.ref-count
+      fill: $sidebar-text-color  !important     
+
 #examine-card a
-  color: $link-color !important
+  color: $sidebar-link-color !important
   font-size: 11px !important
 
 
   &:hover, &:focus
-    color: $link-color !important
+    color: $sidebar-link-color !important
     font-size: 11px !important
     
 
-  color: $link-color !important
+  color: $sidebar-link-color !important
   font-size: 11px !important
 
    

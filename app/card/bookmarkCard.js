@@ -459,11 +459,10 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	 		 .append("span")
 	         .attr("class", "variant-label");
 
-	 container.selectAll(".bookmark-box")
+	 container.selectAll(".bookmark")
 	 		 .append("span")
 	         .attr("class", "favorite-indicator")
-	         .style("float", "right")
-	         .style("padding-top", "4px");
+	         .style("float", "right");
 	        
 	container.selectAll(".bookmark span.variant-label")
 	         .text(function(entry,i) {	
@@ -597,8 +596,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 					var fill = isFavorite ? "gold" : "none";
 					return fill;
 			   })
-			   .style("pointer-events", "none")
-			   .style("stroke", "rgb(132,132,132");
+			   .style("pointer-events", "none");
 		
 			// remove button
 			var removeIcon = selection.append("i")

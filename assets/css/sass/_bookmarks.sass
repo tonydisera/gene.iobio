@@ -4,8 +4,7 @@
     word-break: break-all
 
     &.current
-      font-weight: bold
-      background-color: #eee
+      font-weight: bold     
       line-height: 12px
       padding-bottom: 2px
       padding-top: 2px !important
@@ -14,23 +13,27 @@
       margin-right: 5px
       border: none !important
 
+    #import-help-icon
+      color: $sidebar-link-color !important
+      margin-left: 2px
+
   .bookmark
     font-size: 10px
     cursor: pointer
     display: inline-block
     float: left
-    width: 160px
+    width: 100%
     text-align: left
     padding-top: 4px
-    margin-left: 10px
+    margin-left: 0px
 
   div
     &.bookmark-box
       clear: both
 
     &.bookmark-gene
-      margin-bottom: 5px
       clear: both
+      padding-top: 20px
 
   a.bookmark-gene
     font-size: 11px
@@ -39,6 +42,12 @@
     text-align: left
     padding-top: 4px
     margin-bottom: -5px
+
+  .phenotype-symbol
+    stroke: $sidebar-text-color
+
+  #favorite-badge
+    stroke: $sidebar-text-color
 
   .favorite-indicator
     cursor: pointer

@@ -5,7 +5,8 @@
 var geneiobio_server   = "http://nv-dev.iobio.io/geneinfo/";
 //var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
 var phenolyzerServer   = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
-var geneToPhenoServer  = "http://nv-dev.iobio.io/genetopheno/";
+//var geneToPhenoServer  = "http://nv-dev.iobio.io/genetopheno/";
+var geneToPhenoServer  = "http://nv-green.iobio.io/gene2pheno";
 var hpoServer          = "http://nv-dev.iobio.io/hpo/";
 
 
@@ -489,7 +490,8 @@ function showSlideLeft() {
 	$('#slider-left').removeClass("hide");
 	$('.footer').addClass("hide");
 	$('#close-slide-left').removeClass("hide");
-
+	$('.sidebar-button').removeClass("closed");
+	$('#slider-icon-bar').removeClass("closed");
 
 	resizeCardWidths();
 
@@ -531,15 +533,17 @@ function resizeCardWidths() {
 }
 
 function closeSlideLeft() {
-	$('#nav-section').css("left", "36px");
+	$('#nav-section').css("left", "32px");
 	$('.footer').removeClass("hide");
 	$('.slide-button').removeClass("hide");
 	$('#close-slide-left').addClass("hide");
 	$('#slider-left').addClass("hide");
+	$('#slider-icon-bar').addClass("closed");
 
 	$('#slide-buttons').removeClass('slide-left');
 	$('#container').removeClass('slide-left');
 	$('.sidebar-button.selected').removeClass("selected");
+	$('.sidebar-button').addClass("closed");
 
 
 	resizeCardWidths();

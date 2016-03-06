@@ -5,17 +5,15 @@
 
     &.selected
       fill: rgb(137, 167, 191)
-      stroke: grey
-
-    &.hover
+      stroke: grey d
 
   text
     &.name
-      fill: $text-color !important
+      fill: $sidebar-text-color !important
       font-size: 12px
 
     &.score
-      fill: $text-color !important
+      fill: $sidebar-text-color !important
       font-size: 11px
 
 
@@ -26,7 +24,7 @@
   transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1)
 
 #copy-paste-li, #phenolyzer-search-box
-  color: $text-color !important
+  color: $sidebar-text-color !important
   font-size: 11px
 
 #get-genes-copy-paste-button, #phenolyzer-go-button
@@ -76,7 +74,7 @@
       display: inline
 
     #gene-badge-name
-      color: $app-color !important
+      color: $sidebar-text-color !important
 
   &:hover #gene-badge-remove
     visibility: visible !important
@@ -105,7 +103,7 @@
   -webkit-justify-content: center
 
   #manage-gene-list
-    color:  $text-color !important
+    color:  $sidebar-text-color !important
 
     &:hover
       text-decoration: underline !important

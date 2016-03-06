@@ -1634,8 +1634,8 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 	var svg = container.append("div")		
 		           	   .style("padding-top", "5px")
 				       .append("svg")
-				       .attr("width", 260)
-	           		   .attr("height", "15");
+				       .attr("width", 190)
+	           		   .attr("height", "20");
 	svg.append("text")
 		   .attr("x", "0")
 		   .attr("y", "14")
@@ -1665,7 +1665,7 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 		   .attr("anchor", "start")
 		   .text("ref");	
 	g.append("text")
-		   .attr("x", "94")
+		   .attr("x", "90")
 		   .attr("y", "14")
 		   .attr("class", "ref-count")
 		   .attr("anchor", "start")
@@ -1674,20 +1674,20 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 	g.append("rect")
 	   .attr("x", "1")
 	   .attr("y", "10")
-	   .attr("height", 3)
-	   .attr("width",30)
+	   .attr("height", 4)
+	   .attr("width",28)
 	   .attr("class", "alt-count");
 	g.append("rect")
-	   .attr("x", "31")
+	   .attr("x", "29")
 	   .attr("y", "10")
-	   .attr("height", 3)
-	   .attr("width",30)
+	   .attr("height", 4)
+	   .attr("width",28)
 	   .attr("class", "other-count");
 	g.append("rect")
-	   .attr("x", "61")
+	   .attr("x", "57")
 	   .attr("y", "10")
-	   .attr("height", 3)
-	   .attr("width",30)
+	   .attr("height", 4)
+	   .attr("width",28)
 	   .attr("class", "ref-count");
 
 }
