@@ -1840,7 +1840,9 @@ text.ref-count {
   color: #E0292B !important;
   font-weight: bold;
   font-size: 13px;
-  display: none; }
+  display: none;
+  float: right;
+  padding-top: 3px; }
 #bookmark-panel.editmode i#remove-bookmark {
   display: inline; }
 
