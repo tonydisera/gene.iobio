@@ -47,6 +47,12 @@ function MatrixCard() {
                         recessive: {value: 2, badge: true, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
                         none:      {value: 3, badge: false, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
                      };
+	this.zygosityMap = {  
+		                HOM:        {value: 1, badge: true,  clazz: 'zyg_hom',        symbolFunction: this.showHomSymbol},  
+                        HET:        {value: 2, badge: false, clazz: 'het'        },
+                        HOMREF:     {value: 3, badge: false, clazz: 'homref'     },
+                        GT_UNKNOWN: {value: 4, badge: false, clazz: 'gt_unknown' }
+                     };
 	this.bookmarkMap = {  
 		                Y: {value: 1, badge: true,  clazz: 'bookmark',  symbolFunction: this.showBookmarkSymbol},  
                         N: {value: 2, badge: false, clazz: '',          symbolFunction: this.showBookmarkSymbol}
@@ -88,16 +94,17 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Bookmark'                     ,order:3, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Impact - SnpEff'              ,order:4, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Unaffected Siblings'          ,order:7, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
-		{name:'Affected Siblings'            ,order:6, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Allele Frequency - 1000G'     ,order:8, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Pathogenecity - SIFT'         ,order:2, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'    ,order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap}
+		{name:'Impact - SnpEff'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Zygosity'                     ,order:1, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Pathogenicity - ClinVar'      ,order:2, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Pathogenecity - SIFT'         ,order:3, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Pathogengicity - PolyPhen'    ,order:4, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Bookmark'                     ,order:5, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
+		{name:'Inheritance Mode'             ,order:6, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Affected Siblings'            ,order:7, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
+		{name:'Unaffected Siblings'          ,order:8, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
+		{name:'Allele Frequency - 1000G'     ,order:9, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:10, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap}
 	];
 
 
@@ -904,6 +911,26 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 	         		return "14";
 	         	}
 	         });
+};
+
+MatrixCard.prototype.showHomSymbol = function (selection, options) {
+
+	var g = selection.append("g")
+	         .attr("transform", "translate(1,4)");
+
+	        g.append("rect")
+	         .attr("width", 15)
+	         .attr("height", 10)
+	         .attr("class", "zyg_hom " + selection.datum().clazz)
+	         .style("pointer-events", "none");
+
+	        g.append("text")
+	         .attr("x", 0)
+	         .attr("y", 7)
+	         .style("fill", "white")
+	         .style("font-weight", "bold")
+	         .style("font-size", "6.5px")
+	         .text("Hom");		
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {

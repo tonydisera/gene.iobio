@@ -347,7 +347,7 @@ a
     font-weight: bold
 
   .col.active rect.cellbox
-    fill: rgb(242, 242, 242)
+    fill: transparent
 
   rect.colbox
     fill: none
@@ -355,15 +355,15 @@ a
     pointer-events: none
 
     &.current
-      stroke: rgb(145, 145, 145) !important
-      stroke-width: 2px !important
+      stroke: $current-frame-color !important
+      stroke-width: 1.5px !important
       opacity: 1
       pointer-events: none
 
   .col.active
 
     rect.colbox   
-      stroke: $current-color
+      stroke: $current-frame-color
       stroke-width: 1px
       opacity: 1
 
@@ -592,8 +592,6 @@ section
 #view-finder-track
   align-items: center
 
-#view-finder-chart
-
 #region-chart .axis text
   font-size: 15px
   fill: rgb(120, 120, 120)
@@ -667,7 +665,7 @@ section
   font-size: 13px
 
 #coordinate-frame 
-  border: $current-color solid 1px
+  border: $current-frame-color solid 1px
   width: 19px
   position: absolute
   pointer-events: none

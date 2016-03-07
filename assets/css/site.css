@@ -299,18 +299,18 @@ a {
   cursor: pointer;
   font-weight: bold; }
 #feature-matrix .col.active rect.cellbox {
-  fill: #f2f2f2; }
+  fill: transparent; }
 #feature-matrix rect.colbox {
   fill: none;
   opacity: 0;
   pointer-events: none; }
   #feature-matrix rect.colbox.current {
-    stroke: #919191 !important;
-    stroke-width: 2px !important;
+    stroke: #969696 !important;
+    stroke-width: 1.5px !important;
     opacity: 1;
     pointer-events: none; }
 #feature-matrix .col.active rect.colbox {
-  stroke: #3586c0;
+  stroke: #969696;
   stroke-width: 1px;
   opacity: 1; }
 #feature-matrix text {
@@ -592,7 +592,7 @@ section {
   font-size: 13px; }
 
 #coordinate-frame {
-  border: #3586c0 solid 1px;
+  border: #969696 solid 1px;
   width: 19px;
   position: absolute;
   pointer-events: none;
@@ -1323,10 +1323,7 @@ header {
   fill: #458b00; }
 
 .zyg_hom {
-  fill: #eabd20; }
-
-.zyg_het {
-  fill: rgba(239, 201, 73, 0.4); }
+  fill: rgba(165, 48, 48, 0.79); }
 
 .impact, .effect, .vepConsequence, .type, .zygosity, .recfilter {
   border: solid 2px white;
@@ -1714,7 +1711,8 @@ text.ref-count {
 
 #examine-card {
   font-size: 10px;
-  color: #717171; }
+  color: #717171;
+  padding-top: 10px; }
   #examine-card .tooltip-title {
     font-size: 11px; }
   #examine-card .tooltip-header {
