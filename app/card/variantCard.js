@@ -1940,7 +1940,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	} 
 	var clinSigDisplay = "";
 	for (var key in variant.clinVarClinicalSignificance) {
-		if (key != 'none') {
+		if (key != 'none' && key != 'undefined') {
 			if (clinSigDisplay.length > 0) {
 			  	clinSigDisplay += ", ";
 			}
@@ -1949,7 +1949,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	}
 	var phenotypeDisplay = "";
 	for (var key in variant.clinVarPhenotype) {
-		if (key != 'not_specified') {
+		if (key != 'not_specified'  && key != 'undefined') {
 			if (phenotypeDisplay.length > 0) {
 			  	phenotypeDisplay += ", ";
 			}
@@ -2096,7 +2096,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	var clinvarPhenotypeRow = '';
 	if (phenotypeDisplay != '') {
-		clinvarPhenotypeRow = me._tooltipHeaderLeftJustifyRow('ClinVar - ' + phenotypeDisplay);
+		clinvarPhenotypeRow = me._tooltipHeaderLeftJustifySimpleRow('ClinVar - ' + phenotypeDisplay);
 	}
 			
 	var dbSnpId = getRsId(variant);	
@@ -2210,6 +2210,12 @@ VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value
 VariantCard.prototype._tooltipHeaderLeftJustifyRow = function(value1, value2, value3, value4) {
 	return '<div class="row">'
 	      + '<div class="col-md-12 tooltip-title" style="text-align:left">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '</div>';	
+}
+
+VariantCard.prototype._tooltipHeaderLeftJustifySimpleRow = function(value1) {
+	return '<div class="row">'
+	      + '<div class="col-md-12 tooltip-title" style="text-align:left">' + value1 + '</div>'
 	      + '</div>';	
 }
 
