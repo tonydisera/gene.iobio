@@ -851,7 +851,8 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		}
 				    	}
 				    	if (theGeneObject) {
-				    		_pruneIntronVariants(data);
+				    		me._pruneIntronVariants(data);
+				    		me._pruneHomRefVariants(theVcfData);
 	
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
@@ -1128,6 +1129,19 @@ VariantModel.prototype._pruneIntronVariants = function(data) {
 	}	
 }
 
+VariantModel.prototype._pruneHomRefVariants = function(data) {
+	if (this.relationship == 'proband') {
+		data.features = data.features.filter(function(d) {
+			// Filter homozygous reference for proband only
+			var meetsZygosity = true;
+			if (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') {
+				meetsZygosity = false;
+			}
+			return meetsZygosity;
+		});
+	}
+}
+
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end, strand, transcript, onVcfData) {
 	var me = this;
 
@@ -1166,9 +1180,11 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 	    	var theVcfData = data[1];
 
 		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-		    				    		// If we have more than 500 variants, exclude intron variants
-
+		    	// If we have more than 500 variants, exclude intron variants d
 				me._pruneIntronVariants(theVcfData);
+
+				// Get rid of any homozygous reference from proband
+				me._pruneHomRefVariants(theVcfData);
 					
 
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
