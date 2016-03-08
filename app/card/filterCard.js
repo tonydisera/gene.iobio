@@ -10,7 +10,29 @@ function FilterCard() {
 
 }
 
+FilterCard.prototype.autoSetFilters = function() {
+	this.displayRecFilters();
+	this.initFilterListeners();
+	// If filter status has unique values of PASS + another status (e.g '.' or 'FAIL'),
+	// automatically filter variants to only include those with status PASS.
+	var statusCount = 0;
+	var passStatus = false;
+	for ( key in this.recFilters) {
+		if (key == 'PASS') {
+			passStatus = true;
+		}
+		statusCount++;	
+	}
+	if (passStatus && statusCount > 1) {
+		this.annotsToInclude.PASS = {key: "recfilter", state: true, value: "PASS"};		
+		d3.select("svg#PASS").classed("current", true);
+	} 
+
+}
+
 FilterCard.prototype.getFilterObject = function() {
+
+
 	var afMin = $('#af-amount-start').val() != '' ? +$('#af-amount-start').val() / 100 : null;
 	var afMax = $('#af-amount-end').val()   != '' ? +$('#af-amount-end').val()   / 100 : null;
 
@@ -455,7 +477,6 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	});
 
 	this.displayEffectFilters();
-	this.displayRecFilters();
 	this.initFilterListeners();
 	d3.selectAll(".afexaclevels").each( function(d,i) {
 		var afexaclevel = d3.select(this).attr("id");
@@ -512,23 +533,12 @@ FilterCard.prototype.displayRecFilters = function() {
 	var recFilterKeys = Object.keys(this.recFilters).sort();
 	
 	recFilterKeys.forEach(function(key) {
-		var count = d3.selectAll('#vcf-track .variant')
-		              .filter( function(d,i) {
-		              	var match = false; 
-		              	if (d.recfilter == key) {
-		              		match = true;
-		              	}
-		              	return match;
-		              })[0].length;
-
-		if (count > 0) {
-			recFilterCount++;
-			var label = key == "." ? ". (unassigned)" : key;			
-			var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="12" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
-      					  '</svg>';
-      		$('#rec-filter-box').append(svgElem);
-      	}
+		recFilterCount++;
+		var label = key == "." ? ". (unassigned)" : key;			
+		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="12" transform="translate(0,0)">' +
+                      '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
+  					  '</svg>';
+  		$('#rec-filter-box').append(svgElem);
 	});
 	if (recFilterCount > 0) {
 		$('#rec-filter-panel').removeClass("hide");

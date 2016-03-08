@@ -797,7 +797,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
 			}	
-
+			filterCard.autoSetFilters();
 			var filteredVcfData = this.filterVariants(theVcfData);
 			me._fillVariantChart(filteredVcfData, 
 	  							 regionStart ? regionStart : window.gene.start, 
@@ -871,6 +871,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 									 onVcfData,
 									 onVariantsDisplayed);	
 					filterCard.enableVariantFilters(true);
+
+					filterCard.autoSetFilters();
 						
 				}
 				if (onVcfData) {
