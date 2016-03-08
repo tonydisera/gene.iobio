@@ -88,16 +88,16 @@ function featureMatrixD3() {
 
       svg.enter()
         .append("svg")
-        .attr("width", parseInt(width+margin.right))
+        .attr("width", parseInt(width))
         .attr("height", heightPercent)
-        .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height))
+        .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height))
         .attr("preserveAspectRatio", "none");
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
          .attr("width", parseInt(width+margin.right))
-         .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height));
+         .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
 
 
 
