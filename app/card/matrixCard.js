@@ -8,11 +8,11 @@ function MatrixCard() {
 	this.clinvarMap     = {  
 						'pathogenic'            : {value: 1,   badge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
                         'likely_pathogenic'     : {value: 2,   badge: true, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
-                        'uncertain_significance': {value: 3,   badge: true, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
-                        'benign'                : {value: 100, badge: false, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
-                        'likely_benign'         : {value: 101, badge: false, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
+                        'uncertain_significance': {value: 101, badge: false, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
+                        'benign'                : {value: 102, badge: false, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
+                        'likely_benign'         : {value: 103, badge: false, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'conflicting_data_from_submitters': {value: 121, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  {value: 121, badge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
+						'conflicting_interpretations_of_pathogenicity':  {value: 121, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
                         'drug_response'         : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'confers_sensivity'     : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'risk_factor'           : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
@@ -94,11 +94,11 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Impact - SnpEff'              ,order:0, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Zygosity'                     ,order:1, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
-		{name:'Pathogenicity - ClinVar'      ,order:2, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Pathogenecity - SIFT'         ,order:3, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'    ,order:4, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Zygosity'                     ,order:4, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Pathogengicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
 		{name:'Bookmark'                     ,order:5, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Inheritance Mode'             ,order:6, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
 		{name:'Affected Siblings'            ,order:7, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
@@ -530,10 +530,14 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 							}
 						}
 					} else {
-						mappedValue = matrixRow.map[rawValue].value;
-						mappedClazz = matrixRow.map[rawValue].clazz;
-						symbolFunction = matrixRow.map[rawValue].symbolFunction;
-						theValue = rawValue;
+						if (matrixRow.map.hasOwnProperty(rawValue)) {
+							mappedValue = matrixRow.map[rawValue].value;
+							mappedClazz = matrixRow.map[rawValue].clazz;
+							symbolFunction = matrixRow.map[rawValue].symbolFunction;
+							theValue = rawValue;							
+						} else {
+							console.log("No matrix value to map to " + rawValue + " for " + matrixRow.attribute);
+						}
 
 					}
 				} else if (matrixRow.match == 'range') {
