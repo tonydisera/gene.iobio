@@ -1,13 +1,12 @@
 //
 // Global Variables
 //
-//var geneiobio_server = "http://geneinfo.iobio.io/";
-var geneiobio_server   = "http://nv-dev.iobio.io/geneinfo/";
-//var phenolyzerServer = "https://services.iobio.io/phenolyzer/"
+var global_iobio_services = "http://nv-green.iobio.io/";
+
+var geneiobio_server   = global_iobio_services + "geneinfo/";
+var geneToPhenoServer  = global_iobio_services + "gene2pheno";
+var hpoServer          = global_iobio_services + "hpo/";
 var phenolyzerServer   = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
-//var geneToPhenoServer  = "http://nv-dev.iobio.io/genetopheno/";
-var geneToPhenoServer  = "http://nv-green.iobio.io/gene2pheno";
-var hpoServer          = "http://nv-dev.iobio.io/hpo/";
 
 
 // Engine for gene search suggestions

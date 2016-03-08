@@ -65,44 +65,20 @@ vcfiobio = function module() {
   var SOURCE_TYPE_FILE = "file";
   var sourceType = "url";
 
-  //var vcfstatsAliveServer    = "ws://localhost:7070";
-  //var tabixServer            = "ws://localhost:7090";
-  //var vcfReadDeptherServer   = "ws://localhost:7062";
-  var emailServer            = "ws://localhost:7068";
-  var catInputServer         = "ws://localhost:7063";
-  //var snpEffServer           = "ws://localhost:8040";  
-  //var annotServer            = "ws://localhost:7077";
-  //var vepServer              = "ws://localhost:7078";
-
-/*
-  var vcfstatsAliveServer    = "wss://vcfstatsalive.iobio.io";
-  var tabixServer            = "wss://tabix.iobio.io";
-  var vcfReadDeptherServer   = "wss://vcfdepther.iobio.io";
-  var snpEffServer           = "wss://snpeff.iobio.io";
-  var snpSiftServer          = "wss://snpsift.iobio.io";
-  var vtServer               = "wss://vt.iobio.io";
-  var clinvarServer          = "wss://clinvar.iobio.io";
-  var afServer               = "wss://af.iobio.io";
-  var contigAppenderServer   = "wss://ctgapndr.iobio.io";
-*/
-
-
-
-  //var contigAppenderServer   = "ws://ctgapndr.iobio.io";
-  
   var clinvarIterCount       = 0;
 
-  var vcfstatsAliveServer    = "wss://services.iobio.io/vcfstatsalive";
-  var tabixServer            = "wss://services.iobio.io/tabix";
-  var vcfReadDeptherServer   = "wss://services.iobio.io/vcfdepther";
-  var snpEffServer           = "wss://services.iobio.io/snpeff";
-  var snpSiftServer          = "wss://services.iobio.io/snpsift";
-  var vtServer               = "wss://services.iobio.io/vt";
-  
-  var clinvarServer          = "wss://services.iobio.io/clinvar";
-  var afServer               = "wss://services.iobio.io/af";
-  var vepServer              = "wss://services.iobio.io/vep/";
-  var contigAppenderServer   = "wss://services.iobio.io/ctgapndr";
+  var iobio_services = "wss://nv-green.iobio.io/";
+
+  var vcfstatsAliveServer    = iobio_services + "vcfstatsalive";
+  var tabixServer            = iobio_services + "tabix";
+  var vcfReadDeptherServer   = iobio_services + "vcfdepther";
+  var snpEffServer           = iobio_services + "snpeff";
+  var snpSiftServer          = iobio_services + "snpsift";
+  var vtServer               = iobio_services + "vt/";
+  var clinvarServer          = iobio_services + "clinvar";
+  var afServer               = iobio_services + "af";
+  var vepServer              = iobio_services + "vep/";
+  var contigAppenderServer   = iobio_services + "ctgapndr";
 
 
   var vcfURL;

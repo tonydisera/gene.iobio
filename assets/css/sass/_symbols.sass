@@ -153,6 +153,9 @@
 .zyg_hom
   fill: rgba(165, 48, 48, .79)
 
+.zyg_het
+  fill: #D3D5D8
+
 .impact, .effect, .vepConsequence, .type, .zygosity, .recfilter
   border: solid 2px $sidebar-body-color
   padding: 1px
@@ -171,19 +174,20 @@
   cursor: pointer
   font-weight: bold
   fill: $current-color
-  border: solid 1.5px $text-color
+  border: solid 1.5px $current-frame-color
+  border-radius: 4px
 
 .impact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover
   font-weight: bold
   cursor: pointer
   border: solid 2.5px $current-color
-  border-radius: 2px
+  border-radius: 4px
   padding: 1px
 
 .current
   font-weight: bold
   border: solid 2.5px $current-color
-  border-radius: 2px
+  border-radius: 4px
   padding: 1px
 
 #impact-scheme, #effect-scheme, #regulatory-scheme, #zygosity-scheme
@@ -196,6 +200,9 @@
 
 #impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current
   color: $current-color !important
+
+  .material-icons
+    color: $current-color !important
 
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme, #uasibs-scheme
   padding-top: 2px
@@ -224,7 +231,7 @@
   color: $current-color
   fill: $current-color
   border: solid thin black
-  border-radius: 2px
+  border-radius: 4px
   padding: 1px
 
 #impact-scheme:hover, #effect-scheme:hover, #af1000g-scheme:hover, #afexac-scheme:hover

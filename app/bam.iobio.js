@@ -23,46 +23,21 @@ var Bam = Class.extend({
       }
       
       // set iobio servers
-      this.iobio = {}
+      this.iobio = {};
 
-      /*
-      this.iobio.coverage = "wss://coverage.iobio.io";
-      this.iobio.bamtools = "wss://bamtools.iobio.io";
-      this.iobio.samtools = "wss://samtools.iobio.io";
-      this.iobio.bamReadDepther = "wss://bamReadDepther.iobio.io";
-      this.iobio.bamMerger = "wss://bammerger.iobio.io";      
-      this.iobio.bamstatsAlive = "wss://bamstatsalive.iobio.io"
-      this.iobio.freebayes = "wss://freebayes.iobio.io";
-      this.iobio.bcftools = "wss://bcftools.iobio.io";
-      this.iobio.vcflib = "wss://vcflib.iobio.io";
-      this.iobio.vt = "wss://vt.iobio.io";
-*/
+      this.iobio.services = "wss://nv-green.iobio.io/";
 
+      this.iobio.coverage       = this.iobio.services + "coverage";
+      this.iobio.bamtools       = this.iobio.services + "bamtools";
+      this.iobio.samtools       = this.iobio.services + "samtools";
+      this.iobio.bamReadDepther = this.iobio.services + "bamReadDepther";
+      this.iobio.bamMerger      = this.iobio.services + "bammerger";      
+      this.iobio.bamstatsAlive  = this.iobio.services + "bamstatsalive"
+      this.iobio.freebayes      = this.iobio.services + "freebayes";
+      this.iobio.bcftools       = this.iobio.services + "bcftools";
+      this.iobio.vcflib         = this.iobio.services + "vcflib";
+      this.iobio.vt             = this.iobio.services + "vt";
 
-  
-      this.iobio.coverage = "ws:nv-dev.iobio.io/coverage/";
-      //this.iobio.coverage = "wss://services.iobio.io/coverage";
-      this.iobio.bamtools = "wss://nv-green.iobio.io/bamtools";
-      //this.iobio.bamtools = "wss://services.iobio.io/bamtools";
-      this.iobio.samtools = "wss://nv-green.iobio.io/samtools";
-      //this.iobio.samtools = "wss://services.iobio.io/samtools";
-      this.iobio.bamReadDepther = "wss://services.iobio.io/bamReadDepther";
-      this.iobio.bamMerger = "wss://services.iobio.io/bammerger";      
-      this.iobio.bamstatsAlive = "wss://services.iobio.io/bamstatsalive"
-      this.iobio.freebayes = "wss://services.iobio.io/freebayes";
-      this.iobio.bcftools = "wss://services.iobio.io/bcftools";
-      this.iobio.vcflib = "wss://services.iobio.io/vcflib";
-      this.iobio.vt = "wss://services.iobio.io/vt";
-
-
-      
-
-//      this.iobio.bamtools = "ws://localhost:8061";
-//      this.iobio.samtools = "ws://localhost:8060";
-//      this.iobio.coverage = "ws://localhost:8047"
-//      this.iobio.bamReadDepther = "ws://localhost:8021";
-//      this.iobio.bamMerger = "ws://localhost:8030";      
-//      this.iobio.bamstatsAlive = "ws://localhost:7100"
       return this;
    },
    

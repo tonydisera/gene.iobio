@@ -495,7 +495,7 @@ FilterCard.prototype.displayEffectFilters = function() {
 
 		if (count > 0) {
 
-			var svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
+			var svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="15" transform="translate(0,0)">' +
                           '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
         				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';
@@ -523,9 +523,8 @@ FilterCard.prototype.displayRecFilters = function() {
 
 		if (count > 0) {
 			recFilterCount++;
-			//var label = key == "." ? "(NOT PASSED)" : key;
-			label = key;
-			var svgElem = '<svg id="' + key + '" class="recfilter" width="120" height="12" transform="translate(0,0)">' +
+			var label = key == "." ? ". (unassigned)" : key;			
+			var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="12" transform="translate(0,0)">' +
                           '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
       					  '</svg>';
       		$('#rec-filter-box').append(svgElem);
