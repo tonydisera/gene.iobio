@@ -793,16 +793,17 @@ function initTranscriptControls() {
 		transcriptCardSelector.find('#gene-name').css("margin-left", "0");
 		transcriptCardSelector.find('#gene-name').css("margin-right", "0");
 		transcriptCardSelector.css("margin-top", "0");
-		var windowWidth = $(window).width();
-		//if (windowWidth <= 800) {
-		//	transcriptCardSelector.find('#region-track').css("cssText", "margin-left: 125px !important;");
-		//}
+
+		transcriptCardSelector.find('#expand-button').addClass("disabled");
+		transcriptCardSelector.find('#minimize-button').removeClass("disabled");
 	});
 	transcriptCardSelector.find('#minimize-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').addClass("hide");
 		transcriptCardSelector.find('#gene-name').css("margin-right", "0");
 		transcriptCardSelector.css("margin-top", "-10px");
-		//transcriptCardSelector.find('#region-track').css("cssText", "margin-left: 0px !important;");
+
+		transcriptCardSelector.find('#expand-button').removeClass("disabled");
+		transcriptCardSelector.find('#minimize-button').addClass("disabled");
 	});
 
 

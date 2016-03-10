@@ -15,12 +15,38 @@ body
   font-size: 10px !important
 
 .shadow-z-2
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16)
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.17), 0px 1px 6px rgba(0, 0, 0, 0.17)
 
 .shadow-z-1 
-  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.12), 0px 1px 6px rgba(0, 0, 0, 0.12)
- 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16)
 
+#minimize-button
+  .material-icons
+    font-size: 14px
+    color: $text-color
+
+  &.disabled
+    opacity: .4
+    pointer-events: none
+
+#shrink-button
+  .material-icons
+    font-size: 14px
+    color: $text-color
+
+  &.disabled
+    opacity: .4
+    pointer-events: none
+
+#expand-button
+  .material-icons
+    font-size: 14px
+    color: $text-color
+
+  &.disabled
+    opacity: .4
+    pointer-events: none
+ 
 .btn
   &.btn-default
     background-color: #fff
@@ -507,8 +533,8 @@ section
   padding-bottom: 4px
   padding-left: 10px
   padding-right: 10px
-  margin-top: 8px
-  margin-bottom: 8px
+  margin-top: 4px
+  margin-bottom: 4px
 
 .track-chart
   order: 2

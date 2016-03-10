@@ -414,6 +414,10 @@ VariantCard.prototype.shrinkCard = function(shrink) {
 
 	this.cardSelector.css("padding-bottom", shrink ? "4px" : "10px");
 
+	this.d3CardSelector.select('#shrink-button').classed("disabled", shrink);
+	this.d3CardSelector.select('#expand-button').classed("disabled", !shrink);
+	this.d3CardSelector.select('#minimize-button').classed("disabled", false);
+
 }
 
 VariantCard.prototype.minimizeCard = function(minimize) {
@@ -423,6 +427,10 @@ VariantCard.prototype.minimizeCard = function(minimize) {
 
 	this.d3CardSelector.select('#variant-panel-' + this.cardIndex).classed("hide", minimize);
 	this.cardSelector.css("padding-bottom", minimize ? "4px" : "10px");
+
+	this.d3CardSelector.select('#shrink-button').classed("disabled", false);
+	this.d3CardSelector.select('#expand-button').classed("disabled", false);
+	this.d3CardSelector.select('#minimize-button').classed("disabled", true);
 }
 
 VariantCard.prototype.showBamProgress = function(message) {
