@@ -74,7 +74,7 @@ vcfiobio = function module() {
   var iobio_services = stage_iobio_services;
 
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + "tabix/";
+  var tabixServer            = iobio_services + "od_tabix/";
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
   var snpEffServer           = iobio_services + "snpeff/";
   var snpSiftServer          = iobio_services + "snpsift/";
