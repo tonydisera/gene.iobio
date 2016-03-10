@@ -25,9 +25,14 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {};
 
-      this.iobio.services = "wss://nv-green.iobio.io/";
+      this.stage_iobio_services = "wss://nv-green.iobio.io/";
+      this.prod_iobio_services  = "wss://services.iobio.io/";
+      this.dev_iobio_services   = "ws://nv-dev.iobio.io/";
 
-      this.iobio.coverage       = this.iobio.services + "coverage";
+
+      this.iobio.services = this.prod_iobio_services;
+
+      this.iobio.coverage       = this.dev_iobio_services + "coverage/ ";
       this.iobio.bamtools       = this.iobio.services + "bamtools";
       this.iobio.samtools       = this.iobio.services + "samtools";
       this.iobio.bamReadDepther = this.iobio.services + "bamReadDepther";

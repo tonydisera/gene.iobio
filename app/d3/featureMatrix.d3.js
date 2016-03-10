@@ -153,7 +153,7 @@ function featureMatrixD3() {
           .call(yAxis)
           .selectAll("text")
           .style("text-anchor", "start")
-          .attr("x", "-2")
+          .attr("x", "-28")
           .attr("dx", ".8em")
           .attr("dy", ".15em");
 
@@ -163,11 +163,12 @@ function featureMatrixD3() {
          .append("g")
          .attr("class", "up faded")
          //.attr("transform", "translate(" + rowLabelWidth + ", -13)")
-         .attr("transform", "translate(-17, -13)")
-         .append("polygon")
-         .attr("points", "1,10 8,4 16,10")
-         .attr("x", "0")
-         .attr("y", "0")
+         .attr("transform", "translate(85, -24)")
+         .append("use")
+         .attr("id", "arrow-up")
+         .attr("xlink:href", "#arrow-up-symbol")
+         .attr("width", 44)
+         .attr("height", 44)
          .on("click", function(d,i) {
             // We want to mark the row label that is going to be shifted up
             // or down so that after the matrix is resorted and rewdrawn,
@@ -204,13 +205,12 @@ function featureMatrixD3() {
          .append("g")
          .attr("class", "down faded")
          //.attr("transform", "translate(" + (+rowLabelWidth + 17) + ", 9 )")
-         .attr("transform", "translate(0, 9 )")
-         .append("polygon")
-         .attr("points", "1,10 8,4 16,10")
-         .attr("x", "0")
-         .attr("y", "0")
-         .style("transform", "rotate(180deg)")
-         .style("-webkit-transform", "rotate(180deg)")
+         .attr("transform", "translate(105, -24 )")
+         .append("use")
+         .attr("id", "arrow-down")
+         .attr("xlink:href", "#arrow-down-symbol")
+         .attr("width", 44)
+         .attr("height", 44)
          .on("click", function(d,i) {
             // We want to mark the row label that is going to be shifted up
             // or down so that after the matrix is resorted and rewdrawn,
