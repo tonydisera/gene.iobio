@@ -40,16 +40,16 @@ var Bam = Class.extend({
 
 
   
-      this.iobio.coverage = "wss://services.iobio.io/coverage";
-      this.iobio.bamtools = "wss://services.iobio.io/bamtools";
-      this.iobio.samtools = "wss://services.iobio.io/samtools";
-      this.iobio.bamReadDepther = "wss://services.iobio.io/bamReadDepther";
-      this.iobio.bamMerger = "wss://services.iobio.io/bammerger";      
-      this.iobio.bamstatsAlive = "wss://services.iobio.io/bamstatsalive"
-      this.iobio.freebayes = "wss://services.iobio.io/freebayes";
-      this.iobio.bcftools = "wss://services.iobio.io/bcftools";
-      this.iobio.vcflib = "wss://services.iobio.io/vcflib";
-      this.iobio.vt = "wss://services.iobio.io/vt";
+      this.iobio.coverage = "wss://nv-green.iobio.io/coverage";
+      this.iobio.bamtools = "wss://nv-green.iobio.io/bamtools";
+      this.iobio.samtools = "wss://nv-green.iobio.io/samtools";
+      this.iobio.bamReadDepther = "wss://nv-green.iobio.io/bamReadDepther";
+      this.iobio.bamMerger = "wss://nv-green.iobio.io/bammerger";      
+      this.iobio.bamstatsAlive = "wss://nv-green.iobio.io/bamstatsalive"
+      this.iobio.freebayes = "wss://nv-green.iobio.io/freebayes";
+      this.iobio.bcftools = "wss://nv-green.iobio.io/bcftools";
+      this.iobio.vcflib = "wss://nv-green.iobio.io/vcflib";
+      this.iobio.vt = "wss://nv-green.iobio.io/vt";
 
 
       
@@ -134,6 +134,21 @@ var Bam = Class.extend({
       }
       return encodeURI(url);
    },
+
+    _getBamPileupUrl: function(region, golocal) {     
+      var samtools = this.iobio.samtools;
+      if ( this.sourceType == "url") {
+         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
+         var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
+      } else {
+        
+        var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
+       
+      }
+      return encodeURI(url);
+   },
+
+   
 
    
    _generateExomeBed: function(id) {
@@ -684,7 +699,9 @@ var Bam = Class.extend({
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
         var protocol = me.sourceType == "url" ? '&protocol=http' : '';
-        var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+        var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
+        //var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+
 
         var client = BinaryClient(me.iobio.coverage);
         
