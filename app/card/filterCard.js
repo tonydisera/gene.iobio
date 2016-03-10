@@ -530,7 +530,21 @@ FilterCard.prototype.displayRecFilters = function() {
 	$('#rec-filter-box .recfilter').remove();
 
 	var recFilterCount = 0;
-	var recFilterKeys = Object.keys(this.recFilters).sort();
+	var recFilterKeys = Object.keys(this.recFilters).sort(function(a,b) {
+		if (a == 'PASS') {
+			return -1;
+		} else if (b == 'PASS') {
+			return 1
+		} else {
+			if (a < b) {
+				return -1;
+			} else if (a > b) {
+				return 1
+			} else {
+				return 0;
+			}
+		}
+	});
 	
 	recFilterKeys.forEach(function(key) {
 		recFilterCount++;
