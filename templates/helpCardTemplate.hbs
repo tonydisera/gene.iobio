@@ -14,18 +14,19 @@
 	    	<div class="help-info">A step-by-step guide to using gene.iobio
 
 				<a class="help-link open_page_guide" id="show-overview-bookmarks-tour" 
-					onclick="closeSlideLeft()" href="javascript:void(0)" 
+					onclick="" href="javascript:void(0)" 
 					style="padding-top:3px;">
 				Overview
 				</a>
 				<a class="help-link " id="show-phenolyzer-tour" 
-					onclick="$('#tlyPageGuideBookmarksPhenolyzer').removeClass('hide');closeSlideLeft()" href="javascript:void(0)" >
+					onclick="$('#tlyPageGuideBookmarks').removeClass('hide');" href="javascript:void(0)" >
 				Phenolyzer
 				</a>
 				<a class="help-link " id="show-bookmarks-tour" 
-					onclick="$('#tlyPageGuideBookmarks').removeClass('hide');closeSlideLeft()" href="javascript:void(0)" >
+					onclick="pageGuide.close();pageGuidePhenolyzer.close();$('#tlyPageGuidePhenolyzer').removeClass('hide')" href="javascript:void(0)" >
 				Bookmarks
 				</a>
+				
 
 	    </div>
 	    </div>
