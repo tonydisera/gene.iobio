@@ -51,7 +51,7 @@ function MatrixCard() {
 		                HOM:        {value: 1, badge: true,  clazz: 'zyg_hom',        symbolFunction: this.showHomSymbol},  
                         HET:        {value: 2, badge: false, clazz: 'het'        },
                         HOMREF:     {value: 3, badge: false, clazz: 'homref'     },
-                        GT_UNKNOWN: {value: 4, badge: false, clazz: 'gt_unknown' }
+                        gt_unknown: {value: 4, badge: false, clazz: 'gt_unknown' }
                      };
 	this.bookmarkMap = {  
 		                Y: {value: 1, badge: true,  clazz: 'bookmark',  symbolFunction: this.showBookmarkSymbol},  
@@ -76,7 +76,7 @@ function MatrixCard() {
                  };
 	// For af range, value must be > min and <= max
 	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, badge: false, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},	
-                       {min: -1.1,   max: +0,     value: +3,  badge: false, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
+                       {min: -1.1,   max: +0,     value: +2,  badge: false, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
                        {min: +0,     max: +.0001, value: +3,  badge: false, clazz: 'afexac_uberrare',   symbolFunction: this.showAfExacSymbol},	
                        {min: +.0001, max: +.001,  value: +4,  badge: false, clazz: 'afexac_superrare',  symbolFunction: this.showAfExacSymbol},	
                        {min: +.001,  max: +.01,   value: +5,  badge: false, clazz: 'afexac_rare',       symbolFunction: this.showAfExacSymbol},	
@@ -113,6 +113,15 @@ function MatrixCard() {
 
 	this.featureUnknown = 199;
 
+}
+
+MatrixCard.prototype.toogleMoveRows = function() {
+	if ($('#feature-matrix.shift-rows').length > 0) {
+		$('#move-rows').text("Reorder");
+	} else {
+		$('#move-rows').text("Done");		
+	}
+	$('#feature-matrix').toggleClass("shift-rows");
 }
 
 MatrixCard.prototype.removeRow = function(searchTerm, theMatrixRows) {
