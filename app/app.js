@@ -5,11 +5,11 @@ var stage_iobio_services  = "http://nv-green.iobio.io/";
 var prod_iobio_services   = "http://servoces.iobio.io/";
 var dev_iobio_services    = "http://nv-dev.iobio.io/";
 
-var global_iobio_services = dev_iobio_services;
+var global_iobio_services = stage_iobio_services;
 
-var geneiobio_server   = global_iobio_services + "geneinfo/";
-var geneToPhenoServer  = global_iobio_services + "genetopheno/";
-var hpoServer          = global_iobio_services + "hpo/";
+var geneiobio_server   = global_iobio_services + "geneinfo";
+var geneToPhenoServer  = global_iobio_services + "gene2pheno";
+var hpoServer          = global_iobio_services + "hpo";
 var phenolyzerServer   = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
 
 

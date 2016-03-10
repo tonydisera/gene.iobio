@@ -71,16 +71,16 @@ vcfiobio = function module() {
   var prod_iobio_services = "wss://services.iobio.io/";
   var dev_iobio_services = "ws://nv-dev.iobio.io/";
 
-  var iobio_services = prod_iobio_services;
+  var iobio_services = stage_iobio_services;
 
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
   var tabixServer            = iobio_services + "tabix/";
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
   var snpEffServer           = iobio_services + "snpeff/";
   var snpSiftServer          = iobio_services + "snpsift/";
-  var vtServer               = dev_iobio_services + "vt/";
+  var vtServer               = iobio_services + "vt/";
   var clinvarServer          = iobio_services + "clinvar/";
-  var afServer               = dev_iobio_services + "af/";
+  var afServer               = iobio_services + "af/";
   var vepServer              = iobio_services + "vep/";
   var contigAppenderServer   = iobio_services + "ctgapndr/";
 
