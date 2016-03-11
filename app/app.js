@@ -1051,11 +1051,7 @@ function cacheNextGene(genesToCache) {
 
 		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
 			    		variantCard.promiseCacheVariants(
-			    			geneObject.gene_name,
-			    			geneObject.chr,
-			    			geneObject.start, 
-						 	geneObject.end, 
-						 	geneObject.strand, 
+			    			geneObject, 
 						 	transcript)
 			    		.then( function(vcfData) {
 			    			if (isCachedForCards(geneObject.gene_name, transcript)) {

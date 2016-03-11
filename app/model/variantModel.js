@@ -749,15 +749,18 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 	return new Promise( function(resolve, reject) {
 
+		// Create a gene object with start and end reduced to the variants coordinates.
+		var fakeGeneObject = $().extend({}, theGene);
+		fakeGeneObject.start = variant.start;
+		fakeGeneObject.end = variant.end;
+
 		if ( variant.extraAnnot ) {
 			resolve(variant);
 		} else {	
 			me._promiseVcfRefName(theGene.chr).then( function() {				
 				me.vcf.promiseGetVariants(
 				   me.getVcfRefName(theGene.chr), 
-				   variant.start, 
-			       variant.end, 
-			       theGene.strand, 
+				   fakeGeneObject,
 			       theTranscript,
 			       me.sampleName,
 			       window.geneSource == 'refseq' ? true : false,
@@ -824,9 +827,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 			me._promiseVcfRefName(theGene.chr).then( function() {				
 				me.vcf.promiseGetVariants(
 				   me.getVcfRefName(theGene.chr), 
-				   theGene.start, 
-			       theGene.end, 
-			       theGene.strand, 
+				   theGene,
 			       theTranscript,
 			       me.sampleName,
 			       window.geneSource == 'refseq' ? true : false
@@ -841,12 +842,12 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    	// Associate the correct gene with the data
 				    	var theGeneObject = null;
 				    	for( var key in window.geneObjects) {
-				    		var geneObject = geneObjects[key];
-				    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
-				    			geneObject.start == data.start &&
-				    			geneObject.end == data.end &&
-				    			geneObject.strand == data.strand) {
-				    			theGeneObject = geneObject;
+				    		var go = geneObjects[key];
+				    		if (me.getVcfRefName(go.chr) == data.ref &&
+				    			go.start == data.start &&
+				    			go.end == data.end &&
+				    			go.strand == data.strand) {
+				    			theGeneObject = go;
 				    			data.gene = theGeneObject;
 				    		}
 				    	}
@@ -912,9 +913,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			me._promiseVcfRefName(theGene.chr).then( function() {
 				me._promiseGetAndAnnotateVariants(
 					me.getVcfRefName(theGene.chr),
-					theGene.start, 
-			        theGene.end, 
-			        theGene.strand, 
+					theGene,
 			        theTranscript,
 			        onVcfData)
 				.then( function(data) {
@@ -972,13 +971,14 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 	return data != null;
 }
 
-VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end, strand, transcript) {
+VariantModel.prototype.promiseCacheVariants = function(geneObject, transcript) {
 	var me = this;
+
 
 	return new Promise( function(resolve, reject) {
 
 		// Is the data already cached?  If so, we are done
-		var vcfData = me._getCachedData("vcfData", geneName, transcript);
+		var vcfData = me._getCachedData("vcfData", geneObject.gene_name, transcript);
 		if (vcfData != null && vcfData != '') {			
 			resolve(vcfData);
 		} else {
@@ -986,17 +986,17 @@ VariantModel.prototype.promiseCacheVariants = function(geneName, ref, start, end
 			// so call the iobio services to retreive the variants for the gene region 
 			// and annotate them.
 			me._promiseVcfRefName(ref).then( function() {
-				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), start, end, strand, transcript)
+				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
 				.then( function(data) {
 					// Associate the correct gene with the data
 			    	var theGeneObject = null;
 			    	for( var key in window.geneObjects) {
-			    		var geneObject = geneObjects[key];
-			    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
-			    			geneObject.start == data.start &&
-			    			geneObject.end == data.end &&
-			    			geneObject.strand == data.strand) {
-			    			theGeneObject = geneObject;
+			    		var go = geneObjects[key];
+			    		if (me.getVcfRefName(go.chr) == data.ref &&
+			    			go.start == data.start &&
+			    			go.end == data.end &&
+			    			go.strand == data.strand) {
+			    			theGeneObject = go;
 			    			data.gene = theGeneObject;
 			    		}
 			    	}
@@ -1142,7 +1142,7 @@ VariantModel.prototype._pruneHomRefVariants = function(data) {
 	}
 }
 
-VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end, strand, transcript, onVcfData) {
+VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, onVcfData) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -1166,10 +1166,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(ref), 
-		   start, 
-	       end, 
-	       strand, 
-	       transcript,
+		   geneObject,
+		   transcript,
 	       sampleNames,
 	       window.geneSource == 'refseq' ? true : false,
 	       me.GET_HGVS,
@@ -1209,7 +1207,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, start, end
 		    	if (me.getRelationship() != 'sibling') {
 			    	return me.vcf.promiseGetClinvarRecords(
 			    		theVcfData, 
-			    		me._stripRefName(ref), start, end, 
+			    		me._stripRefName(ref), geneObject.start, geneObject.end, 
 			    		me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {
@@ -1642,8 +1640,8 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 					}
 
 					// Annotate the fb variants
-					me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene.start, window.gene.end, 
-						window.gene.strand, window.selectedTranscript, me.sampleName)
+					me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene, 
+						                             window.selectedTranscript, me.sampleName)
 				    .then( function(data) {
 
 				    	var annotatedRecs = data[0];
