@@ -557,14 +557,14 @@ var effectCategories = [
   }
   
   // NEW
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -573,7 +573,7 @@ var effectCategories = [
             }
           });
       } else {
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -587,7 +587,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -610,7 +610,7 @@ var effectCategories = [
         
         var allRecs = headerRecords.concat(records);
 
-        me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId)
+        me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -628,7 +628,7 @@ var effectCategories = [
   }
 
   // NEW
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
     var me = this;
 
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
@@ -658,26 +658,30 @@ var effectCategories = [
 
     var snpEffUrl = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
 
-    // Skip snpEff if RefSeq transcript set
+    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     var nextUrl;
-    var vepArgs = "";
-    if (isRefSeq) {
+    if (isRefSeq || annotationEngine == 'vep') {
       nextUrl = afUrl;
-      vepArgs = " --refseq ";
     } else {
-      nextUrl = snpEffUrl;
+      nextUrl = snpEffUrl; 
     }
+
+    // If we are getting the hgvs notation, we need an extra command line arg for vep
+    var vepArgs = "";
     if (hgvsNotation) {
       vepArgs += " --hgvs ";
     }
+    // If we are getting the rsID, we need an extra command line arg for vep
     if (getRsId) {
       vepArgs += "  --check_existing ";
     }
     
+    // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
     var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
+    var server = vepServer;
     
     // Connect to the vep server    
-    var client = BinaryClient(vepServer);
+    var client = BinaryClient(server);
     
     var annotatedData = "";
     client.on('open', function(stream){
@@ -858,14 +862,14 @@ var effectCategories = [
 
 
   // NEW
-  exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, isRefSeq, hgvsNotation, getRsId) {
+  exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the 
       // info field.
-      me._annotateVcfRegion(records, refName, sampleName, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
+      me._annotateVcfRegion(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
@@ -1053,7 +1057,7 @@ var effectCategories = [
   }
   
   // NEW
-  exports._annotateVcfRegion = function(records, refName, sampleName, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
       var me = this;
       
       var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
@@ -1081,13 +1085,17 @@ var effectCategories = [
       // Call snpEff service
       var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
 
-      // Bypass snpEff if the transcript set is RefSeq
-      var vepArgs = "";
-      if (isRefSeq) {
+      // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
+      var nextUrl = null;
+      if (annotationEngine == 'vep' || isRefSeq) {
         nextUrl = afUrl;
-        vepArgs = " --refseq "
       } else {
         nextUrl = snpEffUrl;
+      }
+
+      var vepArgs = "";
+      if (isRefSeq) {
+        vepArgs = " --refseq "
       }
       if (hgvsNotation) {
         vepArgs += " --hgvs ";

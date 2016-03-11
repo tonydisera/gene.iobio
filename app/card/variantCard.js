@@ -852,7 +852,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 		if (me.isViewable()) {
 			me.cardSelector.find('.vcfloader').removeClass("hide");
-			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");
+			var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
+			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with " + annotationEngines);
 			me.cardSelector.find("#region-flag").addClass("hide");			
 		}
 
@@ -1135,7 +1136,8 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 		function() {
 			// After variants have been been called from alignments...
 	    	me.cardSelector.find('.vcfloader').removeClass("hide");
-			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with SnpEff and VEP");
+	    	var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
+			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with " + annotationEngine);
 
 		},
 		function(data) {

@@ -114,6 +114,8 @@ FilterCard.prototype.init = function() {
 	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 	$('#select-af-scheme').chosen({width: "115px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 
+	// Default annotation scheme to VEP
+	this.setAnnotationScheme("VEP");
 
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {

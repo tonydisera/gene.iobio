@@ -763,6 +763,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				   fakeGeneObject,
 			       theTranscript,
 			       me.sampleName,
+			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
 			       true,
 			       true
@@ -830,6 +831,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				   theGene,
 			       theTranscript,
 			       me.sampleName,
+			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false
 			    ).then( function(data) {
 			    	var annotatedRecs = data[0];
@@ -1169,6 +1171,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		   geneObject,
 		   transcript,
 	       sampleNames,
+	       filterCard.annotationScheme.toLowerCase(),
 	       window.geneSource == 'refseq' ? true : false,
 	       me.GET_HGVS,
 	       me.GET_RSID
@@ -1641,7 +1644,8 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 					// Annotate the fb variants
 					me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene, 
-						                             window.selectedTranscript, me.sampleName)
+						                             window.selectedTranscript, me.sampleName, 
+						                             filterCard.annotationScheme.toLowerCase())
 				    .then( function(data) {
 
 				    	var annotatedRecs = data[0];
@@ -1983,6 +1987,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 					 window.gene.strand, 
 					 window.selectedTranscript,
 					 me.sampleName,
+					 filterCard.annotationScheme.toLowerCase(),
 					 window.geneSource == 'refseq' ? true : false)
 				.then( function(data) {
 
