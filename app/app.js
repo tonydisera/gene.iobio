@@ -2,10 +2,10 @@
 // Global Variables
 //
 var stage_iobio_services  = "http://nv-green.iobio.io/";
-var prod_iobio_services   = "http://servoces.iobio.io/";
+var prod_iobio_services   = "http://services.iobio.io/";
 var dev_iobio_services    = "http://nv-dev.iobio.io/";
 
-var global_iobio_services = stage_iobio_services;
+var global_iobio_services = prod_iobio_services;
 
 var geneiobio_server   = global_iobio_services + "geneinfo";
 var geneToPhenoServer  = global_iobio_services + "gene2pheno";

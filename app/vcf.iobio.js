@@ -71,7 +71,7 @@ vcfiobio = function module() {
   var prod_iobio_services = "wss://services.iobio.io/";
   var dev_iobio_services = "ws://nv-dev.iobio.io/";
 
-  var iobio_services = stage_iobio_services;
+  var iobio_services = prod_iobio_services;
 
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
   var tabixServer            = iobio_services + "od_tabix/";

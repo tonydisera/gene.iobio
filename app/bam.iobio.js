@@ -30,7 +30,7 @@ var Bam = Class.extend({
       this.dev_iobio_services   = "ws://nv-dev.iobio.io/";
 
 
-      this.iobio.services = this.stage_iobio_services;
+      this.iobio.services = this.prod_iobio_services;
 
       this.iobio.coverage       = this.dev_iobio_services + "coverage/ ";
       this.iobio.bamtools       = this.iobio.services + "bamtools";
