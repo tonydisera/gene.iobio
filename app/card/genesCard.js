@@ -365,6 +365,9 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 		$(geneBadgeName).parent().parent().remove();
 		me._onGeneBadgeUpdate();
 	}
+	delete geneObjects[theGeneName];
+	delete geneAnnots[theGeneName];
+
 
 }
 
@@ -380,6 +383,8 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 		me._onGeneBadgeUpdate();
 	}
+	delete geneObjects[theGeneName];
+	delete geneAnnots[theGeneName];
 
 }
 
