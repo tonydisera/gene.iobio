@@ -670,10 +670,13 @@ function loadGeneFromUrl() {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
 		genesCard._geneBadgeLoading(gene, true, true);
 	} else {
+		// Open the 'About' sidebar by default if there is no data loaded when gene is launched
+		showSidebar("Help");
+
 		if (showTour != null && showTour == 'Y') {
-			pageGuide.open();
+			//pageGuide.open();
 		} else {
-			$('#tourWelcome').addClass("open");
+			//$('#tourWelcome').addClass("open");
 		}
 
 	}
@@ -1303,7 +1306,9 @@ function loadGeneWidget() {
 					}
 
 					if (bam == null && vcf == null) {
-						$('#tourWelcome').addClass("open");
+						// Open the 'About' sidebar by default if there is no data loaded when gene is launched
+						showSidebar("Help");
+						//$('#tourWelcome').addClass("open");
 					}
 
 			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
@@ -1314,7 +1319,7 @@ function loadGeneWidget() {
 					enableCallVariantsButton();						
 		    	} else {
 	
-					$('#tourWelcome').removeClass("open");
+					//$('#tourWelcome').removeClass("open");
 					
 			    	loadTracksForGene();
 			    	// add gene to url params
