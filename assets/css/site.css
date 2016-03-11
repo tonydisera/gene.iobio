@@ -1130,7 +1130,7 @@ header {
     white-space: normal !important;
     background-color: transparent !important;
     font-weight: 100;
-    display: inline-block;
+    display: block;
     padding-top: 4px !important;
     top: 0 !important;
     margin-left: -3px; }
