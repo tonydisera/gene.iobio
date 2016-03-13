@@ -1,6 +1,9 @@
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
+.animate-twice {
+  -webkit-animation-iteration-count: 2; }
+
 .form-group label.control-label {
   font-size: 16px !important;
   color: #5d809d !important; }

@@ -88,6 +88,8 @@
   <link rel="stylesheet" href="assets/css/alertify.core.css" />
   <link rel="stylesheet" href="assets/css/alertify.default.css" />
 
+  <!-- animiate -->
+  <link rel="stylesheet" href="assets/css/animate.css"/>
 
   <!-- chosen type-ahead dropdown -->
   <link rel="stylesheet" href="assets/css/chosen.css" />
@@ -313,11 +315,11 @@
 
         <div id="region-track"  style="clear:both;">
             <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-            <span id="gene-chr" class=" gene-card-label keep-case">chr2</span>
-            <span id="gene-region" class=" gene-card-label keep-case">74229840-74335303</span>
+            <span id="gene-chr" class=" gene-card-label keep-case"></span>
+            <span id="gene-region" class=" gene-card-label keep-case"></span>
             <span id="minus_strand" class="hide " style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-            <span  class="fullview" style="padding-left: 15px">+  -</span>
-            <input id="gene-region-buffer-input" class="fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+            <span  id="gene-plus-minus-label" class="fullview hide " style="padding-left: 15px">+  -</span>
+            <input id="gene-region-buffer-input" class="hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
 
 
              <span style="float:right;margin-right:14px">
@@ -335,6 +337,9 @@
 
         <!-- Non protein-coding gene badges -->
         <div id="non-protein-coding"  style="clear: both;padding-bottom: 0px;display: block;">
+            <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+              Enter a gene name
+            </div>   
             <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
               Pseudogene
             </div>   

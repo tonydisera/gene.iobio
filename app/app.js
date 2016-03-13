@@ -237,6 +237,17 @@ function init() {
 		}
     }); 
 
+    // Encapsulate logic for animate.css into a jquery function
+    $.fn.extend({
+    animateIt: function (animationName, customClassName) {
+    		var additionalClass = customClassName ? ' ' + customClassName : '';
+	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
+	            $(this).removeClass('animated ' + animationName);
+	        });
+	    }
+	});
+
 	// For 'show variants' card
 	$('#select-color-scheme').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 	$('#select-intron-display').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
@@ -602,6 +613,16 @@ function getProbandVariantCard() {
 		}
 	});
 	return probandCard;
+}
+
+function getVariantCard(relationship) {
+	var theCard = null;
+	variantCards.forEach( function(variantCard) {
+		if (variantCard.getRelationship() == relationship) {
+			theCard = variantCard;
+		}
+	});
+	return theCard;
 }
 
 
@@ -1379,6 +1400,14 @@ function loadGeneWidget() {
 */
 function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVariantsDisplayed) {
 
+	if (window.gene == null || window.gene == "") {
+		$('.twitter-typeahead').animateIt('tada');
+		return;
+	} 
+	if (!isDataLoaded()) {
+		$('#add-data-button').animateIt('tada', 'animate-twice');
+	}
+	
 	regionStart = null;
 	regionEnd = null;
 	fulfilledTrioPromise = false;
@@ -1392,7 +1421,9 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	$("#coordinate-frame").css("opacity", 0);
 
 	$('#transcript-card').removeClass("hide");
-
+	$('#gene-region-buffer-input').removeClass("hide");
+	$('#gene-plus-minus-label').removeClass("hide");	
+	
     $('#gene-track').removeClass("hide");
     $('#view-finder-track').removeClass("hide");
 	$('#transcript-btn-group').removeClass("hide");
@@ -1873,6 +1904,20 @@ function nextLoadSib(trioModel, affectedStatus, sibsData, onStatusUpdated) {
 		var sibsCount = window.variantCardsSibs[affectedStatus].length;
 		trioModel.determineSibsStatus(sibsData, affectedStatus, sibsCount, onStatusUpdated);
 	}
+}
+
+function isDataLoaded() {
+	var hasData = false;
+	if (dataCard.mode == 'single') {
+		if (getProbandVariantCard().isReadyToLoad()) {
+			hasData = true;
+		}
+	} else if (dataCard.mode == 'trio') {
+		if (getVariantCard('proband').isReadyToLoad() && getVariantCard('mother').isReadyToLoad() && getVariantCard('father').isReadyToLoad()) {
+			hasData = true;
+		}
+	}
+	return hasData;
 }
 
 function enableLoadButton() {
