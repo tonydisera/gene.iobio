@@ -5,15 +5,21 @@ function DataCard() {
 		father:  'NA12891'
 	};
 	this.defaultUrls = {
-		proband: 'http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz',
-		mother:  'http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz',
-		father:  'http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz'
 	};
 	this.defaultBamUrls = {
-		proband: 'http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam',
-		mother:  'http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam',
-		father:  'http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam'
+		proband: 'https://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12878.bam',
+		mother:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12892.bam',
+		father:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12891.bam'
 	};
+	this.defaultSampleNames = {
+		proband: 'NA12878',
+		mother:  'NA12892',
+		father:  'NA12891'
+	};
+
 
 	this.exomeNames = {
 		proband: 'NA19240',
@@ -21,14 +27,14 @@ function DataCard() {
 		father:  'NA19229' 
 	};
 	this.exomeUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/1000gSV/exome-trio.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
 	};
 	this.exomeBamUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/1000gSV/NA19240.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam',
-		mother:  'https://s3.amazonaws.com/iobio/1000gSV/NA19238.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam',
-		father:  'https://s3.amazonaws.com/iobio/1000gSV/NA19239.mapped.ILLUMINA.bwa.YRI.exome.20130415.bam'
+		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19240.bam',
+		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19238.bam',
+		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19239.bam'
 	};
 	this.exomeSampleNames = {
 		proband: 'NA19240',
@@ -372,6 +378,8 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
 
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
+
+	variantCard.setDefaultSampleName(this.defaultSampleNames[variantCard.getRelationship()]);
 	
 	panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
 	panelSelector.find('#datasource-name').val(this.defaultNames[variantCard.getRelationship()]);
@@ -379,6 +387,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
     panelSelector.find("#url-input").focus();
     panelSelector.find('#vcf-file-info').addClass('hide');
     panelSelector.find('#vcf-file-info').val('');
+
     this.onVcfUrlEntered(panelSelector);
 }
 DataCard.prototype.clearUrl = function(panelSelector) {
