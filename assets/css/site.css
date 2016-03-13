@@ -1593,7 +1593,10 @@ header {
   padding-bottom: 1px; }
 
 .tooltip-footer {
-  color: #2E73AB !important; }
+  color: #2E73AB !important;
+  margin-bottom: -2px;
+  margin-top: 20px !important;
+  font-size: 11px; }
 
 .tooltip a {
   color: #2E73AB !important;
@@ -1773,6 +1776,8 @@ text.ref-count {
     display: inline-block !important;
     float: none;
     color: #717171; }
+  #examine-card .tooltip-footer {
+    margin-top: 40px !important; }
   #examine-card .tooltip-footer #unpin {
     display: none !important; }
   #examine-card .tooltip-subtitle {

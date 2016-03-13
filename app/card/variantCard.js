@@ -2190,14 +2190,29 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 		  examineCol = '<div class="col-sm-4" style="text-align:left;"></div>'
 	}
 
-	if (window.clickedVariant) {
-		return '<div class="row tooltip-footer" style="margin-bottom: -2px;margin-top: 20px !important;font-size: 11px;">'
-		  + examineCol
-		  + '<div class="col-sm-4" style="text-align:left;">' +   '<a href="javascript:void(0)" onclick="bookmarkVariant(\'' + this.getRelationship() + '\')">Bookmark</a>' + '</div>'
-		  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
-		  + '</div>';
-		
+	var bookmarkBadge = '<svg class="bookmark-badge" height="11" width="82"><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="9" style="fill: black;">Bookmarked</text></g></svg>';
+	showAsBookmarked = function(container) {
+		$(container).parent().html(bookmarkBadge);
+	};
 
+	if (window.clickedVariant) {
+		var bookmarkLink = null;
+		if (window.clickedVariant.isBookmark) {
+			return '<div class="row tooltip-footer">'
+			  + examineCol
+			  + '<div class="col-sm-4" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '</div>';
+
+		} else {
+			return '<div class="row tooltip-footer" style="">'
+			  + examineCol
+			  + '<div class="col-sm-4" style="text-align:left;">' +   '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this)">Bookmark</a>' + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '</div>';
+
+		}
+		
 	} else {
 		return '<div class="row tooltip-footer">'
 		  + '<div class="col-md-12 tooltip-footer" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
