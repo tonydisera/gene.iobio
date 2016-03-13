@@ -1180,7 +1180,7 @@ function updateUrl(paramName, value) {
 	Object.keys(params).forEach(function(key) {
 		search.push(key + '=' + params[key]);
 	})
-	window.history.pushState({'index.html' : 'bar'},null,'?'+search.join('&'));	
+    window.history.replaceState(null,null,'?'+search.join('&'));	
 }
 
 function removeUrl(paramName) {
@@ -1199,7 +1199,8 @@ function removeUrl(paramName) {
 	Object.keys(params).forEach(function(key) {
 		search.push(key + '=' + params[key]);
 	})
-	window.history.pushState({'index.html' : 'bar'},null,'?'+search.join('&'));	
+	window.history.replaceState(null,null,'?'+search.join('&'));
+
 }
 
 
