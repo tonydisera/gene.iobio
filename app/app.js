@@ -1404,7 +1404,7 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 		$('.twitter-typeahead').animateIt('tada');
 		return;
 	} 
-	if (!isDataLoaded()) {
+	if (!bypassVariantCards && !isDataLoaded()) {
 		$('#add-data-button').animateIt('tada', 'animate-twice');
 	}
 	
