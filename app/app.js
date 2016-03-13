@@ -528,11 +528,14 @@ function resizeCardWidths() {
 	var sliderWidth    = 0;
 	if ($('#slider-left').hasClass("hide") == false) {
 		sliderWidth = +$('#slider-left').width();
+		$('#nav-section').css("width", "100%");
+	} else {
+		$('#nav-section').css("width", '');
 	}
 	
 	$('#container').css('width', windowWidth - sliderWidth - 40);
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - 55);
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - 55);
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - 60);
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - 60);
 }
 
 function closeSlideLeft() {
