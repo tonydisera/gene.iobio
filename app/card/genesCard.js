@@ -3,7 +3,7 @@
 }
 
 GenesCard.prototype.split = function( val )  {
-	return val.split( /;\n*/ );
+	return val.replace(/^\s+|\s+$/g, "").split( /;\n*/ );
 }
 
 GenesCard.prototype.extractLast = function( term ) {
