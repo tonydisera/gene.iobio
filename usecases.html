@@ -22,21 +22,6 @@
     <a href="http://iobio.io" class="iobioproject">           
       an iobio project
     </a>   
-   <div class="btn-toolbar"  style="float:right;width:105px;display:inline;margin-top: -2px;margin-right: 40px;">
-      <div class="btn-group"  style="display:  inline;margin-top: 15px;">
-
-        <button type="button" id="learn-more-dropdown" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-          Learn more <span class="caret"></span>
-        </button>
-
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="javascript:void(0)" onclick="window.open('index.html?showTour=Y', '_geneiobio');" class="open_page_guide">Tour</a>
-          </li>
-          <li><a href="javascript:void(0)"  onclick="window.open('videos.html', '_screencasts');">Screencasts</a>
-          </li>
-        </ul>
-      </div>
-    </div>
 
   </section>
 
@@ -45,9 +30,10 @@
   <div class="usecases" style="width:810px; margin: 0px auto 35px auto;font-size:16px; text-align:justify;padding-top:30px;">
       <h1 style="color: #6898A8; font-size: 38px; font-family:Quicksand;">Use cases</h1>
       <div>
-        This page provides a number of use cases to highlight the functionality in gene.iobio. These use cases make use of modified alignments for the Platinum trio data set that allow certain scenarios and functionality to be investigated. Each of the use cases below has a brief description of the problem at hand, and the gene name links to a screencast demonstrating the use case. For manual inspection, click <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=&vcf0=http://s3.amazonaws.com/iobio/variants/NA12878.autosome.PASS.vcf.gz&bam0=http://s3.amazonaws.com/iobio/NA12878/NA12878.autsome.bam&name1=&vcf1=http://s3.amazonaws.com/iobio/variants/NA12891.autosome.PASS.vcf.gz&bam1=http://s3.amazonaws.com/iobio/NA12891/NA12891.autsome.bam&name2=&vcf2=http://s3.amazonaws.com/iobio/variants/NA12892.autosome.PASS.vcf.gz&bam2=http://s3.amazonaws.com/iobio/NA12892/NA12892.autsome.bam" target="_app">here</a> and gene.iobio will be launched with the Platinum data preloaded. 
+        This page provides a number of use cases to highlight the functionality in gene.iobio. These use cases make use of modified alignments for the Platinum trio data set that allow certain scenarios and functionality to be investigated. Each of the use cases below has a brief description of the problem at hand, and the gene name links to a screencast demonstrating the use case. For manual inspection, click <a href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=&vcf0=http://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz&bam0=http://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12878.bam&name1=&vcf1=http://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz&bam1=http://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12891.bam&name2=&vcf2=http://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz&bam2=http://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12892.bam" target="_app">here</a> and gene.iobio will be launched with the Platinum data preloaded.
       </div>
         <ul style="list-style-type: none;">
+          <a name="RAI1"></a>
           <li><h3><a href="https://www.youtube.com/watch?v=vsnv6YU1gDc">RAI1 - recessive variant</a></h3> 
             <span class="inline">
               Simple view of a <strong>recessive variant</strong>, pathogenic in clinvar. 
@@ -65,6 +51,8 @@
               </div>
            </span>
       </li >
+
+        <a name="MYLK2"></a>
         <li style="clear:both;"><h3><a href="https://www.youtube.com/watch?v=l-YsG1C6TkI">MYLK2 - real-time variant calling</a></h3>
           <div class="inline">
             This gene is used to demonstrate real-time variant calling using the provided alignments. 
@@ -81,6 +69,8 @@
           </div>
 
         </li>
+
+        <a name="AIRE"></a>
         <li style="clear:both;"><h3><a href="https://www.youtube.com/watch?v=MxIyc23HGxc">AIRE - low coverage alignments</a></h3>
           <div class="inline" >
             Variants can be missed as a result of <strong>low coverage</strong> in the alignments.
@@ -88,7 +78,9 @@
             <div class="inline" style="padding-top:20px;">Both parents have a heterozygous SNP variant that is annotated as 'likely pathogenic' in ClinVar. The cross at this location in the proband indicates that the child does not have this variant, but the coverage track shows that the proband has a drop in coverage at exactly this location. Zooming into this exon shows this coverage drop very clearly. It is possible that the proband is homozygous for this variant, potentially resulting in a recessive disorder, but due to the lack of coverage, we cannot draw a conclusion, one way or the other.
             </div>
             </div>
-        </li>
+        </li>          
+
+        <a name="PDGFB"></a>
         <li style="clear:both;"><h3><a href="https://www.youtube.com/watch?v=k_nfrXgP-N0">PDGFB - alternative transcripts</a></h3>
           <div class="inline">By default, when a gene is loaded, the canonical transcript is displayed and the SnpEff annotations applied to the variants are applicable to this transcript. There are no variants in the 'Rank Variants' table that appear to be interesting. From the transcript drop-down menu, <strong>select the third transcript (ENST00000381551.4).</strong> 
             <br>
@@ -101,8 +93,26 @@
 
           </div>
         </li>  
-        </ul>
-  
+
+        <!-- PDHA1 variant found using 'lactic acidosis' phenotype in phenolyzer -->
+        <a name="PDHA1"></a>
+        <li style="clear:both;"><h3><a href="https://www.youtube.com/watch?v=MxIyc23HGxc">PDHA1 - phenotype driven analysis</a></h3>
+          <div class="inline">
+            Variant analysis can be directed using phenotype information using the <a href="http://phenolyzer.usc.edu">Phenolyzer</a> from Kai Wang's group at <a href="http://genomics.usc.edu/">USC</a>, which is integrated in gene.iobio. For example, consider a patient presenting with lactic acidosis. Which genes should be interrogated for this case?
+            <img src="assets/images/usecases/pdha1_a.png" width="250px" align="left" style="padding-top:10px; padding-right:5px;" />
+            <div class="inline" style="padding-top:20px">
+              From the left panel, select the 'Genes' button and in the Phenolyzer box, enter the phenotype (lactic acidosis) and press 'Run'. <a href="http://phenolyzer.usc.edu">Phenolyzer</a> is then run (note that this operation is only available for academic or non-profit use) and generates a ranked list of genes. By default, the top 30 ranked genes are added to the top gene.iobio panel and the top ranked gene (BCS1L) is automatically loaded and analyzed. 
+            </div>
+            <div class="inline" style="padding-top:20px">
+              There are no variants in this gene that appear interesting, so the next gene (TTPA) can be selected from the top list. Again, there are no variants that stand out as being important, so we move on to the next gene in the list - PDHA1 (as shown in the image below).
+            </div>
+            <img src="assets/images/usecases/pdha1_b.png" width="750px" align="left" style="padding-top:30px; padding-right:5px;" />
+            <div class="inline" style="padding-top:20px">
+              Now, in this gene, we see a missense, heterozygous <i>de novo</i> variant, that is not seen in either the 1000 Genomes or ExAC and is marked as <i>deleterious</i> by SIFT and <i>probably_damaging</i> by PolyPhen. This has a good chance of being the causative variant and it only took looking in three genes to find the variant.
+            </div>
+          </div>
+        </li>
+      </ul>
   </div>
 </div>
 

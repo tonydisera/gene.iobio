@@ -66,14 +66,14 @@ lineD3 = function module() {
            .duration(200)
           .style("opacity", 1);
       label.attr("x", 0)
-           .attr("y", margin.top)
+           .attr("y", margin.top + 5)
            .attr("class", "circle-label")           
            .text(circleText);
 
       container.select(".circle-label")
                .attr( "x", function (d,i) {
                   var w = this.getBBox().width;
-                  var x = mousex + margin.left - (w/2) + 2;
+                  var x = mousex + margin.left - (w/2) + 3;
     
                   if (x + (w/2) > innerWidth) {
                     // If the circle label is too far to the right,
@@ -92,9 +92,10 @@ lineD3 = function module() {
       var circle = container.select(".circle");
       circle.transition()
             .duration(200)
-            .style("opacity", 1);
-      circle.attr("cx", mousex + margin.left + 2)
-            .attr("cy", mousey + margin.top );
+            .style("opacity", .7);
+      circle.attr("cx", mousex + margin.left + 2 )
+            .attr("cy", mousey + margin.top )
+            .attr("r", 3)
               
     }
   };
@@ -172,9 +173,7 @@ lineD3 = function module() {
       var circle = svg.selectAll(".circle").data([0])
         .enter().append('circle')
           .attr("class", "circle")
-          .attr("cx", 0)
-          .attr("cy", 0)
-          .attr("r", 4)
+          .attr("r", 3)
           .style("opacity", 0);
       var circleLabel = svg.selectAll(".circle-label").data([0])
         .enter().append('text')

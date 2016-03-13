@@ -1,0 +1,26 @@
+<div id="gene-badge" style="padding-top:10px;margin-bottom:7px;margin-right:3px;" >
+
+	<button id="gene-badge-button" type="button" onclick="genesCard.selectGeneBadge(this)" 
+		class="btn btn-raised btn-default" 
+		rel="tooltip"   data-html="true" href="#"
+		data-placement="bottom" 		
+		style="color: grey !important;font-size: 11px;padding: 2px 4px 2px 4px;margin: 0px;">
+        <i id="gene-badge-loaded" class="material-icons">done</i>
+        <i id="gene-badge-warning" class="material-icons">warning</i>
+        <i id="gene-badge-error" class="material-icons">error</i>
+        <span id="gene-badge-name" style="float:left;"></span>
+        <img class="gene-badge-loader hide" style="width: 15px; height: 15px; float: left;" src="assets/images/wheel.gif">
+        <span id="gene-badge-phenotype-symbol" style="float:right;height:14px;"></span>
+  		<span id="gene-badge-symbols" style="height:14px;padding-top:1px;padding-left:3px;float:right;"></span>
+
+	</button>	
+
+	<a id="gene-badge-remove" href="javascript:void(0)" 
+		onclick="genesCard.removeGeneBadge(this)" class="btn btn-flatbtn-default" 
+		style="padding: 0;margin-top: 0px;margin-bottom: 0px;color: grey !important;font-size: 11px;margin-left: -2px;margin-left: -3px;padding-top: 3px;">
+
+	  	<i class="material-icons">close</i>
+
+	</a>
+	
+</div>

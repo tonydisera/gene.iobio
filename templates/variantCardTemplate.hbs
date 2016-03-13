@@ -1,13 +1,13 @@
 <div class="variant-card track-expand shadow-z-2 hide" style="min-height: 32px;padding-bottom:0px;background-color:white;">
 
 
-  <div style="text-align:center;margin-top: 6px;margin-bottom: 6px;">
-    <span style="float: left;display: inline-block;min-width: 180px;margin-top: 2px;">
+  <div style="text-align:center;margin-bottom: 6px;">
+    <span style="float: left;display: inline-block;min-width: 250px;max-width:250 px;margin-top: 2px;">
       <span id="card-relationship-label"  class="card-label heading" style="float:left;">
         Sample
       </span>
                   
-      <span id="variant-card-label" class="card-label keep-case" style="float:left;margin-left:3px;"></span>
+      <span id="variant-card-label" class="card-label keep-case" style="float:left;margin-left:3px;margin-right:10px;"></span>
     </span>
     
     <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
@@ -18,12 +18,12 @@
       </li>
 
       <li>
-        <a href="javascript:void(0)" id="button-find-missing-variants" style="visibility:hidden;padding-top:0px">
-            <i class="mdi-action-find-in-page"></i>
-            <span id="missing-variant-count-label" class="badge-label" style="margin-left:-3px;">Call from alignments</span>
-            <span id="missing-variant-count" style="margin-left:0px;" class="badge"></span>
-        </a>
-      </li>
+        <span id="missing-variant-count-label" class="hide badge-label" style="margin-left: 10px;margin-right: 2px;">
+          Called
+        </span>
+        <span id="missing-variant-count" class="hide badge">4</span></li>
+
+      </span>
       <li style="padding-left:10px;" >
             <span id="effect-flag" class="filter-flag hide label label-primary">Effect</span>
             <span id="impact-flag"class="filter-flag hide label label-primary">Impact</span>
@@ -40,12 +40,16 @@
             <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
             <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
             <span id="region-flag" class="hide label label-info">Zoom into region</span>
+            <span id="recfilter-flag" class="hide label label-info">Filter status</span>            
+            <span id="too-many-variants-flag" class="hide filter-flag label label-info"><span id="excluded-variant-count"></span> intron variants not shown.</span>
             <span id="displayed-variant-count" class="badge hide"></span>
+
       </li>
 
     </ul>
 
-    <div style="display: inline;width: 100%;text-align: center;clear: both;margin-left: -350px;">
+
+    <div style="display: inline;width: 100%;text-align: center;clear: both;margin-left: -150px;">
       <div class="loader vcfloader hide"  style="display: inline;">
         <span class="loader-label"></span>
         <img src="assets/images/wheel.gif">
@@ -58,13 +62,13 @@
 
 
     <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-      <i class="mdi-content-remove"></i>
+      <i class="material-icons">remove</i>
     </a>
     <a href="javascript:void(0)" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
-      <i class="mdi-image-crop-7-5"></i>
+      <i class="material-icons">crop_7_5</i>
     </a>
-    <a href="javascript:void(0)" id="expand-button"style="float:right;margin-top:-2px;text-decoration:none;">
-      <i class="mdi-image-crop-din"></i>
+    <a href="javascript:void(0)" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
+      <i class="material-icons">crop_3_2</i>
     </a>
 
    
@@ -78,30 +82,35 @@
 
   <div id="variant-panel" style="clear:both;">
      <div id="multiple-sample-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 570px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+      >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong>The variant file contains multiple samples. Defaulting to first sample in file.
     </div>
     <div id="no-variants-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 570px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> No variants found.  Make sure that the variant file is a valid URL or file.
                                     <br>The variant file must be gzipped compressed (.vcf.gz) and accompanied with a tabix (.vcf.gz.tbi) file.
     </div>
     <div id="no-ref-found-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 570px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> <span id="message"></span>
     </div>
     <div id="clinvar-warning" class="hide alert alert-dismissable alert-info" 
-       style="width: 300px; background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: center;">
+       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> Error accessing ClinVar.
     </div>
+    <div id="error-warning" class="hide alert  alert-info" 
+      >
+         <span id="message"></span>
+    </div>
+
 
     <div id="vcf-track" class="track hide" >
              
@@ -126,7 +135,7 @@
     </div>
 
 
-    <div id="zoom-region-chart"  class="track"></div>
+    <div id="zoom-region-chart"  class="track" style="clear:both;"></div>
 
 
     <div id="bam-track" class="track hide">
@@ -134,7 +143,7 @@
 
       
           <div >
-            <div id="bam-chart-label" class="chart-label" style="visibility:hidden;margin-top: 24px;margin-bottom: -17px;">Coverage
+            <div id="bam-chart-label" class="chart-label" style="visibility:hidden;margin-top: 24px;margin-bottom: -17px;margin-left:15px;">Coverage
             </div>
             <div id="bam-depth"  style="visibility:hidden">
             </div>

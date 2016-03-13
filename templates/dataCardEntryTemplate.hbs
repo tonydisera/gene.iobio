@@ -11,13 +11,13 @@
       <div id="add-vcf-track-toolbar" class="btn-toolbar" style="width:110px;">
         <div class="btn-group" style="display:  inline;" >
 
-          <button type="button" id="vcf-dropdown-button" style="font-size:11px;width:95px;padding-top: 2px;padding-bottom: 1px;" class="icon-button-sm btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-          <i class="mdi-device-now-widgets" style="font-size:14px;padding-right:0px;padding-top:2px;"></i>
+          <button type="button" id="vcf-dropdown-button" style="font-size:11px;width:95px;padding-top: 1px;padding-bottom: 0px;" class="icon-button-sm btn btn-raised btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">dialpad</i>
             Variants <span class="caret"></span>
           </button>
 
           <ul class="dropdown-menu" role="menu">
-            <li id="vcf-file-line-item" style="color:  rgb(51, 51, 51);">
+            <li id="vcf-file-line-item" style="">
                 <div class="file"  id="vcf-file-selector-item">
                     <input type="file" name="files[]" id="vcf-file-upload" multiple="">
                     <label class="file-button" for="vcf-file-upload">Choose VCF File</label>
@@ -68,16 +68,16 @@
     <div id="add-bam-track-toolbar" class="btn-toolbar" style="width:110px;" >
       <div class="btn-group" style="display:inline;">
 
-          <button type="button" id="bam-dropdown-button" style="width:95px;font-size:11px;padding-top: 2px;padding-bottom: 1px;"
+          <button type="button" id="bam-dropdown-button" style="width:95px;font-size:11px;padding-top: 1px;padding-bottom: 0px;"
           class="icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 
-            <i class="mdi-editor-format-align-center" style="font-size:16px;"></i>
+            <i class="material-icons" style="margin-left:-5px;padding-left:0px;font-size:18px;transform: rotate(180deg);">power_input</i>          
             Alignments 
             <span class="caret"></span>
           </button>
 
           <ul class="dropdown-menu" role="menu">
-            <li style="color:  rgb(51, 51, 51);">
+            <li style="">
                  <div id="bam-file-selector-item" class="file">
                     <input type="file" name="files[]" id="bam-file-upload" multiple="">
                     <label class="file-button" for="bam-file-upload">Choose BAM File</label>

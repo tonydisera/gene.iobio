@@ -10,8 +10,15 @@
 #transcript-menu-item.ibo-gene .transcript.selected .exon,
 #transcript-menu-item.ibo-gene .transcript.selected .cds
 { 
-  fill: #81A966 !important;
-  stroke: #81A966 !important;
+  fill:   #2196f3 !important;
+  stroke: #2196f3 !important;
+}
+#transcript-menu-item.ibo-gene .transcript.current .utr,
+#transcript-menu-item.ibo-gene .transcript.current .exon,
+#transcript-menu-item.ibo-gene .transcript.current .cds
+{ 
+    fill:   rgb(119, 167, 19) !important;
+    stroke: rgb(74, 130, 11)!important;
 }
 #transcript-menu-item.ibo-gene .utr:hover,
 #transcript-menu-item.ibo-gene .cds:hover,
@@ -21,9 +28,13 @@
   cursor: pointer;
 }
 
-#transcript-menu-item.ibo-gene .transcript.selected .reference {
+#transcript-menu-item.ibo-gene .transcript.current .reference {
   stroke: rgb(0, 0, 0);
   stroke-width: 1.5px;
+}
+#transcript-menu-item.ibo-gene .transcript.selected .reference {
+
+  stroke-width: 2px;
 }
 .ibo-gene .reference { 
   stroke: rgb(150,150,150); 
@@ -34,13 +45,23 @@
 }
 
 #zoom-region-chart.ibo-gene .cds.danger, #zoom-region-chart.ibo-gene .utr.danger { 
-  fill: rgba(226, 37, 37, .6);
-  stroke: rgba(226,37,37,.6);
+  fill:  rgba(224, 11, 11, 0.6);
 }
 #transcript-menu-item.ibo-gene .transcript.selected .name { 
-  font-style: bold;
-  fill: black;
+  font-style: italic;
+  font-size: 13px;
+  fill:   #2196f3 !important;
 }
+#transcript-menu-item.ibo-gene .transcript.current .name { 
+  font-weight: bold;
+  font-style: italic;
+  fill: black;
+  font-size: 13px;
+}
+#transcript-menu-item.ibo-gene .transcript .name:hover { 
+  cursor: pointer;
+}
+
 #transcript-menu-item.ibo-gene .name { 
   font-size: 11px; 
   fill: rgb(120,120,120); 
@@ -49,11 +70,6 @@
   font-size: 11px; 
   fill: rgb(205, 71, 40);
   font-style: italic;
-}
-#transcript-menu-item.ibo-gene .name:hover { 
-  cursor: pointer;
-  fill: black;
-  font-style: bold;
 }
 .ibo-gene .arrow { stroke: rgb(150,150,150); fill: none; }
 .ibo-gene .axis path, .ibo-gene .axis line { fill: none; stroke: lightgrey; shape-rendering: crispEdges; }

@@ -15,6 +15,11 @@ function featureMatrixD3() {
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
   }
+
+  var columnLabel = function( d, i) {
+    return d.type;
+  }
+ 
  
   // variables 
   var heightPercent = "100%",
@@ -31,6 +36,7 @@ function featureMatrixD3() {
 
       
   function chart(selection, options) {
+    var me = this;
     // merge options and defaults
     options = $.extend(defaults,options);
 
@@ -82,23 +88,23 @@ function featureMatrixD3() {
 
       svg.enter()
         .append("svg")
-        .attr("width", parseInt(width+margin.right))
+        .attr("width", parseInt(width))
         .attr("height", heightPercent)
-        .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height))
+        .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height))
         .attr("preserveAspectRatio", "none");
 
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
          .attr("width", parseInt(width+margin.right))
-         .attr('viewBox', "0 0 " + parseInt(width+margin.right) + " " + parseInt(height));
+         .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
 
 
 
 
       // Generate the column headers
       svg.selectAll("g.colhdr").remove();
-        if (options.showColumnLabels) {
+      if (options.showColumnLabels) {
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
           .append("g")
@@ -118,7 +124,7 @@ function featureMatrixD3() {
             .attr("transform", function(d) {
               return "rotate(-65)" ;
             })
-            .text( function(d) {  return d.type });
+            .text( columnLabel );
 
       }
 
@@ -142,11 +148,12 @@ function featureMatrixD3() {
       svg.selectAll("g.y").data([matrixRowNames]).enter()
           .append("g")
           .attr("class", "y axis")
-          .attr("transform", "translate(1," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
+          //.attr("transform", "translate(1," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
+          .attr("transform", "translate(20," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
           .call(yAxis)
           .selectAll("text")
           .style("text-anchor", "start")
-          .attr("x", "2")
+          .attr("x", "-28")
           .attr("dx", ".8em")
           .attr("dy", ".15em");
 
@@ -155,11 +162,13 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "up faded")
-         .attr("transform", "translate(" + rowLabelWidth + ", -14)")
-         .append("polygon")
-         .attr("points", "1,12 10,4 20,12")
-         .attr("x", "0")
-         .attr("y", "0")
+         //.attr("transform", "translate(" + rowLabelWidth + ", -13)")
+         .attr("transform", "translate(85, -24)")
+         .append("use")
+         .attr("id", "arrow-up")
+         .attr("xlink:href", "#arrow-up-symbol")
+         .attr("width", 44)
+         .attr("height", 44)
          .on("click", function(d,i) {
             // We want to mark the row label that is going to be shifted up
             // or down so that after the matrix is resorted and rewdrawn,
@@ -195,13 +204,13 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "down faded")
-         .attr("transform", "translate(" + (+rowLabelWidth + 21) + ", 15 )")
-         .append("polygon")
-         .attr("points", "1,12 10,4 20,12")
-         .attr("x", "0")
-         .attr("y", "0")
-         .style("transform", "rotate(180deg)")
-         .style("-webkit-transform", "rotate(180deg)")
+         //.attr("transform", "translate(" + (+rowLabelWidth + 17) + ", 9 )")
+         .attr("transform", "translate(105, -24 )")
+         .append("use")
+         .attr("id", "arrow-down")
+         .attr("xlink:href", "#arrow-down-symbol")
+         .attr("width", 44)
+         .attr("height", 44)
          .on("click", function(d,i) {
             // We want to mark the row label that is going to be shifted up
             // or down so that after the matrix is resorted and rewdrawn,
@@ -338,10 +347,12 @@ function featureMatrixD3() {
               var matrix = column.node()
                          .getScreenCTM()
                          .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
-              colObject.screenX = window.pageXOffset + matrix.e + margin.left;
-              colObject.screenY = window.pageYOffset + matrix.f + margin.top;
+              colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
+              colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
               dispatch.d3mouseover(colObject); 
+
+
             })                  
            .on("mouseout", function(d) {      
               var column = d3.select(this.parentNode.parentNode);
@@ -351,13 +362,16 @@ function featureMatrixD3() {
             })
             .on("click", function(d, i) {                
               var colObject = d3.select(this.parentNode.parentNode).datum();
-              var colIndex = Math.floor(i / matrixRowNames.length);               
+
+              var colIndex = Math.floor(i / matrixRowNames.length);  
               var on = !(d3.select(this.parentNode.parentNode).select(".colbox").attr("class").indexOf("current") > -1);
-              d3.select(this.parentNode.parentNode).select(".colbox").classed("current", on);
-              d3.select(this.parentNode.parentNode).classed("current", on);
-              var textDOM = container.selectAll('.x.axis .tick text')[0][colIndex];
-              d3.select(textDOM).classed("current", on);
-              dispatch.d3click(colObject);
+              d3.select(this.parentNode.parentNode.parentNode).select(".colbox.current").classed("current", false);             
+              if (on) {
+                d3.select(this.parentNode.parentNode).select(".colbox").classed("current", on);
+                dispatch.d3click(colObject);
+              } else {
+                dispatch.d3click();
+              }
             });
 
 
@@ -392,7 +406,15 @@ function featureMatrixD3() {
     });
 
   }
- 
+
+  chart.columnLabel = function(_) {
+    if (!arguments.length) {
+      return columnLabel;
+    } else {
+      columnLabel = _;
+      return chart;
+    }
+  }
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;

@@ -23,43 +23,25 @@ var Bam = Class.extend({
       }
       
       // set iobio servers
-      this.iobio = {}
+      this.iobio = {};
 
-      /*
-      this.iobio.coverage = "wss://coverage.iobio.io";
-      this.iobio.bamtools = "wss://bamtools.iobio.io";
-      this.iobio.samtools = "wss://samtools.iobio.io";
-      this.iobio.bamReadDepther = "wss://bamReadDepther.iobio.io";
-      this.iobio.bamMerger = "wss://bammerger.iobio.io";      
-      this.iobio.bamstatsAlive = "wss://bamstatsalive.iobio.io"
-      this.iobio.freebayes = "wss://freebayes.iobio.io";
-      this.iobio.bcftools = "wss://bcftools.iobio.io";
-      this.iobio.vcflib = "wss://vcflib.iobio.io";
-      this.iobio.vt = "wss://vt.iobio.io";
-*/
+      this.stage_iobio_services = "wss://nv-green.iobio.io/";
+      this.prod_iobio_services  = "wss://services.iobio.io/";
+      this.dev_iobio_services   = "ws://nv-dev.iobio.io/";
 
+      this.iobio.services = this.prod_iobio_services;
 
-  
-      this.iobio.coverage = "wss://nv-green.iobio.io/coverage";
-      this.iobio.bamtools = "wss://nv-green.iobio.io/bamtools";
-      this.iobio.samtools = "wss://nv-green.iobio.io/samtools";
-      this.iobio.bamReadDepther = "wss://nv-green.iobio.io/bamReadDepther";
-      this.iobio.bamMerger = "wss://nv-green.iobio.io/bammerger";      
-      this.iobio.bamstatsAlive = "wss://nv-green.iobio.io/bamstatsalive"
-      this.iobio.freebayes = "wss://nv-green.iobio.io/freebayes";
-      this.iobio.bcftools = "wss://nv-green.iobio.io/bcftools";
-      this.iobio.vcflib = "wss://nv-green.iobio.io/vcflib";
-      this.iobio.vt = "wss://nv-green.iobio.io/vt";
+      this.iobio.coverage       = this.dev_iobio_services + "coverage/ ";
+      this.iobio.bamtools       = this.iobio.services + "bamtools";
+      this.iobio.samtools       = this.iobio.services + "od_samtools";
+      this.iobio.bamReadDepther = this.iobio.services + "bamReadDepther";
+      this.iobio.bamMerger      = this.iobio.services + "bammerger";      
+      this.iobio.bamstatsAlive  = this.iobio.services + "bamstatsalive"
+      this.iobio.freebayes      = this.iobio.services + "freebayes";
+      this.iobio.bcftools       = this.iobio.services + "bcftools";
+      this.iobio.vcflib         = this.iobio.services + "vcflib";
+      this.iobio.vt             = this.iobio.services + "vt";
 
-
-      
-
-//      this.iobio.bamtools = "ws://localhost:8061";
-//      this.iobio.samtools = "ws://localhost:8060";
-//      this.iobio.coverage = "ws://localhost:8047"
-//      this.iobio.bamReadDepther = "ws://localhost:8021";
-//      this.iobio.bamMerger = "ws://localhost:8030";      
-//      this.iobio.bamstatsAlive = "ws://localhost:7100"
       return this;
    },
    
@@ -149,6 +131,20 @@ var Bam = Class.extend({
    },
 
    
+
+   
+    _getBamPileupUrl: function(region, golocal) {     
+      var samtools = this.iobio.samtools;
+      if ( this.sourceType == "url") {
+         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
+         var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
+      } else {
+        
+        var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
+       
+      }
+      return encodeURI(url);
+   },
 
    
    _generateExomeBed: function(id) {
@@ -701,7 +697,6 @@ var Bam = Class.extend({
         var protocol = me.sourceType == "url" ? '&protocol=http' : '';
         var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
         //var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
-
 
         var client = BinaryClient(me.iobio.coverage);
         

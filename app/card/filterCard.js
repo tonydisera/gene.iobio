@@ -1,22 +1,60 @@
 function FilterCard() {
 	this.clickedAnnotIds = new Object();
 	this.annotsToInclude = new Object();
-	this.afMin = null;
-	this.afMax = null;
-	this.coverageMin = 10;
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
+	this.recFilters = new Object();
 	this.annotationScheme = "snpEff";
 	this.pathogenicityScheme = "clinvar";
 	this.afScheme = "exac";
 
 }
 
+FilterCard.prototype.autoSetFilters = function() {
+	this.displayRecFilters();
+	this.initFilterListeners();
+	// If filter status has unique values of PASS + another status (e.g '.' or 'FAIL'),
+	// automatically filter variants to only include those with status PASS.
+	var statusCount = 0;
+	var passStatus = false;
+	for ( key in this.recFilters) {
+		if (key == 'PASS') {
+			passStatus = true;
+		}
+		statusCount++;	
+	}
+	if (passStatus && statusCount > 1) {
+		this.annotsToInclude.PASS = {key: "recfilter", state: true, value: "PASS"};		
+		d3.select("svg#PASS").classed("current", true);
+	} 
+
+}
+
+FilterCard.prototype.getFilterObject = function() {
+
+
+	var afMin = $('#af-amount-start').val() != '' ? +$('#af-amount-start').val() / 100 : null;
+	var afMax = $('#af-amount-end').val()   != '' ? +$('#af-amount-end').val()   / 100 : null;
+
+	var filterObject = {
+		'coverageMin': +$('#coverage-min').val(),
+		'afMin': afMin,
+		'afMax': afMax,
+		'afScheme' : this.afScheme,
+		'annotsToInclude': this.annotsToInclude
+    };
+
+    return filterObject;
+}
+
 
 FilterCard.prototype.onSelectAnnotationScheme = function() {
 	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
-	$('#effect-scheme .name').text(this.annotationScheme ==  'snpEff' ? 'Effect' : 'Consequence');
+
+	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
+	this.displayEffectFilters();
 	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 	window.loadTracksForGene();
 
 }
@@ -24,6 +62,18 @@ FilterCard.prototype.onSelectAnnotationScheme = function() {
 FilterCard.prototype.getAnnotationScheme = function() {
 	return this.annotationScheme;
 }
+
+FilterCard.prototype.setAnnotationScheme = function(scheme) {
+	this.annotationScheme = scheme;
+    $('#select-annotation-scheme').val(scheme);	
+	$('#select-annotation-scheme').trigger("chosen:updated");	
+
+	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
+	this.displayEffectFilters();
+	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
+}
+
 
 
 FilterCard.prototype.onSelectPathogenicityScheme = function() {
@@ -39,31 +89,33 @@ FilterCard.prototype.onSelectAFScheme = function() {
 	this.afScheme = $( "#select-af-scheme option:selected" ).text().toLowerCase();
 	
 	var filterCardSelector = $('#filter-track');
-	d3.selectAll("#filter-track .afexaclevel").classed("hide", this.afScheme != "exac");
-	d3.selectAll("#filter-track .af1000glevel").classed("hide", this.afScheme != "1000 genomes");
+	d3.selectAll("#filter-track .afexaclevels").classed("hide", this.afScheme != "exac");
+	d3.selectAll("#filter-track .af1000glevels").classed("hide", this.afScheme != "1000 genomes");
+	d3.selectAll("#filter-track .afexaclevel-panel").classed("hide", this.afScheme != "exac");
+	d3.selectAll("#filter-track .af1000glevel-panel").classed("hide", this.afScheme != "1000 genomes");
 }
 
 FilterCard.prototype.init = function() {
 	var me = this;
 
-	// Init panel based on handlebards template
-	$('#filter-panel').html(filterCardTemplate());
 
 	var filterCardSelector = $('#filter-track');
 	filterCardSelector.find('#expand-button').on('click', function() {
 		filterCardSelector.find('.fullview').removeClass("hide");
-		filterCardSelector.css('min-width', "665px");
+		//filterCardSelector.css('min-width', "665px");
 	});
 	filterCardSelector.find('#minimize-button').on('click', function() {
 		filterCardSelector.find('.fullview').addClass("hide");
-		filterCardSelector.css('min-width', "185px");
+		//filterCardSelector.css('min-width', "185px");
 	});
 
 
-	$('#select-annotation-scheme').chosen({width: "65px;font-size:10px;", disable_search_threshold: 10});
-	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;", disable_search_threshold: 10});
-	$('#select-af-scheme').chosen({width: "110px;font-size:10px;", disable_search_threshold: 10});
+	$('#select-annotation-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	$('#select-af-scheme').chosen({width: "115px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
 
+	// Default annotation scheme to VEP
+	this.setAnnotationScheme("VEP");
 
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
@@ -115,6 +167,7 @@ FilterCard.prototype.init = function() {
 
 	    	d3.selectAll(".impact").classed("nocolor", false);
 	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".vepConsequence").classed("nocolor", true);
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
@@ -133,6 +186,7 @@ FilterCard.prototype.init = function() {
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", false);
+	    	d3.selectAll(".vepConsequence").classed("nocolor", false);
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
@@ -151,6 +205,7 @@ FilterCard.prototype.init = function() {
 
 	    	d3.selectAll(".impact").classed("nocolor", true);
 	    	d3.selectAll(".effect").classed("nocolor", true);
+	    	d3.selectAll(".vepConsequence").classed("nocolor", true);
 	    	d3.selectAll(".zygosity").classed("nocolor", false);
 
 			window.variantCards.forEach(function(variantCard) {
@@ -165,8 +220,8 @@ FilterCard.prototype.init = function() {
 	    	d3.select('#afexac-scheme' ).classed("current", true);
 	    	d3.select('#af1000g-scheme' ).classed("current", false);
 
-	    	d3.selectAll(".afexaclevel").classed("nocolor", false);
-	    	d3.selectAll(".af1000glevel").classed("nocolor", true);
+	    	d3.selectAll(".afexaclevels").classed("nocolor", false);
+	    	d3.selectAll(".af1000glevels").classed("nocolor", true);
 
 	    	// De-select an af1000g filters
 	    	me.resetAfFilters("af1000glevel");
@@ -180,8 +235,8 @@ FilterCard.prototype.init = function() {
 	    	d3.select('#afexac-scheme' ).classed("current", false);
 	    	d3.select('#af1000g-scheme' ).classed("current", true);
 
-	    	d3.selectAll(".afexaclevel").classed("nocolor", true);
-	    	d3.selectAll(".af1000glevel").classed("nocolor", false);
+	    	d3.selectAll(".afexaclevels").classed("nocolor", true);
+	    	d3.selectAll(".af1000glevels").classed("nocolor", false);
 
 	    	me.resetAfFilters("afexaclevel");
 	    	me.resetAfRange();
@@ -195,7 +250,7 @@ FilterCard.prototype.init = function() {
 
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
-	d3.selectAll(".type, .impact, .effect, .sift, .polyphen, .regulatory, .zygosity, .afexaclevel, .af1000glevel, .inheritance, .clinvar, .uasibs")
+	d3.selectAll(".type, .impact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -273,6 +328,7 @@ FilterCard.prototype.clearFilters = function() {
 	this.annotsToInclude = [];
 	d3.selectAll('#filter-track .impact').classed('current', false);
 	d3.selectAll('#filter-track .effect').classed('current', false);
+	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
 	d3.selectAll('#filter-track .type').classed('current', false);
 	d3.selectAll('#filter-track .zygosity').classed('current', false);
 	d3.selectAll('#filter-track .sift').classed('current', false);
@@ -332,10 +388,10 @@ FilterCard.prototype.disableFilters = function() {
 	d3.selectAll(".regulatory").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
-	d3.selectAll(".afexaclevel").each( function(d,i) {		
+	d3.selectAll(".afexaclevels").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
-	d3.selectAll(".af1000glevel").each( function(d,i) {		
+	d3.selectAll(".af1000glevels").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
 	d3.selectAll(".inheritance").each( function(d,i) {		
@@ -349,7 +405,10 @@ FilterCard.prototype.disableFilters = function() {
 	$("#coverage-filter").addClass("hide");
 }
 
-FilterCard.prototype.enableClinvarFilters = function(theVcfData) {
+FilterCard.prototype.enableClinvarFilters = function(theVcfData) {	
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
 	
 	var clinvarVariantMap = {};
 	theVcfData.features.forEach( function(variant) {
@@ -390,41 +449,63 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 
 	d3.selectAll(".impact").each( function(d,i) {
 		var impact = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + impact)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".type").each( function(d,i) {
 		var type = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + type)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + type)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".zygosity").each( function(d,i) {
 		var zygosity = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + zygosity)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + zygosity)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".sift").each( function(d,i) {
 		var sift = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + sift)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + sift)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".polyphen").each( function(d,i) {
 		var polyphen = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + polyphen)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + polyphen)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 	d3.selectAll(".regulatory").each( function(d,i) {
 		var reg = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + reg)[0].length;
+		var count = d3.selectAll('#vcf-track .variant.' + reg)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
 
+	this.displayEffectFilters();
+	this.initFilterListeners();
+	d3.selectAll(".afexaclevels").each( function(d,i) {
+		var afexaclevel = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-track .variant.' + afexaclevel)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	d3.selectAll(".af1000glevels").each( function(d,i) {
+		var af1000glevel = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	$("#af-range-filter").removeClass("hide");
+
+}
+
+FilterCard.prototype.displayEffectFilters = function() {
+	var me = this;
 	$('#effect-filter-box .effect').remove();
+	$('#effect-filter-box .vepConsequence').remove();
 	var nocolor = $('#effect-filter-box #effect-scheme').hasClass("current") ? "" : "nocolor";
-	var values = this.annotationScheme == 'snpEff' ? this.snpEffEffects : this.vepConsequences;
-	var field  = this.annotationScheme == 'snpEff' ? 'effect' : 'vepConsequence';
-	for (key in values) {
-		var count = d3.selectAll('#vcf-variants .variant')
+	var values = this.annotationScheme.toLowerCase() == 'snpeff' ? this.snpEffEffects : this.vepConsequences;
+	var field  = this.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
+
+	var effectKeys = Object.keys(values).sort();
+
+	effectKeys.forEach( function(key) {
+		var count = d3.selectAll('#vcf-track .variant')
 		              .filter( function(d,i) {
 		              	var match = false; 
 		              	for (ef in d[field]) {
@@ -436,27 +517,71 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		              })[0].length;
 
 		if (count > 0) {
-
-			var svgElem = '<svg id="' + key + '" class="effect ' + nocolor + '" width="80" height="14" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 10px;">' + me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" ")) + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1;"></rect>' +
+			var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
+			var svgElem = null;
+			if (effectLabel.length < 20) {
+				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="110" height="15" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
+        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';
+
+			} else {
+				// find first space after 20th character
+				var pos = 0;
+				for (var i = 20; i < effectLabel.length; i++) {
+					if (pos == 0 && effectLabel[i] == " ") {
+						pos = i;
+					}
+				}
+				var label1 = effectLabel.substring(0, pos);
+				var label2 = effectLabel.substring(pos+1, effectLabel.length);
+				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="110" height="25" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
+                          '<text class="name" x="9" y="16" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
+        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
+      					  '</svg>';
+
+			}
+
       		$('#effect-filter-box').append(svgElem);
 		}
-	};
-	this.initFilterListeners();
-	d3.selectAll(".afexaclevel").each( function(d,i) {
-		var afexaclevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + afexaclevel + ',' + '#fb-variants .variant.' + afexaclevel)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".af1000glevel").each( function(d,i) {
-		var af1000glevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-variants .variant.' + af1000glevel)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	$("#af-range-filter").removeClass("hide");
+	});	
+}
 
+FilterCard.prototype.displayRecFilters = function() {
+	var me = this;
+	$('#rec-filter-box .recfilter').remove();
+
+	var recFilterCount = 0;
+	var recFilterKeys = Object.keys(this.recFilters).sort(function(a,b) {
+		if (a == 'PASS') {
+			return -1;
+		} else if (b == 'PASS') {
+			return 1
+		} else {
+			if (a < b) {
+				return -1;
+			} else if (a > b) {
+				return 1
+			} else {
+				return 0;
+			}
+		}
+	});
+	
+	recFilterKeys.forEach(function(key) {
+		recFilterCount++;
+		var label = key == "." ? ". (unassigned)" : key;			
+		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="12" transform="translate(0,0)">' +
+                      '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
+  					  '</svg>';
+  		$('#rec-filter-box').append(svgElem);
+	});
+	if (recFilterCount > 0) {
+		$('#rec-filter-panel').removeClass("hide");
+	} else {
+		$('#rec-filter-panel').addClass("hide");		
+	}	
 }
 
 FilterCard.prototype.capitalizeFirstLetter = function(string) {
@@ -470,15 +595,29 @@ FilterCard.prototype.classifyByImpact = function(d) {
 	var sift = "";
 	var polyphen = "";
 	var regulatory = "";
-	
-	var effectList = (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence);
-    for (key in effectList) {
-      effects += " " + key;
+
+	// this is not FilterCard because we are calling class function within d3 
+	var annotationScheme = filterCard.annotationScheme;
+
+	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);	
+	for (key in effectList) {
+      if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
+      	var tokens = key.split("&");
+      	tokens.forEach( function(token) {
+	      effects += " " + token;
+    		
+      	});
+      } else {
+	      effects += " " + key;	      
+      }
     }
-    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
     for (key in impactList) {
       impacts += " " + key;
       colorimpacts += " " + 'impact_'+key;
+    }
+    if (colorimpacts == "") {
+    	colorimpacts = "impact_none";
     }
     for (key in d.sift) {
     	sift += " " + key;		
@@ -489,8 +628,11 @@ FilterCard.prototype.classifyByImpact = function(d) {
     for (key in d.regulatory) {
     	regulatory += " " + key;		
     }
+
+    var af1000g = Object.keys(d.af1000glevels).join(" ");
+    var afexac = Object.keys(d.afexaclevels).join(" ");
 	
-	return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory + ' ' + d.afexaclevel + ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory + 'recfilter_' + d.recfilter + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 
 FilterCard.prototype.classifyByEffect = function(d) { 
@@ -500,13 +642,28 @@ FilterCard.prototype.classifyByEffect = function(d) {
 	var sift = "";
 	var polyphen = "";
 	var regulatory = "";
+
+	// this is not FilterCard because we are calling class function within d3 
+	var annotationScheme = filterCard.annotationScheme;
 	
-	var effectList = (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepConsequence);
+	
+	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);
     for (key in effectList) {
-      effects += " " + key;
-      coloreffects += " " + 'effect_'+key;
+      if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
+      	var tokens = key.split("&");
+      	tokens.forEach( function(token) {
+      	  effects += " " + token;
+	      coloreffects += " effect_" + token;      		
+      	});
+      } else {
+      	  effects += " " + key;
+	      coloreffects += " effect_" + key;
+      }
     }
-    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    if (coloreffects == "") {
+    	coloreffects = "effect_none";
+    }
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
     for (key in impactList) {
       impacts += " " + key;
     }
@@ -519,8 +676,12 @@ FilterCard.prototype.classifyByEffect = function(d) {
     for (key in d.regulatory) {
     	regulatory += " " + key;		
     }
+
+    var af1000g = Object.keys(d.af1000glevels).join(" ");
+    var afexac = Object.keys(d.afexaclevels).join(" ");
+
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + 'recfilter_' + d.recfilter +  afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 
@@ -531,13 +692,23 @@ FilterCard.prototype.classifyByZygosity = function(d) {
 	var polyphen = "";
 	var regulatory = "";
 	var colorzygs = "";
+
+	// this is not FilterCard because we are calling class function within d3 
+	var annotationScheme = filterCard.annotationScheme;
 	
-	var effectList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.effect : d.vepEffect);
+	
+	var effectList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepEffect);
 	for (key in effectList) {
-      effects += " " + key;
-      effects += " " + key;
+      if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
+      	var tokens = key.split("&");
+      	tokens.forEach( function(token) {
+	      effects += " " + token;	     
+      	});
+      } else {
+	      effects += " " + key;
+      }
     }
-    var impactList =  (this.annotationScheme == null || this.annotationScheme == 'snpEff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
     for (key in impactList) {
       impacts += " " + key;
     }
@@ -550,8 +721,11 @@ FilterCard.prototype.classifyByZygosity = function(d) {
     for (key in d.regulatory) {
     	regulatory += " " + key;		
     }
+    var af1000g = Object.keys(d.af1000glevels).join(" ");
+    var afexac = Object.keys(d.afexaclevels).join(" ");
+
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' +  d.afexaclevel+ ' ' + d.af1000glevel + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + 'recfilter_' + d.recfilter +  afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
 

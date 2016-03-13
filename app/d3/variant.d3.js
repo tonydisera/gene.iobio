@@ -62,20 +62,44 @@ function variantD3() {
           && d.ref == variant.ref 
           && d.alt == variant.alt 
           && d.type.toLowerCase() == variant.type.toLowerCase()) {
-          matchingVariant = variant;
+          
+          if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'homref') {
+            // we want to show an "x" for homozygous reference variants
+            // instead of a circle
+          } else {
+            matchingVariant = variant;
+          }
+          
+
        }
     });
-
+/*
+    svgContainer.selectAll(".variant").classed("current", false);
+    svgContainer.selectAll(".variant")
+        .filter( function(variant,i) {
+          var found = false;
+          if (d.start == variant.start 
+              && d.end == variant.end 
+              && d.ref == variant.ref 
+              && d.alt == variant.alt 
+              && d.type.toLowerCase() == variant.type.toLowerCase()) {
+            found = true;
+          }         
+          return found;
+         })
+         .classed("current", true);
+*/
     // Get the x for this position
     if (matchingVariant) {
       var mousex = d3.round(x(matchingVariant.start));
       var mousey = height - ((matchingVariant.level + 1) * (variantHeight + verticalPadding));
       
 
+
       var circle = svgContainer.select(".circle");
       circle.transition()
             .duration(200)
-            .style("opacity", 1);
+            .style("opacity", .6);
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 2);
 
@@ -86,8 +110,9 @@ function variantD3() {
                          .getScreenCTM()
                          .translate(+circle.node().getAttribute("cx"),+circle.node().getAttribute("cy"));
 
-      matchingVariant.screenX = window.pageXOffset + matrix.e + margin.left;
-      matchingVariant.screenY = window.pageYOffset + matrix.f + margin.top;
+      matchingVariant.screenX = d3.round(window.pageXOffset + matrix.e + margin.left);
+      matchingVariant.screenY = d3.round(window.pageYOffset + matrix.f + margin.top);
+      showCoordinateFrame(matchingVariant.screenX);
 
 
               
@@ -97,7 +122,7 @@ function variantD3() {
       
 
       var garrow = svgContainer.select("g.arrow");
-      garrow.attr("transform", "translate(" + (mousex + margin.left) + "," + (mousey + margin.top) + ")");
+      garrow.attr("transform", "translate(" + (mousex + margin.left) + "," + (mousey + margin.top - 6) + ")");
       garrow.selectAll('.arrow').transition()
             .duration(200)
             .style("opacity", 1);
@@ -105,6 +130,8 @@ function variantD3() {
       
       svgContainer.select(".circle").classed("emphasize", false);
     }
+
+
     return matchingVariant;
   };
 
@@ -120,7 +147,9 @@ function variantD3() {
     if (parentContainer) {
       parentContainer.select('.tooltip').transition()        
                    .duration(500)      
-                   .style("opacity", 0);
+                   .style("opacity", 0)
+                   .style("z-index", 0)
+                   .style("pointer-events", "none");
 
     }
   }
@@ -343,7 +372,7 @@ function variantD3() {
 
       // snps
       track.selectAll('.variant').data(function(d) { 
-        return d['features'].filter( function(d) { return d.type.toUpperCase() == 'SNP'; }) ;
+        return d['features'].filter( function(d) { return d.type.toUpperCase() == 'SNP' || d.type.toUpperCase() == 'MNP'; }) ;
       }).enter().append('rect')
           .attr('class', function(d) { return clazz(d); })          
           .attr('rx', borderRadius)
@@ -411,7 +440,7 @@ function variantD3() {
             .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
 
 
-        track.selectAll('.variant.snp').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
+        track.selectAll('.variant.snp, .variant.mnp').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
             .transition()        
               .duration(1000)
               .attr('x', function(d) { 
@@ -488,6 +517,11 @@ function variantD3() {
             .call(xAxis);       
       }
 
+      // Add grouping for bookmarks
+      svg.select("g.bookmarks").remove();
+      svg.append("g")
+         .attr("class", "bookmarks");
+
 
 
       // add a circle and label
@@ -499,6 +533,8 @@ function variantD3() {
           .attr("cy", 0)
           .attr("r", 6)                    
           .style("opacity", 0);
+
+      
       
       // add a arrow on the x-axis
       svg.selectAll("g.arrow").remove();
@@ -506,20 +542,7 @@ function variantD3() {
                       .enter().append("g")
                       .attr("class", "arrow")
                       .attr("transform", "translate(2,0)");
-      /*
-      garrow.append('polygon')
-          .attr("class", "arrow")
-          .attr("points", "0,8 4,2 8,8")
-          .style("opacity", 0);
-      garrow.append('line')
-          .attr("class", "arrow arrow-line")
-          .attr("x1", 4)
-          .attr("x2", 4)
-          .attr("y1", 8)
-          .attr("y2", 50)
-          .style("opacity", 0);   
-     */  
-
+ 
       garrow.append('line')
           .attr("class", "arrow arrow-line")
           .attr("x1", 8)
@@ -533,13 +556,90 @@ function variantD3() {
           .attr("x2", -2)
           .attr("y1", 0)
           .attr("y2", 8)
-          .style("opacity", 0);      
+          .style("opacity", 0);    
 
 
       
       dispatch.d3rendered();
  
     });
+
+  }
+
+  chart.addBookmark = function(svg, variant, key) {
+
+    // Find the matching variant
+    var matchingVariant = null;
+    svg.selectAll(".variant").each( function (d,i) {
+       if (d.start == variant.start 
+          && d.end == variant.end 
+          && d.ref == variant.ref 
+          && d.alt == variant.alt 
+          && d.type.toLowerCase() == variant.type.toLowerCase()) {
+          matchingVariant = d;
+       }
+    });
+    if (!matchingVariant) {
+      return;
+    }
+
+    matchingVariant.isBookmark = 'Y';
+
+    // Get the x, y for the variant's position
+    var mousex = d3.round(x(matchingVariant.start));
+    var mousey = height - ((matchingVariant.level + 1) * (variantHeight + verticalPadding));      
+
+    var xpos = 0;
+    var ypos = mousey-2;
+    if (variant.type.toUpperCase() == "DEL" || variant.type.toUpperCase() == "COMPLEX") {
+      xpos =  mousex;
+    } else if (variant.type.toUpperCase() == "INS") {
+      xpos =  mousex-.5;
+    }else {
+      xpos =  mousex+.5;
+    }
+
+    var group = svg.select("g.bookmarks")
+       .append("g")
+       .attr("class", "bookmark")
+       .attr("id", key ? key : "")
+       .attr("transform", "translate(" + xpos + "," +  ypos + ")" );
+
+
+    var flagGroup = group.append("g")
+       .attr("transform", "translate(-3,-2)");
+    flagGroup.append("rect")
+             .attr("x", 1)
+             .attr("y", 0)
+             .attr("width", 15)
+             .attr("height", 15);
+    /*
+    flagGroup.append("g")
+             .attr("transform", "translate(1,0),rotate(90)")
+             .append("use")
+             .attr("xlink:href", "#bookmark-symbol")
+             .attr("width", "12")
+             .attr("height", "12");
+    */
+
+
+    /*
+    var flagGroup = group.append("g")
+       .attr("transform", "translate(-1,-5)");
+    flagGroup.append("line")
+             .attr("x1", 4)
+             .attr("x2", 4)
+             .attr("y1", -2)
+             .attr("y2", "14");
+    flagGroup.append("g")
+             .attr("transform", "translate(2,1),rotate(270)")
+             .append("use")
+             .attr("xlink:href", "#bookmark-symbol")
+             .attr("width", "12")
+             .attr("height", "12");
+    */
+
+    return chart;
 
   }
  
