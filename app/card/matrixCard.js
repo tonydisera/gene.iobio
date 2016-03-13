@@ -300,6 +300,20 @@ MatrixCard.prototype._isolateVariants = function() {
 
 }
 
+MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
+	var i = -1;
+	d3.select("#feature-matrix").datum().forEach( function(variant) {
+		if (variant.start == theVariant.start &&
+			variant.alt == theVariant.alt &&
+			variant.end == theVariant.end) {
+			variant.isBookmark = 'Y';
+			index = i;
+		}
+		i++;
+	});
+
+}
+
 MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	var me  = this;
 	var index = -1;

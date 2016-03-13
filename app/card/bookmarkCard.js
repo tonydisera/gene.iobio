@@ -152,6 +152,7 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 			this.bookmarkedVariants[key] = variant;
 			//getProbandVariantCard().unpin();
 			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);
+			matrixCard.addBookmarkFlag(variant);
 			variant.isBookmark = 'Y';
 		}
 	}
