@@ -92,8 +92,8 @@ VariantCard.prototype.summarizeDanger = function(data) {
 	return this.model.summarizeDanger(data);
 }
 
-VariantCard.prototype.promiseCacheVariants = function(geneName, ref, start, end, strand, transcript) {
-	return this.model.promiseCacheVariants(geneObject, transcript);
+VariantCard.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
+	return this.model.promiseCacheVariants(ref, geneObject, transcript);
 }
 
 VariantCard.prototype.isCached = function(geneName, transcript) {

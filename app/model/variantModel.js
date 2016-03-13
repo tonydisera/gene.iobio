@@ -973,7 +973,7 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 	return data != null;
 }
 
-VariantModel.prototype.promiseCacheVariants = function(geneObject, transcript) {
+VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
 	var me = this;
 
 

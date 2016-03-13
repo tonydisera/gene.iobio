@@ -1078,6 +1078,7 @@ function cacheNextGene(genesToCache) {
 
 		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
 			    		variantCard.promiseCacheVariants(
+			    			geneObject.chr,
 			    			geneObject, 
 						 	transcript)
 			    		.then( function(vcfData) {
@@ -1658,6 +1659,7 @@ function addVariantCard() {
 }
 
 function callVariants() {
+
 	fulfilledTrioPromise = false;
 	variantCards.forEach(function(vc) {
 		vc.callVariants(regionStart, regionEnd);
