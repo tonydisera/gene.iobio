@@ -13,8 +13,16 @@ aria-multiselectable="true">
     <div class="panel-heading" role="tab" id="heading1a">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" style="margin-right:4px;" href="#collapse1a" aria-expanded="true" aria-controls="collapse1a">
-          Filter status     
-        </a>
+          VCF Filter status  
+          <a id="import-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" style="font-size:10px;" data-toggle="tooltip" title="What is this field?">
+            <span id="filter-status-help-icon" class="material-icons" style="font-size: 14px;">help</span> 
+          </a>         
+
+          <div id="vcf-filter-status-info" class="collapse" aria-expanded="false" style="clear:both;font-size:10px;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+          This represents the data quality filter in the VCF file. When utilized, the field will 
+          typically contains at least two possible status values: PASS, 
+          for variants that have passed data quality, and '.' for variants not meeting the quality criteria.
+          </div>          
 
       </h4>
     </div>
