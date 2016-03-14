@@ -49,6 +49,7 @@ function DataCard() {
 
 DataCard.prototype.loadDemoData = function() {
 
+	$('#splash').addClass("hide");
 	var alreadyLoaded = false;
 	if (hasDataSources()) {
 		alreadyLoaded = true;
