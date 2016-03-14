@@ -240,6 +240,7 @@ function init() {
     // Encapsulate logic for animate.css into a jquery function
     $.fn.extend({
     animateIt: function (animationName, customClassName) {
+    		$(this).removeClass("hide");
     		var additionalClass = customClassName ? ' ' + customClassName : '';
 	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
 	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
@@ -247,6 +248,17 @@ function init() {
 	        });
 	    }
 	});
+	$.fn.extend({
+    animateSplash: function (animationName) {
+    		$(this).removeClass("hide");
+	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+	        $(this).addClass('animated ' + animationName).one(animationEnd, function() {
+	            $(this).removeClass('animated ' + animationName);
+	            $('.twitter-typeahead').animateIt('tada', 'animate-delayed');	            
+	        });
+	    }
+	});
+
 
 	// For 'show variants' card
 	$('#select-color-scheme').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
@@ -525,6 +537,11 @@ function showSlideLeft() {
 			getProbandVariantCard().adjustTooltip(clickedVariant);
 		}
 
+		if (!$('#splash').hasClass("hide")) {
+			$('#splash-image').animateSplash('zoomIn');
+		}
+
+
 	});
 
 }
@@ -705,6 +722,7 @@ function loadGeneFromUrl() {
 	} else {
 		// Open the 'About' sidebar by default if there is no data loaded when gene is launched
 		showSidebar("Help");
+
 
 		if (showTour != null && showTour == 'Y') {
 			//pageGuide.open();
@@ -1268,8 +1286,8 @@ function getUrlParameter(sParam) {
 function loadGeneWidget() {
 	// kicks off the loading/processing of `local` and `prefetch`
 	gene_engine.initialize();
-	
-	 	
+
+
 	var typeahead = $('#bloodhound .typeahead').typeahead({
 	  hint: true,
 	  highlight: true,
@@ -1354,6 +1372,8 @@ function loadGeneWidget() {
 					enableCallVariantsButton();						
 		    	} else {
 	
+					$('#splash').addClass("hide");
+
 					//$('#tourWelcome').removeClass("open");
 					
 			    	loadTracksForGene();
