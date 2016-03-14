@@ -1123,10 +1123,18 @@ VariantModel.prototype._pruneIntronVariants = function(data) {
 		data.features = data.features.filter(function(variant) {
 			var keep = false;
 			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
-			for (key in variant[effectField]) {
-				if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
-					keep = true;
+			var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
+			for (key in variant[impactField]) {
+				if (key.toLowerCase() == 'high' || key.toLowerCase() == 'moderate') {
+					keep = true
 				}
+			}
+			if (!keep) {
+				for (key in variant[effectField]) {
+					if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
+						keep = true;
+					}
+				}				
 			}
 			if (!keep) {
 				data.intronsExcludedCount++;
