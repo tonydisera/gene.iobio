@@ -19,12 +19,11 @@ aria-multiselectable="true">
           </a>         
 
           <div id="vcf-filter-status-info" class="collapse" aria-expanded="false" style="clear:both;font-size:10px;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
-            All VCF files contain a 'filter status' column defined as a string describing the result
-            of any applied filters for the variant. For variants passing all filters, this usually
-            takes the value 'PASS'. The '.' value means the filter status has not been set and usually
-            results when no filtering has been applied, or, when 'PASS' is also present, means that the
-            variant failed the filters. When the VCF file has been filtered on multiple criteria, the value
-            is usually either 'PASS' or a comma separated list of the failed filters.
+            The 'Filter status' is a tag set by filtering software to explain the result of
+            filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
+            recommended to display variants marked with 'PASS' if present. Often, if some variants
+            are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
+            For more detailed information, with examples, see the blog post on 'Filter status'.
           </div>          
 
       </h4>
