@@ -537,7 +537,7 @@ function showSlideLeft() {
 			getProbandVariantCard().adjustTooltip(clickedVariant);
 		}
 
-		if (!$('#splash').hasClass("hide")) {
+		if (!$('#splash').hasClass("hide") && !isDataLoaded()) {
 			$('#splash-image').animateSplash('zoomIn');
 		}
 
