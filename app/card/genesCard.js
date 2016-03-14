@@ -182,6 +182,69 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	$('#get-genes-dropdown .btn-group').removeClass('open');	
 }
 
+// Handle ACMG56 genes.
+GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
+	var me = this;
+	// Clear the cache
+	clearCache();
+
+	geneNames = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYLK", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S"];
+
+	// Remove gene badges not specified in the text area
+	var geneBadgesToRemove = [];
+	$('#gene-badge-container #gene-badge').each( function(index, value) {
+		var badge =  $(this);
+		var badgeGeneName = badge.find('#gene-badge-name').text();
+		
+		// If this badge does not correspond to a name in the gene list,
+		// flag it to be removed		
+		if (geneNames.indexOf(badgeGeneName) < 0) {
+			geneBadgesToRemove.push(badgeGeneName);
+		}
+
+	});
+	geneBadgesToRemove.forEach( function(geneName) {
+		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+		$(selector).parent().parent().remove();
+	});
+
+
+
+	if (geneNames.length > 0) {
+		$('#gene-badge-container #manage-gene-list').removeClass("hide");
+	} else {
+		$('#gene-badge-container #manage-gene-list').addClass("hide");
+		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
+	}
+
+	// Create a gene badge for each gene name in the comma separated list.
+	for(var i = 0; i < geneNames.length; i++) {
+		var name = geneNames[i];	
+		// Only add the gene badge if it does not already exist
+		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
+		if ($(existingBadge).length == 0) {
+			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
+			me.addGeneBadge(name, true);
+		}
+	}
+
+	// If we are loading from the url, just add the class 'selected' to the gene specified in the 
+	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
+	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
+		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
+		geneBadge.addClass("selected");
+		if (hasDataSources()) {
+			geneBadge.find('.gene-badge-loader').removeClass('hide');
+		}
+	} else if (geneNames.length > 0 && geneNameToSelect == null) {
+		me.selectGene(geneNames[0]);
+	}
+
+	me._onGeneBadgeUpdate();
+
+	$('#get-genes-dropdown .btn-group').removeClass('open');	
+}
+
 GenesCard.prototype.getPhenolyzerGenes = function() {
 	var me = this;
 
