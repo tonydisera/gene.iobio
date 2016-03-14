@@ -579,11 +579,13 @@ FilterCard.prototype.displayRecFilters = function() {
   					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
 	});
+	/*
 	if (recFilterCount > 0) {
 		$('#rec-filter-panel').removeClass("hide");
 	} else {
 		$('#rec-filter-panel').addClass("hide");		
-	}	
+	}
+	*/	
 }
 
 FilterCard.prototype.capitalizeFirstLetter = function(string) {

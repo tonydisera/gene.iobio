@@ -522,7 +522,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 		this.cardSelector.find('#bam-depth').css("visibility", "hidden");
 		this.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
 
-
+    	this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
     	this.cardSelector.find('#displayed-variant-count').text("");
     	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	this.cardSelector.find('#vcf-variant-count').text("");
@@ -581,10 +581,12 @@ VariantCard.prototype.onBrush = function(brush) {
 		this.cardSelector.find("#region-flag").addClass("hide");
 		// Only remove if no other filter flags are on
 		if (this.cardSelector.find(".filter-flag.hide").length == this.cardSelector.find(".filter-flag").length) {
+			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 			this.cardSelector.find("#displayed-variant-count").addClass("hide");
 		}
 	} else {
 		this.cardSelector.find("#region-flag").removeClass("hide");
+		this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 		this.cardSelector.find("#displayed-variant-count").removeClass("hide");
 	}
 
@@ -817,6 +819,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
 			}	
+			me.populateRecFilters(theVcfData);
 			filterCard.autoSetFilters();
 			var filteredVcfData = this.filterVariants(theVcfData);
 			me._fillVariantChart(filteredVcfData, 
@@ -825,7 +828,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 
 			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
-				var filteredVcfData = this.filterVariants(theVcfData);
+				var filteredVcfData = this.filterVariants(theVcfData);    	
+				me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 				me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
 				
 				filterCard.enableVariantFilters(true);
@@ -1024,7 +1028,9 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);    
     this.vcfChart(selection);
 
-	this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(data));
+
+    this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+    this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(data));
 
 	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
@@ -1278,6 +1284,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 
 	// Only hide displayed variant count if we haven't already zoomed
 	if (this.cardSelector.find("#region-flag.hide").length > 0) {
+		this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 		this.cardSelector.find("#displayed-variant-count").addClass("hide");
 	}
 
@@ -1300,7 +1307,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		} else {
 			// We are filtering on af range.  show the filter flag
 			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").removeClass("hide");
-			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
+    		me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+    		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		}
 	} else {
 		me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").addClass("hide");
@@ -1308,6 +1316,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 
 	if (filterObject.coverageMin && filterObject.coverageMin > 0) {
 		me.cardSelector.find("#coverage-flag").removeClass("hide");
+    	me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");		
 		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 	}
 
@@ -1335,6 +1344,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		}
 		if (filterOn) {
 			me.cardSelector.find("#" + key + "-flag").removeClass("hide");
+			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		}  else {
 			me.cardSelector.find("#" + key + "-flag").addClass("hide");
@@ -1353,6 +1363,9 @@ VariantCard.prototype.determineMaxAlleleCount = function() {
 
 VariantCard.prototype.populateEffectFilters = function() {
 	this.model.populateEffectFilters();
+}
+VariantCard.prototype.populateRecFilters = function(theVcfData) {
+	this.model._populateRecFilters(theVcfData.features);
 }
 
 
