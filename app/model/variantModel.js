@@ -1119,7 +1119,7 @@ VariantModel.prototype._pruneIntronVariants = function(data) {
 		data.intronsExcludedCount = 0;
 		data.features = data.features.filter(function(variant) {
 			var keep = false;
-			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepEffect';
+			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
 			for (key in variant[effectField]) {
 				if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
 					keep = true;
