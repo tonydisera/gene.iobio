@@ -1041,6 +1041,7 @@ VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 		+ (this.sampleName != null ? "-" + this.sampleName : "")
 		+ "-" + (geneName != null ? geneName : gene.gene_name) 
 		+ (transcript != null ? "-" + transcript.transcript_id : "")
+	    + "-" + (filterCard.getAnnotationScheme().toLowerCase())
 		+ "-" + dataKind;
 }
 
