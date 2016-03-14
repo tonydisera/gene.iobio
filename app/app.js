@@ -396,6 +396,13 @@ function whichTransitionEvent(){
   }
 }
 
+function sidebarAdjustX(x) {	
+	if (!$("#slider-left").hasClass("hide")) {
+		x -= ($("#slider-left").width() + $("#slider-icon-bar").width());
+		x -= 1;
+	}
+	return x;
+}
 
 function showCoordinateFrame(x) {
 	var top = +$('#nav-section').outerHeight();
@@ -406,9 +413,7 @@ function showCoordinateFrame(x) {
 	height    += +$('#other-variant-cards').outerHeight();
 
 
-	if (!$("#slider-left").hasClass("hide")) {
-		x -= ($("#slider-left").width() + 36);
-	}
+	x = sidebarAdjustX(x);
 	
 	var margins = dataCard.mode == 'trio' ? 10 : 20;
 
@@ -602,6 +607,10 @@ function detectIE() {
 
     // other browser
     return false;
+}
+
+function detectSafari() {
+	return (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1);
 }
 
 

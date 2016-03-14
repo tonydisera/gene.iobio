@@ -1468,9 +1468,9 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	
 	var x = variant.screenX;
 	var y = variant.screenY;
-	if (!$("#slider-left").hasClass("hide")) {
-		x -= ($("#slider-left").width() + 32);
-	}
+
+	x = sidebarAdjustX(x);
+
 
     tooltip.transition()        
            .duration(1000)      

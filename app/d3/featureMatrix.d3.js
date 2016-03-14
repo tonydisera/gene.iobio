@@ -347,7 +347,13 @@ function featureMatrixD3() {
               var matrix = column.node()
                          .getScreenCTM()
                          .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
-              colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
+
+              // Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
+              // so instead the app will use getBoundingClientRect() method instead which does take into consideration
+              // the transform. 
+              var boundRect = column.node().getBoundingClientRect();   
+              colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;                     
+              //colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
               colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
               dispatch.d3mouseover(colObject); 

@@ -353,7 +353,12 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	     	matrix = column.node()
 	          			   .getScreenCTM()
 	        		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
-	      	colObject.screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
+			// Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
+            // so instead the app will use getBoundingClientRect() method instead which does take into consideration
+            // the transform. 
+            var boundRect = column.node().getBoundingClientRect();   
+            colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + me.featureMatrix.margin().left;
+	      	//colObject.screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
 	      	colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
 
 	      	me.showTooltip(colObject, false);
@@ -450,8 +455,12 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var x = variant.screenXMatrix;
 	var y = variant.screenYMatrix + 10;
 
-	if (!$("#slider-left").hasClass("hide")) {
-		x -= ($("#slider-left").width() + 36);
+	x = sidebarAdjustX(x);
+
+	if (detectSafari()) {
+		x += me.featureMatrix.cellSize()/2;
+	} else {
+		x -= me.featureMatrix.cellSize()/2;
 	}
 
 	if (x < w) {
@@ -466,7 +475,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		tooltip.classed("arrow-down-right", true);
 		tooltip.classed("arrow-down-left", false);
 		tooltip.style("width", w + "px")
-		       .style("left", (x - w) + "px") 
+		       .style("left", (x - w + 2) + "px") 
 		       .style("text-align", 'left')    
 		       .style("top", (y - h) + "px");   
 	}	
