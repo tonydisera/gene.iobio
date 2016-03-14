@@ -39,7 +39,7 @@ function DataCard() {
 	this.exomeSampleNames = {
 		proband: 'NA19240',
 		mother:  'NA19238',
-		father:  'NA19229'
+		father:  'NA19239'
 	};
 
 	this.mode = 'single';
