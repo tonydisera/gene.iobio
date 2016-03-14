@@ -325,7 +325,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 		this.cardSelector.find("#fb-chart-label").addClass("hide");
 		this.cardSelector.find("#fb-separator").addClass("hide");
 		this.cardSelector.find("#fb-variants").addClass("hide");
-		this.cardSelector.find("#missing-variant-count").html("");
+		this.cardSelector.find("#missing-variant-count").text("");
 	}
 }
 
@@ -354,6 +354,8 @@ VariantCard.prototype.clearVcf = function() {
 	this.cardSelector.find('#vcf-variant-card-label').text("");
 	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
 	this.cardSelector.find('#vcf-variant-count').text("");
+	this.cardSelector.find('#missing-variant-count-label').addClass("");
+	this.cardSelector.find('#missing-variant-count').text("");
 }
 
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
@@ -471,7 +473,9 @@ VariantCard.prototype.clearWarnings = function() {
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
 	this.cardSelector.find('#error-warning').addClass("hide");
-	this.cardSelector.find('#missing-variant-count-label').addClass("hide");	
+	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
+	this.cardSelector.find('#missing-variant-count').addClass("hide");
+	
 }
 
 /* 
@@ -796,8 +800,16 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 		if (this.isViewable()) {
 			me.cardSelector.find('.vcfloader').addClass("hide");
 			me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-	        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount(theVcfData));		
+	        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount(theVcfData));	
+
 			me.clearWarnings();		
+
+	        if (me.model.hasCalledVariants()) {
+		        me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());	        	
+	        }	
+
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
@@ -1128,6 +1140,10 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 		this.cardSelector.find("#vcf-track").removeClass("hide");
 		this.cardSelector.find(".vcfloader").removeClass("hide");
 		this.cardSelector.find('.vcfloader .loader-label').text("Calling Variants with Freebayes");
+
+		$('#recall-card .' + this.getRelationship() + '.covloader').removeClass("hide");
+		$('#recall-card .' + this.getRelationship() + '.call-variants-count').addClass("hide");
+
 	}
 
 	this.model.promiseCallVariants(
@@ -1149,12 +1165,6 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
 				//me.model.loadTrioInfoForCalledVariants();
 
-				// After variants have been called from alignments and annotated from snpEff/VEP...
-				// Show the called variant count
-				me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
-				me.cardSelector.find('#missing-variant-count').removeClass("hide");
-				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
-
 				// Show loading clinvar progress....
 		    	me.cardSelector.find('.vcfloader').removeClass("hide");
 				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
@@ -1175,10 +1185,20 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			
 
 	}).then( function(data) {
+		// After variants have been called from alignments and annotated from snpEff/VEP...
+		// Show the called variant count
+		me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+		me.cardSelector.find('#missing-variant-count').removeClass("hide");
+		me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
+		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
+		$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
+		$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
+
+
 
 		// Hide the clinvar loader
 		me.cardSelector.find('.vcfloader').addClass("hide");
-
+		
 		// Show the called variants
 		me._fillFreebayesChart(data, regionStart, regionEnd);
 
@@ -1194,6 +1214,8 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 		console.log(error);
 		me.cardSelector.find('.vcfloader').addClass("hide");
+		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
+
 		me.cardSelector.find('#clinvar-warning').removeClass("hide");
 	});
 

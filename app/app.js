@@ -1430,6 +1430,10 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	$('#transcript-btn-group').removeClass("hide");
 	$('#feature-matrix .tooltip').css("opacity", 0);
 
+	$('#recall-card .call-variants-count').addClass("hide");
+	$('#recall-card .call-variants-count').text("");
+	$('#recall-card .covloader').addClass("hide");
+
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
 	readjustCards();

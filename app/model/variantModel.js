@@ -68,6 +68,7 @@ VariantModel.prototype.variantsHaveBeenCalled = function() {
 }
 
 VariantModel.prototype.hasCalledVariants = function() {
+	this.getCalledVariants();
 	return this.fbData != null && this.fbData.features != null && this.fbData.features.length > 0;
 }
 

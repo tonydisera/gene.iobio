@@ -1997,6 +1997,10 @@ text.ref-count {
   #gene-badge-container.manage #gene-badge-remove {
     visibility: visible; }
 
+.call-variants-count {
+  font-size: 11px;
+  margin-top: 5px; }
+
 #slider-left a.help-link {
   font-size: 14px !important;
   color: #5d809d !important;
