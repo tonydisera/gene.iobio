@@ -247,6 +247,9 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	}
 	dangerCounts.IMPACT      = getLowestImpact(impactClasses);
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
+	if (filterCard.getAnnotationScheme().toLowerCase() == 'vep') {
+		dangerCounts.IMPACT = dangerCounts.CONSEQUENCE;
+	}
 	dangerCounts.CLINVAR     = getLowestClinvarClazz(clinvarClasses);
 	dangerCounts.INHERITANCE = inheritanceClasses;
 	
