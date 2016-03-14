@@ -24,7 +24,7 @@ function DataCard() {
 	this.exomeNames = {
 		proband: 'NA19240',
 		mother:  'NA19238',
-		father:  'NA19229' 
+		father:  'NA19239' 
 	};
 	this.exomeUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
