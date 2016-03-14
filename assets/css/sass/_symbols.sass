@@ -156,28 +156,28 @@
 .zyg_het
   fill: #D3D5D8
 
-.impact, .effect, .vepConsequence, .type, .zygosity, .recfilter
+.impact, .vepImpact, .effect, .vepConsequence, .type, .zygosity, .recfilter
   border: solid 2px $sidebar-body-color
   padding: 1px
 
   text
     fill: $sidebar-text-color
 
-.impact.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect
+.impact.nocolor rect, .vepImpact.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect
   fill: lightgrey !important
   stroke: grey
 
 .afexaclevels.nocolor, .af1000glevels.nocolor
   display: none !important
 
-.impact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover
+.impact:hover, .vepImpact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover
   cursor: pointer
   font-weight: bold
   fill: $current-color
   border: solid 1.5px $current-frame-color
   border-radius: 4px
 
-.impact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover
+.impact.current:hover, .vepImpact.current:hover,  .effect.current:hover, .vepConsequence.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover
   font-weight: bold
   cursor: pointer
   border: solid 2.5px $current-color

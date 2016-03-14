@@ -69,6 +69,8 @@ FilterCard.prototype.setAnnotationScheme = function(scheme) {
 	$('#select-annotation-scheme').trigger("chosen:updated");	
 
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
+	d3.select('#filter-card .impact').classed('vepImpact',this.annotationScheme.toLowerCase() == 'vep');
+	d3.select('#filter-card .vepImpact').classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
 	this.displayEffectFilters();
 	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
 	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
@@ -250,7 +252,7 @@ FilterCard.prototype.init = function() {
 
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
-	d3.selectAll(".type, .impact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter")
+	d3.selectAll(".type, .impact, .vepImpact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter")
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
