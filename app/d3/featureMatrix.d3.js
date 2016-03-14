@@ -96,7 +96,7 @@ function featureMatrixD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr("width", parseInt(width+margin.right))
+         .attr("width", parseInt(width))
          .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
 
 
@@ -115,7 +115,7 @@ function featureMatrixD3() {
         colhdrs.enter().append('g')
             .attr('class', 'colhdr')
             .attr('transform', function(d,i) { 
-              return "translate(" + (x.rangeBand() * (i+1)) + ",0)";
+              return "translate(" + (cellSize * (i+1)) + ",0)";
             })
             .append("text")
             .style("text-anchor", "start")
@@ -273,7 +273,7 @@ function featureMatrixD3() {
       cols.enter().append('g')
           .attr('class', 'col')
           .attr('transform', function(d,i) { 
-            return "translate(" + (x.rangeBand() * (i+1)) + ",0)";
+            return "translate(" + (cellSize * (i+1)) + ",0)";
           });
       
 
@@ -347,7 +347,13 @@ function featureMatrixD3() {
               var matrix = column.node()
                          .getScreenCTM()
                          .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
-              colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
+
+              // Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
+              // so instead the app will use getBoundingClientRect() method instead which does take into consideration
+              // the transform. 
+              var boundRect = column.node().getBoundingClientRect();   
+              colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;                     
+              //colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
               colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
               dispatch.d3mouseover(colObject); 

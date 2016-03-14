@@ -9,12 +9,22 @@
 aria-multiselectable="true">
 
   <!-- VCF Record Filters -->
-  <div id="rec-filter-panel" class="hide panel panel-default" style="height:100%">
+  <div id="rec-filter-panel" class=" panel panel-default" style="height:100%">
     <div class="panel-heading" role="tab" id="heading1a">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" style="margin-right:4px;" href="#collapse1a" aria-expanded="true" aria-controls="collapse1a">
-          Filter status     
-        </a>
+          VCF Filter status  
+          <a id="import-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" style="font-size:10px;" data-toggle="tooltip" title="What is this field?">
+            <span id="filter-status-help-icon" class="material-icons" style="font-size: 14px;">help</span> 
+          </a>         
+
+          <div id="vcf-filter-status-info" class="collapse" aria-expanded="false" style="clear:both;font-size:10px;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+            The 'Filter status' is a tag set by filtering software to explain the result of
+            filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
+            recommended to display variants marked with 'PASS' if present. Often, if some variants
+            are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
+            For more detailed information, with examples, see the blog post on 'Filter status'.
+          </div>          
 
       </h4>
     </div>
@@ -58,19 +68,19 @@ aria-multiselectable="true">
               </div>
 
               <div style="text-align:left;">
-                <svg id="HIGH" class="impact" width="60" height="15" transform="translate(0,0)">
+                <svg id="HIGH" class="vepImpact" width="60" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">High</text>
                   <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
-                <svg id="MODERATE" class="impact" width="60" height="15" transform="translate(0,0)">
+                <svg id="MODERATE" class="vepImpact" width="60" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">Moderate</text>
                   <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
-                <svg id="MODIFIER" class="impact" width="60" height="15" transform="translate(0,0)">
+                <svg id="MODIFIER" class="vepImpact" width="60" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">Modifier</text>
                   <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>
-                <svg id="LOW" class="impact" width="60" height="15" transform="translate(0,0)">
+                <svg id="LOW" class="vepImpact" width="60" height="15" transform="translate(0,0)">
                   <text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">Low</text>
                   <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>
                 </svg>

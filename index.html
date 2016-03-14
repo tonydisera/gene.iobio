@@ -373,12 +373,11 @@
              </select>        
           </div>
 
-          <button style="margin-top:0px;margin-left:4px;float:left" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
+          <button id="gene-source-config-button" style="margin-top:0px;margin-left:4px;float:left" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
             <i class="material-icons" style="font-size:15px;">settings</i>
           </button>
 
         </div>   
-
 
         <div id="transcript-panel" class="fullview" >
           <div id="gene-track" class="track hide">           
@@ -392,6 +391,7 @@
 
 
     </div>  
+
 
 
     <div id="track-section" class="push" style="margin-top:5px;">
@@ -496,7 +496,16 @@
       <div id="other-variant-cards">
       </div>
 
+
+      <div id="splash" class="horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
+        <div class="vertical-center">
+          <img id="splash-image" height="400px" class="hide" src="assets/images/gene.iobio.v2.png"   >
+        </div>
+      </div>
+
     </div>
+
+
 
 
 <div id="tourWelcome" class="customPageGuideWelcome hide" style="text-align:center;height:170px;">

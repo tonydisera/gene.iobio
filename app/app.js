@@ -240,6 +240,7 @@ function init() {
     // Encapsulate logic for animate.css into a jquery function
     $.fn.extend({
     animateIt: function (animationName, customClassName) {
+    		$(this).removeClass("hide");
     		var additionalClass = customClassName ? ' ' + customClassName : '';
 	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
 	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
@@ -247,6 +248,17 @@ function init() {
 	        });
 	    }
 	});
+	$.fn.extend({
+    animateSplash: function (animationName) {
+    		$(this).removeClass("hide");
+	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+	        $(this).addClass('animated ' + animationName).one(animationEnd, function() {
+	            $(this).removeClass('animated ' + animationName);
+	            //$('.twitter-typeahead').animateIt('tada', 'animate-delayed');	            
+	        });
+	    }
+	});
+
 
 	// For 'show variants' card
 	$('#select-color-scheme').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
@@ -396,6 +408,13 @@ function whichTransitionEvent(){
   }
 }
 
+function sidebarAdjustX(x) {	
+	if (!$("#slider-left").hasClass("hide")) {
+		x -= ($("#slider-left").width() + $("#slider-icon-bar").width());
+		x -= 1;
+	}
+	return x;
+}
 
 function showCoordinateFrame(x) {
 	var top = +$('#nav-section').outerHeight();
@@ -406,9 +425,7 @@ function showCoordinateFrame(x) {
 	height    += +$('#other-variant-cards').outerHeight();
 
 
-	if (!$("#slider-left").hasClass("hide")) {
-		x -= ($("#slider-left").width() + 36);
-	}
+	x = sidebarAdjustX(x);
 	
 	var margins = dataCard.mode == 'trio' ? 10 : 20;
 
@@ -520,6 +537,11 @@ function showSlideLeft() {
 			getProbandVariantCard().adjustTooltip(clickedVariant);
 		}
 
+		if (!$('#splash').hasClass("hide") && !isDataLoaded()) {
+			$('#splash-image').animateSplash('zoomIn');
+		}
+
+
 	});
 
 }
@@ -602,6 +624,10 @@ function detectIE() {
 
     // other browser
     return false;
+}
+
+function detectSafari() {
+	return (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1);
 }
 
 
@@ -696,6 +722,7 @@ function loadGeneFromUrl() {
 	} else {
 		// Open the 'About' sidebar by default if there is no data loaded when gene is launched
 		showSidebar("Help");
+
 
 		if (showTour != null && showTour == 'Y') {
 			//pageGuide.open();
@@ -1078,6 +1105,7 @@ function cacheNextGene(genesToCache) {
 
 		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
 			    		variantCard.promiseCacheVariants(
+			    			geneObject.chr,
 			    			geneObject, 
 						 	transcript)
 			    		.then( function(vcfData) {
@@ -1258,8 +1286,8 @@ function getUrlParameter(sParam) {
 function loadGeneWidget() {
 	// kicks off the loading/processing of `local` and `prefetch`
 	gene_engine.initialize();
-	
-	 	
+
+
 	var typeahead = $('#bloodhound .typeahead').typeahead({
 	  hint: true,
 	  highlight: true,
@@ -1344,6 +1372,8 @@ function loadGeneWidget() {
 					enableCallVariantsButton();						
 		    	} else {
 	
+					$('#splash').addClass("hide");
+
 					//$('#tourWelcome').removeClass("open");
 					
 			    	loadTracksForGene();
@@ -1404,7 +1434,7 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 		$('.twitter-typeahead').animateIt('tada');
 		return;
 	} 
-	if (!isDataLoaded()) {
+	if (!bypassVariantCards && !isDataLoaded()) {
 		$('#add-data-button').animateIt('tada', 'animate-twice');
 	}
 	
@@ -1428,6 +1458,10 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
     $('#view-finder-track').removeClass("hide");
 	$('#transcript-btn-group').removeClass("hide");
 	$('#feature-matrix .tooltip').css("opacity", 0);
+
+	$('#recall-card .call-variants-count').addClass("hide");
+	$('#recall-card .call-variants-count').text("");
+	$('#recall-card .covloader').addClass("hide");
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
@@ -1658,6 +1692,7 @@ function addVariantCard() {
 }
 
 function callVariants() {
+
 	fulfilledTrioPromise = false;
 	variantCards.forEach(function(vc) {
 		vc.callVariants(regionStart, regionEnd);

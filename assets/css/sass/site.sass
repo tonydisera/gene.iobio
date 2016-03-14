@@ -5,9 +5,63 @@ body
   font-family: $app-font, sans-serif !important
 
 .animate-twice 
-  // -webkit-animation-duration: 1s
-  // -webkit-animation-delay: 0s
   -webkit-animation-iteration-count: 2
+  -maz-animation-iteration-count: 2
+  animation-iteration-count: 2
+ 
+.animate-delayed
+  -webkit-animation-iteration-count: 2
+  -moz-animation-iteration-count: 2
+  animation-iteration-count: 1
+  -webkit-animation-delay: 4s
+  -moz-animation-delay: 4s
+  animation-delay: 4s
+  -webkit-animation-duration: 1.2s
+  -moz-animation-duration: 1.2s
+  animation-duration: 1.2s
+  
+#splash-image
+  -webkit-animation-duration: 2s
+  -webkit-animation-delay: 0s
+  -webkit-animation-iteration-count: 1
+  -moz-animation-duration: 2s
+  -moz-animation-delay: 0s
+  -moz-animation-iteration-count: 1
+  animation-duration: 2s
+  animation-delay: 0s
+  animation-iteration-count: 1
+
+
+#recfilter-flag
+  background-color: #5881AD !important
+
+.horizontal-center
+  display: -ms-Flexbox
+  -ms-box-orient: horizontal
+  display: -webkit-flex
+  display: -moz-flex
+  display: -ms-flex
+  display: flex
+  justify-content: center
+  -webkit-justify-content: center
+  -moz-justify-content: center
+  -ms-justify-content: center
+
+.vertical-center
+  display: -ms-Flexbox
+  -ms-box-orient: vertical
+  display: -webkit-flex
+  display: -moz-flex
+  display: -ms-flex
+  display: flex
+  flex-direction: column
+  -webkit-justify-flex-direction: column
+  -moz-justify-flex-direction: column
+  -ms-Flexbox-justify-flex-direction: column
+  justify-content: center
+  -webkit-justify-content: center
+  -moz-justify-content: center
+  -ms-justify-content: center
 
 
 .form-group 
@@ -1110,6 +1164,8 @@ header
 @import bookmarks
 
 @import genes
+
+@import recall
 
 @import info
 

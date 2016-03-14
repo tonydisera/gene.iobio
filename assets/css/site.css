@@ -2,7 +2,62 @@ body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
 .animate-twice {
-  -webkit-animation-iteration-count: 2; }
+  -webkit-animation-iteration-count: 2;
+  -maz-animation-iteration-count: 2;
+  animation-iteration-count: 2; }
+
+.animate-delayed {
+  -webkit-animation-iteration-count: 2;
+  -moz-animation-iteration-count: 2;
+  animation-iteration-count: 1;
+  -webkit-animation-delay: 4s;
+  -moz-animation-delay: 4s;
+  animation-delay: 4s;
+  -webkit-animation-duration: 1.2s;
+  -moz-animation-duration: 1.2s;
+  animation-duration: 1.2s; }
+
+#splash-image {
+  -webkit-animation-duration: 2s;
+  -webkit-animation-delay: 0s;
+  -webkit-animation-iteration-count: 1;
+  -moz-animation-duration: 2s;
+  -moz-animation-delay: 0s;
+  -moz-animation-iteration-count: 1;
+  animation-duration: 2s;
+  animation-delay: 0s;
+  animation-iteration-count: 1; }
+
+#recfilter-flag {
+  background-color: #5881AD !important; }
+
+.horizontal-center {
+  display: -ms-Flexbox;
+  -ms-box-orient: horizontal;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: flex;
+  justify-content: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center; }
+
+.vertical-center {
+  display: -ms-Flexbox;
+  -ms-box-orient: vertical;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  -webkit-justify-flex-direction: column;
+  -moz-justify-flex-direction: column;
+  -ms-Flexbox-justify-flex-direction: column;
+  justify-content: center;
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center; }
 
 .form-group label.control-label {
   font-size: 16px !important;
@@ -1362,27 +1417,27 @@ header {
 .zyg_het {
   fill: #D3D5D8; }
 
-.impact, .effect, .vepConsequence, .type, .zygosity, .recfilter {
+.impact, .vepImpact, .effect, .vepConsequence, .type, .zygosity, .recfilter {
   border: solid 2px white;
   padding: 1px; }
-  .impact text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
+  .impact text, .vepImpact text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
     fill: #717171; }
 
-.impact.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
+.impact.nocolor rect, .vepImpact.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
   stroke: grey; }
 
 .afexaclevels.nocolor, .af1000glevels.nocolor {
   display: none !important; }
 
-.impact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover {
+.impact:hover, .vepImpact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
   border: solid 1.5px #969696;
   border-radius: 4px; }
 
-.impact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
+.impact.current:hover, .vepImpact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid 2.5px #3586c0;
@@ -1996,6 +2051,10 @@ text.ref-count {
       font-size: 13px; }
   #gene-badge-container.manage #gene-badge-remove {
     visibility: visible; }
+
+.call-variants-count {
+  font-size: 11px;
+  margin-top: 5px; }
 
 #slider-left a.help-link {
   font-size: 14px !important;

@@ -92,8 +92,8 @@ VariantCard.prototype.summarizeDanger = function(data) {
 	return this.model.summarizeDanger(data);
 }
 
-VariantCard.prototype.promiseCacheVariants = function(geneName, ref, start, end, strand, transcript) {
-	return this.model.promiseCacheVariants(geneObject, transcript);
+VariantCard.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
+	return this.model.promiseCacheVariants(ref, geneObject, transcript);
 }
 
 VariantCard.prototype.isCached = function(geneName, transcript) {
@@ -325,7 +325,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 		this.cardSelector.find("#fb-chart-label").addClass("hide");
 		this.cardSelector.find("#fb-separator").addClass("hide");
 		this.cardSelector.find("#fb-variants").addClass("hide");
-		this.cardSelector.find("#missing-variant-count").html("");
+		this.cardSelector.find("#missing-variant-count").text("");
 	}
 }
 
@@ -354,6 +354,8 @@ VariantCard.prototype.clearVcf = function() {
 	this.cardSelector.find('#vcf-variant-card-label').text("");
 	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
 	this.cardSelector.find('#vcf-variant-count').text("");
+	this.cardSelector.find('#missing-variant-count-label').addClass("");
+	this.cardSelector.find('#missing-variant-count').text("");
 }
 
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
@@ -471,7 +473,9 @@ VariantCard.prototype.clearWarnings = function() {
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
 	this.cardSelector.find('#error-warning').addClass("hide");
-	this.cardSelector.find('#missing-variant-count-label').addClass("hide");	
+	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
+	this.cardSelector.find('#missing-variant-count').addClass("hide");
+	
 }
 
 /* 
@@ -518,7 +522,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 		this.cardSelector.find('#bam-depth').css("visibility", "hidden");
 		this.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
 
-
+    	this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
     	this.cardSelector.find('#displayed-variant-count').text("");
     	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	this.cardSelector.find('#vcf-variant-count').text("");
@@ -577,10 +581,12 @@ VariantCard.prototype.onBrush = function(brush) {
 		this.cardSelector.find("#region-flag").addClass("hide");
 		// Only remove if no other filter flags are on
 		if (this.cardSelector.find(".filter-flag.hide").length == this.cardSelector.find(".filter-flag").length) {
+			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 			this.cardSelector.find("#displayed-variant-count").addClass("hide");
 		}
 	} else {
 		this.cardSelector.find("#region-flag").removeClass("hide");
+		this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 		this.cardSelector.find("#displayed-variant-count").removeClass("hide");
 	}
 
@@ -796,8 +802,16 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 		if (this.isViewable()) {
 			me.cardSelector.find('.vcfloader').addClass("hide");
 			me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-	        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount(theVcfData));		
+	        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount(theVcfData));	
+
 			me.clearWarnings();		
+
+	        if (me.model.hasCalledVariants()) {
+		        me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());	        	
+	        }	
+
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
@@ -805,6 +819,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
 			}	
+			me.populateRecFilters(theVcfData);
 			filterCard.autoSetFilters();
 			var filteredVcfData = this.filterVariants(theVcfData);
 			me._fillVariantChart(filteredVcfData, 
@@ -813,7 +828,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 
 			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
-				var filteredVcfData = this.filterVariants(theVcfData);
+				var filteredVcfData = this.filterVariants(theVcfData);    	
+				me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 				me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
 				
 				filterCard.enableVariantFilters(true);
@@ -1012,7 +1028,9 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);    
     this.vcfChart(selection);
 
-	this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(data));
+
+    this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+    this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(data));
 
 	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
@@ -1128,6 +1146,10 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 		this.cardSelector.find("#vcf-track").removeClass("hide");
 		this.cardSelector.find(".vcfloader").removeClass("hide");
 		this.cardSelector.find('.vcfloader .loader-label').text("Calling Variants with Freebayes");
+
+		$('#recall-card .' + this.getRelationship() + '.covloader').removeClass("hide");
+		$('#recall-card .' + this.getRelationship() + '.call-variants-count').addClass("hide");
+
 	}
 
 	this.model.promiseCallVariants(
@@ -1149,12 +1171,6 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
 				//me.model.loadTrioInfoForCalledVariants();
 
-				// After variants have been called from alignments and annotated from snpEff/VEP...
-				// Show the called variant count
-				me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
-				me.cardSelector.find('#missing-variant-count').removeClass("hide");
-				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
-
 				// Show loading clinvar progress....
 		    	me.cardSelector.find('.vcfloader').removeClass("hide");
 				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
@@ -1175,10 +1191,20 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			
 
 	}).then( function(data) {
+		// After variants have been called from alignments and annotated from snpEff/VEP...
+		// Show the called variant count
+		me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+		me.cardSelector.find('#missing-variant-count').removeClass("hide");
+		me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
+		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
+		$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
+		$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
+
+
 
 		// Hide the clinvar loader
 		me.cardSelector.find('.vcfloader').addClass("hide");
-
+		
 		// Show the called variants
 		me._fillFreebayesChart(data, regionStart, regionEnd);
 
@@ -1194,6 +1220,8 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 		console.log(error);
 		me.cardSelector.find('.vcfloader').addClass("hide");
+		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
+
 		me.cardSelector.find('#clinvar-warning').removeClass("hide");
 	});
 
@@ -1256,6 +1284,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 
 	// Only hide displayed variant count if we haven't already zoomed
 	if (this.cardSelector.find("#region-flag.hide").length > 0) {
+		this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 		this.cardSelector.find("#displayed-variant-count").addClass("hide");
 	}
 
@@ -1278,7 +1307,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		} else {
 			// We are filtering on af range.  show the filter flag
 			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").removeClass("hide");
-			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
+    		me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+    		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		}
 	} else {
 		me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").addClass("hide");
@@ -1286,6 +1316,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 
 	if (filterObject.coverageMin && filterObject.coverageMin > 0) {
 		me.cardSelector.find("#coverage-flag").removeClass("hide");
+    	me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");		
 		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 	}
 
@@ -1313,6 +1344,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		}
 		if (filterOn) {
 			me.cardSelector.find("#" + key + "-flag").removeClass("hide");
+			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		}  else {
 			me.cardSelector.find("#" + key + "-flag").addClass("hide");
@@ -1331,6 +1363,9 @@ VariantCard.prototype.determineMaxAlleleCount = function() {
 
 VariantCard.prototype.populateEffectFilters = function() {
 	this.model.populateEffectFilters();
+}
+VariantCard.prototype.populateRecFilters = function(theVcfData) {
+	this.model._populateRecFilters(theVcfData.features);
 }
 
 
@@ -1446,9 +1481,9 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	
 	var x = variant.screenX;
 	var y = variant.screenY;
-	if (!$("#slider-left").hasClass("hide")) {
-		x -= ($("#slider-left").width() + 32);
-	}
+
+	x = sidebarAdjustX(x);
+
 
     tooltip.transition()        
            .duration(1000)      

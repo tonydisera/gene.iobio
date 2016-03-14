@@ -651,7 +651,7 @@ var effectCategories = [
     }
 
     // normalize variants
-    var vtUrl = encodeURI( vtServer + "?cmd=normalize -r " + refFile + " " + encodeURIComponent(nextUrl));
+    var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
     
     // get allele frequencies from 1000G and ExAC
     var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
@@ -668,6 +668,9 @@ var effectCategories = [
 
     // If we are getting the hgvs notation, we need an extra command line arg for vep
     var vepArgs = "";
+    if (isRefSeq) {
+      vepArgs = " --refseq ";
+    }
     if (hgvsNotation) {
       vepArgs += " --hgvs ";
     }
@@ -1074,7 +1077,7 @@ var effectCategories = [
         refFile = "./data/references_hg19/" + refName + ".fa";
       } else {
         refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-      }       
+      }     
       
       // Normalize the variants (e.g. AAA->AAG becomes A->AG)
       var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
@@ -1111,7 +1114,7 @@ var effectCategories = [
       var buffer = "";
       client.on('open', function(){
         var stream = client.createStream({event:'run', params : {'url':vepUrl}});
-
+        
         // New local file streaming
         stream.on('createClientConnection', function(connection) {
           var ended = 0;
@@ -1203,7 +1206,7 @@ var effectCategories = [
           }
           var altIdx = 0;
           alts.forEach(function(alt) {
-            var len = null;
+           var len = null;
             var type = null;
             var end = null;
 

@@ -68,6 +68,7 @@ VariantModel.prototype.variantsHaveBeenCalled = function() {
 }
 
 VariantModel.prototype.hasCalledVariants = function() {
+	this.getCalledVariants();
 	return this.fbData != null && this.fbData.features != null && this.fbData.features.length > 0;
 }
 
@@ -246,6 +247,9 @@ VariantModel.prototype.summarizeDanger = function(theVcfData) {
 	}
 	dangerCounts.IMPACT      = getLowestImpact(impactClasses);
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
+	if (filterCard.getAnnotationScheme().toLowerCase() == 'vep') {
+		dangerCounts.IMPACT = dangerCounts.CONSEQUENCE;
+	}
 	dangerCounts.CLINVAR     = getLowestClinvarClazz(clinvarClasses);
 	dangerCounts.INHERITANCE = inheritanceClasses;
 	
@@ -973,7 +977,7 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 	return data != null;
 }
 
-VariantModel.prototype.promiseCacheVariants = function(geneObject, transcript) {
+VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
 	var me = this;
 
 
@@ -1040,6 +1044,7 @@ VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 		+ (this.sampleName != null ? "-" + this.sampleName : "")
 		+ "-" + (geneName != null ? geneName : gene.gene_name) 
 		+ (transcript != null ? "-" + transcript.transcript_id : "")
+	    + "-" + (filterCard.getAnnotationScheme().toLowerCase())
 		+ "-" + dataKind;
 }
 
@@ -1117,11 +1122,19 @@ VariantModel.prototype._pruneIntronVariants = function(data) {
 		data.intronsExcludedCount = 0;
 		data.features = data.features.filter(function(variant) {
 			var keep = false;
-			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepEffect';
-			for (key in variant[effectField]) {
-				if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
-					keep = true;
+			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
+			var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
+			for (key in variant[impactField]) {
+				if (key.toLowerCase() == 'high' || key.toLowerCase() == 'moderate') {
+					keep = true
 				}
+			}
+			if (!keep) {
+				for (key in variant[effectField]) {
+					if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
+						keep = true;
+					}
+				}				
 			}
 			if (!keep) {
 				data.intronsExcludedCount++;

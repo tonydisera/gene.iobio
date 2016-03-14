@@ -29,7 +29,6 @@ var Bam = Class.extend({
       this.prod_iobio_services  = "wss://services.iobio.io/";
       this.dev_iobio_services   = "ws://nv-dev.iobio.io/";
 
-
       this.iobio.services = this.prod_iobio_services;
 
       this.iobio.coverage       = this.dev_iobio_services + "coverage/ ";
@@ -117,6 +116,21 @@ var Bam = Class.extend({
       }
       return encodeURI(url);
    },
+
+    _getBamPileupUrl: function(region, golocal) {     
+      var samtools = this.iobio.samtools;
+      if ( this.sourceType == "url") {
+         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
+         var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
+      } else {
+        
+        var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
+       
+      }
+      return encodeURI(url);
+   },
+
+   
 
    
     _getBamPileupUrl: function(region, golocal) {     

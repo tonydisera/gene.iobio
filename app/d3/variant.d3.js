@@ -108,13 +108,18 @@ function variantD3() {
 
       var matrix = circle.node()
                          .getScreenCTM()
-                         .translate(+circle.node().getAttribute("cx"),+circle.node().getAttribute("cy"));
+                         .translate(+circle.node().getAttribute("cx"),+circle.node().getAttribute("cy"));      
+      var boundRect = circle.node().getBoundingClientRect();   
 
-      matchingVariant.screenX = d3.round(window.pageXOffset + matrix.e + margin.left);
+      // Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
+      // so instead the app will use getBoundingClientRect() method instead which does take into consideration
+      // the transform. 
+      matchingVariant.screenX = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;                    
+      //matchingVariant.screenX = d3.round(window.pageXOffset + matrix.e + margin.left);
+      
       matchingVariant.screenY = d3.round(window.pageYOffset + matrix.f + margin.top);
+
       showCoordinateFrame(matchingVariant.screenX);
-
-
               
     } else if (indicateMissingVariant) {
       var mousex = d3.round(x(d.start));
