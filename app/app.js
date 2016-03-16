@@ -537,8 +537,11 @@ function showSlideLeft() {
 			getProbandVariantCard().adjustTooltip(clickedVariant);
 		}
 
-		if (!$('#splash').hasClass("hide") && !isDataLoaded()) {
+		if (!$('#splash').hasClass("hide") && !isDataLoaded() && (gene == null || gene == "") ) {
 			$('#splash-image').animateSplash('zoomIn');
+		} 
+		if (isDataLoaded() || (gene != null && gene != "")) {
+			$('#splash').addClass("hide");
 		}
 
 
