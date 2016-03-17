@@ -148,9 +148,11 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 
 	if (geneNames.length > 0) {
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
+		$('#gene-badge-container #clear-gene-list').removeClass("hide");
 	} else {
 		$('#gene-badge-container #manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
+		$('#gene-badge-container #clear-gene-list').addClass("hide");
 	}
 
 	// Create a gene badge for each gene name in the comma separated list.
@@ -209,9 +211,11 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 
 	if (geneNames.length > 0) {
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
+		$('#gene-badge-container #clear-gene-list').removeClass("hide");
 	} else {
 		$('#gene-badge-container #manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
+		$('#gene-badge-container #clear-gene-list').addClass("hide");
 	}
 
 	// Create a gene badge for each gene name in the comma separated list.
@@ -431,6 +435,33 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 
 }
 
+GenesCard.prototype.clearGenes = function() {
+	var me = this;
+	// confirm dialog
+	alertify.set({ buttonReverse: true });
+	alertify.confirm("Clear all genes currently listed?", function (e) {
+	    if (e) {
+	        // user clicked "ok"
+			while (geneNames.length > 0) {
+				var theGeneName = geneNames[0];
+				
+				geneNames.splice(0, 1);
+				var geneBadgeName = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')";	
+				$(geneBadgeName).parent().parent().remove();
+				
+				delete geneObjects[theGeneName];
+				delete geneAnnots[theGeneName];
+			};
+			me._onGeneBadgeUpdate();
+			readjustCards();
+	    } else {
+	        // user clicked "cancel"
+	    }
+	});
+
+}
+
+
 
 GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 	var me = this;
@@ -486,6 +517,8 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		}
 
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
+		$('#gene-badge-container #clear-gene-list').removeClass("hide");
+
 	
 	}
 	me._onGeneBadgeUpdate();

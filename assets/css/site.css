@@ -28,6 +28,11 @@ body {
   animation-delay: 0s;
   animation-iteration-count: 1; }
 
+.alertify {
+  border: 1px solid #e0e0e0;
+  width: 350px;
+  margin-left: -175px; }
+
 #recfilter-flag {
   background-color: #5881AD !important; }
 
@@ -1891,7 +1896,7 @@ text.ref-count {
   clear: both; }
 #bookmark-card div.bookmark-gene {
   clear: both;
-  padding-top: 20px; }
+  padding-top: 10px; }
 #bookmark-card a.bookmark-gene {
   font-size: 12px;
   cursor: pointer;
@@ -2043,6 +2048,10 @@ text.ref-count {
   #gene-badge-container #manage-gene-list {
     color: #717171 !important; }
     #gene-badge-container #manage-gene-list:hover {
+      text-decoration: underline !important; }
+  #gene-badge-container #clear-gene-list {
+    color: #717171 !important; }
+    #gene-badge-container #clear-gene-list:hover {
       text-decoration: underline !important; }
   #gene-badge-container #gene-badge-remove {
     visibility: hidden; }
