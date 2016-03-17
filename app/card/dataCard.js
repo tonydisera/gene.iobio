@@ -49,11 +49,7 @@ function DataCard() {
 
 DataCard.prototype.loadDemoData = function() {
 
-	$('#splash').addClass("hide");
-	var alreadyLoaded = false;
-	if (hasDataSources()) {
-		alreadyLoaded = true;
-	}
+	$('#splash').addClass("hide");	
 	this.mode = 'trio';
 
 	// Clear the cache
@@ -84,7 +80,8 @@ DataCard.prototype.loadDemoData = function() {
 	window.updateUrl("gene", "RAI1");
 	window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 
-	reloadGeneFromUrl(alreadyLoaded);
+	
+	reloadGeneFromUrl();
 
 }
 
