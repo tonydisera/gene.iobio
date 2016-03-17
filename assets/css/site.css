@@ -1893,12 +1893,13 @@ text.ref-count {
   clear: both;
   padding-top: 20px; }
 #bookmark-card a.bookmark-gene {
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
   display: inline-block;
   text-align: left;
   padding-top: 4px;
-  margin-bottom: -5px; }
+  margin-bottom: -5px;
+  color: #717171 !important; }
 #bookmark-card .phenotype-symbol {
   stroke: #717171; }
 #bookmark-card #favorite-badge {
