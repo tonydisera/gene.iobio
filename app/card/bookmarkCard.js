@@ -480,9 +480,10 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	container.selectAll(".bookmark .variant-symbols")
          .each( function(entry, i) {
 		    var selection = d3.select(this);
-         	var variant = entry.value;	         
-         	if (variant.impact) {
-	         	for (var impact in variant.impact) {		         		
+         	var variant = entry.value;	   
+         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';      
+         	if (variant[impactField]) {
+	         	for (var impact in variant[impactField]) {		         		
          			var svg = selection.append("svg")
 								       .attr("class", "impact-badge")
 								       .attr("height", 12)
