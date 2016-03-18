@@ -2108,6 +2108,9 @@ function bookmarkVariant() {
 	if (clickedVariant) {
 		this.bookmarkCard.bookmarkVariant(clickedVariant);
 		this.bookmarkCard.refreshBookmarkList();
+	} else if (examineCard.examinedVariant != null) {
+		this.bookmarkCard.bookmarkVariant(examineCard.examinedVariant);
+		this.bookmarkCard.refreshBookmarkList();
 	}
 }
 
