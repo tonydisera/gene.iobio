@@ -88,19 +88,8 @@ BookmarkCard.prototype.importBookmarks = function() {
 		promises.push(promise);
 	}	
 
-	// Invoke the copy/paste function so that gene buttons
-	// are created for each of the bookmarked genes.
-	var genesBuffer = "";
-	var promises = []
-	for (var geneName in me.bookmarkedGenes) {
-		if (genesBuffer.length > 0) {
-			genesBuffer += ",";
-		}
-		genesBuffer += geneName;
-	}	
-	$('#genes-to-copy').val(genesBuffer);			
-	genesCard.copyPasteGenes(genesBuffer);	
-
+	// Add the bookmarked genes to the gene buttons
+	genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
 
 	$('#import-bookmarks-dropdown .btn-group').removeClass('open');	
 
@@ -337,6 +326,10 @@ BookmarkCard.prototype.sortBookmarksByGene = function() {
     }
 
     me.bookmarkedVariants = sortedBookmarks;
+}
+
+BookmarkCard.prototype.isBookmarkedGene = function(geneName) {
+	return this.bookmarkedGenes[geneName] != null;
 }
 
 

@@ -163,6 +163,8 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		if ($(existingBadge).length == 0) {
 			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
 			me.addGeneBadge(name, true);
+		} else {
+			me._setBookmarkBadge(name);
 		}
 	}
 
@@ -394,6 +396,49 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 	me.highlightPhenolyzerGenes();	
 }
 
+GenesCard.prototype.refreshBookmarkedGenes = function(bookmarkedGenes) {
+	var me = this;
+
+	// Don't throw away the genes we already have loaded, but do get rid of any that are
+	// in the bookmarked gene list as we want these to stay grouped (and order by rank).
+	// The exception is phenolyzer genes.  Just keep them in the order already listed.
+	var selectedPhenoGeneObject  = phenolyzerGenes
+	   .filter( function(phenGene) { 
+	   		return phenGene.selected == true
+	   })
+	   .reduce(function(object, phenoGene) {
+  			object[phenoGene.geneName] = phenoGene; 
+  			return object;
+		}, {});
+	geneNames = geneNames.filter(function(geneName) {
+		var bookmarkedGene = bookmarkedGenes[geneName];
+		var phenolyzerGene = selectedPhenoGeneObject[geneName];
+		var keep =  phenolyzerGene || !bookmarkedGene;
+		if (!keep) {
+			var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+			if (selector && selector.length > 0) {
+				$(selector).parent().parent().remove();
+			}
+		}
+		return keep;
+	})
+
+	// Now create a comma delimited list of all existing genes + selected phenolyzer genes
+	var genesString = geneNames.join(",");
+	for (var bookmarkedGene in bookmarkedGenes) {
+		var phenolyzerGene = selectedPhenoGeneObject[bookmarkedGene];
+		if (!phenolyzerGene) {
+			if (genesString.length > 0) {
+				genesString += ",";
+			}
+			genesString += bookmarkedGene;
+		}
+	}
+	$('#genes-to-copy').val(genesString);
+	
+	me.copyPasteGenes();	
+}
+
 GenesCard.prototype._onGeneBadgeUpdate = function() {
 	var me = this;
 
@@ -450,6 +495,7 @@ GenesCard.prototype.clearGenes = function() {
 	alertify.set({ buttonReverse: true });
 	alertify.confirm("Clear all genes currently listed?", function (e) {
 	    if (e) {
+			// user clicked "ok"
 	        me._clearGenesImpl();
 	    } else {
 	        // user clicked "cancel"
@@ -459,7 +505,7 @@ GenesCard.prototype.clearGenes = function() {
 }
 
 GenesCard.prototype._clearGenesImpl = function() {
-	x// user clicked "ok"
+	var me = this;
 	while (geneNames.length > 0) {
 		var theGeneName = geneNames[0];
 		
@@ -516,6 +562,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 		me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge:last-child"), geneName);
 		me._setPhenotypeBadge(geneName);
+		me._setBookmarkBadge(geneName);
 
 		if (geneNames.indexOf(geneName) < 0) {
 			geneNames.push(geneName);
@@ -590,6 +637,19 @@ GenesCard.prototype.hideTooltip = function() {
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
+}
+
+GenesCard.prototype._setBookmarkBadge = function(geneName) {
+	// If this gene is in the bookmarked genes, show the bookmark glyph
+	var geneBadge = $("#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')").parent();	
+	if (geneBadge) {
+		geneBadge.find("#gene-badge-bookmark svg").remove();
+		if (bookmarkCard.isBookmarkedGene(geneName)) {
+			geneBadge.find('#gene-badge-bookmark').append("<svg class=\"bookmark-badge\" height=\"12\" width=\"10\">");
+			var selection = d3.select(geneBadge.find('#gene-badge-bookmark .bookmark-badge')[0]).data([{translate: 'translate(-2,2)', width:10, height:10, clazz: 'bookmark'}]);
+			matrixCard.showBookmarkSymbol(selection);	
+		} 		
+	}
 }
 
 GenesCard.prototype._setPhenotypeBadge = function(geneName) {
@@ -706,7 +766,7 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 
 	geneBadge.removeClass("error");
 	geneBadge.removeClass("warning");
-	
+
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {
 		if (dangerKey == 'IMPACT') {
