@@ -251,9 +251,6 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 
 	me.showGenesSlideLeft();
 
-	geneNames.length = 0;
-	updateUrl('genes', geneNames.join(","));
-
 	$('.phenolyzer.loader .loader-label').text("Phenolyzer job submitted...")
 	$('.phenolyzer.loader').removeClass("hide");
 	$("#phenolyzer-timeout-message").addClass("hide");
@@ -369,18 +366,30 @@ GenesCard.prototype.highlightPhenolyzerGenes = function() {
 
 GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 	var me = this;
-	var selectedGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
+	var selectedPhenoGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
 
-	// Don't throw away the genes we already have loaded;
-	var genesString = Object.keys(geneObjects).join(",");
+	// Don't throw away the genes we already have loaded, but do get rid of any that are
+	// in the phenolyzer gene list as we want these to stay grouped (and order by rank).
+	selectedPhenoGenes.forEach( function(phenoGene) {
+		geneNames = geneNames.filter(function(geneName) {
+			return geneName != phenoGene.geneName; 
+		})
+		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + phenoGene.geneName + "')";	
+		if (selector && selector.length > 0) {
+			$(selector).parent().parent().remove();
+		}
+	});
 
-	selectedGenes.forEach( function(g) {
+	// Now create a comma delimited list of all existing genes + selected phenolyzer genes
+	var genesString = geneNames.join(",");
+	selectedPhenoGenes.forEach( function(g) {
 		if (genesString.length > 0) {
 			genesString += ",";
 		}
 		genesString += g.geneName;
 	})
 	$('#genes-to-copy').val(genesString);
+	
 	me.copyPasteGenes();	
 	me.highlightPhenolyzerGenes();	
 }
@@ -441,24 +450,28 @@ GenesCard.prototype.clearGenes = function() {
 	alertify.set({ buttonReverse: true });
 	alertify.confirm("Clear all genes currently listed?", function (e) {
 	    if (e) {
-	        // user clicked "ok"
-			while (geneNames.length > 0) {
-				var theGeneName = geneNames[0];
-				
-				geneNames.splice(0, 1);
-				var geneBadgeName = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')";	
-				$(geneBadgeName).parent().parent().remove();
-				
-				delete geneObjects[theGeneName];
-				delete geneAnnots[theGeneName];
-			};
-			me._onGeneBadgeUpdate();
-			readjustCards();
+	        me._clearGenesImpl();
 	    } else {
 	        // user clicked "cancel"
 	    }
 	});
 
+}
+
+GenesCard.prototype._clearGenesImpl = function() {
+	x// user clicked "ok"
+	while (geneNames.length > 0) {
+		var theGeneName = geneNames[0];
+		
+		geneNames.splice(0, 1);
+		var geneBadgeName = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')";	
+		$(geneBadgeName).parent().parent().remove();
+		
+		delete geneObjects[theGeneName];
+		delete geneAnnots[theGeneName];
+	};
+	me._onGeneBadgeUpdate();
+	readjustCards();	
 }
 
 
@@ -1092,13 +1105,15 @@ GenesCard.prototype.selectPhenolyzerGeneRange = function() {
 }
 
 GenesCard.prototype.deselectPhenolyzerGenes = function() {
+	var me = this;
 	for (var i = 0; i < phenolyzerGenes.length; i++) {
+		if (phenolyzerGenes[i].selected) {
+			me.removeGeneBadgeByName(phenolyzerGenes[i].geneName);
+		}
 		phenolyzerGenes[i].selected = false;
 	}
 	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 	this.geneBarChart(selection, {shadowOnHover:false});	
-
-	this.refreshSelectedPhenolyzerGenes();
 
 }
 
