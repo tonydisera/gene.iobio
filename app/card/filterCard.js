@@ -337,9 +337,9 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
-	$('af-amount-start').val(0);
-	$('af-amount-end').val(100);
-	$('coverage-min').val('');
+	$('#af-amount-start').val(0);
+	$('#af-amount-end').val(100);
+	$('#coverage-min').val('');
 }
 
 FilterCard.prototype.resetAfRange = function() {
@@ -372,6 +372,9 @@ FilterCard.prototype.disableFilters = function() {
 	d3.selectAll(".impact").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
+	d3.selectAll(".vepImpact").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
 	d3.selectAll(".type").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
@@ -379,6 +382,9 @@ FilterCard.prototype.disableFilters = function() {
 		d3.select(this).classed("inactive", true);
 	});
 	d3.selectAll(".effect").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".vepConsequence").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
 	d3.selectAll(".sift").each( function(d,i) {		
@@ -454,6 +460,11 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
+	d3.selectAll(".vepImpact").each( function(d,i) {
+		var impact = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
 	d3.selectAll(".type").each( function(d,i) {
 		var type = d3.select(this).attr("id");
 		var count = d3.selectAll('#vcf-track .variant.' + type)[0].length;
@@ -523,8 +534,8 @@ FilterCard.prototype.displayEffectFilters = function() {
 			var svgElem = null;
 			if (effectLabel.length < 20) {
 				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="110" height="15" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
+                          '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
+        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';
 
 			} else {
@@ -537,10 +548,10 @@ FilterCard.prototype.displayEffectFilters = function() {
 				}
 				var label1 = effectLabel.substring(0, pos);
 				var label2 = effectLabel.substring(pos+1, effectLabel.length);
-				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="110" height="25" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
-                          '<text class="name" x="9" y="16" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="0" height="5" style="opacity: 1;"></rect>' +
+				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="110" height="26" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
+                          '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
+        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';
 
 			}
@@ -574,7 +585,7 @@ FilterCard.prototype.displayRecFilters = function() {
 	recFilterKeys.forEach(function(key) {
 		recFilterCount++;
 		var label = key == "." ? ". (unassigned)" : key;			
-		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="12" transform="translate(0,0)">' +
+		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
                       '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
   					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
