@@ -8,19 +8,19 @@ function MatrixCard() {
 	this.clinvarMap     = {  
 						'pathogenic'            : {value: 1,   badge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
                         'likely_pathogenic'     : {value: 2,   badge: true, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
-                        'uncertain_significance': {value: 101, badge: false, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
-                        'benign'                : {value: 102, badge: false, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
-                        'likely_benign'         : {value: 103, badge: false, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
-                        'conflicting_data_from_submitters': {value: 121, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  {value: 121, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
+                        'uncertain_significance': {value: 3,   badge: true, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
+						'conflicting_interpretations_of_pathogenicity':  {value: 4, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
+                        'conflicting_data_from_submitters': {value: 5, badge: false, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
                         'drug_response'         : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'confers_sensivity'     : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'confers_sensitivity'   : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'risk_factor'           : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'other'                 : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'association'           : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'protective'            : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'not_provided'          : {value: 141, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'none'                  : {value: 151, badge: false, clazz: ''}
+                        'not_provided'          : {value: 131, badge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'likely_benign'         : {value: 141, badge: false, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
+                        'benign'                : {value: 151, badge: false, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
+                        'none'                  : {value: 131, badge: false, clazz: ''}
                      };
 	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
                         MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
