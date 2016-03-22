@@ -38,13 +38,13 @@ ExamineCard.prototype.showVariant = function(variant, isRefresh) {
 	}
 
     for (key in variant.clinVarClinicalSignificance) {
-    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge == true) {
+    	if (matrixCard.clinvarMap.hasOwnProperty(key)) {
 		    var clazz = matrixCard.clinvarMap[key].clazz;
-		    var badge = matrixCard.clinvarMap[key].badge;
+		    var badge = matrixCard.clinvarMap[key].examineBadge;
 		    if (badge) {
 				$("#examine-card .tooltip-header:contains('ClinVar')").next().prepend("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
 				var selection = d3.select('#examine-card .clinvar-badge').data([{width:10, height:10, transform: 'translate(0,1)', clazz: clazz}]);
-				matrixCard.showClinVarSymbol(selection);						    	
+				matrixCard.showClinVarSymbol(selection);						    			    	
 		    }
 		}
 	}
