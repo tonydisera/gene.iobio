@@ -2132,9 +2132,13 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		clinvarRow = me._tooltipLongTextRow('ClinVar', clinvarUrl);
 	}
 
-	var clinvarPhenotypeRow = '';
-	if (phenotypeDisplay != '') {
-		clinvarPhenotypeRow = me._tooltipHeaderLeftJustifySimpleRow('ClinVar - ' + phenotypeDisplay);
+	var clinvarRow1 = '';
+	var clinvarRow2 = '';
+	if (clinSigDisplay) {
+		clinvarRow1 = me._tooltipLongTextRow('ClinVar', clinSigDisplay);		
+		if (phenotypeDisplay) {
+			clinvarRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
+		}
 	}
 			
 	var dbSnpId = getRsId(variant);	
@@ -2147,7 +2151,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ siftPolyphenRow
 			+ me._tooltipShortTextRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), 
 									  'Allele Freq 1000G', percentage(variant.af1000G))
-			+ clinvarPhenotypeRow
+			+ clinvarRow1
+			+ clinvarRow2
 			+ me._tooltipRowAlleleCounts() 
 			+ me._linksRow(pinMessage)
 		);                  
