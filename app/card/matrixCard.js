@@ -275,6 +275,19 @@ MatrixCard.prototype.init = function() {
 		matrixCardSelector.find('.fullview').addClass("hide");
 	});
 
+	// Listen for side bar open and close events and adjust the position
+	// of the tooltip and the variant circle if a variant is 'locked'.
+	$('#slider-left').on("open", function() {
+		if (clickedVariant) {
+			me.adjustTooltip(clickedVariant);
+		}
+	});
+	$('#slider-left').on("close", function() {
+		if (clickedVariant) {
+			me.adjustTooltip(clickedVariant);
+		}
+	});
+
 }
 
 
@@ -333,7 +346,7 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 		var column  = d3.select(colNode);
 		var colObject = column.datum();
       	column.classed("active", true);
-
+      	column.select(".colbox").classed("current", true);
 	
       	if (showTooltip) {
 	      	// Get screen coordinates of column.  We will use this to position the
@@ -393,23 +406,27 @@ MatrixCard.prototype.hideTooltip = function() {
 
 }
 
+MatrixCard.prototype.adjustTooltip = function(variant) {
+	if (d3.select('#matrix-track .tooltip').style('opacity') != 0) {
+		this.highlightVariant(variant, true);
+	}
+}
+
 
 MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var me = this;
 
 
-	if (lock && !$("#slider-left").hasClass("hide")) {
+	if (lock) {
 		showSidebar("Examine");
 		examineCard.showVariant(variant);		
 		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
         .then( function(refreshedVariant) {
 			examineCard.showVariant(refreshedVariant, true);
         });
-	}
-
-	if (lock) {
 		getProbandVariantCard().unpin(true);
 	}
+
 
 	var tooltip = d3.select('#matrix-track .tooltip');
 	tooltip.style("z-index", 20);

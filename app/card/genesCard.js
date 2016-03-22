@@ -1118,9 +1118,8 @@ GenesCard.prototype.promiseGetGenePhenotypes = function(geneName) {
 
 GenesCard.prototype.showGenesSlideLeft = function() {
 	var me = this;
-	closeSlideLeft();
-	changeSidebar('Phenolyzer');
-	showSlideLeft();
+
+	showSidebar('Phenolyzer');
 
 
 	if (phenolyzerGenes && phenolyzerGenes.length > 0) {

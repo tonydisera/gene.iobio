@@ -454,7 +454,10 @@ function readjustCards() {
 	d3.select('#track-section').style("padding-top", top+5 + "px");
 }
 
-function changeSidebar(sidebar) {
+
+function showSidebar(sidebar) {
+	//closeSlideLeft(); 	
+
 	$('.sidebar-button').removeClass('selected');
 	if (sidebar == "Filter") {
 		$('#slider-left-content #filter-track').toggleClass("hide", false);	
@@ -507,55 +510,49 @@ function changeSidebar(sidebar) {
 		$('#button-show-help').toggleClass('selected', true);		
 	}
 
+
+	if ($('#slider-left').hasClass("hide")) {
+		$('#slider-left').removeClass("hide");
+		$('.footer').addClass("hide");
+		$('#close-slide-left').removeClass("hide");
+		$('.sidebar-button').removeClass("closed");
+		$('#slider-icon-bar').removeClass("closed");
+
+		resizeCardWidths();
+
+		$('#container').toggleClass('slide-left');
+		$('#nav-section').css("left", "0px");
+
+		var transitionEvent = whichTransitionEvent();
+		$('.slide-left').one(transitionEvent, function(event) {
+			readjustCards();
+
+			
+			$('#slider-left').trigger("open");
+
+			if (!$('#splash').hasClass("hide") && !isDataLoaded() && (gene == null || gene == "") ) {
+				$('#splash-image').animateSplash('zoomIn');
+			} 
+			if (isDataLoaded() || (gene != null && gene != "")) {
+				$('#splash').addClass("hide");
+			}
+
+
+		});
+
+	} 
+
+
+
 }
+
+
 
 function showDataDialog() {
 	$('#dataModal').modal('show')
 
 }
 
-
-function showSlideLeft() {
-
-
-	$('#slider-left').removeClass("hide");
-	$('.footer').addClass("hide");
-	$('#close-slide-left').removeClass("hide");
-	$('.sidebar-button').removeClass("closed");
-	$('#slider-icon-bar').removeClass("closed");
-
-	resizeCardWidths();
-
-	$('#container').toggleClass('slide-left');
-	$('#nav-section').css("left", "0px");
-
-	var transitionEvent = whichTransitionEvent();
-	$('.slide-left').one(transitionEvent, function(event) {
-		readjustCards();
-
-		if (clickedVariant) {
-			getProbandVariantCard().adjustTooltip(clickedVariant);
-		}
-
-		if (!$('#splash').hasClass("hide") && !isDataLoaded() && (gene == null || gene == "") ) {
-			$('#splash-image').animateSplash('zoomIn');
-		} 
-		if (isDataLoaded() || (gene != null && gene != "")) {
-			$('#splash').addClass("hide");
-		}
-
-
-	});
-
-}
-
-function showSidebar(view) {
-
-	closeSlideLeft(); 	
-	changeSidebar(view);
-	showSlideLeft();
-
-}
 
 
 
@@ -593,6 +590,7 @@ function closeSlideLeft() {
 	var transitionEvent = whichTransitionEvent();
 	$('#container').one(transitionEvent, function(event) {
 		readjustCards();
+		$('#slider-left').trigger("close");
 	});
 
 }

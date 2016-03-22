@@ -302,6 +302,18 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 			me.minimizeCard(true);
 		});
 
+		// Listen for side bar open and close events and adjust the position
+		// of the tooltip and the variant circle if a variant is 'locked'.
+		$('#slider-left').on("open", function() {
+			if (clickedVariant) {
+				me.adjustTooltip(clickedVariant);
+			}
+		});
+		$('#slider-left').on("close", function() {
+			if (clickedVariant) {
+				me.adjustTooltip(clickedVariant);
+			}
+		});
 
 	}
 
@@ -1399,7 +1411,9 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 		}
 	}
 	if (tooltip) {
-		this.showTooltip(tooltip, matchingVariant, this, false);		
+		if (tooltip.style("opacity") != 0) {
+			this._showTooltipImpl(tooltip, matchingVariant, this, false);		
+		}
 	}
 
 }
@@ -1451,29 +1465,43 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	
 }
 
-
-
 VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
 	var me = this;
-
 
 	// Only show the tooltip for the chart user mouses over / click
     if (this != sourceVariantCard) {
     	return;
     }
 
-	if (lock && !$("#slider-left").hasClass("hide")) {
-		showSidebar("Examine");
+	if (lock) {
+		matrixCard.unpin(true);
+		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
+
+	    showSidebar("Examine");
 		examineCard.showVariant(variant);
+
 		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
 		        .then( function(refreshedVariant) {
 					examineCard.showVariant(refreshedVariant, true);
 		        });
-
+				
+	} else {
+		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 	}
+}
+
+
+
+
+
+VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVariantCard, lock) {
+	var me = this;
+
 
 	if (lock) {
-		matrixCard.unpin(true);
+		tooltip.style("pointer-events", "all");
+	} else {
+		tooltip.style("pointer-events", "none");          
 	}
 
 	matrixCard.clearSelections();
@@ -1566,26 +1594,6 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 
-	/*
-    if (x < w) {
-    	tooltip.classed("arrow-down-left", true);
-		tooltip.classed("arrow-down-right", false);
-		tooltip.style("width", w + "px")
-		       .style("left", x - 22 + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", (y - h - 18) + "px");   
-
-    } else {
-	  tooltip.classed("arrow-down-left", false);
-	  tooltip.classed("arrow-down-right", true);
-      tooltip.style("width", w + "px")
-             .style("left", (x - w) + 16 + "px") 
-             .style("text-align", 'left')    
-             .style("top", (y - h - 18) + "px");   
-    }
-    */
-
-
     if (x < w) {
     	tooltip.classed("left-arrow", true);
 		tooltip.classed("right-arrow", false);
@@ -1604,21 +1612,6 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
     }
 
 
-
-    if (lock) {
-      tooltip.style("pointer-events", "all");
-    } else {
-      tooltip.style("pointer-events", "none");          
-    }
-
-    //tooltip.on('click', function() {
-	//	me.unpin();
-	//});
-
-	
-
-
-	
 
 }
 
@@ -2218,12 +2211,7 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
 
-	var examineCol = "";
-	if ($("#slider-left").hasClass("hide")) {
-		  examineCol = '<div class="col-sm-4" style="text-align:left;">' +  '<a id="examine" href="javascript:void(0)">Inspect </a>' +  '</div>'
-	} else {
-		  examineCol = '<div class="col-sm-4" style="text-align:left;"></div>'
-	}
+	var examineCol = '<div class="col-sm-4" style="text-align:left;"></div>';
 
 	var bookmarkBadge = '<svg class="bookmark-badge" height="11" width="82"><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="9" style="fill: black;">Bookmarked</text></g></svg>';
 	showAsBookmarked = function(container) {
@@ -2425,6 +2413,7 @@ VariantCard.prototype.unpin = function(saveClickedVariant) {
 	}
 	this.hideCoverageCircle();
 	window.hideCircleRelatedVariants();	
+	window.hideCoordinateFrame();
 }
 
 
