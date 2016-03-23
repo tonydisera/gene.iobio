@@ -2091,7 +2091,15 @@ text.ref-count {
   margin-top: 5px; }
 
 #slider-left a.help-link {
-  font-size: 14px !important;
+  font-size: 13px !important;
+  color: #5d809d !important;
+  font-family: "Quattrocento Sans", sans-serif; }
+#slider-left button.help-link {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 4px;
+  margin-top: 0px;
+  font-size: 13px;
   color: #5d809d !important;
   font-family: "Quattrocento Sans", sans-serif; }
 #slider-left .help-info {
