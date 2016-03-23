@@ -851,7 +851,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 	  							 regionStart ? regionStart : window.gene.start, 
 	  							 regionEnd ? regionEnd : window.gene.end);
 
-
 			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
 				var filteredVcfData = this.filterVariants(theVcfData);    	
 				me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
@@ -1167,7 +1166,7 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	var me = this;
 
-	if (this.isViewable()) {
+	if (this.isViewable() && this.isBamLoaded()) {
 		this.cardSelector.find("#vcf-track").removeClass("hide");
 		this.cardSelector.find(".vcfloader").removeClass("hide");
 		this.cardSelector.find('.vcfloader .loader-label').text("Calling Variants with Freebayes");
