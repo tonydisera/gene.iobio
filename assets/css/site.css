@@ -1808,6 +1808,30 @@ text.ref-count {
   content: "";
   right: 10px; }
 
+.tooltip.black-arrow-left:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 8px solid transparent;
+  border-right: 8px solid #505050;
+  border-bottom: 8px solid transparent;
+  left: -3px;
+  bottom: -5px;
+  -webkit-transform: rotate(209deg);
+  transform: rotate(209deg);
+  content: ""; }
+
+.tooltip.black-arrow-right:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 8px solid transparent;
+  border-left: 8px solid #505050;
+  border-bottom: 8px solid transparent;
+  right: -3px;
+  bottom: -5px;
+  -webkit-transform: rotate(152deg);
+  transform: rotate(152deg);
+  content: ""; }
+
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   overflow-wrap: break-word;

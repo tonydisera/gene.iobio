@@ -325,7 +325,17 @@ function init() {
 
 			getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
 
-		});	
+		})
+		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
+		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, false);
+		    			tooltip.transition()        
+			                   .duration(200)      
+			                   .style("opacity", .9);   
+				        tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))                                 
+				               .style("left", coord.x  + "px") 
+				               .style("text-align", 'left')    
+				               .style("top", coord.y + "px");    
+		 });	
 
     transcriptMenuChart = geneD3()
 	    .width(600)
@@ -414,6 +424,56 @@ function sidebarAdjustX(x) {
 		x -= 1;
 	}
 	return x;
+}
+
+function getTooltipCoordinates(node, tooltip, adjustForVerticalScroll) {
+	var coord = {};
+	var tooltipWidth  = d3.round(tooltip.node().offsetWidth);
+	var tooltipHeight = d3.round(tooltip.node().offsetHeight);	
+
+	// Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
+    // so instead the app will use getBoundingClientRect() method instead which does take into consideration
+    // the transform. 
+	var boundRect = node.getBoundingClientRect();   
+	coord.width = boundRect.width;
+	coord.height = boundRect.height;
+    coord.x = sidebarAdjustX(d3.round(boundRect.left + (boundRect.width/2)));
+    coord.y = d3.round(boundRect.top);
+    if (adjustForVerticalScroll) {
+    	coord.y += $(window).scrollTop();
+    }
+
+    // Position tooltip in the middle of the node
+	coord.x = coord.x - (tooltipWidth/2);
+	// Position tooltip above the node
+	coord.y = coord.y - tooltipHeight;
+
+	
+	// If the tooltip will be cropped to the right, adjust its position
+	// so that it is immediately to the left of the node
+	if  ((coord.x + (tooltipWidth/2) + 100) > $('#proband-variant-card').width()) {
+		coord.x -= tooltipWidth/2;
+		coord.x -= 6;
+		tooltip.classed("black-arrow-left", false);
+		tooltip.classed("black-arrow-right", true);
+	} else if (coord.x < tooltipWidth/2) {
+		// If the tooltip will be cropped to the left, adjust its position
+		// so that it is immediately to the right of the node
+		coord.x += tooltipWidth/2;
+		coord.x += 6;
+		tooltip.classed("black-arrow-left", true);
+		tooltip.classed("black-arrow-down-right", false);
+	} else {
+		// No cropping of tooltip on either side, just default to show tooltip
+		// immediately to the left of the node
+		coord.x += tooltipWidth/2;
+		coord.x += 6;
+		tooltip.classed("black-arrow-left", true);
+		tooltip.classed("black-arrow-right", false);
+	}
+
+	 
+	return coord;
 }
 
 function showCoordinateFrame(x) {

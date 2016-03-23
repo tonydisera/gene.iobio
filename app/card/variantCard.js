@@ -177,7 +177,20 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .showBrush(false)
 				    .trackHeight(16)
 				    .cdsHeight(12)
-		    		.showLabel(false);
+		    		.showLabel(false)
+		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
+		    				    			
+		    			
+		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
+
+		    			tooltip.transition()        
+			                   .duration(200)      
+			                   .style("opacity", .9);   
+			            tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))       
+							   .style("left", coord.x + "px") 
+				               .style("text-align", 'left')    
+				               .style("top", (coord.y - 4) + "px");    
+		    		});
 
 
 		// Create the coverage chart

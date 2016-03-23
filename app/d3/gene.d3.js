@@ -10,7 +10,7 @@ function geneD3() {
   // defaults
 
   // dispatch events
-  var dispatch = d3.dispatch("d3brush", "d3selected");
+  var dispatch = d3.dispatch("d3brush", "d3selected", "d3featuretooltip");
 
   var selectedTranscript = null;
 
@@ -176,6 +176,8 @@ function geneD3() {
 
             }
             dispatch.d3brush(brush);
+
+
          });
 
 
@@ -322,16 +324,13 @@ function geneD3() {
           .attr('width', function(d) { return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start))) })
           .attr('y', trackHeight /2)
           .attr('height', 0)
+          .attr("pointer-events", "all")
+          .style("cursor", "pointer")
           .on("mouseover", function(d) {  
               // show the tooltip
-              var tooltip = container.select('.tooltip');
-              tooltip.transition()        
-                 .duration(200)      
-                 .style("opacity", .9);      
-              tooltip.html(d.feature_type + ': ' + d.start + ' - ' + d.end)                                 
-                 .style("left", (d3.event.pageX) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 24) + "px");    
+              var tooltip = container.select('.tooltip');              
+              var featureObject = d3.select(this);
+              dispatch.d3featuretooltip(featureObject, d, tooltip);
 
               // select the transcript  
               d3.selectAll('.transcript.selected').classed("selected", false);
