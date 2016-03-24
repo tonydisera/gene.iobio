@@ -514,6 +514,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 	window.hideCircleRelatedVariants();
 	this.unpin();
 
+
 	// Clear out the previous gene's data
 	this.model.wipeGeneData();
 
@@ -847,14 +848,14 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			me.populateRecFilters(theVcfData);
 			filterCard.autoSetFilters();
 			var filteredVcfData = this.filterVariants(theVcfData);
+			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+			me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
+				
 			me._fillVariantChart(filteredVcfData, 
 	  							 regionStart ? regionStart : window.gene.start, 
 	  							 regionEnd ? regionEnd : window.gene.end);
 
 			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
-				var filteredVcfData = this.filterVariants(theVcfData);    	
-				me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
-				me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
 				
 				filterCard.enableVariantFilters(true);
 				filterCard.enableClinvarFilters(theVcfData);
@@ -934,7 +935,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			    if (me.isViewable()) {
 			    	// Show the variant count
 					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());				    	
+			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());	
+					me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+					me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount());
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
 
@@ -1053,9 +1056,6 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
     this.vcfChart(selection);
 
 
-    this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
-    this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(data));
-
 	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
 	resizeCardWidths();
@@ -1162,6 +1162,10 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 
 }
 
+VariantCard.prototype.clearCalledVariants = function() {
+	this.model.clearCalledVariants();
+}
+
 
 VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	var me = this;
@@ -1185,69 +1189,58 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 	    	var annotationEngine = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
 			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with " + annotationEngine);
 
+
 		},
 		function(data) {
+			// After variants have been annotated
+			// Enable the variant filters based on the new union of 
+			// vcf variants + called variants
+			filterCard.enableVariantFilters(true);
 
-			// After variants have been annotated with clinvar...
-			// Once all variant cards have freebayes variants,
-			// the app will determine in the inheritance mode
-			// for the freebayes variants
-			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
-				//me.model.loadTrioInfoForCalledVariants();
+			// After variants have been called from alignments and annotated from snpEff/VEP...
+			// Show the called variant count
+			me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+			me.cardSelector.find('#missing-variant-count').removeClass("hide");
+			me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
+			$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
+			$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
+			$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
 
-				// Show loading clinvar progress....
-		    	me.cardSelector.find('.vcfloader').removeClass("hide");
-				me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-				me.cardSelector.find('#clinvar-warning').addClass("hide");
 
-				// Show the called variants
-				me._fillFreebayesChart(me.model.fbData, regionStart, regionEnd);
+			// Show the called variants
+			me._fillFreebayesChart(data, regionStart, regionEnd);
 
-				// Enable the variant filters based on the new union of 
-				// vcf variants + called variants
-				filterCard.enableVariantFilters(true);
-				filterCard.enableInheritanceFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
+		}).then( function(data) {
+			// After variants have been annotated with clinvar and inheritance has been determined...
 
-			}, function(error) {
-				console.log("error when determining inheritance for called variants. " + error);
-			});
 
+
+			// Hide the clinvar loader
+			me.cardSelector.find('.vcfloader').addClass("hide");
 			
+			// Show the called variants
+			me._fillFreebayesChart(data, regionStart, regionEnd);
 
-	}).then( function(data) {
-		// After variants have been called from alignments and annotated from snpEff/VEP...
-		// Show the called variant count
-		me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
-		me.cardSelector.find('#missing-variant-count').removeClass("hide");
-		me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());
-		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
-		$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
-		$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
+			// If this is the proband card, refresh the feature matrix to
+			// show union of vcf variants and called variants
+			if (me.getRelationship() == 'proband') {
+				me.fillFeatureMatrix(regionStart, regionEnd);
+			}
 
+			// Enable inheritance filters
+			filterCard.enableInheritanceFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
 
+			// Enable the clinvar filter
+			filterCard.enableClinvarFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
 
-		// Hide the clinvar loader
-		me.cardSelector.find('.vcfloader').addClass("hide");
-		
-		// Show the called variants
-		me._fillFreebayesChart(data, regionStart, regionEnd);
+		}, function(error) {
 
-		// If this is the proband card, refresh the feature matrix to
-		// show union of vcf variants and called variants
-		if (me.getRelationship() == 'proband') {
-			me.fillFeatureMatrix(regionStart, regionEnd);
-		}
-		// Enable the clinvar filter
-		filterCard.enableClinvarFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
+			console.log(error);
+			me.cardSelector.find('.vcfloader').addClass("hide");
+			$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
 
-	}, function(error) {
-
-		console.log(error);
-		me.cardSelector.find('.vcfloader').addClass("hide");
-		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
-
-		me.cardSelector.find('#clinvar-warning').removeClass("hide");
-	});
+			me.cardSelector.find('#clinvar-warning').removeClass("hide");
+		});
 
 
 } 

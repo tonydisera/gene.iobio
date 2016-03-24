@@ -1756,6 +1756,7 @@ function callVariants() {
 
 	fulfilledTrioPromise = false;
 	variantCards.forEach(function(vc) {
+		vc.clearCalledVariants();
 		vc.callVariants(regionStart, regionEnd);
 	});
 }

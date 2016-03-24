@@ -99,10 +99,9 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	} else {
 		console.log("No function defined to parse ref name from file");
 	}
-	
-
 	return data;
 }
+
 VariantModel.prototype.getBamDataForGene = function(geneObject) {
 	var me = this;
 	var data = null;
@@ -1577,6 +1576,10 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 	}
 }
 
+VariantModel.prototype.clearCalledVariants = function() {
+	this._cacheData(null, "fbData", window.gene.gene_name, window.selectedTranscript);
+}
+
 
 VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, onVariantsCalled, onVariantsAnnotated) {
 	var me = this;
@@ -1697,30 +1700,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						// Determine the unique values in the VCF filter field 
 						me._populateRecFilters(me.fbData.features);
 
-						// Once all variant cards have freebayes variants,
-						// the app will determine in the inheritance mode
-						// for the freebayes variants
-						promiseDetermineInheritance(promiseFullTrioCalledVariants).then(function() {
-							// The variant records in vcfData have updated clinvar and inheritance info.
-							// Reflect me new info in the freebayes variants.
-							getProbandVariantCard().model.fbData.features.forEach(function (fbVariant) {
-								if (fbVariant.source) {
-									fbVariant.inheritance                 = fbVariant.source.inheritance;
-									fbVariant.genotypeRefCountMother      = fbVariant.source.genotypeRefCountMother;
-									fbVariant.genotypeAltCountMother      = fbVariant.source.genotypeAltCountMother;
-									fbVariant.genotypeDepthMother         = fbVariant.source.genotypeDepthMother;
-									fbVariant.genotypeRefCountFather      = fbVariant.source.genotypeRefCountFather;
-									fbVariant.genotypeAltCountFather      = fbVariant.source.genotypeAltCountFather;
-									fbVariant.genotypeDepthFather         = fbVariant.source.genotypeDepthFather;
-									fbVariant.uasibsZygosity              = fbVariant.source.uasibsZygosity;
-								}
-								
-							});	 
-
-						}, function(error) {
-							console.log("a problem in determining inhheritance occurred after calling variants. " + error);
-						});
-
+					
 						if (onVariantsAnnotated) {
 							onVariantsAnnotated(me.fbData);
 						}
@@ -1754,11 +1734,31 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 							}
 							
 						});	 
-
 						// Cache the freebayes variants.
 						me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
 
-						resolve(me.fbData);
+						// For the proband, we need to determine the inheritance and then
+						// fill in the mother/father genotype and allele counts on the
+						// proband's variants.  So we do this first before caching
+						// the called variants and resolving this promise.
+						
+						// Once all variant cards have freebayes variants,
+						// the app will determine in the inheritance mode
+						// for the freebayes variants
+						promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+							// The variant records in vcfData have updated clinvar and inheritance info.
+							
+							// Reflect me new info in the freebayes variants.
+							getProbandVariantCard().model.loadCalledTrioGenotypes();
+
+
+							resolve(me.fbData);
+						}, function(error) {
+							console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
+						});
+
+					
+						
 				
 				    	
 				    }, function(error) {
@@ -1776,6 +1776,43 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 
 } 
+
+VariantModel.prototype.loadCalledTrioGenotypes = function() {
+	var me = this;
+	var sourceVariants = this.vcfData.features
+							 .filter(function (variant) {
+								return variant.fbCalled == 'Y';
+							 })
+							 .reduce(function(object, variant) {
+							 	var key = variant.type + " " + variant.start + " " + variant.ref + " " + variant.alt;
+					  			object[key] = variant; 
+					  			return object;
+					 		 }, {});
+	if (this.fbData) {
+		this.fbData.features.forEach(function (fbVariant) {
+			var key = fbVariant.type + " " + fbVariant.start + " " + fbVariant.ref + " " + fbVariant.alt;
+			var source = sourceVariants[key];
+			if (source) {
+				fbVariant.inheritance                 = source.inheritance;
+				fbVariant.genotypeRefCountMother      = source.genotypeRefCountMother;
+				fbVariant.genotypeAltCountMother      = source.genotypeAltCountMother;
+				fbVariant.genotypeDepthMother         = source.genotypeDepthMother;
+				fbVariant.genotypeRefCountFather      = source.genotypeRefCountFather;
+				fbVariant.genotypeAltCountFather      = source.genotypeAltCountFather;
+				fbVariant.genotypeDepthFather         = source.genotypeDepthFather;
+				fbVariant.fatherZygosity              = source.fatherZygosity;
+				fbVariant.motherZygosity              = source.motherZygosity;
+				fbVariant.uasibsZygosity              = source.uasibsZygosity;
+			}
+				
+			
+		});	
+		// Re-Cache the freebayes variants for proband now that we have mother/father genotype
+		// and allele counts.							
+		me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+
+	}
+}
 
 
 
