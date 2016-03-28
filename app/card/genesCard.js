@@ -246,6 +246,8 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	me._onGeneBadgeUpdate();
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');	
+	$('#splash').addClass("hide");
+	
 }
 
 GenesCard.prototype.getPhenolyzerGenes = function() {
