@@ -591,7 +591,7 @@ function showSidebar(sidebar) {
 			$('#slider-left').trigger("open");
 
 			if (!$('#splash').hasClass("hide") && !isDataLoaded() && (gene == null || gene == "") ) {
-				$('#splash-image').animateSplash('zoomIn');
+				//$('#splash-image').animateSplash('zoomIn');
 			} 
 			if (isDataLoaded() || (gene != null && gene != "")) {
 				$('#splash').addClass("hide");
