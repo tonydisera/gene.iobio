@@ -495,46 +495,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 		// Only show the sample dropdown if the vcf file has more than one sample
 		if (sampleNames.length > 1) {
 			
-			// Populate the sample names in the dropdown
-			me.panelSelectorFilesSelected.find('#vcf-sample-box').removeClass('hide');
-			if (me.mode == 'trio') {
-				$('#unaffected-sibs-box').removeClass('hide');
-				$('#affected-sibs-box').removeClass('hide');
-			}
-			me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.clearOptions();
-			$('#unaffected-sibs-select')[0].selectize.clearOptions();
-			$('#affected-sibs-select')[0].selectize.clearOptions();
-
-			// Add a blank option if there is more than one sample in the vcf file
-			if (sampleNames.length > 1) {
-				me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.addOption({value:""});
-				$('#unaffected-sibs-select')[0].selectize.addOption({value:""});			                             
-				$('#affected-sibs-select')[0].selectize.addOption({value:""});			                             
-			}							         
-
-			// Populate the sample name in the dropdown
-			sampleNames.forEach( function(sampleName) {
-				me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
-				$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
-				$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
-			});
-			me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.refreshOptions();
-			$('#unaffected-sibs-select')[0].selectize.refreshOptions();
-			$('#affected-sibs-select')[0].selectize.refreshOptions();
-
-			me.initSibs();
-
-			// If we are loading from URL parameters and the sample name was specified, select this
-			// sample from dropdown
-			if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
-				me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.setValue(variantCard.getDefaultSampleName());
-
-				variantCard.setSampleName(variantCard.getDefaultSampleName());
-				variantCard.setDefaultSampleName(null);
-				window.enableLoadButton();
-			} else {
-				window.disableLoadButton();
-			}
+			me.populateSampleDropdowns(me.panelSelectorFilesSelected, sampleNames);
 
 		} else {
 			variantCard.setSampleName("");				
@@ -547,7 +508,51 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	});
 }
 
+DataCard.prototype.populateSampleDropdowns = function(panelSelector, sampleNames) {
+	var me = this;
 
+	// Populate the sample names in the dropdown
+	panelSelector.find('#vcf-sample-box').removeClass('hide');
+	if (me.mode == 'trio') {
+		$('#unaffected-sibs-box').removeClass('hide');
+		$('#affected-sibs-box').removeClass('hide');
+	}
+	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
+	$('#unaffected-sibs-select')[0].selectize.clearOptions();
+	$('#affected-sibs-select')[0].selectize.clearOptions();
+
+	// Add a blank option if there is more than one sample in the vcf file
+	if (sampleNames.length > 1) {
+		panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:""});
+		$('#unaffected-sibs-select')[0].selectize.addOption({value:""});			                             
+		$('#affected-sibs-select')[0].selectize.addOption({value:""});			                             
+	}							         
+
+	// Populate the sample name in the dropdown
+	sampleNames.forEach( function(sampleName) {
+		panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
+		$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
+		$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
+	});
+	//panelSelector.find('#vcf-sample-select')[0].selectize.refreshOptions();
+	//$('#unaffected-sibs-select')[0].selectize.refreshOptions();
+	//$('#affected-sibs-select')[0].selectize.refreshOptions();
+
+	
+	me.initSibs();
+
+	// If we are loading from URL parameters and the sample name was specified, select this
+	// sample from dropdown
+	if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
+		panelSelector.find('#vcf-sample-select')[0].selectize.setValue(variantCard.getDefaultSampleName());
+
+		variantCard.setSampleName(variantCard.getDefaultSampleName());
+		variantCard.setDefaultSampleName(null);
+		window.enableLoadButton();
+	} else {
+		window.disableLoadButton();
+	}	
+}
 
 DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
@@ -589,49 +594,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 			
 			// Only show the sample dropdown if there is more than one sample
 			if (sampleNames.length > 1) {
-				// Populate the sample names in the dropdown
-				panelSelector.find('#vcf-sample-box').removeClass('hide');
-				panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
-				if (me.mode == 'trio') {
-					$('#unaffected-sibs-box').removeClass('hide');
-					$('#affected-sibs-box').removeClass('hide');
-				}
-				$('#unaffected-sibs-select')[0].selectize.clearOptions();
-				$('#affected-sibs-select')[0].selectize.clearOptions();
-
-				// Add a blank option if there is more than one sample in the vcf file
-				if (sampleNames.length > 1) {
-					panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:""});
-					$('#unaffected-sibs-select')[0].selectize.addOption({value:""});
-					$('#affected-sibs-select')[0].selectize.addOption({value:""});
-				}	
-
-				// Populate the sample names in the dropdown
-				sampleNames.forEach( function(sampleName) {
-					panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
-					$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
-					$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});			                   
-				});
-				panelSelector.find('#vcf-sample-select')[0].selectize.refreshOptions();
-				$('#unaffected-sibs-select')[0].selectize.refreshOptions();
-				$('#affected-sibs-select')[0].selectize.refreshOptions();
-				me.initSibs();
-
-				// If we are loading from URL parameters and the sample name was specified, select this
-				// sample from dropdown
-				if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
-					panelSelector.find('#vcf-sample-select')[0].selectize.setValue(variantCard.getDefaultSampleName());
-					panelSelector.find('#vcf-sample-select')[0].selectize.refreshOptions();
-
-					variantCard.setSampleName(variantCard.getDefaultSampleName());
-					variantCard.setDefaultSampleName(null);
-					
-					window.enableLoadButton();
-
-				} else {
-					window.disableLoadButton();
-
-				}
+				me.populateSampleDropdowns(panelSelector, sampleNames);
 
 			} else {
 				variantCard.setSampleName("");
