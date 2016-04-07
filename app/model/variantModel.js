@@ -858,7 +858,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    	}
 				    	if (theGeneObject) {
 				    		me._pruneIntronVariants(data);
-				    		me._pruneHomRefVariants(theVcfData);
+				    		me._pruneHomRefVariants(data);
 	
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
