@@ -4,6 +4,52 @@
 body
   font-family: $app-font, sans-serif !important
 
+.form-control,
+.form-group .form-control 
+  background-image: -webkit-gradient(linear, left top, left bottom, from($current-color), to($current-color)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2))
+  background-image: -webkit-linear-gradient($current-color, $current-color), -webkit-linear-gradient(#D2D2D2, #D2D2D2)
+  background-image: -o-linear-gradient($current-color, $current-color), -o-linear-gradient(#D2D2D2, #D2D2D2)
+  background-image: linear-gradient($current-color, $current-color), linear-gradient(#D2D2D2, #D2D2D2)
+
+
+.form-group.is-focused .form-control 
+  background-image: -webkit-gradient(linear, left top, left bottom, from($current-color), to($current-color)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2))
+  background-image: -webkit-linear-gradient($current-color, $current-color), -webkit-linear-gradient(#D2D2D2, #D2D2D2)
+  background-image: -o-linear-gradient($current-color, $current-color), -o-linear-gradient(#D2D2D2, #D2D2D2)
+  background-image: linear-gradient($current-color, $current-color), linear-gradient(#D2D2D2, #D2D2D2)
+
+.form-group.is-focused .form-control .material-input:after
+  background-color: $current-color
+
+.selectize-dropdown
+  font-size: 11px
+  line-height: 15px
+  color: $text-color
+
+.selectize-input
+  font-size: 11px
+  line-height: 15px
+  padding: 5px 4px 4px 4px
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
+  border-radius: 0 !important
+  border: none !important
+  color: $text-color
+
+.selectize-input.focus 
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
+  
+  
+.selectize-input 
+  input 
+    font-size: 11px
+    line-height: 15px
+
+.selectize-control.single 
+  .selectize-input:after 
+    right: 5px
+
 .animate-twice 
   -webkit-animation-iteration-count: 2
   -maz-animation-iteration-count: 2
@@ -645,7 +691,7 @@ section
 
 .iobioproject
   font-size: 18px
-  color: rgb(118, 99, 99)
+  color: $text-color !important
   font-family: $iobio-font
   line-height: 45px
   float: right

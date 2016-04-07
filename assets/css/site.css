@@ -1,6 +1,48 @@
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
+.form-control,
+.form-group .form-control {
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#3586c0), to(#3586c0)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
+  background-image: -webkit-linear-gradient(#3586c0, #3586c0), -webkit-linear-gradient(#D2D2D2, #D2D2D2);
+  background-image: -o-linear-gradient(#3586c0, #3586c0), -o-linear-gradient(#D2D2D2, #D2D2D2);
+  background-image: linear-gradient(#3586c0, #3586c0), linear-gradient(#D2D2D2, #D2D2D2); }
+
+.form-group.is-focused .form-control {
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#3586c0), to(#3586c0)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
+  background-image: -webkit-linear-gradient(#3586c0, #3586c0), -webkit-linear-gradient(#D2D2D2, #D2D2D2);
+  background-image: -o-linear-gradient(#3586c0, #3586c0), -o-linear-gradient(#D2D2D2, #D2D2D2);
+  background-image: linear-gradient(#3586c0, #3586c0), linear-gradient(#D2D2D2, #D2D2D2); }
+
+.form-group.is-focused .form-control .material-input:after {
+  background-color: #3586c0; }
+
+.selectize-dropdown {
+  font-size: 11px;
+  line-height: 15px;
+  color: #717171; }
+
+.selectize-input {
+  font-size: 11px;
+  line-height: 15px;
+  padding: 5px 4px 4px 4px;
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 0 !important;
+  border: none !important;
+  color: #717171; }
+
+.selectize-input.focus {
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
+
+.selectize-input input {
+  font-size: 11px;
+  line-height: 15px; }
+
+.selectize-control.single .selectize-input:after {
+  right: 5px; }
+
 .animate-twice {
   -webkit-animation-iteration-count: 2;
   -maz-animation-iteration-count: 2;
@@ -568,7 +610,7 @@ section {
 
 .iobioproject {
   font-size: 18px;
-  color: #766363;
+  color: #717171 !important;
   font-family: "Quicksand";
   line-height: 45px;
   float: right;
@@ -1157,7 +1199,7 @@ header {
   left: 190px;
   top: 0px; }
 
-.sidebar-button {
+.icon-button.sidebar-button {
   margin-bottom: 0px !important;
   margin-left: 2px !important;
   padding-left: 0px !important;
@@ -1170,20 +1212,18 @@ header {
   height: 48px !important;
   white-space: normal !important;
   line-height: 13px !important;
-  /*background-color: #5C6B88 !important; */
-  /*background-color: #4C6880 !important; */
-  background-color: transparent !important;
+  background-color: rgba(117, 180, 245, 0.22) !important;
   box-shadow: -3px 2px 3px 0 rgba(0, 0, 0, 0.34), -2px -2px 2px 0 rgba(0, 0, 0, 0.14) !important; }
-  .sidebar-button.closed {
+  .icon-button.sidebar-button.closed {
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.4) !important; }
-  .sidebar-button .material-icons {
+  .icon-button.sidebar-button .material-icons {
     font-size: 18px !important;
     /*color: #B8D096  !important */
     color: white !important;
     margin-bottom: 0px !important;
     display: block !important;
     padding-top: 3px; }
-  .sidebar-button .label {
+  .icon-button.sidebar-button .label {
     /*color: #DDFBB2  !important */
     color: white !important;
     font-size: 9px !important;
@@ -1197,16 +1237,16 @@ header {
     padding-top: 4px !important;
     top: 0 !important;
     margin-left: -3px; }
-  .sidebar-button.selected {
+  .icon-button.sidebar-button.selected {
     background-color: white !important;
     color: #5d809d !important;
     font-weight: normal !important;
     /*box-shadow: 0 6px 10px rgba(0, 0, 0, 0.49), 0 10px 30px rgba(0, 0, 0, 0.28) !important */
     box-shadow: -6px 2px 6px 0 rgba(0, 0, 0, 0.49), -2px -2px 2px 0 rgba(0, 0, 0, 0.28) !important; }
-    .sidebar-button.selected .label, .sidebar-button.selected .material-icons {
+    .icon-button.sidebar-button.selected .label, .icon-button.sidebar-button.selected .material-icons {
       color: #5d809d !important;
       margin-left: 0px !important; }
-    .sidebar-button.selected .label {
+    .icon-button.sidebar-button.selected .label {
       font-weight: normal !important; }
 
 #slider-icon-bar {
@@ -1271,16 +1311,17 @@ header {
   -moz-animation-duration: 0.6s;
   animation-duration: 0.6s; }
 
-#clear-filters-link {
-  color: #717171;
-  font-size: 11px;
-  float: right;
-  margin-right: 30px;
+#filter-track h4 {
+  font-size: 12px;
+  color: #5d809d !important;
+  margin-top: 10px;
+  margin-bottom: 6px; }
+#filter-track #clear-filters-link {
   padding-top: 0px;
   padding-bottom: 0px;
   margin-top: 0px;
-  margin-bottom: 10px;
-  cursor: pointer; }
+  margin-bottom: 0px;
+  color: #717171 !important; }
 
 #recessive-symbol .parent .left {
   stroke: #F49A73;
@@ -1417,10 +1458,12 @@ header {
   fill: #458b00; }
 
 .zyg_hom {
-  fill: rgba(165, 48, 48, 0.79); }
+  fill: rgba(173, 38, 38, 0.65);
+  stroke: rgba(0, 0, 0, 0.26); }
 
 .zyg_het {
-  fill: #D3D5D8; }
+  fill: #D3D5D8;
+  stroke: rgba(0, 0, 0, 0.26); }
 
 .impact, .vepImpact, .effect, .vepConsequence, .type, .zygosity, .recfilter {
   border: solid 2px white;
@@ -1435,25 +1478,36 @@ header {
 .afexaclevels.nocolor, .af1000glevels.nocolor {
   display: none !important; }
 
-.impact:hover, .vepImpact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover {
+.impact:hover, .vepImpact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .tooltip-zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
   border: solid 1.5px #969696;
   border-radius: 4px; }
 
-.impact.current:hover, .vepImpact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
+.tooltip-zygosity:hover {
+  border-radius: 0px;
+  border: solid 2.5px #969696; }
+
+.impact.current:hover, .vepImpact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid 2.5px #3586c0;
   border-radius: 4px;
   padding: 1px; }
 
+.tooltip-zygosity.current:hover {
+  border-radius: 0px; }
+
 .current {
   font-weight: bold;
   border: solid 2.5px #3586c0;
   border-radius: 4px;
   padding: 1px; }
+
+.tooltip-zygosity.current {
+  border-radius: 0px;
+  border: solid 2.5px #3586c0 !important; }
 
 #impact-scheme, #effect-scheme, #regulatory-scheme, #zygosity-scheme {
   padding-top: 2px; }
@@ -1572,6 +1626,9 @@ header {
   padding-bottom: 20px;
   background: white; }
 
+#data-card .form-group.form-group-sm {
+  margin-top: 4px; }
+
 .tooltip-title {
   font-size: 11px;
   word-break: break-word; }
@@ -1636,10 +1693,11 @@ header {
   margin-right: 6px;
   margin-top: 0px !important;
   width: 24px !important;
-  color: black; }
+  color: black;
+  border: solid thin rgba(0, 0, 0, 0.22); }
 
 .tooltip-zygosity.hom {
-  background-color: #a53030 !important;
+  background-color: rgba(165, 48, 48, 0.76) !important;
   color: white; }
 .tooltip-zygosity.homref {
   background-color: #5D809D !important;

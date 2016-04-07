@@ -49,7 +49,7 @@ FilterCard.prototype.getFilterObject = function() {
 
 
 FilterCard.prototype.onSelectAnnotationScheme = function() {
-	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
+	this.annotationScheme = $("#select-annotation-scheme")[0].selectize.getValue();
 
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	this.displayEffectFilters();
@@ -65,9 +65,8 @@ FilterCard.prototype.getAnnotationScheme = function() {
 
 FilterCard.prototype.setAnnotationScheme = function(scheme) {
 	this.annotationScheme = scheme;
-    $('#select-annotation-scheme').val(scheme);	
-	$('#select-annotation-scheme').trigger("chosen:updated");	
-
+    $('#select-annotation-scheme')[0].selectize.setValue(scheme, true);	
+    
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	d3.select('#filter-card .impact').classed('vepImpact',this.annotationScheme.toLowerCase() == 'vep');
 	d3.select('#filter-card .vepImpact').classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
@@ -78,17 +77,9 @@ FilterCard.prototype.setAnnotationScheme = function(scheme) {
 
 
 
-FilterCard.prototype.onSelectPathogenicityScheme = function() {
-	this.pathogenicityScheme = $( "#select-pathogenicity-scheme option:selected" ).text().toLowerCase();
-	
-	var filterCardSelector = $('#filter-track');
-	d3.selectAll("#filter-track .clinvar").classed("hide", this.pathogenicityScheme != "clinvar");
-	d3.selectAll("#filter-track .sift").classed("hide", this.pathogenicityScheme != "sift");
-	d3.selectAll("#filter-track .polyphen").classed("hide", this.pathogenicityScheme != "polyphen");
-}
-
 FilterCard.prototype.onSelectAFScheme = function() {
-	this.afScheme = $( "#select-af-scheme option:selected" ).text().toLowerCase();
+	this.afScheme = $( "#select-af-scheme" )[0].selectize.getValue().toLowerCase();
+	//this.afScheme = theAfScheme.toLowerCase();
 	
 	var filterCardSelector = $('#filter-track');
 	d3.selectAll("#filter-track .afexaclevels").classed("hide", this.afScheme != "exac");
@@ -112,9 +103,29 @@ FilterCard.prototype.init = function() {
 	});
 
 
-	$('#select-annotation-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
-	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
-	$('#select-af-scheme').chosen({width: "115px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	$('#select-annotation-scheme').selectize(
+		{ create: true }
+	);
+	$('#select-annotation-scheme')[0].selectize.on('change', function() {
+		me.onSelectAnnotationScheme();
+	});
+
+	$('#select-af-scheme').selectize(
+		{ create: true }
+	);
+	$('#select-af-scheme')[0].selectize.on('change', function() {
+		me.onSelectAFScheme();
+	});
+/*
+	$('#select-annotation-scheme').selectivity();
+    $('#select-annotation-scheme').on('change', function(event) {
+    	me.onSelectAnnotationScheme(event.value);
+    });
+	$('#select-af-scheme').selectivity();
+    $('#select-af-scheme').on('change', function(event) {
+    	me.onSelectAFScheme(event.value);
+    });
+ */
 
 	// Default annotation scheme to VEP
 	this.setAnnotationScheme("VEP");
@@ -328,6 +339,10 @@ FilterCard.prototype.initFilterListeners = function() {
 FilterCard.prototype.clearFilters = function() {
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = [];
+	
+	d3.selectAll('#filter-track .recfilter').classed('current', false);
+	d3.select('#recfilter-flag').classed("hide", true);
+
 	d3.selectAll('#filter-track .impact').classed('current', false);
 	d3.selectAll('#filter-track .effect').classed('current', false);
 	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
@@ -448,6 +463,7 @@ FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
 
 FilterCard.prototype.enableCoverageFilters = function() {
 	$("#coverage-filter").removeClass("hide");
+	
 }
 
 
@@ -503,7 +519,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-	$("#af-range-filter").removeClass("hide");
+	//$("#af-range-filter").removeClass("hide");
 
 }
 
@@ -586,7 +602,7 @@ FilterCard.prototype.displayRecFilters = function() {
 		recFilterCount++;
 		var label = key == "." ? ". (unassigned)" : key;			
 		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
-                      '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
+                      '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
   					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
 	});

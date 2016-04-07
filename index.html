@@ -28,8 +28,9 @@
   <!-- alertify -->
   <script src="assets/js/alertify.min.js"></script> 
 
-  <!-- chosen dropdown (type-ahead) -->
-  <script src="assets/js/chosen.jquery.min.js"></script> 
+
+  <!-- selectize dropdown (type-ahead) -->
+  <script src="assets/js/selectize.js"></script> 
 
   <!-- jquery ui autocomplete -->
   <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -91,9 +92,6 @@
   <!-- animiate -->
   <link rel="stylesheet" href="assets/css/animate.css"/>
 
-  <!-- chosen type-ahead dropdown -->
-  <link rel="stylesheet" href="assets/css/chosen.css" />
-
  
   <!-- material design for bootstrap  
   <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
@@ -104,6 +102,9 @@
   <link href="assets/css/ripples.min.css" rel="stylesheet">
 
   <link href="http://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet">
+
+  <!-- selectize type-ahead dropdown -->
+  <link rel="stylesheet" href="assets/css/selectize.css" />
 
 
   <!-- page guide stylesheet -->
@@ -221,17 +222,19 @@
                     <div id="sample-data-label">
                       AFFECTED SIBLINGS
                     </div>
-                    <select id="affected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
-                      class="chosen-select">
-                    </select>
+                    <div style="width:270px;">
+                      <select id="affected-sibs-select" style="font-size:10px;"  class="selectized" multiple="multiple" placeholder="...select">
+                      </select>
+                    </div>
                 </div>
                 <div id="unaffected-sibs-box" style="float:left;margin-left:10px;padding-bottom:20px;" class="hide">
                     <div id="sample-data-label">
                       UNAFFECTED SIBLINGS
                     </div>
-                    <select id="unaffected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
-                      class="chosen-select">
-                    </select>
+                    <div style="width:270px;">
+                      <select id="unaffected-sibs-select" style="font-size:10px;" class="selectized"  multiple="multiple" placeholder="...select">
+                      </select>
+                    </div>
                 </div>
               </div>
 
@@ -288,14 +291,15 @@
               Data
             </button>
 
-  
+        
+
+
           </div>
 
 
 
           <!-- gene badges for navigation -->
           <div id="gene-badge-container" class="hide" style="margin-top:4px;">
-              
 
             <!-- Buttons for editting gene list, done editting gene list -->
             <div id="cache-genes-button" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 15px;padding-right: 10px;">
@@ -369,12 +373,13 @@
               </div>
           </div> 
 
-          <div id="gene-source-box" class="hide" style="float:left">
-            <select class="fullview hide" id="select-gene-source" onchange="{geneToLatestTranscript={};genesCard.selectGene(window.gene.gene_name);$('#gene-source-box').toggleClass('hide')}">
-                  <option>Gencode Transcript</option>
-                  <option>RefSeq Transcript</option>                   
+          <div id="gene-source-box" class="hide" style="width:120px;float:left">
+            <select id="select-gene-source" class="fullview" data-placeholder="">
+                  <option value="Gencode Transcript" selected>Gencode Transcript</option>
+                  <option value="RefSeq Transcript">RefSeq Transcript</option>                   
              </select>        
           </div>
+              
 
           <button id="gene-source-config-button" style="margin-top:0px;margin-left:4px;float:left" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
             <i class="material-icons" style="font-size:15px;">settings</i>

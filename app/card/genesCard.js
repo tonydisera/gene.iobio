@@ -692,8 +692,10 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error) {
 		me._setGeneBadgeError(window.gene.gene_name, true);
 	} else {
 		vc = getProbandVariantCard();
+		
 		var probandVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-		if (probandVcfData.features.length == 0) {
+		
+		if (probandVcfData != null && probandVcfData.features.length == 0) {
 			me._setGeneBadgeWarning(window.gene.gene_name, true);
 		} else {
 			var dangerObject = vc.summarizeDanger(probandVcfData);
@@ -947,8 +949,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	}
 
 
-	var url = geneiobio_server + 'api/gene/' + geneName;
-	geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
+	var url = geneiobio_server + 'api/gene/' + geneName;	
 	url += "?source=" + geneSource;
 	
 	$.ajax({
@@ -994,6 +995,43 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	 });
 }
 
+/**
+*
+* For some unknown reason, when chosen.js was swapped out with selectize.js, the
+* browser would hang in selectGene() after a gene source (refseq vs gencode) was
+* selected from the dropdown.  It seemed to happen when the dom was changed, so
+* to workaround this problem, refreshGene() is called when the gene source
+* changes.
+*/
+GenesCard.prototype.refreshGene = function(geneName) {
+	var me = this;
+
+	var url = geneiobio_server + 'api/gene/' + window.gene.gene_name;	
+	url += "?source=" + geneSource;
+	
+	$.ajax({
+	    url: url,
+	    jsonp: "callback",
+	    type: "GET",
+	    dataType: "jsonp",
+	    success: function( response ) {
+
+	    	if (response[0].hasOwnProperty('gene_name')) {
+		    	// We have successfully return the gene model data.
+		    	// Load all of the tracks for the gene's region.
+		    	window.gene = response[0];	
+		    	adjustGeneRegion(window.gene);
+		    	window.geneObjects[window.gene.gene_name] = window.gene;			    	
+		    	loadTracksForGene(false);
+	    	} else {
+	    		alertify.error("Gene " + geneName + " not found. ", 
+				      		    function (e) {
+				     			});
+	    	}
+
+	    }
+	 });
+}
 GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 	var me = this;
 

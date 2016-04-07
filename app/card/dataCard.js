@@ -153,9 +153,9 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     });
 
     // When the sample name dropdown is selected
-    panelSelector.find('#vcf-sample-select').on('change', function(event,params) {
-    	me.onVcfSampleSelected(panelSelector);
-    });
+    panelSelector.find('#vcf-sample-select')[0].selectize.on('change', function() {
+		me.onVcfSampleSelected(panelSelector);
+	});
 
 }
 
@@ -164,28 +164,67 @@ DataCard.prototype.init = function() {
 	var me = this;
 
 	$('#proband-data').append(dataCardEntryTemplate());
+	$('#proband-data #vcf-sample-select').selectize(
+		{ 
+			create: true, 			
+			valueField: 'value',
+	    	labelField: 'value',
+	    	searchField: ['value']
+    	}
+	);
 	this.listenToEvents($('#proband-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
-	$('#proband-data #vcf-sample-select').chosen({width: "150px;font-size:11px;"});
-	$('#unaffected-sibs-select').chosen({width: "270px;font-size:11px;"});
-	$('#affected-sibs-select').chosen({width: "270px;font-size:11px;"});
+	
+	
+	$('#unaffected-sibs-select').selectize(
+		{ 
+			create: true, 
+			maxItems: null,  
+			valueField: 'value',
+	    	labelField: 'value',
+	    	searchField: ['value']
+    	}
+	);
+	$('#affected-sibs-select').selectize(
+		{ 
+			create: true, 
+			maxItems: null,  
+			valueField: 'value',
+	    	labelField: 'value',
+	    	searchField: ['value']
+    	}
+	);
 
 
 	$('#mother-data').append(dataCardEntryTemplate());
 	$('#mother-data #sample-data-label').text("MOTHER");
+	$('#mother-data #vcf-sample-select').selectize(
+		{ 
+			create: true, 			
+			valueField: 'value',
+	    	labelField: 'value',
+	    	searchField: ['value']
+    	}
+	);
 	this.listenToEvents($('#mother-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
-	$('#mother-data #vcf-sample-select').chosen({width: "150px;"});
 
 	$('#father-data').append(dataCardEntryTemplate());
 	$('#father-data #sample-data-label').text("FATHER");
+	$('#father-data #vcf-sample-select').selectize(
+		{ 
+			create: true, 			
+			valueField: 'value',
+	    	labelField: 'value',
+	    	searchField: ['value']
+    	}
+	);
 	this.listenToEvents($('#father-data'));
 	addVariantCard();
 	me.setDataSourceRelationship($('#father-data'));
-	$('#father-data #vcf-sample-select').chosen({width: "150px;"});
-
+	
 
 	var dataCardSelector = $('#data-card');
 	dataCardSelector.find('#expand-button').on('click', function() {
@@ -203,8 +242,8 @@ DataCard.prototype.init = function() {
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father
 		// data is loaded.
-		var affectedSibIds  = $("#affected-sibs-select").chosen().val();
-		var unaffectedSibIds = $("#unaffected-sibs-select").chosen().val();
+		var affectedSibIds  = $("#affected-sibs-select")[0].selectize.getValue();
+		var unaffectedSibIds = $("#unaffected-sibs-select")[0].selectize.getValue();
 
 		window.loadSibs(affectedSibIds, 'affected');
 		window.loadSibs(unaffectedSibIds, 'unaffected');
@@ -228,15 +267,13 @@ DataCard.prototype.initSibs = function() {
     window.variantCardsSibs.affected.forEach(function(vc) {
     	affectedSibIds.push(vc.getName());
     })
-    $('#data-card #affected-sibs-select').val(affectedSibIds);
-	$('#data-card #affected-sibs-select').trigger("chosen:updated");
+    $('#data-card #affected-sibs-select')[0].selectize.setValue(affectedSibIds);
 
     var unaffectedSibIds = [];
     window.variantCardsSibs.unaffected.forEach(function(vc) {
     	unaffectedSibIds.push(vc.getName());
     })
-    $('#data-card #unaffected-sibs-select').val(unaffectedSibIds);
-	$('#data-card #unaffected-sibs-select').trigger("chosen:updated");
+    $('#data-card #unaffected-sibs-select')[0].selectize.setValue(unaffectedSibIds);
 
 }
 
@@ -464,41 +501,33 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 				$('#unaffected-sibs-box').removeClass('hide');
 				$('#affected-sibs-box').removeClass('hide');
 			}
-			me.panelSelectorFilesSelected.find('#vcf-sample-select')
-								         .find('option').remove();
-			$('#unaffected-sibs-select').find('option').remove();	
-			$('#affected-sibs-select').find('option').remove();								         
-
+			me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.clearOptions();
+			$('#unaffected-sibs-select')[0].selectize.clearOptions();
+			$('#affected-sibs-select')[0].selectize.clearOptions();
 
 			// Add a blank option if there is more than one sample in the vcf file
 			if (sampleNames.length > 1) {
-				me.panelSelectorFilesSelected.find('#vcf-sample-select')
-				                             .append($("<option></option>"));
-				$('#unaffected-sibs-select').append($("<option></option>"));				                             
-				$('#affected-sibs-select').append($("<option></option>"));				                             
+				me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.addOption({value:""});
+				$('#unaffected-sibs-select')[0].selectize.addOption({value:""});			                             
+				$('#affected-sibs-select')[0].selectize.addOption({value:""});			                             
 			}							         
 
 			// Populate the sample name in the dropdown
 			sampleNames.forEach( function(sampleName) {
-				me.panelSelectorFilesSelected.find('#vcf-sample-select')
-				                            .append($("<option></option>")
-		                                    .attr("value",sampleName)
-		                                    .text(sampleName)); 
-				$('#unaffected-sibs-select').append($("<option></option>")
-		                                    .attr("value",sampleName)
-		                                    .text(sampleName));
-				$('#affected-sibs-select').append($("<option></option>")
-		                                    .attr("value",sampleName)
-		                                    .text(sampleName)); 			                                     		                                    
+				me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
+				$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
+				$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
 			});
-			me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+			me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.refreshOptions();
+			$('#unaffected-sibs-select')[0].selectize.refreshOptions();
+			$('#affected-sibs-select')[0].selectize.refreshOptions();
+
 			me.initSibs();
 
 			// If we are loading from URL parameters and the sample name was specified, select this
 			// sample from dropdown
 			if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
-				me.panelSelectorFilesSelected.find('#vcf-sample-select').val(variantCard.getDefaultSampleName());
-				me.panelSelectorFilesSelected.find('#vcf-sample-select').trigger("chosen:updated");
+				me.panelSelectorFilesSelected.find('#vcf-sample-select')[0].selectize.setValue(variantCard.getDefaultSampleName());
 
 				variantCard.setSampleName(variantCard.getDefaultSampleName());
 				variantCard.setDefaultSampleName(null);
@@ -523,7 +552,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
-	var sampleName = panelSelector.find('#vcf-sample-select option:selected').text();
+	var sampleName = panelSelector.find('#vcf-sample-select')[0].selectize.getValue();
 	variantCard.setSampleName(sampleName);
 	
 	window.updateUrl('sample' + cardIndex, sampleName);
@@ -562,46 +591,37 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 			if (sampleNames.length > 1) {
 				// Populate the sample names in the dropdown
 				panelSelector.find('#vcf-sample-box').removeClass('hide');
-				panelSelector.find('#vcf-sample-select')
-						     .find('option').remove();
+				panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
 				if (me.mode == 'trio') {
 					$('#unaffected-sibs-box').removeClass('hide');
 					$('#affected-sibs-box').removeClass('hide');
 				}
-				$('#unaffected-sibs-select').find('option').remove();
-				$('#affected-sibs-select').find('option').remove();
+				$('#unaffected-sibs-select')[0].selectize.clearOptions();
+				$('#affected-sibs-select')[0].selectize.clearOptions();
 
 				// Add a blank option if there is more than one sample in the vcf file
 				if (sampleNames.length > 1) {
-					panelSelector.find('#vcf-sample-select')
-					             .append($("<option></option>"));
-					$('#unaffected-sibs-select').append($("<option></option>"));
-					$('#affected-sibs-select').append($("<option></option>"));
+					panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:""});
+					$('#unaffected-sibs-select')[0].selectize.addOption({value:""});
+					$('#affected-sibs-select')[0].selectize.addOption({value:""});
 				}	
 
 				// Populate the sample names in the dropdown
 				sampleNames.forEach( function(sampleName) {
-					panelSelector.find('#vcf-sample-select')							 
-					             .append($("<option></option>")
-			                     .attr("value",sampleName)
-			                     .text(sampleName)); 
-					$('#unaffected-sibs-select')							 
-					             .append($("<option></option>")
-			                     .attr("value",sampleName)
-			                     .text(sampleName)); 
-					$('#affected-sibs-select')							 
-					             .append($("<option></option>")
-			                     .attr("value",sampleName)
-			                     .text(sampleName)); 			                   
+					panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
+					$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
+					$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});			                   
 				});
-				panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+				panelSelector.find('#vcf-sample-select')[0].selectize.refreshOptions();
+				$('#unaffected-sibs-select')[0].selectize.refreshOptions();
+				$('#affected-sibs-select')[0].selectize.refreshOptions();
 				me.initSibs();
 
 				// If we are loading from URL parameters and the sample name was specified, select this
 				// sample from dropdown
 				if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
-					panelSelector.find('#vcf-sample-select').val(variantCard.getDefaultSampleName());
-					panelSelector.find('#vcf-sample-select').trigger("chosen:updated");
+					panelSelector.find('#vcf-sample-select')[0].selectize.setValue(variantCard.getDefaultSampleName());
+					panelSelector.find('#vcf-sample-select')[0].selectize.refreshOptions();
 
 					variantCard.setSampleName(variantCard.getDefaultSampleName());
 					variantCard.setDefaultSampleName(null);

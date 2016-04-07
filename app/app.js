@@ -193,9 +193,6 @@ function init() {
  	clearCache();
 
 
-	// Initialize material bootstrap
-    $.material.init();
-
     // Initialize app tour
 	pageGuide = tl.pg.init({ 
 		'auto_refresh': true, 
@@ -261,14 +258,13 @@ function init() {
 
 
 	// For 'show variants' card
-	$('#select-color-scheme').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
-	$('#select-intron-display').chosen({width: "120px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	//$('#select-color-scheme').selectize()
+	//$('#select-intron-display').selectize()
 	
 
     // Slide out panels
     $(iconbarTemplate()).insertBefore("#slider-left");
-	$('#select-gene-source').chosen({width: "140px;float:left;margin-left:10px;padding-right:5px;font-size:11px;background-color:white;", disable_search_threshold: 10});
-	$('#slider-left-content').html(filterCardTemplateHTML);		
+	$('#slider-left-content').append(filterCardTemplateHTML);
 	$('#slider-left-content').append(genesCardTemplateHTML);
 	$('#slider-left-content').append(bookmarkTemplateHTML);
 	$('#slider-left-content').append(examineTemplateHTML);
@@ -382,6 +378,30 @@ function init() {
 
 
 
+	// Initialize material bootstrap
+    $.material.init();
+
+
+	// When the transcript set changes (either GenCode or RefSeq)
+	
+	$('#select-gene-source').selectize(
+		{ 	onChange: function(value) {
+				geneSource = value.toLowerCase().split(" transcript")[0];
+				geneToLatestTranscript = {};
+				genesCard.selectGene(window.gene.gene_name);
+				$('#gene-source-box').toggleClass('hide');
+			} 
+		}
+	);
+    /*
+    $('#select-gene-source').selectivity();
+    $('#select-gene-source').on('change', function(event) {
+    	geneSource = event.value.toLowerCase().split(" transcript")[0];
+		geneToLatestTranscript = {};
+		genesCard.selectGene(window.gene.gene_name);
+		$('#gene-source-box').toggleClass('hide');
+    });
+	*/
 
 	// Initialize transcript view buttons
 	initTranscriptControls();
@@ -1142,7 +1162,6 @@ function cacheNextGene(genesToCache) {
 	
 
 	var url = geneiobio_server + 'api/gene/' + geneName;
-	geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
 	url += "?source=" + geneSource;
 		
 	$.ajax({
@@ -1382,7 +1401,6 @@ function loadGeneWidget() {
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
 		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
-		geneSource = $( "#select-gene-source option:selected" ).text().toLowerCase().split(" transcript")[0];	
 		url += "?source=" + geneSource;
 
 
