@@ -164,9 +164,18 @@ body {
 
 /* autocomplete */
 .ui-menu .ui-menu-item {
-  font-size: 10px; }
+  font-size: 10px;
+  color: #717171; }
 
-.ui-autocomplete {
+.ui-state-hover {
+  background: #f5fafd;
+  color: #717171; }
+
+.ui-menu .ui-state-focus {
+  background: #f5fafd;
+  color: #717171; }
+
+.ui-menu .ui-autocomplete {
   max-height: 400px;
   overflow-y: auto;
   overflow-x: hidden; }
