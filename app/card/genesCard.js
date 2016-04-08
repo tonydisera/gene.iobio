@@ -16,43 +16,35 @@ GenesCard.prototype.init = function() {
 	var hpoUrl = hpoServer + "hot/lookup";
 
 
-	 // don't navigate away from the field on tab when selecting an item
-    $( "#phenolyzer-search-terms" )
-       .bind( "keydown", function( event ) {
-        if ( event.keyCode === $.ui.keyCode.TAB &&
-            $( this ).autocomplete( "instance" ).menu.active ) {
-          event.preventDefault();
-        }
-      })
-      .autocomplete({
-        source: function( request, response ) {
-          $.getJSON( hpoUrl, {
-            term: me.extractLast( request.term )
-          }, response );
-        },
-        search: function() {
-          // custom minLength
-          var term = me.extractLast( this.value );
-          if ( term.length < 2 ) {
-            return false;
-          }
-        },
-        focus: function() {
-          // prevent value inserted on focus
-          return false;
-        },
-        select: function( event, ui ) {
-          var terms = me.split( this.value );
-          // remove the current input
-          terms.pop();
-          // add the selected item
-          terms.push( ui.item.value );
-          // add placeholder to get the comma-and-space at the end
-          terms.push( "" );
-          this.value = terms.join( ";\n" );
-          return false;
-        }
-      });
+  	// Selectize combo for phenotype terms    
+	$('#select-phenotypes').selectize({
+		//plugins: ['remove_button'],
+	    valueField: 'value',
+	    labelField: 'value',
+	    searchField: 'value',
+	    create: true,
+	    maxItems: null,  
+	    maxOptions: 500,  
+	    load: function(query, callback) {
+	        if (!query.length) return callback();
+	        $.ajax({
+	            url: hpoUrl + '?term='+encodeURIComponent(query),
+	            type: 'GET',
+	            error: function() {
+	                callback();
+	            },
+	            success: function(res) {
+	            	if (!query.length) return callback();
+	                callback(res);               
+	            }
+	        });
+	    }
+	});  
+	$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
+		$('#select-phenotypes')[0].selectize.close();
+	});
+
+     
 
 	// Detect when get genes dropdown opens so that
 	// we can prime the textarea with the genes already
@@ -260,7 +252,7 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 	$("#phenolyzer-timeout-message").addClass("hide");
 	$('#phenolyzer-heading').addClass("hide");
 
-	var searchTerms = $('#phenolyzer-search-terms').val();
+	var searchTerms = $('#select-phenotypes')[0].selectize.getValue().join(";");
 	$("#phenolyzer-search-term").text(searchTerms);	
 
 	// Get rid of newlines

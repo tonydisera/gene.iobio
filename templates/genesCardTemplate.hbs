@@ -8,7 +8,7 @@
       <div class="btn-toolbar">
         <div class="btn-group" style="display:inline;">
 
-          <button type="button" style="font-size: 11px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <button type="button" style="width:120px;font-size: 11px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
           <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">content_paste</i>Import Gene set<span style="margin-left:6px" class="caret"></span>
           </button>
 
@@ -26,31 +26,22 @@
             </li>
 
             <li class="todo hide "><a href="">Upload</a></li>
-            <li class="todo hide"><a href="">Phenomizer</a></li>
           </ul>
         </div>
       </div>
    </div>
 
   <!-- ACMG genes -->
-    <div id="acmg-genes" class="" style="margin-top:-5px;width: 150px;">
-      <div class="btn-toolbar">
-        <div class="btn-group" style="display:inline;">
-
-          <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="icon-button-sm btn btn-default btn-raised" style="font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
-            <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">content_paste</i>Import ACMG56 Genes<span style="margin-left:6px"></span>
+   
+          <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
+            <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">content_paste</i>ACMG56 Genes<span style="margin-left:6px"></span>
           </button>
-        </div>
-      </div>
-   </div>
-
-    <div id="phenolyzer-search-box" style="margin-top:10px;">
+   
+    <div id="phenolyzer-search-box" style="margin-top:20px;">
       <div>
-        <div>Phenolyzer</div>
-        <div style="margin-top: 5px;"class="">
-          Enter phenotype
-          <div style="font-style: italic;font-size: 10px;">separate terms with a semicolon ;</div>
-        </div><textarea style="width:180px;height:70px" id="phenolyzer-search-terms"></textarea>
+        <h4>Phenolyzer</h4>
+
+        <select id="select-phenotypes"  placeholder="Enter phenotype terms..."/>
         
         <div style="font-size:10px;width: 120px;">This function is only for academic and non-profit use. 
           <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
@@ -77,8 +68,8 @@
     </div>
 
     <!-- loader gif for phenolyzer -->
-    <div class="phenolyzer loader hide" style="padding-top: 17px;">
-        <span class="loader-label">Running Phenolyzer...</span>
+    <div class="phenolyzer loader hide" style="margin-top: 10px;margin-bottom: 10px;">
+        <span class="loader-label" style="font-size:11px !important">Running Phenolyzer...</span>
         <img src="assets/images/wheel.gif"/>
     </div>
 

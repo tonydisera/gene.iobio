@@ -1,6 +1,12 @@
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
+h4 {
+  font-size: 12px;
+  color: #5d809d;
+  margin-bottom: 4px;
+  margin-top: 10px; }
+
 .form-control,
 .form-group .form-control {
   background-image: -webkit-gradient(linear, left top, left bottom, from(#3586c0), to(#3586c0)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
@@ -32,6 +38,11 @@ body {
   border: none !important;
   color: #717171; }
 
+#phenolyzer-search-box .selectize-input {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border: solid thin #cccccc !important; }
+
 .selectize-input.focus {
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
@@ -42,6 +53,21 @@ body {
 
 .selectize-control.single .selectize-input:after {
   right: 5px; }
+
+.selectize-control.multi .selectize-input > div {
+  color: #717171 !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.03) !important; }
+
+.selectize-control.plugin-remove_button a.remove {
+  color: #717171 !important; }
+
+#slider-left .selectize-control.plugin-remove_button a.remove {
+  color: #717171 !important; }
+
+#slider-left #genes-card .selectize-dropdown-content {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 400px; }
 
 .animate-twice {
   -webkit-animation-iteration-count: 2;

@@ -495,7 +495,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 		// Only show the sample dropdown if the vcf file has more than one sample
 		if (sampleNames.length > 1) {
 			
-			me.populateSampleDropdowns(me.panelSelectorFilesSelected, sampleNames);
+			me.populateSampleDropdowns(variantCard, me.panelSelectorFilesSelected, sampleNames);
 
 		} else {
 			variantCard.setSampleName("");				
@@ -508,7 +508,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	});
 }
 
-DataCard.prototype.populateSampleDropdowns = function(panelSelector, sampleNames) {
+DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector, sampleNames) {
 	var me = this;
 
 	// Populate the sample names in the dropdown
@@ -594,7 +594,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 			
 			// Only show the sample dropdown if there is more than one sample
 			if (sampleNames.length > 1) {
-				me.populateSampleDropdowns(panelSelector, sampleNames);
+				me.populateSampleDropdowns(variantCard, panelSelector, sampleNames);
 
 			} else {
 				variantCard.setSampleName("");
