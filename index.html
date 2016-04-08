@@ -159,9 +159,9 @@
 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel">
   <div id="data-card" class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header" style="padding-top:10px;">
+      <div class="modal-header" style="padding-top:12px;">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Data</h4>
+        <span class="modal-title">Data</span>
 
         <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
           <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
@@ -200,12 +200,12 @@
                   <input id="datasource-relationship" class="hide" value="proband" type="text"/>
                 </div>
 
-                <div id="mother-data" class="hide" style="float:left;margin-top:10px;min-width:500px;">
+                <div id="mother-data" class="hide" style="float:left;margin-top:20px;min-width:500px;">
                   <input id="card-index" class="hide" value="1" type="text">
                   <input id="datasource-relationship" class="hide" value="mother" type="text"/>
                 </div>
 
-                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:10px;min-width:500px;">
+                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:20px;min-width:500px;">
                   <input id="card-index" class="hide" value="2" type="text">
                   <input id="datasource-relationship" class="hide" value="father" type="text"/>
                 </div>
@@ -217,7 +217,7 @@
                       AFFECTED SIBLINGS
                     </div>
                     <div style="width:270px;">
-                      <select id="affected-sibs-select" style="font-size:10px;"  class="selectized" multiple="multiple" placeholder="...select">
+                      <select id="affected-sibs-select" style="font-size:10px;"  class="selectized" multiple="multiple" placeholder="Choose sample(s)...">
                       </select>
                     </div>
                 </div>
@@ -226,7 +226,7 @@
                       UNAFFECTED SIBLINGS
                     </div>
                     <div style="width:270px;">
-                      <select id="unaffected-sibs-select" style="font-size:10px;" class="selectized"  multiple="multiple" placeholder="...select">
+                      <select id="unaffected-sibs-select" style="font-size:10px;" class="selectized"  multiple="multiple" placeholder="Choose sample(s)...">
                       </select>
                     </div>
                 </div>
@@ -252,9 +252,9 @@
 </div>
 
 
- <div id="container" class="push" style="margin-left:32px;margin-top:-10px !important;">
+ <div id="container" class="push" style="margin-top:-10px !important;">
 
-    <div id="nav-section" class="shadow-z-2">
+    <div id="nav-section" class="fixed shadow-z-2">
 
     	<section id="app-title-section">
            <div style="float:left">

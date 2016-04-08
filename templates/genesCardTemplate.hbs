@@ -34,7 +34,7 @@
   <!-- ACMG genes -->
    
           <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
-            <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">content_paste</i>ACMG56 Genes<span style="margin-left:6px"></span>
+            <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">format_list_numbered</i>ACMG56 Genes<span style="margin-left:6px"></span>
           </button>
    
     <div id="phenolyzer-search-box" style="margin-top:20px;">
@@ -68,34 +68,36 @@
     </div>
 
     <!-- loader gif for phenolyzer -->
-    <div class="phenolyzer loader hide" style="margin-top: 10px;margin-bottom: 10px;">
-        <span class="loader-label" style="font-size:11px !important">Running Phenolyzer...</span>
+    <div class="phenolyzer loader hide" style="margin-top: 20px;margin-bottom: 10px;">
+        <span class="loader-label" style="font-size:12px !important">Running Phenolyzer...</span>
         <img src="assets/images/wheel.gif"/>
     </div>
 
 
 	 <div id="phenolyzer-heading" class="hide">
 
-      <div style="font-size: 11px;margin-top: 10px;margin-bottom: 5px;margin-right: 5px;">
+      <div style="font-size: 11px;margin-top: 15px;margin-bottom: 10px;margin-right: 5px;">
   
-        <span style="float:left">select top</span>
+        <span style="float:left" class="phenolyzer-label">select top</span>
 
-        <input id="phenolyzer-select-range-end" type="text" value="10" style="width: 25px;line-height: 11px;margin-left: 2px;">
+        <input id="phenolyzer-select-range-end" class="phenolyzer-label" type="text" value="10" style="width: 25px;line-height: 11px;margin-left: 2px;">
+
 
         <button onclick="genesCard.selectPhenolyzerGeneRange()" class="btn btn-raised btn-default icon-button-sm" style="font-size: 11px;line-height: 12px;margin-left: 4px;margin-top: 0px;margin-bottom: 0px;padding-top: 3px;padding-bottom: 3px;">Go</button>
 
-        <a href="javascript:void(0)" onclick="genesCard.deselectPhenolyzerGenes()" style="float: right;">deselect all</a>
+
+        <a href="javascript:void(0)" class="phenolyzer-label" onclick="genesCard.deselectPhenolyzerGenes()" style="float: right;">deselect all</a>
       </div>
 
-      <div style="margin-left:15px;" >
-          <div style="color:#5d809d;float: left;font-size:11px;">Rank</div>
-          <div style="color:#5d809d;width: 75px;float: left;margin-left: 25px;font-size:11px;">Gene</div>
-          <div style="color:#5d809d;float: left;font-size:12px;">Score</div>
+      <div  >
+          <h5 style="float: left;font-size:11px;">Rank</h5>
+          <h5 style="width: 75px;float: left;margin-left: 25px;font-size:11px;">Gene</h5>
+          <h5 style="float: left;font-size:11px;">Score</h5>
       </div>
 
     </div>
 
-    <div id="phenolyzer-results" style="clear:both;margin-left:15px;">
+    <div id="phenolyzer-results" style="clear:both;">
     </div>
 
     <div id="phenolyzer-timeout-message" class="hide alert alert-dismissable alert-info" style="background-color: rgb(249, 237, 184); border: solid 1px rgb(237, 201, 103);color: rgb(132, 132, 132);text-align: left;margin-left: 0px;margin-right: 10px;">
