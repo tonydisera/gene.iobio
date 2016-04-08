@@ -1676,8 +1676,10 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 }
 
 VariantCard.prototype._appendReadCountHeading = function(container) {
-	var svg = container.append("div")		
-		           	   .style("padding-top", "5px")
+
+	var svg = container.append("div")	
+					   .attr("id", "allele-count-legend")	
+		           	   .style("padding-top", "5px")		           	   
 				       .append("svg")
 				       .attr("width", 190)
 	           		   .attr("height", "20");
@@ -1685,7 +1687,7 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 		   .attr("x", "0")
 		   .attr("y", "14")
 		   .attr("anchor", "start")		 
-		   .attr("class", "tooltip-section-header")
+		   .attr("class", "tooltip-header-small")
 		   .text("Read Counts");	  	           		   
 
 	var g = svg.append("g")

@@ -1895,14 +1895,14 @@ text.ref-count {
   #examine-card .tooltip-header {
     overflow-wrap: break-word;
     text-align: right;
-    width: 50px;
+    width: 60px;
     display: inline-block !important;
     float: none;
     color: #888787; }
   #examine-card .tooltip-row {
     width: 190px;
     clear: both;
-    margin-bottom: 3px; }
+    margin-bottom: 8px; }
   #examine-card .tooltip-value {
     overflow-wrap: break-word;
     margin-left: 10px;
@@ -1910,7 +1910,8 @@ text.ref-count {
     margin-right: 5px;
     display: inline-block !important;
     float: none;
-    color: #717171; }
+    color: #717171;
+    vertical-align: bottom; }
   #examine-card .tooltip-footer {
     margin-top: 40px !important; }
   #examine-card .tooltip-footer #unpin {
