@@ -48,6 +48,7 @@ function DataCard() {
 }
 
 DataCard.prototype.loadDemoData = function() {
+	var me = this;
 
 	$('#splash').addClass("hide");	
 	this.mode = 'trio';
@@ -77,11 +78,15 @@ DataCard.prototype.loadDemoData = function() {
 	window.updateUrl('bam2',  this.exomeBamUrls.father);	
 	window.updateUrl('sample2',  this.exomeSampleNames.father);	
 
-	window.updateUrl("gene", "RAI1");
-	window.updateUrl("genes", "RAI1,AIRE,MYLK2");
+	if (!window.simplify) {
+		window.updateUrl("gene", "RAI1");
+		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
+		reloadGeneFromUrl();
+	} else {
+		loadUrlSources();
+	}
 
 	
-	reloadGeneFromUrl();
 
 }
 
