@@ -331,7 +331,7 @@
             <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
             <span id="gene-chr" class=" gene-card-label keep-case" ></span>
             <span id="gene-region" class="level-simple gene-card-label keep-case"></span>
-            <span id="minus_strand" class="leve-simple" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+            <span id="minus_strand" class="level-simple" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
             <span  id="gene-plus-minus-label" class="level-simple fullview hide " style="padding-left: 15px">+  -</span>
             <input id="gene-region-buffer-input" class="level-simple hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
             <span class="level-simple" style="float:right;margin-right:14px">
@@ -412,13 +412,14 @@
 
         <div id="matrix-track"  class="track shadow-z-2 hide">
             
-              <span class="card-label" style="">Rank Variants</span>
+            <div class="card-label level-simple" style="">Rank Variants</div>
+            <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
 
     
-            <div id="matrix-panel"  style="clear:both;margin-top:-9px;"
+            <div id="matrix-panel"  style="clear:both;margin-top:-9px;min-height:30px"
               class="fullview" aria-expanded="true">
-                <div class="loader">
+                <div class="loader"  style="margin-top:0px;margin-bottom:10px;">
                     <span class="loader-label">Ranking variants</span>
                     <img src="assets/images/wheel.gif"/>
                 </div>
@@ -429,8 +430,16 @@
 
               <a id="move-rows" class="level-simple" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
 
-              <div id="feature-matrix-note" class="level-simple hide" >
-                <svg style="float:left;height: 10px;width:108px">
+              <div id="feature-matrix-note" class="hide" >
+                
+                <span class="level-simple" style="color:  rgb(132,132,132);">
+                  More likely causative
+                </span>
+                <span id="matrix-harmful-note" class="hide level-simple" style="color:  rgb(132,132,132);">
+                  Most harmful
+                </span>
+
+                <svg style="height: 10px;width:108px">
                   <g transform="translate(18,6)">
                     <line x1="0" y1="0" x2="80" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
                   </g>
@@ -438,12 +447,7 @@
                     <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
                   </g>
                 </svg>
-                <span class="level-simple" style="float:left;color:  rgb(132,132,132);">
-                More likely causative
-                </span>
-                <span id="matrix-harmful-note" class="hide level-simple" style="float:left;color:  rgb(132,132,132);">
-                Most harmful
-                </span>
+
               </div> 
             </div>
         </div>

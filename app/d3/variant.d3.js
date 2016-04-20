@@ -388,7 +388,9 @@ function variantD3() {
           .attr('width', function(d) { 
             return showTransition ? 0 : Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
           })
-          .attr('y', 0)
+          .attr('y', function(d) {
+            return showTransition ? 0 :  height - ((d.level + 1) * (variantHeight + verticalPadding));
+          })
           .attr('height', variantHeight);
 
      

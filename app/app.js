@@ -538,7 +538,7 @@ function hideCoordinateFrame() {
 
 function readjustCards() {
 	var top = +$('#nav-section').height();
-	d3.select('#track-section').style("padding-top", top+5 + "px");
+	d3.select('#track-section').style("padding-top", top+8 + "px");
 }
 
 
@@ -1632,12 +1632,15 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 		}
 	}
 
-
+	$('#filter-and-rank-card').removeClass("hide");
+ 	$('#matrix-track').removeClass("hide");
+ 	if (isLevelSimple) {
+	 	$('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
+ 	}
 	$("#matrix-panel .loader").removeClass("hide");
 	$("#feature-matrix").addClass("hide");
 	$("#feature-matrix-note").addClass("hide");
-
-
+	readjustCards();
 
 	filterCard.disableFilters();
 	
@@ -1896,6 +1899,7 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 
 					$("#matrix-panel .loader").removeClass("hide");
 					$("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
+					$("#feature-matrix-note").addClass("hide");
 
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
@@ -1911,9 +1915,11 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 
 						$("#matrix-panel .loader").removeClass("hide");
 						$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
+						$("#feature-matrix-note").addClass("hide");
 						determineSibStatus(trioModel, function() {
 							$("#matrix-panel .loader").addClass("hide");
 						    $("#matrix-panel .loader .loader-label").text("Ranking variants");
+							$("#feature-matrix-note").removeClass("hide");
 							probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);
 
 							resolve();
@@ -1930,6 +1936,7 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 					probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);	
 
 					$("#matrix-panel .loader").addClass("hide");
+					$("#feature-matrix-note").removeClass("hide");
 
 					resolve();		
 				}

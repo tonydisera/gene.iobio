@@ -1,6 +1,9 @@
 .level-simple {
   display: none !important; }
 
+.card-label {
+  text-transform: none !important; }
+
 #region-track.level-simple {
   display: block !important;
   margin-left: 0px !important; }
@@ -54,13 +57,15 @@
   border: solid thin #5d809d;
   margin-left: 0px;
   text-align: center;
-  color: white; }
+  color: white;
+  margin-top: -5px; }
 .variant-card #gene-box.level-simple {
   display: block !important; }
 
-#matrix-track #feature-matrix-note.level-simple {
-  display: inline-block !important;
-  padding-left: 95px; }
+#matrix-track #rank-variants-title {
+  display: block !important; }
+#matrix-track #feature-matrix-note {
+  padding-left: 105px; }
 #matrix-track #matrix-harmful-note.level-simple {
   display: inline-block !important; }
 #matrix-track #feature-matrix text {
@@ -603,9 +608,9 @@ a {
     fill: #3586c0; }
 
 #feature-matrix-note {
-  padding-left: 155px;
+  padding-left: 165px;
   font-size: 12px;
-  margin-top: -3px; }
+  margin-top: -7px; }
 
 #move-rows {
   float: left;
@@ -702,8 +707,8 @@ section {
   padding-bottom: 4px;
   padding-left: 10px;
   padding-right: 10px;
-  margin-top: 4px;
-  margin-bottom: 4px; }
+  margin-top: 6px;
+  margin-bottom: 6px; }
 
 .track-chart {
   order: 2;
@@ -839,7 +844,7 @@ section {
 
 #matrix-track {
   width: 100%;
-  display: table-cell; }
+  display: block; }
 
 #filter-panel {
   font-size: 11px;
