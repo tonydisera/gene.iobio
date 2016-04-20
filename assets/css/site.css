@@ -58,6 +58,22 @@
 .variant-card #gene-box.level-simple {
   display: block !important; }
 
+#matrix-track #feature-matrix-note.level-simple {
+  display: inline-block !important;
+  padding-left: 95px; }
+#matrix-track #matrix-harmful-note.level-simple {
+  display: inline-block !important; }
+#matrix-track #feature-matrix text {
+  font-size: 12px !important; }
+#matrix-track #feature-matrix .colhdr text {
+  font-size: 11px !important; }
+#matrix-track #feature-matrix rect.cellbox {
+  stroke: white !important; }
+#matrix-track #feature-matrix rect.colbox {
+  stroke: #E0DDDD;
+  opacity: 1 !important;
+  stroke-width: 1px !important; }
+
 .tooltip.level-simple {
   display: block !important; }
   .tooltip.level-simple .row {
@@ -585,6 +601,11 @@ a {
   #feature-matrix.shift-rows .y.axis .tick .up #arrow-up:hover, #feature-matrix.shift-rows .y.axis .tick .down #arrow-down:hover {
     cursor: pointer;
     fill: #3586c0; }
+
+#feature-matrix-note {
+  padding-left: 155px;
+  font-size: 12px;
+  margin-top: -3px; }
 
 #move-rows {
   float: left;

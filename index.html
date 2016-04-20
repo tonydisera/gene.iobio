@@ -427,9 +427,9 @@
               <div id="feature-matrix" style="overflow-x: scroll;margin-top:-15px;">
               </div>
 
-              <a id="move-rows" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
+              <a id="move-rows" class="level-simple" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
 
-              <div id="feature-matrix-note" class="hide" style="padding-left: 155px;font-size:12px;margin-top:-3px;">
+              <div id="feature-matrix-note" class="level-simple hide" >
                 <svg style="float:left;height: 10px;width:108px">
                   <g transform="translate(18,6)">
                     <line x1="0" y1="0" x2="80" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
@@ -438,8 +438,11 @@
                     <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
                   </g>
                 </svg>
-                <span style="float:left;color:  rgb(132,132,132);">
+                <span class="level-simple" style="float:left;color:  rgb(132,132,132);">
                 More likely causative
+                </span>
+                <span id="matrix-harmful-note" class="hide level-simple" style="float:left;color:  rgb(132,132,132);">
+                Most harmful
                 </span>
               </div> 
             </div>

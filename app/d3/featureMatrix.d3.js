@@ -105,11 +105,17 @@ function featureMatrixD3() {
       // Generate the column headers
       svg.selectAll("g.colhdr").remove();
       if (options.showColumnLabels) {
+        var translateColHdrGroup = "";
+        if (options.simpleColumnLabels) {
+          translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
+        } else {
+          translateColHdrGroup = "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")";
+        }
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
           .append("g")
           .attr("class", "colhdr")
-          .attr("transform",  "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")");
+          .attr("transform",  translateColHdrGroup);
 
         var colhdrs = colhdrGroup.selectAll('.colhdr').data(data);
         colhdrs.enter().append('g')
@@ -118,11 +124,15 @@ function featureMatrixD3() {
               return "translate(" + (cellSize * (i+1)) + ",0)";
             })
             .append("text")
-            .style("text-anchor", "start")
+            .style("text-anchor", options.simpleColumnLabels ? "middle" : "start")
             .attr("dx", ".8em")
             .attr("dy", ".15em")
             .attr("transform", function(d) {
-              return "rotate(-65)" ;
+              if (options.simpleColumnLabels) {
+                return "" ;
+              } else {
+                return "rotate(-65)" ;
+              }
             })
             .text( columnLabel );
 

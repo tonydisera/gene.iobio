@@ -184,22 +184,45 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	var rsId = getRsId(d);
-	if (rsId != null) {
-		return rsId;
+	if (isLevelSimple) {
+		return (i+1).toString();
 	} else {
-		return d.type + ' ' + d.start;
+		var rsId = getRsId(d);
+		if (rsId != null) {
+			return rsId;
+		} else {
+			return d.type + ' ' + d.start;
+		}		
 	}
+
 }
 
 MatrixCard.prototype.init = function() {
 	var me = this;
 
+	if (isLevelSimple) {
+		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
+		this.removeRow('Zygosity', me.matrixRows);
+
+		this.removeRow('Bookmark', me.matrixRows);
+		//this.removeRow('Inheritance Mode', me.matrixRows);
+		this.removeRow('Affected Siblings', me.matrixRows);
+		this.removeRow('Unaffected Siblings', me.matrixRows);
+		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
+		this.removeRow('Allele Frequency - ExAC', me.matrixRows);
+
+		this.setRowLabel('Impact - SnpEff',             'Impact');
+		this.setRowLabel('Impact - VEP',                'Impact');
+		this.setRowLabel('Pathogenicity - ClinVar',     'Clinical findings');
+		this.setRowLabel('Pathogengicity - PolyPhen',   'Prediction');
+		this.setRowLabel('Inheritance Mode',            'Inheritance');
+	}
+
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 4, left: 24})
 				    .cellSize(18)
-				    .columnLabelHeight(67)
-				    .rowLabelWidth(140)
+				    .columnLabelHeight(isLevelSimple ? 30 : 67)
+				    .rowLabelWidth(isLevelSimple ? 90 : 140)
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
@@ -675,7 +698,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelSimple});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
