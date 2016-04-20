@@ -2,7 +2,12 @@
 // Global Variables
 //
 var isLevelSimple              = true;  // is gene.iobio educational version, simplified version of app
-
+var levelSimpleImpact = {
+	HIGH: 'Harmful',
+	MODERATE:  'Possibly harmful',
+	MODIFIER: 'Neutral',
+	LOW: 'Low'
+}
 var stage_iobio_services  = "http://nv-green.iobio.io/";
 var prod_iobio_services   = "http://services.iobio.io/";
 var dev_iobio_services    = "http://nv-dev.iobio.io/";

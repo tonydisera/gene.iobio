@@ -420,12 +420,14 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 
 	if (lock) {
-		showSidebar("Examine");
-		examineCard.showVariant(variant);		
-		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-        .then( function(refreshedVariant) {
-			examineCard.showVariant(refreshedVariant, true);
-        });
+		if (!isLevelSimple) {
+			showSidebar("Examine");
+			examineCard.showVariant(variant);		
+			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+	        .then( function(refreshedVariant) {
+				examineCard.showVariant(refreshedVariant, true);
+	        });			
+		}
 		getProbandVariantCard().unpin(true);
 	}
 
@@ -436,6 +438,10 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	 .duration(1000)      
 	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
+
+	if (isLevelSimple) {
+		tooltip.classed("level-simple", "true");
+	} 
 
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip"));
 
@@ -460,16 +466,24 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		showSidebar("Examine");
-		examineCard.showVariant(variant);
-		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-        .then( function(refreshedVariant) {
-			examineCard.showVariant(refreshedVariant, true);
-        });
+		if (!isLevelSimple) {
+			showSidebar("Examine");
+			examineCard.showVariant(variant);
+			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+	        .then( function(refreshedVariant) {
+				examineCard.showVariant(refreshedVariant, true);
+	        });
+
+		}
 	});
 
+	var widthSimpleTooltip = 180;
+	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
+		widthSimpleTooltip = 320;
+	}
+
+ 	var w = isLevelSimple ? widthSimpleTooltip : 300;
 	var h = tooltip[0][0].offsetHeight;
-	var w = 300;
 
 	var x = variant.screenXMatrix;
 	var y = variant.screenYMatrix + 10;

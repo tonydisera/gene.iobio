@@ -214,8 +214,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: 17, left: 4})
-				    .showXAxis(true)
+				    .margin({top: 0, right: 2, bottom: isLevelSimple ? 2 : 17, left: 4})
+				    .showXAxis(isLevelSimple ? false : true)
 				    .variantHeight(6)
 				    .verticalPadding(2)
 				    .showBrush(false)
@@ -554,6 +554,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 		this.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
 
     	this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
+    	this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
     	this.cardSelector.find('#displayed-variant-count').text("");
     	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	this.cardSelector.find('#vcf-variant-count').text("");
@@ -617,11 +618,14 @@ VariantCard.prototype.onBrush = function(brush) {
 		if (this.cardSelector.find(".filter-flag.hide").length == this.cardSelector.find(".filter-flag").length) {
 			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 			this.cardSelector.find("#displayed-variant-count").addClass("hide");
+	    	this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
 		}
 	} else {
 		this.cardSelector.find("#region-flag").removeClass("hide");
 		this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 		this.cardSelector.find("#displayed-variant-count").removeClass("hide");
+		this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
+
 	}
 
 	// Filter the gene model to only show 'features' in selected region
@@ -858,6 +862,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			var filteredVcfData = this.filterVariants(theVcfData);
 			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
+			me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
 
@@ -948,6 +953,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());	
 					me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 					me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount());
+					me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
+
 					me.cardSelector.find('#gene-box').css("visibility", "hidden");
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
@@ -1313,6 +1320,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	// Only hide displayed variant count if we haven't already zoomed
 	if (this.cardSelector.find("#region-flag.hide").length > 0) {
 		this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
+	    this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
 		this.cardSelector.find("#displayed-variant-count").addClass("hide");
 	}
 
@@ -1336,6 +1344,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 			// We are filtering on af range.  show the filter flag
 			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").removeClass("hide");
     		me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+    		me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
     		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		}
 	} else {
@@ -1346,6 +1355,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		me.cardSelector.find("#coverage-flag").removeClass("hide");
     	me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");		
 		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
+    	me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
+
 	}
 
 	// Iterate through the filters to see which badges to turn on in the variant card.
@@ -1374,6 +1385,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 			me.cardSelector.find("#" + key + "-flag").removeClass("hide");
 			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find("#displayed-variant-count").removeClass("hide");
+			me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
+
 		}  else {
 			me.cardSelector.find("#" + key + "-flag").addClass("hide");
 		}
@@ -1493,13 +1506,16 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 
-	    showSidebar("Examine");
-		examineCard.showVariant(variant);
+		if (!isLevelSimple) {
+		    showSidebar("Examine");
+			examineCard.showVariant(variant);
 
-		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-		        .then( function(refreshedVariant) {
-					examineCard.showVariant(refreshedVariant, true);
-		        });
+			me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+			        .then( function(refreshedVariant) {
+						examineCard.showVariant(refreshedVariant, true);
+			        });
+
+		}
 				
 	} else {
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
@@ -1519,6 +1535,10 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	} else {
 		tooltip.style("pointer-events", "none");          
 	}
+
+	if (isLevelSimple) {
+		tooltip.classed("level-simple", "true");
+	} 
 
 	matrixCard.clearSelections();
 	matrixCard.highlightVariant(variant);
@@ -1606,7 +1626,12 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		}
 	}
 
- 	var w = 300;
+	var widthSimpleTooltip = 180;
+	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
+		widthSimpleTooltip = 320;
+	}
+
+ 	var w = isLevelSimple ? widthSimpleTooltip : 300;
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 
@@ -1980,29 +2005,40 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	var effectDisplay = "";
 	for (var key in variant.effect) {
-	if (effectDisplay.length > 0) {
-	  	effectDisplay += ", ";
-	}
+		if (effectDisplay.length > 0) {
+		  	effectDisplay += ", ";
+		}
 		// Strip out "_" from effect
 		var tokens = key.split("_");
-		effectDisplay += tokens.join(" ");
+		if (levelSimple) {
+			effectDisplay = tokens.join(" ");
+		} else {
+			effectDisplay += tokens.join(" ");
+		}
 	}    
 	var impactDisplay = "";
 	for (var key in variant.impact) {
 		if (impactDisplay.length > 0) {
 		  	impactDisplay += ", ";
 		}
-		impactDisplay += key;
+		if (isLevelSimple) {
+			impactDisplay = levelSimpleImpact[key];
+		} else {
+			impactDisplay += key;
+		}
 	} 
 	var clinSigDisplay = "";
 	for (var key in variant.clinVarClinicalSignificance) {
-		if (key != 'none' && key != 'undefined') {
-			if (clinSigDisplay.length > 0) {
-			  	clinSigDisplay += ", ";
-			}
-			clinSigDisplay += key.split("_").join(" ");
+		if (key != 'none' && key != 'undefined' ) {
+			if (!isLevelSimple || (key.indexOf("uncertain_significance") >= 0 || key.indexOf("pathogenic") >= 0)) {
+				if (clinSigDisplay.length > 0 ) {
+				  	clinSigDisplay += ", ";
+				}
+				clinSigDisplay += key.split("_").join(" ");	
+			}		
 		}
 	}
+
 	var phenotypeDisplay = "";
 	for (var key in variant.clinVarPhenotype) {
 		if (key != 'not_specified'  && key != 'undefined') {
@@ -2037,14 +2073,22 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		if (vepImpactDisplay.length > 0) {
 		  	vepImpactDisplay += ", ";
 		}
-		vepImpactDisplay += key;
+		if (isLevelSimple) {
+			vepImpactDisplay = levelSimpleImpact[key];
+		} else {
+			vepImpactDisplay += key;
+		}
 	} 
 	var vepConsequenceDisplay = "";
 	for (var key in variant.vepConsequence) {
 		if (vepConsequenceDisplay.length > 0) {
 		  	vepConsequenceDisplay += ", ";
 		}
-		vepConsequenceDisplay += key.split("_").join(" ");
+		if (isLevelSimple) {
+			vepConsequenceDisplay = key.split("_").join(" ");
+		} else {
+			vepConsequenceDisplay += key.split("_").join(" ");
+		}
 	}     	
 	var vepHGVScDisplay = "";
 	for (var key in variant.vepHGVSc) {
@@ -2065,14 +2109,18 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		if (vepSIFTDisplay.length > 0) {
 		  	vepSIFTDisplay += ", ";
 		}
-		vepSIFTDisplay += key;
+		vepSIFTDisplay += key.split("_").join(" ");
 	} 
 	var vepPolyPhenDisplay = "";
 	for (var key in variant.vepPolyPhen) {
 		if (vepPolyPhenDisplay.length > 0) {
 		  	vepPolyPhenDisplay += ", ";
 		}
-		vepPolyPhenDisplay += key;
+		if (isLevelSimple) {
+			vepPolyPhenDisplay = key.split("_").join(" ");
+		} else {
+			vepPolyPhenDisplay += key.split("_").join(" ");
+		}
 	} 
 	
 	var vepRegDisplay = "";
@@ -2129,9 +2177,13 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	                          ? ''
 						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '');
 
-	var impactLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
+	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
 	                  ? effectDisplay 
 					  : vepConsequenceDisplay;
+
+	var impactLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
+	                  ? impactDisplay 
+					  : vepImpactDisplay;					  
 
 	var siftLabel = vepSIFTDisplay != ''  && vepSIFTDisplay != 'unknown' 
 	                ? 'SIFT ' + vepSIFTDisplay
@@ -2142,7 +2194,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
-		 siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen');
+		siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen');
 	}
 
 	var clinvarRow = '';
@@ -2153,18 +2205,37 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var clinvarRow1 = '';
 	var clinvarRow2 = '';
 	if (clinSigDisplay) {
-		clinvarRow1 = me._tooltipLongTextRow('ClinVar', clinSigDisplay);		
+		if (isLevelSimple) {
+			clinvarRow1 = me._tooltipWideHeadingRow('Clinical findings', clinSigDisplay);		
+		} else {
+			clinvarRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinSigDisplay);		
+		}
 		if (phenotypeDisplay) {
-			clinvarRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
+			if (isLevelSimple) {
+				clinvarRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay);		
+			} else {
+				clinvarRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
+			}
 		}
 	}
+
+	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Prediction', vepPolyPhenDisplay + ' to protein') : "";
+
 			
 	var dbSnpId = getRsId(variant);	
 
-	if (type == 'tooltip') {
+	if (isLevelSimple) {
+		return (
+			me._tooltipHeaderRow('   ' + impactLabel , ' impact', '', '')
+			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
+			+ inheritanceModeRow
+			+ polyphenRowSimple
+			+ clinvarRow1
+			+ clinvarRow2 );
+	} else if (type == 'tooltip') {
 		return (
 			  me._tooltipHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
-			+ me._tooltipHeaderRow(impactLabel, '', '', '')
+			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ inheritanceModeRow
 			+ siftPolyphenRow
 			+ me._tooltipShortTextRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), 
@@ -2299,10 +2370,23 @@ VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, clas
 	      + '</div>';	
 }
 
+VariantCard.prototype._tooltipWideHeadingRow = function(value1, value2) {
+	return '<div class="row">'
+	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '</div>';	
+}
+VariantCard.prototype._tooltipWideHeadingSecondRow = function(value1, value2) {
+	return '<div class="row" style="line-height:12px !important;">'
+	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '</div>';	
+}
+
 VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
 	return '<div class="row" style="padding-top:5px;">'
-	      + '<div class="col-sm-2 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-sm-10 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '<div class="col-sm-3 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, value4) {

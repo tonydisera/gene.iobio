@@ -76,17 +76,23 @@ DataCard.prototype.loadDemoData = function() {
 
 	window.updateUrl('name0', this.exomeNames.proband);	
 	window.updateUrl('vcf0',  this.exomeUrls.proband);	
-	window.updateUrl('bam0',  this.exomeBamUrls.proband);	
+	if (!window.isLevelSimple) {
+		window.updateUrl('bam0',  this.exomeBamUrls.proband);	
+	}
 	window.updateUrl('sample0',  this.exomeSampleNames.proband);	
 
 	window.updateUrl('name1', this.exomeNames.mother);	
 	window.updateUrl('vcf1',  this.exomeUrls.mother);	
-	window.updateUrl('bam1',  this.exomeBamUrls.mother);	
+	if (!window.isLevelSimple) {
+		window.updateUrl('bam1',  this.exomeBamUrls.mother);
+	}	
 	window.updateUrl('sample1',  this.exomeSampleNames.mother);	
 
 	window.updateUrl('name2', this.exomeNames.father);	
 	window.updateUrl('vcf2',  this.exomeUrls.father);	
-	window.updateUrl('bam2',  this.exomeBamUrls.father);	
+	if (!window.isLevelSimple) {		
+		window.updateUrl('bam2',  this.exomeBamUrls.father);
+	}	
 	window.updateUrl('sample2',  this.exomeSampleNames.father);	
 
 	if (!window.isLevelSimple) {

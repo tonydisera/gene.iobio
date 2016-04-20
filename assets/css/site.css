@@ -58,6 +58,13 @@
 .variant-card #gene-box.level-simple {
   display: block !important; }
 
+.tooltip.level-simple {
+  display: block !important; }
+  .tooltip.level-simple .row {
+    line-height: 18px !important; }
+    .tooltip.level-simple .row .tooltip-title {
+      font-size: 12px; }
+
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
