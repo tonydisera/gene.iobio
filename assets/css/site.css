@@ -4,6 +4,14 @@
 .card-label {
   text-transform: none !important; }
 
+.track-expand {
+  padding-top: 6px !important;
+  padding-bottom: 10px !important; }
+
+#variant-heading {
+  min-width: 150px !important;
+  max-width: 150px !important; }
+
 #region-track.level-simple {
   display: block !important;
   margin-left: 0px !important; }
@@ -905,6 +913,13 @@ section {
 
 .stats-label {
   margin-bottom: 0px; }
+
+#variant-heading {
+  float: left;
+  display: inline-block;
+  min-width: 250px;
+  max-width: 250px;
+  margin-top: 2px; }
 
 .variant-count {
   order: 2;
