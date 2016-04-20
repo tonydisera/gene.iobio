@@ -37,7 +37,7 @@ VariantCard.prototype.setAffectedStatus = function(theAffectedStatus) {
 
 VariantCard.prototype.setSampleName = function(sampleName) {
 	this.model.setSampleName(sampleName);
-	var cardLabel = this.model.getName() == sampleName ? this.model.getName() : sampleName + " " + this.model.getName();
+	var cardLabel = this.model.getName() == sampleName  || isLevelSimple ? this.model.getName() : sampleName + " " + this.model.getName();
 	if (this.isViewable()) {
 		this.cardSelector.find('#variant-card-label').text(cardLabel);
 	}
@@ -214,7 +214,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: 16, left: 4})
+				    .margin({top: 0, right: 2, bottom: 17, left: 4})
 				    .showXAxis(true)
 				    .variantHeight(6)
 				    .verticalPadding(2)
@@ -377,6 +377,10 @@ VariantCard.prototype.clearVcf = function() {
 	this.cardSelector.find('#vcf-variants').css("display", "none");
 	this.cardSelector.find(".vcfloader").addClass("hide");
 	this.cardSelector.find('#vcf-variant-card-label').text("");
+	this.cardSelector.find('#gene-box').text("");
+	this.cardSelector.find('#gene-box').css("visibility", "hidden");
+
+
 	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
 	this.cardSelector.find('#vcf-variant-count').text("");
 	this.cardSelector.find('#missing-variant-count-label').addClass("");
@@ -409,8 +413,9 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 
    	this.cardSelector.find('#card-relationship-label').text(title);
    	this.cardSelector.find('#variant-card-label').text(
-   	this.model.getName() == this.model.getSampleName() ? 
+   	this.model.getName() == this.model.getSampleName() || isLevelSimple ? 
    		  this.model.getName() : this.model.getSampleName() + " " + this.model.getName());
+   	this.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);
 
 }
 
@@ -553,6 +558,9 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
     	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	this.cardSelector.find('#vcf-variant-count').text("");
     	this.cardSelector.find('#missing-variant-count').text("");
+    	this.cardSelector.find('#gene-box').text("");
+    	this.cardSelector.find('#gene-box').css("visibility", "hidden");
+
 
 
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -850,7 +858,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			var filteredVcfData = this.filterVariants(theVcfData);
 			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
-				
+			me.cardSelector.find('#gene-box').css("visibility", "visible");
+			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
+
 			me._fillVariantChart(filteredVcfData, 
 	  							 regionStart ? regionStart : window.gene.start, 
 	  							 regionEnd ? regionEnd : window.gene.end);
@@ -938,6 +948,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());	
 					me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 					me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount());
+					me.cardSelector.find('#gene-box').css("visibility", "hidden");
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
 

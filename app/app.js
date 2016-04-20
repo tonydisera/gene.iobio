@@ -1,7 +1,7 @@
 //
 // Global Variables
 //
-var simplify              = true;  // is gene.iobio educational version, simplified version of app
+var isLevelSimple              = true;  // is gene.iobio educational version, simplified version of app
 
 var stage_iobio_services  = "http://nv-green.iobio.io/";
 var prod_iobio_services   = "http://services.iobio.io/";
@@ -804,7 +804,7 @@ function loadGeneFromUrl() {
 		genesCard._geneBadgeLoading(gene, true, true);
 	} else {
 		// Open the 'About' sidebar by default if there is no data loaded when gene is launched
-		if (simplify) {
+		if (isLevelSimple) {
 			showSidebar("Phenolyzer");
 			dataCard.loadDemoData();
 		} else {
@@ -852,7 +852,7 @@ function loadUrlSources() {
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
-	if (!simplify) {
+	if (!isLevelSimple) {
 		loadTracksForGene(true);
 	}
 
@@ -917,7 +917,7 @@ function loadUrlSources() {
 	}
 	
 
-	if (vcf != null || bam != null && !simplify) {
+	if (vcf != null || bam != null && !isLevelSimple) {
 		loadTracksForGene( false, function() {
 
 
@@ -1448,7 +1448,7 @@ function loadGeneWidget() {
 
 					if (bam == null && vcf == null) {
 						// Open the 'About' sidebar by default if there is no data loaded when gene is launched
-						if (simplify) {
+						if (isLevelSimple) {
 							showSidebar("Phenolyzer");
 							dataCard.loadDemoData();
 						} else {
@@ -1570,8 +1570,8 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
 
-    $('#gene-chr').text(simplify ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
-    $('#gene-name').text((simplify ? 'GENE ' : '') + window.gene.gene_name);   
+    $('#gene-chr').text(isLevelSimple ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
+    $('#gene-name').text((isLevelSimple ? 'GENE ' : '') + window.gene.gene_name);   
     $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
 
 
@@ -1802,7 +1802,7 @@ function enableCallVariantsButton() {
 		} 
 	});
 	if (bamCount > 0) {
-		if (!simplify) {
+		if (!isLevelSimple) {
 			$('#button-find-missing-variants').removeClass("hide");
 		}
 	} else {

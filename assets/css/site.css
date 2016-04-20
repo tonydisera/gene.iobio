@@ -1,3 +1,63 @@
+.level-simple {
+  display: none !important; }
+
+#region-track.level-simple {
+  display: block !important;
+  margin-left: 0px !important; }
+
+#gene-search-bar.level-simple {
+  display: inline-block !important;
+  margin-left: 50px !important; }
+
+#app-disclaimer-link-right.level-simple {
+  clear: both;
+  font-size: 10px;
+  color: #717171 !important;
+  text-align: right;
+  margin-top: 5px;
+  display: block !important; }
+
+#education-title.level-simple {
+  display: block !important; }
+
+#app-disclaimer-link-left.level-simple {
+  display: none !important; }
+
+#genes-card #phenolyzer-run-label-long.level-simple {
+  display: inline-block !important;
+  vertical-align: top;
+  margin-top: 4px; }
+#genes-card #phenolyzer-run-label.level-simple {
+  display: none !important; }
+#genes-card #phenolyzer-heading h5 {
+  display: inline-block; }
+#genes-card #phenolyzer-heading h5.level-simple {
+  display: none !important; }
+
+.nav li.level-simple {
+  display: none !important; }
+
+#displayed-variant-count-label-simple {
+  display: none; }
+
+#displayed-variant-count-label-simple.level-simple {
+  display: inline-block !important; }
+
+.variant-card #bottom-white-space {
+  display: none !important; }
+.variant-card #bottom-white-space.level-simple {
+  display: block !important;
+  height: 5px; }
+.variant-card #gene-box {
+  display: none !important;
+  background-color: rgba(93, 128, 157, 0.63);
+  border: solid thin #5d809d;
+  margin-left: 0px;
+  text-align: center;
+  color: white; }
+.variant-card #gene-box.level-simple {
+  display: block !important; }
+
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
@@ -308,11 +368,17 @@ html {
 body {
   margin-bottom: 70px; }
 
-#app-disclaimer-link {
+#education-title {
+  display: none; }
+
+#app-disclaimer-link-left {
   font-size: 10px;
   color: #717171 !important;
   display: block;
   text-align: left; }
+
+#app-disclaimer-link-right {
+  display: none; }
 
 #app-disclaimer {
   font-size: 10px;
@@ -686,6 +752,10 @@ section {
   color: #717171;
   font-size: 14px;
   margin-left: 100px; }
+
+#gene-search-bar {
+  margin-left: 150px;
+  display: inline-block; }
 
 #gene-name {
   font-size: 16px !important;
@@ -2052,7 +2122,18 @@ text.ref-count {
   font-size: 11px; }
 
 #genes-card .phenolyzer-label {
-  color: #717171 !important; }
+  color: #717171 !important;
+  font-size: 11px;
+  float: left; }
+#genes-card #phenolyzer-run-label {
+  display: inline-block !important;
+  vertical-align: top;
+  margin-top: 4px; }
+#genes-card #phenolyzer-heading {
+  margin-top: 20px; }
+  #genes-card #phenolyzer-heading h5 {
+    display: inline-block;
+    font-size: 11px; }
 
 #get-genes-copy-paste-button.btn.btn-raised, #phenolyzer-go-button.btn.btn-raised {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12) !important;

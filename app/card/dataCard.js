@@ -26,6 +26,13 @@ function DataCard() {
 		mother:  'NA19238',
 		father:  'NA19239' 
 	};
+
+	this.exomeNamesSimple = {
+		proband: 'Jimmy',
+		mother:  'Mother',
+		father:  'Father' 
+	};
+
 	this.exomeUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
@@ -49,6 +56,10 @@ function DataCard() {
 
 DataCard.prototype.loadDemoData = function() {
 	var me = this;
+
+	if (isLevelSimple) {
+		this.exomeNames = this.exomeNamesSimple;
+	}
 
 	$('#splash').addClass("hide");	
 	this.mode = 'trio';
@@ -78,7 +89,7 @@ DataCard.prototype.loadDemoData = function() {
 	window.updateUrl('bam2',  this.exomeBamUrls.father);	
 	window.updateUrl('sample2',  this.exomeSampleNames.father);	
 
-	if (!window.simplify) {
+	if (!window.isLevelSimple) {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 		reloadGeneFromUrl();
@@ -167,6 +178,10 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 DataCard.prototype.init = function() {
 	var me = this;
+
+	if (this.isLevelSimple) {
+		this.exomeNames
+	}
 
 	$('#proband-data').append(dataCardEntryTemplate());
 	$('#proband-data #vcf-sample-select').selectize(

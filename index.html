@@ -257,20 +257,33 @@
     <div id="nav-section" class="fixed shadow-z-2">
 
     	<section id="app-title-section">
-           <div style="float:left">
+        <div style="float:left">
       	      <a id='home' href="/">
                 <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
               </a>
-              <a href="javascript:void(0)" id="app-disclaimer-link" onclick="$('#disclaimer-modal').modal('show')">Disclaimer</a>
-           </div>
+              <div id="education-title" class="level-simple"
+              style="margin-top: 10px;text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
+                education edition
+              </div>
+              <div>
+                <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-simple"  onclick="$('#disclaimer-modal').modal('show')">
+              Disclaimer
+                </a>
+              </div>
+        </div>
 
           <!-- iobio project link -->
+        <div style="float:right;">
           <a href="http://iobio.io" class="iobioproject">           
-            an iobio project
-          </a>   
+            an iobio project          
+          </a>
+          <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-simple"  onclick="$('#disclaimer-modal').modal('show')">
+            Disclaimer
+          </a>
+        </div>
 
           
-          <div id="gene-search-bar" style="display:inline-block;margin-left:150px;">
+          <div id="gene-search-bar" class="level-simple" >
 
 
             <!-- Gene search -->
@@ -280,7 +293,7 @@
             </span>     
 
             <!-- Button data modal -->
-            <button id="add-data-button" type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
+            <button id="add-data-button" type="button" class="level-simple icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
               <i class="material-icons" style="font-size: 18px;">input</i>      
               Data
             </button>
@@ -293,14 +306,14 @@
 
 
           <!-- gene badges for navigation -->
-          <div id="gene-badge-container" class="hide" style="margin-top:4px;">
+          <div id="gene-badge-container" class="hide" style="clear:both;margin-top:4px;">
 
             <!-- Buttons for editting gene list, done editting gene list -->
-            <div id="cache-genes-button" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 15px;padding-right: 10px;">
+            <div id="cache-genes-button" class="level-simple" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 15px;padding-right: 10px;"
               <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheGenes()">
                 Analyze all
               </a>
-              <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:10px;href="javascript:void(0)" onclick="genesCard.clearGenes()">
+              <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:10px;" href="javascript:void(0)" onclick="genesCard.clearGenes()">
                 Clear all
               </a>
             </div>
@@ -314,16 +327,14 @@
 
 
 
-        <div id="region-track"  style="clear:both;">
+        <div id="region-track" class="level-simple" style="clear:both;">
             <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-            <span id="gene-chr" class=" gene-card-label keep-case"></span>
-            <span id="gene-region" class=" gene-card-label keep-case"></span>
-            <span id="minus_strand" class="hide " style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-            <span  id="gene-plus-minus-label" class="fullview hide " style="padding-left: 15px">+  -</span>
-            <input id="gene-region-buffer-input" class="hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
-
-
-             <span style="float:right;margin-right:14px">
+            <span id="gene-chr" class=" gene-card-label keep-case" ></span>
+            <span id="gene-region" class="level-simple gene-card-label keep-case"></span>
+            <span id="minus_strand" class="leve-simple" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+            <span  id="gene-plus-minus-label" class="level-simple fullview hide " style="padding-left: 15px">+  -</span>
+            <input id="gene-region-buffer-input" class="level-simple hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+            <span class="level-simple" style="float:right;margin-right:14px">
                 <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
                   <i class="material-icons">remove</i>
                 </a>
@@ -337,7 +348,7 @@
 
 
         <!-- Non protein-coding gene badges -->
-        <div id="non-protein-coding"  style="clear: both;padding-bottom: 0px;display: block;">
+        <div id="non-protein-coding" class="level-simple"  style="clear: both;padding-bottom: 0px;display: block;">
             <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
               Enter a gene name
             </div>   
@@ -348,8 +359,8 @@
             </div>                  
         </div>  
 
-
-        <div class="fullview" style="margin-top:-25px"> 
+        
+        <div class="level-simple fullview" style="margin-top:-25px"> 
           <div class="btn-toolbar fullview" 
              style="display: inline-block;float: left;margin-top:-15px;margin-left: 10px;padding-top: 0px; ">
              <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
@@ -379,13 +390,14 @@
             <i class="material-icons" style="font-size:15px;">settings</i>
           </button>
 
-        </div>   
+ 
+      </div>
 
-        <div id="transcript-panel" class="fullview" >
+        <div id="transcript-panel" class="level-simple fullview" >
           <div id="gene-track" class="track hide">           
               <div id="gene-viz" class="track-chart"></div>               
           </div>
-          <span id="zoom-hint" class="hint todo" style="margin-top: -15px;display: block;text-align: center;">
+          <span id="zoom-hint" class="level-simple hint todo" style="margin-top: -15px;display: block;text-align: center;">
               To zoom into region, drag over gene model.
           </span>
         </div>

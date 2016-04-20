@@ -15,7 +15,10 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
-
+	if (isLevelSimple) {
+		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
+	}
+     
   	// Selectize combo for phenotype terms    
 	$('#select-phenotypes').selectize({
 		//plugins: ['remove_button'],
@@ -44,7 +47,7 @@ GenesCard.prototype.init = function() {
 		$('#select-phenotypes')[0].selectize.close();
 	});
 
-     
+
 
 	// Detect when get genes dropdown opens so that
 	// we can prime the textarea with the genes already
@@ -1159,7 +1162,7 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  .margin( {left:10, right: 10, top: 0, bottom: 0} )
 		                      .xValue( function(d){ return +d.score })
 							  .yValue( function(d){ return d.geneName })
-							  .width(120)
+							  .width(isLevelSimple ? 110 : 180)
 							  .barHeight(10)
 							  .labelWidth(60)
 							  .gap(4)
@@ -1173,7 +1176,7 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  });
 		d3.select('#phenolyzer-results svg').remove();
 		var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
-		this.geneBarChart(selection, {shadowOnHover:true});		
+		this.geneBarChart(selection, {shadowOnHover:true, simpleGeneList: isLevelSimple});		
 	}
 
 }
