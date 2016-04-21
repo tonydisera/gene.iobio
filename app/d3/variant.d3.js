@@ -270,11 +270,12 @@ function variantD3() {
       // a rectangle with a min width of 3.
       minWidth = Math.max(minWidth, lowestWidth);
 
-      var symbolScale = d3.scale.linear()
-                    .domain([1,6])
-                    .range([15,25]);
+      var symbolScale = d3.scale.ordinal()
+                    .domain([3,4,5,6,7,8])
+                    .range([9,15,20,25,36,58]);
 
       var symbolSize = symbolScale(minWidth);
+      
      
 
       // Brush

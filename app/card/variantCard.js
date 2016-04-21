@@ -215,7 +215,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .width(1000)
 				    .margin({top: 0, right: 2, bottom: isLevelSimple ? 2 : 17, left: 4})
 				    .showXAxis(isLevelSimple ? false : true)
-				    .variantHeight(6)
+				    .variantHeight(isLevelSimple ? 8 : 6)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(this.variantTooltipHTML)

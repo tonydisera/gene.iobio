@@ -1383,7 +1383,7 @@ VariantModel.prototype._pileupVariants = function(features, start, end) {
 		v.level = 0;
 	});
 
-	var featureWidth = 4;
+	var featureWidth = isLevelSimple ? 8 : 4;
 	var posToPixelFactor = Math.round((end - start) / width);
 	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, featureWidth + 1);
 
