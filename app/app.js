@@ -361,32 +361,34 @@ function init() {
 
 	    });
 
-	 // Initialize genes card
-	 genesCard = new GenesCard();
-	 genesCard.init();
-
-	 // Initialize Matrix card
-	 matrixCard = new MatrixCard();
-	 matrixCard.init();
-	 // Set the tooltip generator now that we have a variant card instance
-	 matrixCard.setTooltipGenerator(getProbandVariantCard().variantTooltipHTML);
-
-	 // Initialize the Filter card
-	 filterCard = new FilterCard();
-	 filterCard.init();
-
-	 // Initialize the bookmark card
-	 bookmarkCard = new BookmarkCard();
-	 bookmarkCard.init();
-
-	 // Initialize examine card
-	 examineCard = new ExamineCard();
-	 examineCard.init();
-
-
 
 	// Initialize material bootstrap
     $.material.init();
+
+	// Initialize genes card
+	genesCard = new GenesCard();
+	genesCard.init();
+
+	// Initialize Matrix card
+	matrixCard = new MatrixCard();
+	matrixCard.init();
+	// Set the tooltip generator now that we have a variant card instance
+	matrixCard.setTooltipGenerator(getProbandVariantCard().variantTooltipHTML);
+
+	// Initialize the Filter card
+	filterCard = new FilterCard();
+	filterCard.init();
+
+	// Initialize the bookmark card
+	bookmarkCard = new BookmarkCard();
+	bookmarkCard.init();
+
+	// Initialize examine card
+	examineCard = new ExamineCard();
+	examineCard.init();
+
+
+
 
 
 	// When the transcript set changes (either GenCode or RefSeq)
@@ -511,6 +513,7 @@ function showCoordinateFrame(x) {
 	var height = +$('#proband-variant-card').outerHeight();
 	height    += +$('#other-variant-cards').outerHeight();
 
+	var width =  +$('#coordinate-frame').outerWidth();
 
 	x = sidebarAdjustX(x);
 	
@@ -518,7 +521,7 @@ function showCoordinateFrame(x) {
 
 	$('#coordinate-frame').css("top", top);
 	$('#coordinate-frame').css("height", height - margins);
-	$('#coordinate-frame').css("left", x - 13);
+	$('#coordinate-frame').css("left", x - d3.round(width/2) - 2);
 	$('#coordinate-frame').css("opacity", 1);
 }
 

@@ -384,7 +384,7 @@ function variantD3() {
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { 
-            return Math.round(x(d.start));
+            return Math.round(x(d.start) - (minWidth/2) + (minWidth/4));
           })
           .attr('width', function(d) { 
             return showTransition ? 0 : Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
@@ -452,7 +452,7 @@ function variantD3() {
             .transition()        
               .duration(1000)
               .attr('x', function(d) { 
-                return d3.round(x(d.start));
+                return d3.round(x(d.start) - (minWidth/2) + (minWidth/4));
               })
               .attr('width', function(d) { 
                 return Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
@@ -539,7 +539,7 @@ function variantD3() {
           .attr("class", "circle")
           .attr("cx", 0)
           .attr("cy", 0)
-          .attr("r", 6)                    
+          .attr("r", minWidth + 2)                    
           .style("opacity", 0);
 
       
