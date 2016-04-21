@@ -242,6 +242,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							hideCoordinateFrame();
 							me.hideCoverageCircle();
 							window.hideCircleRelatedVariants();
+							matrixCard.clearSelections();
 						}
 
 					});
