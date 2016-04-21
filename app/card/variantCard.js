@@ -280,6 +280,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						if (clickedVariant == null) {					    
 							me.hideCoverageCircle();
 							window.hideCircleRelatedVariants();
+							matrixCard.clearSelections();
 						}
 					});
 					
