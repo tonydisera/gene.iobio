@@ -44,12 +44,19 @@
           <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
         </div>
 
-        <select id="select-phenotypes"  placeholder="Enter phenotype terms..."/>
+        <select id="select-phenotypes" class="level-simple" placeholder="Enter phenotype terms..."/>
+
+
+        <select id="select-phenotype-simple" placeholder="Choose disease..." style="display:none;font-size:12px;">
+                <option value="breast cancer">Breast cancer</option>
+                <option value="colon cancer">Colon cancer</option>                   
+                <option value="warfarin syndrome" >Warfarin syndrome</option>                   
+        </select>
         
 
         <div style="text-align:center;">
         
-          <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="icon-button-sm btn btn-default btn-raised" style="line-height:normal;width:120px;margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom: 10px;">
+          <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="level-simple icon-button-sm btn btn-default btn-raised" style="line-height:normal;width:120px;margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom: 10px;">
             <svg height="18" width="19">
               <g transform="translate(0,1)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="18" height="18"></use>
@@ -100,7 +107,7 @@
 
         <div style="text-align:center;clear:both">
             <h5 class="level-simple">Rank</h5>
-            <h5 class="level-simple" style="width: 75px;">Gene</h5>
+            <h5 class="" style="width: 75px;">Genes</h5>
             <h5 class="level-simple" style="margin-right:25px">Score</h5>
         </div>
 

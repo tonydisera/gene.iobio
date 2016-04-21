@@ -81,6 +81,15 @@ GenesCard.prototype.init = function() {
 		}
 	});	
 
+	if (isLevelSimple) {
+		$('#select-phenotype-simple').selectize();
+		$('#select-phenotype-simple')[0].selectize.clear();
+		$('#select-phenotype-simple')[0].selectize.on('change', function() {
+			var phenotype = $('#select-phenotype-simple')[0].selectize.getValue().toLowerCase();
+			me.getPhenolyzerGenes(phenotype);
+		});		
+	}
+
 }
 
 GenesCard.prototype.initCopyPasteGenes = function() {
@@ -245,7 +254,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	
 }
 
-GenesCard.prototype.getPhenolyzerGenes = function() {
+GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 	var me = this;
 
 	me.showGenesSlideLeft();
@@ -255,7 +264,8 @@ GenesCard.prototype.getPhenolyzerGenes = function() {
 	$("#phenolyzer-timeout-message").addClass("hide");
 	$('#phenolyzer-heading').addClass("hide");
 
-	var searchTerms = $('#select-phenotypes')[0].selectize.getValue().join(";");
+	var searchTerms = phenotype != null && phenotype != "" ? phenotype : 
+						$('#select-phenotypes')[0].selectize.getValue().join(";");
 	$("#phenolyzer-search-term").text(searchTerms);	
 
 	// Get rid of newlines
