@@ -1,13 +1,22 @@
 //
 // Global Variables
 //
-var isLevelSimple              = true;  // is gene.iobio educational version, simplified version of app
-var levelSimpleImpact = {
+
+/*
+* These variables control special behavior for running gene.iobio education edition, with
+* a simplified interface and logic.  For running one of the special educational edition 
+* tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
+=*/
+var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
+var isLevelEduTour          = true;
+var levelEduImpact = {
 	HIGH: 'Harmful',
 	MODERATE:  'Possibly harmful',
 	MODIFIER: 'Neutral',
 	LOW: 'Low'
 }
+
+
 var stage_iobio_services  = "http://nv-green.iobio.io/";
 var prod_iobio_services   = "http://services.iobio.io/";
 var dev_iobio_services    = "http://nv-dev.iobio.io/";
@@ -37,6 +46,7 @@ var bookmarkTemplateHTML = null;
 var examineTemplateHTML = null;
 var recallTemplateHTML = null;
 var helpTemplateHTML = null;
+var eduTourTemplateHTML = null;
 var iconbarTemplate = null;
 var tourTemplate = null;
 
@@ -123,6 +133,7 @@ var widthFactors = [
 var pageGuide = null;
 var pageGuideBookmarks = null;
 var pageGuidePhenolyzer = null;
+var pageGuideColonCancer = null;
 
 
 $(document).ready(function(){
@@ -162,6 +173,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/helpCardTemplate.hbs').then(function(compiledTemplate) {
 		helpTemplateHTML = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/eduTourCardTemplate.hbs').then(function(compiledTemplate) {
+		eduTourTemplateHTML = compiledTemplate;
+	}));
 	promises.push(promiseLoadTemplate('templates/iconbarTemplate.hbs').then(function(compiledTemplate) {
 		iconbarTemplate = compiledTemplate;
 	}));
@@ -200,46 +214,22 @@ function init() {
  	clearCache();
 
 
-    // Initialize app tour
-	pageGuide = tl.pg.init({ 
-		'auto_refresh': true, 
-		'custom_open_button': '.open_page_guide',
-		'track_events_cb': function(interactionName) {
-			
-		},
-		'handle_doc_switch': function(currentTour, prevTour) {
-			/*if (prevTour == '#add-data-button' 
-				|| prevTour == '#single-proband-button'
-				|| prevTour == '#add-vcf-track-toolbar'
-				|| prevTour == '"#add-bam-track-toolbar') {
-				//showDataDialog();
-			}*/
-		}
-    }); 
+	$('#nav-edu-tour').append(eduTourTemplateHTML);
+	
 
-    // Initialize bookmarks tour
-	pageGuideBookmarks = tl.pg.init({ 
-		'auto_refresh': true, 
-		'custom_open_button': '#show-bookmarks-tour',
-		'steps_element': '#tlyPageGuideBookmarks',
-		'track_events_cb': function(interactionName) {
-			
-		},
-		'handle_doc_switch': function(currentTour, prevTour) {
-		}
-    }); 
+    // Slide out panels
+    $(iconbarTemplate()).insertBefore("#slider-left");
+	$('#slider-left-content').append(filterCardTemplateHTML);
+	$('#slider-left-content').append(genesCardTemplateHTML);
+	$('#slider-left-content').append(bookmarkTemplateHTML);
+	$('#slider-left-content').append(examineTemplateHTML);
+	$('#slider-left-content').append(helpTemplateHTML);
+	$('#slider-left-content').append(recallTemplateHTML);
+	$('#close-slide-left').click(function() {
+		closeSlideLeft();
+	});
 
-    // Initialize phenolyzer tour
-	pageGuidePhenolyzer = tl.pg.init({ 
-		'auto_refresh': true, 
-		'custom_open_button': '#show-phenolyzer-tour',
-		'steps_element': '#tlyPageGuidePhenolyzer',
-		'track_events_cb': function(interactionName) {
-			
-		},
-		'handle_doc_switch': function(currentTour, prevTour) {
-		}
-    }); 
+	initializeTours();
 
     // Encapsulate logic for animate.css into a jquery function
     $.fn.extend({
@@ -268,18 +258,6 @@ function init() {
 	//$('#select-color-scheme').selectize()
 	//$('#select-intron-display').selectize()
 	
-
-    // Slide out panels
-    $(iconbarTemplate()).insertBefore("#slider-left");
-	$('#slider-left-content').append(filterCardTemplateHTML);
-	$('#slider-left-content').append(genesCardTemplateHTML);
-	$('#slider-left-content').append(bookmarkTemplateHTML);
-	$('#slider-left-content').append(examineTemplateHTML);
-	$('#slider-left-content').append(helpTemplateHTML);
-	$('#slider-left-content').append(recallTemplateHTML);
-	$('#close-slide-left').click(function() {
-		closeSlideLeft();
-	});
 
 
 	// Initialize data card
@@ -428,6 +406,83 @@ function init() {
 	loadGeneFromUrl();
 }
 
+function initializeTours() {
+    if (!isLevelEdu) {
+	    // Initialize app tour
+		pageGuide = tl.pg.init({ 
+			'auto_refresh': true, 
+			'custom_open_button': '#show-main-tour',
+			'steps_element': '#tourMain',
+			'track_events_cb': function(interactionName) {
+				
+			},
+			'handle_doc_switch': function(currentTour, prevTour) {
+				
+			}
+	    }); 
+ 	   // Initialize bookmarks tour
+ 		pageGuideBookmarks = tl.pg.init({ 
+			'auto_refresh': true, 
+			'custom_open_button': '#show-bookmarks-tour',
+			'steps_element': '#tourBookmarks',
+			'track_events_cb': function(interactionName) {
+				
+			},
+			'handle_doc_switch': function(currentTour, prevTour) {
+			}
+	    });     	
+ 
+        // Initialize phenolyzer tour
+    	pageGuidePhenolyzer = tl.pg.init({ 
+			'auto_refresh': true, 
+			'custom_open_button': '#show-phenolyzer-tour',
+			'steps_element': '#tourPhenolyzer',
+			'track_events_cb': function(interactionName) {
+				
+			},
+			'handle_doc_switch': function(currentTour, prevTour) {
+			}
+	    }); 
+
+    }
+ 
+	// Initialize colon cancer tour
+	if (isLevelEdu) {
+		pageGuideColonCancer = tl.pg.init({ 
+			'auto_refresh': true, 
+			'custom_open_button': '#show-case1-tour',
+			'steps_element': '#tourColonCancer',
+			'track_events_cb': function(interactionName) {
+				//alert('track_events_cb: ' + interactionName);	
+				$('#audio-test')[0].pause();
+				$('#audio-bird')[0].pause();			
+			},
+			'handle_doc_switch': function(currentTour, prevTour) {
+				//alert('handle_doc_switch: ' + currentTour + ', ' + prevTour);
+				if (currentTour == '#button-load-jimmy-data') {
+					$('#page-guide-listen-button').removeClass('hide');
+					$('#page-guide-listen-button').off('click');
+					$('#page-guide-listen-button').on('click', function(event) {
+						$('#audio-test')[0].play();
+					})
+					//$('#audio-test')[0].play();
+				} else if (currentTour == '#gene-badge-button:eq(0)') {
+					$('#page-guide-listen-button').removeClass('hide');
+					$('#page-guide-listen-button').off('click');
+					$('#page-guide-listen-button').on('click', function(event) {
+						$('#audio-bird')[0].play();
+					})
+
+				} else {
+					$('#page-guide-listen-button').addClass('hide');					
+				}
+			}
+	    }); 
+
+	}
+
+}
+
 // Function from David Walsh: http://davidwalsh.name/css-animation-callback
 function whichTransitionEvent(){
   var t,
@@ -548,6 +603,14 @@ function readjustCards() {
 function showSidebar(sidebar) {
 	//closeSlideLeft(); 	
 
+
+	if (sidebar == "Phenolyzer") {
+		$('#search-dna-glyph').attr('fill', '#5d809d');	
+	} else {
+		$('#search-dna-glyph').attr('fill', 'white');	
+	}
+
+
 	$('.sidebar-button').removeClass('selected');
 	if (sidebar == "Filter") {
 		$('#slider-left-content #filter-track').toggleClass("hide", false);	
@@ -564,7 +627,7 @@ function showSidebar(sidebar) {
 		$('#slider-left-content #examine-card').toggleClass("hide", true);					
 		$('#slider-left-content #recall-card').toggleClass("hide", true);	
 		$('#slider-left-content #help-card').toggleClass("hide", true);	
-		$('#button-show-phenolyzer').toggleClass('selected', true);		
+		$('#button-show-phenolyzer').toggleClass('selected', true);	
 	} else if (sidebar == "Bookmarks") {
 		$('#slider-left-content #filter-track').toggleClass("hide", true);	
 		$('#slider-left-content #genes-card').toggleClass("hide", true);	
@@ -598,7 +661,7 @@ function showSidebar(sidebar) {
 		$('#slider-left-content #recall-card').toggleClass("hide", true);	
 		$('#slider-left-content #help-card').toggleClass("hide", false);	
 		$('#button-show-help').toggleClass('selected', true);		
-	}
+	} 
 
 
 	if ($('#slider-left').hasClass("hide")) {
@@ -656,9 +719,9 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - 40);
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - 60);
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - 60);
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 40));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 60));
 }
 
 function closeSlideLeft() {
@@ -674,6 +737,7 @@ function closeSlideLeft() {
 	$('.sidebar-button.selected').removeClass("selected");
 	$('.sidebar-button').addClass("closed");
 
+	$('#search-dna-glyph').attr('fill', 'white');	
 
 	resizeCardWidths();
 
@@ -812,7 +876,7 @@ function loadGeneFromUrl() {
 		genesCard._geneBadgeLoading(gene, true, true);
 	} else {
 		// Open the 'About' sidebar by default if there is no data loaded when gene is launched
-		if (isLevelSimple) {
+		if (isLevelEdu) {
 			showSidebar("Phenolyzer");
 			dataCard.loadDemoData();
 		} else {
@@ -845,7 +909,6 @@ function reloadGeneFromUrl(alreadyLoaded) {
 
 	$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: !alreadyLoaded});
 	genesCard._geneBadgeLoading(gene, true, true);
-	
 }
 
 function loadUrlSources() {
@@ -860,7 +923,7 @@ function loadUrlSources() {
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
-	if (!isLevelSimple) {
+	if (!isLevelEdu) {
 		loadTracksForGene(true);
 	}
 
@@ -925,7 +988,11 @@ function loadUrlSources() {
 	}
 	
 
-	if (vcf != null || bam != null && !isLevelSimple) {
+	if (vcf != null || bam != null && !isLevelEdu) {
+		if (isLevelEdu && $('#slider-left').hasClass("hide")) {
+			showSidebar("Phenolyzer");
+		}
+
 		loadTracksForGene( false, function() {
 
 
@@ -952,8 +1019,7 @@ function initTranscriptControls() {
 	transcriptCardSelector.find('#minimize-button').on('click', function() {
 		transcriptCardSelector.find('.fullview').addClass("hide");
 		transcriptCardSelector.find('#gene-name').css("margin-right", "0");
-		transcriptCardSelector.css("margin-top", "-10px");
-
+		
 		transcriptCardSelector.find('#expand-button').removeClass("disabled");
 		transcriptCardSelector.find('#minimize-button').addClass("disabled");
 	});
@@ -1456,9 +1522,8 @@ function loadGeneWidget() {
 
 					if (bam == null && vcf == null) {
 						// Open the 'About' sidebar by default if there is no data loaded when gene is launched
-						if (isLevelSimple) {
+						if (isLevelEdu) {
 							showSidebar("Phenolyzer");
-							dataCard.loadDemoData();
 						} else {
 							showSidebar("Help");
 						}
@@ -1578,8 +1643,8 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	gene.regionStart = formatRegion(window.gene.start);
 	gene.regionEnd   = formatRegion(window.gene.end);
 
-    $('#gene-chr').text(isLevelSimple ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
-    $('#gene-name').text((isLevelSimple ? 'GENE ' : '') + window.gene.gene_name);   
+    $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
+    $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);   
     $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
 
 
@@ -1637,7 +1702,7 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 
 	$('#filter-and-rank-card').removeClass("hide");
  	$('#matrix-track').removeClass("hide");
- 	if (isLevelSimple) {
+ 	if (isLevelEdu) {
 	 	$('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
  	}
 	$("#matrix-panel .loader").removeClass("hide");
@@ -1813,7 +1878,7 @@ function enableCallVariantsButton() {
 		} 
 	});
 	if (bamCount > 0) {
-		if (!isLevelSimple) {
+		if (!isLevelEdu) {
 			$('#button-find-missing-variants').removeClass("hide");
 		}
 	} else {

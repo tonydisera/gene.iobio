@@ -124,6 +124,7 @@ tl.pg.interval = {};
             '<div id="tlyPageGuideOverlay"></div>' +
             '<div id="tlyPageGuideMessages">' +
                 '<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
+                '<a href="#" id="page-guide-listen-button" class="hide tlypageguide_listen" title="Listen to instructions">listen</a>' + // added audio
                 '<span class="tlypageguide_index"></span>' +
                 '<div class="tlypageguide_text"></div>' +
                 '<a href="#" class="tlypageguide_back" title="Previous">Previous</a>' +

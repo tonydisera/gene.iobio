@@ -1,22 +1,9 @@
 <div class="variant-card track-expand shadow-z-2 hide" style="min-height: 32px;padding-bottom:0px;background-color:white;">
 
 
-  <div style="width: 100%;text-align: center;clear: both;">
-    <div class="loader vcfloader hide"  style="display: inline;">
-      <span class="loader-label"></span>
-      <img src="assets/images/wheel.gif">
-    </div>
-    <div class="loader covloader hide" style="display: inline;padding-left: 20px;">
-      <span class="loader-label"></span>      
-      <img src="assets/images/wheel.gif">
-    </div>
-  </div>
-
-
-
   <div style="text-align:center;margin-bottom: 6px;">
     <span id="variant-heading">
-      <span id="card-relationship-label"  class="level-simple card-label heading" style="float:left;">
+      <span id="card-relationship-label"  class="level-edu card-label heading" style="float:left;">
         Sample
       </span>
                   
@@ -24,15 +11,15 @@
     </span>
     
     <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
-      <li class="level-simple">                       
-        <span id="vcf-variant-count-label" class="level-simple badge-label hide">Variants Loaded</span>
+      <li class="level-edu">                       
+        <span id="vcf-variant-count-label" class="level-edu badge-label hide">Variants Loaded</span>
         <span id="vcf-variant-count" class="badge"></span>
       </li>
 
 
       <li>           
-        <span id="displayed-variant-count-label" class="level-simple badge-label" style="margin-left:2px">Displayed</span>
-         <span id="displayed-variant-count-label-simple" class="level-simple hide badge-label" style="margin-left:2px">count</span>            
+        <span id="displayed-variant-count-label" class="level-edu badge-label" style="margin-left:2px">Displayed</span>
+         <span id="displayed-variant-count-label-simple" class="level-edu hide badge-label" style="margin-left:2px"></span>            
         <span id="displayed-variant-count" class="badge hide"></span>
       </li>
 
@@ -64,20 +51,20 @@
             <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
             <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
             <span id="region-flag" class="hide label label-info">Zoom into region</span>
-            <span id="recfilter-flag" class="level-simple hide label label-info">VCF Filter status</span>            
+            <span id="recfilter-flag" class="level-edu hide label label-info">VCF Filter status</span>            
 
       </li>
 
     </ul>
 
 
-    <a href="javascript:void(0)" class="level-simple" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+    <a href="javascript:void(0)" class="level-edu" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">remove</i>
     </a>
-    <a href="javascript:void(0)" class="level-simple" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
+    <a href="javascript:void(0)" class="level-edu" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
       <i class="material-icons">crop_7_5</i>
     </a>
-    <a href="javascript:void(0)" class="level-simple" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
+    <a href="javascript:void(0)" class="level-edu" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">crop_3_2</i>
     </a>
 
@@ -88,6 +75,19 @@
   </div>
   
  
+
+  <div style="margin-top:25px;width: 100%;text-align: center;clear: both;">
+    <div class="loader vcfloader hide"  style="display: inline;">
+      <span class="loader-label"></span>
+      <img src="assets/images/wheel.gif">
+    </div>
+    <div class="loader covloader hide" style="display: inline;padding-left: 20px;">
+      <span class="loader-label"></span>      
+      <img src="assets/images/wheel.gif">
+    </div>
+  </div>
+
+
     
 
   <div id="variant-panel" style="clear:both;">
@@ -134,7 +134,7 @@
             <hr id="fb-separator" class="hide" style="margin-top: 0px;margin-bottom: 0px;">
           </div>
           <div >
-            <div id="vcf-chart-label" class="level-simple chart-label hide" 
+            <div id="vcf-chart-label" class="level-edu chart-label hide" 
              style="margin-top: 4px;margin-bottom: -30px;">
               Variants loaded
             </div>
@@ -144,16 +144,18 @@
       </div>
     </div>
 
+    <div id="gene-box" class="level-edu hide" >
+    </div>
 
-    <div id="zoom-region-chart"  class="track level-simple" style="clear:both;"></div>
+    <div id="zoom-region-chart"  class="track level-edu" style="clear:both;"></div>
 
 
-    <div id="bam-track" class="track hide level-simple">
+    <div id="bam-track" class="track hide level-edu">
       <div class="track-chart">
 
       
           <div >
-            <div id="bam-chart-label" class="chart-label" style="visibility:hidden;margin-top: 24px;margin-bottom: -17px;margin-left:15px;">Coverage
+            <div id="bam-chart-label" class="chart-label" style="visibility:hidden;margin-bottom:-20px;margin-left:15px;">Coverage
             </div>
             <div id="bam-depth"  style="visibility:hidden">
             </div>
@@ -162,9 +164,7 @@
       </div>
     </div>
 
-    <div id="gene-box" class="level-simple hide" >
-    </div>
-    <div id="bottom-white-space" class="level-simple hide" ></div>
 
+  
   </div>
 </div>

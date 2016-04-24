@@ -53,7 +53,7 @@ FilterCard.prototype.onSelectAnnotationScheme = function() {
 
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	this.displayEffectFilters();
-	window.matrixCard.setRowLabel("Impact", isLevelSimple ? "Impact" : "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowLabel("Impact", isLevelEdu ? "Impact" : "Impact - " + this.annotationScheme );
 	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 	window.loadTracksForGene();
 
@@ -71,7 +71,7 @@ FilterCard.prototype.setAnnotationScheme = function(scheme) {
 	d3.select('#filter-card .impact').classed('vepImpact',this.annotationScheme.toLowerCase() == 'vep');
 	d3.select('#filter-card .vepImpact').classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
 	this.displayEffectFilters();
-	window.matrixCard.setRowLabel("Impact", isLevelSimple ? "Impact" : "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowLabel("Impact", isLevelEdu ? "Impact" : "Impact - " + this.annotationScheme );
 	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 }
 

@@ -1,6 +1,7 @@
 @import variables
 
-@import simplify
+@import levelEdu
+@import levelEduTour
 
 
 body
@@ -18,6 +19,28 @@ h5
   color: $app-color
   margin-bottom: 4px
   margin-top: 10px
+
+
+.nav-stretch
+  position: relative
+
+.nav-left 
+  position: absolute
+  left: 5px
+  top: 0 
+  width: 180px 
+  text-align: left
+
+.nav-right
+  position: absolute
+  right: 5px
+  top: 0
+  width: 180px
+
+.nav-center
+  margin: 0 185px 0 185px
+  position: relative
+
 
 .modal-title
   font-size: 16px
@@ -323,14 +346,15 @@ h5
   overflow: hidden
   background-color: #e5e5e5
 
+
 .tlypageguide_shadow
   background-color: rgba(255, 255, 255, 0)
   box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0)
 
   &.tlypageguide-active
-    background-color: rgba(240, 103, 103, 0.2)
-    webkit-box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25)
-    box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25)
+    background-color: transparent !important
+    webkit-box-shadow: 0 0 18px 1px rgba(165, 185, 65, 1) !important
+    box-shadow: 0 0 18px 1px rgba(165, 185, 65, 1) !important
 
 #tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close
   color: white !important
@@ -368,6 +392,7 @@ body
   color: $text-color !important
   display: block
   text-align: left
+  margin-left: 3px 
 
 #app-disclaimer-link-right
   display: none
@@ -623,6 +648,7 @@ a
     float: left
     font-size: 11px !important
     color: $text-color !important
+    margin-top: -7px
 
 .icon
   width: 30px
@@ -684,11 +710,7 @@ section
   box-shadow: 2px 2px 9px 0px rgba(0, 0, 0, 0.15)
 
 .track
-  display: flex
-  display: -webkit-flex
-  flex-direction: row
-  -webkit-flex-direction: row
-  align-items: flex-start
+  display: block
   background-color: white
   padding-top: 4px
   padding-bottom: 4px
@@ -697,15 +719,7 @@ section
   margin-top: 0px
   margin-bottom: 8px
 
-.track-info
-  order: 1
-  -webkit-order: 1
-  flex: 0 0 220px
-  -webkit-flex: 0 0 220px
-  color: rgb(120, 120, 120)
-  margin-right: 10px
-  font-size: 18px
-  max-width: 220px
+
 
 .track-expand
   font-size: 14px
@@ -773,6 +787,7 @@ section
   text-align: center
   background: white
   padding-bottom: 8px !important
+  min-height: 70px
 
 .chart rect
   fill: rgb(49, 102, 147)
@@ -802,8 +817,8 @@ section
 
 
 #gene-search-bar
-  margin-left: 150px
   display: inline-block
+  padding-left: 100px
 
 
 #gene-name
@@ -835,7 +850,7 @@ section
 
 #bam-track
   margin-bottom: 0px
-  margin-top: -40px
+  margin-top: -10px
   margin-left: 0px
   margin-right: 0px
   padding: 0px
@@ -1031,7 +1046,7 @@ header
 
 #bam-depth
   text-align: left
-  margin-top: 10px
+  margin-top: 0px
 
   .circle
     stroke: none

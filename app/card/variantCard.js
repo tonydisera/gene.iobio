@@ -171,7 +171,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: 20, right: 2, bottom: 0, left: 4})
+				    .margin({top: isLevelEduTour ? 0 : 20, right: 2, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .showBrush(false)
 				    .trackHeight(16)
@@ -213,9 +213,9 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: isLevelSimple ? 2 : 17, left: 4})
-				    .showXAxis(isLevelSimple ? false : true)
-				    .variantHeight(isLevelSimple ? 8 : 6)
+				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 2 : 17, left: 4})
+				    .showXAxis(isLevelEdu ? false : true)
+				    .variantHeight(isLevelEdu ? 8 : 6)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(this.variantTooltipHTML)
@@ -420,7 +420,7 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 
 VariantCard.prototype.setVariantCardLabel = function() {
 	
-	if (isLevelSimple) {
+	if (isLevelEdu) {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName() + "'s Variants"  );
 	} else {
 		this.cardSelector.find('#variant-card-label').text(
@@ -483,6 +483,7 @@ VariantCard.prototype.showBamProgress = function(message) {
 	this.cardSelector.find(".covloader .loader-label").text(message);
 	this.cardSelector.find("#bam-depth").css("visibility", "hidden");
 	this.cardSelector.find("#bam-chart-label").css("visibility", "hidden");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "0px");
 }
 
 VariantCard.prototype.endBamProgress = function() {
@@ -491,6 +492,7 @@ VariantCard.prototype.endBamProgress = function() {
 	this.cardSelector.find(".covloader .loader-label").text("");
 	this.cardSelector.find("#bam-depth").css("visibility", "visible");
 	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-17px");
 
 }
 
@@ -564,6 +566,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 		}
 		this.cardSelector.find('#bam-depth').css("visibility", "hidden");
 		this.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
+		this.cardSelector.find('#bam-chart-label').css("margin-bottom", "0px");
 
     	this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
     	this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
@@ -585,6 +588,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 
 		$("#feature-matrix").addClass("hide");
 		$("#feature-matrix-note").addClass("hide");
+		$('#move-rows').addClass("hide");
 
 		if (this.model.isVcfLoaded()) {
 			this.cardSelector.find(".vcfloader").removeClass("hide");
@@ -1525,7 +1529,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 
-		if (!isLevelSimple) {
+		if (!isLevelEdu) {
 		    showSidebar("Examine");
 			examineCard.showVariant(variant);
 
@@ -1555,8 +1559,8 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		tooltip.style("pointer-events", "none");          
 	}
 
-	if (isLevelSimple) {
-		tooltip.classed("level-simple", "true");
+	if (isLevelEdu) {
+		tooltip.classed("level-edu", "true");
 	} 
 
 	matrixCard.clearSelections();
@@ -1650,7 +1654,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		widthSimpleTooltip = 320;
 	}
 
- 	var w = isLevelSimple ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu ? widthSimpleTooltip : 300;
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 
@@ -2040,8 +2044,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		if (impactDisplay.length > 0) {
 		  	impactDisplay += ", ";
 		}
-		if (isLevelSimple) {
-			impactDisplay = levelSimpleImpact[key];
+		if (isLevelEdu) {
+			impactDisplay = levelEduImpact[key];
 		} else {
 			impactDisplay += key;
 		}
@@ -2049,7 +2053,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var clinSigDisplay = "";
 	for (var key in variant.clinVarClinicalSignificance) {
 		if (key != 'none' && key != 'undefined' ) {
-			if (!isLevelSimple || (key.indexOf("uncertain_significance") >= 0 || key.indexOf("pathogenic") >= 0)) {
+			if (!isLevelEdu || (key.indexOf("uncertain_significance") >= 0 || key.indexOf("pathogenic") >= 0)) {
 				if (clinSigDisplay.length > 0 ) {
 				  	clinSigDisplay += ", ";
 				}
@@ -2092,8 +2096,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		if (vepImpactDisplay.length > 0) {
 		  	vepImpactDisplay += ", ";
 		}
-		if (isLevelSimple) {
-			vepImpactDisplay = levelSimpleImpact[key];
+		if (isLevelEdu) {
+			vepImpactDisplay = levelEduImpact[key];
 		} else {
 			vepImpactDisplay += key;
 		}
@@ -2103,7 +2107,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		if (vepConsequenceDisplay.length > 0) {
 		  	vepConsequenceDisplay += ", ";
 		}
-		if (isLevelSimple) {
+		if (isLevelEdu) {
 			vepConsequenceDisplay = key.split("_").join(" ");
 		} else {
 			vepConsequenceDisplay += key.split("_").join(" ");
@@ -2135,7 +2139,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		if (vepPolyPhenDisplay.length > 0) {
 		  	vepPolyPhenDisplay += ", ";
 		}
-		if (isLevelSimple) {
+		if (isLevelEdu) {
 			vepPolyPhenDisplay = key.split("_").join(" ");
 		} else {
 			vepPolyPhenDisplay += key.split("_").join(" ");
@@ -2224,13 +2228,13 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var clinvarRow1 = '';
 	var clinvarRow2 = '';
 	if (clinSigDisplay) {
-		if (isLevelSimple) {
+		if (isLevelEdu) {
 			clinvarRow1 = me._tooltipWideHeadingRow('Clinical findings', clinSigDisplay);		
 		} else {
 			clinvarRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinSigDisplay);		
 		}
 		if (phenotypeDisplay) {
-			if (isLevelSimple) {
+			if (isLevelEdu) {
 				clinvarRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay);		
 			} else {
 				clinvarRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
@@ -2243,7 +2247,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			
 	var dbSnpId = getRsId(variant);	
 
-	if (isLevelSimple) {
+	if (isLevelEdu) {
 		return (
 			me._tooltipHeaderRow('   ' + impactLabel , ' impact', '', '')
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')

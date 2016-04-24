@@ -68,7 +68,8 @@ function geneD3() {
        brushAllowance = geneD3_showBrush ? 20 : 0;
 
        // calculate height
-       geneD3_height = data.length * (trackHeight + arrowHeight);
+       var padding = data.length > 1 ? trackHeight/2 : 0;
+       geneD3_height = data.length * (trackHeight + padding);
 
        // determine inner height (w/o margins)
        var innerHeight = geneD3_height - margin.top - margin.bottom;

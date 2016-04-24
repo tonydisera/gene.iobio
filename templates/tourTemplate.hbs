@@ -4,8 +4,36 @@
   </div>
 </div>
 
+
+<!-- Tour for colon cancer screening case -->
+<ul id="tourColonCancer"  data-tourtitle="coloncancer">
+
+  
+  <li class="tlypageguide_right" data-tourtarget="#button-load-jimmy-data">
+    <div>
+      step1 for use case
+      
+      <br><strong><em>Click on next arrow > to continue to next step.</em></strong>
+    </div>
+  </li>
+
+  <li class="tlypageguide_left" data-tourtarget="#gene-badge-button:eq(0)">
+    <div>
+      This is an instruction about a gene button.
+    </div>
+  </li>
+   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
+    <div>
+      The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
+      Hover over the variants to see more information.  
+      <br><br>
+
+    </div>
+  </li>
+</ul>
+
 <!-- Main gene.iobio tour --->
-<ul id="tlyPageGuide" data-tourtitle="gene.iobio tour">
+<ul id="tourMain" data-tourtitle="main">
  <li class="tlypageguide_left" data-tourtarget="#enter-gene-name">
     <div>
       Type in the gene name BRCA2 and select from the drop down list.
@@ -190,7 +218,7 @@
 
 
 <!-- Tour of bookmarks functionality -->
-<ul id="tlyPageGuideBookmarks" class="hide" data-tourtitle="gene.iobio Bookmarks tour">
+<ul id="tourBookmarks"  data-tourtitle="bookmarks">
 
  
 
@@ -202,7 +230,7 @@
       Do this a few times to bookmark multiple variants.
     </div>
   </li>
-  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #vcf-chart-label">
+  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #vcf-track">
     <div>
       You can also bookmark a variant by clicking on a variant and then clicking on the 'Bookmark' link in the
       tooltip.  
@@ -266,7 +294,7 @@
 
 
 <!-- Tour of phenolyzer functionality -->
-<ul id="tlyPageGuidePhenolyzer" class="hide" data-tourtitle="gene.iobio Phenolyzer tour">
+<ul id="tourPhenolyzer" data-tourtitle="phenolyzer">
 
    <li class="tlypageguide_right" data-tourtarget=".button-show-phenolyzer">
     <div>

@@ -1,5 +1,17 @@
-.level-simple {
+.level-edu {
   display: none !important; }
+
+.nav-center {
+  margin-top: -15px !important; }
+
+#slider-left {
+  left: 0px !important; }
+
+#container {
+  margin-left: 0px !important; }
+
+.fixed {
+  left: 0px !important; }
 
 #coordinate-frame {
   width: 25px !important; }
@@ -9,24 +21,24 @@
 
 .track-expand {
   padding-top: 4px !important;
-  padding-bottom: 4px !important; }
+  padding-bottom: 8px !important; }
 
 #region-track {
-  margin-bottom: 10px !important; }
+  margin-bottom: 4px !important; }
 
 #variant-heading {
   min-width: 120px !important;
   max-width: 120px !important; }
 
-#region-track.level-simple {
+#region-track.level-edu {
   display: block !important;
   margin-left: 0px !important; }
 
-#gene-search-bar.level-simple {
+#gene-search-bar.level-edu {
   display: inline-block !important;
   margin-left: 50px !important; }
 
-#app-disclaimer-link-right.level-simple {
+#app-disclaimer-link-right.level-edu {
   clear: both;
   font-size: 10px;
   color: #717171 !important;
@@ -34,37 +46,37 @@
   margin-top: 5px;
   display: block !important; }
 
-#education-title.level-simple {
+#education-title.level-edu {
   display: block !important; }
 
-#app-disclaimer-link-left.level-simple {
+#app-disclaimer-link-left.level-edu {
   display: none !important; }
 
-#genes-card #phenolyzer-run-label-long.level-simple {
+#genes-card #phenolyzer-run-label-long.level-edu {
   display: inline-block !important;
   vertical-align: top;
   margin-top: 4px; }
-#genes-card #phenolyzer-run-label.level-simple {
+#genes-card #phenolyzer-run-label.level-edu {
   display: none !important; }
 #genes-card #phenolyzer-heading {
   margin-top: 0px !important; }
   #genes-card #phenolyzer-heading h5 {
     display: inline-block; }
-#genes-card #phenolyzer-heading h5.level-simple {
+#genes-card #phenolyzer-heading h5.level-edu {
   display: none !important; }
 
-.nav li.level-simple {
+.nav li.level-edu {
   display: none !important; }
 
 #displayed-variant-count-label-simple {
   display: none; }
 
-#displayed-variant-count-label-simple.level-simple {
+#displayed-variant-count-label-simple.level-edu {
   display: inline-block !important; }
 
 .variant-card #bottom-white-space {
   display: none !important; }
-.variant-card #bottom-white-space.level-simple {
+.variant-card #bottom-white-space.level-edu {
   display: block !important;
   height: 5px; }
 .variant-card #gene-box {
@@ -75,16 +87,16 @@
   text-align: center;
   color: white;
   margin-top: -5px; }
-.variant-card #gene-box.level-simple {
+.variant-card #gene-box.level-edu {
   display: block !important; }
 
 #matrix-track #rank-variants-title {
   display: block !important; }
 #matrix-track #feature-matrix-note {
   padding-left: 105px !important; }
-#matrix-track #matrix-harmful-note.level-simple {
+#matrix-track #matrix-harmful-note.level-edu {
   display: inline-block !important; }
-#matrix-track #feature-matrix text {
+#matrix-track #feature-matrix .y.axis text {
   font-size: 12px !important; }
 #matrix-track #feature-matrix .colhdr text {
   font-size: 11px !important; }
@@ -95,12 +107,54 @@
   opacity: 1 !important;
   stroke-width: 1px !important; }
 
-.tooltip.level-simple {
+.tooltip.level-edu {
   display: block !important; }
-  .tooltip.level-simple .row {
+  .tooltip.level-edu .row {
     line-height: 18px !important; }
-    .tooltip.level-simple .row .tooltip-title {
+    .tooltip.level-edu .row .tooltip-title {
       font-size: 12px; }
+
+.track-expand {
+  padding-bottom: 0px !important; }
+
+.variant-card #zoom-region-chart {
+  display: block !important;
+  margin-top: 0px !important;
+  padding-top: 0px !important; }
+
+#slider-left {
+  top: 52px !important; }
+
+#nav-edu-tour {
+  background-color: #626390;
+  margin-bottom: 12px;
+  display: block !important;
+  height: 50px;
+  width: 100%;
+  text-align: center; }
+  #nav-edu-tour .btn.btn-raised {
+    background-color: #a5b955 !important;
+    color: white !important;
+    margin-left: 20px !important; }
+  #nav-edu-tour .card-label {
+    color: white !important; }
+
+.tlypageguide_shadow {
+  background-color: rgba(255, 255, 255, 0) !important;
+  box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0) !important; }
+  .tlypageguide_shadow.tlypageguide-active {
+    background-color: transparent !important;
+    webkit-box-shadow: 0 0 18px 1px #a5b941 !important;
+    box-shadow: 0 0 18px 1px #a5b941 !important; }
+
+.tlyPageGuideStepIndex {
+  opacity: 0 !important; }
+
+.tlypageguide-active .tlyPageGuideStepIndex {
+  opacity: 1 !important; }
+
+#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_listen {
+  color: white !important; }
 
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
@@ -116,6 +170,26 @@ h5 {
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
+
+.nav-stretch {
+  position: relative; }
+
+.nav-left {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  width: 180px;
+  text-align: left; }
+
+.nav-right {
+  position: absolute;
+  right: 5px;
+  top: 0;
+  width: 180px; }
+
+.nav-center {
+  margin: 0 185px 0 185px;
+  position: relative; }
 
 .modal-title {
   font-size: 16px;
@@ -384,9 +458,9 @@ h5 {
   background-color: rgba(255, 255, 255, 0);
   box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0); }
   .tlypageguide_shadow.tlypageguide-active {
-    background-color: rgba(240, 103, 103, 0.2);
-    webkit-box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25);
-    box-shadow: 0 0 1px 1px rgba(240, 103, 103, 0.25); }
+    background-color: transparent !important;
+    webkit-box-shadow: 0 0 18px 1px #a5b941 !important;
+    box-shadow: 0 0 18px 1px #a5b941 !important; }
 
 #tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close {
   color: white !important; }
@@ -419,7 +493,8 @@ body {
   font-size: 10px;
   color: #717171 !important;
   display: block;
-  text-align: left; }
+  text-align: left;
+  margin-left: 3px; }
 
 #app-disclaimer-link-right {
   display: none; }
@@ -628,7 +703,8 @@ a {
 #matrix-track #move-rows {
   float: left;
   font-size: 11px !important;
-  color: #717171 !important; }
+  color: #717171 !important;
+  margin-top: -7px; }
 
 .icon {
   width: 30px;
@@ -689,11 +765,7 @@ section {
   box-shadow: 2px 2px 9px 0px rgba(0, 0, 0, 0.15); }
 
 .track {
-  display: flex;
-  display: -webkit-flex;
-  flex-direction: row;
-  -webkit-flex-direction: row;
-  align-items: flex-start;
+  display: block;
   background-color: white;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -701,16 +773,6 @@ section {
   padding-right: 10px;
   margin-top: 0px;
   margin-bottom: 8px; }
-
-.track-info {
-  order: 1;
-  -webkit-order: 1;
-  flex: 0 0 220px;
-  -webkit-flex: 0 0 220px;
-  color: #787878;
-  margin-right: 10px;
-  font-size: 18px;
-  max-width: 220px; }
 
 .track-expand {
   font-size: 14px;
@@ -774,7 +836,8 @@ section {
 #app-title-section {
   text-align: center;
   background: white;
-  padding-bottom: 8px !important; }
+  padding-bottom: 8px !important;
+  min-height: 70px; }
 
 .chart rect {
   fill: #316693; }
@@ -800,8 +863,8 @@ section {
   margin-left: 100px; }
 
 #gene-search-bar {
-  margin-left: 150px;
-  display: inline-block; }
+  display: inline-block;
+  padding-left: 100px; }
 
 #gene-name {
   font-size: 16px !important;
@@ -830,7 +893,7 @@ section {
 
 #bam-track {
   margin-bottom: 0px;
-  margin-top: -40px;
+  margin-top: -10px;
   margin-left: 0px;
   margin-right: 0px;
   padding: 0px;
@@ -1011,7 +1074,7 @@ header {
 
 #bam-depth {
   text-align: left;
-  margin-top: 10px; }
+  margin-top: 0px; }
   #bam-depth .circle {
     stroke: none;
     fill: #3586c0;

@@ -15,7 +15,7 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
-	if (isLevelSimple) {
+	if (isLevelEdu) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	}
      
@@ -81,7 +81,7 @@ GenesCard.prototype.init = function() {
 		}
 	});	
 
-	if (isLevelSimple) {
+	if (isLevelEdu) {
 		$('#select-phenotype-simple').selectize();
 		$('#select-phenotype-simple')[0].selectize.clear();
 		$('#select-phenotype-simple')[0].selectize.on('change', function() {
@@ -275,7 +275,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 		searchTerms = searchTerms.substring(0, searchTerms.length - 1);
 	}
 	// Replace semicolon with a colon (semicolon causes term to be truncated)
-	searchTerms = searchTerms.split(";").join(":");
+	searchTerms = searchTerms.split(";").join("\\");
 
 	var url = phenolyzerServer + '?term=' + searchTerms;
 	d3.select('#phenolyzer-results svg').remove();
@@ -982,7 +982,6 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 					firstTimeGeneLoaded = false; 
 				}
 
-
 		    	loadTracksForGene(false, null, callbackVariantsDisplayed);
 	    	} else {
 	    		alertify.error("Gene " + geneName + " not found.  Removing from list.", 
@@ -1172,7 +1171,7 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  .margin( {left:10, right: 10, top: 0, bottom: 0} )
 		                      .xValue( function(d){ return +d.score })
 							  .yValue( function(d){ return d.geneName })
-							  .width(isLevelSimple ? 110 : 180)
+							  .width(isLevelEdu ? 110 : 180)
 							  .barHeight(10)
 							  .labelWidth(60)
 							  .gap(4)
@@ -1186,7 +1185,7 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  });
 		d3.select('#phenolyzer-results svg').remove();
 		var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
-		this.geneBarChart(selection, {shadowOnHover:true, simpleGeneList: isLevelSimple});		
+		this.geneBarChart(selection, {shadowOnHover:true, simpleGeneList: isLevelEdu});		
 	}
 
 }
