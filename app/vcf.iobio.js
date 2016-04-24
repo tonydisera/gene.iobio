@@ -172,46 +172,52 @@ var effectCategories = [
     return success;
   }
 
-  exports.openVcfFile = function(event, callback) {
+  exports.openVcfFile = function(event, callback, callbackError) {
     sourceType = SOURCE_TYPE_FILE;
     vcfURL = null;
-   
-    if (endsWith(event.target.files[0].name, ".vcf") ||
-        endsWith(event.target.files[1].name, ".vcf")) {
-      showFileFormatMessage();
-      return;
-    }
-
+    var success = true;
 
     if (event.target.files.length != 2) {
        showWrongNumberFilesMessage();
-       return;
-    }
-
-
-    var fileType0 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[0].name);
-    var fileType1 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[1].name);
-
-    if (fileType0 == null || fileType0.length < 3 || fileType1 == 0 || fileType1.length <  3) {
-      showWrongNumberFilesMessage();
-      return;
-    }
-
-    fileExt0 = fileType0[2];
-    fileExt1 = fileType1[2];
-
-    if (fileExt0 == 'vcf.gz' && fileExt1 == 'vcf.gz.tbi') {
-      vcfFile   = event.target.files[0];
-      tabixFile = event.target.files[1];
-    } else if (fileExt1 == 'vcf.gz' && fileExt0 == 'vcf.gz.tbi') {
-      vcfFile   = event.target.files[1];
-      tabixFile = event.target.files[0];
-    } else {
-
+       success = false;       
+    } else if (endsWith(event.target.files[0].name, ".vcf") ||
+        endsWith(event.target.files[1].name, ".vcf")) {
       showFileFormatMessage();
-    }
+      success = false;
+    } else {
+      var fileType0 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[0].name);
+      var fileType1 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[1].name);
 
-    callback(vcfFile);
+      if (fileType0 == null || fileType0.length < 3 || fileType1 == 0 || fileType1.length <  3) {
+        showWrongNumberFilesMessage();
+        success = false;
+             
+      } else {
+
+        fileExt0 = fileType0[2];
+        fileExt1 = fileType1[2];
+
+        if (fileExt0 == 'vcf.gz' && fileExt1 == 'vcf.gz.tbi') {
+          vcfFile   = event.target.files[0];
+          tabixFile = event.target.files[1];
+        } else if (fileExt1 == 'vcf.gz' && fileExt0 == 'vcf.gz.tbi') {
+          vcfFile   = event.target.files[1];
+          tabixFile = event.target.files[0];
+        } else {
+          showFileFormatMessage();
+          success = false;
+        }
+      }
+    }
+    if (success) {
+      callback(vcfFile);
+    } else {
+      if (callbackError) {
+        callbackError();
+      }
+    }    
+
+
 
   } 
 
@@ -240,58 +246,57 @@ var effectCategories = [
   }
 
   function showUrlFileFormatMessage() {
-    alertify.error("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
+    alertify.notify("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
+        "error",
+        5,
         function (e) {
         return;
      });
   }
 
   function showHttpsMessage() {
-    alertify.error("https: not yet supported.  Please specify http: for your URL", 
+    alertify.notify("https: not yet supported.  Please specify http: for your URL", 
+        "error",
+        5,
         function (e) {
         return;
      });
   }
 
   function showWrongNumberFilesMessage() {
-    alertify.set(
-      { 
-        labels: {
-          cancel     : "Show me how",
-          ok         : "OK",
-        },  
-        buttonFocus:  "cancel"
-    });
 
-    alertify.confirm("You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file ", 
-        function (e) {
-        if (e) {
-            return;
-        } else {
+
+    alertify.defaults.glossary.ok = "OK";
+    alertify.defaults.glossary.cancel = "Show me how";
+
+    alertify.confirm("", 
+        "You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file ", 
+        function () {
+          return;
+        },
+        function () {
             window.open('http://iobio.io/2015/09/03/install-run-tabix/');
+
         }
-     });
+    );
 
   }
 
   function showFileFormatMessage() {
-    alertify.set(
-      { 
-        labels: {
-          cancel     : "Show me how",
-          ok         : "OK",
-        },  
-        buttonFocus:  "cancel"
-    });
 
-    alertify.confirm("You must select a compressed and indexed vcf file (.vcf.gz) and its corresponding index file (gz.vcf.tbi) in order to run this app. ", 
-        function (e) {
-        if (e) {
-            return;
-        } else {
+    alertify.defaults.glossary.ok = "OK";
+    alertify.defaults.glossary.cancel = "Show me how";
+
+    alertify.confirm("", 
+        "You must select a compressed and indexed vcf file (.vcf.gz) and its corresponding index file (gz.vcf.tbi) in order to run this app. ", 
+        function () {
+          return;
+        },
+        function () {
             window.open('http://iobio.io/2015/09/03/install-run-tabix/');
+
         }
-     });
+     );
   }
   
   function endsWith(str, suffix) {

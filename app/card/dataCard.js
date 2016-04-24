@@ -512,26 +512,30 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	me.panelSelectorFilesSelected.find('.vcf-sample.loader').removeClass('hide');
 
 
-	variantCard.onVcfFilesSelected(event, function(vcfFileName, sampleNames) {
-		me.panelSelectorFilesSelected.find('.vcf-sample.loader').addClass('hide');
+	variantCard.onVcfFilesSelected(
+		event, 
+		function(vcfFileName, sampleNames) {
+			me.panelSelectorFilesSelected.find('.vcf-sample.loader').addClass('hide');
 
-		me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
-		me.panelSelectorFilesSelected.find('#vcf-file-info').val(vcfFileName);
+			me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
+			me.panelSelectorFilesSelected.find('#vcf-file-info').val(vcfFileName);
 
-		// Only show the sample dropdown if the vcf file has more than one sample
-		if (sampleNames.length > 1) {
-			
-			me.populateSampleDropdowns(variantCard, me.panelSelectorFilesSelected, sampleNames);
+			// Only show the sample dropdown if the vcf file has more than one sample
+			if (sampleNames.length > 1) {
+				
+				me.populateSampleDropdowns(variantCard, me.panelSelectorFilesSelected, sampleNames);
 
-		} else {
-			variantCard.setSampleName("");				
-			variantCard.setDefaultSampleName(null);
-			window.removeUrl('sample'+cardIndex);
-			
-			window.enableLoadButton();
-		}
-
-	});
+			} else {
+				variantCard.setSampleName("");				
+				variantCard.setDefaultSampleName(null);
+				window.removeUrl('sample'+cardIndex);
+				
+				window.enableLoadButton();
+			}
+		},
+		function(error) {
+			me.panelSelectorFilesSelected.find(".vcf-sample.loader").addClass("hide");
+		});
 }
 
 DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector, sampleNames) {

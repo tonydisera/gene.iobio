@@ -15,6 +15,11 @@ var levelEduImpact = {
 	MODIFIER: 'Neutral',
 	LOW: 'Low'
 }
+var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
+var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
+var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
+var idleTime = 0;
+var idlePrompting = false;
 
 
 var stage_iobio_services  = "http://nv-green.iobio.io/";
@@ -206,6 +211,10 @@ function promiseLoadTemplate(templateName) {
 
 function init() {
 	var me = this;
+
+	alertify.defaults.glossary.title = "";
+	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
+	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
 
 	$('#tour-placeholder').append(tourTemplate());
 	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
@@ -404,6 +413,10 @@ function init() {
 	$('.sidebar-button.selected').removeClass("selected");
 
 	loadGeneFromUrl();
+
+	if (isLevelEduTour) {
+		checkForInactivity();
+	}
 }
 
 function initializeTours() {
@@ -2288,7 +2301,50 @@ function bookmarkVariant() {
 	}
 }
 
+function checkForInactivity() {
+ 	//Increment the idle time counter every second.
+    var idleInterval = setInterval(timerIncrement, IDLE_INTERVAL); 
 
+    //Zero the idle timer on mouse movement.
+    $(this).mousemove(function (e) {
+        idleTime = 0;
+    });
+    $(this).keypress(function (e) {
+        idleTime = 0;
+    });	
+}
+
+function timerIncrement() {
+	if (idlePrompting) {
+		return;
+	}
+    idleTime = idleTime + 1;
+    if (idleTime > MAX_IDLE) {
+    	idlePrompting = true; 
+    	// If the user hasn't pressed continue in the next x seconds, restart the app.
+		setInterval(restartApp, IDLE_RESTART);  //
+
+    	
+    	//alertify.set({ buttonReverse: true });
+    	alertify.defaults.glossary.ok = "Yes, I want to continue.";
+		alertify.alert("Warning", 
+			"This app will restart in 10 seconds unless there is activity. Do you want to continue?", 
+			function () {
+				// okay
+				idleTime = 0;
+			    idlePrompting = false;
+			}			
+		 );
+
+        
+    }
+}
+
+function restartApp() {
+	if (idleTime > MAX_IDLE) {
+		window.location.reload();
+	}
+}
 
 
  

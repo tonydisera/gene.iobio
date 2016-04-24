@@ -284,10 +284,13 @@ h5 {
   animation-delay: 0s;
   animation-iteration-count: 1; }
 
-.alertify {
-  border: 1px solid #e0e0e0;
-  width: 350px;
-  margin-left: -175px; }
+.alertify .ajs-header {
+  background-color: white;
+  border: none; }
+
+.alertify .ajs-footer {
+  background-color: white;
+  border: none; }
 
 #recfilter-flag {
   background-color: #5881AD !important; }

@@ -414,28 +414,29 @@ VariantModel.prototype.onBamUrlEntered = function(bamUrl) {
 
 }
 
-VariantModel.prototype.promiseVcfFilesSelected = function(event, callbackOnOpen) {
+VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
 		me.sampleName = null;
 		me.vcfData = null;
 		
-		me.vcf.openVcfFile( event, function(vcfFile) {
+		me.vcf.openVcfFile( event, 
+			function(vcfFile) {
 
-			me.vcfFileOpened = true;
-			me.vcfUrlEntered = false;
-			me.getVcfRefName = null;
+				me.vcfFileOpened = true;
+				me.vcfUrlEntered = false;
+				me.getVcfRefName = null;
 
-			callbackOnOpen(vcfFile.name);
-					
-			// Get the sample names from the vcf header
-		    me.vcf.getSampleNames( function(sampleNames) {
-		    	resolve({'fileName': vcfFile.name, 'sampleNames': sampleNames});
-		    });
-
-
-		});
+				// Get the sample names from the vcf header
+			    me.vcf.getSampleNames( function(sampleNames) {
+			    	resolve({'fileName': vcfFile.name, 'sampleNames': sampleNames});
+			    });
+			}, 
+			function(error) {
+				reject(error);
+			}
+		);
 
 	});
 

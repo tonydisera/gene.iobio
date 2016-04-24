@@ -499,15 +499,18 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 GenesCard.prototype.clearGenes = function() {
 	var me = this;
 	// confirm dialog
-	alertify.set({ buttonReverse: true });
-	alertify.confirm("Clear all genes currently listed?", function (e) {
-	    if (e) {
+	alertify.defaults.glossary.ok = 'OK';
+	alertify.defaults.glossary.cancel = 'Cancel';
+	alertify.confirm("Confirm", 
+		"Clear all genes currently listed?", 
+		function (e) {
 			// user clicked "ok"
 	        me._clearGenesImpl();
-	    } else {
-	        // user clicked "cancel"
-	    }
-	});
+		},
+		function() {
+			// user clicked cancel.
+		}
+	);
 
 }
 

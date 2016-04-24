@@ -355,20 +355,24 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
 	}
 }
 
-VariantCard.prototype.onVcfFilesSelected = function(event, callback) {
+VariantCard.prototype.onVcfFilesSelected = function(event, callback, callbackError) {
 	var me = this;
 	if (this.isViewable()) {
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find(".vcfloader").addClass("hide");
 	}
-	this.model.promiseVcfFilesSelected(
-		event, 
-		function(fileName) {
-			me.cardSelector.find('#vcf-name').text(fileName);
-		}).then( function(resolveObject) {			
-			callback(resolveObject.fileName, resolveObject.sampleNames);		
-		});
+	this.model.promiseVcfFilesSelected(event)
+	          .then(function(fileName) {
+				me.cardSelector.find('#vcf-name').text(fileName);
+				callback(resolveObject.fileName, resolveObject.sampleNames);		
+	          },
+	          function(error) {
+				if (callbackError) {
+					callbackError(error);
+				}
+	          });
+		
 }
 
 VariantCard.prototype.clearVcf = function() {
