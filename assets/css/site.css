@@ -122,6 +122,19 @@
   margin-top: 0px !important;
   padding-top: 0px !important; }
 
+#gene-badge-button {
+  font-size: 14px !important;
+  padding: 3px 6px 3px 6px !important; }
+  #gene-badge-button .glyph {
+    padding-top: 2px !important;
+    font-size: 14px !important; }
+  #gene-badge-button #gene-badge-symbols.glyph {
+    padding-top: 0px !important;
+    font-size: 14px !important; }
+  #gene-badge-button #gene-badge-name {
+    padding-left: 2px;
+    padding-right: 2px; }
+
 #slider-left {
   top: 52px !important; }
 
@@ -2275,6 +2288,17 @@ text.ref-count {
 
 #get-genes-copy-paste-button, #phenolyzer-go-button {
   font-size: 11px; }
+
+#gene-badge-button {
+  font-size: 11px;
+  padding: 2px 4px 2px 4px;
+  margin: 0px;
+  color: #717171; }
+  #gene-badge-button #gene-badge-symbols {
+    height: 14px;
+    padding-top: 1px;
+    padding-left: 3px;
+    float: right; }
 
 #gene-badge.selected #gene-badge-button {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19); }

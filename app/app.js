@@ -10,12 +10,14 @@
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;
 var eduTourNumber           = "1";
+var eduTourShowPhenolyzer   = [true, false];
 var levelEduImpact = {
 	HIGH: 'Harmful',
 	MODERATE:  'Possibly harmful',
 	MODIFIER: 'Neutral',
 	LOW: 'Low'
 }
+
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
 var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
@@ -902,9 +904,11 @@ function loadGeneFromUrl() {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
 		genesCard._geneBadgeLoading(gene, true, true);
 	} else {
-		// Open the 'About' sidebar by default if there is no data loaded when gene is launched
+		// Open the sidebar 
 		if (isLevelEdu) {
-			showSidebar("Phenolyzer");
+			if (eduTourShowPhenolyzer[+eduTourNumber-1]) {
+				showSidebar("Phenolyzer");
+			}
 			dataCard.loadDemoData();
 		} else {
 			showSidebar("Help");
@@ -1017,7 +1021,9 @@ function loadUrlSources() {
 
 	if (vcf != null || bam != null && !isLevelEdu) {
 		if (isLevelEdu && $('#slider-left').hasClass("hide")) {
-			showSidebar("Phenolyzer");
+			if (eduTourShowPhenolyzer[+eduTourNumber-1]) {
+				showSidebar("Phenolyzer");
+			}
 		}
 
 		loadTracksForGene( false, function() {
@@ -1550,7 +1556,9 @@ function loadGeneWidget() {
 					if (bam == null && vcf == null) {
 						// Open the 'About' sidebar by default if there is no data loaded when gene is launched
 						if (isLevelEdu) {
-							showSidebar("Phenolyzer");
+							if (eduTourShowPhenolyzer[+eduTourNumber-1]) {
+								showSidebar("Phenolyzer");
+							}							
 						} else {
 							showSidebar("Help");
 						}

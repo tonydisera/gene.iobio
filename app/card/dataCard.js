@@ -54,9 +54,7 @@ function DataCard() {
 			father:  'Father' 
 		},
 		{
-			proband: 'John',
-			mother:  'Mother',
-			father:  'Father' 
+			proband: 'John'
 		}
 	];	
 	this.eduTourSampleNames = [
@@ -66,10 +64,12 @@ function DataCard() {
 			father:  'NA19239' 
 		},
 		{
-			proband: 'NA19239',
-			mother:  'NA19240',
-			father:  'NA19238' 
+			proband: 'NA19239'
 		}
+	];
+	this.eduTourGenes = [
+		[],
+		['VKORC1']
 	];
 	
 
@@ -108,26 +108,35 @@ DataCard.prototype.loadDemoData = function() {
 	}
 	window.updateUrl('sample0',  this.exomeSampleNames.proband);	
 
-	window.updateUrl('name1', this.exomeNames.mother);	
-	window.updateUrl('vcf1',  this.exomeUrls.mother);	
-	if (!window.isLevelEdu) {
-		window.updateUrl('bam1',  this.exomeBamUrls.mother);
-	}	
-	window.updateUrl('sample1',  this.exomeSampleNames.mother);	
+	if (this.exomeNames.mother) {
+		window.updateUrl('name1', this.exomeNames.mother);	
+		window.updateUrl('vcf1',  this.exomeUrls.mother);	
+		if (!window.isLevelEdu) {
+			window.updateUrl('bam1',  this.exomeBamUrls.mother);
+		}	
+		window.updateUrl('sample1',  this.exomeSampleNames.mother);			
+	}
 
-	window.updateUrl('name2', this.exomeNames.father);	
-	window.updateUrl('vcf2',  this.exomeUrls.father);	
-	if (!window.isLevelEdu) {		
-		window.updateUrl('bam2',  this.exomeBamUrls.father);
-	}	
-	window.updateUrl('sample2',  this.exomeSampleNames.father);	
+	if (this.exomeNames.father) {
+		window.updateUrl('name2', this.exomeNames.father);	
+		window.updateUrl('vcf2',  this.exomeUrls.father);	
+		if (!window.isLevelEdu) {		
+			window.updateUrl('bam2',  this.exomeBamUrls.father);
+		}	
+		window.updateUrl('sample2',  this.exomeSampleNames.father);			
+	}
 
 	if (!window.isLevelEdu) {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 		reloadGeneFromUrl();
+	} else if (this.eduTourGenes[+eduTourNumber-1].length > 0) {
+		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber-1][0]);
+		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber-1].join(","));
+		reloadGeneFromUrl();
 	} else {
 		loadUrlSources();
+
 	}
 
 	

@@ -449,8 +449,8 @@ GenesCard.prototype.refreshBookmarkedGenes = function(bookmarkedGenes) {
 GenesCard.prototype._onGeneBadgeUpdate = function() {
 	var me = this;
 
-	// Only show the gene badges if there is more than one gene in the list
-	if (geneNames.length > 1) {
+	// Only show the gene badges if there is at least one gene in the list
+	if (geneNames.length > 0) {
 		$('#gene-badge-container').removeClass("hide");
 	} else {
 		$('#gene-badge-container').addClass("hide");		
