@@ -9,7 +9,7 @@
 =*/
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;
-var eduTourNumber           = "";
+var eduTourNumber           = "1";
 var levelEduImpact = {
 	HIGH: 'Harmful',
 	MODERATE:  'Possibly harmful',
