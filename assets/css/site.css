@@ -16,6 +16,18 @@
 #coordinate-frame {
   width: 25px !important; }
 
+.selectize-input {
+  font-size: 14px !important;
+  line-height: 17px !important; }
+
+.selectize-input input {
+  font-size: 14px !important;
+  line-height: 17px !important; }
+
+.selectize-dropdown {
+  font-size: 14px !important;
+  line-height: 17px !important; }
+
 .card-label {
   text-transform: none !important; }
 
@@ -65,6 +77,9 @@
     padding-left: 2px;
     padding-right: 2px; }
 
+#genes-card #phenolyzer-title {
+  display: block !important;
+  font-size: 14px !important; }
 #genes-card #phenolyzer-run-label-long.level-edu {
   display: inline-block !important;
   vertical-align: top;
@@ -74,9 +89,14 @@
 #genes-card #phenolyzer-heading {
   margin-top: 0px !important; }
   #genes-card #phenolyzer-heading h5 {
-    display: inline-block; }
+    display: inline-block !important;
+    font-size: 14px !important; }
 #genes-card #phenolyzer-heading h5.level-edu {
   display: none !important; }
+#genes-card #phenolyzer-results text.name {
+  font-size: 14px !important; }
+#genes-card #phenolyzer-results text.score {
+  font-size: 14px !important; }
 
 .nav li.level-edu {
   display: none !important; }
@@ -148,18 +168,19 @@
   #nav-edu-tour .btn.btn-raised {
     background-color: #a5b955 !important;
     color: white !important;
-    margin-left: 15px !important; }
+    margin-left: 15px !important;
+    font-size: 14px !important; }
   #nav-edu-tour .card-label {
     color: white !important; }
   #nav-edu-tour .edu-tour-button {
-    width: 75px; }
+    width: 78px; }
     #nav-edu-tour .edu-tour-button i.material-icons {
       display: none; }
     #nav-edu-tour .edu-tour-button.active i.material-icons {
       display: inline-block;
       color: white !important;
       font-size: 15px;
-      padding-bottom: 1px;
+      padding-bottom: 3px;
       padding-right: 0px !important;
       float: none !important; }
 

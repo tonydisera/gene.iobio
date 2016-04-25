@@ -32,27 +32,29 @@
    </div>
 
   <!-- ACMG genes -->
-   
-          <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
+  
+          <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
             <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">format_list_numbered</i>ACMG56 Genes<span style="margin-left:6px"></span>
           </button>
    
-    <div id="phenolyzer-search-box" style="margin-top:20px;">
+    <div id="phenolyzer-search-box" >
       <div>
-        <h4>Phenolyzer</h4>
-        <div style="font-size:10px;margin-bottom:5px;">For academic and non-profit use. 
-          <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
-        </div>
+        <h4 class="level-edu">Phenolyzer</h4>
+        <h4 id="phenolyzer-title" class="hide">Get genes associated with a disease using Phenolyzer</h4>
+        
 
         <select id="select-phenotypes" class="level-edu" placeholder="Enter phenotype terms..."/>
 
 
-        <select id="select-phenotype-simple" placeholder="Choose disease..." style="display:none;font-size:12px;">
+        <select id="select-phenotype-simple" placeholder="Choose disease..." style="display:none;">
                 <option value="breast cancer">Breast cancer</option>
                 <option value="colon cancer">Colon cancer</option>                   
                 <option value="adrenal_insufficiency;b_cell_deficiency" >Adrenal insufficiency and B cell deficiency</option>                   
         </select>
         
+        <div style="font-size:10px;margin-bottom:5px;">For academic and non-profit use. 
+          <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
+        </div>
 
         <div style="text-align:center;">
         

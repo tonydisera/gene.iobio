@@ -1175,9 +1175,9 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 		                      .xValue( function(d){ return +d.score })
 							  .yValue( function(d){ return d.geneName })
 							  .width(isLevelEdu ? 110 : 180)
-							  .barHeight(10)
+							  .barHeight(14)
 							  .labelWidth(60)
-							  .gap(4)
+							  .gap(3)
 							  .on('d3click', function(phenolyzerGene) {
 							  	if (phenolyzerGene.selected) {
 							  		me.addGeneBadge(phenolyzerGene.geneName, true);
