@@ -2256,7 +2256,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	if (isLevelEdu) {
 		return (
-			me._tooltipHeaderRow('   ' + impactLabel , ' impact', '', '')
+			me._tooltipHeaderRow(refalt,'','','') 
+			+ me._tooltipHeaderRow('   ' + impactLabel , ' impact', '', '')
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
 			+ inheritanceModeRow
 			+ polyphenRowSimple

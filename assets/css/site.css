@@ -5,7 +5,8 @@
   margin-top: -15px !important; }
 
 #slider-left {
-  left: 0px !important; }
+  left: 0px !important;
+  background-color: transparent !important; }
 
 #container {
   margin-left: 0px !important; }
