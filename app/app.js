@@ -228,6 +228,9 @@ function init() {
 
 	$('#nav-edu-tour').append(eduTourTemplateHTML);
 	eduTourNumber = getUrlParameter("tour");
+	if (eduTourNumber == null || eduTourNumber == "") {
+		eduTourNumber = "1";
+	}
 	if (eduTourNumber && eduTourNumber != '') {
 		$('#edu-tour-' + eduTourNumber).removeClass("hide");
 	}
