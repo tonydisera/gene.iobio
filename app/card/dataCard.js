@@ -107,6 +107,15 @@ DataCard.prototype.loadDemoData = function() {
 
 }
 
+DataCard.prototype.loadSampleData = function(relationship, name, sampleName) {
+	variantCard = getVariantCard(relationship);
+	variantCard.setName(name);
+	variantCard.setSampleName(sampleName);
+
+	clearCache();
+	window.loadTracksForGene();		
+}
+
 DataCard.prototype.listenToEvents = function(panelSelector) {
 	var me = this;
 
