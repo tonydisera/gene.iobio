@@ -135,9 +135,20 @@
   #nav-edu-tour .btn.btn-raised {
     background-color: #a5b955 !important;
     color: white !important;
-    margin-left: 20px !important; }
+    margin-left: 15px !important; }
   #nav-edu-tour .card-label {
     color: white !important; }
+  #nav-edu-tour .edu-tour-button {
+    width: 75px; }
+    #nav-edu-tour .edu-tour-button i.material-icons {
+      display: none; }
+    #nav-edu-tour .edu-tour-button.active i.material-icons {
+      display: inline-block;
+      color: white !important;
+      font-size: 15px;
+      padding-bottom: 1px;
+      padding-right: 0px !important;
+      float: none !important; }
 
 .tlypageguide_shadow {
   background-color: rgba(255, 255, 255, 0) !important;

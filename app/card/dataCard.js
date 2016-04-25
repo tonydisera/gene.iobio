@@ -26,13 +26,6 @@ function DataCard() {
 		mother:  'NA19238',
 		father:  'NA19239' 
 	};
-
-	this.exomeNamesSimple = {
-		proband: 'Jimmy',
-		mother:  'Mother',
-		father:  'Father' 
-	};
-
 	this.exomeUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
@@ -49,6 +42,38 @@ function DataCard() {
 		father:  'NA19239'
 	};
 
+	this.eduTourUrls = {
+		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
+	};
+	this.eduTourNames = [
+		{
+			proband: 'Jimmy',
+			mother:  'Mother',
+			father:  'Father' 
+		},
+		{
+			proband: 'John',
+			mother:  'Mother',
+			father:  'Father' 
+		}
+	];	
+	this.eduTourSampleNames = [
+		{
+			proband: 'NA19240',
+			mother:  'NA19238',
+			father:  'NA19239' 
+		},
+		{
+			proband: 'NA19239',
+			mother:  'NA19240',
+			father:  'NA19238' 
+		}
+	];
+	
+
+
 	this.mode = 'single';
 	this.panelSelectorFilesSelected = null;
 
@@ -58,8 +83,10 @@ DataCard.prototype.loadDemoData = function() {
 	var me = this;
 
 	if (isLevelEdu) {
-		this.exomeNames = this.exomeNamesSimple;
-	}
+		this.exomeUrls = this.eduTourUrls;
+		this.exomeNames = this.eduTourNames[+eduTourNumber - 1];
+		this.exomeSampleNames = this.eduTourSampleNames[+eduTourNumber - 1];
+	} 
 
 	$('#splash').addClass("hide");	
 	this.mode = 'trio';

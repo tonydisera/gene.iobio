@@ -1,26 +1,90 @@
 <div id="edu-tour-card">
-	<span class="card-label">Colon Cancer Screening</span>
 
-	<span style="inline-block">
-	    <button  class="icon-button-sm btn btn-default btn-raised"  id="show-case1-tour">
-		Instructions
-		</button>
+	<div id="edu-tour-1" class="hide">
+		<span class="card-label">Colon Cancer Screening</span>
+
+		<span style="inline-block">
+		    <button  class="icon-button-sm btn btn-default btn-raised"  id="show-case1-tour" style="margin-right:40px !important;">
+			Instructions
+			</button>
 
 
-	    <button id="button-load-jimmy-data" class="icon-button-sm btn btn-default btn-raised"  
-	    onclick="dataCard.loadSampleData('proband', 'Jimmy', 'NA19238')">Jimmy</button>
+		    <button id="button-load-jimmy-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Jimmy', 'NA19238')">
+		      <span>
+			      <i class="material-icons" >star</i>
+			      Jimmy
+		      </span>
+		    </button>
 
-	    <button class="icon-button-sm btn btn-default btn-raised"  
-	    onclick="dataCard.loadSampleData('proband', 'Sarah', 'NA19239')">Sarah</button>
+		    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Sarah', 'NA19239')">
+		      <span>
+			      <i class="material-icons" >star</i>
+			      Sarah
+		      </span>
+		    </button>
 
-	    <button class="icon-button-sm btn btn-default btn-raised"  
-	    onclick="dataCard.loadSampleData('proband', 'Bobby', 'NA19240')">Bobby</button>
+		    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Bobby', 'NA19240')">
+			  <span>
+			      <i class="material-icons" >star</i>
+			      Bobby
+		      </span>
 
-	    <button class="icon-button-sm btn btn-default btn-raised"  
-	    onclick="">Test your Knowledge</button>
+		    </button>
 
-	</span>
-	<audio id="audio-test" src="https://ia802508.us.archive.org/5/items/testmp3testfile/mpthreetest.mp3" ></audio>
-	<audio id="audio-bird" src="http://www.noiseaddicts.com/samples_1w72b820/282.mp3"><audio>
+		    <button class="icon-button-sm btn btn-default btn-raised"  
+		    onclick="" style="margin-left:40px !important;">
+		    	Test your Knowledge
+		    </button>
+
+		</span>
+		<audio id="audio-test" src="https://ia802508.us.archive.org/5/items/testmp3testfile/mpthreetest.mp3" ></audio>
+		<audio id="audio-bird" src="http://www.noiseaddicts.com/samples_1w72b820/282.mp3"><audio>
+	</div>
+
+	<div id="edu-tour-2" class="hide">
+		<span class="card-label">Warfarin Dosage</span>
+
+		<span style="inline-block">
+		    <button  class="icon-button-sm btn btn-default btn-raised"  id="show-case2-tour" style="margin-right:40px !important;">
+			Instructions
+			</button>
+
+
+		    <button id="button-load-john-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'John', 'NA19238')">
+			  <span>
+			      <i class="material-icons" >star</i>
+			      John
+		      </span>
+	    
+		    </button>
+
+		    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Diego', 'NA19239')">
+		      <span>
+			      <i class="material-icons" >star</i>
+			      Diego
+		      </span>
+		    </button>
+
+		    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Sarah', 'NA19240')">
+		      <span>
+			      <i class="material-icons" >star</i>
+			      Sarah
+		      </span>
+		    </button>
+
+		    <button class="icon-button-sm btn btn-default btn-raised"  
+		    onclick="" style="margin-left:40px !important;">Test your Knowledge</button>
+
+		</span>
+		<audio id="audio-test" src="https://ia802508.us.archive.org/5/items/testmp3testfile/mpthreetest.mp3" ></audio>
+		<audio id="audio-bird" src="http://www.noiseaddicts.com/samples_1w72b820/282.mp3"><audio>
+
+	</div>
 
 </div>

@@ -9,6 +9,7 @@
 =*/
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;
+var eduTourNumber           = "";
 var levelEduImpact = {
 	HIGH: 'Harmful',
 	MODERATE:  'Possibly harmful',
@@ -138,7 +139,7 @@ var widthFactors = [
 var pageGuide = null;
 var pageGuideBookmarks = null;
 var pageGuidePhenolyzer = null;
-var pageGuideColonCancer = null;
+var pageGuideEduTour1 = null;
 
 
 $(document).ready(function(){
@@ -224,6 +225,10 @@ function init() {
 
 
 	$('#nav-edu-tour').append(eduTourTemplateHTML);
+	eduTourNumber = getUrlParameter("tour");
+	if (eduTourNumber && eduTourNumber != '') {
+		$('#edu-tour-' + eduTourNumber).removeClass("hide");
+	}
 	
 
     // Slide out panels
@@ -461,10 +466,10 @@ function initializeTours() {
  
 	// Initialize colon cancer tour
 	if (isLevelEdu) {
-		pageGuideColonCancer = tl.pg.init({ 
+		pageGuideEduTour1 = tl.pg.init({ 
 			'auto_refresh': true, 
 			'custom_open_button': '#show-case1-tour',
-			'steps_element': '#tourColonCancer',
+			'steps_element': '#tourEduCase1',
 			'track_events_cb': function(interactionName) {
 				//alert('track_events_cb: ' + interactionName);	
 				$('#audio-test')[0].pause();
@@ -492,6 +497,15 @@ function initializeTours() {
 			}
 	    }); 
 
+		pageGuideEduTour2 = tl.pg.init({ 
+			'auto_refresh': true, 
+			'custom_open_button': '#show-case2-tour',
+			'steps_element': '#tourEduCase2',
+			'track_events_cb': function(interactionName) {
+			},
+			'handle_doc_switch': function(currentTour, prevTour) {
+			}
+	    }); 
 	}
 
 }
