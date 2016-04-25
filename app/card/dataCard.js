@@ -84,8 +84,13 @@ DataCard.prototype.loadDemoData = function() {
 
 	if (isLevelEdu) {
 		this.exomeUrls = this.eduTourUrls;
-		this.exomeNames = this.eduTourNames[+eduTourNumber - 1];
-		this.exomeSampleNames = this.eduTourSampleNames[+eduTourNumber - 1];
+		if (isLevelEduTour) {
+			this.exomeNames = this.eduTourNames[+eduTourNumber - 1];
+			this.exomeSampleNames = this.eduTourSampleNames[+eduTourNumber - 1];			
+		} else {
+			this.exomeNames = this.eduTourNames[0];
+			this.exomeSampleNames = this.eduTourSampleNames[0];			
+		}
 	} 
 
 	$('#splash').addClass("hide");	
@@ -130,7 +135,7 @@ DataCard.prototype.loadDemoData = function() {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 		reloadGeneFromUrl();
-	} else if (this.eduTourGenes[+eduTourNumber-1].length > 0) {
+	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber-1].length > 0) {
 		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber-1][0]);
 		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber-1].join(","));
 		reloadGeneFromUrl();

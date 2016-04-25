@@ -52,6 +52,19 @@
 #app-disclaimer-link-left.level-edu {
   display: none !important; }
 
+#gene-badge-button {
+  font-size: 14px !important;
+  padding: 3px 6px 3px 6px !important; }
+  #gene-badge-button .glyph {
+    padding-top: 2px !important;
+    font-size: 14px !important; }
+  #gene-badge-button #gene-badge-symbols.glyph {
+    padding-top: 0px !important;
+    font-size: 14px !important; }
+  #gene-badge-button #gene-badge-name {
+    padding-left: 2px;
+    padding-right: 2px; }
+
 #genes-card #phenolyzer-run-label-long.level-edu {
   display: inline-block !important;
   vertical-align: top;
@@ -121,19 +134,6 @@
   display: block !important;
   margin-top: 0px !important;
   padding-top: 0px !important; }
-
-#gene-badge-button {
-  font-size: 14px !important;
-  padding: 3px 6px 3px 6px !important; }
-  #gene-badge-button .glyph {
-    padding-top: 2px !important;
-    font-size: 14px !important; }
-  #gene-badge-button #gene-badge-symbols.glyph {
-    padding-top: 0px !important;
-    font-size: 14px !important; }
-  #gene-badge-button #gene-badge-name {
-    padding-left: 2px;
-    padding-right: 2px; }
 
 #slider-left {
   top: 52px !important; }

@@ -524,6 +524,10 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		x -= me.featureMatrix.cellSize()/2;
 	}
 
+	if (isLevelEduTour) {
+		y -= $('#nav-edu-tour').outerHeight();
+	}
+
 	if (x < w) {
 		tooltip.classed("arrow-down-left", true);
 		tooltip.classed("arrow-down-right", false);

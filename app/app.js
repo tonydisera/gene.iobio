@@ -533,7 +533,8 @@ function whichTransitionEvent(){
 
 function sidebarAdjustX(x) {	
 	if (!$("#slider-left").hasClass("hide")) {
-		x -= ($("#slider-left").width() + $("#slider-icon-bar").width());
+		var iconBarWidth = $("#slider-icon-bar").css("display") == "none" ? 0 : $("#slider-icon-bar").width();
+		x -= ($("#slider-left").width() + iconBarWidth);
 		x -= 1;
 	}
 	return x;
@@ -1019,9 +1020,9 @@ function loadUrlSources() {
 	}
 	
 
-	if (vcf != null || bam != null && !isLevelEdu) {
+	if (vcf != null || bam != null) {
 		if (isLevelEdu && $('#slider-left').hasClass("hide")) {
-			if (eduTourShowPhenolyzer[+eduTourNumber-1]) {
+			if (isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
 		}

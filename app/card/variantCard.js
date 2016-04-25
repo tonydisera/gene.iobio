@@ -1661,6 +1661,9 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
  	var w = isLevelEdu ? widthSimpleTooltip : 300;
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
+	if (isLevelEduTour) {
+		y -= $('#nav-edu-tour').outerHeight();
+	}
 
     if (x < w) {
     	tooltip.classed("left-arrow", true);
