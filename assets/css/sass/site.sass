@@ -386,6 +386,124 @@ h5
   .tlyPageGuideStepIndex
     opacity: 1
 
+// This is for the new next and prev buttons
+#tlyPageGuideWrapper 
+  #tlyPageGuideMessages 
+    span
+      top: 35px !important
+
+    a.tlypageguide_listen
+      color: white !important
+      background-color: rgba(165, 185, 65, 1)
+      -webkit-border-radius: 3px 3px 3px 3px
+      -moz-border-radius: 3px 3px 3px 3px
+      -o-border-radius: 3px 3px 3px 3px
+      border-radius: 3px 3px 3px 3px
+      display: block
+      font-size: 11px
+      height: 24px
+      line-height: 26px
+      text-align: center
+      text-decoration: none
+      width: 50px      
+
+    .tlypageguide_text
+      margin-top: 25px !important
+
+    .pageguide-nav
+      top: 7px
+      left: 15px
+      position: absolute
+
+
+
+    a.pageguide-prev
+      color: white !important
+      background-color: #a5b941
+      text-align: left
+      padding-right: 5px
+      vertical-align: top
+      margin-left: 3px
+      font-size: 12px
+      padding-top: 2px
+      padding-bottom: 3px
+
+      &:focus
+        text-decoration: none !important
+        color: white !important
+
+      &:hover
+        text-decoration: none !important
+        color: white !important
+
+      &:before
+        position: relative
+        display: inline-block
+        border-top: 16px solid transparent
+        border-right: 8px solid #a5b941
+        border-bottom: 16px solid transparent
+        left: -8px
+        bottom: 7px
+        content: ""
+
+
+
+    a.pageguide-next
+      color: white !important
+      background-color: #a5b941
+      text-align: left
+      padding-right: 5px
+      vertical-align: top
+      margin-left: 3px
+      font-size: 12px
+      padding-top: 2px
+      padding-bottom: 3px
+
+      &:focus
+        text-decoration: none !important
+        color: white !important
+
+      &:hover
+        text-decoration: none !important
+        color: white !important
+      
+      &:before 
+        position: relative
+        display: inline-block
+        border-top: 16px solid transparent
+        border-left: 8px solid #a5b941
+        border-bottom: 16px solid transparent
+        right: -35px
+        bottom: 7px
+        content: ""
+    
+    a.pageguide-close
+      color: white !important
+      background-color: rgba(165, 185, 65, 1)
+      text-align: left      
+      vertical-align: top
+      margin-left: 23px
+      -webkit-border-radius: 3px 3px 3px 3px
+      -moz-border-radius: 3px 3px 3px 3px
+      -o-border-radius: 3px 3px 3px 3px
+      border-radius: 3px 3px 3px 3px
+      display: inline-block
+      font-size: 12px
+      height: 20px
+      line-height: 20px
+      text-align: center
+      text-decoration: none
+      width: 50px      
+
+      &:focus
+        text-decoration: none !important
+        color: white !important
+
+      &:hover
+        text-decoration: none !important
+        color: white !important
+ 
+
 
 html
   position: relative

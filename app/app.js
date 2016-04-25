@@ -19,7 +19,7 @@ var levelEduImpact = {
 }
 
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
+var MAX_IDLE      = 200;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
 var idleTime = 0;
 var idlePrompting = false;
@@ -468,6 +468,12 @@ function initializeTours() {
 	    }); 
 
     }
+
+    var steps = {
+    	'#button-load-jimmy-data':   {audio: '#audio-test'},
+    	'#gene-badge-button:eq(0)':  {audio: '#audio-bird'},
+    	'#vcf-track':                {close: true}
+    };
  
 	// Initialize colon cancer tour
 	if (isLevelEdu) {
@@ -475,30 +481,43 @@ function initializeTours() {
 			'auto_refresh': true, 
 			'custom_open_button': '#show-case1-tour',
 			'steps_element': '#tourEduCase1',
-			'track_events_cb': function(interactionName) {
-				//alert('track_events_cb: ' + interactionName);	
-				$('#audio-test')[0].pause();
-				$('#audio-bird')[0].pause();			
+			'track_events_cb': function(interactionName) {				
+				for (key in steps) {
+					var step = steps[key];
+					if (step.audio) {
+						$(step.audio)[0].pause();
+					}
+				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
-				//alert('handle_doc_switch: ' + currentTour + ', ' + prevTour);
-				if (currentTour == '#button-load-jimmy-data') {
-					$('#page-guide-listen-button').removeClass('hide');
+				var step = steps[currentTour];
+				if (step.audio) {
+					var audioSelector = step.audio;
+					$('#edu-tour-modal').modal('show');
+					$(audioSelector)[0].play();
+					$(audioSelector)[0].addEventListener("ended", function(){
+					     $(audioSelector)[0].currentTime = 0;
+					     $('#edu-tour-modal').modal("hide");
+					});
+
+					//$('#page-guide-listen-button').removeClass('hide');
 					$('#page-guide-listen-button').off('click');
 					$('#page-guide-listen-button').on('click', function(event) {
-						$('#audio-test')[0].play();
-					})
-					//$('#audio-test')[0].play();
-				} else if (currentTour == '#gene-badge-button:eq(0)') {
-					$('#page-guide-listen-button').removeClass('hide');
-					$('#page-guide-listen-button').off('click');
-					$('#page-guide-listen-button').on('click', function(event) {
-						$('#audio-bird')[0].play();
-					})
+						$('#edu-tour-modal').modal('show');
+						$(audioSelector)[0].play();
+					});
 
 				} else {
-					$('#page-guide-listen-button').addClass('hide');					
+					$('#page-guide-listen-button').addClass('hide');										
 				}
+
+				if (step.close) {
+					$('#pageguide-close-button').removeClass("hide");
+					$('#pageguide-next-button').addClass("hide");
+				} else {
+					$('#pageguide-close-button').addClass("hide");
+					$('#pageguide-next-button').removeClass("hide");
+				} 
 			}
 	    }); 
 

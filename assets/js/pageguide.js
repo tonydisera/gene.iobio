@@ -123,12 +123,17 @@ tl.pg.interval = {};
         '<div id="tlyPageGuideWrapper">' +
             '<div id="tlyPageGuideOverlay"></div>' +
             '<div id="tlyPageGuideMessages">' +
-                '<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
+                //'<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
                 '<a href="#" id="page-guide-listen-button" class="hide tlypageguide_listen" title="Listen to instructions">listen</a>' + // added audio
                 '<span class="tlypageguide_index"></span>' +
                 '<div class="tlypageguide_text"></div>' +
-                '<a href="#" class="tlypageguide_back" title="Previous">Previous</a>' +
-                '<a href="#" class="tlypageguide_fwd" title="Next">Next</a>' +
+                '<div class="pageguide-nav">' +
+                    '<a href="#" id="pageguide-prev-button" class="pageguide-prev" title="Prev step">back</a>' +
+                    '<a href="#" id="pageguide-next-button" class="pageguide-next" title="Next step">next</a>' +
+                    '<a href="#" id="pageguide-close-button" class="pageguide-close" title="Close">close</a>' +
+                '</div>' +
+                //'<a href="#" class="tlypageguide_back"  title="Previous">Previous</a>' +
+                //'<a href="#" class="tlypageguide_fwd"  title="Next">Next</a>' +
             '</div>' +
             '<div id="tlyPageGuideContent"></div>' +
             '<div id="tlyPageGuideToggles"></div>' +
@@ -216,8 +221,12 @@ tl.pg.interval = {};
         this.preferences = preferences;
         this.$base = pg_elem;
         this.$message = this.$base.find('#tlyPageGuideMessages');
-        this.$fwd = this.$base.find('a.tlypageguide_fwd');
-        this.$back = this.$base.find('a.tlypageguide_back');
+
+        //this.$fwd = this.$base.find('a.tlypageguide_fwd');
+        //this.$back = this.$base.find('a.tlypageguide_back');
+        this.$fwd = this.$base.find('.pageguide-next');
+        this.$back = this.$base.find('.pageguide-prev');
+
         this.$content = this.$base.find('#tlyPageGuideContent');
         this.$steps = $(preferences.steps_element);
         this.uuid = tl.pg.hashCode(preferences.steps_element);
@@ -702,6 +711,12 @@ tl.pg.interval = {};
 
         /* close guide */
         $('.tlypageguide_close', self.$message.add($('.tlypageguide_toggle')))
+            .on('click', function() {
+                self.close();
+                return false;
+        });
+        // tds
+        $('.pageguide-close', self.$message.add($('.tlypageguide_toggle')))
             .on('click', function() {
                 self.close();
                 return false;

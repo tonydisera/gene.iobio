@@ -159,6 +159,14 @@
 #slider-left {
   top: 52px !important; }
 
+#edu-tour-modal .modal-content {
+  background-color: rgba(0, 0, 0, 0.9) !important; }
+  #edu-tour-modal .modal-content .modal-body {
+    min-height: 200px !important; }
+#edu-tour-modal .btn.btn-raised {
+  background-color: #a5b955 !important;
+  color: white !important; }
+
 #nav-edu-tour {
   background-color: #626390;
   margin-bottom: 12px;
@@ -198,9 +206,6 @@
 
 .tlypageguide-active .tlyPageGuideStepIndex {
   opacity: 1 !important; }
-
-#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_listen {
-  color: white !important; }
 
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
@@ -527,6 +532,102 @@ h5 {
 
 .tlypageguide-active .tlyPageGuideStepIndex {
   opacity: 1; }
+
+#tlyPageGuideWrapper #tlyPageGuideMessages span {
+  top: 35px !important; }
+#tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_listen {
+  color: white !important;
+  background-color: #a5b941;
+  -webkit-border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px 3px 3px 3px;
+  -o-border-radius: 3px 3px 3px 3px;
+  border-radius: 3px 3px 3px 3px;
+  display: block;
+  font-size: 11px;
+  height: 24px;
+  line-height: 26px;
+  text-align: center;
+  text-decoration: none;
+  width: 50px; }
+#tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_text {
+  margin-top: 25px !important; }
+#tlyPageGuideWrapper #tlyPageGuideMessages .pageguide-nav {
+  top: 7px;
+  left: 15px;
+  position: absolute; }
+#tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev {
+  color: white !important;
+  background-color: #a5b941;
+  text-align: left;
+  padding-right: 5px;
+  vertical-align: top;
+  margin-left: 3px;
+  font-size: 12px;
+  padding-top: 2px;
+  padding-bottom: 3px; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev:focus {
+    text-decoration: none !important;
+    color: white !important; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev:hover {
+    text-decoration: none !important;
+    color: white !important; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev:before {
+    position: relative;
+    display: inline-block;
+    border-top: 16px solid transparent;
+    border-right: 8px solid #a5b941;
+    border-bottom: 16px solid transparent;
+    left: -8px;
+    bottom: 7px;
+    content: ""; }
+#tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next {
+  color: white !important;
+  background-color: #a5b941;
+  text-align: left;
+  padding-right: 5px;
+  vertical-align: top;
+  margin-left: 3px;
+  font-size: 12px;
+  padding-top: 2px;
+  padding-bottom: 3px; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next:focus {
+    text-decoration: none !important;
+    color: white !important; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next:hover {
+    text-decoration: none !important;
+    color: white !important; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next:before {
+    position: relative;
+    display: inline-block;
+    border-top: 16px solid transparent;
+    border-left: 8px solid #a5b941;
+    border-bottom: 16px solid transparent;
+    right: -35px;
+    bottom: 7px;
+    content: ""; }
+#tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-close {
+  color: white !important;
+  background-color: #a5b941;
+  text-align: left;
+  vertical-align: top;
+  margin-left: 23px;
+  -webkit-border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px 3px 3px 3px;
+  -o-border-radius: 3px 3px 3px 3px;
+  border-radius: 3px 3px 3px 3px;
+  display: inline-block;
+  font-size: 12px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: none;
+  width: 50px; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-close:focus {
+    text-decoration: none !important;
+    color: white !important; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-close:hover {
+    text-decoration: none !important;
+    color: white !important; }
 
 html {
   position: relative;
