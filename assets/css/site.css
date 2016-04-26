@@ -168,14 +168,14 @@
   color: white !important; }
 
 #nav-edu-tour {
-  background-color: #626390;
+  background-color: #757575 !important;
   margin-bottom: 12px;
   display: block !important;
   height: 50px;
   width: 100%;
   text-align: center; }
   #nav-edu-tour .btn.btn-raised {
-    background-color: #a5b955 !important;
+    background-color: #6A94AD !important;
     color: white !important;
     margin-left: 15px !important;
     font-size: 14px !important; }
