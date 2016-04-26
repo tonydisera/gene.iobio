@@ -270,6 +270,8 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 
 	// Get rid of newlines
 	searchTerms = searchTerms.split("\n").join("")
+	// Change space to _
+	searchTerms = searchTerms.split(" ").join("_");
 	// Remove ending delimiter
 	if (searchTerms.lastIndexOf(";") == searchTerms.length-1) {
 		searchTerms = searchTerms.substring(0, searchTerms.length - 1);
@@ -277,7 +279,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 	// Replace semicolon with a colon (semicolon causes term to be truncated)
 	searchTerms = searchTerms.split(";").join("\\");
 
-	var url = phenolyzerServer + '?term=' + searchTerms;
+	var url = phenolyzerServer + '?term=%22' + searchTerms + '%22';
 	d3.select('#phenolyzer-results svg').remove();
    	phenolyzerGenes = [];
 
