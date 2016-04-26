@@ -21,23 +21,29 @@ function DataCard() {
 	};
 
 
-	this.exomeMode = 'trio';
-	this.exomeNames = {
+	this.demoMode = 'trio';
+	this.demoCards = {
+		proband: true,
+		mother: true,
+		father: true
+	};
+
+	this.demoNames = {
 		proband: 'NA19240',
 		mother:  'NA19238',
 		father:  'NA19239' 
 	};
-	this.exomeUrls = {
+	this.demoUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
 	};
-	this.exomeBamUrls = {
+	this.demoBamUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19240.bam',
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19238.bam',
 		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19239.bam'
 	};
-	this.exomeSampleNames = {
+	this.demoSampleNames = {
 		proband: 'NA19240',
 		mother:  'NA19238',
 		father:  'NA19239'
@@ -53,10 +59,22 @@ function DataCard() {
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
 	};
+	this.eduTourCards = [
+		{
+			proband: true,
+			mother:  true,
+			father:  true
+		},
+		{
+			proband: true,
+			mother:  false,
+			father:  false
+		}
+	];	
 	this.eduTourNames = [
 		{
 			proband: 'Father',
-			mother: null,
+			mother: 'Mother',
 			father: 'Father'
 		},
 		{
@@ -66,7 +84,7 @@ function DataCard() {
 	this.eduTourSampleNames = [
 		{
 			proband: 'NA19240',
-			mother:  null, 
+			mother:  'NA19238', 
 			father:  'NA19239' 
 		},
 		{
@@ -89,20 +107,16 @@ DataCard.prototype.loadDemoData = function() {
 	var me = this;
 
 	if (isLevelEdu) {
-		this.exomeUrls = this.eduTourUrls;
-		if (isLevelEduTour) {
-			this.exomeNames = this.eduTourNames[+eduTourNumber - 1];
-			this.exomeSampleNames = this.eduTourSampleNames[+eduTourNumber - 1];			
-			this.exomeMode = this.eduTourModes[+eduTourNumber - 1];
-		} else {
-			this.exomeNames = this.eduTourNames[0];
-			this.exomeSampleNames = this.eduTourSampleNames[0];			
-			this.exomeMode = this.eduTourModes[0];
-		}
+		this.demoUrls = this.eduTourUrls;
+		var idx = isLevelEduTour ? +eduTourNumber-1 : 0;
+		this.demoCards = this.eduTourCards[idx];
+		this.demoNames = this.eduTourNames[idx];
+		this.demoSampleNames = this.eduTourSampleNames[idx];			
+		this.demoMode = this.eduTourModes[idx];
 	} 
 
 	$('#splash').addClass("hide");	
-	this.mode = this.exomeMode;
+	this.mode = this.demoMode;
 
 	// Clear the cache
 	var affectedSibIds  = [];
@@ -114,29 +128,29 @@ DataCard.prototype.loadDemoData = function() {
 	window.updateUrl('rel1', "mother");	
 	window.updateUrl('rel2', "father");	
 
-	window.updateUrl('name0', this.exomeNames.proband);	
-	window.updateUrl('vcf0',  this.exomeUrls.proband);	
+	window.updateUrl('name0', this.demoNames.proband);	
+	window.updateUrl('vcf0',  this.demoUrls.proband);	
 	if (!window.isLevelEdu) {
-		window.updateUrl('bam0',  this.exomeBamUrls.proband);	
+		window.updateUrl('bam0',  this.demoBamUrls.proband);	
 	}
-	window.updateUrl('sample0',  this.exomeSampleNames.proband);	
+	window.updateUrl('sample0',  this.demoSampleNames.proband);	
 
-	if (this.exomeNames.mother) {
-		window.updateUrl('name1', this.exomeNames.mother);	
-		window.updateUrl('vcf1',  this.exomeUrls.mother);	
+	if (this.demoCards.mother) {
+		window.updateUrl('name1', this.demoNames.mother);	
+		window.updateUrl('vcf1',  this.demoUrls.mother);	
 		if (!window.isLevelEdu) {
-			window.updateUrl('bam1',  this.exomeBamUrls.mother);
+			window.updateUrl('bam1',  this.demoBamUrls.mother);
 		}	
-		window.updateUrl('sample1',  this.exomeSampleNames.mother);			
+		window.updateUrl('sample1',  this.demoSampleNames.mother);			
 	} 
 
-	if (this.exomeNames.father) {
-		window.updateUrl('name2', this.exomeNames.father);	
-		window.updateUrl('vcf2',  this.exomeUrls.father);	
+	if (this.demoNames.father) {
+		window.updateUrl('name2', this.demoNames.father);	
+		window.updateUrl('vcf2',  this.demoUrls.father);	
 		if (!window.isLevelEdu) {		
-			window.updateUrl('bam2',  this.exomeBamUrls.father);
+			window.updateUrl('bam2',  this.demoBamUrls.father);
 		}	
-		window.updateUrl('sample2',  this.exomeSampleNames.father);			
+		window.updateUrl('sample2',  this.demoSampleNames.father);			
 	}
 
 	
@@ -247,7 +261,7 @@ DataCard.prototype.init = function() {
 	var me = this;
 
 	if (this.isLevelEdu) {
-		this.exomeNames
+		this.demoNames
 	}
 
 	$('#proband-data').append(dataCardEntryTemplate());
