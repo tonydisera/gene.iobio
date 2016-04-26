@@ -9,33 +9,45 @@
 			</button>
 
 
-		    <button id="button-load-jimmy-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
-		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Jimmy', 'NA19238')">
+		    <button id="button-load-father-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
+		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.mode = 'single';dataCard.loadSampleData('proband', 'Father', 'NA19240')">
 		      <span>
 			      <i class="material-icons" >star</i>
-			      Jimmy
+			      Father
 		      </span>
 		    </button>
 
-		    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
-		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Sarah', 'NA19239')">
-		      <span>
-			      <i class="material-icons" >star</i>
-			      Sarah
-		      </span>
-		    </button>
+		    <span id="children-buttons" style="display:inline-block;height:45px">
+		       <span id="jimmy-and-sarah-buttons" style="display:inline-block;height:45px">
+			    <button id="button-load-jimmy-data" class=" edu-tour-button icon-button-sm btn btn-default btn-raised"  
+			    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.mode = 'trio';dataCard.loadSampleData('proband', 'Jimmy', 'NA19238');">
+			      <span>
+				      <i class="material-icons" >star</i>
+				      Jimmy
+			      </span>
+			    </button>
 
-		    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
-		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Bobby', 'NA19240')">
-			  <span>
-			      <i class="material-icons" >star</i>
-			      Bobby
-		      </span>
+			    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
+			    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.mode = 'trio';dataCard.loadSampleData('proband', 'Sarah', 'NA19239')">
+			      <span>
+				      <i class="material-icons" >star</i>
+				      Sarah
+			      </span>
+			    </button>
+			   </span>
 
-		    </button>
+			    <button class="edu-tour-button icon-button-sm btn btn-default btn-raised"  style="margin-right:20px;"
+			    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.mode = 'trio';dataCard.loadSampleData('proband', 'Bobby', 'NA19240')">
+				  <span>
+				      <i class="material-icons" >star</i>
+				      Bobby
+			      </span>
+
+			    </button>
+		    </span>
 
 		    <button class="icon-button-sm btn btn-default btn-raised"  
-		    onclick="" style="margin-left:40px !important;">
+		    onclick="" style="margin-left:20px !important;">
 		    	Test your Knowledge
 		    </button>
 

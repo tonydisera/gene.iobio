@@ -21,6 +21,7 @@ function DataCard() {
 	};
 
 
+	this.exomeMode = 'trio';
 	this.exomeNames = {
 		proband: 'NA19240',
 		mother:  'NA19238',
@@ -42,6 +43,11 @@ function DataCard() {
 		father:  'NA19239'
 	};
 
+	this.eduTourModes = [
+		'single',
+		'single'
+	];
+
 	this.eduTourUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
@@ -49,9 +55,9 @@ function DataCard() {
 	};
 	this.eduTourNames = [
 		{
-			proband: 'Jimmy',
-			mother:  'Mother',
-			father:  'Father' 
+			proband: 'Father',
+			mother: null,
+			father: 'Father'
 		},
 		{
 			proband: 'John'
@@ -60,7 +66,7 @@ function DataCard() {
 	this.eduTourSampleNames = [
 		{
 			proband: 'NA19240',
-			mother:  'NA19238',
+			mother:  null, 
 			father:  'NA19239' 
 		},
 		{
@@ -87,14 +93,16 @@ DataCard.prototype.loadDemoData = function() {
 		if (isLevelEduTour) {
 			this.exomeNames = this.eduTourNames[+eduTourNumber - 1];
 			this.exomeSampleNames = this.eduTourSampleNames[+eduTourNumber - 1];			
+			this.exomeMode = this.eduTourModes[+eduTourNumber - 1];
 		} else {
 			this.exomeNames = this.eduTourNames[0];
 			this.exomeSampleNames = this.eduTourSampleNames[0];			
+			this.exomeMode = this.eduTourModes[0];
 		}
 	} 
 
 	$('#splash').addClass("hide");	
-	this.mode = 'trio';
+	this.mode = this.exomeMode;
 
 	// Clear the cache
 	var affectedSibIds  = [];
@@ -120,7 +128,7 @@ DataCard.prototype.loadDemoData = function() {
 			window.updateUrl('bam1',  this.exomeBamUrls.mother);
 		}	
 		window.updateUrl('sample1',  this.exomeSampleNames.mother);			
-	}
+	} 
 
 	if (this.exomeNames.father) {
 		window.updateUrl('name2', this.exomeNames.father);	
@@ -130,6 +138,8 @@ DataCard.prototype.loadDemoData = function() {
 		}	
 		window.updateUrl('sample2',  this.exomeSampleNames.father);			
 	}
+
+	
 
 	if (!window.isLevelEdu) {
 		window.updateUrl("gene", "RAI1");
@@ -152,6 +162,7 @@ DataCard.prototype.loadSampleData = function(relationship, name, sampleName) {
 	variantCard = getVariantCard(relationship);
 	variantCard.setName(name);
 	variantCard.setSampleName(sampleName);
+
 
 	clearCache();
 	window.loadTracksForGene();		

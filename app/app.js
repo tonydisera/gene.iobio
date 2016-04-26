@@ -470,9 +470,13 @@ function initializeTours() {
     }
 
     var steps = {
-    	'#button-load-jimmy-data':   {audio: '#audio-test'},
-    	'#gene-badge-button:eq(0)':  {audio: '#audio-bird'},
-    	'#vcf-track':                {close: true}
+    	'#button-load-father-data':   {audio: '#audio-test'},
+    	'#phenolyzer-search-box .selectize-control.single':    {},
+    	'#gene-badge-container':       {audio: '#audio-test'},
+    	'#gene-badge-button:eq(0)':    {},
+    	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
+    	'#children-buttons':           {audio: '#audio-test'},
+    	'#jimmy-and-sarah-buttons':    {audio: '#audio-bird', close: true}
     };
  
 	// Initialize colon cancer tour
@@ -493,6 +497,9 @@ function initializeTours() {
 				var step = steps[currentTour];
 				if (step.audio) {
 					var audioSelector = step.audio;
+					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
+					$(audioSelector)[0].play();
+					/*
 					$('#edu-tour-modal').modal('show');
 					$(audioSelector)[0].play();
 					$(audioSelector)[0].addEventListener("ended", function(){
@@ -506,8 +513,11 @@ function initializeTours() {
 						$('#edu-tour-modal').modal('show');
 						$(audioSelector)[0].play();
 					});
+*/
 
+					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
 				} else {
+					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");
 					$('#page-guide-listen-button').addClass('hide');										
 				}
 
@@ -982,10 +992,11 @@ function loadUrlSources() {
 	}
 
 
-	// get all bam and vcf url params in hash
 
 	if ((bam != null && Object.keys(bam).length > 1) || (vcf != null && Object.keys(vcf).length > 1)) {
-		toggleSampleTrio(true);
+		if (!isLevelEdu) {
+			toggleSampleTrio(true);
+		}
 	} 
 
 

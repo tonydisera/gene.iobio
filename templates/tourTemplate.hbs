@@ -8,28 +8,55 @@
 <!-- Tour for colon cancer screening case -->
 <ul id="tourEduCase1"  data-tourtitle="coloncancer">
 
-  
-  <li class="tlypageguide_right audio" data-tourtarget="#button-load-jimmy-data">
+
+  <li class="tlypageguide_right audio" data-tourtarget="#button-load-father-data">
     <div>
-      step1 for use case
+       [Audio]A father with three children has been diagnosed with colon cancer. The man’s mother and grandfather had colon cancer, too. The man wonders if the cancers in his family have a genetic cause. He decides to have his genome analyzed to search for cancer-causing variants. If the analysis identifies one, the family wants to screen the children for the variant, too. They know that frequent screenings for people at high risk of developing colon cancer is a very effective prevention strategy. Use gene.iobio to conduct the analysis and advise the family. (Possible animation: We see people icons of a family with three children. The father is a different color than the other, let’s say he’s blue. Then a family tree appears and we see the man’s mom and grandpa are blue, too. A double helix spirals across the screen. One rung in the DNA changes color. Question marks appear on kids)
+
+    </div>
+  </li>
+  
+  <li class="tlypageguide_right audio" data-tourtarget="#phenolyzer-search-box .selectize-control.single">
+    <div>
+       Look at the father’s genome first. Click the ‘Phenolyzer (colon cancer)’ box at the left of the screen, and select ‘colon cancer’.
       
-      <br><strong><em>Click on next arrow > to continue to next step.</em></strong>
+      
+    </div>
+  </li>
+
+ 
+  <li class="tlypageguide_right audio" data-tourtarget="#gene-badge-container">
+    <div>
+      [Audio] Gene.iobio generated a list of genes connected with colon cancer. The genes at the top are the ones gene.iobio predicts to be most important. [GRAPHICS: Same pop-up as in the video highlighting the gene list] Here’s the information for the father’s MLH1 gene, the highest ranked one on the list, including the gene model. [GRAPHICS: Point to the gene model for the MLH1 gene. Include annotations to show that this whole thing is the ‘gene’, the blue boxes are ‘exons’ which contain the instructions for building the protein and in between these boxes are ‘introns’] Only the DNA contained in the blue boxes codes for proteins. The rest is involved in other functions. Disease-causing genetic variants usually fall in the ‘protein-coding’ regions.
     </div>
   </li>
 
   <li class="tlypageguide_left" data-tourtarget="#gene-badge-button:eq(0)">
     <div>
-      This is an instruction about a gene button.
-    </div>
-  </li>
-   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
-    <div>
-      The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
-      Hover over the variants to see more information.  
-      <br><br>
+      Look through each of the top five genes for harmful variants. Remember, the variants gene.iobio predicts are harmful will show up as red icons on the among the variants and in the ranking chart. If you find a harmful variant, click on the red icon.
 
     </div>
   </li>
+
+   <li class="tlypageguide_top" data-tourtarget="#feature-matrix .col:eq(0)">
+    <div>
+       [Audio triggered with player clicks on variant in APC gene. Do we need a quick animation here?] You’ve found the source of the colon cancer that runs in this family. People with this variant in their APC gene have a 70 percent lifetime risk of developing cancer. It was discovered at the University of Utah in 1987.
+    </div>
+  </li>
+
+   <li class="tlypageguide_bottom" data-tourtarget="#children-buttons">
+    <div>
+      Examine the APC genes of each of the children. Based on what you find, recommend which children should get frequent colon cancer screenings. 
+
+    </div>
+  </li>
+
+   <li class="tlypageguide_bottom" data-tourtarget="#jimmy-and-sarah-buttons">
+    <div>
+      [Audio] Both Jimmy and Sarah should undergo frequent screenings since they share a disease-causing variant in their APC gene with their father. Armed with this knowledge, they can significantly reduce their risk of developing colon cancer. Luckily for Bobby, he inherited his father’s good copy of the APC gene, so he is far less likely to develop cancer than his siblings. [Possible animation: We see the family tree again as we last saw it in the introduction. The question marks in the children are replaced by the appropriate colors – two blue kids and one not blue.]
+    </div>
+  </li>
+
 </ul>
 
 <!-- Tour for warfarin screening case -->
