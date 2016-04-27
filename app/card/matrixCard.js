@@ -530,7 +530,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		x -= me.featureMatrix.cellSize()/2;
 	}
 
-	if (isLevelEduTour) {
+	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
 		y -= $('#nav-edu-tour').outerHeight();
 	}
 

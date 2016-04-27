@@ -1661,7 +1661,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
  	var w = isLevelEdu ? widthSimpleTooltip : 300;
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
-	if (isLevelEduTour) {
+	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
 		y -= $('#nav-edu-tour').outerHeight();
 	}
 
