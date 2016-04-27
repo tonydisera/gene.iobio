@@ -18,6 +18,7 @@ GenesCard.prototype.init = function() {
 	if (isLevelEdu) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	}
+	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
      
   	// Selectize combo for phenotype terms    
 	$('#select-phenotypes').selectize({

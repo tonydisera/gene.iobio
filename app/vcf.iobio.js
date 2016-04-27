@@ -1709,7 +1709,7 @@ var effectCategories = [
                 if (isLevelEdu && alt.indexOf(",") > 0) {
                   if ((tokens[0] == 1 ) && (tokens[1] == 2)) {
                     keepAlt = true;
-                  } if ((tokens[0] == 2 ) && (tokens[1] == 2)) {
+                  } if (tokens[0] == tokens[1]) {
                     keepAlt = true;
                     theAltIdx = tokens[0] - 1;
                     alt = alt.split(',')[theAltIdx] + ',' + alt.split(',')[theAltIdx];

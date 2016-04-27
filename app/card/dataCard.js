@@ -50,15 +50,21 @@ function DataCard() {
 	};
 
 	this.eduTourModes = [
+		'trio',
 		'single',
 		'single'
 	];
 
-	this.eduTourUrls = [
+	this.eduTourUrls = [ 
 	{
-		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/NHMU/nfkb2.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/NHMU/nfkb2.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/NHMU/nfkb2.vcf.gz'
+	},
+	{
+		proband: 'https://s3.amazonaws.com/iobio/NHMU/apc.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/NHMU/apc.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/NHMU/apc.vcf.gz'
 	},
 	{
 		proband: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz',
@@ -74,15 +80,25 @@ function DataCard() {
 		},
 		{
 			proband: true,
+			mother:  true,
+			father:  true
+		},
+		{
+			proband: true,
 			mother:  false,
 			father:  false
 		}
 	];	
 	this.eduTourNames = [
 		{
+			proband: 'Alex',
+			mother:  'Mother',
+			father:  'Father'
+		},
+		{
 			proband: 'Father',
-			mother: 'Mother',
-			father: 'Father'
+			mother:  'Mother',
+			father:  'Father'
 		},
 		{
 			proband: 'John'
@@ -90,15 +106,21 @@ function DataCard() {
 	];	
 	this.eduTourSampleNames = [
 		{
-			proband: 'NA19240',
-			mother:  'NA19238', 
-			father:  'NA19239' 
+			proband: 'sample3',
+			mother:  'sample1', 
+			father:  'sample2' 
+		},
+		{
+			proband: 'sample3',
+			mother:  'sample1', 
+			father:  'sample2' 
 		},
 		{
 			proband: 'sample1'
 		}
 	];
 	this.eduTourGenes = [
+		[],
 		[],
 		['VKORC1']
 	];
@@ -114,7 +136,7 @@ DataCard.prototype.loadDemoData = function() {
 	var me = this;
 
 	if (isLevelEdu) {
-		var idx = isLevelEduTour ? +eduTourNumber-1 : 0;
+		var idx = isLevelEduTour ? +eduTourNumber : 0;
 		this.demoCards = this.eduTourCards[idx];
 		this.demoUrls = this.eduTourUrls[idx];
 		this.demoNames = this.eduTourNames[idx];
@@ -166,9 +188,9 @@ DataCard.prototype.loadDemoData = function() {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 		reloadGeneFromUrl();
-	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber-1].length > 0) {
-		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber-1][0]);
-		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber-1].join(","));
+	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber].length > 0) {
+		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber][0]);
+		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber].join(","));
 		reloadGeneFromUrl();
 	} else {
 		loadUrlSources();

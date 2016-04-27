@@ -204,13 +204,14 @@ MatrixCard.prototype.init = function() {
 	if (isLevelEdu) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
-		if (isLevelEduTour) {
-			this.setRowLabel("Zygosity", "Genotype");
-		} else {
-			this.removeRow('Zygosity', me.matrixRows);			
-		}		
-
+		this.removeRow('Zygosity', me.matrixRows);	
 		this.removeRow('Bookmark', me.matrixRows);
+
+		// Only show genotype on second educational tour
+		if (!isLevelEdu || eduTourNumber != 2) {
+			this.removeRow('Genotype', me.matrixRows);
+		}				
+		// Only show inheritance on first educational tour
 		if (!isLevelEduTour || eduTourNumber != 1) {
 			this.removeRow('Inheritance Mode', me.matrixRows);
 		}
@@ -224,6 +225,8 @@ MatrixCard.prototype.init = function() {
 		this.setRowLabel('Pathogenicity - ClinVar',     'Clinical findings');
 		this.setRowLabel('Pathogengicity - PolyPhen',   'Prediction');
 		this.setRowLabel('Inheritance Mode',            'Inheritance');
+	} else {
+		this.removeRow('Genotype', me.matrixRows);
 	}
 
 	this.featureMatrix = featureMatrixD3()
@@ -757,36 +760,29 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 
 MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
-	var width = "14";
-	var height = "14";
-	var transform =  "translate(2,2)";
+	var width = options && options.cellSize && options.cellSize > 18 ? "16" : 14;
+	var height = width;
 	var clazz = null;
-	if (options) {
-		if (options.width) {
-			width = options.width;
-		}
-		if (options.height) {
-			height = options.height;
-		}
-		if (options.transform) {
-			transform = options.transform;
-		}
-		if (options.clazz) {
-			clazz = options.clazz;
-		}
+
+	if (options && options.width) {
+		width = options.width;
 	} else {
-		if (selection.datum().width) {
-			width = selection.datum().width;
-		}
-		if (selection.datum().height) {
-			height = selection.datum().height;
-		}
-		if (selection.datum().transform) {
-			transform = selection.datum().transform;
-		}
-		if (selection.datum().clazz) {
-			clazz = selection.datum().clazz;
-		}
+		width = options && options.cellSize && options.cellSize > 18 ? "15" : selection.datum().width;
+	}
+	if (options && options.height) {
+		height = options.height;
+	} else {
+		height = options && options.cellSize && options.cellSize > 18 ? "15" : selection.datum().height;
+	}
+	if (options && options.transform) {
+		transform = options.transform;
+	} else {
+		transform = options && options.cellSize && options.cellSize > 18 ? "translate(3,2)" : selection.datum().transform;
+	}
+	if (options && options.clazz) {
+		clazz = options.clazz;
+	} else {
+		clazz = selection.datum().clazz;
 	}
 
 	selection.append("g")
@@ -819,8 +815,16 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
+	var transform = "translate(2,2)";
+	if (options && options.cellSize && options.cellSize > 18) {
+		transform = "translate(4,2)";
+	} else if (options && options.transform) {
+		transform = options.transform;
+	} else if (selection.datum().transform) {
+		transform = selection.datum().transform;
+	}
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
 	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
@@ -841,8 +845,16 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showSiftSymbol = function (selection, options) {
+	var transform = "translate(2,2)";
+	if (options && options.cellSize && options.cellSize > 18) {
+		transform = "translate(4,2)";
+	} else if (options && options.transform) {
+		transform = options.transform;
+	} else if (selection.datum().transform) {
+		transform = selection.datum().transform;
+	}
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
 	         .attr("width", options  && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
@@ -1044,23 +1056,45 @@ MatrixCard.prototype.showHomSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
+	var width = "20";
+	if ( options && options.cellSize && options.cellSize > 18 ) {
+		width = "22";
+	} else if ( options && options.width ) {
+		width = options.width ;
+	}
+	var height = width;
 
 	selection.append("g")
 	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options && options.width ? options.width : "20")
-	         .attr("height", options && options.width ? options.height : "20")
+	         .attr("width", width)
+	         .attr("height", height)
 	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
+	var width = "20";
+	if ( options && options.cellSize && options.cellSize > 18 ) {
+		width = "22";
+	} else if ( options && options.width ) {
+		width = options.width ;
+	}
+	var height = width;
+
+	var transform = "translate(-1,0)";
+	if (options && options.cellSize && options.cellSize > 18) {
+		transform = "translate(1,0)";
+	} else if (options && options.transform) {
+		transform = options.transform; 
+	}
+
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : "translate(-1,0)")
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", options && options.width ? options.width : "20")
-	         .attr("height", options && options.height ? options.height : "20")
+	         .attr("width", width)
+	         .attr("height", height)
 	         .style("pointer-events", "none");
 	
 };
@@ -1187,22 +1221,23 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
-	var symbolScale = d3.scale.linear()
-                    .domain([1,6])
-                    .range([10,40]);
+	var symbolScale = d3.scale.ordinal()
+                    .domain([3,4,5,6,7,8])
+                    .range([9,15,20,25,36,58]);
+	
+    var symbolSize = symbolScale(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
 
-    var symbolSize = symbolScale(6);
-
-    var translate       = options && options.cellSize > 18 ?  "translate(7,5)" : "translate(4,4)" ; 
-
-    var translateSymbol = options && options.cellSize > 18 ?  "translate(10,10)" : "translate(8,8)";
+    var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ; 
+    var translateSymbol = options && options.cellSize && options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
+    var width           = options && options.cellSize && options.cellSize > 18 ? 10 : 8;
+    var height          = width;
      
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
 		         .attr("transform", translate)
 		         .append("rect")
-		         .attr("width", 8)
-		         .attr("height", 8)
+		         .attr("width", width)
+		         .attr("height", height)
 		         .attr("class", "filter-symbol " + selection.datum().clazz)
 		         .style("pointer-events", "none");		
 	} else {

@@ -9,7 +9,7 @@
 =*/
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;
-var eduTourNumber           = "1";
+var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
 var levelEduImpact = {
 	HIGH: 'Harmful',
@@ -229,7 +229,7 @@ function init() {
 	$('#nav-edu-tour').append(eduTourTemplateHTML);
 	eduTourNumber = getUrlParameter("tour");
 	if (eduTourNumber == null || eduTourNumber == "") {
-		eduTourNumber = "1";
+		eduTourNumber = "0";
 	}
 	if (eduTourNumber && eduTourNumber != '') {
 		$('#edu-tour-' + eduTourNumber).removeClass("hide");
@@ -626,6 +626,9 @@ function showCoordinateFrame(x) {
 	var top = +$('#nav-section').outerHeight();
 	top    += +$('#matrix-track').outerHeight();
 	top    += 30;
+	if (isLevelEduTour && $('#slider-left').hasClass("hide")) {
+		top += 50;
+	}
 
 	var height = +$('#proband-variant-card').outerHeight();
 	height    += +$('#other-variant-cards').outerHeight();
@@ -939,7 +942,7 @@ function loadGeneFromUrl() {
 	} else {
 		// Open the sidebar 
 		if (isLevelEdu) {
-			if (eduTourShowPhenolyzer[+eduTourNumber-1]) {
+			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
 			dataCard.loadDemoData();
@@ -1052,10 +1055,10 @@ function loadUrlSources() {
 		});
 	}
 	
-
+ 
 	if (vcf != null || bam != null) {
 		if (isLevelEdu && $('#slider-left').hasClass("hide")) {
-			if (isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
 		}
@@ -1590,7 +1593,7 @@ function loadGeneWidget() {
 					if (bam == null && vcf == null) {
 						// Open the 'About' sidebar by default if there is no data loaded when gene is launched
 						if (isLevelEdu) {
-							if (eduTourShowPhenolyzer[+eduTourNumber-1]) {
+							if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 								showSidebar("Phenolyzer");
 							}							
 						} else {
