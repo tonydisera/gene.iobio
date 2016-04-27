@@ -54,11 +54,18 @@ function DataCard() {
 		'single'
 	];
 
-	this.eduTourUrls = {
+	this.eduTourUrls = [
+	{
 		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
 		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
-	};
+	},
+	{
+		proband: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz',
+		mother: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz',
+		father: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz'
+	}
+	];
 	this.eduTourCards = [
 		{
 			proband: true,
@@ -88,7 +95,7 @@ function DataCard() {
 			father:  'NA19239' 
 		},
 		{
-			proband: 'NA19239'
+			proband: 'sample1'
 		}
 	];
 	this.eduTourGenes = [
@@ -107,9 +114,9 @@ DataCard.prototype.loadDemoData = function() {
 	var me = this;
 
 	if (isLevelEdu) {
-		this.demoUrls = this.eduTourUrls;
 		var idx = isLevelEduTour ? +eduTourNumber-1 : 0;
 		this.demoCards = this.eduTourCards[idx];
+		this.demoUrls = this.eduTourUrls[idx];
 		this.demoNames = this.eduTourNames[idx];
 		this.demoSampleNames = this.eduTourSampleNames[idx];			
 		this.demoMode = this.eduTourModes[idx];

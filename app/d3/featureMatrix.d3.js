@@ -330,7 +330,7 @@ function featureMatrixD3() {
       cells.each( function(d,i) {
          var symbolFunction = d.symbolFunction;
          if (symbolFunction) {
-           d3.select(this).call(symbolFunction);
+           d3.select(this).call(symbolFunction, {'cellSize': cellSize});
          }
       });
 

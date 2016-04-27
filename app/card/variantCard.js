@@ -1607,7 +1607,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
+		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
@@ -2256,7 +2256,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	if (isLevelEdu) {
 		return (
-			me._tooltipHeaderRow(refalt,'','','') 
+			me._tooltipHeaderRow('Genotype', variant.eduGenotype, '','') 
 			+ me._tooltipHeaderRow('   ' + impactLabel , ' impact', '', '')
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
 			+ inheritanceModeRow

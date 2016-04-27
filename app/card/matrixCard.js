@@ -106,7 +106,8 @@ function MatrixCard() {
 		{name:'Affected Siblings'            ,order:7, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
 		{name:'Unaffected Siblings'          ,order:8, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
 		{name:'Allele Frequency - 1000G'     ,order:9, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:10, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap}
+		{name:'Allele Frequency - ExAC'      ,order:10, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotype' }
 	];
 
 
@@ -210,7 +211,9 @@ MatrixCard.prototype.init = function() {
 		}		
 
 		this.removeRow('Bookmark', me.matrixRows);
-		//this.removeRow('Inheritance Mode', me.matrixRows);
+		if (!isLevelEduTour || eduTourNumber != 1) {
+			this.removeRow('Inheritance Mode', me.matrixRows);
+		}
 		this.removeRow('Affected Siblings', me.matrixRows);
 		this.removeRow('Unaffected Siblings', me.matrixRows);
 		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
@@ -224,8 +227,8 @@ MatrixCard.prototype.init = function() {
 	}
 
 	this.featureMatrix = featureMatrixD3()
-				    .margin({top: 0, right: 40, bottom: 4, left: 24})
-				    .cellSize(18)
+				    .margin({top: 0, right: 40, bottom: 7, left: 24})
+				    .cellSize(isLevelEdu ? 23 : 18)
 				    .columnLabelHeight(isLevelEdu ? 30 : 67)
 				    .rowLabelWidth(isLevelEdu ? 90 : 140)
 				    .columnLabel( me.getVariantLabel )
@@ -476,7 +479,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
+		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
@@ -608,7 +611,12 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 				rawValue = 'N';
 			} 
 			if (rawValue != null && rawValue != "") {
-				if (matrixRow.match == 'exact') {
+				if (matrixRow.match == 'field') {
+					theValue = rawValue;
+					mappedClazz = matrixRow.attribute;
+					symbolFunction = me.showTextSymbol;
+
+				} else if (matrixRow.match == 'exact') {
 					// We are going to get the mapped value through exact match,
 					// so this will involve a simple associative array lookup.
 					// Some features (like impact) are multi-value and are stored in a
@@ -812,14 +820,14 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 
 MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", options ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
+	         .attr("transform", options && options.transform ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", options ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
-	         .attr("height", options ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "14"))
+	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
+	         .attr("height", options && options.height ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "14"))
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
-	         	var clazz = options ? options.clazz : selection.datum().clazz;
+	         	var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
 
 	         	if (clazz == 'polyphen_probably_damaging') {
 	         		return "#ad494A";
@@ -834,15 +842,15 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 
 MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", options ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
+	         .attr("transform", options && options.transform ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", options ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
+	         .attr("width", options  && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
 	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
-				var clazz = options ? options.clazz : selection.datum().clazz;
+				var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
 
 	         	if (clazz == 'sift_deleterious') {
 	         		return "#ad494A";
@@ -1038,32 +1046,32 @@ MatrixCard.prototype.showHomSymbol = function (selection, options) {
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(0,0)")
+	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options ? options.width : "20")
-	         .attr("height", options ? options.height : "20")
+	         .attr("width", options && options.width ? options.width : "20")
+	         .attr("height", options && options.width ? options.height : "20")
 	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(-1,0)")
+	         .attr("transform", options && options.transform ? options.transform : "translate(-1,0)")
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", options ? options.width : "20")
-	         .attr("height", options ? options.height : "20")
+	         .attr("width", options && options.width ? options.width : "20")
+	         .attr("height", options && options.height ? options.height : "20")
 	         .style("pointer-events", "none");
 	
 };
 
 MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(0,0)")
+	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options ? options.width : "20")
-	         .attr("height", options ? options.height : "20")
+	         .attr("width", options && options.width ? options.width : "20")
+	         .attr("height", options && options.height ? options.height : "20")
 	         .style("pointer-events", "none");
 
 	selection.append("line")
@@ -1076,6 +1084,18 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 
 
 };
+
+MatrixCard.prototype.showTextSymbol = function (selection, options) {
+	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)"
+	selection.append("g")
+	         .attr("transform", translate)
+	         .append("text")
+	         .attr("x", 0)
+	         .attr("y", 11)
+	         .text(selection.datum().value);
+	
+};
+
 
 
 MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
@@ -1164,7 +1184,7 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 
 }
 
-MatrixCard.prototype.showImpactSymbol = function(selection) {
+MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
 	var symbolScale = d3.scale.linear()
@@ -1172,10 +1192,14 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
                     .range([10,40]);
 
     var symbolSize = symbolScale(6);
+
+    var translate       = options && options.cellSize > 18 ?  "translate(7,5)" : "translate(4,4)" ; 
+
+    var translateSymbol = options && options.cellSize > 18 ?  "translate(10,10)" : "translate(8,8)";
      
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
-		         .attr("transform", "translate(4,4)")
+		         .attr("transform", translate)
 		         .append("rect")
 		         .attr("width", 8)
 		         .attr("height", 8)
@@ -1184,7 +1208,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection) {
 	} else {
 		selection
 		  .append("g")
-		  .attr("transform", "translate(8,8)")
+		  .attr("transform", translateSymbol)
 		  .append('path')
           .attr("d", function(d,i) { 
           	return d3.svg

@@ -1205,7 +1205,12 @@ var effectCategories = [
         if (rec.pos && rec.id) {
           var alts = [];
           if(rec.alt.indexOf(',') > -1) {
-            alts = rec.alt.split(",");
+            // Done split apart multiple alt alleles for education edition
+            if (isLevelEdu) {
+              alts.push(rec.alt);
+            } else {
+              alts = rec.alt.split(",");
+            }
           } else {
             alts.push(rec.alt);
           }
@@ -1701,7 +1706,31 @@ var effectCategories = [
               }
               var tokens = genotypeForSample.split(delim);
               if (tokens.length == 2) {
-                if (tokens[0] == gtNumber || tokens[1] == gtNumber) {
+                if (isLevelEdu && alt.indexOf(",") > 0) {
+                  if ((tokens[0] == 1 ) && (tokens[1] == 2)) {
+                    keepAlt = true;
+                  } if ((tokens[0] == 2 ) && (tokens[1] == 2)) {
+                    keepAlt = true;
+                    theAltIdx = tokens[0] - 1;
+                    alt = alt.split(',')[theAltIdx] + ',' + alt.split(',')[theAltIdx];
+                  } else if (tokens[0] == 0 && tokens[1] != 0) {
+                    var theAltIdx = +tokens[1] - 1;
+                    alt = alt.split(',')[theAltIdx]
+                  } else if (tokens[1] == 0 && tokens[0] != 0) {
+                    var theAltIdx = +tokens[0] - 1;
+                    alt = alt.split(',')[theAltIdx]
+                  } 
+                  if (keepAlt) {
+                    if (tokens[0] == tokens[1]) {
+                      zygosity = "HOM";
+                      homCount++;
+                    } else {
+                      zygosity = "HET";
+                      hetCount++;
+                    }                    
+                  }
+
+                } else if (tokens[0] == gtNumber || tokens[1] == gtNumber) {
                   keepAlt = true;
                   if (tokens[0] == tokens[1]) {
                     zygosity = "HOM";
@@ -1726,6 +1755,22 @@ var effectCategories = [
             genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[gtIndex], ",");
             genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtIndex];
             genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtIndex];
+
+            var eduGenotype = "";
+            if (isLevelEdu) {
+              if (alt.indexOf(",") > 0) {
+                alt.split(",").forEach( function(altToken) {
+                  if (eduGenotype.length > 0) {
+                    eduGenotype += " ";
+                  }
+                  eduGenotype += altToken;
+                });
+              } else if (zygosity == "HET") {
+                eduGenotype = rec.ref + " " + alt;
+              } else if (zygosity == "HOM") {
+                eduGenotype = alt + " " + alt;
+              }
+            }
 
 
             // Get rid of the left most anchor base for insertions and
@@ -1838,6 +1883,7 @@ var effectCategories = [
                 'genotypeAltReverseCount' : genotypeAltReverseCountForSample,
                 'genotypeRefForwardCount' : genotypeRefForwardCountForSample,
                 'genotypeRefReverseCount' : genotypeRefReverseCountForSample,
+                'eduGenotype' : eduGenotype,
                 'zygosity': zygosity ? zygosity : 'gt_unknown', 
                 'phased': phased,
                 'effect': effects, 

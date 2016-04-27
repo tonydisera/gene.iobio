@@ -279,7 +279,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 	// Replace semicolon with a colon (semicolon causes term to be truncated)
 	searchTerms = searchTerms.split(";").join("\\");
 
-	var url = phenolyzerServer + '?term=%22' + searchTerms + '%22';
+	var url = phenolyzerServer + '?term=' + searchTerms;
 	d3.select('#phenolyzer-results svg').remove();
    	phenolyzerGenes = [];
 
