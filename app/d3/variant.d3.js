@@ -443,6 +443,8 @@ function variantD3() {
 
       // update 
       if (showTransition) {
+        var interval = 1000 / data[0].features.length;
+
         track.transition()
             .duration(1000)
             .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
@@ -451,6 +453,8 @@ function variantD3() {
         track.selectAll('.variant.snp, .variant.mnp').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
             .transition()        
               .duration(1000)
+              .delay(function(d, i) { return i * interval; })
+              .ease("bounce")
               .attr('x', function(d) { 
                 return d3.round(x(d.start) - (minWidth/2) + (minWidth/4));
               })
@@ -467,6 +471,8 @@ function variantD3() {
         trackindel.selectAll('.variant.del')
             .transition()  
               .duration(1000) 
+              .delay(function(d, i) { return i * interval; })
+              .ease("bounce")
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
@@ -483,6 +489,8 @@ function variantD3() {
         trackindel.selectAll('.variant.ins')
             .transition()                 
               .duration(1000)  
+              .delay(function(d, i) { return i * interval; })
+              .ease("bounce")
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
@@ -498,7 +506,8 @@ function variantD3() {
 
           trackindel.selectAll('.variant.complex')
             .transition()                 
-              .duration(1000)  
+              .duration(1000)
+              .delay(function(d, i) { return i * interval; })  
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
