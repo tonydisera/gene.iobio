@@ -31,10 +31,12 @@ var dev_iobio_services    = "http://nv-dev.iobio.io/";
 
 var global_iobio_services = prod_iobio_services;
 
-var geneiobio_server   = global_iobio_services + "geneinfo";
-var geneToPhenoServer  = global_iobio_services + "gene2pheno";
-var hpoServer          = global_iobio_services + "hpo";
-var phenolyzerServer   = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
+var geneiobio_server     = global_iobio_services + "geneinfo";
+var geneToPhenoServer    = global_iobio_services + "gene2pheno";
+var hpoServer            = global_iobio_services + "hpo";
+var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
+var phenolyzerOnlyServer = global_iobio_services + "phenolyzer/"
+var NUMBER_PHENOLYZER_GENES = 300;
 
 
 // Engine for gene search suggestions

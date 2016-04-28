@@ -785,6 +785,10 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 		clazz = selection.datum().clazz;
 	}
 
+	if (transform == null || transform == "") {
+		transform = "translate(2,1)";
+	}
+
 	selection.append("g")
 	         .attr("transform", transform)
 	         .append("use")
@@ -827,8 +831,8 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
-	         .attr("height", options && options.height ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "14"))
+	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "13"))
+	         .attr("height", options && options.height ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "13"))
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 	         	var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
