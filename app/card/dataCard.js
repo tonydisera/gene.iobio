@@ -111,7 +111,7 @@ function DataCard() {
 			father:  'sample2' 
 		},
 		{
-			proband: 'sample3',
+			proband: 'sample2',
 			mother:  'sample1', 
 			father:  'sample2' 
 		},

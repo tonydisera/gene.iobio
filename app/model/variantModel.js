@@ -1224,7 +1224,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			    	return me.vcf.promiseGetClinvarRecords(
 			    		theVcfData, 
 			    		me._stripRefName(ref), geneObject.start, geneObject.end, 
-			    		me._refreshVariantsWithClinvar.bind(me, theVcfData));
+			    		isLevelEdu ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {
 		    		// We bypass getting clinvar records for unaffected siblings
@@ -1525,6 +1525,81 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 }
 
 
+VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData, clinvarVariants) {	
+	var me = this;
+	if (theVcfData == null) {
+		return;
+	}
+
+	var parseClinvarInfo = function(variant, clinvarVariant) {		
+		clinvarCodes = {
+			'0':   'not_provided',
+			'1':   'not_provided',
+			'2':   'benign',
+			'3':   'likely_benign',
+			'4':   'likely_pathogenic',
+			'5':   'pathogenic',
+			'6':   'drug_response',
+			'7':   'other',
+			'255': 'other'
+		};
+		clinvarVariant.info.split(";").forEach( function (annotToken) {
+			if (annotToken.indexOf("CLNSIG=") == 0) {
+            	var clinvarCode = annotToken.substring(7, annotToken.length);  
+            	variant.clinVarClinicalSignificance = {};
+            	clinvarCode.split("|").forEach(function(code) {
+	            	clinvarToken = clinvarCodes[code];
+	            	var mapEntry = matrixCard.clinvarMap[clinvarToken];
+					if (mapEntry != null) {
+						if (variant.clinvarRank == null || 
+							mapEntry.value < variant.clinvarRank) {
+							variant.clinvarRank = mapEntry.value;
+							variant.clinvar = mapEntry.clazz;
+						}
+						variant.clinVarClinicalSignificance[clinvarToken] = "Y";
+					}	
+
+            	})
+            } else if (annotToken.indexOf("CLNDBN=") == 0) {
+            	phenotypes = annotToken.substring(7, annotToken.length);  
+            	variant.clinVarPhenotype = {};
+            	phenotypes.split("|").forEach(function(phenotype) {
+            		
+            		variant.clinVarPhenotype[phenotype] = "Y";
+            	})
+            }       
+		})
+	}
+
+	var loadClinvarProperties = function(recs) {
+		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarVariants.length; null) {
+
+			var clinvarVariant = clinvarVariants[clinvarIter];
+			
+			// compare curr variant and curr clinVar record
+			if (recs[vcfIter].start == +clinvarVariant.pos) {			
+				// add clinVar info to variant if it matches
+				if (recs[vcfIter].alt == clinvarVariant.alt &&
+					recs[vcfIter].ref == clinvarVariant.ref) {
+					parseClinvarInfo(recs[vcfIter], clinvarVariant);
+				}
+				vcfIter++;
+				clinvarIter++;
+			} else if (recs[vcfIter].start < +clinvarVariant.pos) {						
+				vcfIter++;
+			} else {
+				clinvarIter++;
+			}
+		}
+	}
+
+	// Load the clinvar info for the variants loaded from the vcf	
+	var sortedFeatures = theVcfData.features.sort(orderVariantsByPosition);
+	loadClinvarProperties(sortedFeatures);
+
+}
+
+
 VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {		
 	variant.clinVarUid = clinvar.uid;
 
@@ -1713,7 +1788,8 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 			    		return me.vcf.promiseGetClinvarRecords(
 						    		me.fbData, 
 						    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
-						    		me._refreshVariantsWithClinvar.bind(me, theVcfData));
+						    		isLevelEdu ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+
 
 
 

@@ -939,22 +939,132 @@ var effectCategories = [
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
         
-        me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
-        .then(  function() {
-          resolve(theVcfData);
-        }, function(error) {
-          reject();
-        });
+        if (isLevelEdu) {
+          me.promiseLocalGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
+          .then(  function() {
+            resolve(theVcfData);
+          }, function(error) {
+            reject();
+          });
+
+        } else {
+          me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
+          .then(  function() {
+            resolve(theVcfData);
+          }, function(error) {
+            reject();
+          });
+
+        }
       }
 
     });
   }  
+
+  // For exhibit (no internet)
+  // NEW
+  exports.promiseLocalGetClinvarRecordsImpl = function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
+    var me = this;
+
+    return new Promise( function(resolve, reject) {
+
+      me.clinvarIterCount++;
+      var isFinal = false;
+      if (me.clinvarIterCount == numberOfBatches) {
+          isFinal = true;
+      }
+
+      var vcfURL = "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz"
+
+      var tabix = iobio_services + "tabix/"
+
+      var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
+      var tabixUrl   = tabix + "?cmd=-h " + vcfURL + regionParm + '&protocol=http&encoding=utf8';
+
+      // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
+      var url = encodeURI(tabixUrl);
+      var server = tabix;
+      
+      // Connect to the vep server    
+      var client = BinaryClient(server);
+      
+      var clinvarData = "";
+      client.on('open', function(stream){
+
+          // Run the command
+          var stream = client.createStream({event:'run', params : {'url':url}});
+
+          //
+          // listen for stream data (the output) event. 
+          //
+          stream.on('data', function(data, options) {
+             if (data == undefined) {
+                return;
+             } 
+             clinvarData += data;
+          });
+
+          //
+          // listen for stream data (the output) event. 
+          //
+          stream.on('error', function(data, options) {
+             console.log(data);
+             reject("unable to get clinvar vcf records");
+          });
+
+          // Whenall of the annotated vcf data has been returned, call
+          // the callback function.
+          stream.on('end', function() {
+            var clinvarRecs = clinvarData.split("\n");
+            var vcfObjects = [];
+            
+            clinvarRecs.forEach(function(record) {
+              if (record.charAt(0) == "#") {
+                
+              } else {
+
+                // Parse the vcf record into its fields
+                var fields = record.split('\t');
+                var pos    = fields[1];
+                var id     = fields[2];
+                var ref    = fields[3];
+                var alt    = fields[4];
+                var qual   = fields[5];
+                var filter = fields[6];
+                var info   = fields[7];
+                var format = fields[8];
+                var genotypes = [];
+                for (var i = 9; i < fields.length; i++) {
+                  genotypes.push(fields[i]);
+                }
+
+                // Turn vcf record into a JSON object and add it to an array
+                var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                                 'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+                vcfObjects.push(vcfObject);
+              }
+            });
+
+           
+            clinvarLoadVariantsFunction(vcfObjects);
+
+            if (isFinal) {
+              resolve();
+            }
+
+          }); // end - stream.end()
+      });  // end - client.open()
+
+    });
+
+  }
 
   // NEW
   exports.promiseGetClinvarRecordsImpl = function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
+
 
       // Multiallelic input vcf records were assigned a number submission
       // index.  Create a map that ties the vcf record number to the
