@@ -529,7 +529,7 @@ VariantCard.prototype.clearWarnings = function() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataLoaded, callbackVariantsDisplayed) {
+VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 	var me = this;
 	
 	// Reset any previous locked variant
@@ -611,15 +611,9 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz, callbackDataL
 			regionEnd, 
 			function() {	
 				me._showBamDepth( regionStart, regionEnd );
-				if (callbackDataLoaded) {
-					callbackDataLoaded(me);
-				};
+				readjustCards();
 			},
-			function() {
-			  	if (callbackVariantsDisplayed) {
-			  		callbackVariantsDisplayed(me);
-			  	}
-			 });
+			true);
 
 	}
 }
@@ -771,7 +765,7 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd) {
 
 
 
-VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData, onVariantsDisplayed) {
+VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData) {
 	var me = this;
 
 	if (theVcfData == null) {
@@ -804,7 +798,7 @@ VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData, onVari
 
 
 			me.endVariantProgress();
-			me._showVariants(regionStart, regionEnd, null, onVariantsDisplayed);
+			me._showVariants(regionStart, regionEnd, null, false);
 
 
 			// Refresh the feature matrix after clinvar AND the coverage has
@@ -838,7 +832,7 @@ VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data) {
 }
 
 
-VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData, onVariantsDisplayed, bypassTransition) {
+VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition) {
 	var me = this;
 
 	if (!this.model.isVcfReadyToLoad()) {
@@ -886,23 +880,25 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 			me.cardSelector.find('#gene-box').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
 
-			me._fillVariantChart(filteredVcfData, 
-	  							 regionStart ? regionStart : window.gene.start, 
-	  							 regionEnd ? regionEnd : window.gene.end,
-	  							 false,
-	  							 bypassTransition);
+			if (me.getRelationship() != 'proband') {
+				me._fillVariantChart(filteredVcfData, 
+		  							 regionStart ? regionStart : window.gene.start, 
+		  							 regionEnd ? regionEnd : window.gene.end,
+		  							 false,
+		  							 showTransition);  // Don't show transitions for mother and father				
+			}
 
-			promiseDetermineInheritance(null, onVariantsDisplayed).then(function() {
+			promiseDetermineInheritance().then(function() {
 				
 				filterCard.enableVariantFilters(true);
 				filterCard.enableClinvarFilters(theVcfData);
 				
 
-	  			me._fillVariantChart(filteredVcfData, 
+	  			getProbandVariantCard()._fillVariantChart(filteredVcfData, 
 	  								 regionStart ? regionStart : window.gene.start, 
 	  								 regionEnd ? regionEnd : window.gene.end,
 	  								 false,
-	  								 true  // we have already loaded the chart; bypass showing variant's 'falling'
+	  								 showTransition  // this is where we show the transition unless we have already done so
 	  								 );
 
 	  			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
@@ -912,9 +908,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 										   regionEnd ? regionEnd : window.gene.end);
 				}	
 
-				if (onVariantsDisplayed) {
-					onVariantsDisplayed();
-				}
+				
 
 			}, function(error) {
 				console.log("an error occurred when determine inheritance. " + error);
@@ -922,8 +916,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 			
 		}
-		if (onVcfData) {
-	   	    onVcfData();
+		if (onVariantsDisplayed) {
+	   	    onVariantsDisplayed();
    	    }
    	    if (me.getRelationship() == 'proband') {
 	   	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
@@ -956,18 +950,18 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 					// don't have clinvar annotations nor coverage
 					// Here we call this method again and since we
 					// have vcf data, the variant chart will be filled
-					me._showVariants(regionStart ? regionStart : window.gene.start, 
-									 regionEnd ? regionEnd : window.gene.end,
-									 onVcfData,
-									 onVariantsDisplayed);	
+					//me._showVariants(regionStart ? regionStart : window.gene.start, 
+					//				 regionEnd ? regionEnd : window.gene.end,
+					//				 onVcfData,
+					//				 onVariantsDisplayed);	
 					filterCard.enableVariantFilters(true);
 
 					filterCard.autoSetFilters();
 						
 				}
-				if (onVcfData) {
-				    onVcfData();
-			    }
+				//if (onVcfData) {
+				 //   onVcfData();
+			    //}
 				
 			}).then ( function(data) {
 				// After clinvar data retrieved...
@@ -989,7 +983,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 					// have vcf data, the variant chart will be filled
 		  			me._showVariants(regionStart ? regionStart : window.gene.start, 
 									 regionEnd ? regionEnd : window.gene.end,
-									 onVcfData,
 									 onVariantsDisplayed,
 									 true);
 
@@ -1060,7 +1053,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVcfData
 
 
 
-VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd, bypassFeatureMatrix, bypassTransition) {
+VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd, bypassFeatureMatrix, showTransition) {
 	
 	if (bypassFeatureMatrix == null) {
 		bypassFeatureMatrix = false;
@@ -1097,7 +1090,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
 	// Load the chart with the new data
 	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);    
-	this.vcfChart.showTransition(!bypassTransition);
+	this.vcfChart.showTransition(showTransition);
     this.vcfChart(selection);
 
 
@@ -1316,7 +1309,7 @@ VariantCard.prototype.filterVariants = function(theVcfData) {
 	if (this.model.isVcfLoaded()) {
 		var data = theVcfData ? theVcfData : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		var filteredVcfData = this._filterVariants(data, this.vcfChart);
-		this._fillVariantChart(filteredVcfData, regionStart, regionEnd);	
+		this._fillVariantChart(filteredVcfData, regionStart, regionEnd, false);	
 		return filteredVcfData;
 	} else {
 		return null;
@@ -1665,7 +1658,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		y -= $('#nav-edu-tour').outerHeight();
 	}
 
-    if (x < w) {
+    if (x < w + 50) {
     	tooltip.classed("left-arrow", true);
 		tooltip.classed("right-arrow", false);
 		tooltip.style("width", w + "px")
@@ -1992,12 +1985,12 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) {
 	if (this.model.getBamDataForGene(window.gene) != null) {
 		var bamDepth = null;
-		if (sourceVariantCard == this && variant.genotypeDepth != null && variant.genotypeDepth != '') {
-			bamDepth = variant.genotypeDepth;
+		if (sourceVariantCard == this && variant.bamDepth != null && variant.bamDepth != '') {
+			bamDepth = variant.bamDepth;
 		} else {
 			var matchingVariant = this.model.getMatchingVariant(variant);
 			if (matchingVariant != null) {
-				bamDepth = matchingVariant.genotypeDepth;
+				bamDepth = matchingVariant.bamDepth;
 			}
 		}
 		this.bamDepthChart.showCircle()(variant.start, bamDepth);

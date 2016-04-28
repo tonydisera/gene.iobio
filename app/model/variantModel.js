@@ -1463,7 +1463,7 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, cover
 				var coverageStart = coverageRow[0];
 				var coverageDepth = coverageRow[1];
 
-				// compare curr variant and curr clinVar record
+				// compare curr variant and curr coverage record
 				if (recs[vcfIter].start == coverageStart) {			
 					recs[vcfIter].bamDepth = +coverageDepth;
 					vcfIter++;

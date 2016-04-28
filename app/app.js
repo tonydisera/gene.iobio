@@ -1063,10 +1063,7 @@ function loadUrlSources() {
 			}
 		}
 
-		loadTracksForGene( false, function() {
-
-
-		});
+		loadTracksForGene( false );
 	} else {
 		//showDataDialog();
 	}
@@ -1667,7 +1664,7 @@ function loadGeneWidget() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVariantsDisplayed) {
+function loadTracksForGene(bypassVariantCards) {
 
 	if (window.gene == null || window.gene == "") {
 		$('.twitter-typeahead').animateIt('tada');
@@ -1790,20 +1787,7 @@ function loadTracksForGene(bypassVariantCards, callbackDataLoaded, callbackVaria
 	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
 				variantCard.hide();
 			} else {
-			 	variantCard.loadTracksForGene(filterCard.classifyByImpact, 
-			 		function(theVariantCard) {		
-				 		if (callbackDataLoaded) {
-				 			callbackDataLoaded(theVariantCard);
-				 		}	 		
-				 	},
-			 		function(theVariantCard) {
-			 			if (theVariantCard.getRelationship() == 'proband') {
-			 				readjustCards();
-			 			}
-			 			if (callbackVariantsDisplayed) {
-				 			callbackVariantsDisplayed(theVariantCard);
-				 		}	 		
-			 		});
+			 	variantCard.loadTracksForGene(filterCard.classifyByImpact);
 			}
 		});
 	}
@@ -2003,7 +1987,7 @@ function loadSibs(sibs, affectedStatus) {
  *  highest total (alt + ref) allele count.
  *
  */
-function promiseDetermineInheritance(promise, onVariantsDisplayed) {	
+function promiseDetermineInheritance(promise) {	
 
 	return new Promise( function(resolve, reject) {
 		var thePromise = null;
@@ -2060,7 +2044,7 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 							$("#matrix-panel .loader").addClass("hide");
 						    $("#matrix-panel .loader .loader-label").text("Ranking variants");
 							$("#feature-matrix-note").removeClass("hide");
-							probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);
+							probandVariantCard.refreshVariantChartAndMatrix();
 
 							resolve();
 
@@ -2073,7 +2057,7 @@ function promiseDetermineInheritance(promise, onVariantsDisplayed) {
 
 					probandVariantCard.populateEffectFilters();
 					
-					probandVariantCard.refreshVariantChartAndMatrix(null, onVariantsDisplayed);	
+					probandVariantCard.refreshVariantChartAndMatrix();	
 
 					$("#matrix-panel .loader").addClass("hide");
 					$("#feature-matrix-note").removeClass("hide");
