@@ -557,6 +557,13 @@ function initializeTours() {
 			'handle_doc_switch': function(currentTour, prevTour) {
 			}
 	    }); 
+
+
+	    if (eduTourNumber == "1") {
+	    	pageGuideEduTour1.open();
+	    } else if (eduTourNumber = "2") {
+	    	pageGuideEduTour2.open();	    	
+	    }
 	}
 
 }

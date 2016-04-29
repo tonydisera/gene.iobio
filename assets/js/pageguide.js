@@ -123,15 +123,15 @@ tl.pg.interval = {};
         '<div id="tlyPageGuideWrapper">' +
             '<div id="tlyPageGuideOverlay"></div>' +
             '<div id="tlyPageGuideMessages">' +
+                '<div class="pageguide-nav">' +
+                    '<a href="#" id="pageguide-prev-button" class="pageguide-prev" title="Prev step">back&nbsp;</a>' +
+                    '<a href="#" id="pageguide-next-button" class="pageguide-next" title="Next step">next&nbsp;&nbsp;</a>' +
+                    '<a href="#" id="pageguide-close-button" class="pageguide-close" title="Close">close</a>' +
+                '</div>' +
                 //'<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
                 '<a href="#" id="page-guide-listen-button" class="hide tlypageguide_listen" title="Listen to instructions">listen</a>' + // added audio
                 '<span class="tlypageguide_index"></span>' +
                 '<div class="tlypageguide_text"></div>' +
-                '<div class="pageguide-nav">' +
-                    '<a href="#" id="pageguide-prev-button" class="pageguide-prev" title="Prev step">back</a>' +
-                    '<a href="#" id="pageguide-next-button" class="pageguide-next" title="Next step">next</a>' +
-                    '<a href="#" id="pageguide-close-button" class="pageguide-close" title="Close">close</a>' +
-                '</div>' +
                 //'<a href="#" class="tlypageguide_back"  title="Previous">Previous</a>' +
                 //'<a href="#" class="tlypageguide_fwd"  title="Next">Next</a>' +
             '</div>' +
