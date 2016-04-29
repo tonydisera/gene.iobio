@@ -207,7 +207,7 @@ DataCard.prototype.loadSampleData = function(relationship, name, sampleName) {
 	variantCard.setSampleName(sampleName);
 
 
-	clearCache();
+	//clearCache();
 	window.loadTracksForGene();		
 }
 

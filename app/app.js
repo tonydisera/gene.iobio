@@ -7,6 +7,7 @@
 * a simplified interface and logic.  For running one of the special educational edition 
 * tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
 =*/
+var isOffline               = true;
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;
 var eduTourNumber           = "0";
@@ -19,7 +20,7 @@ var levelEduImpact = {
 }
 
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 200;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
+var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
 var idleTime = 0;
 var idlePrompting = false;
@@ -36,7 +37,6 @@ var geneToPhenoServer    = global_iobio_services + "gene2pheno";
 var hpoServer            = global_iobio_services + "hpo";
 var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
 var phenolyzerOnlyServer = global_iobio_services + "phenolyzer/"
-var NUMBER_PHENOLYZER_GENES = 300;
 
 
 // Engine for gene search suggestions
@@ -144,6 +144,7 @@ var pageGuide = null;
 var pageGuideBookmarks = null;
 var pageGuidePhenolyzer = null;
 var pageGuideEduTour1 = null;
+var pageGuideEduTour2 = null;
 
 
 $(document).ready(function(){
@@ -472,13 +473,13 @@ function initializeTours() {
     }
 
     var steps = {
-    	'#button-load-father-data':   {audio: '#audio-test'},
+    	'#button-load-father-data':    {audio: '#audio-test'},
     	'#phenolyzer-search-box .selectize-control.single':    {},
-    	'#gene-badge-container':       {audio: '#audio-test'},
-    	'#gene-badge-button:eq(0)':    {},
+    	'#phenolyzer-results':         {audio: '#audio-test'},
+    	'#gene-badge-container':       {},
     	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
-    	'#children-buttons':           {audio: '#audio-test'},
-    	'#jimmy-and-sarah-buttons':    {audio: '#audio-bird', close: true}
+    	'#children-buttons':           {},
+    	'.edu-tour-1-child-buttons':   {audio: '#audio-bird', close: true}
     };
  
 	// Initialize colon cancer tour
@@ -487,7 +488,8 @@ function initializeTours() {
 			'auto_refresh': true, 
 			'custom_open_button': '#show-case1-tour',
 			'steps_element': '#tourEduCase1',
-			'track_events_cb': function(interactionName) {				
+			'track_events_cb': function(interactionName) {	
+
 				for (key in steps) {
 					var step = steps[key];
 					if (step.audio) {
@@ -496,11 +498,22 @@ function initializeTours() {
 				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+				if (currentTour == '.edu-tour-1-child-buttons') {
+					$('.edu-tour-1-child-buttons .edu-tour-button:eq(0)').addClass("emphasize");
+					$('.edu-tour-1-child-buttons .edu-tour-button:eq(2)').addClass("emphasize");
+				} else {
+					$('.edu-tour-1-child-buttons .edu-tour-button').removeClass("emphasize");
+				}
 				var step = steps[currentTour];
+				if (step.dialog) {
+					$('#edu-tour-modal').modal('show');
+				} else {
+					$('#edu-tour-modal').modal("hide");
+				}
 				if (step.audio) {
 					var audioSelector = step.audio;
 					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
-					$(audioSelector)[0].play();
+					$(audioSelector)[0].play();					
 					/*
 					$('#edu-tour-modal').modal('show');
 					$(audioSelector)[0].play();
@@ -522,6 +535,8 @@ function initializeTours() {
 					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");
 					$('#page-guide-listen-button').addClass('hide');										
 				}
+
+
 
 				if (step.close) {
 					$('#pageguide-close-button').removeClass("hide");

@@ -723,6 +723,9 @@ tl.pg.interval = {};
         });
 
         /* interaction: item click */
+        // tds - comment out this code.  we don't want users to click on other
+        // steps when going through tour.  The tour should be followed sequentially.
+        /*
         self.$base.on('click', '.tlyPageGuideStepIndex', function () {
             var selector = self.hashTable[$(this).parent().data('selectorhash')];
             var target = self.targetData[selector];
@@ -730,6 +733,7 @@ tl.pg.interval = {};
             self.track_event('PG.specific_elt');
             self.show_message(index - 1);
         });
+        /*
 
         /* interaction: fwd/back click */
         self.$fwd.on('click', function() {

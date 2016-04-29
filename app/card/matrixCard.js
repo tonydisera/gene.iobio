@@ -269,6 +269,9 @@ MatrixCard.prototype.init = function() {
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
+				    	if (isLevelEdu) {
+				    		return;
+				    	}
 				    	var column = null;
 				    	var columnPrev = null;
 				    	me.filteredMatrixRows.forEach(function(col) {
@@ -286,6 +289,9 @@ MatrixCard.prototype.init = function() {
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
+				    	if (isLevelEdu) {
+				    		return;
+				    	}
 				    	var column = null;
 				    	var columnNext = null;
 				    	me.filteredMatrixRows.forEach(function(col) {
@@ -462,6 +468,15 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 				examineCard.showVariant(refreshedVariant, true);
 	        });			
 		}
+		
+		if (isLevelEduTour && eduTourNumber == "1" 
+			&& pageGuideEduTour1.cur_idx == 3
+			&& variant.vepImpact[HIGH] != "HIGH" 
+			&& variant.start == 112116592 
+			&& window.gene.gene_name == 'APC') {
+			pageGuideEduTour1.navigateForward();
+		}
+
 		getProbandVariantCard().unpin(true);
 	}
 

@@ -148,6 +148,14 @@
     .tooltip.level-edu .row .tooltip-title {
       font-size: 12px; }
 
+#edu-tour-modal {
+  top: 5%;
+  right: 50%;
+  outline: none; }
+
+.modal-backdrop {
+  background: transparent !important; }
+
 .track-expand {
   padding-bottom: 0px !important; }
 
@@ -192,6 +200,8 @@
       padding-bottom: 3px;
       padding-right: 0px !important;
       float: none !important; }
+    #nav-edu-tour .edu-tour-button.emphasize {
+      background-color: #a5b941 !important; }
 
 .tlypageguide_shadow {
   background-color: rgba(255, 255, 255, 0) !important;

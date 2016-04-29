@@ -939,8 +939,8 @@ var effectCategories = [
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
         
-        if (isLevelEdu) {
-          me.promiseLocalGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
+        if (isOffline) {
+          me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
           .then(  function() {
             resolve(theVcfData);
           }, function(error) {
@@ -961,9 +961,9 @@ var effectCategories = [
     });
   }  
 
-  // For exhibit (no internet)
+  // When there is no internet, read the clinvar vcf to obtain clinvar annotations
   // NEW
-  exports.promiseLocalGetClinvarRecordsImpl = function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecordsOffline= function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {

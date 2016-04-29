@@ -1526,6 +1526,14 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 
+		if (isLevelEduTour && eduTourNumber == "1" 
+			&& pageGuideEduTour1.cur_idx == 3
+			&& variant.vepImpact[HIGH] != "HIGH" 
+			&& variant.start == 112116592 
+			&& window.gene.gene_name == 'APC') {
+			pageGuideEduTour1.navigateForward();
+		}
+
 		if (!isLevelEdu) {
 		    showSidebar("Examine");
 			examineCard.showVariant(variant);

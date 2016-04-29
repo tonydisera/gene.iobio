@@ -1,5 +1,8 @@
  function GenesCard() {
 	this.geneBarChart = null;
+	this.NUMBER_PHENOLYZER_GENES = 300;
+	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
+
 }
 
 GenesCard.prototype.split = function( val )  {
@@ -280,21 +283,13 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 	// Replace ; with @ to delimit different search terms
 	searchTerms = searchTerms.split(";").join("@");
 
-
-	var url = "";
-	if (isLevelEdu) {
-		url = phenolyzerOnlyServer + '?cmd=' + searchTerms;
-	} else {
-		url = phenolyzerServer + '?term=' + searchTerms;
-	}
-
 	d3.select('#phenolyzer-results svg').remove();
    	phenolyzerGenes = [];
 
-   	if (isLevelEdu) {
-		this._getPhenolyzerOnlyGenesImpl(url)
+   	if (isOffline) {
+		this._getPhenolyzerGenesOffline(searchTerms)
    	} else {
-		this._getPhenolyzerGenesImpl(url);
+		this._getPhenolyzerGenesImpl(phenolyzerServer + '?term=' + searchTerms);
    	}
 }
 
@@ -328,7 +323,7 @@ GenesCard.prototype._getPhenolyzerGenesImpl = function(url) {
 					$('#phenolyzer-heading').removeClass("hide");
 					
 					var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-					me._parsePhenolyzerData(data.record, selectedEnd);
+					me._parsePhenolyzerData(data.record, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
 					
 					me.showGenesSlideLeft();					
 
@@ -350,13 +345,13 @@ GenesCard.prototype._getPhenolyzerGenesImpl = function(url) {
 
 }
 
-GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd) {
+GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd, numberPhenolyzerGenes) {
 	var count = 0;
 	data.split("\n").forEach( function(rec) {
 		var fields = rec.split("\t");
 		if (fields.length > 2) {
 			var geneName  		         = fields[1];
-			if (count < NUMBER_PHENOLYZER_GENES) {
+			if (count < numberPhenolyzerGenes) {
 				var rank                 = fields[0];
 				var score                = fields[3];
 				var haploInsuffScore     = fields[5];
@@ -370,32 +365,57 @@ GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd) {
 	});	
 }
 
-GenesCard.prototype._getPhenolyzerOnlyGenesImpl = function(url) {
+GenesCard.prototype._getPhenolyzerGenesOffline = function(searchTerms) {
 	var me = this;
-	$.ajax( 
-		{
-			url: url,
-			error: function (xhr, ajaxOptions, thrownError) {
-				closeSlideLeft(); 
-				$('.phenolyzer.loader').addClass("hide");
-				alert("An error occurred in Phenolyzer iobio services. " + thrownError);
+	if (isLevelEduTour && searchTerms == 'colon_cancer') {
+		var data = "";
+
+		$.ajax({
+	      type: "GET",
+	      url: "http://localhost/phenolyzer/colon_cancer.txt",
+	      dataType: "text",
+	      success: function(data) {
+	      	me.showGenesSlideLeft();
+			$('.phenolyzer.loader').addClass("hide");
+			$('#phenolyzer-heading').removeClass("hide");
+			
+			var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+			me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES_OFFLINE);
+			
+			me.showGenesSlideLeft();		
+			me.refreshSelectedPhenolyzerGenes(); 	
+	      }
+	     });
+					
+
+	} else {
+		var phenolyzerUrl = phenolyzerOnlyServer + '?cmd=' + searchTerms;
+		$.ajax( 
+			{
+				url: phenolyzerUrl,
+				error: function (xhr, ajaxOptions, thrownError) {
+					closeSlideLeft(); 
+					$('.phenolyzer.loader').addClass("hide");
+					alert("An error occurred in Phenolyzer iobio services. " + thrownError);
+				}
 			}
-		}
-	  )
-	 .done(function(data) { 
+		  )
+		 .done(function(data) { 
 
- 		me.showGenesSlideLeft();
-		$('.phenolyzer.loader').addClass("hide");
-		$('#phenolyzer-heading').removeClass("hide");
-		
-		var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-		me._parsePhenolyzerData(data, selectedEnd);
-		
-		me.showGenesSlideLeft();					
+	 		me.showGenesSlideLeft();
+			$('.phenolyzer.loader').addClass("hide");
+			$('#phenolyzer-heading').removeClass("hide");
+			
+			var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+			me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
+			
+			me.showGenesSlideLeft();					
 
-		me.refreshSelectedPhenolyzerGenes(); 		
+			me.refreshSelectedPhenolyzerGenes(); 		
 
-	 });
+		 });
+	}
+
 }
 
 GenesCard.prototype.isPhenolyzerGene = function(geneName) {
