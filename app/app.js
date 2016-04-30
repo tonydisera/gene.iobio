@@ -430,6 +430,34 @@ function init() {
 	if (isLevelEduTour) {
 		checkForInactivity();
 	}
+	$("#cb1").click( function() {
+	    alert($(this).attr("checked"));
+	});
+	$("#cb1").change( function() {
+	    alert($(this).attr("checked"));
+	});
+}
+
+function onEduTour1Check(checkbox) {
+	var answer   = { "jimmy": true, "bobby": false, "sarah": true};
+	var name     = checkbox[0].id;
+	var checked  = checkbox[0].checked
+	var answerLabel = $('#' + name + "-answer");
+	// If the correct answer is "true"
+	if (answer[name] == true) {
+		if (answer[name] == checked) {
+			answerLabel.css("visibility", "visible");	
+		} else {
+			answerLabel.css("visibility", "hidden");	
+		}
+	} else {
+		if (answer[name] == checked) {
+			answerLabel.css("visibility", "hidden");	
+		} else {
+			answerLabel.css("visibility", "visible");	
+		}
+
+	}
 }
 
 function initializeTours() {
@@ -498,6 +526,14 @@ function initializeTours() {
 				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+				if (currentTour == "#children-buttons") {
+					$("#cbJimmy").click( function() {
+					    alert($(this).attr("checked"));
+					});
+					$("#cbJimmy").change( function() {
+					    alert($(this).attr("checked"));
+					});
+				}
 				if (currentTour == '.edu-tour-1-child-buttons') {
 					$('.edu-tour-1-child-buttons .edu-tour-button:eq(0)').addClass("emphasize");
 					$('.edu-tour-1-child-buttons .edu-tour-button:eq(2)').addClass("emphasize");
@@ -557,7 +593,6 @@ function initializeTours() {
 			'handle_doc_switch': function(currentTour, prevTour) {
 			}
 	    }); 
-
 
 	    if (eduTourNumber == "1") {
 	    	pageGuideEduTour1.open();

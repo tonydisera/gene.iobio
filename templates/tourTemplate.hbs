@@ -47,21 +47,32 @@
    <li class="tlypageguide_bottom" data-tourtarget="#children-buttons">
     <div>
       Examine the APC genes of each of the children. Based on what you find, recommend which children should get frequent colon cancer screenings. 
-      <div style="text-align:center;margin-top:20px;margin-bottom:20px;">
-              <label style="font-size:20px;margin-right:20px;">
-                <input type="checkbox">
-                Jimmy
-              </label>
-              <label style="font-size:20px;margin-right:20px;">
-                <input type="checkbox">
-                Bobby
-              </label>
-              <label style="font-size:20px;margin-right:20px;">
-                <input type="checkbox">
-                Sarah
-              </label>
+      <div style="text-align:center;margin-top:20px;margin-bottom:40px;">
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox" onclick="onEduTour1Check($(this))" id="jimmy">
+            <label for="jimmy" >Jimmy</label>
+        </div>
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox"  onclick="onEduTour1Check($(this))" id="bobby">
+            <label for="bobby">Bobby</label>
+         </div>
+        <div class="custom-checkbox" style="display:inline-block">
+            <input type="checkbox"  onclick="onEduTour1Check($(this))" id="sarah">
+            <label for="sarah" >Sarah</label>
+         </div>
       </div>
- 
+    
+      <div style="text-align:center;margin-top: -40px;margin-bottom:40px;">
+          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
+              <label id="jimmy-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+          </div>
+          <div style="display:inline-block;margin-right: 36px;">            
+              <label id="bobby-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+           </div>
+          <div style="display:inline-block">
+              <label id="sarah-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+           </div>
+        </div>      
     </div>
   </li>
 

@@ -217,6 +217,21 @@
 .tlypageguide-active .tlyPageGuideStepIndex {
   opacity: 1 !important; }
 
+.tlypageguide_text {
+  font-size: 18px !important; }
+  .tlypageguide_text .checkbox label {
+    font-size: 25px !important;
+    line-height: 25px !important;
+    color: #FFFFFF !important; }
+
+.edu-tour-answer {
+  color: #a5b941 !important;
+  font-size: 20px !important; }
+
+.edu-tour-answer.incorrect {
+  color: #B13A3B !important;
+  font-size: 20px !important; }
+
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
 
