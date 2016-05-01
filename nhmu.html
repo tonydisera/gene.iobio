@@ -8,22 +8,22 @@
 	<script src="assets/js/material.js"></script>
 	<script src="assets/js/ripples.js"></script>
 
-	<!-- alertify -->
-	<script src="assets/js/alertify.min.js"></script> 
-
 	<!-- bootstrap -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.css">
+
+	<!-- alertify -->
+	<script src="assets/js/alertify.min.js"></script> 
 
 	<!-- fonts -->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link href='http://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css'>
 
-	<link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
-	<link href="assets/css/ripples.min.css" rel="stylesheet">
-
 	<!-- alertify -->
 	<link rel="stylesheet" href="assets/css/alertify.min.css" />
 	<link rel="stylesheet" href="assets/css/alertify.default.min.css" />
+
+	<link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
+	<link href="assets/css/ripples.min.css" rel="stylesheet">
 
 
 	<style>
@@ -141,12 +141,10 @@
 </svg>
 <script>
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 2;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
+var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
 var idleTime = 0;
 var idlePrompting = false;
-var EXHIBIT_URL             = 'http://localhost/gene.iobio/exhibit.html'
-
 
 $(document).ready(function() {
 	$.material.init();
@@ -187,57 +185,6 @@ function stopVideo() {
 function showCaseStudy(tourNumber) {
 	var url = "http://localhost/gene.iobio?tour=" + tourNumber;
 	window.location.href = url;
-}
-
-function checkForInactivity() {
- 	//Increment the idle time counter every second.
-    var idleInterval = setInterval(timerIncrement, IDLE_INTERVAL); 
-
-    //Zero the idle timer on mouse movement.
-    $(this).mousemove(function (e) {
-        idleTime = 0;
-    });
-    $(this).keypress(function (e) {
-        idleTime = 0;
-    });	
-}
-
-function timerIncrement() {
-	if (idlePrompting) {
-		return;
-	}
-    idleTime = idleTime + 1;
-    if (idleTime > MAX_IDLE && !$('#video-container').hasClass("hide")) {
-    	idlePrompting = true; 
-    	// If the user hasn't pressed continue in the next x seconds, restart the app.
-		setTimeout(restartApp, IDLE_RESTART);  //
-
-    	
-    	//alertify.set({ buttonReverse: true });
-    	alertify.defaults.glossary.ok = "Yes, I want to continue.";
-		alertify.alert("Warning", 
-			"This app will restart in 10 seconds unless there is activity. Do you want to continue?", 
-			function () {
-				// okay
-				idleTime = 0;
-			    idlePrompting = false;
-			}			
-		 );
-
-        
-    }
-}
-
-function restartApp() {
-	if (idleTime > MAX_IDLE) {
-		//window.location.reload();
-		startOver();
-	}
-}
-
-function startOver() {
-
-	window.location.href = EXHIBIT_URL;
 }
 
 </script>
