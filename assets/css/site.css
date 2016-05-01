@@ -232,6 +232,12 @@
     line-height: 25px !important;
     color: #FFFFFF !important; }
 
+.tlypageguide_index {
+  display: none !important; }
+
+.tlypageguide-active .tlyPageGuideStepIndex {
+  color: transparent !important; }
+
 .edu-tour-answer {
   color: #a5b941 !important;
   font-size: 20px !important; }
