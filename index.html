@@ -16,10 +16,11 @@
   <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
 
 
-  <!-- material design for bootstrap library
-  <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/material.min.js"></script>
-  <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/ripples.min.js"></script>
-   -->
+  <!-- educational tour animations (adobe animate edge) -->
+  <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+  <script src="assets/js/animations/gene-model.js"></script>
+
+
 
   <!-- Bootstrap Material Design -->
   <script src="assets/js/material.js"></script>
@@ -275,10 +276,7 @@
  <div id="container" class="push" style="margin-top:-10px !important;">
 
     <div id="nav-section" class="fixed shadow-z-2">
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox" id="cb1">
-            <label for="cb1" >Jimmy</label>
-        </div>
+
 
     	<section id="app-title-section" class="nav-stretch">
         <div class="nav-left">
@@ -306,6 +304,9 @@
             Disclaimer
           </a>
         </div>
+
+
+
 
           
           <div id="gene-search-bar" class="level-edu nav-center" >
@@ -556,8 +557,10 @@
 
     </div>
 
+<div style="z-index:9999;margin: auto;text-align: center;position: absolute;bottom:10px;width: 100%;">
+        <canvas id="gene-model-animation" class="hide edu-tour-animation" width="550" height="174" style="background-color:transparent"></canvas>
 
-
+</div>
 
 <div id="tourWelcome" class="customPageGuideWelcome hide" style="text-align:center;height:170px;">
   <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
@@ -611,6 +614,8 @@
       </div>
 
     </div>
+
+
     
 </body>
 

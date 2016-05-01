@@ -176,19 +176,27 @@
   color: white !important; }
 
 #nav-edu-tour {
-  background-color: #757575 !important;
+  background-color: #1D287B;
   margin-bottom: 12px;
   display: block !important;
   height: 50px;
   width: 100%;
   text-align: center; }
+  #nav-edu-tour #start-over {
+    float: left !important;
+    margin-left: 5px !important;
+    margin-right: -190px !important;
+    font-size: 20px !important;
+    padding: 8px !important;
+    margin-top: 5px !important; }
   #nav-edu-tour .btn.btn-raised {
-    background-color: #6A94AD !important;
     color: white !important;
+    background-color: #c59d56 !important;
     margin-left: 15px !important;
     font-size: 14px !important; }
   #nav-edu-tour .card-label {
-    color: white !important; }
+    color: white !important;
+    font-size: 20px !important; }
   #nav-edu-tour .edu-tour-button {
     width: 78px; }
     #nav-edu-tour .edu-tour-button i.material-icons {

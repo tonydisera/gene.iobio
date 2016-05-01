@@ -4,13 +4,15 @@
 	</div>
 
 	<div id="edu-tour-1" class="hide">
-		<span class="card-label">Colon Cancer Screening</span>
+		<button  id="start-over" class="icon-button-sm btn btn-default btn-raised" 
+		onclick="startOver()" >
+				Return to Start
+		</button>
+
+		<span class="card-label">Hunt for cancer gene in family</span>
 
 		<span style="inline-block">
-		    <button  class="icon-button-sm btn btn-default btn-raised"  id="show-case1-tour" style="margin-right:40px !important;">
-			Start Over
-			</button>
-
+		    
 
 		    <button id="button-load-father-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
 		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.mode = 'single';dataCard.loadSampleData('proband', 'Father', 'sample2')">
@@ -53,16 +55,19 @@
 		</span>
 		<audio id="audio-test" src="https://ia802508.us.archive.org/5/items/testmp3testfile/mpthreetest.mp3" ></audio>
 		<audio id="audio-bird" src="http://www.noiseaddicts.com/samples_1w72b820/282.mp3"><audio>
+
+		
 	</div>
 
 	<div id="edu-tour-2" class="hide">
-		<span class="card-label">Warfarin Dosage</span>
+		<button  id="start-over" class="icon-button-sm btn btn-default btn-raised" 
+		onclick="startOver()" >
+				Return to Start
+		</button>
+
+		<span class="card-label">Decide how much medicine to give a patient</span>
 
 		<span style="inline-block">
-		    <button  class="icon-button-sm btn btn-default btn-raised"  id="show-case2-tour" style="margin-right:40px !important;">
-			Start Over
-			</button>
-
 
 		    <button id="button-load-john-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
 		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'John', 'sample1')">

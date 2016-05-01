@@ -12,6 +12,7 @@ var isLevelEdu              = true;  // is gene.iobio educational version, simpl
 var isLevelEduTour          = true;
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
+var EXHIBIT_URL             = 'http://localhost/gene.iobio/exhibit.html'
 var levelEduImpact = {
 	HIGH: 'Harmful',
 	MODERATE:  'Possibly harmful',
@@ -227,7 +228,7 @@ function init() {
 
 	// Clear the local cache
  	clearCache();
-
+	
 
 	$('#nav-edu-tour').append(eduTourTemplateHTML);
 	eduTourNumber = getUrlParameter("tour");
@@ -460,6 +461,24 @@ function onEduTour1Check(checkbox) {
 	}
 }
 
+function showEduTourAnimation(show, id) {
+	if (show) {
+		$('#' + id).removeClass("hide");
+		var canvas = document.getElementById(id);
+		var exportRoot = new lib.genemodel();
+
+		var stage = new createjs.Stage(canvas);
+		stage.addChild(exportRoot);
+		stage.update();
+
+		createjs.Ticker.setFPS(lib.properties.fps);
+		createjs.Ticker.addEventListener("tick", stage);	
+	} else {
+		$('.edu-tour-animation').addClass("hide");
+	}
+		
+}
+
 function initializeTours() {
     if (!isLevelEdu) {
 	    // Initialize app tour
@@ -504,6 +523,7 @@ function initializeTours() {
     	'#button-load-father-data':    {audio: '#audio-test'},
     	'#phenolyzer-search-box .selectize-control.single':    {},
     	'#phenolyzer-results':         {audio: '#audio-test'},
+    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', delay:0}},
     	'#gene-badge-container':       {},
     	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
     	'#children-buttons':           {},
@@ -518,6 +538,10 @@ function initializeTours() {
 			'steps_element': '#tourEduCase1',
 			'track_events_cb': function(interactionName) {	
 
+				if (interactionName == "PG.close") {
+					startOver();
+				}
+
 				for (key in steps) {
 					var step = steps[key];
 					if (step.audio) {
@@ -526,14 +550,8 @@ function initializeTours() {
 				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
-				if (currentTour == "#children-buttons") {
-					$("#cbJimmy").click( function() {
-					    alert($(this).attr("checked"));
-					});
-					$("#cbJimmy").change( function() {
-					    alert($(this).attr("checked"));
-					});
-				}
+
+
 				if (currentTour == '.edu-tour-1-child-buttons') {
 					$('.edu-tour-1-child-buttons .edu-tour-button:eq(0)').addClass("emphasize");
 					$('.edu-tour-1-child-buttons .edu-tour-button:eq(2)').addClass("emphasize");
@@ -541,14 +559,24 @@ function initializeTours() {
 					$('.edu-tour-1-child-buttons .edu-tour-button').removeClass("emphasize");
 				}
 				var step = steps[currentTour];
+				if (step.animation) {
+					setTimeout( function() {showEduTourAnimation(true, step.animation.name)}, step.animation.delay);
+				} else {
+					showEduTourAnimation(false);		
+				}
+				
 				if (step.dialog) {
 					$('#edu-tour-modal').modal('show');
 				} else {
 					$('#edu-tour-modal').modal("hide");
 				}
+				if (step.height) {
+					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
+				} else {
+					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");					
+				}
 				if (step.audio) {
 					var audioSelector = step.audio;
-					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
 					$(audioSelector)[0].play();					
 					/*
 					$('#edu-tour-modal').modal('show');
@@ -566,9 +594,8 @@ function initializeTours() {
 					});
 */
 
-					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
+					//$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
 				} else {
-					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");
 					$('#page-guide-listen-button').addClass('hide');										
 				}
 
@@ -2444,8 +2471,13 @@ function timerIncrement() {
 
 function restartApp() {
 	if (idleTime > MAX_IDLE) {
-		window.location.reload();
+		//window.location.reload();
+		startOver();
 	}
+}
+
+function startOver() {
+	window.location.href = EXHIBIT_URL;
 }
 
 
