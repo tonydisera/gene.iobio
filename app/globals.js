@@ -35,17 +35,17 @@ var dev_iobio_services      = "nv-dev.iobio.io/";
 var prod_iobio_services     = "services.iobio.io/";
 var self_contained_services = "frontend/"
 
-var iobio_services        = "wss://"  + (isSelfContainedServer ? self_contained_services : prod_iobio_services);
+var iobio_services        = (isSelfContainedServer ? "ws://" : "wss://")  + (isSelfContainedServer ? self_contained_services : prod_iobio_services);
 var iobio_http_services   = "http://" + (isSelfContainedServer ? self_contained_services : prod_iobio_services);
 
-var geneiobio_server     = iobio_http_services + "geneinfo";
-var geneToPhenoServer    = iobio_http_services + "gene2pheno";
-var hpoServer            = iobio_http_services + "hpo";
+var geneiobio_server     = iobio_http_services + "geneinfo/";
+var geneToPhenoServer    = iobio_http_services + "gene2pheno/";
+var hpoServer            = iobio_http_services + "hpo/";
 var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
 var phenolyzerOnlyServer = iobio_http_services + "phenolyzer/";
 
-var OFFLINE_PHENOLYZER_CACHE_URL =  "/exhibit_cache/";
-var OFFLINE_CLINVAR_VCF_URL      = isSelfContainedServer ?  "/exhibit_cache/clinvar.vcf.gz" : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
+var OFFLINE_PHENOLYZER_CACHE_URL =  "exhibit_cache/";
+var OFFLINE_CLINVAR_VCF_URL      = isSelfContainedServer ?  "exhibit_cache/clinvar.vcf.gz" : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
 
 var EXHIBIT_URL              = 'exhibit.html'
 var EXHIBIT_URL1             = 'exhibit-case-complete.html'
