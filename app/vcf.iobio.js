@@ -68,7 +68,7 @@ vcfiobio = function module() {
   var clinvarIterCount       = 0;
 
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + "od_tabix/";
+  var tabixServer            = iobio_services + isSelfContainedServer ? "tabix/" : "od_tabix/";
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
   var snpEffServer           = iobio_services + "snpeff/";
   var snpSiftServer          = iobio_services + "snpsift/";
