@@ -412,7 +412,8 @@ tl.pg.interval = {};
                 self.$content.append(
                     '<div class="tlypageguide_shadow tlypageguide_shadow' + hashCode +
                     '" data-selectorhash="' + hashCode + '">' +
-                        '<span class="tlyPageGuideStepIndex ' + positionClass +'"></span>' +
+                        '<span class="' + positionClass +'"></span>' +
+//                        '<span class="tlyPageGuideStepIndex ' + positionClass +'"></span>' +
                     '</div>'
                 );
             }
@@ -503,7 +504,7 @@ tl.pg.interval = {};
                 $el.css(style);
             }
             if (changes.index != null) {
-                $el.find('.tlyPageGuideStepIndex').text(changes.index);
+                //$el.find('.tlyPageGuideStepIndex').text(changes.index);
             }
         }
         this.changeQueue = [];
@@ -780,7 +781,7 @@ tl.pg.interval = {};
      **/
     tl.pg.PageGuide.prototype.roll_number = function (num_wrapper, new_text, left) {
         num_wrapper.animate({ 'text-indent': (left ? '' : '-') + '50px' }, 'fast', function() {
-            num_wrapper.html(new_text);
+            //num_wrapper.html(new_text);
             num_wrapper.css({ 'text-indent': (left ? '-' : '') + '50px' }, 'fast').animate({ 'text-indent': "0" }, 'fast');
         });
     };
