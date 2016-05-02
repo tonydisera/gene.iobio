@@ -18,7 +18,7 @@ var levelEduImpact = {
 	MODIFIER: 'Neutral',
 	LOW: 'Low'
 }
-var EXHIBIT_URL             = 'http://localhost/gene.iobio/exhibit.html'
+var EXHIBIT_URL             = 'exhibit.html'
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
 var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
