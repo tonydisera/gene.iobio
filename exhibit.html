@@ -31,10 +31,15 @@
 			background-color: #1D287B;
 			font-family: 'Cabin' !important;
 		}
+		#banner {
+			background-image: url("assets/images/exhibit-pattern.png"); 
+			height: 70px;
+		}
 		h1 {
 			color: white;
 			font-family: 'Cabin' !important;
 			font-size: 47px;
+			margin-top: 5px;
 		}
 		h2 {
 			color: #F3E6B2;
@@ -85,6 +90,9 @@
 </head>
 <body id="edu-tour-welcome">
 	<div id="container">
+
+		<div id="banner">
+		</div>
 		<h1 class="app">gene.iobio</h1>
 		<h2>Hunt for disease-causing genes. Decide how to treat patients.</h2>
 
@@ -145,7 +153,7 @@ var MAX_IDLE      = 2;    // After 1 minute (e.g. 3 * 20 seconds), prompt the us
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
 var idleTime = 0;
 var idlePrompting = false;
-var EXHIBIT_URL             = 'http://localhost/gene.iobio/exhibit.html'
+var EXHIBIT_URL             = 'exhibit.html'
 
 
 $(document).ready(function() {
@@ -185,7 +193,7 @@ function stopVideo() {
 	$("#stop").removeClass("disabled")
 }
 function showCaseStudy(tourNumber) {
-	var url = "http://localhost/gene.iobio?tour=" + tourNumber;
+	var url = "../gene.iobio?tour=" + tourNumber;
 	window.location.href = url;
 }
 
