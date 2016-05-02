@@ -367,12 +367,12 @@ GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd, numberPhe
 
 GenesCard.prototype._getPhenolyzerGenesOffline = function(searchTerms) {
 	var me = this;
-	if (isLevelEduTour && searchTerms == 'colon_cancer') {
 		var data = "";
 
-		$.ajax({
+		$.ajax(
+		{
 	      type: "GET",
-	      url: "../../exhibit_cache/colon_cancer.txt",
+	      url: OFFLINE_PHENOLYZER_CACHE_URL + searchTerms.split(' ').join("_") + '.txt',
 	      dataType: "text",
 	      success: function(data) {
 	      	me.showGenesSlideLeft();
@@ -384,37 +384,39 @@ GenesCard.prototype._getPhenolyzerGenesOffline = function(searchTerms) {
 			
 			me.showGenesSlideLeft();		
 			me.refreshSelectedPhenolyzerGenes(); 	
-	      }
-	     });
+	     },
+	     error: function(error) {
+
+			var phenolyzerUrl = phenolyzerOnlyServer + '?cmd=' + searchTerms;
+			$.ajax( 
+				{
+					url: phenolyzerUrl,
+					error: function (xhr, ajaxOptions, thrownError) {
+						closeSlideLeft(); 
+						$('.phenolyzer.loader').addClass("hide");
+						alert("An error occurred in Phenolyzer iobio services. " + thrownError);
+					}
+				}
+			  )
+			 .done(function(data) { 
+
+		 		me.showGenesSlideLeft();
+				$('.phenolyzer.loader').addClass("hide");
+				$('#phenolyzer-heading').removeClass("hide");
+				
+				var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+				me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
+				
+				me.showGenesSlideLeft();					
+
+				me.refreshSelectedPhenolyzerGenes(); 		
+
+			});
+		 }
+		 });
 					
 
-	} else {
-		var phenolyzerUrl = phenolyzerOnlyServer + '?cmd=' + searchTerms;
-		$.ajax( 
-			{
-				url: phenolyzerUrl,
-				error: function (xhr, ajaxOptions, thrownError) {
-					closeSlideLeft(); 
-					$('.phenolyzer.loader').addClass("hide");
-					alert("An error occurred in Phenolyzer iobio services. " + thrownError);
-				}
-			}
-		  )
-		 .done(function(data) { 
 
-	 		me.showGenesSlideLeft();
-			$('.phenolyzer.loader').addClass("hide");
-			$('#phenolyzer-heading').removeClass("hide");
-			
-			var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-			me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
-			
-			me.showGenesSlideLeft();					
-
-			me.refreshSelectedPhenolyzerGenes(); 		
-
-		 });
-	}
 
 }
 

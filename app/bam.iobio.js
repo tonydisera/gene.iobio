@@ -25,22 +25,16 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {};
 
-      this.stage_iobio_services = "wss://nv-green.iobio.io/";
-      this.prod_iobio_services  = "wss://services.iobio.io/";
-      this.dev_iobio_services   = "ws://nv-dev.iobio.io/";
-
-      this.iobio.services = this.prod_iobio_services;
-
-      this.iobio.coverage       = this.dev_iobio_services + "coverage/ ";
-      this.iobio.bamtools       = this.iobio.services + "bamtools";
-      this.iobio.samtools       = this.iobio.services + "od_samtools";
-      this.iobio.bamReadDepther = this.iobio.services + "bamReadDepther";
-      this.iobio.bamMerger      = this.iobio.services + "bammerger";      
-      this.iobio.bamstatsAlive  = this.iobio.services + "bamstatsalive"
-      this.iobio.freebayes      = this.iobio.services + "freebayes";
-      this.iobio.bcftools       = this.iobio.services + "bcftools";
-      this.iobio.vcflib         = this.iobio.services + "vcflib";
-      this.iobio.vt             = this.iobio.services + "vt";
+      this.iobio.coverage       = iobio_services + "coverage/ ";
+      this.iobio.bamtools       = iobio_services + "bamtools";
+      this.iobio.samtools       = iobio_services + "od_samtools";
+      this.iobio.bamReadDepther = iobio_services + "bamReadDepther";
+      this.iobio.bamMerger      = iobio_services + "bammerger";      
+      this.iobio.bamstatsAlive  = iobio_services + "bamstatsalive"
+      this.iobio.freebayes      = iobio_services + "freebayes";
+      this.iobio.bcftools       = iobio_services + "bcftools";
+      this.iobio.vcflib         = iobio_services + "vcflib";
+      this.iobio.vt             = iobio_services + "vt";
 
       return this;
    },

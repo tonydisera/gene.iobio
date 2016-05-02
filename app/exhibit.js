@@ -1,11 +1,3 @@
-var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 40;    // After 2 minute (e.g. 3 * 40 seconds), prompt the user about inactivity
-var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
-var idleTime = 0;
-var idlePrompting = false;
-var EXHIBIT_URL             = 'exhibit.html'
-
-
 $(document).ready(function() {
 	$.material.init();
 	$("#exhibit-video").on("ended", function() {
@@ -19,7 +11,7 @@ function showVideo() {
 	$('#video-container').removeClass('hide');
 	$('#start-here').addClass('hide');
 	$('h1').addClass('hide');
-	$('h2').addClass('hide');
+	$('h3').addClass('hide');
 	playVideo();
 }
 function hideVideo() {

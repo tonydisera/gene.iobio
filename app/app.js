@@ -2,44 +2,6 @@
 // Global Variables
 //
 
-/*
-* These variables control special behavior for running gene.iobio education edition, with
-* a simplified interface and logic.  For running one of the special educational edition 
-* tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
-=*/
-var isOffline               = true;
-var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
-var isLevelEduTour          = true;
-var eduTourNumber           = "0";
-var eduTourShowPhenolyzer   = [true, false];
-var levelEduImpact = {
-	HIGH: 'Harmful',
-	MODERATE:  'Possibly harmful',
-	MODIFIER: 'Neutral',
-	LOW: 'Low'
-}
-var EXHIBIT_URL              = 'exhibit.html'
-var EXHIBIT_URL1             = 'exhibit-case-complete.html'
-var EXHIBIT_URL2             = 'exhibit-cases-complete.html'
-var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
-var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
-var idleTime = 0;
-var idlePrompting = false;
-
-
-var stage_iobio_services  = "http://nv-green.iobio.io/";
-var prod_iobio_services   = "http://services.iobio.io/";
-var dev_iobio_services    = "http://nv-dev.iobio.io/";
-
-var global_iobio_services = prod_iobio_services;
-
-var geneiobio_server     = global_iobio_services + "geneinfo";
-var geneToPhenoServer    = global_iobio_services + "gene2pheno";
-var hpoServer            = global_iobio_services + "hpo";
-var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
-var phenolyzerOnlyServer = global_iobio_services + "phenolyzer/"
-
 
 // Engine for gene search suggestions
 var gene_engine = new Bloodhound({

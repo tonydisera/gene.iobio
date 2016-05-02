@@ -67,12 +67,6 @@ vcfiobio = function module() {
 
   var clinvarIterCount       = 0;
 
-  var stage_iobio_services = "wss://nv-green.iobio.io/";
-  var prod_iobio_services = "wss://services.iobio.io/";
-  var dev_iobio_services = "ws://nv-dev.iobio.io/";
-
-  var iobio_services = prod_iobio_services;
-
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
   var tabixServer            = iobio_services + "od_tabix/";
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
@@ -974,7 +968,7 @@ var effectCategories = [
           isFinal = true;
       }
 
-      var vcfURL = "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz"
+      var vcfURL = OFFLINE_CLINVAR_VCF_URL;
 
       var tabix = iobio_services + "tabix/"
 
