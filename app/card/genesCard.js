@@ -1,4 +1,4 @@
- function GenesCard() {
+function GenesCard() {
 	this.geneBarChart = null;
 	this.NUMBER_PHENOLYZER_GENES = 300;
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
@@ -372,7 +372,7 @@ GenesCard.prototype._getPhenolyzerGenesOffline = function(searchTerms) {
 
 		$.ajax({
 	      type: "GET",
-	      url: "http://localhost/phenolyzer/colon_cancer.txt",
+	      url: "../../exhibit_cache/colon_cancer.txt",
 	      dataType: "text",
 	      success: function(data) {
 	      	me.showGenesSlideLeft();
