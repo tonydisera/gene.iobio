@@ -45,7 +45,7 @@ var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.c
 var phenolyzerOnlyServer = iobio_http_services + "phenolyzer/";
 
 var OFFLINE_PHENOLYZER_CACHE_URL =  "exhibit_cache/";
-var OFFLINE_CLINVAR_VCF_URL      = isSelfContainedServer ?  "exhibit_cache/clinvar.vcf.gz" : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
+var OFFLINE_CLINVAR_VCF_URL      = isSelfContainedServer ?  "http://frontend/exhibit_cache/clinvar.vcf.gz" : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
 
 var EXHIBIT_URL              = 'exhibit.html'
 var EXHIBIT_URL1             = 'exhibit-case-complete.html'
