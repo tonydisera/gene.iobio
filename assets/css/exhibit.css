@@ -1,6 +1,31 @@
+@font-face {
+	font-family: DIN; 
+	src:         url('../fonts/DIN-Regular.ttf');
+	font-weight: normal;
+	font-style:  normal;
+}
+@font-face {
+	font-family: DIN; 
+	src:         url('../fonts/DIN-Medium.ttf');
+	font-weight: bold;
+	font-style:  normal;
+}
+@font-face {
+	font-family: DIN; 
+	src:         url('../fonts/DIN-Bold.ttf');
+	font-weight: bolder;
+	font-style:  normal;
+}
+@font-face {
+	font-family: DIN; 
+	src:         url('../fonts/DIN-Light.ttf');
+	font-weight: 100;
+	font-style:  normal;
+}
+
 body#edu-tour-welcome {
 	background-color: #1D287B;
-	font-family: 'Cabin' !important;
+	font-family: 'DIN' !important;
 }
 #banner {
 	background-image: url("../images/exhibit-pattern.png"); 
@@ -9,22 +34,23 @@ body#edu-tour-welcome {
 }
 h1 {
 	color: white;
-	font-family: 'Cabin' !important;
+	font-family: 'DIN' !important;
 	font-size: 47px;
 	margin-top: 5px;
 	margin-bottom: 5px;
+	font-weight: bolder;
 }
 h2 {
 	color: #F3E6B2;
-	font-family: 'Cabin' !important;
-	font-weight: 400;
+	font-family: 'DIN' !important;
+	font-weight: bold;
 	font-size: 38px;
 	margin-top: 10px;
 }
 h3 {
 	color: #F3E6B2;
-	font-family: 'Cabin' !important;
-	font-weight: 400;
+	font-family: 'DIN' !important;
+	font-weight: bold;
 	font-size: 24px;
 	margin-top: 10px;
 }
@@ -51,7 +77,7 @@ h3 {
 	color: white !important;
 	background-color: rgba(165, 185, 65, 1) !important;
 	text-transform: none !important;	
-	font-family: 'Cabin' !important;	
+	font-family: 'DIN' !important;	
 	font-size: 14px !important;	
 }
 .exhibit-button.large {
