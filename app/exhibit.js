@@ -40,11 +40,11 @@ function stopVideo() {
 	$("#stop").removeClass("disabled")
 }
 function showCaseStudy(tourNumber) {
-	var url = "../gene.iobio?tour=" + tourNumber;
+	var url = (isSelfContainedServer ? "/?tour=1" : "../gene.iobio?tour=") + tourNumber;
 	window.location.href = url;
 }
 function showNewCaseStudy() {
-	var url = "../gene.iobio?tour=" + getUrlParameter("tour") + '&completedTour=' + getUrlParameter("completedTour");
+	var url = (isSelfContainedServer ? "/?tour=" : "../gene.iobio?tour=") + getUrlParameter("tour") + '&completedTour=' + getUrlParameter("completedTour");
 	window.location.href = url;
 }
 function showCaseStudies() {
