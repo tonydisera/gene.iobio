@@ -1,0 +1,75 @@
+body#edu-tour-welcome {
+	background-color: #1D287B;
+	font-family: 'Cabin' !important;
+}
+#banner {
+	background-image: url("../images/exhibit-pattern.png"); 
+	height: 70px;
+	text-align: left;
+}
+h1 {
+	color: white;
+	font-family: 'Cabin' !important;
+	font-size: 47px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+h2 {
+	color: #F3E6B2;
+	font-family: 'Cabin' !important;
+	font-weight: 400;
+	font-size: 38px;
+	margin-top: 10px;
+}
+h3 {
+	color: #F3E6B2;
+	font-family: 'Cabin' !important;
+	font-weight: 400;
+	font-size: 24px;
+	margin-top: 10px;
+}
+.app {
+	color: white !important;
+}
+
+#container {
+	text-align: center;
+}
+
+#button-container {
+	text-align: center;
+	margin-top: 0px;
+
+}
+
+#video-container {
+	text-align: center;
+	margin-top: -60px;			
+}
+
+.exhibit-button {
+	color: white !important;
+	background-color: rgba(165, 185, 65, 1) !important;
+	text-transform: none !important;	
+	font-family: 'Cabin' !important;	
+	font-size: 14px !important;	
+}
+.exhibit-button.large {
+	width: 80%;
+	height: 90px;
+	font-size: 30px !important; 
+	text-align: center;
+	vertical-align: middle;
+	margin: auto;
+	display: block;
+	margin-top: 50px;
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.57), 0 3px 1px -2px rgba(0, 0, 0, 0.68), 0 1px 5px 0 rgba(0, 0, 0, 0.67);
+}
+.exhibit-button.fat.large {
+	height: 110px;
+}
+
+#start-over {
+	font-size: 20px !important;
+	margin-left: 10px;
+}

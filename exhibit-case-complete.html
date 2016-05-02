@@ -31,33 +31,15 @@
 <body id="edu-tour-welcome">
 	<div id="container">
 		<div id="banner">
+			<button id="start-over" onclick="startOver()" class="exhibit-button btn btn-raised">
+				Start Over
+			</button>
 		</div>
-		<h1 class="app">Explore gene.iobio</h1>
-		<h3>Hunt for disease-causing genes. Decide how to treat patients.</h3>
+		<h3 style="margin-top:80px;margin-bottom:70px;">You helped patients get care tailored to their specific needs.</h3>
 
 		<div id="button-container">
-			<button id="start-here" onclick="showVideo()" class="exhibit-button large btn btn-raised">Start here</button>
-			<div id="video-container" class="hide">
-				<div id="video-controls">
-					<button id="play" class="exhibit-button btn btn-raised" onclick="playVideo()">
-						<i class="material-icons">play_circle_filled</i>
-						Play
-					</button>
-					<button id="pause" class="exhibit-button btn btn-raised" onclick="pauseVideo()">
-						<i class="material-icons">pause_circle_filled</i>
-						Pause
-					</button>
-					<button id="stop" class="exhibit-button btn btn-raised" onclick="stopVideo()">
-						<i class="material-icons">stop</i>
-						Stop
-					</button>
-				</div>
-				<video id="exhibit-video" width="800" height="500" controls>
-				  <source src="assets/video/gene.iobio.1.0.freebayes.mp4" type="video/mp4">
-				</video>
-			</div>
-			<button id="returning-player" onclick="showCaseStudies()" class="exhibit-button large btn btn-raised">
-				Returning Player
+			<button  onclick="showNewCaseStudy()" class="exhibit-button large btn btn-raised">
+				Help more patients
 			</button>
 		</div>
 
@@ -66,6 +48,7 @@
 	</div>
 </body>
 
-	<script src="app/exhibit.js"></script> 
+
+<script src="app/exhibit.js"></script> 
 
 </html>

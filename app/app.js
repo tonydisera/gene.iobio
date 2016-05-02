@@ -18,7 +18,9 @@ var levelEduImpact = {
 	MODIFIER: 'Neutral',
 	LOW: 'Low'
 }
-var EXHIBIT_URL             = 'exhibit.html'
+var EXHIBIT_URL              = 'exhibit.html'
+var EXHIBIT_URL1             = 'exhibit-case-complete.html'
+var EXHIBIT_URL2             = 'exhibit-cases-complete.html'
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
 var MAX_IDLE      = 20;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
@@ -518,19 +520,19 @@ function initializeTours() {
 
     }
 
-    var steps = {
-    	'#button-load-father-data':    {audio: '#audio-test'},
-    	'#phenolyzer-search-box .selectize-control.single':    {},
-    	'#phenolyzer-results':         {audio: '#audio-test'},
-    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', delay:0}},
-    	'#gene-badge-container':       {},
-    	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
-    	'#children-buttons':           {},
-    	'.edu-tour-1-child-buttons':   {audio: '#audio-bird', close: true}
-    };
  
 	// Initialize colon cancer tour
 	if (isLevelEdu) {
+	    var steps = {
+	    	'#button-load-father-data':    {audio: '#audio-test'},
+	    	'#phenolyzer-search-box .selectize-control.single':    {},
+	    	'#phenolyzer-results':         {audio: '#audio-test'},
+	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', delay:0}},
+	    	'#gene-badge-container':       {},
+	    	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
+	    	'#children-buttons':           {},
+	    	'.edu-tour-1-child-buttons':   {audio: '#audio-bird', close: true}
+	    };
 		pageGuideEduTour1 = tl.pg.init({ 
 			'auto_refresh': true, 
 			'custom_open_button': '#show-case1-tour',
@@ -538,7 +540,7 @@ function initializeTours() {
 			'track_events_cb': function(interactionName) {	
 
 				if (interactionName == "PG.close") {
-					startOver();
+					completeTour();
 				}
 
 				for (key in steps) {
@@ -615,6 +617,9 @@ function initializeTours() {
 			'custom_open_button': '#show-case2-tour',
 			'steps_element': '#tourEduCase2',
 			'track_events_cb': function(interactionName) {
+				if (interactionName == "PG.close") {
+					completeTour();
+				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
 			}
@@ -2476,7 +2481,23 @@ function restartApp() {
 }
 
 function startOver() {
-	window.location.href = EXHIBIT_URL;
+	if (isLevelEdu) {
+		window.location.href = EXHIBIT_URL;
+	} else {
+		window.location.reload();
+	}
+}
+function completeTour() {
+	if (isLevelEdu) {
+		var completedTour = getUrlParameter("completedTour");
+		var url = null;
+		if (completedTour != null && completedTour != "") {
+			url = EXHIBIT_URL2;
+		} else {
+			url = EXHIBIT_URL1 + '?tour=' + (eduTourNumber == 1 ? 2 : 1) + '&completedTour=' + eduTourNumber;
+		}
+		window.location.href = url;
+	} 
 }
 
 
