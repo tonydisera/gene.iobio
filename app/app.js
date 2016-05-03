@@ -486,7 +486,7 @@ function initializeTours() {
 	// Initialize colon cancer tour
 	if (isLevelEdu) {
 	    var steps = {
-	    	'#button-load-father-data':    {audio: '#audio-test'},
+	    	'#edu-tour-label':    {audio: '#audio-test'},
 	    	'#phenolyzer-search-box .selectize-control.single':    {},
 	    	'#phenolyzer-results':         {audio: '#audio-test'},
 	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', delay:0}},
@@ -713,7 +713,7 @@ function hideCoordinateFrame() {
 
 function readjustCards() {
 	var top = +$('#nav-section').height();
-	d3.select('#track-section').style("padding-top", top+8 + "px");
+	d3.select('#track-section').style("padding-top", top+3 + "px");
 }
 
 

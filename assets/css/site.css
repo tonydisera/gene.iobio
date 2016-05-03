@@ -108,21 +108,24 @@
 #displayed-variant-count-label-simple.level-edu {
   display: inline-block !important; }
 
-.variant-card #bottom-white-space {
-  display: none !important; }
-.variant-card #bottom-white-space.level-edu {
-  display: block !important;
-  height: 5px; }
-.variant-card #gene-box {
-  display: none !important;
-  background-color: rgba(93, 128, 157, 0.63);
-  border: solid thin #5d809d;
-  margin-left: 0px;
-  text-align: center;
-  color: white;
-  margin-top: -5px; }
-.variant-card #gene-box.level-edu {
-  display: block !important; }
+.variant-card {
+  padding-bottom: 1px !important; }
+  .variant-card #bottom-white-space {
+    display: none !important; }
+  .variant-card #bottom-white-space.level-edu {
+    display: block !important;
+    height: 5px; }
+  .variant-card #gene-box {
+    display: none !important;
+    background-color: rgba(93, 128, 157, 0.63);
+    border: solid thin #5d809d;
+    margin-left: 0px;
+    text-align: center;
+    color: white;
+    margin-top: -5px;
+    margin-bottom: 10px; }
+  .variant-card #gene-box.level-edu {
+    display: block !important; }
 
 #matrix-track #rank-variants-title {
   display: block !important; }
@@ -156,12 +159,20 @@
 .modal-backdrop {
   background: transparent !important; }
 
+#app-title-section {
+  min-height: 60px !important; }
+
+.track {
+  margin-top: 0px !important;
+  margin-bottom: 3px !important; }
+
 .track-expand {
-  padding-bottom: 0px !important; }
+  margin-top: 3px !important;
+  margin-bottom: 3px !important; }
 
 .variant-card #zoom-region-chart {
   display: block !important;
-  margin-top: 0px !important;
+  margin-top: -5px !important;
   padding-top: 0px !important; }
 
 #slider-left {
@@ -176,7 +187,7 @@
   color: white !important; }
 
 #nav-edu-tour {
-  background-color: #1D287B;
+  background-color: rgba(0, 0, 0, 0.9);
   margin-bottom: 12px;
   display: block !important;
   height: 50px;
@@ -192,8 +203,8 @@
     color: white !important;
     background-color: #a5b941 !important; }
   #nav-edu-tour .btn.btn-raised {
-    color: #7D7D7D !important;
-    background-color: #F3E6B2 !important;
+    color: white !important;
+    background-color: #1F2C8A !important;
     margin-left: 15px !important;
     font-size: 14px !important; }
   #nav-edu-tour .card-label {
@@ -205,7 +216,7 @@
       display: none; }
     #nav-edu-tour .edu-tour-button.active i.material-icons {
       display: inline-block;
-      color: #7D7D7D !important;
+      color: white !important;
       font-size: 15px;
       padding-bottom: 3px;
       padding-right: 0px !important;
@@ -655,7 +666,10 @@ h5 {
   text-decoration: none;
   width: 50px; }
 #tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_text {
-  margin-top: 25px !important; }
+  margin-top: 0px !important;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px; }
 #tlyPageGuideWrapper #tlyPageGuideMessages .pageguide-nav {
   margin-left: 20px;
   margin-right: 20px;
@@ -977,7 +991,7 @@ a {
   z-index: 2;
   right: 5px;
   background-color: white;
-  margin-bottom: 8px; }
+  margin-bottom: 6px; }
 
 section {
   text-align: left;
@@ -1033,7 +1047,7 @@ section {
   padding-left: 10px;
   padding-right: 10px;
   margin-top: 0px;
-  margin-bottom: 8px; }
+  margin-bottom: 6px; }
 
 .track-expand {
   font-size: 14px;
@@ -1217,17 +1231,21 @@ section {
   pointer-events: none;
   opacity: 0; }
 
-.variant-card .vcfloader {
-  text-align: center;
-  background-color: white;
-  display: table;
-  padding-right: 2px;
-  padding-left: 2px;
-  margin-top: 0px;
-  margin-bottom: 10px; }
-.variant-card #bam-track .loader {
-  margin-top: 0px !important;
-  margin-bottom: 5px !important; }
+.variant-card {
+  min-height: 32px;
+  padding-bottom: 0px;
+  background-color: white; }
+  .variant-card .vcfloader {
+    text-align: center;
+    background-color: white;
+    display: table;
+    padding-right: 2px;
+    padding-left: 2px;
+    margin-top: 0px;
+    margin-bottom: 10px; }
+  .variant-card #bam-track .loader {
+    margin-top: 0px !important;
+    margin-bottom: 5px !important; }
 
 .stats-box {
   display: flex;

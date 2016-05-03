@@ -2237,7 +2237,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var clinvarRow2 = '';
 	if (clinSigDisplay) {
 		if (isLevelEdu) {
-			clinvarRow1 = me._tooltipWideHeadingRow('Clinical findings', clinSigDisplay);		
+			clinvarRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay);		
 		} else {
 			clinvarRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinSigDisplay);		
 		}
@@ -2250,15 +2250,17 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		}
 	}
 
-	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Prediction', vepPolyPhenDisplay + ' to protein') : "";
+	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Predicted effect', vepPolyPhenDisplay + ' to protein') : "";
 
-			
+	
 	var dbSnpId = getRsId(variant);	
+
+	var genotypeRow = isLevelEduTour && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', variant.eduGenotype, '','')  : "";
 
 	if (isLevelEdu) {
 		return (
-			me._tooltipHeaderRow('Genotype', variant.eduGenotype, '','') 
-			+ me._tooltipHeaderRow('   ' + impactLabel , ' impact', '', '')
+			genotypeRow
+			+ me._tooltipHeaderRow('Severity - ' + impactLabel , '', '', '')
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
 			+ inheritanceModeRow
 			+ polyphenRowSimple
@@ -2403,14 +2405,14 @@ VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, clas
 }
 
 VariantCard.prototype._tooltipWideHeadingRow = function(value1, value2) {
-	return '<div class="row">'
-	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	return '<div class="row" style="">'
+	      + '<div class="col-sm-4 tooltip-title"  style="line-height: 11px;text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 VariantCard.prototype._tooltipWideHeadingSecondRow = function(value1, value2) {
 	return '<div class="row" style="line-height:12px !important;">'
-	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-4 tooltip-title" style="line-height: 11px;text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }

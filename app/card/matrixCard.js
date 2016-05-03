@@ -220,10 +220,10 @@ MatrixCard.prototype.init = function() {
 		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
 		this.removeRow('Allele Frequency - ExAC', me.matrixRows);
 
-		this.setRowLabel('Impact - SnpEff',             'Impact');
-		this.setRowLabel('Impact - VEP',                'Impact');
-		this.setRowLabel('Pathogenicity - ClinVar',     'Clinical findings');
-		this.setRowLabel('Pathogengicity - PolyPhen',   'Prediction');
+		this.setRowLabel('Impact - SnpEff',             'Severity');
+		this.setRowLabel('Impact - VEP',                'Severity');
+		this.setRowLabel('Pathogenicity - ClinVar',     'Known from research');
+		this.setRowLabel('Pathogengicity - PolyPhen',   'Predicted effect');
 		this.setRowLabel('Inheritance Mode',            'Inheritance');
 	} else {
 		this.removeRow('Genotype', me.matrixRows);
@@ -233,7 +233,7 @@ MatrixCard.prototype.init = function() {
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
 				    .cellSize(isLevelEdu ? 23 : 18)
 				    .columnLabelHeight(isLevelEdu ? 30 : 67)
-				    .rowLabelWidth(isLevelEdu ? 90 : 140)
+				    .rowLabelWidth(isLevelEdu ? 100 : 140)
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
