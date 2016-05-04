@@ -270,9 +270,12 @@ function variantD3() {
       // a rectangle with a min width of 3.
       minWidth = Math.max(minWidth, lowestWidth);
 
+      // TODO:  Need to review this code!!!  Added for exhibit
+      minWidth = variantHeight;
+
       var symbolScale = d3.scale.ordinal()
-                    .domain([3,4,5,6,7,8])
-                    .range([9,15,20,25,36,58]);
+                    .domain([3,4,5,6,7,8,10,12])
+                    .range([9,15,20,25,36,58,70,100]);
 
       var symbolSize = symbolScale(minWidth);
       
@@ -387,7 +390,8 @@ function variantD3() {
             return Math.round(x(d.start) - (minWidth/2) + (minWidth/4));
           })
           .attr('width', function(d) { 
-            return showTransition ? 0 : Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+//            return showTransition ? 0 : Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+            return showTransition ? 0 : variantHeight;
           })
           .attr('y', function(d) {
             return showTransition ? 0 :  height - ((d.level + 1) * (variantHeight + verticalPadding));
@@ -459,7 +463,9 @@ function variantD3() {
                 return d3.round(x(d.start) - (minWidth/2) + (minWidth/4));
               })
               .attr('width', function(d) { 
-                return Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+                // TODO:  Need to review!!
+//                return Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+                return variantHeight;
               })
               .attr('y', function(d) {             
                 return height - ((d.level + 1) * (variantHeight + verticalPadding));

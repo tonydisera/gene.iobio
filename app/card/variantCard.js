@@ -159,9 +159,20 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 	this.cardIndex = cardIndex;
 
+
 	if (this.isViewable()) {
 		this.cardSelector = cardSelector;
 		this.d3CardSelector = d3CardSelector;
+
+
+		// If the we are in guided tour mode, then clicking anywhere in the variant card unlocks
+		// any locked variant.
+		if (isLevelEduTour) {
+			me.cardSelector.on('click', function() {
+				//me.unpin();
+				
+			});
+		}
 
 		this.cardSelector.find('#variant-panel').attr("id", "variant-panel-" + cardIndex);
 
@@ -215,7 +226,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .width(1000)
 				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 2 : 17, left: 4})
 				    .showXAxis(isLevelEdu ? false : true)
-				    .variantHeight(isLevelEdu ? 8 : 6)
+				    .variantHeight(isLevelEdu ? 12 : 6)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(this.variantTooltipHTML)
@@ -1654,9 +1665,9 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		}
 	}
 
-	var widthSimpleTooltip = 180;
+	var widthSimpleTooltip = 220;
 	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
-		widthSimpleTooltip = 320;
+		widthSimpleTooltip = 500;
 	}
 
  	var w = isLevelEdu ? widthSimpleTooltip : 300;
@@ -2405,14 +2416,14 @@ VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, clas
 }
 
 VariantCard.prototype._tooltipWideHeadingRow = function(value1, value2) {
-	return '<div class="row" style="">'
-	      + '<div class="col-sm-4 tooltip-title"  style="line-height: 11px;text-align:right;word-break:normal">' + value1  +'</div>'
+	return '<div class="row" style="padding-bottom:5px;padding-top:3px;">'
+	      + '<div class="col-sm-4 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 VariantCard.prototype._tooltipWideHeadingSecondRow = function(value1, value2) {
-	return '<div class="row" style="line-height:12px !important;">'
-	      + '<div class="col-sm-4 tooltip-title" style="line-height: 11px;text-align:right;word-break:normal">' + value1  +'</div>'
+	return '<div class="row" style="padding-bottom:5px;">'
+	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
