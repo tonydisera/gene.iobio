@@ -550,7 +550,8 @@ function initializeTours() {
 	    }); 
 
 	    var eduTour2Steps = {
-	    	'#edu-tour-2-label':             {audio: '#audio-test', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
+	    	'#edu-tour-2-label':             {audio: '#audio-test'},
+//	    	'#edu-tour-2-label':             {audio: '#audio-test', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
 	    	'#feature-matrix .col:eq(2)':    {audio: '#audio-test'},
 	    	'#button-load-john-data':        {},
 	    	'#button-load-diego-data':       {},
