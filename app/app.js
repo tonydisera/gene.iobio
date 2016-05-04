@@ -442,6 +442,25 @@ function showEduTourAnimation(show, id) {
 		
 }
 
+function showEduTourAnimationNew(show, clazz) {
+	if (show) {
+		$('.' + clazz).removeClass("hide");
+
+		AdobeEdge.loadComposition('anim-test-v1', clazz, {
+		    scaleToFit: "both",
+		    centerStage: "both",
+		    minW: "0px",
+		    maxW: "undefined",
+		    width: "730px",
+		    height: "238px"
+		}, {"dom":{}}, {"dom":{}});	
+
+	} else {
+		$('.edu-tour-animation').addClass("hide");
+	}
+ 
+}
+
 function initializeTours() {
     if (!isLevelEdu) {
 	    // Initialize app tour
@@ -485,11 +504,12 @@ function initializeTours() {
  
 	// Initialize colon cancer tour
 	if (isLevelEdu) {
-	    var steps = {
+	    var eduTour1Steps = {
 	    	'#edu-tour-label':    {audio: '#audio-test'},
 	    	'#phenolyzer-search-box .selectize-control.single':    {},
 	    	'#phenolyzer-results':         {audio: '#audio-test'},
-	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', delay:0}},
+	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px'},
+//	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', showFunction: showEduTourAnimation, delay:0}},
 	    	'#gene-badge-container':       {},
 	    	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
 	    	'#children-buttons':           {},
@@ -505,8 +525,8 @@ function initializeTours() {
 					completeTour();
 				}
 
-				for (key in steps) {
-					var step = steps[key];
+				for (key in eduTour1Steps) {
+					var step = eduTour1Steps[key];
 					if (step.audio) {
 						$(step.audio)[0].pause();
 					}
@@ -521,58 +541,22 @@ function initializeTours() {
 				} else {
 					$('.edu-tour-1-child-buttons .edu-tour-button').removeClass("emphasize");
 				}
-				var step = steps[currentTour];
-				if (step.animation) {
-					setTimeout( function() {showEduTourAnimation(true, step.animation.name)}, step.animation.delay);
-				} else {
-					showEduTourAnimation(false);		
-				}
+
+				var step = eduTour1Steps[currentTour];
+				customizeEduTourStep(step);
+
 				
-				if (step.dialog) {
-					$('#edu-tour-modal').modal('show');
-				} else {
-					$('#edu-tour-modal').modal("hide");
-				}
-				if (step.height) {
-					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
-				} else {
-					$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");					
-				}
-				if (step.audio) {
-					var audioSelector = step.audio;
-					$(audioSelector)[0].play();					
-					/*
-					$('#edu-tour-modal').modal('show');
-					$(audioSelector)[0].play();
-					$(audioSelector)[0].addEventListener("ended", function(){
-					     $(audioSelector)[0].currentTime = 0;
-					     $('#edu-tour-modal').modal("hide");
-					});
-
-					//$('#page-guide-listen-button').removeClass('hide');
-					$('#page-guide-listen-button').off('click');
-					$('#page-guide-listen-button').on('click', function(event) {
-						$('#edu-tour-modal').modal('show');
-						$(audioSelector)[0].play();
-					});
-*/
-
-					//$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "600px");
-				} else {
-					$('#page-guide-listen-button').addClass('hide');										
-				}
-
-
-
-				if (step.close) {
-					$('#pageguide-close-button').removeClass("hide");
-					$('#pageguide-next-button').addClass("hide");
-				} else {
-					$('#pageguide-close-button').addClass("hide");
-					$('#pageguide-next-button').removeClass("hide");
-				} 
 			}
 	    }); 
+
+	    var eduTour2Steps = {
+	    	'#edu-tour-2-label':             {audio: '#audio-test', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
+	    	'#feature-matrix .col:eq(2)':    {audio: '#audio-test'},
+	    	'#button-load-john-data':        {},
+	    	'#button-load-diego-data':       {},
+	    	'#button-load-sarah-data':       {},
+	    	'#edu-tour-2':                   {audio: '#audio-test', close: true}
+	    };
 
 		pageGuideEduTour2 = tl.pg.init({ 
 			'auto_refresh': true, 
@@ -582,8 +566,18 @@ function initializeTours() {
 				if (interactionName == "PG.close") {
 					completeTour();
 				}
+				for (key in eduTour2Steps) {
+					var step = eduTour2Steps[key];
+					if (step.audio) {
+						$(step.audio)[0].pause();
+					}
+				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+
+				var step = eduTour2Steps[currentTour];
+				customizeEduTourStep(step);
+
 			}
 	    }); 
 
@@ -594,6 +588,38 @@ function initializeTours() {
 	    }
 	}
 
+}
+
+
+function customizeEduTourStep(step) {
+	if (step.animation) {
+		setTimeout( function() {step.animation.showFunction(true, step.animation.name)}, step.animation.delay);
+	} else {
+		showEduTourAnimation(false);		
+	}
+	if (step.dialog) {
+		$('#edu-tour-modal').modal('show');
+	} else {
+		$('#edu-tour-modal').modal("hide");
+	}
+	if (step.height) {
+		$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
+	} else {
+		$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");					
+	}
+	if (step.audio) {
+		var audioSelector = step.audio;
+		$(audioSelector)[0].play();					
+	} else {
+		$('#page-guide-listen-button').addClass('hide');										
+	}
+	if (step.close) {
+		$('#pageguide-close-button').removeClass("hide");
+		$('#pageguide-next-button').addClass("hide");
+	} else {
+		$('#pageguide-close-button').addClass("hide");
+		$('#pageguide-next-button').removeClass("hide");
+	} 	
 }
 
 // Function from David Walsh: http://davidwalsh.name/css-animation-callback
