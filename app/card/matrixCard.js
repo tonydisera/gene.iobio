@@ -96,11 +96,11 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
+		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
 		{name:'Zygosity'                     ,order:4, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
 		{name:'Bookmark'                     ,order:5, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Inheritance Mode'             ,order:6, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
 		{name:'Affected Siblings'            ,order:7, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
@@ -208,7 +208,7 @@ MatrixCard.prototype.init = function() {
 		this.removeRow('Bookmark', me.matrixRows);
 
 		// Only show genotype on second educational tour
-		if (!isLevelEdu || eduTourNumber != 2) {
+		if (!isLevelEduTour || eduTourNumber != 2) {
 			this.removeRow('Genotype', me.matrixRows);
 		}				
 		// Only show inheritance on first educational tour
@@ -223,7 +223,7 @@ MatrixCard.prototype.init = function() {
 		this.setRowLabel('Impact - SnpEff',             'Severity');
 		this.setRowLabel('Impact - VEP',                'Severity');
 		this.setRowLabel('Pathogenicity - ClinVar',     'Known from research');
-		this.setRowLabel('Pathogengicity - PolyPhen',   'Predicted effect');
+		this.setRowLabel('Pathogenicity - PolyPhen',    'Predicted effect');
 		this.setRowLabel('Inheritance Mode',            'Inheritance');
 	} else {
 		this.removeRow('Genotype', me.matrixRows);
@@ -526,9 +526,9 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		}
 	});
 
-	var widthSimpleTooltip = 180;
+	var widthSimpleTooltip = 220;
 	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
-		widthSimpleTooltip = 320;
+		widthSimpleTooltip = 500;
 	}
 
  	var w = isLevelEdu ? widthSimpleTooltip : 300;

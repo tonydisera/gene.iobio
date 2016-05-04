@@ -4,7 +4,7 @@ function FilterCard() {
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
 	this.recFilters = new Object();
-	this.annotationScheme = "snpEff";
+	this.annotationScheme = "vep";
 	this.pathogenicityScheme = "clinvar";
 	this.afScheme = "exac";
 
