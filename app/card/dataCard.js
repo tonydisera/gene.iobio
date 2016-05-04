@@ -57,19 +57,19 @@ function DataCard() {
 
 	this.eduTourUrls = [ 
 	{
-		proband: 'https://s3.amazonaws.com/iobio/NHMU/nfkb2.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/NHMU/nfkb2.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/NHMU/nfkb2.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
 	},
 	{
-		proband: 'https://s3.amazonaws.com/iobio/NHMU/apc.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/NHMU/apc.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/NHMU/apc.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
 	},
 	{
-		proband: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz',
-		mother: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz',
-		father: 'https://s3.amazonaws.com/iobio/NHMU/vkorc1.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+		mother: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+		father: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
 	}
 	];
 	this.eduTourCards = [
@@ -79,21 +79,19 @@ function DataCard() {
 			father:  true
 		},
 		{
-			proband: true,
+			proband: false,
 			mother:  true,
 			father:  true
 		},
 		{
-			proband: true,
+			proband: false,
 			mother:  false,
 			father:  false
 		}
 	];	
 	this.eduTourNames = [
 		{
-			proband: 'Alex',
-			mother:  'Mother',
-			father:  'Father'
+			proband: 'Alex'
 		},
 		{
 			proband: 'Father',
