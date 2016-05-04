@@ -13,9 +13,9 @@ var eduTourShowPhenolyzer   = [true, false];
 
 var levelEduImpact = {
 	HIGH:      'Harmful',
-	MODERATE:  'Possibly harmful',
-	MODIFIER:  'Neutral',
-	LOW:       'Low'
+	MODERATE:  'Probably harmful',
+	MODIFIER:  'Probably benign',
+	LOW:       'Benign'
 }
 
 //
