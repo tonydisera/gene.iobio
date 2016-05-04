@@ -23,6 +23,9 @@
 		margin-top: -5px !important
 		padding-top: 0px !important
 
+.card-label
+	font-size: 16px !important
+
 
 
 #gene-badge-container
@@ -36,17 +39,17 @@
 #edu-tour-modal
 	
 	.modal-content
-		background-color: rgba(0,0,0,.9) !important
+		background-color: $tour-background-color !important
 		
 		.modal-body
 			min-height:  200px !important
 
 	.btn.btn-raised
-		background-color: rgb(165, 185, 85) !important
+		background-color: $tour-button-color !important
 		color: white !important
 
 #nav-edu-tour
-	background-color: rgba(0,0,0,.9)
+	background-color:  $tour-background-color
 	margin-bottom: 12px
 	display: block !important
 	height: 50px
@@ -61,11 +64,11 @@
 		padding: 8px !important
 		margin-top: 5px !important
 		color: white !important
-		background-color: rgba(165, 185, 65, 1) !important
+		background-color: $tour-button-color !important
 		
 	.btn.btn-raised
 		color: white !important
-		background-color: #1F2C8A !important 
+		background-color: $tour-data-button-color !important 
 		margin-left: 15px !important
 		font-size: 14px !important
 
@@ -89,9 +92,12 @@
 				float: none !important	
 
 		&.emphasize
-			background-color: rgba(165, 185, 65, 1) !important
+			background-color: $tour-button-color !important
 			color: white !important
 
+#tlyPageGuideWrapper 
+	#tlyPageGuideMessages
+		background-color: $tour-background-color !important
 
 .tlypageguide_shadow
 	background-color: rgba(255, 255, 255, 0) !important
@@ -99,8 +105,8 @@
 
 	&.tlypageguide-active
 		background-color: transparent !important
-		webkit-box-shadow: 0 0 18px 1px rgba(165, 185, 65, 1) !important
-		box-shadow: 0 0 18px 1px rgba(165, 185, 65, 1) !important
+		webkit-box-shadow: 0 0 18px 1px $tour-button-color !important
+		box-shadow: 0 0 18px 1px $tour-button-color !important
 
 .tlyPageGuideStepIndex
 	opacity: 0 !important
@@ -125,7 +131,7 @@
 	color: transparent !important
 
 .edu-tour-answer
-	color: rgba(165, 185, 65, 1) !important
+	color: $tour-button-color !important
 	font-size: 20px !important
 
 .edu-tour-answer.incorrect
@@ -153,7 +159,7 @@ span.arrow
 
 
 .down 
-	border-top-color: rgba(165, 185, 65, 1) !important
+	border-top-color: $tour-button-color !important
 	top: -20px
 
 .down
@@ -166,7 +172,7 @@ span.arrow
 		margin-top: -45px
 
 .up 
-	border-bottom-color: rgba(165, 185, 65, 1) !important
+	border-bottom-color: $tour-button-color !important
 	bottom: -20px !important
 
 .up
@@ -180,7 +186,7 @@ span.arrow
 
 
 .left 
-	border-right-color: rgba(165, 185, 65, 1) !important
+	border-right-color: $tour-button-color !important
 	right: -20px !important
 
 .left
@@ -194,7 +200,7 @@ span.arrow
 
 
 .right 
-	border-left-color: rgba(165, 185, 65, 1) !important
+	border-left-color: $tour-button-color !important
 	left: -20px !important
 
 .right
