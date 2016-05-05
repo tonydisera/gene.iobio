@@ -3,13 +3,15 @@
 * a simplified interface and logic.  For running one of the special educational edition 
 * tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
 */
-var isSelfContainedServer   = true; // is the client + the server running on one machine?
+var isSelfContainedServer   = false; // is the client + the server running on one machine?
 var isOffline               = true;  // is there any internet connect to outside services like clinvar, ncbi?
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
+
+var EDU_TOUR_VARIANT_SIZE   = 16;
 
 var levelEduImpact = {
 	HIGH:      'Harmful',
