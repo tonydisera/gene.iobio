@@ -568,9 +568,9 @@ tl.pg.interval = {};
             if (height < defaultHeight) {
                 height = defaultHeight;
             }
-            if (height > $(window).height()/2) {
-                height = $(window).height()/2;
-            }
+            //if (height > $(window).height()/2) {
+            //    height = $(window).height()/2;
+           //  }
 
             this.$message.show().animate({'height': height}, 500);
             if (!tl.pg.isScrolledIntoView($(targetKey), this.$message.outerHeight())) {
