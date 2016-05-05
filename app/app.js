@@ -449,10 +449,10 @@ function showEduTourAnimationNew(show, clazz) {
 		AdobeEdge.loadComposition('anim-test-v1', clazz, {
 		    scaleToFit: "both",
 		    centerStage: "both",
-		    minW: "0px",
-		    maxW: "undefined",
-		    width: "730px",
-		    height: "238px"
+		    	minW: "0px",
+			    maxW: "undefined",
+			    width: "1460px",
+			    height: "468px"
 		}, {"dom":{}}, {"dom":{}});	
 
 	} else {
@@ -550,8 +550,7 @@ function initializeTours() {
 	    }); 
 
 	    var eduTour2Steps = {
-	    	'#edu-tour-2-label':             {audio: '#audio-test'},
-//	    	'#edu-tour-2-label':             {audio: '#audio-test', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
+	    	'#edu-tour-2-label':             {audio: '#audio-test', height: '400px', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
 	    	'#feature-matrix .col:eq(2)':    {audio: '#audio-test'},
 	    	'#button-load-john-data':        {},
 	    	'#button-load-diego-data':       {},
