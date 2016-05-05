@@ -469,13 +469,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	        });			
 		}
 		
-		if (isLevelEduTour && eduTourNumber == "1" 
-			&& pageGuideEduTour1.cur_idx == 3
-			&& variant.vepImpact[HIGH] != "HIGH" 
-			&& variant.start == 112116592 
-			&& window.gene.gene_name == 'APC') {
-			pageGuideEduTour1.navigateForward();
-		}
+		eduTourCheckVariant(variant);
 
 		getProbandVariantCard().unpin(true);
 	}

@@ -86,12 +86,7 @@ GenesCard.prototype.init = function() {
 	});	
 
 	if (isLevelEdu) {
-		$('#select-phenotype-simple').selectize();
-		$('#select-phenotype-simple')[0].selectize.clear();
-		$('#select-phenotype-simple')[0].selectize.on('change', function() {
-			var phenotype = $('#select-phenotype-simple')[0].selectize.getValue().toLowerCase();
-			me.getPhenolyzerGenes(phenotype);
-		});		
+		eduTourCheckPhenolyzer();
 	}
 
 }

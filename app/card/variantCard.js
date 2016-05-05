@@ -224,7 +224,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 2 : 17, left: 4})
+				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 12 : 17, left: 4})
 				    .showXAxis(isLevelEdu ? false : true)
 				    .variantHeight(isLevelEdu ? EDU_TOUR_VARIANT_SIZE : 6)
 				    .verticalPadding(2)
@@ -1537,13 +1537,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 
-		if (isLevelEduTour && eduTourNumber == "1" 
-			&& pageGuideEduTour1.cur_idx == 3
-			&& variant.vepImpact[HIGH] != "HIGH" 
-			&& variant.start == 112116592 
-			&& window.gene.gene_name == 'APC') {
-			pageGuideEduTour1.navigateForward();
-		}
+		eduTourCheckVariant();
 
 		if (!isLevelEdu) {
 		    showSidebar("Examine");

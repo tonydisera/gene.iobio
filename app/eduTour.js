@@ -4,6 +4,27 @@ var pageGuidePhenolyzer = null;
 var pageGuideEduTour1 = null;
 var pageGuideEduTour2 = null;
 
+var eduTour1Steps = {
+	'#edu-tour-label':                                  {index: 0, first: true, audio: '#audio1-1'},
+	'#phenolyzer-search-box .selectize-control.single': {index: 1},
+	'#phenolyzer-results':                              {index: 2, audio: '#audio1-2'},
+	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#audio1-3', height: '150px'},
+	'#gene-badge-container':                            {index: 4 },
+	'#feature-matrix .col:eq(0)':                       {index: 5, audio: '#audio1-4'},
+	'#children-buttons':                                {index: 6 },
+	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#audio1-5', close: true}
+};
+
+var eduTour2Steps = {
+	'#edu-tour-2-label':             {index: 0, first: true, audio: '#audio2-1', height: '400px', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
+	'#feature-matrix .col:eq(2)':    {index: 1, audio: '#audio2-2'},
+	'#button-load-john-data':        {index: 2},
+	'#button-load-diego-data':       {index: 3},
+	'#button-load-sarah-data':       {index: 4},
+	'#edu-tour-2':                   {index: 5, audio: '#audio2-3', close: true}
+};
+
+
 function initializeTours() {
     if (!isLevelEdu) {
 	    // Initialize app tour
@@ -47,17 +68,7 @@ function initializeTours() {
  
 	// Initialize colon cancer tour
 	if (isLevelEdu) {
-	    var eduTour1Steps = {
-	    	'#edu-tour-label':    {audio: '#audio-test'},
-	    	'#phenolyzer-search-box .selectize-control.single':    {},
-	    	'#phenolyzer-results':         {audio: '#audio-test'},
-	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px'},
-//	    	'#proband-variant-card #zoom-region-chart':  {audio: '#audio-test', height: '150px', animation: {name: 'gene-model-animation', showFunction: showEduTourAnimation, delay:0}},
-	    	'#gene-badge-container':       {},
-	    	'#feature-matrix .col:eq(0)':  {audio: '#audio-bird'},
-	    	'#children-buttons':           {},
-	    	'.edu-tour-1-child-buttons':   {audio: '#audio-bird', close: true}
-	    };
+
 		pageGuideEduTour1 = tl.pg.init({ 
 			'auto_refresh': true, 
 			'custom_open_button': '#show-case1-tour',
@@ -72,6 +83,7 @@ function initializeTours() {
 					var step = eduTour1Steps[key];
 					if (step.audio) {
 						$(step.audio)[0].pause();
+						$(step.audio)[0].currentTime = 0;
 					}
 				}
 			},
@@ -86,20 +98,12 @@ function initializeTours() {
 				}
 
 				var step = eduTour1Steps[currentTour];
-				customizeEduTourStep(step);
+				customizeEduTourStep(pageGuideEduTour1, step);
 
 				
 			}
 	    }); 
 
-	    var eduTour2Steps = {
-	    	'#edu-tour-2-label':             {audio: '#audio-test', height: '400px', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
-	    	'#feature-matrix .col:eq(2)':    {audio: '#audio-test'},
-	    	'#button-load-john-data':        {},
-	    	'#button-load-diego-data':       {},
-	    	'#button-load-sarah-data':       {},
-	    	'#edu-tour-2':                   {audio: '#audio-test', close: true}
-	    };
 
 		pageGuideEduTour2 = tl.pg.init({ 
 			'auto_refresh': true, 
@@ -113,13 +117,14 @@ function initializeTours() {
 					var step = eduTour2Steps[key];
 					if (step.audio) {
 						$(step.audio)[0].pause();
+						$(step.audio)[0].currentTime = 0;
 					}
 				}
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
 
 				var step = eduTour2Steps[currentTour];
-				customizeEduTourStep(step);
+				customizeEduTourStep(pageGuidEduTour2, step);
 
 			}
 	    }); 
@@ -134,7 +139,7 @@ function initializeTours() {
 }
 
 
-function customizeEduTourStep(step) {
+function customizeEduTourStep(pageGuide, step) {
 	if (step.animation) {
 		setTimeout( function() {step.animation.showFunction(true, step.animation.name)}, step.animation.delay);
 	} else {
@@ -152,9 +157,20 @@ function customizeEduTourStep(step) {
 	}
 	if (step.audio) {
 		var audioSelector = step.audio;
-		$(audioSelector)[0].play();					
+		$(audioSelector)[0].play();		
+		// When audio finished, automatically move to next step
+		$(audioSelector).on("ended", function() {
+			if (!step.close && step.index == pageGuide.cur_idx) {
+				pageGuide.navigateForward();
+			}
+		});			
 	} else {
 		$('#page-guide-listen-button').addClass('hide');										
+	}
+	if (step.first) {
+		$('#pageguide-prev-button').addClass("hide");
+	} else {
+		$('#pageguide-prev-button').removeClass("hide");		
 	}
 	if (step.close) {
 		$('#pageguide-close-button').removeClass("hide");
@@ -163,6 +179,38 @@ function customizeEduTourStep(step) {
 		$('#pageguide-close-button').addClass("hide");
 		$('#pageguide-next-button').removeClass("hide");
 	} 	
+}
+
+function eduTourCheckPhenolyzer() {
+	$('#select-phenotype-edutour').selectize();
+	$('#select-phenotype-edutour')[0].selectize.clear();
+	$('#select-phenotype-edutour')[0].selectize.on('change', function() {
+		var phenotype = $('#select-phenotype-edutour')[0].selectize.getValue().toLowerCase();
+		var correct = true;
+		if (isLevelEduTour && eduTourNumber == 1) {
+			if (phenotype != 'colon_cancer') {
+				alertify.error("Please select 'Colon cancer' to continue with this tour.")
+				correct = false;
+			}
+		}
+		if (correct) {
+			genesCard.getPhenolyzerGenes(phenotype);
+			if (eduTourNumber == 1  && pageGuideEduTour1.cur_idx == 1) {
+				pageGuideEduTour1.navigateForward();
+			}
+			
+		}
+	});			
+}
+
+function eduTourCheckVariant(variant) {
+	if (isLevelEduTour && eduTourNumber == "1" 
+		&& pageGuideEduTour1.cur_idx == 3
+		&& variant.vepImpact[HIGH] != "HIGH" 
+		&& variant.start == 112116592 
+		&& window.gene.gene_name == 'APC') {
+		pageGuideEduTour1.navigateForward();
+	}	
 }
 
 function onEduTour1Check(checkbox) {

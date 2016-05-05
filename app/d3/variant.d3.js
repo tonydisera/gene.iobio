@@ -101,7 +101,7 @@ function variantD3() {
             .duration(200)
             .style("opacity", .6);
       circle.attr("cx", mousex + margin.left + 2)
-            .attr("cy", mousey + margin.top + 2);
+            .attr("cy", mousey + margin.top + 6);
 
       circle.classed("emphasize", emphasize);
 

@@ -34,6 +34,7 @@ function pauseVideo() {
 }
 function stopVideo() {
 	$("#exhibit-video")[0].pause();
+	$("#exhibit-video")[0].currentTime = 0;
 	hideVideo();
 	//$("#play").removeClass("disabled")
 	//$("#pause").addClass("disabled")
