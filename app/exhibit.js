@@ -22,22 +22,22 @@ function hideVideo() {
 }
 function playVideo() {
 	$("#exhibit-video")[0].play();
-	$("#play").addClass("disabled")
-	$("#pause").removeClass("disabled")
-	$("#stop").removeClass("disabled")
+	//$("#play").addClass("disabled")
+	//$("#pause").removeClass("disabled")
+	//$("#stop").removeClass("disabled")
 }
 function pauseVideo() {
 	$("#exhibit-video")[0].pause();
-	$("#play").removeClass("disabled")
-	$("#pause").addClass("disabled")
-	$("#stop").removeClass("disabled")
+	//$("#play").removeClass("disabled")
+	//$("#pause").addClass("disabled")
+	//$("#stop").removeClass("disabled")
 }
 function stopVideo() {
 	$("#exhibit-video")[0].pause();
 	hideVideo();
-	$("#play").removeClass("disabled")
-	$("#pause").addClass("disabled")
-	$("#stop").removeClass("disabled")
+	//$("#play").removeClass("disabled")
+	//$("#pause").addClass("disabled")
+	//$("#stop").removeClass("disabled")
 }
 function showCaseStudy(tourNumber) {
 	var url = (isSelfContainedServer ? "/?tour=" : "../gene.iobio?tour=") + tourNumber;
