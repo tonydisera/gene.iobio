@@ -273,9 +273,14 @@ function variantD3() {
       // TODO:  Need to review this code!!!  Added for exhibit
       minWidth = variantHeight;
 
+      var symbolScaleCircle = d3.scale.ordinal()
+                    .domain([3,4,5,6,7,8,10,12,14,16])
+                    .range([9,15,20,25,36,58,70,100,130,260]);
+      var symbolSizeCircle = symbolScaleCircle(minWidth);
+
       var symbolScale = d3.scale.ordinal()
-                    .domain([3,4,5,6,7,8,10,12])
-                    .range([9,15,20,25,36,58,70,100]);
+                    .domain([3,4,5,6,7,8,10,12,14,16])
+                    .range([9,15,20,25,36,58,70,100,130,160]);
 
       var symbolSize = symbolScale(minWidth);
       
@@ -501,7 +506,7 @@ function variantD3() {
                 return d3.svg
                      .symbol()
                      .type(getSymbol(d,i))
-                     .size(symbolSize)();
+                     .size(symbolSizeCircle)();
               })
               .attr("transform", function(d) { 
                   var xCoord = x(d.start) + 2;

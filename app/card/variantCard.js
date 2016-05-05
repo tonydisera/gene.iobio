@@ -226,7 +226,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .width(1000)
 				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 2 : 17, left: 4})
 				    .showXAxis(isLevelEdu ? false : true)
-				    .variantHeight(isLevelEdu ? 12 : 6)
+				    .variantHeight(isLevelEdu ? EDU_TOUR_VARIANT_SIZE : 6)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(this.variantTooltipHTML)
