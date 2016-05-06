@@ -5,23 +5,33 @@ var pageGuideEduTour1 = null;
 var pageGuideEduTour2 = null;
 
 var eduTour1Steps = {
-	'#edu-tour-label':                                  {index: 0, first: true, audio: '#audio1-1'},
+	'#edu-tour-label':                                  {index: 0, first: true, audio: '#tour1-recording1'},
 	'#phenolyzer-search-box .selectize-control.single': {index: 1},
-	'#phenolyzer-results':                              {index: 2, audio: '#audio1-2'},
-	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#audio1-3', height: '150px'},
+	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
+	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '150px'},
 	'#gene-badge-container':                            {index: 4 },
-	'#feature-matrix .col:eq(0)':                       {index: 5, audio: '#audio1-4'},
+	'#feature-matrix .col:eq(0)':                       {index: 5, audio: '#tour1-recording4'},
 	'#children-buttons':                                {index: 6 },
-	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#audio1-5', close: true}
+	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#tour1-recording5', close: true}
 };
 
 var eduTour2Steps = {
-	'#edu-tour-2-label':             {index: 0, first: true, audio: '#audio2-1', height: '400px', animation: {name: 'EDGE-1020589079', showFunction: showEduTourAnimationNew, delay: 0}},
-	'#feature-matrix .col:eq(2)':    {index: 1, audio: '#audio2-2'},
+	'#edu-tour-2-label': {
+		index: 0, 
+		first: true, 
+		audio: '#tour2-recording1', 
+		height: '400px', 
+		animation: {
+			clazz: 'EDGE-1020589079', 
+			container: "tour2-animation1", 
+			showFunction: showEduTourAnimationNew, 
+			delay: 0}
+	},
+	'#feature-matrix .col:eq(2)':    {index: 1, audio: '#tour2-recording2'},
 	'#button-load-john-data':        {index: 2},
 	'#button-load-diego-data':       {index: 3},
 	'#button-load-sarah-data':       {index: 4},
-	'#edu-tour-2':                   {index: 5, audio: '#audio2-3', close: true}
+	'#edu-tour-2':                   {index: 5, audio: '#tour2-recording3', close: true}
 };
 
 
@@ -124,7 +134,7 @@ function initializeTours() {
 			'handle_doc_switch': function(currentTour, prevTour) {
 
 				var step = eduTour2Steps[currentTour];
-				customizeEduTourStep(pageGuidEduTour2, step);
+				customizeEduTourStep(pageGuideEduTour2, step);
 
 			}
 	    }); 
@@ -141,9 +151,9 @@ function initializeTours() {
 
 function customizeEduTourStep(pageGuide, step) {
 	if (step.animation) {
-		setTimeout( function() {step.animation.showFunction(true, step.animation.name)}, step.animation.delay);
+		setTimeout( function() {step.animation.showFunction(true, step.animation.clazz, step.animation.container)}, step.animation.delay);
 	} else {
-		showEduTourAnimation(false);		
+		showEduTourAnimationNew(false);		
 	}
 	if (step.dialog) {
 		$('#edu-tour-modal').modal('show');
@@ -253,8 +263,9 @@ function showEduTourAnimation(show, id) {
 		
 }
 
-function showEduTourAnimationNew(show, clazz) {
+function showEduTourAnimationNew(show, clazz, container) {
 	if (show) {
+		$('#' + container).removeClass("hide");
 		$('.' + clazz).removeClass("hide");
 
 		AdobeEdge.loadComposition('anim-test-v1', clazz, {
@@ -267,7 +278,8 @@ function showEduTourAnimationNew(show, clazz) {
 		}, {"dom":{}}, {"dom":{}});	
 
 	} else {
-		$('.edu-tour-animation').addClass("hide");
+		$('.tour-animation').addClass("hide");
+		$('.tour-animation-container').addClass("hide");
 	}
  
 }

@@ -50,7 +50,7 @@ function DataCard() {
 	};
 
 	this.eduTourModes = [
-		'trio',
+		'single',
 		'single',
 		'single'
 	];
@@ -75,13 +75,13 @@ function DataCard() {
 	this.eduTourCards = [
 		{
 			proband: true,
-			mother:  true,
-			father:  true
+			mother:  false,
+			father:  false
 		},
 		{
-			proband: false,
-			mother:  true,
-			father:  true
+			proband: true,
+			mother:  false,
+			father:  false
 		},
 		{
 			proband: false,
@@ -94,9 +94,7 @@ function DataCard() {
 			proband: 'Alex'
 		},
 		{
-			proband: 'Father',
-			mother:  'Mother',
-			father:  'Father'
+			proband: 'Father'
 		},
 		{
 			proband: 'John'
