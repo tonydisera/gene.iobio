@@ -34,7 +34,7 @@
 
 
 #slider-left
-	top: 52px !important
+	top: 62px !important
 
 #edu-tour-modal
 	
@@ -52,9 +52,10 @@
 	background-color:  $tour-background-color
 	margin-bottom: 12px
 	display: block !important
-	height: 50px
+	height: 60px
 	width: 100%
 	text-align: center
+	padding-top: 6px
 
 	#start-over
 		float: left !important
@@ -100,13 +101,12 @@
 		background-color: $tour-background-color !important
 
 .tlypageguide_shadow
-	background-color: rgba(255, 255, 255, 0) !important
-	box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0) !important
 
 	&.tlypageguide-active
 		background-color: transparent !important
-		webkit-box-shadow: 0 0 18px 1px $tour-button-color !important
-		box-shadow: 0 0 18px 1px $tour-button-color !important
+		webkit-box-shadow: none !important
+		box-shadow: none !important
+		border: #F05B5B solid 6px !important
 
 .tlyPageGuideStepIndex
 	opacity: 0 !important
@@ -123,12 +123,15 @@
 			font-size: 25px !important
 			line-height: 25px !important
 			color: #FFFFFF !important
+			webkit-box-shadow: none !important
+			box-shador: none
 
 .tlypageguide_index
 	display: none !important
 
 .tlypageguide-active .tlyPageGuideStepIndex 
 	color: transparent !important
+	border: #F96262 solid 6px !important
 
 .edu-tour-answer
 	color: $tour-button-color !important

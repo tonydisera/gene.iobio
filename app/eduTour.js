@@ -215,7 +215,7 @@ function eduTourCheckPhenolyzer() {
 
 function eduTourCheckVariant(variant) {
 	if (isLevelEduTour && eduTourNumber == "1" 
-		&& pageGuideEduTour1.cur_idx == 3
+		&& pageGuideEduTour1.cur_idx == 4
 		&& variant.vepImpact[HIGH] != "HIGH" 
 		&& variant.start == 112116592 
 		&& window.gene.gene_name == 'APC') {

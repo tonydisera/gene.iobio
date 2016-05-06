@@ -445,10 +445,10 @@ tl.pg.interval = {};
                     newTargetData.targetStyle.display = 'block';
                     var offset = $el.offset();
                     $.extend(newTargetData.targetStyle, {
-                        top: offset.top,
-                        left: offset.left,
-                        width: $el.outerWidth(),
-                        height: $el.outerHeight(),
+                        top: offset.top - 6,
+                        left: offset.left - 6 ,
+                        width: $el.outerWidth() +6,
+                        height: $el.outerHeight() + 6,
                         'z-index': $el.css('z-index')
                     });
                     visibleIndex++;

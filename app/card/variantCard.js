@@ -1537,7 +1537,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 
-		eduTourCheckVariant();
+		eduTourCheckVariant(variant);
 
 		if (!isLevelEdu) {
 		    showSidebar("Examine");
