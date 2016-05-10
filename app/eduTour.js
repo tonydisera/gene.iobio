@@ -8,7 +8,7 @@ var eduTour1Steps = {
 	'#edu-tour-label':                                  {index: 0, first: true, audio: '#tour1-recording1'},
 	'#phenolyzer-search-box .selectize-control.single': {index: 1},
 	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
-	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '150px'},
+	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4 },
 	'#feature-matrix .col:eq(0)':                       {index: 5, audio: '#tour1-recording4'},
 	'#children-buttons':                                {index: 6 },

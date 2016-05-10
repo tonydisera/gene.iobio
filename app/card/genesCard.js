@@ -453,6 +453,9 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 
 	// Now create a comma delimited list of all existing genes + selected phenolyzer genes
 	var genesString = geneNames.join(",");
+	if (isLevelEdu) {
+		genesString = "";
+	}
 	selectedPhenoGenes.forEach( function(g) {
 		if (genesString.length > 0) {
 			genesString += ",";
