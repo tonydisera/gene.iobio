@@ -26,7 +26,7 @@ var Bam = Class.extend({
       this.iobio = {};
 
       this.stage_iobio_services = "wss://nv-green.iobio.io/";
-      this.prod_iobio_services  = "wss://services.iobio.io/";
+      this.prod_iobio_services  = "wss://nv-prod.iobio.io/";
       this.dev_iobio_services   = "ws://nv-dev.iobio.io/";
 
       this.iobio.services = this.prod_iobio_services;

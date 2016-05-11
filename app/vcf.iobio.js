@@ -68,7 +68,7 @@ vcfiobio = function module() {
   var clinvarIterCount       = 0;
 
   var stage_iobio_services = "wss://nv-green.iobio.io/";
-  var prod_iobio_services = "wss://services.iobio.io/";
+  var prod_iobio_services = "wss://nv-prod.iobio.io/";
   var dev_iobio_services = "ws://nv-dev.iobio.io/";
 
   var iobio_services = prod_iobio_services;
