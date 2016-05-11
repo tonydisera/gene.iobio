@@ -225,25 +225,31 @@
     background-color: #a5b941 !important; }
   #nav-edu-tour .btn.btn-raised {
     color: white !important;
-    background-color: rgba(156, 153, 153, 0.9) !important;
+    background-color: #3F58B5 !important;
     margin-left: 15px !important;
-    font-size: 14px !important; }
+    font-size: 18px !important;
+    padding: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    margin-top: 5px !important; }
   #nav-edu-tour .card-label {
     color: white !important;
     font-size: 20px !important; }
   #nav-edu-tour .edu-tour-button {
-    width: 78px; }
+    width: 88px; }
     #nav-edu-tour .edu-tour-button i.material-icons {
       display: none; }
-    #nav-edu-tour .edu-tour-button.active i.material-icons {
-      display: inline-block;
-      color: white !important;
-      font-size: 15px;
-      padding-bottom: 3px;
-      padding-right: 0px !important;
-      float: none !important; }
+    #nav-edu-tour .edu-tour-button.active {
+      background-color: #a5b941 !important; }
+      #nav-edu-tour .edu-tour-button.active i.material-icons {
+        display: inline-block;
+        color: white !important;
+        font-size: 15px;
+        padding-bottom: 3px;
+        padding-right: 0px !important;
+        float: none !important; }
     #nav-edu-tour .edu-tour-button.emphasize {
-      background-color: #a5b941 !important;
+      background-color: #F05B5B !important;
       color: white !important; }
 
 #tlyPageGuideWrapper #tlyPageGuideMessages {

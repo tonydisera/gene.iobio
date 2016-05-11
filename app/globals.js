@@ -34,7 +34,7 @@ var idlePrompting = false;
 //
 var stage_iobio_services    = "nv-green.iobio.io/";
 var dev_iobio_services      = "nv-dev.iobio.io/";
-var prod_iobio_services     = "services.iobio.io/";
+var prod_iobio_services     = "nv-prod.iobio.io/";
 var self_contained_services = "frontend/"
 
 var iobio_services        = (isSelfContainedServer ? "ws://" : "wss://")  + (isSelfContainedServer ? self_contained_services : prod_iobio_services);

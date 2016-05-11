@@ -71,19 +71,25 @@
 		color: white !important
 		background-color: $tour-data-button-color !important 
 		margin-left: 15px !important
-		font-size: 14px !important
+		font-size: 18px !important
+		padding: 8px !important
+		padding-left: 10px !important
+		padding-right: 10px !important
+		margin-top: 5px !important
 
 	.card-label
 		color: white !important
 		font-size: 20px !important
 
 	.edu-tour-button
-		width: 78px
+		width: 88px
 
 		i.material-icons
 			display: none
 
 		&.active
+			background-color: $tour-button-color !important
+
 			i.material-icons
 				display: inline-block
 				color: white !important
@@ -93,7 +99,7 @@
 				float: none !important	
 
 		&.emphasize
-			background-color: $tour-button-color !important
+			background-color: $tour-hilite-color !important
 			color: white !important
 
 #tlyPageGuideWrapper 
@@ -106,7 +112,7 @@
 		background-color: transparent !important
 		webkit-box-shadow: none !important
 		box-shadow: none !important
-		border: #F05B5B solid 6px !important
+		border: $tour-hilite-color solid 6px !important
 
 .tlyPageGuideStepIndex
 	opacity: 0 !important

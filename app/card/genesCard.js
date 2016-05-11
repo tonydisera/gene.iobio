@@ -1197,7 +1197,7 @@ GenesCard.prototype.promiseGetGenePhenotypes = function(geneName) {
       if (phenotypes != null) {
       	resolve([phenotypes, geneName]);
       } else {
-	      var url = geneToPhenoServer + "/api/gene/" + geneName;
+	      var url = geneToPhenoServer + "api/gene/" + geneName;
 	      $.ajax({
 		    url: url,
 		    jsonp: "callback",
