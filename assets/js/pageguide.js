@@ -444,11 +444,27 @@ tl.pg.interval = {};
                     $el = $($elements[i]); // is it weird to '$($x)'?
                     newTargetData.targetStyle.display = 'block';
                     var offset = $el.offset();
+
+                    var width = null;
+                    var height = null;
+                    var top = offset.top;
+                    var left = offset.left;
+                    if (typeof($el[0].getBBox) == 'function') {
+                        width  = $el[0].getBBox().width + 20;
+                        height = $el[0].getBBox().height + 20;
+                        top -= 10;
+                        left -= 10;
+                    } else {
+                        width = $el.outerWidth() + 6;
+                        height = $el.outerHeight() + 6
+                        top -= 6;
+                        left -= 6;
+                    }
                     $.extend(newTargetData.targetStyle, {
-                        top: offset.top - 6,
-                        left: offset.left - 6 ,
-                        width: $el.outerWidth() +6,
-                        height: $el.outerHeight() + 6,
+                        top:  top,
+                        left: left,
+                        width: width,
+                        height: height,
                         'z-index': $el.css('z-index')
                     });
                     visibleIndex++;
