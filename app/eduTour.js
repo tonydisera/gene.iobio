@@ -10,7 +10,7 @@ var eduTour1Steps = {
 	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4 },
-	'#feature-matrix .col:eq(0)':                       {index: 5, audio: '#tour1-recording4'},
+	'rect.HIGH.stop_gained':                       {index: 5, audio: '#tour1-recording4'},
 	'#children-buttons':                                {index: 6 },
 	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#tour1-recording5', close: true}
 };
