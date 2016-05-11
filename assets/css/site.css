@@ -225,7 +225,7 @@
     background-color: #a5b941 !important; }
   #nav-edu-tour .btn.btn-raised {
     color: white !important;
-    background-color: #3F58B5 !important;
+    background-color: #989898 !important;
     margin-left: 15px !important;
     font-size: 18px !important;
     padding: 8px !important;
@@ -242,7 +242,7 @@
     #nav-edu-tour .edu-tour-button.active {
       background-color: #a5b941 !important; }
       #nav-edu-tour .edu-tour-button.active i.material-icons {
-        display: inline-block;
+        display: none;
         color: white !important;
         font-size: 15px;
         padding-bottom: 3px;
