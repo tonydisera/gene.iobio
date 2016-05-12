@@ -33,7 +33,7 @@ var Bam = Class.extend({
 
       this.iobio.coverage       = this.iobio.services + "coverage/ ";
       this.iobio.bamtools       = this.iobio.services + "bamtools";
-      this.iobio.samtools       = this.iobio.services + "samtools";
+      this.iobio.samtools       = this.iobio.services + "od_samtools";
       this.iobio.bamReadDepther = this.iobio.services + "bamReadDepther";
       this.iobio.bamMerger      = this.iobio.services + "bammerger";      
       this.iobio.bamstatsAlive  = this.iobio.services + "bamstatsalive"
