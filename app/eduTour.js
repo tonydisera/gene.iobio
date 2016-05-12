@@ -16,18 +16,14 @@ var eduTour1Steps = {
 };
 
 var eduTour2Steps = {
-	'#edu-tour-2-label': {
-		index: 0, 
-		first: true, 
-		audio: '#tour2-recording1', 
-		height: '400px', 
+	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1', height: '400px', 
 		animation: {
 			clazz: 'EDGE-1020589079', 
 			container: "tour2-animation1", 
 			showFunction: showEduTourAnimationNew, 
 			delay: 0}
 	},
-	'#feature-matrix .col:eq(2)':    {index: 1, audio: '#tour2-recording2'},
+	'#vcf-variants rect:eq(2)':      {index: 1, audio: '#tour2-recording2'},
 	'#button-load-john-data':        {index: 2},
 	'#button-load-diego-data':       {index: 3},
 	'#button-load-sarah-data':       {index: 4},

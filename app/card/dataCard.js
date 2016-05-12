@@ -55,6 +55,7 @@ function DataCard() {
 		'single'
 	];
 
+
 	this.eduTourUrls = [ 
 	{
 		proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
@@ -70,6 +71,24 @@ function DataCard() {
 		proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
 		mother: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
 		father: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
+	}
+	];
+
+	this.eduTourUrlsOffline = [ 
+	{
+		proband: 'http://localhost/exhibit_cache/nhmu.vcf.gz',
+		mother:  'http://localhost/exhibit_cache/nhmu.vcf.gz',
+		father:  'http://localhost/exhibit_cache/nhmu.vcf.gz'
+	},
+	{
+		proband: 'http://localhost/exhibit_cache/nhmu.vcf.gz',
+		mother:  'http://localhost/exhibit_cache/nhmu.vcf.gz',
+		father:  'http://localhost/exhibit_cache/nhmu.vcf.gz'
+	},
+	{
+		proband: 'http://localhost/exhibit_cache/nhmu.vcf.gz',
+		mother:  'http://localhost/exhibit_cache/nhmu.vcf.gz',
+		father:  'http://localhost/exhibit_cache/nhmu.vcf.gz'
 	}
 	];
 	this.eduTourCards = [
@@ -133,11 +152,11 @@ DataCard.prototype.loadDemoData = function() {
 
 	if (isLevelEdu) {
 		var idx = isLevelEduTour ? +eduTourNumber : 0;
-		this.demoCards = this.eduTourCards[idx];
-		this.demoUrls = this.eduTourUrls[idx];
-		this.demoNames = this.eduTourNames[idx];
+		this.demoCards      = this.eduTourCards[idx];
+		this.demoUrls        = isSelfContainedServer ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
+		this.demoNames       = this.eduTourNames[idx];
 		this.demoSampleNames = this.eduTourSampleNames[idx];			
-		this.demoMode = this.eduTourModes[idx];
+		this.demoMode        = this.eduTourModes[idx];
 	} 
 
 	$('#splash').addClass("hide");	
