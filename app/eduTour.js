@@ -11,7 +11,7 @@ var eduTour1Steps = {
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
 	'rect.HIGH.stop_gained':                            {index: 5, audio: '#tour1-recording4'},
-	'#children-buttons':                                {index: 6 },
+	'#children-buttons':                                {index: 6, disableNext: true, correct: false},
 	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#tour1-recording5', close: true}
 };
 
@@ -260,6 +260,14 @@ function onEduTour1Check(checkbox) {
 			answerLabel.css("visibility", "visible");	
 		}
 
+	}
+	if ($('#jimmy')[0].checked == answer['jimmy']
+		&& $('#bobby')[0].checked == answer['bobby']
+		&& $('#sarah')[0].checked == answer['sarah']) {
+		eduTour1Steps['#children-buttons'].correct = true;	
+		pageGuideEduTour1.navigateForward();
+	} else {
+		eduTour1Steps['#children-buttons'].correct = false;			
 	}
 }
 
