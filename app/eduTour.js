@@ -9,7 +9,7 @@ var eduTour1Steps = {
 	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false},
 	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
-	'#gene-badge-container':                            {index: 4 },
+	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
 	'rect.HIGH.stop_gained':                            {index: 5, audio: '#tour1-recording4'},
 	'#children-buttons':                                {index: 6 },
 	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#tour1-recording5', close: true}
@@ -233,7 +233,11 @@ function eduTourCheckVariant(variant) {
 		&& variant.vepImpact[HIGH] != "HIGH" 
 		&& variant.start == 112116592 
 		&& window.gene.gene_name == 'APC') {
+		eduTour1Steps['#gene-badge-container'].correct = true;			
 		pageGuideEduTour1.navigateForward();
+	} else {
+		eduTour1Steps['#gene-badge-container'].correct = false;			
+
 	}	
 }
 
