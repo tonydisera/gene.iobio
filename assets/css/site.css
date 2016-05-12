@@ -32,11 +32,13 @@
 
 .iobio {
   font-size: 32px !important;
-  padding-top: 5px !important; }
+  padding-top: 5px !important;
+  margin-top: -5px !important; }
 
 .iobioapp {
   font-size: 32px !important;
-  padding-top: 5px !important; }
+  padding-top: 5px !important;
+  margin-top: -5px !important; }
 
 .card-label {
   text-transform: none !important; }
@@ -69,7 +71,7 @@
   display: block !important; }
 
 #home {
-  margin-top: -5px !important; }
+  margin-top: -9px !important; }
 
 #education-title.level-edu {
   display: block !important;
