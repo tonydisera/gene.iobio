@@ -6,7 +6,7 @@ var pageGuideEduTour2 = null;
 
 var eduTour1Steps = {
 	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, audio: '#tour1-recording1'},
-	'#phenolyzer-search-box .selectize-control.single': {index: 1},
+	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false},
 	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4 },
@@ -155,6 +155,12 @@ function customizeEduTourStep(pageGuide, step) {
 	} else {
 		$('.tlypageguide_shadow')[step.index].style.visibility = 'visible';
 	}
+
+	if (step.disableNext == true && step.correct == false) {
+		$('.pageguide-next').addClass("disabled");
+	} else {
+		$('.pageguide-next').removeClass("disabled");		
+	}
 	if (step.animation) {
 		setTimeout( function() {step.animation.showFunction(true, step.animation.clazz, step.animation.container)}, step.animation.delay);
 	} else {
@@ -209,11 +215,14 @@ function eduTourCheckPhenolyzer() {
 			}
 		}
 		if (correct) {
+			eduTour1Steps['#phenolyzer-search-box .selectize-control.single'].correct = true;
 			genesCard.getPhenolyzerGenes(phenotype);
 			if (eduTourNumber == 1  && pageGuideEduTour1.cur_idx == 1) {
 				pageGuideEduTour1.navigateForward();
 			}
 			
+		} else {
+			eduTour1Steps['#phenolyzer-search-box .selectize-control.single'].correct = false;
 		}
 	});			
 }

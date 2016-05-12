@@ -754,6 +754,9 @@ tl.pg.interval = {};
 
         /* interaction: fwd/back click */
         self.$fwd.on('click', function() {
+            if ($('#pageguide-next-button').hasClass("disabled")) {
+                return false;
+            }
             if (self.is_open) {
                 self.navigateForward();
             }

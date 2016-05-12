@@ -5,8 +5,8 @@
 */
 var isSelfContainedServer   = false; // is the client + the server running on one machine?
 var isOffline               = true;  // is there any internet connect to outside services like clinvar, ncbi?
-var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
-var isLevelEduTour          = true;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var isLevelEdu              = false;  // is gene.iobio educational version, simplified version of app
+var isLevelEduTour          = false;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
