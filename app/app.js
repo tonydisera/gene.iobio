@@ -2199,5 +2199,14 @@ function bookmarkVariant() {
 }
 
 
+function switchGenotype(gt) {
+	if (gt != null && gt.length == 3) {
+		return gt[2] +  gt[0];
+	} else {
+		return gt;
+	}
+
+}
+
 
  

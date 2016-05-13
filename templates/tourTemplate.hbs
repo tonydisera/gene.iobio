@@ -98,45 +98,137 @@
 
   
   <li class="tlypageguide_up" data-tourtarget="#edu-tour-2-label">
-  
+    [audio + animation of warfarin dosage]
+  </li>
+
+  <li class="tlypageguide_up" data-tourtarget="#edu-tour-2 #start-over">  
+    <div style="text-align:center">
+      [audio + animation of genotypes]
+    </div>
   </li>
 
   <li class="tlypageguide_down" data-tourtarget="#vcf-variants rect:eq(2)">
-    <div>
-    [GRAPHICS (TONY) - Show genotype legend with warfarin doses]
+      We will be evaluating the variant on the right, highlighted in red.  This variant determines
+      the sensitivity to Warfarin.  Click on it to see the genotype.
+  </li>  
 
+  <li class="tlypageguide_down" data-tourtarget="#button-load-john-data">
+    <div style="float:left;width:70%">
+
+      Based on John's genotype, what dosage should John receive?
+      <div style="text-align:center;margin-top:10px;margin-bottom:0px;">
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox" onclick="onEduTour2Check($(this))" id="john-normal">
+            <label for="john-normal" >Normal</label>
+        </div>
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="john-lower">
+            <label for="john-lower">Lower</label>
+         </div>
+        <div class="custom-checkbox" style="display:inline-block">
+            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="john-lowest">
+            <label for="john-lowest" >Lowest</label>
+         </div>
+      </div>
+    
+      <div style="text-align:center;margin-top:0px;margin-bottom:0px">
+          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
+              <label id="john-normal-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+          </div>
+          <div style="display:inline-block;margin-right: 36px;">            
+              <label id="john-lower-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+           </div>
+          <div style="display:inline-block">
+              <label id="john-lowest-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+           </div>
+        </div>  
+    </div>
+    <div style="float:left;>
+      <img width="200" height="100" src="assets/images/edutour/dose_legend.png">
     </div>
   </li>  
 
-  <li class="tlypageguide_up" data-tourtarget="#button-load-john-data">
-    <div>
-      Start with the first patient, John. Select the ‘VKORC1’ gene from the drop down list at the top of the page. Tourch each of the variants in John’s VKORC1 gene. Find the variant that determines his sensitivity to Warfarin and recommend a dose for him below. 
-
-      [GRAPHICS: Question at the bottom of the screen reads: “What dose of Warfarin does John need?” Three radio buttons read: “Normal” “Lower” “Lowest”. A “Help” button allows player to bring up a screen that reminds them of the doses required by people with different genotypes: “GG = normal dose, AG = lower dose, AA = lowest dose.]
-    </div>
-  </li>  
 
   <li class="tlypageguide_up" data-tourtarget="#button-load-diego-data">
-    <div>
-
-      Now select Diego. Find the variant that determines his sensitivity to Warfarin and recommend a dose for him below. [GRAPHICS: Question at the bottom of the screen reads: “What dose of Warfarin does Diego need?” Three radio buttons read: “Normal” “Lower” “Lowest”. A “Help” button allows player to bring up a screen that reminds them of the doses required by people with different genotypes: “GG = normal dose, AG = lower dose, AA = lowest dose.]
-
+    <div style="float:left;width:70%">      
+      Now select Diego. Click on the variant and recommend a dose for him below. 
+      <div style="text-align:center;margin-top:10px;margin-bottom:0px;">
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox" onclick="onEduTour2Check($(this))" id="diego-normal">
+            <label for="diego-normal" >Normal</label>
+        </div>
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="diego-lower">
+            <label for="diego-lower">Lower</label>
+         </div>
+        <div class="custom-checkbox" style="display:inline-block">
+            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="diego-lowest">
+            <label for="diego-lowest" >Lowest</label>
+         </div>
+      </div>
+    
+      <div style="text-align:center;margin-top:0px;margin-bottom:0px">
+          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
+              <label id="diego-normal-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+          </div>
+          <div style="display:inline-block;margin-right: 36px;">            
+              <label id="diego-lower-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+           </div>
+          <div style="display:inline-block">
+              <label id="diego-lowest-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+           </div>
+        </div>  
     </div>
+    <div style="float:left;background-color:white;padding: 10px;">
+      <img width="200" height="100" src="assets/images/edutour/dose_legend.png">
+    </div>      
+
   </li> 
 
-  <li class="tlypageguide_up" data-tourtarget="#button-load-sarah-data">
+  <li class="tlypageguide_up" data-tourtarget="#button-load-anna-data">
     <div>
 
-      Now select Sarah. Find the variant that determines her sensitivity to Warfarin and recommend a dose for her below. [GRAPHICS: Question at the bottom of the screen reads: “What dose of Warfarin does Sarah need?” Three radio buttons read: “Normal” “Lower” “Lowest”. A “Help” button allows player to bring up a screen that reminds them of the doses required by people with different genotypes: “GG = normal dose, AG = lower dose, AA = lowest dose.]
+    <div style="float:left;width:70%">      
+      <br><br>
+      Now select Anna. Click on the variant and recommend a dose for her below. 
+      <div style="text-align:center;margin-top:10px;margin-bottom:0px;">
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox" onclick="onEduTour2Check($(this))" id="anna-normal">
+            <label for="anna-normal" >Normal</label>
+        </div>
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="anna-lower">
+            <label for="anna-lower">Lower</label>
+         </div>
+        <div class="custom-checkbox" style="display:inline-block">
+            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="anna-lowest">
+            <label for="anna-lowest" >Lowest</label>
+         </div>
+      </div>
+    
+      <div style="text-align:center;margin-top:0px;margin-bottom:0px">
+          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
+              <label id="anna-normal-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+          </div>
+          <div style="display:inline-block;margin-right: 36px;">            
+              <label id="anna-lower-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+           </div>
+          <div style="display:inline-block">
+              <label id="anna-lowest-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+           </div>
+        </div>  
+    </div>
+    <div style="float:left;background-color:white;padding: 10px;">
+      <img width="200" height="100" src="assets/images/edutour/dose_legend.png">
+    </div> 
 
     </div>
   </li>  
 
   <li class="tlypageguide_up" data-tourtarget="#edu-tour-2">
-    <div>
 
-    [Audio] [GRAPHICS: show the variants and recommended doses side by side for the three patients: John-GG-normal dose; Diego-AA-lower dose, Sarah has AG] Based on their genetic variants, each of these three patients needed a different dose of Warfarin. Thank you for advising their doctor.
-    </div>
+      <img width="450" src="assets/images/edutour/patient_to_dose_legend.png">
+
   </li>  
 
  

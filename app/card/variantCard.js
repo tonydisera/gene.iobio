@@ -2260,7 +2260,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	
 	var dbSnpId = getRsId(variant);	
 
-	var genotypeRow = isLevelEduTour && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', variant.eduGenotype, '','')  : "";
+	var genotypeRow = isLevelEduTour && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
 	if (isLevelEdu) {
 		return (
