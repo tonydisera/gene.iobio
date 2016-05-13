@@ -270,8 +270,9 @@
   opacity: 1 !important; }
 
 .tlypageguide_text {
-  font-size: 18px !important;
-  text-align: center !important; }
+  font-size: 23px !important;
+  text-align: center !important;
+  line-height: 25px !important; }
   .tlypageguide_text .checkbox label {
     font-size: 25px !important;
     line-height: 25px !important;

@@ -16,9 +16,12 @@ var eduTour1Steps = {
 };
 
 var eduTour2Steps = {
-	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1', height: '400px', 
+	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1', height: '470px', 
 		animation: {
-			clazz: 'EDGE-1020589079', 
+			name: 'use-case01-scene01-v1', 
+			clazz: 'EDGE-462912531',
+			width: "1200px",
+		    height: "468px",
 			container: "tour2-animation1", 
 			showFunction: showEduTourAnimationNew, 
 			delay: 0}
@@ -159,7 +162,7 @@ function customizeEduTourStep(pageGuide, step) {
 		$('.pageguide-next').removeClass("disabled");		
 	}
 	if (step.animation) {
-		setTimeout( function() {step.animation.showFunction(true, step.animation.clazz, step.animation.container)}, step.animation.delay);
+		setTimeout( function() {step.animation.showFunction(true, step.animation.name, step.animation.clazz, step.animation.width, step.animation.height, step.animation.container)}, step.animation.delay);
 	} else {
 		showEduTourAnimationNew(false);		
 	}
@@ -313,11 +316,12 @@ function showEduTourAnimation(show, id) {
 		
 }
 
-function showEduTourAnimationNew(show, clazz, container) {
+function showEduTourAnimationNew(show, name, clazz, width, height, container) {
 	if (show) {
 		$('#' + container).removeClass("hide");
 		$('.' + clazz).removeClass("hide");
 
+/*
 		AdobeEdge.loadComposition('anim-test-v1', clazz, {
 		    scaleToFit: "both",
 		    centerStage: "both",
@@ -326,6 +330,15 @@ function showEduTourAnimationNew(show, clazz, container) {
 			    width: "1460px",
 			    height: "468px"
 		}, {"dom":{}}, {"dom":{}});	
+*/
+		AdobeEdge.loadComposition(name, clazz, {
+		    scaleToFit: "both",
+		    centerStage: "both",
+		    minW: "0px",
+		    maxW: "undefined",
+		    width: width,
+		    height: height
+		}, {"dom":{}}, {"dom":{}});
 
 	} else {
 		$('.tour-animation').addClass("hide");
