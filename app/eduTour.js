@@ -31,10 +31,8 @@ var eduTour2Steps = {
 	},
 	'#edu-tour-2 #start-over':       {index: 1, noElement: true, audio: '#tour2-recording2'},
 	'#vcf-variants rect:eq(2)':      {index: 2},
-	'#button-load-john-data':        {index: 3, disableNext: true, correct: false},
-	'#button-load-diego-data':       {index: 4, disableNext: true, correct: false},
-	'#button-load-anna-data':        {index: 5, disableNext: true, correct: false},
-	'#edu-tour-2':                   {index: 6, noElement: true, audio: '#tour2-recording3', close: true}
+	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false},
+	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true}
 };
 
 
@@ -282,16 +280,36 @@ function onEduTour2Check(checkbox) {
 	var dosage  = tokens[1];
 	var checked          = checkbox[0].checked
 	var answerLabel      = $('#' + checkboxId + "-answer");
+	var allAnswerLabels  = $('.' + name + "-answer");
+	var allCheckboxes    = $('.' + name + "-checkbox");
+
+	allCheckboxes.each(function(i,val) {
+		if ($(this)[0].id == checkboxId) {
+
+		} else {
+			$(this)[0].checked = false;
+		}
+	})
 	
 	// Show if the answer is correct or incorrect
+	allAnswerLabels.addClass("hide");
 	if (checked) {
-		answerLabel.css("visibility", "visible");	
+		answerLabel.removeClass("hide");	
 	} else {
-		answerLabel.css("visibility", "hidden");	
+		answerLabel.addClass("hide");	
 	}
 
-	var stepSelector = '#button-load-' + name + '-data';
-	if (checked && answer[name] == dosage) {
+	var correctCount = 0;
+	for (var key in answer) {
+		var dosage = answer[key];
+		var selector = "#" + key + "-" + dosage;
+		if ($(selector)[0].checked) {
+			correctCount++;
+		}
+	}
+
+	var stepSelector = '#child-buttons-tour2';
+	if (correctCount == 3) {
 		eduTour2Steps[stepSelector].correct = true;	
 		//pageGuideEduTour2.navigateForward();
 		$('#pageguide-next-button').removeClass("disabled");

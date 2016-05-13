@@ -104,117 +104,84 @@
       We will be evaluating the variant on the right, highlighted in red.  This variant determines
       the sensitivity to Warfarin.  Click on it to see the genotype.
   </li>  
-
-  <li class="tlypageguide_down" data-tourtarget="#button-load-john-data">
-    <div style="float:left;width:70%">
-
-      Based on John's genotype, what dosage should John receive?
-      <div style="text-align:center;margin-top:10px;margin-bottom:0px;">
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox" onclick="onEduTour2Check($(this))" id="john-normal">
-            <label for="john-normal" >Normal</label>
-        </div>
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="john-lower">
-            <label for="john-lower">Lower</label>
-         </div>
-        <div class="custom-checkbox" style="display:inline-block">
-            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="john-lowest">
-            <label for="john-lowest" >Lowest</label>
-         </div>
-      </div>
-    
-      <div style="text-align:center;margin-top:0px;margin-bottom:0px">
-          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
-              <label id="john-normal-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
-          </div>
-          <div style="display:inline-block;margin-right: 36px;">            
-              <label id="john-lower-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
-           </div>
-          <div style="display:inline-block">
-              <label id="john-lowest-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
-           </div>
-      </div>  
-    </div>
-    <div style="float:left;background-color:white;padding: 10px;">
-      <img width="200" height="100" src="assets/images/edutour/dose_legend.png">
-      </div>
-  </li>  
-
-
-  <li class="tlypageguide_up" data-tourtarget="#button-load-diego-data">
-    <div style="float:left;width:70%">      
-      Now select Diego. Click on the variant and recommend a dose for him below. 
-      <div style="text-align:center;margin-top:10px;margin-bottom:0px;">
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox" onclick="onEduTour2Check($(this))" id="diego-normal">
-            <label for="diego-normal" >Normal</label>
-        </div>
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="diego-lower">
-            <label for="diego-lower">Lower</label>
-         </div>
-        <div class="custom-checkbox" style="display:inline-block">
-            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="diego-lowest">
-            <label for="diego-lowest" >Lowest</label>
-         </div>
-      </div>
-    
-      <div style="text-align:center;margin-top:0px;margin-bottom:0px">
-          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
-              <label id="diego-normal-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
-          </div>
-          <div style="display:inline-block;margin-right: 36px;">            
-              <label id="diego-lower-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
-           </div>
-          <div style="display:inline-block">
-              <label id="diego-lowest-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
-           </div>
-        </div>  
-    </div>
-    <div style="float:left;background-color:white;padding: 10px;">
-      <img width="200" height="100" src="assets/images/edutour/dose_legend.png">
-    </div>      
-
-  </li> 
-
-  <li class="tlypageguide_up" data-tourtarget="#button-load-anna-data">
+ 
+  <li class="tlypageguide_down" data-tourtarget="#child-buttons-tour2">
     <div>
-
-    <div style="float:left;width:70%">      
-      <br><br>
-      Now select Anna. Click on the variant and recommend a dose for her below. 
-      <div style="text-align:center;margin-top:10px;margin-bottom:0px;">
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox" onclick="onEduTour2Check($(this))" id="anna-normal">
-            <label for="anna-normal" >Normal</label>
-        </div>
-        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
-            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="anna-lower">
-            <label for="anna-lower">Lower</label>
-         </div>
-        <div class="custom-checkbox" style="display:inline-block">
-            <input type="checkbox"  onclick="onEduTour2Check($(this))" id="anna-lowest">
-            <label for="anna-lowest" >Lowest</label>
-         </div>
-      </div>
-    
-      <div style="text-align:center;margin-top:0px;margin-bottom:0px">
-          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
-              <label id="anna-normal-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
-          </div>
-          <div style="display:inline-block;margin-right: 36px;">            
-              <label id="anna-lower-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
-           </div>
-          <div style="display:inline-block">
-              <label id="anna-lowest-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
-           </div>
-        </div>  
+    Select each patient and look at the genotype to determine the correct dosage.
+    <br><br>
     </div>
-    <div style="float:left;background-color:white;padding: 10px;">
-      <img width="200" height="100" src="assets/images/edutour/dose_legend.png">
-    </div> 
+    <div style="margin-bottom:30px;margin-top:-10px;">
+      <div style="float:left;width:25%;text-align:left">
+        John
+        <div style="text-align:left;margin-top:0px;margin-bottom:0px">
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-normal">
+              <label for="john-normal" >Normal</label>
+          </div>
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-lower">
+              <label for="john-lower">Lower</label>
+           </div>
+          <div class="custom-checkbox" style="display:inline">
+              <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-lowest">
+              <label for="john-lowest" >Lowest</label>
+           </div>
+           <div  style="text-align:left;margin-top:-7px;">
+            <label id="john-normal-answer" class="john-answer incorrect hide edu-tour-answer" >incorrect</label>
+            <label id="john-lower-answer"  class="john-answer hide edu-tour-answer" >correct</label>
+            <label id="john-lowest-answer" class="john-answer hide incorrect edu-tour-answer">incorrect</label>
+           </div>
+        </div>
+      
+      </div>
+      <div style="float:left;width:25%;text-align:left">
+        Diego
+        <div style="text-align:left;margin-top:0px;margin-bottom:0px">
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-normal">
+              <label for="diego-normal" >Normal</label>
+          </div>
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-lower">
+              <label for="diego-lower">Lower</label>
+           </div>
+          <div class="custom-checkbox" style="display:inline">
+              <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-lowest">
+              <label for="diego-lowest" >Lowest</label>
+           </div>
+           <div  style="text-align:left;margin-top:-7px;">
+            <label id="diego-normal-answer" class="diego-answer incorrect hide edu-tour-answer" >incorrect</label>
+            <label id="diego-lower-answer"  class="diego-answer hide incorrect edu-tour-answer" >incorrect</label>
+            <label id="diego-lowest-answer" class="diego-answer hide  edu-tour-answer">correct</label>
+           </div>
+        </div>
+      </div>
 
+      <div style="float:left;width:25%;text-align:left">
+        Anna
+        <div style="text-align:left;margin-top:0px;margin-bottom:0px">
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-normal">
+              <label for="anna-normal" >Normal</label>
+          </div>
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-lower">
+              <label for="anna-lower">Lower</label>
+           </div>
+          <div class="custom-checkbox" style="display:inline">
+              <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-lowest">
+              <label for="anna-lowest" >Lowest</label>
+           </div>
+           <div  style="text-align:left;margin-top:-7px;">
+            <label id="anna-normal-answer" class="anna-answer  hide edu-tour-answer" >correct</label>
+            <label id="anna-lower-answer"  class="anna-answer hide incorrect edu-tour-answer" >incorrect</label>
+            <label id="anna-lowest-answer" class="anna-answer hide incorrect edu-tour-answer">incorrect</label>
+           </div>
+        </div>
+      </div>
+      <div style="margin-top:20px;float:left;width:25%;background-color:white;padding: 10px;">
+        <img width="200" src="assets/images/edutour/dose_legend.png">
+      </div>
     </div>
   </li>  
 
