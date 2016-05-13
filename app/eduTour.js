@@ -5,7 +5,18 @@ var pageGuideEduTour1 = null;
 var pageGuideEduTour2 = null;
 
 var eduTour1Steps = {
-	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, audio: '#tour1-recording1'},
+	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, 
+		height: '470px', 		
+		audio: '#tour1-recording1',
+		animation: {
+			name: 'use-case01-scene01-v1', 
+			clazz: 'EDGE-462912531',
+			width: "1200px",
+		    height: "468px",
+			container: "tour2-animation1", 
+			showFunction: showEduTourAnimationNew, 
+			delay: 0}
+		},
 	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false},
 	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
@@ -16,15 +27,7 @@ var eduTour1Steps = {
 };
 
 var eduTour2Steps = {
-	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1', height: '470px', 
-		animation: {
-			name: 'use-case01-scene01-v1', 
-			clazz: 'EDGE-462912531',
-			width: "1200px",
-		    height: "468px",
-			container: "tour2-animation1", 
-			showFunction: showEduTourAnimationNew, 
-			delay: 0}
+	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1'
 	},
 	'#edu-tour-2 #start-over':       {index: 1, noElement: true, audio: '#tour2-recording2'},
 	'#vcf-variants rect:eq(2)':      {index: 2},
