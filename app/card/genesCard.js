@@ -18,38 +18,40 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
+	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
 	if (isLevelEdu) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
+	} else {
+	  	// Selectize combo for phenotype terms    
+		$('#select-phenotypes').selectize({
+			//plugins: ['remove_button'],
+		    valueField: 'value',
+		    labelField: 'value',
+		    searchField: 'value',
+		    create: true,
+		    maxItems: null,  
+		    maxOptions: 500,  
+		    load: function(query, callback) {
+		        if (!query.length) return callback();
+		        $.ajax({
+		            url: hpoUrl + '?term='+encodeURIComponent(query),
+		            type: 'GET',
+		            error: function() {
+		                callback();
+		            },
+		            success: function(res) {
+		            	if (!query.length) return callback();
+		                callback(res);               
+		            }
+		        });
+		    }
+		});  
+		$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
+			$('#select-phenotypes')[0].selectize.close();
+		});
+
 	}
-	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
      
-  	// Selectize combo for phenotype terms    
-	$('#select-phenotypes').selectize({
-		//plugins: ['remove_button'],
-	    valueField: 'value',
-	    labelField: 'value',
-	    searchField: 'value',
-	    create: true,
-	    maxItems: null,  
-	    maxOptions: 500,  
-	    load: function(query, callback) {
-	        if (!query.length) return callback();
-	        $.ajax({
-	            url: hpoUrl + '?term='+encodeURIComponent(query),
-	            type: 'GET',
-	            error: function() {
-	                callback();
-	            },
-	            success: function(res) {
-	            	if (!query.length) return callback();
-	                callback(res);               
-	            }
-	        });
-	    }
-	});  
-	$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
-		$('#select-phenotypes')[0].selectize.close();
-	});
 
 
 
@@ -1043,7 +1045,9 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 		    	updateUrl('gene', window.gene.gene_name);
 
-		    	me.updateGeneInfoLink(window.gene.gene_name);
+		    	if (!isOffline) {
+			    	me.updateGeneInfoLink(window.gene.gene_name);
+		    	}
 
 				if (!hasDataSources()) {
 					//showDataDialog();
@@ -1115,12 +1119,14 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 	var geneAnnot = geneAnnots[geneName];
 	if (geneAnnot == null) {
 		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+		
 		me.promiseSetGeneAnnot(geneBadge, geneName).then( function(data) {
 			geneAnnot = data;
 			setSelectedGeneLink(geneAnnot)
 		}, function(error) {
 			console.log("error getting gene annot gene gene badge selected. " + error)
 		});
+
 	} else {
 		setSelectedGeneLink(geneAnnot);
 	}
