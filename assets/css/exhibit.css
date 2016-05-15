@@ -101,3 +101,33 @@ h3 {
 	font-size: 20px !important;
 	margin-left: 10px;
 }
+
+.edu-cases {	
+	-webkit-animation-iteration-count: 1;
+	-moz-animation-iteration-count: 1;
+	animation-iteration-count: 1;
+	-webkit-animation-delay: .1s;
+	-moz-animation-delay: .1s;
+	animation-delay: .1s;
+	-webkit-animation-duration: 1.2s;
+	-moz-animation-duration: 1.2s;
+	animation-duration: 1.2;
+}
+
+#thankyou {
+	position:absolute;
+	bottom:10px;
+	width:100%;	
+}
+
+#thankyou #header {
+	color: rgba(165, 185, 65, 1);
+	font-size: 18px;
+	margin-top: 25px;
+	margin-bottom: 0px;
+}
+#thankyou a {
+	margin-left: 20px;
+}
+
+

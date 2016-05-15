@@ -32,12 +32,12 @@
 
 .iobio {
   font-size: 32px !important;
-  padding-top: 5px !important;
+  padding-top: 12px !important;
   margin-top: -5px !important; }
 
 .iobioapp {
   font-size: 32px !important;
-  padding-top: 5px !important;
+  padding-top: 12px !important;
   margin-top: -5px !important; }
 
 .card-label {
@@ -255,7 +255,10 @@
       color: white !important; }
 
 #tlyPageGuideWrapper #tlyPageGuideMessages {
-  background-color: rgba(81, 77, 77, 0.9) !important; }
+  background-color: rgba(81, 77, 77, 0.9) !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  width: 100% !important; }
 
 .tlypageguide_shadow.tlypageguide-active {
   background-color: transparent !important;

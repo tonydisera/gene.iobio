@@ -6,10 +6,10 @@ var pageGuideEduTour2 = null;
 
 var eduTour1Steps = {
 	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, 
-		height: '470px', 		
 		audio: '#tour1-recording1',
+		height: '500px', 		
 		animation: {
-			name: 'use-case01-scene01-v1', 
+			name: 'use-case01-scene01-v2', 
 			clazz: 'EDGE-462912531',
 			width: "1200px",
 		    height: "468px",
@@ -23,7 +23,18 @@ var eduTour1Steps = {
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
 	'rect.HIGH.stop_gained':                            {index: 5, audio: '#tour1-recording4'},
 	'#children-buttons':                                {index: 6, disableNext: true, correct: false},
-	'.edu-tour-1-child-buttons':                        {index: 7, audio: '#tour1-recording5', close: true}
+	'.edu-tour-1-child-buttons':                        {index: 7, close: true,
+		audio: '#tour1-recording5', 
+		height: '500px', 		
+		animation: {
+			name: 'use-case01-scene07-v1', 
+			clazz: 'EDGE-462912531',
+			width: "1200px",
+		    height: "468px",
+			container: "tour2-animation1", 
+			showFunction: showEduTourAnimationNew, 
+			delay: 0}
+		}	
 };
 
 var eduTour2Steps = {

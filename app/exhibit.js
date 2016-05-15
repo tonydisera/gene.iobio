@@ -1,10 +1,38 @@
 $(document).ready(function() {
 	$.material.init();
 	$("#exhibit-video").on("ended", function() {
-		hideVideo();   	
-		showCaseStudies();	
+		$('.exhibit-welcome').animateVideoDone('fadeOutRight');	
 	});
+
+	// Encapsulate logic for animate.css into a jquery function
+    $.fn.extend({
+    animateIt: function (animationName, customClassName) {
+    		$(this).removeClass("hide");
+    		var additionalClass = customClassName ? ' ' + customClassName : '';
+	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
+	            $(this).removeClass('animated ' + animationName);
+	        });
+	    }
+	});
+
+	// Encapsulate logic for animate.css into a jquery function
+    $.fn.extend({
+	animateVideoDone: function (animationName, customClassName) {
+			$(this).removeClass("hide");
+			var additionalClass = customClassName ? ' ' + customClassName : '';
+	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
+	            $(document).addClass("hide");	           
+	            //$(this).removeClass('animated ' + animationName);	
+				//hideVideo();   	
+				showCaseStudies();	
+        	});
+	    }
+	});
+
 	checkForInactivity();
+
 });
 
 function showVideo() {
@@ -12,13 +40,12 @@ function showVideo() {
 	$('#start-here').addClass('hide');
 	$('h1').addClass('hide');
 	$('h3').addClass('hide');
+	$('#thankyou').addClass('hide');
+	
 	playVideo();
 }
 function hideVideo() {
 	$('#video-container').addClass('hide');
-	$('#start-here').removeClass('hide');	
-	$('h1').removeClass('hide');
-	$('h2').removeClass('hide');
 }
 function playVideo() {
 	$("#exhibit-video")[0].play();
@@ -51,6 +78,7 @@ function showNewCaseStudy() {
 function showCaseStudies() {
 	var url = "exhibit-cases.html"
 	window.location.href = url;
+	
 }
 
 function getUrlParameter(sParam) {

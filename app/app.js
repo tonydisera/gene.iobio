@@ -1262,15 +1262,15 @@ function isCachedForCards(geneName, transcript) {
 
 
 function clearCache() {
-	if (localStorage) {
-		localStorage.clear();
-	}
-	
-	//window.geneObjects = {};
-	//window.geneAnnots = {};
-	//window.gene = null;
-	//window.selectedTranscript = null;
-	window.genesToCache = [];
+	//if (isLevelEduTour) {
+		
+	//} else {
+		if (localStorage) {
+			localStorage.clear();
+		}
+		window.genesToCache = [];
+	//}
+
 }
 
 
