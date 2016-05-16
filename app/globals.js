@@ -24,7 +24,7 @@ var levelEduImpact = {
 // For the exhibit version, we will restart to the welcome page after n seconds of inactivity
 //
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 30;    // After 1 minute (e.g. 3 * 20 seconds), prompt the user about inactivity
+var MAX_IDLE      = 60;    // After 3 minute (e.g. 3 * 60  = 180 seconds), prompt the user about inactivity
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
 var idleTime = 0;
 var idlePrompting = false;

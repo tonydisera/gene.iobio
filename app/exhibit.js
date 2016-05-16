@@ -117,6 +117,9 @@ function checkForInactivity() {
     $(this).keypress(function (e) {
         idleTime = 0;
     });	
+    if ($('#video-container').hasClass("hide")) {
+    	idleTime = 0;
+    }
 }
 
 function timerIncrement() {
@@ -124,7 +127,7 @@ function timerIncrement() {
 		return;
 	}
     idleTime = idleTime + 1;
-    if (idleTime > MAX_IDLE && !$('#video-container').hasClass("hide")) {
+    if (idleTime > MAX_IDLE && $('#video-container').hasClass("hide")) {
     	idlePrompting = true; 
     	// If the user hasn't pressed continue in the next x seconds, restart the app.
 		setTimeout(restartApp, IDLE_RESTART);  //

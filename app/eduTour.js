@@ -3,44 +3,79 @@ var pageGuideBookmarks = null;
 var pageGuidePhenolyzer = null;
 var pageGuideEduTour1 = null;
 var pageGuideEduTour2 = null;
+var edgeObject = null;
 
 var eduTour1Steps = {
 	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, 
 		audio: '#tour1-recording1',
-		height: '500px', 		
+		height: 'full', 		
 		animation: {
 			name: 'use-case01-scene01-v2', 
 			clazz: 'EDGE-462912531',
-			width: "1200px",
+		    width: "1200px",
 		    height: "468px",
-			container: "tour2-animation1", 
+			container: "animation-container-1", 
 			showFunction: showEduTourAnimationNew, 
 			delay: 0}
 		},
 	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false},
-	'#phenolyzer-results':                              {index: 2, audio: '#tour1-recording2'},
+	'#phenolyzer-results':                              {index: 2, 
+		audio: '#tour1-recording2',
+		//height: "50px"
+		/*,
+		animation: {
+			name: 'use-case01-scene03-v1',
+			clazz: 'EDGE-30904779',
+		    width: "1200px",
+		    height: "468px",
+			container: "animation-container-2", 
+			showFunction: showEduTourAnimationNew, 
+			delay: 0
+		}*/
+	},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
 	'rect.HIGH.stop_gained':                            {index: 5, audio: '#tour1-recording4'},
 	'#children-buttons':                                {index: 6, disableNext: true, correct: false},
-	'.edu-tour-1-child-buttons':                        {index: 7, close: true,
+	'.edu-tour-1-child-buttons':                        {index: 7, close: true, noElement: true,
 		audio: '#tour1-recording5', 
-		height: '500px', 		
+		height: 'full', 		
 		animation: {
 			name: 'use-case01-scene07-v1', 
 			clazz: 'EDGE-462912531',
-			width: "1200px",
+		    width: "1200px",
 		    height: "468px",
-			container: "tour2-animation1", 
+			container: "animation-container-1", 
 			showFunction: showEduTourAnimationNew, 
 			delay: 0}
 		}	
 };
 
 var eduTour2Steps = {
-	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1'
+	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1',
+	    height: 'full',
+		animation: {
+			name: 'use-case02-scene01-v1', 
+			clazz: 'EDGE-462912531',
+			width: "1200px",
+		    height: "468px",
+			container: "animation-container-1", 
+			showFunction: showEduTourAnimationNew, 
+			delay: 0
+		}
 	},
-	'#edu-tour-2 #start-over':       {index: 1, noElement: true, audio: '#tour2-recording2'},
+	'#edu-tour-2 #start-over':       {index: 1, noElement: true, audio: '#tour2-recording2',
+	    height: 'full',
+		animation: {
+					name: 'use-case02-scene02-v1', 
+					clazz: 'EDGE-462912531',
+					width: "1200px",
+				    height: "468px",
+					container: "animation-container-1", 
+					showFunction: showEduTourAnimationNew, 
+					delay: 0
+				}
+		},
 	'#vcf-variants rect:eq(2)':      {index: 2},
 	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false},
 	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true}
@@ -108,6 +143,7 @@ function initializeTours() {
 						$(step.audio)[0].currentTime = 0;
 					}
 				}
+				
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
 
@@ -173,8 +209,20 @@ function customizeEduTourStep(pageGuide, step) {
 	} else {
 		$('.pageguide-next').removeClass("disabled");		
 	}
+	if (step.height) {
+		if (step.height == 'full') {
+			var stepHeight = window.innerHeight - $('#nav-edu-tour').height() - 140;
+			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", stepHeight);
+		} else {
+			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
+		}
+	} else {
+		$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");					
+	}
 	if (step.animation) {
-		setTimeout( function() {step.animation.showFunction(true, step.animation.name, step.animation.clazz, step.animation.width, step.animation.height, step.animation.container)}, step.animation.delay);
+		setTimeout( function() {
+			step.animation.showFunction(true, step)}, 
+			step.animation.delay);
 	} else {
 		showEduTourAnimationNew(false);		
 	}
@@ -182,11 +230,6 @@ function customizeEduTourStep(pageGuide, step) {
 		$('#edu-tour-modal').modal('show');
 	} else {
 		$('#edu-tour-modal').modal("hide");
-	}
-	if (step.height) {
-		$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
-	} else {
-		$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", "10px");					
 	}
 	if (step.audio) {
 		var audioSelector = step.audio;
@@ -348,32 +391,56 @@ function showEduTourAnimation(show, id) {
 		
 }
 
-function showEduTourAnimationNew(show, name, clazz, width, height, container) {
+function showEduTourAnimationNew(show, step) {
 	if (show) {
-		$('#' + container).removeClass("hide");
-		$('.' + clazz).removeClass("hide");
 
-/*
-		AdobeEdge.loadComposition('anim-test-v1', clazz, {
-		    scaleToFit: "both",
-		    centerStage: "both",
-		    	minW: "0px",
-			    maxW: "undefined",
-			    width: "1460px",
-			    height: "468px"
-		}, {"dom":{}}, {"dom":{}});	
-*/
-		AdobeEdge.loadComposition(name, clazz, {
-		    scaleToFit: "both",
-		    centerStage: "both",
-		    minW: "0px",
-		    maxW: "undefined",
-		    width: width,
-		    height: height
-		}, {"dom":{}}, {"dom":{}});
+
+		$('#' + step.animation.container).removeClass("hide");
+
+		if (step.animation.edgeObject && step.animation.edgeObject.getStage()) {
+			step.animation.edgeObject.getStage().play(0);
+		} else {
+
+			
+			AdobeEdge.loadComposition(
+				step.animation.name, 
+				step.animation.clazz, {
+				    scaleToFit: "both",
+				    centerStage: "both",
+				    minW: "0px",
+				    maxW: "800px",
+				    width:  step.animation.width,
+				    height: step.animation.height
+				}, 
+				{"dom":{}}, 
+				{"dom":{}}
+			);
+			step.animation.edgeObject = AdobeEdge.getComposition(step.animation.clazz);
+		/*
+			AdobeEdge.Symbol.bindElementAction(step.animation.clazz, step.animation.name, "document", "compositionReady", 
+				function(sym, e) {
+					alert('trigger');
+
+				});
+			var stage = $(step.animation.edgeObject.getStage());
+			var rescale = '.5';
+			stage.scale(.5);
+		*/
+			/*
+			stage.css('transform', 'scale(' + rescale + ')');
+			stage.css( '-o-transform', 'scale(' + rescale + ')');
+			stage.css('-ms-transform', 'scale(' + rescale + ')');
+			stage.css('-webkit-transform', 'scale(' + rescale + ')');
+			stage.css('-moz-transform', 'scale(' + rescale + ')');
+			stage.css('-o-transform', 'scale(' + rescale + ')');
+			*/
+
+		}
+
+		return edgeObject;
+
 
 	} else {
-		$('.tour-animation').addClass("hide");
 		$('.tour-animation-container').addClass("hide");
 	}
  

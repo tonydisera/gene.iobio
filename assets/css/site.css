@@ -208,6 +208,9 @@
   background-color: #a5b941 !important;
   color: white !important; }
 
+.tour-animation {
+  transform: scale(0.3); }
+
 #nav-edu-tour {
   background-color: rgba(81, 77, 77, 0.9);
   margin-bottom: 12px;
@@ -258,7 +261,11 @@
   background-color: rgba(81, 77, 77, 0.9) !important;
   margin-left: 0px !important;
   margin-right: 0px !important;
-  width: 100% !important; }
+  width: 100% !important;
+  padding-bottom: 10px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 10px !important; }
 
 .tlypageguide_shadow.tlypageguide-active {
   background-color: transparent !important;
@@ -704,27 +711,28 @@ h5 {
   text-decoration: none;
   width: 50px; }
 #tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_text {
-  margin-top: 0px !important;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px; }
+  margin-top: -65px !important;
+  margin-left: 160px;
+  margin-right: 160px;
+  margin-bottom: 0px; }
 #tlyPageGuideWrapper #tlyPageGuideMessages .pageguide-nav {
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
   margin-top: 0px;
   text-align: center; }
 #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev {
   color: white !important;
   background-color: #a5b941;
   text-align: left;
-  padding-right: 5px;
+  padding-right: 0px;
   vertical-align: top;
-  margin-left: 3px;
-  margin-right: 10px;
+  margin-left: 0px;
+  margin-right: 40% !important;
   font-size: 28px;
   padding-top: 2px;
   padding-bottom: 3px;
-  border-radius: 3px 3px 3px 3px; }
+  border-radius: 3px 3px 3px 3px;
+  visibility: visible; }
   #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev:focus {
     text-decoration: none !important;
     color: white !important; }
@@ -737,21 +745,25 @@ h5 {
     border-top: 30px solid transparent;
     border-right: 19px solid #a5b941;
     border-bottom: 30px solid transparent;
-    left: -10px;
+    left: -11px;
     bottom: 10px;
     content: ""; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev.hide {
+    visibility: hidden !important;
+    display: inline-block !important; }
 #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next {
   color: white !important;
   background-color: #a5b941;
   text-align: left;
   padding-right: 2px;
   vertical-align: top;
-  margin-left: 10px;
-  margin-right: 3px;
+  margin-left: 41% !important;
+  margin-right: 0px;
   font-size: 28px;
   padding-top: 2px;
   padding-bottom: 3px;
-  border-radius: 3px 3px 3px 3px; }
+  border-radius: 3px 3px 3px 3px;
+  visibility: visible; }
   #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next:focus {
     text-decoration: none !important;
     color: white !important; }
@@ -771,12 +783,15 @@ h5 {
     color: rgba(0, 0, 0, 0.26) !important;
     opacity: 0.65 !important;
     cursor: not-allowed !important; }
+  #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next.hide {
+    visibility: hidden !important;
+    display: inline-block !important; }
 #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-close {
   color: white !important;
   background-color: #a5b941;
   text-align: left;
   vertical-align: top;
-  margin-left: 23px;
+  margin-left: 90%;
   -webkit-border-radius: 3px 3px 3px 3px;
   -moz-border-radius: 3px 3px 3px 3px;
   -o-border-radius: 3px 3px 3px 3px;
@@ -784,11 +799,12 @@ h5 {
   display: inline-block;
   font-size: 28px;
   height: 39px;
-  padding-left: 10px;
+  padding-left: 9px;
   padding-right: 10px;
   text-align: center;
   text-decoration: none;
-  width: 85px; }
+  width: 85px;
+  margin-top: -75px; }
   #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-close:focus {
     text-decoration: none !important;
     color: white !important; }
