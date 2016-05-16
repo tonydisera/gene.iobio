@@ -79,6 +79,10 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	// getBamRefName function instead of the getVcfRefName function.
 	var theGetRefNameFunction = me.getVcfRefName != null ? me.getVcfRefName : me.getBamRefName;
 
+	if (theGetRefNameFunction == null) {
+		theGetRefNameFunction = me._stripRefName;
+	}
+
 	if (theGetRefNameFunction) {
 		if (me.vcfData != null) {
 			if (theGetRefNameFunction(geneObject.chr) == me.vcfData.ref &&

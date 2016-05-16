@@ -126,9 +126,7 @@ function DataCard() {
 			father:  'sample2' 
 		},
 		{
-			proband: 'sample2',
-			mother:  'sample1', 
-			father:  'sample2' 
+			proband: 'sample2'
 		},
 		{
 			proband: 'sample1'
@@ -216,10 +214,11 @@ DataCard.prototype.loadDemoData = function() {
 
 }
 
-DataCard.prototype.loadSampleData = function(relationship, name, sampleName) {
+DataCard.prototype.loadSampleData = function(relationship, name, sampleName, mode) {
 	variantCard = getVariantCard(relationship);
 	variantCard.setName(name);
 	variantCard.setSampleName(sampleName);
+	this.mode = 'single';
 
 
 	//clearCache();

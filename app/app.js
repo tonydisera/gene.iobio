@@ -1262,14 +1262,14 @@ function isCachedForCards(geneName, transcript) {
 
 
 function clearCache() {
-	//if (isLevelEduTour) {
+	if (isOffline) {
 		
-	//} else {
+	} else {
 		if (localStorage) {
 			localStorage.clear();
 		}
 		window.genesToCache = [];
-	//}
+	}
 
 }
 

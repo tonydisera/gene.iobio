@@ -847,9 +847,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 	var me = this;
 
 	if (!this.model.isVcfReadyToLoad()) {
-		if (onVcfData) {
-			onVcfData();
-		}
 		return;
 	}
 
