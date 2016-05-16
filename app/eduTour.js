@@ -76,7 +76,7 @@ var eduTour2Steps = {
 					delay: 0
 				}
 		},
-	'#vcf-variants rect:eq(2)':      {index: 2},
+	'#proband-variant-card #vcf-variants rect:eq(2)':      {index: 2},
 	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false},
 	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true}
 };
