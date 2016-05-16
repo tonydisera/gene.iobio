@@ -48,8 +48,7 @@
 		background-color: $tour-button-color !important
 		color: white !important
 
-.tour-animation
-	transform: scale(.3) !important
+
 
 #nav-edu-tour
 	background-color:  $tour-background-color
@@ -146,6 +145,13 @@
 			webkit-box-shadow: none !important
 			box-shador: none
 
+	.answers
+		&.selected
+			.answer-label
+				color: #a5b941 !important
+				font-weight: bold !important
+
+
 .tlypageguide_index
 	display: none !important
 
@@ -158,7 +164,7 @@
 	font-size: 20px !important
 
 .edu-tour-answer.incorrect
-	color: #B13A3B !important
+	color: $tour-hilite-color !important
 	font-size: 20px !important
 
 
@@ -234,5 +240,15 @@ span.arrow
 		width: 25px
 		margin-left: -45px
 		margin-top: -7px
+
+
+#vcf-variants 
+	.circle
+		stroke-width:  6px !important
+		stroke:    #FF0000 !important
+
+	&.emphasize
+		stroke-width:  8px !important
+		stroke:    #FF0000 !important
 
 

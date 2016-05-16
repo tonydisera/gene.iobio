@@ -73,7 +73,7 @@
 		<span id="child-buttons-tour2" style="display:inline-block">
 
 		    <button id="button-load-john-data" class="active edu-tour-button icon-button-sm btn btn-default btn-raised"  
-		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'John', 'sample1')">
+		    onclick="$('.answers').removeClass('selected');$('#john-answers').addClass('selected');$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'John', 'sample1')">
 			  <span>
 			      <i class="material-icons" >star</i>
 			      John
@@ -82,7 +82,7 @@
 		    </button>
 
 		    <button id="button-load-diego-data"  class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
-		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Diego', 'sample3')">
+		    onclick="$('.answers').removeClass('selected');$('#diego-answers').addClass('selected');$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Diego', 'sample3')">
 		      <span>
 			      <i class="material-icons" >star</i>
 			      Diego
@@ -90,7 +90,7 @@
 		    </button>
 
 		    <button id="button-load-anna-data"  class="edu-tour-button icon-button-sm btn btn-default btn-raised"  
-		    onclick="$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Anna', 'sample2')">
+		    onclick="$('.answers').removeClass('selected');$('#anna-answers').addClass('selected');$('.edu-tour-button.active').removeClass('active');$(this).addClass('active');dataCard.loadSampleData('proband', 'Anna', 'sample2')">
 		      <span>
 			      <i class="material-icons" >star</i>
 			      Anna

@@ -76,7 +76,7 @@ var eduTour2Steps = {
 					delay: 0
 				}
 		},
-	'#proband-variant-card #vcf-variants rect:eq(2)':      {index: 2},
+	'#proband-variant-card #vcf-track':      {index: 2, noElement: true},
 	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false},
 	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true}
 };
@@ -184,6 +184,13 @@ function initializeTours() {
 				var step = eduTour2Steps[currentTour];
 				customizeEduTourStep(pageGuideEduTour2, step);
 
+				if (currentTour == "#proband-variant-card #vcf-track") {
+					var variant = getProbandVariantCard().model.vcfData.features[2];
+					var tooltip = getProbandVariantCard().d3CardSelector.select("#vcf-variants .tooltip");
+					getProbandVariantCard().showTooltip(tooltip, variant, getProbandVariantCard(), false );
+					getProbandVariantCard().showVariantCircle(variant, getProbandVariantCard());
+				}
+
 			}
 	    }); 
 
@@ -211,7 +218,7 @@ function customizeEduTourStep(pageGuide, step) {
 	}
 	if (step.height) {
 		if (step.height == 'full') {
-			var stepHeight = window.innerHeight - $('#nav-edu-tour').height();
+			var stepHeight = window.innerHeight - 100;
 			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", stepHeight);
 		} else {
 			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
@@ -254,7 +261,11 @@ function customizeEduTourStep(pageGuide, step) {
 	} else {
 		$('#pageguide-close-button').addClass("hide");
 		$('#pageguide-next-button').removeClass("hide");
-	} 	
+	} 
+
+	if (step.animation) {
+		$('#pageguide-next-button').addClass("hide");
+	} 
 }
 
 function eduTourCheckPhenolyzer() {

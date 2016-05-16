@@ -208,9 +208,6 @@
   background-color: #a5b941 !important;
   color: white !important; }
 
-.tour-animation {
-  transform: scale(0.3); }
-
 #nav-edu-tour {
   background-color: rgba(81, 77, 77, 0.9);
   margin-bottom: 12px;
@@ -289,6 +286,9 @@
     color: #FFFFFF !important;
     webkit-box-shadow: none !important;
     box-shador: none; }
+  .tlypageguide_text .answers.selected .answer-label {
+    color: #a5b941 !important;
+    font-weight: bold !important; }
 
 .tlypageguide_index {
   display: none !important; }
@@ -302,7 +302,7 @@
   font-size: 20px !important; }
 
 .edu-tour-answer.incorrect {
-  color: #B13A3B !important;
+  color: #F05B5B !important;
   font-size: 20px !important; }
 
 span.arrow {
@@ -367,6 +367,13 @@ span.arrow:after {
   width: 25px;
   margin-left: -45px;
   margin-top: -7px; }
+
+#vcf-variants .circle {
+  stroke-width: 6px !important;
+  stroke: #FF0000 !important; }
+#vcf-variants.emphasize {
+  stroke-width: 8px !important;
+  stroke: #FF0000 !important; }
 
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
@@ -732,7 +739,7 @@ h5 {
   padding-top: 2px;
   padding-bottom: 3px;
   border-radius: 3px 3px 3px 3px;
-  visibility: visible; }
+  visibility: hidden; }
   #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev:focus {
     text-decoration: none !important;
     color: white !important; }
@@ -757,7 +764,7 @@ h5 {
   text-align: left;
   padding-right: 2px;
   vertical-align: top;
-  margin-left: 41% !important;
+  margin-left: 40% !important;
   margin-right: 0px;
   font-size: 28px;
   padding-top: 2px;
