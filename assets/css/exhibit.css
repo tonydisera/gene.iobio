@@ -115,16 +115,18 @@ h3 {
 }
 
 #thankyou {
-	position:absolute;
-	bottom:10px;
-	width:100%;	
+	position: absolute;
+    bottom: 0px;
+    width: 100%;
+    background: #314096;
+    padding: 10px;
 }
 
 #thankyou #header {
 	color: rgba(165, 185, 65, 1);
-	font-size: 18px;
+	font-size: 24px;
 	margin-top: 25px;
-	margin-bottom: 0px;
+	margin-bottom: 25px;
 }
 #thankyou a {
 	margin-left: 20px;

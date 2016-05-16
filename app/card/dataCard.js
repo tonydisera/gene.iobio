@@ -76,19 +76,19 @@ function DataCard() {
 
 	this.eduTourUrlsOffline = [ 
 	{
-		proband: 'http://frontend/exhibit_cache/nhmu.vcf.gz',
-		mother:  'http://frontend/exhibit_cache/nhmu.vcf.gz',
-		father:  'http://frontend/exhibit_cache/nhmu.vcf.gz'
+		proband: 'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
+		mother:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
+		father:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz'
 	},
 	{
-		proband: 'http://frontend/exhibit_cache/nhmu.vcf.gz',
-		mother:  'http://frontend/exhibit_cache/nhmu.vcf.gz',
-		father:  'http://frontend/exhibit_cache/nhmu.vcf.gz'
+		proband: 'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
+		mother:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
+		father:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz'
 	},
 	{
-		proband: 'http://frontend/exhibit_cache/nhmu.vcf.gz',
-		mother:  'http://frontend/exhibit_cache/nhmu.vcf.gz',
-		father:  'http://frontend/exhibit_cache/nhmu.vcf.gz'
+		proband: 'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
+		mother:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
+		father:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz'
 	}
 	];
 	this.eduTourCards = [
