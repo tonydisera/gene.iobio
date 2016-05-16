@@ -630,8 +630,9 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 			var x = d3.event.pageX;
 			var y = d3.event.pageY;
-            
-			me.showTooltip(me.formatGeneDescriptionHTML(geneAnnot.description, geneAnnot.summary), x, y, 300);
+            if (geneAnnot && geneAnnot.description) {
+				me.showTooltip(me.formatGeneDescriptionHTML(geneAnnot.description, geneAnnot.summary), x, y, 300);
+            }
 		  })
 		  .on("mouseout", function(d,i) {
 		  	me.hideTooltip();
