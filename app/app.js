@@ -1454,7 +1454,9 @@ function loadGeneWidget() {
 						//$('#tourWelcome').addClass("open");
 					}
 
-			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
+					if (!isOffline) {
+				    	genesCard.updateGeneInfoLink(window.gene.gene_name);
+					}
 
 		    		// Autoload data specified in url
 					loadUrlSources();
@@ -1471,7 +1473,9 @@ function loadGeneWidget() {
 			    	updateUrl('gene', window.gene.gene_name);
 
 
-			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
+			    	if (!isOffline) {
+				    	genesCard.updateGeneInfoLink(window.gene.gene_name);
+			    	}
 
 
 
