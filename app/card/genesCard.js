@@ -637,7 +637,9 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		  	me.hideTooltip();
 		  });
 
-		me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge:last-child"), geneName);
+		if (!isOffline) {
+			me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge:last-child"), geneName);
+		}
 		me._setPhenotypeBadge(geneName);
 		me._setBookmarkBadge(geneName);
 
