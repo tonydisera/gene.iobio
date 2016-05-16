@@ -198,7 +198,7 @@
   font-size: 16px !important; }
 
 #slider-left {
-  top: 62px !important; }
+  top: 102px !important; }
 
 #edu-tour-modal .modal-content {
   background-color: rgba(81, 77, 77, 0.9) !important; }
@@ -212,33 +212,34 @@
   background-color: rgba(81, 77, 77, 0.9);
   margin-bottom: 12px;
   display: block !important;
-  height: 60px;
+  height: 100px;
   width: 100%;
   text-align: center;
-  padding-top: 6px; }
+  padding-top: 20px; }
   #nav-edu-tour #start-over {
     float: left !important;
     margin-left: 5px !important;
     margin-right: -190px !important;
-    font-size: 18px !important;
+    font-size: 23px !important;
     padding: 8px !important;
     margin-top: 5px !important;
     color: white !important;
-    background-color: #a5b941 !important; }
+    background-color: #a5b941 !important;
+    width: 178px; }
   #nav-edu-tour .btn.btn-raised {
     color: white !important;
     background-color: #989898 !important;
     margin-left: 15px !important;
-    font-size: 18px !important;
+    font-size: 24px !important;
     padding: 8px !important;
     padding-left: 10px !important;
     padding-right: 10px !important;
-    margin-top: 5px !important; }
+    margin-top: 10px !important; }
   #nav-edu-tour .card-label {
     color: white !important;
     font-size: 20px !important; }
   #nav-edu-tour .edu-tour-button {
-    width: 88px; }
+    width: 108px; }
     #nav-edu-tour .edu-tour-button i.material-icons {
       display: none; }
     #nav-edu-tour .edu-tour-button.active {
@@ -719,8 +720,8 @@ h5 {
   width: 50px; }
 #tlyPageGuideWrapper #tlyPageGuideMessages .tlypageguide_text {
   margin-top: -65px !important;
-  margin-left: 160px;
-  margin-right: 160px;
+  margin-left: 200px;
+  margin-right: 200px;
   margin-bottom: 0px; }
 #tlyPageGuideWrapper #tlyPageGuideMessages .pageguide-nav {
   margin-left: 0px;
