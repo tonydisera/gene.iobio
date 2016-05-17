@@ -24,7 +24,7 @@ var eduTour1Steps = {
 	},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
-	'rect.HIGH.stop_gained':                            {index: 5, audio: '#tour1-recording4'},
+	'#edu-tour-1 #start-over':                          {index: 5, audio: '#tour1-recording4', noElement: true},
 	'#children-buttons':                                {index: 6, disableNext: true, correct: false},
 	'.edu-tour-1-child-buttons':                        {index: 7, close: true, noElement: true,
 		audio: '#tour1-recording5', 
@@ -198,7 +198,7 @@ function initializeTours() {
 
 
 function customizeEduTourStep(pageGuide, step) {
-	if (step.noElement == true) {
+	if (step.hasOwnProperty('noElement') && step.noElement == true) {
 		$('.tlypageguide_shadow')[step.index].style.visibility = 'hidden';
 	} else {
 		$('.tlypageguide_shadow')[step.index].style.visibility = 'visible';
@@ -292,7 +292,8 @@ function eduTourCheckVariant(variant) {
 		&& variant.vepImpact[HIGH] != "HIGH" 
 		&& variant.start == 112116592 
 		&& window.gene.gene_name == 'APC') {
-		eduTour1Steps['#gene-badge-container'].correct = true;			
+		eduTour1Steps['#gene-badge-container'].correct = true;		
+		$('.pageguide-next').addClass("disabled");	
 		pageGuideEduTour1.navigateForward();
 	} else {
 		eduTour1Steps['#gene-badge-container'].correct = false;			
