@@ -95,9 +95,11 @@
     <div>
     Select each patient. Determine their genotype and choose the correct dosage for them below.
     <br><br>
-    </div>
+    </div>    
     <div    style="margin-bottom:40px;margin-top:-10px;">
-      <div id="john-answers"  class="answers selected" style="float:left;width:33%;text-align:left">
+      
+
+      <div id="john-answers"  class="answers selected" >
         <div class="answer-label">John</div>
         <div style="text-align:left;margin-top:0px;margin-bottom:0px">
           <div class="custom-checkbox" style="display:block;">
@@ -112,7 +114,7 @@
               <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-lowest">
               <label for="john-lowest" >Lowest AA</label>
            </div>
-           <div  style="text-align:left;margin-top:-7px;margin-bottom:20px;">
+           <div  style="text-align:left;margin-top:-7px;margin-bottom:0px;">
             <label id="john-normal-answer" class="john-answer incorrect hide edu-tour-answer" >incorrect</label>
             <label id="john-lower-answer"  class="john-answer hide edu-tour-answer" >correct</label>
             <label id="john-lowest-answer" class="john-answer hide incorrect edu-tour-answer">incorrect</label>
@@ -120,7 +122,7 @@
         </div>
       
       </div>
-      <div  id="diego-answers" class="answers" style="float:left;width:33%;text-align:left">
+      <div  id="diego-answers" class="answers" >
         <div class="answer-label">Diego</div>
         <div  style="text-align:left;margin-top:0px;margin-bottom:0px">
           <div class="custom-checkbox" style="display:block;">
@@ -135,7 +137,7 @@
               <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-lowest">
               <label for="diego-lowest" >Lowest AA</label>
            </div>
-           <div  style="text-align:left;margin-top:-7px;margin-bottom:20px;">
+           <div  style="text-align:left;margin-top:-7px;margin-bottom:0px;">
             <label id="diego-normal-answer" class="diego-answer incorrect hide edu-tour-answer" >incorrect</label>
             <label id="diego-lower-answer"  class="diego-answer hide incorrect edu-tour-answer" >incorrect</label>
             <label id="diego-lowest-answer" class="diego-answer hide  edu-tour-answer">correct</label>
@@ -143,7 +145,8 @@
         </div>
       </div>
 
-      <div  id="anna-answers"  class="answers" style="float:left;width:33%;text-align:left">
+      
+      <div  id="anna-answers"  class="answers" >
         <div class="answer-label">Anna</div>
         <div style="text-align:left;margin-top:0px;margin-bottom:0px">
           <div class="custom-checkbox" style="display:block;">
@@ -158,13 +161,14 @@
               <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-lowest">
               <label for="anna-lowest" >Lowest AA</label>
            </div>
-           <div  style="text-align:left;margin-top:-7px;margin-bottom:20px;">
+           <div  style="text-align:left;margin-top:-7px;margin-bottom:0px;">
             <label id="anna-normal-answer" class="anna-answer  hide edu-tour-answer" >correct</label>
             <label id="anna-lower-answer"  class="anna-answer hide incorrect edu-tour-answer" >incorrect</label>
             <label id="anna-lowest-answer" class="anna-answer hide incorrect edu-tour-answer">incorrect</label>
            </div>
         </div>
       </div>
+
       <!-- <div style="margin-top:20px;float:left;width:25%;background-color:white;padding: 10px;">
         <img width="200" src="assets/images/edutour/dose_legend.png">
       </div>

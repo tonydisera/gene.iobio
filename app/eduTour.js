@@ -269,7 +269,7 @@ function eduTourCheckPhenolyzer() {
 		var correct = true;
 		if (isLevelEduTour && eduTourNumber == 1) {
 			if (phenotype != 'colon_cancer') {
-				alertify.error("Please select 'Colon cancer' to continue with this tour.")
+				alertify.alert("Please select 'Colon cancer' to continue with this tour.")
 				correct = false;
 			}
 		}
