@@ -216,7 +216,7 @@ function customizeEduTourStep(pageGuide, step) {
 	}
 	if (step.height) {
 		if (step.height == 'full') {
-			var stepHeight = window.innerHeight - 150;
+			var stepHeight = window.innerHeight - 10;
 			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", stepHeight);
 		} else {
 			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
