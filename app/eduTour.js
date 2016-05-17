@@ -256,7 +256,7 @@ function customizeEduTourStep(pageGuide, step) {
 		$('#pageguide-next-button').removeClass("hide");
 	} 
 
-	if (step.animation  && isSelfContainedServer) {
+	if (step.animation  && hideNextButtonAnim) {
 		$('#pageguide-next-button').addClass("hide");
 	} 
 }
@@ -324,11 +324,13 @@ function onEduTour1Check(checkbox) {
 		&& $('#bobby')[0].checked == answer['bobby']
 		&& $('#sarah')[0].checked == answer['sarah']) {
 		eduTour1Steps['#children-buttons'].correct = true;	
+		$('#pageguide-next-button').removeClass("disabled");
 		setTimeout(function() {
 			pageGuideEduTour1.navigateForward();
 		}, 2000);
 	} else {
 		eduTour1Steps['#children-buttons'].correct = false;			
+		$('#pageguide-next-button').addClass("disabled");
 	}
 }
 

@@ -124,12 +124,14 @@ h3 {
 
 #thankyou #header {
 	color: rgba(165, 185, 65, 1);
-	font-size: 24px;
+	font-size: 18px;
 	margin-top: 25px;
-	margin-bottom: 25px;
+	margin-bottom: 5px;
+	text-align: center;
 }
 #thankyou a {
 	margin-left: 20px;
+	font-size: 23px;
 }
 
 
