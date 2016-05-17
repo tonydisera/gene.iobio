@@ -185,8 +185,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .margin({top: isLevelEduTour ? 0 : 20, right: 2, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .showBrush(false)
-				    .trackHeight(16)
-				    .cdsHeight(12)
+				    .trackHeight(isLevelEduTour ? 32 : 16)
+				    .cdsHeight(isLevelEduTour ? 24 : 12)
 		    		.showLabel(false)
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 		    				    			
@@ -591,6 +591,9 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
     	this.cardSelector.find('#missing-variant-count').text("");
     	this.cardSelector.find('#gene-box').text("");
     	this.cardSelector.find('#gene-box').css("visibility", "hidden");
+    	if (isLevelEduTour && eduTourNumber == "1") {
+	    	this.cardSelector.find("#gene-box").addClass("deemphasize");
+    	}
 
 
 
@@ -1102,7 +1105,11 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
     this.vcfChart(selection);
 
 
-	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+    if (isLevelEdu && eduTourNumber == "2") {
+		this.cardSelector.find('#zoom-region-chart').css("display", "none");
+    } else {
+		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+    }
 
 	resizeCardWidths();
 

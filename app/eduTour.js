@@ -263,7 +263,7 @@ function customizeEduTourStep(pageGuide, step) {
 		$('#pageguide-next-button').removeClass("hide");
 	} 
 
-	if (step.animation) {
+	if (step.animation  && isSelfContainedServer) {
 		$('#pageguide-next-button').addClass("hide");
 	} 
 }

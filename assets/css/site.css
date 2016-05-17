@@ -139,6 +139,10 @@
     color: white;
     margin-top: -5px;
     margin-bottom: 10px; }
+    .variant-card #gene-box.deemphasize {
+      color: #1F538A !important;
+      border: solid thin transparent !important;
+      background-color: transparent !important; }
   .variant-card #gene-box.level-edu {
     display: block !important; }
 

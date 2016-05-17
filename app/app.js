@@ -260,8 +260,8 @@ function init() {
 	    .margin({top:20, right: 2, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(16)
-	    .cdsHeight(12)
+	    .trackHeight(isLevelEduTour ? 32 : 16)
+	    .cdsHeight(isLevelEduTour ? 24 : 12)
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 	    	if (!brush.empty()) {
@@ -303,8 +303,8 @@ function init() {
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
-	    .trackHeight(12)
-	    .cdsHeight(8)
+	    .trackHeight(isLevelEduTour ? 36 : 16)
+	    .cdsHeight(isLevelEduTour ? 24 : 12)
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
@@ -1709,12 +1709,15 @@ function showTranscripts(regionStart, regionEnd) {
 
 	// Show the gene transcripts.
     // Compress the tracks if we have more than 10 transcripts
-    if (transcripts.length > 10) {
-    	transcriptChart.trackHeight(10);
-    	transcriptChart.cdsHeight(8);
-    } else {
-    	transcriptChart.trackHeight(16);
-    	transcriptChart.cdsHeight(12);
+    if (!isLevelEduTour) {
+	    if (transcripts.length > 10) {
+	    	transcriptChart.trackHeight(10);
+	    	transcriptChart.cdsHeight(8);
+	    } else {
+	    	transcriptChart.trackHeight(16);
+	    	transcriptChart.cdsHeight(12);
+	    }
+
     }
 
     if (transcriptViewMode == "single") {
