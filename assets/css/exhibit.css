@@ -129,7 +129,11 @@ h3 {
 	margin-bottom: 5px;
 	text-align: center;
 }
-#thankyou a {
+#thankyou span {
+	margin-left: 20px;
+	font-size: 23px;
+}
+#thankyou img {
 	margin-left: 20px;
 	font-size: 23px;
 }
