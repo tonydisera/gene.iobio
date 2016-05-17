@@ -19,7 +19,7 @@
 
 .variant-card
 	#zoom-region-chart
-		display: block !important
+		display: block
 		margin-top: -20px !important
 		padding-top: 0px !important
 
@@ -102,7 +102,11 @@
 				float: none !important	
 
 		&.emphasize
-			background-color: $tour-hilite-color !important
+			background-color: $tour-theme-color !important
+			color: white !important
+
+		&.healthy
+			background-color: #4E86B7 !important
 			color: white !important
 
 
@@ -252,4 +256,23 @@ span.arrow
 		stroke-width:  8px !important
 		stroke:    #FF0000 !important
 
+.gene-card-label
+	font-size: 18px !important
+
+#gene-badge-button
+	font-size: 18px !important
+	padding: 4px 6px 2px 6px !important
+
+	.glyph
+		padding-top: 4px !important
+    
+	#gene-badge-symbols.glyph
+		padding-top: 3px !important
+ 
+#gene-badge.selected
+	#gene-badge-name, #gene-badge-danger-count, #gene-badge-remove i
+		font-weight: bold
+
+#gene-badge-loaded
+	font-size: 18px !important
 

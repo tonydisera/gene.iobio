@@ -1106,7 +1106,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
 
     if (isLevelEdu && eduTourNumber == "2") {
-		this.cardSelector.find('#zoom-region-chart').css("display", "none");
+		this.cardSelector.find('#zoom-region-chart').css("display", "none !important");
     } else {
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
     }

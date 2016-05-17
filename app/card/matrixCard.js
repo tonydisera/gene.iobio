@@ -107,7 +107,7 @@ function MatrixCard() {
 		{name:'Unaffected Siblings'          ,order:8, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
 		{name:'Allele Frequency - 1000G'     ,order:9, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
 		{name:'Allele Frequency - ExAC'      ,order:10, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotype' }
+		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
 

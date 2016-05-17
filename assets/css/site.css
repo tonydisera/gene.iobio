@@ -138,11 +138,13 @@
     text-align: center;
     color: white;
     margin-top: -5px;
-    margin-bottom: 10px; }
+    margin-bottom: 10px;
+    font-size: 18px !important; }
     .variant-card #gene-box.deemphasize {
       color: #1F538A !important;
       border: solid thin transparent !important;
-      background-color: transparent !important; }
+      background-color: transparent !important;
+      font-size: 18px !important; }
   .variant-card #gene-box.level-edu {
     display: block !important; }
 
@@ -194,7 +196,7 @@
   margin-bottom: 3px !important; }
 
 .variant-card #zoom-region-chart {
-  display: block !important;
+  display: block;
   margin-top: -20px !important;
   padding-top: 0px !important; }
 
@@ -256,7 +258,10 @@
         padding-right: 0px !important;
         float: none !important; }
     #nav-edu-tour .edu-tour-button.emphasize {
-      background-color: #F05B5B !important;
+      background-color: #1D287B !important;
+      color: white !important; }
+    #nav-edu-tour .edu-tour-button.healthy {
+      background-color: #4E86B7 !important;
       color: white !important; }
 
 #tlyPageGuideWrapper #tlyPageGuideMessages {
@@ -379,6 +384,23 @@ span.arrow:after {
 #vcf-variants.emphasize {
   stroke-width: 8px !important;
   stroke: #FF0000 !important; }
+
+.gene-card-label {
+  font-size: 18px !important; }
+
+#gene-badge-button {
+  font-size: 18px !important;
+  padding: 4px 6px 2px 6px !important; }
+  #gene-badge-button .glyph {
+    padding-top: 4px !important; }
+  #gene-badge-button #gene-badge-symbols.glyph {
+    padding-top: 3px !important; }
+
+#gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
+  font-weight: bold; }
+
+#gene-badge-loaded {
+  font-size: 18px !important; }
 
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
@@ -1212,7 +1234,7 @@ section {
   padding-left: 100px; }
 
 #gene-name {
-  font-size: 16px !important;
+  font-size: 16px;
   color: #1F538A;
   font-weight: bold; }
 

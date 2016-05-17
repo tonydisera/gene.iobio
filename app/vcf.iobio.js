@@ -1875,6 +1875,7 @@ var effectCategories = [
                 eduGenotype = alt + " " + alt;
               }
             }
+            var eduGenotypeReversed = switchGenotype(eduGenotype);
 
 
             // Get rid of the left most anchor base for insertions and
@@ -1988,6 +1989,7 @@ var effectCategories = [
                 'genotypeRefForwardCount' : genotypeRefForwardCountForSample,
                 'genotypeRefReverseCount' : genotypeRefReverseCountForSample,
                 'eduGenotype' : eduGenotype,
+                'eduGenotypeReversed': eduGenotypeReversed,
                 'zygosity': zygosity ? zygosity : 'gt_unknown', 
                 'phased': phased,
                 'effect': effects, 

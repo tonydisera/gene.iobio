@@ -20,18 +20,7 @@ var eduTour1Steps = {
 		},
 	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false},
 	'#phenolyzer-results':                              {index: 2, 
-		audio: '#tour1-recording2',
-		//height: "50px"
-		/*,
-		animation: {
-			name: 'use-case01-scene03-v1',
-			clazz: 'EDGE-30904779',
-		    width: "1200px",
-		    height: "468px",
-			container: "animation-container-2", 
-			showFunction: showEduTourAnimationNew, 
-			delay: 0
-		}*/
+		audio: '#tour1-recording2'
 	},
 	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
@@ -149,10 +138,14 @@ function initializeTours() {
 
 
 				if (currentTour == '.edu-tour-1-child-buttons') {
+					$('#button-load-father-data').addClass("emphasize");
 					$('.edu-tour-1-child-buttons .edu-tour-button:eq(0)').addClass("emphasize");
+					$('.edu-tour-1-child-buttons .edu-tour-button:eq(1)').addClass("healthy");
 					$('.edu-tour-1-child-buttons .edu-tour-button:eq(2)').addClass("emphasize");
 				} else {
 					$('.edu-tour-1-child-buttons .edu-tour-button').removeClass("emphasize");
+					$('.edu-tour-1-child-buttons .edu-tour-button').removeClass("healthy");
+					$('#button-load-father-data').removeClass("emphasize");
 				}
 
 				var step = eduTour1Steps[currentTour];
@@ -331,7 +324,9 @@ function onEduTour1Check(checkbox) {
 		&& $('#bobby')[0].checked == answer['bobby']
 		&& $('#sarah')[0].checked == answer['sarah']) {
 		eduTour1Steps['#children-buttons'].correct = true;	
-		pageGuideEduTour1.navigateForward();
+		setTimeout(function() {
+			pageGuideEduTour1.navigateForward();
+		}, 2000);
 	} else {
 		eduTour1Steps['#children-buttons'].correct = false;			
 	}
