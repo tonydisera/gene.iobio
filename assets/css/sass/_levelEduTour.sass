@@ -5,7 +5,17 @@
 
 .modal-backdrop 
 	background: transparent !important
+  
+.selectize-input
+	font-size: 18px !important
 
+	input
+		font-size: 18px !important
+		line-height: 20px !important
+
+.selectize-dropdown
+	font-size: 18px !important
+	line-height: 20px !important
 
 #app-title-section 
 	min-height: 60px !important
@@ -35,6 +45,13 @@
 	#manage-genes
 //		display: inline-block !important
 
+	&.manage #gene-badge-remove
+		visibility: hidden !important
+
+
+#gene-badge
+	&:hover #gene-badge-remove
+		visibility: hidden !important
 
 #slider-left
 	top: 102px !important

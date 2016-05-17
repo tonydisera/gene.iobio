@@ -95,7 +95,7 @@
 
 #genes-card #phenolyzer-title {
   display: block !important;
-  font-size: 14px !important; }
+  font-size: 18px !important; }
 #genes-card #phenolyzer-run-label-long.level-edu {
   display: inline-block !important;
   vertical-align: top;
@@ -106,7 +106,7 @@
   margin-top: 0px !important; }
   #genes-card #phenolyzer-heading h5 {
     display: inline-block !important;
-    font-size: 14px !important; }
+    font-size: 18px !important; }
 #genes-card #phenolyzer-heading h5.level-edu {
   display: none !important; }
 #genes-card #phenolyzer-results text.name {
@@ -184,6 +184,16 @@
 .modal-backdrop {
   background: transparent !important; }
 
+.selectize-input {
+  font-size: 18px !important; }
+  .selectize-input input {
+    font-size: 18px !important;
+    line-height: 20px !important; }
+
+.selectize-dropdown {
+  font-size: 18px !important;
+  line-height: 20px !important; }
+
 #app-title-section {
   min-height: 60px !important; }
 
@@ -205,6 +215,9 @@
 
 #gene-badge-container {
   padding-bottom: 6px !important; }
+
+#gene-badge:hover #gene-badge-remove {
+  visibility: hidden !important; }
 
 #slider-left {
   top: 102px !important; }
@@ -2694,7 +2707,7 @@ text.ref-count {
 #gene-badge.visited #gene-badge-name {
   color: #717171 !important; }
 #gene-badge:hover #gene-badge-remove {
-  visibility: visible !important; }
+  visibility: visible; }
 
 #gene-badge.visited.error #gene-badge-loaded {
   display: none; }

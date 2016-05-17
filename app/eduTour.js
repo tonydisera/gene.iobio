@@ -6,7 +6,7 @@ var pageGuideEduTour2 = null;
 var edgeObject = null;
 
 var eduTour1Steps = {
-	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, 
+	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, disableTourButtons: true,
 		audio: '#tour1-recording1',
 		height: 'full', 		
 		animation: {
@@ -18,15 +18,15 @@ var eduTour1Steps = {
 			showFunction: showEduTourAnimationNew, 
 			delay: 0}
 		},
-	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false},
-	'#phenolyzer-results':                              {index: 2, 
+	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false, disableTourButtons: true},
+	'#phenolyzer-results':                              {index: 2, disableTourButtons: true,
 		audio: '#tour1-recording2'
 	},
-	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px'},
-	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false},
-	'#edu-tour-1 #start-over':                          {index: 5, audio: '#tour1-recording4', noElement: true},
-	'#children-buttons':                                {index: 6, disableNext: true, correct: false},
-	'.edu-tour-1-child-buttons':                        {index: 7, close: true, noElement: true,
+	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px', disableTourButtons: true},
+	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false, disableTourButtons: true},
+	'#edu-tour-1 #start-over':                          {index: 5, audio: '#tour1-recording4', noElement: true, disableTourButtons: true},
+	'#children-buttons':                                {index: 6, disableNext: true, correct: false, disableTourButtons: false},
+	'.edu-tour-1-child-buttons':                        {index: 7, close: true, noElement: true, disableTourButtons: false,
 		audio: '#tour1-recording5', 
 		height: 'full', 		
 		animation: {
@@ -41,7 +41,7 @@ var eduTour1Steps = {
 };
 
 var eduTour2Steps = {
-	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1',
+	'#edu-tour-2-label': { index: 0, first: true, noElement: true, audio: '#tour2-recording1', disableTourButtons: true,
 	    height: 'full',
 		animation: {
 			name: 'use-case02-scene01-v1', 
@@ -53,7 +53,7 @@ var eduTour2Steps = {
 			delay: 0
 		}
 	},
-	'#edu-tour-2 #start-over':       {index: 1, noElement: true, audio: '#tour2-recording2',
+	'#edu-tour-2 #start-over':       {index: 1, noElement: true, audio: '#tour2-recording2', disableTourButtons: true,
 	    height: 'full',
 		animation: {
 					name: 'use-case02-scene02-v1', 
@@ -65,9 +65,9 @@ var eduTour2Steps = {
 					delay: 0
 				}
 		},
-	'#proband-variant-card #vcf-track':      {index: 2, noElement: true},
-	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false},
-	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true}
+	'#proband-variant-card #vcf-track':      {index: 2, noElement: true, disableTourButtons: true},
+	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false, disableTourButtons: false},
+	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true, disableTourButtons: false}
 };
 
 
@@ -209,9 +209,14 @@ function customizeEduTourStep(pageGuide, step) {
 	} else {
 		$('.pageguide-next').removeClass("disabled");		
 	}
+	if (step.disableTourButtons) {
+		$('.edu-tour-data-button').addClass("disabled");
+	} else {
+		$('.edu-tour-data-button').removeClass("disabled");
+	}
 	if (step.height) {
 		if (step.height == 'full') {
-			var stepHeight = window.innerHeight - 140;
+			var stepHeight = window.innerHeight - 150;
 			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", stepHeight);
 		} else {
 			$('#tlyPageGuideMessages .tlypageguide_text').css("min-height", step.height);
@@ -238,6 +243,10 @@ function customizeEduTourStep(pageGuide, step) {
 		$(audioSelector).on("ended", function() {
 			if (!step.close && step.index == pageGuide.cur_idx) {
 				pageGuide.navigateForward();
+			} else if (step.close) {
+				setTimeout(function() {
+					completeTour();
+				},2000);
 			}
 		});			
 	} else {
