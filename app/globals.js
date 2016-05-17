@@ -7,6 +7,7 @@ var isSelfContainedServer   = true; // is the client + the server running on one
 var isOffline               = true;  // is there any internet connect to outside services like clinvar, ncbi?
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var hideNextButtonAnim      = true;
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
@@ -46,7 +47,7 @@ var hpoServer            = iobio_http_services + "hpo/";
 var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/"
 var phenolyzerOnlyServer = iobio_http_services + "phenolyzer/";
 
-var OFFLINE_PHENOLYZER_CACHE_URL = isSelfContainedServer ?  "exhibit_cache/" : "http://localhost/exhibit_cache/";
+var OFFLINE_PHENOLYZER_CACHE_URL = isSelfContainedServer ?  "exhibit_cache/" : "../exhibit_cache/";
 var OFFLINE_CLINVAR_VCF_URL      = isSelfContainedServer ?  "http://frontend/exhibit_cache/clinvar.vcf.gz" : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
 
 var EXHIBIT_URL              = 'exhibit.html'
