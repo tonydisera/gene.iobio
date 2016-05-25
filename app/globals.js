@@ -3,11 +3,12 @@
 * a simplified interface and logic.  For running one of the special educational edition 
 * tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
 */
-var isSelfContainedServer   = true; // is the client + the server running on one machine?
+var isSelfContainedServer   = false; // is the client + the server running on one machine?
 var isOffline               = true;  // is there any internet connect to outside services like clinvar, ncbi?
 var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
 var isLevelEduTour          = true;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
-var hideNextButtonAnim      = true;
+var hasTimeout              = true;  // is a timeout based on n seconds of inactivity used?
+var hideNextButtonAnim      = false;
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
@@ -25,7 +26,8 @@ var levelEduImpact = {
 // For the exhibit version, we will restart to the welcome page after n seconds of inactivity
 //
 var IDLE_INTERVAL = 3000;  // (in milliseconds) Check for inactivity every 5 seconds 
-var MAX_IDLE      = 60;    // After 3 minute (e.g. 3 * 60  = 180 seconds), prompt the user about inactivity
+//var MAX_IDLE      = 60;    // After 3 minute (e.g. 3 * 60  = 180 seconds), prompt the user about inactivity
+var MAX_IDLE      = 3;   
 var IDLE_RESTART  = 10000; // (in milliseconds) Automatically restart app in no prompt action taken after 10 seconds
 var idleTime = 0;
 var idlePrompting = false;

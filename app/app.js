@@ -176,6 +176,14 @@ function promiseLoadTemplate(templateName) {
 function init() {
 	var me = this;
 
+	// If we are using the gene.iobio education tour edition, automatically load 
+	// exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
+	if (isLevelEduTour && !getUrlParameter("tour")) {
+		var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
+		window.location.assign(exhibitUrl);
+		return;			
+	}
+
 	alertify.defaults.glossary.title = "";
 	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
 	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
@@ -385,15 +393,12 @@ function init() {
 
 	loadGeneFromUrl();
 
-	if (isLevelEduTour) {
+	// In cases where timeout=true, restart app after n seconds of inactivity
+	// (e.g. no mouse move, button click, etc.). 
+	if (hasTimeout) {
 		checkForInactivity();
 	}
-	$("#cb1").click( function() {
-	    alert($(this).attr("checked"));
-	});
-	$("#cb1").change( function() {
-	    alert($(this).attr("checked"));
-	});
+
 }
 
 
