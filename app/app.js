@@ -1267,7 +1267,7 @@ function isCachedForCards(geneName, transcript) {
 
 
 function clearCache() {
-	if (isOffline) {
+	if (keepLocalStorage) {
 		
 	} else {
 		if (localStorage) {

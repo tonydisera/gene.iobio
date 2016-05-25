@@ -151,7 +151,7 @@ DataCard.prototype.loadDemoData = function() {
 	if (isLevelEdu) {
 		var idx = isLevelEduTour ? +eduTourNumber : 0;
 		this.demoCards      = this.eduTourCards[idx];
-		this.demoUrls        = isSelfContainedServer ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
+		this.demoUrls        = isOffline ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
 		this.demoNames       = this.eduTourNames[idx];
 		this.demoSampleNames = this.eduTourSampleNames[idx];			
 		this.demoMode        = this.eduTourModes[idx];
