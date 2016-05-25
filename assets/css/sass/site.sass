@@ -1,7 +1,7 @@
 @import variables
 
-@import levelEdu
-@import levelEduTour
+//@import levelEdu
+//@import levelEduTour
 
 
 body
@@ -357,6 +357,10 @@ h5
   overflow: hidden
   background-color: #e5e5e5
 
+// Don't show the number box 
+.tlypageguide_index 
+  display: none !important 
+
 
 .tlypageguide_shadow
   background-color: rgba(255, 255, 255, 0)
@@ -364,8 +368,11 @@ h5
 
   &.tlypageguide-active
     background-color: transparent !important
-    webkit-box-shadow: 0 0 18px 1px rgba(165, 185, 65, 1) important
-    box-shadow: 0 0 18px 1px rgba(165, 185, 65, 1) important
+    webkit-box-shadow: none !important
+    box-shadow: none !important
+    border: $tour-hilite-color solid 6px !important
+    z-index: 1999 !important
+
 
 #tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close
   color: white !important
@@ -389,12 +396,14 @@ h5
 // This is for the new next and prev buttons
 #tlyPageGuideWrapper 
   #tlyPageGuideMessages 
+    min-height: 130px
+
     span
       top: 35px !important
 
     a.tlypageguide_listen
       color: white !important
-      background-color: rgba(165, 185, 65, 1)
+      background-color:  $tour-button-color
       -webkit-border-radius: 3px 3px 3px 3px
       -moz-border-radius: 3px 3px 3px 3px
       -o-border-radius: 3px 3px 3px 3px
@@ -408,33 +417,32 @@ h5
       width: 50px      
 
     .tlypageguide_text
-      margin-top: -65px !important
       margin-left: 200px
       margin-right: 200px
-      margin-bottom: 0px
+      margin-top: 10px
+      margin-bottom: 10px
+
 
     .pageguide-nav
-      margin-left: 0px
-      margin-right: 0px
-      margin-top: 0px
       text-align: center
-
-
+      position: absolute
+      bottom: 10px
+      width: 100%
+      margin-top: 3px
 
 
     a.pageguide-prev
       color: white !important
-      background-color: #a5b941
+      background-color:  $tour-button-color
       text-align: left
       padding-right: 0px
       vertical-align: top
-      margin-left: 0px
+      margin-left: -15px
       margin-right: 40% !important
       font-size: 28px
       padding-top: 2px
       padding-bottom: 3px
       border-radius: 3px 3px 3px 3px
-      visibility: hidden 
       
 
       &:focus
@@ -449,7 +457,7 @@ h5
         position: relative
         display: inline-block
         border-top: 30px solid transparent
-        border-right: 19px solid #a5b941
+        border-right: 19px solid $tour-button-color
         border-bottom: 30px solid transparent
         left: -11px
         bottom: 10px
@@ -462,12 +470,12 @@ h5
 
     a.pageguide-next
       color: white !important
-      background-color: #a5b941
+      background-color: $tour-button-color
       text-align: left
       padding-right: 2px
       vertical-align: top
       margin-left: 40% !important
-      margin-right: 0px
+      margin-right: 10px
       font-size: 28px
       padding-top: 2px
       padding-bottom: 3px
@@ -486,7 +494,7 @@ h5
         position: relative
         display: inline-block
         border-top: 30px solid transparent
-        border-left: 19px solid #a5b941
+        border-left: 19px solid  $tour-button-color
         border-bottom: 30px solid transparent
         right: -87px
         bottom: 11px
@@ -504,23 +512,12 @@ h5
     
     a.pageguide-close
       color: white !important
-      background-color: rgba(165, 185, 65, 1)
-      text-align: left      
-      vertical-align: top
-      margin-left: 90%
-      -webkit-border-radius: 3px 3px 3px 3px
-      -moz-border-radius: 3px 3px 3px 3px
-      -o-border-radius: 3px 3px 3px 3px
-      border-radius: 3px 3px 3px 3px
-      display: inline-block
+      background-color: transparent
+      position: absolute
+      top: 0px
+      right: 15px
       font-size: 28px
-      height: 39px
-      padding-left: 9px
-      padding-right: 10px
-      text-align: center
       text-decoration: none
-      width: 85px 
-      margin-top: -75px     
 
       &:focus
         text-decoration: none !important

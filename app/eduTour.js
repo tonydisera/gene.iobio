@@ -76,6 +76,8 @@ function initializeTours() {
 	    // Initialize app tour
 		pageGuide = tl.pg.init({ 
 			'auto_refresh': true, 
+			'show_numbers': false,
+			'close_button_text': 'X',
 			'custom_open_button': '#show-main-tour',
 			'steps_element': '#tourMain',
 			'track_events_cb': function(interactionName) {
@@ -88,6 +90,8 @@ function initializeTours() {
  	   // Initialize bookmarks tour
  		pageGuideBookmarks = tl.pg.init({ 
 			'auto_refresh': true, 
+			'show_numbers': false,
+			'close_button_text': 'X',
 			'custom_open_button': '#show-bookmarks-tour',
 			'steps_element': '#tourBookmarks',
 			'track_events_cb': function(interactionName) {
@@ -100,6 +104,8 @@ function initializeTours() {
         // Initialize phenolyzer tour
     	pageGuidePhenolyzer = tl.pg.init({ 
 			'auto_refresh': true, 
+			'show_numbers': false,
+			'close_button_text': 'X',
 			'custom_open_button': '#show-phenolyzer-tour',
 			'steps_element': '#tourPhenolyzer',
 			'track_events_cb': function(interactionName) {
@@ -117,6 +123,8 @@ function initializeTours() {
 
 		pageGuideEduTour1 = tl.pg.init({ 
 			'auto_refresh': true, 
+			'show_numbers': false,
+			'close_button_text': 'close',
 			'custom_open_button': '#show-case1-tour',
 			'steps_element': '#tourEduCase1',
 			'track_events_cb': function(interactionName) {	
@@ -159,6 +167,8 @@ function initializeTours() {
 		pageGuideEduTour2 = tl.pg.init({ 
 			'auto_refresh': true, 
 			'custom_open_button': '#show-case2-tour',
+			'show_numbers': false,
+			'close_button_text': 'close',
 			'steps_element': '#tourEduCase2',
 			'track_events_cb': function(interactionName) {
 				if (interactionName == "PG.close") {

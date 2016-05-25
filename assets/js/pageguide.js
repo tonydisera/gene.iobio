@@ -115,7 +115,9 @@ tl.pg.interval = {};
         'steps_element': '#tlyPageGuide',
         'auto_refresh': false,
         'refresh_welcome': false,
-        'refresh_interval': 500
+        'refresh_interval': 500,
+        'show_numbers': true,
+        'close_button_label': "X"
     };
 
     // boilerplate markup for the message display element and shadow/index bubble container.
@@ -123,17 +125,17 @@ tl.pg.interval = {};
         '<div id="tlyPageGuideWrapper">' +
             '<div id="tlyPageGuideOverlay"></div>' +
             '<div id="tlyPageGuideMessages">' +
-                '<div class="pageguide-nav">' +
-                    '<a href="#" id="pageguide-prev-button" class="pageguide-prev" title="Prev step">back&nbsp;</a>' +
-                    '<a href="#" id="pageguide-next-button" class="pageguide-next" title="Next step">next&nbsp;&nbsp;</a>' +
-                    '<a href="#" id="pageguide-close-button" class="pageguide-close" title="Close">close</a>' +
-                '</div>' +
+                '<a href="#" id="pageguide-close-button" class="pageguide-close" title="Close"></a>' +
                 //'<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
-                '<a href="#" id="page-guide-listen-button" class="hide tlypageguide_listen" title="Listen to instructions">listen</a>' + // added audio
                 '<span class="tlypageguide_index"></span>' +
                 '<div class="tlypageguide_text"></div>' +
                 //'<a href="#" class="tlypageguide_back"  title="Previous">Previous</a>' +
                 //'<a href="#" class="tlypageguide_fwd"  title="Next">Next</a>' +
+                '<div class="pageguide-nav">' +
+                    '<a href="#" id="pageguide-prev-button" class="pageguide-prev" title="Prev step">back&nbsp;</a>' +
+                    '<a href="#" id="pageguide-next-button" class="pageguide-next" title="Next step">next&nbsp;&nbsp;</a>' +
+                '</div>' +
+
             '</div>' +
             '<div id="tlyPageGuideContent"></div>' +
             '<div id="tlyPageGuideToggles"></div>' +
@@ -173,6 +175,7 @@ tl.pg.interval = {};
         if (!$wrapper.length) {
             wrapperExists = false;
             $wrapper = $(tl.pg.wrapper_markup);
+            $wrapper.find("#pageguide-close-button").text(preferences.close_button_label);
         }
 
         if (preferences.custom_open_button == null &&
@@ -413,7 +416,7 @@ tl.pg.interval = {};
                     '<div class="tlypageguide_shadow tlypageguide_shadow' + hashCode +
                     '" data-selectorhash="' + hashCode + '">' +
                         '<span class="' + positionClass +'"></span>' +
-//                        '<span class="tlyPageGuideStepIndex ' + positionClass +'"></span>' +
+                        (self.preferences.show_numbers ? '<span class="tlyPageGuideStepIndex ' + positionClass +'"></span>' : '') +
                     '</div>'
                 );
             }
@@ -455,8 +458,8 @@ tl.pg.interval = {};
                         top -= 10;
                         left -= 10;
                     } else {
-                        width = $el.outerWidth() + 6;
-                        height = $el.outerHeight() + 6
+                        width = $el.outerWidth() + 12;
+                        height = $el.outerHeight() + 12
                         top -= 6;
                         left -= 6;
                     }
@@ -519,8 +522,8 @@ tl.pg.interval = {};
                 }
                 $el.css(style);
             }
-            if (changes.index != null) {
-                //$el.find('.tlyPageGuideStepIndex').text(changes.index);
+            if (changes.index != null && this.preferences.show_numbers) {
+                $el.find('.tlyPageGuideStepIndex').text(changes.index);
             }
         }
         this.changeQueue = [];
@@ -799,8 +802,11 @@ tl.pg.interval = {};
      * left (boolean): whether or not to roll to the left-hand side
      **/
     tl.pg.PageGuide.prototype.roll_number = function (num_wrapper, new_text, left) {
+        var self = this;
         num_wrapper.animate({ 'text-indent': (left ? '' : '-') + '50px' }, 'fast', function() {
-            //num_wrapper.html(new_text);
+            if (self.preferences.show_numbers) {
+                num_wrapper.html(new_text);
+            }
             num_wrapper.css({ 'text-indent': (left ? '-' : '') + '50px' }, 'fast').animate({ 'text-indent': "0" }, 'fast');
         });
     };
