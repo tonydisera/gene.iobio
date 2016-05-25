@@ -15,7 +15,7 @@ var eduTour1Steps = {
 		    width: "1200px",
 		    height: "468px",
 			container: "animation-container-1", 
-			showFunction: showEduTourAnimationNew, 
+			showFunction: showEduTourAnimation, 
 			delay: 0}
 		},
 	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false, disableTourButtons: true},
@@ -35,7 +35,7 @@ var eduTour1Steps = {
 		    width: "1200px",
 		    height: "468px",
 			container: "animation-container-1", 
-			showFunction: showEduTourAnimationNew, 
+			showFunction: showEduTourAnimation, 
 			delay: 0}
 		}	
 };
@@ -49,7 +49,7 @@ var eduTour2Steps = {
 			width: "1200px",
 		    height: "468px",
 			container: "animation-container-1", 
-			showFunction: showEduTourAnimationNew, 
+			showFunction: showEduTourAnimation, 
 			delay: 0
 		}
 	},
@@ -61,7 +61,7 @@ var eduTour2Steps = {
 					width: "1200px",
 				    height: "468px",
 					container: "animation-container-1", 
-					showFunction: showEduTourAnimationNew, 
+					showFunction: showEduTourAnimation, 
 					delay: 0
 				}
 		},
@@ -229,7 +229,7 @@ function customizeEduTourStep(pageGuide, step) {
 			step.animation.showFunction(true, step)}, 
 			step.animation.delay);
 	} else {
-		showEduTourAnimationNew(false);		
+		showEduTourAnimation(false);		
 	}
 	if (step.dialog) {
 		$('#edu-tour-modal').modal('show');
@@ -388,25 +388,8 @@ function onEduTour2Check(checkbox) {
 	}
 }
 
-function showEduTourAnimation(show, id) {
-	if (show) {
-		$('#' + id).removeClass("hide");
-		var canvas = document.getElementById(id);
-		var exportRoot = new lib.genemodel();
 
-		var stage = new createjs.Stage(canvas);
-		stage.addChild(exportRoot);
-		stage.update();
-
-		createjs.Ticker.setFPS(lib.properties.fps);
-		createjs.Ticker.addEventListener("tick", stage);	
-	} else {
-		$('.edu-tour-animation').addClass("hide");
-	}
-		
-}
-
-function showEduTourAnimationNew(show, step) {
+function showEduTourAnimation(show, step) {
 	if (show) {
 
 
@@ -425,7 +408,8 @@ function showEduTourAnimationNew(show, step) {
 				    minW: "0px",
 				    maxW: "800px",
 				    width:  step.animation.width,
-				    height: step.animation.height
+				    height: step.animation.height,
+				    htmlRoot: "assets/animations/"
 				}, 
 				{"dom":{}}, 
 				{"dom":{}}
@@ -461,61 +445,6 @@ function showEduTourAnimationNew(show, step) {
  
 }
 
-function checkForInactivity() {
- 	//Increment the idle time counter every second.
-    var idleInterval = setInterval(timerIncrement, IDLE_INTERVAL); 
-
-    //Zero the idle timer on mouse movement.
-    $(this).mousemove(function (e) {
-        idleTime = 0;
-    });
-    $(this).keypress(function (e) {
-        idleTime = 0;
-    });	
-}
-
-function timerIncrement() {
-	if (idlePrompting) {
-		return;
-	}
-    idleTime = idleTime + 1;
-    if (idleTime > MAX_IDLE) {
-    	idlePrompting = true; 
-    	// If the user hasn't pressed continue in the next x seconds, restart the app.
-		setInterval(restartApp, IDLE_RESTART);  //
-
-    	
-    	//alertify.set({ buttonReverse: true });
-    	alertify.defaults.glossary.ok = "Yes, I want to continue.";
-		alertify.alert("Warning", 
-			"This app will restart in 10 seconds unless there is activity. Do you want to continue?", 
-			function () {
-				// okay
-				idleTime = 0;
-			    idlePrompting = false;
-			}			
-		 );
-
-        
-    }
-}
-
-function restartApp() {
-	if (idleTime > MAX_IDLE) {
-		
-		if (isSelfContainedServer) {
-			startOver();
-		}
-	}
-}
-
-function startOver() {
-	if (isLevelEdu) {
-		window.location.href = EXHIBIT_URL;
-	} else {
-		window.location.reload();
-	}
-}
 function completeTour() {
 	if (isLevelEdu) {
 		var completedTour = getUrlParameter("completedTour");
