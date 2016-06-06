@@ -5,8 +5,8 @@
 */
 var isOffline               = false;  // is there any internet connect to outside services and resources?
 var keepLocalStorage        = false; // maintain cache between sessions?
-var isLevelEdu              = true;  // is gene.iobio educational version, simplified version of app
-var isLevelEduTour          = true;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var isLevelEdu              = false;  // is gene.iobio educational version, simplified version of app
+var isLevelEduTour          = false;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 var hasTimeout              = false;  // is a timeout based on n seconds of inactivity used?
 var hideNextButtonAnim      = true; // is next button hidden on animations during edu tour?
 
