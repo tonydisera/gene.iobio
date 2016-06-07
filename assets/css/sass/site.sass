@@ -1459,6 +1459,37 @@ header
   p
     margin: 0
 
+// Material design checkboxes
+.checkbox
+
+  input[type=checkbox]:checked + .checkbox-material .check
+    border-color: $app-color
+
+    &:before
+      color:  $app-color
+  
+  label
+    font-size:    11px
+    line-height:  12px
+    color:        $text-color  
+
+    .check
+      margin-right: 0px
+
+  .checkbox-material
+    top: 0px
+
+    .check
+      width: 18px
+      height:  18px
+      top: 5px
+      left: 0px
+      
+      &:before
+        margin-top:  -5px
+        margin-left:  5px  
+
+
 
 @import slideout
 

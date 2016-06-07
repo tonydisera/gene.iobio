@@ -1322,6 +1322,7 @@ VariantCard.prototype.filterCalledVariants = function() {
 	}
 }
 
+
 VariantCard.prototype.filterVariants = function(theVcfData) {
 	if (this.model.isVcfLoaded()) {
 		var data = theVcfData ? theVcfData : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
@@ -1337,6 +1338,8 @@ VariantCard.prototype.filterVariants = function(theVcfData) {
 VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	var me = this;
 
+
+
 	var data = dataToFilter ? dataToFilter : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (data == null || data.features == null || data.features.length == 0) {
 		return;
@@ -1348,11 +1351,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 
 	me.cardSelector.find(".filter-flag").addClass("hide");
 
-	// Show a badge when the intronic variants have been removed
-	if (data.intronsExcludedCount != null && data.intronsExcludedCount > 0) {
-		me.cardSelector.find("#too-many-variants-flag").removeClass("hide");
-		me.cardSelector.find("#excluded-variant-count").text(data.intronsExcludedCount);
-	}
+
+	
 
 	// Only hide displayed variant count if we haven't already zoomed
 	if (this.cardSelector.find("#region-flag.hide").length > 0) {
@@ -1361,6 +1361,15 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		this.cardSelector.find("#displayed-variant-count").addClass("hide");
 	}
 
+
+	// Show a badge when the intronic variants have been removed
+	if ($('#exonic-only-cb').is(":checked")) {
+		me.cardSelector.find("#too-many-variants-flag").removeClass("hide");
+		me.cardSelector.find("#excluded-variant-count").text(data.intronsExcludedCount);
+    	me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");		
+		me.cardSelector.find("#displayed-variant-count").removeClass("hide");
+    	me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
+	} 
 	// Filter variants
 	var filterObject = filterCard.getFilterObject();
 	var filteredData = this.model.filterVariants(data, filterObject);

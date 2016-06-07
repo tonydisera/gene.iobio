@@ -1123,28 +1123,8 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 
 VariantModel.prototype._pruneIntronVariants = function(data) {
 	if (data.features.length > 500) {
-		data.intronsExcludedCount = 0;
-		data.features = data.features.filter(function(variant) {
-			var keep = false;
-			var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
-			var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
-			for (key in variant[impactField]) {
-				if (key.toLowerCase() == 'high' || key.toLowerCase() == 'moderate') {
-					keep = true
-				}
-			}
-			if (!keep) {
-				for (key in variant[effectField]) {
-					if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
-						keep = true;
-					}
-				}				
-			}
-			if (!keep) {
-				data.intronsExcludedCount++;
-			}
-			return keep;
-		});
+		filterCard.setExonicOnlyFilter();
+
 	}	
 }
 
@@ -1986,6 +1966,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		afField = "af1000G";
 	}
 
+	var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
+	var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
+
+
 	var afLowerVal = filterObject.afMin;
 	var afUpperVal = filterObject.afMax;
 
@@ -1993,6 +1977,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 	if (filterObject.coverageMin != null && filterObject.coverageMin != '') {
 		coverageMin = +filterObject.coverageMin;
 	}
+	data.intronsExcludedCount = 0;
 	   
 	var filteredFeatures = data.features.filter(function(d) {
 
@@ -2018,6 +2003,31 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		} else {
 			meetsAf = true;
 		}
+
+
+	
+			
+		var meetsExonic = false;
+		if (filterObject.exonicOnly) {
+			for (key in d[impactField]) {
+				if (key.toLowerCase() == 'high' || key.toLowerCase() == 'moderate') {
+					meetsExonic = true;
+				}
+			}
+			if (!meetsExonic) {
+				for (key in d[effectField]) {
+					if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
+						meetsExonic = true;
+					}
+				}				
+			}
+			if (!meetsExonic) {
+				data.intronsExcludedCount++;
+			}
+		} else {
+			meetsExonic = true;
+		}
+
 
 		// Evaluate the coverage for the variant to see if it meets min.
 		var meetsCoverage = true;
@@ -2078,7 +2088,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		}
 
 
-		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot;
+		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
 	});
 
 	

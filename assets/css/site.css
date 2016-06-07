@@ -3,13 +3,13 @@ body {
 
 h4 {
   font-size: 12px;
-  color: #1F538A;
+  color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
 
 h5 {
   font-size: 11px;
-  color: #1F538A;
+  color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
 
@@ -35,7 +35,7 @@ h5 {
 
 .modal-title {
   font-size: 16px;
-  color: #1F538A; }
+  color: #5d809d; }
 
 .form-control,
 .form-group .form-control {
@@ -167,7 +167,7 @@ h5 {
 
 .form-group label.control-label {
   font-size: 16px !important;
-  color: #1F538A !important; }
+  color: #5d809d !important; }
 
 #filter-track a.chosen-single {
   font-size: 10px !important; }
@@ -244,7 +244,7 @@ h5 {
   height: 30px !important;
   width: 200px;
   font-size: 14px;
-  color: #1F538A;
+  color: #5d809d;
   background-color: white; }
   #select_side_bar_chosen.chosen-container-single .chosen-single div {
     top: 5px !important; }
@@ -522,11 +522,11 @@ body {
       color: #96C774 !important; }
 
 .card-label {
-  color: #1F538A !important;
+  color: #5d809d !important;
   text-transform: uppercase; }
 
 .gene-card-label {
-  color: #1F538A !important; }
+  color: #5d809d !important; }
 
 .keep-case {
   text-transform: none !important; }
@@ -536,7 +536,7 @@ body {
   margin-left: 2px;
   margin-right: 1px;
   text-align: left;
-  color: #1F538A; }
+  color: #5d809d; }
 
 #sample-data-label {
   color: #717171; }
@@ -553,7 +553,7 @@ a {
   font-weight: bold; }
 
 .form-control-wrapper .material-input:before {
-  background-color: #1F538A !important; }
+  background-color: #5d809d !important; }
 
 .chart-label {
   color: #717171;
@@ -779,7 +779,7 @@ section {
 
 .iobioapp {
   font-size: 34px;
-  color: #1F538A;
+  color: #5d809d;
   font-family: "Quicksand";
   float: left;
   margin-top: -8px; }
@@ -827,7 +827,7 @@ section {
 
 #gene-name {
   font-size: 16px;
-  color: #1F538A;
+  color: #5d809d;
   font-weight: bold; }
 
 #gene-region-info {
@@ -1221,7 +1221,7 @@ header {
   float: left;
   font-size: 22px;
   padding-right: 4px;
-  color: #1F538A !important; }
+  color: #5d809d !important; }
 
 #bloodhound .typeahead {
   min-width: 170px;
@@ -1267,9 +1267,30 @@ header {
   .tt-suggestion p {
     margin: 0; }
 
+.checkbox input[type=checkbox]:checked + .checkbox-material .check {
+  border-color: #5d809d; }
+  .checkbox input[type=checkbox]:checked + .checkbox-material .check:before {
+    color: #5d809d; }
+.checkbox label {
+  font-size: 11px;
+  line-height: 12px;
+  color: #717171; }
+  .checkbox label .check {
+    margin-right: 0px; }
+.checkbox .checkbox-material {
+  top: 0px; }
+  .checkbox .checkbox-material .check {
+    width: 18px;
+    height: 18px;
+    top: 5px;
+    left: 0px; }
+    .checkbox .checkbox-material .check:before {
+      margin-top: -5px;
+      margin-left: 5px; }
+
 /* Bootstrap accordion */
 #slider-left a {
-  color: #1F538A !important; }
+  color: #5d809d !important; }
 #slider-left .btn.btn-raised {
   background-color: transparent !important;
   color: #717171 !important; }
@@ -1278,9 +1299,9 @@ header {
 #slider-left .icon-button-sm {
   color: #717171 !important; }
 #slider-left .icon-button i {
-  color: #1F538A !important; }
+  color: #5d809d !important; }
 #slider-left .icon-button-sm i {
-  color: #1F538A !important; }
+  color: #5d809d !important; }
 
 #slider-left .card-label {
   display: none; }
@@ -1294,7 +1315,7 @@ header {
   vertical-align: middle;
   color: #717171 !important; }
   .close-button:hover {
-    color: #1F538A !important; }
+    color: #5d809d !important; }
 
 #slide-buttons {
   position: absolute;
@@ -1377,11 +1398,11 @@ header {
     margin-left: -3px; }
   .icon-button.sidebar-button.selected {
     background-color: white !important;
-    color: #1F538A !important;
+    color: #5d809d !important;
     font-weight: normal !important;
     box-shadow: -6px 2px 6px 0 rgba(0, 0, 0, 0.49), -2px -2px 2px 0 rgba(0, 0, 0, 0.28) !important; }
     .icon-button.sidebar-button.selected .label, .icon-button.sidebar-button.selected .material-icons {
-      color: #1F538A !important;
+      color: #5d809d !important;
       margin-left: 0px !important; }
     .icon-button.sidebar-button.selected .label {
       font-weight: normal !important; }
@@ -1451,7 +1472,7 @@ header {
 
 #filter-track h4 {
   font-size: 12px;
-  color: #1F538A !important;
+  color: #5d809d !important;
   margin-top: 10px;
   margin-bottom: 6px; }
 #filter-track #clear-filters-link {
@@ -1460,6 +1481,9 @@ header {
   margin-top: 0px;
   margin-bottom: 0px;
   color: #717171 !important; }
+#filter-track .checkbox label {
+  font-size: 10px;
+  line-height: 11px; }
 
 #recessive-symbol .parent .left {
   stroke: #F49A73;
@@ -1480,12 +1504,12 @@ header {
   stroke-width: 3; }
 
 #trio-symbol .parent .left {
-  stroke: #1F538A;
-  stroke: #1F538A; }
+  stroke: #5d809d;
+  stroke: #5d809d; }
 #trio-symbol .parent .right {
-  stroke: #1F538A; }
+  stroke: #5d809d; }
 #trio-symbol .proband .left, #trio-symbol .proband .right {
-  stroke: #1F538A; }
+  stroke: #5d809d; }
 
 #phenotype-symbol {
   fill: #ABA2A2;
@@ -2082,12 +2106,12 @@ text.ref-count {
     fill: #717171 !important; }
 
 #examine-card a {
-  color: #1F538A !important;
+  color: #5d809d !important;
   font-size: 11px !important;
-  color: #1F538A !important;
+  color: #5d809d !important;
   font-size: 11px !important; }
   #examine-card a:hover, #examine-card a:focus {
-    color: #1F538A !important;
+    color: #5d809d !important;
     font-size: 11px !important; }
 
 #bookmark-card a {
@@ -2103,7 +2127,7 @@ text.ref-count {
     margin-right: 5px;
     border: none !important; }
   #bookmark-card a #import-help-icon {
-    color: #1F538A !important;
+    color: #5d809d !important;
     margin-left: 2px; }
 #bookmark-card .bookmark {
   font-size: 10px;
@@ -2246,7 +2270,7 @@ text.ref-count {
 
 #gene-badge-loaded {
   font-size: 14px;
-  color: #1F538A;
+  color: #5d809d;
   font-weight: bold;
   padding-right: 1px;
   float: left;
@@ -2315,7 +2339,7 @@ text.ref-count {
 
 #slider-left a.help-link {
   font-size: 13px !important;
-  color: #1F538A !important;
+  color: #5d809d !important;
   font-family: "Quattrocento Sans", sans-serif; }
 #slider-left button.help-link {
   padding-top: 0px;
@@ -2323,7 +2347,7 @@ text.ref-count {
   margin-bottom: 4px;
   margin-top: 0px;
   font-size: 13px;
-  color: #1F538A !important;
+  color: #5d809d !important;
   font-family: "Quattrocento Sans", sans-serif; }
 #slider-left .help-info {
   margin-left: 10px;
@@ -2340,7 +2364,7 @@ text.ref-count {
 #slider-left .usecases li {
   padding-top: 20px; }
   #slider-left .usecases li .inline {
-    color: #1F538A;
+    color: #5d809d;
     margin-left: 10px;
     font-family: helvetica; }
 
@@ -2428,7 +2452,7 @@ text.ref-count {
     margin-left: 200px !important; } }
 .iobioapp {
   font-size: 24px;
-  color: #1F538A;
+  color: #5d809d;
   margin-top: 0px; }
 
 .iobio {

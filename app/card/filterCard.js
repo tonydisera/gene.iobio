@@ -41,7 +41,8 @@ FilterCard.prototype.getFilterObject = function() {
 		'afMin': afMin,
 		'afMax': afMax,
 		'afScheme' : this.afScheme,
-		'annotsToInclude': this.annotsToInclude
+		'annotsToInclude': this.annotsToInclude,
+		'exonicOnly': $('#exonic-only-cb').is(":checked")
     };
 
     return filterObject;
@@ -167,6 +168,10 @@ FilterCard.prototype.init = function() {
 	// listen for go button on coverage
 	$('#coverage-go-button').on('click', function() {
 		window.filterVariants();
+	});
+	// listen to checkbox for filtering exonic only variants
+	$('#exonic-only-cb').click(function() {	   
+		window.filterVariants();	    
 	});
 
 
@@ -333,6 +338,14 @@ FilterCard.prototype.initFilterListeners = function() {
 	  });
 
 }
+
+FilterCard.prototype.setExonicOnlyFilter = function(on) {
+	if (on == null) {
+		on  = true;
+	}
+	$('#exonic-only-cb').prop('checked', on);
+}
+
 
 
 
