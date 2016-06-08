@@ -1178,7 +1178,7 @@ VariantCard.prototype.sortFeatureMatrix = function() {
 	       this.filterVariants() 
 	     : this.filterCalledVariants();
 	
-	window.matrixCard.fillFeatureMatrix(filteredVcfData, true);
+	window.matrixCard.fillFeatureMatrix(filteredVcfData);
 }
 
 

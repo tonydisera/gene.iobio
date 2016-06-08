@@ -400,6 +400,8 @@ DataCard.prototype.init = function() {
 
 		window.enableCallVariantsButton();
 
+		window.matrixCard.reset();
+
 		window.loadTracksForGene();		
 
 	});

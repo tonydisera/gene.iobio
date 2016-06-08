@@ -436,6 +436,10 @@ MatrixCard.prototype.clearSelections = function() {
 	d3.selectAll('#feature-matrix .y.axis .down').classed("faded", true);
 }
 
+MatrixCard.prototype.reset = function() {
+	this.filteredMatrixRows = null;
+}
+
 
 MatrixCard.prototype.hideTooltip = function() {
 	var tooltip = d3.select('#matrix-track .tooltip');
@@ -561,7 +565,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	}	
 }
 
-MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
+MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
 
 	if (theVcfData == null) {
@@ -574,7 +578,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 
 
 	// Figure out if we should show the unaffected sibs row
-	if (partialRefresh == null || !partialRefresh) {
+	if (this.filteredMatrixRows == null) {
 		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);	
 		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
 			me.removeRow('Affected Siblings', me.filteredMatrixRows);
@@ -594,7 +598,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 		});
 	}
 
-	// Sort the matrix columns
+	// Sort the matrix columns	
 	this.filteredMatrixRows = this.filteredMatrixRows.sort(function(a, b) {
 		if (a.order == b.order) {
 			return 0;
@@ -604,6 +608,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 			return 1;
 		}
 	});
+    
 	
 	// Fill all features used in feature matrix for each variant
 	this.featureVcfData.features.forEach( function(variant) {
