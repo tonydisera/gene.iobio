@@ -53,7 +53,7 @@ lineD3 = function module() {
       var invertedx = x.invert(mousex); 
       var invertedy = y.invert(mousey); 
 
-      if (theDepth == null) {
+      if (theDepth == null || theDepth == "") {
         theDepth = depthy.toString();
       }
       var circleText = formatCircleText(posx, theDepth);

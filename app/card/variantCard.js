@@ -2019,8 +2019,14 @@ VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) 
 			var matchingVariant = this.model.getMatchingVariant(variant);
 			if (matchingVariant != null) {
 				bamDepth = matchingVariant.bamDepth;
+				// If samtools mpileup didn't return coverage for this position, use the variant's depth
+				// field.
+				if (bamDepth == null || bamDepth == '') {
+					bamDepth = matchingVariant.genotypeDepth;
+				}
 			}
 		}
+
 		this.bamDepthChart.showCircle()(variant.start, bamDepth);
 
 
