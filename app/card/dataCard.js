@@ -200,6 +200,12 @@ DataCard.prototype.loadDemoData = function() {
 	if (!window.isLevelEdu) {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
+
+		clearCache();
+		window.matrixCard.reset();
+		window.loadedUrl = false;
+
+
 		reloadGeneFromUrl();
 	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber].length > 0) {
 		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber][0]);

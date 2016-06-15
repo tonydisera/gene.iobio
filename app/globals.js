@@ -41,6 +41,7 @@ var self_contained_services = "frontend/"
 
 var iobio_services        = (isOffline ? "ws://" : "wss://")  + (isOffline ? self_contained_services : prod_iobio_services);
 var iobio_http_services   = "http://" + (isOffline ? self_contained_services : prod_iobio_services);
+var iobio_server          = prod_iobio_services;
 
 var geneiobio_server     = iobio_http_services + "geneinfo/";
 var geneToPhenoServer    = iobio_http_services + "gene2pheno/";

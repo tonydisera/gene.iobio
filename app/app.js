@@ -820,7 +820,8 @@ function loadGeneFromUrl() {
 	
 }
 
-function reloadGeneFromUrl(alreadyLoaded) {
+function reloadGeneFromUrl() {
+	
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
 
@@ -833,7 +834,7 @@ function reloadGeneFromUrl(alreadyLoaded) {
 		genesCard.copyPasteGenes(gene);
 	}
 
-	$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: !alreadyLoaded});
+	$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
 	genesCard._geneBadgeLoading(gene, true, true);
 }
 
@@ -872,17 +873,6 @@ function loadUrlSources() {
 		window.loadSibs(unaffectedSibs, 'unaffected');	
 	}
 
-	if (bam != null) {
-		Object.keys(bam).forEach(function(urlParameter) {
-			var cardIndex = urlParameter.substring(3);
-			var variantCard      = variantCards[+cardIndex];
-			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
-			var panelSelector    = $(panelSelectorStr);
-			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
-			panelSelector.find('#bam-url-input').removeClass("hide");
-			dataCard.onBamUrlEntered(panelSelector);
-		});
-	}
 	if (vcf != null) {
 		Object.keys(vcf).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
@@ -892,6 +882,18 @@ function loadUrlSources() {
 			panelSelector.find('#url-input').val(vcf[urlParameter]);
 			panelSelector.find('#url-input').removeClass("hide");
 			dataCard.onVcfUrlEntered(panelSelector);
+		});
+	}
+
+	if (bam != null) {
+		Object.keys(bam).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
+			panelSelector.find('#bam-url-input').removeClass("hide");
+			dataCard.onBamUrlEntered(panelSelector);
 		});
 	}
 	if (dsname != null) {

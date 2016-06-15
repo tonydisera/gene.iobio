@@ -67,6 +67,9 @@ vcfiobio = function module() {
 
   var clinvarIterCount       = 0;
 
+  var tabix          = iobio_server + "tabix/";
+  var vcfReadDepther = iobio_server + "vcfdepther/";
+
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
   var tabixServer            = iobio_services + (isOffline ? "tabix/" : "od_tabix/");
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
@@ -91,6 +94,35 @@ vcfiobio = function module() {
   var regions = [];
   var regionIndex = 0;
   var stream = null;
+
+
+  var refLengths_GRCh37 = 
+  {
+        "1":   +249250621,
+        "2":   +243199373,
+        "3":   +198022430,
+        "4":   +191154276,
+        "5":   +180915260,
+        "6":   +171115067,
+        "7":   +159138663,
+        "8":   +146364022,
+        "9":   +141213431,
+        "10":  +135534747,
+        "11":  +135006516,
+        "12":  +133851895,
+        "13":  +115169878,
+        "14":  +107349540,
+        "15":  +102531392,
+        "16":  +90354753,
+        "17":  +81195210,
+        "18":  +78077248,
+        "19":  +59128983,
+        "20":  +63025520,
+        "21":  +48129895,
+        "22":  +51304566,
+        "X":   +155270560,
+        "Y":   +59373566
+      };
 
 // NEW 
 var effectCategories = [
@@ -147,74 +179,176 @@ var effectCategories = [
     vcfFile = null;
   }
 
-  exports.openVcfUrl = function(url) {
-    var success = true;
-    sourceType = SOURCE_TYPE_URL;
-    vcfURL = url;
-    vcfFile = null;
-    tabixFile = null;
-    if (url != null && url != '') {
-      if (endsWith(url.toLowerCase(), ".vcf.gz") == false) {
-        showUrlFileFormatMessage();
-        success = false;
-      } /*else if (url.indexOf("https") == 0) {
-        showHttpsMessage();
-        success = false;
-      }*/
 
-    }
-    return success;
+  var errorMessageMap =  {
+    "tabix Error: stderr - Could not load .tbi":  "Unable to load the index (.tbi) file, which has to exist in same directory and be given the same name as the .vcf.gz with the file extension of .vcf.gz.tbi.",
+    "tabix Error: stderr - [E::hts_open] fail to open file": "Unable to access the .vcf.gz file.  ",
+    "tabix Error: stderr - [M::test_and_fetch] downloading file": "Invalid index or compressed vcf.  Try bgzipping the vcf and recreating the index with tabix."
   }
 
-  exports.openVcfFile = function(event, callback, callbackError) {
-    sourceType = SOURCE_TYPE_FILE;
-    vcfURL = null;
-    var success = true;
+  var ignoreMessageMap =  {
+    //"tabix Error: stderr - [M::test_and_fetch] downloading file": {ignore: true}
+  }
 
-    if (event.target.files.length != 2) {
-       showWrongNumberFilesMessage();
-       success = false;       
-    } else if (endsWith(event.target.files[0].name, ".vcf") ||
-        endsWith(event.target.files[1].name, ".vcf")) {
-      showFileFormatMessage();
-      success = false;
+
+
+  exports.openVcfUrl = function(url, callback) {
+    var me = this;
+    sourceType = SOURCE_TYPE_URL;
+    vcfURL = url;
+
+    var fileType0 = /([^.]*)\.(vcf\.gz)$/.exec(url);
+    var fileExt0 = fileType0 && fileType0.length > 1 ? fileType0[2] : null;
+    if (fileExt0 == null) {
+      callback(false, "Please specify a URL to a compressed, indexed vcf file with the file extension vcf.gz");
     } else {
-      var fileType0 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[0].name);
-      var fileType1 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[1].name);
-
-      if (fileType0 == null || fileType0.length < 3 || fileType1 == 0 || fileType1.length <  3) {
-        showWrongNumberFilesMessage();
-        success = false;
-             
-      } else {
-
-        fileExt0 = fileType0[2];
-        fileExt1 = fileType1[2];
-
-        if (fileExt0 == 'vcf.gz' && fileExt1 == 'vcf.gz.tbi') {
-          vcfFile   = event.target.files[0];
-          tabixFile = event.target.files[1];
-        } else if (fileExt1 == 'vcf.gz' && fileExt0 == 'vcf.gz.tbi') {
-          vcfFile   = event.target.files[1];
-          tabixFile = event.target.files[0];
-        } else {
-          showFileFormatMessage();
-          success = false;
-        }
-      }
+      this.checkVcfUrl(url,function(success, message) {
+          callback(success, message);
+      });      
     }
-    if (success) {
-      callback(vcfFile);
-    } else {
-      if (callbackError) {
-        callbackError();
+
+  }
+
+  exports.checkVcfUrl = function(url, callback) {
+    var me = this;
+    var success = null;
+    var cmd = new iobio.cmd(
+        tabix,
+        ['-H', url]
+    );
+
+    cmd.on('data', function(data) {      
+      if (data != undefined) {
+        success = true;
+      }
+    });
+
+    cmd.on('end', function() {
+      if (success == null) {
+        success = true;
+        callback(success);          
+      }
+    });
+
+    cmd.on('error', function(error) {
+      if (me.ignoreErrorMessage(error)) {
+        success = true;
+        callback(success)
+      } else {
+        if (success == null) {
+          success = false;
+          callback(success, me.translateErrorMessage(error));            
+        }        
+      }
+
+    });
+
+    cmd.run();
+  }
+
+  exports.ignoreErrorMessage = function(error) {
+    var me = this;
+    var ignore = false;
+    for (err in ignoreMessageMap) {
+      if (error.indexOf(err) == 0) {
+        ignore = ignoreMessageMap[err].ignore;
       }
     }    
+    return ignore;
+
+  }
+
+  exports.translateErrorMessage = function(error) {
+    var me = this;
+    var message = null;
+    for (err in errorMessageMap) {
+      if (message == null && error.indexOf(err) == 0) {
+        message = errorMessageMap[err];
+      }
+    }    
+    return message ? message : error;
+  }
+
+  exports.openVcfFile = function(event, callback, errorCallback) {
+    sourceType = SOURCE_TYPE_FILE;
+                
+    if (event.target.files.length != 2) {
+       errorCallback('must select 2 files, both a .vcf.gz and .vcf.gz.tbi file');
+    }
+
+    if (endsWith(event.target.files[0].name, ".vcf") ||
+        endsWith(event.target.files[1].name, ".vcf")) {
+      errorCallback('You must select a compressed vcf file (.vcf.gz), not a vcf file');
+    }
+
+    var fileType0 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[0].name);
+    var fileType1 = /([^.]*)\.(vcf\.gz(\.tbi)?)$/.exec(event.target.files[1].name);
+
+    var fileExt0 = fileType0 && fileType0.length > 1 ? fileType0[2] : null;
+    var fileExt1 = fileType1 && fileType1.length > 1 ? fileType1[2] : null;
+
+    var rootFileName0 = fileType0 && fileType0.length > 1 ? fileType0[1] : null;
+    var rootFileName1 = fileType1 && fileType1.length > 1 ? fileType1[1] : null;
 
 
+    if (fileType0 == null || fileType0.length < 3 || fileType1 == null || fileType1.length <  3) {
+      errorCallback('You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file');
+    } 
+
+
+    if (fileExt0 == 'vcf.gz' && fileExt1 == 'vcf.gz.tbi') {
+      if (rootFileName0 != rootFileName1) {
+        errorCallback('The index (.tbi) file must be named ' +  rootFileName0 + ".tbi");
+      } else {
+        vcfFile   = event.target.files[0];
+        tabixFile = event.target.files[1];
+      }    
+    } else if (fileExt1 == 'vcf.gz' && fileExt0 == 'vcf.gz.tbi') {
+      if (rootFileName0 != rootFileName1) {
+        errorCallback('The index (.tbi) file must be named ' +  rootFileName1 + ".tbi");
+      } else {
+        vcfFile   = event.target.files[1];
+        tabixFile = event.target.files[0];
+      }
+    } else {
+      errorCallback('You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file');
+    }
+
+    callback(vcfFile);
 
   } 
 
+
+  function showFileFormatMessage() {
+    alertify.set(
+      { 
+        labels: {
+          cancel     : "Show me how",
+          ok         : "OK",
+        },  
+        buttonFocus:  "cancel"
+    });
+
+    alertify.confirm("You must select a compressed vcf file and its corresponding index file in order to run this app. ", 
+        function (e) {
+        if (e) {
+            return;
+        } else {
+            window.location = 'http://iobio.io/2015/09/03/install-run-tabix/';
+        }
+     });
+  }
+  
+  function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  }
+
+  exports.setSamples = function(sampleNames) {
+    samples = sampleNames;
+  }
+  exports.getSamples = function() {
+    return samples;
+  }
   exports.getVcfFile = function() {
     return vcfFile;
   }
@@ -239,65 +373,27 @@ var effectCategories = [
     sourceType = st;
   }
 
-  function showUrlFileFormatMessage() {
-    alertify.notify("The URL must point to a compressed and indexed vcf file (.vcf.gz). And the corresponding index file (.vcf.gz.tbi) must exist in the same directory", 
-        "error",
-        5,
-        function (e) {
-        return;
-     });
-  }
 
-  function showHttpsMessage() {
-    alertify.notify("https: not yet supported.  Please specify http: for your URL", 
-        "error",
-        5,
-        function (e) {
-        return;
-     });
-  }
-
-  function showWrongNumberFilesMessage() {
-
-
-    alertify.defaults.glossary.ok = "OK";
-    alertify.defaults.glossary.cancel = "Show me how";
-
-    alertify.confirm("", 
-        "You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file ", 
-        function () {
-          return;
-        },
-        function () {
-            window.open('http://iobio.io/2015/09/03/install-run-tabix/');
-
-        }
-    );
-
-  }
-
-  function showFileFormatMessage() {
-
-    alertify.defaults.glossary.ok = "OK";
-    alertify.defaults.glossary.cancel = "Show me how";
-
-    alertify.confirm("", 
-        "You must select a compressed and indexed vcf file (.vcf.gz) and its corresponding index file (gz.vcf.tbi) in order to run this app. ", 
-        function () {
-          return;
-        },
-        function () {
-            window.open('http://iobio.io/2015/09/03/install-run-tabix/');
-
-        }
-     );
-  }
   
   function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
   }
 
-  // New
+
+  exports.stripChr = function(ref) {
+    if (ref.indexOf("chr") == 0) {
+      return ref.split("chr")[1];
+    } else {
+      return ref;
+    }
+  }
+
+
+  exports.isNumeric = function(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+  
+    // New
   exports.getReferenceNames = function(callback) {
       vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
         var tbiIdx = tbiR;
@@ -313,247 +409,172 @@ var effectCategories = [
       });
   }
 
-  exports.loadIndex = function(callback) {
- 
-    vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
-      var tbiIdx = tbiR;
-      refDensity.length = 0;
+  exports.loadRemoteIndex = function(callback, callbackError) {
+    var me = this;
+    var buffer = "";
+    var refName;
+    
+    var cmd = new iobio.cmd(
+        vcfReadDepther,
+        ['-i', vcfURL + '.tbi']
+    );
 
-      for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
-        var ref   = tbiIdx.idxContent.head.names[i];
-
-        var indexseq = tbiIdx.idxContent.indexseq[i];
-        var refLength = indexseq.n_intv * size16kb;
-
-        // Use the linear index to load the estimated density data
-        var intervalPoints = [];
-        for (var x = 0; x < indexseq.n_intv; x++) {
-          var interval = indexseq.intervseq[x];
-          var fileOffset = interval.valueOf();
-          var fileOffsetPrev = x > 0 ? indexseq.intervseq[x - 1].valueOf() : 0;
-          var intervalPos = x * size16kb;
-          intervalPoints.push( [intervalPos, fileOffset - fileOffsetPrev] );
-          
-        }
-
-        // Load the reference density data.  Exclude reference if 0 points.
-        refDensity[ref] = {"idx": i, "intervalPoints": intervalPoints, };
-        refData.push( {"name": ref, "value": refLength, "refLength": refLength, "idx": i});
-
-
+    cmd.on('data', function(data) {
+      
+      if (data == undefined) {
+        return;
       }
 
-      // Call function from js-bv-sampling to obtain point data.
-      estimateCoverageDepth(tbiIdx, function(estimates) {
+      data = buffer + data;
 
-      for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
+      var recs = data.split("\n");
+      if (recs.length > 0) {     
+        for (var i=0; i < recs.length; i++)  {
+          if (recs[i] == undefined) {
+            return;
+          }
 
-          
-          var refName   = tbiIdx.idxContent.head.names[i];
-          var pointData = estimates[i];
+          var success = true;
+          if ( recs[i][0] == '#' ) {
+          var tokens = recs[i].substr(1).split("\t");
+            if (tokens.length >= 3) {
+              var refNamePrev = refName;
+              refIndex = tokens[0];
+              refName = tokens[1];     
 
-          // Sort by position of read; otherwise, we get a wonky
-          // line chart for read depth.  (When a URL is provided,
-          // bamtools returns a sorted array.  We need this same
-          // behavior when the BAM file is loaded from a file
-          // on the client.
-          pointData = pointData.sort(function(a,b) {
-              var x = +a.pos; 
-              var y = +b.pos;
-              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-          });  
-
-          // Zero fill any 16kb points not in array
-          var zeroPointData = [];
-          for (var x = 1; x < pointData.length - 1; x++) {
-              var posPrev = pointData[x-1].pos;
-              var pos     = pointData[x].pos;
-              var posDiff = pos - posPrev;
-              if (posDiff > size16kb) {
-                  var intervalCount = posDiff / size16kb;
-                  for (var y = 0; y < intervalCount; y++) {
-                    zeroPointData.push({pos: posPrev + (y*size16kb), depth: 0});
-                  }
+              var calcRefLength = tokens[2];
+              var refLength = refLengths_GRCh37[me.stripChr(refName)];
+              if (refLength == null) {
+                 refLength = calcRefLength;
               }
+
+              // Zero fill the previous reference point data and callback with the
+              // data we have loaded so far.
+              if (refData.length > 0) {
+                var refDataPrev = refData[refData.length - 1];
+                me.zeroFillPointData(refDataPrev);
+                
+              }
+
+              refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "calcRefLength": +calcRefLength, "idx": +refIndex});
+              refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};   
+
+
+            } else {
+                success = false;
+            }
           }
-          if (zeroPointData.length > 0) {
-            pointData = pointData.concat(zeroPointData);
-            pointData = pointData.sort(function(a,b) {
-              var x = +a.pos; 
-              var y = +b.pos;
-              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-            });  
+          else {
+             if (recs[i] != "") {
+                if (refDensity[refName] == null) {
+                  //console.log("Invalid reference " + refName + " for point data " + recs[i]);
+                  success = false;
+                } else {
+                  var fields = recs[i].split("\t");
+                  if (fields.length >= 2) {
+                    var point = [ parseInt(fields[0]), parseInt(fields[1]) ];
+                    refDensity[refName].points.push(point);
+                    refDensity[refName].intervalPoints.push(point);
+                  } else {
+                    success = false;
+                  }
+                }
 
-          }
-
-          var refLength = pointData[pointData.length - 1].pos + size16kb;
-
-          //refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "idx": + i});
-          refObject = refDensity[refName];
-          refObject.points = [];
-          
-          for (var x = 0; x < pointData.length; x++) {
-            var point = [pointData[x].pos, pointData[x].depth];
-            refObject.points.push(point);
+             }
+          }                  
+          if (success) {
+            buffer = "";
+          } else {
+            buffer += recs[i];
           }
         }
-
-      });
-
-
-      callback.call(this, refData);
-
-    });
-  }
+      } else  {
+        buffer += data;
+      } 
 
 
-  exports.loadRemoteIndex = function(theVcfUrl, callback) {
-    if (theVcfUrl != null) {
-      vcfURL = theVcfUrl;
-    }
-    sourceType = SOURCE_TYPE_URL;
 
-    var client = BinaryClient(vcfReadDeptherServer);
-    var url = encodeURI( vcfReadDeptherServer + '?cmd=-i ' + vcfURL + ".tbi");
+    })
 
-    client.on('open', function(stream){
-      var stream = client.createStream({event:'run', params : {'url':url}});
-      var currentSequence;
-      var refName;
-      stream.on('data', function(data, options) {
-         data = data.split("\n");
-         for (var i=0; i < data.length; i++)  {
-            if ( data[i][0] == '#' ) {
-               
-               var tokens = data[i].substr(1).split("\t");
-               refIndex = tokens[0];
-               refName = tokens[1];
-               var refLength = tokens[2];
+    // All data has been streamed.
+    cmd.on('end', function() {
+      // sort refData so references or ordered numerically
+      refData = me.sortRefData(refData);
 
-               
-               refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "idx": +refIndex});
-               refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};
-            }
-            else {
-               if (data[i] != "") {
-                  var d = data[i].split("\t");
-                  var point = [ parseInt(d[0]), parseInt(d[1]) ];
-                  refDensity[refName].points.push(point);
-                  refDensity[refName].intervalPoints.push(point);
 
-               }
-            }                  
-         }
-      });
+      // Zero fill the previous reference point data and callback with the
+      // for the last reference that was loaded
+      if (refData.length > 0) {
+        var refDataPrev = refData[refData.length - 1];
+        me.zeroFillPointData(refDataPrev);        
+      }
+      if (callback) {
+        callback(refData);
+      }
+    })
 
-      stream.on("error", function(error) {
+    // Catch error event when fired 
+    cmd.on('error', function(error) {
+      console.log("Error occurred in loadRemoteIndex. " +  error);
+      if (callbackError) {
+        callbackError("Error occurred in loadRemoteIndex. " +  error);
+      }
+    })
 
-      });
+    // execute command
+    cmd.run();
 
-      stream.on('end', function() {
-         callback.call(this, refData);
-      });
-    });
+
+    
 
   };
 
 
 
+  exports.zeroFillPointData = function(refObject) {
 
-  exports.getReferences = function(minLengthPercent, maxLengthPercent) {
-    var references = [];
-    
-    // Calculate the total length
-    var totalLength = +0;
-    for (var i = 0; i < refData.length; i++) {
-      var refObject = refData[i];
-      totalLength += refObject.value;
-    }
+        var refDensityObject = refDensity[refObject.name];
 
-    // Only include references with length within percent range
-    for (var i = 0; i < refData.length; i++) {
-      var refObject = refData[i];
-      var lengthPercent = refObject.value / totalLength;
-      if (lengthPercent >= minLengthPercent && lengthPercent <= maxLengthPercent) {
-        references.push(refObject);
-      }
-    }
+        // If we have sparse data, keep track of these regions
+        var realPointCount = 0;
+        refDensityObject.points.forEach( function (point) {
+          if (point[1] > 0) {
+            realPointCount++;
+          }
+        });
+        if (realPointCount < 100) {
+          refObject.sparsePointData = [];
+          refDensityObject.points.forEach( function (point) {
+          if (point[1] > 0) {
+            refObject.sparsePointData.push( {pos: point[0], depth: point[1]});
+          }
+        });
+        }
+        
+       
+  };
 
 
-    return references;
+  exports.sortRefData = function(refData) {
+    var me = this;
+    return refData.sort(function(refa,refb) {
+          var x = me.stripChr(refa.name); 
+          var y = me.stripChr(refb.name);
+          if (me.isNumeric(x) && me.isNumeric(y)) {
+            return ((+x < +y) ? -1 : ((+x > +y) ? 1 : 0));
+          } else {
+             if (!me.isNumeric(x) && !me.isNumeric(y)) {
+                return ((+x < +y) ? -1 : ((+x > +y) ? 1 : 0));
+             } else if (!me.isNumeric(x)) {
+                return 1;
+             } else {
+                return -1;
+             }
+          }
+          
+      });      
   }
 
-
-  exports.getEstimatedDensity = function(ref, useLinearIndex, removeTheDataSpikes, maxPoints, rdpEpsilon) {
-    var points = useLinearIndex ? refDensity[ref].intervalPoints.concat() : refDensity[ref].points.concat();
-
-    if (removeTheDataSpikes) {
-      var filteredPoints = this._applyCeiling(points);
-      if (filteredPoints.length > 500) {
-        points = filteredPoints;
-      }
-    } 
-
-
-    // Reduce point data to to a reasonable number of points for display purposes
-    if (maxPoints) {
-      var factor = d3.round(points.length / 900);
-      points = this.reducePoints(points, factor, function(d) { return d[0]; }, function(d) { return d[1]});
-    }
-
-    // Now perform RDP
-    if (rdpEpsilon) {
-      points = this._performRDP(points, rdpEpsilon, function(d) { return d[0] }, function(d) { return d[1] });
-    }
-
-    return points;
-  }
-
-  exports.getGenomeEstimatedDensity = function(useLinearIndex, removeTheDataSpikes, maxPoints, rdpEpsilon) {
-    var allPoints = [];
-    var offset = 0;
-    for (var i = 0; i < refData.length; i++) {
-
-      var points = useLinearIndex ? refDensity[refData[i].name].intervalPoints.concat() : refDensity[refData[i].name].points.concat();
-
-      var offsetPoints = [];
-      for (var x = 0; x < points.length; x++) {
-        offsetPoints.push([points[x][0] + offset, points[x][1]]);
-      }
-      allPoints = allPoints.concat(offsetPoints);
-      // We are making a linear representation of all ref density.
-      // We will add the length of the ref to the 
-      // next reference's positions.
-      offset = offset + refData[i].value;
-    }
-    if (removeTheDataSpikes) {
-      allPoints = this._applyCeiling(allPoints);
-    }
-
-    // Reduce point data to to a reasonable number of points for display purposes
-    if (maxPoints) {
-      var factor = d3.round(allPoints.length / maxPoints);
-      allPoints = this.reducePoints(allPoints, factor, function(d) { return d[0]; }, function(d) { return d[1]});
-    }
-
-    // Now perform RDP
-    if (rdpEpsilon) {
-      allPoints = this._performRDP(allPoints, rdpEpsilon, function(d) { return d[0] }, function(d) { return d[1] });
-    }
-
-
-    return allPoints;
-  }
-
-  // MODIFIED
-  exports.getStats = function(refs, regionParm, options, callback) {    
-    if (sourceType == SOURCE_TYPE_URL) {
-      this._getRemoteStats(refs, regionParm, options, callback);
-    } else {
-      this._getLocalStats(refs, regionParm, options, callback);
-    }
-    
-  }
   
   // NEW
   exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
@@ -778,6 +799,7 @@ var effectCategories = [
   }
 
 
+
     // NEW
   exports.getSampleNames = function(callback) {
     if (sourceType == SOURCE_TYPE_URL) {
@@ -816,50 +838,43 @@ var effectCategories = [
   // NEW
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
-    var tabixUrl = encodeURI(tabixServer + "?cmd=-h " + vcfURL +  ' 1:1-1' + '&protocol=http&encoding=utf8');
-
-    // Connect to the tabix server    
-    var client = BinaryClient(tabixServer);
     
-    var sampleNames = [];
+    var cmd = new iobio.cmd(
+        tabix,
+        ['-h', vcfURL, '1:1-1']);
+
+
+
+    cmd.http();
+
+
     var headerData = "";
-    
-    client.on('open', function(stream){
-
-      // Run the command
-      var stream = client.createStream({event:'run', params : {'url':tabixUrl}});
-
-      //
-      // listen for stream data (the output) event. 
-      //
-      stream.on('data', function(data, options) {
+    // Use Results
+    cmd.on('data', function(data) {
          if (data == undefined) {
             return;
          } 
          headerData += data;
-      });
+    });
 
-      //
-      // listen for stream data (the output) event. 
-      //
-      stream.on('error', function(data, options) {
-         console.log(data);
-      });
-
-      // When all of the data has been returned, parse the header
-      // records to get the sample names
-      stream.on('end', function() {
-        headerRecords = headerData.split("\n");
-        headerRecords.forEach(function(headerRec) {
-            if (headerRec.indexOf("#CHROM") == 0) {
-              var headerFields = headerRec.split("\t");
-              sampleNames = headerFields.slice(9);
-              callback(sampleNames);
-            }
-        });
-      });
+    cmd.on('end', function(data) {
+        var headerRecords = headerData.split("\n");
+         headerRecords.forEach(function(headerRec) {
+              if (headerRec.indexOf("#CHROM") == 0) {
+                var headerFields = headerRec.split("\t");
+                var sampleNames = headerFields.slice(9);
+                callback(sampleNames);
+              }
+         });
 
     });
+
+    cmd.on('error', function(error) {
+      console.log(error);
+    });
+    
+    cmd.run(); 
+
   }
 
 
@@ -2262,19 +2277,7 @@ var effectCategories = [
 
   };
 
-  // MODIFIED
-  // We we are dealing with a local VCF, we will create a mini-vcf of all of the sampled regions.
-  // This mini-vcf will be streamed to vcfstatsAliveServer.  
-  exports._getLocalStats = function(refs, regionParm, options, callback) {    
-    this._getRegions(refs, regionParm, options);
-    
-    this._streamVcf(vcfstatsAliveServer, callback);
 
-    if (debug) {
-      this._streamVcf(catInputServer);
-    }
-     
-  };  
 
   exports._streamVcf = function(server, callback) {
 
@@ -2377,279 +2380,11 @@ var effectCategories = [
       
     });
 
-    //
-    // stream the vcf
-    //
-    /*
-    client.on("stream", function(stream) {
-      // This is the callback function that will get invoked each time a set of vcf records is
-      // returned from the binary parser for a given region.  
-      var onGetRecords = function(records) {
-        var me = this;
-        if (regionIndex == regions.length) {
-          // The executing code should never get there as we should exit the recursion in onGetRecords.
-        } else {
-
-          // Stream the vcf records we just parsed for a region in the vcf, one records at a time
-          if (records) {
-            for (var r = 0; r < records.length; r++) {              
-              stream.write(records[r] + "\n");
-            }
-          } else {
-            // This is an error condition.  If vcfRecords can't return any
-            // records, we will hit this point in the code.
-            // Just log it for now and move on to the next region.
-            console.log("WARNING:  unable to create vcf records for region  " + regionIndex);
-          }
-
-          regionIndex++;
-
-          if (regionIndex > regions.length) {
-            return;
-          } else if (regionIndex == regions.length) {
-            // We have streamed all of the regions so now we will end the stream.
-            stream.end();
-            return;
-          } else {
-            // There are more regions to obtain vcf records for, so call getVcfRecords now
-            // that regionIndex has been incremented.
-            vcfReader.getRecords(regions[regionIndex].name, 
-              regions[regionIndex].start, 
-              regions[regionIndex].end, 
-              onGetRecords);
-          }      
-
-        }
-      }
-
-      //vcfReader.getHeaderRecords( function(headerRecords) {
-      //  for (h = 0; h < headerRecords.length; h++) {
-      //    stream.write(headerRecords[h] + "\n");
-      //  }
-      //});
-      vcfReader.getHeader( function(header) {
-         stream.write(header + "\n");
-      });
-
-
-      // Now we recursively call vcfReader.getRecords (by way of callback function onGetRecords)
-      // so that we parse vcf records one region at a time, streaming the vcf records
-      // to the server.
-      vcfReader.getRecords(
-          regions[regionIndex].name, 
-          regions[regionIndex].start, 
-          regions[regionIndex].end, 
-          onGetRecords);
-
-      });
-
-
-
     
-    client.on("error", function(error) {
-
-    });
-*/
-
   }
-
-  // MODIFIED
-  exports._getRemoteStats = function(refs, regionParm, options, callback) {      
-    var me = this;
-
-    
-    me._getRegions(refs, regionParm, options);
-    
-    // This is the tabix url.  Here we send the regions as arguments.  tabix
-    // output (vcf header+records for the regions) will be piped
-    // to the vcfstatsalive server.
-    var regionStr = "";
-    regions.forEach(function(region) { 
-      regionStr += " " + region.name + ":" + region.start + "-" + region.end 
-    });
-    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionStr + "&encoding=binary";
-
-    // This is the full url for vcfstatsalive server which is piped its input from tabixserver
-    var url = encodeURI( vcfstatsAliveServer + '?cmd=-u 1000 ' + encodeURIComponent(tabixUrl));
-
-    // Connect to the vcfstatsaliveserver    
-    var client = BinaryClient(vcfstatsAliveServer);
-
-    var buffer = "";
-    client.on('open', function(stream){
-
-        // Run the command
-        var stream = client.createStream({event:'run', params : {'url':url}});
-
-       // Listen for data to be streamed back to the client
-        stream.on('data', function(data, options) {
-           if (data == undefined) {
-              return;
-           } 
-           var success = true;
-           try {
-             var obj = JSON.parse(buffer + data);
-           } catch(e) {
-             success = false;
-             buffer += data;
-           }
-           if(success) {
-             buffer = "";
-             callback(obj); 
-           }               
-        });
-        stream.on('end', function() {
-           if (options.onEnd != undefined)
-              options.onEnd();
-        });
-     });
-     
-  };  
 
 
  
-  // MODIFIED
-  exports._getRegions = function(refs, regionObject, options) {
-
-    regionIndex = 0;
-    regions.length = 0;
-    var bedRegions;
-
-    if (regionObject) {
-      regions.push( regionObject );
-    } else {
-      for (var j=0; j < refs.length; j++) {
-        var ref      = refData[refs[j]];
-        var start    = options.start;
-        var end      = options.end ? options.end : ref.refLength;
-        var length   = end - start;
-        if ( length < options.binSize * options.binNumber) {
-          regions.push({
-            'name' : ref.name,
-            'start': start,
-            'end'  : end    
-          });
-        } else {
-           // create random reference coordinates
-           for (var i=0; i < options.binNumber; i++) {   
-              var s = start + parseInt(Math.random()*length); 
-              regions.push( {
-                 'name' : ref.name,
-                 'start' : s,
-                 'end' : s + options.binSize
-              }); 
-           }
-           // sort by start value
-           regions = regions.sort(function(a,b) {
-              var x = a.start; var y = b.start;
-              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-           });               
-           
-           // intelligently determine exome bed coordinates
-           /*
-           if (options.exomeSampling)
-              options.bed = me._generateExomeBed(options.sequenceNames[0]);
-           
-           // map random region coordinates to bed coordinates
-           if (options.bed != undefined)
-              bedRegions = me._mapToBedCoordinates(SQs[0].name, regions, options.bed)
-            */
-        }
-      } 
-
-    }
-    return regions;     
-
-  }
-
-  /*
-  *
-  *  Stream the vcf.iobio snapshot (html) to the emailServer which
-  *  will email a description of the problem along with an html file attachment
-  *  that is the snapshop of vcfiobio.
-  */
-  exports.sendEmail = function(screenContents, email, note) {
-    var client = BinaryClient(emailServer);
-    // Strip of the #modal-report-problem from the URL
-    var theURL = location.href;
-    if (theURL.indexOf("#modal-report-problem") > -1){
-      theURL = theURL.substr(0, theURL.indexOf("#modal-report-problem"));
-    }
-
-    // Format the body of the email
-    var htmlBody = '<span style="padding-right: 4px">Reported by:</span>' + email  + "<br><br>" + 
-                   '<span style="padding-right: 51px">URL:</span>'         + theURL + "<br><br>" + 
-                   note + '<br><br>';
-
-    client.on('open', function(stream){
-      var stream = client.createStream(
-      {
-        'from':     email, 
-        'to':       'vcfiobio@googlegroups.com',
-        'subject':  'vcf.iobio.io Issue',
-        'filename': 'vcfiobio_snapshot.html',
-        'body':     htmlBody
-      });
-      stream.write(screenContents);
-      stream.end();
-    });
-  }
-
-
-  exports.jsonToArray = function(_obj, keyAttr, valueAttr) {
-    var theArray = [];
-    for (prop in _obj) {
-      var o = new Object();
-      o[keyAttr] = prop;
-      o[valueAttr] = _obj[prop];
-      theArray.push(o);
-    }
-    return theArray;
-  };
-
-  exports.jsonToValueArray = function(_obj) {
-    var theArray = [];
-    for (var key in _obj) {
-      theArray.push(_obj[key]);
-    }
-    return theArray;
-  };
-
-  exports.jsonToArray2D = function(_obj) {
-    var theArray = [];
-    for (prop in _obj) {
-      var row = [];
-      row[0] =  +prop;
-      row[1] =  +_obj[prop];
-      theArray.push(row);
-    }
-    return theArray;
-  };
-
-
-  exports.reducePoints = function(data, factor, xvalue, yvalue) {
-    if (factor <= 1 ) {
-      return data;
-    }
-    var i, j, results = [], sum = 0, length = data.length, avgWindow;
-
-    if (!factor || factor <= 0) {
-      factor = 1;
-    }
-
-    // Create a sliding window of averages
-    for(i = 0; i < length; i+= factor) {
-      // Slice from i to factor
-      avgWindow = data.slice(i, i+factor);
-      for (j = 0; j < avgWindow.length; j++) {
-          var y = yvalue(avgWindow[j]);
-          sum += y != null ? d3.round(y) : 0;
-      }
-      results.push([xvalue(data[i]), sum])
-      sum = 0;
-    }
-    return results;
-  };
 
 
   //
@@ -2659,71 +2394,6 @@ var effectCategories = [
   //
   //
   //
-
-  exports._makeid = function(){
-    // make unique string id;
-     var text = "";
-     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-     for( var i=0; i < 5; i++ )
-         text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-     return text;
-  };
-
-  exports._performRDP = function(data, epsilon, pos, depth) {
-    var smoothedData = properRDP(data, epsilon);
-    return smoothedData;
-  }
-
-  exports._applyCeiling = function(someArray) {  
-    if (someArray.length < 5) {
-      return someArray;
-    }
-
-    // Copy the values, rather than operating on references to existing values
-    var values = someArray.concat();
-
-    // Then sort
-    values.sort( function(a, b) {
-            return a[1] - b[1];
-         });
-
-    /* Then find a generous IQR. This is generous because if (values.length / 4) 
-     * is not an int, then really you should average the two elements on either 
-     * side to find q1.
-     */     
-    var q1 = values[Math.floor((values.length / 4))][1];
-    // Likewise for q3. 
-    var q3 = values[Math.ceil((values.length * (3 / 4)))][1];
-    var iqr = q3 - q1;
-    var newValues = [];
-    if (q3 != q1) {
-      // Then find min and max values
-      var maxValue = d3.round(q3 + iqr*1.5);
-      var minValue = d3.round(q1 - iqr*1.5);
-
-      // Then filter anything beyond or beneath these values.
-      var changeCount = 0;
-      values.forEach(function(x) {
-          var value = x[1];
-          if (x[1] > maxValue) {
-            value = maxValue;
-            changeCount++;
-          }
-          newValues.push([x[0], value]);
-      });
-    } else {
-      newValues = values;
-    }
-
-    newValues.sort( function(a, b) {
-      return a[0] - b[0];
-    });
-
-    // Then return
-    return newValues;
-  }
 
 
   // Allow on() method to be invoked on this class

@@ -470,29 +470,26 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 		success = false;
 
 	} else {
-		
-	   
-	    success = this.vcf.openVcfUrl(vcfUrl);
-	    if (success) {
-		    this.vcfUrlEntered = true;
-		    this.vcfFileOpened = false;	    	
-	    } else {
-	    	this.vcfUrlEntered = false;
-	    }
+		me.vcfUrlEntered = true;
+	    me.vcfFileOpened = false;
+	    me.getVcfRefName = null;	
 
-	}
-	if (success) {
-    	
-	    this.getVcfRefName = null;	
-	    // Get the sample names from the vcf header
-	    this.vcf.getSampleNames( function(sampleNames) {
-	    	callback(success, sampleNames);
+	    success = this.vcf.openVcfUrl(vcfUrl, function(success, message) {
+		    if (success) {
+			    me.vcfUrlEntered = true;
+			    me.vcfFileOpened = false;
+			    me.getVcfRefName = null;	
+			    // Get the sample names from the vcf header
+			    me.vcf.getSampleNames( function(sampleNames) {
+			    	callback(success, sampleNames);
+			    });	    	
+		    } else {
+		    	me.vcfUrlEntered = false;
+		    	callback(success);
+		    }	    	
 	    });
-	} else {
-		callback(success);
 
 	}
-
 
 }
 
@@ -543,7 +540,7 @@ VariantModel.prototype._promiseVcfRefName = function(ref) {
 
 			} else {
 
-				me.vcf.loadRemoteIndex(null, function(refData) {
+				me.vcf.loadRemoteIndex(function(refData) {
 					var foundRef = false;
 			    	refData.forEach( function(ref) {
 				 		if (ref.name == theRef) {
@@ -566,6 +563,7 @@ VariantModel.prototype._promiseVcfRefName = function(ref) {
 			    	} else {
 			    		reject();
 					} 
+		    	}, function(error) {
 		    	});
 			} 		
 		}

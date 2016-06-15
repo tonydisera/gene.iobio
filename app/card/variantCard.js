@@ -374,8 +374,8 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback, callbackErr
 		this.cardSelector.find(".vcfloader").addClass("hide");
 	}
 	this.model.promiseVcfFilesSelected(event)
-	          .then(function(fileName) {
-				me.cardSelector.find('#vcf-name').text(fileName);
+	          .then(function(resolveObject) {
+				me.cardSelector.find('#vcf-name').text(resolveObject.fileName);
 				callback(resolveObject.fileName, resolveObject.sampleNames);		
 	          },
 	          function(error) {

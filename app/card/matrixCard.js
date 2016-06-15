@@ -781,12 +781,12 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 	if (options && options.width) {
 		width = options.width;
 	} else {
-		width = options && options.cellSize && options.cellSize > 18 ? "15" : selection.datum().width;
+		width = options && options.cellSize && options.cellSize > 18 ? "15" : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14");
 	}
 	if (options && options.height) {
 		height = options.height;
 	} else {
-		height = options && options.cellSize && options.cellSize > 18 ? "15" : selection.datum().height;
+		height = options && options.cellSize && options.cellSize > 18 ? "15" :(selection.datum().hasOwnProperty("height") ? selection.datum().height : "14");
 	}
 	if (options && options.transform) {
 		transform = options.transform;
