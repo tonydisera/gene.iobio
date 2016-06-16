@@ -627,10 +627,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = 'N';
 			} 
-			if (rawValue != null && rawValue != "") {
-				if (matrixRow.attribute == 'clinVarClinicalSignificance') {
-					console.log("encountered clinvar");
-				}
+			if (rawValue != null && rawValue != "") {				
 				if (matrixRow.match == 'field') {
 					theValue = rawValue;
 					mappedClazz = matrixRow.attribute;
