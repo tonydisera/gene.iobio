@@ -15,14 +15,14 @@ function MatrixCard() {
                         'drug_response'         : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'confers_sensitivity'   : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'risk_factor'           : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'other'                 : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: null},
+                        'other'                 : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbo},
                         'association'           : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'protective'            : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'not_provided'          : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: null},
+                        'not_provided'          : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'likely_benign'         : {value: 141, badge: false, examineBadge: true, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'benign/likely_benign'  : {value: 141, badge: false, examineBadge: true, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'benign'                : {value: 151, badge: false, examineBadge: true, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
-                        'none'                  : {value: 131, badge: false, examineBadge: false, clazz: ''}
+                        'none'                  : {value: 161, badge: false, examineBadge: false, clazz: ''}
                      };
 	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
                         MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
@@ -628,6 +628,9 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 				rawValue = 'N';
 			} 
 			if (rawValue != null && rawValue != "") {
+				if (matrixRow.attribute == 'clinVarClinicalSignificance') {
+					console.log("encountered clinvar");
+				}
 				if (matrixRow.match == 'field') {
 					theValue = rawValue;
 					mappedClazz = matrixRow.attribute;
@@ -644,7 +647,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 						// Keep the lowest mapped value
 						for (val in rawValue) {
 							var entry = matrixRow.map[val];
-							if (entry != null && (mappedValue == null || entry.value < mappedValue)) {
+							if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
 								mappedValue = entry.value;
 								mappedClazz = entry.clazz;
 								symbolFunction = entry.symbolFunction;
@@ -820,9 +823,9 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 	         	} else if (clazz == 'clinvar_uc') {
 	         		return "rgba(231,186,82,1)";
 	         	} else if (clazz == 'clinvar_benign') {
-	         		return "rgba(181,207,107,1)";
+	         		return "rgba(156,194,49,1)";	         		
 	         	} else if (clazz == 'clinvar_lbenign') {
-	         		return "rgba(156,194,49,1)";
+	         		return "rgba(181,207,107,1)";
 	         	} else if (clazz == 'clinvar_other') {
 	         		return "rgb(189,189,189)";
 	         	} else if (clazz == 'clinvar_cd') {
