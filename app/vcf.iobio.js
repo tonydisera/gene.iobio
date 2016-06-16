@@ -1881,12 +1881,37 @@ var effectCategories = [
               return theObject[minScore];
             }
 
+            var getHighestScore = function(theObject, cullFunction, theTranscriptId) {
+              var maxScore = -99;
+              for( score in theObject) {
+                if (+score > maxScore) {
+                  maxScore = +score;
+                }
+              }
+              // Now get other entries with the same SIFT/Polyphen category
+              var categoryObject = theObject[maxScore];
+              for (var category in categoryObject) {
+                for (var theScore in theObject) {
+                  var theCategoryObject = theObject[theScore];
+                  if (+theScore != +maxScore && theCategoryObject[category] != null) {
+                    var theTranscripts = theCategoryObject[category];
+                    for (var transcriptId in theTranscripts) {
+                      appendTranscript(categoryObject, category, transcriptId);
+                    }
+                  }
+                }
+
+              }
+              theObject[maxScore] = cullFunction(categoryObject, theTranscriptId);
+              return theObject[maxScore];
+            }
+
             if (keepAlt) {
 
               var highestImpactSnpeff = getHighestImpact(allSnpeff, cullTranscripts, selectedTranscriptID);
               var highestImpactVep = getHighestImpact(allVep, cullTranscripts, selectedTranscriptID);
               var highestSIFT = getLowestScore(allSIFT, cullTranscripts, selectedTranscriptID);
-              var highestPolyphen = getLowestScore(allPolyphen, cullTranscripts, selectedTranscriptID);
+              var highestPolyphen = getHighestScore(allPolyphen, cullTranscripts, selectedTranscriptID);
 
               variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
                 'strand': geneObject.strand, 
