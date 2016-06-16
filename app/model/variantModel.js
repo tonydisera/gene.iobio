@@ -1206,7 +1206,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			    	return me.vcf.promiseGetClinvarRecords(
 			    		theVcfData, 
 			    		me._stripRefName(ref), geneObject.start, geneObject.end, 
-			    		isLevelEdu ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+			    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {
 		    		// We bypass getting clinvar records for unaffected siblings
@@ -1235,7 +1235,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    }, 
 	    function(error) {
 	    	// If error when getting clinvar records	    	
-	    	console.log("an error occurred when getting clinvar records " + error);
+	    	console.log("an error occurred when annotating vcf records " + error);
 	    	reject();
 
 	    }).then( function(data) {

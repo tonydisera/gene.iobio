@@ -9,6 +9,7 @@ var isLevelEdu              = false;  // is gene.iobio educational version, simp
 var isLevelEduTour          = false;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 var hasTimeout              = false;  // is a timeout based on n seconds of inactivity used?
 var hideNextButtonAnim      = true; // is next button hidden on animations during edu tour?
+var isClinvarOffline        = false; // is clinvar offline?  (Pull from clinvar hosted from URL?)
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];

@@ -1,3 +1,5 @@
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (Buffer){
 /*! binary.js build:0.2.1, development. Copyright(c) 2012 Eric Zhang <eric@ericzhang.com> MIT Licensed */
 (function(exports){
 var binaryFeatures = {};
@@ -1205,6 +1207,16 @@ function onFull(buffer, extraSize, callback){
 */
 exports.BlobReadStream = BlobReadStream;
 
+function genGuid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
 function BinaryStream(socket, id, create, meta) {
   if (!(this instanceof BinaryStream)) return new BinaryStream(options);
   
@@ -1214,6 +1226,7 @@ function BinaryStream(socket, id, create, meta) {
 
   
   this.id = id;
+  this.guid = genGuid();
   this._socket = socket;
     
   this.writable = true;
@@ -1225,12 +1238,14 @@ function BinaryStream(socket, id, create, meta) {
   
   if(create) {
     // This is a stream we are creating
+    meta.guid = self.guid;
     this._write(1, meta, this.id);
   }
 }
 
 util.inherits(BinaryStream, Stream);
 
+BinaryStream.prototype.guid = undefined;
 
 BinaryStream.prototype._onDrain = function() {
   if(!this.paused) {
@@ -1253,6 +1268,10 @@ BinaryStream.prototype._onError = function(error){
   this.readable = false;
   this.writable = false;
   this.emit('error', error);
+};
+
+BinaryStream.prototype._onMessage = function(event, msg){    
+  this.emit(event, msg);
 };
 
 BinaryStream.prototype._onCreateClientConnection = function(connection){
@@ -1307,6 +1326,10 @@ BinaryStream.prototype.error = function(error) {
 
 BinaryStream.prototype.createClientConnection = function(connection) {
   this._write(8, connection, this.id);
+};
+
+BinaryStream.prototype.message = function(event, msg) {    
+  this._write(9, [event, msg], this.id);
 };
 
 BinaryStream.prototype.destroy = BinaryStream.prototype.destroySoon = function() {
@@ -1438,7 +1461,7 @@ function BinaryClient(socket, options) {
         case 1:
           var meta = data[1];
           var streamId = data[2];
-          var binaryStream = self._receiveStream(streamId);
+          var binaryStream = self._receiveStream(streamId, meta.guid);
           self.emit('stream', binaryStream, meta);
           break;
         case 2:
@@ -1506,7 +1529,18 @@ function BinaryClient(socket, options) {
           } else {
             self.emit('error', new Error('Received `error` message for unknown stream: ' + streamId));
           }
-          break;          
+          break; 
+        case 9:          
+          var event = data[1][0];
+          var msg = data[1][1];
+          var streamId = data[2];          
+          var binaryStream = self.streams[streamId];          
+          if(binaryStream) {            
+            binaryStream._onMessage(event, msg);
+          } else {
+            self.emit('error', new Error('Received `error` message for unknown stream: ' + streamId));
+          }
+          break;                   
         default:
           self.emit('error', new Error('Unrecognized message type received: ' + data[0]));
       }
@@ -1563,9 +1597,10 @@ BinaryClient.prototype.send = function(data, meta){
   return stream;
 };
 
-BinaryClient.prototype._receiveStream = function(streamId){
+BinaryClient.prototype._receiveStream = function(streamId, guid){
   var self = this;
   var binaryStream = new BinaryStream(this._socket, streamId, false);
+  binaryStream.guid = guid;
   binaryStream.on('close', function(){
     delete self.streams[streamId];
   });
@@ -1596,3 +1631,1110 @@ BinaryClient.prototype.close = BinaryClient.prototype.destroy = function() {
 exports.BinaryClient = BinaryClient;
 
 })(this);
+
+}).call(this,{"isBuffer":require("../node_modules/browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
+
+},{"../node_modules/browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":3}],2:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],3:[function(require,module,exports){
+/**
+ * Determine if an object is Buffer
+ *
+ * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * License:  MIT
+ *
+ * `npm install is-buffer`
+ */
+
+module.exports = function (obj) {
+  return !!(obj != null &&
+    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
+      (obj.constructor &&
+      typeof obj.constructor.isBuffer === 'function' &&
+      obj.constructor.isBuffer(obj))
+    ))
+}
+
+},{}],4:[function(require,module,exports){
+var hasOwn = Object.prototype.hasOwnProperty;
+var toStr = Object.prototype.toString;
+var undefined;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
+
+var isPlainObject = function isPlainObject(obj) {
+	'use strict';
+	if (!obj || toStr.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var has_own_constructor = hasOwn.call(obj, 'constructor');
+	var has_is_property_of_method = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !has_own_constructor && !has_is_property_of_method) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) {}
+
+	return key === undefined || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	'use strict';
+	var options, name, src, copy, copyIsArray, clone,
+		target = arguments[0],
+		i = 1,
+		length = arguments.length,
+		deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target === copy) {
+					continue;
+				}
+
+				// Recurse if we're merging plain objects or arrays
+				if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+					if (copyIsArray) {
+						copyIsArray = false;
+						clone = src && isArray(src) ? src : [];
+					} else {
+						clone = src && isPlainObject(src) ? src : {};
+					}
+
+					// Never move original objects, clone them
+					target[name] = extend(deep, clone, copy);
+
+				// Don't bring in undefined values
+				} else if (copy !== undefined) {
+					target[name] = copy;
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+},{}],5:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],6:[function(require,module,exports){
+'use strict';
+module.exports = require('./lib/index');
+
+},{"./lib/index":10}],7:[function(require,module,exports){
+'use strict';
+
+var randomFromSeed = require('./random/random-from-seed');
+
+var ORIGINAL = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+var alphabet;
+var previousSeed;
+
+var shuffled;
+
+function reset() {
+    shuffled = false;
+}
+
+function setCharacters(_alphabet_) {
+    if (!_alphabet_) {
+        if (alphabet !== ORIGINAL) {
+            alphabet = ORIGINAL;
+            reset();
+        }
+        return;
+    }
+
+    if (_alphabet_ === alphabet) {
+        return;
+    }
+
+    if (_alphabet_.length !== ORIGINAL.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. You submitted ' + _alphabet_.length + ' characters: ' + _alphabet_);
+    }
+
+    var unique = _alphabet_.split('').filter(function(item, ind, arr){
+       return ind !== arr.lastIndexOf(item);
+    });
+
+    if (unique.length) {
+        throw new Error('Custom alphabet for shortid must be ' + ORIGINAL.length + ' unique characters. These characters were not unique: ' + unique.join(', '));
+    }
+
+    alphabet = _alphabet_;
+    reset();
+}
+
+function characters(_alphabet_) {
+    setCharacters(_alphabet_);
+    return alphabet;
+}
+
+function setSeed(seed) {
+    randomFromSeed.seed(seed);
+    if (previousSeed !== seed) {
+        reset();
+        previousSeed = seed;
+    }
+}
+
+function shuffle() {
+    if (!alphabet) {
+        setCharacters(ORIGINAL);
+    }
+
+    var sourceArray = alphabet.split('');
+    var targetArray = [];
+    var r = randomFromSeed.nextValue();
+    var characterIndex;
+
+    while (sourceArray.length > 0) {
+        r = randomFromSeed.nextValue();
+        characterIndex = Math.floor(r * sourceArray.length);
+        targetArray.push(sourceArray.splice(characterIndex, 1)[0]);
+    }
+    return targetArray.join('');
+}
+
+function getShuffled() {
+    if (shuffled) {
+        return shuffled;
+    }
+    shuffled = shuffle();
+    return shuffled;
+}
+
+/**
+ * lookup shuffled letter
+ * @param index
+ * @returns {string}
+ */
+function lookup(index) {
+    var alphabetShuffled = getShuffled();
+    return alphabetShuffled[index];
+}
+
+module.exports = {
+    characters: characters,
+    seed: setSeed,
+    lookup: lookup,
+    shuffled: getShuffled
+};
+
+},{"./random/random-from-seed":13}],8:[function(require,module,exports){
+'use strict';
+var alphabet = require('./alphabet');
+
+/**
+ * Decode the id to get the version and worker
+ * Mainly for debugging and testing.
+ * @param id - the shortid-generated id.
+ */
+function decode(id) {
+    var characters = alphabet.shuffled();
+    return {
+        version: characters.indexOf(id.substr(0, 1)) & 0x0f,
+        worker: characters.indexOf(id.substr(1, 1)) & 0x0f
+    };
+}
+
+module.exports = decode;
+
+},{"./alphabet":7}],9:[function(require,module,exports){
+'use strict';
+
+var randomByte = require('./random/random-byte');
+
+function encode(lookup, number) {
+    var loopCounter = 0;
+    var done;
+
+    var str = '';
+
+    while (!done) {
+        str = str + lookup( ( (number >> (4 * loopCounter)) & 0x0f ) | randomByte() );
+        done = number < (Math.pow(16, loopCounter + 1 ) );
+        loopCounter++;
+    }
+    return str;
+}
+
+module.exports = encode;
+
+},{"./random/random-byte":12}],10:[function(require,module,exports){
+'use strict';
+
+var alphabet = require('./alphabet');
+var encode = require('./encode');
+var decode = require('./decode');
+var isValid = require('./is-valid');
+
+// Ignore all milliseconds before a certain time to reduce the size of the date entropy without sacrificing uniqueness.
+// This number should be updated every year or so to keep the generated id short.
+// To regenerate `new Date() - 0` and bump the version. Always bump the version!
+var REDUCE_TIME = 1459707606518;
+
+// don't change unless we change the algos or REDUCE_TIME
+// must be an integer and less than 16
+var version = 6;
+
+// if you are using cluster or multiple servers use this to make each instance
+// has a unique value for worker
+// Note: I don't know if this is automatically set when using third
+// party cluster solutions such as pm2.
+var clusterWorkerId = require('./util/cluster-worker-id') || 0;
+
+// Counter is used when shortid is called multiple times in one second.
+var counter;
+
+// Remember the last time shortid was called in case counter is needed.
+var previousSeconds;
+
+/**
+ * Generate unique id
+ * Returns string id
+ */
+function generate() {
+
+    var str = '';
+
+    var seconds = Math.floor((Date.now() - REDUCE_TIME) * 0.001);
+
+    if (seconds === previousSeconds) {
+        counter++;
+    } else {
+        counter = 0;
+        previousSeconds = seconds;
+    }
+
+    str = str + encode(alphabet.lookup, version);
+    str = str + encode(alphabet.lookup, clusterWorkerId);
+    if (counter > 0) {
+        str = str + encode(alphabet.lookup, counter);
+    }
+    str = str + encode(alphabet.lookup, seconds);
+
+    return str;
+}
+
+
+/**
+ * Set the seed.
+ * Highly recommended if you don't want people to try to figure out your id schema.
+ * exposed as shortid.seed(int)
+ * @param seed Integer value to seed the random alphabet.  ALWAYS USE THE SAME SEED or you might get overlaps.
+ */
+function seed(seedValue) {
+    alphabet.seed(seedValue);
+    return module.exports;
+}
+
+/**
+ * Set the cluster worker or machine id
+ * exposed as shortid.worker(int)
+ * @param workerId worker must be positive integer.  Number less than 16 is recommended.
+ * returns shortid module so it can be chained.
+ */
+function worker(workerId) {
+    clusterWorkerId = workerId;
+    return module.exports;
+}
+
+/**
+ *
+ * sets new characters to use in the alphabet
+ * returns the shuffled alphabet
+ */
+function characters(newCharacters) {
+    if (newCharacters !== undefined) {
+        alphabet.characters(newCharacters);
+    }
+
+    return alphabet.shuffled();
+}
+
+
+// Export all other functions as properties of the generate function
+module.exports = generate;
+module.exports.generate = generate;
+module.exports.seed = seed;
+module.exports.worker = worker;
+module.exports.characters = characters;
+module.exports.decode = decode;
+module.exports.isValid = isValid;
+
+},{"./alphabet":7,"./decode":8,"./encode":9,"./is-valid":11,"./util/cluster-worker-id":14}],11:[function(require,module,exports){
+'use strict';
+var alphabet = require('./alphabet');
+
+function isShortId(id) {
+    if (!id || typeof id !== 'string' || id.length < 6 ) {
+        return false;
+    }
+
+    var characters = alphabet.characters();
+    var len = id.length;
+    for(var i = 0; i < len;i++) {
+        if (characters.indexOf(id[i]) === -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+module.exports = isShortId;
+
+},{"./alphabet":7}],12:[function(require,module,exports){
+'use strict';
+
+var crypto = typeof window === 'object' && (window.crypto || window.msCrypto); // IE 11 uses window.msCrypto
+
+function randomByte() {
+    if (!crypto || !crypto.getRandomValues) {
+        return Math.floor(Math.random() * 256) & 0x30;
+    }
+    var dest = new Uint8Array(1);
+    crypto.getRandomValues(dest);
+    return dest[0] & 0x30;
+}
+
+module.exports = randomByte;
+
+},{}],13:[function(require,module,exports){
+'use strict';
+
+// Found this seed-based random generator somewhere
+// Based on The Central Randomizer 1.3 (C) 1997 by Paul Houle (houle@msc.cornell.edu)
+
+var seed = 1;
+
+/**
+ * return a random number based on a seed
+ * @param seed
+ * @returns {number}
+ */
+function getNextValue() {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed/(233280.0);
+}
+
+function setSeed(_seed_) {
+    seed = _seed_;
+}
+
+module.exports = {
+    nextValue: getNextValue,
+    seed: setSeed
+};
+
+},{}],14:[function(require,module,exports){
+'use strict';
+
+module.exports = 0;
+
+},{}],15:[function(require,module,exports){
+(function (global){
+// Creates and executes iobio commands
+
+// Grab an existing iobio namespace object, or create a blank object
+// if it doesn't exist
+var iobio = global.iobio || {};
+global.iobio = iobio;
+
+
+// catch page unload event and send disconnect events to all connections
+global.onbeforeunload = function() {
+	global.iobioClients.forEach(function(runner){
+		try {
+			runner.client.close();
+			// runner.client.createStream({event:'disconnecting'});
+		} catch(e) {
+
+		}
+	});
+};
+
+// export if being used as a node module - needed for test framework
+if ( typeof module === 'object' ) { module.exports = iobio;}
+
+var EventEmitter = require('events').EventEmitter;
+var inherits = require('inherits');
+var shortid = require('shortid');
+
+
+// Command function starts here
+iobio.cmd = function(service, params, opts) {	
+	// Call EventEmitter constructor
+	EventEmitter.call(this);
+
+	// var cmdBuilder = require('./cmdBuilder.js'), // creates iobio commands 		
+	var extend = require('extend');
+	
+   	this.options = {
+   		/* defaults */ 
+   		id: shortid.generate()
+   	};
+   	extend(this.options, opts);      	
+	this.protocol = 'ws';	
+	this.pipedCommands = { };	
+	this.pipedCommands[ this.options.id ] = this;
+
+	// make sure params isn't undefined
+	params = params || [];
+
+	var conn = require('./conn.js'); // handles connection code		
+	this.connection = new conn(this.protocol, service, params, this.options);
+	var me = this;
+	
+	// bind stream events	
+	require('./utils/bindStreamEvents')(this, this.connection);
+}
+
+// inherit eventEmitter
+inherits(iobio.cmd, EventEmitter);
+
+// functions
+
+// Chain commands
+iobio.cmd.prototype.pipe = function(service, params, opts) {	
+	
+	
+	// add current url to params		
+	params = params || [];
+	params.push( this.url() );
+
+	// create new command
+	var newCmd = new iobio.cmd(service, params, opts || {});
+	// var newCmd = new iobio.cmd(service, params, opts || {});
+
+	// transfer pipedCommands to new command;
+	for (var id in this.pipedCommands ) { newCmd.pipedCommands[id] = this.pipedCommands[id]; }
+	
+	return newCmd;
+}
+
+// Create url
+iobio.cmd.prototype.url = function() { return 'iobio://' + this.connection.uri; }
+iobio.cmd.prototype.http = function() { return 'http://' + this.connection.uri; }
+iobio.cmd.prototype.ws = function() { return 'ws://' + this.connection.uri; }
+iobio.cmd.prototype.id = this.id 
+
+
+// getters/setters
+iobio.cmd.prototype.protocol = function(_) {
+	if (!arguments.length) return this.protocol;
+	this.protocol = _;
+	return this;
+}
+
+// Execute command
+iobio.cmd.prototype.run = function() {	
+
+ 	// run 
+	this.connection.run(this.pipedCommands); 
+	// send pipedCommands so that each command can properly handle the request comming back
+	// e.g. if the second command of 3 that are piped together is sending file data then it 
+	// should handle the request for data coming from the server.
+}
+
+// Kill running command instantly, leaving any data in the pipe
+iobio.cmd.prototype.kill = function() {
+	this.connection.runner.kill();
+}
+
+// End command safely. This may take a second or two and still give more data
+iobio.cmd.prototype.end = function() {
+	this.connection.runner.end();
+}
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+},{"./conn.js":16,"./utils/bindStreamEvents":22,"events":2,"extend":4,"inherits":5,"shortid":6}],16:[function(require,module,exports){
+(function (global){
+// Create connection and handle the results
+
+var EventEmitter = require('events').EventEmitter;
+var inherits = require('inherits');
+
+var conn = function(protocol, service, params, opts) {	
+	// Call EventEmitter constructor
+	EventEmitter.call(this);
+
+	var me = this;	
+	this.opts = opts;
+	this.service = service;
+	this.protocol = protocol;
+	this.params = params;	
+
+	// create url	
+	var UrlBuilder = require('./urlBuilder.js');
+	var	urlBuilder = new UrlBuilder(service, params, opts);
+	this.urlBuilder = urlBuilder;
+	this.uri = urlBuilder.uri;
+
+	if (protocol == 'ws')
+		this.Runner  = require('./protocol/ws.js');
+	else if (protocol == 'http')
+		this.Runner = require('./protocol/http.js');	
+}
+
+// inherit eventEmitter
+inherits(conn, EventEmitter);
+
+// Functions
+
+// Run command on connection
+conn.prototype.run = function(pipedCommands) {
+	// run
+	this.runner = new this.Runner(this.urlBuilder, pipedCommands, this.opts);
+	var me = this;
+	global.iobioClients = global.iobioClients || []
+	global.iobioClients.push(this.runner);
+
+	// bind stream events	
+	require('./utils/bindStreamEvents')(this,this.runner);
+}
+
+module.exports = conn;
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+},{"./protocol/http.js":17,"./protocol/ws.js":18,"./urlBuilder.js":21,"./utils/bindStreamEvents":22,"events":2,"inherits":5}],17:[function(require,module,exports){
+
+},{}],18:[function(require,module,exports){
+// Websocket code for running iobio command and getting results
+
+var EventEmitter = require('events').EventEmitter;
+var inherits = require('inherits');
+
+var ws = function(urlBuilder, pipedCommands, opts) {
+	// Call EventEmitter constructor
+	EventEmitter.call(this);
+
+	var wsUrl = 'ws://' + urlBuilder.uri,
+		BinaryClient = require('binaryjs').BinaryClient,
+		client = BinaryClient(wsUrl),
+		me = this;  
+
+		this.client = client;
+		this.stream;            
+
+		client.on('open', function(stream){
+			var stream = client.createStream({event:'run', params : {'url':wsUrl}});    
+			me.stream = stream;
+
+			stream.on('createClientConnection', function(connection) {
+				// determine serverAddress 
+				var serverAddress;				
+				var cmd = pipedCommands[connection.id];
+				if (cmd) {
+					var cmdOpts = cmd.options;
+					var cmdUrlBuilder = cmd.connection.urlBuilder;					
+				} else {
+					var cmdOpts =  opts;
+					var cmdUrlBuilder =  urlBuilder;				
+				}
+				
+
+				// go through by priority
+				if (connection.serverAddress)  // defined by requesting iobio service
+					serverAddress = connection.serverAddress;
+				else if (cmdOpts && cmdOpts.writeStream && cmdOpts.writeStream.serverAddress) // defined by writestream on client
+					serverAddress = cmdOpts.writeStream.serverAddress
+				else  // defined by client
+					serverAddress = cmdUrlBuilder.getService();				
+				
+				// connect to server
+				var dataClient = BinaryClient('ws://' + serverAddress);
+				dataClient.on('open', function() {										
+					var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+					var file = cmdUrlBuilder.getFile();
+					file.write(dataStream, cmdOpts);					
+				})
+            })      
+			
+			stream.on('data', function(data, options) {				
+				me.emit('data', data);
+			});
+
+			stream.on('end', function() {
+				me.emit('end');
+			})   
+
+			stream.on('error', function(error) {
+				me.emit('error', error);
+			})  
+
+			stream.on('queue', function(queue) {				
+				me.emit('queue', queue)
+			})    
+		});
+}
+
+// inherit eventEmitter
+inherits(ws, EventEmitter);
+
+ws.prototype.kill = function() {
+	this.stream.destroy();	
+}
+
+ws.prototype.end = function() {
+	this.stream.end();	
+}
+
+module.exports = ws;
+},{"binaryjs":1,"events":2,"inherits":5}],19:[function(require,module,exports){
+// Create iobio url for a file command and setup stream for reading the file to the iobio web service
+
+var BlobReadStream = require('binaryjs').BlobReadStream;
+
+var file = function(fileObj) {       
+    var me = this;
+    me.fileObj = fileObj
+    me.url = encodeURIComponent("http://client");
+}
+
+file.prototype.getType = function() { return 'file'; }
+
+file.prototype.getFileObj = function() { return this.fileObj; }
+
+file.prototype.getUrl = function( ) { return this.url; }
+
+file.prototype.write = function(stream, options) {
+
+    var me = this;
+    var chunkSize = options.chunkSize || (500 * 1024);             ;
+    if (options && options.writeStream) 
+        options.writeStream(stream, function() {stream.end()})
+    else {        
+        (new BlobReadStream(this.fileObj, {'chunkSize': chunkSize})).pipe(stream);
+    }
+}
+
+module.exports = file;
+},{"binaryjs":1}],20:[function(require,module,exports){
+// Create iobio url for a url command
+
+var url = function(param) {	
+	var p = 'http' + param.slice(5,param.length);
+	this.url =  encodeURIComponent( p ); 
+}
+
+url.prototype.getType = function() { return 'url'; }
+
+url.prototype.getUrl = function( ) { return this.url; }
+
+module.exports = url;
+},{}],21:[function(require,module,exports){
+// Creates the command
+
+var urlBuilder = function(service, params, opts) {	
+	var urlParams = require('./utils/hash2UrlParams.js'),
+		eventEmitter = require('events').EventEmitter(),
+		fileParamer = require('./source/file.js'),
+		urlParamer = require('./source/url.js'),
+		sourceType
+		opts = opts || {};
+
+	this.uri = null;	
+	this.service = service;
+	var me = this;	
+
+	// handle iobio urls and files to correct
+	for (var i=0; i< params.length; i++) {					
+		if(params[i].slice(0,8) == 'iobio://') {
+			sourceType = 'url'
+			var source = new urlParamer(params[i]);
+			params[i] = source.getUrl();
+		} else if (Object.prototype.toString.call(params[i]) == '[object File]' || Object.prototype.toString.call(params[i]) == '[object Blob]') {
+			sourceType = 'file';						
+			me.file = new fileParamer(params[i])
+			params[i] = me.file.getUrl();			
+		}
+	}
+
+	// create source url
+	this.uri =  encodeURI(service + '?cmd=' + params.join(' ') + urlParams(opts.urlparams) + urlParams({id:opts.id}));		
+	if (sourceType == 'file') this.uri += '&protocol=websocket';
+}
+
+urlBuilder.prototype.getFile = function() { return this.file; }
+urlBuilder.prototype.getService = function() { return this.service; }
+
+module.exports = urlBuilder;
+},{"./source/file.js":19,"./source/url.js":20,"./utils/hash2UrlParams.js":23,"events":2}],22:[function(require,module,exports){
+var bindStreamEvents = function(parent, child) {
+	// handle events
+	child.on('data', function(data) { parent.emit('data',data)});
+	child.on('end',   function() { parent.emit('end')});
+	child.on('error', function(error) { parent.emit('error',error)});	
+	child.on('queue', function(queue) { parent.emit('queue', queue)});	
+}
+
+module.exports = bindStreamEvents;	
+},{}],23:[function(require,module,exports){
+var urlParams = function(params) {
+	var str = ''
+	if (params)
+		str = '&' + Object.keys(params).map(function(k) { return k+'='+params[k]}).join('&');		
+	return str;
+}
+
+module.exports = urlParams;
+},{}]},{},[15])
+
+
+//# sourceMappingURL=iobio.js.map

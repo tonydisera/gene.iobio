@@ -3,55 +3,11 @@
 //  Tony Di Sera
 //  October 2014
 //
-//  This is a data manager class for the variant summary data.
+//  This is a data manager class for variant data.
 // 
 //  Two file are used to generate the variant data: 
 //    1. the bgzipped vcf (.vcf.gz) 
 //    2. its corresponding tabix file (.vcf.gz.tbi).  
-//
-//  The variant summary data come in 3 main fforms:  
-//    1. reference names and lengths 
-//    2. variant density (point data), 
-//    3. vcf stats (variant types, tstv ration allele frequency, mutation spectrum,
-//       insertion/deletion distribution, and qc distribution).  
-//  The reference names and lengths as well as the variant density data obtained from 
-//  the tabix file; the vcf stats are determined by parsing the vcf file in sampled regions.
-//
-//  The files can be hosted remotely, specified by a URL, or reside on the client, accesssed as a local
-//  file on the file system. When the files are on a remote server, vcfiobio communicates with iobio services 
-//  to obtain the metrics data.  When the files are accessed locally, a client-side javascript library
-//  is used to a) read the tabix file to obtain the reference names/lengths and the variant density data 
-//  and b) parse the vcf records from sampled regions.  This mini vcf file is then streamed to iobio services
-//  to obtain the vcf metrics.  
-//  
-//  The follow example code illustrates the method calls to make
-//  when the vcf file is served remotely (a URL is entered)
-//
-//  var vcfiobio = vcfiobio();
-//  vcfiobio.loadRemoteIndex(vcfUrl, function(data) {
-//     // Filter out the short (<1% median reference length) references
-//     vcfiobio.getReferenceData(.01, 100);
-//     // Show all the references (example: in a pie chart) here....
-//     // Render the variant density data here....
-//  });
-//  vcfiobio.getEstimatedDensity(refName);
-//  vcfiobio.getStats(refs, options, function(data) {
-//     // Render the vcf stats here....
-//  });
-//  
-//
-//  When the vcf file resides on the local file system, call
-//  openVcfFile() and then call loadIndex() instead
-//  of loadRemoteIndex().
-//
-//  var vcfiobio = vcfiobio();
-//  vcfiobio.openVcfFile( event, function(vcfFile) {
-//    vcfiobio.loadIndex( function(data) {
-//     .... same as above ......
-//    });
-//  });
-//  ...  same as above
-//
 //
 vcfiobio = function module() {
 
@@ -68,18 +24,17 @@ vcfiobio = function module() {
   var clinvarIterCount       = 0;
 
   var tabix          = iobio_server + "tabix/";
+//  var tabix          = iobio_server + (isOffline ? "tabix/" : "od_tabix/");
   var vcfReadDepther = iobio_server + "vcfdepther/";
+  var snpEff         = iobio_server + "snpeff/";
+  var snpSift        = iobio_server + "snpsift/";
+  var vt             = iobio_server + "vt/";
+  var clinvar        = iobio_server + "clinvar/";
+  var af             = iobio_server + "af/";
+  var vep            = iobio_server + "vep/";
+  var contigAppender = iobio_server + "ctgapndr/";
+  var vcfstatsAlive  = iobio_server + "vcfstatsalive/";
 
-  var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + (isOffline ? "tabix/" : "od_tabix/");
-  var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
-  var snpEffServer           = iobio_services + "snpeff/";
-  var snpSiftServer          = iobio_services + "snpsift/";
-  var vtServer               = iobio_services + "vt/";
-  var clinvarServer          = iobio_services + "clinvar/";
-  var afServer               = iobio_services + "af/";
-  var vepServer              = iobio_services + "vep/";
-  var contigAppenderServer   = iobio_services + "ctgapndr/";
 
 
   var vcfURL;
@@ -392,7 +347,7 @@ var effectCategories = [
   exports.isNumeric = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
-  
+
     // New
   exports.getReferenceNames = function(callback) {
       vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
@@ -593,6 +548,8 @@ var effectCategories = [
             }
           });
       } else {
+        //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
+        
         me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
           function(annotatedData, data) {
             if (annotatedData && data) {
@@ -601,10 +558,12 @@ var effectCategories = [
               reject();
             }
           });
+
       }
 
     });
   }
+
 
   // NEW
   exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
@@ -629,7 +588,8 @@ var effectCategories = [
     vcfReader.getRecords(refName, geneObject.start, geneObject.end, function(records) {
         
         var allRecs = headerRecords.concat(records);
-
+        
+        
         me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
@@ -639,6 +599,7 @@ var effectCategories = [
             errorCallback("_getLocalVariantsImpl() error - " + error);
           }
         });
+    
 
 
     });
@@ -649,42 +610,16 @@ var effectCategories = [
 
   // NEW
   exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+    
     var me = this;
-
+  
+    // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
-    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
     if (refName.indexOf('chr') == 0) {
       refFile = "./data/references_hg19/" + refName + ".fa";
     } else {
       refFile = "./data/references/hs_ref_chr" + refName + ".fa";
     }    
-    
-    // TODO - Need to generalize to grab reference names for species instead of hardcoding
-    var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
-
-    // If multi-sample vcf, select only the genotype field for the specified sample
-    var nextUrl = "";
-    if (sampleName != null && sampleName != "") {
-      nextUrl = encodeURI( vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
-    } else {
-      nextUrl = contigAppenderUrl;
-    }
-
-    // normalize variants
-    var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
-    
-    // get allele frequencies from 1000G and ExAC
-    var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-
-    var snpEffUrl = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
-
-    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
-    var nextUrl;
-    if (isRefSeq || annotationEngine == 'vep') {
-      nextUrl = afUrl;
-    } else {
-      nextUrl = snpEffUrl; 
-    }
 
     // If we are getting the hgvs notation, we need an extra command line arg for vep
     var vepArgs = "";
@@ -698,87 +633,92 @@ var effectCategories = [
     if (getRsId) {
       vepArgs += "  --check_existing ";
     }
+
+
+
+    // Create an iobio command get get the variants and add any header recs.
+    var cmd = new iobio.cmd(tabix,['-h', vcfURL, regionParm]) 
+                       .pipe(contigAppender, [me.getHumanRefNames(refName)])
+
+
+    // filter sample(s)
+    if (sampleName != null && sampleName != "") {
+      cmd = cmd.pipe(vt, ["subset", "-s", sampleName]);
+    } 
+
+    // normalize variants
+    cmd = cmd.pipe(vt, ["normalize", "-n", "-r", refFile]);
     
-    // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
-    var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
-    var server = vepServer;
+    // get allele frequencies from 1000G and ExAC
+    cmd = cmd.pipe(af);
+
+    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
+    if (isRefSeq || annotationEngine == 'vep') {
+    } else {
+      cmd = cmd.pipe(snpEff);
+    }
+
+    cmd = cmd.pipe(vep, vepArgs);
     
-    // Connect to the vep server    
-    var client = BinaryClient(server);
+
+    var annotatedData = "";  
+    // Get the results from the iobio command
+    cmd.on('data', function(data) {
+         if (data == undefined) {
+            return;
+         } 
+         annotatedData += data;
+    });
+
+    // We have all of the annotated vcf recs.  Now parse them into vcf objects
+    cmd.on('end', function(data) {
+      var annotatedRecs = annotatedData.split("\n");
+      var vcfObjects = [];
+      var contigHdrRecFound = false;
+      var vepFields = {};
+
+      annotatedRecs.forEach(function(record) {
+        if (record.charAt(0) == "#") {
+          // Figure out how the vep fields positions
+          if (record.indexOf("INFO=<ID=CSQ") > 0) {
+            vepFields = me.parseHeaderFieldForVep(record);                
+          }
+        } else {
+
+          // Parse the vcf record into its fields
+          var fields = record.split('\t');
+          var pos    = fields[1];
+          var id     = fields[2];
+          var ref    = fields[3];
+          var alt    = fields[4];
+          var qual   = fields[5];
+          var filter = fields[6];
+          var info   = fields[7];
+          var format = fields[8];
+          var genotypes = [];
+          for (var i = 9; i < fields.length; i++) {
+            genotypes.push(fields[i]);
+          }
+
+          // Turn vcf record into a JSON object and add it to an array
+          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                           'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+          vcfObjects.push(vcfObject);
+        }
+      });
+
+      // Parse the vcf object into a variant object that is visualized by the client.
+      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
+
+      callback(annotatedRecs, results);                  
+    });
+
+    cmd.on('error', function(error) {
+       console.log(error);       
+    });
     
-    var annotatedData = "";
-    client.on('open', function(stream){
+    cmd.run(); 
 
-        // Run the command
-        var stream = client.createStream({event:'run', params : {'url':url}});
-
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('data', function(data, options) {
-           if (data == undefined) {
-              return;
-           } 
-           annotatedData += data;
-        });
-
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('error', function(data, options) {
-           console.log(data);
-           if (errorCallback) {
-            errorCallback(data);
-           }
-        });
-
-        // Whenall of the annotated vcf data has been returned, call
-        // the callback function.
-        stream.on('end', function() {
-          var annotatedRecs = annotatedData.split("\n");
-          var vcfObjects = [];
-          var contigHdrRecFound = false;
-          var vepFields = {};
-
-          annotatedRecs.forEach(function(record) {
-            if (record.charAt(0) == "#") {
-              // Figure out how the vep fields positions
-              if (record.indexOf("INFO=<ID=CSQ") > 0) {
-                vepFields = me.parseHeaderFieldForVep(record);                
-              }
-            } else {
-
-              // Parse the vcf record into its fields
-              var fields = record.split('\t');
-              var pos    = fields[1];
-              var id     = fields[2];
-              var ref    = fields[3];
-              var alt    = fields[4];
-              var qual   = fields[5];
-              var filter = fields[6];
-              var info   = fields[7];
-              var format = fields[8];
-              var genotypes = [];
-              for (var i = 9; i < fields.length; i++) {
-                genotypes.push(fields[i]);
-              }
-
-              // Turn vcf record into a JSON object and add it to an array
-              var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                               'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
-              vcfObjects.push(vcfObject);
-            }
-          });
-
-           // Parse the vcf object into a variant object that is visualized by the client.
-          var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
-
-          callback(annotatedRecs, results);          
-
-        }); // end - stream.end()
-    });  // end - client.open()
-
-  
   }
 
   exports.parseHeaderFieldForVep = function(record) {
@@ -842,10 +782,6 @@ var effectCategories = [
     var cmd = new iobio.cmd(
         tabix,
         ['-h', vcfURL, '1:1-1']);
-
-
-
-    cmd.http();
 
 
     var headerData = "";
@@ -948,7 +884,7 @@ var effectCategories = [
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
         
-        if (isOffline) {
+        if (isClinvarOffline) {
           me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
           .then(  function() {
             resolve(theVcfData);
@@ -983,87 +919,66 @@ var effectCategories = [
           isFinal = true;
       }
 
-      var vcfURL = OFFLINE_CLINVAR_VCF_URL;
-
-      var tabix = iobio_services + "tabix/"
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var tabixUrl   = tabix + "?cmd=-h " + vcfURL + regionParm + '&protocol=http&encoding=utf8';
+      var cmd = new iobio.cmd(tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm]);
 
-      // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
-      var url = encodeURI(tabixUrl);
-      var server = tabix;
-      
-      // Connect to the vep server    
-      var client = BinaryClient(server);
-      
+
       var clinvarData = "";
-      client.on('open', function(stream){
+      // Parse results 
+      cmd.on('data', function(data) {
+        if (data == undefined) {
+            return;
+        } 
+        clinvarData += data;
+      });
 
-          // Run the command
-          var stream = client.createStream({event:'run', params : {'url':url}});
-
-          //
-          // listen for stream data (the output) event. 
-          //
-          stream.on('data', function(data, options) {
-             if (data == undefined) {
-                return;
-             } 
-             clinvarData += data;
-          });
-
-          //
-          // listen for stream data (the output) event. 
-          //
-          stream.on('error', function(data, options) {
-             console.log(data);
-             reject("unable to get clinvar vcf records");
-          });
-
-          // Whenall of the annotated vcf data has been returned, call
-          // the callback function.
-          stream.on('end', function() {
-            var clinvarRecs = clinvarData.split("\n");
-            var vcfObjects = [];
+      cmd.on('end', function(data) {
+        var clinvarRecs = clinvarData.split("\n");
+        var vcfObjects = [];
+        
+        clinvarRecs.forEach(function(record) {
+          if (record.charAt(0) == "#") {
             
-            clinvarRecs.forEach(function(record) {
-              if (record.charAt(0) == "#") {
-                
-              } else {
+          } else {
 
-                // Parse the vcf record into its fields
-                var fields = record.split('\t');
-                var pos    = fields[1];
-                var id     = fields[2];
-                var ref    = fields[3];
-                var alt    = fields[4];
-                var qual   = fields[5];
-                var filter = fields[6];
-                var info   = fields[7];
-                var format = fields[8];
-                var genotypes = [];
-                for (var i = 9; i < fields.length; i++) {
-                  genotypes.push(fields[i]);
-                }
-
-                // Turn vcf record into a JSON object and add it to an array
-                var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
-                                 'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
-                vcfObjects.push(vcfObject);
-              }
-            });
-
-           
-            clinvarLoadVariantsFunction(vcfObjects);
-
-            if (isFinal) {
-              resolve();
+            // Parse the vcf record into its fields
+            var fields = record.split('\t');
+            var pos    = fields[1];
+            var id     = fields[2];
+            var ref    = fields[3];
+            var alt    = fields[4];
+            var qual   = fields[5];
+            var filter = fields[6];
+            var info   = fields[7];
+            var format = fields[8];
+            var genotypes = [];
+            for (var i = 9; i < fields.length; i++) {
+              genotypes.push(fields[i]);
             }
 
-          }); // end - stream.end()
-      });  // end - client.open()
+            // Turn vcf record into a JSON object and add it to an array
+            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                             'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+            vcfObjects.push(vcfObject);
+          }
+        });
 
+       
+        clinvarLoadVariantsFunction(vcfObjects);
+
+        if (isFinal) {
+          resolve();
+        }
+
+      });
+
+      cmd.on('error', function(error) {
+        console.log("unable to get clinvar vcf records. " + error);
+        reject("unable to get clinvar vcf records. " + error);
+      });
+      
+      cmd.run(); 
     });
 
   }
@@ -1185,98 +1100,86 @@ var effectCategories = [
   
   // NEW
   exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
-      var me = this;
-      
-      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
+    var me = this;
 
-      // If multi-sample vcf, select only the genotype field for the specified sample
-      var nextUrl = "";
-      if (sampleName != null && sampleName != "") {
-        nextUrl = encodeURI( vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
-      } else {
-        nextUrl = contigAppenderUrl;
-      }
 
-      if (refName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + refName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-      }     
-      
-      // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-      var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
-      
-      // Get Allele Frequencies from 1000G and ExAC
-      var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-            
-      // Call snpEff service
-      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
+    //  Figure out the reference sequence file path
+    if (refName.indexOf('chr') == 0) {
+      refFile = "./data/references_hg19/" + refName + ".fa";
+    } else {
+      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+    }
+    // Figure out the vep args   
+    var vepArgs = "";
+    if (isRefSeq) {
+      vepArgs = " --refseq "
+    }
+    if (hgvsNotation) {
+      vepArgs += " --hgvs ";
+    }
+    if (getRsId) {
+      vepArgs += "  --check_existing ";
+    }
 
-      // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
-      var nextUrl = null;
-      if (annotationEngine == 'vep' || isRefSeq) {
-        nextUrl = afUrl;
-      } else {
-        nextUrl = snpEffUrl;
-      }
 
-      var vepArgs = "";
-      if (isRefSeq) {
-        vepArgs = " --refseq "
+    // options to write stream of vcf records from local file to cmd
+    var opts = {        
+      writeStream: function(stream) {  
+
+        records.forEach( function(record) {
+          if (record.trim() == "") {
+          } else {
+            stream.write(record + "\n");
+          }
+        });
+
+        stream.end();
       }
-      if (hgvsNotation) {
-        vepArgs += " --hgvs ";
-      }
-      if (getRsId) {
-        vepArgs += "  --check_existing ";
-      }
-      
-      // Call VEP
-      var vepUrl = encodeURI( vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
-      
-      var client = BinaryClient(vepServer);
-      var buffer = "";
-      client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':vepUrl}});
+    };
+
+
+    //  Streamed vcf recs first go through contig appender to add mandatory header recs
+    var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), vcfFile], opts);
+     
+    // Filter samples  
+    if (sampleName != null && sampleName != "") {
+      cmd = cmd.pipe(vt, ['subset', '-s', sampleName]);
+    } 
+
+    // Normalize the variants (e.g. AAA->AAG becomes A->AG)
+    cmd = cmd.pipe(vt, ['normalize', '-n', '-r', refFile]);
+          
+         
+    // Get Allele Frequencies from 1000G and ExAC
+    cmd = cmd.pipe(af);
         
-        // New local file streaming
-        stream.on('createClientConnection', function(connection) {
-          var ended = 0;
-          var dataClient = BinaryClient('ws://' + connection.serverAddress);
-          dataClient.on('open', function() {
-            var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+    // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
+    if (annotationEngine == 'vep' || isRefSeq) {
+    } else {
+      cmd.pipe(snpEff);
+    }
 
-            records.forEach( function(record) {
-              if (record.trim() == "") {
-              } else {
-                dataStream.write(record + "\n");
-              }
-            });
-            dataStream.end();
-          });
-        });
-  
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('data', function(data, options) {
-           if (data == undefined) {
-              return;
-           } 
-           buffer = buffer + data;
-        });
+    cmd.pipe(vep, [vepArgs]);
+    
+    var buffer = "";
+    // Get the results from the command
+    cmd.on('data', function(data) {
+         buffer = buffer + data;
+    });
 
-        // Whem all of the annotated vcf data has been returned, call
-        // the callback function.
-        stream.on('end', function() {
-          callback(buffer);
-        });
-        
-      });
+    cmd.on('end', function() {
+         callback(buffer);
+    });
+
+    cmd.on('error', function(error) {
+      console.log("error while annotating vcf records " + error);        
+    });
+
+    // Run the iobio command
+    cmd.run();
+     
       
-      client.on("error", function(error) {
-        console.log("error while annotating vcf records " + error);
-      });
+
   }
 
 
@@ -2277,114 +2180,6 @@ var effectCategories = [
 
   };
 
-
-
-  exports._streamVcf = function(server, callback) {
-
-    var client = BinaryClient(server);
-    var url = encodeURI( server + "?protocol=websocket&cmd=" + encodeURIComponent("http://client"));
-
-    var buffer = "";
-    client.on('open', function(){
-      var stream = client.createStream({event:'run', params : {'url':url}});
-
-      // New local file streaming
-      stream.on('createClientConnection', function(connection) {
-        var ended = 0;
-        var dataClient = BinaryClient('ws://' + connection.serverAddress);
-        dataClient.on('open', function() {
-          var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-
-          var onGetRecords = function(records) {
-            var me = this;
-            if (regionIndex == regions.length) {
-              // The executing code should never get there as we should exit the recursion in onGetRecords.
-            } else {
-
-              // Stream the vcf records we just parsed for a region in the vcf, one records at a time
-              if (records) {
-                for (var r = 0; r < records.length; r++) {              
-                  dataStream.write(records[r] + "\n");
-                }
-              } else {
-                // This is an error condition.  If vcfRecords can't return any
-                // records, we will hit this point in the code.
-                // Just log it for now and move on to the next region.
-                console.log("WARNING:  unable to create vcf records for region  " + regionIndex);
-              }
-
-              regionIndex++;
-
-              if (regionIndex > regions.length) {
-                return;
-              } else if (regionIndex == regions.length) {
-                // We have streamed all of the regions so now we will end the stream.
-                dataStream.end();
-                return;
-              } else {
-                // There are more regions to obtain vcf records for, so call getVcfRecords now
-                // that regionIndex has been incremented.
-                vcfReader.getRecords(regions[regionIndex].name, 
-                  regions[regionIndex].start, 
-                  regions[regionIndex].end, 
-                  onGetRecords);
-              }      
-
-            }
-          }
-
-          //vcfReader.getHeaderRecords( function(headerRecords) {
-          //  for (h = 0; h < headerRecords.length; h++) {
-          //    stream.write(headerRecords[h] + "\n");
-          //  }
-          //});
-          vcfReader.getHeader( function(header) {
-             dataStream.write(header + "\n");
-          });
-
-
-          // Now we recursively call vcfReader.getRecords (by way of callback function onGetRecords)
-          // so that we parse vcf records one region at a time, streaming the vcf records
-          // to the server.
-          vcfReader.getRecords(
-              regions[regionIndex].name, 
-              regions[regionIndex].start, 
-              regions[regionIndex].end, 
-              onGetRecords);
-
-        });
-      });
-
-      
-      //
-      // listen for stream data (the output) event. 
-      //
-      stream.on('data', function(data, options) {
-         if (data == undefined) {
-            return;
-         } 
-         var success = true;
-         try {
-           var obj = JSON.parse(buffer + data);
-         } catch(e) {
-           success = false;
-           buffer += data;
-         }
-         if(success) {
-           buffer = "";
-           if (callback) {
-             callback(obj); 
-           }
-         }               
-      });
-      
-    });
-
-    
-  }
-
-
- 
 
 
   //
