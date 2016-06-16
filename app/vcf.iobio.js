@@ -1097,9 +1097,121 @@ var effectCategories = [
 
    
   }
+
+   // NEW
+  exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+      var me = this;
+
+
+  var prod_iobio_services = "wss://nv-prod.iobio.io/";
+  var iobio_services = prod_iobio_services;
+
+  var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
+  var tabixServer            = iobio_services + "od_tabix/";
+  var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
+  var snpEffServer           = iobio_services + "snpeff/";
+  var snpSiftServer          = iobio_services + "snpsift/";
+  var vtServer               = iobio_services + "vt/";
+  var clinvarServer          = iobio_services + "clinvar/";
+  var afServer               = iobio_services + "af/";
+  var vepServer              = iobio_services + "vep/";
+  var contigAppenderServer   = iobio_services + "ctgapndr/";
+
+
+      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
+
+      // If multi-sample vcf, select only the genotype field for the specified sample
+      var nextUrl = "";
+      if (sampleName != null && sampleName != "") {
+        nextUrl = encodeURI( vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+      } else {
+        nextUrl = contigAppenderUrl;
+      }
+
+      if (refName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + refName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+      }       
+      
+      // Normalize the variants (e.g. AAA->AAG becomes A->AG)
+      var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
+      
+      // Get Allele Frequencies from 1000G and ExAC
+      var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
+            
+      // Call snpEff service
+      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
+
+      // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
+      var nextUrl = null;
+      if (annotationEngine == 'vep' || isRefSeq) {
+        nextUrl = afUrl;
+      } else {
+        nextUrl = snpEffUrl;
+      }
+
+      var vepArgs = "";
+      if (isRefSeq) {
+        vepArgs = " --refseq "
+      }
+      if (hgvsNotation) {
+        vepArgs += " --hgvs ";
+      }
+      if (getRsId) {
+        vepArgs += "  --check_existing ";
+      }
+      
+      // Call VEP
+      var vepUrl = encodeURI( vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
+      
+      var client = BinaryClient(vepServer);
+      var buffer = "";
+      client.on('open', function(){
+        var stream = client.createStream({event:'run', params : {'url':vepUrl}});
+
+        // New local file streaming
+        stream.on('createClientConnection', function(connection) {
+          var ended = 0;
+          var dataClient = BinaryClient('ws://' + connection.serverAddress);
+          dataClient.on('open', function() {
+            var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+
+            records.forEach( function(record) {
+              if (record.trim() == "") {
+              } else {
+                dataStream.write(record + "\n");
+              }
+            });
+            dataStream.end();
+          });
+        });
+  
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           buffer = buffer + data;
+        });
+
+        // Whem all of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          callback(buffer);
+        });
+        
+      });
+      
+      client.on("error", function(error) {
+        console.log("error while annotating vcf records " + error);
+      });
+  }
   
   // NEW
-  exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+  exports._annotateVcfRegionNew = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
     var me = this;
 
 

@@ -532,8 +532,7 @@ VariantCard.prototype.clearWarnings = function() {
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
 	this.cardSelector.find('#error-warning').addClass("hide");
-	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
-	this.cardSelector.find('#missing-variant-count').addClass("hide");
+
 	
 }
 
@@ -588,6 +587,7 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
     	this.cardSelector.find('#displayed-variant-count').text("");
     	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	this.cardSelector.find('#vcf-variant-count').text("");
+    	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
     	this.cardSelector.find('#missing-variant-count').text("");
     	this.cardSelector.find('#gene-box').text("");
     	this.cardSelector.find('#gene-box').css("visibility", "hidden");
@@ -873,6 +873,11 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		        me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
 				me.cardSelector.find('#missing-variant-count').removeClass("hide");
 				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());	        	
+	        } else if (me.model.variantsHaveBeenCalled()) {
+	        	// If call variants has occurred but 0 variants returned.
+		        me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').text("0");	        		        	
 	        }	
 
 
