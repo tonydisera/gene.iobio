@@ -462,6 +462,9 @@ FilterCard.prototype.enableClinvarFilters = function(theVcfData) {
 
 FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
 	var inheritanceVariantMap = {};
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
 	theVcfData.features.forEach( function(variant) {
 		if (variant.inheritance != null && variant.inheritance != '' && variant.inheritance != 'none') {
 			inheritanceVariantMap[variant.inheritance] = 'Y';
