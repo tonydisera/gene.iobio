@@ -849,7 +849,30 @@ VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data) {
 VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition) {
 	var me = this;
 
+	// If we have alignments but no vcf, we want to load the called variants and return.
 	if (!this.model.isVcfReadyToLoad()) {
+		if (!me.model.hasCalledVariants()) {
+			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+		} else {
+			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
+			if (me.model.isBamLoaded()) {
+				me._fillFreebayesChart(me.model.getCalledVariants(), 
+									   regionStart ? regionStart : window.gene.start, 
+									   regionEnd ? regionEnd : window.gene.end);
+				me.cardSelector.find('#missing-variant-count').removeClass("hide");
+				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());	        	
+
+				if (me.getRelationship() == 'proband') {
+					me.fillFeatureMatrix(regionStart, regionEnd);
+					genesCard.refreshCurrentGeneBadge(null, me.model.getCalledVariants());
+				} 
+			}
+			me.cardSelector.find('#missing-variant-count-label').removeClass("hide");
+			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+		}
+ 		if (onVariantsDisplayed) {
+			onVariantsDisplayed();
+		}
 		return;
 	}
 
@@ -1157,7 +1180,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (this.getRelationship() == 'proband' && theVcfData.features != null && theVcfData.features.length == 0) {
+	if (this.getRelationship() == 'proband' && theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
 		$('#filter-and-rank-card').addClass("hide");
     	//$('#matrix-track').addClass("hide");
     	return;
@@ -1285,6 +1308,11 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			// show union of vcf variants and called variants
 			if (me.getRelationship() == 'proband') {
 				me.fillFeatureMatrix(regionStart, regionEnd);
+			}
+
+			// Show gene badges
+			if (me.getRelationship() == 'proband') {
+				genesCard.refreshCurrentGeneBadge();
 			}
 
 			// Enable inheritance filters

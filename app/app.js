@@ -1634,12 +1634,12 @@ function loadTracksForGene(bypassVariantCards) {
 		}
 	}
 
-	$('#filter-and-rank-card').removeClass("hide");
- 	$('#matrix-track').removeClass("hide");
+	//$('#filter-and-rank-card').removeClass("hide");
+ 	//$('#matrix-track').removeClass("hide");
  	if (isLevelEdu) {
 	 	$('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
  	}
-	$("#matrix-panel .loader").removeClass("hide");
+	//mat $("#matrix-panel .loader").removeClass("hide");
 	$("#feature-matrix").addClass("hide");
 	$("#feature-matrix-note").addClass("hide");
 	readjustCards();
@@ -1889,6 +1889,9 @@ function promiseDetermineInheritance(promise) {
 
 					probandVariantCard.refreshVariantChartAndMatrix();
 
+					$('#filter-and-rank-card').removeClass("hide");
+				 	$('#matrix-track').removeClass("hide");
+
 					$("#matrix-panel .loader").removeClass("hide");
 					$("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
 					$("#feature-matrix-note").addClass("hide");
@@ -1904,6 +1907,9 @@ function promiseDetermineInheritance(promise) {
 						probandVariantCard.refreshVariantChartAndMatrix();
 
 						genesCard.refreshCurrentGeneBadge();
+
+						$('#filter-and-rank-card').removeClass("hide");
+				 		$('#matrix-track').removeClass("hide");
 
 						$("#matrix-panel .loader").removeClass("hide");
 						$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
@@ -1927,7 +1933,7 @@ function promiseDetermineInheritance(promise) {
 					
 					probandVariantCard.refreshVariantChartAndMatrix();	
 
-					$("#matrix-panel .loader").addClass("hide");
+					//mat $("#matrix-panel .loader").addClass("hide");
 					$("#feature-matrix-note").removeClass("hide");
 
 					resolve();		
@@ -2220,6 +2226,10 @@ function switchGenotype(gt) {
 		return gt;
 	}
 
+}
+
+function endsWith(str, suffix) {
+	return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
 

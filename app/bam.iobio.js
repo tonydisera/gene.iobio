@@ -25,9 +25,11 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {};
 
+      this.iobio.samtools       = iobio_server + "samtools/" 
+
       this.iobio.coverage       = iobio_services + "coverage/ ";
       this.iobio.bamtools       = iobio_services + "bamtools";
-      this.iobio.samtools       = iobio_services + "od_samtools";
+      this.iobio.samtoolsService = iobio_services + "od_samtools";
       this.iobio.bamReadDepther = iobio_services + "bamReadDepther";
       this.iobio.bamMerger      = iobio_services + "bammerger";      
       this.iobio.bamstatsAlive  = iobio_services + "bamstatsalive"
@@ -36,8 +38,134 @@ var Bam = Class.extend({
       this.iobio.vcflib         = iobio_services + "vcflib";
       this.iobio.vt             = iobio_services + "vt";
 
+
+      this.errorMessageMap =  {
+        "samtools Error: stderr - Could not load .bai":  "Unable to load the index (.bai) file, which has to exist in same directory and be given the same name as the .bam with the file extension of .bam.bai.",
+        "samtools Error: stderr - [E::hts_open] fail to open file": "Unable to access the file.  ",
+        "samtools Error: stderr - [M::test_and_fetch] downloading file": "Invalid index or compressed vcf.  Try re-creating the bam and index file."
+      }
+
+      var ignoreMessageMap =  {
+        //"tabix Error: stderr - [M::test_and_fetch] downloading file": {ignore: true}
+      }
+
+
       return this;
    },
+
+
+
+  checkBamUrl: function(url, callback) {
+    var me = this;
+    var success = null;
+    var cmd = new iobio.cmd(
+        me.iobio.samtools,
+        ['view', '-H', url]
+    );
+
+    cmd.on('data', function(data) {      
+      if (data != undefined) {
+        success = true;
+      }
+    });
+
+    cmd.on('end', function() {
+      if (success == null) {
+        success = true;
+        callback(success);          
+      }
+    });
+
+    cmd.on('error', function(error) {
+      if (me.ignoreErrorMessage(error)) {
+        success = true;
+        callback(success)
+      } else {
+        if (success == null) {
+          success = false;
+          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));            
+        }        
+      }
+
+    });
+
+    cmd.run();
+  },
+
+  ignoreErrorMessage: function(error) {
+    var me = this;
+    var ignore = false;
+    for (err in me.ignoreMessageMap) {
+      if (error.indexOf(err) == 0) {
+        ignore = me.ignoreMessageMap[err].ignore;
+      }
+    }    
+    return ignore;
+
+  },
+
+  translateErrorMessage:  function(error) {
+    var me = this;
+    var message = null;
+    for (err in me.errorMessageMap) {
+      if (message == null && error.indexOf(err) == 0) {
+        message = me.errorMessageMap[err];
+      }
+    }    
+    return message ? message : error;
+  },
+
+  checkBamFile: function(event, callback, errorCallback) {
+
+                
+    if (event.target.files.length != 2) {
+       errorCallback('must select 2 files, both a .bam and .bam.bai file');
+    }
+
+    if (endsWith(event.target.files[0].name, ".sam") ||
+        endsWith(event.target.files[1].name, ".sam")) {
+      errorCallback('You must select a bam file, not a sam file');
+    }
+
+    var fileType0 = /([^.]*)\.(\.bam(\.bai)?)$/.exec(event.target.files[0].name);
+    var fileType1 = /([^.]*)\.(\.bam(\.bai)?)$/.exec(event.target.files[1].name);
+
+    var fileExt0 = fileType0 && fileType0.length > 1 ? fileType0[2] : null;
+    var fileExt1 = fileType1 && fileType1.length > 1 ? fileType1[2] : null;
+
+    var rootFileName0 = fileType0 && fileType0.length > 1 ? fileType0[1] : null;
+    var rootFileName1 = fileType1 && fileType1.length > 1 ? fileType1[1] : null;
+
+
+    if (fileType0 == null || fileType0.length < 3 || fileType1 == null || fileType1.length <  3) {
+      errorCallback('You must select BOTH  a compressed bam file  and an index (.bai)  file');
+    } 
+
+
+    if (fileExt0 == 'bam' && fileExt1 == 'bam.bai') {
+      if (rootFileName0 != rootFileName1) {
+        errorCallback('The index (.bam.bai) file must be named ' +  rootFileName0 + ".bam.bai");
+      } else {
+        vcfFile   = event.target.files[0];
+        tabixFile = event.target.files[1];
+      }    
+    } else if (fileExt1 == 'bam' && fileExt0 == 'bam.bai') {
+      if (rootFileName0 != rootFileName1) {
+        errorCallback('The index (.bam.bai) file must be named ' +  rootFileName1 + ".bam.bai");
+      } else {
+        vcfFile   = event.target.files[1];
+        tabixFile = event.target.files[0];
+      }
+    } else {
+      errorCallback('You must select BOTH  a bam and an index (.bam.bai)  file');
+    }
+
+    callback(sucess);
+
+  }, 
+
+
+
    
    fetch: function( name, start, end, callback, options ) {
       var me = this;      
@@ -74,7 +202,7 @@ var Bam = Class.extend({
    },
    
    _getBamRegionsUrl: function(regions, golocal) {
-      var samtools = this.iobio.samtools;
+      var samtools = this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
@@ -112,7 +240,7 @@ var Bam = Class.extend({
    },
 
     _getBamPileupUrl: function(region, golocal) {     
-      var samtools = this.iobio.samtools;
+      var samtools = this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
          var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
          var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
@@ -128,7 +256,7 @@ var Bam = Class.extend({
 
    
     _getBamPileupUrl: function(region, golocal) {     
-      var samtools = this.iobio.samtools;
+      var samtools = this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
          var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
          var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
@@ -435,8 +563,8 @@ var Bam = Class.extend({
       else if (me.sourceType == 'file')
          me.promise(function() { me.getHeader(callback); })
       else {
-         var client = BinaryClient(me.iobio.samtools);
-         var url = encodeURI( me.iobio.samtools + '?cmd=view -H ' + this.bamUri)
+         var client = BinaryClient(me.iobio.samtoolsService);
+         var url = encodeURI( me.iobio.samtoolsService + '?cmd=view -H ' + this.bamUri)
          client.on('open', function(stream){
             var stream = client.createStream({event:'run', params : {'url':url}});
             var rawHeader = ""

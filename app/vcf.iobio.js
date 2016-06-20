@@ -137,7 +137,7 @@ var effectCategories = [
 
   var errorMessageMap =  {
     "tabix Error: stderr - Could not load .tbi":  "Unable to load the index (.tbi) file, which has to exist in same directory and be given the same name as the .vcf.gz with the file extension of .vcf.gz.tbi.",
-    "tabix Error: stderr - [E::hts_open] fail to open file": "Unable to access the .vcf.gz file.  ",
+    "tabix Error: stderr - [E::hts_open] fail to open file": "Unable to access the file.  ",
     "tabix Error: stderr - [M::test_and_fetch] downloading file": "Invalid index or compressed vcf.  Try bgzipping the vcf and recreating the index with tabix."
   }
 
@@ -192,7 +192,7 @@ var effectCategories = [
       } else {
         if (success == null) {
           success = false;
-          callback(success, me.translateErrorMessage(error));            
+          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));            
         }        
       }
 

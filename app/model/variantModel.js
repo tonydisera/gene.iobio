@@ -386,9 +386,13 @@ VariantModel.prototype.promiseBamFilesSelected = function(event) {
 			if (bamFile && baiFile) {
 				me.bamFileOpened = true;
 				me.bam = new Bam( bamFile, { bai: baiFile });
-
-				me.getBamRefName = me._stripRefName;
-				resolve(bamFile.name);							
+				me.bam.checkBamFile(event, function() {
+					me.getBamRefName = me._stripRefName;
+					resolve(bamFile.name);							
+				},
+				function(error) {
+					reject(Error(error));
+				});
 			} else {
 				reject(Error('bam and bai file not loaded'));
 			}
@@ -411,6 +415,14 @@ VariantModel.prototype.onBamUrlEntered = function(bamUrl) {
 	    
 		this.bamUrlEntered = true;
 		this.bam = new Bam(bamUrl);
+
+		this.bam.checkBamUrl(bamUrl, function(success, message) {
+			if (!success) {
+				this.bamUrlEntered = false;
+				this.bam = null;
+				alertify.alert(message);
+			}
+		});
 
 	}
     
@@ -485,6 +497,7 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 			    });	    	
 		    } else {
 		    	me.vcfUrlEntered = false;
+		    	alertify.alert(message);
 		    	callback(success);
 		    }	    	
 	    });

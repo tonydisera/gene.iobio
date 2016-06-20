@@ -763,20 +763,24 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 		});	
 }
 
-GenesCard.prototype.refreshCurrentGeneBadge = function(error) {
+GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 	var me = this;
 
 	if (error && error.length > 0) {
 		me._setGeneBadgeError(window.gene.gene_name, true);
 	} else {
-		vc = getProbandVariantCard();
+		var theVcfData = null;
+		if (vcfData) {
+			theVcfData = vcfData;
+		} else {
+			vc = getProbandVariantCard();		
+			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+		}
 		
-		var probandVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-		
-		if (probandVcfData != null && probandVcfData.features.length == 0) {
+		if (theVcfData != null && theVcfData.features.length == 0) {
 			me._setGeneBadgeWarning(window.gene.gene_name, true);
 		} else {
-			var dangerObject = vc.summarizeDanger(probandVcfData);
+			var dangerObject = vc.summarizeDanger(theVcfData);
 			me._setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
 		}
