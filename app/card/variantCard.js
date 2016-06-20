@@ -856,6 +856,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		} else {
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
+				me.cardSelector.find("#zoom-region-chart").css("margin-top", "0px");
 				me._fillFreebayesChart(me.model.getCalledVariants(), 
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
@@ -876,6 +877,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		return;
 	}
 
+	me.cardSelector.find("#zoom-region-chart").css("margin-top", "-30px");
 	if (this.isViewable()) {
 		this.cardSelector.removeClass("hide");
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -1289,6 +1291,9 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
 			$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
 
+			if (!me.model.isVcfReadyToLoad()) {
+				me.cardSelector.find("#zoom-region-chart").css("margin-top", "0px");
+			}
 
 			// Show the called variants
 			me._fillFreebayesChart(data, regionStart, regionEnd);
