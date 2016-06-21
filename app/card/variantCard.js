@@ -2110,7 +2110,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		}
 		// Strip out "_" from effect
 		var tokens = key.split("_");
-		if (levelSimple) {
+		if (isLevelEdu || isLevelEduTour) {
 			effectDisplay = tokens.join(" ");
 		} else {
 			effectDisplay += tokens.join(" ");

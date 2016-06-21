@@ -23,17 +23,16 @@ vcfiobio = function module() {
 
   var clinvarIterCount       = 0;
 
-  var tabix          = iobio_server + "tabix/";
+  var tabix          = iobio_server  + "tabix/";
 //  var tabix          = iobio_server + (isOffline ? "tabix/" : "od_tabix/");
   var vcfReadDepther = iobio_server + "vcfdepther/";
   var snpEff         = iobio_server + "snpeff/";
-  var snpSift        = iobio_server + "snpsift/";
-  var vt             = iobio_server + "vt/";
+  var vt             = dev_iobio_services + "vt/";
   var clinvar        = iobio_server + "clinvar/";
-  var af             = iobio_server + "af/";
-  var vep            = iobio_server + "vep/";
-  var contigAppender = iobio_server + "ctgapndr/";
-  var vcfstatsAlive  = iobio_server + "vcfstatsalive/";
+  var af             = "services.iobio.io/" + "af/";
+  var vep            = dev_iobio_services + "vep/";
+  var contigAppender = dev_iobio_services + "ctgapndr/";
+
 
 
 
@@ -79,7 +78,7 @@ vcfiobio = function module() {
         "Y":   +59373566
       };
 
-// NEW 
+
 var effectCategories = [
 ['coding_sequence_variant', 'coding'],
 ['chromosome' ,'chromosome'],
@@ -348,7 +347,7 @@ var effectCategories = [
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
 
-    // New
+
   exports.getReferenceNames = function(callback) {
       vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
         var tbiIdx = tbiR;
@@ -531,7 +530,6 @@ var effectCategories = [
   }
 
   
-  // NEW
   exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
@@ -565,7 +563,6 @@ var effectCategories = [
   }
 
 
-  // NEW
   exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
     var me = this;
 
@@ -608,7 +605,6 @@ var effectCategories = [
 
   }
 
-  // NEW
   exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
     
     var me = this;
@@ -739,8 +735,6 @@ var effectCategories = [
   }
 
 
-
-    // NEW
   exports.getSampleNames = function(callback) {
     if (sourceType == SOURCE_TYPE_URL) {
       this._getRemoteSampleNames(callback);
@@ -749,7 +743,6 @@ var effectCategories = [
     }
   }
  
-  // NEW
   exports._getLocalSampleNames = function(callback) {
     var me = this;
 
@@ -775,7 +768,6 @@ var effectCategories = [
 
   }
 
-  // NEW
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
     
@@ -814,7 +806,6 @@ var effectCategories = [
   }
 
 
-  // NEW
   exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
@@ -866,7 +857,6 @@ var effectCategories = [
     });
   }
 
-    // NEW
   exports.promiseGetClinvarRecords = function(theVcfData, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
     var me = this;
     
@@ -907,7 +897,6 @@ var effectCategories = [
   }  
 
   // When there is no internet, read the clinvar vcf to obtain clinvar annotations
-  // NEW
   exports.promiseGetClinvarRecordsOffline= function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
     var me = this;
 
@@ -983,7 +972,7 @@ var effectCategories = [
 
   }
 
-  // NEW
+
   exports.promiseGetClinvarRecordsImpl = function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
     var me = this;
 
@@ -1098,120 +1087,9 @@ var effectCategories = [
    
   }
 
-   // NEW
+
+
   exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
-      var me = this;
-
-
-  var prod_iobio_services = "wss://nv-prod.iobio.io/";
-  var iobio_services = prod_iobio_services;
-
-  var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + "od_tabix/";
-  var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
-  var snpEffServer           = iobio_services + "snpeff/";
-  var snpSiftServer          = iobio_services + "snpsift/";
-  var vtServer               = iobio_services + "vt/";
-  var clinvarServer          = iobio_services + "clinvar/";
-  var afServer               = iobio_services + "af/";
-  var vepServer              = iobio_services + "vep/";
-  var contigAppenderServer   = iobio_services + "ctgapndr/";
-
-
-      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
-
-      // If multi-sample vcf, select only the genotype field for the specified sample
-      var nextUrl = "";
-      if (sampleName != null && sampleName != "") {
-        nextUrl = encodeURI( vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
-      } else {
-        nextUrl = contigAppenderUrl;
-      }
-
-      if (refName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + refName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-      }       
-      
-      // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-      var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
-      
-      // Get Allele Frequencies from 1000G and ExAC
-      var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
-            
-      // Call snpEff service
-      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
-
-      // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
-      var nextUrl = null;
-      if (annotationEngine == 'vep' || isRefSeq) {
-        nextUrl = afUrl;
-      } else {
-        nextUrl = snpEffUrl;
-      }
-
-      var vepArgs = "";
-      if (isRefSeq) {
-        vepArgs = " --refseq "
-      }
-      if (hgvsNotation) {
-        vepArgs += " --hgvs ";
-      }
-      if (getRsId) {
-        vepArgs += "  --check_existing ";
-      }
-      
-      // Call VEP
-      var vepUrl = encodeURI( vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
-      
-      var client = BinaryClient(vepServer);
-      var buffer = "";
-      client.on('open', function(){
-        var stream = client.createStream({event:'run', params : {'url':vepUrl}});
-
-        // New local file streaming
-        stream.on('createClientConnection', function(connection) {
-          var ended = 0;
-          var dataClient = BinaryClient('ws://' + connection.serverAddress);
-          dataClient.on('open', function() {
-            var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-
-            records.forEach( function(record) {
-              if (record.trim() == "") {
-              } else {
-                dataStream.write(record + "\n");
-              }
-            });
-            dataStream.end();
-          });
-        });
-  
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('data', function(data, options) {
-           if (data == undefined) {
-              return;
-           } 
-           buffer = buffer + data;
-        });
-
-        // Whem all of the annotated vcf data has been returned, call
-        // the callback function.
-        stream.on('end', function() {
-          callback(buffer);
-        });
-        
-      });
-      
-      client.on("error", function(error) {
-        console.log("error while annotating vcf records " + error);
-      });
-  }
-  
-  // NEW
-  exports._annotateVcfRegionNew = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
     var me = this;
 
 
@@ -1254,24 +1132,26 @@ var effectCategories = [
     var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), vcfFile], opts);
      
     // Filter samples  
+
     if (sampleName != null && sampleName != "") {
       cmd = cmd.pipe(vt, ['subset', '-s', sampleName]);
     } 
-
+    
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
     cmd = cmd.pipe(vt, ['normalize', '-n', '-r', refFile]);
           
-         
+      
     // Get Allele Frequencies from 1000G and ExAC
     cmd = cmd.pipe(af);
         
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
     } else {
-      cmd.pipe(snpEff);
+      cmd = cmd.pipe(snpEff);
     }
 
-    cmd.pipe(vep, [vepArgs]);
+    cmd = cmd.pipe(vep, [vepArgs]);
+    
     
     var buffer = "";
     // Get the results from the command
@@ -1449,7 +1329,6 @@ var effectCategories = [
               } else if (annotToken.indexOf("RS=") == 0) {
                 rs = annotToken.substring(3, annotToken.length);
               } else if (annotToken.indexOf("AF=") == 0) {
-                // TODO:  vcfstatsalive must look at af by alt.
                 // For now, just grab first af
                 //af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), altIdx);   
                 af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), 0);    
