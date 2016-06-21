@@ -770,10 +770,10 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 		me._setGeneBadgeError(window.gene.gene_name, true);
 	} else {
 		var theVcfData = null;
+		var vc = getProbandVariantCard();		
 		if (vcfData) {
 			theVcfData = vcfData;
 		} else {
-			vc = getProbandVariantCard();		
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		}
 		

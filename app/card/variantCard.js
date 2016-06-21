@@ -604,9 +604,11 @@ VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
 
 		this.cardSelector.find('#fb-variants').addClass("hide");
 
-		$("#feature-matrix").addClass("hide");
-		$("#feature-matrix-note").addClass("hide");
-		$('#move-rows').addClass("hide");
+		if (this.getRelationship() == 'proband') {
+			$("#feature-matrix").addClass("hide");
+			$("#feature-matrix-note").addClass("hide");
+			$('#move-rows').addClass("hide");			
+		}
 
 		if (this.model.isVcfLoaded()) {
 			this.cardSelector.find(".vcfloader").removeClass("hide");
@@ -864,6 +866,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				me.cardSelector.find('#missing-variant-count').text(me.model.getCalledVariantCount());	        	
 
 				if (me.getRelationship() == 'proband') {
+					
 					me.fillFeatureMatrix(regionStart, regionEnd);
 					genesCard.refreshCurrentGeneBadge(null, me.model.getCalledVariants());
 				} 
@@ -1332,7 +1335,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			me.cardSelector.find('.vcfloader').addClass("hide");
 			$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
 
-			me.cardSelector.find('#clinvar-warning').removeClass("hide");
+			me.cardSelector.find('#freebayes-error').removeClass("hide");
 		});
 
 
@@ -1482,8 +1485,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 }
 
 
-VariantCard.prototype.determineMaxAlleleCount = function() {
-	this.model.determineMaxAlleleCount();
+VariantCard.prototype.determineMaxAlleleCount = function(vcfData) {
+	return this.model.determineMaxAlleleCount(vcfData);
 }
 
 VariantCard.prototype.populateEffectFilters = function() {
@@ -2078,13 +2081,15 @@ VariantCard.prototype.hideCoverageCircle = function() {
 }
 
 VariantCard.prototype.getMaxAlleleCount = function() {
-	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	var theVcfData = this.model.isVcfLoaded() 
+				      ? this.model.getVcfDataForGene(window.gene, window.selectedTranscript)
+				      : this.model.getCalledVariants();
 	if (theVcfData == null) {
 		return null;
 	}
 	var count = theVcfData.maxAlleleCount;
 	if (!count) {
-		this.determineMaxAlleleCount();
+		this.determineMaxAlleleCount(theVcfData);
 		count = theVcfData.maxAlleleCount;
 	}
 	return count;

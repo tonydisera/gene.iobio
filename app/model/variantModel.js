@@ -1267,8 +1267,13 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 
 }
 
-VariantModel.prototype.determineMaxAlleleCount = function() {
-	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
+	var theVcfData = null;
+	if (vcfData) {
+		theVcfData = vcfData;
+	} else {
+		theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
+	}
 	if (theVcfData == null || theVcfData.features == null) {
 		return;
 	}
@@ -1303,6 +1308,7 @@ VariantModel.prototype.determineMaxAlleleCount = function() {
 		});
 		theVcfData.maxAlleleCount = maxAlleleCount;
 	}
+	return theVcfData;
 
 }
 
@@ -1705,7 +1711,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 					function(data) {
 
 					if (data == null || data.length == 0) {
-						reject();
+						reject("A problem occurred while calling variants.");
 					}
 
 					// Parse string into records
@@ -1822,6 +1828,8 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 							// Reflect me new info in the freebayes variants.
 							getProbandVariantCard().model.loadCalledTrioGenotypes();
 
+							// Cache the freebayes variants.
+							getProbandVariantCard().model._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
 
 							resolve(me.fbData);
 						}, function(error) {
