@@ -23,7 +23,7 @@ vcfiobio = function module() {
 
   var clinvarIterCount       = 0;
 
-  var tabix          = iobio_server  + "tabix/";
+  var tabix          = dev_iobio_services + "tabix/";
 //  var tabix          = iobio_server + (isOffline ? "tabix/" : "od_tabix/");
   var vcfReadDepther = iobio_server + "vcfdepther/";
   var snpEff         = iobio_server + "snpeff/";
@@ -180,8 +180,9 @@ var effectCategories = [
     cmd.on('end', function() {
       if (success == null) {
         success = true;
-        callback(success);          
       }
+      callback(success);          
+    
     });
 
     cmd.on('error', function(error) {
@@ -191,6 +192,7 @@ var effectCategories = [
       } else {
         if (success == null) {
           success = false;
+          console.log(error);
           callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));            
         }        
       }
