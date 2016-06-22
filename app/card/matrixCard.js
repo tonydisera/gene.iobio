@@ -155,6 +155,13 @@ MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 			row.name = newRowLabel;
 		}
 	});
+	if (this.filteredMatrixRows) {
+		this.filteredMatrixRows.forEach( function (row) {
+			if (row.name.indexOf(searchTerm) >= 0) {
+				row.name = newRowLabel;
+			}
+		});		
+	}
 	
 }
 
@@ -164,6 +171,13 @@ MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
 			row.attribute = newRowAttribute;
 		}
 	});
+	if (this.filteredMatrixRows) {
+		this.filteredMatrixRows.forEach( function (row) {
+			if (row.name.indexOf(searchTerm) >= 0) {
+				row.attribute = newRowAttribute;
+			}
+		});		
+	}
 	
 }
 
@@ -1241,9 +1255,13 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 	var type = d3.select(selection.node().parentNode).datum().type;
 	var symbolScale = d3.scale.ordinal()
                     .domain([3,4,5,6,7,8])
-                    .range([9,15,20,25,36,58]);
+                    .range([9,15,25,38,54,58]);
+	var symbolScaleCircle = d3.scale.ordinal()
+			                  .domain([3,4,5,6,7,8])
+			                  .range([9,15,25,58,68,78]);                    
 	
     var symbolSize = symbolScale(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
+    var symbolSizeCircle = symbolScaleCircle(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
 
     var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ; 
     var translateSymbol = options && options.cellSize && options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
@@ -1266,7 +1284,14 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
           .attr("d", function(d,i) { 
           	return d3.svg
                      .symbol()
-                     .size(symbolSize)
+                     .size( function(d,i) {
+                     	if (type.toUpperCase() == 'INS') {
+                     		return symbolSizeCircle;
+
+                     	} else {
+                     		return symbolSize;
+                     	}
+                     })
                      .type( function(d,i) {
                      	if (type.toUpperCase() == 'DEL') {
 						    return 'triangle-up';

@@ -275,12 +275,12 @@ function variantD3() {
 
       var symbolScaleCircle = d3.scale.ordinal()
                     .domain([3,4,5,6,7,8,10,12,14,16])
-                    .range([9,15,20,25,36,58,70,100,130,260]);
+                    .range([9,15,25,38,54,58,70,100,130,260]);
       var symbolSizeCircle = symbolScaleCircle(minWidth);
 
       var symbolScale = d3.scale.ordinal()
                     .domain([3,4,5,6,7,8,10,12,14,16])
-                    .range([9,15,20,25,36,58,70,100,130,160]);
+                    .range([9,15,20,25,32,58,70,100,130,160]);
 
       var symbolSize = symbolScale(minWidth);
       
