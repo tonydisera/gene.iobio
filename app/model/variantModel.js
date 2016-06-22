@@ -1736,7 +1736,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 					// Annotate the fb variants
 					me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene, 
-						                             window.selectedTranscript, me.sampleName, 
+						                             window.selectedTranscript, null, 
 						                             filterCard.annotationScheme.toLowerCase())
 				    .then( function(data) {
 

@@ -25,11 +25,10 @@ vcfiobio = function module() {
 
   var tabix          = dev_iobio_services + "tabix/";
 //  var tabix          = iobio_server + (isOffline ? "tabix/" : "od_tabix/");
-  var vcfReadDepther = iobio_server + "vcfdepther/";
-  var snpEff         = iobio_server + "snpeff/";
+  var vcfReadDepther = dev_iobio_services + "vcfdepther/";
+  var snpEff         = iobio_server       + "snpeff/";
   var vt             = dev_iobio_services + "vt/";
-  var clinvar        = iobio_server + "clinvar/";
-  var af             = "services.iobio.io/" + "af/";
+  var af             = dev_iobio_services + "af/";
   var vep            = dev_iobio_services + "vep/";
   var contigAppender = dev_iobio_services + "ctgapndr/";
 
@@ -1131,7 +1130,7 @@ var effectCategories = [
 
 
     //  Streamed vcf recs first go through contig appender to add mandatory header recs
-    var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), vcfFile], opts);
+    var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), (vcfFile ? vcfFile : new Blob()) ], opts);
      
     // Filter samples  
 
