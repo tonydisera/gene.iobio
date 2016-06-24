@@ -1202,6 +1202,16 @@ function cacheNextGene(genesToCache) {
 		    		}
 
 		    	});	
+		    } else {
+				genesCard._setGeneBadgeError(geneName);			    				
+    			if (genesToCache.indexOf(geneName) >= 0) {
+    				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
+	    			genesCard._geneBadgeLoading(geneName, false);
+
+	    			genesToCache.shift();
+		    		cacheNextGene(genesToCache);					
+    			}		    	
+
 		    }
 		}
 	});
