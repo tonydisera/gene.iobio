@@ -1118,15 +1118,14 @@ function cacheCodingRegions() {
 
 
 function cacheGenes() {
-	if (genesToCache != null && genesToCache.length > 0) {
-		return;
+	if (genesToCache == null || genesToCache.length == 0) {
+		genesToCache = [];
+		geneNames.forEach(function(geneName) {
+			if (geneName != window.gene.gene_name) {
+				genesToCache.push(geneName);
+			}
+		})		
 	}
-	genesToCache = [];
-	geneNames.forEach(function(geneName) {
-		if (geneName != window.gene.gene_name) {
-			genesToCache.push(geneName);
-		}
-	})
 
 	cacheNextGene(genesToCache);
 
