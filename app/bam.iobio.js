@@ -21,22 +21,28 @@ var Bam = Class.extend({
       } else if ( this.bamUri.slice(0,4) == "http" || this.bamUri.slice(0,3) == "ftp" ) {
          this.sourceType = "url";         
       }
+      this.bamFile = null;
+      this.baiFile = null;
       
       // set iobio servers
       this.iobio = {};
 
-      this.iobio.samtools       = iobio_server + "samtools/" 
+      this.iobio.samtools            = dev_iobio_services + "samtools/" 
+      this.iobio.coverage            = dev_iobio_services + "coverage/ ";
+      this.iobio.cat                 = dev_iobio_services + "cat/ ";
+      this.iobio.samtoolsOnDemand    = iobio_services + "od_samtools/";
+      this.iobio.freebayes           = dev_iobio_services + "freebayes/";
+      this.iobio.vcflib              = dev_iobio_services + "vcflib/";
+      this.iobio.vt                  = dev_iobio_services + "vt/";
 
-      this.iobio.coverage       = iobio_services + "coverage/ ";
-      this.iobio.bamtools       = iobio_services + "bamtools";
-      this.iobio.samtoolsService = iobio_services + "od_samtools";
-      this.iobio.bamReadDepther = iobio_services + "bamReadDepther";
-      this.iobio.bamMerger      = iobio_services + "bammerger";      
-      this.iobio.bamstatsAlive  = iobio_services + "bamstatsalive"
-      this.iobio.freebayes      = iobio_services + "freebayes";
-      this.iobio.bcftools       = iobio_services + "bcftools";
-      this.iobio.vcflib         = iobio_services + "vcflib";
-      this.iobio.vt             = iobio_services + "vt";
+
+      // to be deleted after devkit conversion
+      this.iobio.coverageService                = "ws://" + dev_iobio_services + "coverage/ ";
+      this.iobio.samtoolsService                = "ws://" + "nv-prod.iobio.io/" + "samtools";
+      this.iobio.samtoolsServiceOnDemand        = iobio_services + "od_samtools";
+      this.iobio.freebayesService               = iobio_services + "freebayes";
+      this.iobio.vcflibService                  = iobio_services + "vcflib";
+      this.iobio.vtService                      = iobio_services + "vt";
 
 
       this.errorMessageMap =  {
@@ -116,8 +122,8 @@ var Bam = Class.extend({
   },
 
   checkBamFile: function(event, callback, errorCallback) {
+    var me = this;
 
-                
     if (event.target.files.length != 2) {
        errorCallback('must select 2 files, both a .bam and .bam.bai file');
     }
@@ -127,8 +133,8 @@ var Bam = Class.extend({
       errorCallback('You must select a bam file, not a sam file');
     }
 
-    var fileType0 = /([^.]*)\.(\.bam(\.bai)?)$/.exec(event.target.files[0].name);
-    var fileType1 = /([^.]*)\.(\.bam(\.bai)?)$/.exec(event.target.files[1].name);
+    var fileType0 = /([^.]*)\.(bam(\.bai)?)$/.exec(event.target.files[0].name);
+    var fileType1 = /([^.]*)\.(bam(\.bai)?)$/.exec(event.target.files[1].name);
 
     var fileExt0 = fileType0 && fileType0.length > 1 ? fileType0[2] : null;
     var fileExt1 = fileType1 && fileType1.length > 1 ? fileType1[2] : null;
@@ -146,22 +152,21 @@ var Bam = Class.extend({
       if (rootFileName0 != rootFileName1) {
         errorCallback('The index (.bam.bai) file must be named ' +  rootFileName0 + ".bam.bai");
       } else {
-        vcfFile   = event.target.files[0];
-        tabixFile = event.target.files[1];
+        me.bamFile   = event.target.files[0];
+        me.baiFile = event.target.files[1];
       }    
     } else if (fileExt1 == 'bam' && fileExt0 == 'bam.bai') {
       if (rootFileName0 != rootFileName1) {
         errorCallback('The index (.bam.bai) file must be named ' +  rootFileName1 + ".bam.bai");
       } else {
-        vcfFile   = event.target.files[1];
-        tabixFile = event.target.files[0];
+        me.bamFile   = event.target.files[1];
+        me.baiFile = event.target.files[0];
       }
     } else {
       errorCallback('You must select BOTH  a bam and an index (.bam.bai)  file');
     }
 
-    callback(sucess);
-
+    callback(true);
   }, 
 
 
@@ -202,45 +207,22 @@ var Bam = Class.extend({
    },
    
    _getBamRegionsUrl: function(regions, golocal) {
-      var samtools = this.iobio.samtoolsService;
+      var samtools = this.sourceType == "url" ? this.iobio.samtoolsServiceOnDemand : this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
          var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&protocol=http&encoding=binary";
       } else {
-         // creates a url for a new bam that is sliced from an old bam
-         // open connection to iobio webservice that will request this data, since connections can only be opened from browser
-         /*var me = this;
-         var connectionID = this._makeid();
-         var client = BinaryClient(samtools + '?id=', {'connectionID' : connectionID} );
-         client.on('open', function(stream){
-            var stream = client.createStream({event:'setID', 'connectionID':connectionID});
-            stream.end();
-         })
-        */
+
         var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client");
         
-        /* var ended = 0;
-         var me = this;
-         // send data to samtools when it asks for it         
-         client.on('stream', function(stream, options) {
-            stream.write(me.header.toStr);            
-            for (var i=0; i < regions.length; i++) {
-              var region = regions[i];
-               me.convert('sam', region.name, region.start, region.end, function(data,e) {   
-                  stream.write(data);                   
-                  ended += 1;                  
-                  if ( regions.length == ended) stream.end();
-               }, {noHeader:true});               
-            }
-         })
-          */
+
       }
       return encodeURI(url);
    },
 
     _getBamPileupUrl: function(region, golocal) {     
-      var samtools = this.iobio.samtoolsService;
+      var samtools = this.sourceType == "url" ? this.iobio.samtoolsServiceOnDemand : this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
          var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
          var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
@@ -252,142 +234,8 @@ var Bam = Class.extend({
       return encodeURI(url);
    },
 
-   
 
-   
-    _getBamPileupUrl: function(region, golocal) {     
-      var samtools = this.iobio.samtoolsService;
-      if ( this.sourceType == "url") {
-         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
-         var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
-      } else {
-        
-        var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
-       
-      }
-      return encodeURI(url);
-   },
 
-   
-   _generateExomeBed: function(id) {
-      var bed = "";
-      var readDepth = this.readDepth[id];
-      var start, end;
-      var sum =0;
-      // for (var i=0; i < readDepth.length; i++){
-      //    sum += readDepth[i].depth;
-      // }
-      // console.log("avg = " + parseInt(sum / readDepth.length));
-      // merge contiguous blocks into a single block and convert to bed format
-      for( var i=0; i < readDepth.length; i++){
-         if (readDepth[i].depth < 20) {
-            if (start != undefined)
-               bed += id + "\t" + start + "\t" + end + "\t.\t.\t.\t.\t.\t.\t.\t.\t.\n"
-            start = undefined;
-         }
-         else {         
-            if (start == undefined) start = readDepth[i].pos;
-            end = readDepth[i].pos + 16384;
-         }
-      }
-      // add final record if data stopped on non-zero
-      if (start != undefined)
-         bed += id + "\t" + start + "\t" + end + "\t.\t.\t.\t.\t.\t.\t.\t.\t.\n"
-      return bed;
-   },
-   
-   _tmp: function(ref, regions, bed){
-      var me = this;
-      var bedRegions = [];
-      var a = this._bedToCoordinateArray(ref, bed);
-      regions.forEach(function(reg) {
-         var start = reg.start
-         var length = reg.end - reg.start;
-         var ci = me._getClosestValueIndex(a, reg.start); // update lo start value
-         var maxci = a.length;
-         while(length > 0 && ci < maxci) {
-            var newStart,newEnd;
-            
-            // determine start position
-            if ( a[ci].start <= start ) newStart = start;
-            else newStart = a[ci].start;
-            
-            // determine end position
-            if ( a[ci].end >=  newStart+length ) newEnd = newStart+length
-            else { newEnd = a[ci].end; ci += 1; }
-            
-            // update length left to sample
-            length -= newEnd - newStart;
-            // push new regions
-            bedRegions.push({ name:reg.name, 'start':newStart, 'end':newEnd});
-         }            
-      })
-      return bedRegions;
-   },
-   
-   _mapToBedCoordinates: function(ref, regions, bed) {
-      var a = this._bedToCoordinateArray(ref, bed);
-      var a_i = 0;
-      var bedRegions = [];
-      if (a.length == 0) {
-         alert("Bed file doesn't have coordinates for reference: " + regions[0].name + ". Sampling normally");
-         return null;
-      }
-      regions.forEach(function(reg){
-         for (a_i; a_i < a.length; a_i++) {
-            if (a[a_i].end > reg.end)
-               break;
-            
-            if (a[a_i].start >= reg.start)
-               bedRegions.push( {name:reg.name, start:a[a_i].start, end:a[a_i].end})
-         }
-      }) 
-      return bedRegions
-   },
-   
-   _bedToCoordinateArray: function(ref, bed) {
-      var me = this;
-      var a = [];
-      bed.split("\n").forEach(function(line){
-        if (line[0] == '#' || line == "") return;
-  
-        var fields = line.split("\t");
-        if (me._referenceMatchesBed(ref, fields[0])) {
-           a.push({ chr:ref, start:parseInt(fields[1]), end:parseInt(fields[2]) });
-        }
-      });
-      return a;
-   },
-
-   _referenceMatchesBed: function(ref, bedRef) {
-      if (ref == bedRef) {
-        return true;
-      } 
-      // Try stripping chr from reference names and then comparing
-      ref1 = ref.replace(/^chr?/,'');
-      bedRef1 = bedRef.replace(/^chr?/,'');
-
-      return (ref1 == bedRef1);
-   },
-   
-   _getClosestValueIndex: function(a, x) {
-       var lo = -1, hi = a.length;
-       while (hi - lo > 1) {
-           var mid = Math.round((lo + hi)/2);
-           if (a[mid].start <= x) {
-               lo = mid;
-           } else {
-               hi = mid;
-           }
-       }
-       if (lo == -1 ) return 0;
-       if ( a[lo].end > x )
-           return lo;
-       else
-           return hi;
-   },
-
-   
    getReferencesWithReads: function(callback) {
       var refs = [];
       var me = this;
@@ -425,137 +273,7 @@ var Bam = Class.extend({
       }, { 'format': format })
    },
    
-   count: function() {
-      // Prints number of alignments in BAM file(s)
-   },
-   
-   coverage: function() {
-      // Prints coverage statistics from the input BAM file
-   },
-   
-   filter: function() {
-      // Filters BAM file(s) by user-specified criteria
-   },
-   
-   estimateBaiReadDepth: function(callback) {      
-      var me = this, readDepth = {};
-      me.readDepth = {};
-      
-      function cb() {
-         if (me.header) {
-            for (var id in readDepth) {
-              if (readDepth.hasOwnProperty(id))
-              var name = me.header.sq[parseInt(id)].name;
-               if ( me.readDepth[ name ] == undefined){
-                  me.readDepth[ name ] = readDepth[id];
-                  callback( name, readDepth[id] );
-               }                
-            }  
-         }
-      }
-            
-      me.getHeader(function(header) { 
-         if (Object.keys(me.readDepth).length > 0)
-            cb();
-      });
-      if ( Object.keys(me.readDepth).length > 0 )
-         callback(me.readDepth)
-      else if (me.sourceType == 'url') {
-         var client = BinaryClient(me.iobio.bamReadDepther);
-         var url = encodeURI( me.iobio.bamReadDepther + '?cmd=-i ' + me.bamUri + ".bai")
-         client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url}});
-            var currentSequence;
-            stream.on('data', function(data, options) {
-               data = data.split("\n");
-               for (var i=0; i < data.length; i++)  {
-                  if ( data[i][0] == '#' ) {
-                     if ( Object.keys(readDepth).length > 0 ) { cb() };
-                     currentSequence = data[i].substr(1);
-                     readDepth[currentSequence] = [];
-                  }
-                  else {
-                     if (data[i] != "") {
-                        var d = data[i].split("\t");
-                        readDepth[currentSequence].push({ pos:parseInt(d[0]), depth:parseInt(d[1]) });
-                     }
-                  }                  
-               }
-            });
-            stream.on('end', function() {
-               cb();
-            });
-         });
-      } else if (me.sourceType == 'file') {
-          me.baiBlob.fetch(function(header){
-             if (!header) {
-                  return dlog("Couldn't access BAI");
-              }
-          
-              var uncba = new Uint8Array(header);
-              var baiMagic = readInt(uncba, 0);
-              if (baiMagic != BAI_MAGIC) {
-                  return dlog('Not a BAI file');
-              }
-              var nref = readInt(uncba, 4);
-          
-              bam.indices = [];
-              var p = 8;
-              
-              for (var ref = 0; ref < nref; ++ref) {
-                  var bins = [];
-                  var blockStart = p;
-                  var nbin = readInt(uncba, p); p += 4;
-                  if (nbin > 0) readDepth[ref] = [];
-                  for (var b = 0; b < nbin; ++b) {
-                      var bin = readInt(uncba, p);
-                      var nchnk = readInt(uncba, p+4);
-                      p += 8;
-                      // p += 8 + (nchnk * 16);
-                      var byteCount = 0;
-                      for (var c=0; c < nchnk; ++c) {                         
-                         var startBlockAddress = readVob(uncba, p);
-                         var endBlockAddress = readVob(uncba, p+8);
-                         p += 16; 
-                         byteCount += (endBlockAddress.block - startBlockAddress.block);
-                      }                      
-                     if ( bin >=  4681 && bin <= 37449) {
-                        var position = (bin - 4681) * 16384;
-                        readDepth[ref][bin-4681] = {pos:position, depth:byteCount};
-                        // readDepth[ref].push({pos:position, depth:byteCount});
-                       //bins[bin - 4681] = byteCount;
-                     }
-                  }
-                  var nintv = readInt(uncba, p); p += 4;
-                  p += (nintv * 8);
-                  
-                  if (nbin > 0) {
-                     for (var i=0 ; i < readDepth[ref].length; i++) {
-                        if(readDepth[ref][i] == undefined)
-                           readDepth[ref][i] = {pos : (i+1)*16000, depth:0};
-                     }
-                  }
-                  // Sort by position of read; otherwise, we get a wonky
-                  // line chart for read depth.  (When a URL is provided,
-                  // bamtools returns a sorted array.  We need this same
-                  // behavior when the BAM file is loaded from a file
-                  // on the client.
-                  if (readDepth[ref] != undefined) {
-                  readDepth[ref] = readDepth[ref].sort(function(a,b) {
-                      var x = a.pos; 
-                      var y = b.pos;
-                      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                   });  
-                }
-              }   
 
-              // Invoke Callback function                    
-              cb();
-          });
-      }
-         
-   },
-   
    getHeader: function(callback) {
       var me = this;
       if (me.header)
@@ -564,7 +282,7 @@ var Bam = Class.extend({
          me.promise(function() { me.getHeader(callback); })
       else {
          var client = BinaryClient(me.iobio.samtoolsService);
-         var url = encodeURI( me.iobio.samtoolsService + '?cmd=view -H ' + this.bamUri)
+         var url = encodeURI( me.iobio.samtoolsServiceOnDemand + '?cmd=view -H ' + this.bamUri)
          client.on('open', function(stream){
             var stream = client.createStream({event:'run', params : {'url':url}});
             var rawHeader = ""
@@ -599,171 +317,7 @@ var Bam = Class.extend({
       this.header = header;
    },
    	
-   index: function() {
-      // Generates index for BAM file
-   },
-   
-   merge: function() {
-      // Merge multiple BAM files into single file
-   },
-   
-   random: function() {
-      // Select random alignments from existing BAM file(s), intended more as a testing tool.
-   },
-   
-   resolve: function() {
-      // Resolves paired-end reads (marking the IsProperPair flag as needed)
-   },
-   
-   revert: function() {
-      // Removes duplicate marks and restores original base qualities
-   },
-   
-   sort: function() {
-      // Sorts the BAM file according to some criteria
-   },
-   
-   split: function() {
-      // Splits a BAM file on user-specified property, creating a new BAM output file for each value found
-   },
-   
-   stats: function(name, start, end, callback) {
-      // Prints some basic statistics from input BAM file(s)
-      var client = BinaryClient(this.iobio.bamstatsAlive);
-      var url = encodeURI( this.iobio.bamstatsAlive + '?cmd=-u 1000 -s ' + start + " -l " + parseInt(end-start) + " " + encodeURIComponent(this._getBamUrl(name,start,end)) );
-      client.on('open', function(stream){
-         var stream = client.createStream({event:'run', params : {'url':url}});
-         var buffer = "";
-         stream.on('data', function(data, options) {
-            if (data == undefined) return;
-            var success = true;
-            try {
-              var obj = JSON.parse(buffer + data)
-            } catch(e) {
-              success = false;
-              buffer += data;
-            }
-            if(success) {
-              buffer = "";
-              callback(obj); 
-            }
-         });
-      });
-   }, 
-   
-   sampleStats: function(callback, options) {
-      // Prints some basic statistics from sampled input BAM file(s)      
-      options = $.extend({
-         binSize : 40000, // defaults
-         binNumber : 20,
-         start : 1,
-      },options);
-      var me = this;
-      
-      function goSampling(SQs) {      
-         var regions = [];
-         var bedRegions;
-         for (var j=0; j < SQs.length; j++) {
-            var sqStart = options.start;
-            var length = SQs[j].end - sqStart;
-            if ( length < options.binSize * options.binNumber) {
-               SQs[j].start = sqStart;
-               regions.push(SQs[j])
-            } else {
-               // create random reference coordinates
-               var regions = [];
-               for (var i=0; i < options.binNumber; i++) {   
-                  var s=sqStart + parseInt(Math.random()*length); 
-                  regions.push( {
-                     'name' : SQs[j].name,
-                     'start' : s,
-                     'end' : s+options.binSize
-                  }); 
-               }
-               // sort by start value
-               regions = regions.sort(function(a,b) {
-                  var x = a.start; var y = b.start;
-                  return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-               });               
-               
-               // intelligently determine exome bed coordinates
-               if (options.exomeSampling)
-                  options.bed = me._generateExomeBed(options.sequenceNames[0]);
-               
-               // map random region coordinates to bed coordinates
-               if (options.bed != undefined)
-                  bedRegions = me._mapToBedCoordinates(SQs[0].name, regions, options.bed)
-            }
-         }      
-         
-         var client = BinaryClient(me.iobio.bamstatsAlive);
-         var regStr = JSON.stringify((bedRegions || regions).map(function(d) { return {start:d.start,end:d.end,chr:d.name};}));                 
-         // var samtoolsCmd = JSON.stringify((bedRegions || regions).map(function(d) { return {d.start,end:d.end,chr:d.name};}));
-         // var url = encodeURI( me.iobio.bamstatsAlive + '?cmd=-u 30000 -f 2000 -r \'' + regStr + '\' ' + encodeURIComponent(me._getBamRegionsUrl(regions)));
-         var url = encodeURI( me.iobio.bamstatsAlive + '?cmd=-u 3000 -r \'' + regStr + '\' ' + encodeURIComponent(me._getBamRegionsUrl(regions)));
-         var buffer = "";
-         client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url}});
 
-            // New local file streaming
-            stream.on('createClientConnection', function(connection) {
-              var ended = 0;
-              var dataClient = BinaryClient('ws://' + connection.serverAddress);
-              dataClient.on('open', function() {
-                var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-                dataStream.write(me.header.toStr);            
-                for (var i=0; i < regions.length; i++) {
-                  var region = regions[i];
-                   me.convert('sam', region.name, region.start, region.end, function(data,e) {   
-                      dataStream.write(data);                   
-                      ended += 1;                  
-                      if ( regions.length == ended) dataStream.end();
-                   }, {noHeader:true});               
-                }                
-              })
-            });
-
-            stream.on('data', function(data, options) {
-               if (data == undefined) return;
-               var success = true;
-               try {
-                 var obj = JSON.parse(buffer + data)
-               } catch(e) {
-                 success = false;
-                 buffer += data;
-               }
-               if(success) {
-                 buffer = "";
-                 callback(obj); 
-               }               
-            });
-            stream.on('end', function() {
-               if (options.onEnd != undefined)
-                  options.onEnd();
-            });
-         });
-      }
-      
-      if ( options.sequenceNames != undefined && options.sequenceNames.length == 1 && options.end != undefined) {
-         goSampling([{name:options.sequenceNames[0], end:options.end}]);
-      } else  if (options.sequenceNames != undefined && options.sequenceNames.length == 1){
-         this.getHeader(function(header){
-            var sq;
-            $(header.sq).each( function(i,d) { 
-               if(d.name == options.sequenceNames[0]) 
-               sq = d; 
-            })
-            goSampling([sq]);
-         });
-      } else {
-         this.getHeader(function(header){
-            goSampling(header.sq); 
-         });
-         // this.getReferencesWithReads(function(refs) {            
-         //    goSampling(refs);
-         // })
-      }
-   }, 
 
    transformRefName: function(refName, callback) {
     var found = false;
@@ -789,7 +343,7 @@ var Bam = Class.extend({
    *  the second for coverage of specific positions.  The latter can then be matched to vcf records
    *  , for example, to obtain the coverage for each variant.
    */
-   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback) {
+   getCoverageForRegionOld: function(refName, regionStart, regionEnd, regions, maxPoints, callback) {
       var me = this;
       this.transformRefName(refName, function(trRefName){        
 
@@ -817,10 +371,10 @@ var Bam = Class.extend({
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
         var protocol = me.sourceType == "url" ? '&protocol=http' : '';
-        var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
+        var url = encodeURI( me.iobio.coverageService + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
         //var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
-        var client = BinaryClient(me.iobio.coverage);
+        var client = BinaryClient(me.iobio.coverageService);
         
         var samData = "";
         var samRecs = [];
@@ -898,6 +452,143 @@ var Bam = Class.extend({
       });
    },
 
+   /*
+   *  This method will return coverage as point data.  It takes the reference name along
+   *  with the region start and end.  Optionally, the caller can provide an array of
+   *  region objects to get the coverage at exact positions.  Also, this method takes an
+   *  optional argument of maxPoints that will specify how many data points should be returned
+   *  for the region.  If not specified, all data points are returned.  The callback method
+   *  will send back to arrays; one for the coverage points, reduced down to the maxPoints, and
+   *  the second for coverage of specific positions.  The latter can then be matched to vcf records
+   *  , for example, to obtain the coverage for each variant.
+   */
+   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
+      var me = this;
+      this.transformRefName(refName, function(trRefName){     
+        var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
+
+        var regionsArg = "";
+        regions.forEach( function(region) {
+          region.name = trRefName;
+          if (region.name && region.start && region.end) {
+            if (regionsArg.length == 0) {
+              regionsArg += " -p ";
+            } else {
+              regionsArg += ",";
+            }
+            regionsArg += region.name + ":" + region.start +  ":" + region.end;
+          }
+        }); 
+        var maxPointsArg = "";
+        if (maxPoints) {
+          maxPointsArg = " -m " + maxPoints;
+        } else {
+          maxPointsArg = " -m 0"
+        }
+        var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
+        var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
+
+        var cmd = null;
+        // When file served remotely, first run samtools view, then run samtools mpileup.
+        // When bam file is read as a local file, just stream sam records for region to
+        // samtools mpileup.
+        if (me.sourceType == "url") {
+          cmd = new iobio.cmd(samtools, ['view', '-b',       me.bamUri, regionArg],
+            {
+              'urlparams': {'encoding':'binary'}
+            }); 
+          cmd = cmd.pipe(samtools, ["mpileup"]);
+        } else {
+
+
+          cmd = new iobio.cmd(samtools, ['mpileup',  new Blob()],
+            {
+              'urlparams': {'encoding':'utf8'},
+              writeStream: function(stream) {
+                 stream.write(me.header.toStr);  
+                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {   
+                    stream.write(data);                   
+                    stream.end();
+                 }, {noHeader:true});                      
+              }
+            }); 
+
+
+
+/*
+this is troubleshooting code.  if cat.sh pipes to a file first, the samtools mpileup 
+doesn't truncate.
+          cmd = new iobio.cmd(me.iobio.cat, [new Blob()],
+            {
+             
+              writeStream: function(stream) {
+                 stream.write(me.header.toStr);  
+                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {   
+                    stream.write(data);                   
+                    stream.end();
+                 }, {noHeader:true});                      
+              }
+            })
+          cmd = cmd.pipe(samtools, ['mpileup']);
+*/
+        }
+
+        // After running samtools mpileup, run coverage service to summarize point data.
+        cmd = cmd.pipe(me.iobio.coverage, [maxPointsArg, spanningRegionArg, regionsArg]);
+
+        var samData = "";
+        cmd.on('data', function(data) {      
+          if (data == undefined) {
+            return; 
+          } 
+         
+          samData += data;        
+        });
+
+        cmd.on('end', function() {
+          if (samData != "") {
+            var coverage = null;
+            var coverageForPoints = [];
+            var coverageForRegion = [];
+            var lines = samData.split('\n');
+            lines.forEach(function(line) {
+              if (line.indexOf("#specific_points") == 0) {
+                coverage = coverageForPoints;
+              } else if (line.indexOf("#reduced_points") == 0 ) {
+                coverage = coverageForRegion;
+              } else {                      
+                var fields = line.split('\t');
+                var pos = -1;
+                var depth = -1;
+                if (fields[0] != null && fields[0] != '') {
+                  var pos   = +fields[0];
+                }
+                if (fields[1] != null && fields[1] != '') {
+                  var depth = +fields[1];
+                }
+                if (coverage){
+                  if (pos > -1  && depth > -1) {
+                    coverage.push([pos, depth]);
+                  }
+                }
+              }
+            });
+          }
+          callback(coverageForRegion, coverageForPoints);          
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+
+        });
+
+        cmd.run();
+
+
+      });   
+   
+   },
+      
 
    //
    //
@@ -934,25 +625,6 @@ var Bam = Class.extend({
 
 
    },
-
-
-    //
-   //
-   // NEW
-   //
-   //
-   _getBamMergeUrl: function(refName, regionStart, regionEnd) {
-    var theBam  = this.bamUri;
-
-    var url = this.iobio.bamMerger + '?binary=true&cmd=' + refName + ':' + regionStart + '-' + regionEnd 
-    + " '" 
-    + theBam
-    + "' ";
-
-    return url;
-
-   },
-
 
 
                  
