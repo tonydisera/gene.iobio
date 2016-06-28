@@ -72,6 +72,10 @@ VariantModel.prototype.hasCalledVariants = function() {
 	return this.fbData != null && this.fbData.features != null && this.fbData.features.length > 0;
 }
 
+VariantModel.prototype.isInheritanceLoaded = function() {
+	return (this.vcfData != null && this.vcfData.loadState != null && this.vcfData.loadState['inheritance']);	
+}
+
 VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
 	var me = this;
 	var data = null;

@@ -62,6 +62,10 @@ VariantCard.prototype.isViewable = function() {
 	return this.model.relationship != 'sibling';
 }
 
+VariantCard.prototype.isInheritanceLoaded = function() {
+	return this.model.isInheritanceLoaded();
+}
+
 VariantCard.prototype.isReadyToLoad = function() {
 	return this.model.isReadyToLoad();
 }
