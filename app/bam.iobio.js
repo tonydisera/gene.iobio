@@ -595,7 +595,7 @@ doesn't truncate.
    // NEW
    //
    //
-   getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
+   getFreebayesVariantsOld: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
     var me = this;
     this.transformRefName(refName, function(trRefName){ 
@@ -611,16 +611,16 @@ doesn't truncate.
       } else {
         refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
       }       
-      var urlF = me.iobio.freebayes 
+      var urlF = me.iobio.freebayesService 
         + "?cmd=-f " + refFile  + " " 
         + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
 
-      var urlV = me.iobio.vt + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
+      var urlV = me.iobio.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
 
-      var url = me.iobio.vcflib + '?cmd=vcffilter -f "QUAL > 1" '
+      var url = me.iobio.vcflibService + '?cmd=vcffilter -f "QUAL > 1" '
                 + encodeURIComponent(encodeURI(urlV));
 
-      me._callVariants(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflib, encodeURI(url), callback);
+      me._callVariants(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflibService, encodeURI(url), callback);
     });
 
 
@@ -700,6 +700,80 @@ doesn't truncate.
    },  
 
 
+   //
+   //
+   // NEW
+   //
+   //
+   getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
+
+    var me = this;
+    this.transformRefName(refName, function(trRefName){ 
+
+      var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
+      var refFile = null;
+      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
+      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
+      // the reference name to determine if the references should be hg19 (starts with 'chr;)
+      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
+      // we point freebayes to a particular directory for the reference files.
+      if (trRefName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + trRefName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
+      }  
+      var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
+
+      var cmd = null;
+      // When file served remotely, first run samtools view, then run samtools mpileup.
+      // When bam file is read as a local file, just stream sam records for region to
+      // samtools mpileup.
+      if (me.sourceType == "url") {
+        cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
+          {
+            'urlparams': {'encoding':'binary'}
+          }); 
+        cmd = cmd.pipe(me.iobio.freebayes, ['-f', refFile]);
+      } else {
+        cmd = new iobio.cmd(me.iobio.freebayes, ['-f', refFile, new Blob()],
+            {
+              'urlparams': {'encoding':'utf8'},
+              writeStream: function(stream) {
+                 stream.write(me.header.toStr);  
+                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {   
+                    stream.write(data);                   
+                    stream.end();
+                 }, {noHeader:true});                      
+              }
+            }); 
+      }
+  
+
+      cmd = cmd.pipe(me.iobio.vt, ['normalize', '-r', refFile]);
+      cmd = cmd.pipe(me.iobio.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+
+      var variantData = "";
+      cmd.on('data', function(data) {      
+          if (data == undefined) {
+            return; 
+          } 
+         
+          variantData += data;        
+      });
+
+      cmd.on('end', function() {
+        callback(variantData);
+      });
+
+      cmd.on('error', function(error) {
+        console.log(error);
+      });
+
+      cmd.run();
+
+    }); 
+
+   },
    //
    //
    // NEW
