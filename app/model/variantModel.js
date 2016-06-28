@@ -873,7 +873,9 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		}
 				    	}
 				    	if (theGeneObject) {
-				    		me._pruneIntronVariants(data);
+				    		if (me.getRelationship() == 'proband') {
+					    		me.pruneIntronVariants(data);
+				    		}
 				    		me._pruneHomRefVariants(data);
 	
 					    	// Cache the data if variants were retreived.  If no variants, don't
@@ -1132,7 +1134,7 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 	return data;
 }
 
-VariantModel.prototype._pruneIntronVariants = function(data) {
+VariantModel.prototype.pruneIntronVariants = function(data) {
 	if (data.features.length > 500) {
 		filterCard.setExonicOnlyFilter();
 
@@ -1190,7 +1192,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 
 		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 		    	// If we have more than 500 variants, exclude intron variants d
-				me._pruneIntronVariants(theVcfData);
+		    	if (me.getRelationship() == 'proband') {
+					me.pruneIntronVariants(theVcfData);
+		    	}
 
 				// Get rid of any homozygous reference from proband
 				me._pruneHomRefVariants(theVcfData);

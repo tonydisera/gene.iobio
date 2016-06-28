@@ -917,6 +917,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 			}	
 			me.populateRecFilters(theVcfData);
 			filterCard.autoSetFilters();
+			if (me.getRelationship() == 'proband') {
+				me.model.pruneIntronVariants(theVcfData);
+		    }
 			var filteredVcfData = this.filterVariants(theVcfData);
 			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));

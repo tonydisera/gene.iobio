@@ -368,6 +368,7 @@ FilterCard.prototype.clearFilters = function() {
 	$('#af-amount-start').val(0);
 	$('#af-amount-end').val(100);
 	$('#coverage-min').val('');
+	this.setExonicOnlyFilter(false);
 }
 
 FilterCard.prototype.resetAfRange = function() {
