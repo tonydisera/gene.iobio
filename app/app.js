@@ -1170,21 +1170,35 @@ function cacheNextGene(genesToCache) {
 						 	transcript)
 			    		.then( function(vcfData) {
 			    			if (isCachedForCards(geneObject.gene_name, transcript)) {
-			    				vc = getProbandVariantCard();
-			    				var probandVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
-			    				var dangerObject = vc.summarizeDanger(probandVcfData);
-								
-								genesCard._geneBadgeLoading(geneObject.gene_name, false);
-								if (probandVcfData.features.length == 0) {
-			    					genesCard._setGeneBadgeWarning(geneObject.gene_name);
-			    				} else {
-			    					genesCard._setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-								}
-			    				
-								if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
-									genesToCache.shift();
-				    				cacheNextGene(genesToCache);									
-								}
+
+			    				// we need to compare the proband variants to mother and father variants to determine
+								// the inheritance mode. 
+								var probandVcfData = getVariantCard("proband").model.getVcfDataForGene(geneObject, transcript);
+								var motherVcfData  = getVariantCard("mother" ).model.getVcfDataForGene(geneObject, transcript);
+								var fatherVcfData  = getVariantCard("father" ).model.getVcfDataForGene(geneObject, transcript);
+				
+
+								var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
+								trioModel.compareVariantsToMotherFather(function() {
+
+				    				var dangerObject = getVariantCard("proband").summarizeDanger(probandVcfData);
+									
+									genesCard._geneBadgeLoading(geneObject.gene_name, false);
+									if (probandVcfData.features.length == 0) {
+				    					genesCard._setGeneBadgeWarning(geneObject.gene_name);
+				    				} else {
+				    					genesCard._setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
+									}
+				    				
+									if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
+										genesToCache.shift();
+					    				cacheNextGene(genesToCache);									
+									}
+
+			    				}, function(error) {
+			    					console.log("problem determining inheritance for " + geneObject.gene__name + ". " + error);
+			    				});
+
 			    			}
 
 			    		}, function(error) {
