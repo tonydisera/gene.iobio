@@ -1,33 +1,33 @@
 
-// extending Thomas Down's original BAM js work 
+// extending Thomas Down's original BAM js work
 
 var Bam = Class.extend({
-   
+
    init: function(bamUri, options) {
       this.bamUri = bamUri;
       this.options = options; // *** add options mapper ***
       // test if file or url
       if (typeof(this.bamUri) == "object") {
          this.sourceType = "file";
-         this.bamBlob = new BlobFetchable(bamUri); 
+         this.bamBlob = new BlobFetchable(bamUri);
          this.baiBlob = new BlobFetchable(this.options.bai); // *** add if statement if here ***
          this.promises = [];
          this.bam = undefined;
          var me = this;
          makeBam(this.bamBlob, this.baiBlob, function(bam) {
             me.setHeader(bam.header);
-            me.provide(bam); 
+            me.provide(bam);
          });
       } else if ( this.bamUri.slice(0,4) == "http" || this.bamUri.slice(0,3) == "ftp" ) {
-         this.sourceType = "url";         
+         this.sourceType = "url";
       }
       this.bamFile = null;
       this.baiFile = null;
-      
+
       // set iobio servers
       this.iobio = {};
 
-      this.iobio.samtools            = dev_iobio_services + "samtools/" 
+      this.iobio.samtools            = dev_iobio_services + "samtools/"
       this.iobio.coverage            = dev_iobio_services + "coverage/ ";
       this.iobio.cat                 = dev_iobio_services + "cat/ ";
       this.iobio.samtoolsOnDemand    = iobio_services + "od_samtools/";
@@ -69,7 +69,7 @@ var Bam = Class.extend({
         ['view', '-H', url]
     );
 
-    cmd.on('data', function(data) {      
+    cmd.on('data', function(data) {
       if (data != undefined) {
         success = true;
       }
@@ -78,7 +78,7 @@ var Bam = Class.extend({
     cmd.on('end', function() {
       if (success == null) {
         success = true;
-        callback(success);          
+        callback(success);
       }
     });
 
@@ -89,8 +89,8 @@ var Bam = Class.extend({
       } else {
         if (success == null) {
           success = false;
-          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));            
-        }        
+          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));
+        }
       }
 
     });
@@ -105,7 +105,7 @@ var Bam = Class.extend({
       if (error.indexOf(err) == 0) {
         ignore = me.ignoreMessageMap[err].ignore;
       }
-    }    
+    }
     return ignore;
 
   },
@@ -117,7 +117,7 @@ var Bam = Class.extend({
       if (message == null && error.indexOf(err) == 0) {
         message = me.errorMessageMap[err];
       }
-    }    
+    }
     return message ? message : error;
   },
 
@@ -145,7 +145,7 @@ var Bam = Class.extend({
 
     if (fileType0 == null || fileType0.length < 3 || fileType1 == null || fileType1.length <  3) {
       errorCallback('You must select BOTH  a compressed bam file  and an index (.bai)  file');
-    } 
+    }
 
 
     if (fileExt0 == 'bam' && fileExt1 == 'bam.bai') {
@@ -154,7 +154,7 @@ var Bam = Class.extend({
       } else {
         me.bamFile   = event.target.files[0];
         me.baiFile = event.target.files[1];
-      }    
+      }
     } else if (fileExt1 == 'bam' && fileExt0 == 'bam.bai') {
       if (rootFileName0 != rootFileName1) {
         errorCallback('The index (.bam.bai) file must be named ' +  rootFileName1 + ".bam.bai");
@@ -167,30 +167,30 @@ var Bam = Class.extend({
     }
 
     callback(true);
-  }, 
+  },
 
 
 
-   
+
    fetch: function( name, start, end, callback, options ) {
-      var me = this;      
+      var me = this;
       // handle bam has been created yet
       if(this.bam == undefined) // **** TEST FOR BAD BAM ***
          this.promise(function() { me.fetch( name, start, end, callback, options ); });
       else
          this.bam.fetch( name, start, end, callback, options );
    },
-   
+
    promise: function( callback ) {
       this.promises.push( callback );
    },
-   
+
    provide: function(bam) {
       this.bam = bam;
-      while( this.promises.length != 0 ) 
+      while( this.promises.length != 0 )
          this.promises.shift()();
    },
-   
+
    _makeid: function() {
       // make unique string id;
        var text = "";
@@ -201,11 +201,11 @@ var Bam = Class.extend({
 
        return text;
    },
-   
+
    _getBamUrl: function(name, start, end) {
       return this._getBamRegionsUrl([ {'name':name,'start':start,'end':end} ]);
    },
-   
+
    _getBamRegionsUrl: function(regions, golocal) {
       var samtools = this.sourceType == "url" ? this.iobio.samtoolsServiceOnDemand : this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
@@ -215,21 +215,21 @@ var Bam = Class.extend({
       } else {
 
         var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client");
-        
+
 
       }
       return encodeURI(url);
    },
 
-    _getBamPileupUrl: function(region, golocal) {     
+    _getBamPileupUrl: function(region, golocal) {
       var samtools = this.sourceType == "url" ? this.iobio.samtoolsServiceOnDemand : this.iobio.samtoolsService;
       if ( this.sourceType == "url") {
-         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);         
+         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);
          var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
       } else {
-        
+
         var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
-       
+
       }
       return encodeURI(url);
    },
@@ -240,7 +240,7 @@ var Bam = Class.extend({
       var refs = [];
       var me = this;
       if (this.sourceType == 'url') {
-         
+
       } else {
          this.getHeader(function(header) {
             for (var i=0; i < header.sq.length; i++) {
@@ -251,17 +251,17 @@ var Bam = Class.extend({
          })
       }
    },
-   
+
    // *** bamtools functionality ***
 
    convert: function(format, name, start, end, callback, options) {
       // Converts between BAM and a number of other formats
       if (!format || !name || !start || !end)
          return "Error: must supply format, sequenceid, start nucleotide and end nucleotide"
-      
+
       if (format.toLowerCase() != "sam")
          return "Error: format + " + options.format + " is not supported"
-      var me = this;   
+      var me = this;
       this.fetch(name, start, end, function(data,e) {
          if(options && options.noHeader)
             callback(data, e);
@@ -272,7 +272,7 @@ var Bam = Class.extend({
          }
       }, { 'format': format })
    },
-   
+
 
    getHeader: function(callback) {
       var me = this;
@@ -290,16 +290,16 @@ var Bam = Class.extend({
                rawHeader += data;
             });
             stream.on('end', function() {
-               me.setHeader(rawHeader);             
+               me.setHeader(rawHeader);
                callback( me.header);
             });
          });
       }
-         
+
       // need to make this work for URL bams
       // need to incorporate real promise framework throughout
    },
-   
+
    setHeader: function(headerStr) {
       var header = { sq:[], toStr : headerStr };
       var lines = headerStr.split("\n");
@@ -313,10 +313,10 @@ var Bam = Class.extend({
             })
             header.sq.push({name:fHash["SN"], end:1+parseInt(fHash["LN"])});
          }
-      }               
+      }
       this.header = header;
    },
-   	
+
 
 
    transformRefName: function(refName, callback) {
@@ -325,7 +325,7 @@ var Bam = Class.extend({
       header.sq.forEach(function(seq) {
         if (seq.name == refName || seq.name.split('chr')[1] == refName || seq.name == refName.split('chr')[1]) {
           found = true;
-          callback(seq.name);        
+          callback(seq.name);
         }
       })
       if (!found) callback(refName); // not found
@@ -345,11 +345,11 @@ var Bam = Class.extend({
    */
    getCoverageForRegionOld: function(refName, regionStart, regionEnd, regions, maxPoints, callback) {
       var me = this;
-      this.transformRefName(refName, function(trRefName){        
+      this.transformRefName(refName, function(trRefName){
 
         // set the ref name for every region and find the lower and upper bound (start, end)
         // of all regions;
-        
+
         var regionsArg = "";
         regions.forEach( function(region) {
           region.name = trRefName;
@@ -361,7 +361,7 @@ var Bam = Class.extend({
             }
             regionsArg += region.name + ":" + region.start +  ":" + region.end;
           }
-        }); 
+        });
         var maxPointsArg = "";
         if (maxPoints) {
           maxPointsArg = " -m " + maxPoints;
@@ -375,7 +375,7 @@ var Bam = Class.extend({
         //var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
         var client = BinaryClient(me.iobio.coverageService);
-        
+
         var samData = "";
         var samRecs = [];
         var parseByLine = false;
@@ -388,24 +388,24 @@ var Bam = Class.extend({
               var dataClient = BinaryClient('ws://' + connection.serverAddress);
               dataClient.on('open', function() {
                 var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-                dataStream.write(me.header.toStr);  
-                var theRegions = [spanningRegion];          
+                dataStream.write(me.header.toStr);
+                var theRegions = [spanningRegion];
                 for (var i=0; i < theRegions.length; i++) {
                   var region = theRegions[i];
-                   me.convert('sam', region.name, region.start, region.end, function(data,e) {   
-                      dataStream.write(data);                   
-                      ended += 1;                  
+                   me.convert('sam', region.name, region.start, region.end, function(data,e) {
+                      dataStream.write(data);
+                      ended += 1;
                       if ( theRegions.length == ended) dataStream.end();
-                   }, {noHeader:true});               
-                }                
+                   }, {noHeader:true});
+                }
               })
             });
 
             stream.on('data', function(data, options) {
                if (data == undefined) {
-                return; 
-               } 
-             
+                return;
+               }
+
                 samData += data;
             });
 
@@ -420,7 +420,7 @@ var Bam = Class.extend({
                       coverage = coverageForPoints;
                     } else if (line.indexOf("#reduced_points") == 0 ) {
                       coverage = coverageForRegion;
-                    } else {                      
+                    } else {
                       var fields = line.split('\t');
                       var pos = -1;
                       var depth = -1;
@@ -464,7 +464,7 @@ var Bam = Class.extend({
    */
    getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
       var me = this;
-      this.transformRefName(refName, function(trRefName){     
+      this.transformRefName(refName, function(trRefName){
         var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
 
         var regionsArg = "";
@@ -478,7 +478,7 @@ var Bam = Class.extend({
             }
             regionsArg += region.name + ":" + region.start +  ":" + region.end;
           }
-        }); 
+        });
         var maxPointsArg = "";
         if (maxPoints) {
           maxPointsArg = " -m " + maxPoints;
@@ -496,37 +496,38 @@ var Bam = Class.extend({
           cmd = new iobio.cmd(samtools, ['view', '-b',       me.bamUri, regionArg],
             {
               'urlparams': {'encoding':'binary'}
-            }); 
+            });
           cmd = cmd.pipe(samtools, ["mpileup"]);
         } else {
 
+          function writeSamFile (stream) {
+             stream.write(me.header.toStr);
+             me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
+                stream.write(data);
+                stream.end();
+             }, {noHeader:true});
+          }
 
-          cmd = new iobio.cmd(samtools, ['mpileup',  new Blob()],
+          cmd = new iobio.cmd(samtools, ['mpileup',  writeSamFile ],
+          // cmd = new iobio.cmd('0.0.0.0:8060', ['mpileup',  new Blob()],
             {
-              'urlparams': {'encoding':'utf8'},
-              writeStream: function(stream) {
-                 stream.write(me.header.toStr);  
-                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {   
-                    stream.write(data);                   
-                    stream.end();
-                 }, {noHeader:true});                      
-              }
-            }); 
+              'urlparams': {'encoding':'utf8'}
+            });
 
 
 
 /*
-this is troubleshooting code.  if cat.sh pipes to a file first, the samtools mpileup 
+this is troubleshooting code.  if cat.sh pipes to a file first, the samtools mpileup
 doesn't truncate.
           cmd = new iobio.cmd(me.iobio.cat, [new Blob()],
             {
-             
+
               writeStream: function(stream) {
-                 stream.write(me.header.toStr);  
-                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {   
-                    stream.write(data);                   
+                 stream.write(me.header.toStr);
+                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
+                    stream.write(data);
                     stream.end();
-                 }, {noHeader:true});                      
+                 }, {noHeader:true});
               }
             })
           cmd = cmd.pipe(samtools, ['mpileup']);
@@ -537,15 +538,16 @@ doesn't truncate.
         cmd = cmd.pipe(me.iobio.coverage, [maxPointsArg, spanningRegionArg, regionsArg]);
 
         var samData = "";
-        cmd.on('data', function(data) {      
+        cmd.on('data', function(data) {
           if (data == undefined) {
-            return; 
-          } 
-         
-          samData += data;        
+            return;
+          }
+
+          samData += data;
         });
 
         cmd.on('end', function() {
+
           if (samData != "") {
             var coverage = null;
             var coverageForPoints = [];
@@ -556,7 +558,7 @@ doesn't truncate.
                 coverage = coverageForPoints;
               } else if (line.indexOf("#reduced_points") == 0 ) {
                 coverage = coverageForRegion;
-              } else {                      
+              } else {
                 var fields = line.split('\t');
                 var pos = -1;
                 var depth = -1;
@@ -574,7 +576,7 @@ doesn't truncate.
               }
             });
           }
-          callback(coverageForRegion, coverageForPoints);          
+          callback(coverageForRegion, coverageForPoints);
         });
 
         cmd.on('error', function(error) {
@@ -585,10 +587,10 @@ doesn't truncate.
         cmd.run();
 
 
-      });   
-   
+      });
+
    },
-      
+
 
    //
    //
@@ -598,7 +600,7 @@ doesn't truncate.
    getFreebayesVariantsOld: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
     var me = this;
-    this.transformRefName(refName, function(trRefName){ 
+    this.transformRefName(refName, function(trRefName){
 
       var refFile = null;
       // TODO:  This is a workaround until we introduce a genome build dropdown.  For
@@ -610,9 +612,9 @@ doesn't truncate.
         refFile = "./data/references_hg19/" + trRefName + ".fa";
       } else {
         refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }       
-      var urlF = me.iobio.freebayesService 
-        + "?cmd=-f " + refFile  + " " 
+      }
+      var urlF = me.iobio.freebayesService
+        + "?cmd=-f " + refFile  + " "
         + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
 
       var urlV = me.iobio.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
@@ -627,7 +629,7 @@ doesn't truncate.
    },
 
 
-                 
+
 
    //
    //
@@ -635,10 +637,10 @@ doesn't truncate.
    //
    //
    _callVariants: function(refName, regionStart, regionEnd, regionStrand, server, url, callback) {
-    
+
     var me = this;
     var client = BinaryClient(server);
-  
+
     var variant = null;
     var stream = null;
     var vcfRecs = [];
@@ -653,28 +655,28 @@ doesn't truncate.
         var dataClient = BinaryClient('ws://' + connection.serverAddress);
         dataClient.on('open', function() {
           var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-          dataStream.write(me.header.toStr); 
-          var regions =  [{'name':refName,'start':regionStart,'end':regionEnd} ];           
+          dataStream.write(me.header.toStr);
+          var regions =  [{'name':refName,'start':regionStart,'end':regionEnd} ];
           for (var i=0; i < regions.length; i++) {
             var region = regions[i];
-             me.convert('sam', region.name, region.start, region.end, function(data,e) {   
-                dataStream.write(data);                   
-                ended += 1;                  
+             me.convert('sam', region.name, region.start, region.end, function(data,e) {
+                dataStream.write(data);
+                ended += 1;
                 if ( regions.length == ended) dataStream.end();
-             }, {noHeader:true});               
-          }                
+             }, {noHeader:true});
+          }
         })
       });
-      
+
       //
-      // listen for stream data (the output) event. 
+      // listen for stream data (the output) event.
       //
       var buf = '';
       stream.on('data', function(data, options) {
         if (data == undefined) {
           return;
-        } 
-        
+        }
+
         var success = true;
         try {
           buf += data;
@@ -684,7 +686,7 @@ doesn't truncate.
         if(success) {
           if (callback) {
           }
-        }               
+        }
       });
 
       stream.on('end', function() {
@@ -694,10 +696,10 @@ doesn't truncate.
       stream.on("error", function(error) {
         console.log("encountered stream error: " + error);
       });
-      
+
     });
 
-   },  
+   },
 
 
    //
@@ -708,7 +710,7 @@ doesn't truncate.
    getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
     var me = this;
-    this.transformRefName(refName, function(trRefName){ 
+    this.transformRefName(refName, function(trRefName){
 
       var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
       var refFile = null;
@@ -721,7 +723,7 @@ doesn't truncate.
         refFile = "./data/references_hg19/" + trRefName + ".fa";
       } else {
         refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }  
+      }
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
       var cmd = null;
@@ -732,33 +734,35 @@ doesn't truncate.
         cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
           {
             'urlparams': {'encoding':'binary'}
-          }); 
+          });
         cmd = cmd.pipe(me.iobio.freebayes, ['-f', refFile]);
       } else {
-        cmd = new iobio.cmd(me.iobio.freebayes, ['-f', refFile, new Blob()],
+
+        var writeStream = function(stream) {
+           stream.write(me.header.toStr);
+           me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
+              stream.write(data);
+              stream.end();
+           }, {noHeader:true});
+        }
+
+        cmd = new iobio.cmd(me.iobio.freebayes, ['-f', refFile, writeStream],
             {
-              'urlparams': {'encoding':'utf8'},
-              writeStream: function(stream) {
-                 stream.write(me.header.toStr);  
-                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {   
-                    stream.write(data);                   
-                    stream.end();
-                 }, {noHeader:true});                      
-              }
-            }); 
+              'urlparams': {'encoding':'utf8'}
+            });
       }
-  
+
 
       cmd = cmd.pipe(me.iobio.vt, ['normalize', '-r', refFile]);
       cmd = cmd.pipe(me.iobio.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
 
       var variantData = "";
-      cmd.on('data', function(data) {      
+      cmd.on('data', function(data) {
           if (data == undefined) {
-            return; 
-          } 
-         
-          variantData += data;        
+            return;
+          }
+
+          variantData += data;
       });
 
       cmd.on('end', function() {
@@ -771,7 +775,7 @@ doesn't truncate.
 
       cmd.run();
 
-    }); 
+    });
 
    },
    //
@@ -813,6 +817,6 @@ doesn't truncate.
       return results;
    }
 
- 
-   
+
+
 });

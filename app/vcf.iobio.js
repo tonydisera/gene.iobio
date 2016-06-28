@@ -4,10 +4,10 @@
 //  October 2014
 //
 //  This is a data manager class for variant data.
-// 
-//  Two file are used to generate the variant data: 
-//    1. the bgzipped vcf (.vcf.gz) 
-//    2. its corresponding tabix file (.vcf.gz.tbi).  
+//
+//  Two file are used to generate the variant data:
+//    1. the bgzipped vcf (.vcf.gz)
+//    2. its corresponding tabix file (.vcf.gz.tbi).
 //
 vcfiobio = function module() {
 
@@ -49,7 +49,7 @@ vcfiobio = function module() {
   var stream = null;
 
 
-  var refLengths_GRCh37 = 
+  var refLengths_GRCh37 =
   {
         "1":   +249250621,
         "2":   +243199373,
@@ -117,7 +117,7 @@ var effectCategories = [
 ['3_prime_UTR_truncation +','utr'],
 ['5_prime_UTR_variant'  ,'utr'],
 ['5_prime_UTR_truncation +','utr']
-]; 
+];
 
   exports.isFile = function() {
     return sourceType != null && sourceType == SOURCE_TYPE_FILE;
@@ -157,7 +157,7 @@ var effectCategories = [
     } else {
       this.checkVcfUrl(url,function(success, message) {
           callback(success, message);
-      });      
+      });
     }
 
   }
@@ -170,7 +170,7 @@ var effectCategories = [
         ['-H', url]
     );
 
-    cmd.on('data', function(data) {      
+    cmd.on('data', function(data) {
       if (data != undefined) {
         success = true;
       }
@@ -180,8 +180,8 @@ var effectCategories = [
       if (success == null) {
         success = true;
       }
-      callback(success);          
-    
+      callback(success);
+
     });
 
     cmd.on('error', function(error) {
@@ -192,8 +192,8 @@ var effectCategories = [
         if (success == null) {
           success = false;
           console.log(error);
-          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));            
-        }        
+          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));
+        }
       }
 
     });
@@ -208,7 +208,7 @@ var effectCategories = [
       if (error.indexOf(err) == 0) {
         ignore = ignoreMessageMap[err].ignore;
       }
-    }    
+    }
     return ignore;
 
   }
@@ -220,13 +220,13 @@ var effectCategories = [
       if (message == null && error.indexOf(err) == 0) {
         message = errorMessageMap[err];
       }
-    }    
+    }
     return message ? message : error;
   }
 
   exports.openVcfFile = function(event, callback, errorCallback) {
     sourceType = SOURCE_TYPE_FILE;
-                
+
     if (event.target.files.length != 2) {
        errorCallback('must select 2 files, both a .vcf.gz and .vcf.gz.tbi file');
     }
@@ -248,7 +248,7 @@ var effectCategories = [
 
     if (fileType0 == null || fileType0.length < 3 || fileType1 == null || fileType1.length <  3) {
       errorCallback('You must select BOTH  a compressed vcf file (.vcf.gz) and an index (.tbi)  file');
-    } 
+    }
 
 
     if (fileExt0 == 'vcf.gz' && fileExt1 == 'vcf.gz.tbi') {
@@ -257,7 +257,7 @@ var effectCategories = [
       } else {
         vcfFile   = event.target.files[0];
         tabixFile = event.target.files[1];
-      }    
+      }
     } else if (fileExt1 == 'vcf.gz' && fileExt0 == 'vcf.gz.tbi') {
       if (rootFileName0 != rootFileName1) {
         errorCallback('The index (.tbi) file must be named ' +  rootFileName1 + ".tbi");
@@ -271,20 +271,20 @@ var effectCategories = [
 
     callback(vcfFile);
 
-  } 
+  }
 
 
   function showFileFormatMessage() {
     alertify.set(
-      { 
+      {
         labels: {
           cancel     : "Show me how",
           ok         : "OK",
-        },  
+        },
         buttonFocus:  "cancel"
     });
 
-    alertify.confirm("You must select a compressed vcf file and its corresponding index file in order to run this app. ", 
+    alertify.confirm("You must select a compressed vcf file and its corresponding index file in order to run this app. ",
         function (e) {
         if (e) {
             return;
@@ -293,7 +293,7 @@ var effectCategories = [
         }
      });
   }
-  
+
   function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
   }
@@ -329,7 +329,7 @@ var effectCategories = [
   }
 
 
-  
+
   function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
   }
@@ -352,7 +352,7 @@ var effectCategories = [
   exports.getReferenceNames = function(callback) {
       vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
         var tbiIdx = tbiR;
-        
+
         var refNames = [];
         refNames.length = 0;
 
@@ -368,14 +368,14 @@ var effectCategories = [
     var me = this;
     var buffer = "";
     var refName;
-    
+
     var cmd = new iobio.cmd(
         vcfReadDepther,
         ['-i', vcfURL + '.tbi']
     );
 
     cmd.on('data', function(data) {
-      
+
       if (data == undefined) {
         return;
       }
@@ -383,7 +383,7 @@ var effectCategories = [
       data = buffer + data;
 
       var recs = data.split("\n");
-      if (recs.length > 0) {     
+      if (recs.length > 0) {
         for (var i=0; i < recs.length; i++)  {
           if (recs[i] == undefined) {
             return;
@@ -395,7 +395,7 @@ var effectCategories = [
             if (tokens.length >= 3) {
               var refNamePrev = refName;
               refIndex = tokens[0];
-              refName = tokens[1];     
+              refName = tokens[1];
 
               var calcRefLength = tokens[2];
               var refLength = refLengths_GRCh37[me.stripChr(refName)];
@@ -408,11 +408,11 @@ var effectCategories = [
               if (refData.length > 0) {
                 var refDataPrev = refData[refData.length - 1];
                 me.zeroFillPointData(refDataPrev);
-                
+
               }
 
               refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "calcRefLength": +calcRefLength, "idx": +refIndex});
-              refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};   
+              refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};
 
 
             } else {
@@ -436,7 +436,7 @@ var effectCategories = [
                 }
 
              }
-          }                  
+          }
           if (success) {
             buffer = "";
           } else {
@@ -445,7 +445,7 @@ var effectCategories = [
         }
       } else  {
         buffer += data;
-      } 
+      }
 
 
 
@@ -461,14 +461,14 @@ var effectCategories = [
       // for the last reference that was loaded
       if (refData.length > 0) {
         var refDataPrev = refData[refData.length - 1];
-        me.zeroFillPointData(refDataPrev);        
+        me.zeroFillPointData(refDataPrev);
       }
       if (callback) {
         callback(refData);
       }
     })
 
-    // Catch error event when fired 
+    // Catch error event when fired
     cmd.on('error', function(error) {
       console.log("Error occurred in loadRemoteIndex. " +  error);
       if (callbackError) {
@@ -480,7 +480,7 @@ var effectCategories = [
     cmd.run();
 
 
-    
+
 
   };
 
@@ -505,15 +505,15 @@ var effectCategories = [
           }
         });
         }
-        
-       
+
+
   };
 
 
   exports.sortRefData = function(refData) {
     var me = this;
     return refData.sort(function(refa,refb) {
-          var x = me.stripChr(refa.name); 
+          var x = me.stripChr(refa.name);
           var y = me.stripChr(refb.name);
           if (me.isNumeric(x) && me.isNumeric(y)) {
             return ((+x < +y) ? -1 : ((+x > +y) ? 1 : 0));
@@ -526,11 +526,11 @@ var effectCategories = [
                 return -1;
              }
           }
-          
-      });      
+
+      });
   }
 
-  
+
   exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
@@ -548,7 +548,7 @@ var effectCategories = [
           });
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
-        
+
         me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
           function(annotatedData, data) {
             if (annotatedData && data) {
@@ -584,10 +584,10 @@ var effectCategories = [
 
     // Get the vcf records for this region
     vcfReader.getRecords(refName, geneObject.start, geneObject.end, function(records) {
-        
+
         var allRecs = headerRecords.concat(records);
-        
-        
+
+
         me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
@@ -597,7 +597,7 @@ var effectCategories = [
             errorCallback("_getLocalVariantsImpl() error - " + error);
           }
         });
-    
+
 
 
     });
@@ -607,16 +607,16 @@ var effectCategories = [
   }
 
   exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
-    
+
     var me = this;
-  
+
     // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
     if (refName.indexOf('chr') == 0) {
       refFile = "./data/references_hg19/" + refName + ".fa";
     } else {
       refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }    
+    }
 
     // If we are getting the hgvs notation, we need an extra command line arg for vep
     var vepArgs = "";
@@ -634,18 +634,18 @@ var effectCategories = [
 
 
     // Create an iobio command get get the variants and add any header recs.
-    var cmd = new iobio.cmd(tabix,['-h', vcfURL, regionParm]) 
+    var cmd = new iobio.cmd(tabix,['-h', vcfURL, regionParm])
                        .pipe(contigAppender, [me.getHumanRefNames(refName)])
 
 
     // filter sample(s)
     if (sampleName != null && sampleName != "") {
       cmd = cmd.pipe(vt, ["subset", "-s", sampleName]);
-    } 
+    }
 
     // normalize variants
     cmd = cmd.pipe(vt, ["normalize", "-n", "-r", refFile]);
-    
+
     // get allele frequencies from 1000G and ExAC
     cmd = cmd.pipe(af);
 
@@ -656,14 +656,14 @@ var effectCategories = [
     }
 
     cmd = cmd.pipe(vep, vepArgs);
-    
 
-    var annotatedData = "";  
+
+    var annotatedData = "";
     // Get the results from the iobio command
     cmd.on('data', function(data) {
          if (data == undefined) {
             return;
-         } 
+         }
          annotatedData += data;
     });
 
@@ -678,7 +678,7 @@ var effectCategories = [
         if (record.charAt(0) == "#") {
           // Figure out how the vep fields positions
           if (record.indexOf("INFO=<ID=CSQ") > 0) {
-            vepFields = me.parseHeaderFieldForVep(record);                
+            vepFields = me.parseHeaderFieldForVep(record);
           }
         } else {
 
@@ -698,7 +698,7 @@ var effectCategories = [
           }
 
           // Turn vcf record into a JSON object and add it to an array
-          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
                            'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
@@ -707,14 +707,14 @@ var effectCategories = [
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
 
-      callback(annotatedRecs, results);                  
+      callback(annotatedRecs, results);
     });
 
     cmd.on('error', function(error) {
-       console.log(error);       
+       console.log(error);
     });
-    
-    cmd.run(); 
+
+    cmd.run();
 
   }
 
@@ -730,7 +730,7 @@ var effectCategories = [
           fieldName = fieldName.trim("\"");
         }
         vepFields[fieldName] = idx;
-      }    
+      }
     }
     return vepFields;
   }
@@ -743,7 +743,7 @@ var effectCategories = [
       this._getLocalSampleNames(callback);
     }
   }
- 
+
   exports._getLocalSampleNames = function(callback) {
     var me = this;
 
@@ -764,14 +764,14 @@ var effectCategories = [
 
       });
    });
-    
-    
+
+
 
   }
 
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
-    
+
     var cmd = new iobio.cmd(
         tabix,
         ['-h', vcfURL, '1:1-1']);
@@ -782,7 +782,7 @@ var effectCategories = [
     cmd.on('data', function(data) {
          if (data == undefined) {
             return;
-         } 
+         }
          headerData += data;
     });
 
@@ -801,8 +801,8 @@ var effectCategories = [
     cmd.on('error', function(error) {
       console.log(error);
     });
-    
-    cmd.run(); 
+
+    cmd.run();
 
   }
 
@@ -812,7 +812,7 @@ var effectCategories = [
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
-      // Each vcf record returned will have an EFF field in the 
+      // Each vcf record returned will have an EFF field in the
       // info field.
       me._annotateVcfRegion(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
 
@@ -824,7 +824,7 @@ var effectCategories = [
           if (record.charAt(0) == "#") {
             // Figure out how the vep fields positions
             if (record.indexOf("INFO=<ID=CSQ") > 0) {
-              vepFields = me.parseHeaderFieldForVep(record);                
+              vepFields = me.parseHeaderFieldForVep(record);
             }
           } else {
 
@@ -845,7 +845,7 @@ var effectCategories = [
 
 
             // Turn vcf record into a JSON object and add it to an array
-            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
                              'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
             vcfObjects.push(vcfObject);
           }
@@ -860,7 +860,7 @@ var effectCategories = [
 
   exports.promiseGetClinvarRecords = function(theVcfData, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
     var me = this;
-    
+
     return new Promise( function(resolve, reject) {
       var batchSize = 100;
       me.clinvarIterCount = 0;
@@ -874,7 +874,7 @@ var effectCategories = [
         var start = i * batchSize;
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
-        
+
         if (isClinvarOffline) {
           me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
           .then(  function() {
@@ -895,7 +895,7 @@ var effectCategories = [
       }
 
     });
-  }  
+  }
 
   // When there is no internet, read the clinvar vcf to obtain clinvar annotations
   exports.promiseGetClinvarRecordsOffline= function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
@@ -915,21 +915,21 @@ var effectCategories = [
 
 
       var clinvarData = "";
-      // Parse results 
+      // Parse results
       cmd.on('data', function(data) {
         if (data == undefined) {
             return;
-        } 
+        }
         clinvarData += data;
       });
 
       cmd.on('end', function(data) {
         var clinvarRecs = clinvarData.split("\n");
         var vcfObjects = [];
-        
+
         clinvarRecs.forEach(function(record) {
           if (record.charAt(0) == "#") {
-            
+
           } else {
 
             // Parse the vcf record into its fields
@@ -948,13 +948,13 @@ var effectCategories = [
             }
 
             // Turn vcf record into a JSON object and add it to an array
-            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
                              'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
             vcfObjects.push(vcfObject);
           }
         });
 
-       
+
         clinvarLoadVariantsFunction(vcfObjects);
 
         if (isFinal) {
@@ -967,8 +967,8 @@ var effectCategories = [
         console.log("unable to get clinvar vcf records. " + error);
         reject("unable to get clinvar vcf records. " + error);
       });
-      
-      cmd.run(); 
+
+      cmd.run();
     });
 
   }
@@ -989,7 +989,7 @@ var effectCategories = [
       url += "(" + refName + "[Chromosome]" + " AND ";
       // clinvarToSourceMap = new Object();
       variants.forEach(function(variant) {
-       
+
         var pos    = variant.start;
         var ref    = variant.ref;
         var alt    = variant.alt;
@@ -999,16 +999,16 @@ var effectCategories = [
         } else {
           // sourceIndex++;
           // // Figure out if this is multiallelic and increment
-          // // the index accordinging.  
+          // // the index accordinging.
 
           // var altTokens = alt.split(",");
           // altTokens.forEach(function(altToken) {
           //   clinvarIndex++;
           //   clinvarToSourceMap[clinvarIndex] = sourceIndex;
-          // });            
+          // });
 
           // Get rid of the left most anchor base for insertions and
-          // deletions for accessing clinvar 
+          // deletions for accessing clinvar
           var clinvarStart = +pos;
           if (alt == '.') {
 
@@ -1020,9 +1020,9 @@ var effectCategories = [
           } else if (alt.length > ref.length) {
             // insertion
             clinvarStart++;
-          } 
+          }
 
-          url += clinvarStart + ',' 
+          url += clinvarStart + ','
         }
       });
 
@@ -1030,12 +1030,12 @@ var effectCategories = [
 
       var clinvarVariants = null;
       $.ajax( url )
-        .done(function(data) {        
+        .done(function(data) {
           var webenv = data["esearchresult"]["webenv"];
           var queryKey = data["esearchresult"]["querykey"];
           var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
           $.ajax( summaryUrl )
-            .done(function(sumData) { 
+            .done(function(sumData) {
               me.clinvarIterCount++;
               var isFinal = false;
               if (me.clinvarIterCount == numberOfBatches) {
@@ -1053,15 +1053,15 @@ var effectCategories = [
                 if (isFinal) {
                   resolve();
                 }
-                
+
               } else {
-                var sorted = sumData.result.uids.sort(function(a,b){ 
+                var sorted = sumData.result.uids.sort(function(a,b){
                   var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
                   var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                  if ( aStart > bStart) 
-                    return 1; 
-                  else 
-                    return -1; 
+                  if ( aStart > bStart)
+                    return 1;
+                  else
+                    return -1;
                 })
                 sumData.result.uids = sorted
                 if (clinvarLoadVariantsFunction) {
@@ -1085,7 +1085,7 @@ var effectCategories = [
         })
       });
 
-   
+
   }
 
 
@@ -1100,7 +1100,7 @@ var effectCategories = [
     } else {
       refFile = "./data/references/hs_ref_chr" + refName + ".fa";
     }
-    // Figure out the vep args   
+    // Figure out the vep args
     var vepArgs = "";
     if (isRefSeq) {
       vepArgs = " --refseq "
@@ -1113,10 +1113,8 @@ var effectCategories = [
     }
 
 
-    // options to write stream of vcf records from local file to cmd
-    var opts = {        
-      writeStream: function(stream) {  
 
+    var writeStream = function(stream) {
         records.forEach( function(record) {
           if (record.trim() == "") {
           } else {
@@ -1126,25 +1124,24 @@ var effectCategories = [
 
         stream.end();
       }
-    };
 
 
     //  Streamed vcf recs first go through contig appender to add mandatory header recs
-    var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), (vcfFile ? vcfFile : new Blob()) ], opts);
-     
-    // Filter samples  
+    var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), (vcfFile ? vcfFile : writeStream) ]);
+
+    // Filter samples
 
     if (sampleName != null && sampleName != "") {
       cmd = cmd.pipe(vt, ['subset', '-s', sampleName]);
-    } 
-    
+    }
+
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
     cmd = cmd.pipe(vt, ['normalize', '-n', '-r', refFile]);
-          
-      
+
+
     // Get Allele Frequencies from 1000G and ExAC
     cmd = cmd.pipe(af);
-        
+
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
     } else {
@@ -1152,8 +1149,8 @@ var effectCategories = [
     }
 
     cmd = cmd.pipe(vep, [vepArgs]);
-    
-    
+
+
     var buffer = "";
     // Get the results from the command
     cmd.on('data', function(data) {
@@ -1165,13 +1162,13 @@ var effectCategories = [
     });
 
     cmd.on('error', function(error) {
-      console.log("error while annotating vcf records " + error);        
+      console.log("error while annotating vcf records " + error);
     });
 
     // Run the iobio command
     cmd.run();
-     
-      
+
+
 
   }
 
@@ -1210,7 +1207,7 @@ var effectCategories = [
         var transcripts = theObject[key];
         if (transcripts == null) {
           transcripts = {};
-        } 
+        }
         transcripts[theTranscriptId] = theTranscriptId;
         theObject[key] = transcripts;
       }
@@ -1239,12 +1236,12 @@ var effectCategories = [
               var annotTokens = rec.info.split(";");
               annotTokens.forEach(function(annotToken) {
                 if (annotToken.indexOf("SVLEN=") == 0) {
-                  len = Math.abs(+annotToken.substring(6, annotToken.length));       
+                  len = Math.abs(+annotToken.substring(6, annotToken.length));
                 } else if (annotToken.indexOf("SVTYPE=") == 0) {
                   type = annotToken.substring(7, annotToken.length);
                   //if (type && type.toLowerCase() == 'mnp') {
                   //  type = 'snp';
-                  //}       
+                  //}
                 }
               });
               rec.ref = '';
@@ -1279,9 +1276,9 @@ var effectCategories = [
 
             // svtype and snpEff annotations from the info field
             var effects = new Object();
-            var impacts = new Object();  
+            var impacts = new Object();
             var allSnpeff = new Object();
-            var af = null;       
+            var af = null;
             var typeAnnotated = null;
             var combinedDepth = null;
             var af1000G = '.';
@@ -1292,7 +1289,7 @@ var effectCategories = [
             // vep annotations from the info field
             //Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature
             // |BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|
-            // Protein_position|Amino_acids|Codons|            
+            // Protein_position|Amino_acids|Codons|
             // Existing_variation|DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|
             // SIFT|PolyPhen|HGVS_OFFSET|CLIN_SIG|SOMATIC|PHENO|
             // MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
@@ -1314,7 +1311,7 @@ var effectCategories = [
             var polyphen = new Object(); // need a special field for filtering purposes
             var regulatory = new Object(); // need a special field for filtering purposes
 
-            var vepRegs = [];            
+            var vepRegs = [];
             var vepRegBioTypeIndex = 7;
             var vepRegMotifNameIndex = 28;
             var vepRegMotifPosIndex = 29;
@@ -1324,19 +1321,19 @@ var effectCategories = [
             // annotation EFF
             annotTokens.forEach(function(annotToken) {
               if (annotToken.indexOf("BGAF_1KG=") == 0) {
-                af1000G = annotToken.substring(9, annotToken.length);                
+                af1000G = annotToken.substring(9, annotToken.length);
               } else if (annotToken.indexOf("BGAF_EXAC=") == 0) {
                 afExAC = annotToken.substring(10, annotToken.length);
               } else if (annotToken.indexOf("RS=") == 0) {
                 rs = annotToken.substring(3, annotToken.length);
               } else if (annotToken.indexOf("AF=") == 0) {
                 // For now, just grab first af
-                //af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), altIdx);   
-                af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), 0);    
+                //af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), altIdx);
+                af = me.parseAnnotForAlt(annotToken.substring(3, annotToken.length), 0);
               } if (annotToken.indexOf("TYPE=") == 0) {
-                typeAnnotated = me.parseAnnotForAlt(annotToken.substring(5, annotToken.length), altIdx);     
+                typeAnnotated = me.parseAnnotForAlt(annotToken.substring(5, annotToken.length), altIdx);
               } if (annotToken.indexOf("DP=") == 0) {
-                combinedDepth = annotToken.substring(3, annotToken.length);                
+                combinedDepth = annotToken.substring(3, annotToken.length);
               } else if (annotToken.indexOf("EFF=") == 0) {
                 // We have found the EFF annotation. Now split
                 // the EFF annotation into its parts.  Each
@@ -1349,17 +1346,17 @@ var effectCategories = [
                   // If we passed in an applicable transcript, grab the snpEff
                   // annotations pertaining to it.  Otherwise, just grab the
                   // first snpEff annotations listed.
-                  
-                  //EFF= Effect ( Effect_Impact | Functional_Class | Codon_Change | Amino_Acid_Change| Amino_Acid_Length | 
-                  //              Gene_Name | Transcript_BioType | Gene_Coding | Transcript_ID | Exon_Rank  | 
+
+                  //EFF= Effect ( Effect_Impact | Functional_Class | Codon_Change | Amino_Acid_Change| Amino_Acid_Length |
+                  //              Gene_Name | Transcript_BioType | Gene_Coding | Transcript_ID | Exon_Rank  |
                   //              Genotype_Number [ | ERRORS | WARNINGS ] )
-                  
+
                   var stop = token.indexOf("(");
                   var theEffect = token.substring(0, stop);
                   var remaining = token.substring(stop+1,token.length);
                   var effectTokens = remaining.split("|");
-                  var theImpact = effectTokens[0];   
-                  var theTranscriptId = effectTokens[8]; 
+                  var theImpact = effectTokens[0];
+                  var theTranscriptId = effectTokens[8];
 
 
                   // Make sure that this annotation belongs to a transcript in the gene's transcript set.
@@ -1369,13 +1366,13 @@ var effectCategories = [
                       validTranscript = true;
                     }
                   });
- 
+
                   if (validTranscript) {
                     // Determine if this is an annotation for the selected transcript
-                    var parseForSelectedTranscript = false; 
+                    var parseForSelectedTranscript = false;
                     if (selectedTranscriptID && token.indexOf(selectedTranscriptID) > -1) {
                       parseForSelectedTranscript = true;
-                    } 
+                    }
 
 
                     // Map all impact to effects so that we can determine
@@ -1389,14 +1386,14 @@ var effectCategories = [
                     allSnpeff[theImpact] = effectsObject;
 
                     if (parseForSelectedTranscript) {
-                      // Parse out the effect 
+                      // Parse out the effect
                       effects[theEffect] = theEffect;
 
                       // Parse out the impact
-                      impacts[theImpact] = theImpact;                  
-                    }                    
+                      impacts[theImpact] = theImpact;
+                    }
                   } else {
-                    //console.log(geneObject.gene_name + " " + theEffect + ": throwing out invalid transcript " + selectedTranscriptID)                    
+                    //console.log(geneObject.gene_name + " " + theEffect + ": throwing out invalid transcript " + selectedTranscriptID)
                   }
 
 
@@ -1413,7 +1410,7 @@ var effectCategories = [
                 //|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation
                 //|DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|REFSEQ_MATCH|SIFT|PolyPhen|HGVS_OFFSET
                 //|CLIN_SIG|SOMATIC|PHENO|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
-                transcriptTokens.forEach(function(transcriptToken) {                  
+                transcriptTokens.forEach(function(transcriptToken) {
                     var vepTokens   = transcriptToken.split("|");
                     var feature     = vepTokens[vepFields.Feature];
                     var featureType = vepTokens[vepFields.Feature_type];
@@ -1421,7 +1418,7 @@ var effectCategories = [
                     // If the transcript is the selected transcript, parse
                     // all of the vep fields.  We place these into maps
                     // because we can have multiple vep consequences for
-                    // the same transcript.  
+                    // the same transcript.
                     // TODO:  Need to sort so that highest impact shows first
                     //        and is used for filtering and ranking purposes.
                     if (featureType == 'Transcript' && (feature == selectedTranscriptID || feature == selectedTranscript.transcript_id)) {
@@ -1440,8 +1437,8 @@ var effectCategories = [
 
                       var siftString = vepTokens[vepFields.SIFT];
                       var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
-                      vepSIFT[siftDisplay] = siftDisplay;   
-                      sift['sift_'+ siftDisplay] = 'sift_' + siftDisplay;                   
+                      vepSIFT[siftDisplay] = siftDisplay;
+                      sift['sift_'+ siftDisplay] = 'sift_' + siftDisplay;
 
                       var polyphenString = vepTokens[vepFields.PolyPhen];
                       var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
@@ -1461,7 +1458,7 @@ var effectCategories = [
                       var regKey = reg;
                       if (reg == "promoter") {
                         regKey = "the_promoter";
-                      } 
+                      }
 
                       var valueUrl = "";
                       if (feature != "" && feature != null) {
@@ -1471,7 +1468,7 @@ var effectCategories = [
                         valueUrl = reg.split("_").join(" ").toLowerCase();
                       }
                       regulatory[(featureType == 'RegulatoryFeature' ? "reg_" : "mot_") + regKey.toLowerCase()] = valueUrl;
-                    } 
+                    }
                     if (featureType == 'Transcript') {
                       var theTranscriptId = feature;
 
@@ -1494,14 +1491,14 @@ var effectCategories = [
                         var polyphenString = vepTokens[vepFields.PolyPhen];
                         var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
                         var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : 99;
-                        
+
 
 
                         var consequencesObject = allVep[theImpact];
                         if (consequencesObject == null) {
                           consequencesObject = {};
                         }
-                        appendTranscript(consequencesObject, theConsequences, theTranscriptId);                      
+                        appendTranscript(consequencesObject, theConsequences, theTranscriptId);
                         allVep[theImpact] = consequencesObject;
 
                         var siftObject = allSIFT[siftScore];
@@ -1523,7 +1520,7 @@ var effectCategories = [
                         //console.log(geneObject.gene_name + " " + theConsequences + ": throwing out invalid transcript " + theTranscriptId);
                       }
 
-                      
+
                     }
 
                 });
@@ -1546,7 +1543,7 @@ var effectCategories = [
                   effectCats[effCat] = effCat;
                   found = true;
                 }
-              };            
+              };
               if (!found) {
                 effectCats['other'] = 'other';
               }
@@ -1585,7 +1582,7 @@ var effectCategories = [
                 var gtAltCountIndex = gtTokens["AO"];
                 if (gtAlleleCountIndex) {
                   //
-                  // GATK allele counts 
+                  // GATK allele counts
                   //
                   var countTokens = tokens[gtAlleleCountIndex].split(",");
                   if (countTokens.length >= 2 ) {
@@ -1600,8 +1597,8 @@ var effectCategories = [
                     })
 
                     genotypeAltCounts.push(altAlleleCounts);
-                    genotypeRefCounts.push(refAlleleCount);    
-                    genotypeDepths.push(totalAllelicDepth);                
+                    genotypeRefCounts.push(refAlleleCount);
+                    genotypeDepths.push(totalAllelicDepth);
                   } else {
                     genotypeAltCounts.push(null);
                     genotypeRefCounts.push(null);
@@ -1609,11 +1606,11 @@ var effectCategories = [
                   }
                 } else if (gtAltCountIndex) {
                   //
-                  // Freebayes allele counts   
-                  //           
-                  var totalAllelicDepth = 0; 
+                  // Freebayes allele counts
+                  //
+                  var totalAllelicDepth = 0;
 
-                  var altCount = tokens[gtAltCountIndex];   
+                  var altCount = tokens[gtAltCountIndex];
                   genotypeAltCounts.push(altCount);
 
                   var altCountTokens = altCount.split(",");
@@ -1628,14 +1625,14 @@ var effectCategories = [
                   if (gtRefCountIndex) {
                     refCount = tokens[gtRefCountIndex];
                     genotypeRefCounts.push(refCount);
-                    totalAllelicDepth += +refCount;                    
+                    totalAllelicDepth += +refCount;
                   } else {
                     genotypeRefCounts.push(null);
                   }
 
                   genotypeDepths.push(totalAllelicDepth);
 
-                  
+
                 } else {
                   genotypeAltCounts.push(null);
                   genotypeRefCounts.push(null)
@@ -1650,30 +1647,30 @@ var effectCategories = [
                   // GATK Strand allele counts, comma separated
                   //
                   var countTokens = tokens[strandAlleleCountIndex].split(",");
-                  if (countTokens.length == 4) {                    
-                    genotypeRefForwardCounts.push(tokens[0]);                    
-                    genotypeRefReverseCounts.push(tokens[1]);                    
-                    genotypeAltForwardCounts.push(tokens[2]);                    
-                    genotypeAltReverseCounts.push(tokens[3]);                    
+                  if (countTokens.length == 4) {
+                    genotypeRefForwardCounts.push(tokens[0]);
+                    genotypeRefReverseCounts.push(tokens[1]);
+                    genotypeAltForwardCounts.push(tokens[2]);
+                    genotypeAltReverseCounts.push(tokens[3]);
                   } else {
-                    genotypeRefForwardCounts.push(null);                    
-                    genotypeRefReverseCounts.push(null);                    
-                    genotypeAltForwardCounts.push(null);                    
-                    genotypeAltReverseCounts.push(null);        
+                    genotypeRefForwardCounts.push(null);
+                    genotypeRefReverseCounts.push(null);
+                    genotypeAltForwardCounts.push(null);
+                    genotypeAltReverseCounts.push(null);
                   }
                 } else if (strandRefForwardIndex && strandRefReverseIndex && strandAltForwardIndex && strandAltReverseIndex ) {
                   //
                   // Freebayes Strand bias counts (SRF, SRR, SAF, SAR)
                   //
                   genotypeRefForwardCounts.push(tokens[strandRefForwardIndex]);
-                  genotypeRefReverseCounts.push(tokens[strandRefReverseIndex]);                    
-                  genotypeAltForwardCounts.push(tokens[strandAltForwardIndex]);                    
-                  genotypeAltReverseCounts.push(tokens[strandAltReverseIndex]);        
+                  genotypeRefReverseCounts.push(tokens[strandRefReverseIndex]);
+                  genotypeAltForwardCounts.push(tokens[strandAltForwardIndex]);
+                  genotypeAltReverseCounts.push(tokens[strandAltReverseIndex]);
                 } else {
-                  genotypeRefForwardCounts.push(null);                    
-                  genotypeRefReverseCounts.push(null);                    
-                  genotypeAltForwardCounts.push(null);                    
-                  genotypeAltReverseCounts.push(null);        
+                  genotypeRefForwardCounts.push(null);
+                  genotypeRefReverseCounts.push(null);
+                  genotypeAltForwardCounts.push(null);
+                  genotypeAltReverseCounts.push(null);
                 }
               }
             });
@@ -1692,7 +1689,7 @@ var effectCategories = [
 
 
             // Only keep the alt if we have a genotype that matches.
-            // For example 
+            // For example
             // A->G    0|1 keep
             // A->G,C  0|1 keep A->G, but bypass A->C
             // A->G,C  0|2 bypass A->G, keep A->C
@@ -1702,7 +1699,7 @@ var effectCategories = [
             if (sampleCount == -1) {
               sampleCount = genotypes.length;
             }
-            
+
 
             var gtIndex = 0;
             genotypeForSample = genotypes[gtIndex];
@@ -1733,7 +1730,7 @@ var effectCategories = [
                   } else if (tokens[1] == 0 && tokens[0] != 0) {
                     var theAltIdx = +tokens[0] - 1;
                     alt = alt.split(',')[theAltIdx]
-                  } 
+                  }
                   if (keepAlt) {
                     if (tokens[0] == tokens[1]) {
                       zygosity = "HOM";
@@ -1741,7 +1738,7 @@ var effectCategories = [
                     } else {
                       zygosity = "HET";
                       hetCount++;
-                    }                    
+                    }
                   }
 
                 } else if (tokens[0] == gtNumber || tokens[1] == gtNumber) {
@@ -1789,10 +1786,10 @@ var effectCategories = [
 
 
             // Get rid of the left most anchor base for insertions and
-            // deletions for accessing clinvar 
+            // deletions for accessing clinvar
             var clinvarStart = +rec.pos;
             var clinvarRef = rec.ref;
-            var clinvarAlt = alt; 
+            var clinvarAlt = alt;
             if (clinvarAlt == '.') {
               clinvarAlt = '-';
             } else if (clinvarRef == '.') {
@@ -1807,7 +1804,7 @@ var effectCategories = [
               clinvarStart++;
               clinvarRef = clinvarRef.length == 1 ? "-" : clinvarRef.substr(1,clinvarRef.length-1);
               clinvarAlt = clinvarAlt.substr(1,clinvarAlt.length-1);
-            } 
+            }
 
             var cullTranscripts = function(transcriptObject, theTranscriptId) {
               // If the current transcript is included in the list,
@@ -1832,19 +1829,19 @@ var effectCategories = [
               var theEffects = theObject['HIGH'];
               if (theEffects) {
                 return {HIGH: cullFunction(theEffects, theTranscriptId)};
-              } 
+              }
               theEffects = theObject['MODERATE'];
               if (theEffects) {
                 return {MODERATE: cullFunction(theEffects, theTranscriptId)};
-              } 
+              }
               theEffects = theObject['MODIFIER'];
               if (theEffects) {
                 return {MODIFIER: cullFunction(theEffects, theTranscriptId)};
-              } 
+              }
               theEffects = theObject['LOW'];
               if (theEffects) {
                 return {LOW: cullFunction(theEffects, theTranscriptId)};
-              } 
+              }
               return {};
             }
 
@@ -1905,16 +1902,16 @@ var effectCategories = [
               var highestSIFT = getLowestScore(allSIFT, cullTranscripts, selectedTranscriptID);
               var highestPolyphen = getHighestScore(allPolyphen, cullTranscripts, selectedTranscriptID);
 
-              variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0, 
-                'strand': geneObject.strand, 
+              variants.push( {'start': +rec.pos, 'end': +end, 'len': +len, 'level': +0,
+                'strand': geneObject.strand,
                 'chrom': refName,
-                'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type, 
-                'id': rec.id, 'ref': rec.ref, 
-                'alt': alt, 'qual': rec.qual, 'recfilter': rec.filter, 
+                'type': typeAnnotated && typeAnnotated != '' ? typeAnnotated : type,
+                'id': rec.id, 'ref': rec.ref,
+                'alt': alt, 'qual': rec.qual, 'recfilter': rec.filter,
                 'af': af,
-                'combinedDepth': combinedDepth,             
-                'genotypes': genotypes, 
-                'genotype': genotypeForSample, 
+                'combinedDepth': combinedDepth,
+                'genotypes': genotypes,
+                'genotype': genotypeForSample,
                 'genotypeDepth' : genotypeDepthForSample,
                 'genotypeFilteredDepth' : genotypeFilteredDepthForSample,
                 'genotypeAltCount' : genotypeAltCountForSample,
@@ -1925,10 +1922,10 @@ var effectCategories = [
                 'genotypeRefReverseCount' : genotypeRefReverseCountForSample,
                 'eduGenotype' : eduGenotype,
                 'eduGenotypeReversed': eduGenotypeReversed,
-                'zygosity': zygosity ? zygosity : 'gt_unknown', 
+                'zygosity': zygosity ? zygosity : 'gt_unknown',
                 'phased': phased,
-                'effect': effects, 
-                'impact': impacts, 
+                'effect': effects,
+                'impact': impacts,
                 'highestImpactSnpeff': highestImpactSnpeff,
                 'highestImpactVep': highestImpactVep,
                 'highestSIFT': highestSIFT,
@@ -1953,10 +1950,10 @@ var effectCategories = [
                 'vepSIFT': vepSIFT,
                 'sift' : sift,
                 'vepPolyPhen':  vepPolyPhen,
-                'polyphen' : polyphen, 
+                'polyphen' : polyphen,
                 'vepRegs':  vepRegs,
                 'regulatory' : regulatory
-                } 
+                }
               );
 
               if (rec.pos < geneObject.start ) {
@@ -1974,7 +1971,7 @@ var effectCategories = [
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
       var results = {'ref': refName, 'start': +geneObject.start, 'end': +geneObject.end, 'strand': geneObject.strand, 'transcript': selectedTranscript,
-        'variantRegionStart': variantRegionStart, 'name': 'vcf track', 
+        'variantRegionStart': variantRegionStart, 'name': 'vcf track',
         'homCount': homCount, 'hetCount': hetCount, 'sampleCount' : sampleCount,
         'features': variants};
 
@@ -2001,7 +1998,7 @@ var effectCategories = [
       if (af.indexOf(",") > 0) {
         var aftokens = af.split(",");
         var theAf = aftokens[+altIdx];
-        return theAf; 
+        return theAf;
       } else {
         return af;
       }
@@ -2019,8 +2016,8 @@ var effectCategories = [
       }
     }  else {
       annotValue = value;
-    }   
-    return annotValue;       
+    }
+    return annotValue;
   };
 
   exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
@@ -2033,7 +2030,7 @@ var effectCategories = [
       widthFactor = widthFactor ? widthFactor : 1;
       // Variant's can overlap each over.  Set a field called variant.level which determines
       // how to stack the variants vertically in these cases.
-      var posLevels = [];      
+      var posLevels = [];
       posLevels.length = 0;
       var maxLevel = 0;
       variants.forEach(function(variant) {
@@ -2045,11 +2042,11 @@ var effectCategories = [
           for ( var k=0; k <= posLevels[idx].length; k++ ) {
             if (posLevels[idx][k] == undefined) {
               posLevel = k;
-              break;                
+              break;
             }
-          }            
+          }
         }
-        
+
         // Set variant level.
         variant.level = posLevel;
 
@@ -2060,7 +2057,7 @@ var effectCategories = [
           stack[variant.level] = true;
           posLevels[idx] = stack;
 
-          // Capture the max level of the entire region. 
+          // Capture the max level of the entire region.
           if (posLevels[idx].length-1 > maxLevel) {
             maxLevel = posLevels[idx].length - 1;
           }
@@ -2071,7 +2068,7 @@ var effectCategories = [
 
 
   exports.compareVcfRecords = function(variants1, variants2, comparisonAttr, onMatchFunction, onNoMatchFunction) {
-    
+
     var set1Label = 'unique1';
     var set2Label = 'unique2';
     var commonLabel = 'common';
@@ -2111,7 +2108,7 @@ var effectCategories = [
 
 
     // Iterate through the variants from the first set,
-    // marking the consensus field based on whether a 
+    // marking the consensus field based on whether a
     // matching variant from the second list is encountered.
     var idx1 = 0;
     var idx2 = 0;
@@ -2126,7 +2123,7 @@ var effectCategories = [
 
       variant1 = features1[idx1];
       variant2 = features2[idx2];
-      
+
       var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
       var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
 
@@ -2182,16 +2179,16 @@ var effectCategories = [
             onNoMatchFunction(variant1, null);
         }
       }
-    } 
+    }
     if (idx2 < features2.length) {
       for(x = idx2; x < features2.length; x++) {
         var variant2 = features2[x];
         variant2[comparisonAttribute] = set2Label;
         if (onNoMatchFunction) {
             onNoMatchFunction(null, variant2);
-        }        
+        }
       }
-    } 
+    }
 
 
 
@@ -2202,7 +2199,7 @@ var effectCategories = [
   //
   //
   //
-  //  PRIVATE 
+  //  PRIVATE
   //
   //
   //
