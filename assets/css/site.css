@@ -2013,10 +2013,23 @@ text.ref-count {
 #get-genes-copy-paste-button, #phenolyzer-go-button {
   font-size: 11px; }
 
-#gene-badge.selected #gene-badge-button {
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19); }
-#gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
-  font-weight: bold; }
+#gene-badge {
+  margin-top: 10px;
+  margin-bottom: 7px;
+  margin-right: 3px; }
+
+#gene-badge.loading {
+  border-left: #e8cd8e solid 12px; }
+
+#gene-badge.loading.selected {
+  border-left: #e8cd8e solid 12px; }
+
+#gene-badge.selected {
+  border-left: #a0a0a0 solid 12px; }
+  #gene-badge.selected #gene-badge-button {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19); }
+  #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
+    font-weight: bold; }
 
 #gene-badge.phenolyzer #gene-badge-button {
   border: solid 1px #9FC2D0; }
