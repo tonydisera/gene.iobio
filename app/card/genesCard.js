@@ -154,10 +154,12 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0) {
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
 		$('#gene-badge-container #clear-gene-list').removeClass("hide");
+		$('#gene-badge-container #manage-cache-link').removeClass("hide");
 	} else {
 		$('#gene-badge-container #manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
 		$('#gene-badge-container #clear-gene-list').addClass("hide");
+		$('#gene-badge-container #manage-cache-link').addClass("hide");
 	}
 
 	// Create a gene badge for each gene name in the comma separated list.
@@ -166,7 +168,6 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		// Only add the gene badge if it does not already exist
 		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
 		if ($(existingBadge).length == 0) {
-			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
 			me.addGeneBadge(name, true);
 		} else {
 			me._setBookmarkBadge(name);
@@ -179,7 +180,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
 		geneBadge.addClass("selected");
 		if (hasDataSources()) {
-			geneBadge.find('.gene-badge-loader').removeClass('hide');
+			me._setGeneBadgeLoading(geneBadge, true);
 		}
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
@@ -219,10 +220,12 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0) {
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
 		$('#gene-badge-container #clear-gene-list').removeClass("hide");
+		$('#gene-badge-container #manage-cache-link').removeClass("hide");
 	} else {
 		$('#gene-badge-container #manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
 		$('#gene-badge-container #clear-gene-list').addClass("hide");
+		$('#gene-badge-container #manage-cache-link').addClass("hide");
 	}
 
 	// Create a gene badge for each gene name in the comma separated list.
@@ -231,7 +234,6 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 		// Only add the gene badge if it does not already exist
 		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
 		if ($(existingBadge).length == 0) {
-			var newBadgeSelector = '#gene-badge-container #gene-badge:last-child';	
 			me.addGeneBadge(name, true);
 		}
 	}
@@ -242,7 +244,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
 		geneBadge.addClass("selected");
 		if (hasDataSources()) {
-			geneBadge.find('.gene-badge-loader').removeClass('hide');
+			me._setGeneBadgeLoading(geneBadge, true);
 		}
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
@@ -569,7 +571,7 @@ GenesCard.prototype.clearGenes = function() {
 	alertify.defaults.glossary.ok = 'OK';
 	alertify.defaults.glossary.cancel = 'Cancel';
 	alertify.confirm("Confirm", 
-		"Clear all genes currently listed?", 
+		"Remove all genes currently listed?", 
 		function (e) {
 			// user clicked "ok"
 	        me._clearGenesImpl();
@@ -620,8 +622,8 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 	var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
 	if ($(selector).length == 0) {
-		$('#gene-badge-container').append(geneBadgeTemplate());
-		$("#gene-badge-container #gene-badge:last-child").find('#gene-badge-name').text(geneName);
+		$('#gene-badge-container #after-genes').before(geneBadgeTemplate());
+		$("#gene-badge-container #gene-badge").last().find('#gene-badge-name').text(geneName);
 		d3.select($(selector)[0]).data([geneName]);
 		d3.select($(selector)[0])
 		  .on("mouseover", function(d,i) {
@@ -639,7 +641,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		  });
 
 		if (!isOffline) {
-			me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge:last-child"), geneName);
+			me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge").last(), geneName);
 		}
 		me._setPhenotypeBadge(geneName);
 		me._setBookmarkBadge(geneName);
@@ -650,7 +652,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 		if (!bypassSelecting) {
 			if (hasDataSources()) {
-				$(selector).parent().find('.gene-badge-loader').removeClass("hide");
+				me._setGeneBadgeLoading($(selector).parent().parent(), true);
 			}
 			$("#gene-badge.selected").removeClass("selected");		
 			$(selector).parent().parent().addClass("selected");			
@@ -658,6 +660,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
 		$('#gene-badge-container #clear-gene-list').removeClass("hide");
+		$('#gene-badge-container #manage-cache-link').removeClass("hide");
 
 	
 	}
@@ -717,6 +720,10 @@ GenesCard.prototype.hideTooltip = function() {
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
+}
+
+GenesCard.prototype.setBookmarkBadge = function(geneName) {
+	this._setBookmarkBadge(geneName);
 }
 
 GenesCard.prototype._setBookmarkBadge = function(geneName) {
@@ -780,7 +787,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 		if (theVcfData != null && theVcfData.features.length == 0) {
 			me._setGeneBadgeWarning(window.gene.gene_name, true);
 		} else {
-			var dangerObject = vc.summarizeDanger(theVcfData);
+			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData);
 			me._setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
 		}
@@ -794,16 +801,26 @@ GenesCard.prototype.hideGeneBadgeLoading = function(geneName) {
 	me._geneBadgeLoading(geneName, false);
 }
 
+GenesCard.prototype._setGeneBadgeLoading = function(geneBadge, show) {
+	if (show) {
+		geneBadge.find('.gene-badge-loader').removeClass("hide");
+		geneBadge.addClass("loading");
+	} else {
+		geneBadge.find('.gene-badge-loader').addClass("hide");
+		geneBadge.removeClass("loading");
+	}
+}
+
 GenesCard.prototype._geneBadgeLoading = function(geneName, show, force) {
 	var me = this;
 
 	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
 	if (show) {
 		if (force || hasDataSources()) {
-			geneBadge.find('.gene-badge-loader').removeClass("hide");
+			me._setGeneBadgeLoading(geneBadge, true);
 		}
 	} else {
-		geneBadge.find('.gene-badge-loader').addClass("hide");		
+		me._setGeneBadgeLoading(geneBadge, false);
 	}
 }
 
@@ -837,7 +854,7 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 	geneBadge.find('#gene-badge-circle').removeClass('mdi-action-done');
 	geneBadge.find('#gene-badge-circle').removeClass('btn-default');
 
-	geneBadge.find('.gene-badge-loader').addClass('hide');
+	me._setGeneBadgeLoading(geneBadge, false);
 
 	geneBadge.find('#gene-badge-danger-count').removeClass("impact_HIGH");
 	geneBadge.find('#gene-badge-danger-count').removeClass("impact_MODERATE");
@@ -853,6 +870,10 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 	geneBadge.removeClass("error");
 	geneBadge.removeClass("warning");
 
+	// Indicate if gene has a bookmared variants
+	me._setBookmarkBadge(geneName);
+
+	// Now set danger badges
 	var doneWithImpact = false;
 	for (dangerKey in dangerObject) {
 		if (dangerKey == 'IMPACT') {
@@ -1023,11 +1044,11 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	$("#gene-badge.selected").removeClass("selected");
 	geneBadge.addClass("selected");
 	
-	$(".gene-badge-loader").each( function(index, value) {
-		$(this).addClass("hide");
+	$(".gene-badge-button").each( function(index, value) {
+		me._setGeneBadgeLoading($(this), false);
 	});
 	if (hasDataSources()) {
-		geneBadge.find('.gene-badge-loader').removeClass('hide');
+		me._setGeneBadgeLoading(geneBadge, true);
 	}
 
 
