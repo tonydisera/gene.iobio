@@ -186,6 +186,8 @@ function promiseLoadTemplate(templateName) {
 function init() {
 	var me = this;
 
+	alertify.set({ delay : 15000 }); // 15 seconds
+
 	$('#tour-placeholder').append(tourTemplate());
 	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
 
@@ -1181,7 +1183,7 @@ function cacheNextGene(genesToCache) {
 								var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 								trioModel.compareVariantsToMotherFather(function() {
 
-				    				var dangerObject = getVariantCard("proband").summarizeDanger(probandVcfData);
+				    				var dangerObject = getVariantCard("proband").summarizeDanger(geneName, probandVcfData);
 									
 									genesCard._geneBadgeLoading(geneObject.gene_name, false);
 									if (probandVcfData.features.length == 0) {
@@ -2195,6 +2197,10 @@ function bookmarkVariant() {
 		this.bookmarkCard.refreshBookmarkList();
 	}
 }
+
+
+
+
 
 
 

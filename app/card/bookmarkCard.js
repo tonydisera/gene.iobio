@@ -135,7 +135,6 @@ BookmarkCard.prototype.reverseBases = function(bases) {
 BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	var me = this;
 	if (variant) {		
-
 		var key = this.getBookmarkKey(gene.gene_name, gene.chr, variant.start, variant.ref, variant.alt);
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
@@ -143,7 +142,15 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);
 			matrixCard.addBookmarkFlag(variant);
 			variant.isBookmark = 'Y';
+
+			var keys = me.bookmarkedGenes[gene.gene_name];
+	    	if (keys == null) {
+	    		keys = [];
+	    	}
+	    	keys.push(key);
+	    	me.bookmarkedGenes[gene.gene_name] = keys;
 		}
+		genesCard.setBookmarkBadge(gene.gene_name);
 	}
 }
 
@@ -163,6 +170,7 @@ BookmarkCard.prototype.removeBookmark = function(key, variant) {
 	}
 	if (bookmarkKeys.length == 0) {
 		delete this.bookmarkedGenes[geneName];
+		genesCard.setBookmarkBadge(geneName);
 	}
 
 	this.refreshBookmarkList();
