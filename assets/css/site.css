@@ -2345,6 +2345,36 @@ text.ref-count {
       font-size: 13px; }
   #gene-badge-container.manage #gene-badge-remove {
     visibility: visible; }
+  #gene-badge-container #manage-cache-link {
+    color: #717171 !important;
+    font-size: 11px;
+    margin-top: 14px;
+    padding-left: 0px;
+    cursor: pointer; }
+    #gene-badge-container #manage-cache-link:hover {
+      text-decoration: underline !important; }
+
+#manage-cache-modal .modal-dialog {
+  width: 500px; }
+#manage-cache-modal .modal-body {
+  margin-top: 30px;
+  margin-bottom: 30px; }
+#manage-cache-modal .cache-label {
+  width: 220px;
+  display: inline-block;
+  height: 30px;
+  font-size: 14px; }
+#manage-cache-modal .cache-size {
+  width: 60px;
+  display: inline-block;
+  font-size: 14px;
+  margin-right: 50px;
+  color: #5d809d;
+  text-align: right; }
+#manage-cache-modal button {
+  width: 100px;
+  padding-top: 2px;
+  padding-bottom: 2px; }
 
 .call-variants-count {
   font-size: 11px;

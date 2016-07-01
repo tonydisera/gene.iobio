@@ -184,6 +184,7 @@ function init() {
 		return;			
 	}
 
+
 	alertify.defaults.glossary.title = "";
 	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
 	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
@@ -1211,7 +1212,7 @@ function cacheNextGene(genesToCache) {
 								var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 								trioModel.compareVariantsToMotherFather(function() {
 
-				    				var dangerObject = getVariantCard("proband").summarizeDanger(probandVcfData);
+				    				var dangerObject = getVariantCard("proband").summarizeDanger(geneName, probandVcfData);
 									
 									genesCard._geneBadgeLoading(geneObject.gene_name, false);
 									if (probandVcfData.features.length == 0) {

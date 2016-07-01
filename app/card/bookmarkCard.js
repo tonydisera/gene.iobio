@@ -143,7 +143,15 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);
 			matrixCard.addBookmarkFlag(variant);
 			variant.isBookmark = 'Y';
+
+			var keys = me.bookmarkedGenes[gene.gene_name];
+	    	if (keys == null) {
+	    		keys = [];
+	    	}
+	    	keys.push(key);
+	    	me.bookmarkedGenes[gene.gene_name] = keys;
 		}
+		genesCard.setBookmarkBadge(gene.gene_name);
 	}
 }
 
@@ -163,6 +171,7 @@ BookmarkCard.prototype.removeBookmark = function(key, variant) {
 	}
 	if (bookmarkKeys.length == 0) {
 		delete this.bookmarkedGenes[geneName];
+		genesCard.setBookmarkBadge(geneName);
 	}
 
 	this.refreshBookmarkList();

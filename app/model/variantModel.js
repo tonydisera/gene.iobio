@@ -146,7 +146,7 @@ VariantModel.prototype.getVariantCount = function(data) {
 	}
 }
 
-VariantModel.prototype.summarizeDanger = function(theVcfData) {
+VariantModel.summarizeDanger = function(geneName, theVcfData) {
 	dangerCounts = {};
 	if (theVcfData == null || theVcfData.features.length == null) {
 		console.log("unable to summarize danger due to null data");
@@ -1061,12 +1061,16 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 }
 
 VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
-	return this.getRelationship() 
-		+ (this.sampleName != null ? "-" + this.sampleName : "")
-		+ "-" + (geneName != null ? geneName : gene.gene_name) 
-		+ (transcript != null ? "-" + transcript.transcript_id : "")
-	    + "-" + (filterCard.getAnnotationScheme().toLowerCase())
-		+ "-" + dataKind;
+	return CacheHelper.getCacheKey(
+		{relationship: this.getRelationship(),
+		 sample: (this.sampleName != null ? this.sampleName : "null"),
+		 gene: (geneName != null ? geneName : gene.gene_name),
+		 transcript: (transcript != null ? transcript.transcript_id : "null"),
+		 annotationScheme: (filterCard.getAnnotationScheme().toLowerCase()),
+		 dataKind: dataKind
+		}
+	);	
+
 }
 
 VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
@@ -1079,39 +1083,24 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 
     	var dataStringCompressed = null;
     	try {
-    		//dataStringCompressed = stringCompress.deflate(dataString);
-
-    		//console.log("before compression=" + dataString.length);
 			dataStringCompressed = LZString.compressToUTF16(dataString);
-    		//console.log("after compression=" + dataStringCompressed.length);
     	} catch (e) {    		
 	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
+	   		alertify.error("Error occurred when compressing analyzed data before caching.");
 	   		success = false;
     	}
 
     	if (success) {
 	    	try {
 		      	localStorage.setItem(this._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
-	    	} catch(e) {
-				if (e == QUOTA_EXCEEDED_ERR) {
-	    			// TODO - keep track of times that genes were cached and delete the
-	    			// oldest entry(ies).  Need to delete enough to store the current 
-	    			// data that needs to be cached.
-	    			console.log("local storage quota exceeded.  clearing local storage to continue.")
-	    			localStorage.clear();
-	    			try {
-				      	localStorage.setItem(this._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
-	    			} catch(e) {
-			    		console.log("an error occurred when attempting to store into local storage (2nd attempt).  Cache key is " + me._getCacheKey() + ". Exception is " + e);
-			    		success = false;
-	    			}
-	    		} else { 
-			    	console.log("an error occurred when attempting to store into local storage.  Cache key is " + me._getCacheKey() + ". Exception is " + e);
-			    	success = false;
-	    		}   		
+	    		
+	    	} catch(error) {
+		      	CacheHelper.showError(this._getCacheKey(dataKind, geneName, transcript), error);
+		    	success = false;
 	    	}    		
     	}
 
+    	
       	return success;
     } else {
     	return false;
