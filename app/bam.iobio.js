@@ -497,7 +497,7 @@ var Bam = Class.extend({
             {
               'urlparams': {'encoding':'binary'}
             });
-          cmd = cmd.pipe(samtools, ["mpileup"]);
+          cmd = cmd.pipe(samtools, ["mpileup", "-"]);
         } else {
 
           function writeSamFile (stream) {
@@ -509,7 +509,6 @@ var Bam = Class.extend({
           }
 
           cmd = new iobio.cmd(samtools, ['mpileup',  writeSamFile ],
-          // cmd = new iobio.cmd('0.0.0.0:8060', ['mpileup',  new Blob()],
             {
               'urlparams': {'encoding':'utf8'}
             });

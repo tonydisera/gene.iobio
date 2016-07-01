@@ -277,9 +277,6 @@ BamRecord.prototype.convertTo = function(format) {
  var keys = [ "readName", "flag", "segment", "pos", "mq", "cigar", "rnext", "pnext", "tlen", "seq", "quals", "tags"   ]
 
  if (format == "sam") {
-    if( this["readName"] == 'ERR194147.537888101') {
-        var h = 5;
-    }
     for (var i=0; i < keys.length; i++) {
         if (keys[i] == 'pos' || keys[i] == 'pnext' ) this[keys[i]] += 1;
         if (keys[i] == 'cigar' && this[keys[i]] == '') this[keys[i]] = '*';

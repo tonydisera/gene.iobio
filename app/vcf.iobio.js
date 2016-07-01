@@ -31,6 +31,7 @@ vcfiobio = function module() {
   var af             = dev_iobio_services + "af/";
   var vep            = dev_iobio_services + "vep/";
   var contigAppender = dev_iobio_services + "ctgapndr/";
+  var bcftools = dev_iobio_services + "bcftools/";
 
 
 
@@ -632,19 +633,25 @@ var effectCategories = [
     }
 
 
+    var contigStr = "";
+    me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+        contigStr += "##contig=<ID=" + ref + ">\n";
+    })
+    var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
     var cmd = new iobio.cmd(tabix,['-h', vcfURL, regionParm])
-                       .pipe(contigAppender, [me.getHumanRefNames(refName)])
-
+      .pipe(bcftools, ['annotate', '-h', contigNameFile, '-'])
 
     // filter sample(s)
+    window.testData = "";
     if (sampleName != null && sampleName != "") {
-      cmd = cmd.pipe(vt, ["subset", "-s", sampleName]);
+      var sampleNameFile = new Blob([sampleName])
+      cmd = cmd.pipe(vt, ["subset", "-s", sampleNameFile, '-'])
     }
 
     // normalize variants
-    cmd = cmd.pipe(vt, ["normalize", "-n", "-r", refFile]);
+    cmd = cmd.pipe("nv-dev.iobio.io/vt/", ["normalize", "-n", "-r", refFile, '-'])
 
     // get allele frequencies from 1000G and ExAC
     cmd = cmd.pipe(af);
@@ -1127,20 +1134,33 @@ var effectCategories = [
 
 
     //  Streamed vcf recs first go through contig appender to add mandatory header recs
-    var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), (vcfFile ? vcfFile : writeStream) ]);
+    // var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), (vcfFile ? vcfFile : writeStream) ]);
+
+    // var writeContigNames = function(stream) {
+    //   me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+    //     stream.write("##contig=<ID=" + ref + ">\n");
+    //   })
+    //   stream.end();
+    // }
+    var contigStr = "";
+    me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+        contigStr += "##contig=<ID=" + ref + ">\n";
+    })
+    var contigNameFile = new Blob([contigStr])
+
+    var cmd = new iobio.cmd(bcftools, ['annotate', '-h', contigNameFile, (vcfFile ? vcfFile : writeStream) ])
 
     // Filter samples
-
     if (sampleName != null && sampleName != "") {
-      cmd = cmd.pipe(vt, ['subset', '-s', sampleName]);
+      var sampleNameFile = new Blob([sampleName])
+      cmd = cmd.pipe(vt, ['subset', '-s', sampleNameFile, '-']);
     }
 
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(vt, ['normalize', '-n', '-r', refFile]);
-
+    cmd = cmd.pipe(vt, ['normalize', '-n', '-r', refFile, '-'])
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(af);
+    cmd = cmd.pipe(af)
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
@@ -1167,8 +1187,6 @@ var effectCategories = [
 
     // Run the iobio command
     cmd.run();
-
-
 
   }
 
