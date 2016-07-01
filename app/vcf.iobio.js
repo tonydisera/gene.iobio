@@ -644,14 +644,14 @@ var effectCategories = [
       .pipe(bcftools, ['annotate', '-h', contigNameFile, '-'])
 
     // filter sample(s)
-    window.testData = "";
     if (sampleName != null && sampleName != "") {
-      var sampleNameFile = new Blob([sampleName])
+
+      var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
       cmd = cmd.pipe(vt, ["subset", "-s", sampleNameFile, '-'])
     }
 
     // normalize variants
-    cmd = cmd.pipe("nv-dev.iobio.io/vt/", ["normalize", "-n", "-r", refFile, '-'])
+    cmd = cmd.pipe(vt, ["normalize", "-n", "-r", refFile, '-'])
 
     // get allele frequencies from 1000G and ExAC
     cmd = cmd.pipe(af);
@@ -1148,11 +1148,11 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(bcftools, ['annotate', '-h', contigNameFile, (vcfFile ? vcfFile : writeStream) ])
+    var cmd = new iobio.cmd(bcftools, ['annotate', '-h', contigNameFile, writeStream ])
 
     // Filter samples
     if (sampleName != null && sampleName != "") {
-      var sampleNameFile = new Blob([sampleName])
+      var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
       cmd = cmd.pipe(vt, ['subset', '-s', sampleNameFile, '-']);
     }
 
