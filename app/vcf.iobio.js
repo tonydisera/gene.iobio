@@ -23,17 +23,30 @@ vcfiobio = function module() {
 
   var clinvarIterCount       = 0;
 
-  var tabix          = dev_iobio_services + "tabix/";
-//  var tabix          = iobio_server + (isOffline ? "tabix/" : "od_tabix/");
-  var vcfReadDepther = dev_iobio_services + "vcfdepther/";
-  var snpEff         = iobio_server       + "snpeff/";
-  var vt             = dev_iobio_services + "vt/";
-  var af             = dev_iobio_services + "af/";
-  var vep            = dev_iobio_services + "vep/";
-  var contigAppender = dev_iobio_services + "ctgapndr/";
-  var bcftools = dev_iobio_services + "bcftools/";
+  // new minion servers
+  var tabix          = new_iobio_services + "tabix/";
+//  var tabix          = new_iobio_services + (isOffline ? "tabix/" : "od_tabix/");
+  var vcfReadDepther = new_iobio_services  + "vcfdepther/";
+  var snpEff         = new_iobio_services  + "snpeff/";
+  var vt             = new_iobio_services  + "vt/";
+  var af             = new_iobio_services  + "af/";
+  var vep            = new_iobio_services  + "vep/";
+  var contigAppender = new_iobio_services  + "ctgapndr/";
+  var bcftools       = new_iobio_services  + "bcftools/";
 
 
+  // old (pre devkit)
+  var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
+  var tabixServer            = iobio_services + "tabix/";
+  //var tabixServer            = iobio_services + (isOffline ? "tabix/" : "od_tabix/");
+  var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
+  var snpEffServer           = iobio_services + "snpeff/";
+  var snpSiftServer          = iobio_services + "snpsift/";
+  var vtServer               = iobio_services + "vt/";
+  var clinvarServer          = iobio_services + "clinvar/";
+  var afServer               = iobio_services + "af/";
+  var vepServer              = iobio_services + "vep/";
+  var contigAppenderServer   = iobio_services + "ctgapndr/";
 
 
   var vcfURL;
@@ -366,6 +379,14 @@ var effectCategories = [
   }
 
   exports.loadRemoteIndex = function(callback, callbackError) {
+    if (useDevkit) {
+      return this.loadRemoteIndexDevkit(callback, callbackError);
+    } else {
+      return this.loadRemoteIndexOld(callback, callbackError);      
+    }
+  }
+
+  exports.loadRemoteIndexDevkit = function(callback, callbackError) {
     var me = this;
     var buffer = "";
     var refName;
@@ -485,6 +506,54 @@ var effectCategories = [
 
   };
 
+
+  exports.loadRemoteIndexOld = function(callback, callbackError) {
+
+    sourceType = SOURCE_TYPE_URL;
+
+    var client = BinaryClient(vcfReadDeptherServer);
+    var url = encodeURI( vcfReadDeptherServer + '?cmd=-i ' + vcfURL + ".tbi");
+
+    client.on('open', function(stream){
+      var stream = client.createStream({event:'run', params : {'url':url}});
+      var currentSequence;
+      var refName;
+      stream.on('data', function(data, options) {
+         data = data.split("\n");
+         for (var i=0; i < data.length; i++)  {
+            if ( data[i][0] == '#' ) {
+               
+               var tokens = data[i].substr(1).split("\t");
+               refIndex = tokens[0];
+               refName = tokens[1];
+               var refLength = tokens[2];
+
+               
+               refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "idx": +refIndex});
+               refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};
+            }
+            else {
+               if (data[i] != "") {
+                  var d = data[i].split("\t");
+                  var point = [ parseInt(d[0]), parseInt(d[1]) ];
+                  refDensity[refName].points.push(point);
+                  refDensity[refName].intervalPoints.push(point);
+
+               }
+            }                  
+         }
+      });
+
+      stream.on("error", function(error) {
+        console.log(error);
+      });
+
+      stream.on('end', function() {
+         callback.call(this, refData);
+      });
+    });
+
+  };
 
 
   exports.zeroFillPointData = function(refObject) {
@@ -608,6 +677,16 @@ var effectCategories = [
   }
 
   exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+    if (useDevkit) {
+      return this._getRemoteVariantsImplDevkit(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback);
+    } else {
+      return this._getRemoteVariantsImplOld(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback);
+    }
+
+  }
+
+
+  exports._getRemoteVariantsImplDevkit = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
 
     var me = this;
 
@@ -725,6 +804,138 @@ var effectCategories = [
 
   }
 
+  exports._getRemoteVariantsImplOld = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+    var me = this;
+
+    var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
+    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
+    if (refName.indexOf('chr') == 0) {
+      refFile = "./data/references_hg19/" + refName + ".fa";
+    } else {
+      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+    }    
+    
+    // TODO - Need to generalize to grab reference names for species instead of hardcoding
+    var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
+
+    // If multi-sample vcf, select only the genotype field for the specified sample
+    var nextUrl = "";
+    if (sampleName != null && sampleName != "") {
+      nextUrl = encodeURI( vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+    } else {
+      nextUrl = contigAppenderUrl;
+    }
+
+    // normalize variants
+    var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
+    
+    // get allele frequencies from 1000G and ExAC
+    var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
+
+    var snpEffUrl = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
+
+    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
+    var nextUrl;
+    if (isRefSeq || annotationEngine == 'vep') {
+      nextUrl = afUrl;
+    } else {
+      nextUrl = snpEffUrl; 
+    }
+
+    // If we are getting the hgvs notation, we need an extra command line arg for vep
+    var vepArgs = "";
+    if (isRefSeq) {
+      vepArgs = " --refseq ";
+    }
+    if (hgvsNotation) {
+      vepArgs += " --hgvs ";
+    }
+    // If we are getting the rsID, we need an extra command line arg for vep
+    if (getRsId) {
+      vepArgs += "  --check_existing ";
+    }
+    
+    // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
+    var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
+    var server = vepServer;
+    
+    // Connect to the vep server    
+    var client = BinaryClient(server);
+    
+    var annotatedData = "";
+    client.on('open', function(stream){
+
+        // Run the command
+        var stream = client.createStream({event:'run', params : {'url':url}});
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           annotatedData += data;
+        });
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('error', function(data, options) {
+           console.log(data);
+           if (errorCallback) {
+            errorCallback(data);
+           }
+        });
+
+        // Whenall of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          var annotatedRecs = annotatedData.split("\n");
+          var vcfObjects = [];
+          var contigHdrRecFound = false;
+          var vepFields = {};
+
+          annotatedRecs.forEach(function(record) {
+            if (record.charAt(0) == "#") {
+              // Figure out how the vep fields positions
+              if (record.indexOf("INFO=<ID=CSQ") > 0) {
+                vepFields = me.parseHeaderFieldForVep(record);                
+              }
+            } else {
+
+              // Parse the vcf record into its fields
+              var fields = record.split('\t');
+              var pos    = fields[1];
+              var id     = fields[2];
+              var ref    = fields[3];
+              var alt    = fields[4];
+              var qual   = fields[5];
+              var filter = fields[6];
+              var info   = fields[7];
+              var format = fields[8];
+              var genotypes = [];
+              for (var i = 9; i < fields.length; i++) {
+                genotypes.push(fields[i]);
+              }
+
+              // Turn vcf record into a JSON object and add it to an array
+              var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt, 
+                               'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+              vcfObjects.push(vcfObject);
+            }
+          });
+
+           // Parse the vcf object into a variant object that is visualized by the client.
+          var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
+
+          callback(annotatedRecs, results);          
+
+        }); // end - stream.end()
+    });  // end - client.open()
+
+  
+  }
   exports.parseHeaderFieldForVep = function(record) {
     var vepFields = {};
     var tokens = record.split("Format: ");
@@ -751,6 +962,7 @@ var effectCategories = [
     }
   }
 
+
   exports._getLocalSampleNames = function(callback) {
     var me = this;
 
@@ -772,11 +984,16 @@ var effectCategories = [
       });
    });
 
-
-
   }
 
   exports._getRemoteSampleNames = function(callback) {
+    if (useDevkit) {
+      return this._getRemoteSampleNamesDevkit(callback);
+    } else {
+      return this._getRemoteSampleNamesOld(callback);
+    }
+  }
+  exports._getRemoteSampleNamesDevkit = function(callback) {
     var me = this;
 
     var cmd = new iobio.cmd(
@@ -813,6 +1030,53 @@ var effectCategories = [
 
   }
 
+  exports._getRemoteSampleNamesOld = function(callback) {
+    var me = this;
+    var tabixUrl = encodeURI(tabixServer + "?cmd=-h " + vcfURL +  ' 1:1-1' + '&protocol=http&encoding=utf8');
+
+    // Connect to the tabix server    
+    var client = BinaryClient(tabixServer);
+    
+    var sampleNames = [];
+    var headerData = "";
+    
+    client.on('open', function(stream){
+
+      // Run the command
+      var stream = client.createStream({event:'run', params : {'url':tabixUrl}});
+
+      //
+      // listen for stream data (the output) event. 
+      //
+      stream.on('data', function(data, options) {
+         if (data == undefined) {
+            return;
+         } 
+         headerData += data;
+      });
+
+      //
+      // listen for stream data (the output) event. 
+      //
+      stream.on('error', function(data, options) {
+         console.log(data);
+      });
+
+      // When all of the data has been returned, parse the header
+      // records to get the sample names
+      stream.on('end', function() {
+        headerRecords = headerData.split("\n");
+        headerRecords.forEach(function(headerRec) {
+            if (headerRec.indexOf("#CHROM") == 0) {
+              var headerFields = headerRec.split("\t");
+              sampleNames = headerFields.slice(9);
+              callback(sampleNames);
+            }
+        });
+      });
+
+    });
+  }
 
   exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
@@ -1095,9 +1359,16 @@ var effectCategories = [
 
   }
 
+ exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+  if (useDevkit) {
+    return this._annotateVcfRegionDevkit(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar);
+  } else {
+    return this._annotateVcfRegionOld(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar);
+  }
+ }
 
 
-  exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+  exports._annotateVcfRegionDevkit = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
     var me = this;
 
 
@@ -1190,7 +1461,100 @@ var effectCategories = [
 
   }
 
+  exports._annotateVcfRegionOld = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+      var me = this;
+   
+      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
 
+      // If multi-sample vcf, select only the genotype field for the specified sample
+      var nextUrl = "";
+      if (sampleName != null && sampleName != "") {
+        nextUrl = encodeURI( vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+      } else {
+        nextUrl = contigAppenderUrl;
+      }
+
+      if (refName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + refName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + refName + ".fa";
+      }       
+      
+      // Normalize the variants (e.g. AAA->AAG becomes A->AG)
+      var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
+      
+      // Get Allele Frequencies from 1000G and ExAC
+      var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
+            
+      // Call snpEff service
+      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
+
+      // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
+      var nextUrl = null;
+      if (annotationEngine == 'vep' || isRefSeq) {
+        nextUrl = afUrl;
+      } else {
+        nextUrl = snpEffUrl;
+      }
+
+      var vepArgs = "";
+      if (isRefSeq) {
+        vepArgs = " --refseq "
+      }
+      if (hgvsNotation) {
+        vepArgs += " --hgvs ";
+      }
+      if (getRsId) {
+        vepArgs += "  --check_existing ";
+      }
+      
+      // Call VEP
+      var vepUrl = encodeURI( vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
+      
+      var client = BinaryClient(vepServer);
+      var buffer = "";
+      client.on('open', function(){
+        var stream = client.createStream({event:'run', params : {'url':vepUrl}});
+
+        // New local file streaming
+        stream.on('createClientConnection', function(connection) {
+          var ended = 0;
+          var dataClient = BinaryClient('ws://' + connection.serverAddress);
+          dataClient.on('open', function() {
+            var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+
+            records.forEach( function(record) {
+              if (record.trim() == "") {
+              } else {
+                dataStream.write(record + "\n");
+              }
+            });
+            dataStream.end();
+          });
+        });
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+           if (data == undefined) {
+              return;
+           } 
+           buffer = buffer + data;
+        });
+
+        // Whem all of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          callback(buffer);
+        });
+        
+      });
+      
+      client.on("error", function(error) {
+        console.log("error while annotating vcf records " + error);
+      });
+  }
 
   exports.getHumanRefNames = function(refName) {
     if (refName.indexOf("chr") == 0) {

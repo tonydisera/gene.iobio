@@ -27,18 +27,19 @@ var Bam = Class.extend({
       // set iobio servers
       this.iobio = {};
 
-      this.iobio.samtools            = dev_iobio_services + "samtools/"
-      this.iobio.coverage            = dev_iobio_services + "coverage/ ";
-      this.iobio.cat                 = dev_iobio_services + "cat/ ";
-      this.iobio.samtoolsOnDemand    = iobio_services + "od_samtools/";
-      this.iobio.freebayes           = dev_iobio_services + "freebayes/";
-      this.iobio.vcflib              = dev_iobio_services + "vcflib/";
-      this.iobio.vt                  = dev_iobio_services + "vt/";
+      // new minion (devkit) services
+      this.iobio.samtools            = new_iobio_services + "samtools/"
+      this.iobio.coverage            = new_iobio_services + "coverage/ ";
+      this.iobio.cat                 = new_iobio_services + "cat/ ";
+      this.iobio.samtoolsOnDemand    = new_iobio_services + "od_samtools/";
+      this.iobio.freebayes           = new_iobio_services + "freebayes/";
+      this.iobio.vcflib              = new_iobio_services + "vcflib/";
+      this.iobio.vt                  = new_iobio_services + "vt/";
 
 
-      // to be deleted after devkit conversion
-      this.iobio.coverageService                = "ws://" + dev_iobio_services + "coverage/ ";
-      this.iobio.samtoolsService                = "ws://" + "nv-prod.iobio.io/" + "samtools";
+      // old minion (pre devkit) services
+      this.iobio.coverageService                = iobio_services + "coverage/ ";
+      this.iobio.samtoolsService                = iobio_services + "samtools";
       this.iobio.samtoolsServiceOnDemand        = iobio_services + "od_samtools";
       this.iobio.freebayesService               = iobio_services + "freebayes";
       this.iobio.vcflibService                  = iobio_services + "vcflib";
@@ -332,6 +333,14 @@ var Bam = Class.extend({
     })
    },
 
+  getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback)  {
+    if (useDevkit) {
+      this.getCoverageForRegionDevkit(refName, regionStart, regionEnd, regions, maxPoints, callback);
+    } else {
+      this.getCoverageForRegionOld(refName, regionStart, regionEnd, regions, maxPoints, callback);
+    }
+  },
+
 
    /*
    *  This method will return coverage as point data.  It takes the reference name along
@@ -462,7 +471,7 @@ var Bam = Class.extend({
    *  the second for coverage of specific positions.  The latter can then be matched to vcf records
    *  , for example, to obtain the coverage for each variant.
    */
-   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
+   getCoverageForRegionDevkit: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
       var me = this;
       this.transformRefName(refName, function(trRefName){
         var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
@@ -513,24 +522,6 @@ var Bam = Class.extend({
               'urlparams': {'encoding':'utf8'}
             });
 
-
-
-/*
-this is troubleshooting code.  if cat.sh pipes to a file first, the samtools mpileup
-doesn't truncate.
-          cmd = new iobio.cmd(me.iobio.cat, [new Blob()],
-            {
-
-              writeStream: function(stream) {
-                 stream.write(me.header.toStr);
-                 me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
-                    stream.write(data);
-                    stream.end();
-                 }, {noHeader:true});
-              }
-            })
-          cmd = cmd.pipe(samtools, ['mpileup']);
-*/
         }
 
         // After running samtools mpileup, run coverage service to summarize point data.
@@ -591,122 +582,17 @@ doesn't truncate.
    },
 
 
-   //
-   //
-   // NEW
-   //
-   //
-   getFreebayesVariantsOld: function(refName, regionStart, regionEnd, regionStrand, callback) {
-
-    var me = this;
-    this.transformRefName(refName, function(trRefName){
-
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
-      var urlF = me.iobio.freebayesService
-        + "?cmd=-f " + refFile  + " "
-        + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
-
-      var urlV = me.iobio.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
-
-      var url = me.iobio.vcflibService + '?cmd=vcffilter -f "QUAL > 1" '
-                + encodeURIComponent(encodeURI(urlV));
-
-      me._callVariants(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflibService, encodeURI(url), callback);
-    });
 
 
-   },
-
-
-
-
-   //
-   //
-   // NEW
-   //
-   //
-   _callVariants: function(refName, regionStart, regionEnd, regionStrand, server, url, callback) {
-
-    var me = this;
-    var client = BinaryClient(server);
-
-    var variant = null;
-    var stream = null;
-    var vcfRecs = [];
-    vcfRecs.length = null;
-
-    client.on('open', function(){
-      stream = client.createStream({event:'run', params : {'url':url}});
-
-      // New local file streaming
-      stream.on('createClientConnection', function(connection) {
-        var ended = 0;
-        var dataClient = BinaryClient('ws://' + connection.serverAddress);
-        dataClient.on('open', function() {
-          var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-          dataStream.write(me.header.toStr);
-          var regions =  [{'name':refName,'start':regionStart,'end':regionEnd} ];
-          for (var i=0; i < regions.length; i++) {
-            var region = regions[i];
-             me.convert('sam', region.name, region.start, region.end, function(data,e) {
-                dataStream.write(data);
-                ended += 1;
-                if ( regions.length == ended) dataStream.end();
-             }, {noHeader:true});
-          }
-        })
-      });
-
-      //
-      // listen for stream data (the output) event.
-      //
-      var buf = '';
-      stream.on('data', function(data, options) {
-        if (data == undefined) {
-          return;
-        }
-
-        var success = true;
-        try {
-          buf += data;
-        } catch(e) {
-          success = false;
-        }
-        if(success) {
-          if (callback) {
-          }
-        }
-      });
-
-      stream.on('end', function() {
-        callback(buf);
-      });
-
-      stream.on("error", function(error) {
-        console.log("encountered stream error: " + error);
-      });
-
-    });
-
-   },
-
-
-   //
-   //
-   // NEW
-   //
-   //
    getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
+    if (useDevkit) {
+      return this.getFreebayesVariantsDevkit(refName, regionStart, regionEnd, regionStrand, callback);
+    } else {
+      return this.getFreebayesVariantsOld(refName, regionStart, regionEnd, regionStrand, callback);
+    }
+   },
+
+   getFreebayesVariantsDevkit: function(refName, regionStart, regionEnd, regionStrand, callback) {
 
     var me = this;
     this.transformRefName(refName, function(trRefName){
@@ -777,11 +663,112 @@ doesn't truncate.
     });
 
    },
+
+
+   getFreebayesVariantsOld: function(refName, regionStart, regionEnd, regionStrand, callback) {
+
+    var me = this;
+    this.transformRefName(refName, function(trRefName){
+
+      var refFile = null;
+      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
+      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
+      // the reference name to determine if the references should be hg19 (starts with 'chr;)
+      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
+      // we point freebayes to a particular directory for the reference files.
+      if (trRefName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + trRefName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
+      }
+      var urlF = me.iobio.freebayesService
+        + "?cmd=-f " + refFile  + " "
+        + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
+
+      var urlV = me.iobio.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
+
+      var url = me.iobio.vcflibService + '?cmd=vcffilter -f "QUAL > 1" '
+                + encodeURIComponent(encodeURI(urlV));
+
+      me._callVariantsOld(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflibService, encodeURI(url), callback);
+    });
+
+
+   },
+
+
    //
    //
    // NEW
    //
    //
+   _callVariantsOld: function(refName, regionStart, regionEnd, regionStrand, server, url, callback) {
+
+    var me = this;
+    var client = BinaryClient(server);
+
+    var variant = null;
+    var stream = null;
+    var vcfRecs = [];
+    vcfRecs.length = null;
+
+    client.on('open', function(){
+      stream = client.createStream({event:'run', params : {'url':url}});
+
+      // New local file streaming
+      stream.on('createClientConnection', function(connection) {
+        var ended = 0;
+        var dataClient = BinaryClient('ws://' + connection.serverAddress);
+        dataClient.on('open', function() {
+          var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
+          dataStream.write(me.header.toStr);
+          var regions =  [{'name':refName,'start':regionStart,'end':regionEnd} ];
+          for (var i=0; i < regions.length; i++) {
+            var region = regions[i];
+             me.convert('sam', region.name, region.start, region.end, function(data,e) {
+                dataStream.write(data);
+                ended += 1;
+                if ( regions.length == ended) dataStream.end();
+             }, {noHeader:true});
+          }
+        })
+      });
+
+      //
+      // listen for stream data (the output) event.
+      //
+      var buf = '';
+      stream.on('data', function(data, options) {
+        if (data == undefined) {
+          return;
+        }
+
+        var success = true;
+        try {
+          buf += data;
+        } catch(e) {
+          success = false;
+        }
+        if(success) {
+          if (callback) {
+          }
+        }
+      });
+
+      stream.on('end', function() {
+        callback(buf);
+      });
+
+      stream.on("error", function(error) {
+        console.log("encountered stream error: " + error);
+      });
+
+    });
+
+   },
+
+
+
    reducePoints: function(data, factor, xvalue, yvalue) {
       if (factor <= 1 ) {
         return data;
@@ -815,6 +802,9 @@ doesn't truncate.
       }
       return results;
    }
+
+ 
+
 
 
 
