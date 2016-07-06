@@ -4,13 +4,16 @@
 * tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
 */
 var isOffline               = false;  // is there any internet connect to outside services and resources?
-var keepLocalStorage        = false; // maintain cache between sessions?
-var isLevelEdu              = false;  // is gene.iobio educational version, simplified version of app
-var isLevelEduTour          = false;  // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
-var hasTimeout              = false;  // is a timeout based on n seconds of inactivity used?
-var hideNextButtonAnim      = true; // is next button hidden on animations during edu tour?
 var isClinvarOffline        = true; // is clinvar offline?  (Pull from clinvar hosted from URL?)
-var useDevkit               = false; // point to new minion services and use new iobio.js devkit?
+
+var isLevelEdu              = false; // is gene.iobio educational version, simplified version of app
+var isLevelEduTour          = false; // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var hideNextButtonAnim      = true;  // is next button hidden on animations during edu tour?
+
+var hasTimeout              = false; // is a timeout based on n seconds of inactivity used?
+var keepLocalStorage        = false; // maintain cache between sessions?
+
+var useDevkit               = true; // point to new minion services and use new iobio.js devkit?
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
