@@ -4,6 +4,6 @@
 */
 var isOffline         = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline  = true;           // is clinvar offline?  (Pull from clinvar hosted from URL?)
-var useDevkit         = true;           // point to new minion services and use new iobio.js devkit?
+var useDevkit         = false;           // point to new minion services and use new iobio.js devkit?
 var serverInstance    = "@hostname@/";  // this will be replace with the name of the server used for this deployement
 var serverCacheDir    = "local_cache/"; // this is the directory from the server instance where resource files (like clinvar vcf) will be served

@@ -1152,12 +1152,15 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 	if (geneAnnot == null) {
 		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
 		
-		me.promiseSetGeneAnnot(geneBadge, geneName).then( function(data) {
-			geneAnnot = data;
-			setSelectedGeneLink(geneAnnot)
-		}, function(error) {
-			console.log("error getting gene annot gene gene badge selected. " + error)
-		});
+		if (!isOffline) {
+			me.promiseSetGeneAnnot(geneBadge, geneName).then( function(data) {
+				geneAnnot = data;
+				setSelectedGeneLink(geneAnnot)
+			}, function(error) {
+				console.log("error getting gene annot gene gene badge selected. " + error)
+			});
+			
+		}
 
 	} else {
 		setSelectedGeneLink(geneAnnot);

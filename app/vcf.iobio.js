@@ -37,8 +37,7 @@ vcfiobio = function module() {
 
   // old (pre devkit)
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + "tabix/";
-  //var tabixServer            = iobio_services + (isOffline ? "tabix/" : "od_tabix/");
+  var tabixServer            = iobio_services + "od_tabix/";
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
   var snpEffServer           = iobio_services + "snpeff/";
   var snpSiftServer          = iobio_services + "snpsift/";
