@@ -49,6 +49,7 @@ var Bam = Class.extend({
       this.errorMessageMap =  {
         "samtools Error: stderr - Could not load .bai":  "Unable to load the index (.bai) file, which has to exist in same directory and be given the same name as the .bam with the file extension of .bam.bai.",
         "samtools Error: stderr - [E::hts_open] fail to open file": "Unable to access the file.  ",
+        "samtools Error: stderr - [E::hts_open_format] fail to open file": "Unable to access the file.  ",
         "samtools Error: stderr - [M::test_and_fetch] downloading file": "Invalid index or compressed vcf.  Try re-creating the bam and index file."
       }
 
@@ -79,6 +80,8 @@ var Bam = Class.extend({
     cmd.on('end', function() {
       if (success == null) {
         success = true;
+      }
+      if (success) {
         callback(success);
       }
     });
@@ -90,7 +93,7 @@ var Bam = Class.extend({
       } else {
         if (success == null) {
           success = false;
-          callback(success, 'An error occurred when accessing ' + url + ".  " + me.translateErrorMessage(error));
+          callback(success, me.translateErrorMessage(error));
         }
       }
 

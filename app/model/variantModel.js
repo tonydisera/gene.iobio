@@ -25,6 +25,9 @@ function VariantModel() {
 
 	this.GET_RSID = false;
 	this.GET_HGVS = false;
+
+	this.lastVcfAlertify = null;
+	this.lastBamAlertify = null;
 }
 
 
@@ -407,7 +410,8 @@ VariantModel.prototype.promiseBamFilesSelected = function(event) {
 
 }
 
-VariantModel.prototype.onBamUrlEntered = function(bamUrl) {
+VariantModel.prototype.onBamUrlEntered = function(bamUrl, callback) {
+	var me = this;
 	this.bamData = null;
 	this.fbData = null;
 
@@ -420,11 +424,20 @@ VariantModel.prototype.onBamUrlEntered = function(bamUrl) {
 		this.bamUrlEntered = true;
 		this.bam = new Bam(bamUrl);
 
-		this.bam.checkBamUrl(bamUrl, function(success, message) {
+		this.bam.checkBamUrl(bamUrl, function(success, errorMsg) {
+			if (me.lastBamAlertify) {
+				me.lastBamAlertify.dismiss();
+			}
 			if (!success) {
 				this.bamUrlEntered = false;
 				this.bam = null;
-				alertify.alert(message);
+				var msg = "<span style='font-size:18px'>" + errorMsg + "</span><br><span style='font-size:12px'>" + bamUrl + "</span>";
+ 		        alertify.set('notifier','position', 'top-right');
+				me.lastBamAlertify = alertify.error(msg, 15); 
+			} 
+			if(callback) {
+
+				callback(success);
 			}
 		});
 
@@ -490,9 +503,13 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 	    me.vcfFileOpened = false;
 	    me.getVcfRefName = null;	
 
-	    success = this.vcf.openVcfUrl(vcfUrl, function(success, message) {
+	    success = this.vcf.openVcfUrl(vcfUrl, function(success, errorMsg) {
+	    	if (me.lastVcfAlertify) {
+		    	me.lastVcfAlertify.dismiss();
+		    }
 		    if (success) {
-			    me.vcfUrlEntered = true;
+		    	
+				me.vcfUrlEntered = true;
 			    me.vcfFileOpened = false;
 			    me.getVcfRefName = null;	
 			    // Get the sample names from the vcf header
@@ -501,7 +518,9 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 			    });	    	
 		    } else {
 		    	me.vcfUrlEntered = false;
-		    	alertify.alert(message);
+		    	var msg = "<span style='font-size:18px'>" + errorMsg + "</span><br><span style='font-size:12px'>" + vcfUrl + "</span>";
+		    	alertify.set('notifier','position', 'top-right');
+		    	me.lastVcfAlertify = alertify.error(msg, 15);
 		    	callback(success);
 		    }	    	
 	    });
@@ -1040,7 +1059,6 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			    	
 
 			    }, function(error) {
-			    	reject({isValid: false, message: error});
 			    });
 			}, function(error) {
 				var isValid = false;
@@ -1086,7 +1104,8 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 			dataStringCompressed = LZString.compressToUTF16(dataString);
     	} catch (e) {    		
 	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
-	   		alertify.error("Error occurred when compressing analyzed data before caching.");
+    		alertify.set('notifier','position', 'top-right');
+	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);
 	   		success = false;
     	}
 

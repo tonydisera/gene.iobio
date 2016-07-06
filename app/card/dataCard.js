@@ -464,7 +464,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 }
 
 
-DataCard.prototype.onBamUrlEntered = function(panelSelector) {
+DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -479,11 +479,21 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector) {
 	this.setDataSourceName(panelSelector);
 	this.setDataSourceRelationship(panelSelector);
 
-	variantCard.onBamUrlEntered(bamUrlInput.val());	
-	variantCard.setName(variantCard.getName());
+	variantCard.onBamUrlEntered(bamUrlInput.val(), function(success) {
 
-	window.updateUrl('bam' + cardIndex, bamUrlInput.val());
-	enableLoadButton();
+		if (success) {
+			variantCard.setName(variantCard.getName());
+			window.updateUrl('bam' + cardIndex, bamUrlInput.val());
+			enableLoadButton();			
+		} else {
+			window.disableLoadButton();
+		}
+
+		if (callback) {
+			callback(success);
+		}
+
+	});	
 
 }
 
@@ -726,7 +736,7 @@ DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	}
 }
 
-DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
+DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 	var me = this;
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
@@ -767,6 +777,10 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector) {
 
 		} else {
 			window.disableLoadButton();
+		}
+
+		if (callback) {
+			callback(success);
 		}
 		
 		

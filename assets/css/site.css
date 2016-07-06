@@ -13,6 +13,16 @@ h5 {
   margin-bottom: 4px;
   margin-top: 10px; }
 
+.alertify-notifier .ajs-message {
+  width: 460px; }
+
+.alertify-notifier.ajs-right .ajs-message.ajs-visible {
+  right: 472px; }
+
+.alertify-notifier .ajs-message.ajs-error {
+  background: rgba(191, 64, 64, 0.95);
+  text-shadow: none; }
+
 .nav-stretch {
   position: relative; }
 

@@ -358,18 +358,25 @@ VariantCard.prototype.onBamFilesSelected = function(event, callback) {
 	});
 }
 
-VariantCard.prototype.onBamUrlEntered = function(bamUrl) {
-	this.model.onBamUrlEntered(bamUrl);
-	if (bamUrl == null || bamUrl.trim() == "") {
-		this.cardSelector.find("#bam-track").addClass("hide");
-		this.cardSelector.find(".covloader").addClass("hide");
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+VariantCard.prototype.onBamUrlEntered = function(bamUrl, callback) {
+	this.model.onBamUrlEntered(bamUrl, function(success) {
+		if (success) {
+			if (bamUrl == null || bamUrl.trim() == "") {
+				this.cardSelector.find("#bam-track").addClass("hide");
+				this.cardSelector.find(".covloader").addClass("hide");
+				this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
-		this.cardSelector.find("#fb-chart-label").addClass("hide");
-		this.cardSelector.find("#fb-separator").addClass("hide");
-		this.cardSelector.find("#fb-variants").addClass("hide");
-		this.cardSelector.find("#missing-variant-count").text("");
-	}
+				this.cardSelector.find("#fb-chart-label").addClass("hide");
+				this.cardSelector.find("#fb-separator").addClass("hide");
+				this.cardSelector.find("#fb-variants").addClass("hide");
+				this.cardSelector.find("#missing-variant-count").text("");
+			}			
+		}
+		if (callback) {
+			callback(success);
+		}
+
+	});
 }
 
 VariantCard.prototype.onVcfFilesSelected = function(event, callback, callbackError) {

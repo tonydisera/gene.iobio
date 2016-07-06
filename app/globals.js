@@ -13,7 +13,7 @@ var hideNextButtonAnim      = true;  // is next button hidden on animations duri
 var hasTimeout              = false; // is a timeout based on n seconds of inactivity used?
 var keepLocalStorage        = false; // maintain cache between sessions?
 
-var useDevkit               = true; // point to new minion services and use new iobio.js devkit?
+var useDevkit               = false; // point to new minion services and use new iobio.js devkit?
 
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];

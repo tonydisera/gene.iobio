@@ -189,6 +189,7 @@ function init() {
 	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
 	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
 
+
 	$('#tour-placeholder').append(tourTemplate());
 	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
 
@@ -797,8 +798,9 @@ function loadGeneFromUrl() {
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
 	if (gene != undefined) {
+		// Type in the gene name, this will trigger the event to get the
+		// gene info and then call loadUrlSources()
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
-		genesCard._geneBadgeLoading(gene, true, true);
 	} else {
 		// Open the sidebar 
 		if (isLevelEdu) {
@@ -864,6 +866,7 @@ function loadUrlSources() {
 	} 
 
 
+
 	// Now create variant cards for the affected and unaffected sibs
 	if (affectedSibsString) {
 		var affectedSibs = affectedSibsString.split(",");	
@@ -874,29 +877,6 @@ function loadUrlSources() {
 		window.loadSibs(unaffectedSibs, 'unaffected');	
 	}
 
-	if (vcf != null) {
-		Object.keys(vcf).forEach(function(urlParameter) {
-			var cardIndex = urlParameter.substring(3);
-			var variantCard      = variantCards[+cardIndex];
-			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
-			var panelSelector    = $(panelSelectorStr);
-			panelSelector.find('#url-input').val(vcf[urlParameter]);
-			panelSelector.find('#url-input').removeClass("hide");
-			dataCard.onVcfUrlEntered(panelSelector);
-		});
-	}
-
-	if (bam != null) {
-		Object.keys(bam).forEach(function(urlParameter) {
-			var cardIndex = urlParameter.substring(3);
-			var variantCard      = variantCards[+cardIndex];
-			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
-			var panelSelector    = $(panelSelectorStr);
-			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
-			panelSelector.find('#bam-url-input').removeClass("hide");
-			dataCard.onBamUrlEntered(panelSelector);
-		});
-	}
 	if (dsname != null) {
 		Object.keys(dsname).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(4);
@@ -916,19 +896,65 @@ function loadUrlSources() {
 			variantCard.setDefaultSampleName(sampleName);
 		});
 	}
-	
- 
-	if (vcf != null || bam != null) {
-		if (isLevelEdu && $('#slider-left').hasClass("hide")) {
-			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-				showSidebar("Phenolyzer");
-			}
-		}
 
-		loadTracksForGene( false );
-	} else {
-		//showDataDialog();
+	var bamLoadedCount = 0;
+	var vcfLoadedCount = 0;
+
+	var bamCount = bam != null ? Object.keys(bam).length : 0;
+	var vcfCount = vcf != null ? Object.keys(vcf).length : 0;
+
+	if (vcf != null) {
+		Object.keys(vcf).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			panelSelector.find('#url-input').val(vcf[urlParameter]);
+			panelSelector.find('#url-input').removeClass("hide");
+			dataCard.onVcfUrlEntered(panelSelector, function(success) {
+				if (success) {
+					vcfLoadedCount++;
+				}
+				loadTracks();
+			});
+		});
 	}
+
+	if (bam != null) {
+		Object.keys(bam).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
+			panelSelector.find('#bam-url-input').removeClass("hide");
+			dataCard.onBamUrlEntered(panelSelector, function(success) {
+				if (success) {
+					bamLoadedCount++;
+				}
+				loadTracks();
+			});
+		});
+	}
+
+	
+
+	var loadTracks = function() {
+		if (vcf != null || bam != null) {
+			// Only load tracks for genes if all bam and vcf urls loaded without error
+			if (vcfCount == vcfLoadedCount && bamCount == bamLoadedCount) {
+				loadTracksForGene( false );
+
+				if (isLevelEdu && $('#slider-left').hasClass("hide")) {
+					if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+						showSidebar("Phenolyzer");
+					}
+				}
+			}
+		} 
+	};
+ 
+	
 
 }
 
@@ -1498,9 +1524,9 @@ function loadGeneWidget() {
 	
 					$('#splash').addClass("hide");
 
-					//$('#tourWelcome').removeClass("open");
-					
+					genesCard.selectGene(window.gene.gene_name);
 			    	loadTracksForGene();
+
 			    	// add gene to url params
 			    	updateUrl('gene', window.gene.gene_name);
 
@@ -1555,6 +1581,8 @@ function loadGeneWidget() {
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
 function loadTracksForGene(bypassVariantCards) {
+
+	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
 	if (window.gene == null || window.gene == "") {
 		$('.twitter-typeahead').animateIt('tada');

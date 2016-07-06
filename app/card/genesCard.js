@@ -179,9 +179,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
 		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
 		geneBadge.addClass("selected");
-		if (hasDataSources()) {
-			me._setGeneBadgeLoading(geneBadge, true);
-		}
+
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
 	}
@@ -795,6 +793,11 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 	bookmarkCard.refreshBookmarkList();
 }
 
+GenesCard.prototype.showGeneBadgeLoading = function(geneName) {
+	var me = this;
+
+	me._geneBadgeLoading(geneName, true);
+}
 GenesCard.prototype.hideGeneBadgeLoading = function(geneName) {
 	var me = this;
 
@@ -1027,10 +1030,11 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 GenesCard.prototype.selectGeneBadge = function(badgeElement) {
 	var me = this;
 
-	//var badge = $(badgeElement).parent().parent();
 	var badge = $(badgeElement).parent();
-	var theGeneName = badge.find("#gene-badge-name").text();		
-	me.selectGene(theGeneName);
+	if (badge) {
+		var theGeneName = badge.find("#gene-badge-name").text();		
+		me.selectGene(theGeneName);		
+	}
 
 }
 
