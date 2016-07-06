@@ -24,8 +24,7 @@ vcfiobio = function module() {
   var clinvarIterCount       = 0;
 
   // new minion servers
-  var tabix          = new_iobio_services + "tabix/";
-//  var tabix          = new_iobio_services + (isOffline ? "tabix/" : "od_tabix/");
+  var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
   var vcfReadDepther = new_iobio_services  + "vcfdepther/";
   var snpEff         = new_iobio_services  + "snpeff/";
   var vt             = new_iobio_services  + "vt/";
@@ -37,7 +36,7 @@ vcfiobio = function module() {
 
   // old (pre devkit)
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + "od_tabix/";
+  var tabixServer            = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
   var snpEffServer           = iobio_services + "snpeff/";
   var snpSiftServer          = iobio_services + "snpsift/";
@@ -1244,8 +1243,7 @@ var effectCategories = [
       });
 
       cmd.on('error', function(error) {
-        console.log("unable to get clinvar vcf records. " + error);
-        reject("unable to get clinvar vcf records. " + error);
+        console.log(error);
       });
 
       cmd.run();
