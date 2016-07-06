@@ -34,11 +34,11 @@ var Bam = Class.extend({
 
       // old minion (pre devkit) services
       this.iobio.coverageService                = iobio_services + "coverage/ ";
-      this.iobio.samtoolsService                = iobio_services + "samtools";
-      this.iobio.samtoolsServiceOnDemand        = iobio_services + "od_samtools";
-      this.iobio.freebayesService               = iobio_services + "freebayes";
-      this.iobio.vcflibService                  = iobio_services + "vcflib";
-      this.iobio.vtService                      = iobio_services + "vt";
+      this.iobio.samtoolsService                = iobio_services + "samtools/";
+      this.iobio.samtoolsServiceOnDemand        = iobio_services + "od_samtools/";
+      this.iobio.freebayesService               = iobio_services + "freebayes/";
+      this.iobio.vcflibService                  = iobio_services + "vcflib/";
+      this.iobio.vtService                      = iobio_services + "vt/";
 
 
       this.errorMessageMap =  {
