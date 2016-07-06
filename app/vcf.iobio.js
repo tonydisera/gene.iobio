@@ -153,7 +153,7 @@ var effectCategories = [
   }
 
   var ignoreMessageMap =  {
-    //"tabix Error: stderr - [M::test_and_fetch] downloading file": {ignore: true}
+    "tabix Error: stderr - [M::test_and_fetch] downloading file": {ignore: true}
   }
 
 
