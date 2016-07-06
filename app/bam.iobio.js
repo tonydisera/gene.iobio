@@ -9,20 +9,15 @@ var Bam = Class.extend({
       // test if file or url
       if (typeof(this.bamUri) == "object") {
          this.sourceType = "file";
-         this.bamBlob = new BlobFetchable(bamUri);
-         this.baiBlob = new BlobFetchable(this.options.bai); // *** add if statement if here ***
-         this.promises = [];
-         this.bam = undefined;
-         var me = this;
-         makeBam(this.bamBlob, this.baiBlob, function(bam) {
-            me.setHeader(bam.header);
-            me.provide(bam);
-         });
-      } else if ( this.bamUri.slice(0,4) == "http" || this.bamUri.slice(0,3) == "ftp" ) {
+         this.bamFile = this.bamUri;
+         this.baiFile = this.options.bai;
+         this.makeBamBlob();
+      } else  {
          this.sourceType = "url";
+         this.bamFile = null;
+         this.baiFile = null;
       }
-      this.bamFile = null;
-      this.baiFile = null;
+      this.promises = [];
 
       // set iobio servers
       this.iobio = {};
@@ -61,6 +56,15 @@ var Bam = Class.extend({
       return this;
    },
 
+   makeBamBlob: function() {
+     var me = this;
+     this.bamBlob = new BlobFetchable(this.bamFile);
+     this.baiBlob = new BlobFetchable(this.baiFile); // *** add if statement if here ***         
+     makeBam(this.bamBlob, this.baiBlob, function(bam) {
+        me.setHeader(bam.header);
+        me.provide(bam);
+     });
+   }, 
 
 
   checkBamUrl: function(url, callback) {
@@ -93,6 +97,7 @@ var Bam = Class.extend({
       } else {
         if (success == null) {
           success = false;
+          me.bamUri = url;
           callback(success, me.translateErrorMessage(error));
         }
       }
@@ -125,16 +130,19 @@ var Bam = Class.extend({
     return message ? message : error;
   },
 
-  checkBamFile: function(event, callback, errorCallback) {
+  openBamFile: function(event, callback) {
     var me = this;
 
+
     if (event.target.files.length != 2) {
-       errorCallback('must select 2 files, both a .bam and .bam.bai file');
+       callback(false, 'must select 2 files, both a .bam and .bam.bai file');
+       return;
     }
 
     if (endsWith(event.target.files[0].name, ".sam") ||
         endsWith(event.target.files[1].name, ".sam")) {
-      errorCallback('You must select a bam file, not a sam file');
+      callback(false, 'You must select a bam file, not a sam file');
+      return;
     }
 
     var fileType0 = /([^.]*)\.(bam(\.bai)?)$/.exec(event.target.files[0].name);
@@ -148,29 +156,35 @@ var Bam = Class.extend({
 
 
     if (fileType0 == null || fileType0.length < 3 || fileType1 == null || fileType1.length <  3) {
-      errorCallback('You must select BOTH  a compressed bam file  and an index (.bai)  file');
+      callback(false, 'You must select BOTH  a compressed bam file  and an index (.bai)  file');
+      return;
     }
 
 
     if (fileExt0 == 'bam' && fileExt1 == 'bam.bai') {
       if (rootFileName0 != rootFileName1) {
-        errorCallback('The index (.bam.bai) file must be named ' +  rootFileName0 + ".bam.bai");
+        callback(false, 'The index (.bam.bai) file must be named ' +  rootFileName0 + ".bam.bai");
+        return;
       } else {
         me.bamFile   = event.target.files[0];
         me.baiFile = event.target.files[1];
       }
     } else if (fileExt1 == 'bam' && fileExt0 == 'bam.bai') {
       if (rootFileName0 != rootFileName1) {
-        errorCallback('The index (.bam.bai) file must be named ' +  rootFileName1 + ".bam.bai");
+        callback(false, 'The index (.bam.bai) file must be named ' +  rootFileName1 + ".bam.bai");
+        return;
       } else {
         me.bamFile   = event.target.files[1];
         me.baiFile = event.target.files[0];
+        me.sourceType = "file";
+        me.makeBamBlob();
       }
     } else {
-      errorCallback('You must select BOTH  a bam and an index (.bam.bai)  file');
+      callback(false, 'You must select BOTH  a bam and an index (.bam.bai)  file');
+      return;
     }
-
     callback(true);
+    return;
   },
 
 

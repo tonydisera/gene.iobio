@@ -673,7 +673,6 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 			}
 		},
 		function(error) {
-			alertify.alert(error);
 			me.panelSelectorFilesSelected.find(".vcf-sample.loader").addClass("hide");
 		});
 }

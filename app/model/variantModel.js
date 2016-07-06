@@ -372,38 +372,28 @@ VariantModel.prototype.promiseBamFilesSelected = function(event) {
 		me.bamData = null;
 		me.fbData = null;
 
-		if (event.target.files.length != 2) {
-		   alert('must select both a .bam and .bai file');
-		   reject(Error('must select both a .bam and .bai file'));
-		} else {
-			var fileType0 = /[^.]+$/.exec(event.target.files[0].name)[0];
-			var fileType1 = /[^.]+$/.exec(event.target.files[1].name)[0];
-
-			if (fileType0 == 'bam' && fileType1 == 'bai') {
-			    bamFile = event.target.files[0];
-			    baiFile = event.target.files[1];
-			} else if (fileType1 == 'bam' && fileType0 == 'bai') {
-			    bamFile = event.target.files[1];
-			    baiFile = event.target.files[0];
-			} else {
-			    alert('must select both a .bam and .bai file');
-			    reject(Error("must select both a .bam and .bai file"));
+		me.bam = new Bam();	
+		me.bam.openBamFile(event, function(success, message) {
+			if (me.lastBamAlertify) {
+				me.lastBamAlertify.dismiss();
 			}
-
-			if (bamFile && baiFile) {
+			if (success) {
 				me.bamFileOpened = true;
-				me.bam = new Bam( bamFile, { bai: baiFile });
-				me.bam.checkBamFile(event, function() {
-					me.getBamRefName = me._stripRefName;
-					resolve(bamFile.name);							
-				},
-				function(error) {
-					reject(Error(error));
-				});
+				me.getBamRefName = me._stripRefName;
+				resolve(me.bam.bamFile.name);							
+
 			} else {
-				reject(Error('bam and bai file not loaded'));
+				if (me.lastBamAlertify) {
+					me.lastBamAlertify.dismiss();
+				}
+				var msg = "<span style='font-size:18px'>" + message + "</span>";
+		        alertify.set('notifier','position', 'top-right');
+				me.lastBamAlertify = alertify.error(msg, 15); 		
+
+				reject(message);
+
 			}
-		}
+		});
 
 	});
 
@@ -454,20 +444,30 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 		me.sampleName = null;
 		me.vcfData = null;
 		
-		me.vcf.openVcfFile( event, 
-			function(vcfFile) {
+		me.vcf.openVcfFile( event,
+			function(success, message) {
+				if (me.lastVcfAlertify) {
+					me.lastVcfAlertify.dismiss();
+				} 
+				if (success) {
+					
 
-				me.vcfFileOpened = true;
-				me.vcfUrlEntered = false;
-				me.getVcfRefName = null;
+					me.vcfFileOpened = true;
+					me.vcfUrlEntered = false;
+					me.getVcfRefName = null;
 
-				// Get the sample names from the vcf header
-			    me.vcf.getSampleNames( function(sampleNames) {
-			    	resolve({'fileName': vcfFile.name, 'sampleNames': sampleNames});
-			    });
-			}, 
-			function(error) {
-				reject(error);
+					// Get the sample names from the vcf header
+				    me.vcf.getSampleNames( function(sampleNames) {
+				    	resolve({'fileName': me.vcf.getVcfFile().name, 'sampleNames': sampleNames});
+				    });
+				} else {
+				
+					var msg = "<span style='font-size:18px'>" + message + "</span>";
+			    	alertify.set('notifier','position', 'top-right');
+			    	me.lastVcfAlertify = alertify.error(msg, 15);
+
+					reject(message);					
+				}
 			}
 		);
 
