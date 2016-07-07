@@ -232,6 +232,7 @@ var Bam = Class.extend({
       } else {
         me.bamFile   = event.target.files[0];
         me.baiFile = event.target.files[1];
+
       }
     } else if (fileExt1 == 'bam' && fileExt0 == 'bam.bai') {
       if (rootFileName0 != rootFileName1) {
@@ -240,13 +241,13 @@ var Bam = Class.extend({
       } else {
         me.bamFile   = event.target.files[1];
         me.baiFile = event.target.files[0];
-        me.sourceType = "file";
-        me.makeBamBlob();
       }
     } else {
       callback(false, 'You must select BOTH  a bam and an index (.bam.bai)  file');
       return;
     }
+    me.sourceType = "file";
+    me.makeBamBlob();
     callback(true);
     return;
   },
@@ -358,22 +359,20 @@ var Bam = Class.extend({
 
    getHeader: function(callback) {
       var me = this;
-      if (me.header)
-         callback(me.header);
-      else if (me.sourceType == 'file')
-         me.promise(function() { me.getHeader(callback); })
-      else {
+      if (me.header) {
+         callback(me.header);        
+      }
+      else if (me.sourceType == 'file') {
+        console.log('Error: header not set for local bam file');
+        callback(null);
+      } else {
         if (useDevkit) {
           me.getRemoteHeaderDevkit(callback);
         } else {
           me.getRemoteHeaderOld(callback);
 
         }
-         
       }
-
-      // need to make this work for URL bams
-      // need to incorporate real promise framework throughout
    },
 
    getRemoteHeaderDevkit: function(callback) {
