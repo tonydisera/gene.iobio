@@ -1804,7 +1804,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 			    		return me.vcf.promiseGetClinvarRecords(
 						    		me.fbData, 
 						    		me._stripRefName(window.gene.chr), regionStart, regionEnd, 
-						    		isLevelEdu ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+						    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 
 

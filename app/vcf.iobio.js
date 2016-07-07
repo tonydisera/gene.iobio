@@ -176,6 +176,14 @@ var effectCategories = [
   }
 
   exports.checkVcfUrl = function(url, callback) {
+    if (useDevkit) {
+      this.checkVcfUrlDevkit(url, callback);
+    } else {
+      this.checkVcfUrlOld(url, callback);
+    }
+  }
+
+  exports.checkVcfUrlDevkit = function(url, callback) {
     var me = this;
     var success = null;
     var cmd = new iobio.cmd(
@@ -214,6 +222,63 @@ var effectCategories = [
     });
 
     cmd.run();
+  }
+
+  exports.checkVcfUrlOld = function(url, callback) {
+    var me = this;
+    var success = null;
+    var url = encodeURI( tabixServer + '?cmd= -H ' + url);
+    
+    // Connect to the vep server    
+    var client = BinaryClient(tabixServer);
+    
+
+    client.on('open', function(stream){
+
+        // Run the command
+        var stream = client.createStream({event:'run', params : {'url':url}});
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+          if (data != undefined) {
+            success = true;
+          }
+         
+        });
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('error', function(error, options) {
+          if (me.ignoreErrorMessage(error)) {
+            success = true;
+            callback(success)
+          } else {
+            if (success == null) {
+              success = false;
+              console.log(error);
+              callback(success, me.translateErrorMessage(error));
+            }
+          }
+          
+        });
+
+        // Whenall of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          if (success == null) {
+            success = true;
+          }
+          if (success) {
+            callback(success);
+          }   
+
+        }); // end - stream.end()
+    });  // end - client.open()
+
+
   }
 
   exports.ignoreErrorMessage = function(error) {

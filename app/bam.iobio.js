@@ -26,7 +26,7 @@ var Bam = Class.extend({
       this.iobio.samtools            = new_iobio_services + "samtools/"
       this.iobio.coverage            = new_iobio_services + "coverage/ ";
       this.iobio.cat                 = new_iobio_services + "cat/ ";
-      this.iobio.samtoolsOnDemand    = new_iobio_services + "od_samtools/";
+      this.iobio.samtoolsOnDemand    = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
       this.iobio.freebayes           = new_iobio_services + "freebayes/";
       this.iobio.vcflib              = new_iobio_services + "vcflib/";
       this.iobio.vt                  = new_iobio_services + "vt/";
@@ -35,7 +35,7 @@ var Bam = Class.extend({
       // old minion (pre devkit) services
       this.iobio.coverageService                = iobio_services + "coverage/ ";
       this.iobio.samtoolsService                = iobio_services + "samtools/";
-      this.iobio.samtoolsServiceOnDemand        = iobio_services + "od_samtools/";
+      this.iobio.samtoolsServiceOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
       this.iobio.freebayesService               = iobio_services + "freebayes/";
       this.iobio.vcflibService                  = iobio_services + "vcflib/";
       this.iobio.vtService                      = iobio_services + "vt/";
@@ -66,8 +66,16 @@ var Bam = Class.extend({
      });
    }, 
 
-
   checkBamUrl: function(url, callback) {
+    if (useDevkit) {
+      this.checkBamUrlDevkit(url, callback);
+    } else {
+      this.checkBamUrlOld(url, callback);
+    }
+  },
+
+
+  checkBamUrlDevkit: function(url, callback) {
     var me = this;
     var success = null;
     var cmd = new iobio.cmd(
@@ -105,6 +113,62 @@ var Bam = Class.extend({
     });
 
     cmd.run();
+  },
+
+
+  checkBamUrlOld: function(url, callback) {
+    var me = this;
+    var success = null;
+    var url = encodeURI( this.iobio.samtoolsService + '?cmd= view -H ' + url);
+    
+    // Connect to the vep server    
+    var client = BinaryClient(this.iobio.samtoolsService);
+    
+
+    client.on('open', function(stream){
+
+        // Run the command
+        var stream = client.createStream({event:'run', params : {'url':url}});
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('data', function(data, options) {
+          if (data != undefined) {
+            success = true;
+          }
+         
+        });
+
+        //
+        // listen for stream data (the output) event. 
+        //
+        stream.on('error', function(error, options) {
+          if (me.ignoreErrorMessage(error)) {
+            success = true;
+            callback(success)
+          } else {
+            if (success == null) {
+              success = false;
+              console.log(error);
+              callback(success, me.translateErrorMessage(error));
+            }
+          }
+          
+        });
+
+        // Whenall of the annotated vcf data has been returned, call
+        // the callback function.
+        stream.on('end', function() {
+          if (success == null) {
+            success = true;
+          }
+          if (success) {
+            callback(success);
+          }   
+
+        }); // end - stream.end()
+    });  // end - client.open()
   },
 
   ignoreErrorMessage: function(error) {
@@ -299,23 +363,59 @@ var Bam = Class.extend({
       else if (me.sourceType == 'file')
          me.promise(function() { me.getHeader(callback); })
       else {
-         var client = BinaryClient(me.iobio.samtoolsService);
-         var url = encodeURI( me.iobio.samtoolsServiceOnDemand + '?cmd=view -H ' + this.bamUri)
-         client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url}});
-            var rawHeader = ""
-            stream.on('data', function(data, options) {
-               rawHeader += data;
-            });
-            stream.on('end', function() {
-               me.setHeader(rawHeader);
-               callback( me.header);
-            });
-         });
+        if (useDevkit) {
+          me.getRemoteHeaderDevkit(callback);
+        } else {
+          me.getRemoteHeaderOld(callback);
+
+        }
+         
       }
 
       // need to make this work for URL bams
       // need to incorporate real promise framework throughout
+   },
+
+   getRemoteHeaderDevkit: function(callback) {
+    var me = this;
+    var success = null;
+    var cmd = new iobio.cmd(
+        me.iobio.samtools,
+        ['view', '-H', me.bamUri]
+    );
+    var rawHeader = "";
+    cmd.on('data', function(data) {
+      if (data != undefined) {
+        rawHeader += data;
+      }
+    });
+
+    cmd.on('end', function() {
+      me.setHeader(rawHeader);
+      callback( me.header);
+    });
+
+    cmd.on('error', function(error) {
+      console.log(error);
+    });
+    cmd.run();    
+   },
+
+   getRemoteHeaderOld: function(callback) {
+      var me = this;
+      var client = BinaryClient(me.iobio.samtoolsService);
+      var url = encodeURI( me.iobio.samtoolsServiceOnDemand + '?cmd=view -H ' + this.bamUri)
+      client.on('open', function(stream){
+        var stream = client.createStream({event:'run', params : {'url':url}});
+        var rawHeader = ""
+        stream.on('data', function(data, options) {
+           rawHeader += data;
+        });
+        stream.on('end', function() {
+           me.setHeader(rawHeader);
+           callback( me.header);
+        });
+      });    
    },
 
    setHeader: function(headerStr) {

@@ -7,4 +7,4 @@ var isClinvarOffline  = true;           // is clinvar offline?  (Pull from clinv
 var useDevkit         = false;           // point to new minion services and use new iobio.js devkit?
 var serverInstance    = "@hostname@/";  // this will be replace with the name of the server used for this deployement
 var serverCacheDir    = "local_cache/"; // this is the directory from the server instance where resource files (like clinvar vcf) will be served
-var useOnDemand       = true;           // use on demand tabix and samtools
+var useOnDemand       = false;           // use on demand tabix and samtools
