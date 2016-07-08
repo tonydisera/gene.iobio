@@ -11,6 +11,7 @@ lineD3 = function module() {
 
   var x = null;
   var y = null;
+  var maxDepth = null;
   var container = null;
 
   var formatter = d3.format(',');
@@ -257,7 +258,8 @@ lineD3 = function module() {
       } else {
         x.domain(d3.extent(data, pos));
       }
-      y.domain([0, d3.max(data, depth)]);
+      var theMaxDepth = maxDepth ? Math.max(maxDepth,d3.max(data, depth)) : d3.max(data, depth);
+      y.domain([0, theMaxDepth]);
 
       var brush = d3.svg.brush()
         .x(x)
@@ -470,7 +472,7 @@ lineD3 = function module() {
   }
 
   exports.depth = function(_) {
-    if (!arguments.length) return dept;
+    if (!arguments.length) return depth;
     depth = _;
     return exports; 
   }
@@ -479,6 +481,12 @@ lineD3 = function module() {
     if (!arguments.length) return kind;
     kind = _;
     return exports; 
+  }
+
+  exports.maxDepth = function(_) {
+    if (!arguments.length) return maxDepth;
+    maxDepth = _;
+    return exports;     
   }
 
   exports.showXAxis = function(_) {

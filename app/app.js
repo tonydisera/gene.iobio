@@ -1712,13 +1712,49 @@ function loadTracksForGene(bypassVariantCards) {
 	
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
-	 	variantCards.forEach(function(variantCard) {
-	 		if (dataCard.mode == 'single' && variantCard.getRelationship() != 'proband') {
-				variantCard.hide();
+
+		// Load the variants in the variant cards.
+		var variantPromises = [];
+		var coveragePromises = [];
+		var allMaxDepth = 0;
+	 	variantCards.forEach(function(vc) {
+	 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
+				vc.hide();
 			} else {
-			 	variantCard.loadTracksForGene(filterCard.classifyByImpact);
+				var vPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact)
+			                     .then( function() {
+			
+									var cPromise = vc.promiseLoadBamDepth()
+									                 .then( function(coverageData) {
+														if (coverageData) {
+															var max = d3.max(coverageData, function(d,i) { return d[1]});
+															if (max > allMaxDepth) {
+																allMaxDepth = max;
+															}						
+														}
+													 }); 
+									coveragePromises.push(cPromise); 
+
+								  });		 
+			 	variantPromises.push(vPromise);
 			}
 		});
+
+	 	// When all of the variants have been displayed in the variant cards, load
+	 	// the coverage charts.
+		Promise.all(variantPromises).then(function() {
+
+			// When all bam depths have been loaded, now we can scale based on the max depth
+			// of all sample's coverage data
+			Promise.all(coveragePromises).then(function() {
+				variantCards.forEach(function(variantCard) {
+					variantCard.showBamDepth(allMaxDepth, function() {
+					});
+				});
+			});
+
+		});
+
 	}
 	
 

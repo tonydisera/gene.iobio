@@ -552,99 +552,104 @@ VariantCard.prototype.clearWarnings = function() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.loadTracksForGene = function (classifyClazz) {
+VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 	var me = this;
-	
-	// Reset any previous locked variant
-	this.clickedVariant = null;
-	window.hideCircleRelatedVariants();
-	this.unpin();
+
+	return new Promise( function(resolve, reject) {
+		// Reset any previous locked variant
+		me.clickedVariant = null;
+		window.hideCircleRelatedVariants();
+		me.unpin();
 
 
-	// Clear out the previous gene's data
-	this.model.wipeGeneData();
+		// Clear out the previous gene's data
+		me.model.wipeGeneData();
 
-	// Clear out the freebayes charts in the variant card
-	this.cardSelector.find('#fb-chart-label').addClass("hide");
-	this.cardSelector.find('#fb-separator').addClass("hide");
-	this.d3CardSelector.select('#fb-variants svg').remove();
-	this.clearWarnings();
+		// Clear out the freebayes charts in the variant card
+		me.cardSelector.find('#fb-chart-label').addClass("hide");
+		me.cardSelector.find('#fb-separator').addClass("hide");
+		me.d3CardSelector.select('#fb-variants svg').remove();
+		me.clearWarnings();
 
-	if (this.isViewable()) {
-		filterCard.clearFilters();
+		if (me.isViewable()) {
+			filterCard.clearFilters();
 
-		this.vcfChart.clazz(classifyClazz);
-		this.fbChart.clazz(classifyClazz);
+			me.vcfChart.clazz(classifyClazz);
+			me.fbChart.clazz(classifyClazz);
 
-		if (this.model.isBamLoaded() || this.model.isVcfLoaded()) {	      
-			this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+			if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
+				me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
 
-			// Workaround.  For some reason, d3 doesn't clean up previous transcript
-			// as expected.  So we will just force the svg to be removed so that we
-			// start with a clean slate to avoid the bug where switching between transcripts
-			// resulted in last transcripts features not clearing out.
-			this.d3CardSelector.select('#zoom-region-chart svg').remove();
+				// Workaround.  For some reason, d3 doesn't clean up previous transcript
+				// as expected.  So we will just force the svg to be removed so that we
+				// start with a clean slate to avoid the bug where switching between transcripts
+				// resulted in last transcripts features not clearing out.
+				me.d3CardSelector.select('#zoom-region-chart svg').remove();
 
-			selection = this.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-			this.zoomRegionChart.regionStart(+window.gene.start);
-			this.zoomRegionChart.regionEnd(+window.gene.end);
-			this.zoomRegionChart(selection);
+				selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
+				me.zoomRegionChart.regionStart(+window.gene.start);
+				me.zoomRegionChart.regionEnd(+window.gene.end);
+				me.zoomRegionChart(selection);
 
-		}
-		this.cardSelector.find('#bam-depth').css("visibility", "hidden");
-		this.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
-		this.cardSelector.find('#bam-chart-label').css("margin-bottom", "0px");
+			}
+			me.cardSelector.find('#bam-depth').css("visibility", "hidden");
+			me.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
+			me.cardSelector.find('#bam-chart-label').css("margin-bottom", "0px");
 
-    	this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
-    	this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
-    	this.cardSelector.find('#displayed-variant-count').text("");
-    	this.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-    	this.cardSelector.find('#vcf-variant-count').text("");
-    	this.cardSelector.find('#missing-variant-count-label').addClass("hide");
-    	this.cardSelector.find('#missing-variant-count').text("");
-    	this.cardSelector.find('#gene-box').text("");
-    	this.cardSelector.find('#gene-box').css("visibility", "hidden");
-    	if (isLevelEduTour && eduTourNumber == "1") {
-	    	this.cardSelector.find("#gene-box").addClass("deemphasize");
-    	}
+	    	me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
+	    	me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
+	    	me.cardSelector.find('#displayed-variant-count').text("");
+	    	me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+	    	me.cardSelector.find('#vcf-variant-count').text("");
+	    	me.cardSelector.find('#missing-variant-count-label').addClass("hide");
+	    	me.cardSelector.find('#missing-variant-count').text("");
+	    	me.cardSelector.find('#gene-box').text("");
+	    	me.cardSelector.find('#gene-box').css("visibility", "hidden");
+	    	if (isLevelEduTour && eduTourNumber == "1") {
+		    	me.cardSelector.find("#gene-box").addClass("deemphasize");
+	    	}
 
 
 
-		this.cardSelector.find('#vcf-track').removeClass("hide");
-		this.cardSelector.find('#vcf-variants').css("display", "none");
-		this.cardSelector.find('#vcf-chart-label').addClass("hide");
-		this.cardSelector.find('#vcf-name').addClass("hide");	
+			me.cardSelector.find('#vcf-track').removeClass("hide");
+			me.cardSelector.find('#vcf-variants').css("display", "none");
+			me.cardSelector.find('#vcf-chart-label').addClass("hide");
+			me.cardSelector.find('#vcf-name').addClass("hide");	
 
-		this.cardSelector.find('#fb-variants').addClass("hide");
+			me.cardSelector.find('#fb-variants').addClass("hide");
 
-		if (this.getRelationship() == 'proband') {
-			$("#feature-matrix").addClass("hide");
-			$("#feature-matrix-note").addClass("hide");
-			$('#move-rows').addClass("hide");			
-		}
+			if (me.getRelationship() == 'proband') {
+				$("#feature-matrix").addClass("hide");
+				$("#feature-matrix-note").addClass("hide");
+				$('#move-rows').addClass("hide");			
+			}
 
-		if (this.model.isVcfLoaded()) {
-			this.cardSelector.find(".vcfloader").removeClass("hide");
-			this.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
+			if (me.model.isVcfLoaded()) {
+				me.cardSelector.find(".vcfloader").removeClass("hide");
+				me.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
+			} else {
+				$("#filter-and-rank-card").addClass("hide");
+			}
+
+
+
+			// Load the variant chart.
+			me._showVariants( regionStart, 
+				regionEnd, 
+				function() {						
+					readjustCards();
+					resolve();
+				},
+				true);
+
 		} else {
-			$("#filter-and-rank-card").addClass("hide");
+			resolve();
 		}
 
 
-
-		// Load the read coverage and variant charts.  If a bam hasn't been
-		// loaded, the read coverage chart and called variant charts are
-		// not rendered.  If the vcf file hasn't been loaded, the vcf variant
-		// chart is not rendered.
-		me._showVariants( regionStart, 
-			regionEnd, 
-			function() {	
-				me._showBamDepth( regionStart, regionEnd );
-				readjustCards();
-			},
-			true);
-
-	}
+	});
+	
+	
 }
 
 VariantCard.prototype.setLoadState = function(theState) {
@@ -714,8 +719,36 @@ VariantCard.prototype._showFreebayesVariants = function(regionStart, regionEnd) 
 	}
 }
 
+VariantCard.prototype.promiseLoadBamDepth = function() {	
+	var me = this;
 
-VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, callbackDataLoaded) {	
+	return new Promise( function(resolve, reject) {
+		if (!me.model.isBamLoaded()) {		
+			resolve(null);
+		}
+
+		var coverage = me.model.getBamDataForGene(window.gene);
+		if (coverage != null) {
+			resolve(coverage);
+		} else {
+			// If we have varaitns, get coverage for every variant
+			me.showBamProgress("Calculating coverage");
+			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+				me.endBamProgress();
+				resolve(coverageData);
+			});
+		}		
+	});
+
+
+
+}
+
+VariantCard.prototype.showBamDepth = function(maxDepth, callbackDataLoaded) {
+	this._showBamDepth(regionStart, regionEnd, maxDepth, callbackDataLoaded);
+}
+
+VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth, callbackDataLoaded) {	
 	var me = this;
 
 
@@ -740,9 +773,9 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, callbackD
 		me.endBamProgress();
 		if (regionStart && regionEnd) {
 			var filteredData = me.model.filterBamDataByRegion(coverage, regionStart, regionEnd);
-			me._fillBamChart(filteredData, regionStart, regionEnd);
+			me._fillBamChart(filteredData, regionStart, regionEnd, maxDepth);
 		} else {
-			me._fillBamChart(coverage, window.gene.start, window.gene.end);
+			me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
 		}
 		if (callbackDataLoaded) {
 	   	    callbackDataLoaded();
@@ -755,7 +788,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, callbackD
 		
 		this.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
 			me.endBamProgress();
-			me._fillBamChart(coverageData, window.gene.start, window.gene.end);
+			me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
 
 			filterCard.enableCoverageFilters();
 			me.refreshVariantChartAndMatrix(theVcfData);
@@ -772,7 +805,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, callbackD
 }
 
 
-VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd) {
+VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, maxDepth) {
 	if (this.isViewable()) {
 		// Reduce down to 1000 points
         var reducedData = this.model.reduceBamData(data, 1000);
@@ -785,6 +818,11 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd) {
 		this.bamDepthChart.height(!(this.model.isVcfLoaded()) ? 65 : 45 );
 		this.bamDepthChart.margin(!(this.model.isVcfLoaded()) ? {top: 10, right: 2, bottom: 20, left: 4} : {top: 10, right: 2, bottom: 0, left: 4} );
 	
+		// Detemine the y-scale be setting the maxDepth accross all samples
+		if (maxDepth) {
+			this.bamDepthChart.maxDepth(maxDepth);
+		}
+
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
