@@ -24,7 +24,8 @@ vcfiobio = function module() {
   var clinvarIterCount       = 0;
 
   // new minion servers
-  var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+  //var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+  var tabix          = new_iobio_services  +  "tabix/";
   var vcfReadDepther = new_iobio_services  + "vcfdepther/";
   var snpEff         = new_iobio_services  + "snpeff/";
   var vt             = new_iobio_services  + "vt/";
