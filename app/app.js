@@ -943,6 +943,17 @@ function loadUrlSources() {
 		if (vcf != null || bam != null) {
 			// Only load tracks for genes if all bam and vcf urls loaded without error
 			if (vcfCount == vcfLoadedCount && bamCount == bamLoadedCount) {
+
+				if (sample != null) {
+					Object.keys(sample).forEach(function(urlParameter) {
+						var cardIndex = urlParameter.substring(6);
+						var variantCard = variantCards[+cardIndex];
+						var sampleName = sample[urlParameter];
+						variantCard.setSampleName(sampleName);
+						variantCard.setDefaultSampleName(sampleName);
+					});
+				}
+				
 				loadTracksForGene( false );
 
 				if (isLevelEdu && $('#slider-left').hasClass("hide")) {
