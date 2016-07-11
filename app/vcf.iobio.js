@@ -1592,7 +1592,7 @@ var effectCategories = [
         // New local file streaming
         stream.on('createClientConnection', function(connection) {
           var ended = 0;
-          var dataClient = BinaryClient('ws://' + connection.serverAddress);
+          var dataClient = BinaryClient('ws://' + (isOffline ? contigAppender : connection.serverAddress));
           dataClient.on('open', function() {
             var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
 
