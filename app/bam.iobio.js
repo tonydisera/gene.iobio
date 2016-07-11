@@ -511,7 +511,7 @@ var Bam = Class.extend({
             // New local file streaming
             stream.on('createClientConnection', function(connection) {
               var ended = 0;
-              var dataClient = BinaryClient('ws://' + (isOffline ? samtools : connection.serverAddress));
+              var dataClient = BinaryClient('ws://' + (isOffline ? me.iobio.samtools : connection.serverAddress));
               dataClient.on('open', function() {
                 var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
                 dataStream.write(me.header.toStr);
