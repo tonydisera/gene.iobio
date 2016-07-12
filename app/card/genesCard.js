@@ -702,6 +702,7 @@ GenesCard.prototype.addGene = function(geneName) {
 	if (geneNames.indexOf(geneName) < 0) {
 		geneNames.push(geneName);
 	} 
+	me.addGeneBadge(geneName);
 	me.pageToGene(geneName);
 	
 
@@ -738,10 +739,10 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 		if (!bypassSelecting) {
 			if (hasDataSources()) {
-				me._setGeneBadgeLoading($(selector).parent().parent(), true);
+				me._setGeneBadgeLoading(theGeneBadge, true);
 			}
 			$("#gene-badge.selected").removeClass("selected");		
-			$(selector).parent().parent().addClass("selected");			
+			theGeneBadge.addClass("selected");			
 		}
 
 		$('#gene-badge-container #manage-gene-list').removeClass("hide");
