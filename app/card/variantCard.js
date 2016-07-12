@@ -699,7 +699,7 @@ VariantCard.prototype.onBrush = function(brush) {
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 
 	this._showBamDepth(regionStart, regionEnd);
-	this._showVariants(regionStart, regionEnd);
+	this._showVariants(regionStart, regionEnd, null, null, true);
 	this._showFreebayesVariants(regionStart, regionEnd);
 }
 
@@ -899,7 +899,7 @@ VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data) {
 }
 
 
-VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition) {
+VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition, isZoom) {
 	var me = this;
 
 	// If we have alignments but no vcf, we want to load the called variants and return.
@@ -967,7 +967,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 									   regionEnd ? regionEnd : window.gene.end);
 			}	
 			me.populateRecFilters(theVcfData);
-			filterCard.autoSetFilters();
+			if (!isZoom) {
+				filterCard.autoSetFilters();
+			}
 			if (me.getRelationship() == 'proband') {
 				me.model.pruneIntronVariants(theVcfData);
 		    }
