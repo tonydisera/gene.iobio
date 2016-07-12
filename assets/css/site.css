@@ -23,6 +23,31 @@ h5 {
   background: rgba(191, 64, 64, 0.95);
   text-shadow: none; }
 
+.pagination {
+  margin: 5px 0; }
+
+.pagination > .active > a {
+  color: #fff !important;
+  background-color: #5d809d !important;
+  border-color: #5d809d; }
+
+.pagination > li > a {
+  line-height: 0.8;
+  color: #717171 !important;
+  font-size: 11px; }
+
+.pagination > li.prev a {
+  font-size: 21px;
+  line-height: 0.8;
+  padding-top: 1px;
+  padding-bottom: 3px; }
+
+.pagination > li.next a {
+  font-size: 21px;
+  line-height: 0.8;
+  padding-top: 1px;
+  padding-bottom: 3px; }
+
 .nav-stretch {
   position: relative; }
 
@@ -31,7 +56,8 @@ h5 {
   left: 5px;
   top: 0;
   width: 180px;
-  text-align: left; }
+  text-align: left;
+  padding-left: 3px; }
 
 .nav-right {
   position: absolute;
@@ -40,7 +66,7 @@ h5 {
   width: 180px; }
 
 .nav-center {
-  margin: 0 185px 0 185px;
+  margin: 0 0px 0 0px;
   position: relative; }
 
 .modal-title {
@@ -829,7 +855,8 @@ section {
   padding-bottom: 0px;
   color: #717171;
   font-size: 14px;
-  margin-left: 100px; }
+  margin-left: 100px;
+  margin-top: 5px; }
 
 #gene-search-bar {
   display: inline-block;
@@ -2272,7 +2299,7 @@ text.ref-count {
 
 #gene-badge {
   margin-top: 10px;
-  margin-bottom: 7px;
+  margin-bottom: 0px;
   margin-right: 3px; }
 
 #gene-badge.loading {
@@ -2284,7 +2311,7 @@ text.ref-count {
 #gene-badge.selected {
   border-left: #7ea238 solid 12px; }
   #gene-badge.selected #gene-badge-button {
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19); }
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19); }
   #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
     font-weight: bold; }
 

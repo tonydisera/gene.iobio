@@ -1491,7 +1491,7 @@ function loadGeneWidget() {
 		    	adjustGeneRegion(window.gene);	
 
 		    	// Add the gene badge
-		    	genesCard.addGeneBadge(window.gene.gene_name);					
+		    	genesCard.addGene(window.gene.gene_name);	
 			    	
 		    	    
 		    	window.geneObjects[window.gene.gene_name] = window.gene;

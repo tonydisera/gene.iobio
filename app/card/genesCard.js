@@ -2,6 +2,8 @@ function GenesCard() {
 	this.geneBarChart = null;
 	this.NUMBER_PHENOLYZER_GENES = 300;
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
+	this.GENES_PER_PAGE = 50;
+	this.currentPageNumber = 1;
 
 }
 
@@ -17,6 +19,14 @@ GenesCard.prototype.init = function() {
 	var me = this;
 
 	var hpoUrl = hpoServer + "hot/lookup";
+
+	 // init bootpag
+    $('#gene-page-selection').bootpag({
+        total: 0,
+        maxVisible: 0
+    }).on("page", function(event, pageNumber){
+         me._goToPage(pageNumber);
+    });
 
 	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
 	if (isLevelEdu) {
@@ -93,6 +103,8 @@ GenesCard.prototype.init = function() {
 
 }
 
+
+
 GenesCard.prototype.initCopyPasteGenes = function() {
 	var me = this;
 	if (geneNames.length == 0 || geneNames == null) {
@@ -102,6 +114,68 @@ GenesCard.prototype.initCopyPasteGenes = function() {
 	}
 }
 
+
+GenesCard.prototype.pageToGene = function(geneName) {
+	var me = this;
+	if (geneNames && geneNames.length > this.GENES_PER_PAGE) {
+		var pos = geneNames.indexOf(geneName) + 1;
+		if (pos > this.GENES_PER_PAGE) {
+			var pageNumber = Math.ceil(pos / this.GENES_PER_PAGE);
+			me._goToPage(pageNumber);
+			me._initPaging();
+		} else {
+			me._goToPage(1);
+			me._initPaging();
+		}
+	}
+}
+
+GenesCard.prototype._goToPage = function(pageNumber) {
+	var me = this;
+	this.currentPageNumber = pageNumber;
+	$('#gene-badge-container #gene-badge').remove();
+	var end     = (this.GENES_PER_PAGE * pageNumber);
+	var start   = end - this.GENES_PER_PAGE;
+	// Create a gene badge for each gene name in the comma separated list.
+	for(var i = start; i < Math.min(end, geneNames.length); i++) {
+		var name = geneNames[i];	
+		// Only add the gene badge if it does not already exist
+		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
+		if ($(existingBadge).length == 0) {
+			me.addGeneBadge(name, true);
+		} else {
+			me._setBookmarkBadge(name);
+		}
+	}
+
+}
+
+GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
+	var me = this;
+	if (theGeneNames == null) {
+		theGeneNames = window.geneNames;
+	}
+	var pageCount = Math.ceil(theGeneNames.length / this.GENES_PER_PAGE);
+	if (theGeneNames.length > this.GENES_PER_PAGE) {
+		$('#gene-page-selection').bootpag({
+			page: startOver ? 1 : Math.min(me.currentPageNumber, pageCount),
+        	total: pageCount,
+        	maxVisible: pageCount
+    	});
+    	if (me.currentPageNumber > pageCount) {
+    		me.currentPageNumber = pageCount;
+    		me._goToPage(pageCount);
+    	}
+	} else if (theGeneNames.length > 0) {
+		$('#gene-page-selection').html("");
+		me.currentPageNumber = 1;
+		me._goToPage(me.currentPageNumber);	
+		$('#gene-page-selection').html("");	
+	} else {
+		$('#gene-page-selection').html("");
+	}
+
+}
 
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	var me = this;
@@ -162,8 +236,10 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		$('#gene-badge-container #manage-cache-link').addClass("hide");
 	}
 
+	this._initPaging(geneNames, true);
+
 	// Create a gene badge for each gene name in the comma separated list.
-	for(var i = 0; i < geneNames.length; i++) {
+	for(var i = 0; i < Math.min(geneNames.length, this.GENES_PER_PAGE); i++) {
 		var name = geneNames[i];	
 		// Only add the gene badge if it does not already exist
 		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
@@ -235,6 +311,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 			me.addGeneBadge(name, true);
 		}
 	}
+	this._initPaging(geneNames, true);
 
 	// If we are loading from the url, just add the class 'selected' to the gene specified in the 
 	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
@@ -559,7 +636,7 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 	}
 	delete geneObjects[theGeneName];
 	delete geneAnnots[theGeneName];
-
+	me._initPaging(geneNames);
 
 }
 
@@ -594,6 +671,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 		delete geneAnnots[theGeneName];
 	};
 	me._onGeneBadgeUpdate();
+	me._initPaging(geneNames);
 	readjustCards();	
 }
 
@@ -612,6 +690,20 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 	}
 	delete geneObjects[theGeneName];
 	delete geneAnnots[theGeneName];
+	me._initPaging(geneNames);
+
+}
+
+GenesCard.prototype.addGene = function(geneName) {
+	var me = this;
+	if (!isOffline) {
+		me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge").last(), geneName);
+	}
+	if (geneNames.indexOf(geneName) < 0) {
+		geneNames.push(geneName);
+	} 
+	me.pageToGene(geneName);
+	
 
 }
 
@@ -638,15 +730,10 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		  	me.hideTooltip();
 		  });
 
-		if (!isOffline) {
-			me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge").last(), geneName);
-		}
 		me._setPhenotypeBadge(geneName);
 		me._setBookmarkBadge(geneName);
 
-		if (geneNames.indexOf(geneName) < 0) {
-			geneNames.push(geneName);
-		}
+		
 
 		if (!bypassSelecting) {
 			if (hasDataSources()) {
@@ -1288,8 +1375,10 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  	if (phenolyzerGene.selected) {
 							  		me.addGeneBadge(phenolyzerGene.geneName, true);
 							  		me.highlightPhenolyzerGenes();
+							  		me._initPaging();
 							  	} else {
 							  		me.removeGeneBadgeByName(phenolyzerGene.geneName);
+							  		me._initPaging();
 							  	}
 							  });
 		d3.select('#phenolyzer-results svg').remove();
