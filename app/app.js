@@ -8,7 +8,7 @@ var gene_engine = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   local: [],
-  limit: 20
+  limit: 200
 });
 
 // Handlebar templates
@@ -1575,6 +1575,7 @@ function loadGeneWidget() {
 	if ( gene_list === null ) {
 		// fetch gene list from server			
 		$.ajax({url: 'gene_names.json'}).done(function(data, status, res) {
+			data.sort();
 			gene_engine.add($.map(data, function(gene) { return { name: gene }; }));
 			localStorage.setItem('gene_list', JSON.stringify(data));
 		})

@@ -140,7 +140,7 @@ GenesCard.prototype._goToPage = function(pageNumber) {
 	for(var i = start; i < Math.min(end, geneNames.length); i++) {
 		var name = geneNames[i];	
 		// Only add the gene badge if it does not already exist
-		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
+		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
 			me.addGeneBadge(name, true);
 		} else {
@@ -219,7 +219,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 
 	});
 	geneBadgesToRemove.forEach( function(geneName) {
-		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+		var selector = me._getGeneBadge(geneName);
 		$(selector).parent().parent().remove();
 	});
 
@@ -242,7 +242,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	for(var i = 0; i < Math.min(geneNames.length, this.GENES_PER_PAGE); i++) {
 		var name = geneNames[i];	
 		// Only add the gene badge if it does not already exist
-		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
+		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
 			me.addGeneBadge(name, true);
 		} else {
@@ -253,7 +253,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	// If we are loading from the url, just add the class 'selected' to the gene specified in the 
 	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
-		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
+		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
@@ -285,7 +285,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 
 	});
 	geneBadgesToRemove.forEach( function(geneName) {
-		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
+		var selector = me._getGeneBadge(geneName);
 		$(selector).parent().parent().remove();
 	});
 
@@ -306,7 +306,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	for(var i = 0; i < geneNames.length; i++) {
 		var name = geneNames[i];	
 		// Only add the gene badge if it does not already exist
-		var existingBadge = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + name + "')";	
+		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
 			me.addGeneBadge(name, true);
 		}
@@ -316,7 +316,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	// If we are loading from the url, just add the class 'selected' to the gene specified in the 
 	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
-		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneNameToSelect + "')").parent().parent();
+		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
 		if (hasDataSources()) {
 			me._setGeneBadgeLoading(geneBadge, true);
@@ -524,9 +524,9 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 		geneNames = geneNames.filter(function(geneName) {
 			return geneName != phenoGene.geneName; 
 		})
-		var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + phenoGene.geneName + "')";	
-		if (selector && selector.length > 0) {
-			$(selector).parent().parent().remove();
+		var gb = me._getGeneBadge(phenoGene.geneName);	
+		if (gb && gb.length > 0) {
+			gb.remove();
 		}
 	});
 
@@ -566,9 +566,9 @@ GenesCard.prototype.refreshBookmarkedGenes = function(bookmarkedGenes) {
 		var phenolyzerGene = selectedPhenoGeneObject[geneName];
 		var keep =  phenolyzerGene || !bookmarkedGene;
 		if (!keep) {
-			var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
-			if (selector && selector.length > 0) {
-				$(selector).parent().parent().remove();
+			var gb = me._getGeneBadge(geneName);
+			if (gb && gb.length > 0) {
+				gb.remove();
 			}
 		}
 		return keep;
@@ -630,8 +630,8 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 	var index = geneNames.indexOf(theGeneName);
 	if (index >= 0) {
 		geneNames.splice(index, 1);
-		var geneBadgeName = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')";	
-		$(geneBadgeName).parent().parent().remove();
+		var gb = me._getGeneBadge(theGeneName);
+		gb.remove();
 		me._onGeneBadgeUpdate();
 	}
 	delete geneObjects[theGeneName];
@@ -664,8 +664,8 @@ GenesCard.prototype._clearGenesImpl = function() {
 		var theGeneName = geneNames[0];
 		
 		geneNames.splice(0, 1);
-		var geneBadgeName = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')";	
-		$(geneBadgeName).parent().parent().remove();
+		var gb = me._getGeneBadge(theGeneName);
+		gb.remove();
 		
 		delete geneObjects[theGeneName];
 		delete geneAnnots[theGeneName];
@@ -710,12 +710,13 @@ GenesCard.prototype.addGene = function(geneName) {
 GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	var me = this;
 
-	var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
-	if ($(selector).length == 0) {
+	var gb = me._getGeneBadge(geneName);
+	if (gb == null || gb.length == 0) {
 		$('#gene-badge-container #after-genes').before(geneBadgeTemplate());
 		$("#gene-badge-container #gene-badge").last().find('#gene-badge-name').text(geneName);
-		d3.select($(selector)[0]).data([geneName]);
-		d3.select($(selector)[0])
+		var theGeneBadge = me._getGeneBadge(geneName);
+		d3.select(theGeneBadge[0]).data([geneName]);
+		d3.select(theGeneBadge[0])
 		  .on("mouseover", function(d,i) {
 			var geneName = d3.select(this).text();
 			var geneAnnot = geneAnnots[geneName];
@@ -812,8 +813,9 @@ GenesCard.prototype.setBookmarkBadge = function(geneName) {
 }
 
 GenesCard.prototype._setBookmarkBadge = function(geneName) {
+	var me = this;
 	// If this gene is in the bookmarked genes, show the bookmark glyph
-	var geneBadge = $("#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')").parent();	
+	var geneBadge = me._getGeneBadge(geneName);
 	if (geneBadge) {
 		geneBadge.find("#gene-badge-bookmark svg").remove();
 		if (bookmarkCard.isBookmarkedGene(geneName)) {
@@ -831,7 +833,7 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 			var phenotypes = data[0];
 			var theGeneName = data[1];
 			if (theGeneName != null && phenotypes != null && phenotypes.length > 0) {
-				var geneBadge = $("#gene-badge-container #gene-badge #gene-badge-name:contains('" + theGeneName + "')").parent();	
+				var geneBadge = me._getGeneBadge(theGeneName);
 				geneBadge.find("#gene-badge-phenotype-symbol").append("<svg class=\"phenotype-badge\" height=\"14\" width=\"14\">");
 				var selection = d3.select(geneBadge.find('#gene-badge-phenotype-symbol .phenotype-badge')[0]).data([{width:13, height:13,clazz: 'phenotype', phenotypes: phenotypes}]);
 				matrixCard.showPhenotypeSymbol(selection);	
@@ -904,7 +906,7 @@ GenesCard.prototype._setGeneBadgeLoading = function(geneBadge, show) {
 GenesCard.prototype._geneBadgeLoading = function(geneName, show, force) {
 	var me = this;
 
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	var geneBadge = me._getGeneBadge(geneName);
 	if (show) {
 		if (force || hasDataSources()) {
 			me._setGeneBadgeLoading(geneBadge, true);
@@ -917,7 +919,7 @@ GenesCard.prototype._geneBadgeLoading = function(geneName, show, force) {
 GenesCard.prototype._setGeneBadgeWarning = function(geneName, select) {
 	var me = this;
 
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	var geneBadge = me._getGeneBadge(geneName);
 	geneBadge.addClass("warning");	
 	geneBadge.addClass("visited");	
 	if (select) {
@@ -926,9 +928,15 @@ GenesCard.prototype._setGeneBadgeWarning = function(geneName, select) {
 	geneBadge.find("#gene-badge-warning").removeClass("hide");
 }
 
+GenesCard.prototype._getGeneBadge = function(geneName) {
+	return $("#gene-badge-container #gene-badge-name"). filter(function() {
+    	return $(this).text() === geneName;
+	}).parent().parent();
+}
+
 GenesCard.prototype._setGeneBadgeError = function(geneName, select) {
 	var me = this;
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	var geneBadge = me._getGeneBadge(geneName);
 	geneBadge.addClass("error");	
 	geneBadge.addClass("visited");	
 	if (select) {
@@ -939,7 +947,7 @@ GenesCard.prototype._setGeneBadgeError = function(geneName, select) {
 GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
 	var me = this;
 
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	var geneBadge = me._getGeneBadge(geneName);
 	geneBadge.find('#gene-badge-circle').removeClass('btn-success');
 	geneBadge.find('#gene-badge-circle').removeClass('mdi-action-done');
 	geneBadge.find('#gene-badge-circle').removeClass('btn-default');
@@ -1130,7 +1138,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 	$('.typeahead.tt-input').val(geneName);
 	
-	var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+	var geneBadge = me._getGeneBadge(geneName);
 	
 	$("#gene-badge.selected").removeClass("selected");
 	geneBadge.addClass("selected");
@@ -1178,9 +1186,8 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	    		alertify.error("Gene " + geneName + " not found.  Removing from list.", 
 				      		    function (e) {
 				     			});
-			    var selector = "#gene-badge-container #gene-badge #gene-badge-name:contains('" + geneName + "')";	
-				//$(selector).parent().remove();
-				$(selector).parent().parent().remove();
+			    var gb = me._getGeneBadge(geneName);
+				gb.remove();
 				var index = geneNames.indexOf(geneName);
 				geneNames.splice(index, 1);
 
@@ -1237,7 +1244,7 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 	}
 	var geneAnnot = geneAnnots[geneName];
 	if (geneAnnot == null) {
-		var geneBadge = $("#gene-badge-container #gene-badge-name:contains('" + geneName + "')").parent().parent();
+		var geneBadge = me._getGeneBadge(geneName);
 		
 		if (!isOffline) {
 			me.promiseSetGeneAnnot(geneBadge, geneName).then( function(data) {

@@ -1286,8 +1286,10 @@ header {
 
 .tt-dropdown-menu {
   width: 170px;
+  max-height: 400px;
+  overflow-y: scroll;
   margin-top: 2px;
-  padding: 8px 0;
+  padding: 4px 0;
   background-color: #fff;
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
