@@ -167,8 +167,8 @@ DataCard.prototype.loadDemoData = function() {
 	window.loadSibs(unaffectedSibIds, 'unaffected');
 
 	window.updateUrl('rel0', "proband");	
-	window.updateUrl('rel1', "father");	
-	window.updateUrl('rel2', "mother");	
+	window.updateUrl('rel', "mother");	
+	window.updateUrl('rel2', "father");	
 
 	window.updateUrl('name0', this.demoNames.proband);	
 	window.updateUrl('vcf0',  this.demoUrls.proband);	
@@ -177,22 +177,22 @@ DataCard.prototype.loadDemoData = function() {
 	}
 	window.updateUrl('sample0',  this.demoSampleNames.proband);	
 
-	if (this.demoCards.father) {
-		window.updateUrl('name2', this.demoNames.mother);	
-		window.updateUrl('vcf2',  this.demoUrls.mother);	
+	if (this.demoCards.mother) {
+		window.updateUrl('name1', this.demoNames.mother);	
+		window.updateUrl('vcf1',  this.demoUrls.mother);	
 		if (!window.isLevelEdu) {
-			window.updateUrl('bam2',  this.demoBamUrls.mother);
+			window.updateUrl('bam1',  this.demoBamUrls.mother);
 		}	
-		window.updateUrl('sample2',  this.demoSampleNames.mother);			
+		window.updateUrl('sample1',  this.demoSampleNames.mother);			
 	} 
 
-	if (this.demoNames.mother) {
-		window.updateUrl('name1', this.demoNames.father);	
-		window.updateUrl('vcf1',  this.demoUrls.father);	
+	if (this.demoNames.father) {
+		window.updateUrl('name2', this.demoNames.father);	
+		window.updateUrl('vcf2',  this.demoUrls.father);	
 		if (!window.isLevelEdu) {		
-			window.updateUrl('bam1',  this.demoBamUrls.father);
+			window.updateUrl('bam2',  this.demoBamUrls.father);
 		}	
-		window.updateUrl('sample1',  this.demoSampleNames.father);			
+		window.updateUrl('sample2',  this.demoSampleNames.father);			
 	}
 
 	
@@ -347,6 +347,21 @@ DataCard.prototype.init = function() {
 	);
 
 
+	$('#mother-data').append(dataCardEntryTemplate());
+	$('#mother-data #sample-data-label').text("MOTHER");
+	$('#mother-data #vcf-sample-select').selectize(
+		{ 
+			create: true, 			
+			valueField: 'value',
+	    	labelField: 'value',
+	    	searchField: ['value']
+    	}
+	);
+	this.listenToEvents($('#mother-data'));
+	addVariantCard();
+	me.setDataSourceRelationship($('#mother-data'));
+
+
 
 	$('#father-data').append(dataCardEntryTemplate());
 	$('#father-data #sample-data-label').text("FATHER");
@@ -363,21 +378,6 @@ DataCard.prototype.init = function() {
 	addVariantCard();
 	me.setDataSourceRelationship($('#father-data'));
 
-
-	$('#mother-data').append(dataCardEntryTemplate());
-	$('#mother-data #sample-data-label').text("MOTHER");
-	$('#mother-data #vcf-sample-select').selectize(
-		{ 
-			create: true, 			
-			valueField: 'value',
-	    	labelField: 'value',
-	    	searchField: ['value']
-    	}
-	);
-	this.listenToEvents($('#mother-data'));
-
-	addVariantCard();
-	me.setDataSourceRelationship($('#mother-data'));
 	
 	var dataCardSelector = $('#data-card');
 	dataCardSelector.find('#expand-button').on('click', function() {
