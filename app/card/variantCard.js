@@ -699,7 +699,13 @@ VariantCard.prototype.onBrush = function(brush) {
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 
 	this._showBamDepth(regionStart, regionEnd);
-	this._showVariants(regionStart, regionEnd, null, null, true);
+	this._showVariants(regionStart, regionEnd, 
+		function() {
+			if (clickedVariant) {
+				me.showCoverageCircle(clickedVariant, me);
+			}
+		}, 
+		null, true);
 	this._showFreebayesVariants(regionStart, regionEnd);
 }
 

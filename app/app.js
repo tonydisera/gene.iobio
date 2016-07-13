@@ -274,6 +274,7 @@ function init() {
 	    .cdsHeight(isLevelEduTour ? 24 : 12)
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
+	    	hideCoordinateFrame();
 	    	if (!brush.empty()) {
 	    		$('#zoom-hint').text('To zoom out, click outside bounding box.');
 				regionStart = d3.round(brush.extent()[0]);
@@ -424,11 +425,14 @@ function whichTransitionEvent(){
   }
 }
 
-function sidebarAdjustX(x) {	
+function sidebarAdjustX(x, isRelative) {	
 	if (!$("#slider-left").hasClass("hide")) {
 		var iconBarWidth = $("#slider-icon-bar").css("display") == "none" ? 0 : $("#slider-icon-bar").width();
 		x -= ($("#slider-left").width() + iconBarWidth);
 		x -= 1;
+	} else if (isRelative != null && isRelative == true) {
+		var iconBarWidth = $("#slider-icon-bar").css("display") == "none" ? 0 : $("#slider-icon-bar").width();
+		x -= iconBarWidth;
 	}
 	return x;
 }
@@ -494,16 +498,28 @@ function showCoordinateFrame(x) {
 	var height = +$('#proband-variant-card').outerHeight();
 	height    += +$('#other-variant-cards').outerHeight();
 
+
 	var width =  +$('#coordinate-frame').outerWidth();
 
-	x = sidebarAdjustX(x);
+	var topX = x;
+	topX = sidebarAdjustX(topX, true);
 	
+	x = sidebarAdjustX(x);
+
 	var margins = dataCard.mode == 'trio' ? 10 : 20;
 
 	$('#coordinate-frame').css("top", top);
 	$('#coordinate-frame').css("height", height - margins);
 	$('#coordinate-frame').css("left", x - d3.round(width/2) - 2);
 	$('#coordinate-frame').css("opacity", 1);
+
+	if (regionStart == gene.start && regionEnd == gene.end) {
+
+		$('#top-coordinate-frame').css("left", topX - d3.round(width/2) - 2 - 10);
+		$('#top-coordinate-frame').css("opacity", 1);
+	} 
+
+
 }
 
 function unpinAll() {
@@ -517,6 +533,7 @@ function unpinAll() {
 
 function hideCoordinateFrame() {
 	$('#coordinate-frame').css("opacity", 0);
+	$('#top-coordinate-frame').css("opacity", 0);
 }
 
 

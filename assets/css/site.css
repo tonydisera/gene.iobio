@@ -952,6 +952,15 @@ section {
   pointer-events: none;
   opacity: 0; }
 
+#top-coordinate-frame {
+  border: #969696 solid 1px;
+  width: 19px;
+  position: relative;
+  pointer-events: none;
+  opacity: 0;
+  top: 50px;
+  height: 62px; }
+
 .variant-card {
   min-height: 32px;
   padding-bottom: 0px;
