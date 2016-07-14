@@ -168,7 +168,10 @@ lineD3 = function module() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr('viewBox', "0 0 " + (parseInt(width) + margin.left + margin.right) + " " + parseInt(height));
+        .filter(function() { 
+           return this.parentNode === container.node();
+         })
+        .attr('viewBox', "0 0 " + (parseInt(width) + margin.left + margin.right) + " " + parseInt(height));
 
       // add a circle and label
       var circle = svg.selectAll(".circle").data([0])

@@ -109,11 +109,14 @@ function geneD3() {
       // every time we draw the chart.
       if (geneD3_widthPercent && geneD3_heightPercent) {
         d3.select(this).selectAll("svg")
+           .filter(function() { 
+              return this.parentNode === container.node();
+           })
           .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
           .attr("preserveAspectRatio", "none");
       } 
 
-      d3.select(this).selectAll("svg")
+      container.selectAll("svg")
         .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
         .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
 

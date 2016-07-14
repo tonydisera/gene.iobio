@@ -314,6 +314,10 @@ function variantD3() {
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
          .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
+        .filter(function() { 
+            return this.parentNode === container.node();
+        })
+        .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
     
 

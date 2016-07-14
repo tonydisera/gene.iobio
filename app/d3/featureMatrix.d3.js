@@ -96,6 +96,9 @@ function featureMatrixD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
+          .filter(function() { 
+            return this.parentNode === container.node();
+          })
          .attr("width", parseInt(width))
          .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
 
