@@ -242,6 +242,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
 					    	clickedVariant = d;
+					    	clickedVariantCard = me;
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
@@ -280,6 +281,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
 					    	clickedVariant = d;
+					    	clickedVariantCard = me;
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
 				    	} else {
@@ -557,7 +559,8 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 
 	return new Promise( function(resolve, reject) {
 		// Reset any previous locked variant
-		me.clickedVariant = null;
+		clickedVariant = null;
+		clickedVariantCard = null;
 		window.hideCircleRelatedVariants();
 		me.unpin();
 
@@ -659,7 +662,8 @@ VariantCard.prototype.setLoadState = function(theState) {
 	}
 }
 
-VariantCard.prototype.onBrush = function(brush) {
+VariantCard.prototype.onBrush = function(brush, callback) {
+	var me = this;
 	if (brush.empty()) {
 		this.cardSelector.find("#region-flag").addClass("hide");
 		// Only remove if no other filter flags are on
@@ -701,12 +705,12 @@ VariantCard.prototype.onBrush = function(brush) {
 	this._showBamDepth(regionStart, regionEnd);
 	this._showVariants(regionStart, regionEnd, 
 		function() {
-			if (clickedVariant) {
-				me.showCoverageCircle(clickedVariant, me);
+			me._showFreebayesVariants(regionStart, regionEnd);
+			if (callback) {
+				callback();
 			}
 		}, 
 		null, true);
-	this._showFreebayesVariants(regionStart, regionEnd);
 }
 
 
@@ -761,6 +765,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 	if (!this.model.isBamLoaded()) {
 		// We can still apply the filter coverage if the vcf has the read depth in the
 		// genotype field, so go ahead and show the coverage range filter.
+		this.cardSelector.find("#bam-track").addClass("hide");
 		filterCard.enableCoverageFilters();
 		if (callbackDataLoaded) {
 			callbackDataLoaded();
@@ -1449,8 +1454,8 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	}
 
 
-	this.clickedVariant = null;
-	window.hideCircleRelatedVariants();
+
+	//window.hideCircleRelatedVariants();
 
 	me.cardSelector.find(".filter-flag").addClass("hide");
 
@@ -1574,7 +1579,7 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 	var matchingVariant = null;
 	var tooltip = null;
 	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants svg');
+		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
 		matchingVariant = this.fbChart.showCircle()(variant, container, false, true);
 		if (matchingVariant) {
 			tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
@@ -1582,7 +1587,7 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 		
 	}
 	if (this.vcfChart != null) {
-		var container = this.d3CardSelector.selectAll('#vcf-variants svg');;
+		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
 		matchingVariant = this.vcfChart.showCircle()(variant, container, false, true);
 		if (matchingVariant ) {
 			tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
@@ -1604,7 +1609,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	var matchingVariant = null;
 	var indicateMissingVariant = false;
 	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants svg');
+		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
 		var lock = clickedVariant != null && this == sourceVariantCard;
 			
 		// Show the missing variant on the fbchart if we just have variants from those
@@ -1624,7 +1629,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 		
 	}
 	if (this.vcfChart != null) {
-		var container = this.d3CardSelector.selectAll('#vcf-variants svg');;
+		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
 		var lock = clickedVariant != null && this == sourceVariantCard;
 
 		// Only show the X for missing variant if we didn't already find the variant in
@@ -2102,12 +2107,12 @@ VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCou
 
 VariantCard.prototype.hideVariantCircle = function(variant) {
 	if (this.vcfChart != null) {
-		var container = this.d3CardSelector.selectAll('#vcf-variants svg');
+		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');
 		var parentContainer = this.d3CardSelector.selectAll('#vcf-variants');
 		this.vcfChart.hideCircle()(container, parentContainer);
 	}
 	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants svg');
+		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
 		var parentContainer = this.d3CardSelector.selectAll('#fb-variants');
 		this.fbChart.hideCircle()(container, parentContainer);
 	}
@@ -2218,9 +2223,13 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	}
 
 	var clinvarUrl = "";
-	if (variant.clinVarUid != null && variant.clinVarUid != '') {
-		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
-		clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+	if (clinSigDisplay != null && clinSigDisplay != "") {
+		if (variant.clinVarUid != null && variant.clinVarUid != '') {
+			var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
+			clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+		} else {
+			clinvarUrl = clinSigDisplay;
+		}		
 	}
 
 	var zygosity = "";
@@ -2626,9 +2635,9 @@ VariantCard.prototype.removeBookmarkFlags = function() {
 VariantCard.prototype.removeBookmarkFlag = function(variant, key) {
 	// Remove the current indicator from the bookmark flag
 	if (variant.fbCalled == 'Y') {
-		this.d3CardSelector.select("#fb-variants svg .bookmark#" + key).remove();
+		this.d3CardSelector.select("#fb-variants > svg .bookmark#" + key).remove();
 	} else {
-		this.d3CardSelector.select("#vcf-variants svg .bookmark#" + key).remove();
+		this.d3CardSelector.select("#vcf-variants > svg .bookmark#" + key).remove();
 	}
 
 }
@@ -2660,11 +2669,11 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 		}
 	} else {
 		// Check to see if the bookmark flag for this variant already exists
-		var isEmpty = this.d3CardSelector.selectAll("#vcf-variants svg .bookmark#" + key).empty();
+		var isEmpty = this.d3CardSelector.selectAll("#vcf-variants > svg .bookmark#" + key).empty();
 
 		// If the flag isn't present, add it to the vcf variant
 		if (isEmpty) {
-			container = this.d3CardSelector.selectAll('#vcf-variants svg');
+			container = this.d3CardSelector.selectAll('#vcf-variants > svg');
 			variant.isBookmark = "Y";
 			this.vcfChart.addBookmark(container, variant, key);
 		}
@@ -2682,6 +2691,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 VariantCard.prototype.unpin = function(saveClickedVariant) {
 	if (!saveClickedVariant) {
 		clickedVariant = null;
+		clickedVariantCard = null;
 	}
 	this.hideCoverageCircle();
 	window.hideCircleRelatedVariants();	

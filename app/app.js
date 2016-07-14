@@ -79,6 +79,7 @@ var matrixCard = new MatrixCard();
 
 // clicked variant
 var clickedVariant = null;
+var clickedVariantCard = null;
 
 
 // Format the start and end positions with commas
@@ -290,13 +291,27 @@ function init() {
 				regionEnd   = window.gene.end;
 			}
 
+
+			var variantCount = 0;
 			variantCards.forEach(function(variantCard) {
-		    	variantCard.onBrush(brush);
+		    	variantCard.onBrush(brush, function() {
+					variantCount++;
+					// Wait until all variant cards have finished with onBrush,
+					// then fill feature matrix and circle variants.
+					if (variantCount == variantCards.length) {
+						getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+			    		if (clickedVariant && clickedVariantCard) {
+							clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
+							window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
+							showCoordinateFrame(clickedVariant.screenX)
+						}
+					}
+		    	});
+		    	
 		    });
 
 
-			getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
-
+			
 		})
 		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, false);
@@ -516,7 +531,7 @@ function showCoordinateFrame(x) {
 	if (regionStart == gene.start && regionEnd == gene.end) {
 
 		$('#top-coordinate-frame').css("left", topX - d3.round(width/2) - 2 - 10);
-		$('#top-coordinate-frame').css("opacity", 1);
+		$('#top-coordinate-frame').removeClass("hide");
 	} 
 
 
@@ -533,7 +548,7 @@ function unpinAll() {
 
 function hideCoordinateFrame() {
 	$('#coordinate-frame').css("opacity", 0);
-	$('#top-coordinate-frame').css("opacity", 0);
+	$('#top-coordinate-frame').addClass("hide");
 }
 
 

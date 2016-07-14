@@ -1100,20 +1100,31 @@ section
   font-size: 13px
 
 #coordinate-frame 
-  border: $current-frame-color solid 1px
+  /* don't show rectangle border.  (remove coordinate rectangle) */
+  /* border: $current-frame-color solid 1px */
+  border: none
   width: 19px
   position: absolute
   pointer-events: none
   opacity: 0
 
 #top-coordinate-frame 
-  border: $current-frame-color solid 1px
+  border: none
   width: 19px
   position: relative
   pointer-events: none
-  opacity: 0
-  top: 50px
-  height: 62px
+  top: 0px
+  height: 12px
+  visibility: visible
+
+  &.hide
+    visibility:  hidden !important
+    display: block !important
+
+  .coordinate-arrow
+    stroke-width: 1px !important
+    stroke: black !important
+    fill: #ff7d7d
 
 .variant-card
   min-height: 32px

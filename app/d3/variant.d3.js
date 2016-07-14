@@ -99,7 +99,7 @@ function variantD3() {
       var circle = svgContainer.select(".circle");
       circle.transition()
             .duration(200)
-            .style("opacity", .6);
+            .style("opacity", 1);
       circle.attr("cx", mousex + margin.left + 2)
             .attr("cy", mousey + margin.top + 6);
 
@@ -313,7 +313,6 @@ function variantD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
         .filter(function() { 
             return this.parentNode === container.node();
         })
@@ -557,38 +556,43 @@ function variantD3() {
 
 
       // add a circle and label
-      svg.selectAll(".circle").remove();
-      var circle = svg.selectAll(".circle").data([0])
-        .enter().append('circle')
-          .attr("class", "circle")
-          .attr("cx", 0)
-          .attr("cy", 0)
-          .attr("r", minWidth + 2)                    
-          .style("opacity", 0);
+      if (svg.selectAll(".circle").empty()) {
+        //svg.selectAll(".circle").remove();
+        var circle = svg.selectAll(".circle").data([0])
+          .enter().append('circle')
+            .attr("class", "circle")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", minWidth + 2)                    
+            .style("opacity", 0);
+
+      }
 
       
       
       // add a arrow on the x-axis
-      svg.selectAll("g.arrow").remove();
-      var garrow = svg.selectAll("g.arrow").data([0])
-                      .enter().append("g")
-                      .attr("class", "arrow")
-                      .attr("transform", "translate(2,0)");
- 
-      garrow.append('line')
-          .attr("class", "arrow arrow-line")
-          .attr("x1", 8)
-          .attr("x2", -2)
-          .attr("y1", 8)
-          .attr("y2", 0)
-          .style("opacity", 0);      
-      garrow.append('line')
-          .attr("class", "arrow arrow-line")
-          .attr("x1", 8)
-          .attr("x2", -2)
-          .attr("y1", 0)
-          .attr("y2", 8)
-          .style("opacity", 0);    
+      if (svg.selectAll(".arrow").empty()) {
+        //svg.selectAll("g.arrow").remove();
+          var garrow = svg.selectAll("g.arrow").data([0])
+                          .enter().append("g")
+                          .attr("class", "arrow")
+                          .attr("transform", "translate(2,0)");
+     
+          garrow.append('line')
+              .attr("class", "arrow arrow-line")
+              .attr("x1", 8)
+              .attr("x2", -2)
+              .attr("y1", 8)
+              .attr("y2", 0)
+              .style("opacity", 0);      
+          garrow.append('line')
+              .attr("class", "arrow arrow-line")
+              .attr("x1", 8)
+              .attr("x2", -2)
+              .attr("y1", 0)
+              .attr("y2", 8)
+              .style("opacity", 0);  
+      }  
 
 
       
