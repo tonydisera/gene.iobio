@@ -983,7 +983,14 @@ function loadUrlSources() {
 						var sampleName = sample[urlParameter];
 						variantCard.setSampleName(sampleName);
 						variantCard.setDefaultSampleName(sampleName);
+
+						// When vcf Url was entered, sample dropdown was cleared and resulted
+						// in the url parameter sample# getting clear.  Re-establish the
+						// url to the pre- onVcfUrlUpdated parameters
+						console.log("app.loadUrlSources setting sample url: " + 'sample'+cardIndex + sampleName);
+						updateUrl('sample'+cardIndex, sampleName);
 					});
+
 				}
 				
 				loadTracksForGene( false );

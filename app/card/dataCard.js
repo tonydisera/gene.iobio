@@ -298,10 +298,7 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     	this.value = null;
     });
 
-    // When the sample name dropdown is selected
-    panelSelector.find('#vcf-sample-select')[0].selectize.on('change', function() {
-		me.onVcfSampleSelected(panelSelector);
-	});
+   
 
 }
 
@@ -680,6 +677,9 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector, sampleNames) {
 	var me = this;
 
+    // When the sample name dropdown is selected
+    panelSelector.find('#vcf-sample-select')[0].selectize.off('change');
+
 	// Populate the sample names in the dropdown
 	panelSelector.find('#vcf-sample-box').removeClass('hide');
 	if (me.mode == 'trio') {
@@ -703,9 +703,6 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 		$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
 		$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
 	});
-	//panelSelector.find('#vcf-sample-select')[0].selectize.refreshOptions();
-	//$('#unaffected-sibs-select')[0].selectize.refreshOptions();
-	//$('#affected-sibs-select')[0].selectize.refreshOptions();
 
 	
 	me.initSibs();
@@ -721,6 +718,12 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 	} else {
 		window.disableLoadButton();
 	}	
+
+	// When the sample name dropdown is selected
+    panelSelector.find('#vcf-sample-select')[0].selectize.on('change', function() {
+		me.onVcfSampleSelected(panelSelector);
+	});
+
 }
 
 DataCard.prototype.onVcfSampleSelected = function(panelSelector) {

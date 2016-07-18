@@ -255,7 +255,6 @@ var effectCategories = [
         stream.on('error', function(error, options) {
           if (me.ignoreErrorMessage(error)) {
             success = true;
-            callback(success)
           } else {
             if (success == null) {
               success = false;
