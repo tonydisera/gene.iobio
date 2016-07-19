@@ -546,9 +546,7 @@ VariantCard.prototype.clearWarnings = function() {
 	this.cardSelector.find('#no-variants-warning').addClass("hide");
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
-	this.cardSelector.find('#error-warning').addClass("hide");
-
-	
+	this.cardSelector.find('#error-warning').addClass("hide");	
 }
 
 /* 
@@ -572,6 +570,7 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 		me.cardSelector.find('#fb-chart-label').addClass("hide");
 		me.cardSelector.find('#fb-separator').addClass("hide");
 		me.d3CardSelector.select('#fb-variants svg').remove();
+		me.cardSelector.find(".filter-flag").addClass("hide");
 		me.clearWarnings();
 
 		if (me.isViewable()) {
@@ -633,7 +632,6 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 			} else {
 				$("#filter-and-rank-card").addClass("hide");
 			}
-
 
 
 			// Load the variant chart.

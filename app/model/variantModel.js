@@ -927,6 +927,15 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 
 }
 
+VariantModel.prototype.loadVariantCount = function(regionStart, regionEnd, callback) {
+	var me = this;
+
+	me._promiseVcfRefName(window.gene.chr).then( function() {
+		me.vcf.getVariantCount(me.getVcfRefName(window.gene.chr), 
+			regionStart, regionEnd, me.sampleName, callback);
+	});
+}
+
 VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, regionStart, regionEnd, onVcfData) {
 	var me = this;
 
@@ -1187,7 +1196,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			}			
 		}
 
-		
+
+
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(ref), 
 		   geneObject,
@@ -1276,6 +1286,10 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    	console.log("an error occurred after getting clinvar records " + error);
 	    	reject();
 	    });
+
+	
+		
+
 
 
 	});

@@ -1151,6 +1151,79 @@ var effectCategories = [
     });
   }
 
+  exports.getVariantCount = function(ref, start, end, sampleName, callback) {
+    //if (useDevkit) {
+      this._getVariantCountDevkit(ref, start, end, sampleName, callback);
+    //} else {
+     // callback(-1);
+    //}
+  }
+
+  exports._getVariantCountDevkit = function(ref, start, end, sampleName, callback) {
+    var me = this;
+
+    var region = ref + ":" + start + "-" + end;
+
+    var contigStr = "";
+    me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+        contigStr += "##contig=<ID=" + ref + ">\n";
+    })
+    var contigNameFile = new Blob([contigStr])
+   
+    var cmd = new iobio.cmd(tabix, ['-h', vcfURL, region]);
+
+    cmd  = cmd.pipe(bcftools, ['annotate', '-h', contigNameFile, '-'])
+
+    if (sampleName != null && sampleName != "") {
+      var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
+      cmd = cmd.pipe(vt, ['subset', '-s', sampleNameFile, '-']);
+    }
+
+    cmd = cmd.pipe(bcftools, ['stats']);
+                       
+
+    var statsData = "";
+    // Use Results
+    cmd.on('data', function(data) {
+         if (data == undefined) {
+            return;
+         }
+         statsData += data;
+    });
+
+    cmd.on('end', function(data) {
+        
+        var recs = statsData.split("\n");
+        var startIdx = null;
+        for(var i =0; i < recs.length && startIdx == null; i++) {
+          if (recs[i].indexOf("# SN, Summary numbers:") == 0) {
+            startIdx = i + 2;
+          }
+        };
+
+        var numRecs = null;
+        if (startIdx) {
+          for (var i = startIdx; i < recs.length && numRecs == null; i++) {
+            var fields = recs[i].split("\t");
+            if (fields.length > 3 && fields[2] == 'number of records:') {
+              numRecs = +fields[3];
+            }
+          }
+        }
+        if (callback) {
+          callback(numRecs);
+        }
+
+    });
+
+    cmd.on('error', function(error) {
+      console.log(error);
+    });
+
+    cmd.run();
+
+  }
+
   exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
