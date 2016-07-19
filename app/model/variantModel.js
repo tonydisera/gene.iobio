@@ -134,6 +134,13 @@ VariantModel.prototype.getBamDataForGene = function(geneObject) {
 	} 
 	return data ? data.coverage : null;
 }
+
+VariantModel.prototype.getDangerSummaryForGene = function(geneName) {
+	var me = this;
+	var	dangerSummary = this._getCachedData("dangerSummary", geneName, null);
+	return dangerSummary;
+}
+
 VariantModel.prototype.getVariantCount = function(data) {
 	var theVcfData = data != null ? data : this.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData == null || theVcfData.features == null) {
@@ -1098,6 +1105,9 @@ VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 		}
 	);	
 
+}
+VariantModel.prototype.cacheDangerSummary = function(dangerSummary, geneName) {
+	this._cacheData(dangerSummary, "dangerSummary", geneName);
 }
 
 VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {

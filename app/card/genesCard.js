@@ -4,6 +4,7 @@ function GenesCard() {
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
 	this.GENES_PER_PAGE = 50;
 	this.currentPageNumber = 1;
+	this.geneNameLoading = null;
 
 }
 
@@ -145,6 +146,17 @@ GenesCard.prototype._goToPage = function(pageNumber) {
 			me.addGeneBadge(name, true);
 		} else {
 			me._setBookmarkBadge(name);
+		}
+		// Indicate the loading glyph if app is in the middle
+		// of caching variants for this gene
+		if (me.geneNameLoading && name == me.geneNameLoading) {
+			me._geneBadgeLoading(name, true);
+		}
+		// If the danger summary has already been determined,
+		// set the appropriate gene badges.
+		var geneSummary = getProbandVariantCard().getDangerSummaryForGene(name);
+		if (geneSummary) {
+			me._setGeneBadgeGlyphs(name, geneSummary);
 		}
 	}
 
@@ -898,6 +910,7 @@ GenesCard.prototype._setGeneBadgeLoading = function(geneBadge, show) {
 	if (show) {
 		geneBadge.find('.gene-badge-loader').removeClass("hide");
 		geneBadge.addClass("loading");
+
 	} else {
 		geneBadge.find('.gene-badge-loader').addClass("hide");
 		geneBadge.removeClass("loading");
@@ -910,10 +923,16 @@ GenesCard.prototype._geneBadgeLoading = function(geneName, show, force) {
 	var geneBadge = me._getGeneBadge(geneName);
 	if (show) {
 		if (force || hasDataSources()) {
-			me._setGeneBadgeLoading(geneBadge, true);
+			if (geneBadge.length > 0) {
+				me._setGeneBadgeLoading(geneBadge, true);
+			}
+			me.geneNameLoading = geneName;
 		}
 	} else {
-		me._setGeneBadgeLoading(geneBadge, false);
+		if (geneBadge.length > 0) {
+			me._setGeneBadgeLoading(geneBadge, false);
+		}
+		me.geneNameLoading = null;
 	}
 }
 
@@ -949,6 +968,13 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 	var me = this;
 
 	var geneBadge = me._getGeneBadge(geneName);
+	// If the gene badge is not present because it is on a different page,
+	// just bypass.
+	if (geneBadge == null || geneBadge.length == 0) {
+		return;
+	}
+
+
 	geneBadge.find('#gene-badge-circle').removeClass('btn-success');
 	geneBadge.find('#gene-badge-circle').removeClass('mdi-action-done');
 	geneBadge.find('#gene-badge-circle').removeClass('btn-default');
