@@ -73,25 +73,10 @@ function variantD3() {
 
        }
     });
-/*
-    svgContainer.selectAll(".variant").classed("current", false);
-    svgContainer.selectAll(".variant")
-        .filter( function(variant,i) {
-          var found = false;
-          if (d.start == variant.start 
-              && d.end == variant.end 
-              && d.ref == variant.ref 
-              && d.alt == variant.alt 
-              && d.type.toLowerCase() == variant.type.toLowerCase()) {
-            found = true;
-          }         
-          return found;
-         })
-         .classed("current", true);
-*/
+
     // Get the x for this position
     if (matchingVariant) {
-      var mousex = d3.round(x(matchingVariant.start));
+      var mousex = x(matchingVariant.start);
       var mousey = height - ((matchingVariant.level + 1) * (variantHeight + verticalPadding));
       
 
@@ -101,7 +86,7 @@ function variantD3() {
             .duration(200)
             .style("opacity", 1);
       circle.attr("cx", mousex + margin.left + 2)
-            .attr("cy", mousey + margin.top + 6);
+            .attr("cy", mousey + margin.top + 4);
 
       circle.classed("emphasize", emphasize);
 
@@ -563,7 +548,7 @@ function variantD3() {
             .attr("class", "circle")
             .attr("cx", 0)
             .attr("cy", 0)
-            .attr("r", minWidth + 2)                    
+            .attr("r", variantHeight + 2)                    
             .style("opacity", 0);
 
       }
