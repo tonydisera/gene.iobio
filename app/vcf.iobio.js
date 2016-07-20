@@ -2017,7 +2017,7 @@ var effectCategories = [
                         var siftScore = siftString != null && siftString != "" ? siftString.split("(")[1].split(")")[0] : 99;
                         var polyphenString = vepTokens[vepFields.PolyPhen];
                         var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
-                        var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : 99;
+                        var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : -99;
 
 
 
