@@ -350,6 +350,7 @@
           <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
             Disclaimer
           </a>
+
         </div>
 
 
@@ -380,10 +381,9 @@
 
           <!-- gene badges for navigation -->
           <div class="nav-center">
-            <div id="gene-badge-container" class="" style="clear:both;margin-top:4px;">
-
-              <!-- Buttons for editting gene list, done editting gene list -->
-              <div id="manage-genes" class="level-edu" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 15px;padding-right: 10px;">
+            
+            <!-- Buttons for editting gene list, done editting gene list -->
+            <div id="manage-genes" class="level-edu">
                 <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheGenes()">
                   Analyze all
                 </a>
@@ -391,14 +391,36 @@
                 href="javascript:void(0)" onclick="genesCard.clearGenes()">
                   Remove all
                 </a>
+               <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="CacheHelper.openDialog()" >
+                  cache...
+                </a>         
+            </div>
+            
+            <div id="gene-page-selection"></div>                          
+            <div id="gene-page-control">              
+              <div id="select-gene-container">
+                  <select id="select-gene-sort" style="font-size:10px;">                 
+                  </select>
               </div>
+              <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide" 
+                onclick="genesCard.viewDefaultsGenesPerPage()" >
+                view 50
+              </a>
+              <a href="javascript:void(0)" id="view-all-genes" class="gene-paging-link hide" 
+                onclick="genesCard.viewAllGenes()" >
+                | all
+              </a>
+                  
+            </div>
+            
 
-              <div id="after-genes" style="display:inline-block;margin-top:12px;">
-                 <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="CacheHelper.openDialog()" >Clear cache...</a>
+            <div id="gene-badge-container" class="" style="clear:both;">
+
+              <div id="after-genes" style="display:inline-block;margin-top:5px;">
+                                           
               </div>
 
             </div>
-            <div id="gene-page-selection"></div>
           </div>
 
       </section>

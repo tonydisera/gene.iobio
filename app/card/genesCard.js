@@ -2,7 +2,8 @@ function GenesCard() {
 	this.geneBarChart = null;
 	this.NUMBER_PHENOLYZER_GENES = 300;
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
-	this.GENES_PER_PAGE = 50;
+	this.GENES_PER_PAGE_DEFAULT = 50;
+	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
 
@@ -28,6 +29,23 @@ GenesCard.prototype.init = function() {
     }).on("page", function(event, pageNumber){
          me._goToPage(pageNumber);
     });
+
+    $('#select-gene-sort').attr("placeholder", "sort");
+	$('#select-gene-sort').selectize({
+	    valueField: 'value',
+	    labelField: 'value',
+	    searchField: 'value',
+	    create: true
+	});
+	$('#select-gene-sort')[0].selectize.addOption({value:"(none)"});
+	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
+	$('#select-gene-sort')[0].selectize.addOption({value:"relevance"});
+	$('#select-gene-sort')[0].selectize.on('change', function() {
+		me.sortGenes();
+	});
+	$('#select-gene-sort')[0].selectize.on('dropdown_open', function() {
+		$('#select-gene-sort')[0].selectize.setValue("");
+	});
 
 	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
 	if (isLevelEdu) {
@@ -104,6 +122,131 @@ GenesCard.prototype.init = function() {
 
 }
 
+GenesCard.prototype.sortGenes = function() {
+	var me = this;
+	var sortBy = $('#select-gene-sort')[0].selectize.getValue();
+	if (sortBy.indexOf("gene name") == 0) {			
+		var sortedGeneNames = geneNames.slice().sort();
+		me._initPaging(sortedGeneNames, true);
+		me._goToPage(1, sortedGeneNames);
+	} else if (sortBy.indexOf("(none)") == 0) {	
+		me._initPaging(null, true);
+		me._goToPage(1);
+	} else if (sortBy.indexOf("relevance") == 0) {	
+		var sortedGeneNames = geneNames.slice().sort(me.compareDangerSummary);
+		me._initPaging(sortedGeneNames, true);
+		me._goToPage(1, sortedGeneNames);
+	}	
+}
+
+
+GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
+	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
+	var danger2 = getProbandVariantCard().getDangerSummaryForGene(geneName2);
+
+	if (danger1 == null && danger2 == null) {
+		return 0;
+	} else if (danger2 == null) {
+		return -1;
+	} else if (danger1 == null) {
+		return 1;
+	}
+
+	// lowest clinvar value = highest relevance
+	var clinvar1 = null;
+	if (danger1.CLINVAR) {
+		for (key in danger1.CLINVAR) {
+			clinvar1 = danger1.CLINVAR[key].value;
+		}
+	}
+	var clinvar2 = null;
+	if (danger2.CLINVAR) {
+		for (key in danger2.CLINVAR) {
+			clinvar2 = danger2.CLINVAR[key].value;
+		}
+	}
+
+
+	// sift
+	var sift1 = null;
+	if (danger1.SIFT) {
+		for (key in danger1.SIFT) {
+			var siftClass = Object.keys(danger1.SIFT[key])[0];
+			sift1 = matrixCard.siftMap[siftClass].value;
+		}
+	}
+	var sift2 = null;
+	if (danger2.SIFT) {
+		for (key in danger2.SIFT) {
+			var siftClass = Object.keys(danger2.SIFT[key])[0];
+			sift2 = matrixCard.siftMap[siftClass].value;
+		}
+	}
+
+
+	// polyphen
+	var polyphen1 = null;
+	if (danger1.POLYPHEN) {
+		for (key in danger1.POLYPHEN) {
+			var polyphenClass = Object.keys(danger1.POLYPHEN[key])[0];
+			polyphen1 = matrixCard.polyphenMap[polyphenClass].value;
+		}
+	}
+	var polyphen2 = null;
+	if (danger2.POLYPHEN) {
+		for (key in danger2.POLYPHEN) {
+			var polyphenClass = Object.keys(danger2.POLYPHEN[key])[0];
+			polyphen2 = matrixCard.polyphenMap[polyphenClass].value;
+		}
+	}
+	// lowest impact value = highest relevance
+	var impact1 = null;
+	if (danger1.IMPACT) {
+		for (key in danger1.IMPACT) {
+			impact1 = matrixCard.impactMap[key].value;
+		}
+	}
+	var impact2 = null;
+	if (danger2.IMPACT) {
+		for (key in danger2.IMPACT) {
+			impact2 = matrixCard.impactMap[key].value;
+		}
+	}
+
+	if (clinvar1 > clinvar2) {
+		return -1;
+	} else if (clinvar2 > clinvar1) {
+		return 1;
+	} else {
+		if (sift1 > sift2) {
+			return -1;
+		} else if (sift2 > sift1) {
+			return 1;
+		} else {
+			if (polyphen1 > polyphen2) {
+				return -1;
+			} else if (polyphen2 > polyphen1) {
+				return 1;
+			} else {
+				if (impact1 > impact2) {
+					return -1;
+				} else if (impact2 > impact1) {
+					return 1;
+				} else {
+					if (geneName1 > geneName2) {
+						return 1;
+					} else if (geneName2 > geneName1) {
+						return -1;
+					} else {
+						return 0;
+					}
+				}
+			}
+		}
+
+	}
+}
+
 
 
 GenesCard.prototype.initCopyPasteGenes = function() {
@@ -131,15 +274,28 @@ GenesCard.prototype.pageToGene = function(geneName) {
 	}
 }
 
-GenesCard.prototype._goToPage = function(pageNumber) {
+GenesCard.prototype.viewDefaultsGenesPerPage = function() {
+	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
+	this._initPaging(null, true);
+}
+
+GenesCard.prototype.viewAllGenes = function() {
+	this.GENES_PER_PAGE = geneNames.length;
+	this._initPaging(null, true);
+}
+
+GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 	var me = this;
+	if (theGeneNames == null) {
+		theGeneNames = window.geneNames;
+	}
 	this.currentPageNumber = pageNumber;
 	$('#gene-badge-container #gene-badge').remove();
 	var end     = (this.GENES_PER_PAGE * pageNumber);
 	var start   = end - this.GENES_PER_PAGE;
 	// Create a gene badge for each gene name in the comma separated list.
-	for(var i = start; i < Math.min(end, geneNames.length); i++) {
-		var name = geneNames[i];	
+	for(var i = start; i < Math.min(end, theGeneNames.length); i++) {
+		var name = theGeneNames[i];	
 		// Only add the gene badge if it does not already exist
 		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
@@ -169,6 +325,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 	}
 	var pageCount = Math.ceil(theGeneNames.length / this.GENES_PER_PAGE);
 	if (theGeneNames.length > this.GENES_PER_PAGE) {
+		$('.gene-paging-link').removeClass("hide");
 		$('#gene-page-selection').bootpag({
 			page: startOver ? 1 : Math.min(me.currentPageNumber, pageCount),
         	total: pageCount,
@@ -179,11 +336,17 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
     		me._goToPage(pageCount);
     	}
 	} else if (theGeneNames.length > 0) {
+		if (this.GENES_PER_PAGE > this.GENES_PER_PAGE_DEFAULT) {
+			$('.gene-paging-link').removeClass("hide");
+		} else {
+			$('.gene-paging-link').addClass("hide");
+		}
 		$('#gene-page-selection').html("");
 		me.currentPageNumber = 1;
 		me._goToPage(me.currentPageNumber);	
 		$('#gene-page-selection').html("");	
 	} else {
+		$('.gene-paging-link').addClass("hide");
 		$('#gene-page-selection').html("");
 	}
 
@@ -238,14 +401,14 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 
 
 	if (geneNames.length > 0) {
-		$('#gene-badge-container #manage-gene-list').removeClass("hide");
-		$('#gene-badge-container #clear-gene-list').removeClass("hide");
-		$('#gene-badge-container #manage-cache-link').removeClass("hide");
+		$('#manage-gene-list').removeClass("hide");
+		$('#clear-gene-list').removeClass("hide");
+		$('#manage-cache-link').removeClass("hide");
 	} else {
-		$('#gene-badge-container #manage-gene-list').addClass("hide");
+		$('#manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
-		$('#gene-badge-container #clear-gene-list').addClass("hide");
-		$('#gene-badge-container #manage-cache-link').addClass("hide");
+		$('#clear-gene-list').addClass("hide");
+		$('#manage-cache-link').addClass("hide");
 	}
 
 	this._initPaging(geneNames, true);
@@ -304,14 +467,14 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 
 
 	if (geneNames.length > 0) {
-		$('#gene-badge-container #manage-gene-list').removeClass("hide");
-		$('#gene-badge-container #clear-gene-list').removeClass("hide");
-		$('#gene-badge-container #manage-cache-link').removeClass("hide");
+		$('#manage-gene-list').removeClass("hide");
+		$('#clear-gene-list').removeClass("hide");
+		$('#manage-cache-link').removeClass("hide");
 	} else {
-		$('#gene-badge-container #manage-gene-list').addClass("hide");
+		$('#manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
-		$('#gene-badge-container #clear-gene-list').addClass("hide");
-		$('#gene-badge-container #manage-cache-link').addClass("hide");
+		$('#clear-gene-list').addClass("hide");
+		$('#manage-cache-link').addClass("hide");
 	}
 
 	// Create a gene badge for each gene name in the comma separated list.
@@ -757,9 +920,9 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 			theGeneBadge.addClass("selected");			
 		}
 
-		$('#gene-badge-container #manage-gene-list').removeClass("hide");
-		$('#gene-badge-container #clear-gene-list').removeClass("hide");
-		$('#gene-badge-container #manage-cache-link').removeClass("hide");
+		$('#manage-gene-list').removeClass("hide");
+		$('#clear-gene-list').removeClass("hide");
+		$('#manage-cache-link').removeClass("hide");
 
 	
 	}
@@ -999,153 +1162,161 @@ GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, selec
 	me._setBookmarkBadge(geneName);
 
 	// Now set danger badges
-	var doneWithImpact = false;
-	for (dangerKey in dangerObject) {
-		if (dangerKey == 'IMPACT') {
-			var impactClasses = dangerObject[dangerKey];
-			var symbolIndex = 0;
-			for (impactClass in impactClasses) {
-				var types = impactClasses[impactClass];
-				for (type in types) {
-					var theClazz = 'impact_' + impactClass;	
-					var effectObject = types[type];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"12\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[symbolIndex]).data([{width:10, height:10,clazz: theClazz, type:  type, effectObject: effectObject}]);
-					symbolIndex++;
-					matrixCard.showImpactBadge(selection);	
-					selection.on("mouseover", function(d,i) {
-									var maxEffect = "";
-									for (effectKey in d.effectObject) {
-										var transcriptObject = d.effectObject[effectKey];
-										if (Object.keys(transcriptObject).length > 0) {
-											for (key in transcriptObject) {
-												maxEffect += "<div>";
-												maxEffect += effectKey + " ";
-												maxEffect += "(located on non-canonical transcript " + key + ") ";
-												maxEffect += "</div>";
-											}
-										} else {
-												maxEffect += "<div>";
-												maxEffect += effectKey;
-												maxEffect += "</div>";
-										}
-									}
-									var x = d3.event.pageX;
-									var y = d3.event.pageY;
-
-									var annotScheme = filterCard.annotationScheme.toLowerCase() ==  'snpeff' ? 'SnpEff Effect' : 'VEP Consequence';
-									me.showTooltip(annotScheme + " " + maxEffect.split("_").join(" "), x, y, maxEffect.length > 70 ? 350 : 120);
-								})
-								.on("mouseout", function(d,i) {
-										me.hideTooltip();
-								});
-				}
-			}
-		} else if (dangerKey == 'CLINVAR') {
-			var dangerClinvar = dangerObject[dangerKey];
-			if (dangerClinvar) {
-				for (key in dangerClinvar) {
-					var clinvarObject = dangerClinvar[key];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,1)', clinvarName: key, clinvarObject: clinvarObject, clazz: clinvarObject.clazz}]);
-					matrixCard.showClinVarSymbol(selection);		
-					selection.on("mouseover", function(d,i) {
-									var x = d3.event.pageX;
-									var y = d3.event.pageY;
-									me.showTooltip("ClinVar " + d.clinvarName.split("_").join(" "), x, y, 150);
-								})
-								.on("mouseout", function(d,i) {
-										me.hideTooltip();
-								});										
-				}				
-			}
-
-		} else if (dangerKey == 'SIFT') {
-			var dangerSift = dangerObject[dangerKey];
-			if (dangerSift != null) {
-				var symbolIndex = 0;
-				for (clazz in dangerSift) {
-					var siftObject = dangerSift[clazz];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[symbolIndex]).data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz, siftObject: siftObject }]);					
-					matrixCard.showSiftSymbol(selection);	
-					symbolIndex++;			
-					selection.on("mouseover", function(d,i) {
-									var maxSift = "SIFT ";
-									for (key in d.siftObject) {
-										maxSift += key + " ";
-										var transcriptObject = d.siftObject[key];
-										for (key in transcriptObject) {
-											maxSift += key + " ";
-										}
-									}
-									var x = d3.event.pageX;
-									var y = d3.event.pageY;
-									me.showTooltip(maxSift.split("_").join(" "), x, y, 150);
-								})
-								.on("mouseout", function(d,i) {
-										me.hideTooltip();
-								});
-
-				}
-			}
-
-		} else if (dangerKey == 'POLYPHEN') {			
-			var dangerPolyphen = dangerObject[dangerKey];
-			if (dangerPolyphen != null) {
-				var symbolIndex = 0;
-				for (clazz in dangerPolyphen) {
-					var polyphenObject = dangerPolyphen[clazz];
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz, polyphenObject: polyphenObject}]);
-					matrixCard.showPolyPhenSymbol(selection);	
-					symbolIndex++;
-					selection.on("mouseover", function(d,i) {
-									var maxPolyphen = "PolyPhen ";
-									for (key in d.polyphenObject) {
-										maxPolyphen += key + " ";
-										var transcriptObject = d.polyphenObject[key];
-										for (key in transcriptObject) {
-											maxPolyphen += key + " ";
-										}
-									}
-									var x = d3.event.pageX;
-									var y = d3.event.pageY;
-									me.showTooltip(maxPolyphen.split("_").join(" "), x, y, 170);
-								})
-								.on("mouseout", function(d,i) {
-										me.hideTooltip();
-								});							
-				}
-			}
-
-		} else if (dangerKey == 'INHERITANCE') {
-			var inheritanceClasses = dangerObject[dangerKey];
-			if (inheritanceClasses != null) {
-				var symbolIndex = 0;
-				for (key in inheritanceClasses) {
-					var inheritanceValue = inheritanceClasses[key];
-					var clazz = key;
-					var symbolFunction = matrixCard.inheritanceMap[inheritanceValue].symbolFunction;
-					geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"12\" width=\"14\">");
-					var options = {width:18, height:20, transform: 'translate(-2,-2)'};
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: clazz}]);
-					symbolFunction(selection, options);	
-					symbolIndex++;	
-					selection.on("mouseover", function(d,i) {
-
-									var x = d3.event.pageX;
-									var y = d3.event.pageY;
-									me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
-								})
-								.on("mouseout", function(d,i) {
-										me.hideTooltip();
-								});						
-				}
-			}
-
+	if (dangerObject.CLINVAR) {
+		var dangerClinvar = dangerObject.CLINVAR;
+		if (dangerClinvar) {
+			for (key in dangerClinvar) {
+				var clinvarObject = dangerClinvar[key];
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,1)', clinvarName: key, clinvarObject: clinvarObject, clazz: clinvarObject.clazz}]);
+				matrixCard.showClinVarSymbol(selection);		
+				selection.on("mouseover", function(d,i) {
+								var x = d3.event.pageX;
+								var y = d3.event.pageY;
+								me.showTooltip("ClinVar " + d.clinvarName.split("_").join(" "), x, y, 150);
+							})
+							.on("mouseout", function(d,i) {
+									me.hideTooltip();
+							});										
+			}				
 		}
+
+	} 
+
+	if (dangerObject.SIFT) {
+		var dangerSift = dangerObject.SIFT;
+		if (dangerSift != null) {
+			var symbolIndex = 0;
+			for (clazz in dangerSift) {
+				var siftObject = dangerSift[clazz];
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[symbolIndex]).data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz, siftObject: siftObject }]);					
+				matrixCard.showSiftSymbol(selection);	
+				symbolIndex++;			
+				selection.on("mouseover", function(d,i) {
+								var maxSift = "SIFT ";
+								for (key in d.siftObject) {
+									maxSift += key + " ";
+									var transcriptObject = d.siftObject[key];
+									for (key in transcriptObject) {
+										maxSift += key + " ";
+									}
+								}
+								var x = d3.event.pageX;
+								var y = d3.event.pageY;
+								me.showTooltip(maxSift.split("_").join(" "), x, y, 150);
+							})
+							.on("mouseout", function(d,i) {
+									me.hideTooltip();
+							});
+
+			}
+		}
+
+	} 
+
+	if (dangerObject.POLYPHEN) {			
+		var dangerPolyphen = dangerObject.POLYPHEN;
+		if (dangerPolyphen != null) {
+			var symbolIndex = 0;
+			for (clazz in dangerPolyphen) {
+				var polyphenObject = dangerPolyphen[clazz];
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz, polyphenObject: polyphenObject}]);
+				matrixCard.showPolyPhenSymbol(selection);	
+				symbolIndex++;
+				selection.on("mouseover", function(d,i) {
+								var maxPolyphen = "PolyPhen ";
+								for (key in d.polyphenObject) {
+									maxPolyphen += key + " ";
+									var transcriptObject = d.polyphenObject[key];
+									for (key in transcriptObject) {
+										maxPolyphen += key + " ";
+									}
+								}
+								var x = d3.event.pageX;
+								var y = d3.event.pageY;
+								me.showTooltip(maxPolyphen.split("_").join(" "), x, y, 170);
+							})
+							.on("mouseout", function(d,i) {
+									me.hideTooltip();
+							});							
+			}
+		}
+
+	} 
+
+
+	if (dangerObject.IMPACT) {
+		var impactClasses = dangerObject.IMPACT;
+		var symbolIndex = 0;
+		for (impactClass in impactClasses) {
+			var types = impactClasses[impactClass];
+			for (type in types) {
+				var theClazz = 'impact_' + impactClass;	
+				var effectObject = types[type];
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"12\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[symbolIndex]).data([{width:10, height:10,clazz: theClazz, type:  type, effectObject: effectObject}]);
+				symbolIndex++;
+				matrixCard.showImpactBadge(selection);	
+				selection.on("mouseover", function(d,i) {
+								var maxEffect = "";
+								for (effectKey in d.effectObject) {
+									var transcriptObject = d.effectObject[effectKey];
+									if (Object.keys(transcriptObject).length > 0) {
+										for (key in transcriptObject) {
+											maxEffect += "<div>";
+											maxEffect += effectKey + " ";
+											maxEffect += "(located on non-canonical transcript " + key + ") ";
+											maxEffect += "</div>";
+										}
+									} else {
+											maxEffect += "<div>";
+											maxEffect += effectKey;
+											maxEffect += "</div>";
+									}
+								}
+								var x = d3.event.pageX;
+								var y = d3.event.pageY;
+
+								var annotScheme = filterCard.annotationScheme.toLowerCase() ==  'snpeff' ? 'SnpEff Effect' : 'VEP Consequence';
+								me.showTooltip(annotScheme + " " + maxEffect.split("_").join(" "), x, y, maxEffect.length > 70 ? 350 : 120);
+							})
+							.on("mouseout", function(d,i) {
+									me.hideTooltip();
+							});
+			}
+		}
+	} 
+
+
+	if (dangerObject.INHERITANCE) {
+		var inheritanceClasses = dangerObject.INHERITANCE;
+		if (inheritanceClasses != null) {
+			var symbolIndex = 0;
+			for (key in inheritanceClasses) {
+				var inheritanceValue = inheritanceClasses[key];
+				var clazz = key;
+				var symbolFunction = matrixCard.inheritanceMap[inheritanceValue].symbolFunction;
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"12\" width=\"14\">");
+				var options = {width:18, height:20, transform: 'translate(-2,-2)'};
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: clazz}]);
+				symbolFunction(selection, options);	
+				symbolIndex++;	
+				selection.on("mouseover", function(d,i) {
+
+								var x = d3.event.pageX;
+								var y = d3.event.pageY;
+								me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
+							})
+							.on("mouseout", function(d,i) {
+									me.hideTooltip();
+							});						
+			}
+		}
+
 	}
+
 	readjustCards();
 }
 

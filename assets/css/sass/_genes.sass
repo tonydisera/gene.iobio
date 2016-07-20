@@ -60,8 +60,8 @@
     float: right    
 
 #gene-badge
-  margin-top: 10px
-  margin-bottom: 0px
+  margin-top: 5px
+  margin-bottom: 5px
   margin-right: 3px
 
 #gene-badge.loading
@@ -134,6 +134,19 @@
       display: inline
 
 
+#manage-genes
+  display: inline-block
+  font-size: 11px
+  vertical-align: top
+  padding-top: 10px
+  float: left
+
+  a
+    color:  $sidebar-text-color !important
+
+    &:hover
+      text-decoration: underline !important
+
 #gene-badge-container
   display: flex
   display: -webkit-flex
@@ -141,18 +154,16 @@
   -webkit-flex-flow: row wrap
   justify-content: center
   -webkit-justify-content: center
+  max-height: 200px
+  overflow-y: auto
+  padding-bottom: 4px
 
-  #manage-gene-list
+  a
     color:  $sidebar-text-color !important
 
     &:hover
       text-decoration: underline !important
 
-  #clear-gene-list
-    color:  $sidebar-text-color !important
-
-    &:hover
-      text-decoration: underline !important
 
   #gene-badge-remove
     i
@@ -165,15 +176,51 @@
   &.manage #gene-badge-remove
     visibility: visible
 
-  #manage-cache-link
+
+
+#gene-page-selection
+  display: inline-block
+  margin-bottom: 0px
+  padding-bottom: 0px
+  vertical-align: top
+  font-size: 0px   
+
+#manage-cache-link
+  font-size: 11px
+  padding-left: 0px
+  cursor: pointer
+  margin-top: 2px
+  display: inline-block
+  color: $text-color !important
+  margin-left: 10px
+
+#gene-page-control
+  float: right
+
+  a.gene-paging-link
     color:  $sidebar-text-color !important
-    font-size: 11px
-    margin-top: 14px
-    padding-left: 0px
-    cursor: pointer
+    font-size:  11px
+    display: inline-block
+    vertical-align: top
+    margin-left: 0px   
+    padding-top: 2px 
 
     &:hover
       text-decoration: underline !important
+
+
+      
+
+  #select-gene-container
+    display: inline-block
+    width: 85px
+    vertical-align: bottom
+    margin-right: 5px
+
+    .selectize-input
+      padding-bottom: 2px
+      padding-top: 2px
+
 
 #manage-cache-modal
 
