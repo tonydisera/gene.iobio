@@ -22,7 +22,6 @@ iobio.cmd = function(service, params, opts) {
 	// Call EventEmitter constructor
 	EventEmitter.call(this);
 
-
 	var me = this;
 
 	this.id = shortid.generate()
@@ -4280,6 +4279,9 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 					var argPos = connection.argPos || 0;
 					var file = cmdUrlBuilder.files[argPos];
 					file.write(dataStream, cmdOpts);
+					dataStream.on('softend', function() {
+						file.end();
+					})
 				})
             })
 
@@ -4315,13 +4317,17 @@ ws.prototype.closeClient = function() {
 }
 
 ws.prototype.kill = function() {
+	// end stream immediately
 	if (this.stream)
-		this.stream.destroy();
+		this.stream.end();
 }
 
 ws.prototype.end = function() {
+	// send end event without ending stream
+    // this lets upstream streams end first, which causes
+    // downstream streams to end gracefully when the data runs out
 	if (this.stream)
-		this.stream.end();
+		this.stream.message('softend');
 }
 
 module.exports = ws;
@@ -4345,6 +4351,7 @@ file.prototype.getUrl = function( ) { return this.url; }
 file.prototype.write = function(stream, options) {
 
     var me = this;
+    this.stream = stream;
     var chunkSize = options.chunkSize || (500 * 1024);             ;
     // check if fileObj is a function and if so execute it
     if (Object.prototype.toString.call(this.fileObj) == '[object Function]')
@@ -4352,6 +4359,10 @@ file.prototype.write = function(stream, options) {
     else {
         (new BlobReadStream(this.fileObj, {'chunkSize': chunkSize})).pipe(stream);
     }
+}
+
+file.prototype.end = function() {
+    if (this.stream) this.stream.end();
 }
 
 module.exports = file;
