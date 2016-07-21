@@ -482,11 +482,18 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 	this.setDataSourceName(panelSelector);
 	this.setDataSourceRelationship(panelSelector);
 
-	variantCard.onBamUrlEntered(bamUrlInput.val(), function(success) {
+	var bamUrl = bamUrlInput.val();
+	if (isOffline) {
+		if (bamUrl.indexOf(offlineUrlTag) == 0) {
+			bamUrl = "http://" + serverInstance + serverDataDir + bamUrl.split(offlineUrlTag)[1];
+		}
+	}
+
+	variantCard.onBamUrlEntered(bamUrl, function(success) {
 
 		if (success) {
 			variantCard.setName(variantCard.getName());
-			window.updateUrl('bam' + cardIndex, bamUrlInput.val());
+			window.updateUrl('bam' + cardIndex, bamUrl);
 			enableLoadButton();			
 		} else {
 			window.disableLoadButton();
@@ -759,6 +766,12 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 
 	var vcfUrl = panelSelector.find('#url-input').val();
+
+	if (isOffline) {
+		if (vcfUrl.indexOf(offlineUrlTag) == 0) {
+			vcfUrl = "http://" + serverInstance + serverDataDir + vcfUrl.split(offlineUrlTag)[1];
+		}
+	}
 
 	panelSelector.find('#vcf-sample-box').addClass('hide');
 	panelSelector.find('.vcf-sample.loader').removeClass('hide');
