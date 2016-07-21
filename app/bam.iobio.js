@@ -755,7 +755,7 @@ var Bam = Class.extend({
       }
 
 
-      cmd = cmd.pipe(me.iobio.vt, ['normalize', '-r', refFile]);
+      cmd = cmd.pipe(me.iobio.vt, ['normalize', '-r', refFile, '-']);
       cmd = cmd.pipe(me.iobio.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
 
       var variantData = "";
