@@ -34,14 +34,14 @@ function DataCard() {
 		father:  'NA19239' 
 	};
 	this.demoUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz'
 	};
 	this.demoBamUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19240.bam',
-		mother:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19238.bam',
-		father:  'https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19239.bam'
+		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA19240.bam',
+		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA19238.bam',
+		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA19239.bam'
 	};
 	this.demoSampleNames = {
 		proband: 'NA19240',
