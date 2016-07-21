@@ -94,6 +94,8 @@ var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
+var autoCall = null;
+
 // The smaller the region, the wider we can
 // make the rect of each variant
 var widthFactors = [

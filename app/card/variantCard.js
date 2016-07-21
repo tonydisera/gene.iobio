@@ -739,17 +739,59 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			resolve(null);
 		}
 
-		var coverage = me.model.getBamDataForGene(window.gene);
-		if (coverage != null) {
-			resolve(coverage);
+
+		var callVariantsAndLoadCoverage = function() {
+			if (!me.model.isVcfReadyToLoad()) {
+				genesCard.showGeneBadgeLoading(window.gene.gene_name);
+			}
+			
+			// If no vcf supplied, automatically call variants (then get coverage)
+			if (autoCall && !me.model.isVcfReadyToLoad() && !me.model.hasCalledVariants()) {	
+				me.callVariants(regionStart, regionEnd, function() {
+					loadCoverage();
+				});
+			} else {
+				// Otherwise, if a vcf was loaded, just get the coverage
+				me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
+				loadCoverage();
+			}			
+		}
+
+		var loadCoverage = function() {
+			var coverage = me.model.getBamDataForGene(window.gene);
+			if (coverage != null) {
+				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+				resolve(coverage);
+			} else {
+				// If we have varaitns, get coverage for every variant
+				me.showBamProgress("Calculating coverage");
+				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+					me.endBamProgress();
+					genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+					resolve(coverageData);
+				});
+			}					
+		};
+
+		if (autoCall == null) {
+			alertify.confirm("Automatically call variants from alignments?",
+		        function () {	
+		        	// ok		     
+		        	autoCall = true;  
+		        	callVariantsAndLoadCoverage();
+		    	},
+				function () {
+					// cancel
+					autoCall = false;
+					callVariantsAndLoadCoverage();
+				}).set('labels', {ok:'Yes', cancel:'No'}); 
 		} else {
-			// If we have varaitns, get coverage for every variant
-			me.showBamProgress("Calculating coverage");
-			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
-				me.endBamProgress();
-				resolve(coverageData);
-			});
-		}		
+			callVariantsAndLoadCoverage();
+		}
+
+		
+
+
 	});
 
 
@@ -917,12 +959,14 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 	// If we have alignments but no vcf, we want to load the called variants and return.
 	if (!this.model.isVcfReadyToLoad()) {
+		if (me.model.isBamLoaded()) {
+			this.cardSelector.removeClass("hide");
+		}
 		if (!me.model.hasCalledVariants()) {
 			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 		} else {
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
-				me.cardSelector.find("#zoom-region-chart").css("margin-top", "0px");
 				me._fillFreebayesChart(me.model.getCalledVariants(), 
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
@@ -1290,7 +1334,16 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 	
 	if (data) {
 		this.cardSelector.find('#fb-chart-label').removeClass("hide");
-		this.cardSelector.find('#fb-separator').removeClass("hide");
+		me.cardSelector.find('#zoom-region-chart').css("visibility", "visible");	
+		if (me.model.isVcfReadyToLoad()) {
+			this.cardSelector.find('#fb-separator').removeClass("hide");
+			me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
+
+		} else {
+			this.cardSelector.find('#fb-separator').addClass("hide");
+			me.cardSelector.find('#zoom-region-chart').css("margin-top", "-25px");	
+		}
+
 		this.cardSelector.find('#fb-variants').removeClass("hide");
 
 		this.fbChart.regionStart(regionStart);
@@ -1324,7 +1377,7 @@ VariantCard.prototype.clearCalledVariants = function() {
 }
 
 
-VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
+VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) {
 	var me = this;
 
 	if (this.isViewable() && this.isBamLoaded()) {
@@ -1364,7 +1417,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 			$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
 
 			if (!me.model.isVcfReadyToLoad()) {
-				me.cardSelector.find("#zoom-region-chart").css("margin-top", "0px");
+				//me.cardSelector.find("#zoom-region-chart").css("margin-top", "0px");
 			}
 
 			// Show the called variants
@@ -1397,6 +1450,10 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd) {
 
 			// Enable the clinvar filter
 			filterCard.enableClinvarFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
+
+			if (callback) {
+				callback();
+			}
 
 		}, function(error) {
 

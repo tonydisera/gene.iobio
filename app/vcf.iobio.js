@@ -801,6 +801,7 @@ var effectCategories = [
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
       cmd = cmd.pipe(vt, ["subset", "-s", sampleNameFile, '-'])
     }
+    console.log(cmd.ws());
 
     // normalize variants
     cmd = cmd.pipe(vt, ["normalize", "-n", "-r", refFile, '-'])
@@ -814,7 +815,11 @@ var effectCategories = [
       cmd = cmd.pipe(snpEff);
     }
 
-    cmd = cmd.pipe(vep, vepArgs);
+    if (vepArgs == "") {
+      cmd = cmd.pipe(vep);
+    } else {
+      cmd = cmd.pipe(vep, [vepArgs]);
+    }
 
 
     var annotatedData = "";
