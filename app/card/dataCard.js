@@ -320,6 +320,8 @@ DataCard.prototype.init = function() {
     	}
 	);
 	this.listenToEvents($('#proband-data'));
+	$('#proband-data').find("#url-input").removeClass('hide');
+	$('#proband-data').find("#bam-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 	
@@ -355,6 +357,8 @@ DataCard.prototype.init = function() {
     	}
 	);
 	this.listenToEvents($('#mother-data'));
+	$('#mother-data').find("#url-input").removeClass('hide');
+	$('#mother-data').find("#bam-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
 
@@ -373,6 +377,8 @@ DataCard.prototype.init = function() {
 	this.listenToEvents($('#father-data'));
 
 	addVariantCard();
+	$('#father-data').find("#url-input").removeClass('hide');
+	$('#father-data').find("#bam-url-input").removeClass('hide');
 	me.setDataSourceRelationship($('#father-data'));
 
 	
