@@ -44,7 +44,6 @@ var geneToLatestTranscript = {};
 var genesToCache = [];
 var cacheQueue = [];
 var batchSize = null;
-var DEFAULT_BATCH_SIZE = 10;
 
 var loadedUrl = false;
 

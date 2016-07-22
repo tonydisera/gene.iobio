@@ -10,6 +10,9 @@ var hideNextButtonAnim      = true;  // is next button hidden on animations duri
 var hasTimeout              = false; // is a timeout based on n seconds of inactivity used?
 var keepLocalStorage        = false; // maintain cache between sessions?
 
+var DEFAULT_BATCH_SIZE      = 5;  // how many genes can be analyzed simultaneously for 'Analyze all'
+
+
 var eduTourNumber           = "0";
 var eduTourShowPhenolyzer   = [true, false];
 
