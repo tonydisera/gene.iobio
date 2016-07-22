@@ -461,7 +461,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	});
 	geneBadgesToRemove.forEach( function(geneName) {
 		var selector = me._getGeneBadge(geneName);
-		$(selector).parent().parent().remove();
+		selector.remove();
 	});
 
 
