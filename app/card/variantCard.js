@@ -192,7 +192,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: isLevelEduTour ? 0 : 20, right: 2, bottom: 0, left: 4})
+				    .margin({top: 0, right: 2, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .showBrush(false)
 				    .trackHeight(isLevelEduTour ? 32 : 16)
@@ -752,7 +752,7 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 				});
 			} else {
 				// Otherwise, if a vcf was loaded, just get the coverage
-				me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
+				//me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
 				loadCoverage();
 			}			
 		}
@@ -773,18 +773,23 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			}					
 		};
 
-		if (autoCall == null) {
-			alertify.confirm("Automatically call variants from alignments?",
-		        function () {	
-		        	// ok		     
-		        	autoCall = true;  
-		        	callVariantsAndLoadCoverage();
-		    	},
-				function () {
-					// cancel
-					autoCall = false;
-					callVariantsAndLoadCoverage();
-				}).set('labels', {ok:'Yes', cancel:'No'}); 
+
+		if (!me.model.isVcfReadyToLoad() && me.model.isBamLoaded()) {
+			if (autoCall == null) {
+				alertify.confirm("Automatically call variants from alignments?",
+			        function () {	
+			        	// ok		     
+			        	autoCall = true;  
+			        	callVariantsAndLoadCoverage();
+			    	},
+					function () {
+						// cancel
+						autoCall = false;
+						callVariantsAndLoadCoverage();
+					}).set('labels', {ok:'Yes', cancel:'No'}); 
+			} else {
+				callVariantsAndLoadCoverage();
+			}
 		} else {
 			callVariantsAndLoadCoverage();
 		}
@@ -988,7 +993,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		return;
 	}
 
-	me.cardSelector.find("#zoom-region-chart").css("margin-top", "-30px");
+	//me.cardSelector.find("#zoom-region-chart").css("margin-top", "-30px");
 	if (this.isViewable()) {
 		this.cardSelector.removeClass("hide");
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -1337,11 +1342,11 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 		me.cardSelector.find('#zoom-region-chart').css("visibility", "visible");	
 		if (me.model.isVcfReadyToLoad()) {
 			this.cardSelector.find('#fb-separator').removeClass("hide");
-			me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
+			//me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
 
 		} else {
 			this.cardSelector.find('#fb-separator').addClass("hide");
-			me.cardSelector.find('#zoom-region-chart').css("margin-top", "-25px");	
+			//me.cardSelector.find('#zoom-region-chart').css("margin-top", "-25px");	
 		}
 
 		this.cardSelector.find('#fb-variants').removeClass("hide");
