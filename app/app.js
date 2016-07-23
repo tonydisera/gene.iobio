@@ -794,6 +794,7 @@ function toggleSampleTrio(show) {
 			if (variantCard.getRelationship() == 'mother') {
 				motherCard = variantCard;
 				motherCard.clearVcf();
+				motherCard.clearBam();
 				motherCard.hide();
 				$('#mother-data').find('#vcf-file-info').val('');
 				$('#mother-data').find('#vcf-url-input').val('');
@@ -803,6 +804,7 @@ function toggleSampleTrio(show) {
 			} else if (variantCard.getRelationship() == 'father') {
 				fatherCard = variantCard;
 				fatherCard.clearVcf();
+				fatherCard.clearBam();
 				fatherCard.hide();
 				$('#father-data').find('#vcf-file-info').val('');
 				$('#father-data').find('#vcf-url-input').val('');

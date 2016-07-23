@@ -57,6 +57,12 @@ var Bam = Class.extend({
       return this;
    },
 
+   clear: function() {
+    this.bamFile = null;
+    this.baiFile = null;
+    this.bamUri = null;
+   },
+
    makeBamBlob: function() {
      var me = this;
      this.bamBlob = new BlobFetchable(this.bamFile);

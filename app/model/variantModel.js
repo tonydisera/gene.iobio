@@ -491,8 +491,17 @@ VariantModel.prototype.clearVcf = function() {
 	window.removeUrl('sample'+this.cardIndex);
 	window.removeUrl('vcf'+this.cardIndex);
 	this.vcf.clear();
+}
 
+VariantModel.prototype.clearBam = function() {
 
+	this.bamData = null;
+	this.bamUrlEntered = false;
+	this.bamFileOpened = false;
+	window.removeUrl('bam'+this.cardIndex);
+	if (this.bam) {
+		this.bam.clear();
+	}
 }
 
 VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
