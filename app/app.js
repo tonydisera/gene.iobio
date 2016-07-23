@@ -945,42 +945,6 @@ function loadUrlSources() {
 	var bamCount = bam != null ? Object.keys(bam).length : 0;
 	var vcfCount = vcf != null ? Object.keys(vcf).length : 0;
 
-	if (vcf != null) {
-		Object.keys(vcf).forEach(function(urlParameter) {
-			var cardIndex = urlParameter.substring(3);
-			var variantCard      = variantCards[+cardIndex];
-			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
-			var panelSelector    = $(panelSelectorStr);
-			panelSelector.find('#url-input').val(vcf[urlParameter]);
-			panelSelector.find('#url-input').removeClass("hide");
-			dataCard.onVcfUrlEntered(panelSelector, function(success) {
-				if (success) {
-					vcfLoadedCount++;
-				}
-				loadTracks();
-			});
-		});
-	}
-
-	if (bam != null) {
-		Object.keys(bam).forEach(function(urlParameter) {
-			var cardIndex = urlParameter.substring(3);
-			var variantCard      = variantCards[+cardIndex];
-			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
-			var panelSelector    = $(panelSelectorStr);
-			panelSelector.find('#bam-url-input').val(bam[urlParameter]);
-			panelSelector.find('#bam-url-input').removeClass("hide");
-			dataCard.onBamUrlEntered(panelSelector, function(success) {
-				if (success) {
-					bamLoadedCount++;
-				}
-				loadTracks();
-			});
-		});
-	}
-
-	
-
 	var loadTracks = function() {
 		if (vcf != null || bam != null) {
 			// Only load tracks for genes if all bam and vcf urls loaded without error
@@ -1013,6 +977,49 @@ function loadUrlSources() {
 		} 
 	};
  
+
+	if (vcf != null) {
+		Object.keys(vcf).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			if (variantCard) {
+				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+				var panelSelector    = $(panelSelectorStr);
+				panelSelector.find('#url-input').val(vcf[urlParameter]);
+				panelSelector.find('#url-input').removeClass("hide");
+				dataCard.onVcfUrlEntered(panelSelector, function(success) {
+					if (success) {
+						vcfLoadedCount++;
+					}
+					loadTracks();
+				});				
+			}
+
+		});
+	}
+
+	if (bam != null) {
+		Object.keys(bam).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(3);
+			var variantCard      = variantCards[+cardIndex];
+			if (variantCard) {
+				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+				var panelSelector    = $(panelSelectorStr);
+				panelSelector.find('#bam-url-input').val(bam[urlParameter]);
+				panelSelector.find('#bam-url-input').removeClass("hide");
+				dataCard.onBamUrlEntered(panelSelector, function(success) {
+					if (success) {
+						bamLoadedCount++;
+					}
+					loadTracks();
+				});				
+			}
+		});
+	}
+
+	
+
+
 	
 
 }
