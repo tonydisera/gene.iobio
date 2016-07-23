@@ -26,8 +26,8 @@ var Bam = Class.extend({
       this.iobio.samtools            = new_iobio_services + "samtools/"
       this.iobio.coverage            = new_iobio_services + "coverage/ ";
       this.iobio.cat                 = new_iobio_services + "cat/ ";
-//      this.iobio.samtoolsOnDemand    = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-      this.iobio.samtoolsOnDemand    = new_iobio_services +  "samtools/";
+      this.iobio.samtoolsOnDemand    = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
+      //this.iobio.samtoolsOnDemand    = new_iobio_services +  "samtools/";
       this.iobio.freebayes           = new_iobio_services + "freebayes/";
       this.iobio.vcflib              = new_iobio_services + "vcflib/";
       this.iobio.vt                  = new_iobio_services + "vt/";
@@ -591,7 +591,7 @@ var Bam = Class.extend({
    getCoverageForRegionDevkit: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
       var me = this;
       this.transformRefName(refName, function(trRefName){
-        var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
+        var samtools = me.sourceType == "url" ?  me.iobio.samtoolsOnDemand : me.iobio.samtools;
 
         var regionsArg = "";
         regions.forEach( function(region) {
@@ -748,10 +748,18 @@ var Bam = Class.extend({
            }, {noHeader:true});
         }
 
-        cmd = new iobio.cmd(me.iobio.freebayes, ['-f', refFile, writeStream],
-            {
+        /*cmd = new iobio.cmd(me.iobio.freebayes, ['-f', refFile, writeStream],
+             {
               'urlparams': {'encoding':'utf8'}
+             });
+        */
+        
+        cmd = new iobio.cmd(samtools, ['view -b',  writeStream ],
+            {
+              'urlparams': {'encoding':'binary'}
             });
+        cmd = cmd.pipe(me.iobio.freebayes, ['-f', refFile]);
+        
       }
 
 
