@@ -96,17 +96,17 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
-		{name:'Zygosity'                     ,order:4, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
 		{name:'Pathogenicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
-		{name:'Bookmark'                     ,order:5, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Inheritance Mode'             ,order:6, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Affected Siblings'            ,order:7, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Unaffected Siblings'          ,order:8, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
-		{name:'Allele Frequency - 1000G'     ,order:9, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:10, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
+		{name:'Bookmark'                     ,order:4, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
+		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Affected Siblings'            ,order:6, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
+		{name:'Unaffected Siblings'          ,order:7, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
+		{name:'Allele Frequency - 1000G'     ,order:8, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Zygosity'                     ,order:10, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
