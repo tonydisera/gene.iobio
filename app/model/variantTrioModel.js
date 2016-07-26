@@ -45,9 +45,6 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	    // This is the attribute on variant a (proband) and variant b (mother)
 		// that will store whether the variant is unique or matches.
     	'compareMother',
-    	// This is the attribute on the proband variant that will store the
-		// mother's zygosity in the case where the variant match
-		'motherZygosity',
     	// This is the callback function called every time we find the same variant
     	// in both sets. Here we take the mother variant's af and store it in the
     	// proband's variant for further sorting/display in the feature matrix.
@@ -56,6 +53,11 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
     		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
 		    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
 		    variantA.genotypeDepthMother    = variantB.genotypeDepth;
+
+	        variantB.probandZygosity         = variantA.zygosity != null ? variantA.zygosity : '';
+    		variantB.genotypeAltCountProband = variantA.genotypeAltCount;
+		    variantB.genotypeRefCountProband = variantA.genotypeRefCount;
+		    variantB.genotypeDepthProband    = variantA.genotypeDepth;
 		}
 	).then( function() {
 
@@ -66,9 +68,6 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	       	 // This is the attribute on variant a (proband) and variant b (father)
 	        // that will store whether the variant is unique or matches.
 	        'compareFather',
-	        // This is the attribute on the proband variant that will store the
-	        // father's zygosity in the case where the variant match
-	        'fatherZygosity',
 	    	// This is the callback function called every time we find the same variant
 	    	// in both sets. Here we take the father variant's zygosity and store it in the
 	    	// proband's variant for further sorting/display in the feature matrix.
@@ -77,6 +76,12 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
 	        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
 			    variantA.genotypeDepthFather    = variantB.genotypeDepth;
+
+	        	variantB.probandZygosity         = variantA.zygosity != null ? variantA.zygosity : '';
+	        	variantB.genotypeAltCountProband = variantA.genotypeAltCount;
+	        	variantB.genotypeRefCountProband = variantA.genotypeRefCount;
+			    variantB.genotypeDepthProband    = variantA.genotypeDepth;
+
 	        });  	
 
 	}, function(error) {
@@ -110,9 +115,39 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		
 	});
 
+
+	//
+	// Now compare mother's variant to father's variants
+	//
+	me.promiseCompareVariants(
+		me.motherVcfData,
+		me.fatherVcfData,
+	    // This is the attribute on variant a (proband) and variant b (mother)
+		// that will store whether the variant is unique or matches.
+    	'compareMotherFather',
+    	// This is the callback function called every time we find the same variant
+    	// in both sets. Here we take the mother variant's af and store it in the
+    	// proband's variant for further sorting/display in the feature matrix.
+    	function(variantMother, variantFather) {
+    		variantMother.fatherZygosity = variantFather.zygosity != null ? variantFather.zygosity : '';
+    		variantMother.genotypeAltCountFather = variantFather.genotypeAltCount;
+		    variantMother.genotypeRefCountFather = variantFather.genotypeRefCount;
+		    variantMother.genotypeDepthFather    = variantFather.genotypeDepth;
+
+	        variantFather.motherZygosity         = variantMother.zygosity != null ? variantMother.zygosity : '';
+    		variantFather.genotypeAltCountMother = variantMother.genotypeAltCount;
+		    variantFather.genotypeRefCountMother = variantMother.genotypeRefCount;
+		    variantFather.genotypeDepthMother    = variantMother.genotypeDepth;
+		}
+	).then( function() {
+
+	}, function(error) {
+		console.log("error occured when comparing proband variants to mother?");
+	})	
+
 }
 
-VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfData, compareAttribute, matchAttribute, onMatchFunction, onNoMatchFunction ) {
+VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfData, compareAttribute, onMatchFunction, onNoMatchFunction ) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -369,10 +404,7 @@ VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, zygosityAt
 			sibVcfData,		
 			// This is the attribute on variant a (proband) and variant b (unaffected sib)
 	        // that will store whether the variant is unique or matches.
-	        null,
-	        // This is the attribute on the proband variant that will store the
-	        // zygosity in the case where the variant match
-	        null,
+	        null,	        
 	    	// This is the callback function called every time we find the same variant
 	    	// in both sets. Here we take the father variant's zygosity and store it in the
 	    	// proband's variant for further sorting/display in the feature matrix.

@@ -422,6 +422,12 @@ VariantCard.prototype.clearVcf = function() {
 	this.cardSelector.find('#missing-variant-count').text("");
 }
 
+VariantCard.prototype.clearBam = function() {
+	this.model.clearBam();
+	this.cardSelector.find('#bam-track').addClass("hide");
+}
+
+
 VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 	var me = this;
 	if (me.isViewable()) {
@@ -1879,59 +1885,122 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 }
 
+
+VariantCard.prototype._getTrioAlleleCountFields = function(variant) {
+	var me = this;
+	var trioFields = {};
+	if (me.model.getRelationship() == 'proband') {
+		trioFields.PROBAND = { zygosity: variant.zygosity, 
+			                   genotypeAltCount: variant.genotypeAltCount, 
+			                   genotypeRefCount: variant.genotypeRefCount, 
+			                   genotypeDepth: variant.genotypeDepth,
+			                   selected: true };
+		trioFields.MOTHER  = { zygosity: variant.motherZygosity, 
+			                   genotypeAltCount: variant.genotypeAltCountMother, 
+			                   genotypeRefCount: variant.genotypeRefCountMother, 
+			                   genotypeDepth: variant.genotypeDepthMother };
+		trioFields.FATHER  = { zygosity: variant.fatherZygosity, 
+			                   genotypeAltCount: variant.genotypeAltCountFather, 
+			                   genotypeRefCount: variant.genotypeRefCountFather, 
+			                   genotypeDepth: variant.genotypeDepthFather };
+	} else if (me.model.getRelationship() == 'mother') {
+		trioFields.PROBAND = { zygosity: variant.probandZygosity, 
+			                   genotypeAltCount: variant.genotypeAltCountProband, 
+			                   genotypeRefCount: variant.genotypeRefCountProband, 
+			                   genotypeDepth: variant.genotypeDepthProband };
+		trioFields.MOTHER  = { zygosity: variant.zygosity, 
+			                   genotypeAltCount: variant.genotypeAltCount, 
+			                   genotypeRefCount: variant.genotypeRefCount, 
+			                   genotypeDepth: variant.genotypeDepth,
+			                   selected: true};
+		trioFields.FATHER =  { zygosity: variant.fatherZygosity, 
+			                   genotypeAltCount: variant.genotypeAltCountFather, 
+			                   genotypeRefCount: variant.genotypeRefCountFather, 
+			                   genotypeDepth: variant.genotypeDepthFather };
+	} else if (me.model.getRelationship() == 'father') {
+		trioFields.PROBAND = { zygosity: variant.probandZygosity, 
+			                   genotypeAltCount: variant.genotypeAltCountProband, 
+			                   genotypeRefCount: variant.genotypeRefCountProband, 
+			                   genotypeDepth: variant.genotypeDepthProband };
+		trioFields.MOTHER  = { zygosity: variant.motherZygosity, 
+			                   genotypeAltCount: variant.genotypeAltCountMother, 
+			                   genotypeRefCount: variant.genotypeRefCountMother, 
+			                   genotypeDepth: variant.genotypeDepthMother };
+		trioFields.FATHER  = { zygosity: variant.zygosity, 
+			                   genotypeAltCount: variant.genotypeAltCount, 
+			                   genotypeRefCount: variant.genotypeRefCount, 
+			                   genotypeDepth: variant.genotypeDepth,
+			                   selected: true };
+	} 
+	return trioFields;
+
+}
+
 VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, barWidth) {
 	var me = this;
-	container.select("div.proband-alt-count").remove();
 	
+	// Get the alt, ref, depth and zygosity field for proband, mother, father of trio
+	var trioFields = me._getTrioAlleleCountFields(variant);
+
+	container.select("div.proband-alt-count").remove();	
 	me._appendReadCountHeading(container);
 
+	
+	// Show the Proband's allele counts
+	var selectedClazz = trioFields.PROBAND.selected ? 'selected' : '';
 	var row = container.append("div")
 	                   .attr("class", "proband-alt-count tooltip-row");
 	row.append("div")
 	   .attr("class", "proband-alt-count tooltip-header-small")
-	   .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(me.getRelationship()) + "</span>");
+	   .html("<span class='tooltip-subtitle " + selectedClazz + "'>" + 'Proband' + "</span>");
 	row.append("div")
-		   .attr("class", "tooltip-zygosity label " + variant.zygosity.toLowerCase())
-		   .text(variant.zygosity ? capitalizeFirstLetter(variant.zygosity.toLowerCase()) : "");
+		   .attr("class", "tooltip-zygosity label " + ( trioFields.PROBAND.zygosity ? trioFields.PROBAND.zygosity.toLowerCase() : ""))
+		   .text(trioFields.PROBAND.zygosity ? capitalizeFirstLetter(trioFields.PROBAND.zygosity.toLowerCase()) : "");
 	var column = row.append("div")
 	                .attr("class", "proband-alt-count tooltip-allele-count-bar");
+	if (trioFields.PROBAND.zygosity && trioFields.PROBAND.zygosity != '') {
+		me._appendAlleleCountSVG(column, trioFields.PROBAND.genotypeAltCount, trioFields.PROBAND.genotypeRefCount, trioFields.PROBAND.genotypeDepth, barWidth);	
+	}               
+
 	
-	this._appendAlleleCountSVG(column, variant.genotypeAltCount, variant.genotypeRefCount, variant.genotypeDepth, barWidth);
-	
-	if (dataCard.mode == 'trio' && this.getRelationship() == 'proband') {
+	if (dataCard.mode == 'trio') {
+		// For a trio, now show the mother and father allele counts
+
 		// Mother
+		selectedClazz = trioFields.MOTHER.selected ? 'selected' : '';
 		container.select("div.mother-alt-count").remove();
 		row = container.append("div")
-	                   .attr("class", "mother-alt-count tooltip-row");		
+	                   .attr("class", "mother-alt-count tooltip-row");		    
+		row.append("div")
+		   .attr("class", "mother-alt-count tooltip-header-small")
+		   .html("<span class='tooltip-subtitle " + selectedClazz + "'>Mother</span>");
+		row.append("div")
+		   .attr("class", "tooltip-zygosity label " + (trioFields.MOTHER.zygosity != null ? trioFields.MOTHER.zygosity.toLowerCase() : ""))
+		   .text(trioFields.MOTHER.zygosity ? capitalizeFirstLetter(trioFields.MOTHER.zygosity.toLowerCase()) : "");
+		column = row.append("div")
+		            .attr("class", "mother-alt-count tooltip-allele-count-bar");
+		if (trioFields.MOTHER.zygosity && trioFields.MOTHER.zygosity != '') {			            
+			this._appendAlleleCountSVG(column, trioFields.MOTHER.genotypeAltCount,trioFields.MOTHER.genotypeRefCount, trioFields.MOTHER.genotypeDepth, barWidth);		
+		}
 
-	    // If we have determined the inheritance for mother or father, show the allele count bars for the full trio
-	    if ((variant.motherZygosity && variant.motherZygosity != '') || (variant.fatherZygosity && variant.fatherZygosity != null)) {
-			row.append("div")
-			   .attr("class", "mother-alt-count tooltip-header-small")
-			   .html("<span class='tooltip-subtitle'>Mother</span>");
-			row.append("div")
-			   .attr("class", "tooltip-zygosity label " + (variant.motherZygosity != null ? variant.motherZygosity.toLowerCase() : ""))
-			   .text(variant.motherZygosity ? capitalizeFirstLetter(variant.motherZygosity.toLowerCase()) : "");
-			column = row.append("div")
-			            .attr("class", "mother-alt-count tooltip-allele-count-bar")
-			this._appendAlleleCountSVG(column, variant.genotypeAltCountMother, variant.genotypeRefCountMother, variant.genotypeDepthMother, barWidth);		
-
-			// Father
-			container.select("div.father-alt-count").remove();
-			row = container.append("div")
-		                   .attr("class", "father-alt-count tooltip-row");	
-			row.append("div")
-		       .attr("class", "father-alt-count tooltip-header-small")
-		       .html("<span class='tooltip-subtitle'>Father</span>");
-			row.append("div")
-			   .attr("class",  "tooltip-zygosity label " + (variant.fatherZygosity != null ? variant.fatherZygosity.toLowerCase() : ""))
-			   .text(variant.fatherZygosity ? capitalizeFirstLetter(variant.fatherZygosity.toLowerCase()) : "");
-			column = row.append("div")
-		                .attr("class", "father-alt-count tooltip-allele-count-bar")
-			this._appendAlleleCountSVG(column, variant.genotypeAltCountFather, variant.genotypeRefCountFather, variant.genotypeDepthFather, barWidth);
-
-	    }
-	}
+		// Father
+		selectedClazz = trioFields.FATHER.selected ? 'selected' : '';
+		container.select("div.father-alt-count").remove();
+		row = container.append("div")
+	                   .attr("class", "father-alt-count tooltip-row");	
+		row.append("div")
+	       .attr("class", "father-alt-count tooltip-header-small")
+	       .html("<span class='tooltip-subtitle " + selectedClazz + "'>Father</span>");
+		row.append("div")
+		   .attr("class",  "tooltip-zygosity label " + (trioFields.FATHER.zygosity != null ? trioFields.FATHER.zygosity.toLowerCase() : ""))
+		   .text(trioFields.FATHER.zygosity ? capitalizeFirstLetter(trioFields.FATHER.zygosity.toLowerCase()) : "");
+		column = row.append("div")
+	                .attr("class", "father-alt-count tooltip-allele-count-bar")
+		if (trioFields.FATHER.zygosity && trioFields.FATHER.zygosity != '') {			            
+			this._appendAlleleCountSVG(column, trioFields.FATHER.genotypeAltCount, trioFields.FATHER.genotypeRefCount, trioFields.FATHER.genotypeDepth, barWidth);
+		}
+    
+	} 
 }
 
 VariantCard.prototype._appendReadCountHeading = function(container) {
@@ -1940,7 +2009,7 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 					   .attr("id", "allele-count-legend")	
 		           	   .style("padding-top", "5px")		           	   
 				       .append("svg")
-				       .attr("width", 190)
+				       .attr("width", 198)
 	           		   .attr("height", "20");
 	svg.append("text")
 		   .attr("x", "0")
@@ -1950,7 +2019,7 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 		   .text("Read Counts");	  	           		   
 
 	var g = svg.append("g")
-	           .attr("transform", "translate(70,0)");
+	           .attr("transform", "translate(77,0)");
 
 	g.append("text")
 		   .attr("x", "13")
