@@ -43,7 +43,7 @@ var prod_iobio_services     = "nv-prod.iobio.io/";
 
 var new_iobio_services    = isOffline ? serverInstance : dev_iobio_services;
 var iobio_services        = (isOffline ? "ws://" : "wss://")  + (isOffline ? serverInstance : prod_iobio_services);
-var iobio_http_services   = "http://" + (isOffline ? serverInstance : prod_iobio_services);
+var iobio_http_services   = "http://" + (isOffline ? serverInstance : stage_iobio_services);
 
 var geneiobio_server     = iobio_http_services + "geneinfo/";
 var geneToPhenoServer    = iobio_http_services + "gene2pheno/";
