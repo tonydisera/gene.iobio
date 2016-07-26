@@ -2068,7 +2068,7 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 }
 
 VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth, barWidth) {
-	var MAX_BAR_WIDTH = barWidth ? barWidth : 200;
+	var MAX_BAR_WIDTH = barWidth ? barWidth : 185;
 	var PADDING = 20;
 	var BAR_WIDTH = 0;
 	if ((genotypeDepth == null || genotypeDepth == '') && (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0)) {
