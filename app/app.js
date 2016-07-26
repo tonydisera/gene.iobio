@@ -1837,7 +1837,13 @@ function loadTracksForGene(bypassVariantCards) {
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
 
-		// Load the variants in the variant cards.
+		// Load the variants in the variant cards first.  When all are loaded,
+		// load the coverage for the alignment files.  We load the variants
+		// first so that we can send in the specific points of the variants
+		// to samtools mpileup to get the exact coverage at each 
+		// variant's position.  We load the coverage before showing
+		// the coverage so that the max depth for all variant cards
+		// is determined so that the coverage scales across all samples.
 		var variantPromises = [];
 		var coveragePromises = [];
 		var allMaxDepth = 0;

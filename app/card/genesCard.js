@@ -153,90 +153,108 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	}
 
 	// lowest clinvar value = highest relevance
-	var clinvar1 = null;
+	var clinvar1 = 9999;
 	if (danger1.CLINVAR) {
 		for (key in danger1.CLINVAR) {
-			clinvar1 = danger1.CLINVAR[key].value;
+			var showBadge = matrixCard.clinvarMap[key].badge;
+			if (showBadge) {
+				clinvar1 = danger1.CLINVAR[key].value;
+			}
 		}
 	}
-	var clinvar2 = null;
+	var clinvar2 = 9999;
 	if (danger2.CLINVAR) {
 		for (key in danger2.CLINVAR) {
-			clinvar2 = danger2.CLINVAR[key].value;
+			var showBadge = matrixCard.clinvarMap[key].badge;
+			if (showBadge) {
+				clinvar2 = danger2.CLINVAR[key].value;
+			}
 		}
 	}
 
 
 	// sift
-	var sift1 = null;
+	var sift1 = 9999;
 	if (danger1.SIFT) {
 		for (key in danger1.SIFT) {
 			var siftClass = Object.keys(danger1.SIFT[key])[0];
-			sift1 = matrixCard.siftMap[siftClass].value;
+			var showBadge = matrixCard.siftMap[siftClass].badge;
+			if (showBadge) {
+				sift1 = matrixCard.siftMap[siftClass].value;
+			}
 		}
 	}
-	var sift2 = null;
+	var sift2 = 9999;
 	if (danger2.SIFT) {
 		for (key in danger2.SIFT) {
 			var siftClass = Object.keys(danger2.SIFT[key])[0];
-			sift2 = matrixCard.siftMap[siftClass].value;
+			var showBadge = matrixCard.siftMap[siftClass].badge;
+			if (showBadge) {
+				sift2 = matrixCard.siftMap[siftClass].value;
+			}
 		}
 	}
 
 
 	// polyphen
-	var polyphen1 = null;
+	var polyphen1 = 9999;
 	if (danger1.POLYPHEN) {
 		for (key in danger1.POLYPHEN) {
 			var polyphenClass = Object.keys(danger1.POLYPHEN[key])[0];
-			polyphen1 = matrixCard.polyphenMap[polyphenClass].value;
+			var showBadge = matrixCard.polyphenMap[polyphenClass].badge;
+			if (showBadge) {
+				polyphen1 = matrixCard.polyphenMap[polyphenClass].value;
+			}
 		}
 	}
-	var polyphen2 = null;
+	var polyphen2 = 9999;
 	if (danger2.POLYPHEN) {
 		for (key in danger2.POLYPHEN) {
 			var polyphenClass = Object.keys(danger2.POLYPHEN[key])[0];
-			polyphen2 = matrixCard.polyphenMap[polyphenClass].value;
+			var showBadge = matrixCard.polyphenMap[polyphenClass].badge;
+			if (showBadge) {
+				polyphen2 = matrixCard.polyphenMap[polyphenClass].value;
+			}			
 		}
 	}
 	// lowest impact value = highest relevance
-	var impact1 = null;
+	var impact1 = 9999;
 	if (danger1.IMPACT) {
 		for (key in danger1.IMPACT) {
 			impact1 = matrixCard.impactMap[key].value;
 		}
 	}
-	var impact2 = null;
+	var impact2 = 9999;
 	if (danger2.IMPACT) {
 		for (key in danger2.IMPACT) {
 			impact2 = matrixCard.impactMap[key].value;
 		}
 	}
 
-	if (clinvar1 > clinvar2) {
+	if (clinvar1 < clinvar2) {
 		return -1;
-	} else if (clinvar2 > clinvar1) {
+	} else if (clinvar2 < clinvar1) {
 		return 1;
 	} else {
-		if (sift1 > sift2) {
+		if (sift1 < sift2) {
 			return -1;
-		} else if (sift2 > sift1) {
+		} else if (sift2 < sift1) {
 			return 1;
 		} else {
-			if (polyphen1 > polyphen2) {
+			if (polyphen1 < polyphen2) {
 				return -1;
-			} else if (polyphen2 > polyphen1) {
+			} else if (polyphen2 < polyphen1) {
 				return 1;
 			} else {
-				if (impact1 > impact2) {
+				if (impact1 < impact2) {
 					return -1;
-				} else if (impact2 > impact1) {
+				} else if (impact2 < impact1) {
 					return 1;
 				} else {
-					if (geneName1 > geneName2) {
-						return 1;
-					} else if (geneName2 > geneName1) {
+					if (geneName1 < geneName2) {
 						return -1;
+					} else if (geneName2 < geneName1) {
+						return 1;
 					} else {
 						return 0;
 					}

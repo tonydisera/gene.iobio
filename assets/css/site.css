@@ -1901,20 +1901,21 @@ header {
 .tooltip-allele-count-bar {
   overflow-wrap: break-word;
   float: left;
-  width: 180px; }
+  width: 180px;
+  height: 25px; }
 
 .tooltip-zygosity {
   float: left;
   font-size: 9px;
   font-weight: normal !important;
-  padding-top: 2px !important;
+  padding-top: 1px !important;
   padding-bottom: 0px !important;
-  padding-right: 2px !important;
-  padding-left: 2px !important;
+  padding-right: 0px !important;
+  padding-left: 0px !important;
   background-color: #D3D5D8 !important;
-  margin-right: 6px;
+  margin-right: 3px;
   margin-top: 0px !important;
-  width: 24px !important;
+  width: 33px !important;
   color: black;
   border: solid thin rgba(0, 0, 0, 0.22); }
 
@@ -1923,10 +1924,7 @@ header {
   color: white; }
 .tooltip-zygosity.homref {
   background-color: #5D809D !important;
-  width: 35px !important;
-  color: white;
-  margin-left: -6px !important;
-  margin-right: 1px; }
+  color: white; }
 
 .tooltip-subtitle {
   font-size: 10px;
@@ -1934,6 +1932,10 @@ header {
   color: #717171;
   padding-top: 4px;
   padding-bottom: 1px; }
+  .tooltip-subtitle.selected {
+    font-weight: bolder;
+    color: #3586c0;
+    font-style: italic; }
 
 .tooltip-footer {
   color: #2E73AB !important;
@@ -2432,7 +2434,8 @@ text.ref-count {
   margin-left: 10px; }
 
 #gene-page-control {
-  float: right; }
+  float: right;
+  width: 170px; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
     font-size: 11px;
