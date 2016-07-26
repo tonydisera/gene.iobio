@@ -21,7 +21,6 @@ vcfiobio = function module() {
   var SOURCE_TYPE_FILE = "file";
   var sourceType = "url";
 
-  var clinvarIterCount       = 0;
 
   // new minion servers
   var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
@@ -37,7 +36,8 @@ vcfiobio = function module() {
 
   // old (pre devkit)
   var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+ // var tabixServer            = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+  var tabixServer            = iobio_services +  "tabix/";
   var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
   var snpEffServer           = iobio_services + "snpeff/";
   var snpSiftServer          = iobio_services + "snpsift/";
@@ -935,7 +935,7 @@ var effectCategories = [
     // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
     var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
     var server = vepServer;
-    
+
     // Connect to the vep server    
     var client = BinaryClient(server);
     
@@ -1279,12 +1279,11 @@ var effectCategories = [
     });
   }
 
-  exports.promiseGetClinvarRecords = function(theVcfData, refName, regionStart, regionEnd, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecords = function(theVcfData, refName, geneObject, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       var batchSize = 100;
-      me.clinvarIterCount = 0;
       // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
       // repeating until all variants have been processed.
       var numberOfBatches = Math.ceil(theVcfData.features.length / batchSize);
@@ -1295,9 +1294,10 @@ var effectCategories = [
         var start = i * batchSize;
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
+        var isLastBatch = (i == numberOfBatches - 1 ? true : false);
 
         if (isClinvarOffline) {
-          me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
+          me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction)
           .then(  function() {
             resolve(theVcfData);
           }, function(error) {
@@ -1305,7 +1305,7 @@ var effectCategories = [
           });
 
         } else {
-          me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction)
+          me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction)
           .then(  function() {
             resolve(theVcfData);
           }, function(error) {
@@ -1319,16 +1319,14 @@ var effectCategories = [
   }
 
   // When there is no internet, read the clinvar vcf to obtain clinvar annotations
-  exports.promiseGetClinvarRecordsOffline= function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecordsOffline= function(variants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
+      var regionStart = geneObject.start;
+      var regionEnd = geneObject.end;
 
-      me.clinvarIterCount++;
-      var isFinal = false;
-      if (me.clinvarIterCount == numberOfBatches) {
-          isFinal = true;
-      }
+
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
@@ -1378,7 +1376,7 @@ var effectCategories = [
 
         clinvarLoadVariantsFunction(vcfObjects);
 
-        if (isFinal) {
+        if (isLastBatch) {
           resolve();
         }
 
@@ -1394,10 +1392,13 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetClinvarRecordsImpl = function(variants, refName, regionStart, regionEnd, numberOfBatches, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecordsImpl = function(variants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
+
+      var regionStart = geneObject.start;
+      var regionEnd = geneObject.end;
 
 
       // Multiallelic input vcf records were assigned a number submission
@@ -1417,16 +1418,6 @@ var effectCategories = [
         if (pos == null || ref == null || alt == null) {
 
         } else {
-          // sourceIndex++;
-          // // Figure out if this is multiallelic and increment
-          // // the index accordinging.
-
-          // var altTokens = alt.split(",");
-          // altTokens.forEach(function(altToken) {
-          //   clinvarIndex++;
-          //   clinvarToSourceMap[clinvarIndex] = sourceIndex;
-          // });
-
           // Get rid of the left most anchor base for insertions and
           // deletions for accessing clinvar
           var clinvarStart = +pos;
@@ -1456,21 +1447,15 @@ var effectCategories = [
           var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
           $.ajax( summaryUrl )
             .done(function(sumData) {
-              me.clinvarIterCount++;
-              var isFinal = false;
-              if (me.clinvarIterCount == numberOfBatches) {
-                isFinal = true;
-              }
+
               if (sumData.result == null) {
                 if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
                   sumData.esummaryresult.forEach( function(message) {
-                    //console.log(message);
                   });
                 }
-                //console.log("No data returned from clinvar request " + summaryUrl);
                 sumData.result = {uids: []};
                 clinvarLoadVariantsFunction(sumData.result);
-                if (isFinal) {
+                if (isLastBatch) {
                   resolve();
                 }
 
@@ -1483,11 +1468,11 @@ var effectCategories = [
                   else
                     return -1;
                 })
-                sumData.result.uids = sorted
+                sumData.result.uids = sorted;
                 if (clinvarLoadVariantsFunction) {
                   clinvarLoadVariantsFunction(sumData.result);
                 }
-                if (isFinal) {
+                if (isLastBatch) {
                   resolve();
                 }
 

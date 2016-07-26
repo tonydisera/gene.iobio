@@ -1262,8 +1262,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		    	// 
 		    	if (me.getRelationship() != 'sibling') {
 			    	return me.vcf.promiseGetClinvarRecords(
+
 			    		theVcfData, 
-			    		me._stripRefName(ref), geneObject.start, geneObject.end, 
+			    		me._stripRefName(ref), geneObject, 
 			    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {

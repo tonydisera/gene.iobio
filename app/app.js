@@ -1380,15 +1380,13 @@ function cacheGene(geneName) {
 
 			    		}, function(error) {
 			    			genesCard._setGeneBadgeError(geneObject.gene_name);			    				
-			    			if (genesToCache.indexOf(geneObject.gene_name) >= 0) {
-			    				var message = error.hasOwnProperty("message") ? error.message : error;
-				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-				    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+		    				var message = error.hasOwnProperty("message") ? error.message : error;
+			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
+			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
 
-		    					// take this gene off of the queue and see
-		    					// if next batch of genes should be analyzed
-					    		cacheNextGene(geneObject.gene_name);					
-			    			}
+	    					// take this gene off of the queue and see
+	    					// if next batch of genes should be analyzed
+				    		cacheNextGene(geneObject.gene_name);					
 			    		});
 
 		    		}
@@ -1396,12 +1394,9 @@ function cacheGene(geneName) {
 		    	});	
 		    } else {
 				genesCard._setGeneBadgeError(geneName);			    				
-    			if (genesToCache.indexOf(geneName) >= 0) {
-    				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
-	    			genesCard._geneBadgeLoading(geneName, false);
-
-		    		cacheNextGene(geneName);
-		    	}					
+				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
+    			genesCard._geneBadgeLoading(geneName, false);
+	    		cacheNextGene(geneName);
     		}		    	
 
 
