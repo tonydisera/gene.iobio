@@ -412,8 +412,8 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 
 	});
 	geneBadgesToRemove.forEach( function(geneName) {
-		var selector = me._getGeneBadge(geneName);
-		$(selector).parent().parent().remove();
+		var gb = me._getGeneBadge(geneName);
+		gb.remove();
 	});
 
 
@@ -478,8 +478,8 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 
 	});
 	geneBadgesToRemove.forEach( function(geneName) {
-		var selector = me._getGeneBadge(geneName);
-		selector.remove();
+		var gb = me._getGeneBadge(geneName);
+		gb.remove();
 	});
 
 
@@ -877,7 +877,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 	var index = geneNames.indexOf(theGeneName);
 	if (index >= 0) {
 		geneNames.splice(index, 1);
-		$(badgeElement).parent().remove();
+		$(badgeElement).remove();
 
 		me._onGeneBadgeUpdate();
 	}
