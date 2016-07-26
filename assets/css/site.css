@@ -2434,7 +2434,8 @@ text.ref-count {
   margin-left: 10px; }
 
 #gene-page-control {
-  float: right; }
+  float: right;
+  width: 170px; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
     font-size: 11px;
