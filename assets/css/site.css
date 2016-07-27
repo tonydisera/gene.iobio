@@ -1929,13 +1929,12 @@ header {
 .tooltip-subtitle {
   font-size: 10px;
   text-align: center;
-  color: #717171;
+  color: black;
   padding-top: 4px;
   padding-bottom: 1px; }
   .tooltip-subtitle.selected {
-    font-weight: bolder;
-    color: #3586c0;
-    font-style: italic; }
+    font-weight: bold;
+    color: #3586c0; }
 
 .tooltip-footer {
   color: #2E73AB !important;
@@ -2003,6 +2002,13 @@ text.other-count-under {
   font-style: italic !important; }
 text.ref-count {
   fill: #717171 !important; }
+
+#coverage-svg .processing {
+  margin-left: 40px;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 10px;
+  color: black; }
 
 .tooltip.left-arrow:before {
   position: absolute;

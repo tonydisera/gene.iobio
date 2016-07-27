@@ -1894,43 +1894,52 @@ VariantCard.prototype._getTrioAlleleCountFields = function(variant) {
 			                   genotypeAltCount: variant.genotypeAltCount, 
 			                   genotypeRefCount: variant.genotypeRefCount, 
 			                   genotypeDepth: variant.genotypeDepth,
-			                   selected: true };
+			                   selected: true,
+			                   done: true };
 		trioFields.MOTHER  = { zygosity: variant.motherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountMother, 
 			                   genotypeRefCount: variant.genotypeRefCountMother, 
-			                   genotypeDepth: variant.genotypeDepthMother };
+			                   genotypeDepth: variant.genotypeDepthMother,
+			                   done: variant.hasOwnProperty("motherZygosity") };
 		trioFields.FATHER  = { zygosity: variant.fatherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountFather, 
 			                   genotypeRefCount: variant.genotypeRefCountFather, 
-			                   genotypeDepth: variant.genotypeDepthFather };
+			                   genotypeDepth: variant.genotypeDepthFather,
+			                   done: variant.hasOwnProperty("fatherZygosity") };
 	} else if (me.model.getRelationship() == 'mother') {
 		trioFields.PROBAND = { zygosity: variant.probandZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountProband, 
 			                   genotypeRefCount: variant.genotypeRefCountProband, 
-			                   genotypeDepth: variant.genotypeDepthProband };
+			                   genotypeDepth: variant.genotypeDepthProband,
+			                   done: variant.hasOwnProperty("probandZygosity")  };
 		trioFields.MOTHER  = { zygosity: variant.zygosity, 
 			                   genotypeAltCount: variant.genotypeAltCount, 
 			                   genotypeRefCount: variant.genotypeRefCount, 
 			                   genotypeDepth: variant.genotypeDepth,
-			                   selected: true};
+			                   selected: true,
+			                   done: true };
 		trioFields.FATHER =  { zygosity: variant.fatherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountFather, 
 			                   genotypeRefCount: variant.genotypeRefCountFather, 
-			                   genotypeDepth: variant.genotypeDepthFather };
+			                   genotypeDepth: variant.genotypeDepthFather,
+			                   done: variant.hasOwnProperty("fatherZygosity") };
 	} else if (me.model.getRelationship() == 'father') {
 		trioFields.PROBAND = { zygosity: variant.probandZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountProband, 
 			                   genotypeRefCount: variant.genotypeRefCountProband, 
-			                   genotypeDepth: variant.genotypeDepthProband };
+			                   genotypeDepth: variant.genotypeDepthProband,
+			                   done: variant.hasOwnProperty("probandZygosity") };
 		trioFields.MOTHER  = { zygosity: variant.motherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountMother, 
 			                   genotypeRefCount: variant.genotypeRefCountMother, 
-			                   genotypeDepth: variant.genotypeDepthMother };
+			                   genotypeDepth: variant.genotypeDepthMother,
+			                   done: variant.hasOwnProperty("motherZygosity")  };
 		trioFields.FATHER  = { zygosity: variant.zygosity, 
 			                   genotypeAltCount: variant.genotypeAltCount, 
 			                   genotypeRefCount: variant.genotypeRefCount, 
 			                   genotypeDepth: variant.genotypeDepth,
-			                   selected: true };
+			                   selected: true,
+			                   done: true };
 	} 
 	return trioFields;
 
@@ -1947,7 +1956,7 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 
 	
 	// Show the Proband's allele counts
-	var selectedClazz = trioFields.PROBAND.selected ? 'selected' : '';
+	var selectedClazz = dataCard.mode == 'trio' && trioFields.PROBAND.selected ? 'selected' : '';
 	var row = container.append("div")
 	                   .attr("class", "proband-alt-count tooltip-row");
 	row.append("div")
@@ -1960,7 +1969,9 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 	                .attr("class", "proband-alt-count tooltip-allele-count-bar");
 	if (trioFields.PROBAND.zygosity && trioFields.PROBAND.zygosity != '') {
 		me._appendAlleleCountSVG(column, trioFields.PROBAND.genotypeAltCount, trioFields.PROBAND.genotypeRefCount, trioFields.PROBAND.genotypeDepth, barWidth);	
-	}               
+	}  else if (!trioFields.PROBAND.done) {
+		column.append("span").attr("class", "processing").text("analyzing..");
+	}             
 
 	
 	if (dataCard.mode == 'trio') {
@@ -1981,6 +1992,8 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 		            .attr("class", "mother-alt-count tooltip-allele-count-bar");
 		if (trioFields.MOTHER.zygosity && trioFields.MOTHER.zygosity != '') {			            
 			this._appendAlleleCountSVG(column, trioFields.MOTHER.genotypeAltCount,trioFields.MOTHER.genotypeRefCount, trioFields.MOTHER.genotypeDepth, barWidth);		
+		} else if (!trioFields.MOTHER.done) {
+			column.append("span").attr("class", "processing").text("analyzing..");
 		}
 
 		// Father
@@ -1998,6 +2011,8 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 	                .attr("class", "father-alt-count tooltip-allele-count-bar")
 		if (trioFields.FATHER.zygosity && trioFields.FATHER.zygosity != '') {			            
 			this._appendAlleleCountSVG(column, trioFields.FATHER.genotypeAltCount, trioFields.FATHER.genotypeRefCount, trioFields.FATHER.genotypeDepth, barWidth);
+		} else if (!trioFields.FATHER.done) {
+			column.append("span").attr("class", "processing").text("analyzing..");
 		}
     
 	} 
