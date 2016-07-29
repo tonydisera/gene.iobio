@@ -2616,13 +2616,13 @@ VariantCard.prototype._linksRow = function(variant, pinMessage) {
 		if (variant.hasOwnProperty('isBookmark') && variant.isBookmark == 'Y') {
 			return '<div class="row tooltip-footer">'
 			  + '<div class="col-sm-4"></div>'
-			  + '<div class="col-sm-4 tooltip-footer" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
-			  + '<div class="col-md-4 tooltip-footer" style="text-align:right;">' +  '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '<div class="col-sm-4 " id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
+			  + '<div class="col-md-4 " style="text-align:right;">' +  '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
 			  + '</div>';
 
 		} else {
 			return '<div class="row tooltip-footer">'
-			  + '<div class="col-md-12 tooltip-footer" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
+			  + '<div class="col-md-12 " style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
 			  + '</div>';
 		}
 	}

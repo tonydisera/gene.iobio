@@ -1939,8 +1939,10 @@ header {
 .tooltip-footer {
   color: #2E73AB !important;
   margin-bottom: -2px;
-  margin-top: 20px !important;
+  margin-top: 35px !important;
   font-size: 11px; }
+  .tooltip-footer .bookmark text {
+    font-size: 11px !important; }
 
 .tooltip a {
   color: #2E73AB !important;
