@@ -23,11 +23,6 @@ ExamineCard.prototype.showVariant = function(variant, isRefresh) {
 
 	$('#examine-card #examine-card-content').html(getProbandVariantCard().variantDetailHTML(variant));
 
-	if (variant.isBookmark) {
-		$("#examine-card .tooltip-title").prepend("<svg class=\"bookmark-badge\" height=\"14\" width=\"15\">");
-		var selection = d3.select('#examine-card .bookmark-badge').data([{clazz: "bookmark"}]);
-		matrixCard.showBookmarkSymbol(selection);
-	}
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	

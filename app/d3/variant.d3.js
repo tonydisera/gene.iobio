@@ -664,6 +664,25 @@ function variantD3() {
 
   }
  
+
+  chart.removeBookmark = function(svg, variant) {
+    // Find the matching variant
+    var matchingVariant = null;
+    svg.selectAll(".variant").each( function (d,i) {
+       if (d.start == variant.start 
+          && d.end == variant.end 
+          && d.ref == variant.ref 
+          && d.alt == variant.alt 
+          && d.type.toLowerCase() == variant.type.toLowerCase()) {
+          matchingVariant = d;
+       }
+    });
+    if (!matchingVariant) {
+      return;
+    }
+    matchingVariant.isBookmark = 'N';
+  }
+
   function tickFormatter (d) {
     if ((d / 1000000) >= 1)
       d = d / 1000000 + "M";

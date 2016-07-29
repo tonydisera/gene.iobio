@@ -1749,11 +1749,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		matrixCard.showImpactBadge(selection);	
 
 	}
-	if (variant.isBookmark) {
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"bookmark-badge\" height=\"16\" width=\"35\">");
-		var selection = tooltip.select('.bookmark-badge').data([{clazz: "bookmark"}]);
-		matrixCard.showBookmarkSymbol(selection);
-	}
+
 	if (variant.inheritance && variant.inheritance != '') {
 		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
@@ -2529,7 +2525,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ clinvarRow1
 			+ clinvarRow2
 			+ me._tooltipRowAlleleCounts() 
-			+ me._linksRow(pinMessage)
+			+ me._linksRow(variant, pinMessage)
 		);                  
 
 	} else {
@@ -2555,7 +2551,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ me._tooltipRow('Qual', variant.qual) 
 			+ me._tooltipRow('Filter', variant.recfilter) 
 			+ me._tooltipRowAlleleCounts() 
-			+ me._linksRow()
+			+ me._linksRow(variant)
 		);                  
 
 	}
@@ -2586,7 +2582,7 @@ VariantCard.prototype.variantTooltipMinimalHTML = function(variant) {
 }
 
 
-VariantCard.prototype._linksRow = function(pinMessage) {
+VariantCard.prototype._linksRow = function(variant, pinMessage) {
 	if (pinMessage == null) {
 		pinMessage = 'Click on variant to lock tooltip';
 	}
@@ -2600,7 +2596,7 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 
 	if (window.clickedVariant) {
 		var bookmarkLink = null;
-		if (window.clickedVariant.isBookmark) {
+		if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
 			return '<div class="row tooltip-footer">'
 			  + examineCol
 			  + '<div class="col-sm-4" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
@@ -2617,9 +2613,18 @@ VariantCard.prototype._linksRow = function(pinMessage) {
 		}
 		
 	} else {
-		return '<div class="row tooltip-footer">'
-		  + '<div class="col-md-12 tooltip-footer" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
-		  + '</div>';
+		if (variant.hasOwnProperty('isBookmark') && variant.isBookmark == 'Y') {
+			return '<div class="row tooltip-footer">'
+			  + '<div class="col-sm-4"></div>'
+			  + '<div class="col-sm-4 tooltip-footer" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
+			  + '<div class="col-md-4 tooltip-footer" style="text-align:right;">' +  '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '</div>';
+
+		} else {
+			return '<div class="row tooltip-footer">'
+			  + '<div class="col-md-12 tooltip-footer" style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
+			  + '</div>';
+		}
 	}
 }
 
@@ -2748,8 +2753,12 @@ VariantCard.prototype.removeBookmarkFlag = function(variant, key) {
 	// Remove the current indicator from the bookmark flag
 	if (variant.fbCalled == 'Y') {
 		this.d3CardSelector.select("#fb-variants > svg .bookmark#" + key).remove();
+		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
+		this.fbChart.removeBookmark(container, variant);
 	} else {
 		this.d3CardSelector.select("#vcf-variants > svg .bookmark#" + key).remove();
+		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');
+		this.vcfChart.removeBookmark(container, variant);
 	}
 
 }

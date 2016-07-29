@@ -159,6 +159,7 @@ BookmarkCard.prototype.removeBookmark = function(key, variant) {
 	var me = this;
 	variant.isBookmark = 'N';
 	getProbandVariantCard().removeBookmarkFlag(variant, this.compressKey(key));
+	matrixCard.removeBookmarkFlag(variant);
 
 
 	var geneName = key.split(": ")[0];
@@ -609,6 +610,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          	         .text("close");  
 
  			removeIcon.on('click', function(d,i) {
+					d3.event.stopPropagation(); 				
  					me.removeBookmark(d.key, d.value);
 			   });
 

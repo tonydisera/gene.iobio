@@ -191,6 +191,16 @@ MatrixCard.prototype.getRowAttribute = function(searchTerm) {
 	return attribute;
 }
 
+MatrixCard.prototype.getRowOrder = function(searchTerm) {
+	var order = "";
+	this.matrixRows.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			order = row.order;
+		}
+	});	
+	return order;
+}
+
 
 MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 	this.featureMatrix.tooltipHTML(tooltipFunction);
@@ -370,7 +380,8 @@ MatrixCard.prototype._isolateVariants = function() {
 }
 
 MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
-	var i = -1;
+	var i = 0;
+	var index = -1;
 	d3.select("#feature-matrix").datum().forEach( function(variant) {
 		if (variant.start == theVariant.start &&
 			variant.alt == theVariant.alt &&
@@ -380,9 +391,40 @@ MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
 		}
 		i++;
 	});
+	if (index >= 0) {
+		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
+		var column  = d3.select(colNode);
+		var colObject = column.datum();		
+
+		var rowIdx = this.getRowOrder("Bookmark");
+		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ")").data([{clazz: 'bookmark' }]);
+		this.showBookmarkSymbol(selection);
+	}
 
 }
+MatrixCard.prototype.removeBookmarkFlag = function(theVariant) {
+	var i = 0;
+	var index = -1;
+	d3.select("#feature-matrix").datum().forEach( function(variant) {
+		if (variant.start == theVariant.start &&
+			variant.alt == theVariant.alt &&
+			variant.end == theVariant.end) {
+			variant.isBookmark = 'Y';
+			index = i;
+		}
+		i++;
+	});
+	if (index >= 0) {
+		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
+		var column  = d3.select(colNode);
+		var colObject = column.datum();	
+		colObject.isBookmark = 'N';	
 
+		var rowIdx = this.getRowOrder("Bookmark");
+		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ") g.bookmark").remove();
+	}
+
+}
 MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	var me  = this;
 	var index = -1;
@@ -513,11 +555,6 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
-	}
-	if (variant.isBookmark) {
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"bookmark-badge\" height=\"16\" width=\"35\">");
-		var selection = tooltip.select('.bookmark-badge').data([{clazz: "bookmark"}]);
-		matrixCard.showBookmarkSymbol(selection);
 	}
 
 	var selection = tooltip.select("#coverage-svg");
