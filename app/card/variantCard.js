@@ -644,7 +644,7 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 			}
 
 
-			// Load the variant chart.
+			// Load the variant chart.			
 			me._showVariants( regionStart, 
 				regionEnd, 
 				function() {						
@@ -652,6 +652,8 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 					resolve();
 				},
 				true);
+			
+
 
 		} else {
 			resolve();
@@ -816,6 +818,7 @@ VariantCard.prototype.showBamDepth = function(maxDepth, callbackDataLoaded) {
 VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth, callbackDataLoaded) {	
 	var me = this;
 
+	filterCard.enableCoverageFilters();
 
 	if (!this.model.isBamLoaded()) {
 		// We can still apply the filter coverage if the vcf has the read depth in the
@@ -848,16 +851,13 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
    	    }
 	} else {
 
-		// If we have varaitns, get coverage for every variant
+		// If we have variants, get coverage for every variant
 		me.showBamProgress("Calculating coverage");
 
 		
 		this.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
 			me.endBamProgress();
 			me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
-
-			filterCard.enableCoverageFilters();
-			me.refreshVariantChartAndMatrix(theVcfData);
 
 			if (callbackDataLoaded) {
 		   	    callbackDataLoaded();
@@ -896,54 +896,29 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 	}
 }
 
-
-
-VariantCard.prototype.refreshVariantChartAndMatrix = function(theVcfData) {
+/*
+*  This method is invoked with the variants have been fully annotated, including
+*  vep, clinvar, coverage (from alignments), and inheritance (for trio).
+*  
+*/
+VariantCard.prototype.showFinalizedVariants = function() {
 	var me = this;
-
-	if (theVcfData == null) {
-		theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	me.endVariantProgress();
+	theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	// For the proband, the fillFeatureMatrix method will both display the variants
+	// in the Ranked Variants card (the feature matrix) as well as the Variant card for
+	// the proband sample.  
+	if (me.model.getRelationship() == 'proband') {
+		me.fillFeatureMatrix(regionStart, regionEnd);
+	} else {
+		// For mother and father, show the variants in their respective
+		// Variant cards.
+		me._showVariants(regionStart, regionEnd, null, false);
 	}
-
-	// Refresh feature matrix for proband card as soon as variants
-	// inheritance mode determined and clinvar loaded
-	this.model.promiseAnnotated(theVcfData)
-	    .then(function() {	
-	        // Show the freebayes variants if we have fb data
-			if (me.model.isBamLoaded()) {
-				me._fillFreebayesChart(me.model.getCalledVariants(), regionStart, regionEnd);
-			}	
-
-			if (me.model.getRelationship() == 'proband') {
-				me.fillFeatureMatrix(regionStart, regionEnd);
-			}
-		},
-		function(error) {			
-		});
-
- 	// Refresh variant charts when variants are annotated
- 	// with clinvar, inheritance mode determined, and
- 	// (if alignments provided) initialized with coverage 
- 	// (depth) from alignments.
- 	this.model.promiseAnnotatedAndCoverage(theVcfData)
- 	    .then(function() {
-
-
-
-			me.endVariantProgress();
-			me._showVariants(regionStart, regionEnd, null, false);
-
-
-			// Refresh the feature matrix after clinvar AND the coverage has
-			// been loaded
-			if (me.model.getRelationship() == 'proband') {
-				me.fillFeatureMatrix(regionStart, regionEnd);				
-			}
-
- 		},
- 		function(error) {
- 		});
-
+	// Show called variants as well.
+	if (me.model.isBamLoaded()) {
+		me._fillFreebayesChart(me.model.getCalledVariants(), regionStart, regionEnd);
+	}	
 }
 
 
@@ -1041,48 +1016,14 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 			if (me.getRelationship() == 'proband') {
 				me.model.pruneIntronVariants(theVcfData);
 		    }
-			var filteredVcfData = this.filterVariants(theVcfData);
+		    // Filter variants runs filter and then fills the variant chart.
+			var filteredVcfData = this.filterVariants(theVcfData, showTransition);
 			me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount(filteredVcfData));
 			me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
 
-			if (me.getRelationship() != 'proband') {
-				me._fillVariantChart(filteredVcfData, 
-		  							 regionStart ? regionStart : window.gene.start, 
-		  							 regionEnd ? regionEnd : window.gene.end,
-		  							 false,
-		  							 showTransition);  // Don't show transitions for mother and father				
-			}
-
-			promiseDetermineInheritance().then(function() {
-				
-				filterCard.enableVariantFilters(true);
-				filterCard.enableClinvarFilters(theVcfData);
-				
-
-	  			getProbandVariantCard()._fillVariantChart(filteredVcfData, 
-	  								 regionStart ? regionStart : window.gene.start, 
-	  								 regionEnd ? regionEnd : window.gene.end,
-	  								 false,
-	  								 showTransition  // this is where we show the transition unless we have already done so
-	  								 );
-
-	  			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
-				if (me.model.isBamLoaded()) {
-					me._fillFreebayesChart(me.model.getCalledVariants(), 
-										   regionStart ? regionStart : window.gene.start, 
-										   regionEnd ? regionEnd : window.gene.end);
-				}	
-
-				
-
-			}, function(error) {
-				console.log("an error occurred when determine inheritance. " + error);
-			})	    	
-
-			
 		}
 		if (onVariantsDisplayed) {
 	   	    onVariantsDisplayed();
@@ -1158,9 +1099,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		  			if (me.getRelationship() == 'proband') {
 				    	filterCard.enableClinvarFilters(data);
 				    }
-
-				    // Indicate that we have refreshed variants
-					me.refreshVariantChartAndMatrix(data, onVariantsDisplayed);
 
 					// Show the 'Call from alignments' button if we a bam file/url was specified
 					if (me.isBamLoaded() && me.isViewable()) {
@@ -1323,7 +1261,7 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	}
 
 	var filteredVcfData = this.model.isVcfLoaded() ? 
-	       this.filterVariants() 
+	       this.filterVariants(null, false) 
 	     : this.filterCalledVariants();
 	
 	window.matrixCard.fillFeatureMatrix(filteredVcfData);
@@ -1501,11 +1439,11 @@ VariantCard.prototype.filterCalledVariants = function() {
 }
 
 
-VariantCard.prototype.filterVariants = function(theVcfData) {
+VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
 	if (this.model.isVcfLoaded()) {
 		var data = theVcfData ? theVcfData : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		var filteredVcfData = this._filterVariants(data, this.vcfChart);
-		this._fillVariantChart(filteredVcfData, regionStart, regionEnd, false);	
+		this._fillVariantChart(filteredVcfData, regionStart, regionEnd, null, showTransition);	
 		return filteredVcfData;
 	} else {
 		return null;
@@ -1894,50 +1832,59 @@ VariantCard.prototype._getTrioAlleleCountFields = function(variant) {
 			                   genotypeAltCount: variant.genotypeAltCount, 
 			                   genotypeRefCount: variant.genotypeRefCount, 
 			                   genotypeDepth: variant.genotypeDepth,
+			                   bamDepth: variant.bamDepth,
 			                   selected: true,
 			                   done: true };
 		trioFields.MOTHER  = { zygosity: variant.motherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountMother, 
 			                   genotypeRefCount: variant.genotypeRefCountMother, 
 			                   genotypeDepth: variant.genotypeDepthMother,
+			                   bamDepth: variant.bamDepthMother,
 			                   done: variant.hasOwnProperty("motherZygosity") };
 		trioFields.FATHER  = { zygosity: variant.fatherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountFather, 
 			                   genotypeRefCount: variant.genotypeRefCountFather, 
 			                   genotypeDepth: variant.genotypeDepthFather,
+			                   bamDepth: variant.bamDepthFather,
 			                   done: variant.hasOwnProperty("fatherZygosity") };
 	} else if (me.model.getRelationship() == 'mother') {
 		trioFields.PROBAND = { zygosity: variant.probandZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountProband, 
 			                   genotypeRefCount: variant.genotypeRefCountProband, 
 			                   genotypeDepth: variant.genotypeDepthProband,
+			                   bamDepth: variant.bamDepthProband,
 			                   done: variant.hasOwnProperty("probandZygosity")  };
 		trioFields.MOTHER  = { zygosity: variant.zygosity, 
 			                   genotypeAltCount: variant.genotypeAltCount, 
 			                   genotypeRefCount: variant.genotypeRefCount, 
 			                   genotypeDepth: variant.genotypeDepth,
+			                   bamDepth: variant.bamDepth,
 			                   selected: true,
 			                   done: true };
 		trioFields.FATHER =  { zygosity: variant.fatherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountFather, 
 			                   genotypeRefCount: variant.genotypeRefCountFather, 
 			                   genotypeDepth: variant.genotypeDepthFather,
+			                   bamDepth: variant.bamDepthFather,
 			                   done: variant.hasOwnProperty("fatherZygosity") };
 	} else if (me.model.getRelationship() == 'father') {
 		trioFields.PROBAND = { zygosity: variant.probandZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountProband, 
 			                   genotypeRefCount: variant.genotypeRefCountProband, 
 			                   genotypeDepth: variant.genotypeDepthProband,
+			                   bamDepth: variant.bamDepthProband,
 			                   done: variant.hasOwnProperty("probandZygosity") };
 		trioFields.MOTHER  = { zygosity: variant.motherZygosity, 
 			                   genotypeAltCount: variant.genotypeAltCountMother, 
 			                   genotypeRefCount: variant.genotypeRefCountMother, 
 			                   genotypeDepth: variant.genotypeDepthMother,
+			                   bamDepth: variant.bamDepthMother,
 			                   done: variant.hasOwnProperty("motherZygosity")  };
 		trioFields.FATHER  = { zygosity: variant.zygosity, 
 			                   genotypeAltCount: variant.genotypeAltCount, 
 			                   genotypeRefCount: variant.genotypeRefCount, 
 			                   genotypeDepth: variant.genotypeDepth,
+			                   bamDepth: variant.bamDepth,
 			                   selected: true,
 			                   done: true };
 	} 
@@ -1968,7 +1915,12 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 	var column = row.append("div")
 	                .attr("class", "proband-alt-count tooltip-allele-count-bar");
 	if (trioFields.PROBAND.zygosity && trioFields.PROBAND.zygosity != '') {
-		me._appendAlleleCountSVG(column, trioFields.PROBAND.genotypeAltCount, trioFields.PROBAND.genotypeRefCount, trioFields.PROBAND.genotypeDepth, barWidth);	
+		me._appendAlleleCountSVG(column, 
+			trioFields.PROBAND.genotypeAltCount, 
+			trioFields.PROBAND.genotypeRefCount, 
+			trioFields.PROBAND.genotypeDepth, 
+			trioFields.PROBAND.bamDepth, 
+			barWidth);	
 	}  else if (!trioFields.PROBAND.done) {
 		column.append("span").attr("class", "processing").text("analyzing..");
 	}             
@@ -1991,7 +1943,12 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 		column = row.append("div")
 		            .attr("class", "mother-alt-count tooltip-allele-count-bar");
 		if (trioFields.MOTHER.zygosity && trioFields.MOTHER.zygosity != '') {			            
-			this._appendAlleleCountSVG(column, trioFields.MOTHER.genotypeAltCount,trioFields.MOTHER.genotypeRefCount, trioFields.MOTHER.genotypeDepth, barWidth);		
+			this._appendAlleleCountSVG(column, 
+				trioFields.MOTHER.genotypeAltCount,
+				trioFields.MOTHER.genotypeRefCount, 
+				trioFields.MOTHER.genotypeDepth, 
+				trioFields.MOTHER.bamDepth, 
+				barWidth);		
 		} else if (!trioFields.MOTHER.done) {
 			column.append("span").attr("class", "processing").text("analyzing..");
 		}
@@ -2010,7 +1967,12 @@ VariantCard.prototype.createAlleleCountSVGTrio = function(container, variant, ba
 		column = row.append("div")
 	                .attr("class", "father-alt-count tooltip-allele-count-bar")
 		if (trioFields.FATHER.zygosity && trioFields.FATHER.zygosity != '') {			            
-			this._appendAlleleCountSVG(column, trioFields.FATHER.genotypeAltCount, trioFields.FATHER.genotypeRefCount, trioFields.FATHER.genotypeDepth, barWidth);
+			this._appendAlleleCountSVG(column, 
+				trioFields.FATHER.genotypeAltCount, 
+				trioFields.FATHER.genotypeRefCount, 
+				trioFields.FATHER.genotypeDepth, 
+				trioFields.FATHER.bamDepth,  
+				barWidth);
 		} else if (!trioFields.FATHER.done) {
 			column.append("span").attr("class", "processing").text("analyzing..");
 		}
@@ -2082,7 +2044,9 @@ VariantCard.prototype._appendReadCountHeading = function(container) {
 
 }
 
-VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, genotypeRefCount, genotypeDepth, barWidth) {
+VariantCard.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, 
+	genotypeRefCount, genotypeDepth, bamDepth, barWidth) {
+
 	var MAX_BAR_WIDTH = barWidth ? barWidth : 185;
 	var PADDING = 20;
 	var BAR_WIDTH = 0;

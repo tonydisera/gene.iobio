@@ -15,15 +15,18 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	me.probandVcfData.features.forEach(function(variant) {
 		variant.compareMother = null;
 		variant.compareFather = null;
+		variant.compareMotherFather = null;
 		variant.inheritance = 'none';
 		variant.fatherZygosity = null;
 		variant.motherZygosity = null;
 		variant.genotypeAltCountFather = null;
 		variant.genotypeRefCountFather = null;
 		variant.genotypeDepthFather    = null;
+		variant.bamDepthFather         = null;
 		variant.genotypeAltCountMother = null;
 		variant.genotypeRefCountMother = null;
 		variant.genotypeDepthMother    = null;
+		variant.bamDepthMother         = null;
 
 	});
 
@@ -33,6 +36,34 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		callback(me.probandVcfData);
 		return;
 	} 
+	// Clear out the inheritance, mother/father zygosity, mother/father genotype fields 
+	// stored in proband variants
+	me.motherVcfData.features.forEach(function(variant) {
+		variant.compareMotherFather     = null;
+		variant.probandZygosity         = null;
+		variant.fatherZygosity          = null;
+		variant.genotypeAltCountProband = null;
+		variant.genotypeRefCountProband = null;
+		variant.genotypeDepthProband    = null;
+		variant.bamDepthProband         = null;
+		variant.genotypeAltCountFather  = null;
+		variant.genotypeRefCountFather  = null;
+		variant.genotypeDepthFather     = null;
+		variant.bamDepthFather          = null;
+	});
+	me.fatherVcfData.features.forEach(function(variant) {
+		variant.compareMotherFather     = null;
+		variant.probandZygosity         = null;
+		variant.motherZygosity          = null;
+		variant.genotypeAltCountProband = null;
+		variant.genotypeRefCountProband = null;
+		variant.genotypeDepthProband    = null;
+		variant.bamDepthProband         = null;
+		variant.genotypeAltCountMother  = null;
+		variant.genotypeRefCountMother  = null;
+		variant.genotypeDepthMother     = null;
+		variant.bamDepthMother          = null;
+	});
 
 
 	// Sort the variants
@@ -53,11 +84,13 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
     		variantA.genotypeAltCountMother = variantB.genotypeAltCount;
 		    variantA.genotypeRefCountMother = variantB.genotypeRefCount;
 		    variantA.genotypeDepthMother    = variantB.genotypeDepth;
+		    variantA.bamDepthMother         = variantB.bamDepth;
 
 	        variantB.probandZygosity         = variantA.zygosity != null ? variantA.zygosity : '';
     		variantB.genotypeAltCountProband = variantA.genotypeAltCount;
 		    variantB.genotypeRefCountProband = variantA.genotypeRefCount;
 		    variantB.genotypeDepthProband    = variantA.genotypeDepth;
+		    variantB.bamDepthProband         = variantA.bamDepth;
 		}
 	).then( function() {
 
@@ -76,11 +109,13 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	        	variantA.genotypeAltCountFather = variantB.genotypeAltCount;
 	        	variantA.genotypeRefCountFather = variantB.genotypeRefCount;
 			    variantA.genotypeDepthFather    = variantB.genotypeDepth;
+			    variantA.bamDepthFather         = variantB.bamDepth;
 
 	        	variantB.probandZygosity         = variantA.zygosity != null ? variantA.zygosity : '';
 	        	variantB.genotypeAltCountProband = variantA.genotypeAltCount;
 	        	variantB.genotypeRefCountProband = variantA.genotypeRefCount;
 			    variantB.genotypeDepthProband    = variantA.genotypeDepth;
+			    variantB.bamDepthProband         = variantA.bamDepth;
 
 	        });  	
 
@@ -133,11 +168,13 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
     		variantMother.genotypeAltCountFather = variantFather.genotypeAltCount;
 		    variantMother.genotypeRefCountFather = variantFather.genotypeRefCount;
 		    variantMother.genotypeDepthFather    = variantFather.genotypeDepth;
+		    variantMother.bamDepthFahter         = variantFather.bamDepth;
 
 	        variantFather.motherZygosity         = variantMother.zygosity != null ? variantMother.zygosity : '';
     		variantFather.genotypeAltCountMother = variantMother.genotypeAltCount;
 		    variantFather.genotypeRefCountMother = variantMother.genotypeRefCount;
 		    variantFather.genotypeDepthMother    = variantMother.genotypeDepth;
+		    variantFather.bamDepthMother         = variantMother.bamDepth;
 		}
 	).then( function() {
 

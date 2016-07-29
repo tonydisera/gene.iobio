@@ -1828,57 +1828,75 @@ function loadTracksForGene(bypassVariantCards) {
 	readjustCards();
 
 	filterCard.disableFilters();
+
+	var relevantVariantCards = dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
 	
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
 
-		// Load the variants in the variant cards first.  When all are loaded,
-		// load the coverage for the alignment files.  We load the variants
-		// first so that we can send in the specific points of the variants
-		// to samtools mpileup to get the exact coverage at each 
-		// variant's position.  We load the coverage before showing
-		// the coverage so that the max depth for all variant cards
-		// is determined so that the coverage scales across all samples.
+		// Load the variants in the variant cards first. After each sample's
+		// variants are shown, load the coverage from the alignment file for
+		// the sample. We load the variants first so that we can send in the 
+		// specific points of the variants to samtools mpileup to get the exact 
+		// coverage at each variant's position.  We load the coverage before showing
+		// the coverage so that the max depth for all variant cards is determined 
+		// so that the coverage scales across all samples.
 		var variantPromises = [];
 		var coveragePromises = [];
 		var allMaxDepth = 0;
-	 	variantCards.forEach(function(vc) {
+	 	relevantVariantCards.forEach(function(vc) {
 	 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
 				vc.hide();
 			} else {
 				var vPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact)
-			                     .then( function() {
-			
-									var cPromise = vc.promiseLoadBamDepth()
-									                 .then( function(coverageData) {
-														if (coverageData) {
-															var max = d3.max(coverageData, function(d,i) { return d[1]});
-															if (max > allMaxDepth) {
-																allMaxDepth = max;
-															}						
-														}
-													 }); 
-									coveragePromises.push(cPromise); 
+                  .then( function() {
 
-								  });		 
-			 	variantPromises.push(vPromise);
+					var cPromise = vc.promiseLoadBamDepth()
+					                 .then( function(coverageData) {
+											if (coverageData) {
+												var max = d3.max(coverageData, function(d,i) { return d[1]});
+												if (max > allMaxDepth) {
+													allMaxDepth = max;
+												}						
+											}
+																							
+					                 });
+					coveragePromises.push(cPromise); 
+
+				  });				 
+				  variantPromises.push(vPromise);		 
 			}
 		});
 
-	 	// When all of the variants have been displayed in the variant cards, load
-	 	// the coverage charts.
+	 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
+	 	// (including vep, clinvar, and coverage), compare the proband to mother and father
+	 	// to determine inheritance and obtain the trio's allele counts.
+	 	// Once inheritance is determined, show the feature matrix for the proband
+	 	// and refresh the variants for all samples.
 		Promise.all(variantPromises).then(function() {
 
-			// When all bam depths have been loaded, now we can scale based on the max depth
-			// of all sample's coverage data
+			// When all bam depths have been loaded, the variants are fully annotated
+			// so determine inheritance (if trio).  Also scale the coverage chart y-axis
+			// based on the max depth of all sample's coverage data
 			Promise.all(coveragePromises).then(function() {
-				variantCards.forEach(function(variantCard) {
+				promiseDetermineInheritance().then(function() {
+					relevantVariantCards.forEach(function(vc) {
+						vc.showFinalizedVariants();
+					})
+				});
+
+				relevantVariantCards.forEach(function(variantCard) {
 					variantCard.showBamDepth(allMaxDepth, function() {
 					});
 				});
 			});
 
-		});
+
+		});					                 	
+
+		
+
+		
 
 	}
 	
@@ -2112,7 +2130,6 @@ function promiseDetermineInheritance(promise) {
 
 					probandVariantCard.populateEffectFilters();
 
-					probandVariantCard.refreshVariantChartAndMatrix();
 
 					$('#filter-and-rank-card').removeClass("hide");
 				 	$('#matrix-track').removeClass("hide");
@@ -2129,7 +2146,6 @@ function promiseDetermineInheritance(promise) {
 
 						probandVariantCard.determineMaxAlleleCount();
 						
-						probandVariantCard.refreshVariantChartAndMatrix();
 
 						genesCard.refreshCurrentGeneBadge();
 
@@ -2143,7 +2159,6 @@ function promiseDetermineInheritance(promise) {
 							$("#matrix-panel .loader").addClass("hide");
 						    $("#matrix-panel .loader .loader-label").text("Ranking variants");
 							$("#feature-matrix-note").removeClass("hide");
-							probandVariantCard.refreshVariantChartAndMatrix();
 
 							resolve();
 
@@ -2156,7 +2171,6 @@ function promiseDetermineInheritance(promise) {
 
 					probandVariantCard.populateEffectFilters();
 					
-					probandVariantCard.refreshVariantChartAndMatrix();	
 
 					//mat $("#matrix-panel .loader").addClass("hide");
 					$("#feature-matrix-note").removeClass("hide");
@@ -2455,6 +2469,14 @@ function switchGenotype(gt) {
 
 function endsWith(str, suffix) {
 	return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+function showStackTrace(e) {
+  var stack = e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+      .replace(/^\s+at\s+/gm, '')
+      .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+      .split('\n');
+  console.log(stack);
 }
 
 
