@@ -1693,9 +1693,13 @@ function loadGeneWidget() {
 	if ( gene_list === null ) {
 		// fetch gene list from server			
 		$.ajax({url: 'gene_names.json'}).done(function(data, status, res) {
-			data.sort();
-			gene_engine.add($.map(data, function(gene) { return { name: gene }; }));
-			localStorage.setItem('gene_list', JSON.stringify(data));
+
+			// Sort and get rid  of any duplicates gene names
+			var sortedGenes = sortAndUnique(data);
+			console.log("unique gene names length=" + sortedGenes.length);
+
+			gene_engine.add($.map(sortedGenes, function(gene) { return { name: gene }; }));
+			localStorage.setItem('gene_list', JSON.stringify(sortedGenes));
 		})
 	} else {
 		// grab gene list from localStorage			
@@ -1705,6 +1709,12 @@ function loadGeneWidget() {
 	}	
 
 
+}
+
+function sortAndUnique(unsortedArray) {
+    return unsortedArray.sort().filter(function(item, pos, theArray) {
+        return !pos || item != theArray[pos - 1];
+    });
 }
 
 /* 
