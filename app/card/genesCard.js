@@ -711,6 +711,9 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 	var me = this;
 	var selectedPhenoGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
 
+
+
+
 	// Don't throw away the genes we already have loaded, but do get rid of any that are
 	// in the phenolyzer gene list as we want these to stay grouped (and order by rank).
 	selectedPhenoGenes.forEach( function(phenoGene) {
@@ -1596,12 +1599,13 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  .gap(3)
 							  .on('d3click', function(phenolyzerGene) {
 							  	if (phenolyzerGene.selected) {
-							  		me.addGeneBadge(phenolyzerGene.geneName, true);
-							  		me.highlightPhenolyzerGenes();
+							  		me.addGene(phenolyzerGene.geneName);
 							  		me._initPaging();
+							  		me.highlightPhenolyzerGenes();
 							  	} else {
 							  		me.removeGeneBadgeByName(phenolyzerGene.geneName);
 							  		me._initPaging();
+							  		me.highlightPhenolyzerGenes();
 							  	}
 							  });
 		d3.select('#phenolyzer-results svg').remove();
@@ -1615,12 +1619,23 @@ GenesCard.prototype.selectPhenolyzerGeneRange = function() {
 	var start = 0;
 	var end   = +$('#phenolyzer-select-range-end').val();
 
+	var oldPhenoGenesToRemove = [];
+
 	for (var i = 0; i < phenolyzerGenes.length; i++) {
+		if (phenolyzerGenes[i].selected && (i < start || i >= end)) {
+			oldPhenoGenesToRemove.push(phenolyzerGenes[i].geneName);
+		}
 		phenolyzerGenes[i].selected = false;
 	}
 	for (var i = start; i < end; i++) {
 		phenolyzerGenes[i].selected = true;
 	}
+
+	geneNames = geneNames.filter(function(geneName) {
+		// keep genes not in the list of old pheno genes that
+		// are no longer in the selected range
+		return oldPhenoGenesToRemove.indexOf(geneName) < 0;
+	});
 
 	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 	this.geneBarChart(selection, {shadowOnHover:false});	
