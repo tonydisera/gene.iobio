@@ -74,10 +74,18 @@ var Bam = Class.extend({
    }, 
 
   checkBamUrl: function(url, callback) {
-    if (useDevkit) {
-      this.checkBamUrlDevkit(url, callback);
+    var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(bam)$/;
+    var parts = rexp.exec(url);
+    // first element has entire url, second has the bam extension.
+    var extension = parts && parts.length == 2  ? parts[1] : null;
+    if (extension == null) {
+      callback(false, "Please specify a URL to a compressed, indexed alignment file with the file extension bam");
     } else {
-      this.checkBamUrlOld(url, callback);
+      if (useDevkit) {
+        this.checkBamUrlDevkit(url, callback);
+      } else {
+        this.checkBamUrlOld(url, callback);
+      }
     }
   },
 

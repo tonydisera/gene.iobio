@@ -23,8 +23,8 @@ vcfiobio = function module() {
 
 
   // new minion servers
-  var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-  //var tabix          = new_iobio_services  +  "tabix/";
+  //var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+  var tabix          = new_iobio_services  +  "tabix/";
   var vcfReadDepther = new_iobio_services  + "vcfdepther/";
   var snpEff         = new_iobio_services  + "snpeff/";
   var vt             = new_iobio_services  + "vt/";
@@ -164,9 +164,11 @@ var effectCategories = [
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;
 
-    var fileType0 = /([^.]*)\.(vcf\.gz)$/.exec(url);
-    var fileExt0 = fileType0 && fileType0.length > 1 ? fileType0[2] : null;
-    if (fileExt0 == null) {
+    var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(vcf\.gz)$/;
+    var parts = rexp.exec(url);
+    // first element has entire url, the second element is the .vcf.gz extension.
+    var extension = parts && parts.length == 2  ? parts[1] : null;
+    if (extension == null) {
       callback(false, "Please specify a URL to a compressed, indexed vcf file with the file extension vcf.gz");
     } else {
       this.checkVcfUrl(url,function(success, message) {
@@ -761,6 +763,7 @@ var effectCategories = [
 
   exports._getRemoteVariantsImplDevkit = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
 
+    var ts1 = Date.now();
     var me = this;
 
     // Figure out the file location of the reference seq files
@@ -870,6 +873,9 @@ var effectCategories = [
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
 
+      var ts2 = Date.now();
+      console.log("******* runtime *******   " + (ts2 - ts1));
+      
       callback(annotatedRecs, results);
     });
 
