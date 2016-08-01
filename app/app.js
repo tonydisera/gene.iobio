@@ -386,6 +386,7 @@ function init() {
 		{ 	onChange: function(value) {
 				geneSource = value.toLowerCase().split(" transcript")[0];
 				geneToLatestTranscript = {};
+				loadHumanGeneList();
 				genesCard.selectGene(window.gene.gene_name);
 				$('#gene-source-box').toggleClass('hide');
 			} 
@@ -1687,35 +1688,40 @@ function loadGeneWidget() {
 		    }
 		});
 	});	
-
-	// check if gene_list is stored locally	
-	var gene_list = localStorage.getItem("gene_list");
-	if ( gene_list === null ) {
-		// fetch gene list from server			
-		$.ajax({url: 'gene_names.json'}).done(function(data, status, res) {
-
-			// Sort and get rid  of any duplicates gene names
-			var sortedGenes = sortAndUnique(data);
-			console.log("unique gene names length=" + sortedGenes.length);
-
-			gene_engine.add($.map(sortedGenes, function(gene) { return { name: gene }; }));
-			localStorage.setItem('gene_list', JSON.stringify(sortedGenes));
-		})
-	} else {
-		// grab gene list from localStorage			
-		gene_engine.add(
-			$.map(JSON.parse(gene_list), function(gene) { return { name: gene }; })
-		);
-	}	
-
-
+	loadHumanGeneList();
 }
 
-function sortAndUnique(unsortedArray) {
-    return unsortedArray.sort().filter(function(item, pos, theArray) {
-        return !pos || item != theArray[pos - 1];
-    });
+function loadHumanGeneList() {
+			
+	$.ajax({url: 'genes.json',
+			data_type: 'json',
+            success: function( data ) {
+
+            	var sortedGenes = data.sort( function(geneObject1, geneObject2) {
+            		if (geneObject1.gene_name < geneObject2.gene_name) {
+            			return -1;
+            		} else if (geneObject1.gene_name > geneObject2.gene_name) {
+            			return 1;
+            		} else {
+            			return 0;
+            		}
+            	}).filter( function (geneObject) {
+            		return geneObject.source.toLowerCase() == geneSource.toLowerCase();
+            	});
+            	console.log(geneSource + " genes  = " + sortedGenes.length);
+
+            	gene_engine.clear();
+				gene_engine.add($.map(sortedGenes, function(gene) { return { name: gene.gene_name, source: gene.source }; }));
+				localStorage.setItem('gene_list', JSON.stringify(sortedGenes));
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+            	console.log("failed to get genes.json " + thrownError);
+            	console.log(xhr.status);
+            }
+	})
 }
+
+
 
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
