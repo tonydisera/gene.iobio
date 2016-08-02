@@ -913,9 +913,10 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		$("#gene-badge-container #gene-badge").last().find('#gene-badge-name').text(geneName);
 		var theGeneBadge = me._getGeneBadge(geneName);
 		d3.select(theGeneBadge[0]).data([geneName]);
-		d3.select(theGeneBadge[0])
+		
+		d3.select(theGeneBadge.find("#gene-badge-name")[0])
 		  .on("mouseover", function(d,i) {
-			var geneName = d3.select(this).text();
+		  	var geneName = d3.select(this.parentNode.parentNode).data()
 			var geneAnnot = geneAnnots[geneName];
 
 			var x = d3.event.pageX;
@@ -929,6 +930,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		  });
 
 		me._setPhenotypeBadge(geneName);
+		me.promiseSetGeneAnnot(theGeneBadge, geneName);
 		me._setBookmarkBadge(geneName);
 
 		
