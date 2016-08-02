@@ -32,6 +32,9 @@ lineD3 = function module() {
         return pos + ',' + depth;
   }
   var showCircle = function(start, theDepth) {
+    if (container == null) {
+      return;
+    }
     // Find the closest position in the data
     d = null;
     if (theData) {
@@ -102,6 +105,9 @@ lineD3 = function module() {
   };
 
   var hideCircle = function() {
+    if (container == null) {
+      return;
+    }
     container.select(".circle").transition()        
                  .duration(500)      
                  .style("opacity", 0); 

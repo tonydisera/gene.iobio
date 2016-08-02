@@ -429,6 +429,11 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	var me  = this;
 	var index = -1;
 	var i = 0;
+	// The feature matrix may not be filled yet.  In this case, just return here.
+	if (d3.select("#feature-matrix") == null || d3.select("#feature-matrix").datum() == null ) {
+		return;
+	}
+
 	d3.select("#feature-matrix").datum().forEach( function(variant) {
 		if (variant.start == theVariant.start &&
 			variant.alt == theVariant.alt &&
