@@ -257,6 +257,13 @@ h5 {
   top: -2px !important;
   right: 0 !important; }
 
+.alert.alert-danger {
+  background-color: #c55951;
+  color: white;
+  width: 400px;
+  display: block;
+  margin: auto; }
+
 /* autocomplete */
 .ui-menu .ui-menu-item {
   font-size: 10px;
