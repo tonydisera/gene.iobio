@@ -763,7 +763,6 @@ var effectCategories = [
 
   exports._getRemoteVariantsImplDevkit = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
 
-    var ts1 = Date.now();
     var me = this;
 
     // Figure out the file location of the reference seq files
@@ -873,8 +872,6 @@ var effectCategories = [
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
 
-      var ts2 = Date.now();
-      console.log("******* runtime *******   " + (ts2 - ts1));
       
       callback(annotatedRecs, results);
     });
