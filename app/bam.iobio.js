@@ -23,9 +23,10 @@ var Bam = Class.extend({
       this.iobio = {};
 
       // new minion (devkit) services
-      this.iobio.samtools            = new_iobio_services + "samtools/"
+      //this.iobio.samtools            = new_iobio_services + "samtools/"
       this.iobio.coverage            = new_iobio_services + "coverage/ ";
       this.iobio.cat                 = new_iobio_services + "cat/ ";
+      this.iobio.samtools            = new_iobio_services +  "samtools/";
       //this.iobio.samtoolsOnDemand    = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
       this.iobio.samtoolsOnDemand    = new_iobio_services +  "samtools/";
       this.iobio.freebayes           = new_iobio_services + "freebayes/";
@@ -747,11 +748,12 @@ var Bam = Class.extend({
       // When bam file is read as a local file, just stream sam records for region to
       // samtools mpileup.
       if (me.sourceType == "url") {
+        //cmd = new iobio.cmd("nv-green.iobio.io/samtools/", ['view', '-b', me.bamUri, regionArg],
         cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
-          {
+         {
             'urlparams': {'encoding':'binary'}
           });
-        cmd = cmd.pipe(me.iobio.freebayes, ['-f', refFile]);
+        cmd = cmd.pipe(me.iobio.freebayes, [ '--stdin', '-f', refFile]);
       } else {
 
         var writeStream = function(stream) {
@@ -761,25 +763,19 @@ var Bam = Class.extend({
               stream.end();
            }, {noHeader:true});
         }
-
-        /*cmd = new iobio.cmd(me.iobio.freebayes, ['-f', refFile, writeStream],
-             {
-              'urlparams': {'encoding':'utf8'}
-             });
-        */
         
         cmd = new iobio.cmd(samtools, ['view -b',  writeStream ],
             {
               'urlparams': {'encoding':'binary'}
             });
-        cmd = cmd.pipe(me.iobio.freebayes, ['-f', refFile]);
-        
+        cmd = cmd.pipe(me.iobio.freebayes, [ '--stdin', '-f', refFile]);
+         
       }
 
 
       cmd = cmd.pipe(me.iobio.vt, ['normalize', '-r', refFile, '-']);
       cmd = cmd.pipe(me.iobio.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
-
+      
       var variantData = "";
       cmd.on('data', function(data) {
           if (data == undefined) {
