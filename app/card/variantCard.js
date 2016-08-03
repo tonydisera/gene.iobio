@@ -757,6 +757,36 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			if (autoCall && !me.model.isVcfReadyToLoad() && !me.model.hasCalledVariants()) {	
 				me.callVariants(regionStart, regionEnd, function() {
 					loadCoverage();
+
+					// For the proband, we need to determine the inheritance and then
+					// fill in the mother/father genotype and allele counts on the
+					// proband's variants.  So we do this first before caching
+					// the called variants and resolving this promise.
+					
+					// Once all variant cards have freebayes variants,
+					// the app will determine in the inheritance mode
+					// for the freebayes variants
+					promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+	
+						variantCards.forEach(function(variantCard) {
+							// Reflect me new info in the freebayes variants.
+							variantCard.model.loadCalledTrioGenotypes();
+
+							//  Refresh the feature matrix (proband only) and variant cards
+							if (variantCard.getRelationship() == 'proband') {
+								variantCard.fillFeatureMatrix(regionStart, regionEnd);
+							} else {
+								variantCard._showVariants(regionStart, regionEnd, null, false);
+							}
+
+						})
+
+						// Cache the freebayes variants.
+						getProbandVariantCard().model._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+					}, function(error) {
+						console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
+					});
+
 				});
 			} else {
 				// Otherwise, if a vcf was loaded, just get the coverage
@@ -1403,6 +1433,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) 
 			if (callback) {
 				callback();
 			}
+
 
 		}, function(error) {
 

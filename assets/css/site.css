@@ -104,6 +104,10 @@ h5 {
   border: none !important;
   color: #717171; }
 
+#gene-source-box .selectize-input {
+  padding-top: 8px;
+  padding-bottom: 7px; }
+
 #phenolyzer-search-box .selectize-input {
   -webkit-box-shadow: none;
   box-shadow: none;

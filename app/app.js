@@ -59,7 +59,7 @@ var transcriptViewMode = "single";
 var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
-var geneSource = typeof siteGeneSource !== 'undefined' && siteGeneSource ? siteGeneSource : "gencode";
+var geneSource = "gencode";
 
 var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
@@ -455,7 +455,7 @@ function checkGeneSource(geneName) {
 	if (typeof siteGeneSource !== 'undefined' && siteGeneSource) {
 		if (siteGeneSource != geneSource) {
 			var saveGene = window.gene;
-			geneSource = siteGeneSource;
+			//geneSource = siteGeneSource;
 			window.gene = null;
 			switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
 			window.gene = saveGene;
@@ -1944,8 +1944,48 @@ function loadTracksForGene(bypassVariantCards) {
 	filterCard.disableFilters();
 
 	var relevantVariantCards = dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
+
+	// Find out if if there are alignments only.  In this case, prompt the user
+	// to determine if alignments should automatically be auto-called with freebayes.
+	var promptForAutocall = null;
+	if (autoCall == null) {
+		relevantVariantCards.forEach( function (variantCard) {
+			if (!variantCard.model.isVcfReadyToLoad() && variantCard.model.isBamLoaded()) {
+				promptForAutocall = true;
+			}
+		});		
+	} else {
+		promptForAutocall = false;
+	}
+
+	// At this point either prompt for autocalling or just continue
+	// on, loading the data.
+	if (promptForAutocall) {
+		alertify.confirm("Automatically call variants from alignments?",
+	        function () {	
+	        	// ok		     
+	        	autoCall = true;  
+	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+	    	},
+			function () {
+				// cancel
+				autoCall = false;
+	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+			}).set('labels', {ok:'Yes', cancel:'No'}); 		
+	} else {
+		loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+	}		
 	
 
+
+
+	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
+
+
+	
+}
+
+function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 	if (bypassVariantCards == null || !bypassVariantCards) {
 
 		// Load the variants in the variant cards first. After each sample's
@@ -2008,17 +2048,8 @@ function loadTracksForGene(bypassVariantCards) {
 
 		});					                 	
 
-		
-
-		
-
 	}
-	
 
-	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
-
-
-	
 }
 
 function addCommas(nStr)

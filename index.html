@@ -466,10 +466,16 @@
             </div>                  
         </div>  
 
+        <div id="gene-source-box"  style="width:113px;float:left;margin-left: 10px;margin-top: -5px;">
+          <select id="select-gene-source" class="fullview" data-placeholder="">
+                <option value="Gencode Transcript">Gencode Transcript</option>
+                <option value="RefSeq Transcript">RefSeq Transcript</option>                   
+           </select>        
+        </div>
         
         <div class="level-edu fullview" style="margin-top:-25px"> 
           <div class="btn-toolbar fullview" 
-             style="display: inline-block;float: left;margin-top:-15px;margin-left: 10px;padding-top: 0px; ">
+             style="display: inline-block;float: left;margin-top:-15px;margin-left: 5px;padding-top: 0px; ">
              <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
                   <button id="transcript-dropdown-button" type="button"  
                   style="width:150px;font-size:11px"
@@ -485,18 +491,8 @@
               </div>
           </div> 
 
-          <div id="gene-source-box" class="hide" style="width:120px;float:left">
-            <select id="select-gene-source" class="fullview" data-placeholder="">
-                  <option value="Gencode Transcript">Gencode Transcript</option>
-                  <option value="RefSeq Transcript">RefSeq Transcript</option>                   
-             </select>        
-          </div>
-              
 
 
-          <button id="gene-source-config-button" style="margin-top:0px;margin-left:4px;float:left" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
-            <i class="material-icons" style="font-size:15px;">settings</i>
-          </button>
 
  
       </div>

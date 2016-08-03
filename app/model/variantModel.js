@@ -1787,7 +1787,8 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 					// Annotate the fb variants
 					me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(refName), window.gene, 
 						                             window.selectedTranscript, null, 
-						                             filterCard.annotationScheme.toLowerCase())
+						                             filterCard.annotationScheme.toLowerCase(),
+						                             window.geneSource == 'refseq' ? true : false)
 				    .then( function(data) {
 
 				    	var annotatedRecs = data[0];
@@ -1863,31 +1864,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 						});	 
 						// Cache the freebayes variants.
 						me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
-
-						// For the proband, we need to determine the inheritance and then
-						// fill in the mother/father genotype and allele counts on the
-						// proband's variants.  So we do this first before caching
-						// the called variants and resolving this promise.
-						
-						// Once all variant cards have freebayes variants,
-						// the app will determine in the inheritance mode
-						// for the freebayes variants
-						promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
-							// The variant records in vcfData have updated clinvar and inheritance info.
-							
-							// Reflect me new info in the freebayes variants.
-							getProbandVariantCard().model.loadCalledTrioGenotypes();
-
-							// Cache the freebayes variants.
-							getProbandVariantCard().model._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
-
-							resolve(me.fbData);
-						}, function(error) {
-							console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
-						});
-
-					
-						
+						resolve(me.fbData);
 				
 				    	
 				    }, function(error) {
@@ -1926,12 +1903,20 @@ VariantModel.prototype.loadCalledTrioGenotypes = function() {
 				fbVariant.genotypeRefCountMother      = source.genotypeRefCountMother;
 				fbVariant.genotypeAltCountMother      = source.genotypeAltCountMother;
 				fbVariant.genotypeDepthMother         = source.genotypeDepthMother;
+				fbVariant.bamDepthMother              = source.bamDepthMother;
 				fbVariant.genotypeRefCountFather      = source.genotypeRefCountFather;
 				fbVariant.genotypeAltCountFather      = source.genotypeAltCountFather;
 				fbVariant.genotypeDepthFather         = source.genotypeDepthFather;
+				fbVariant.bamDepthFather              = source.bamDepthFather;
 				fbVariant.fatherZygosity              = source.fatherZygosity;
 				fbVariant.motherZygosity              = source.motherZygosity;
 				fbVariant.uasibsZygosity              = source.uasibsZygosity;
+				if (me.relationship != 'proband') {
+					fbVariant.genotypeRefCountProband      = source.genotypeRefCountProband;
+					fbVariant.genotypeAltCountProband      = source.genotypeAltCountProband;
+					fbVariant.genotypeDepthProband         = source.genotypeDepthProband;
+					fbVariant.probandZygosity              = source.probandZygosity;
+				}
 			}
 				
 			
