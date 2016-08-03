@@ -40,6 +40,9 @@ var geneObjects = {};
 var geneAnnots = {};
 var genePhenotypes = {};
 var geneToLatestTranscript = {};
+var refseqOnly = {};
+var gencodeOnly = {};
+
 
 var genesToCache = [];
 var cacheQueue = [];
@@ -262,10 +265,7 @@ function init() {
 
 
 	
-	
-	// Set up the gene search widget
-	loadGeneWidget();
-	$('#bloodhound .typeahead').focus();
+
 
 	
 	// Create transcript chart
@@ -386,21 +386,13 @@ function init() {
 		{ 	onChange: function(value) {
 				geneSource = value.toLowerCase().split(" transcript")[0];
 				geneToLatestTranscript = {};
-				loadHumanGeneList();
-				genesCard.selectGene(window.gene.gene_name);
-				$('#gene-source-box').toggleClass('hide');
+				if (window.gene) {
+					genesCard.selectGene(window.gene.gene_name);
+				}
 			} 
 		}
 	);
-    /*
-    $('#select-gene-source').selectivity();
-    $('#select-gene-source').on('change', function(event) {
-    	geneSource = event.value.toLowerCase().split(" transcript")[0];
-		geneToLatestTranscript = {};
-		genesCard.selectGene(window.gene.gene_name);
-		$('#gene-source-box').toggleClass('hide');
-    });
-	*/
+
 
 	// Initialize transcript view buttons
 	initTranscriptControls();
@@ -415,7 +407,14 @@ function init() {
 
 	$('.sidebar-button.selected').removeClass("selected");
 
-	loadGeneFromUrl();
+	
+	// Set up the gene search widget
+	loadGeneWidget( function(success) {
+		if (success) {
+			loadGeneFromUrl();
+		}
+	});
+	$('#bloodhound .typeahead').focus();
 
 	// In cases where timeout=true, restart app after n seconds of inactivity
 	// (e.g. no mouse move, button click, etc.). 
@@ -423,6 +422,53 @@ function init() {
 		checkForInactivity();
 	}
 
+}
+
+
+function validateGeneTranscripts() {
+	if (window.gene.transcripts.length == 0) {
+		$('#transcript-card').removeClass("hide");
+		$('#transcript-btn-group').removeClass("hide");
+		$('#non-protein-coding #no-transcripts-badge').removeClass("hide");
+		$('#non-protein-coding #no-transcripts-badge').text("Unable to analyze gene.  No transcripts found.");
+		$('#gene-viz svg').remove();
+		$('#transcript-menu svg').remove();
+		$('#transcript-dropdown-button').html("&nbsp;");
+	    $('#gene-chr').text(window.gene.chr);
+	    $('#gene-name').text(window.gene.gene_name);   
+	    $('#gene-region').text(addCommas(window.gene.start) + "-" + addCommas(window.gene.end));
+	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+	    genesCard.setGeneBadgeError(window.gene.gene_name);
+	    return false;
+	} else {
+		return true;
+	}
+
+}
+
+
+function checkGeneSource(geneName) {
+	var switchMsg = null;
+	if (refseqOnly[geneName] && geneSource != 'refseq') {
+		switchMsg = 'Gene ' + geneName + ' only in RefSeq.  Switching to this transcript set.';
+		window.gene = null;
+		switchGeneSource('RefSeq Transcript');	
+	} else if (gencodeOnly[geneName] && geneSource != 'gencode') {
+		switchMsg = 'Gene ' + geneName + ' only in Gencode.  Switching to this transcript set.';
+		window.gene = null;
+		switchGeneSource('Gencode Transcript');	
+	}
+	if (switchMsg) {
+		var msg = "<span style='font-size:18px'>" + switchMsg + "</span>";
+		alertify.set('notifier','position', 'top-right');
+		alertify.error(msg, 6); 	
+	}	
+}
+
+
+function switchGeneSource(newGeneSource) {
+	$('#select-gene-source')[0].selectize.setValue(newGeneSource);	
+	$('#gene-source-box').removeClass('hide');
 }
 
 
@@ -1266,18 +1312,7 @@ function cacheGenes() {
 		return;
 	}
 
-	// If this is the first time we have kicked to 'Analyze all',
-	// place all of the genes in a list.  This list
-	// is all of the genes that need to be analyzed (and cached.)
-	if (genesToCache == null || genesToCache.length == 0) {
-		genesToCache = [];
-		geneNames.forEach(function(geneName) {
-			if (geneName != window.gene.gene_name) {
-				genesToCache.push(geneName);
-			}
-		})		
-	}
-
+	
 	// Determine the batch size.  (It will be smaller that the
 	// default batch size if the genes remaining to be cached is
 	// smaller than the batch size.)
@@ -1360,9 +1395,9 @@ function cacheGene(geneName) {
 									
 									genesCard._geneBadgeLoading(geneObject.gene_name, false);
 									if (probandVcfData.features.length == 0) {
-				    					genesCard._setGeneBadgeWarning(geneObject.gene_name);
+				    					genesCard.setGeneBadgeWarning(geneObject.gene_name);
 				    				} else {
-				    					genesCard._setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
+				    					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 									}
 				    				
 				    					// take this gene off of the queue and see
@@ -1380,7 +1415,7 @@ function cacheGene(geneName) {
 			    			}
 
 			    		}, function(error) {
-			    			genesCard._setGeneBadgeError(geneObject.gene_name);			    				
+			    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
 		    				var message = error.hasOwnProperty("message") ? error.message : error;
 			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
 			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
@@ -1394,7 +1429,7 @@ function cacheGene(geneName) {
 
 		    	});	
 		    } else {
-				genesCard._setGeneBadgeError(geneName);			    				
+				genesCard.setGeneBadgeError(geneName);			    				
 				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
     			genesCard._geneBadgeLoading(geneName, false);
 	    		cacheNextGene(geneName);
@@ -1555,7 +1590,7 @@ function getUrlParameter(sParam) {
 
 
 
-function loadGeneWidget() {
+function loadGeneWidget(callback) {
 	// kicks off the loading/processing of `local` and `prefetch`
 	gene_engine.initialize();
 
@@ -1583,6 +1618,7 @@ function loadGeneWidget() {
 	
 	typeahead.on('typeahead:selected',function(evt,data){	
 
+
 		// Ignore second event triggered by loading gene widget from url parameter
 		if (data.loadFromUrl && loadedUrl) {
 			return;
@@ -1593,10 +1629,15 @@ function loadGeneWidget() {
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
 		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
+
+		// If necessary, switch from gencode to refseq or vice versa if this gene
+		// only has transcripts in only one of the gene sets
+		checkGeneSource(data.name);
+
 		url += "?source=" + geneSource;
 
 
-		
+
 		$.ajax({
 		    url: url,
 		    jsonp: "callback",
@@ -1607,6 +1648,7 @@ function loadGeneWidget() {
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
 		    	window.gene = response[0];	
+		    	
 		    	adjustGeneRegion(window.gene);	
 
 		    	// Add the gene badge
@@ -1614,6 +1656,10 @@ function loadGeneWidget() {
 			    	
 		    	    
 		    	window.geneObjects[window.gene.gene_name] = window.gene;
+
+		    	if (!validateGeneTranscripts()) {
+		    		return;
+		    	}
 		    	
 		    	// set all searches to correct gene	
 		    	$('.typeahead.tt-input').val(window.gene.gene_name);
@@ -1660,12 +1706,9 @@ function loadGeneWidget() {
 			    	// add gene to url params
 			    	updateUrl('gene', window.gene.gene_name);
 
-
 			    	if (!isOffline) {
 				    	genesCard.updateGeneInfoLink(window.gene.gene_name);
 			    	}
-
-
 
 					if (firstTimeGeneLoaded && !hasDataSources()) {
 						//showDataDialog();
@@ -1687,38 +1730,68 @@ function loadGeneWidget() {
 		    complete: function( xhr, status ) {
 		    }
 		});
+
+		
+		
 	});	
-	loadHumanGeneList();
+	loadFullGeneSet(callback);
 }
 
-function loadHumanGeneList() {
+function loadFullGeneSet(callback) {
 			
 	$.ajax({url: 'genes.json',
 			data_type: 'json',
             success: function( data ) {
-
-            	var sortedGenes = data.sort( function(geneObject1, geneObject2) {
-            		if (geneObject1.gene_name < geneObject2.gene_name) {
-            			return -1;
-            		} else if (geneObject1.gene_name > geneObject2.gene_name) {
-            			return 1;
-            		} else {
-            			return 0;
-            		}
-            	}).filter( function (geneObject) {
-            		return geneObject.source.toLowerCase() == geneSource.toLowerCase();
-            	});
-            	console.log(geneSource + " genes  = " + sortedGenes.length);
-
+            	var sortedGenes = getRidOfDuplicates(data);
             	gene_engine.clear();
-				gene_engine.add($.map(sortedGenes, function(gene) { return { name: gene.gene_name, source: gene.source }; }));
-				localStorage.setItem('gene_list', JSON.stringify(sortedGenes));
-            },
+				gene_engine.add($.map(sortedGenes, function(gene) { return { name: gene.gene_name, genecode: gene.genecode, refseq: gene.refseq }; }));
+				if (callback) {
+					callback(true);
+				}
+	        },
             error: function(xhr, ajaxOptions, thrownError) {
             	console.log("failed to get genes.json " + thrownError);
             	console.log(xhr.status);
+            	if (callback) {
+            		callback(false);
+            	}
             }
 	})
+}
+
+function getRidOfDuplicates(genes) {
+	var sortedGenes = genes.sort( function(g1, g2) {
+		if (g1.gene_name < g2.gene_name) {
+			return -1;
+		} else if (g1.gene_name > g2.gene_name) {
+			return 1;
+		} else {
+			return 0;
+		}
+	});
+	// Flag gene objects with same name
+ 	for (var i =0; i < sortedGenes.length - 1; i++) {
+        var gene = sortedGenes[i];
+        var nextGene = sortedGenes[i+1];
+        if (i == 0) {
+          gene.dup = false;
+        }
+        nextGene.dup = false;
+
+        if (gene.gene_name == nextGene.gene_name && gene.refseq == nextGene.refseq && gene.gencode == nextGene.gencode) {
+        	nextGene.dup = true;
+	    }
+	    if (gene.refseq != gene.gencode) {
+	    	if (gene.refseq) {
+	    		refseqOnly[gene.gene_name] = gene;
+	    	} else {
+	    		gencodeOnly[gene.gene_name] = gene;
+	    	}
+	    }
+	}
+	return sortedGenes.filter(function(gene) {
+		return gene.dup == false;
+	});
 }
 
 
@@ -1762,6 +1835,8 @@ function loadTracksForGene(bypassVariantCards) {
 	$('#recall-card .call-variants-count').addClass("hide");
 	$('#recall-card .call-variants-count').text("");
 	$('#recall-card .covloader').addClass("hide");
+
+	$('#no-transcripts-badge').addClass("hide");
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
@@ -2185,8 +2260,7 @@ function promiseDetermineInheritance(promise) {
 				} else {
 					probandVariantCard.determineMaxAlleleCount();
 
-					probandVariantCard.populateEffectFilters();
-					
+					probandVariantCard.populateEffectFilters();					
 
 					//mat $("#matrix-panel .loader").addClass("hide");
 					$("#feature-matrix-note").removeClass("hide");

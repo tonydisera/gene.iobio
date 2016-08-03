@@ -321,6 +321,9 @@ h5 {
 .label-primary {
   background-color: #6D9652; }
 
+#no-transcripts-badge {
+  font-size: 14px !important; }
+
 .poweredby {
   margin-right: 10px;
   color: white !important;

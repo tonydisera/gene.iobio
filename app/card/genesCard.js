@@ -276,6 +276,10 @@ GenesCard.prototype.initCopyPasteGenes = function() {
 	}
 }
 
+GenesCard.prototype.validateGeneSource = function(geneName) {
+
+}
+
 
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
@@ -330,7 +334,7 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		// set the appropriate gene badges.
 		var geneSummary = getProbandVariantCard().getDangerSummaryForGene(name);
 		if (geneSummary) {
-			me._setGeneBadgeGlyphs(name, geneSummary);
+			me.setGeneBadgeGlyphs(name, geneSummary);
 		}
 	}
 
@@ -892,6 +896,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 GenesCard.prototype.addGene = function(geneName) {
 	var me = this;
+
 	if (!isOffline) {
 		me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge").last(), geneName);
 	}
@@ -1060,7 +1065,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 	var me = this;
 
 	if (error && error.length > 0) {
-		me._setGeneBadgeError(window.gene.gene_name, true);
+		me.setGeneBadgeError(window.gene.gene_name, true);
 	} else {
 		var theVcfData = null;
 		var vc = getProbandVariantCard();		
@@ -1071,10 +1076,10 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 		}
 		
 		if (theVcfData != null && theVcfData.features.length == 0) {
-			me._setGeneBadgeWarning(window.gene.gene_name, true);
+			me.setGeneBadgeWarning(window.gene.gene_name, true);
 		} else {
 			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData);
-			me._setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
 		}
 	}
@@ -1122,7 +1127,7 @@ GenesCard.prototype._geneBadgeLoading = function(geneName, show, force) {
 	}
 }
 
-GenesCard.prototype._setGeneBadgeWarning = function(geneName, select) {
+GenesCard.prototype.setGeneBadgeWarning = function(geneName, select) {
 	var me = this;
 
 	var geneBadge = me._getGeneBadge(geneName);
@@ -1140,7 +1145,7 @@ GenesCard.prototype._getGeneBadge = function(geneName) {
 	}).parent().parent();
 }
 
-GenesCard.prototype._setGeneBadgeError = function(geneName, select) {
+GenesCard.prototype.setGeneBadgeError = function(geneName, select) {
 	var me = this;
 	var geneBadge = me._getGeneBadge(geneName);
 	geneBadge.addClass("error");	
@@ -1150,7 +1155,7 @@ GenesCard.prototype._setGeneBadgeError = function(geneName, select) {
 	}	
 }
 
-GenesCard.prototype._setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
+GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
 	var me = this;
 
 	var geneBadge = me._getGeneBadge(geneName);
@@ -1357,6 +1362,10 @@ GenesCard.prototype.selectGeneBadge = function(badgeElement) {
 GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	var me = this;
 
+	// If necessary, switch from gencode to refseq or vice versa if this gene
+	// only has transcripts in only one of the gene sets
+	checkGeneSource(geneName);
+
 	$('.typeahead.tt-input').val(geneName);
 	
 	var geneBadge = me._getGeneBadge(geneName);
@@ -1386,6 +1395,11 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
 		    	window.gene = response[0];
+
+		    	if (!validateGeneTranscripts()) {		    		
+		    		return;
+		    	}
+
 		    	adjustGeneRegion(window.gene);	
 
 		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
@@ -1404,13 +1418,8 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 		    	loadTracksForGene(false, null, callbackVariantsDisplayed);
 	    	} else {
-	    		alertify.error("Gene " + geneName + " not found.  Removing from list.", 
-				      		    function (e) {
-				     			});
-			    var gb = me._getGeneBadge(geneName);
-				gb.remove();
-				var index = geneNames.indexOf(geneName);
-				geneNames.splice(index, 1);
+	    		console.log("Gene " + geneName + " not found");
+	    		me.setGeneBadgeError(geneName);
 
 	    	}
 
@@ -1443,6 +1452,9 @@ GenesCard.prototype.refreshGene = function(geneName) {
 		    	// We have successfully return the gene model data.
 		    	// Load all of the tracks for the gene's region.
 		    	window.gene = response[0];	
+		    	if (!validateGeneTranscripts()) {
+		    		return;
+		    	}
 		    	adjustGeneRegion(window.gene);
 		    	window.geneObjects[window.gene.gene_name] = window.gene;			    	
 		    	loadTracksForGene(false);
