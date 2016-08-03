@@ -1744,7 +1744,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+		$(tooltip[0]).find(".tooltip-title.variant").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
@@ -2505,10 +2505,17 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	var genotypeRow = isLevelEduTour && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
+	var qualityWarningRow = "";
+	if (filterCard.shouldWarnForNonPassVariants()) {
+		if (variant.recfilter != 'PASS') {
+			qualityWarningRow = me._tooltipLowQualityHeaderRow();
+		}
+	}
+
 	if (isLevelEdu) {
 		return (
 			genotypeRow
-			+ me._tooltipHeaderRow('Severity - ' + impactLabel , '', '', '')
+			+ me._tooltipVariantHeaderRow('Severity - ' + impactLabel , '', '', '')
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
 			+ inheritanceModeRow
 			+ polyphenRowSimple
@@ -2516,7 +2523,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ clinvarRow2 );
 	} else if (type == 'tooltip') {
 		return (
-			  me._tooltipHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
+			  qualityWarningRow
+			+  me._tooltipVariantHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ inheritanceModeRow
 			+ siftPolyphenRow
@@ -2530,7 +2538,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	} else {
 		return (
-			  me._tooltipHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
+			qualityWarningRow
+			+ me._tooltipVariantHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
 			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
 			+ inheritanceModeRow
 
@@ -2637,6 +2646,16 @@ VariantCard.prototype._tooltipBlankRow = function() {
 VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value4) {
 	return '<div class="row">'
 	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '</div>';	
+}
+VariantCard.prototype._tooltipVariantHeaderRow = function(value1, value2, value3, value4) {
+	return '<div class="row">'
+	      + '<div class="col-md-12 tooltip-title variant" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '</div>';	
+}
+VariantCard.prototype._tooltipLowQualityHeaderRow = function() {
+	return '<div class="row">'
+	      + '<div class="col-md-12 tooltip-title danger" style="text-align:center">' + 'LOW QUALITY VARIANT' + '</div>'
 	      + '</div>';	
 }
 

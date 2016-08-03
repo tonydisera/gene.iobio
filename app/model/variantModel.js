@@ -2035,6 +2035,8 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		afField = "af1000G";
 	}
 
+
+
 	var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
 	var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
 
@@ -2049,6 +2051,14 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 	data.intronsExcludedCount = 0;
 	   
 	var filteredFeatures = data.features.filter(function(d) {
+
+		if (filterCard.shouldWarnForNonPassVariants()) {
+			if (d.recfilter != 'PASS') {
+					d.featureClass = 'low-quality';
+			} else {
+				d.featureClass = '';
+			}
+		}
 
 		var meetsRegion = true;
 		if (window.regionStart != null && window.regionEnd != null ) {			

@@ -10,9 +10,27 @@ function FilterCard() {
 
 }
 
+FilterCard.prototype.shouldWarnForNonPassVariants = function() {
+	var statusCount = 0;
+	var passStatus = false;
+	for ( key in this.recFilters) {
+		if (key == 'PASS') {
+			passStatus = true;
+		}
+		statusCount++;	
+	}
+	if (passStatus && statusCount > 1) {
+		return true;
+	}  else {
+		return false;
+	}
+}
+
 FilterCard.prototype.autoSetFilters = function() {
+	
 	this.displayRecFilters();
 	this.initFilterListeners();
+	/*
 	// If filter status has unique values of PASS + another status (e.g '.' or 'FAIL'),
 	// automatically filter variants to only include those with status PASS.
 	var statusCount = 0;
@@ -27,6 +45,7 @@ FilterCard.prototype.autoSetFilters = function() {
 		this.annotsToInclude.PASS = {key: "recfilter", state: true, value: "PASS"};		
 		d3.select("svg#PASS").classed("current", true);
 	} 
+	*/
 
 }
 

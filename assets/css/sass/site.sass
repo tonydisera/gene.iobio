@@ -368,7 +368,7 @@ h5
 .label-warning
   padding-bottom: 2px !important
   background-color: transparent !important
-  color: rgb(205, 71, 40) !important
+  color: $danger-font-color !important
   font-weight: normal !important
   font-size: 11px !important
 
@@ -773,6 +773,15 @@ a
       fill: white
       stroke: rgb(230, 230, 230)
       stroke-width: 1px
+
+    .col
+      &.danger
+        rect.cellbox
+          fill: rgba(187, 0, 0, 0.13) !important
+
+      &.low-quality
+        rect.cellbox
+          fill: rgba(0, 0, 0, 0.13) !important
 
     .colhdr text
       font-size: 9px

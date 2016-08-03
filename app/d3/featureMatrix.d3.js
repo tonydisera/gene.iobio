@@ -284,7 +284,9 @@ function featureMatrixD3() {
       // Generate the cols
       var cols = g.selectAll('.col').data(data);
       cols.enter().append('g')
-          .attr('class', 'col')
+          .attr('class', function(d,i) {
+            return "col  " + d.featureClass;
+          })
           .attr('transform', function(d,i) { 
             return "translate(" + (cellSize * (i+1)) + ",0)";
           });

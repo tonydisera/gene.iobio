@@ -314,7 +314,7 @@ h5 {
 .label-warning {
   padding-bottom: 2px !important;
   background-color: transparent !important;
-  color: #cd4728 !important;
+  color: #b32f2f !important;
   font-weight: normal !important;
   font-size: 11px !important; }
 
@@ -658,6 +658,10 @@ a {
   fill: white;
   stroke: #e6e6e6;
   stroke-width: 1px; }
+#matrix-track #feature-matrix .col.danger rect.cellbox {
+  fill: rgba(187, 0, 0, 0.13) !important; }
+#matrix-track #feature-matrix .col.low-quality rect.cellbox {
+  fill: rgba(0, 0, 0, 0.13) !important; }
 #matrix-track #feature-matrix .colhdr text {
   font-size: 9px;
   pointer-events: none; }
@@ -1864,6 +1868,11 @@ header {
 .tooltip-title {
   font-size: 11px;
   word-break: break-word; }
+  .tooltip-title.danger {
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #b32f2f; }
 
 .tooltip-header {
   overflow-wrap: break-all;
