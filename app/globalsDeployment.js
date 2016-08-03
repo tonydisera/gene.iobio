@@ -10,3 +10,4 @@ var serverCacheDir    = "local_cache/"; // this is the directory from the server
 var useOnDemand       = true;           // use on demand tabix and samtools
 var serverDataDir     = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag     = "arup:"         // this is the first part of the "file path" that will flag that this should be converted into a local server instance URL
+var siteGeneSource    = "refseq";       // what should the gene source default to: refseq or gencode?

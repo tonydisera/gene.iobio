@@ -59,7 +59,7 @@ var transcriptViewMode = "single";
 var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
-var geneSource = "gencode";
+var geneSource = typeof siteGeneSource !== 'undefined' && siteGeneSource ? siteGeneSource : "gencode";
 
 var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
@@ -448,6 +448,20 @@ function validateGeneTranscripts() {
 
 
 function checkGeneSource(geneName) {
+	$('#no-transcripts-badge').addClass("hide");
+
+
+	// First switch back to the site specific gene source (if provided)
+	if (typeof siteGeneSource !== 'undefined' && siteGeneSource) {
+		if (siteGeneSource != geneSource) {
+			var saveGene = window.gene;
+			geneSource = siteGeneSource;
+			window.gene = null;
+			switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
+			window.gene = saveGene;
+		}
+	}
+
 	var switchMsg = null;
 	if (refseqOnly[geneName] && geneSource != 'refseq') {
 		switchMsg = 'Gene ' + geneName + ' only in RefSeq.  Switching to this transcript set.';
@@ -459,10 +473,13 @@ function checkGeneSource(geneName) {
 		switchGeneSource('Gencode Transcript');	
 	}
 	if (switchMsg) {
-		var msg = "<span style='font-size:18px'>" + switchMsg + "</span>";
-		alertify.set('notifier','position', 'top-right');
-		alertify.error(msg, 6); 	
-	}	
+		//var msg = "<span style='font-size:18px'>" + switchMsg + "</span>";
+		//alertify.set('notifier','position', 'top-right');
+		//alertify.error(msg, 6); 	
+		$('#non-protein-coding #no-transcripts-badge').removeClass("hide");
+		$('#non-protein-coding #no-transcripts-badge').text(switchMsg);
+
+	} 	
 }
 
 
@@ -872,6 +889,12 @@ function loadGeneFromUrl() {
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
 
+	var theGeneSource = getUrlParameter("geneSource");
+	if (theGeneSource != null && theGeneSource != "") {
+		siteGeneSource = theGeneSource;
+		switchGeneSource(theGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
+	}
+
 	// Get the gene list from the url.  Add the gene badges, selecting
 	// the gene that was passed in the url parameter
 	var genes = getUrlParameter("genes");
@@ -937,6 +960,7 @@ function loadUrlSources() {
 	var affectedSibsString = getUrlParameter("affectedSibs");
 	var unaffectedSibsString = getUrlParameter("unaffectedSibs");
 	var batchSize = getUrlParameter("batchSize");
+	
 
 	if (batchSize != null && batchSize != "") {
 		DEFAULT_BATCH_SIZE = batchSize;
@@ -1836,7 +1860,6 @@ function loadTracksForGene(bypassVariantCards) {
 	$('#recall-card .call-variants-count').text("");
 	$('#recall-card .covloader').addClass("hide");
 
-	$('#no-transcripts-badge').addClass("hide");
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
