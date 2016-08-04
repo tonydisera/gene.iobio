@@ -1768,7 +1768,7 @@ function loadFullGeneSet(callback) {
             success: function( data ) {
             	var sortedGenes = getRidOfDuplicates(data);
             	gene_engine.clear();
-				gene_engine.add($.map(sortedGenes, function(gene) { return { name: gene.gene_name, genecode: gene.genecode, refseq: gene.refseq }; }));
+				gene_engine.add(sortedGenes);
 				if (callback) {
 					callback(true);
 				}
@@ -1796,6 +1796,8 @@ function getRidOfDuplicates(genes) {
 	// Flag gene objects with same name
  	for (var i =0; i < sortedGenes.length - 1; i++) {
         var gene = sortedGenes[i];
+
+
         var nextGene = sortedGenes[i+1];
         if (i == 0) {
           gene.dup = false;
@@ -1805,6 +1807,9 @@ function getRidOfDuplicates(genes) {
         if (gene.gene_name == nextGene.gene_name && gene.refseq == nextGene.refseq && gene.gencode == nextGene.gencode) {
         	nextGene.dup = true;
 	    }
+
+	    // Some more processing to gather unique gene sets and add field 'name'
+        gene.name = gene.gene_name;
 	    if (gene.refseq != gene.gencode) {
 	    	if (gene.refseq) {
 	    		refseqOnly[gene.gene_name] = gene;
