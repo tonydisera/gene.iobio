@@ -1303,8 +1303,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    	resolve(data);
 	    }, 
 	    function(error) {
-	    	console.log("an error occurred after getting clinvar records " + error);
-	    	reject();
+	    	console.log("an error occurred after vcf data returned (post processing) " + error);
+	    	reject(error);
 	    });
 
 	

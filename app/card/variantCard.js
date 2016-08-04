@@ -1775,7 +1775,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title.variant").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+		$(tooltip[0]).find(".tooltip-title.main-header").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
@@ -2546,7 +2546,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	if (isLevelEdu) {
 		return (
 			genotypeRow
-			+ me._tooltipVariantHeaderRow('Severity - ' + impactLabel , '', '', '')
+			+ me._tooltipMainHeaderRow('Severity - ' + impactLabel , '', '', '')
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
 			+ inheritanceModeRow
 			+ polyphenRowSimple
@@ -2555,7 +2555,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	} else if (type == 'tooltip') {
 		return (
 			  qualityWarningRow
-			+  me._tooltipVariantHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
+			+  me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ inheritanceModeRow
 			+ siftPolyphenRow
@@ -2570,7 +2570,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	} else {
 		return (
 			qualityWarningRow
-			+ me._tooltipVariantHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
 			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
 			+ inheritanceModeRow
 
@@ -2679,9 +2679,9 @@ VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value
 	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
-VariantCard.prototype._tooltipVariantHeaderRow = function(value1, value2, value3, value4) {
+VariantCard.prototype._tooltipMainHeaderRow = function(value1, value2, value3, value4) {
 	return '<div class="row">'
-	      + '<div class="col-md-12 tooltip-title variant" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '<div class="col-md-12 tooltip-title main-header" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
 VariantCard.prototype._tooltipLowQualityHeaderRow = function() {
