@@ -628,6 +628,11 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 		return;
 	}
 
+	if (filterCard.shouldWarnForNonPassVariants()) {
+		$('#low-quality-legend').removeClass("hide");
+	} else {
+		$('#low-quality-legend').addClass("hide");		
+	}
 
 	// Flag any bookmarked variants
     bookmarkCard.determineVariantBookmarks(theVcfData, window.gene);

@@ -658,6 +658,14 @@ a {
 .material-dropdown li:hover {
   background: #c8c8c8; }
 
+#matrix-track #low-quality-legend {
+  float: left;
+  margin-top: -20px;
+  font-size: 12px;
+  margin-left: 160px;
+  font-style: italic;
+  vertical-align: top;
+  color: #717171; }
 #matrix-track #feature-matrix rect.cellbox {
   fill: white;
   stroke: #e6e6e6;
