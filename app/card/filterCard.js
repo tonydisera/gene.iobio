@@ -336,6 +336,14 @@ FilterCard.prototype.initFilterListeners = function() {
 	  			}
 	  		})
 	  	}
+	  	if (schemeClass.indexOf('inactive') >= 0) {
+	  		var tokens = schemeClass.split(' ');
+	  		tokens.forEach(function(clazz) {
+	  			if (clazz != 'inactive') {
+	  				schemeClass = clazz;
+	  			}
+	  		})
+	  	}
 
 	  	// If af level clicked on, reset af range filter
 	  	if (d3.select(this).attr("class").indexOf("af1000glevel") || 
