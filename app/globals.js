@@ -1,7 +1,3 @@
-// how many genes can be analyzed simultaneously for 'Analyze all'
-var DEFAULT_BATCH_SIZE      = 5;  
-
-
 //
 // URLS
 //
