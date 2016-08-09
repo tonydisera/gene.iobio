@@ -2709,7 +2709,7 @@ VariantCard.prototype._tooltipMainHeaderRow = function(value1, value2, value3, v
 }
 VariantCard.prototype._tooltipLowQualityHeaderRow = function() {
 	return '<div class="row">'
-	      + '<div class="col-md-12 tooltip-title danger" style="text-align:center">' + 'DID NOT MEET FILTERING CRITERIA' + '</div>'
+	      + '<div class="col-md-12 tooltip-title danger" style="text-align:center">' + 'FLAGGED FOR NOT MEETING FILTERING CRITERIA' + '</div>'
 	      + '</div>';	
 }
 

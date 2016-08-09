@@ -2185,6 +2185,8 @@ text.ref-count {
     float: none;
     color: #717171;
     vertical-align: bottom; }
+  #examine-card .tooltip-title.danger {
+    width: 200px; }
   #examine-card .tooltip-footer {
     margin-top: 40px !important; }
   #examine-card .tooltip-footer #unpin {
