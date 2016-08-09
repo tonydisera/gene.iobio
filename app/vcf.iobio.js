@@ -22,32 +22,6 @@ vcfiobio = function module() {
   var sourceType = "url";
 
 
-  // new minion servers
-  //var tabix          = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-  var tabix          = new_iobio_services  +  "tabix/";
-  var vcfReadDepther = new_iobio_services  + "vcfdepther/";
-  var snpEff         = new_iobio_services  + "snpeff/";
-  var vt             = new_iobio_services  + "vt/";
-  var af             = new_iobio_services  + "af/";
-  var vep            = new_iobio_services  + "vep/";
-  var contigAppender = new_iobio_services  + "ctgapndr/";
-  var bcftools       = new_iobio_services  + "bcftools/";
-
-
-  // old (pre devkit)
-  var vcfstatsAliveServer    = iobio_services + "vcfstatsalive/";
-  var tabixServer            = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-  //var tabixServer            = iobio_services +  "tabix/";
-  var vcfReadDeptherServer   = iobio_services + "vcfdepther/";
-  var snpEffServer           = iobio_services + "snpeff/";
-  var snpSiftServer          = iobio_services + "snpsift/";
-  var vtServer               = iobio_services + "vt/";
-  var clinvarServer          = iobio_services + "clinvar/";
-  var afServer               = iobio_services + "af/";
-  var vepServer              = iobio_services + "vep/";
-  var contigAppenderServer   = iobio_services + "ctgapndr/";
-
-
   var vcfURL;
   var vcfReader;
   var vcfFile;
@@ -190,7 +164,7 @@ var effectCategories = [
     var me = this;
     var success = null;
     var cmd = new iobio.cmd(
-        tabix,
+        IOBIO.tabix,
         ['-H', url]
     );
 
@@ -230,10 +204,10 @@ var effectCategories = [
   exports.checkVcfUrlOld = function(url, callback) {
     var me = this;
     var success = null;
-    var url = encodeURI( tabixServer + '?cmd= -H ' + url);
+    var url = encodeURI( IOBIO.tabixServer + '?cmd= -H ' + url);
     
     // Connect to the vep server    
-    var client = BinaryClient(tabixServer);
+    var client = BinaryClient(IOBIO.tabixServer);
     
 
     client.on('open', function(stream){
@@ -378,7 +352,7 @@ var effectCategories = [
         if (e) {
             return;
         } else {
-            window.location = 'http://iobio.io/2015/09/03/install-run-tabix/';
+            window.location = 'http://IOBIO.io/2015/09/03/install-run-tabix/';
         }
      });
   }
@@ -467,7 +441,7 @@ var effectCategories = [
     var refName;
 
     var cmd = new iobio.cmd(
-        vcfReadDepther,
+        IOBIO.vcfReadDepther,
         ['-i', vcfURL + '.tbi']
     );
 
@@ -586,8 +560,8 @@ var effectCategories = [
 
     sourceType = SOURCE_TYPE_URL;
 
-    var client = BinaryClient(vcfReadDeptherServer);
-    var url = encodeURI( vcfReadDeptherServer + '?cmd=-i ' + vcfURL + ".tbi");
+    var client = BinaryClient(IOBIO.vcfReadDeptherServer);
+    var url = encodeURI( IOBIO.vcfReadDeptherServer + '?cmd=-i ' + vcfURL + ".tbi");
 
     client.on('open', function(stream){
       var stream = client.createStream({event:'run', params : {'url':url}});
@@ -788,38 +762,38 @@ var effectCategories = [
 
 
     var contigStr = "";
-    me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+    getHumanRefNames(refName).split(" ").forEach(function(ref) {
         contigStr += "##contig=<ID=" + ref + ">\n";
     })
     var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
-    var cmd = new iobio.cmd(tabix,['-h', vcfURL, regionParm])
-      .pipe(bcftools, ['annotate', '-h', contigNameFile, '-'])
+    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm])
+      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
 
     // filter sample(s)
     if (sampleName != null && sampleName != "") {
 
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(vt, ["subset", "-s", sampleNameFile, '-'])
+      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'])
     }
 
     // normalize variants
-    cmd = cmd.pipe(vt, ["normalize", "-n", "-r", refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'])
 
     // get allele frequencies from 1000G and ExAC
-    cmd = cmd.pipe(af);
+    cmd = cmd.pipe(IOBIO.af);
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (isRefSeq || annotationEngine == 'vep') {
     } else {
-      cmd = cmd.pipe(snpEff);
+      cmd = cmd.pipe(IOBIO.snpEff);
     }
 
     if (vepArgs == "") {
-      cmd = cmd.pipe(vep);
+      cmd = cmd.pipe(IOBIO.vep);
     } else {
-      cmd = cmd.pipe(vep, [vepArgs]);
+      cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
     }
 
 
@@ -888,7 +862,7 @@ var effectCategories = [
     var me = this;
 
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
-    var tabixUrl = tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
+    var tabixUrl = IOBIO.tabixServer + "?cmd=-h " + vcfURL + regionParm + '&encoding=binary';
     if (refName.indexOf('chr') == 0) {
       refFile = "./data/references_hg19/" + refName + ".fa";
     } else {
@@ -896,23 +870,23 @@ var effectCategories = [
     }    
     
     // TODO - Need to generalize to grab reference names for species instead of hardcoding
-    var contigAppenderUrl = encodeURI( contigAppenderServer + "?cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(tabixUrl)));
+    var contigAppenderUrl = encodeURI( IOBIO.contigAppenderServer + "?cmd= " + getHumanRefNames(refName) + " " + encodeURIComponent(encodeURI(IOBIO.tabixUrl)));
 
     // If multi-sample vcf, select only the genotype field for the specified sample
     var nextUrl = "";
     if (sampleName != null && sampleName != "") {
-      nextUrl = encodeURI( vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+      nextUrl = encodeURI( IOBIO.vtServer + "?cmd= subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
     } else {
       nextUrl = contigAppenderUrl;
     }
 
     // normalize variants
-    var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
+    var vtUrl = encodeURI( IOBIO.vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl));
     
     // get allele frequencies from 1000G and ExAC
-    var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
+    var afUrl = encodeURI( IOBIO.afServer + "?cmd= " + encodeURIComponent(vtUrl));
 
-    var snpEffUrl = encodeURI( snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
+    var snpEffUrl = encodeURI( IOBIO.snpEffServer + '?cmd= ' + encodeURIComponent(afUrl));
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     var nextUrl;
@@ -936,8 +910,8 @@ var effectCategories = [
     }
     
     // We always annotate with VEP because we get SIFT and PolyPhen scores (and regulatory annotations)
-    var url = encodeURI( vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
-    var server = vepServer;
+    var url = encodeURI( IOBIO.vepServer + '?cmd= ' + vepArgs + encodeURIComponent(nextUrl));
+    var server = IOBIO.vepServer;
 
     // Connect to the vep server    
     var client = BinaryClient(server);
@@ -1077,7 +1051,7 @@ var effectCategories = [
     var me = this;
 
     var cmd = new iobio.cmd(
-        tabix,
+        IOBIO.tabix,
         ['-h', vcfURL, '1:1-1']);
 
 
@@ -1112,10 +1086,10 @@ var effectCategories = [
 
   exports._getRemoteSampleNamesOld = function(callback) {
     var me = this;
-    var tabixUrl = encodeURI(tabixServer + "?cmd=-h " + vcfURL +  ' 1:1-1' + '&protocol=http&encoding=utf8');
+    var tabixUrl = encodeURI(IOBIO.tabixServer + "?cmd=-h " + vcfURL +  ' 1:1-1' + '&protocol=http&encoding=utf8');
 
     // Connect to the tabix server    
-    var client = BinaryClient(tabixServer);
+    var client = BinaryClient(IOBIO.tabixServer);
     
     var sampleNames = [];
     var headerData = "";
@@ -1172,21 +1146,21 @@ var effectCategories = [
     var region = ref + ":" + start + "-" + end;
 
     var contigStr = "";
-    me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+    getHumanRefNames(refName).split(" ").forEach(function(ref) {
         contigStr += "##contig=<ID=" + ref + ">\n";
     })
     var contigNameFile = new Blob([contigStr])
    
-    var cmd = new iobio.cmd(tabix, ['-h', vcfURL, region]);
+    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region]);
 
-    cmd  = cmd.pipe(bcftools, ['annotate', '-h', contigNameFile, '-'])
+    cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
 
     if (sampleName != null && sampleName != "") {
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(vt, ['subset', '-s', sampleNameFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-']);
     }
 
-    cmd = cmd.pipe(bcftools, ['stats']);
+    cmd = cmd.pipe(IOBIO.bcftools, ['stats']);
                        
 
     var statsData = "";
@@ -1229,6 +1203,53 @@ var effectCategories = [
 
     cmd.run();
 
+  }
+
+  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript) {
+    var me = this;
+
+    return new Promise( function(resolve, reject) {
+      // For each vcf records, call snpEff to get the annotations.
+      // Each vcf record returned will have an EFF field in the
+      // info field.
+      var vcfObjects = [];
+      var vepFields = {};
+
+      annotatedRecs.forEach(function(record) {
+        if (record.charAt(0) == "#") {
+          // Figure out how the vep fields positions
+          if (record.indexOf("INFO=<ID=CSQ") > 0) {
+            vepFields = me.parseHeaderFieldForVep(record);
+          }
+        } else {
+
+          // Parse the vcf record into its fields
+          var fields = record.split('\t');
+          var pos    = fields[1];
+          var id     = fields[2];
+          var ref    = fields[3];
+          var alt    = fields[4];
+          var qual   = fields[5];
+          var filter = fields[6];
+          var info   = fields[7];
+          var format = fields[8];
+          var genotypes = [];
+          for (var i = 9; i < fields.length; i++) {
+            genotypes.push(fields[i]);
+          }
+
+
+          // Turn vcf record into a JSON object and add it to an array
+          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
+                           'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
+          vcfObjects.push(vcfObject);
+        }
+
+        // Parse the vcf object into a variant object that is visualized by the client.
+        var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
+        resolve([annotatedRecs, results]);
+      });
+    });
   }
 
   exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
@@ -1333,7 +1354,7 @@ var effectCategories = [
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm]);
+      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm]);
 
 
       var clinvarData = "";
@@ -1542,41 +1563,33 @@ var effectCategories = [
 
 
     //  Streamed vcf recs first go through contig appender to add mandatory header recs
-    // var cmd = new iobio.cmd(contigAppender, [me.getHumanRefNames(refName), (vcfFile ? vcfFile : writeStream) ]);
-
-    // var writeContigNames = function(stream) {
-    //   me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
-    //     stream.write("##contig=<ID=" + ref + ">\n");
-    //   })
-    //   stream.end();
-    // }
     var contigStr = "";
-    me.getHumanRefNames(refName).split(" ").forEach(function(ref) {
+    getHumanRefNames(refName).split(" ").forEach(function(ref) {
         contigStr += "##contig=<ID=" + ref + ">\n";
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(bcftools, ['annotate', '-h', contigNameFile, writeStream ])
+    var cmd = new iobio.cmd(IOBIO.bcftools, ['annotate', '-h', contigNameFile, writeStream ])
 
     // Filter samples
     if (sampleName != null && sampleName != "") {
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(vt, ['subset', '-s', sampleNameFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-']);
     }
 
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(vt, ['normalize', '-n', '-r', refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'])
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(af)
+    cmd = cmd.pipe(IOBIO.af)
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
     } else {
-      cmd = cmd.pipe(snpEff);
+      cmd = cmd.pipe(IOBIO.snpEff);
     }
 
-    cmd = cmd.pipe(vep, [vepArgs]);
+    cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
 
 
     var buffer = "";
@@ -1601,12 +1614,12 @@ var effectCategories = [
   exports._annotateVcfRegionOld = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
       var me = this;
    
-      var contigAppenderUrl = encodeURI( contigAppenderServer + "?protocol=websocket&cmd= " + me.getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
+      var contigAppenderUrl = encodeURI( IOBIO.contigAppenderServer + "?protocol=websocket&cmd= " + getHumanRefNames(refName) + " " + encodeURIComponent("http://client"));
 
       // If multi-sample vcf, select only the genotype field for the specified sample
       var nextUrl = "";
       if (sampleName != null && sampleName != "") {
-        nextUrl = encodeURI( vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
+        nextUrl = encodeURI( IOBIO.vtServer + "?cmd=subset -s " + sampleName + " " + encodeURIComponent(contigAppenderUrl));
       } else {
         nextUrl = contigAppenderUrl;
       }
@@ -1618,13 +1631,13 @@ var effectCategories = [
       }       
       
       // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-      var vtUrl = encodeURI( vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
+      var vtUrl = encodeURI( IOBIO.vtServer + "?cmd=normalize -n -r " + refFile + " " + encodeURIComponent(nextUrl) );
       
       // Get Allele Frequencies from 1000G and ExAC
-      var afUrl = encodeURI( afServer + "?cmd= " + encodeURIComponent(vtUrl));
+      var afUrl = encodeURI( IOBIO.afServer + "?cmd= " + encodeURIComponent(vtUrl));
             
       // Call snpEff service
-      var snpEffUrl = encodeURI( snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
+      var snpEffUrl = encodeURI( IOBIO.snpEffServer + "?cmd=" + encodeURIComponent(afUrl));
 
       // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
       var nextUrl = null;
@@ -1646,9 +1659,9 @@ var effectCategories = [
       }
       
       // Call VEP
-      var vepUrl = encodeURI( vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
+      var vepUrl = encodeURI( IOBIO.vepServer + "?cmd= " + vepArgs + encodeURIComponent(nextUrl));
       
-      var client = BinaryClient(vepServer);
+      var client = BinaryClient(IOBIO.vepServer);
       var buffer = "";
       client.on('open', function(){
         var stream = client.createStream({event:'run', params : {'url':vepUrl}});
@@ -1691,14 +1704,6 @@ var effectCategories = [
       client.on("error", function(error) {
         console.log("error while annotating vcf records " + error);
       });
-  }
-
-  exports.getHumanRefNames = function(refName) {
-    if (refName.indexOf("chr") == 0) {
-      return "chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr20 chr21 chr22 chrX chrY";
-    } else {
-      return "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y";
-    }
   }
 
 

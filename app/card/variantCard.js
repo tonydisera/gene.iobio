@@ -2686,7 +2686,7 @@ VariantCard.prototype._tooltipMainHeaderRow = function(value1, value2, value3, v
 }
 VariantCard.prototype._tooltipLowQualityHeaderRow = function() {
 	return '<div class="row">'
-	      + '<div class="col-md-12 tooltip-title danger" style="text-align:center">' + 'POSSIBLE LOW QUALITY' + '</div>'
+	      + '<div class="col-md-12 tooltip-title danger" style="text-align:center">' + 'POTENTIALLY LOW QUALITY' + '</div>'
 	      + '</div>';	
 }
 
