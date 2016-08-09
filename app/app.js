@@ -2194,7 +2194,23 @@ function callVariants() {
 	fulfilledTrioPromise = false;
 	variantCards.forEach(function(vc) {
 		vc.clearCalledVariants();
-		vc.callVariants(regionStart, regionEnd);
+		vc.callVariants(regionStart, regionEnd, function() {
+			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+				variantCards.forEach(function(variantCard) {
+					// Reflect me new info in the freebayes variants.
+					variantCard.model.loadCalledTrioGenotypes();
+
+					//  Refresh the feature matrix (proband only) and variant cards
+					if (variantCard.getRelationship() == 'proband') {
+						variantCard.fillFeatureMatrix(regionStart, regionEnd);
+					} else {
+						variantCard._showVariants(regionStart, regionEnd, null, false);
+					}
+
+				})				
+			});
+
+		});
 	});
 }
 
