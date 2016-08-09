@@ -720,12 +720,12 @@ a {
 #matrix-track #feature-matrix-note {
   padding-left: 165px;
   font-size: 12px;
-  margin-top: -7px; }
+  margin-top: 0px; }
 #matrix-track #move-rows {
   float: left;
   font-size: 11px !important;
   color: #717171 !important;
-  margin-top: -7px; }
+  margin-top: 0px; }
 
 .icon {
   width: 30px;
