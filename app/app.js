@@ -2197,6 +2197,7 @@ function callVariants() {
 		vc.callVariants(regionStart, regionEnd, function() {
 			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
 				variantCards.forEach(function(variantCard) {
+
 					// Reflect me new info in the freebayes variants.
 					variantCard.model.loadCalledTrioGenotypes();
 
@@ -2207,7 +2208,7 @@ function callVariants() {
 						variantCard._showVariants(regionStart, regionEnd, null, false);
 					}
 
-				})				
+				});				
 			});
 
 		});
@@ -2323,6 +2324,8 @@ function promiseDetermineInheritance(promise) {
 
 						probandVariantCard.determineMaxAlleleCount();
 						
+						// Enable inheritance filters
+						filterCard.enableInheritanceFilters(getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript));
 
 						genesCard.refreshCurrentGeneBadge();
 
