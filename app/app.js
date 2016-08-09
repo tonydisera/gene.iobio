@@ -378,22 +378,6 @@ function init() {
 
 
 
-
-
-	// When the transcript set changes (either GenCode or RefSeq)
-	
-	$('#select-gene-source').selectize(
-		{ 	onChange: function(value) {
-				geneSource = value.toLowerCase().split(" transcript")[0];
-				geneToLatestTranscript = {};
-				if (window.gene) {
-					genesCard.selectGene(window.gene.gene_name);
-				}
-			} 
-		}
-	);
-
-
 	// Initialize transcript view buttons
 	initTranscriptControls();
 
@@ -408,6 +392,8 @@ function init() {
 	$('.sidebar-button.selected').removeClass("selected");
 
 	
+	$('#select-gene-source').selectize({});
+
 	// Set up the gene search widget
 	loadGeneWidget( function(success) {
 		if (success) {
@@ -450,27 +436,20 @@ function validateGeneTranscripts() {
 function checkGeneSource(geneName) {
 	$('#no-transcripts-badge').addClass("hide");
 
-
-	// First switch back to the site specific gene source (if provided)
-	if (typeof siteGeneSource !== 'undefined' && siteGeneSource) {
-		if (siteGeneSource != geneSource) {
-			var saveGene = window.gene;
-			//geneSource = siteGeneSource;
-			window.gene = null;
-			switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
-			window.gene = saveGene;
-		}
-	}
-
+	
 	var switchMsg = null;
 	if (refseqOnly[geneName] && geneSource != 'refseq') {
 		switchMsg = 'Gene ' + geneName + ' only in RefSeq.  Switching to this transcript set.';
-		window.gene = null;
 		switchGeneSource('RefSeq Transcript');	
 	} else if (gencodeOnly[geneName] && geneSource != 'gencode') {
 		switchMsg = 'Gene ' + geneName + ' only in Gencode.  Switching to this transcript set.';
-		window.gene = null;
 		switchGeneSource('Gencode Transcript');	
+	} else {
+		// In the case where the gene is valid in both gene sources,
+		// check to see if the gene source needs to be set back to the preferred setting,
+		// which will be either the site specific source or the  gene source
+		// last selected from the dropdown
+		resetGeneSource();
 	}
 	if (switchMsg) {
 		//var msg = "<span style='font-size:18px'>" + switchMsg + "</span>";
@@ -482,10 +461,40 @@ function checkGeneSource(geneName) {
 	} 	
 }
 
+function resetGeneSource() {
+	// Switch back to the site specific gene source (if provided),
+	// but only if the user hasn't already selected a gene
+	// source from the dropdown, which will override any default setting.
+	if (typeof siteGeneSource !== 'undefined' && siteGeneSource) {
+		if (siteGeneSource != geneSource) {
+			switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
+		}
+	}	
+}
+
 
 function switchGeneSource(newGeneSource) {
+
+	// turn off event handling - instead we want to manually set the
+	// gene source value
+	$('#select-gene-source')[0].selectize.off('change');
+
+
 	$('#select-gene-source')[0].selectize.setValue(newGeneSource);	
-	$('#gene-source-box').removeClass('hide');
+	geneSource = newGeneSource.toLowerCase().split(" transcript")[0];
+
+
+	// turn on event handling
+	$('#select-gene-source')[0].selectize.on('change', function(value) { 	
+		geneSource = value.toLowerCase().split(" transcript")[0];
+		// When the user picks a different gene source from the dropdown,
+		// this becomes the 'new' site gene source
+		siteGeneSource = geneSource;
+		geneToLatestTranscript = {};
+		if (window.gene) {
+			genesCard.selectGene(window.gene.gene_name);
+		}
+	});
 }
 
 
