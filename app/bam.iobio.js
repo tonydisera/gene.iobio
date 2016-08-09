@@ -19,30 +19,6 @@ var Bam = Class.extend({
       }
       this.promises = [];
 
-      // set iobio servers
-      this.iobio = {};
-
-      // new minion (devkit) services
-      //this.iobio.samtools            = new_iobio_services + "samtools/"
-      this.iobio.coverage            = new_iobio_services + "coverage/ ";
-      this.iobio.cat                 = new_iobio_services + "cat/ ";
-      this.iobio.samtools            = new_iobio_services +  "samtools/";
-      //this.iobio.samtoolsOnDemand    = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-      this.iobio.samtoolsOnDemand    = new_iobio_services +  "samtools/";
-      this.iobio.freebayes           = new_iobio_services + "freebayes/";
-      this.iobio.vcflib              = new_iobio_services + "vcflib/";
-      this.iobio.vt                  = new_iobio_services + "vt/";
-
-
-      // old minion (pre devkit) services
-      this.iobio.coverageService                = iobio_services + "coverage/ ";
-      this.iobio.samtoolsService                = iobio_services + "samtools/";
-      this.iobio.samtoolsServiceOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-      this.iobio.freebayesService               = iobio_services + "freebayes/";
-      this.iobio.vcflibService                  = iobio_services + "vcflib/";
-      this.iobio.vtService                      = iobio_services + "vt/";
-
-
       this.errorMessageMap =  {
         "samtools Error: stderr - Could not load .bai":  "Unable to load the index (.bai) file, which has to exist in same directory and be given the same name as the .bam with the file extension of .bam.bai.",
         "samtools Error: stderr - [E::hts_open] fail to open file": "Unable to access the file.  ",
@@ -95,7 +71,7 @@ var Bam = Class.extend({
     var me = this;
     var success = null;
     var cmd = new iobio.cmd(
-        me.iobio.samtools,
+        IOBIO.samtools,
         ['view', '-H', url]
     );
 
@@ -135,10 +111,10 @@ var Bam = Class.extend({
   checkBamUrlOld: function(url, callback) {
     var me = this;
     var success = null;
-    var url = encodeURI( this.iobio.samtoolsService + '?cmd= view -H ' + url);
+    var url = encodeURI( IOBIO.samtoolsService + '?cmd= view -H ' + url);
     
     // Connect to the vep server    
-    var client = BinaryClient(this.iobio.samtoolsService);
+    var client = BinaryClient(IOBIO.samtoolsService);
     
 
     client.on('open', function(stream){
@@ -306,7 +282,7 @@ var Bam = Class.extend({
    },
 
    _getBamRegionsUrl: function(regions, golocal) {
-      var samtools = this.sourceType == "url" ? this.iobio.samtoolsServiceOnDemand : this.iobio.samtoolsService;
+      var samtools = this.sourceType == "url" ? IOBIO.samtoolsServiceOnDemand : IOBIO.samtoolsService;
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
@@ -321,7 +297,7 @@ var Bam = Class.extend({
    },
 
     _getBamPileupUrl: function(region, golocal) {
-      var samtools = this.sourceType == "url" ? this.iobio.samtoolsServiceOnDemand : this.iobio.samtoolsService;
+      var samtools = this.sourceType == "url" ? IOBIO.samtoolsServiceOnDemand : IOBIO.samtoolsService;
       if ( this.sourceType == "url") {
          var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);
          var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
@@ -395,7 +371,7 @@ var Bam = Class.extend({
     var me = this;
     var success = null;
     var cmd = new iobio.cmd(
-        me.iobio.samtools,
+        IOBIO.samtools,
         ['view', '-H', me.bamUri]
     );
     var rawHeader = "";
@@ -418,8 +394,8 @@ var Bam = Class.extend({
 
    getRemoteHeaderOld: function(callback) {
       var me = this;
-      var client = BinaryClient(me.iobio.samtoolsService);
-      var url = encodeURI( me.iobio.samtoolsServiceOnDemand + '?cmd=view -H ' + this.bamUri)
+      var client = BinaryClient(IOBIO.samtoolsService);
+      var url = encodeURI( IOBIO.samtoolsServiceOnDemand + '?cmd=view -H ' + this.bamUri)
       client.on('open', function(stream){
         var stream = client.createStream({event:'run', params : {'url':url}});
         var rawHeader = ""
@@ -512,10 +488,10 @@ var Bam = Class.extend({
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
         var protocol = me.sourceType == "url" ? '&protocol=http' : '';
-        var url = encodeURI( me.iobio.coverageService + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
-        //var url = encodeURI( me.iobio.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
+        var url = encodeURI( IOBIO.coverageService + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
+        //var url = encodeURI( IOBIO.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
 
-        var client = BinaryClient(me.iobio.coverageService);
+        var client = BinaryClient(IOBIO.coverageService);
 
         var samData = "";
         var samRecs = [];
@@ -526,7 +502,7 @@ var Bam = Class.extend({
             // New local file streaming
             stream.on('createClientConnection', function(connection) {
               var ended = 0;
-              var dataClient = BinaryClient('ws://' + (isOffline ? me.iobio.samtools : connection.serverAddress));
+              var dataClient = BinaryClient('ws://' + (isOffline ? IOBIO.samtools : connection.serverAddress));
               dataClient.on('open', function() {
                 var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
                 dataStream.write(me.header.toStr);
@@ -606,7 +582,7 @@ var Bam = Class.extend({
    getCoverageForRegionDevkit: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
       var me = this;
       this.transformRefName(refName, function(trRefName){
-        var samtools = me.sourceType == "url" ?  me.iobio.samtoolsOnDemand : me.iobio.samtools;
+        var samtools = me.sourceType == "url" ?  IOBIO.samtoolsOnDemand : IOBIO.samtools;
 
         var regionsArg = "";
         regions.forEach( function(region) {
@@ -657,7 +633,7 @@ var Bam = Class.extend({
         }
 
         // After running samtools mpileup, run coverage service to summarize point data.
-        cmd = cmd.pipe(me.iobio.coverage, [maxPointsArg, spanningRegionArg, regionsArg]);
+        cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg]);
 
         var samData = "";
         cmd.on('data', function(data) {
@@ -716,20 +692,20 @@ var Bam = Class.extend({
 
 
 
-   getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, callback) {
+   getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback) {
     if (useDevkit) {
-      return this.getFreebayesVariantsDevkit(refName, regionStart, regionEnd, regionStrand, callback);
+      return this.getFreebayesVariantsDevkit(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback);
     } else {
       return this.getFreebayesVariantsOld(refName, regionStart, regionEnd, regionStrand, callback);
     }
    },
 
-   getFreebayesVariantsDevkit: function(refName, regionStart, regionEnd, regionStrand, callback) {
+   getFreebayesVariantsDevkit: function(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback) {
 
     var me = this;
     this.transformRefName(refName, function(trRefName){
 
-      var samtools = this.sourceType == "url" ? trRefNameOnDemand : me.iobio.samtools;
+      var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
       var refFile = null;
       // TODO:  This is a workaround until we introduce a genome build dropdown.  For
       // now, we support Grch37 and hg19.  For now, this lame code simply looks at
@@ -748,12 +724,12 @@ var Bam = Class.extend({
       // When bam file is read as a local file, just stream sam records for region to
       // samtools mpileup.
       if (me.sourceType == "url") {
-        //cmd = new iobio.cmd("nv-green.iobio.io/samtools/", ['view', '-b', me.bamUri, regionArg],
+        //cmd = new iobio.cmd("nv-green.IOBIO.io/samtools/", ['view', '-b', me.bamUri, regionArg],
         cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
          {
             'urlparams': {'encoding':'binary'}
           });
-        cmd = cmd.pipe(me.iobio.freebayes, [ '--stdin', '-f', refFile]);
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
       } else {
 
         var writeStream = function(stream) {
@@ -768,13 +744,38 @@ var Bam = Class.extend({
             {
               'urlparams': {'encoding':'binary'}
             });
-        cmd = cmd.pipe(me.iobio.freebayes, [ '--stdin', '-f', refFile]);
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
          
       }
 
 
-      cmd = cmd.pipe(me.iobio.vt, ['normalize', '-r', refFile, '-']);
-      cmd = cmd.pipe(me.iobio.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+      cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+
+
+      //
+      // NEW CODE - Annotate variants that were just called from freebayes
+      //
+     
+      // bcftools to append header rec for contig
+      var contigStr = "";
+      getHumanRefNames(refName).split(" ").forEach(function(ref) {
+          contigStr += "##contig=<ID=" + ref + ">\n";
+      })
+      var contigNameFile = new Blob([contigStr])
+      //cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
+
+      // Get Allele Frequencies from 1000G and ExAC
+      //cmd = cmd.pipe(IOBIO.af)
+
+      // VEP to annotate
+      var vepArgs = "";
+      if (isRefSeq) {
+        vepArgs = " --refseq "
+      }
+      //cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+
+
       
       var variantData = "";
       cmd.on('data', function(data) {
@@ -816,16 +817,16 @@ var Bam = Class.extend({
       } else {
         refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
       }
-      var urlF = me.iobio.freebayesService
+      var urlF = IOBIO.freebayesService
         + "?cmd=-f " + refFile  + " "
         + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
 
-      var urlV = me.iobio.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
+      var urlV = IOBIO.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
 
-      var url = me.iobio.vcflibService + '?cmd=vcffilter -f "QUAL > 1" '
+      var url = IOBIO.vcflibService + '?cmd=vcffilter -f "QUAL > 1" '
                 + encodeURIComponent(encodeURI(urlV));
 
-      me._callVariantsOld(trRefName, regionStart, regionEnd, regionStrand, me.iobio.vcflibService, encodeURI(url), callback);
+      me._callVariantsOld(trRefName, regionStart, regionEnd, regionStrand, IOBIO.vcflibService, encodeURI(url), callback);
     });
 
 
@@ -853,7 +854,7 @@ var Bam = Class.extend({
       // New local file streaming
       stream.on('createClientConnection', function(connection) {
         var ended = 0;
-        var dataClient = BinaryClient('ws://' + (isOffline ? me.iobio.samtools : connection.serverAddress));
+        var dataClient = BinaryClient('ws://' + (isOffline ? IOBIO.samtools : connection.serverAddress));
         dataClient.on('open', function() {
           var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
           dataStream.write(me.header.toStr);

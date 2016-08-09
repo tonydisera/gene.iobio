@@ -1758,6 +1758,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 					window.gene.start, 
 					window.gene.end, 
 					window.gene.strand, 
+					window.geneSource == 'refseq' ? true : false,
 					function(data) {
 
 					if (data == null || data.length == 0) {
