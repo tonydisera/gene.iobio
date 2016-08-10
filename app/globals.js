@@ -20,8 +20,7 @@ var phenolyzerOnlyServer = iobio_http_services + "phenolyzer/";
 
 // new devkit / minion2 services
 var IOBIO = {};
-//IOBIO.tabix                   = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-IOBIO.tabix                   = new_iobio_services  + "tabix/";
+IOBIO.tabix                   = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
 IOBIO.vcfReadDepther          = new_iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = new_iobio_services  + "snpeff/";
 IOBIO.vt                      = new_iobio_services  + "vt/";
@@ -31,8 +30,7 @@ IOBIO.contigAppender          = new_iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = new_iobio_services  + "bcftools/";
 IOBIO.coverage                = new_iobio_services + "coverage/ ";
 IOBIO.samtools                = new_iobio_services +  "samtools/";
-//IOBIO.samtoolsOnDemand        = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.samtoolsOnDemand        = new_iobio_services + "samtools/";
+IOBIO.samtoolsOnDemand        = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
 IOBIO.freebayes               = new_iobio_services + "freebayes/";
 IOBIO.vcflib                  = new_iobio_services + "vcflib/";
 
