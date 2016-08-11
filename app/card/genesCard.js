@@ -1359,6 +1359,24 @@ GenesCard.prototype.selectGeneBadge = function(badgeElement) {
 
 }
 
+GenesCard.prototype.setSelectedGene = function(geneName) {
+	var me = this;
+
+	$("#gene-badge.selected").removeClass("selected");
+	var geneBadge = me._getGeneBadge(geneName);
+	geneBadge.addClass("selected");
+
+	$("#gene-badge.loading").each( function(index, value) {
+		var geneName = $(this).find("#gene-badge-name").text();
+		if (cacheQueue.indexOf(geneName) < 0) {
+			me._setGeneBadgeLoading($(this), false);
+		}
+	});
+	if (hasDataSources()) {
+		me._setGeneBadgeLoading(geneBadge, true);
+	}	
+}
+
 GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	var me = this;
 
@@ -1368,18 +1386,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 	$('.typeahead.tt-input').val(geneName);
 	
-	var geneBadge = me._getGeneBadge(geneName);
-	
-	$("#gene-badge.selected").removeClass("selected");
-	geneBadge.addClass("selected");
-	
-	$(".gene-badge-button").each( function(index, value) {
-		me._setGeneBadgeLoading($(this), false);
-	});
-	if (hasDataSources()) {
-		me._setGeneBadgeLoading(geneBadge, true);
-	}
-
+	me.setSelectedGene(geneName);
 
 	var url = geneiobio_server + 'api/gene/' + geneName;	
 	url += "?source=" + geneSource;

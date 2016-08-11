@@ -1733,7 +1733,7 @@ function loadGeneWidget(callback) {
 	
 					$('#splash').addClass("hide");
 
-					genesCard.selectGene(window.gene.gene_name);
+					genesCard.setSelectedGene(window.gene.gene_name);
 			    	loadTracksForGene();
 
 			    	// add gene to url params
@@ -1758,7 +1758,10 @@ function loadGeneWidget(callback) {
 		        
 		        console.log( "Error: " + errorThrown );
 		        console.log( "Status: " + status );
-		        console.dir( xhr );
+		        console.log( xhr );
+		        console.log("Gene " + data.name + " not found");
+	    		genesCard.setGeneBadgeError(data.name);
+
 		    },
 		    complete: function( xhr, status ) {
 		    }
