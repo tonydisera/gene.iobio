@@ -57,8 +57,8 @@ var OFFLINE_PHENOLYZER_CACHE_URL  = isOffline ?  (serverCacheDir) : ("../" + ser
 // Url for offline Clinvar URL
 var OFFLINE_CLINVAR_VCF_URL       = isOffline ?  ("http://" + serverInstance + serverCacheDir + "clinvar.vcf.gz") : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
 
-
-
+var NCBI_GENE_SEARCH_URL          = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json";
+var NCBI_GENE_SUMMARY_URL         = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&usehistory=y&retmode=json"; 
 //
 //  EDUCATIONAL / EXHIBIT
 //

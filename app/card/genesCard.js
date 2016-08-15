@@ -805,23 +805,70 @@ GenesCard.prototype._onGeneBadgeUpdate = function() {
 
 }
 
-GenesCard.prototype.promiseSetGeneAnnot = function(geneBadgeSelector, name) {
+
+
+
+GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneName) {
 	var me = this;
 
-	return new Promise( function(resolve, reject) {
-		// Get the gene info (name, description) from ncbi
-		me.promiseGetGeneAnnotation(name).then( function(geneAnnot) {
-			//geneBadgeSelector.find('#gene-badge-button').attr('title', geneAnnot.description + "  -  " + geneAnnot.summary);
-			geneAnnots[name] = geneAnnot;
-			d3.select(geneBadgeSelector).data([geneAnnot]);
-
-			resolve(geneAnnot);
-
-		}, function(error) {
-			reject("problem getting gene info from ncbi. " + error);
+	// If the site is configured so that NO outside access is allowed to obtain
+	// the gene summary from NCBI, just resolve with a null summary
+	if (!accessNCBIGeneSummary) {
+		return new Promise( function(resolve, reject) {
+			resolve(null);
 		});
+	}
 
-	});
+    return new Promise( function(resolve, reject) {
+
+   	  var geneInfo = geneAnnots[geneName];
+   	  if (geneInfo != null) {
+   	  	d3.select(geneBadgeSelector).data([geneInfo]);
+   	  	resolve(geneInfo);
+   	  } else {
+   	  	  // Search NCBI based on the gene name to obtain the gene ID
+	      var url = NCBI_GENE_SEARCH_URL + "&term=" + "(" + geneName + "[Gene name]" + " AND 9606[Taxonomy ID]";
+
+	      var clinvarVariants = null;
+	      $.ajax( url )
+	        .done(function(data) {  
+
+	          // Now that we have the gene ID, get the NCBI gene summary      
+	          var webenv = data["esearchresult"]["webenv"];
+	          var queryKey = data["esearchresult"]["querykey"];
+	          var summaryUrl = NCBI_GENE_SUMMARY_URL + "&query_key=" + queryKey + "&WebEnv=" + webenv;
+	          $.ajax( summaryUrl )
+	            .done(function(sumData) { 
+	              
+	              if (sumData.result == null || sumData.result.uids.length == 0) {
+	                if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
+	                  sumData.esummaryresult.forEach( function(message) {
+	                    console.log(message);
+	                  });
+	                }
+	                reject("No NCBI gene summary returned for gene " + geneName);
+	                
+	              } else {
+				
+	                var uid = sumData.result.uids[0];
+	                var geneInfo = sumData.result[uid];
+
+					geneAnnots[geneName] = geneInfo;
+					d3.select(geneBadgeSelector).data([geneInfo]);
+
+	                resolve(geneInfo);
+	              }
+	            })
+	            .fail(function() {
+	              reject('An error occurred when getting gene summary from NCBI for gene ' + geneName);
+	            })
+	        })
+	        .fail(function() {
+	          reject('An error occurred when searching NCBI by gene name to obtain gene ID for ' + geneName);
+	        })
+   	  }
+   	});
+
 }
 
 GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
@@ -896,10 +943,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 GenesCard.prototype.addGene = function(geneName) {
 	var me = this;
-
-	if (!isOffline) {
-		me.promiseSetGeneAnnot($("#gene-badge-container #gene-badge").last(), geneName);
-	}
+	
 	if (geneNames.indexOf(geneName) < 0) {
 		geneNames.push(geneName);
 	} 
@@ -921,7 +965,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		
 		d3.select(theGeneBadge.find("#gene-badge-name")[0])
 		  .on("mouseover", function(d,i) {
-		  	var geneName = d3.select(this.parentNode.parentNode).data()
+		  	var geneName = d3.select(this.parentNode.parentNode).datum()
 			var geneAnnot = geneAnnots[geneName];
 
 			var x = d3.event.pageX;
@@ -935,7 +979,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 		  });
 
 		me._setPhenotypeBadge(geneName);
-		me.promiseSetGeneAnnot(theGeneBadge, geneName);
+		me._promiseGetGeneSummary(theGeneBadge, geneName);
 		me._setBookmarkBadge(geneName);
 
 		
@@ -1414,9 +1458,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 		    	updateUrl('gene', window.gene.gene_name);
 
-		    	if (!isOffline) {
-			    	me.updateGeneInfoLink(window.gene.gene_name);
-		    	}
+			    me.updateGeneInfoLink(window.gene.gene_name);
 
 				if (!hasDataSources()) {
 					//showDataDialog();
@@ -1485,16 +1527,14 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 	var geneAnnot = geneAnnots[geneName];
 	if (geneAnnot == null) {
 		var geneBadge = me._getGeneBadge(geneName);
-		
-		if (!isOffline) {
-			me.promiseSetGeneAnnot(geneBadge, geneName).then( function(data) {
+		me._promiseGetGeneSummary(geneBadge, geneName).then( function(data) {
+			if (data) {
 				geneAnnot = data;
-				setSelectedGeneLink(geneAnnot)
-			}, function(error) {
-				console.log("error getting gene annot gene gene badge selected. " + error)
-			});
-			
-		}
+				setSelectedGeneLink(geneAnnot);				
+			}
+		}, function(error) {
+			console.log("error getting gene annot gene gene badge selected. " + error)
+		});
 
 	} else {
 		setSelectedGeneLink(geneAnnot);
@@ -1516,52 +1556,6 @@ GenesCard.prototype.manageGeneList = function(manage) {
 	}
 }
 
-GenesCard.prototype.promiseGetGeneAnnotation = function(geneName) {
-	var me = this;
-
-    return new Promise( function(resolve, reject) {
-
-   	  var geneInfo = geneAnnots[geneName];
-   	  if (geneInfo != null) {
-   	  	resolve(geneInfo);
-   	  } else {
-	      var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json&term=";
-	      url += "(" + geneName + "[Gene name]" + " AND 9606[Taxonomy ID]";
-
-	      var clinvarVariants = null;
-	      $.ajax( url )
-	        .done(function(data) {        
-	          var webenv = data["esearchresult"]["webenv"];
-	          var queryKey = data["esearchresult"]["querykey"];
-	          var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
-	          $.ajax( summaryUrl )
-	            .done(function(sumData) { 
-	              
-	              if (sumData.result == null || sumData.result.uids.length == 0) {
-	                if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
-	                  sumData.esummaryresult.forEach( function(message) {
-	                    console.log(message);
-	                  });
-	                }
-	                reject("No data returned from eutils request " + summaryUrl);
-	                
-	              } else {
-	                var uid = sumData.result.uids[0];
-	                var geneInfo = sumData.result[uid];
-	                resolve(geneInfo);
-	              }
-	            })
-	            .fail(function() {
-	              reject('Error: gene info http request failed to get gene summary data');
-	            })
-	        })
-	        .fail(function() {
-	          reject('Error: gene info http request failed to get IDs');
-	        })
-   	  }
-   	});
-
-}
 
 GenesCard.prototype.promiseGetGenePhenotypes = function(geneName) {
 	var me = this;
