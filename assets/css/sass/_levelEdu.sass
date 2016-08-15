@@ -184,6 +184,9 @@
   #matrix-harmful-note.level-edu
     display: inline-block !important
 
+  #low-quality-legend    
+    display: none !important
+
   #feature-matrix 
 
     .y.axis
@@ -202,6 +205,14 @@
       opacity: 1 !important
       stroke-width: 1px !important
 
+    .col
+      &.danger
+        rect.cellbox
+          fill: transparent !important
+
+      &.low-quality
+        rect.cellbox
+          fill: transparent !important
 
 .tooltip.level-edu 
   display: block !important

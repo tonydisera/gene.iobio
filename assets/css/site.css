@@ -671,9 +671,9 @@ a {
   stroke: #e6e6e6;
   stroke-width: 1px; }
 #matrix-track #feature-matrix .col.danger rect.cellbox {
-  fill: rgba(187, 0, 0, 0.13) !important; }
+  fill: rgba(187, 0, 0, 0.13); }
 #matrix-track #feature-matrix .col.low-quality rect.cellbox {
-  fill: rgba(0, 0, 0, 0.13) !important; }
+  fill: rgba(0, 0, 0, 0.13); }
 #matrix-track #feature-matrix .colhdr text {
   font-size: 9px;
   pointer-events: none; }

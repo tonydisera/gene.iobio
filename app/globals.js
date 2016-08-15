@@ -68,9 +68,7 @@ var NCBI_GENE_SUMMARY_URL         = "http://eutils.ncbi.nlm.nih.gov/entrez/eutil
 * a simplified interface and logic.  For running one of the special educational edition 
 * tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
 */
-var isLevelEdu              = false; // is gene.iobio educational version, simplified version of app
-var isLevelEduTour          = false; // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
-var hideNextButtonAnim      = true;  // is next button hidden on animations during edu tour?
+var hideNextButtonAnim      = false;  // is next button hidden on animations during edu tour?
 var hasTimeout              = false; // is a timeout based on n seconds of inactivity used?
 var keepLocalStorage        = false; // maintain cache between sessions?
 

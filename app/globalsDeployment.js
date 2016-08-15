@@ -18,4 +18,12 @@ var siteGeneSource        = "gencode";      // what should the gene source defau
 var DEFAULT_BATCH_SIZE    = 5;              // how many genes can be analyzed simultaneously for 'Analyze all'
 
 
+/*
+* These variables control special behavior for running gene.iobio education edition, with
+* a simplified interface and logic.  For running one of the special educational edition 
+* tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
+*/
+var isLevelEdu            = false; // is gene.iobio educational version, simplified version of app
+var isLevelEduTour        = false; // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+
 
