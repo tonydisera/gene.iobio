@@ -177,11 +177,8 @@ var effectCategories = [
     cmd.on('end', function() {
       if (success == null) {
         success = true;
-      }
-      if (success) {
         callback(success);
       }
-
     });
 
     cmd.on('error', function(error) {

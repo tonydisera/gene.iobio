@@ -590,6 +590,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
 	var variantCard = variantCards[+cardIndex];
 
 	variantCard.setDefaultSampleName(this.defaultSampleNames[variantCard.getRelationship()]);
+	window.updateUrl('sample' + cardIndex, this.defaultSampleNames[variantCard.getRelationship()]);
 	
 	panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
 	panelSelector.find('#datasource-name').val(this.defaultNames[variantCard.getRelationship()]);
