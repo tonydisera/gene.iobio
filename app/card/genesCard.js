@@ -558,14 +558,23 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
    	phenolyzerGenes = [];
 
    	if (isOffline) {
-		this._getPhenolyzerGenesOffline(searchTerms)
+   		if (isLevelEduTour) {
+			this._getPhenolyzerGenesExhibit(searchTerms)
+   		} else {
+			this._getPhenolyzerGenesBasic(searchTerms)
+   		}
    	} else {
-		this._getPhenolyzerGenesImpl(phenolyzerServer + '?term=' + searchTerms);
+		this._getPhenolyzerGenesAdvanced(phenolyzerServer + '?term=' + searchTerms);
    	}
 }
 
 
-GenesCard.prototype._getPhenolyzerGenesImpl = function(url) {
+/*
+*  This method will utilize Yi's cool caching and queueing mechanisms
+*  for Phenolyzer, built on Amazon's distributed hash tables (Dynamo)
+*  and Message queuing service.
+*/
+GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
 	var me = this;
 	
 	$.ajax({
@@ -581,12 +590,12 @@ GenesCard.prototype._getPhenolyzerGenesImpl = function(url) {
 			 	} else if (data.record == 'queued') {
 			 		$('.phenolyzer.loader .loader-label').text("Phenolyzer job queued...")
 			 		setTimeout(function() {
-	     			  me._getPhenolyzerGenesImpl(url);
+	     			  me._getPhenolyzerGenesAdvanced(url);
 	     			}, 5000);
 			 	} else if (data.record == 'pending') {
 			 		$('.phenolyzer.loader .loader-label').text("Running Phenolyzer...")
 			 		setTimeout(function() {
-	     			  me._getPhenolyzerGenesImpl(url);
+	     			  me._getPhenolyzerGenesAdvanced(url);
 	     			}, 5000);
 			 	} else {
 			 		me.showGenesSlideLeft();
@@ -616,6 +625,78 @@ GenesCard.prototype._getPhenolyzerGenesImpl = function(url) {
 
 }
 
+
+/*
+*
+* For the exhibit version of gene.iobio, there is a dropdown of phenotype terms.
+*  So for this use case, the few phenolyzer results are cached in a file
+*  on the local server instance.  If for some reason, the file cannot be loaded,
+*  the code falls back to a normal Phenolyzer http service request.
+*/
+GenesCard.prototype._getPhenolyzerGenesExhibit = function(searchTerms) {
+	var me = this;
+	var data = "";
+
+	// First see if there is a file on the local instance server containing the ranked
+	// genes for this particular phenotype search term.
+	$.ajax(
+		{
+	      type: "GET",
+	      url: OFFLINE_PHENOLYZER_CACHE_URL + searchTerms.split(' ').join("_") + '.txt',
+	      dataType: "text",
+	      success: function(data) {
+	      	me.showGenesSlideLeft();
+			$('.phenolyzer.loader').addClass("hide");
+			$('#phenolyzer-heading').removeClass("hide");
+			
+			var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+			me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES_OFFLINE);
+			
+			me.showGenesSlideLeft();		
+			me.refreshSelectedPhenolyzerGenes(); 	
+	     },
+	     error: function(error) {
+	     	// We didn't find the phenolyzer cached data for the phenotype search term,
+	     	// so call the Phenolyzer service to get the ranked list of genes.
+	     	me._getPhenolyzerGenesBasic(searchTerms);
+		 }
+	});
+}
+
+/*
+*  For non-amazon instances of IOBIO, use the basic Phenolyzer service to
+*  return a ranked gene list based on a phenotype (or a list of phenotypes).*
+*/
+GenesCard.prototype._getPhenolyzerGenesBasic = function(searchTerms) {
+
+	var phenolyzerUrl = phenolyzerOnlyServer + '?cmd=' + searchTerms;
+	$.ajax( 
+		{
+			url: phenolyzerUrl,
+			error: function (xhr, ajaxOptions, thrownError) {
+				closeSlideLeft(); 
+				$('.phenolyzer.loader').addClass("hide");
+				alert("An error occurred in Phenolyzer iobio services. " + thrownError);
+			}
+		}
+	  )
+	 .done(function(data) { 
+
+ 		me.showGenesSlideLeft();
+		$('.phenolyzer.loader').addClass("hide");
+		$('#phenolyzer-heading').removeClass("hide");
+		
+		var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+		me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
+		
+		me.showGenesSlideLeft();					
+
+		me.refreshSelectedPhenolyzerGenes(); 		
+
+	});
+}
+
+
 GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd, numberPhenolyzerGenes) {
 	var count = 0;
 	data.split("\n").forEach( function(rec) {
@@ -634,61 +715,6 @@ GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd, numberPhe
 
 		}
 	});	
-}
-
-GenesCard.prototype._getPhenolyzerGenesOffline = function(searchTerms) {
-	var me = this;
-		var data = "";
-
-		$.ajax(
-		{
-	      type: "GET",
-	      url: OFFLINE_PHENOLYZER_CACHE_URL + searchTerms.split(' ').join("_") + '.txt',
-	      dataType: "text",
-	      success: function(data) {
-	      	me.showGenesSlideLeft();
-			$('.phenolyzer.loader').addClass("hide");
-			$('#phenolyzer-heading').removeClass("hide");
-			
-			var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-			me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES_OFFLINE);
-			
-			me.showGenesSlideLeft();		
-			me.refreshSelectedPhenolyzerGenes(); 	
-	     },
-	     error: function(error) {
-
-			var phenolyzerUrl = phenolyzerOnlyServer + '?cmd=' + searchTerms;
-			$.ajax( 
-				{
-					url: phenolyzerUrl,
-					error: function (xhr, ajaxOptions, thrownError) {
-						closeSlideLeft(); 
-						$('.phenolyzer.loader').addClass("hide");
-						alert("An error occurred in Phenolyzer iobio services. " + thrownError);
-					}
-				}
-			  )
-			 .done(function(data) { 
-
-		 		me.showGenesSlideLeft();
-				$('.phenolyzer.loader').addClass("hide");
-				$('#phenolyzer-heading').removeClass("hide");
-				
-				var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-				me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
-				
-				me.showGenesSlideLeft();					
-
-				me.refreshSelectedPhenolyzerGenes(); 		
-
-			});
-		 }
-		 });
-					
-
-
-
 }
 
 GenesCard.prototype.isPhenolyzerGene = function(geneName) {
