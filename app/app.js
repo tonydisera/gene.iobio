@@ -1962,7 +1962,7 @@ function loadTracksForGene(bypassVariantCards) {
 
 	filterCard.disableFilters();
 
-	var relevantVariantCards = dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
+	var relevantVariantCards = getRelevantVariantCards();
 
 	// Find out if if there are alignments only.  In this case, prompt the user
 	// to determine if alignments should automatically be auto-called with freebayes.
@@ -2069,6 +2069,15 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 
 	}
 
+}
+
+/*
+*  Even though the app has initialize three variant cards, we only want to return
+*  the proband variant card if this is a 'single' proband analyis.  For 'trio'
+*  analysis, return all variant cards.
+*/
+function getRelevantVariantCards() {
+	return dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
 }
 
 function addCommas(nStr)
@@ -2195,11 +2204,17 @@ function addVariantCard() {
 function callVariants() {
 
 	fulfilledTrioPromise = false;
-	variantCards.forEach(function(vc) {
+	getRelevantVariantCards().forEach(function(vc) {
 		vc.clearCalledVariants();
 		vc.callVariants(regionStart, regionEnd, function() {
 			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
-				variantCards.forEach(function(variantCard) {
+
+				// After all samples (in the case of a trio) have had their variants called,
+				// compare to deterimine inheritance mode for proband.  
+				// After that, we will loop through all of the variant
+				// cards to refresh the content since the allele counts reflect
+				// the full trio.
+				getRelevantVariantCards().forEach(function(variantCard) {
 
 					// Reflect me new info in the freebayes variants.
 					variantCard.model.loadCalledTrioGenotypes();
