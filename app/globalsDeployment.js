@@ -12,9 +12,9 @@ var useOnDemand           = true;           // use on demand tabix and samtools
 var serverInstance        = "@hostname@/";  // this will be replace with the name of the server used for this deployement
 var serverCacheDir        = "local_cache/"; // this is the directory from the server instance where resource files (like clinvar vcf) will be served
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
-var offlineUrlTag         = "arup:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
+var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
 
-var siteGeneSource        = "refseq";       // what should the gene source default to: refseq or gencode?
+var siteGeneSource        = "gencode";      // what should the gene source default to: refseq or gencode?
 var DEFAULT_BATCH_SIZE    = 5;              // how many genes can be analyzed simultaneously for 'Analyze all'
 
 
