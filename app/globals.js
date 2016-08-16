@@ -11,7 +11,7 @@ var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_
 var old_iobio_services        = (isOffline ? "ws://" : "wss://")  + (isOffline ? serverInstance : prod_iobio_services);
 
 // http services
-var geneiobio_server     = iobio_http_services + "geneinfo/";
+var geneInfoServer     = iobio_http_services + "geneinfo/";
 var geneToPhenoServer    = iobio_http_services + "gene2pheno/";
 var hpoServer            = iobio_http_services + "hpo/";
 var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";

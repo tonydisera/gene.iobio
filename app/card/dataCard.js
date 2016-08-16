@@ -201,7 +201,7 @@ DataCard.prototype.loadDemoData = function() {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 
-		clearCache();
+		cacheHelper.clearCache();
 		window.matrixCard.reset();
 		window.loadedUrl = false;
 
@@ -227,7 +227,7 @@ DataCard.prototype.loadSampleData = function(relationship, name, sampleName, mod
 	this.mode = 'single';
 
 
-	//clearCache();
+	//cacheHelper.clearCache();
 	window.loadTracksForGene();		
 }
 
@@ -393,7 +393,7 @@ DataCard.prototype.init = function() {
 		
 		
 		// Clear the cache
-		clearCache();
+		cacheHelper.clearCache();
 
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father

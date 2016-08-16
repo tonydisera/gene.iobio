@@ -30,7 +30,7 @@ GenesCard.prototype.init = function() {
          me._goToPage(pageNumber);
     });
 
-    $('#select-gene-sort').attr("placeholder", "sort");
+    $('#select-gene-sort').attr("placeholder", "sort genes by");
 	$('#select-gene-sort').selectize({
 	    valueField: 'value',
 	    labelField: 'value',
@@ -38,8 +38,8 @@ GenesCard.prototype.init = function() {
 	    create: true
 	});
 	$('#select-gene-sort')[0].selectize.addOption({value:"(none)"});
-	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
 	$('#select-gene-sort')[0].selectize.addOption({value:"relevance"});
+	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
 	$('#select-gene-sort')[0].selectize.on('change', function() {
 		me.sortGenes();
 	});
@@ -1458,7 +1458,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	
 	me.setSelectedGene(geneName);
 
-	var url = geneiobio_server + 'api/gene/' + geneName;	
+	var url = geneInfoServer + 'api/gene/' + geneName;	
 	url += "?source=" + geneSource;
 	
 	$.ajax({
@@ -1513,7 +1513,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 GenesCard.prototype.refreshGene = function(geneName) {
 	var me = this;
 
-	var url = geneiobio_server + 'api/gene/' + window.gene.gene_name;	
+	var url = geneInfoServer + 'api/gene/' + window.gene.gene_name;	
 	url += "?source=" + geneSource;
 	
 	$.ajax({

@@ -44,10 +44,6 @@ var refseqOnly = {};
 var gencodeOnly = {};
 
 
-var genesToCache = [];
-var cacheQueue = [];
-var batchSize = null;
-
 var loadedUrl = false;
 
 
@@ -65,6 +61,7 @@ var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
 
 
+// bookmark card
 var bookmarkCard = new BookmarkCard();
 
 // data card
@@ -81,6 +78,9 @@ var examineCard = new ExamineCard();
 
 // matrix card
 var matrixCard = new MatrixCard();
+
+// cache helper
+var cacheHelper = new CacheHelper();
 
 
 // clicked variant
@@ -203,7 +203,7 @@ function init() {
 	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
 
 	// Clear the local cache
- 	clearCache();
+ 	cacheHelper.clearCache();
 	
 
 	$('#nav-edu-tour').append(eduTourTemplateHTML);
@@ -1323,171 +1323,6 @@ function cacheCodingRegions() {
 }
 
 
-function analyzeAll() {
-	// Start over with a new queue of genes to be analyzed
-	// is all of the genes that need to be analyzed (and cached.)
-	genesToCache = [];
-	cacheQueue = [];
-	geneNames.forEach(function(geneName) {
-		if (geneName != window.gene.gene_name) {
-			genesToCache.push(geneName);
-		}
-	});
-	cacheGenes();	
-}
-
-
-
-function cacheGenes() {
-	// If we still have genes in the cache queue, exit. (Wait to kick off next batch 
-	// of genes to analyze until all genes in last batch are analyzed.)
-	if (cacheQueue.length > 0) {
-		return;
-	}
-
-	
-	// Determine the batch size.  (It will be smaller that the
-	// default batch size if the genes remaining to be cached is
-	// smaller than the batch size.)
-	batchSize = Math.min(genesToCache.length, DEFAULT_BATCH_SIZE);
-
-	// Place next batch of genes in caching queue 
-	for (var i = 0; i < batchSize; i++) {
-		cacheQueue.push(genesToCache[i]);
-	}
-	// Remove this batch of genes from the list of all genes to be cached
-	for (var i = 0; i < batchSize; i++) {
-		genesToCache.shift();
-	}
-	// Invoke method to cache each of the genes in the queue
-	for (var i = 0; i < batchSize; i++) {
-		cacheGene(cacheQueue[i]);
-	}
-
-
-}
-
-
-
-function cacheGene(geneName) {
-
-
-	var url = geneiobio_server + 'api/gene/' + geneName;
-	url += "?source=" + geneSource;
-
-	// Get the gene model 		
-	$.ajax({
-	    url: url,
-	    jsonp: "callback",
-	    type: "GET",
-	    dataType: "jsonp",
-	    success: function( response ) {
-
-	    	// Now that we have the gene model,
-	    	// load and annotate the variants for each
-	    	// sample (e.g. each variant card)
-	    	if (response[0].hasOwnProperty('gene_name')) {
-
-		    	var geneObject = response[0];
-		    	adjustGeneRegion(geneObject);
-		    	var transcript = getCanonicalTranscript(geneObject);
-		    	window.geneObjects[geneObject.gene_name] = geneObject;
-			    genesCard._geneBadgeLoading(geneObject.gene_name, true);
-
-
-			    // For each sample, get and annotate the genes and
-			    // cache the variants
-		    	variantCards.forEach(function(variantCard) {
-
-		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-			    		variantCard.promiseCacheVariants(
-			    			geneObject.chr,
-			    			geneObject, 
-						 	transcript)
-			    		.then( function(vcfData) {
-			    			// Once all analysis of the gene variants for each of
-			    			// the samples is complete, determine the inheritance 
-			    			// (if this is a trio)
-			    			if (isCachedForCards(geneObject.gene_name, transcript)) {
-
-			    				// we need to compare the proband variants to mother and father variants to determine
-								// the inheritance mode. 
-								var probandVcfData = getVariantCard("proband").model.getVcfDataForGene(geneObject, transcript);
-								var motherVcfData  = getVariantCard("mother" ).model.getVcfDataForGene(geneObject, transcript);
-								var fatherVcfData  = getVariantCard("father" ).model.getVcfDataForGene(geneObject, transcript);
-				
-
-								var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
-								trioModel.compareVariantsToMotherFather(function() {
-
-									// Now that inheritance has been determined,
-									// summarize the variants for the proband to
-									// create the gene badges, representing the
-									// most pathogenic variants for this gene
-				    				var dangerObject = getVariantCard("proband").summarizeDanger(geneName, probandVcfData);
-									
-									genesCard._geneBadgeLoading(geneObject.gene_name, false);
-									if (probandVcfData.features.length == 0) {
-				    					genesCard.setGeneBadgeWarning(geneObject.gene_name);
-				    				} else {
-				    					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-									}
-				    				
-				    					// take this gene off of the queue and see
-				    					// if next batch of genes should be analyzed
-				    					cacheNextGene(geneObject.gene_name);
-				    				
-
-			    				}, function(error) {
-			    					console.log("problem determining inheritance for " + geneObject.gene__name + ". " + error);
-			    					// take this gene off of the queue and see
-			    					// if next batch of genes should be analyzed
-			    					cacheNextGene(geneObject.gene_name);
-			    				});
-
-			    			}
-
-			    		}, function(error) {
-			    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-		    				var message = error.hasOwnProperty("message") ? error.message : error;
-			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
-
-	    					// take this gene off of the queue and see
-	    					// if next batch of genes should be analyzed
-				    		cacheNextGene(geneObject.gene_name);					
-			    		});
-
-		    		}
-
-		    	});	
-		    } else {
-				genesCard.setGeneBadgeError(geneName);			    				
-				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
-    			genesCard._geneBadgeLoading(geneName, false);
-	    		cacheNextGene(geneName);
-    		}		    	
-
-
-		}
-	});
-
-	
-				
-
-}
-
-function cacheNextGene(geneName) {
-	// Take the analyzed (and cached) gene off of the cache queue
-	var idx = cacheQueue.indexOf(geneName);
-	if (idx >= 0) {
-		cacheQueue.splice(idx,1);
-	}
-	// Invoke cacheGenes, which will kick off the next batch
-	// of genes to analyze once all of the genes in
-	// the current batch have been analyzed.
-	cacheGenes();		
-}
 
 
 function hasDataSources() {
@@ -1500,34 +1335,9 @@ function hasDataSources() {
 	return hasDataSource;
 }
 
-function isCachedForCards(geneName, transcript) {
-	var count = 0;
-	variantCards.forEach( function(variantCard) {
-		if (variantCard.isCached(geneName, transcript)) {
-			count++;
-		}
-	});
-	if (dataCard.mode == 'single') {
-		return count == 1;
-	} else {
-		return count == variantCards.length;
-	}
-}
 
 
 
-
-function clearCache() {
-	if (keepLocalStorage) {
-		
-	} else {
-		if (localStorage) {
-			localStorage.clear();
-		}
-		window.genesToCache = [];
-	}
-
-}
 
 
 function adjustGeneRegionBuffer() {
@@ -1537,7 +1347,7 @@ function adjustGeneRegionBuffer() {
 		GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
 		$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});		
 	}
-	clearCache();
+	cacheHelper.clearCache();
 
 }
 
@@ -1661,7 +1471,7 @@ function loadGeneWidget(callback) {
 		
 		if (data.name.indexOf(':') != -1) var searchType = 'region';
 		else var searchType = 'gene';
-		var url = geneiobio_server + 'api/' + searchType + '/' + data.name;
+		var url = geneInfoServer + 'api/' + searchType + '/' + data.name;
 
 		// If necessary, switch from gencode to refseq or vice versa if this gene
 		// only has transcripts in only one of the gene sets
