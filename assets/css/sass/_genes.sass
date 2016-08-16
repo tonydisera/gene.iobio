@@ -135,17 +135,21 @@
 
 
 #manage-genes
-  display: inline-block
-  font-size: 11px
-  vertical-align: top
-  padding-top: 10px
   float: left
+  padding-top: 2px
 
   a
     color:  $sidebar-text-color !important
 
     &:hover
       text-decoration: underline !important
+
+#manage-gene-list
+  display: inline-block
+  padding-bottom: 4px
+  margin-right: 10px
+  font-size: 11px
+
 
 #gene-badge-container
   display: flex
@@ -184,19 +188,18 @@
   padding-bottom: 0px
   vertical-align: top
   font-size: 0px   
+  margin-left: 140px  
 
 #manage-cache-link
-  font-size: 11px
-  padding-left: 0px
-  cursor: pointer
-  margin-top: 2px
-  display: inline-block
   color: $text-color !important
-  margin-left: 10px
+  font-size: 11px
+  display: inline-block
+  vertical-align: top
+  margin-left: 12px
+  padding-top: 2px
 
 #gene-page-control
   float: right
-  width: 170px
 
   a.gene-paging-link
     color:  $sidebar-text-color !important
@@ -209,18 +212,23 @@
     &:hover
       text-decoration: underline !important
 
+#clear-gene-list
+  color:  $sidebar-text-color !important
+  font-size:  11px
+  margin-left: 0px
+
 
       
 
-  #select-gene-container
-    display: inline-block
-    width: 85px
-    vertical-align: bottom
-    margin-right: 5px
+#select-gene-container
+  display: inline-block
+  width: 115px
+  vertical-align: bottom
+  margin-right: 5px
 
-    .selectize-input
-      padding-bottom: 2px
-      padding-top: 2px
+  .selectize-input
+    padding-bottom: 2px
+    padding-top: 2px
 
 
 #manage-cache-modal

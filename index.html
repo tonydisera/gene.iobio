@@ -306,6 +306,7 @@
       </div>
 
       <div class="modal-footer" style="clear-both">
+         
           <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
           <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
             <i class="material-icons">cloud_done</i>
@@ -327,19 +328,16 @@
 
     	<section id="app-title-section" class="nav-stretch">
         <div class="nav-left">
-      	      <a id='home' style="display:inline-block;width:170px;href="/">
+      	      <a id='home' style="display:inline-block">
                 <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
               </a>
-              
+              <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
+                 Disclaimer
+              </a>              
               <div id="education-title" class="level-edu"
               style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
                 education edition
               </div>
-
-                <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
-              Disclaimer
-                </a>
-
         </div>
 
           <!-- iobio project link -->
@@ -371,10 +369,7 @@
               <i class="material-icons" style="font-size: 18px;">input</i>      
               Data
             </button>
-
-        
-
-
+    
           </div>
 
 
@@ -384,25 +379,31 @@
             
             <!-- Buttons for editting gene list, done editting gene list -->
             <div id="manage-genes" class="level-edu">
-                <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="analyzeAll()">
+              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
+                 <i class="material-icons">playlist_add_check</i>
                   Analyze all
-                </a>
-                <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:10px;"  
+              </a>
+             
+              <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"  
                 href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                  Remove all
-                </a>
-               <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="CacheHelper.openDialog()" >
-                  cache...
-                </a>         
+                  Clear all
+              </a>
+
+             
             </div>
             
-            <div id="gene-page-selection"></div>                          
+            <div id="gene-page-selection"></div>  
+
+            
+
             <div id="gene-page-control" class="level-edu">              
+             
               <div id="select-gene-container">
                   <select id="select-gene-sort" style="font-size:10px;">                 
                   </select>
               </div>
-              <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide" 
+             
+               <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide" 
                 onclick="genesCard.viewDefaultsGenesPerPage()" >
                 view 50
               </a>
@@ -410,7 +411,12 @@
                 onclick="genesCard.viewAllGenes()" >
                 | all
               </a>
-                  
+
+
+              <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="CacheHelper.openDialog()" >
+                  cached results...
+              </a>  
+                             
             </div>
             
 
@@ -418,6 +424,7 @@
 
               <div id="after-genes" style="display:inline-block;margin-top:5px;">
                                            
+                                                         
               </div>
 
             </div>

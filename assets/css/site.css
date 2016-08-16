@@ -55,9 +55,10 @@ h5 {
   position: absolute;
   left: 5px;
   top: 0;
-  width: 180px;
   text-align: left;
-  padding-left: 3px; }
+  padding-left: 3px;
+  padding-top: 5px;
+  width: 230px; }
 
 .nav-right {
   position: absolute;
@@ -66,7 +67,7 @@ h5 {
   width: 230px; }
 
 .nav-center {
-  margin: 0 0px 0 0px;
+  margin: 4px 0px 0 0px;
   position: relative; }
 
 .modal-title {
@@ -217,6 +218,9 @@ h5 {
 
 .shadow-z-1 {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16); }
+
+i.material-icons {
+  color: #5d809d; }
 
 #minimize-button .material-icons {
   font-size: 14px;
@@ -501,9 +505,11 @@ body {
 #app-disclaimer-link-left {
   font-size: 10px;
   color: #717171 !important;
-  display: block;
   text-align: left;
-  margin-left: 3px; }
+  margin-right: 10px;
+  padding-top: 15px;
+  font-style: italic;
+  float: right; }
 
 #app-disclaimer-link-right {
   display: none; }
@@ -826,7 +832,7 @@ section {
   margin-bottom: 0px; }
 
 .iobio {
-  font-size: 34px;
+  font-size: 30px;
   color: #717171;
   font-family: "Quicksand";
   float: left;
@@ -840,7 +846,7 @@ section {
   font-size: 19px; }
 
 .iobioapp {
-  font-size: 34px;
+  font-size: 30px;
   color: #5d809d;
   font-family: "Quicksand";
   float: left;
@@ -851,7 +857,7 @@ section {
   color: #717171 !important;
   font-family: "Quicksand";
   float: right;
-  margin-top: 0px;
+  margin-top: 5px;
   line-height: 30px; }
 
 #app-title-section {
@@ -2425,15 +2431,18 @@ text.ref-count {
   display: inline; }
 
 #manage-genes {
-  display: inline-block;
-  font-size: 11px;
-  vertical-align: top;
-  padding-top: 10px;
-  float: left; }
+  float: left;
+  padding-top: 2px; }
   #manage-genes a {
     color: #717171 !important; }
     #manage-genes a:hover {
       text-decoration: underline !important; }
+
+#manage-gene-list {
+  display: inline-block;
+  padding-bottom: 4px;
+  margin-right: 10px;
+  font-size: 11px; }
 
 #gene-badge-container {
   display: flex;
@@ -2463,20 +2472,19 @@ text.ref-count {
   margin-bottom: 0px;
   padding-bottom: 0px;
   vertical-align: top;
-  font-size: 0px; }
+  font-size: 0px;
+  margin-left: 160px; }
 
 #manage-cache-link {
-  font-size: 11px;
-  padding-left: 0px;
-  cursor: pointer;
-  margin-top: 2px;
-  display: inline-block;
   color: #717171 !important;
-  margin-left: 10px; }
+  font-size: 11px;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 12px;
+  padding-top: 2px; }
 
 #gene-page-control {
-  float: right;
-  width: 170px; }
+  float: right; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
     font-size: 11px;
@@ -2486,14 +2494,20 @@ text.ref-count {
     padding-top: 2px; }
     #gene-page-control a.gene-paging-link:hover {
       text-decoration: underline !important; }
-  #gene-page-control #select-gene-container {
-    display: inline-block;
-    width: 85px;
-    vertical-align: bottom;
-    margin-right: 5px; }
-    #gene-page-control #select-gene-container .selectize-input {
-      padding-bottom: 2px;
-      padding-top: 2px; }
+
+#clear-gene-list {
+  color: #717171 !important;
+  font-size: 11px;
+  margin-left: 0px; }
+
+#select-gene-container {
+  display: inline-block;
+  width: 115px;
+  vertical-align: bottom;
+  margin-right: 5px; }
+  #select-gene-container .selectize-input {
+    padding-bottom: 2px;
+    padding-top: 2px; }
 
 #manage-cache-modal .modal-dialog {
   width: 500px; }
@@ -2634,23 +2648,5 @@ text.ref-count {
 
   #region-track {
     margin-left: 200px !important; } }
-.iobioapp {
-  font-size: 24px;
-  color: #5d809d;
-  margin-top: 0px; }
-
-.iobio {
-  font-size: 24px;
-  margin-top: 0px; }
-
-.iobioproject {
-  margin-left: 20px; }
-
-@media screen and (max-device-width: 800px), screen and (max-width: 800px) {
-  .iobio, .iobioapp {
-    font-size: 18px !important; }
-
-  .iobioproject {
-    font-size: 16px; } }
 
 /*# sourceMappingURL=site.css.map */
