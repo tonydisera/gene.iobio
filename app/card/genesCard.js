@@ -1438,7 +1438,9 @@ GenesCard.prototype.setSelectedGene = function(geneName) {
 
 	$("#gene-badge.loading").each( function(index, value) {
 		var geneName = $(this).find("#gene-badge-name").text();
-		if (cacheQueue.indexOf(geneName) < 0) {
+		// Turn off 'loading' animation for non-selected genes,
+		// except for genes currently being analyzed in background.
+		if (cacheHelper.cacheQueue.indexOf(geneName) < 0) {
 			me._setGeneBadgeLoading($(this), false);
 		}
 	});
