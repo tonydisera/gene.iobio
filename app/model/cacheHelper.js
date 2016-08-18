@@ -122,7 +122,17 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 				    				} else {
 				    					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 									}
-				    				
+
+									// Re-cache the results now that inheritance has been determined
+									getRelevantVariantCards().forEach(function(vc) {
+										if (autoCall && !vc.model.isVcfReadyToLoad()) {
+											var data = vc.model.getVcfDataForGene(geneObject, transcript);
+											vc.model._cacheData(data, "fbData", geneObject.gene_name, transcript);
+											vc.model._cacheData(data, "vcfData", geneObject.gene_name, transcript);											
+										}
+									})
+
+
 			    					// take this gene off of the queue and see
 			    					// if next batch of genes should be analyzed
 			    					me.cacheNextGene(geneObject.gene_name);

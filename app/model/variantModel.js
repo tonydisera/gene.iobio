@@ -1050,7 +1050,6 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
 	var me = this;
 
-
 	return new Promise( function(resolve, reject) {
 
 		// Is the data already cached?  If so, we are done
@@ -1058,54 +1057,154 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 		if (vcfData != null && vcfData != '') {			
 			resolve(vcfData);
 		} else {
-			// We don't have the variants for the gene in cache, 
-			// so call the iobio services to retreive the variants for the gene region 
-			// and annotate them.
-			me._promiseVcfRefName(ref).then( function() {
-				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
-				.then( function(data) {
-					// Associate the correct gene with the data
-			    	var theGeneObject = null;
-			    	for( var key in window.geneObjects) {
-			    		var go = geneObjects[key];
-			    		if (me.getVcfRefName(go.chr) == data.ref &&
-			    			go.start == data.start &&
-			    			go.end == data.end &&
-			    			go.strand == data.strand) {
-			    			theGeneObject = go;
-			    			data.gene = theGeneObject;
-			    		}
-			    	}
-			    	if (theGeneObject) {
-			    		// Flag any bookmarked variants
-					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
 
-				    	// Cache the data
-					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
-						resolve(data);				    	
-				    } else {
-				    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
-				    }
-			    	
+			
+			// If no vcf supplied (only alignments provided), automatically call variants 
+			if (autoCall && !me.isVcfReadyToLoad()) {	
+				me._promiseCacheCalledVariants(ref, geneObject, transcript).then(function (data) {
+					resolve(data);
+				});
+			} else {
 
-			    }, function(error) {
-			    });
-			}, function(error) {
-				var isValid = false;
-				// for caching, treat missing chrX as a normal case.
-				if (ref != null && ref.toUpperCase().indexOf("X")) {
-					isValid = true;
-				}
+				// We don't have the variants for the gene in cache, 
+				// so call the iobio services to retreive the variants for the gene region 
+				// and annotate them.
+				me._promiseVcfRefName(ref).then( function() {
+					me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
+					.then( function(data) {
+						// Associate the correct gene with the data
+				    	var theGeneObject = null;
+				    	for( var key in window.geneObjects) {
+				    		var go = geneObjects[key];
+				    		if (me.getVcfRefName(go.chr) == data.ref &&
+				    			go.start == data.start &&
+				    			go.end == data.end &&
+				    			go.strand == data.strand) {
+				    			theGeneObject = go;
+				    			data.gene = theGeneObject;
+				    		}
+				    	}
+				    	if (theGeneObject) {
+				    		// Flag any bookmarked variants
+						    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
 
-				reject({isValid: isValid, message: "missing reference"});
-			});
+					    	// Cache the data
+						   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+							resolve(data);				    	
+					    } else {
+					    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
+					    }
+				    	
+
+				    }, function(error) {
+				    });
+				}, function(error) {
+					var isValid = false;
+					// for caching, treat missing chrX as a normal case.
+					if (ref != null && ref.toUpperCase().indexOf("X")) {
+						isValid = true;
+					}
+
+					reject({isValid: isValid, message: "missing reference"});
+				});
+
+
+			}
 
 		}
 
-
-
 	});
 
+}
+
+VariantModel.prototype._promiseCacheCalledVariants = function(ref, geneObject, transcript) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+		var fbData = me._getCachedData("fbData", geneObject.gene_name, transcript);
+		if (fbData) {
+			resolve(fbData);
+		} else {
+
+			// Call Freebayes variants
+			me.bam.getFreebayesVariants(ref, 
+				geneObject.start, 
+				geneObject.end, 
+				geneObject.strand, 
+				window.geneSource == 'refseq' ? true : false,
+				function(data) {
+
+				if (data == null || data.length == 0) {
+					reject("A problem occurred while calling variants.");
+				}
+
+				// Parse string into records
+				var fbRecs = [];
+				var recs = data.split("\n");
+				recs.forEach( function(rec) {
+					fbRecs.push(rec);
+				});
+				
+
+				// Annotate the fb variants
+				me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(ref), geneObject, 
+					                             transcript, null, 
+					                             filterCard.annotationScheme.toLowerCase(),
+					                             window.geneSource == 'refseq' ? true : false)
+			    .then( function(data) {
+
+			    	var theData = data[1];
+
+			    	// Flag the called variants
+				   	theData.features.forEach( function(feature) {
+				   		feature.fbCalled = 'Y';
+				   	});
+		    		return me.vcf.promiseGetClinvarRecords(
+					    		theData, 
+					    		me._stripRefName(ref), geneObject, 
+					    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theData) : me._refreshVariantsWithClinvar.bind(me, theData));
+
+
+
+
+			    }, function(error) {
+			    	var message = "Problem when annotating called variants in Analyze All. " + error;
+					console.log(message);
+					reject({isValid: false, message: message});
+			    })
+			    .then (function(data) {
+
+
+					// We are done getting the clinvar data for called variants.
+			    	// Now merge called data with variant set and display.
+					// Prepare vcf and fb data for comparisons
+					//me._prepareVcfAndFbData(data);
+
+		        	// Filter the freebayes variants to only keep the ones
+		        	// not present in the vcf variant set.
+					me._determineVariantAfLevels(data);
+
+		        	// Pileup the variants
+		        	var pileupObject = me._pileupVariants(data.features, geneObject.start, geneObject.end);
+					data.maxLevel = pileupObject.maxLevel + 1;
+					data.featureWidth = pileupObject.featureWidth;		
+
+					// Cache the freebayes variants.
+					me._cacheData(data, "fbData", geneObject.gene_name, transcript);
+					me._cacheData(data, "vcfData", geneObject.gene_name, transcript);
+					resolve(data);
+			
+			    	
+			    }, function(error) {
+			    	var message = "Problem when calling variants in Analyze All. " + error;
+					console.log(message);
+					reject({isValid: false, message: message});
+			    });
+			
+			});	
+
+		}		
+	});
+	
 }
 
 VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
@@ -1936,17 +2035,20 @@ VariantModel.prototype.loadCalledTrioGenotypes = function() {
 
 
 
-VariantModel.prototype._prepareVcfAndFbData = function() {
+VariantModel.prototype._prepareVcfAndFbData = function(data) {
 	var me = this;
-	// Deal with case where no variants were called
+	var theFbData = data ? data : me.fbData;
+	// Deal with case where no variants were loaded
 	if (!me.isVcfLoaded()) {
 		// If no variants are loaded, create a dummy vcfData with 0 features
-		me.vcfData = $.extend({}, me.fbData);
+		me.vcfData = $.extend({}, theFbData);
 		me.vcfData.features = [];
 		me.setLoadState(me.vcfData, 'clinvar');
 		me.setLoadState(me.vcfData, 'coverage');
 		me.setLoadState(me.vcfData, 'inheritance');
 	}
+
+
 	// Flag the variants as called by Freebayes and add unique to vcf
 	// set
 	me.vcfData.features = me.vcfData.features.filter( function(feature) {
@@ -1959,6 +2061,7 @@ VariantModel.prototype._prepareVcfAndFbData = function() {
 	me.vcfData.features = me.vcfData.features.filter( function(d) {
 		return d.consensus != 'unique2';
 	});	
+
 
 }
 

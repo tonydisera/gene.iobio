@@ -781,8 +781,6 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 
 						})
 
-						// Cache the freebayes variants.
-						getProbandVariantCard().model._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
 					}, function(error) {
 						console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
 					});
@@ -982,7 +980,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 		} else {
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
-			if (me.model.isBamLoaded()) {
+			if (me.model.isBamLoaded()) {				
 				me._fillFreebayesChart(me.model.getCalledVariants(), 
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
