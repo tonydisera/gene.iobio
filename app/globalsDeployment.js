@@ -6,7 +6,6 @@ var isOffline             = false;          // is there any internet connect to 
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
 var accessNCBIGeneSummary = true;           // is it okay to access NCBI web resources to obtain the refseq gene summary?  In cases where the server and client are COMPLETELY offline, set this to false.
 
-var useDevkit             = true;           // point to new minion services and use new iobio.js devkit?
 var useOnDemand           = true;           // use on demand tabix and samtools
 
 var serverInstance        = "@hostname@/";  // this will be replace with the name of the server used for this deployement

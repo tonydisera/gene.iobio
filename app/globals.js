@@ -8,17 +8,16 @@ var prod_iobio_services       = "nv-prod.iobio.io/";
 var new_iobio_services        = isOffline              ? serverInstance : stage_iobio_services;
 var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_iobio_services);
 
-var old_iobio_services        = (isOffline ? "ws://" : "wss://")  + (isOffline ? serverInstance : prod_iobio_services);
 
 // http services
-var geneInfoServer     = iobio_http_services + "geneinfo/";
-var geneToPhenoServer    = iobio_http_services + "gene2pheno/";
-var hpoServer            = iobio_http_services + "hpo/";
-var phenolyzerServer     = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
-var phenolyzerOnlyServer = iobio_http_services + "phenolyzer/";
+var geneInfoServer            = iobio_http_services + "geneinfo/";
+var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
+var hpoServer                 = iobio_http_services + "hpo/";
+var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
+var phenolyzerOnlyServer      = iobio_http_services + "phenolyzer/";
 
 
-// new devkit / minion2 services
+// iobio services
 var IOBIO = {};
 IOBIO.tabix                   = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
 IOBIO.vcfReadDepther          = new_iobio_services  + "vcfdepther/";
@@ -34,22 +33,6 @@ IOBIO.samtoolsOnDemand        = new_iobio_services + (useOnDemand ? "od_samtools
 IOBIO.freebayes               = new_iobio_services + "freebayes/";
 IOBIO.vcflib                  = new_iobio_services + "vcflib/";
 
-// Old (pre devkit) services
-IOBIO.vcfstatsAliveServer     = old_iobio_services + "vcfstatsalive/";
-IOBIO.tabixServer             = old_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-IOBIO.vcfReadDeptherServer    = old_iobio_services + "vcfdepther/";
-IOBIO.snpEffServer            = old_iobio_services + "snpeff/";
-IOBIO.snpSiftServer           = old_iobio_services + "snpsift/";
-IOBIO.vtServer                = old_iobio_services + "vt/";
-IOBIO.clinServer              = old_iobio_services + "clin/";
-IOBIO.afServer                = old_iobio_services + "af/";
-IOBIO.vepServer               = old_iobio_services + "vep/";
-IOBIO.contigAppenderServer    = old_iobio_services + "ctgapndr/";
-IOBIO.coverageService         = old_iobio_services + "coverage/ ";
-IOBIO.samtoolsService         = old_iobio_services + "samtools/";
-IOBIO.samtoolsServiceOnDemand = old_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.freebayesService        = old_iobio_services + "freebayes/";
-IOBIO.vcflibService           = old_iobio_services + "vcflib/";
 
 // URL for Phenolyzer
 var OFFLINE_PHENOLYZER_CACHE_URL  = isOffline ?  (serverCacheDir) : ("../" + serverCacheDir);

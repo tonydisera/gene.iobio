@@ -51,6 +51,8 @@ var Bam = Class.extend({
    }, 
 
   checkBamUrl: function(url, callback) {
+    var me = this;
+
     var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(bam)$/;
     var parts = rexp.exec(url);
     // first element has entire url, second has the bam extension.
@@ -58,110 +60,47 @@ var Bam = Class.extend({
     if (extension == null) {
       callback(false, "Please specify a URL to a compressed, indexed alignment file with the file extension bam");
     } else {
-      if (useDevkit) {
-        this.checkBamUrlDevkit(url, callback);
-      } else {
-        this.checkBamUrlOld(url, callback);
-      }
+      var success = null;
+      var cmd = new iobio.cmd(
+          IOBIO.samtools,
+          ['view', '-H', url]
+      );
+
+      cmd.on('data', function(data) {
+        if (data != undefined) {
+          success = true;
+        }
+      });
+
+      cmd.on('end', function() {
+        if (success == null) {
+          success = true;
+        }
+        if (success) {
+          callback(success);
+        }
+      });
+
+      cmd.on('error', function(error) {
+        if (me.ignoreErrorMessage(error)) {
+          success = true;
+          callback(success)
+        } else {
+          if (success == null) {
+            success = false;
+            me.bamUri = url;
+            callback(success, me.translateErrorMessage(error));
+          }
+        }
+
+      });
+
+      cmd.run();      
+      
     }
   },
 
 
-  checkBamUrlDevkit: function(url, callback) {
-    var me = this;
-    var success = null;
-    var cmd = new iobio.cmd(
-        IOBIO.samtools,
-        ['view', '-H', url]
-    );
-
-    cmd.on('data', function(data) {
-      if (data != undefined) {
-        success = true;
-      }
-    });
-
-    cmd.on('end', function() {
-      if (success == null) {
-        success = true;
-      }
-      if (success) {
-        callback(success);
-      }
-    });
-
-    cmd.on('error', function(error) {
-      if (me.ignoreErrorMessage(error)) {
-        success = true;
-        callback(success)
-      } else {
-        if (success == null) {
-          success = false;
-          me.bamUri = url;
-          callback(success, me.translateErrorMessage(error));
-        }
-      }
-
-    });
-
-    cmd.run();
-  },
-
-
-  checkBamUrlOld: function(url, callback) {
-    var me = this;
-    var success = null;
-    var url = encodeURI( IOBIO.samtoolsService + '?cmd= view -H ' + url);
-    
-    // Connect to the vep server    
-    var client = BinaryClient(IOBIO.samtoolsService);
-    
-
-    client.on('open', function(stream){
-
-        // Run the command
-        var stream = client.createStream({event:'run', params : {'url':url}});
-
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('data', function(data, options) {
-          if (data != undefined) {
-            success = true;
-          }
-         
-        });
-
-        //
-        // listen for stream data (the output) event. 
-        //
-        stream.on('error', function(error, options) {
-          if (me.ignoreErrorMessage(error)) {
-            success = true;
-            callback(success)
-          } else {
-            if (success == null) {
-              success = false;
-              console.log(error);
-              callback(success, me.translateErrorMessage(error));
-            }
-          }
-          
-        });
-
-        // Whenall of the annotated vcf data has been returned, call
-        // the callback function.
-        stream.on('end', function() {
-          if (success == null) {
-            success = true;
-          }
-          if (success) {
-            callback(success);
-          }   
-
-        }); // end - stream.end()
-    });  // end - client.open()
-  },
 
   ignoreErrorMessage: function(error) {
     var me = this;
@@ -358,56 +297,34 @@ var Bam = Class.extend({
         console.log('Error: header not set for local bam file');
         callback(null);
       } else {
-        if (useDevkit) {
-          me.getRemoteHeaderDevkit(callback);
-        } else {
-          me.getRemoteHeaderOld(callback);
 
-        }
+        var success = null;
+        var cmd = new iobio.cmd(
+            IOBIO.samtools,
+            ['view', '-H', me.bamUri]
+        );
+        var rawHeader = "";
+        cmd.on('data', function(data) {
+          if (data != undefined) {
+            rawHeader += data;
+          }
+        });
+
+        cmd.on('end', function() {
+          me.setHeader(rawHeader);
+          callback( me.header);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+        cmd.run();    
+
+        
       }
    },
 
-   getRemoteHeaderDevkit: function(callback) {
-    var me = this;
-    var success = null;
-    var cmd = new iobio.cmd(
-        IOBIO.samtools,
-        ['view', '-H', me.bamUri]
-    );
-    var rawHeader = "";
-    cmd.on('data', function(data) {
-      if (data != undefined) {
-        rawHeader += data;
-      }
-    });
 
-    cmd.on('end', function() {
-      me.setHeader(rawHeader);
-      callback( me.header);
-    });
-
-    cmd.on('error', function(error) {
-      console.log(error);
-    });
-    cmd.run();    
-   },
-
-   getRemoteHeaderOld: function(callback) {
-      var me = this;
-      var client = BinaryClient(IOBIO.samtoolsService);
-      var url = encodeURI( IOBIO.samtoolsServiceOnDemand + '?cmd=view -H ' + this.bamUri)
-      client.on('open', function(stream){
-        var stream = client.createStream({event:'run', params : {'url':url}});
-        var rawHeader = ""
-        stream.on('data', function(data, options) {
-           rawHeader += data;
-        });
-        stream.on('end', function() {
-           me.setHeader(rawHeader);
-           callback( me.header);
-        });
-      });    
-   },
 
    setHeader: function(headerStr) {
       var header = { sq:[], toStr : headerStr };
@@ -441,14 +358,6 @@ var Bam = Class.extend({
     })
    },
 
-  getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback)  {
-    if (useDevkit) {
-      this.getCoverageForRegionDevkit(refName, regionStart, regionEnd, regions, maxPoints, callback);
-    } else {
-      this.getCoverageForRegionOld(refName, regionStart, regionEnd, regions, maxPoints, callback);
-    }
-  },
-
 
    /*
    *  This method will return coverage as point data.  It takes the reference name along
@@ -460,126 +369,7 @@ var Bam = Class.extend({
    *  the second for coverage of specific positions.  The latter can then be matched to vcf records
    *  , for example, to obtain the coverage for each variant.
    */
-   getCoverageForRegionOld: function(refName, regionStart, regionEnd, regions, maxPoints, callback) {
-      var me = this;
-      this.transformRefName(refName, function(trRefName){
-
-        // set the ref name for every region and find the lower and upper bound (start, end)
-        // of all regions;
-
-        var regionsArg = "";
-        regions.forEach( function(region) {
-          region.name = trRefName;
-          if (region.name && region.start && region.end) {
-            if (regionsArg.length == 0) {
-              regionsArg += " -p ";
-            } else {
-              regionsArg += ",";
-            }
-            regionsArg += region.name + ":" + region.start +  ":" + region.end;
-          }
-        });
-        var maxPointsArg = "";
-        if (maxPoints) {
-          maxPointsArg = " -m " + maxPoints;
-        } else {
-          maxPointsArg = " -m 0"
-        }
-        var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
-        var spanningRegion = {name:trRefName, start: regionStart, end: regionEnd};
-        var protocol = me.sourceType == "url" ? '&protocol=http' : '';
-        var url = encodeURI( IOBIO.coverageService + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamPileupUrl(spanningRegion,true)) );
-        //var url = encodeURI( IOBIO.coverage + '?encoding=utf8' + protocol + '&cmd= ' + maxPointsArg  + spanningRegionArg + regionsArg + " " + encodeURIComponent(me._getBamRegionsUrl([spanningRegion],true)) );
-
-        var client = BinaryClient(IOBIO.coverageService);
-
-        var samData = "";
-        var samRecs = [];
-        var parseByLine = false;
-        client.on('open', function(stream){
-            var stream = client.createStream({event:'run', params : {'url':url}});
-
-            // New local file streaming
-            stream.on('createClientConnection', function(connection) {
-              var ended = 0;
-              var dataClient = BinaryClient('ws://' + (isOffline ? IOBIO.samtools : connection.serverAddress));
-              dataClient.on('open', function() {
-                var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-                dataStream.write(me.header.toStr);
-                var theRegions = [spanningRegion];
-                for (var i=0; i < theRegions.length; i++) {
-                  var region = theRegions[i];
-                   me.convert('sam', region.name, region.start, region.end, function(data,e) {
-                      dataStream.write(data);
-                      ended += 1;
-                      if ( theRegions.length == ended) dataStream.end();
-                   }, {noHeader:true});
-                }
-              })
-            });
-
-            stream.on('data', function(data, options) {
-               if (data == undefined) {
-                return;
-               }
-
-                samData += data;
-            });
-
-            stream.on('end', function() {
-                if (samData != "") {
-                  var coverage = null;
-                  var coverageForPoints = [];
-                  var coverageForRegion = [];
-                  var lines = samData.split('\n');
-                  lines.forEach(function(line) {
-                    if (line.indexOf("#specific_points") == 0) {
-                      coverage = coverageForPoints;
-                    } else if (line.indexOf("#reduced_points") == 0 ) {
-                      coverage = coverageForRegion;
-                    } else {
-                      var fields = line.split('\t');
-                      var pos = -1;
-                      var depth = -1;
-                      if (fields[0] != null && fields[0] != '') {
-                        var pos   = +fields[0];
-                      }
-                      if (fields[1] != null && fields[1] != '') {
-                        var depth = +fields[1];
-                      }
-                      if (coverage){
-                        if (pos > -1  && depth > -1) {
-                          coverage.push([pos, depth]);
-                        }
-                      }
-                    }
-                  });
-                  callback(coverageForRegion, coverageForPoints);
-
-                } else {
-                  callback([]);
-                }
-            });
-
-            stream.on("error", function(error) {
-              console.log("encountered stream error: " + error);
-            });
-
-        });
-      });
-   },
-
-   /*
-   *  This method will return coverage as point data.  It takes the reference name along
-   *  with the region start and end.  Optionally, the caller can provide an array of
-   *  region objects to get the coverage at exact positions.  Also, this method takes an
-   *  optional argument of maxPoints that will specify how many data points should be returned
-   *  for the region.  If not specified, all data points are returned.  The callback method
-   *  will send back to arrays; one for the coverage points, reduced down to the maxPoints, and
-   *  the second for coverage of specific positions.  The latter can then be matched to vcf records
-   *  , for example, to obtain the coverage for each variant.
-   */
-   getCoverageForRegionDevkit: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
+   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
       var me = this;
       this.transformRefName(refName, function(trRefName){
         var samtools = me.sourceType == "url" ?  IOBIO.samtoolsOnDemand : IOBIO.samtools;
@@ -690,17 +480,7 @@ var Bam = Class.extend({
    },
 
 
-
-
    getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback) {
-    if (useDevkit) {
-      return this.getFreebayesVariantsDevkit(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback);
-    } else {
-      return this.getFreebayesVariantsOld(refName, regionStart, regionEnd, regionStrand, callback);
-    }
-   },
-
-   getFreebayesVariantsDevkit: function(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback) {
 
     var me = this;
     this.transformRefName(refName, function(trRefName){
@@ -801,107 +581,6 @@ var Bam = Class.extend({
    },
 
 
-   getFreebayesVariantsOld: function(refName, regionStart, regionEnd, regionStrand, callback) {
-
-    var me = this;
-    this.transformRefName(refName, function(trRefName){
-
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
-      var urlF = IOBIO.freebayesService
-        + "?cmd=-f " + refFile  + " "
-        + encodeURIComponent(me._getBamUrl(trRefName,regionStart,regionEnd));
-
-      var urlV = IOBIO.vtService + '?cmd=normalize -r ' + refFile + ' ' + encodeURIComponent(encodeURI(urlF))
-
-      var url = IOBIO.vcflibService + '?cmd=vcffilter -f "QUAL > 1" '
-                + encodeURIComponent(encodeURI(urlV));
-
-      me._callVariantsOld(trRefName, regionStart, regionEnd, regionStrand, IOBIO.vcflibService, encodeURI(url), callback);
-    });
-
-
-   },
-
-
-   //
-   //
-   // NEW
-   //
-   //
-   _callVariantsOld: function(refName, regionStart, regionEnd, regionStrand, server, url, callback) {
-
-    var me = this;
-    var client = BinaryClient(server);
-
-    var variant = null;
-    var stream = null;
-    var vcfRecs = [];
-    vcfRecs.length = null;
-
-    client.on('open', function(){
-      stream = client.createStream({event:'run', params : {'url':url}});
-
-      // New local file streaming
-      stream.on('createClientConnection', function(connection) {
-        var ended = 0;
-        var dataClient = BinaryClient('ws://' + (isOffline ? IOBIO.samtools : connection.serverAddress));
-        dataClient.on('open', function() {
-          var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
-          dataStream.write(me.header.toStr);
-          var regions =  [{'name':refName,'start':regionStart,'end':regionEnd} ];
-          for (var i=0; i < regions.length; i++) {
-            var region = regions[i];
-             me.convert('sam', region.name, region.start, region.end, function(data,e) {
-                dataStream.write(data);
-                ended += 1;
-                if ( regions.length == ended) dataStream.end();
-             }, {noHeader:true});
-          }
-        })
-      });
-
-      //
-      // listen for stream data (the output) event.
-      //
-      var buf = '';
-      stream.on('data', function(data, options) {
-        if (data == undefined) {
-          return;
-        }
-
-        var success = true;
-        try {
-          buf += data;
-        } catch(e) {
-          success = false;
-        }
-        if(success) {
-          if (callback) {
-          }
-        }
-      });
-
-      stream.on('end', function() {
-        callback(buf);
-      });
-
-      stream.on("error", function(error) {
-        console.log("encountered stream error: " + error);
-      });
-
-    });
-
-   },
 
 
 
