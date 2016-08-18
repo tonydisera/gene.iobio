@@ -393,6 +393,16 @@ function init() {
 
 	
 	$('#select-gene-source').selectize({});
+	$('#select-gene-source')[0].selectize.on('change', function(value) { 	
+		geneSource = value.toLowerCase().split(" transcript")[0];
+		// When the user picks a different gene source from the dropdown,
+		// this becomes the 'new' site gene source
+		siteGeneSource = geneSource;
+		geneToLatestTranscript = {};
+		if (window.gene) {
+			genesCard.selectGene(window.gene.gene_name);
+		}
+	});	
 
 	// Set up the gene search widget
 	loadGeneWidget( function(success) {
