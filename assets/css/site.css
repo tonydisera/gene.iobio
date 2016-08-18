@@ -32,21 +32,23 @@ h5 {
   border-color: #5d809d; }
 
 .pagination > li > a {
-  line-height: 0.8;
+  line-height: 0.4;
   color: #717171 !important;
   font-size: 11px; }
 
 .pagination > li.prev a {
-  font-size: 21px;
-  line-height: 0.8;
+  font-size: 18px;
+  line-height: 0.7;
   padding-top: 1px;
-  padding-bottom: 3px; }
+  padding-bottom: 3px;
+  color: #5d809d !important; }
 
 .pagination > li.next a {
-  font-size: 21px;
-  line-height: 0.8;
+  font-size: 18px;
+  line-height: 0.7;
   padding-top: 1px;
-  padding-bottom: 3px; }
+  padding-bottom: 3px;
+  color: #5d809d !important; }
 
 .nav-stretch {
   position: relative; }
@@ -67,7 +69,7 @@ h5 {
   width: 230px; }
 
 .nav-center {
-  margin: 4px 0px 0 0px;
+  margin: 0px 0px 0 0px;
   position: relative; }
 
 .modal-title {
@@ -863,7 +865,7 @@ section {
 #app-title-section {
   text-align: center;
   background: white;
-  padding-bottom: 8px !important;
+  padding-bottom: 0px !important;
   min-height: 70px; }
 
 .chart rect {
@@ -888,7 +890,7 @@ section {
   color: #717171;
   font-size: 14px;
   margin-left: 100px;
-  margin-top: 5px; }
+  padding-top: 3px; }
 
 #gene-search-bar {
   display: inline-block;
@@ -2369,8 +2371,8 @@ text.ref-count {
     float: right; }
 
 #gene-badge {
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin-top: 0px;
+  margin-bottom: 9px;
   margin-right: 3px; }
 
 #gene-badge.loading {
@@ -2451,7 +2453,7 @@ text.ref-count {
   -webkit-flex-flow: row wrap;
   justify-content: center;
   -webkit-justify-content: center;
-  max-height: 200px;
+  max-height: 150px;
   overflow-y: auto;
   padding-bottom: 4px; }
   #gene-badge-container a {
@@ -2473,7 +2475,8 @@ text.ref-count {
   padding-bottom: 0px;
   vertical-align: top;
   font-size: 0px;
-  margin-left: 160px; }
+  margin-left: 140px;
+  margin-top: 2px; }
 
 #manage-cache-link {
   color: #717171 !important;
