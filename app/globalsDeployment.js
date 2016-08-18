@@ -17,6 +17,7 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var siteGeneSource        = "gencode";      // what should the gene source default to: refseq or gencode?
 var DEFAULT_BATCH_SIZE    = 5;              // how many genes can be analyzed simultaneously for 'Analyze all'
 
+var autoCall              = true;           // if only alignments are provided, should variants automatically be called?
 
 /*
 * These variables control special behavior for running gene.iobio education edition, with
