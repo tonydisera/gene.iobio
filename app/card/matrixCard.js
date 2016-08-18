@@ -603,7 +603,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		y -= $('#nav-edu-tour').outerHeight();
 	}
 
-	if (x < w) {
+	if (x < w + 50) {
 		tooltip.classed("arrow-down-left", true);
 		tooltip.classed("arrow-down-right", false);
 		tooltip.style("width", w + "px")
