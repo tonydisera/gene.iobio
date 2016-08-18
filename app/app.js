@@ -914,6 +914,11 @@ function loadGeneFromUrl() {
 		switchGeneSource(theGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
 	}
 
+	var batchSize = getUrlParameter("batchSize");	
+	if (batchSize != null && batchSize != "") {
+		DEFAULT_BATCH_SIZE = batchSize;
+	}
+
 	// Get the gene list from the url.  Add the gene badges, selecting
 	// the gene that was passed in the url parameter
 	var genes = getUrlParameter("genes");
@@ -978,12 +983,7 @@ function loadUrlSources() {
 	var sample = getUrlParameter(/sample*/);	
 	var affectedSibsString = getUrlParameter("affectedSibs");
 	var unaffectedSibsString = getUrlParameter("unaffectedSibs");
-	var batchSize = getUrlParameter("batchSize");
-	
 
-	if (batchSize != null && batchSize != "") {
-		DEFAULT_BATCH_SIZE = batchSize;
-	}
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
