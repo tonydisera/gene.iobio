@@ -100,7 +100,7 @@ var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
-var autoCall = null;
+
 
 // The smaller the region, the wider we can
 // make the rect of each variant
@@ -1860,6 +1860,20 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 				  variantPromises.push(vPromise);		 
 			}
 		});
+
+
+	 	//
+	 	// TODO:  When variants are called from alignments, the normal full trio promise
+	 	// is never fullfilled, so this case of re-determining inheritance is only
+	 	// working for the standard use case of 'loaded variants'.  The code
+	 	// that determines inheritance needs to be centralized for 4 use cases:
+	 	//  1. the normal one where variants are loaded from a VCF (handled below)
+	 	//  2. the normal one where 'Analyze all' is performed on variants loaded from VCF (also handled below)
+	 	//  3. the case where variants are called for alignments, displaying alongside the loaded variants
+	 	//  4. the case where variants are auto-called when only alignments are provided
+	 	//  5. the case where 'Analyze all' is performed, auto-calling variants when only alignments are provided
+	 	//
+		
 
 	 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
 	 	// (including vep, clinvar, and coverage), compare the proband to mother and father
