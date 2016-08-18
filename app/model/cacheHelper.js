@@ -10,6 +10,7 @@ function CacheHelper() {
 
 
 CacheHelper.prototype.analyzeAll = function() {
+
 	var me = this;
 	// Start over with a new queue of genes to be analyzed
 	// is all of the genes that need to be analyzed (and cached.)
@@ -82,85 +83,95 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 		    	adjustGeneRegion(geneObject);
 		    	var transcript = getCanonicalTranscript(geneObject);
 		    	window.geneObjects[geneObject.gene_name] = geneObject;
-			    genesCard._geneBadgeLoading(geneObject.gene_name, true);
+			   
 
+			    if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+			    	// take this gene off of the queue and see
+			    	// if next batch of genes should be analyzed
+			    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
+			    	me.cacheNextGene(geneObject.gene_name);
+			    } else {
 
-			    // For each sample, get and annotate the genes and
-			    // cache the variants
-		    	getRelevantVariantCards().forEach(function(variantCard) {
+					genesCard._geneBadgeLoading(geneObject.gene_name, true);
+				    // For each sample, get and annotate the genes and
+				    // cache the variants
+			    	getRelevantVariantCards().forEach(function(variantCard) {
 
-		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-			    		variantCard.promiseCacheVariants(
-			    			geneObject.chr,
-			    			geneObject, 
-						 	transcript)
-			    		.then( function(vcfData) {
-			    			// Once all analysis of the gene variants for each of
-			    			// the samples is complete, determine the inheritance 
-			    			// (if this is a trio)
-			    			if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+			    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
+				    		variantCard.promiseCacheVariants(
+				    			geneObject.chr,
+				    			geneObject, 
+							 	transcript)
+				    		.then( function(vcfData) {
+				    			// Once all analysis of the gene variants for each of
+				    			// the samples is complete, determine the inheritance 
+				    			// (if this is a trio)
+				    			if (me.isCachedForCards(geneObject.gene_name, transcript)) {
 
-			    				// we need to compare the proband variants to mother and father variants to determine
-								// the inheritance mode. 
-								var probandVcfData = getVariantCard("proband").model.getVcfDataForGene(geneObject, transcript);
-								var motherVcfData  = getVariantCard("mother" ).model.getVcfDataForGene(geneObject, transcript);
-								var fatherVcfData  = getVariantCard("father" ).model.getVcfDataForGene(geneObject, transcript);
-				
+				    				// we need to compare the proband variants to mother and father variants to determine
+									// the inheritance mode. 
+									var probandVcfData = getVariantCard("proband").model.getVcfDataForGene(geneObject, transcript);
+									var motherVcfData  = getVariantCard("mother" ).model.getVcfDataForGene(geneObject, transcript);
+									var fatherVcfData  = getVariantCard("father" ).model.getVcfDataForGene(geneObject, transcript);
+					
 
-								var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
-								trioModel.compareVariantsToMotherFather(function() {
+									var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
+									trioModel.compareVariantsToMotherFather(function() {
 
-									// Now that inheritance has been determined,
-									// summarize the variants for the proband to
-									// create the gene badges, representing the
-									// most pathogenic variants for this gene
-				    				var dangerObject = getVariantCard("proband").summarizeDanger(geneName, probandVcfData);
-									
-									genesCard._geneBadgeLoading(geneObject.gene_name, false);
-									if (probandVcfData.features.length == 0) {
-				    					genesCard.setGeneBadgeWarning(geneObject.gene_name);
-				    				} else {
-				    					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-									}
-
-									// Re-cache the results now that inheritance has been determined
-									getRelevantVariantCards().forEach(function(vc) {
-										if (autoCall && !vc.model.isVcfReadyToLoad()) {
-											var data = vc.model.getVcfDataForGene(geneObject, transcript);
-											vc.model._cacheData(data, "fbData", geneObject.gene_name, transcript);
-											vc.model._cacheData(data, "vcfData", geneObject.gene_name, transcript);											
+										// Now that inheritance has been determined,
+										// summarize the variants for the proband to
+										// create the gene badges, representing the
+										// most pathogenic variants for this gene
+					    				var dangerObject = getVariantCard("proband").summarizeDanger(geneName, probandVcfData);
+										
+										genesCard._geneBadgeLoading(geneObject.gene_name, false);
+										if (probandVcfData.features.length == 0) {
+					    					genesCard.setGeneBadgeWarning(geneObject.gene_name);
+					    				} else {
+					    					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 										}
-									})
+
+										// Re-cache the results now that inheritance has been determined
+										getRelevantVariantCards().forEach(function(vc) {
+											if (autoCall && !vc.model.isVcfReadyToLoad()) {
+												var data = vc.model.getVcfDataForGene(geneObject, transcript);
+												vc.model._cacheData(data, "fbData", geneObject.gene_name, transcript);
+												vc.model._cacheData(data, "vcfData", geneObject.gene_name, transcript);											
+											}
+										})
 
 
-			    					// take this gene off of the queue and see
-			    					// if next batch of genes should be analyzed
-			    					me.cacheNextGene(geneObject.gene_name);
-				    				
+				    					// take this gene off of the queue and see
+				    					// if next batch of genes should be analyzed
+				    					me.cacheNextGene(geneObject.gene_name);
+					    				
 
-			    				}, function(error) {
-			    					console.log("problem determining inheritance for " + geneObject.gene__name + ". " + error);
-			    					// take this gene off of the queue and see
-			    					// if next batch of genes should be analyzed
-			    					me.cacheNextGene(geneObject.gene_name);
-			    				});
+				    				}, function(error) {
+				    					console.log("problem determining inheritance for " + geneObject.gene__name + ". " + error);
+				    					// take this gene off of the queue and see
+				    					// if next batch of genes should be analyzed
+				    					me.cacheNextGene(geneObject.gene_name);
+				    				});
 
-			    			}
+				    			}
 
-			    		}, function(error) {
-			    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-		    				var message = error.hasOwnProperty("message") ? error.message : error;
-			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+				    		}, function(error) {
+				    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
+			    				var message = error.hasOwnProperty("message") ? error.message : error;
+				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
+				    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
 
-	    					// take this gene off of the queue and see
-	    					// if next batch of genes should be analyzed
-				    		me.cacheNextGene(geneObject.gene_name);					
-			    		});
+		    					// take this gene off of the queue and see
+		    					// if next batch of genes should be analyzed
+					    		me.cacheNextGene(geneObject.gene_name);					
+				    		});
 
-		    		}
+			    		}
 
-		    	});	
+			    	});				    	
+			    }
+
+
 		    } else {
 				genesCard.setGeneBadgeError(geneName);			    				
 				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
@@ -199,7 +210,7 @@ CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
 	if (dataCard.mode == 'single') {
 		return count == 1;
 	} else {
-		return count == variantCards.length;
+		return count == getRelevantVariantCards().length;
 	}
 }
 
