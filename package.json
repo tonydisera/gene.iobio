@@ -5,6 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "./node_modules/karma/bin/karma start karma.conf.js",
+    "postinstall": "./node_modules/selenium-standalone/bin/selenium-standalone install",
+    "e2e": "./node_modules/.bin/nightwatch",
     "start": "node server.js"
   },
   "repository": {
@@ -26,6 +28,12 @@
     "karma-html2js-preprocessor": "^1.0.0",
     "karma-jasmine": "^1.0.2",
     "karma-json-fixtures-preprocessor": "0.0.6",
-    "karma-phantomjs-launcher": "^1.0.1"
+    "karma-phantomjs-launcher": "^1.0.1",
+    "nightwatch": "^0.9.7",
+    "phantomjs-prebuilt": "^2.1.12",
+    "selenium-standalone": "^5.5.0"
+  },
+  "dependencies": {
+    "es6-promise": "^3.2.1"
   }
 }
