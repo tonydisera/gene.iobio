@@ -668,7 +668,7 @@ GenesCard.prototype._getPhenolyzerGenesExhibit = function(searchTerms) {
 *  return a ranked gene list based on a phenotype (or a list of phenotypes).*
 */
 GenesCard.prototype._getPhenolyzerGenesBasic = function(searchTerms) {
-
+	var me = this;
 	var phenolyzerUrl = phenolyzerOnlyServer + '?cmd=' + searchTerms;
 	$.ajax( 
 		{
