@@ -156,6 +156,8 @@ var effectCategories = [
   exports.checkVcfUrl = function(url, callback) {
     var me = this;
     var success = null;
+    var buffer = "";
+    var recordCount = 0;
     var cmd = new iobio.cmd(
         IOBIO.tabix,
         ['-H', url]
@@ -164,20 +166,21 @@ var effectCategories = [
     cmd.on('data', function(data) {
       if (data != undefined) {
         success = true;
+        buffer += data;
       }
     });
 
     cmd.on('end', function() {
       if (success == null) {
         success = true;
+      }
+      if (success && buffer.length > 0) {
         callback(success);
       }
     });
 
     cmd.on('error', function(error) {
       if (me.ignoreErrorMessage(error)) {
-        success = true;
-        callback(success)
       } else {
         if (success == null) {
           success = false;
