@@ -717,7 +717,7 @@ var effectCategories = [
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
 
-      
+
       callback(annotatedRecs, results);
     });
 
@@ -829,7 +829,7 @@ var effectCategories = [
         contigStr += "##contig=<ID=" + ref + ">\n";
     })
     var contigNameFile = new Blob([contigStr])
-   
+
     var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region]);
 
     cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
@@ -840,7 +840,7 @@ var effectCategories = [
     }
 
     cmd = cmd.pipe(IOBIO.bcftools, ['stats']);
-                       
+
 
     var statsData = "";
     // Use Results
@@ -852,7 +852,7 @@ var effectCategories = [
     });
 
     cmd.on('end', function(data) {
-        
+
         var recs = statsData.split("\n");
         var startIdx = null;
         for(var i =0; i < recs.length && startIdx == null; i++) {
@@ -1143,56 +1143,71 @@ var effectCategories = [
       url = url.slice(0,url.length-1) + '[c37])'
 
       var clinvarVariants = null;
-      $.ajax( url )
-        .done(function(data) {
-          var webenv = data["esearchresult"]["webenv"];
-          var queryKey = data["esearchresult"]["querykey"];
-          var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
-          $.ajax( summaryUrl )
-            .done(function(sumData) {
+      var requestClinvarSummaryTries = 0;
+      requestClinvarSummary(url);
 
-              if (sumData.result == null) {
-                if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
-                  sumData.esummaryresult.forEach( function(message) {
-                  });
-                }
-                sumData.result = {uids: []};
-                clinvarLoadVariantsFunction(sumData.result);
-                if (isLastBatch) {
-                  resolve();
-                }
-
+      function requestClinvarSummary(url) {
+        $.ajax( url )
+          .done(function(data) {
+            if (data["esearchresult"]["ERROR"] != undefined) {
+              if (requestClinvarSummaryTries < 2 ) {
+                requestClinvarSummaryTries += 1;
+                console.log('clinvar request failed ' + requestClinvarSummaryTries + ' times (' + data["esearchresult"]["ERROR"] + '). Trying again ...')
+                requestClinvarSummary(url);
               } else {
-                var sorted = sumData.result.uids.sort(function(a,b){
-                  var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                  var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                  if ( aStart > bStart)
-                    return 1;
-                  else
-                    return -1;
-                })
-                sumData.result.uids = sorted;
-                if (clinvarLoadVariantsFunction) {
-                  clinvarLoadVariantsFunction(sumData.result);
-                }
-                if (isLastBatch) {
-                  resolve();
-                }
-
+                console.log('clinvar request failed 3 times (' + data.esearchresult.ERROR + '). Aborting ...')
               }
-            })
-            .fail(function() {
-              console.log('Error: clinvar http request failed to get summary data');
-              reject('Error: clinvar http request failed to get summary data');
-            })
-        })
-        .fail(function() {
-          console.log('Error: clinvar http request failed to get IDs');
-          reject('Error: clinvar http request failed to get IDs');
+            } else {
+              var webenv = data["esearchresult"]["webenv"];
+              var queryKey = data["esearchresult"]["querykey"];
+              console.log(queryKey)
+              var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
+              $.ajax( summaryUrl )
+                .done(function(sumData) {
 
-        })
+                  if (sumData.result == null) {
+                    if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
+                      sumData.esummaryresult.forEach( function(message) {
+                      });
+                    }
+                    sumData.result = {uids: []};
+                    clinvarLoadVariantsFunction(sumData.result);
+                    if (isLastBatch) {
+                      resolve();
+                    }
+
+                  } else {
+                    var sorted = sumData.result.uids.sort(function(a,b){
+                      var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                      var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                      if ( aStart > bStart)
+                        return 1;
+                      else
+                        return -1;
+                    })
+                    sumData.result.uids = sorted;
+                    if (clinvarLoadVariantsFunction) {
+                      clinvarLoadVariantsFunction(sumData.result);
+                    }
+                    if (isLastBatch) {
+                      resolve();
+                    }
+
+                  }
+                })
+                .fail(function() {
+                  console.log('Error: clinvar http request failed to get summary data');
+                  reject('Error: clinvar http request failed to get summary data');
+                })
+            }
+          })
+          .fail(function() {
+            console.log('Error: clinvar http request failed to get IDs');
+            reject('Error: clinvar http request failed to get IDs');
+
+          })
+        }
       });
-
 
   }
 
