@@ -27,8 +27,8 @@ var isLevelEdu            = false; // is gene.iobio educational version, simplif
 var isLevelEduTour        = false; // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 
 
-//var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emails should feedback be sent to?   if no emails are provided, the feedback link will be hidden
-//var feedbackAttachScreenCapture = true;          // should the feedback include a screen capture?
-//var feedbackShowURL             = false;         // show the feedback email show the URL that launched gene.iobio?
+var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emails should feedback be sent to?   if no emails are provided, the feedback link will be hidden
+var feedbackAttachScreenCapture = true;          // should the feedback include a screen capture?
+var feedbackShowURL             = false;         // show the feedback email show the URL that launched gene.iobio?
 
 

@@ -2592,6 +2592,7 @@ function emailFeedback() {
     	}
 	};
 
+	var name = $('#feedback-name').val();
 	var email = $('#feedback-email').val();
 	var note  = $('#feedback-note').val();
 
@@ -2638,7 +2639,8 @@ function emailFeedback() {
 		htmlAttachment    += '</html>';
 	}
 
-	sendFeedbackEmail(email, note, htmlAttachment);
+	sendFeedbackEmail(name, email, note, htmlAttachment);
+	sendFeedbackReceivedEmail(email);
 
 	if (feedbackAttachScreenCapture) {
 		$('#feedback-screen-capture').empty();
@@ -2653,7 +2655,7 @@ function emailFeedback() {
 *  will email a description of the problem along with an html file attachment
 *  that is the snapshop of vcfiobio.
 */
-function sendFeedbackEmail(email, note, htmlAttachment) {
+function sendFeedbackEmail(name, email, note, htmlAttachment) {
 	var client = BinaryClient(emailServer);
 
 	// Strip of the #modal-report-problem from the URL
@@ -2666,7 +2668,8 @@ function sendFeedbackEmail(email, note, htmlAttachment) {
 	}
 
 	// Format the body of the email
-	var htmlBody = '<span style="padding-right: 4px">Reported by:</span>' + email  + "<br><br>";
+	var htmlBody = '<span style="padding-right: 4px">Reported by:</span>' + name  + "<br><br>";
+	htmlBody    += '<span style="padding-right: 4px">Email:</span>' + email  + "<br><br>";
 	if (feedbackShowURL) {
 		htmlBody +=  '<span style="padding-right: 51px">gene.iobio URL:</span>' + appURL + "<br><br>";
 	} 
@@ -2689,6 +2692,29 @@ function sendFeedbackEmail(email, note, htmlAttachment) {
 	  if (feedbackAttachScreenCapture && htmlAttachment) {
 		  stream.write(htmlAttachment);
 	  }
+	  stream.end();
+	});
+}
+
+
+function sendFeedbackReceivedEmail(email) {
+	var client = BinaryClient(emailServer);
+
+	// Format the body of the email
+	var htmlBody = 'Thank you for your feedback on gene.iobio.  We will review your email as soon as possible.';
+	htmlBody     += '<br><br>';
+    htmlBody     += 'Best regards,<br>';
+    htmlBody     += 'The IOBIO team';
+
+	var emailObject = {
+	    'from':     feedbackEmails, 
+	    'to':       email,
+	    'subject':  'gene.iobio feedback received',
+	    'body':     htmlBody
+	 };
+	 
+	client.on('open', function(stream){
+	  var stream = client.createStream(emailObject);	
 	  stream.end();
 	});
 }

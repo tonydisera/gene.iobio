@@ -5,8 +5,8 @@ var stage_iobio_services      = "nv-green.iobio.io/";
 var dev_iobio_services        = "nv-dev-new.iobio.io/";
 var prod_iobio_services       = "nv-prod.iobio.io/";
 
-var new_iobio_services        = isOffline              ? serverInstance : stage_iobio_services;
-var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_iobio_services);
+var new_iobio_services        = isOffline              ? serverInstance : dev_iobio_services;
+var iobio_http_services       = "http://" + (isOffline ? serverInstance : dev_iobio_services);
 
 
 // http services
@@ -15,6 +15,9 @@ var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
 var phenolyzerOnlyServer      = iobio_http_services + "phenolyzer/";
+
+// email services
+var emailServer                 = "ws://nv-dev.iobio.io/email/";
 
 
 // iobio services
