@@ -418,6 +418,12 @@ function init() {
 		checkForInactivity();
 	}
 
+	if (feedbackEmails != undefined && feedbackEmails != "") {
+		$('#feedback-link').removeClass("hide");
+		$('#feedback-link').on('click', showFeedback);
+	    $('#report-feedback-button').on('click', emailFeedback);
+	}
+
 }
 
 
@@ -2516,6 +2522,175 @@ function getHumanRefNames(refName) {
     } else {
       return "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y";
     }
+}
+
+function formatCurrentDateTime(delim) {
+	var theDelim = delim ? delim : '-';
+	var theTimeDelim = delim ? delim : ':';
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+
+	var yyyy = today.getFullYear();
+	if(dd<10){
+	    dd='0'+dd
+	} 
+	if(mm<10){
+	    mm='0'+mm
+	} 
+
+
+	var hours = today.getHours();
+	var minutes = today.getMinutes();
+	var ampm = hours >= 12 ? 'pm' : 'am';
+	hours = hours % 12;
+	hours = hours ? hours : 12; // the hour '0' should be '12'
+	minutes = minutes < 10 ? '0'+minutes : minutes;
+	var theTime = hours + theTimeDelim + minutes + ampm;
+
+	var today = mm + theDelim + dd + theDelim + yyyy + theDelim + theTime;
+	return today;
+}
+
+
+
+function showFeedback() {
+	
+	$('#feedback-note').val("");	
+
+	if (feedbackAttachScreenCapture) {
+		$('#feedback-screen-capture-area').removeClass("hide");
+		$('#feedback-screen-capture').empty();
+		$('#feedback-screen-capture').append(  "<div id='feedback-container' class='"       + "'></div>"  );
+
+		$('#feedback-screen-capture #feedback-container').append(  $('#nav-section').html() );
+		$('#feedback-screen-capture #feedback-container').append(  $('#track-section').html() );
+		$('#feedback-screen-capture #feedback-container').append(  $('#proband-variant-card').html() );
+		$('#feedback-screen-capture #feedback-container').append(  $('#other-variant-cards').html() );
+
+		if (!$('#slider-left').hasClass('hide')) {
+			$('#feedback-screen-capture').append(  "<div style='width:5px'></div>"  );
+			$('#feedback-screen-capture').append(  "<div id='slider-left-content' class='"     + $('#slider-left-content').attr("class") + "'>"       + $('#slider-left-content').html()     + "</div");		
+		}
+		$('#feedback-screen-capture').append(  $('#svg-glyphs-placeholder').html() );	
+
+		// Take out identifiers
+		$('#feedback-screen-capture #variant-card-label').text("");
+
+	
+	} else {
+		$('#feedback-screen-capture-area').addClass("hide");		
+	}	
+}
+
+function emailFeedback() {
+
+	// Change newlines to html breaks
+	$.valHooks.textarea = {
+    	get: function(elem) {
+        	return elem.value.replace(/\r?\n/g, "<br>");
+    	}
+	};
+
+	var email = $('#feedback-email').val();
+	var note  = $('#feedback-note').val();
+
+	if (email == null || email.trim().length == 0) {
+		$('#feedback-warning').text("Please specify an email");
+		$('#feedback-warning').removeClass("hide");
+		return;
+	} else if (note == null || note.trim().length == 0) {
+		$('#feedback-warning').text("Please fill in the description");
+		$('#feedback-warning').removeClass("hide");
+		return;
+	} else {
+		$('#feedback-warning').addClass("hide");
+	}
+
+	var htmlAttachment = null;
+
+	if (feedbackAttachScreenCapture) {
+		htmlAttachment    = '<html>';
+
+		htmlAttachment    += '<head>';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap-material-design.css" type="text/css">';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap.css" type="text/css">';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/gene.d3.css" type="text/css">';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/google-fonts.css" type="text/css">';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/material-icons.css" type="text/css">';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/selectize.css" type="text/css">';
+	    htmlAttachment    += '<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">';
+	    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/site.css" type="text/css">';
+	    htmlAttachment    += '</head>';
+		
+		htmlAttachment    += "<body style='margin-bottom:0px'>";
+
+
+		$('#feedback-screen-capture .pagination.bootpag .prev a').text("<<");
+		$('#feedback-screen-capture .pagination.bootpag .next a').text(">>");
+		$('#feedback-screen-capture #container').attr("width", "initial");
+
+		htmlAttachment    += '<div id="feedback-screen-capture">';
+		htmlAttachment    += $('#feedback-screen-capture').html();
+		htmlAttachment    += '</div>'
+		htmlAttachment    += '</body>'
+
+		htmlAttachment    += '</html>';
+	}
+
+	sendFeedbackEmail(email, note, htmlAttachment);
+
+	if (feedbackAttachScreenCapture) {
+		$('#feedback-screen-capture').empty();
+	}
+
+	$('#feedback-modal').modal('hide');
+}
+
+/*
+*
+*  Stream the app snapshot (html) to the emailServer which
+*  will email a description of the problem along with an html file attachment
+*  that is the snapshop of vcfiobio.
+*/
+function sendFeedbackEmail(email, note, htmlAttachment) {
+	var client = BinaryClient(emailServer);
+
+	// Strip of the #modal-report-problem from the URL
+	var appURL = "";
+	if (feedbackShowURL) {
+		appURL = location.href;
+		if (appURL.indexOf("#feedback-modal") > -1){
+	  		appURL = appURL.substr(0, appURL.indexOf("#feedback-modal"));
+		}
+	}
+
+	// Format the body of the email
+	var htmlBody = '<span style="padding-right: 4px">Reported by:</span>' + email  + "<br><br>";
+	if (feedbackShowURL) {
+		htmlBody +=  '<span style="padding-right: 51px">gene.iobio URL:</span>' + appURL + "<br><br>";
+	} 
+	htmlBody += note + '<br><br>';
+
+	var emailObject = {
+	    'from':     email, 
+	    'to':       feedbackEmails,
+	    'subject':  'Feedback on gene.iobio',
+	    'body':     htmlBody
+	 };
+	 if (feedbackAttachScreenCapture && htmlAttachment) {
+	 	emailObject.filename = 'gene.iobio.screencapture.' + formatCurrentDateTime('.') + '.html';
+	 } else {
+	 	emailObject.filename = '';
+	 }
+
+	client.on('open', function(stream){
+	  var stream = client.createStream(emailObject);
+	  if (feedbackAttachScreenCapture && htmlAttachment) {
+		  stream.write(htmlAttachment);
+	  }
+	  stream.end();
+	});
 }
 
 

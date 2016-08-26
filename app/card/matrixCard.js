@@ -503,7 +503,7 @@ MatrixCard.prototype.reset = function() {
 
 
 MatrixCard.prototype.hideTooltip = function() {
-	var tooltip = d3.select('#matrix-track .tooltip');
+	var tooltip = d3.select('#container #matrix-track .tooltip');
 	tooltip.transition()        
            .duration(500)      
            .style("opacity", 0)
@@ -540,7 +540,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	}
 
 
-	var tooltip = d3.select('#matrix-track .tooltip');
+	var tooltip = d3.select('#container #matrix-track .tooltip');
 	tooltip.style("z-index", 20);
 	tooltip.transition()        
 	 .duration(1000)      
