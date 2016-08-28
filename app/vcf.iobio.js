@@ -1170,7 +1170,6 @@ var effectCategories = [
             } else {
               var webenv = data["esearchresult"]["webenv"];
               var queryKey = data["esearchresult"]["querykey"];
-              console.log(queryKey)
               var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
               $.ajax( summaryUrl )
                 .done(function(sumData) {

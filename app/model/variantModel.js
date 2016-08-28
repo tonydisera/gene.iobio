@@ -1813,7 +1813,6 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 			variant.clinVarPhenotype[phToken.toLowerCase()] = 'Y';
 		});
 	}
-	console.log("clinvar for " + variant.start + " " + variant.ref + "->" + variant.alt + " = " + variant.clinVarUid + " " + variant.clinvar)
 }
 
 VariantModel.prototype.clearCalledVariants = function() {
