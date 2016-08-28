@@ -5,7 +5,7 @@ function CacheHelper() {
 	this.genesToCache = [];
 	this.cacheQueue = [];
 	this.batchSize = null;
-
+	this.launchTimestamp = Date.now();
 }
 
 
@@ -221,66 +221,71 @@ CacheHelper.prototype.clearCache = function() {
 	if (keepLocalStorage) {
 		
 	} else {
-		if (localStorage) {
-			localStorage.clear();
-		}
+		me._clearCache();
 		me.genesToCache = [];
 	}
+}
 
+CacheHelper.prototype.getCacheKey = function(cacheObject) {
+	return        this.launchTimestamp
+	    + "---" + cacheObject.relationship 
+		+ "---" + cacheObject.sample
+		+ "---" + cacheObject.gene
+		+ "---" + cacheObject.transcript
+	    + "---" + cacheObject.annotationScheme
+		+ "---" + cacheObject.dataKind;
 }
 
 
-CacheHelper.getCacheSize = function() {  // provide the size in bytes of the data currently stored
-  var size = 0;
-  var coverageSize = 0;
-  var nonBadgeSize = 0;
-  for (var i=0; i<=localStorage.length-1; i++)  
-  {  
-  	key = localStorage.key(i);  
-  	var dataSize = localStorage.getItem(key).length;
-  	size     += dataSize;
+CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes of the data currently stored
+	var me = this;
+	var size = 0;
+	var coverageSize = 0;
+	var nonBadgeSize = 0;
+	for (var i=0; i<=localStorage.length-1; i++)  
+	{  
+		key = localStorage.key(i);  
+		keyObject = CacheHelper._parseCacheKey(key);
+		if (keyObject.launchTimestamp == me.launchTimestamp) {
+		  	var dataSize = localStorage.getItem(key).length;
+		  	size     += dataSize;
 
-  	var cacheObject = CacheHelper.parseCacheKey(key);
-  	if (cacheObject.dataKind == 'bamData') {
-  		coverageSize +=  dataSize;
-  	}
-  	if (!CacheHelper.hasBadgeOfInterest(key)) {
-  		nonBadgeSize += dataSize;
-  	}
-  }  
-  return {total:     (CacheHelper.sizeMB(size) + " MB"), 
-          coverage:  (CacheHelper.sizeMB(coverageSize) + " MB"),
-      	  nonBadge:  (CacheHelper.sizeMB(nonBadgeSize) + " MB")};
+		  	var cacheObject = CacheHelper._parseCacheKey(key);
+		  	if (cacheObject.dataKind == 'bamData') {
+		  		coverageSize +=  dataSize;
+		  	}
+		  	if (!me._hasBadgeOfInterest(key)) {
+		  		nonBadgeSize += dataSize;
+		  	}  		
+		}
+	}  
+	return {total:     (CacheHelper._sizeMB(size) + " MB"), 
+	      coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
+	  	  nonBadge:  (CacheHelper._sizeMB(nonBadgeSize) + " MB")};
 }
 
-CacheHelper.sizeMB = function(size) {
-	var sizeMB = size / (1024*1024);
-	return  Math.round(sizeMB * 100) / 100;
+
+CacheHelper.prototype._clearCache = function() {
+	var me = this;
+	if (localStorage) {
+		for (var i=0; i<=localStorage.length-1; i++)  {  
+			var key = localStorage.key(i); 	
+			keyObject = CacheHelper._parseCacheKey(key);
+			if (keyObject.launchTimestamp == me.launchTimestamp) {
+				localStorage[key] = "";
+			}
+		}	
+	}
 }
 
-
-CacheHelper.parseCacheKey = function(cacheKey) {
-	var tokens = cacheKey.split("---");
-	return { relationship: tokens[0], 
-		     sample: tokens[1], 
-		     gene: tokens[2], 
-		     transcript: tokens[3], 
-		     annotationScheme: tokens[4], 
-		     dataKind: tokens[5]
-		    };
-
-}
-
-CacheHelper.clearAll = function() {
+CacheHelper.prototype.clearAll = function() {
+	var me = this;
 	// confirm dialog
 	alertify.confirm("Clear all cached data?", function (e) {
 	    if (e) {
 			// user clicked "ok"
-			for (var i=0; i<=localStorage.length-1; i++)  {  
-  				var key = localStorage.key(i); 	
-  				localStorage[key] = "";
-  			}
-  			CacheHelper.refreshDialog();
+			me._clearCache();
+  			me.refreshDialog();
 	        
 	    } else {
 	        // user clicked "cancel"
@@ -288,43 +293,82 @@ CacheHelper.clearAll = function() {
 	});
 }
 
-CacheHelper.clearCoverageCache = function() {
+CacheHelper.prototype.clearCoverageCache = function() {
+	var me = this;
 	for (var i=0; i<=localStorage.length-1; i++)  {  
   		var key = localStorage.key(i); 	
-		cacheObject = CacheHelper.parseCacheKey(key);
-		if (cacheObject.dataKind == "bamData") {
-			localStorage[key] = "";
-		}
+		var keyObject = CacheHelper._parseCacheKey(key);
+	  		if (keyObject.launchTimestamp == me.launchTimestamp) {
+				if (keyObject.dataKind == "bamData") {
+					localStorage[key] = "";
+				}
+	  		}
 	}
-	CacheHelper.refreshDialog();
+	me.refreshDialog();
 }
-CacheHelper.clearNonBadgeCache = function() {
+CacheHelper.prototype.clearNonBadgeCache = function() {
+	var me = this;
 	for (var i=0; i<=localStorage.length-1; i++)  {  
   		var key = localStorage.key(i); 	
-		if (CacheHelper.isProbandVariantCache(key) && !CacheHelper.hasBadgeOfInterest(key)) {
-			var cacheObject = CacheHelper.parseCacheKey(key);
-			CacheHelper.clearCacheForGene(cacheObject.gene);
+  		var keyObject = CacheHelper._parseCacheKey(key);
+  		if (keyObject.launchTimestamp == me.launchTimestamp) {
+			if (me._isProbandVariantCache(key) && !me._hasBadgeOfInterest(key)) {
+				me.clearCacheForGene(keyObject.gene);
+			}  			
+  		}
+	}
+	me.refreshDialog();
+}
+
+CacheHelper.prototype.refreshDialog = function() {
+	var sizes = this.getCacheSize();
+	$("#cache-size").text(sizes.total);
+	$("#coverage-size").text(sizes.coverage);
+	$("#non-badge-size").text(sizes.nonBadge);	
+}
+
+CacheHelper.prototype.openDialog = function() {
+	this.refreshDialog();
+	$('#manage-cache-modal').modal('show');
+}
+
+
+
+CacheHelper.prototype.clearCacheForGene = function(geneName) {
+	var me = this;
+	var keys = me.getKeysForGene(geneName);
+	keys.forEach( function(key) {
+		localStorage[key] = "";
+	});
+}
+
+
+CacheHelper.prototype._getKeysForGene = function(geneName) {
+	var me = this;
+	var keys = [];
+	for (var i=0; i<=localStorage.length-1; i++)  {  
+  		var key = localStorage.key(i); 	
+		cacheObject = CacheHelper._parseCacheKey(key);
+		if (cacheObject.launchTimestamp == me.launchTimestamp) {
+			if (cacheObject.gene == geneName) {
+				keys.push(key);
+			}			
 		}
 	}
-	CacheHelper.refreshDialog();
+	return keys;
 }
 
-CacheHelper.isProbandVariantCache = function(key) {
-	var cacheObject = CacheHelper.parseCacheKey(key);
-	return (cacheObject && cacheObject.dataKind == "vcfData" && cacheObject.relationship == "proband");
-
-}
-
-CacheHelper.hasBadgeOfInterest = function(key) {
+CacheHelper.prototype._hasBadgeOfInterest = function(key) {
+	var me = this;
 	hasBadge = false;
-	var cacheObject = CacheHelper.parseCacheKey(key);
+	var cacheObject = CacheHelper._parseCacheKey(key);
 	var probandKey = null;
-	if (CacheHelper.isProbandVariantCache(key)) {
+	if (me._isProbandVariantCache(key)) {
 		probandKey = key;
 	} else {
-		var keys = CacheHelper.getKeysForGene(cacheObject.gene);
+		var keys = me._getKeysForGene(cacheObject.gene);
 		keys.forEach( function(theKey) {
-			if (probandKey == null && CacheHelper.isProbandVariantCache(theKey)) {
+			if (probandKey == null && me._isProbandVariantCache(theKey)) {
 				probandKey = theKey;
 			}
 		});
@@ -334,12 +378,12 @@ CacheHelper.hasBadgeOfInterest = function(key) {
 		}
 	}
 
-	var probandCacheObject = CacheHelper.parseCacheKey(probandKey);
+	var probandCacheObject = CacheHelper._parseCacheKey(probandKey);
 	var dangerCacheObject = $().extend(probandCacheObject);
-	dangerCacheObject.dataKind   = "dangerObject";
+	dangerCacheObject.dataKind   = "dangerSummary";
 	dangerCacheObject.transcript = "null";
 
-	var dangerObject = CacheHelper.getCachedData(CacheHelper.getCacheKey(dangerCacheObject));
+	var dangerObject = CacheHelper.getCachedData(me.getCacheKey(dangerCacheObject));
 	if (dangerObject) {
 		for(dangerKey in dangerObject) {
 			var dangerValue = dangerObject[dangerKey];
@@ -354,41 +398,44 @@ CacheHelper.hasBadgeOfInterest = function(key) {
 			}		
 		}
 	} else {
-		// If we can't find the danger summary, play it safe and mark it as having
-		// badges so its cache doesn't get deleted.
-		hasBadge = true;
+		hasBadge = false;
 	}
 	return hasBadge;
 
 }
 
-CacheHelper.getKeysForGene = function(geneName) {
-	var keys = [];
-	for (var i=0; i<=localStorage.length-1; i++)  {  
-  		var key = localStorage.key(i); 	
-		cacheObject = CacheHelper.parseCacheKey(key);
-		if (cacheObject.gene == geneName) {
-			keys.push(key);
-		}
-	}
-	return keys;
+
+CacheHelper.prototype._isProbandVariantCache = function(key) {
+	var cacheObject = CacheHelper._parseCacheKey(key);
+	return (cacheObject 
+		&& cacheObject.launchTimestamp == this.launchTimestamp 
+		&& ( cacheObject.dataKind == "vcfData"  || cacheObject.dataKind == "fbData")
+		&& cacheObject.relationship == "proband");
+
 }
 
-CacheHelper.clearCacheForGene = function(geneName) {
-	var keys = CacheHelper.getKeysForGene(geneName);
-	keys.forEach( function(key) {
-		localStorage[key] = "";
-	});
+
+
+
+CacheHelper._sizeMB = function(size) {
+	var _sizeMB = size / (1024*1024);
+	return  Math.round(_sizeMB * 100) / 100;
 }
 
-CacheHelper.getCacheKey = function(cacheObject) {
-	return        cacheObject.relationship 
-		+ "---" + cacheObject.sample
-		+ "---" + cacheObject.gene
-		+ "---" + cacheObject.transcript
-	    + "---" + cacheObject.annotationScheme
-		+ "---" + cacheObject.dataKind;
+
+CacheHelper._parseCacheKey = function(cacheKey) {
+	var tokens = cacheKey.split("---");
+	return { launchTimestamp: tokens[0],
+		     relationship: tokens[1], 
+		     sample: tokens[2], 
+		     gene: tokens[3], 
+		     transcript: tokens[4], 
+		     annotationScheme: tokens[5], 
+		     dataKind: tokens[6]
+		    };
+
 }
+
 
 CacheHelper.getCachedData = function(key) {
 	var data = null;
@@ -407,20 +454,9 @@ CacheHelper.getCachedData = function(key) {
 	return data;	
 }
 
-CacheHelper.refreshDialog = function() {
-	var sizes = CacheHelper.getCacheSize();
-	$("#cache-size").text(sizes.total);
-	$("#coverage-size").text(sizes.coverage);
-	$("#non-badge-size").text(sizes.nonBadge);	
-}
-
-CacheHelper.openDialog = function() {
-	CacheHelper.refreshDialog();
-	$('#manage-cache-modal').modal('show');
-}
 
 CacheHelper.showError = function(key, cacheError) {
-	var cacheObject = CacheHelper.parseCacheKey(key);
+	var cacheObject = CacheHelper._parseCacheKey(key);
 	var errorType = cacheError.hasOwnProperty("name") ? cacheError.name : "A problem";
 	var errorKey = cacheObject.gene + "---" + errorType;
 

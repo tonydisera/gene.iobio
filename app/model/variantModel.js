@@ -1208,7 +1208,7 @@ VariantModel.prototype._promiseCacheCalledVariants = function(ref, geneObject, t
 }
 
 VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
-	return CacheHelper.getCacheKey(
+	return cacheHelper.getCacheKey(
 		{relationship: this.getRelationship(),
 		 sample: (this.sampleName != null ? this.sampleName : "null"),
 		 gene: (geneName != null ? geneName : gene.gene_name),
