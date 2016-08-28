@@ -996,36 +996,45 @@ var effectCategories = [
       if (numberOfBatches == 0) {
         numberOfBatches = 1;
       }
+      var clinvarPromises = [];
       for( var i = 0; i < numberOfBatches; i++) {
         var start = i * batchSize;
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
-        var isLastBatch = (i == numberOfBatches - 1 ? true : false);
+        //var isLastBatch = (i == numberOfBatches - 1 ? true : false);
 
         if (isClinvarOffline) {
-          me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction)
-          .then(  function() {
-            resolve(theVcfData);
+          var promise = me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
+          .then(  function() {  
+
           }, function(error) {
             reject();
           });
+          clinvarPromises.push(promise);
 
         } else {
-          me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction)
-          .then(  function() {
-            resolve(theVcfData);
+          var promise = me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
+          .then(  function() {   
+                     
           }, function(error) {
             reject();
           });
+          clinvarPromises.push(promise);
 
         }
       }
+
+      Promise.all(clinvarPromises).then(function() {
+        resolve(theVcfData);
+      });
+
+
 
     });
   }
 
   // When there is no internet, read the clinvar vcf to obtain clinvar annotations
-  exports.promiseGetClinvarRecordsOffline= function(variants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecordsOffline= function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1082,9 +1091,7 @@ var effectCategories = [
 
         clinvarLoadVariantsFunction(vcfObjects);
 
-        if (isLastBatch) {
-          resolve();
-        }
+        resolve();
 
       });
 
@@ -1098,7 +1105,7 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetClinvarRecordsImpl = function(variants, refName, geneObject, isLastBatch, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecordsImpl = function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1175,10 +1182,7 @@ var effectCategories = [
                     }
                     sumData.result = {uids: []};
                     clinvarLoadVariantsFunction(sumData.result);
-                    if (isLastBatch) {
-                      resolve();
-                    }
-
+                    resolve();
                   } else {
                     var sorted = sumData.result.uids.sort(function(a,b){
                       var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
@@ -1192,10 +1196,7 @@ var effectCategories = [
                     if (clinvarLoadVariantsFunction) {
                       clinvarLoadVariantsFunction(sumData.result);
                     }
-                    if (isLastBatch) {
-                      resolve();
-                    }
-
+                    resolve();
                   }
                 })
                 .fail(function() {

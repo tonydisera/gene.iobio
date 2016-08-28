@@ -1648,8 +1648,8 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 	}
 
 	var loadClinvarProperties = function(recs) {
-		for( var vcfIter = 0, covIter = 0; vcfIter < recs.length && covIter < clinVarIds.length; null) {
-			var uid = clinVarIds[covIter];
+		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinVarIds.length; null) {
+			var uid = clinVarIds[clinvarIter];
 			var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start;
 			var clinVarAlt   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].alt;
 			var clinVarRef   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].ref;
@@ -1661,13 +1661,17 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 				if (recs[vcfIter].clinvarAlt == clinVarAlt &&
 					recs[vcfIter].clinvarRef == clinVarRef) {
 					me._addClinVarInfoToVariant(recs[vcfIter], clinVars[uid]);
+					vcfIter++;
+					clinvarIter++;
+				} else {
+					// Only advance the clinvar iterator if clinvar entry didn't match the variant
+					// because there can be multiple clinvar entries for the same position.
+					clinvarIter++;
 				}
-				vcfIter++;
-				covIter++;
 			} else if (recs[vcfIter].start < clinVarStart) {						
 				vcfIter++;
 			} else {
-				covIter++;
+				clinvarIter++;
 			}
 		}
 	}
@@ -1736,9 +1740,14 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 				if (recs[vcfIter].alt == clinvarVariant.alt &&
 					recs[vcfIter].ref == clinvarVariant.ref) {
 					parseClinvarInfo(recs[vcfIter], clinvarVariant);
+					vcfIter++;
+					clinvarIter++;
+				} else {
+					// Only advance the clinvar iterator if clinvar entry didn't match the variant
+					// because there can be multiple clinvar entries for the same position.
+					clinvarIter++;
 				}
-				vcfIter++;
-				clinvarIter++;
+				
 			} else if (recs[vcfIter].start < +clinvarVariant.pos) {						
 				vcfIter++;
 			} else {
@@ -1804,6 +1813,7 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 			variant.clinVarPhenotype[phToken.toLowerCase()] = 'Y';
 		});
 	}
+	console.log("clinvar for " + variant.start + " " + variant.ref + "->" + variant.alt + " = " + variant.clinVarUid + " " + variant.clinvar)
 }
 
 VariantModel.prototype.clearCalledVariants = function() {
@@ -1990,6 +2000,9 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 VariantModel.prototype.loadCalledTrioGenotypes = function() {
 	var me = this;
+	if (this.vcfData == null || this.vcfData.features == null) {
+		return;
+	}
 	var sourceVariants = this.vcfData.features
 							 .filter(function (variant) {
 								return variant.fbCalled == 'Y';
