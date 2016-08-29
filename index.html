@@ -484,7 +484,15 @@
 
 
         <div id="region-track" class="level-edu level-mygene2" style="clear:both;">
-            <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
+
+            <div id="select-gene-box"  class="level-mygene2 hide">
+              <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
+              </select>
+            </div>     
+            <div id="gene-summary" class="level-mygene2 hide">              
+            </div>
+
+            <a id="gene-name" target="_genecards" class="level-mygene2 gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
             <span id="gene-chr" class="level-mygene2 gene-card-label keep-case" ></span>
             <span id="gene-region" class="level-edu level-mygene2 gene-card-label keep-case"></span>
             <span id="minus_strand" class="level-edu level-mygene2" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>

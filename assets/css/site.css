@@ -2831,6 +2831,27 @@ text.ref-count {
   text-align: left;
   padding-left: 10px; }
 
+#transcript-panel {
+  margin-top: -16px !important; }
+
+#select-gene-box.level-mygene2 {
+  display: inline-block !important;
+  width: 130px;
+  vertical-align: top; }
+  #select-gene-box.level-mygene2 .selectize-input {
+    font-size: 18px !important; }
+  #select-gene-box.level-mygene2 .selectize-dropdown-content {
+    font-size: 18px !important;
+    max-height: initial !important; }
+
+#gene-summary.level-mygene2 {
+  display: inline-block !important;
+  text-align: left;
+  font-size: 11px;
+  color: #717171;
+  margin-left: 10px;
+  width: calc(100% - 160px); }
+
 #variant-heading {
   min-width: 140px !important;
   max-width: 140px !important; }

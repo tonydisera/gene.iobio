@@ -1539,9 +1539,9 @@ VariantModel.prototype._pileupVariants = function(features, start, end) {
 		v.level = 0;
 	});
 
-	var featureWidth = isLevelEdu ? EDU_TOUR_VARIANT_SIZE : 4;
+	var featureWidth = isLevelEdu || isLevelMygene2 ? EDU_TOUR_VARIANT_SIZE : 4;
 	var posToPixelFactor = Math.round((end - start) / width);
-	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, featureWidth + (isLevelEdu ? EDU_TOUR_VARIANT_SIZE*2 : 4));
+	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, featureWidth + (isLevelEdu || isLevelMygene2 ? EDU_TOUR_VARIANT_SIZE*2 : 4));
 
 	if ( maxLevel > 30) {
 		for( var i = 1; i < posToPixelFactor; i++) {

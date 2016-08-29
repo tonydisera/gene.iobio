@@ -442,7 +442,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
 			me.addGeneBadge(name, true);
-		} else {
+	} else {
 			me._setBookmarkBadge(name);
 		}
 	}
@@ -452,9 +452,15 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
 		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
+		if (isLevelMygene2) {
+			$('#select-gene')[0].selectize.setValue(geneNameToSelect);
+		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
+		if (isLevelMygene2) {
+			$('#select-gene')[0].selectize.setValue(geneNames[0]);
+		}
 	}
 
 	me._onGeneBadgeUpdate();
@@ -981,6 +987,13 @@ GenesCard.prototype.addGene = function(geneName) {
 
 GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	var me = this;
+
+	if (isLevelMygene2) {
+		$('#select-gene')[0].selectize.addOption({value:geneName});
+		if (!bypassSelecting) {
+			$('#select-gene')[0].selectize.setValue(geneName);
+		}
+	}
 
 	var gb = me._getGeneBadge(geneName);
 	if (gb == null || gb.length == 0) {

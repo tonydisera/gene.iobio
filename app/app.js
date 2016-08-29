@@ -412,6 +412,20 @@ function init() {
 	});
 	$('#bloodhound .typeahead').focus();
 
+	if (isLevelMygene2) {
+		$('#select-gene').selectize(
+			{ 
+				create: false, 			
+				valueField: 'value',
+		    	labelField: 'value',
+		    	searchField: ['value']
+	    	}
+		);	
+		$('#select-gene')[0].selectize.on('change', function() {
+			genesCard.selectGene($('#select-gene')[0].selectize.getValue());
+		});	
+	}
+
 	// In cases where timeout=true, restart app after n seconds of inactivity
 	// (e.g. no mouse move, button click, etc.). 
 	if (hasTimeout) {
@@ -1722,7 +1736,8 @@ function loadTracksForGene(bypassVariantCards) {
     $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
     $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);   
     $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
-
+	$('#gene-summary').text(isLevelMygene2 && geneAnnots[window.gene.gene_name] ? geneAnnots[window.gene.gene_name].summary : "");
+    
 
 	if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
 		$('#non-protein-coding #gene-type-badge').addClass("hide");
