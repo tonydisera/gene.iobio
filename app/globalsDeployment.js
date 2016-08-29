@@ -25,6 +25,7 @@ var autoCall              = true;           // if only alignments are provided, 
 */
 var isLevelEdu            = false; // is gene.iobio educational version, simplified version of app
 var isLevelEduTour        = false; // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var isLevelMygene2        = true;  // is gene.iobio the mygene2 beginner version
 
 
 var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emails should feedback be sent to?   if no emails are provided, the feedback link will be hidden

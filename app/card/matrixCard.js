@@ -209,7 +209,7 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelMygene2) {
 		return (i+1).toString();
 	} else {
 		var rsId = getRsId(d);
@@ -225,7 +225,7 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 MatrixCard.prototype.init = function() {
 	var me = this;
 
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelMygene2) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
 		this.removeRow('Zygosity', me.matrixRows);	
@@ -255,9 +255,9 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
-				    .cellSize(isLevelEdu ? 23 : 18)
-				    .columnLabelHeight(isLevelEdu ? 30 : 67)
-				    .rowLabelWidth(isLevelEdu ? 100 : 140)
+				    .cellSize(isLevelEdu  || isLevelMygene2 ? 23 : 18)
+				    .columnLabelHeight(isLevelEdu  || isLevelMygene2 ? 30 : 67)
+				    .rowLabelWidth(isLevelEdu  || isLevelMygene2 ? 100 : 140)
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
@@ -293,7 +293,7 @@ MatrixCard.prototype.init = function() {
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
-				    	if (isLevelEdu) {
+				    	if (isLevelEdu  || isLevelMygene2) {
 				    		return;
 				    	}
 				    	var column = null;
@@ -313,7 +313,7 @@ MatrixCard.prototype.init = function() {
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
-				    	if (isLevelEdu) {
+				    	if (isLevelEdu  || isLevelMygene2) {
 				    		return;
 				    	}
 				    	var column = null;
@@ -525,7 +525,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 
 	if (lock) {
-		if (!isLevelEdu) {
+		if (!isLevelEdu && !isLevelMygene2) {
 			showSidebar("Examine");
 			examineCard.showVariant(variant);		
 			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
@@ -547,7 +547,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
 
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelMygene2) {
 		tooltip.classed("level-edu", "true");
 	} 
 
@@ -569,7 +569,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		if (!isLevelEdu) {
+		if (!isLevelEdu && !isLevelMygene2) {
 			showSidebar("Examine");
 			examineCard.showVariant(variant);
 			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
@@ -585,7 +585,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu  || isLevelMygene2 ? widthSimpleTooltip : 300;
 	var h = tooltip[0][0].offsetHeight;
 
 	var x = variant.screenXMatrix;
@@ -794,7 +794,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu || isLevelMygene2});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.

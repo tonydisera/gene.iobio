@@ -195,8 +195,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .margin({top: 0, right: 2, bottom: 0, left: 4})
 				    .showXAxis(false)
 				    .showBrush(false)
-				    .trackHeight(isLevelEduTour ? 32 : 16)
-				    .cdsHeight(isLevelEduTour ? 24 : 12)
+				    .trackHeight(isLevelEduTour || isLevelMygene2 ? 32 : 16)
+				    .cdsHeight(isLevelEduTour || isLevelMygene2 ? 24 : 12)
 		    		.showLabel(false)
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 		    				    			
@@ -234,9 +234,9 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 12 : 17, left: 4})
-				    .showXAxis(isLevelEdu ? false : true)
-				    .variantHeight(isLevelEdu ? EDU_TOUR_VARIANT_SIZE : 6)
+				    .margin({top: 0, right: 2, bottom: isLevelEdu  || isLevelMygene2 ? 12 : 17, left: 4})
+				    .showXAxis(isLevelEdu  || isLevelMygene2 ? false : true)
+				    .variantHeight(isLevelEdu  || isLevelMygene2 ? EDU_TOUR_VARIANT_SIZE : 6)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(this.variantTooltipHTML)
@@ -1843,7 +1843,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu || isLevelMygene2 ? widthSimpleTooltip : 300;
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {

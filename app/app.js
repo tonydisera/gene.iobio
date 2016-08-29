@@ -276,8 +276,8 @@ function init() {
 	    .margin({top:20, right: 2, bottom: 0, left: 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEduTour ? 32 : 16)
-	    .cdsHeight(isLevelEduTour ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelMygene2 ? 32 : 16)
+	    .cdsHeight(isLevelEduTour  || isLevelMygene2  ? 24 : 12)
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
@@ -334,8 +334,8 @@ function init() {
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
-	    .trackHeight(isLevelEduTour ? 36 : 16)
-	    .cdsHeight(isLevelEduTour ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelMygene2  ? 36 : 16)
+	    .cdsHeight(isLevelEduTour || isLevelMygene2 ? 24 : 12)
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
@@ -771,9 +771,9 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 40));
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 60));
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 60));
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelMygene2 ? 0 : 40));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelMygene2 ? 0 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelMygene2 ? 0 : 60));
 }
 
 function closeSlideLeft() {
@@ -942,7 +942,7 @@ function loadGeneFromUrl() {
 		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
 	} else {
 		// Open the sidebar 
-		if (isLevelEdu) {
+		if (isLevelEdu || isLevelMygene2) {
 			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
@@ -1066,7 +1066,7 @@ function loadUrlSources() {
 				
 				loadTracksForGene( false );
 
-				if (isLevelEdu && $('#slider-left').hasClass("hide")) {
+				if ((isLevelEdu || isLevelMygene2) && $('#slider-left').hasClass("hide")) {
 					if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 						showSidebar("Phenolyzer");
 					}
@@ -1972,7 +1972,7 @@ function showTranscripts(regionStart, regionEnd) {
 
 	// Show the gene transcripts.
     // Compress the tracks if we have more than 10 transcripts
-    if (!isLevelEduTour) {
+    if (!isLevelEduTour && !isLevelMygene2) {
 	    if (transcripts.length > 10) {
 	    	transcriptChart.trackHeight(10);
 	    	transcriptChart.cdsHeight(8);

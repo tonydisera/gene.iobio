@@ -137,7 +137,7 @@
   <div id="nav-edu-tour" class="shadow-z-2 hide" >
   </div>
 
-  <div id="slide-buttons"  class="level-edu">
+  <div id="slide-buttons"  class="level-edu level-mygene2">
     <div id="close-slide-left" class="close-button fade-in hide">
         <i class="material-icons" id="close-slide-left-glyph" style="line-height:.8;font-size: 40px;font-weight: bold;">keyboard_arrow_left</i>
     </div>
@@ -367,12 +367,15 @@
       	      <a id='home' style="display:inline-block">
                 <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
               </a>
-              <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
+              <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu level-mygene2"  onclick="$('#disclaimer-modal').modal('show')">
                  Disclaimer
               </a>              
               <div id="education-title" class="level-edu"
               style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
                 education edition
+              </div>
+              <div id="beginner-title" class="level-mygene2">
+                Beginner
               </div>
         </div>
 
@@ -381,7 +384,7 @@
           <a href="http://iobio.io" class="iobioproject">           
             an iobio project          
           </a>
-          <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
+          <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu level-mygene2"  onclick="$('#disclaimer-modal').modal('show')">
             Disclaimer
           </a>
 
@@ -391,7 +394,7 @@
 
 
           
-          <div id="gene-search-bar" class="level-edu nav-center" >
+          <div id="gene-search-bar" class="level-edu level-mygene2 nav-center" >
 
 
             <!-- Gene search -->
@@ -401,7 +404,7 @@
             </span>     
 
             <!-- Button data modal -->
-            <button id="add-data-button" type="button" class="level-edu icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
+            <button id="add-data-button" type="button" class="level-edu level-mygene2 icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
               <i class="material-icons" style="font-size: 18px;">input</i>      
               Data
             </button>
@@ -419,7 +422,7 @@
           <div class="nav-center">
             
             <!-- Buttons for editting gene list, done editting gene list -->
-            <div id="manage-genes" class="level-edu">
+            <div id="manage-genes" class="level-edu level-mygene2">
               <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
                  <i class="material-icons">playlist_add_check</i>
                   Analyze all
@@ -433,11 +436,11 @@
              
             </div>
             
-            <div id="gene-page-selection"></div>  
+            <div id="gene-page-selection" class="level-mygene2"></div>  
 
             
 
-            <div id="gene-page-control" class="level-edu">              
+            <div id="gene-page-control" class="level-edu level-mygene2">              
              
               <div id="select-gene-container">
                   <select id="select-gene-sort" style="font-size:10px;">                 
@@ -461,7 +464,7 @@
             </div>
             
 
-            <div id="gene-badge-container" class="" style="clear:both;">
+            <div id="gene-badge-container" class="level-mygene2" style="clear:both;">
 
               <div id="after-genes" style="display:inline-block;margin-top:5px;">
                                            
@@ -480,14 +483,14 @@
 
 
 
-        <div id="region-track" class="level-edu" style="clear:both;">
+        <div id="region-track" class="level-edu level-mygene2" style="clear:both;">
             <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-            <span id="gene-chr" class=" gene-card-label keep-case" ></span>
-            <span id="gene-region" class="level-edu gene-card-label keep-case"></span>
-            <span id="minus_strand" class="level-edu" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-            <span  id="gene-plus-minus-label" class="level-edu fullview hide " style="padding-left: 15px">+  -</span>
-            <input id="gene-region-buffer-input" class="level-edu hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
-            <span class="level-edu" style="float:right;margin-right:14px">
+            <span id="gene-chr" class="level-mygene2 gene-card-label keep-case" ></span>
+            <span id="gene-region" class="level-edu level-mygene2 gene-card-label keep-case"></span>
+            <span id="minus_strand" class="level-edu level-mygene2" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+            <span  id="gene-plus-minus-label" class="level-edu level-mygene2 fullview hide " style="padding-left: 15px">+  -</span>
+            <input id="gene-region-buffer-input" class="level-edu level-mygene2 hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+            <span class="level-edu level-mygene2" style="float:right;margin-right:14px">
                 <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
                   <i class="material-icons">remove</i>
                 </a>
@@ -501,7 +504,7 @@
 
 
         <!-- Non protein-coding gene badges -->
-        <div id="non-protein-coding" class="level-edu"  style="clear: both;padding-bottom: 0px;display: block;">
+        <div id="non-protein-coding" class="level-edu level-mygene2"  style="clear: both;padding-bottom: 0px;display: block;">
             <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
               Enter a gene name
             </div>   
@@ -514,14 +517,14 @@
             </div>                  
         </div>  
 
-        <div id="gene-source-box" class="level-edu" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
+        <div id="gene-source-box" class="level-edu level-mygene2" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
           <select id="select-gene-source" class="fullview" data-placeholder="">
                 <option value="Gencode Transcript">Gencode Transcript</option>
                 <option value="RefSeq Transcript">RefSeq Transcript</option>                   
            </select>        
         </div>
         
-        <div class="level-edu fullview" style="margin-top:-25px"> 
+        <div class="level-edu level-mygene2 fullview" style="margin-top:-25px"> 
           <div class="btn-toolbar fullview" 
              style="display: inline-block;float: left;margin-top:-38px;margin-left: 5px;padding-top: 0px; ">
              <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
@@ -571,7 +574,7 @@
 
         <div id="matrix-track"  class="track shadow-z-2 hide">
             
-            <div class="card-label level-edu" style="">Rank Variants</div>
+            <div class="card-label level-edu level-mygene2" style="">Rank Variants</div>
 
             <span id="low-quality-legend" class="hide">
                 <div style="display:inline-block;width:15px;height:15px;background-color: #dedede;"></div>
@@ -595,11 +598,11 @@
               <div id="feature-matrix" style="overflow-x: scroll;margin-top:-15px;">
               </div>
 
-              <a id="move-rows" class="level-edu hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
+              <a id="move-rows" class="level-edu level-mygene2 hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
 
               <div id="feature-matrix-note" class="hide" >
                 
-                <span class="level-edu" style="color:  rgb(132,132,132);">
+                <span class="level-edu level-mygene2" style="color:  rgb(132,132,132);">
                   More likely causative
                 </span>
                 <span id="matrix-harmful-note" class="hide level-edu" style="color:  rgb(132,132,132);">

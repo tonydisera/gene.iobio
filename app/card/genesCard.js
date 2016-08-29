@@ -48,7 +48,7 @@ GenesCard.prototype.init = function() {
 	});
 
 	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelMygene2) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	} else {
 	  	// Selectize combo for phenotype terms    
@@ -116,7 +116,7 @@ GenesCard.prototype.init = function() {
 		}
 	});	
 
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelMygene2) {
 		eduTourCheckPhenolyzer();
 	}
 
@@ -758,7 +758,7 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 
 	// Now create a comma delimited list of all existing genes + selected phenolyzer genes
 	var genesString = geneNames.join(",");
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelMygene2) {
 		genesString = "";
 	}
 	selectedPhenoGenes.forEach( function(g) {
