@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var nightwatch = require('gulp-nightwatch');
 var util = require('gulp-util');
+var jasmineBrowser = require('gulp-jasmine-browser');
 
 var fork = require('child_process').fork;
 var args = require('yargs').argv;
@@ -31,6 +32,22 @@ gulp.task('e2e', ['nightwatch'], function(done) {
 	}
 	done();
 });
+
+gulp.task('jasmine', function() {
+	var files = getKarmaFiles();
+  return gulp.src(files)
+    .pipe(jasmineBrowser.specRunner())
+    .pipe(jasmineBrowser.server({port: 8888}));
+});
+
+
+function getKarmaFiles() {
+	// Hack to get array of files from karma.conf.js
+	var files;
+	var mockConfig = { set: function(obj) { files = obj.files; } }
+	require('./karma.conf.js')(mockConfig);
+	return files;
+}
 
 function log(message) {
 	util.log(util.colors.blue(message));

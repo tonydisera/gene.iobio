@@ -21,6 +21,7 @@
   "homepage": "https://github.com/tonydisera/gene.iobio#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-jasmine-browser": "^1.6.0",
     "gulp-nightwatch": "^0.3.0",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
