@@ -34,8 +34,10 @@ gulp.task('e2e', ['nightwatch'], function(done) {
 });
 
 gulp.task('jasmine', function() {
-	var files = getKarmaFiles();
-  return gulp.src(files)
+	var fileConfig = getKarmaFiles();
+	var files = fileConfig.files;
+	var excludedFiles = fileConfig.excludedFiles;
+  return gulp.src(files.concat(excludedFiles))
     .pipe(jasmineBrowser.specRunner())
     .pipe(jasmineBrowser.server({port: 8888}));
 });
@@ -43,10 +45,13 @@ gulp.task('jasmine', function() {
 
 function getKarmaFiles() {
 	// Hack to get array of files from karma.conf.js
-	var files;
-	var mockConfig = { set: function(obj) { files = obj.files; } }
+	var files, excludes;
+	var mockConfig = { set: function(obj) { files = obj.files; excludes = obj.exclude; } }
 	require('./karma.conf.js')(mockConfig);
-	return files;
+	var excludedFiles = excludes.map(function(excludedFile) {
+		return '!' + excludedFile;
+	});
+	return { files: files, excludedFiles: excludedFiles };
 }
 
 function log(message) {
