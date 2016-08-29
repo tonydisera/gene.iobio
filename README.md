@@ -45,7 +45,7 @@ To run end-to-end integration tests with selenium and nightwatch:
 gulp e2e
 ```
 
-This will run a server on port 3008 so that selenium can run tests against it. The server is shut down when the tests are finished.
+This will run a server (i.e. `node server.js`) on port 3008 so that the selenium server (on port 4444) can run tests against it. The server is shut down when the tests are finished.
 
 To specify a specific browser, use the **-e** option, e.g.
 
