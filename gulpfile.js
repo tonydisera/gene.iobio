@@ -3,6 +3,7 @@ var nightwatch = require('gulp-nightwatch');
 var util = require('gulp-util');
 var jasmineBrowser = require('gulp-jasmine-browser');
 var watch = require('gulp-watch');
+var plumber = require('gulp-plumber');
 
 var fork = require('child_process').fork;
 var args = require('yargs').argv;
@@ -41,6 +42,7 @@ gulp.task('jasmine', function() {
 	var watchedFiles = files.concat(excludedFiles);
   return gulp.src(watchedFiles)
   	.pipe(watch(watchedFiles))
+  	.pipe(plumber())
     .pipe(jasmineBrowser.specRunner())
     .pipe(jasmineBrowser.server({port: 8888}));
 });
