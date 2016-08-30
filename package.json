@@ -33,8 +33,5 @@
     "nightwatch": "^0.9.7",
     "phantomjs-prebuilt": "^2.1.12",
     "selenium-standalone": "^5.5.0"
-  },
-  "dependencies": {
-    "es6-promise": "^3.2.1"
   }
 }
