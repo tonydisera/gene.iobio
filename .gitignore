@@ -1,3 +1,6 @@
-bower_components
 assets/css/.sass-cache
 assets/css/sass/.sass-cache
+node_modules
+e2e/logs
+e2e/screenshots
+phantomjsdriver.log
