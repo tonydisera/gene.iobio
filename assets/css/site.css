@@ -2839,9 +2839,9 @@ text.ref-count {
   width: 130px;
   vertical-align: top; }
   #select-gene-box.level-mygene2 .selectize-input {
-    font-size: 18px !important; }
+    font-size: 14px !important; }
   #select-gene-box.level-mygene2 .selectize-dropdown-content {
-    font-size: 18px !important;
+    font-size: 14px !important;
     max-height: initial !important; }
 
 #gene-summary.level-mygene2 {
@@ -2896,26 +2896,49 @@ text.ref-count {
     padding-left: 2px;
     padding-right: 2px; }
 
-#genes-card #phenolyzer-title {
-  display: block !important;
-  font-size: 18px !important; }
-#genes-card #phenolyzer-run-label-long.level-mygene2 {
-  display: inline-block !important;
-  vertical-align: top;
-  margin-top: 4px; }
-#genes-card #phenolyzer-run-label.level-mygene2 {
-  display: none !important; }
-#genes-card #phenolyzer-heading {
-  margin-top: 0px !important; }
-  #genes-card #phenolyzer-heading h5 {
-    display: inline-block !important;
+#genes-card {
+  padding-top: 10px !important; }
+  #genes-card .tt-dropdown-menu {
+    width: 100% !important;
+    color: #717171;
+    font-size: 14px !important; }
+  #genes-card .tt-hint {
+    width: 100% !important;
+    font-size: 14px !important;
+    margin-right: 0px !important; }
+  #genes-card .tt-input {
+    width: 100% !important;
+    color: #717171;
+    font-size: 14px !important;
+    margin-right: 0px !important; }
+  #genes-card #bloodhound-sidebar.level-mygene2 {
+    display: block !important;
+    margin-bottom: 20px; }
+    #genes-card #bloodhound-sidebar.level-mygene2 .twitter-typeahead {
+      width: 100%; }
+    #genes-card #bloodhound-sidebar.level-mygene2 #enter-gene-name-sidebar.level-mygene2 {
+      display: block !important; }
+  #genes-card #phenolyzer-search-box .selectize-input input {
+    padding: 4px !important; }
+  #genes-card #phenolyzer-search-box .selectize-input .item {
+    padding: 4px !important; }
+  #genes-card #phenolyzer-title {
+    display: block !important;
     font-size: 18px !important; }
-#genes-card #phenolyzer-heading h5.level-mygene2 {
-  display: none !important; }
-#genes-card #phenolyzer-results text.name {
-  font-size: 14px !important; }
-#genes-card #phenolyzer-results text.score {
-  font-size: 14px !important; }
+  #genes-card #phenolyzer-run-label-long.level-mygene2 {
+    display: inline-block !important;
+    vertical-align: top;
+    margin-top: 4px; }
+  #genes-card #phenolyzer-run-label.level-mygene2 {
+    display: none !important; }
+  #genes-card #phenolyzer-title {
+    display: none !important; }
+  #genes-card #phenolyzer-results {
+    display: none !important; }
+  #genes-card #powered-by-phenolyzer.level-mygene2 {
+    display: inline-block !important;
+    color: #5d809d;
+    font-size: 12px; }
 
 .nav li.level-mygene2 {
   display: none !important; }
@@ -2942,12 +2965,12 @@ text.ref-count {
     color: white;
     margin-top: -5px;
     margin-bottom: 10px;
-    font-size: 18px !important; }
+    font-size: 16px !important; }
     .variant-card #gene-box.deemphasize {
       color: #5d809d !important;
       border: solid thin transparent !important;
       background-color: transparent !important;
-      font-size: 18px !important; }
+      font-size: 16px !important; }
   .variant-card #gene-box.level-mygene2 {
     display: block !important; }
   .variant-card #zoom-region-chart {

@@ -410,7 +410,7 @@ function init() {
 			loadGeneFromUrl();
 		}
 	});
-	$('#bloodhound .typeahead').focus();
+	getGeneBloodhoundElement().focus();
 
 	if (isLevelMygene2) {
 		$('#select-gene').selectize(
@@ -924,6 +924,22 @@ function toggleSampleTrio(show) {
 
 }
 
+function getGeneBloodhoundElement() {
+	return isLevelMygene2 ? $('#bloodhound-sidebar .typeahead') : $('#bloodhound .typeahead');	
+}
+
+function getGeneBloodhoundInputElement() {
+	return isLevelMygene2 ? $('#bloodhound-sidebar .typeahead.tt-input') : $('#bloodhound .typeahead.tt-input');	
+}
+function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
+	if (!isLevelMygene2) {
+		getGeneBloodhoundInputElement.val(geneName);
+	}
+	if (trigger) {
+		getGeneBloodhoundInputElement().trigger('typeahead:selected', {"name": geneName, loadFromUrl: loadFromUrl});
+	}
+}
+
 function loadGeneFromUrl() {
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
@@ -950,10 +966,11 @@ function loadGeneFromUrl() {
 
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
-	if (gene != undefined) {
+    if (gene != undefined) {
 		// Type in the gene name, this will trigger the event to get the
 		// gene info and then call loadUrlSources()
-		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+		setGeneBloodhoundInputElement(gene, true, true);
+		
 	} else {
 		// Open the sidebar 
 		if (isLevelEdu || isLevelMygene2) {
@@ -990,7 +1007,7 @@ function reloadGeneFromUrl() {
 		genesCard.copyPasteGenes(gene);
 	}
 
-	$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+	setGeneBloodhoundInputElement(gene, true, true);
 	genesCard._geneBadgeLoading(gene, true, true);
 }
 
@@ -1375,7 +1392,7 @@ function adjustGeneRegionBuffer() {
 		alert("Up to 50 kb upstream/downstream regions can be displayed.")
 	} else {
 		GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
-		$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});		
+		setGeneBloodhoundInputElement(gene.gene_name, false, true);		
 	}
 	cacheHelper.clearCache();
 
@@ -1468,7 +1485,7 @@ function loadGeneWidget(callback) {
 	gene_engine.initialize();
 
 
-	var typeahead = $('#bloodhound .typeahead').typeahead({
+	var typeahead = getGeneBloodhoundElement().typeahead({
 	  hint: true,
 	  highlight: true,
 	  minLength: 1
@@ -1535,7 +1552,7 @@ function loadGeneWidget(callback) {
 		    	}
 		    	
 		    	// set all searches to correct gene	
-		    	$('.typeahead.tt-input').val(window.gene.gene_name);
+			    setGeneBloodhoundInputElement(window.gene.gene_name);
 		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
 		    	
 

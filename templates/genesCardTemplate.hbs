@@ -36,6 +36,17 @@
           <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu level-mygene2 icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
             <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">format_list_numbered</i>ACMG56 Genes<span style="margin-left:6px"></span>
           </button>
+
+
+  <!-- Gene search box (mygene2 only) -->
+
+  <span id="bloodhound-sidebar" class="level-mygene2 hide" >
+      <input id="enter-gene-name-sidebar" class="level-edu typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
+      placeholder="Gene">
+  </span>     
+
+
+  <!-- Phenolyzer -->          
    
     <div id="phenolyzer-search-box" >
       <div>
@@ -43,16 +54,18 @@
         <h4 id="phenolyzer-title" class="hide">Phenolyzer</h4>
         
 
-        <select id="select-phenotypes" class="level-edu level-mygene2" placeholder="Enter phenotype terms..."/>
+        <select id="select-phenotypes" class="level-edu" placeholder="Enter phenotype terms..."/>
 
 
-        <select id="select-phenotype-edutour" placeholder="Choose disease..." style="display:none;">
+        <select id="select-phenotype-edutour" class="level-mygene2" placeholder="Choose disease..." style="display:none;">
                 <option value="breast_cancer">Breast cancer</option>
                 <option value="colon_cancer">Colon cancer</option>                   
                 <option value="b_cell_deficiency" >B Cell deficiency</option>                   
         </select>
         
-        <div style="font-size:10px;margin-bottom:5px;">For academic and non-profit use. 
+        <div style="font-size:10px;margin-bottom:5px;">          
+          <span id="powered-by-phenolyzer" class="hide level-mygene2">Powered by Phenolyzer</span>
+          For academic and non-profit use. 
           <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
         </div>
 
@@ -92,7 +105,7 @@
 
     <div style="text-align:center">
 
-  	 <div id="phenolyzer-heading" class="hide">
+  	 <div id="phenolyzer-heading" class="hide level-mygene2">
 
         <div class="level-edu level-mygene2 style="font-size: 11px;margin-bottom: 10px;margin-right: 5px;">
     

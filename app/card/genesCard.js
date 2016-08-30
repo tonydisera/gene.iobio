@@ -48,9 +48,13 @@ GenesCard.prototype.init = function() {
 	});
 
 	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
-	if (isLevelEdu || isLevelMygene2) {
+	if (isLevelEdu) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	} else {
+
+		if (isLevelMygene2) {
+			$('#select-phenotypes').attr("placeholder", "Name of condition...")
+		}
 	  	// Selectize combo for phenotype terms    
 		$('#select-phenotypes').selectize({
 			//plugins: ['remove_button'],
@@ -58,7 +62,7 @@ GenesCard.prototype.init = function() {
 		    labelField: 'value',
 		    searchField: 'value',
 		    create: true,
-		    maxItems: null,  
+		    maxItems: isLevelMygene2 ? 1 : null,  
 		    maxOptions: 500,  
 		    load: function(query, callback) {
 		        if (!query.length) return callback();
@@ -77,6 +81,9 @@ GenesCard.prototype.init = function() {
 		});  
 		$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
 			$('#select-phenotypes')[0].selectize.close();
+			if (isLevelMygene2) {
+				me.getPhenolyzerGenes(value);
+			}
 		});
 
 	}
@@ -376,6 +383,10 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	var me = this;
+
+	if (isLevelMygene2) {
+		$('#select-gene')[0].selectize.clearOptions();
+	}
 
 
 	var genesString = $('#genes-to-copy').val();
@@ -1469,7 +1480,7 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 	// only has transcripts in only one of the gene sets
 	checkGeneSource(geneName);
 
-	$('.typeahead.tt-input').val(geneName);
+	setGeneBloodhoundInputElement(geneName);
 	
 	me.setSelectedGene(geneName);
 
