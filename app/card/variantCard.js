@@ -1722,7 +1722,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 
 		eduTourCheckVariant(variant);
 
-		if (!isLevelEdu) {
+		if (!isLevelEdu && !isLevelMygene2) {
 		    showSidebar("Examine");
 			examineCard.showVariant(variant);
 
@@ -1758,6 +1758,11 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 	matrixCard.clearSelections();
 	matrixCard.highlightVariant(variant);
+
+	// Don't show the tooltip for mygene2 beginner mode
+	if (isLevelMygene2) {
+		return;
+	}
 	
 	var x = variant.screenX;
 	var y = variant.screenY;

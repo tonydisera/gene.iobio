@@ -523,6 +523,11 @@ MatrixCard.prototype.adjustTooltip = function(variant) {
 MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var me = this;
 
+	// Don't show the tooltip for mygene2 beginner mode
+	if (isLevelMygene2) {
+		return;
+	}
+
 
 	if (lock) {
 		if (!isLevelEdu && !isLevelMygene2) {

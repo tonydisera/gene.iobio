@@ -51,6 +51,25 @@ FilterCard.prototype.autoSetFilters = function() {
 
 FilterCard.prototype.getFilterObject = function() {
 
+	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
+	if (isLevelMygene2) {
+		var annots = 	{
+			af1000g_rare:     {key: 'af1000glevels', state: true, value: 'af1000g_rare'},
+			exac_rare:        {key: 'afexaclevels',  state: true, value: 'afexac_rare'},
+			afexac_unique_nc: {key: 'afexaclevels',  state: true, value: 'afexac_unique_nc'}
+
+		}
+		if (this.shouldWarnForNonPassVariants()) {
+			annots.PASS =   {key: 'recfilter',     state: true, value: 'PASS'};
+		}
+
+		var filterObject = {
+			annotsToInclude: annots
+		};
+			
+		return filterObject;
+	}
+
 
 	var afMin = $('#af-amount-start').val() != '' ? +$('#af-amount-start').val() / 100 : null;
 	var afMax = $('#af-amount-end').val()   != '' ? +$('#af-amount-end').val()   / 100 : null;
