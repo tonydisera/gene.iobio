@@ -933,7 +933,7 @@ function getGeneBloodhoundInputElement() {
 }
 function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
 	if (!isLevelMygene2) {
-		getGeneBloodhoundInputElement.val(geneName);
+		getGeneBloodhoundInputElement().val(geneName);
 	}
 	if (trigger) {
 		getGeneBloodhoundInputElement().trigger('typeahead:selected', {"name": geneName, loadFromUrl: loadFromUrl});
