@@ -1414,6 +1414,19 @@ function adjustGeneRegion(geneObject) {
 }
 
 
+function switchToAdvancedMode() {
+	var origin   = window.location.origin;
+	origin = origin.replace("beginner", "");
+
+	var pathname = window.location.pathname;
+	pathname = pathname.replace("/beginner/", "");
+	pathname = pathname.replace("beginner", "");
+	
+	var search   = window.location.search;
+
+	location.assign(origin + pathname + search);
+}
+
 function updateUrl(paramName, value) {
 	var params = {};
 	// turn params into hash

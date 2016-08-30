@@ -53,7 +53,7 @@ GenesCard.prototype.init = function() {
 	} else {
 
 		if (isLevelMygene2) {
-			$('#select-phenotypes').attr("placeholder", "Name of condition...")
+			$('#select-phenotypes').attr("placeholder", "Name of condition")
 		}
 	  	// Selectize combo for phenotype terms    
 		$('#select-phenotypes').selectize({

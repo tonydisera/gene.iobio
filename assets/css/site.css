@@ -2786,6 +2786,8 @@ text.ref-count {
 #slider-left {
   left: 0px !important;
   background-color: transparent !important; }
+  #slider-left #slider-left-content {
+    padding-right: 10px !important; }
 
 #container {
   margin-left: 0px !important; }
@@ -2898,6 +2900,9 @@ text.ref-count {
 
 #genes-card {
   padding-top: 10px !important; }
+  #genes-card #button-launch-advanced-mode {
+    display: block !important;
+    margin-top: 40px; }
   #genes-card .tt-dropdown-menu {
     width: 100% !important;
     color: #717171;
@@ -2919,7 +2924,8 @@ text.ref-count {
     #genes-card #bloodhound-sidebar.level-mygene2 #enter-gene-name-sidebar.level-mygene2 {
       display: block !important; }
   #genes-card #phenolyzer-search-box .selectize-input input {
-    padding: 4px !important; }
+    padding: 4px !important;
+    width: 100% !important; }
   #genes-card #phenolyzer-search-box .selectize-input .item {
     padding: 4px !important; }
   #genes-card #phenolyzer-title {
