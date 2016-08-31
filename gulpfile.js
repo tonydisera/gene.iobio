@@ -23,7 +23,9 @@ gulp.task('nightwatch', ['start-server'], function() {
 		.pipe(nightwatch({
 			configFile: 'nightwatch.json',
 			cliArgs: cliArgs
-		}));
+		})).on('error', function(err) {
+			if (child) { child.kill(); }
+		});
 });
 
 gulp.task('e2e', ['nightwatch'], function(done) {

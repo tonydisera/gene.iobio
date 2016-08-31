@@ -2,7 +2,7 @@ module.exports = {
 
   // default timeout value in milliseconds for waitFor commands and implicit waitFor value for
   // expect assertions
-  waitForConditionTimeout : 10000,
+  waitForConditionTimeout : 15000,
 
   // this will cause waitFor commands on elements to throw an error if multiple
   // elements are found using the given locate strategy and selector

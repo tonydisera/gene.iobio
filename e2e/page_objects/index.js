@@ -1,70 +1,63 @@
+var appTitleSection = require('./sections/appTitleSection.js');
+var dataCard = require('./sections/dataCard.js');
+var sliderIconBar = require('./sections/sliderIconBar.js');
+var sliderLeft = require('./sections/sliderLeft.js');
+
 module.exports = {
   url: function() {
     return this.api.launchUrl;
   },
+
   elements: {
     sliderLeft: '#slider-left',
-    matrixTrack: '#matrix-track'
+    appTitleSection: '#app-title-section',
+    dataCard: '#data-card',
+    matrixTrack: '#matrix-track',
+    transcriptCard: '#transcript-card',
+    probandVariantCard: '#proband-variant-card',
+    motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
+    fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)'
   },
 
+  commands: [{
+    load: function() {
+      return this.navigate().waitForElementVisible('@sliderLeft');
+    }
+  }],
+
   sections: {
-
-    sliderIconBar: {
-      selector: '#slider-icon-bar',
-      elements: {
-        filter: { selector: '#button-show-filters' },
-        inspect: { selector: '#button-show-examine' },
-        findGenes: { selector: '#button-show-phenolyzer' },
-        bookmarks: { selector: '#button-show-bookmarks' },
-        callVariants: { selector: '#button-find-missing-variants' },
-        about: { selector: '#button-show-help' }
-      }
-    },
-
-    sliderLeft: {
-      selector: '#slider-left',
-      elements: {
-        filterTrack: { selector: '#filter-track' },
-        genesCard: { selector: '#genes-card' },
-        bookmarkCard: { selector: '#bookmark-card' },
-        examineCard: { selector: '#examine-card' },
-        helpCard: { selector: '#help-card' },
-        recallCard: { selector: '#recall-card' }
-      }
-    },
-
-    appTitleSection: {
-      selector: '#app-title-section',
-      elements: {
-        enterGeneName: { selector: '#enter-gene-name' },
-        addDataButton: { selector: '#add-data-button' },
-        geneBadgeName: { selector: '#gene-badge-name' }
-      }
-    },
-
-    dataCard: {
-      selector: '#data-card',
-      elements: {
-        singleProbandButton: { selector: '#single-proband-button' },
-        trioButton: { selector: '#trio-button' },
-        pedigreeButton: { selector: '#pedigree-button' },
-        otherButton: { selector: '#other-button' },
-        enterName: { selector: '#datasource-name' },
-        variantsButton: { selector: '#vcf-dropdown-button' },
-        alignmentsButton: { selector: '#bam-dropdown-button' },
-        vcfInput: { selector: '#url-input' },
-        bamInput: { selector: '#bam-url-input' },
-        loadButton: { selector: '#ok-button' },
-        platinumTrio: { selector: '#display-platinum-vcf-url-item' },
-        probandVcfSampleBox: { selector: '#proband-data #vcf-sample-box' }
-      }
-    },
+    appTitleSection: appTitleSection,
+    dataCard: dataCard,
+    sliderIconBar: sliderIconBar,
+    sliderLeft: sliderLeft,
 
     matrixTrack: {
       selector: '#matrix-track',
       elements: {
+        matrixPanel: { selector: '#matrix-panel' }
+      }
+    },
+
+    transcriptCard: {
+      selector: '#transcript-card',
+      elements: {
 
       }
+    },
+
+    probandVariantCard: {
+      selector: '#proband-variant-card',
+      elements: {
+
+      }
+    },
+
+    motherVariantCard: {
+      selector: '#other-variant-cards .variant-card:nth-child(1)'
+    },
+
+    fatherVariantCard: {
+      selector: '#other-variant-cards .variant-card:nth-child(2)'
     }
 
   }
