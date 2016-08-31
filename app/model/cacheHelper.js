@@ -5,7 +5,10 @@ function CacheHelper() {
 	this.genesToCache = [];
 	this.cacheQueue = [];
 	this.batchSize = null;
-	this.launchTimestamp = Date.now();
+}
+
+CacheHelper.prototype.isolateSession = function() {
+	this.launchTimestamp = Date.now().valueOf();	
 }
 
 
@@ -216,12 +219,12 @@ CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
 
 
 
-CacheHelper.prototype.clearCache = function() {
+CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 	var me = this;
 	if (keepLocalStorage) {
 		
 	} else {
-		me._clearCache();
+		me._clearCache(launchTimestampToClear);
 		me.genesToCache = [];
 	}
 }
@@ -264,17 +267,66 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 	  	  nonBadge:  (CacheHelper._sizeMB(nonBadgeSize) + " MB")};
 }
 
+CacheHelper._logCacheSize = function() {
+	var cacheInfo = {};
+	for (var i=0; i<=localStorage.length-1; i++)  
+	{  
+		var key = localStorage.key(i); 
+		var keyPart = "";
+		if (key.indexOf("---")) {
+			keyPart = key.split("---")[0];
+		} else {
+			keyPart = key;
+		}
+			
+		var size = cacheInfo[keyPart];
+		if (size == null) {
+			size = 0;
+		}
+		size += localStorage.getItem(key).length;
+		cacheInfo[keyPart] = size;			
+	}
+	console.log(cacheInfo);
+	var totalSize = 0;
+	Object.keys(cacheInfo).forEach(function(key) {
+		totalSize += cacheInfo[key];
+	})
+	console.log(totalSize);	
+}
 
-CacheHelper.prototype._clearCache = function() {
+CacheHelper._logCacheContents = function() {
+	var x, xLen, log=[],total=0;
+	for (x in localStorage){
+		xLen =  ((localStorage[x].length * 1 + x.length * 1)/1024); 
+		log.push(x + " = " +  xLen.toFixed(2) + " KB"); 
+		total+= xLen}; 
+		if (total > 1024){
+			log.unshift("Total = " + (total/1024).toFixed(2)+ " MB");
+		} else{
+			log.unshift("Total = " + total.toFixed(2)+ " KB");}; 
+			console.log(log.join("\n")
+	);	
+}
+
+CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 	var me = this;
+	var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
 	if (localStorage) {
+		console.log('CLEARING CACHE ' + theLaunchTimeStamp);
+		CacheHelper._logCacheSize();
+		var keysToRemove = [];
 		for (var i=0; i<=localStorage.length-1; i++)  {  
 			var key = localStorage.key(i); 	
 			keyObject = CacheHelper._parseCacheKey(key);
-			if (keyObject.launchTimestamp == me.launchTimestamp) {
-				localStorage[key] = "";
-			}
+			if (keyObject.launchTimestamp == theLaunchTimeStamp) {
+				keysToRemove.push(key);
+			} 
 		}	
+		keysToRemove.forEach( function(key) {
+			localStorage.removeItem(key);			
+		})
+		CacheHelper._logCacheSize();
+		CacheHelper._logCacheContents();
 	}
 }
 
@@ -467,7 +519,7 @@ CacheHelper.showError = function(key, cacheError) {
     // Only show the error once
     if (!recordedCacheErrors[errorKey]) {
 	    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Click on 'Clear cache...' to clear cache."
-		alertify.notify(message, 'error', 15);	
+		alertify.notify(message, 'error', 60);	
     	recordedCacheErrors[errorKey] = message;
     }
 }
