@@ -5,8 +5,8 @@ var stage_iobio_services      = "nv-green.iobio.io/";
 var dev_iobio_services        = "nv-dev-new.iobio.io/";
 var prod_iobio_services       = "nv-prod.iobio.io/";
 
-var new_iobio_services        = isOffline              ? serverInstance : dev_iobio_services;
-var iobio_http_services       = "http://" + (isOffline ? serverInstance : dev_iobio_services);
+var new_iobio_services        = isOffline              ? serverInstance : stage_iobio_services;
+var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_iobio_services);
 
 
 // http services
