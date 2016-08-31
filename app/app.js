@@ -80,7 +80,8 @@ var examineCard = new ExamineCard();
 var matrixCard = new MatrixCard();
 
 // cache helper
-var cacheHelper = new CacheHelper();
+var cacheHelper = null;
+var launchTimestampToClear = null;
 
 
 // clicked variant
@@ -184,7 +185,22 @@ function promiseLoadTemplate(templateName) {
 
 function init() {
 	var me = this;
+	cacheHelper = new CacheHelper();
 
+	window.onbeforeunload = function () {
+	    launchTimestampToClear = cacheHelper.launchTimestamp;
+	    console.log("SAVING TIMESTAMP " + launchTimestampToClear);
+	    return "Are you sure you want to exit gene.iobio?";
+	};
+	window.onunload = function () {
+		console.log("CLEARING CACHE for " + launchTimestampToClear);
+    	cacheHelper.clearCache(launchTimestampToClear);
+	};
+
+
+	cacheHelper.isolateSession();
+
+	
 	// If we are using the gene.iobio education tour edition, automatically load 
 	// exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
 	if (isLevelEduTour && !getUrlParameter("tour")) {
