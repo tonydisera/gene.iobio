@@ -15,4 +15,4 @@ module.exports = {
     addDataButton: { selector: '#add-data-button' },
     geneBadgeName: { selector: '#gene-badge-name' }
   }
-}
+};

@@ -23,7 +23,7 @@ module.exports = {
         selectPlatinumTrio: function() {
           return this.click('@variantsButton')
                      .click('@platinumTrio')
-                     .waitForElementVisible('@probandVcfSampleBox')
+                     .waitForElementVisible('@probandVcfSampleBox');
         }
       }],
       elements: {
@@ -37,7 +37,7 @@ module.exports = {
       selector: '#mother-data',
       commands: [{
         selectPlatinumTrio: function() {
-          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox')
+          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
         }
       }],
       elements: {
@@ -62,4 +62,4 @@ module.exports = {
       }
     }
   }
-}
+};

@@ -8,4 +8,4 @@ module.exports = {
     helpCard: { selector: '#help-card' },
     recallCard: { selector: '#recall-card' }
   }
-}
+};

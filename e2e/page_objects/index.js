@@ -34,7 +34,7 @@ module.exports = {
     matrixTrack: {
       selector: '#matrix-track',
       elements: {
-        matrixPanel: { selector: '#matrix-panel' }
+        featureMatrix: { selector: '#feature-matrix' }
       }
     },
 

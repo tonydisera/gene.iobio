@@ -1,13 +1,18 @@
+var indexPage, appTitleSection, dataCard, matrixTrack;
+
 module.exports = {
   beforeEach: function(client) {
     client.maximizeWindow();
   },
 
-  'Loading Platinum Single and Platinum Trio shows the correct cards': function(client) {
-    var indexPage = client.page.index();
-    var appTitleSection = indexPage.section.appTitleSection;
-    var dataCard = indexPage.section.dataCard;
+  before: function(client) {
+    indexPage = client.page.index();
+    appTitleSection = indexPage.section.appTitleSection;
+    dataCard = indexPage.section.dataCard;
+    matrixTrack = indexPage.section.matrixTrack;
+  },
 
+  'Loading Platinum Single shows the correct cards (only proband)': function(client) {
     indexPage.load();
     appTitleSection.openDataMenu();
     dataCard.selectSingle();
@@ -20,10 +25,10 @@ module.exports = {
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.not.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.not.be.visible;
+    matrixTrack.waitForElementVisible('@featureMatrix');
+  },
 
-    indexPage.waitForElementVisible('@matrixTrack');
-
-    // Platinum Trio
+  'Loading Platinum Trio shows the correct cards (proband, mother, and father)': function(client) {
     appTitleSection.openDataMenu();
     dataCard.selectTrio();
     dataCard.section.motherData.selectPlatinumTrio();
@@ -34,10 +39,20 @@ module.exports = {
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.be.visible;
+  },
 
+  'Clicking Single after Loading Trio Data should not immediately hide mother and father variant cards': function(client) {
+    matrixTrack.waitForElementVisible('@featureMatrix');
+    appTitleSection.openDataMenu();
+    dataCard.selectSingle();
+    indexPage.expect.element('@motherVariantCard').to.be.visible;
+    indexPage.expect.element('@fatherVariantCard').to.be.visible;
+  },
+
+  'Changing your mind to Trio should still have the load button enabled': function(client) {
+    dataCard.selectTrio();
+    dataCard.assert.cssClassNotPresent('@loadButton', "disabled");
     client.end();
   }
 };
-
-// bug start with trio, then click data, load button is enabled, click single removes mother father data without load, then click trio, load button is disabled
 

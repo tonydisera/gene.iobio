@@ -8,4 +8,4 @@ module.exports = {
     callVariants: { selector: '#button-find-missing-variants' },
     about: { selector: '#button-show-help' }
   }
-}
+};
