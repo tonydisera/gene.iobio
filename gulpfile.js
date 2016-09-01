@@ -4,6 +4,7 @@ var util = require('gulp-util');
 var jasmineBrowser = require('gulp-jasmine-browser');
 var watch = require('gulp-watch');
 var plumber = require('gulp-plumber');
+var jshint = require('gulp-jshint');
 
 var fork = require('child_process').fork;
 var args = require('yargs').argv;
@@ -16,10 +17,16 @@ gulp.task('start-server', function(done) {
 	done();
 });
 
-gulp.task('nightwatch', ['start-server'], function() {
+gulp.task('jshint', function() {
+	return gulp.src(["./e2e/*_spec.js", "./e2e/page_objects/**/*.js"])
+		.pipe(jshint('.jshintrc'))
+		.pipe(jshint.reporter('jshint-stylish'))
+})
+
+gulp.task('nightwatch', ['start-server', 'jshint'], function() {
 	var cliArgs = JSON.parse(JSON.stringify(args));
 	if (args.e) { cliArgs['env'] = args.e; }
-	return gulp.src('')
+	return gulp.src([])
 		.pipe(nightwatch({
 			configFile: 'nightwatch.json',
 			cliArgs: cliArgs
