@@ -1328,7 +1328,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	       sampleNames,
 	       filterCard.annotationScheme.toLowerCase(),
 	       window.geneSource == 'refseq' ? true : false,
-	       me.GET_HGVS,
+	       window.isLevelMygene2 ? true : me.GET_HGVS,
 	       me.GET_RSID
 	    ).then( function(data) {
 

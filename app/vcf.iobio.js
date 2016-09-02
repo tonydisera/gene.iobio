@@ -1301,11 +1301,15 @@ var effectCategories = [
 
   }
 
+  exports.stripTranscriptPrefix = function(transcriptId) {
+      var nameTokens = transcriptId.split('.');
+      return nameTokens.length > 0 ? nameTokens[0] : transcriptId;
+  }
+
 
   exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields) {
       var me = this;
-      var nameTokens = selectedTranscript.transcript_id.split('.');
-      var selectedTranscriptID = nameTokens.length > 0 ? nameTokens[0] : selectedTranscript;
+      var selectedTranscriptID = me.stripTranscriptPrefix(selectedTranscript.transcript_id);
 
 
       // The variant region may span more than the specified region.
@@ -1932,7 +1936,8 @@ var effectCategories = [
                 var transcripts = transcriptObject[key];
                 var found = false;
                 for (var transcriptId in transcripts) {
-                  if (theTranscriptId.indexOf(transcriptId) == 0) {
+                  var strippedTranscriptId = me.stripTranscriptPrefix(transcriptId);
+                  if (theTranscriptId.indexOf(strippedTranscriptId) == 0) {
                     found = true;
                   }
                 }

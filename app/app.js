@@ -289,7 +289,7 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: 2, bottom: 0, left: 4})
+	    .margin({top:20, right: isLevelMygene2 || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelMygene2 || isLevelEduTour ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(isLevelEduTour || isLevelMygene2 ? 32 : 16)

@@ -110,6 +110,21 @@ function MatrixCard() {
 		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
+	this.matrixRowsMygene2 = [
+		{name:'Pathogenicity - ClinVar',order:0, index:0, match:  'field', attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Consequence',            order:1, index:1, match:  'field', attribute: 'highestImpactVep',            formatFunction: this.formatConsequenceHighestImpact, rankFunction: this.getImpactRank  },
+		{name:'Transcript'             ,order:2, index:2, match:  'field', attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      },
+		{name:'Protein'                ,order:3, index:3, match:  'field', attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
+		{name:'cDNA'                   ,order:4, index:4, match:  'field', attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'Inheritance Mode'       ,order:5, index:5, match:  'field', attribute: 'inheritance',                 },
+		{name:'Chr'                    ,order:6, index:6, match:  'field', attribute: 'chrom',                       },
+		{name:'Position'               ,order:7, index:7, match:  'field', attribute: 'start',                       },
+		{name:'Ref'                    ,order:8, index:8, match:  'field', attribute: 'ref',                         },
+		{name:'Alt'                    ,order:9, index:9, match:  'field', attribute: 'alt',                         },
+		{name:'Mutation Freq 1000G'    ,order:10,index:10,match:  'field', attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Mutation Freq ExAC'     ,order:11,index:11,match:  'field', attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
+	];
+
 
 	this.filteredMatrixRows = null;
 
@@ -225,7 +240,9 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 MatrixCard.prototype.init = function() {
 	var me = this;
 
-	if (isLevelEdu || isLevelMygene2) {
+	if (isLevelMygene2) {
+		this.matrixRows = this.matrixRowsMygene2;
+	} else if (isLevelEdu || isLevelMygene2) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
 		this.removeRow('Zygosity', me.matrixRows);	
@@ -695,8 +712,17 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			} 
 			if (rawValue != null && rawValue != "") {				
 				if (matrixRow.match == 'field') {
-					theValue = rawValue;
+					if (matrixRow.formatFunction) {
+						theValue = matrixRow.formatFunction.call(me, variant, rawValue);
+					} else {
+						theValue = rawValue;
+					}					
 					mappedClazz = matrixRow.attribute;
+					if (matrixRow.rankFunction) {
+						mappedValue = matrixRow.rankFunction.call(me, variant, rawValue);
+					} else {
+						mappedValue = theValue;
+					}
 					symbolFunction = me.showTextSymbol;
 
 				} else if (matrixRow.match == 'exact') {
@@ -1414,3 +1440,136 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 	}
 
 }
+
+MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
+	var buf = "";
+	for (key in clinvarSig) {
+		if (key == "none" || key == "not_provided") {
+
+		} else {
+			if (buf.length > 0) {
+				buf += ",";
+			}
+			buf += key.split("_").join(' ');
+		}
+	}
+	return buf;
+}
+MatrixCard.prototype.getClinvarRank = function(variant, clinvarSig) {
+	var me = this;
+	var lowestRank = 99;
+	for (key in clinvarSig) {
+		var rank = me.clinvarMap[key].value;
+		if (rank < lowestRank) {
+			lowestRank = rank;
+		}
+	}	
+	return lowestRank;
+}
+MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
+	var me = this;
+	var lowestRank = 99;
+	for (key in highestImpactVep) {
+		var rank = me.impactMap[key].value;
+		if (rank < lowestRank) {
+			lowestRank = rank;
+		}
+	}	
+	return lowestRank;
+}
+MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) {
+	return value && value != "" && +value >= 0 ? this.percentage(+value,2) : "";
+}
+
+MatrixCard.prototype.formatTranscriptHighestImpact = function(variant, highestImpactVep) {
+	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
+		return "";
+	} else {
+		var transcripts = [];
+		for( impactKey in highestImpactVep) {
+			var consequenceObject = highestImpactVep[impactKey];
+			for (consequenceKey in consequenceObject) {
+				var transcriptObject = consequenceObject[consequenceKey];
+				if (transcriptObject == null || transcriptObject == '' || Object.keys(transcriptObject).length == 0) {
+					// Use canonical transcript
+					transcripts.push(selectedTranscript.transcript_id);
+				} else {
+					// Show all non-canonical transcripts that this highest impact applies to
+					for (transcript in transcriptObject) {
+						transcripts.push(transcript);
+					}
+				}
+			}
+		}
+		return transcripts.join(",");
+	}
+
+}
+MatrixCard.prototype.formatConsequenceHighestImpact = function(variant, highestImpactVep) {
+	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
+		return "";
+	} else {
+		var consequences = [];
+		for( impactKey in highestImpactVep) {
+			var consequenceObject = highestImpactVep[impactKey];
+			for (consequenceKey in consequenceObject) {
+				consequences.push(consequenceKey.split('_variant').join(' ').split('_').join(' '));
+			}
+		}
+		return consequences.join(",");
+	}
+
+}
+
+MatrixCard.prototype.formatHgvsP = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":p.");
+			if (buf.length > 0) {
+				buf += ",";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = tokens[1];
+				var simpleNotation = basicNotation.replace(/[0-9]/g, '');
+				var aminoAcids = simpleNotation.split(/([A-Z][^A-Z]*)/g).filter(function(part) {return part.length != 0});;
+				if (aminoAcids.length == 2) {
+					buf += aminoAcids.join('>');
+				} else {
+					buf += simpleNotation;
+				}
+			} 		
+		}
+		return buf;
+	}
+}
+MatrixCard.prototype.formatHgvsC = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":c.");
+			if (buf.length > 0) {
+				buf += ",";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = tokens[1];
+				var simpleNotation = basicNotation.replace(/[0-9]/g, '');
+				buf += simpleNotation;
+			} 		
+		}
+		return buf;
+	}
+
+}
+
+
+MatrixCard.prototype.percentage = function(a, places) {
+	var pct = a * 100;
+	return round(pct, places) + "%";
+}
+
+

@@ -12,6 +12,8 @@ function featureMatrixD3() {
 
   var container = null;
 
+  var CELL_WIDTH_MYGENE2 = 100;
+
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
   }
@@ -52,8 +54,8 @@ function featureMatrixD3() {
         innerHeight -= columnLabelHeight;
       } 
 
-      width = data.length * cellSize;   
-      width += margin.left + margin.right + rowLabelWidth;
+      width = data.length * (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize);   
+      width += margin.left + margin.right + rowLabelWidth + (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize);
       var innerWidth = width - margin.left - margin.right - rowLabelWidth;
 
       container = d3.select(this);
@@ -112,7 +114,7 @@ function featureMatrixD3() {
         if (options.simpleColumnLabels) {
           translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
         } else {
-          translateColHdrGroup = "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")";
+          translateColHdrGroup = "translate(" + (+rowLabelWidth+((isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize)/2)) + "," + (columnLabelHeight) + ")";
         }
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
@@ -124,7 +126,7 @@ function featureMatrixD3() {
         colhdrs.enter().append('g')
             .attr('class', 'colhdr')
             .attr('transform', function(d,i) { 
-              return "translate(" + (cellSize * (i+1)) + ",0)";
+              return "translate(" + ((isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) * (i+1)) + ",0)";
             })
             .append("text")
             .style("text-anchor", options.simpleColumnLabels ? "middle" : "start")
@@ -288,7 +290,7 @@ function featureMatrixD3() {
             return "col  " + d.featureClass;
           })
           .attr('transform', function(d,i) { 
-            return "translate(" + (cellSize * (i+1)) + ",0)";
+            return "translate(" + ((isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) * (i+1)) + ",0)";
           });
       
 
@@ -314,7 +316,7 @@ function featureMatrixD3() {
             return cellSize - 1; 
           })
           .attr('y', 0)
-          .attr('width', cellSize - 1);
+          .attr('width', (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) - 1);
          
 
 
@@ -348,7 +350,7 @@ function featureMatrixD3() {
             return (cellSize * matrixRowNames.length) - 1;
           })
           .attr('y', y(matrixRowNames[0]) + y.rangeBand())
-          .attr('width', cellSize - 1);
+          .attr('width', (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) - 1);
      
       g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  

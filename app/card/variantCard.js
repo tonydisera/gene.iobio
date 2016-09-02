@@ -192,7 +192,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: 0, left: 4})
+				    .margin({top: 0, right: isLevelMygene2 || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelMygene2 || isLevelEduTour ? 9 : 4})
 				    .showXAxis(false)
 				    .showBrush(false)
 				    .trackHeight(isLevelEduTour || isLevelMygene2 ? 32 : 16)
@@ -220,7 +220,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
-							.margin( {top: 10, right: 2, bottom: 20, left: 4} )
+							.margin( {top: 10, right: isLevelMygene2 || isLevelEduTour ? 7 : 2, bottom: 20, left: isLevelMygene2 || isLevelEduTour ? 9 : 4} )
 							.showXAxis(true)
 							.showYAxis(false)
 							.showTooltip(true)
@@ -234,7 +234,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: isLevelEdu  || isLevelMygene2 ? 12 : 17, left: 4})
+				    .margin({top: 0, right: isLevelMygene2 || isLevelEduTour ? 7 : 2, bottom: isLevelEdu  || isLevelMygene2 ? 12 : 17, left: isLevelMygene2 || isLevelEduTour ? 9 : 4})
 				    .showXAxis(isLevelEdu  || isLevelMygene2 ? false : true)
 				    .variantHeight(isLevelEdu  || isLevelMygene2 ? EDU_TOUR_VARIANT_SIZE : 6)
 				    .verticalPadding(2)
@@ -273,7 +273,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// variant set from vcf
 		this.fbChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: 10, left: 4}) // bottom margin for missing variant x when no vcf variants loaded
+				    .margin({top: 0, right: isLevelMygene2 || isLevelEduTour ? 7 : 2, bottom: 10, left: isLevelMygene2 || isLevelEduTour ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
 				    .variantHeight(6)
 				    .verticalPadding(2)
