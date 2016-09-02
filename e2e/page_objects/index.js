@@ -41,7 +41,7 @@ module.exports = {
     transcriptCard: {
       selector: '#transcript-card',
       elements: {
-
+        geneName: { selector: '#gene-name' }
       }
     },
 

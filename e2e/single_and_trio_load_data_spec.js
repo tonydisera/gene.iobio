@@ -1,8 +1,9 @@
-var indexPage, appTitleSection, dataCard, matrixTrack;
+var indexPage, appTitleSection, dataCard, matrixTrack, transcriptCard;
 
 module.exports = {
+  tags: [],
   beforeEach: function(client) {
-    client.maximizeWindow();
+    client.resizeWindow(1280, 800);
   },
 
   before: function(client) {
@@ -10,6 +11,7 @@ module.exports = {
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
+    transcriptCard = indexPage.section.transcriptCard;
   },
 
   'Loading Platinum Single shows the correct cards (only proband)': function(client) {
@@ -21,7 +23,7 @@ module.exports = {
 
     appTitleSection.selectGene('BRCA2');
 
-    appTitleSection.expect.element('@geneBadgeName').text.to.equal('BRCA2');
+    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.not.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.not.be.visible;
@@ -35,7 +37,7 @@ module.exports = {
     dataCard.section.fatherData.selectPlatinumTrio();
     dataCard.clickLoad();
 
-    appTitleSection.expect.element('@geneBadgeName').text.to.equal('BRCA2');
+    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.be.visible;
