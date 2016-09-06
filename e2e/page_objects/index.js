@@ -2,6 +2,7 @@ var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var sliderIconBar = require('./sections/sliderIconBar.js');
 var sliderLeft = require('./sections/sliderLeft.js');
+var matrixTrack = require('./sections/matrixTrack.js')
 
 module.exports = {
   url: function() {
@@ -30,13 +31,7 @@ module.exports = {
     dataCard: dataCard,
     sliderIconBar: sliderIconBar,
     sliderLeft: sliderLeft,
-
-    matrixTrack: {
-      selector: '#matrix-track',
-      elements: {
-        featureMatrix: { selector: '#feature-matrix' }
-      }
-    },
+    matrixTrack: matrixTrack,
 
     transcriptCard: {
       selector: '#transcript-card',
