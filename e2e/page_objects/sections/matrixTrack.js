@@ -1,14 +1,14 @@
 var CLINVAR = {
   LABEL: 'Pathogenicity - ClinVar',
-  SYMBOL: '> g',
-  BENIGN: '> g',
-  PATHOGENIC: '> g'
+  SYMBOL: "/*[local-name()='g']",
+  BENIGN: "/*[local-name()='g']",
+  PATHOGENIC: "/*[local-name()='g']"
 };
 
 var SIFT = {
   LABEL: 'Pathogenecity - SIFT',
-  SYMBOL: '> g',
-  TOLERATED: '> g'
+  SYMBOL: "/*[local-name()='g']",
+  TOLERATED: "/*[local-name()='g']"
 };
 
 var POLYPHEN = {
@@ -89,37 +89,43 @@ module.exports = {
     assertSymbolsPresent: function(label, variants, symbolSelector) {
       var self = this;
       this.assertSymbols(label, variants, symbolSelector, function(pathToSymbol) {
+        self.api.useXpath();
         self.expect.element(pathToSymbol).to.be.present;
+        self.api.useCss();
       });
     },
     assertSymbolsNotPresent: function(label, variants, symbolSelector) {
       var self = this;
       this.assertSymbols(label, variants, symbolSelector, function(pathToSymbol) {
+        self.api.useXpath();
         self.expect.element(pathToSymbol).to.not.be.present;
+        self.api.useCss();
       });
     },
     assertSymbols: function(label, variants, symbolSelector, expectation) {
       var self = this;
       this.api.elements('xpath', precedingSiblingsToLabel(label), function(precedingLabelElements) {
         var labelIndex = precedingLabelElements.value.length + 1;
-        // var symbolSelector = '> g';
-        var row = '> .cell:nth-child(' + labelIndex + ') ';
+        var row = "/*[local-name()='g'][" + labelIndex + "]";
 
         variants.forEach(function(variant) {
           self.api.elements('xpath', precedingSiblingsToVariant(variant), function(precedingVariantElements) {
             var variantIndex = precedingVariantElements.value.length + 1;
-            var column =  '> .col:nth-child(' + variantIndex + ') ';
-            var pathTosymbol = '#feature-matrix > svg > .group ' + column + row + symbolSelector;
-            expectation(pathTosymbol);
+            var column = "/*[local-name()='g'][" + variantIndex + "]";
+            var pathToSymbol = "//div[@id='feature-matrix']/*[local-name()='svg']/*[@class='group']" + column + row + symbolSelector;
+            expectation(pathToSymbol);
           });
         });
       });
     },
     waitForMatrixLoaded: function() {
-      this.waitForElementVisible('@featureMatrix', 30000);
+      this.waitForElementVisible('@featureMatrix', 45000);
     }
   }],
   elements: {
     featureMatrix: { selector: '#feature-matrix' }
   }
 };
+
+
+
