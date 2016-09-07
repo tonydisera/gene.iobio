@@ -1,22 +1,34 @@
 var CLINVAR = {
   LABEL: 'Pathogenicity - ClinVar',
-  SYMBOL: "/*[local-name()='g']",
-  BENIGN: "/*[local-name()='g']",
-  PATHOGENIC: "/*[local-name()='g']"
+  SYMBOL: "/*[local-name()='g']", // used to assert that a symbol is not present in the DOM
+  BENIGN: "/*[local-name()='text' and text()='benign']",
+  PATHOGENIC: "/*[local-name()='text' and text()='pathogenic']"
 };
 
 var SIFT = {
   LABEL: 'Pathogenecity - SIFT',
   SYMBOL: "/*[local-name()='g']",
-  TOLERATED: "/*[local-name()='g']"
+  TOLERATED: "/*[local-name()='text' and text()='tolerated']"
 };
 
 var POLYPHEN = {
-  LABEL: 'Pathogenicity - PolyPhen'
+  LABEL: 'Pathogenicity - PolyPhen',
+  SYMBOL: "/*[local-name()='g']",
+  BENIGN: "/*[local-name()='text' and text()='benign']",
+  POSSIBLY_DAMAGING: "/*[local-name()='text' and text()='possibly_damaging']"
 };
 
-var VEP = {
-  LABEL: 'Impact - VEP'
+var IMPACT = {
+  LABEL: 'Impact - VEP',
+  SYMBOL: "/*[local-name()='g']",
+  HIGH: "/*[local-name()='text' and text()='HIGH']",
+  MODERATE: "/*[local-name()='text' and text()='MODERATE']",
+  MODIFIER: "/*[local-name()='text' and text()='MODIFIER']",
+  LOW: "/*[local-name()='text' and text()='LOW']",
+  COMPLEX_DIAMOND: "/*[local-name()='g']/*[contains(concat(' ', normalize-space(@class), ' '), ' complex ')]",
+  INS_CIRCLE: "/*[local-name()='g']/*[contains(concat(' ', normalize-space(@class), ' '), ' ins ')]",
+  DEL_TRIANGLE: "/*[local-name()='g']/*[contains(concat(' ', normalize-space(@class), ' '), ' del ')]",
+  SNP_RECT: "/*[local-name()='g']/*[contains(concat(' ', normalize-space(@class), ' '), ' snp ')]"
 };
 
 var BOOKMARK = {
@@ -84,6 +96,37 @@ module.exports = {
       this.assertSymbolsNotPresent(SIFT.LABEL, variants, SIFT.SYMBOL);
     },
 
+    // PolyPhen
+    assertPolyPhenBenign: function(variants) {
+      this.assertSymbolsPresent(POLYPHEN.LABEL, variants, POLYPHEN.BENIGN);
+    },
+    assertPolyPhenPossiblyDamaging: function(variants) {
+      this.assertSymbolsPresent(POLYPHEN.LABEL, variants, POLYPHEN.POSSIBLY_DAMAGING);
+    },
+    assertPolyPhenNull: function(variants) {
+      this.assertSymbolsNotPresent(POLYPHEN.LABEL, variants, POLYPHEN.SYMBOL);
+    },
+
+    // Impact - VEP
+    assertImpactHigh: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.HIGH);
+    },
+
+    assertImpactModerate: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.MODERATE);
+    },
+
+    assertImpactModifier: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.MODIFIER);
+    },
+
+    assertImpactLow: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.LOW);
+    },
+
+    assertImpactNull: function(variants) {
+      this.assertSymbolsNotPresent(IMPACT.LABEL, variants, IMPACT.SYMBOL);
+    },
 
 
     assertSymbolsPresent: function(label, variants, symbolSelector) {

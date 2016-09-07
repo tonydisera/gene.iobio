@@ -30,37 +30,19 @@ module.exports = {
   'SIFT Pathogenicity row should be accurate': function(client) {
     matrixTrack.assertSIFTTolerated(['snp 41244435', 'snp 41223094', 'snp 41244000', 'snp 41244936']);
     matrixTrack.assertSIFTNull(['complex 41204842']);
+  },
+
+  'PolyPhen Pathogenicity row should be accurate': function(client) {
+    matrixTrack.assertPolyPhenPossiblyDamaging(['snp 41244435']);
+    matrixTrack.assertPolyPhenBenign(['snp 41223094', 'snp 41244000', 'snp 41244936']);
+    matrixTrack.assertPolyPhenNull(['complex 41204842']);
+  },
+
+  'Impact VEP row should be accurate': function(client) {
+    matrixTrack.assertImpactModerate(['snp 41244435', 'snp 41223094', 'snp 41244000', 'snp 41244936']);
+    matrixTrack.assertImpactModifier(['complex 41204842', 'ins 41275081']);
+    matrixTrack.assertImpactLow(['snp 41245466', 'snp 41245237', 'snp 41234470']);
     client.end();
   }
 }
-
-
-// <div id="feature-matrix">
-//   <svg>
-//     <g class="colhdr">
-//       <g><text>snp 41244435</text></g>
-//       <g><text>snp 41244436</text></g>
-//       <g><text>snp 41244437</text></g>
-//     </g>
-//     <g class="group">
-//       <g class="col">
-//         <g class="cell"><rect></rect><text>benign</text><g><use href="#clinvar-symbol"></use></g></g>
-//         <g class="cell"><rect></rect><text>benign</text><g><use href="#danger-symbol"></use></g></g>
-//       </g>
-//       <g class="col">
-//         <g class="cell"><rect></rect><text>benign</text><g><use href="#clinvar-symbol"></use></g></g>
-//         <g class="cell"><rect></rect><text>benign</text><g><use href="#danger-symbol"></use></g></g>
-//       </g>
-//       <g class="col">
-//         <g class="cell"><rect></rect><text></text></g>
-//         <g class="cell"><rect></rect><text></text></g>
-//       </g>
-//     </g>
-//     <g class="y axis">
-//       <g class="tick"><line></line><text>Pathogenicity - ClinVar</text></g>
-//       <g class="tick"><line></line><text>Pathogenicity - SIFT</text></g>
-//       <g class="tick"><line></line><text>Pathogenicity - PolyPhen</text></g>
-//     </g>
-//   </svg>
-// </div>
 
