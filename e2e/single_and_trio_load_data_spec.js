@@ -27,7 +27,7 @@ module.exports = {
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.not.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.not.be.visible;
-    matrixTrack.waitForElementVisible('@featureMatrix');
+    matrixTrack.waitForMatrixLoaded();
   },
 
   'Loading Platinum Trio shows the correct cards (proband, mother, and father)': function(client) {
@@ -44,7 +44,7 @@ module.exports = {
   },
 
   'Clicking Single after Loading Trio Data should not immediately hide mother and father variant cards': function(client) {
-    matrixTrack.waitForElementVisible('@featureMatrix');
+    matrixTrack.waitForMatrixLoaded();
     appTitleSection.openDataMenu();
     dataCard.selectSingle();
     indexPage.expect.element('@motherVariantCard').to.be.visible;

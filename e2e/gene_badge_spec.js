@@ -21,10 +21,10 @@ module.exports = {
     dataCard.clickLoad();
 
     appTitleSection.selectGene('BRCA2');
-    matrixTrack.waitForElementVisible('@featureMatrix');
+    matrixTrack.waitForMatrixLoaded();
     appTitleSection.selectGene('BRAF');
     client.pause(1000);
-    matrixTrack.waitForElementVisible('@featureMatrix');
+    matrixTrack.waitForMatrixLoaded();
     appTitleSection.removeGene('BRAF');
     appTitleSection.section.selectedGeneBadge.expect.element('@name').text.to.equal('BRAF');
     client.end();

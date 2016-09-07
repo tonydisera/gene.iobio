@@ -13,7 +13,7 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;
   },
 
-  'Should not be able to x out a gene badge for the gene you are currently viewing': function(client) {
+  'ClinVar Pathogenicity row should be accurate': function(client) {
     indexPage.load();
     appTitleSection.openDataMenu();
     dataCard.selectSingle();
@@ -21,10 +21,15 @@ module.exports = {
     dataCard.clickLoad();
 
     appTitleSection.selectGene('BRCA1');
-    matrixTrack.waitForElementVisible('@featureMatrix');
+    matrixTrack.waitForMatrixLoaded();
 
-    matrixTrack.assertSymbolsPresent('Pathogenicity - ClinVar', ['snp 41244435', 'snp 41223094', 'snp 41244000', 'snp 41244936', 'snp 41234470']);
-    matrixTrack.assertSymbolsNotPresent('Pathogenicity - ClinVar', ['complex 41204842', 'ins 41275081']);
+    matrixTrack.assertClinVarBenign(['snp 41244435', 'snp 41223094', 'snp 41244000', 'snp 41244936', 'snp 41234470']);
+    matrixTrack.assertClinVarNull(['complex 41204842', 'ins 41275081']);
+  },
+
+  'SIFT Pathogenicity row should be accurate': function(client) {
+    matrixTrack.assertSIFTTolerated(['snp 41244435', 'snp 41223094', 'snp 41244000', 'snp 41244936']);
+    matrixTrack.assertSIFTNull(['complex 41204842']);
     client.end();
   }
 }
