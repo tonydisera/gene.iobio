@@ -2613,7 +2613,10 @@ function formatCurrentDateTime(delim) {
 	return today;
 }
 
-
+function stripTranscriptPrefix(transcriptId) {
+	var nameTokens = transcriptId.split('.');
+	return nameTokens.length > 0 ? nameTokens[0] : transcriptId;
+}
 
 function showFeedback() {
 	
