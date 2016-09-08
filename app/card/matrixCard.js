@@ -111,18 +111,18 @@ function MatrixCard() {
 	];
 
 	this.matrixRowsMygene2 = [
-		{name:'Pathogenicity - ClinVar',order:0, index:0, match:  'field', attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
-		{name:'Consequence',            order:1, index:1, match:  'field', attribute: 'highestImpactVep',            formatFunction: this.formatConsequenceHighestImpact, rankFunction: this.getImpactRank  },
-		{name:'Transcript'             ,order:2, index:2, match:  'field', attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      },
-		{name:'Protein'                ,order:3, index:3, match:  'field', attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
-		{name:'cDNA'                   ,order:4, index:4, match:  'field', attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
-		{name:'Inheritance Mode'       ,order:5, index:5, match:  'field', attribute: 'inheritance',                 },
-		{name:'Chr'                    ,order:6, index:6, match:  'field', attribute: 'chrom',                       },
-		{name:'Position'               ,order:7, index:7, match:  'field', attribute: 'start',                       },
-		{name:'Ref'                    ,order:8, index:8, match:  'field', attribute: 'ref',                         },
-		{name:'Alt'                    ,order:9, index:9, match:  'field', attribute: 'alt',                         },
-		{name:'Mutation Freq 1000G'    ,order:10,index:10,match:  'field', attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Mutation Freq ExAC'     ,order:11,index:11,match:  'field', attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
+		{name:'Pathogenicity - ClinVar',order:0, index:0, match:  'field', height: 20, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Severity',               order:1, index:1, match:  'field', height: 20, attribute: 'highestImpactVep',            formatFunction: this.formatHighestImpact,            rankFunction: this.getImpactRank  },
+		{name:'Transcript'             ,order:2, index:2, match:  'field', height: 50, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      },
+		{name:'Protein'                ,order:3, index:3, match:  'field', height: 20, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
+		{name:'cDNA'                   ,order:4, index:4, match:  'field', height: 20, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'Inheritance Mode'       ,order:5, index:5, match:  'field', height: 20, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
+		{name:'Chr'                    ,order:6, index:6, match:  'field', height: 20, attribute: 'chrom',                       },
+		{name:'Position'               ,order:7, index:7, match:  'field', height: 20, attribute: 'start',                       },
+		{name:'Ref'                    ,order:8, index:8, match:  'field', height: 20, attribute: 'ref',                         },
+		{name:'Alt'                    ,order:9, index:9, match:  'field', height: 20, attribute: 'alt',                         },
+		{name:'Mutation Freq 1000G'    ,order:10,index:10,match:  'field', height: 20, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Mutation Freq ExAC'     ,order:11,index:11,match:  'field', height: 20, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
 	];
 
 
@@ -276,6 +276,7 @@ MatrixCard.prototype.init = function() {
 				    .columnLabelHeight(isLevelEdu  || isLevelMygene2 ? 30 : 67)
 				    .rowLabelWidth(isLevelEdu  || isLevelMygene2 ? 100 : 140)
 				    .columnLabel( me.getVariantLabel )
+				    .cellHeights(isLevelMygene2 ? me.matrixRowsMygene2.map(function(d){return d.height}) : null)
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
 				    		me.unpin();
@@ -1230,13 +1231,16 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
+	var me = this;
 	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)"
-	selection.append("g")
-	         .attr("transform", translate)
-	         .append("text")
-	         .attr("x", 0)
-	         .attr("y", 11)
-	         .text(selection.datum().value);
+	var text =  selection.append("g")
+				         .attr("transform", translate)
+				         .append("text")
+				         .attr("x", 0)
+				         .attr("y", 11)
+				         .attr("dy", "0em")
+				         .text(selection.datum().value);
+	MatrixCard.wrap(text, options.cellSize);
 	
 };
 
@@ -1457,7 +1461,7 @@ MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
 }
 MatrixCard.prototype.getClinvarRank = function(variant, clinvarSig) {
 	var me = this;
-	var lowestRank = 99;
+	var lowestRank = 9999;
 	for (key in clinvarSig) {
 		var rank = me.clinvarMap[key].value;
 		if (rank < lowestRank) {
@@ -1492,16 +1496,16 @@ MatrixCard.prototype.formatTranscriptHighestImpact = function(variant, highestIm
 				var transcriptObject = consequenceObject[consequenceKey];
 				if (transcriptObject == null || transcriptObject == '' || Object.keys(transcriptObject).length == 0) {
 					// Use canonical transcript
-					transcripts.push(selectedTranscript.transcript_id);
+					transcripts.push(stripTranscriptPrefix(selectedTranscript.transcript_id));
 				} else {
 					// Show all non-canonical transcripts that this highest impact applies to
 					for (transcript in transcriptObject) {
-						transcripts.push(transcript);
+						transcripts.push(stripTranscriptPrefix(transcript));
 					}
 				}
 			}
 		}
-		return transcripts.join(",");
+		return transcripts.join(" ");
 	}
 
 }
@@ -1517,6 +1521,14 @@ MatrixCard.prototype.formatConsequenceHighestImpact = function(variant, highestI
 			}
 		}
 		return consequences.join(",");
+	}
+
+}
+MatrixCard.prototype.formatHighestImpact = function(variant, highestImpactVep) {
+	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
+		return "";
+	} else {
+		return Object.keys(highestImpactVep).join(" ");
 	}
 
 }
@@ -1566,10 +1578,43 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 
 }
 
+MatrixCard.prototype.formatInheritance = function(variant, value) {
+	return (value == null || value == 'none') ? '' : value;
+}
+
 
 MatrixCard.prototype.percentage = function(a, places) {
 	var pct = a * 100;
 	return round(pct, places) + "%";
+}
+
+MatrixCard.wrap = function(text, width) {
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text()
+                    .split(/\s+/)
+                    .filter( function(d,i) {
+                    	return d != null && d != '';
+        			})
+                    .reverse();
+    var word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
 }
 
 

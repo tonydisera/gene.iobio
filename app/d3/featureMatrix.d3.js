@@ -13,6 +13,7 @@ function featureMatrixD3() {
   var container = null;
 
   var CELL_WIDTH_MYGENE2 = 100;
+  var CELL_HEIGHT_MYGENE2 = 40;
 
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
@@ -31,7 +32,8 @@ function featureMatrixD3() {
       matrixRowNames = null;
       cellSize = 10,
       rowLabelWidth = 100,
-      columnLabelHeight = 100;
+      columnLabelHeight = 100
+      cellHeights = null;
       
   //  options
   var defaults = {};
@@ -44,7 +46,17 @@ function featureMatrixD3() {
 
     selection.each(function(data) {
       // Calculate height of matrix
-      height = matrixRowNames.length * cellSize;   
+
+      var firstCellHeight = null;
+      var matrixHeight = null;
+      if (cellHeights && cellHeights.length > 0) {
+        matrixHeight = cellHeights.reduce(function(pv, cv) { return pv + cv; }, 0);
+        firstCellHeight = cellHeights[0];
+      } else {
+        matrixHeight  = matrixRowNames.length * (isLevelMygene2 ? CELL_HEIGHT_MYGENE2 : cellSize);   
+        firstCellHeight = (isLevelMygene2 ? CELL_HEIGHT_MYGENE2 : cellSize);
+      }
+      height = matrixHeight;
       height += margin.top + margin.bottom;
       if (options.showColumnLabels) {
         height += columnLabelHeight;
@@ -82,6 +94,9 @@ function featureMatrixD3() {
                         .orient("left")
                         .outerTickSize(0)   
                         .ticks(matrixRowNames.length);
+
+
+
                        
                         
       
@@ -146,7 +161,7 @@ function featureMatrixD3() {
 
       var translate = "translate(" + rowLabelWidth + ",";
       if (options.showColumnLabels) {
-        translate += (+columnLabelHeight - cellSize) + ")";
+        translate += (+columnLabelHeight - firstCellHeight) + ")";
       } else {
         translate += "-30)"
       }
@@ -163,8 +178,7 @@ function featureMatrixD3() {
       svg.selectAll("g.y").data([matrixRowNames]).enter()
           .append("g")
           .attr("class", "y axis")
-          //.attr("transform", "translate(1," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
-          .attr("transform", "translate(20," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
+          .attr("transform", "translate(20," + (options.showColumnLabels ? columnLabelHeight + (cellHeights != null && cellHeights.length > 0 ? 4 : 0) : "0") + ")")
           .call(yAxis)
           .selectAll("text")
           .style("text-anchor", "start")
@@ -276,6 +290,19 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick line").classed("hide", true);
       svg.selectAll("g.y.axis path").classed("hide", true);
 
+      // Adjust the y-axis transform attribute so that translate(x,y) changes y
+      // to cell heights
+      if (cellHeights != null && cellHeights.length > 0) {
+        svg.selectAll("g.y.axis g.tick").each( function(d,i) {
+            var y = 0;
+            for (var idx = 0; idx < i; idx++) {
+              y += cellHeights[idx] ;
+            }  
+            y += 4;
+            d3.select(this).attr('transform', 'translate(0,' + y + ')');
+        })
+      }
+
       // add tooltip div
       var tooltip = container.selectAll(".tooltip").data([0])
         .enter().append('div')
@@ -300,7 +327,20 @@ function featureMatrixD3() {
       }).enter().append('g')
           .attr('class', "cell") 
           .attr('transform', function(d,i) {
-            return 'translate(0,' +  +(y(matrixRowNames[i]) + +y.rangeBand()) + ')';
+            var y = 0;
+            if (cellHeights && cellHeights.length > 0) {
+              var pos = (i+1) % matrixRows.length;
+              if (pos == 0) {
+                pos = matrixRows.length;
+              } 
+              for (var idx = 0; idx < pos-1; idx++) {
+                y += cellHeights[idx] ;
+              }  
+              y = y + firstCellHeight;            
+            } else {
+              y = y(matrixRowNames[i]) + y.rangeBand();
+            }
+            return 'translate(0,' +  y + ')';
         });
 
 
@@ -313,7 +353,17 @@ function featureMatrixD3() {
             return 0;
           })
           .attr('height', function(d, i) { 
-            return cellSize - 1; 
+            if (cellHeights && cellHeights.length > 0) {
+              var pos = (i+1) % matrixRows.length;
+              if (pos == 0) {
+                pos = matrixRows.length -1;
+              } else {
+                pos = pos - 1;
+              }
+              return cellHeights[pos] - 1;
+            } else {
+              return (isLevelMygene2 ? CELL_HEIGHT_MYGENE2 : cellSize) - 1; 
+            }
           })
           .attr('y', 0)
           .attr('width', (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) - 1);
@@ -337,7 +387,7 @@ function featureMatrixD3() {
       cells.each( function(d,i) {
          var symbolFunction = d.symbolFunction;
          if (symbolFunction) {
-           d3.select(this).call(symbolFunction, {'cellSize': cellSize});
+           d3.select(this).call(symbolFunction, {'cellSize': (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize)});
          }
       });
 
@@ -347,9 +397,16 @@ function featureMatrixD3() {
             return 0;
           })
           .attr('height', function(d, i) { 
-            return (cellSize * matrixRowNames.length) - 1;
+            return matrixHeight - 1;
           })
-          .attr('y', y(matrixRowNames[0]) + y.rangeBand())
+          .attr('y', function(d,i) {
+            if (cellHeights && cellHeights.length > 0) {
+              return firstCellHeight;
+            } else {
+              return y(matrixRowNames[0]) + y.rangeBand();
+            }
+
+          }) 
           .attr('width', (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) - 1);
      
       g.selectAll('rect.cellbox')
@@ -438,6 +495,16 @@ function featureMatrixD3() {
       return chart;
     }
   }
+
+  chart.cellHeights = function(_) {
+    if (!arguments.length) {
+      return cellHeights;
+    } else {
+      cellHeights = _;
+      return chart;
+    }
+  }
+
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;
