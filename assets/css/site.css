@@ -2767,6 +2767,9 @@ text.ref-count {
 .level-mygene2 {
   display: none !important; }
 
+.filter-flag {
+  display: none !important; }
+
 #feedback-link {
   display: none !important; }
 
@@ -2992,12 +2995,15 @@ text.ref-count {
   display: inline-block !important; }
 #matrix-track #low-quality-legend {
   display: none !important; }
+#matrix-track #feature-matrix text {
+  font-size: 10px; }
 #matrix-track #feature-matrix .y.axis text {
-  font-size: 12px !important; }
+  font-size: 11px !important; }
 #matrix-track #feature-matrix .colhdr text {
   font-size: 11px !important; }
 #matrix-track #feature-matrix rect.cellbox {
-  stroke: white !important; }
+  stroke: #e6e6e6 !important;
+  stroke-width: 0.5px !important; }
 #matrix-track #feature-matrix rect.colbox {
   stroke: #E0DDDD;
   opacity: 1 !important;
