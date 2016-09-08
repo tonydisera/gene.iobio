@@ -312,8 +312,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 	var me = this;
 	var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
 	if (localStorage) {
-		console.log('CLEARING CACHE ' + theLaunchTimeStamp);
-		CacheHelper._logCacheSize();
+		//CacheHelper._logCacheSize();
 		var keysToRemove = [];
 		for (var i=0; i<=localStorage.length-1; i++)  {  
 			var key = localStorage.key(i); 	
@@ -325,8 +324,8 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 		keysToRemove.forEach( function(key) {
 			localStorage.removeItem(key);			
 		})
-		CacheHelper._logCacheSize();
-		CacheHelper._logCacheContents();
+		//CacheHelper._logCacheSize();
+		//CacheHelper._logCacheContents();
 	}
 }
 
