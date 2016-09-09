@@ -260,7 +260,7 @@
     display: block !important
 
   #feature-matrix-note
-    padding-left: 112px !important
+    padding-left: 152px !important
 
   #matrix-harmful-note.level-mygene2
     display: inline-block !important
@@ -271,15 +271,15 @@
   #feature-matrix 
 
     text
-      font-size: 10px 
+      font-size: 11px 
 
     .y.axis
       text
-        font-size: 11px !important
+        font-size: 13px !important
     
     .colhdr 
       text 
-        font-size: 11px !important
+        font-size: 13px !important
 
     rect.cellbox 
       stroke: #e6e6e6 !important
@@ -298,6 +298,16 @@
       &.low-quality
         rect.cellbox
           fill: transparent !important
+
+      &.active
+        rect.colbox
+          stroke: $current-color !important
+          stroke-width: 1.5px !important
+      
+      rect.colbox
+        &.current
+          stroke: $current-color !important
+          stroke-width: 2.5px !important
 
   
 .tooltip.level-mygene2 

@@ -2990,17 +2990,17 @@ text.ref-count {
 #matrix-track #rank-variants-title {
   display: block !important; }
 #matrix-track #feature-matrix-note {
-  padding-left: 112px !important; }
+  padding-left: 152px !important; }
 #matrix-track #matrix-harmful-note.level-mygene2 {
   display: inline-block !important; }
 #matrix-track #low-quality-legend {
   display: none !important; }
 #matrix-track #feature-matrix text {
-  font-size: 10px; }
+  font-size: 11px; }
 #matrix-track #feature-matrix .y.axis text {
-  font-size: 11px !important; }
+  font-size: 13px !important; }
 #matrix-track #feature-matrix .colhdr text {
-  font-size: 11px !important; }
+  font-size: 13px !important; }
 #matrix-track #feature-matrix rect.cellbox {
   stroke: #e6e6e6 !important;
   stroke-width: 0.5px !important; }
@@ -3012,6 +3012,12 @@ text.ref-count {
   fill: transparent !important; }
 #matrix-track #feature-matrix .col.low-quality rect.cellbox {
   fill: transparent !important; }
+#matrix-track #feature-matrix .col.active rect.colbox {
+  stroke: #3586c0 !important;
+  stroke-width: 1.5px !important; }
+#matrix-track #feature-matrix .col rect.colbox.current {
+  stroke: #3586c0 !important;
+  stroke-width: 2.5px !important; }
 
 .tooltip.level-mygene2 {
   display: block !important; }
