@@ -98,7 +98,7 @@ function MatrixCard() {
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogenicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenicity - PolyPhen'     ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
 		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
 		{name:'Bookmark'                     ,order:4, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
@@ -111,18 +111,18 @@ function MatrixCard() {
 	];
 
 	this.matrixRowsMygene2 = [
-		{name:'Pathogenicity - ClinVar',order:0, index:0, match:  'field', height: 20, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
-		{name:'Severity',               order:1, index:1, match:  'field', height: 20, attribute: 'highestImpactVep',            formatFunction: this.formatHighestImpact,            rankFunction: this.getImpactRank  },
-		{name:'Transcript'             ,order:2, index:2, match:  'field', height: 50, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      },
-		{name:'Protein'                ,order:3, index:3, match:  'field', height: 20, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
-		{name:'cDNA'                   ,order:4, index:4, match:  'field', height: 20, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
-		{name:'Inheritance Mode'       ,order:5, index:5, match:  'field', height: 20, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
-		{name:'Chr'                    ,order:6, index:6, match:  'field', height: 20, attribute: 'chrom',                       },
-		{name:'Position'               ,order:7, index:7, match:  'field', height: 20, attribute: 'start',                       },
-		{name:'Ref'                    ,order:8, index:8, match:  'field', height: 20, attribute: 'ref',                         },
-		{name:'Alt'                    ,order:9, index:9, match:  'field', height: 20, attribute: 'alt',                         },
-		{name:'Mutation Freq 1000G'    ,order:10,index:10,match:  'field', height: 20, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Mutation Freq ExAC'     ,order:11,index:11,match:  'field', height: 20, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
+		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 28, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Severity',               order:1,  index:1,  match:  'field', height: 18, attribute: 'highestImpactVep',            formatFunction: this.formatHighestImpact,            rankFunction: this.getImpactRank  },
+		{name:'Inheritance Mode'       ,order:2,  index:2,  match:  'field', height: 18, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
+		{name:'Protein'                ,order:3,  index:3,  match:  'field', height: 18, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
+		{name:'cDNA'                   ,order:4,  index:4,  match:  'field', height: 18, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'Mutation Freq 1000G'    ,order:5,  index:5,  match:  'field', height: 18, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Mutation Freq ExAC'     ,order:6,  index:6,  match:  'field', height: 18, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Chr'                    ,order:7,  index:7,  match:  'field', height: 18, attribute: 'chrom',                       },
+		{name:'Position'               ,order:8,  index:8,  match:  'field', height: 18, attribute: 'start',                       },
+		{name:'Ref'                    ,order:9,  index:9,  match:  'field', height: 18, attribute: 'ref',                         },
+		{name:'Alt'                    ,order:10, index:10, match:  'field', height: 18, attribute: 'alt'                          },
+		{name:'Transcript'             ,order:11, index:11, match:  'field', height: 50, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      }
 	];
 
 
@@ -272,11 +272,12 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
-				    .cellSize(isLevelEdu  || isLevelMygene2 ? 23 : 18)
-				    .columnLabelHeight(isLevelEdu  || isLevelMygene2 ? 30 : 67)
-				    .rowLabelWidth(isLevelEdu  || isLevelMygene2 ? 100 : 140)
-				    .columnLabel( me.getVariantLabel )
+				    .cellSize(isLevelEdu ? 23 : (isLevelMygene2 ? null : 18))
+				    .cellWidth(isLevelMygene2 ? 130 : null)
 				    .cellHeights(isLevelMygene2 ? me.matrixRowsMygene2.map(function(d){return d.height}) : null)
+				    .columnLabelHeight(isLevelEdu  || isLevelMygene2 ? 30 : 67)
+				    .rowLabelWidth(isLevelEdu  ? 100 : (isLevelMygene2 ? 25 : 140))
+				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
 				    		me.unpin();
