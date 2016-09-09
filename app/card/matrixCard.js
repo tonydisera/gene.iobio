@@ -115,7 +115,7 @@ function MatrixCard() {
 		{name:'Severity',               order:1,  index:1,  match:  'field', height: 18, attribute: 'highestImpactVep',            formatFunction: this.formatHighestImpact,            rankFunction: this.getImpactRank  },
 		{name:'Inheritance Mode'       ,order:2,  index:2,  match:  'field', height: 18, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
 		{name:'Protein'                ,order:3,  index:3,  match:  'field', height: 18, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
-		{name:'cDNA'                   ,order:4,  index:4,  match:  'field', height: 18, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'cDNA'                   ,order:4,  index:4,  match:  'field', height: 28, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
 		{name:'Mutation Freq 1000G'    ,order:5,  index:5,  match:  'field', height: 18, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
 		{name:'Mutation Freq ExAC'     ,order:6,  index:6,  match:  'field', height: 18, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage },
 		{name:'Chr'                    ,order:7,  index:7,  match:  'field', height: 18, attribute: 'chrom',                       },
@@ -1241,7 +1241,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("y", 11)
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
-	MatrixCard.wrap(text, options.cellSize);
+	MatrixCard.wrap(text, options.cellSize, 3);
 	
 };
 
@@ -1452,6 +1452,16 @@ MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
 		if (key == "none" || key == "not_provided") {
 
 		} else {
+			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
+			if (isLevelMygene2) {
+				if (key.indexOf("pathogenic") >= 0) {
+					if (variant.featureClass == null) {
+						variant.featureClass = "";
+					}
+					variant.featureClass += " danger";
+				}
+
+			}
 			if (buf.length > 0) {
 				buf += ",";
 			}
@@ -1506,7 +1516,7 @@ MatrixCard.prototype.formatTranscriptHighestImpact = function(variant, highestIm
 				}
 			}
 		}
-		return transcripts.join(" ");
+		return transcripts.sort().join(" ");
 	}
 
 }
@@ -1529,6 +1539,19 @@ MatrixCard.prototype.formatHighestImpact = function(variant, highestImpactVep) {
 	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
 		return "";
 	} else {
+			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
+			if (isLevelMygene2) {
+				for (key in highestImpactVep) {
+					if (key == 'HIGH') {
+						if (variant.featureClass == null) {
+							variant.featureClass = "";
+						}
+						variant.featureClass += " danger";
+					}
+
+				}
+
+			}		
 		return Object.keys(highestImpactVep).join(" ");
 	}
 
@@ -1542,7 +1565,7 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
 		for(var key in value) {
 			var tokens = key.split(":p.");
 			if (buf.length > 0) {
-				buf += ",";
+				buf += " ";
 			}
 			if (tokens.length == 2) {
 				var basicNotation = tokens[1];
@@ -1566,7 +1589,7 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 		for(var key in value) {
 			var tokens = key.split(":c.");
 			if (buf.length > 0) {
-				buf += ",";
+				buf += " ";
 			}
 			if (tokens.length == 2) {
 				var basicNotation = tokens[1];
@@ -1589,15 +1612,19 @@ MatrixCard.prototype.percentage = function(a, places) {
 	return round(pct, places) + "%";
 }
 
-MatrixCard.wrap = function(text, width) {
+MatrixCard.wrap = function(text, width, maxLines) {
+  if (maxLines == null) {
+  	maxLines = 10;
+  }
   text.each(function() {
     var text = d3.select(this),
         words = text.text()
                     .split(/\s+/)
                     .filter( function(d,i) {
-                    	return d != null && d != '';
+                    	return d != null && d != '' && d.trim() != '';
         			})
                     .reverse();
+    var wordCount = words.length;
     var word,
         line = [],
         lineNumber = 0,
@@ -1607,13 +1634,18 @@ MatrixCard.wrap = function(text, width) {
         tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
     while (word = words.pop()) {
       line.push(word);
-      tspan.text(line.join(" "));
-      if (tspan.node().getComputedTextLength() > width) {
-        line.pop();
-        tspan.text(line.join(" "));
-        line = [word];
-        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-      }
+      if (lineNumber < maxLines) {
+      	  if (lineNumber == maxLines-1) {
+      	  	word = " more ...";
+      	  }
+	      tspan.text(line.join(" "));
+	      if (tspan.node().getComputedTextLength() > width && wordCount > 1) {
+	        line.pop();
+	        tspan.text(line.join(" "));
+	        line = [word];
+	        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+	      }
+      } 
     }
   });
 }

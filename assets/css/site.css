@@ -3009,7 +3009,9 @@ text.ref-count {
   opacity: 1 !important;
   stroke-width: 1px !important; }
 #matrix-track #feature-matrix .col.danger rect.cellbox {
-  fill: transparent !important; }
+  fill: rgba(187, 0, 0, 0.31) !important; }
+#matrix-track #feature-matrix .col.danger .cell text {
+  fill: black !important; }
 #matrix-track #feature-matrix .col.low-quality rect.cellbox {
   fill: transparent !important; }
 #matrix-track #feature-matrix .col.active rect.colbox {
