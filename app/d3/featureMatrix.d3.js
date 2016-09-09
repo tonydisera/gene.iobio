@@ -12,9 +12,6 @@ function featureMatrixD3() {
 
   var container = null;
 
-  var CELL_WIDTH_MYGENE2 = 100;
-  var CELL_HEIGHT_MYGENE2 = 40;
-
   var tooltipHTML = function(colObject, rowIndex) {
     return "tootip at row " + rowIndex;
   }
@@ -31,9 +28,11 @@ function featureMatrixD3() {
       matrixRows = null,
       matrixRowNames = null;
       cellSize = 10,
+      cellWidth = null,
+      cellHeight = null,
+      cellHeights = null,
       rowLabelWidth = 100,
-      columnLabelHeight = 100
-      cellHeights = null;
+      columnLabelHeight = 100;
       
   //  options
   var defaults = {};
@@ -53,8 +52,8 @@ function featureMatrixD3() {
         matrixHeight = cellHeights.reduce(function(pv, cv) { return pv + cv; }, 0);
         firstCellHeight = cellHeights[0];
       } else {
-        matrixHeight  = matrixRowNames.length * (isLevelMygene2 ? CELL_HEIGHT_MYGENE2 : cellSize);   
-        firstCellHeight = (isLevelMygene2 ? CELL_HEIGHT_MYGENE2 : cellSize);
+        matrixHeight  = matrixRowNames.length * (cellHeight != null ? cellHeight : cellSize);   
+        firstCellHeight = (cellHeight != null ? cellHeight : cellSize);
       }
       height = matrixHeight;
       height += margin.top + margin.bottom;
@@ -66,8 +65,8 @@ function featureMatrixD3() {
         innerHeight -= columnLabelHeight;
       } 
 
-      width = data.length * (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize);   
-      width += margin.left + margin.right + rowLabelWidth + (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize);
+      width = data.length *  (cellWidth != null ? cellWidth : cellSize);   
+      width += margin.left + margin.right + rowLabelWidth +  (cellWidth != null ? cellWidth : cellSize);
       var innerWidth = width - margin.left - margin.right - rowLabelWidth;
 
       container = d3.select(this);
@@ -127,9 +126,13 @@ function featureMatrixD3() {
       if (options.showColumnLabels) {
         var translateColHdrGroup = "";
         if (options.simpleColumnLabels) {
-          translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
+          if (cellWidth) {
+            translateColHdrGroup = "translate(" + (+rowLabelWidth + (cellWidth/2) - 4) + "," + (columnLabelHeight-4) + ")";
+          } else {
+            translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
+          }
         } else {
-          translateColHdrGroup = "translate(" + (+rowLabelWidth+((isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize)/2)) + "," + (columnLabelHeight) + ")";
+          translateColHdrGroup = "translate(" + (+rowLabelWidth+( (cellWidth != null ? cellWidth : cellSize) / 2 )) + "," + (columnLabelHeight) + ")";
         }
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
@@ -141,7 +144,7 @@ function featureMatrixD3() {
         colhdrs.enter().append('g')
             .attr('class', 'colhdr')
             .attr('transform', function(d,i) { 
-              return "translate(" + ((isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) * (i+1)) + ",0)";
+              return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
             })
             .append("text")
             .style("text-anchor", options.simpleColumnLabels ? "middle" : "start")
@@ -317,7 +320,7 @@ function featureMatrixD3() {
             return "col  " + d.featureClass;
           })
           .attr('transform', function(d,i) { 
-            return "translate(" + ((isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) * (i+1)) + ",0)";
+            return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
           });
       
 
@@ -362,11 +365,11 @@ function featureMatrixD3() {
               }
               return cellHeights[pos] - 1;
             } else {
-              return (isLevelMygene2 ? CELL_HEIGHT_MYGENE2 : cellSize) - 1; 
+              return  (cellHeight != null ? cellHeight : cellSize) - 1; 
             }
           })
           .attr('y', 0)
-          .attr('width', (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) - 1);
+          .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
          
 
 
@@ -387,7 +390,7 @@ function featureMatrixD3() {
       cells.each( function(d,i) {
          var symbolFunction = d.symbolFunction;
          if (symbolFunction) {
-           d3.select(this).call(symbolFunction, {'cellSize': (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize)});
+           d3.select(this).call(symbolFunction, {'cellSize': (cellWidth != null ? cellWidth : cellSize)});
          }
       });
 
@@ -407,7 +410,7 @@ function featureMatrixD3() {
             }
 
           }) 
-          .attr('width', (isLevelMygene2 ? CELL_WIDTH_MYGENE2 : cellSize) - 1);
+          .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
      
       g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  
@@ -496,16 +499,6 @@ function featureMatrixD3() {
     }
   }
 
-  chart.cellHeights = function(_) {
-    if (!arguments.length) {
-      return cellHeights;
-    } else {
-      cellHeights = _;
-      return chart;
-    }
-  }
-
-
   chart.margin = function(_) {
     if (!arguments.length) return margin;
     margin = _;
@@ -582,6 +575,35 @@ function featureMatrixD3() {
     cellSize = _;
     return chart;
   }
+
+
+  chart.cellWidth = function(_) {
+    if (!arguments.length) {
+      return cellWidth;
+    } else {
+      cellWidth = _;
+      return chart;
+    }
+  }
+
+  chart.cellHeight = function(_) {
+    if (!arguments.length) {
+      return cellHeight;
+    } else {
+      cellHeight = _;
+      return chart;
+    }
+  }
+
+  chart.cellHeights = function(_) {
+    if (!arguments.length) {
+      return cellHeights;
+    } else {
+      cellHeights = _;
+      return chart;
+    }
+  }
+
   chart.rowLabelWidth = function(_) {
     if (!arguments.length) return rowLabelWidth;
     rowLabelWidth = _;
