@@ -4264,7 +4264,7 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 					var cmdUrlBuilder =  urlBuilder;
 				}
 
-        console.log( timeStamp() + " createClientConnection event for cmd: " + cmd.id);
+        //console.log( timeStamp() + " createClientConnection event for cmd: " + cmd.id);
 				// go through by priority
 				if (connection.serverAddress)  // defined by requesting iobio service
 					serverAddress = connection.serverAddress;
