@@ -7,6 +7,8 @@
 var iobio = global.iobio || {};
 global.iobio = iobio;
 
+iobio.version = require('../package.json').version;
+
 // export if being used as a node module - needed for test framework
 if ( typeof module === 'object' ) { module.exports = iobio;}
 
@@ -143,7 +145,7 @@ iobio.cmd.prototype.toString = function() {
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./conn.js":18,"./utils/bindStreamEvents":24,"events":7,"extend":8,"inherits":9,"shortid":13}],2:[function(require,module,exports){
+},{"../package.json":18,"./conn.js":19,"./utils/bindStreamEvents":25,"events":7,"extend":8,"inherits":9,"shortid":13}],2:[function(require,module,exports){
 (function (Buffer){
 /*! binary.js build:0.2.1, development. Copyright(c) 2012 Eric Zhang <eric@ericzhang.com> MIT Licensed */
 (function(exports){
@@ -758,12 +760,12 @@ EventEmitter.prototype.addListener = function(type, listener, scope, once) {
   if ('function' !== typeof listener) {
     throw new Error('addListener only takes instances of Function');
   }
-
+  
   // To avoid recursion in the case that type == "newListeners"! Before
   // adding it to the listeners, first emit "newListeners".
   this.emit('newListener', type, typeof listener.listener === 'function' ?
             listener.listener : listener);
-
+            
   if (!this._events[type]) {
     // Optimize the case of one listener. Don't need the extra array object.
     this._events[type] = listener;
@@ -931,7 +933,7 @@ var util = {
     function setZeroTimeoutPostMessage(fn) {
       timeouts.push(fn);
       global.postMessage(messageName, '*');
-    }
+    }		
 
     function handleMessage(event) {
       if (event.source == global && event.data == messageName) {
@@ -1049,20 +1051,20 @@ Stream.prototype.pipe = function(dest, options) {
 exports.Stream = Stream;
 function BlobReadStream(source, options){
   Stream.call(this);
-
+  
   options = util.extend({
       readDelay: 0,
       paused: false
   }, options);
-
+  
   this._source = source;
   this._start = 0;
   this._readChunkSize = options.chunkSize || source.size;
   this._readDelay = options.readDelay;
-
+  
   this.readable = true;
   this.paused = options.paused;
-
+  
   this._read();
 }
 
@@ -1084,42 +1086,42 @@ BlobReadStream.prototype.destroy = function(){
 };
 
 BlobReadStream.prototype._read = function(){
-
+    
   var self = this;
-
+  
   function emitReadChunk(){
     self._emitReadChunk();
   }
-
+  
   var readDelay = this._readDelay;
   if (readDelay !== 0){
     this._timeoutId = setTimeout(emitReadChunk, readDelay);
   } else {
     util.setZeroTimeout(emitReadChunk);
   }
-
+    
 };
 
 BlobReadStream.prototype._emitReadChunk = function(){
-
+    
   if(this.paused || !this.readable) return;
-
+  
   var chunkSize = Math.min(this._source.size - this._start, this._readChunkSize);
-
+  
   if(chunkSize === 0){
       this.readable = false;
       this.emit("end");
       return;
   }
-
+  
   var sourceEnd = this._start + chunkSize;
   var chunk = (this._source.slice || this._source.webkitSlice || this._source.mozSlice).call(this._source, this._start, sourceEnd);
-
+  
   this._start = sourceEnd;
   this._read();
-
+  
   this.emit("data", chunk);
-
+  
 };
 
 /*
@@ -1128,32 +1130,32 @@ BlobReadStream.prototype._emitReadChunk = function(){
 
 
 function BlobWriteStream(options){
-
+    
     stream.Stream.call(this);
-
+    
     options = _.extend({
         onFull: onFull,
         onEnd: function(){},
         minBlockAllocSize: 0,
         drainDelay:0
     }, options);
-
+    
     this._onFull = options.onFull;
     this._onEnd = options.onEnd;
     this._onWrite = options.onWrite;
-
+    
     this._minBlockAllocSize = options.minBlockAllocSize;
     this._maxBlockAllocSize = options.maxBlockAllocSize;
     this._drainDelay = options.drainDelay;
-
+    
     this._buffer = new Buffer(options.minBlockAllocSize);
     this._destination = this._buffer;
     this._destinationPos = 0;
-
+    
     this._writeQueue = [];
     this._pendingOnFull = false;
     this._pendingQueueDrain = false;
-
+    
     this.writable = true;
     this.bytesWritten = 0;
 }
@@ -1165,47 +1167,47 @@ BlobWriteStream.prototype.getBuffer = function(){
 };
 
 BlobWriteStream.prototype.write = function(data, encoding){
-
+    
     if(!this.writable){
         throw new Error("stream is not writable");
     }
-
+    
     if(!Buffer.isBuffer(data)){
         data = new Buffer(data, encoding);
     }
-
+    
     if(data.length){
         this._writeQueue.push(data);
     }
-
+    
     this._commit();
-
+    
     return this._writeQueue.length === 0;
 };
 
 BlobWriteStream.prototype._commit = function(){
-
+    
     var self = this;
-
+    
     var destination = this._destination;
     var writeQueue = this._writeQueue;
-
+    
     var startDestinationPos = this._destinationPos;
-
+    
     while(writeQueue.length && destination.length){
-
+        
         var head = writeQueue[0];
-
+        
         var copySize = Math.min(destination.length, head.length);
-
+        
         head.copy(destination, 0, 0, copySize);
-
+        
         head = head.slice(copySize);
         destination = destination.slice(copySize);
-
+        
         this.bytesWritten += copySize;
         this._destinationPos += copySize;
-
+        
         if(head.length === 0){
             writeQueue.shift();
         }
@@ -1213,24 +1215,24 @@ BlobWriteStream.prototype._commit = function(){
             writeQueue[0] = head;
         }
     }
-
+    
     this._destination = destination;
-
+    
     bytesCommitted = this._destinationPos - startDestinationPos;
     if(bytesCommitted){
         if(this._onWrite){
-
+            
             if(writeQueue.length){
                 this._pendingQueueDrain = true;
             }
-
+            
             // By locking destination the buffer is frozen and the onWrite
             // callback cannot miss any write commits
             this._destination = emptyBuffer;
-
+            
             var consumer = this._onWrite;
             this._onWrite = null;
-
+            
             consumer.call(this, function(nextCallback){
                 util.setZeroTimeout(function(){
                     self._destination = destination;
@@ -1238,20 +1240,20 @@ BlobWriteStream.prototype._commit = function(){
                     self._commit();
                 });
             }, consumer);
-
+            
             return;
         }
     }
-
+    
     if(writeQueue.length){
-
+        
         this._pendingQueueDrain = true;
         this._growBuffer();
     }
     else if(this._pendingQueueDrain){
-
+        
         this._pendingQueueDrain = false;
-
+        
         if(this._drainDelay !== 0){
             setTimeout(function(){
                 self.emit("drain");
@@ -1266,30 +1268,30 @@ BlobWriteStream.prototype._commit = function(){
 };
 
 BlobWriteStream.prototype._growBuffer = function(){
-
+    
     var self = this;
     var writeQueue = this._writeQueue;
-
+    
     var requestSize = this._minBlockAllocSize;
-
+    
     var maxBlockAllocSize = this._maxBlockAllocSize;
     var add = (maxBlockAllocSize === undefined ? function(a, b){return a + b;} : function(a, b){return Math.min(a + b, maxBlockAllocSize);});
-
+    
     for(var i = 0, queueLength = writeQueue.length; i < queueLength; i++){
         requestSize = add(requestSize, writeQueue[i].length);
     }
-
+    
     // Prevent concurrent onFull callbacks
     if(this._pendingOnFull){
         return;
     }
     this._pendingOnFull = true;
-
+    
     this._onFull(this._buffer, requestSize, function(buffer, destination){
         util.setZeroTimeout(function(){
-
+            
             self._pendingOnFull = false;
-
+            
             if(!destination){
                 if(self.writable){
                     self.emit("error", new Error("buffer is full"));
@@ -1297,24 +1299,24 @@ BlobWriteStream.prototype._growBuffer = function(){
                 self.destroy();
                 return;
             }
-
+            
             self._buffer = buffer;
             self._destination = destination;
-
+            
             self._commit();
         });
     });
 };
 
 BlobWriteStream.prototype.end = function(data, encoding){
-
+    
     var self = this;
-
+    
     function _end(){
         self.writable = false;
         self._onEnd();
     }
-
+    
     if(data){
         if(this.write(data, encoding)){
             _end();
@@ -1335,7 +1337,7 @@ BlobWriteStream.prototype.destroy = function(){
 };
 
 BlobWriteStream.prototype.consume = function(consume){
-
+    
     this._buffer = this._buffer.slice(consume);
     this._destinationPos -= consume;
 };
@@ -1364,23 +1366,23 @@ function genGuid() {
 
 function BinaryStream(socket, id, create, meta) {
   if (!(this instanceof BinaryStream)) return new BinaryStream(options);
-
+  
   var self = this;
-
+  
   Stream.call(this);
 
-
+  
   this.id = id;
   this.guid = genGuid();
   this._socket = socket;
-
+    
   this.writable = true;
   this.readable = true;
   this.paused = false;
-
+  
   this._closed = false;
   this._ended = false;
-
+  
   if(create) {
     // This is a stream we are creating
     meta.guid = self.guid;
@@ -1415,7 +1417,7 @@ BinaryStream.prototype._onError = function(error){
   this.emit('error', error);
 };
 
-BinaryStream.prototype._onMessage = function(event, msg){
+BinaryStream.prototype._onMessage = function(event, msg){    
   this.emit(event, msg);
 };
 
@@ -1473,7 +1475,7 @@ BinaryStream.prototype.createClientConnection = function(connection) {
   this._write(8, connection, this.id);
 };
 
-BinaryStream.prototype.message = function(event, msg) {
+BinaryStream.prototype.message = function(event, msg) {    
   this._write(9, [event, msg], this.id);
 };
 
@@ -1486,7 +1488,7 @@ BinaryStream.prototype.destroy = BinaryStream.prototype.destroySoon = function()
 // Read stream
 
 BinaryStream.prototype._onEnd = function() {
-  if(this._ended) {
+  if(this._ended) { 
     return;
   }
   this._ended = true;
@@ -1495,7 +1497,7 @@ BinaryStream.prototype._onEnd = function() {
 };
 
 BinaryStream.prototype._onData = function(data) {
-  // Dispatch
+  // Dispatch 
   this.emit('data', data);
 };
 
@@ -1512,17 +1514,17 @@ BinaryStream.prototype.resume = function() {
 
 function BinaryClient(socket, options) {
   if (!(this instanceof BinaryClient)) return new BinaryClient(socket, options);
-
+  
   EventEmitter.call(this);
-
+  
   var self = this;
-
+  
   this._options = util.extend({
     chunkSize: 40960
   }, options);
-
+  
   this.streams = {};
-
+  
   if(typeof socket === 'string') {
     this._nextId = 0;
     this._socket = new WebSocket(socket);
@@ -1531,9 +1533,9 @@ function BinaryClient(socket, options) {
     this._nextId = 1;
     this._socket = socket;
   }
-
+  
   this._socket.binaryType = 'arraybuffer';
-
+  
   this._socket.addEventListener('open', function(){
     self.emit('open');
   });
@@ -1553,40 +1555,40 @@ function BinaryClient(socket, options) {
   });
   this._socket.addEventListener('message', function(data, flags){
     util.setZeroTimeout(function(){
-
+  
       // Message format
       // [type, payload, bonus ]
       //
       // Reserved
       // [ 0  , X , X ]
-      //
+      // 
       //
       // New stream
       // [ 1  , Meta , new streamId ]
-      //
+      // 
       //
       // Data
       // [ 2  , Data , streamId ]
-      //
+      // 
       //
       // Pause
       // [ 3  , null , streamId ]
-      //
+      // 
       //
       // Resume
       // [ 4  , null , streamId ]
-      //
+      // 
       //
       // End
       // [ 5  , null , streamId ]
-      //
+      // 
       //
       // Close
       // [ 6  , null , streamId ]
-      //
-
+      // 
+      
       data = data.data;
-
+      
       try {
           data = util.unpack(data);
       } catch (ex) {
@@ -1598,7 +1600,7 @@ function BinaryClient(socket, options) {
           return self.emit('error', new Error('Received message with wrong part count: ' + data.length));
       if ('number' != typeof data[0])
           return self.emit('error', new Error('Received message with non-number type: ' + data[0]));
-
+      
       switch(data[0]) {
         case 0:
           // Reserved
@@ -1667,25 +1669,25 @@ function BinaryClient(socket, options) {
           break;
         case 8:
           var connection = data[1];
-          var streamId = data[2];
-          var binaryStream = self.streams[streamId];
+          var streamId = data[2];          
+          var binaryStream = self.streams[streamId];          
           if(binaryStream) {
             binaryStream._onCreateClientConnection(connection);
           } else {
             self.emit('error', new Error('Received `error` message for unknown stream: ' + streamId));
           }
-          break;
-        case 9:
+          break; 
+        case 9:          
           var event = data[1][0];
           var msg = data[1][1];
-          var streamId = data[2];
-          var binaryStream = self.streams[streamId];
-          if(binaryStream) {
+          var streamId = data[2];          
+          var binaryStream = self.streams[streamId];          
+          if(binaryStream) {            
             binaryStream._onMessage(event, msg);
           } else {
             self.emit('error', new Error('Received `error` message for unknown stream: ' + streamId));
           }
-          break;
+          break;                   
         default:
           self.emit('error', new Error('Unrecognized message type received: ' + data[0]));
       }
@@ -1704,7 +1706,7 @@ BinaryClient.prototype.send = function(data, meta){
       (new BufferReadStream(data, {chunkSize: this._options.chunkSize})).pipe(stream);
     } else {
       stream.write(data);
-    }
+    } 
   } else if (util.isNode !== true) {
     if(data.constructor == Blob || data.constructor == File) {
       (new BlobReadStream(data, {chunkSize: this._options.chunkSize})).pipe(stream);
@@ -4173,6 +4175,47 @@ module.exports = {
 module.exports = 0;
 
 },{}],18:[function(require,module,exports){
+module.exports={
+  "name": "iobio.js",
+  "version": "1.0.0",
+  "description": "Client side iobio javascript library for building and executing iobio commands",
+  "browser": {
+    "binaryjs": "./lib/binary.js"
+  },
+  "browserify-shim": {
+    "external": "global:External"
+  },
+  "devDependencies": {
+    "brfs": "^1.4.0",
+    "browserify": "^10.2.0",
+    "browserify-istanbul": "^0.2.1",
+    "browserify-shim": "~3.8.0",
+    "coveralls": "^2.11.2",
+    "gulp": "^3.8.11",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.12.31",
+    "karma-browserify": "^4.1.2",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-coverage": "0.2.6",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-jasmine": "^0.3.5",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "extend": "^2.0.1",
+    "inherits": "^2.0.1",
+    "shortid": "^2.2.2"
+  },
+  "scripts": {
+    "testServer": "node ./node_modules/karma/bin/karma start test/karma.conf.js",
+    "test": "gulp testTravis"
+  }
+}
+
+},{}],19:[function(require,module,exports){
 // Create connection and handle the results
 
 var EventEmitter = require('events').EventEmitter;
@@ -4216,9 +4259,9 @@ conn.prototype.run = function(pipedCommands) {
 }
 
 module.exports = conn;
-},{"./protocol/http.js":19,"./protocol/ws.js":20,"./urlBuilder.js":23,"./utils/bindStreamEvents":24,"events":7,"inherits":9}],19:[function(require,module,exports){
+},{"./protocol/http.js":20,"./protocol/ws.js":21,"./urlBuilder.js":24,"./utils/bindStreamEvents":25,"events":7,"inherits":9}],20:[function(require,module,exports){
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // Websocket code for running iobio command and getting results
 
 var EventEmitter = require('events').EventEmitter;
@@ -4239,10 +4282,10 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 
 		client.on('open', function(stream){
 			var stream = client.createStream({event:'run', params : {'url':wsUrl}}),
-				first = true;
+				first = true,
+				dataClients = [];
 			me.stream = stream;
 
-      var dataClients = [];
 			stream.on('createClientConnection', function(connection) {
 				// determine serverAddress
 				var serverAddress;
@@ -4264,7 +4307,7 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 					var cmdUrlBuilder =  urlBuilder;
 				}
 
-        //console.log( timeStamp() + " createClientConnection event for cmd: " + cmd.id);
+
 				// go through by priority
 				if (connection.serverAddress)  // defined by requesting iobio service
 					serverAddress = connection.serverAddress;
@@ -4273,13 +4316,10 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 				else  // defined by client
 					serverAddress = cmdUrlBuilder.service;
 
-        // serverAddress = serverAddress + "/";
-
 				// connect to server
 				var dataClient = BinaryClient(protocol + '://' + serverAddress);
-        dataClients.push(dataClient);
+				dataClients.push(dataClient);
 				dataClient.on('open', function() {
-          //console.log( timeStamp() + " dataClient open for cmd: " + cmd.id);
 					var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
 					var argPos = connection.argPos || 0;
 					var file = cmdUrlBuilder.files[argPos];
@@ -4287,7 +4327,6 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 					dataStream.on('softend', function() {
 						file.end();
 					})
-
 				})
             })
 
@@ -4297,10 +4336,9 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 			});
 
 			stream.on('end', function() {
-        stream.end();
-        me.closeClient();
-        dataClients.forEach(function(dc){ dc.close(); })
 				me.emit('end');
+				me.closeClient();
+				dataClients.forEach(function(dc) { dc.close(); })
 			})
 
 			stream.on('exit', function(code) {
@@ -4321,10 +4359,8 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 inherits(ws, EventEmitter);
 
 ws.prototype.closeClient = function() {
-	if (this.client) {
-    console.log('closing client');
+	if (this.client)
 		this.client.close();
-  }
 }
 
 ws.prototype.kill = function() {
@@ -4342,7 +4378,7 @@ ws.prototype.end = function() {
 }
 
 module.exports = ws;
-},{"binaryjs":2,"events":7,"inherits":9}],21:[function(require,module,exports){
+},{"binaryjs":2,"events":7,"inherits":9}],22:[function(require,module,exports){
 // Create iobio url for a file/function command and setup stream for reading the file/function to the iobio web service
 
 var BlobReadStream = require('binaryjs').BlobReadStream;
@@ -4377,12 +4413,12 @@ file.prototype.end = function() {
 }
 
 module.exports = file;
-},{"binaryjs":2}],22:[function(require,module,exports){
+},{"binaryjs":2}],23:[function(require,module,exports){
 // Create iobio url for a url command
 
-var url = function(param) {
+var url = function(param) {	
 	var p = 'http' + param.slice(5,param.length);
-	this.url =  encodeURIComponent( p );
+	this.url =  encodeURIComponent( p ); 
 }
 
 url.prototype.getType = function() { return 'url'; }
@@ -4390,7 +4426,7 @@ url.prototype.getType = function() { return 'url'; }
 url.prototype.getUrl = function( ) { return this.url; }
 
 module.exports = url;
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // Creates the command
 
 var urlBuilder = function(service, params, opts) {
@@ -4434,10 +4470,13 @@ var urlBuilder = function(service, params, opts) {
 	// create source url
 	this.uri =  encodeURI(service + '?cmd=' + params.join(' ') + urlParams(opts.urlparams) + urlParams({id:opts.id}));
 	if (fileSource) this.uri += '&protocol=websocket';
+
+	// add iobio version
+	this.uri += '&iobiojsversion=' + iobio.version;
 }
 
 module.exports = urlBuilder;
-},{"./source/file.js":21,"./source/url.js":22,"./utils/hash2UrlParams.js":25,"events":7}],24:[function(require,module,exports){
+},{"./source/file.js":22,"./source/url.js":23,"./utils/hash2UrlParams.js":26,"events":7}],25:[function(require,module,exports){
 var bindStreamEvents = function(parent, child) {
 	// handle events
 	child.on('data', function(data) { parent.emit('data',data)});
@@ -4449,11 +4488,11 @@ var bindStreamEvents = function(parent, child) {
 }
 
 module.exports = bindStreamEvents;
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var urlParams = function(params) {
 	var str = ''
 	if (params)
-		str = '&' + Object.keys(params).map(function(k) { return k+'='+params[k]}).join('&');
+		str = '&' + Object.keys(params).map(function(k) { return k+'='+params[k]}).join('&');		
 	return str;
 }
 
