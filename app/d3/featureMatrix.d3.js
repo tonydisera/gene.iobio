@@ -330,20 +330,20 @@ function featureMatrixD3() {
       }).enter().append('g')
           .attr('class', "cell") 
           .attr('transform', function(d,i) {
-            var y = 0;
+            var yPos = 0;
             if (cellHeights && cellHeights.length > 0) {
               var pos = (i+1) % matrixRows.length;
               if (pos == 0) {
                 pos = matrixRows.length;
               } 
               for (var idx = 0; idx < pos-1; idx++) {
-                y += cellHeights[idx] ;
+                yPos += cellHeights[idx] ;
               }  
-              y = y + firstCellHeight;            
+              yPos = yPos + firstCellHeight;            
             } else {
-              y = y(matrixRowNames[i]) + y.rangeBand();
+              yPos = y(matrixRowNames[i]) + y.rangeBand();
             }
-            return 'translate(0,' +  y + ')';
+            return 'translate(0,' +  yPos + ')';
         });
 
 
