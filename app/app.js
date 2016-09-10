@@ -1432,11 +1432,21 @@ function adjustGeneRegion(geneObject) {
 
 function switchToAdvancedMode() {
 	var origin   = window.location.origin;
-	origin = origin.replace("beginner", "");
+	origin = origin.replace("beginner", "advanced");
 
 	var pathname = window.location.pathname;
-	pathname = pathname.replace("/beginner/", "");
-	pathname = pathname.replace("beginner", "");
+	pathname = pathname.replace("/beginner", "/advanced");
+	
+	var search   = window.location.search;
+
+	location.assign(origin + pathname + search);
+}
+function switchToBeginnerMode() {
+	var origin   = window.location.origin;
+	origin = origin.replace("advanced", "beginner");
+
+	var pathname = window.location.pathname;
+	pathname = pathname.replace("/advanced", "/beginner");
 	
 	var search   = window.location.search;
 
