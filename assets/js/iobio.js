@@ -4279,7 +4279,7 @@ var ws = function(urlBuilder, pipedCommands, opts) {
 				var dataClient = BinaryClient(protocol + '://' + serverAddress);
         dataClients.push(dataClient);
 				dataClient.on('open', function() {
-          console.log( timeStamp() + " dataClient open for cmd: " + cmd.id);
+          //console.log( timeStamp() + " dataClient open for cmd: " + cmd.id);
 					var dataStream = dataClient.createStream({event:'clientConnected', 'connectionID' : connection.id});
 					var argPos = connection.argPos || 0;
 					var file = cmdUrlBuilder.files[argPos];
