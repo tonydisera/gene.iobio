@@ -8,7 +8,8 @@ var CLINVAR = {
 var SIFT = {
   LABEL: 'Pathogenecity - SIFT',
   SYMBOL: "/*[local-name()='g']",
-  TOLERATED: "/*[local-name()='text' and text()='tolerated']"
+  TOLERATED: "/*[local-name()='text' and text()='tolerated']",
+  DELETERIOUS: "/*[local-name()='text' and text()='deleterious']",
 };
 
 var POLYPHEN = {
@@ -32,23 +33,46 @@ var IMPACT = {
 };
 
 var BOOKMARK = {
-  LABEL: 'Bookmark'
+  LABEL: 'Bookmark',
+  SYMBOL: "/*[local-name()='g']",
 };
 
 var INHERITANCE = {
-  LABEL: 'Inheritance Mode'
+  LABEL: 'Inheritance Mode',
+  SYMBOL: '',
+  DENOVO: '',
+  RECESSIVE: ''
 };
 
 var AF1000G = {
-  LABEL: 'Allele Frequency - 1000G'
+  LABEL: 'Allele Frequency - 1000G',
+  SYMBOL: "/*[local-name()='g']",
+  UNIQUE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' af1000g_unique ')]",
+  UBERRARE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' af1000g_uberrare ')]",
+  SUPERRARE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' af1000g_superrare ')]",
+  RARE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' af1000g_rare ')]",
+  UNCOMMON: "/*[contains(concat(' ', normalize-space(@class), ' '), ' af1000g_uncommon ')]",
+  COMMON: "/*[contains(concat(' ', normalize-space(@class), ' '), ' af1000g_common ')]"
 };
 
 var AFEXAC = {
-  LABEL: 'Allele Frequency - ExAC'
+  LABEL: 'Allele Frequency - ExAC',
+  SYMBOL: "/*[local-name()='g']",
+  UNIQUE_NC: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_unique_nc ')]",
+  UNIQUE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_unique ')]",
+  UBERRARE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_uberrare ')]",
+  SUPERRARE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_superrare ')]",
+  RARE: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_rare ')]",
+  UNCOMMON: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_uncommon ')]",
+  COMMON: "/*[contains(concat(' ', normalize-space(@class), ' '), ' afexac_common ')]"
 };
 
 var ZYGOSITY = {
-  LABEL: 'Zygosity'
+  LABEL: 'Zygosity',
+  HOM: "/*[local-name()='text' and text()='HOM']",
+  HET: "/*[local-name()='text' and text()='HET']",
+  HOMREF: '',
+  GT_UNKNOWN: ''
 };
 
 function precedingSiblingsToLabel(label) {
@@ -124,10 +148,128 @@ module.exports = {
       this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.LOW);
     },
 
+    assertImpactComplexDiamond: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.COMPLEX_DIAMOND);
+    },
+
+    assertImpactInsCircle: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.INS_CIRCLE);
+    },
+
+    assertImpactDelTriangle: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.DEL_TRIANGLE);
+    },
+
+    assertImpactSnpRect: function(variants) {
+      this.assertSymbolsPresent(IMPACT.LABEL, variants, IMPACT.SNP_RECT);
+    },
+
     assertImpactNull: function(variants) {
       this.assertSymbolsNotPresent(IMPACT.LABEL, variants, IMPACT.SYMBOL);
     },
 
+    // BOOKMARK
+    assertBookmarkPresent: function(variants) {
+      this.assertSymbolsPresent(BOOKMARK.LABEL, variants, BOOKMARK.SYMBOL);
+    },
+
+    assertBookmarkNull: function(variants) {
+      this.assertSymbolsNotPresent(BOOKMARK.LABEL, variants, BOOKMARK.SYMBOL);
+    },
+
+    // INHERITANCE
+    assertInheritanceDenovo: function(variants) {
+      this.assertSymbolsPresent(INHERITANCE.LABEL, variants, INHERITANCE.DENOVO);
+    },
+
+    assertInheritanceRecessive: function(variants) {
+      this.assertSymbolsPresent(INHERITANCE.LABEL, variants, INHERITANCE.RECESSIVE);
+    },
+
+    assertInheritanceNull: function(variants) {
+      this.assertSymbolsNotPresent(INHERITANCE.LABEL, variants, INHERITANCE.SYMBOL);
+    },
+
+    // AF1000G
+    assertAf1000gUnique: function(variants) {
+      this.assertSymbolsPresent(AF1000G.LABEL, variants, AF1000G.UNIQUE);
+    },
+
+    assertAf1000gUberrare: function(variants) {
+      this.assertSymbolsPresent(AF1000G.LABEL, variants, AF1000G.UBERRARE);
+    },
+
+    assertAf1000gSuperrare: function(variants) {
+      this.assertSymbolsPresent(AF1000G.LABEL, variants, AF1000G.SUPERRARE);
+    },
+
+    assertAf1000gRare: function(variants) {
+      this.assertSymbolsPresent(AF1000G.LABEL, variants, AF1000G.RARE);
+    },
+
+    assertAf1000gUncommon: function(variants) {
+      this.assertSymbolsPresent(AF1000G.LABEL, variants, AF1000G.UNCOMMON);
+    },
+
+    assertAf1000gCommon: function(variants) {
+      this.assertSymbolsPresent(AF1000G.LABEL, variants, AF1000G.COMMON);
+    },
+
+    assertAf1000gNull: function(variants) {
+      this.assertSymbolsNotPresent(AF1000G.LABEL, variants, AF1000G.SYMBOL);
+    },
+
+    // AFEXAC
+    assertAfexacUniqueNc: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.UNIQUE_NC);
+    },
+
+    assertAfexacUnique: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.UNIQUE);
+    },
+
+    assertAfexacUberrare: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.UBERRARE);
+    },
+
+    assertAfexacSuperrare: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.SUPERRARE);
+    },
+
+    assertAfexacRare: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.RARE);
+    },
+
+    assertAfexacUncommon: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.UNCOMMON);
+    },
+
+    assertAfexacCommon: function(variants) {
+      this.assertSymbolsPresent(AFEXAC.LABEL, variants, AFEXAC.COMMON);
+    },
+
+    assertAfexacNull: function(variants) {
+      this.assertSymbolsNotPresent(AFEXAC.LABEL, variants, AFEXAC.SYMBOL);
+    },
+
+    // Zygosity
+    assertZygosityHom: function(variants) {
+      this.assertSymbolsPresent(ZYGOSITY.LABEL, variants, ZYGOSITY.HOM);
+    },
+
+    assertZygosityHet: function(variants) {
+      this.assertSymbolsPresent(ZYGOSITY.LABEL, variants, ZYGOSITY.HET);
+    },
+
+    assertZygosityHomRef: function(variants) {
+      this.assertSymbolsPresent(ZYGOSITY.LABEL, variants, ZYGOSITY.HOMREF);
+    },
+
+    assertZygosityGtUnknown: function(variants) {
+      this.assertSymbolsPresent(ZYGOSITY.LABEL, variants, ZYGOSITY.GT_UNKNOWN);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     assertSymbolsPresent: function(label, variants, symbolSelector) {
       var self = this;
@@ -162,7 +304,7 @@ module.exports = {
       });
     },
     waitForMatrixLoaded: function() {
-      this.waitForElementVisible('@featureMatrix', 45000);
+      this.waitForElementVisible('@featureMatrix', 60000);
     }
   }],
   elements: {
