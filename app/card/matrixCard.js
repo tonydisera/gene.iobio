@@ -1593,7 +1593,7 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 			}
 			if (tokens.length == 2) {
 				var basicNotation = tokens[1];
-				var simpleNotation = basicNotation.replace(/[0-9]/g, '');
+				var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
 				buf += simpleNotation;
 			} 		
 		}
