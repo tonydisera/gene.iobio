@@ -3018,8 +3018,9 @@ text.ref-count {
   stroke: #3586c0 !important;
   stroke-width: 1.5px !important; }
 #matrix-track #feature-matrix .col rect.colbox.current {
-  stroke: #3586c0 !important;
-  stroke-width: 2.5px !important; }
+  stroke: #E0DDDD !important;
+  opacity: 1 !important;
+  stroke-width: 1px !important; }
 
 .tooltip.level-mygene2 {
   display: block !important; }

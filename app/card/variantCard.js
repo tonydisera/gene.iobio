@@ -245,7 +245,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    })
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
-					    	clickedVariant = d;
+					    	clickedVariant = isLevelMygene2 ? null : d;
 					    	clickedVariantCard = me;
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
@@ -284,7 +284,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    })	
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
-					    	clickedVariant = d;
+					    	clickedVariant = isLevelMygene2 ? null : d;
 					    	clickedVariantCard = me;
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);

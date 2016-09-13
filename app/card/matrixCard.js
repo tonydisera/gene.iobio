@@ -283,8 +283,8 @@ MatrixCard.prototype.init = function() {
 				    		me.unpin();
 				    	} else {
 					    	if (variant != clickedVariant) {
-					    		clickedVariant = variant;
-					    		me.showTooltip(variant, true);
+					    		clickedVariant = isLevelMygene2 ? null : variant;
+					    		me.showTooltip(variant, isLevelMygene2 ? false : true);
 						    	variantCards.forEach(function(variantCard) {
 						    		variantCard.showVariantCircle(variant);
 						    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
@@ -674,6 +674,14 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	}
 	
 	resizeCardWidths();
+
+	if (isLevelMygene2) {
+		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
+			$('#matrix-track').addClass("hide");
+		} else {
+			$('#matrix-track').removeClass("hide");		
+		}		
+	}
 
 	if (theVcfData != null) {
 		this.featureVcfData = {};
