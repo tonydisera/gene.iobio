@@ -1510,14 +1510,16 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 		    	updateUrl('gene', window.gene.gene_name);
 
-			    me.updateGeneInfoLink(window.gene.gene_name);
+			    me.updateGeneInfoLink(window.gene.gene_name, function() {
+					if (!hasDataSources()) {
+						//showDataDialog();
+						firstTimeGeneLoaded = false; 
+					}
 
-				if (!hasDataSources()) {
-					//showDataDialog();
-					firstTimeGeneLoaded = false; 
-				}
+			    	loadTracksForGene(false, null, callbackVariantsDisplayed);
+			    	
+			    });
 
-		    	loadTracksForGene(false, null, callbackVariantsDisplayed);
 	    	} else {
 	    		console.log("Gene " + geneName + " not found");
 	    		me.setGeneBadgeError(geneName);
@@ -1568,7 +1570,7 @@ GenesCard.prototype.refreshGene = function(geneName) {
 	    }
 	 });
 }
-GenesCard.prototype.updateGeneInfoLink = function(geneName) {
+GenesCard.prototype.updateGeneInfoLink = function(geneName, callback) {
 	var me = this;
 
 	var setSelectedGeneLink = function(geneAnnot) {
@@ -1584,12 +1586,18 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 				geneAnnot = data;
 				setSelectedGeneLink(geneAnnot);				
 			}
+			if (callback) {
+				callback.call(me);
+			}
 		}, function(error) {
 			console.log("error getting gene annot gene gene badge selected. " + error)
 		});
 
 	} else {
 		setSelectedGeneLink(geneAnnot);
+		if (callback) {
+			callback.call(me);
+		}
 	}
 
 }
