@@ -1645,6 +1645,17 @@ header {
   fill: #FAF5BE;
   stroke: #807D7D; }
 
+#feature-matrix .impact_HIGH {
+  pointer-events: none; }
+#feature-matrix .impact_MODERATE {
+  pointer-events: none; }
+#feature-matrix .impact_MODIFIER {
+  pointer-events: none; }
+#feature-matrix .impact_LOW {
+  pointer-events: none; }
+#feature-matrix .impact_NOIMPACT, #feature-matrix .impact_none, #feature-matrix .effect_none {
+  pointer-events: none; }
+
 .effect_transcript_ablation {
   fill: #ff0000; }
 
