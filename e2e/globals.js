@@ -11,4 +11,10 @@ module.exports = {
   // controls the timeout time for async hooks. Expects the done() callback to be invoked within this time
   // or an error is thrown
   asyncHookTimeout : 10000,
+
+  variantFileUrl: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+  NA12877SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12877.exome.bam',
+  NA12878SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
+  NA12891SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
+  NA12892SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
 };

@@ -24,13 +24,27 @@ module.exports = {
           return this.click('@variantsButton')
                      .click('@platinumTrio')
                      .waitForElementVisible('@probandVcfSampleBox');
+        },
+        selectSample: function(sample) {
+          return this.waitForElementVisible('@probandVcfSampleBox')
+                     .click('@probandVcfSampleSelectBox')
+                     .click(".selectize-dropdown-content [data-value='" + sample + "']");
+        },
+        inputUrl: function(url) {
+          this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
+        },
+        inputAlignmentsUrl: function(url) {
+          return this.setValue('@bamUrlInput', [url]);
         }
       }],
       elements: {
         variantsButton: { selector: '#vcf-dropdown-button' },
         alignmentsButton: { selector: '#bam-dropdown-button' },
         platinumTrio: { selector: '#display-platinum-vcf-url-item' },
-        probandVcfSampleBox: { selector: '#vcf-sample-box' }
+        probandVcfSampleBox: { selector: '#vcf-sample-box' },
+        probandVcfSampleSelectBox: { selector: '#vcf-sample-select-box .selectize-input' },
+        urlInput: { selector: '#url-input' },
+        bamUrlInput: { selector: '#bam-url-input' }
       }
     },
     motherData: {
