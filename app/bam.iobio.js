@@ -19,16 +19,28 @@ var Bam = Class.extend({
       }
       this.promises = [];
 
+
+      this.ignoreMessages =  [
+        /samtools\sError:\s.*:\sstderr\s-\s\[M::test_and_fetch\]\sdownloading\sfile\s.*\sto\slocal\sdirectory/
+      ];
+
+
       this.errorMessageMap =  {
-        "samtools Error: stderr - Could not load .bai":  "Unable to load the index (.bai) file, which has to exist in same directory and be given the same name as the .bam with the file extension of .bam.bai.",
-        "samtools Error: stderr - [E::hts_open] fail to open file": "Unable to access the file.  ",
-        "samtools Error: stderr - [E::hts_open_format] fail to open file": "Unable to access the file.  ",
-        "samtools Error: stderr - [M::test_and_fetch] downloading file": "Invalid index or compressed vcf.  Try re-creating the bam and index file."
+        "samtools Could not load .bai": { 
+            regExp: /samtools\sError:\s.*:\sstderr\s-\sCould not load .bai.*/,
+            message:  "Unable to load the index (.bai) file, which has to exist in same directory and be given the same name as the .bam with the file extension of .bam.bai."
+        },
+         "samtools [E::hts_open]": {
+            regExp:  /samtools\sError:\s.*:\sstderr\s-\s\[E::hts_open\]\sfail\sto\sopen\sfile/,
+            message: "Unable to access the file.  "
+         },
+         "samtools [E::hts_open_format]": {
+            regExp:  /samtools\sError:\s.*:\sstderr\s-\s\[E::hts_open_format\]\sfail\sto\sopen\sfile/,
+            message: "Unable to access the file. "
+         }
       }
 
-      var ignoreMessageMap =  {
-        //"tabix Error: stderr - [M::test_and_fetch] downloading file": {ignore: true}
-      }
+
 
 
       return this;
@@ -104,22 +116,23 @@ var Bam = Class.extend({
 
   ignoreErrorMessage: function(error) {
     var me = this;
-    var ignore = false;
-    for (err in me.ignoreMessageMap) {
-      if (error.indexOf(err) == 0) {
-        ignore = me.ignoreMessageMap[err].ignore;
+    var ignore = false;    
+    me.ignoreMessages.forEach( function(regExp) {
+      if (error.match(regExp)) {
+        ignore = true;
       }
-    }
+    });
     return ignore;
 
   },
 
-  translateErrorMessage:  function(error) {
+  translateErrorMessage: function(error) {
     var me = this;
     var message = null;
-    for (err in me.errorMessageMap) {
-      if (message == null && error.indexOf(err) == 0) {
-        message = me.errorMessageMap[err];
+    for (key in me.errorMessageMap) {
+      var errMsg = me.errorMessageMap[key];
+      if (message == null && error.match(errMsg.regExp)) {
+        message = errMsg.message;
       }
     }
     return message ? message : error;

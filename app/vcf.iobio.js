@@ -121,15 +121,23 @@ var effectCategories = [
 
 
   var errorMessageMap =  {
-    "tabix Error: stderr - Could not load .tbi":  "Unable to load the index (.tbi) file, which has to exist in same directory and be given the same name as the .vcf.gz with the file extension of .vcf.gz.tbi.",
-    "tabix Error: stderr - [E::hts_open] fail to open file": "Unable to access the file.  ",
-    "tabix Error: stderr - [E::hts_open_format] fail to open file": "Unable to access the file.  ",
-    "tabix Error: stderr - [M::test_and_fetch] downloading file": "Invalid index or compressed vcf.  Try bgzipping the vcf and recreating the index with tabix."
+    "tabix Could not load .tbi": { 
+        regExp: /tabix\sError:\s.*:\sstderr\s-\sCould not load .tbi.*/,
+        message:  "Unable to load the index (.tbi) file, which has to exist in same directory and be given the same name as the .vcf.gz with the file extension of .vcf.gz.tbi.  "
+    },
+     "tabix [E::hts_open]": {
+        regExp:  /tabix\sError:\s.*:\sstderr\s-\s\[E::hts_open\]\sfail\sto\sopen\sfile/,
+        message: "Unable to access the file.  "
+     },
+     "tabix [E::hts_open_format]": {
+        regExp:  /tabix\sError:\s.*:\sstderr\s-\s\[E::hts_open_format\]\sfail\sto\sopen\sfile/,
+        message: "Unable to access the file. "
+     }
   }
 
-  var ignoreMessageMap =  {
-    "tabix Error: stderr - [M::test_and_fetch] downloading file": {ignore: true}
-  }
+  var ignoreMessages =  [
+    /tabix\sError:\s.*:\sstderr\s-\s\[M::test_and_fetch\]\sdownloading\sfile\s.*\sto\slocal\sdirectory/
+  ];
 
 
 
@@ -196,12 +204,12 @@ var effectCategories = [
 
   exports.ignoreErrorMessage = function(error) {
     var me = this;
-    var ignore = false;
-    for (err in ignoreMessageMap) {
-      if (error.indexOf(err) == 0) {
-        ignore = ignoreMessageMap[err].ignore;
+    var ignore = false;    
+    ignoreMessages.forEach( function(regExp) {
+      if (error.match(regExp)) {
+        ignore = true;
       }
-    }
+    });
     return ignore;
 
   }
@@ -209,9 +217,10 @@ var effectCategories = [
   exports.translateErrorMessage = function(error) {
     var me = this;
     var message = null;
-    for (err in errorMessageMap) {
-      if (message == null && error.indexOf(err) == 0) {
-        message = errorMessageMap[err];
+    for (key in errorMessageMap) {
+      var errMsg = errorMessageMap[key];
+      if (message == null && error.match(errMsg.regExp)) {
+        message = errMsg.message;
       }
     }
     return message ? message : error;
