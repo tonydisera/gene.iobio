@@ -16,9 +16,8 @@ var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
 var phenolyzerOnlyServer      = iobio_http_services + "phenolyzer/";
 
-// email services
-var emailServer                 = "ws://nv-dev.iobio.io/email/";
-
+// email service
+var emailServer               = "ws://" +   new_iobio_services + "email/";
 
 // iobio services
 var IOBIO = {};
