@@ -8,7 +8,8 @@ module.exports = {
       return this.click('@trioButton');
     },
     clickLoad: function() {
-      return this.click('@loadButton');
+      return this.click('@loadButton')
+                 .api.pause(1000)
     }
   }],
   elements: {
