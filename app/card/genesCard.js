@@ -6,7 +6,7 @@ function GenesCard() {
 	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
-
+	this.sortedGeneNames = null;
 }
 
 GenesCard.prototype.split = function( val )  {
@@ -27,7 +27,7 @@ GenesCard.prototype.init = function() {
         total: 0,
         maxVisible: 0
     }).on("page", function(event, pageNumber){
-         me._goToPage(pageNumber);
+         me._goToPage(pageNumber, me.sortedGeneNames);
     });
 
     $('#select-gene-sort').attr("placeholder", "Order genes by");
@@ -40,8 +40,8 @@ GenesCard.prototype.init = function() {
 	$('#select-gene-sort')[0].selectize.addOption({value:"(original order)"});
 	$('#select-gene-sort')[0].selectize.addOption({value:"By relevance"});
 	$('#select-gene-sort')[0].selectize.addOption({value: "By gene name"});
-	$('#select-gene-sort')[0].selectize.on('change', function() {
-		me.sortGenes();
+	$('#select-gene-sort')[0].selectize.on('item_add', function(selectedValue) {
+		me.sortGenes(selectedValue);
 	});
 	$('#select-gene-sort')[0].selectize.on('dropdown_open', function() {
 		$('#select-gene-sort')[0].selectize.setValue("");
@@ -122,21 +122,15 @@ GenesCard.prototype.init = function() {
 
 }
 
-GenesCard.prototype.sortGenes = function() {
-	var me = this;
-	var sortBy = $('#select-gene-sort')[0].selectize.getValue();
-	if (sortBy.indexOf("gene name") >= 0) {			
-		var sortedGeneNames = geneNames.slice().sort();
-		me._initPaging(sortedGeneNames, true);
-		me._goToPage(1, sortedGeneNames);
-	} else if (sortBy.indexOf("original order") >= 0) {	
-		me._initPaging(null, true);
-		me._goToPage(1);
-	} else if (sortBy.indexOf("relevance") >= 0) {	
-		var sortedGeneNames = geneNames.slice().sort(me.compareDangerSummary);
-		me._initPaging(sortedGeneNames, true);
-		me._goToPage(1, sortedGeneNames);
-	}	
+GenesCard.prototype.sortGenes = function(sortBy) {
+	this.sortedGeneNames = null;
+	if (sortBy.indexOf("gene name") >= 0) {
+		this.sortedGeneNames = geneNames.slice().sort();
+	}
+	else if (sortBy.indexOf("relevance") >= 0) {
+		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummary);
+	}
+	this._initPaging(this.sortedGeneNames, true);
 }
 
 
@@ -347,16 +341,14 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 	}
 	var pageCount = Math.ceil(theGeneNames.length / this.GENES_PER_PAGE);
 	if (theGeneNames.length > this.GENES_PER_PAGE) {
+		this.currentPageNumber = startOver ? 1 : Math.min(me.currentPageNumber, pageCount);
 		$('.gene-paging-link').removeClass("hide");
 		$('#gene-page-selection').bootpag({
-			page: startOver ? 1 : Math.min(me.currentPageNumber, pageCount),
-        	total: pageCount,
-        	maxVisible: pageCount
-    	});
-    	if (me.currentPageNumber > pageCount) {
-    		me.currentPageNumber = pageCount;
-    	} 
-		me._goToPage(me.currentPageNumber)
+			page: me.currentPageNumber,
+      total: pageCount,
+      maxVisible: pageCount
+    });
+		this._goToPage(this.currentPageNumber, theGeneNames);
 	} else if (theGeneNames.length > 0) {
 		if (this.GENES_PER_PAGE > this.GENES_PER_PAGE_DEFAULT) {
 			$('.gene-paging-link').removeClass("hide");
@@ -364,9 +356,9 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 			$('.gene-paging-link').addClass("hide");
 		}
 		$('#gene-page-selection').html("");
-		me.currentPageNumber = 1;
-		me._goToPage(me.currentPageNumber);	
-		$('#gene-page-selection').html("");	
+		this.currentPageNumber = 1;
+		this._goToPage(this.currentPageNumber, theGeneNames);
+		$('#gene-page-selection').html("");
 	} else {
 		$('.gene-paging-link').addClass("hide");
 		$('#gene-page-selection').html("");
