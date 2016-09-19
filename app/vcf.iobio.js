@@ -136,7 +136,8 @@ var effectCategories = [
   }
 
   var ignoreMessages =  [
-    /tabix\sError:\s.*:\sstderr\s-\s\[M::test_and_fetch\]\sdownloading\sfile\s.*/
+    /tabix\sError:\s.*:\sstderr\s-\s\[M::test_and_fetch\]\sdownloading\sfile\s.*/,
+    /tabix\sError:\s.*:\sstderr\s-\s.*to local directory/
   ];
 
 
