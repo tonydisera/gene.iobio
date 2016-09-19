@@ -1,31 +1,58 @@
+var appTitleSection = require('./sections/appTitleSection.js');
+var dataCard = require('./sections/dataCard.js');
+var sliderIconBar = require('./sections/sliderIconBar.js');
+var sliderLeft = require('./sections/sliderLeft.js');
+var matrixTrack = require('./sections/matrixTrack.js')
+
 module.exports = {
   url: function() {
     return this.api.launchUrl;
   },
-  sections: {
 
-    sliderIconBar: {
-      selector: '#slider-icon-bar',
+  elements: {
+    sliderLeft: '#slider-left',
+    appTitleSection: '#app-title-section',
+    dataCard: '#data-card',
+    matrixTrack: '#matrix-track',
+    transcriptCard: '#transcript-card',
+    probandVariantCard: '#proband-variant-card',
+    motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
+    fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)'
+  },
+
+  commands: [{
+    load: function() {
+      return this.navigate().waitForElementVisible('@sliderLeft');
+    }
+  }],
+
+  sections: {
+    appTitleSection: appTitleSection,
+    dataCard: dataCard,
+    sliderIconBar: sliderIconBar,
+    sliderLeft: sliderLeft,
+    matrixTrack: matrixTrack,
+
+    transcriptCard: {
+      selector: '#transcript-card',
       elements: {
-        filter: { selector: '#button-show-filters' },
-        inspect: { selector: '#button-show-examine' },
-        findGenes: { selector: '#button-show-phenolyzer' },
-        bookmarks: { selector: '#button-show-bookmarks' },
-        callVariants: { selector: '#button-find-missing-variants' },
-        about: { selector: '#button-show-help' }
+        geneName: { selector: '#gene-name' }
       }
     },
 
-    sliderLeft: {
-      selector: '#slider-left',
+    probandVariantCard: {
+      selector: '#proband-variant-card',
       elements: {
-        filterTrack: { selector: '#filter-track' },
-        genesCard: { selector: '#genes-card' },
-        bookmarkCard: { selector: '#bookmark-card' },
-        examineCard: { selector: '#examine-card' },
-        helpCard: { selector: '#help-card' },
-        recallCard: { selector: '#recall-card' }
+
       }
+    },
+
+    motherVariantCard: {
+      selector: '#other-variant-cards .variant-card:nth-child(1)'
+    },
+
+    fatherVariantCard: {
+      selector: '#other-variant-cards .variant-card:nth-child(2)'
     }
 
   }
