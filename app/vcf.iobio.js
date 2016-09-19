@@ -896,7 +896,7 @@ var effectCategories = [
 
   }
 
-  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript) {
+  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript, sampleIndex) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -907,7 +907,9 @@ var effectCategories = [
       var vepFields = {};
 
       annotatedRecs.forEach(function(record) {
-        if (record.charAt(0) == "#") {
+        if (record == null || record == "") {
+
+        } else if (record.charAt(0) == "#") {
           // Figure out how the vep fields positions
           if (record.indexOf("INFO=<ID=CSQ") > 0) {
             vepFields = me.parseHeaderFieldForVep(record);
@@ -935,11 +937,13 @@ var effectCategories = [
                            'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
-
-        // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
-        resolve([annotatedRecs, results]);
       });
+
+
+      // Parse the vcf object into a variant object that is visualized by the client.
+      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleIndex);
+      resolve([annotatedRecs, results]);
+
     });
   }
 
@@ -1311,10 +1315,17 @@ var effectCategories = [
   }
 
 
-  exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields) {
+  exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleIndex) {
       var me = this;
       var nameTokens = selectedTranscript.transcript_id.split('.');
       var selectedTranscriptID = nameTokens.length > 0 ? nameTokens[0] : selectedTranscript;
+
+      // Use the sample index to grab the right genotype column from the vcf record
+      // If it isn't provided, assume that the first genotype column is the one
+      // to be evaluated and parsed.
+      if (sampleIndex == null) {
+        sampleIndex = 0;
+      }
 
 
       // The variant region may span more than the specified region.
@@ -1697,8 +1708,8 @@ var effectCategories = [
 
               } else {
                 var tokens = genotype.split(":");
-                gtIndex = gtTokens["GT"];
-                genotypes.push(tokens[gtIndex]);
+                gtFieldIndex = gtTokens["GT"];
+                genotypes.push(tokens[gtFieldIndex]);
 
                 gtDepthIndex = gtTokens["DP"];
                 if (gtDepthIndex) {
@@ -1829,8 +1840,7 @@ var effectCategories = [
             }
 
 
-            var gtIndex = 0;
-            genotypeForSample = genotypes[gtIndex];
+            genotypeForSample = genotypes[sampleIndex];
 
             if (genotypeForSample == null) {
               keepAlt = true;
@@ -1885,15 +1895,15 @@ var effectCategories = [
               }
             }
 
-            genotypeDepthForSample = genotypeDepths[gtIndex];
-            genotypeFilteredDepthForSample = genotypeFilteredDepths[gtIndex];
-            genotypeRefCountForSample = genotypeRefCounts[gtIndex];
-            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtIndex];
-            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtIndex];
+            genotypeDepthForSample = genotypeDepths[gtFieldIndex];
+            genotypeFilteredDepthForSample = genotypeFilteredDepths[gtFieldIndex];
+            genotypeRefCountForSample = genotypeRefCounts[gtFieldIndex];
+            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtFieldIndex];
+            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtFieldIndex];
 
-            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[gtIndex], ",");
-            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtIndex];
-            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtIndex];
+            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[gtFieldIndex], ",");
+            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtFieldIndex];
+            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtFieldIndex];
 
             var eduGenotype = "";
             if (isLevelEdu) {

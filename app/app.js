@@ -2058,6 +2058,14 @@ function addVariantCard() {
 }
 
 function callVariants() {
+	if (dataCard.mode == 'trio') {
+		jointCallVariants();
+	} else {
+		singleCallVariants();
+	}
+}
+
+function singleCallVariants() {
 
 	fulfilledTrioPromise = false;
 	getRelevantVariantCards().forEach(function(vc) {
@@ -2087,6 +2095,83 @@ function callVariants() {
 
 		});
 	});
+}
+
+function jointCallVariants(callback) {
+	fulfilledTrioPromise = false;
+
+	var bams = [];
+	var cards = getRelevantVariantCards();
+	cards.forEach(function(vc) {
+		vc.clearCalledVariants();
+		vc.showCallVariantsProgress('starting');
+		bams.push(vc.model.bam);
+	});
+
+	
+	var sampleIndex = 0;
+	var jointVcfRecs = null;
+	var translatedRefName = null;
+
+	var parseNextCalledVariants = function(afterParseCallback) {
+		if (sampleIndex >= cards.length) {
+			if (afterParseCallback) {
+				afterParseCallback();
+			}
+			return;
+		}		
+		var vc = cards[sampleIndex];
+		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, sampleIndex)
+	                .then(function(data) {
+	                	var theFbData = data[1];
+				    
+					    // Get the unique freebayes variants and set up the allele counts
+					    vc.model.processFreebayesVariants(theFbData);
+						
+						sampleIndex++;
+						parseNextCalledVariants(afterParseCallback);					    				    
+				    });
+	}
+	
+	getProbandVariantCard().model.bam.freebayesJointCall(
+		window.gene.chr, 
+		window.gene.start, 
+		window.gene.end, 
+		window.gene.strand, 
+		bams, 
+		window.geneSource == 'refseq' ? true : false, 
+		function(theData, trRefName) {
+
+			translatedRefName = trRefName;
+			jointVcfRecs = 	theData.split("\n");		
+
+			parseNextCalledVariants(function() {
+				promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+
+					cards.forEach( function(vc) {
+
+						// Reflect me new info in the freebayes variants.
+						vc.model.loadCalledTrioGenotypes();
+
+						// Show the counts
+						vc.showCallVariantsProgress('counting');
+						vc.showCallVariantsProgress('done');
+
+						//  Refresh the feature matrix (proband only) and variant cards
+						if (vc.getRelationship() == 'proband') {
+							vc.fillFeatureMatrix(window.gene.start, window.gene.end);
+						} 
+						vc._showVariants(window.gene.start, window.gene.end, null, false);
+
+					});
+					if (callback) {
+						callback();
+					}
+				});				
+			});
+		}
+	);
+
 }
 
 function enableCallVariantsButton() {

@@ -543,7 +543,7 @@ var Bam = Class.extend({
 
 
       cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
-      cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+      //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
 
 
       //
@@ -593,7 +593,119 @@ var Bam = Class.extend({
 
    },
 
+   writeStream: function(stream) {
+      var me = this;
+      // TODO:  Need to figure out how to pass in trRefName, regionStart, regionEnd
+      stream.write(me.header.toStr);
+      me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
+          stream.write(data);
+          stream.end();
+      }, {noHeader:true});
+   },
 
+   freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
+    var me = this;
+
+        
+    this.transformRefName(refName, function(trRefName){
+
+      var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+      var refFile = null;
+      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
+      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
+      // the reference name to determine if the references should be hg19 (starts with 'chr;)
+      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
+      // we point freebayes to a particular directory for the reference files.
+      if (trRefName.indexOf('chr') == 0) {
+        refFile = "./data/references_hg19/" + trRefName + ".fa";
+      } else {
+        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
+      }
+      var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
+
+      var freebayesArgs = [];
+      bams.forEach( function(bam) {
+        if (bam.sourceType == "url") {
+          //cmd = new iobio.cmd("nv-green.IOBIO.io/samtools/", ['view', '-b', me.bamUri, regionArg],
+          var bamCmd = new iobio.cmd(samtools, ['view', '-b', bam.bamUri, regionArg],
+          {
+            'urlparams': {'encoding':'binary'}
+          });
+          freebayesArgs.push("-b");
+          freebayesArgs.push(bamCmd)
+        } else {          
+          var bamCmd = new iobio.cmd(samtools, ['view -b',  bam.writeStream ],
+            {
+              'urlparams': {'encoding':'binary'}
+            });
+          freebayesArgs.push("-b");
+          freebayesArgs.push(bamCmd)
+        }
+      });
+      freebayesArgs.push("-f");
+      freebayesArgs.push(refFile);
+
+      
+      var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs);
+      
+
+      // Normalize variants
+      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+
+      // Subset on all samples (this will get rid of low quality cases where no sample 
+      // is actually called as having the alt) 
+      //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
+
+      // Filter out anything with qual <= 0
+      //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+
+
+      //
+      // Annotate variants that were just called from freebayes
+      //
+     
+      // bcftools to append header rec for contig
+      var contigStr = "";
+      getHumanRefNames(refName).split(" ").forEach(function(ref) {
+          contigStr += "##contig=<ID=" + ref + ">\n";
+      })
+      var contigNameFile = new Blob([contigStr])
+      cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
+
+      // Get Allele Frequencies from 1000G and ExAC
+      cmd = cmd.pipe(IOBIO.af)
+
+      // VEP to annotate
+      var vepArgs = "";
+      if (isRefSeq) {
+        vepArgs = " --refseq "
+      }
+      cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+
+
+      
+      var variantData = "";
+      cmd.on('data', function(data) {
+          if (data == undefined) {
+            return;
+          }
+
+          variantData += data;
+      });
+
+      cmd.on('end', function() {
+        callback(variantData, trRefName);
+      });
+
+      cmd.on('error', function(error) {
+        console.log(error);
+      });
+
+      cmd.run();
+
+    });
+
+   },
 
 
 

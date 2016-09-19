@@ -280,7 +280,19 @@ VariantModel.summarizeDanger = function(geneName, theVcfData) {
 }
 
 VariantModel.prototype.getCalledVariantCount = function() {
-	return this.fbData.features.length != null ? this.fbData.features.length : "0";
+	if (this.fbData.features ) {
+		return this.fbData.features
+		                  .filter(function(d) {
+							// Filter homozygous reference for proband only
+							var meetsZygosity = true;
+							if (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') {
+								meetsZygosity = false;
+							}
+							return meetsZygosity;
+						  }).length;
+	} else {
+		return "0";
+	}
 }
 
 
@@ -1243,10 +1255,10 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 
     	if (success) {
 	    	try {
-		      	localStorage.setItem(this._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
+		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    		
 	    	} catch(error) {
-		      	CacheHelper.showError(this._getCacheKey(dataKind, geneName, transcript), error);
+		      	CacheHelper.showError(me._getCacheKey(dataKind, geneName, transcript), error);
 		    	success = false;
 	    	}    		
     	}
@@ -1468,7 +1480,9 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 
 VariantModel.prototype.populateEffectFilters = function(variants) {
 	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	this._populateEffectFilters(theVcfData.features);
+	if (theVcfData && theVcfData.features) {
+		this._populateEffectFilters(theVcfData.features);
+	}
 }
 
 VariantModel.prototype._populateEffectFilters  = function(variants) {
@@ -1906,56 +1920,7 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 				    .then( function(data) {
 
 				    	var annotatedRecs = data[0];
-				    	me.fbData = data[1];
-
-				    	// Flag the called variants
-					   	me.fbData.features.forEach( function(feature) {
-					   		feature.fbCalled = 'Y';
-					   	});
-
-						// We may have called variants that are slightly outside of the region of interest.
-						// Filter these out.
-						if (window.regionStart != null && window.regionEnd != null ) {	
-							me.fbData.features = me.fbData.features.filter( function(d) {
-								meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
-								return meetsRegion;
-							});
-						}	
-
-				    	// We are done getting the clinvar data for called variants.
-				    	// Now merge called data with variant set and display.
-						// Prepare vcf and fb data for comparisons
-						me._prepareVcfAndFbData();
-
-						// Determine allele freq levels
-			        	me._determineVariantAfLevels(me.fbData);
-
-			        	// Filter the freebayes variants to only keep the ones
-			        	// not present in the vcf variant set.
-						me._determineUniqueFreebayesVariants();
-
-
-			        	// Show the snpEff effects / vep consequences in the filter card
-						me._populateEffectFilters(me.fbData.features);
-
-						// Determine the unique values in the VCF filter field 
-						me._populateRecFilters(me.fbData.features);
-
-					
-						if (onVariantsAnnotated) {
-							onVariantsAnnotated(me.fbData);
-						}
-
-						var theVcfData = me.getVcfDataForGene(window.gene, window.selectedTranscript);
-						
-						// Now get the clinvar data	
-						// ??	    	
-			    		return me.vcf.promiseGetClinvarRecords(
-						    		me.fbData, 
-						    		me._stripRefName(window.gene.chr), window.gene, 
-						    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
-
-
+				    	me.processFreebayesVariants(data[1], onVariantsAnnotated);
 
 
 				    }, function(error) {
@@ -1996,6 +1961,59 @@ VariantModel.prototype.promiseCallVariants = function(regionStart, regionEnd, on
 
 
 } 
+
+VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) {
+	var me = this;
+
+	me.fbData = theFbData;
+	// Flag the called variants
+   	me.fbData.features.forEach( function(feature) {
+   		feature.fbCalled = 'Y';
+   	});
+
+	// We may have called variants that are slightly outside of the region of interest.
+	// Filter these out.
+	if (window.regionStart != null && window.regionEnd != null ) {	
+		me.fbData.features = me.fbData.features.filter( function(d) {
+			meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+			return meetsRegion;
+		});
+	}	
+
+	// We are done getting the clinvar data for called variants.
+	// Now merge called data with variant set and display.
+	// Prepare vcf and fb data for comparisons
+	me._prepareVcfAndFbData();
+
+	// Determine allele freq levels
+	me._determineVariantAfLevels(me.fbData);
+
+	// Filter the freebayes variants to only keep the ones
+	// not present in the vcf variant set.
+	me._determineUniqueFreebayesVariants();
+
+
+	// Show the snpEff effects / vep consequences in the filter card
+	me._populateEffectFilters(me.fbData.features);
+
+	// Determine the unique values in the VCF filter field 
+	me._populateRecFilters(me.fbData.features);
+
+
+	if (callback) {
+		callback(me.fbData);
+	}
+
+	var theVcfData = me.getVcfDataForGene(window.gene, window.selectedTranscript);
+	
+	// Now get the clinvar data		    	
+	return me.vcf.promiseGetClinvarRecords(
+	    		me.fbData, 
+	    		me._stripRefName(window.gene.chr), window.gene, 
+	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+
+
+}
 
 VariantModel.prototype.loadCalledTrioGenotypes = function() {
 	var me = this;
