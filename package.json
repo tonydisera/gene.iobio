@@ -21,10 +21,13 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-jasmine-browser": "^1.6.0",
+    "gulp-jshint": "^2.0.1",
     "gulp-nightwatch": "^0.3.0",
     "gulp-plumber": "^1.1.0",
     "gulp-watch": "^4.3.9",
     "jasmine-core": "^2.4.1",
+    "jshint": "^2.9.3",
+    "jshint-stylish": "^2.2.1",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
