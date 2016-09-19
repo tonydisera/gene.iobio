@@ -1,23 +1,27 @@
 <html>
 <head>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/site.css" />
 
   <!-- fonts -->
-  <link href='http://fonts.googleapis.com/css?family=Quicksand:400|Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Raleway:400,300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="assets/css/google-fonts.css">  
 
 
   <script src="assets/js/jquery.1.11.1.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script> 
+  <script src="assets/js/bootstrap.min.js"></script> 
   <link href="assets/js/video-js/video-js.css" rel="stylesheet">
   <script src="assets/js/video-js/video.js"></script>
    <style>
+     body {
+        padding-left: 20px;
+        padding-right: 20px;
+     }
      h1 {
         text-align:center;
         color: #5d809d;;
         font-family:Raleway;
-        font-size:26px;
+        font-size:32px;
         margin-top:0px;
         padding-bottom:10px;
         font-weight:normal;        
@@ -69,26 +73,21 @@
           width:100px;
           display:inline-block;        
        }
+
+       .videos .video-title {
+          font-size: 24px;
+       }
+       .videos .video-subtitle {
+          font-size: 16px;
+       }
    </style>
 </head>
 <body style="background:white">
-  <section id="app-title-section" style="height:40px;padding-top:0px !important;" class="shadow-z-1">
-    <a id="home" href="/" style="float: left;">
-          <span class="iobioapp"><span class="hide beta">beta</span> gene</span><span class="iobio">.iobio
-          </span>
-    </a>
-    <!-- <span class="iobio" style="float:none;clear:both;margin-right:50px">Screencasts</span> -->
-    <a href="http://iobio.io" class="iobioproject">           
-      an iobio project
-    </a>   
-
-    
-
-  </section>
+  
 
 <div class="container" class="shadow-z-1" style="">
 
-  <h1 style="margin-top:10px;">Examples</h1>
+  <h1 style="margin-top:10px;">gene.iobio Tutorials</h1>
  
   <h2 style="margin-top:30px;">Datasets</h2>
      
@@ -98,7 +97,7 @@
         Platinum trio - whole genome sequencing
        </a>
        <br>
-       <a class="example-datasets" href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=&bam0=https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19240.bam&name1=&bam1=https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19238.bam&name2=&bam2=https://s3.amazonaws.com/iobio/gene/wes_1000g/NA19239.bam&vcf0=https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz&sample0=NA19240&vcf1=https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz&sample1=NA19238&vcf2=https://s3.amazonaws.com/iobio/gene/wes_1000g/exome-trio.vcf.gz&sample2=NA19239&genes=RAI1,AIRE,PDGFB,MYLK2,PDHA1" 
+       <a class="example-datasets" href="http://gene.iobio.io/?rel0=proband&rel1=mother&rel2=father&gene=RAI1&name0=&bam0=https://s3.amazonaws.com/iobio/samples/bam/NA19240.bam&name1=&bam1=https://s3.amazonaws.com/iobio/samples/bam/NA19238.bam&name2=&bam2=https://s3.amazonaws.com/iobio/samples/bam/NA19239.bam&vcf0=https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz&sample0=NA19240&vcf1=https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz&sample1=NA19238&vcf2=https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz&sample2=NA19239&genes=RAI1,AIRE,PDGFB,MYLK2,PDHA1" 
        s>    
         1000 Genomes project trio - exome sequencing
        </a>

@@ -1,6 +1,6 @@
 /* -*- mode: javascript; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 
-// 
+//
 // Dalliance Genome Explorer
 // (c) Thomas Down 2006-2011
 //
@@ -103,7 +103,7 @@ function makeBam(data, bai, callback) {
             p += (nintv * 8);
             if (nbin > 0) {
                 bam.indices[ref] = new Uint8Array(header, blockStart, p - blockStart);
-            }                     
+            }
         }
         if (bam.chrToIndex) {
             return callback(bam);
@@ -160,7 +160,7 @@ BamFile.prototype.blocksForRange = function(refId, min, max) {
         }
     }
     // dlog('Lowest LB = ' + lowest);
-    
+
     var prunedOtherChunks = [];
     if (lowest != null) {
         for (var i = 0; i < otherChunks.length; ++i) {
@@ -221,7 +221,7 @@ BamFile.prototype.fetch = function(chr, min, max, callback, options) {
             callback(null, 'Error in index fetch');
         }
     }
-    
+
     var records = [];
     var index = 0;
     var data;
@@ -269,25 +269,29 @@ var SEQRET_DECODER = ['=', 'A', 'C', 'x', 'G', 'x', 'x', 'x', 'T', 'x', 'x', 'x'
 var CIGAR_DECODER = ['M', 'I', 'D', 'N', 'S', 'H', 'P', '=', 'X', '?', '?', '?', '?', '?', '?', '?'];
 
 function BamRecord() {
-   
+
 }
 
 BamRecord.prototype.convertTo = function(format) {
  var record = "";
  var keys = [ "readName", "flag", "segment", "pos", "mq", "cigar", "rnext", "pnext", "tlen", "seq", "quals", "tags"   ]
- 
+
  if (format == "sam") {
     for (var i=0; i < keys.length; i++) {
-        if (keys[i] == 'pos') this[keys[i]] += 1;
+        if (keys[i] == 'pos' || keys[i] == 'pnext' ) this[keys[i]] += 1;
+        if (keys[i] == 'cigar' && this[keys[i]] == '') this[keys[i]] = '*';
         record += this[keys[i]] + '\t'
     }
+
+
+
       // if (keys[i] == 'rnext')
       //   record += this.indexToChr[ keys['rnext']-1 ] + '\t';
       // else
       //   record += this[keys[i]] + '\t'
-    record = record.slice(0, record.length-1).trim() + "\n";    
- }  
- 
+    record = record.slice(0, record.length-1).trim() + "\n";
+ }
+
  return record;
 }
 
@@ -295,7 +299,7 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
     while (true) {
         var blockSize = readInt(ba, offset);
         var blockEnd = offset + blockSize + 4;
-        if (blockEnd >= ba.length) {                     
+        if (blockEnd >= ba.length) {
             return sink;
         }
 
@@ -303,7 +307,7 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
 
         var refID = readInt(ba, offset + 4);
         var pos = readInt(ba, offset + 8);
-        
+
         var bmn = readInt(ba, offset + 12);
         var bin = (bmn & 0xffff0000) >> 16;
         var mq = (bmn & 0xff00) >> 8;
@@ -312,25 +316,25 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
         var flag_nc = readInt(ba, offset + 16);
         var flag = (flag_nc & 0xffff0000) >> 16;
         var nc = flag_nc & 0xffff;
-        
+
         record.flag = flag;
-    
+
         var lseq = readInt(ba, offset + 20);
-        
+
         var nextRef  = readInt(ba, offset + 24);
         var nextPos = readInt(ba, offset + 28);
-        
+
         record.rnext = this.indexToChr[ nextRef ];
         record.pnext = nextPos;
-        
+
         var tlen = readInt(ba, offset + 32);
         record.tlen = tlen;
-    
+
         var readName = '';
         for (var j = 0; j < nl-1; ++j) {
             readName += String.fromCharCode(ba[offset + 36 + j]);
         }
-    
+
         var p = offset + 36 + nl;
 
         var cigar = '';
@@ -340,7 +344,7 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
             p += 4;
         }
         record.cigar = cigar;
-    
+
         var seq = '';
         var seqBytes = (lseq + 1 ) >> 1;
         for (var j = 0; j < seqBytes; ++j) {
@@ -360,7 +364,7 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
         }
         p += lseq;
         record.quals = qseq;
-        
+
         record.pos = pos;
         record.mq = mq;
         record.readName = readName;
@@ -376,7 +380,7 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
                 value = String.fromCharCode(ba[p + 3]);
                 p += 4;
             } else if (type == 'i' || type == 'I') {
-                value = readInt(ba, p + 3);                
+                value = readInt(ba, p + 3);
                 p += 7;
             } else if (type == 'c' || type == 'C') {
                 value = ba[p + 3];
@@ -418,7 +422,7 @@ BamFile.prototype.readBamRecords = function(ba, offset, sink, min, max, chrId) {
     // if (options && options.format)
     //   sink.forEach(function(elem) { data += elem.convertTo(options.format) })
     // else
-      
+
     // Exits via top of loop.
 }
 
@@ -488,7 +492,7 @@ function reg2bin(beg, end)
 
 /* calculate the list of bins that may overlap with region [beg,end) (zero-based) */
 var MAX_BIN = (((1<<18)-1)/7);
-function reg2bins(beg, end) 
+function reg2bins(beg, end)
 {
     var i = 0, k, list = [];
     --end;

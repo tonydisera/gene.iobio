@@ -49,17 +49,19 @@
 
   </div>    
 
-  <div class="vcf-sample loader hide" style="margin-left: 110px;">
+  <div class="vcf-sample loader hide" style="margin-top:0px;margin-left: 110px;">
       <span class="loader-label" style="font-size:11px;">Accessing file header</span>
       <img src="assets/images/wheel.gif" style="height:17px;width:17px;">
   </div>
       
   <span id="vcf-sample-box" class="fullview hide">
-      <span style="font-size: 11px;width: 100px;display: inline-block;color:rgb(132,132,132)">
+      <span style="font-size: 11px;width: 100px;display: inline-block;color:rgb(132,132,132);vertical-align: top;padding-top: 4px;">
         Sample
       </span>
-      <select id="vcf-sample-select" style="font-size:10px;" data-placeholder="Choose a sample..." class="chosen-select form-control">
-      </select>
+      <div id="vcf-sample-select-box"  style="display:inline-block;width:200px;">
+        <select id="vcf-sample-select" style="font-size:10px;" data-placeholder="Choose a sample...">
+        </select>
+      </div>
   </span>
 
  

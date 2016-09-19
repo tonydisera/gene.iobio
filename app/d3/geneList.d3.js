@@ -57,7 +57,7 @@
 			var svg = svgData.enter()
 					    .append('svg')
 					    .attr('class', 'chart')
-					    .attr('width',  margin.left + width + labelWidth + 20)
+					    .attr('width',  width)
 					    .attr('height', (barHeight + gap * 2) * data.length + 30)
 					    .append("g")
 					    .attr("transform", "translate(" + margin.left +", " + margin.top + ")");
@@ -81,7 +81,7 @@
 			 .attr("dy", ".36em")
 			 .attr("text-anchor", "start")
 			 .attr('class', 'score')
-			 .text(function(d, i) {return i+1 + "."});
+			 .text(function(d, i) {return i+1 + "."});		    	
 
 			line.append("rect")
 			    .attr("class", "cellbox")
@@ -150,16 +150,18 @@
 				 .attr("text-anchor", "start")
 				 .attr('class', 'name')				 
 				 .text(function(d) {return yValue(d)});	
-		
-			line.append("text")
-			     .attr("class", "score")
-				 .attr("x", function(d) { return 120; })
-				 .attr("y", 0 )
-				 .attr("dx", -5)
-				 .attr("dy", ".36em")
-				 .attr("text-anchor", "start")
-				 .attr('class', 'score')
-				 .text(function(d) {return xValue(d)});
+			if (!options.simpleGeneList) {
+				line.append("text")
+				     .attr("class", "score")
+					 .attr("x", function(d) { return 120; })
+					 .attr("y", 0 )
+					 .attr("dx", -5)
+					 .attr("dy", ".36em")
+					 .attr("text-anchor", "start")
+					 .attr('class', 'score')
+					 .text(function(d) {return xValue(d)});
+
+			}
 			
 
 		});

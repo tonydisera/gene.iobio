@@ -73,25 +73,10 @@ function variantD3() {
 
        }
     });
-/*
-    svgContainer.selectAll(".variant").classed("current", false);
-    svgContainer.selectAll(".variant")
-        .filter( function(variant,i) {
-          var found = false;
-          if (d.start == variant.start 
-              && d.end == variant.end 
-              && d.ref == variant.ref 
-              && d.alt == variant.alt 
-              && d.type.toLowerCase() == variant.type.toLowerCase()) {
-            found = true;
-          }         
-          return found;
-         })
-         .classed("current", true);
-*/
+
     // Get the x for this position
     if (matchingVariant) {
-      var mousex = d3.round(x(matchingVariant.start));
+      var mousex = x(matchingVariant.start);
       var mousey = height - ((matchingVariant.level + 1) * (variantHeight + verticalPadding));
       
 
@@ -99,9 +84,9 @@ function variantD3() {
       var circle = svgContainer.select(".circle");
       circle.transition()
             .duration(200)
-            .style("opacity", .6);
+            .style("opacity", 1);
       circle.attr("cx", mousex + margin.left + 2)
-            .attr("cy", mousey + margin.top + 2);
+            .attr("cy", mousey + margin.top + 4);
 
       circle.classed("emphasize", emphasize);
 
@@ -270,11 +255,20 @@ function variantD3() {
       // a rectangle with a min width of 3.
       minWidth = Math.max(minWidth, lowestWidth);
 
-      var symbolScale = d3.scale.linear()
-                    .domain([1,6])
-                    .range([15,25]);
+      // TODO:  Need to review this code!!!  Added for exhibit
+      minWidth = variantHeight;
+
+      var symbolScaleCircle = d3.scale.ordinal()
+                    .domain([3,4,5,6,7,8,10,12,14,16])
+                    .range([9,15,25,38,54,58,70,100,130,260]);
+      var symbolSizeCircle = symbolScaleCircle(minWidth);
+
+      var symbolScale = d3.scale.ordinal()
+                    .domain([3,4,5,6,7,8,10,12,14,16])
+                    .range([9,15,20,25,32,58,70,100,130,160]);
 
       var symbolSize = symbolScale(minWidth);
+      
      
 
       // Brush
@@ -304,7 +298,10 @@ function variantD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
+        .filter(function() { 
+            return this.parentNode === container.node();
+        })
+        .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
     
 
@@ -383,12 +380,15 @@ function variantD3() {
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { 
-            return Math.round(x(d.start));
+            return Math.round(x(d.start) - (minWidth/2) + (minWidth/4));
           })
           .attr('width', function(d) { 
-            return showTransition ? 0 : Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+//            return showTransition ? 0 : Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+            return showTransition ? 0 : variantHeight;
           })
-          .attr('y', 0)
+          .attr('y', function(d) {
+            return showTransition ? 0 :  height - ((d.level + 1) * (variantHeight + verticalPadding));
+          })
           .attr('height', variantHeight);
 
      
@@ -440,6 +440,8 @@ function variantD3() {
 
       // update 
       if (showTransition) {
+        var interval = 1000 / data[0].features.length;
+
         track.transition()
             .duration(1000)
             .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
@@ -448,11 +450,15 @@ function variantD3() {
         track.selectAll('.variant.snp, .variant.mnp').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
             .transition()        
               .duration(1000)
+              .delay(function(d, i) { return i * interval; })
+              .ease("bounce")
               .attr('x', function(d) { 
-                return d3.round(x(d.start));
+                return d3.round(x(d.start) - (minWidth/2) + (minWidth/4));
               })
               .attr('width', function(d) { 
-                return Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+                // TODO:  Need to review!!
+//                return Math.max(Math.round(x(d.end) - x(d.start)), minWidth);
+                return variantHeight;
               })
               .attr('y', function(d) {             
                 return height - ((d.level + 1) * (variantHeight + verticalPadding));
@@ -464,6 +470,8 @@ function variantD3() {
         trackindel.selectAll('.variant.del')
             .transition()  
               .duration(1000) 
+              .delay(function(d, i) { return i * interval; })
+              .ease("bounce")
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
@@ -480,11 +488,13 @@ function variantD3() {
         trackindel.selectAll('.variant.ins')
             .transition()                 
               .duration(1000)  
+              .delay(function(d, i) { return i * interval; })
+              .ease("bounce")
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
                      .type(getSymbol(d,i))
-                     .size(symbolSize)();
+                     .size(symbolSizeCircle)();
               })
               .attr("transform", function(d) { 
                   var xCoord = x(d.start) + 2;
@@ -495,7 +505,8 @@ function variantD3() {
 
           trackindel.selectAll('.variant.complex')
             .transition()                 
-              .duration(1000)  
+              .duration(1000)
+              .delay(function(d, i) { return i * interval; })  
               .attr("d", function(d,i) {
                 return d3.svg
                      .symbol()
@@ -530,38 +541,43 @@ function variantD3() {
 
 
       // add a circle and label
-      svg.selectAll(".circle").remove();
-      var circle = svg.selectAll(".circle").data([0])
-        .enter().append('circle')
-          .attr("class", "circle")
-          .attr("cx", 0)
-          .attr("cy", 0)
-          .attr("r", 6)                    
-          .style("opacity", 0);
+      if (svg.selectAll(".circle").empty()) {
+        //svg.selectAll(".circle").remove();
+        var circle = svg.selectAll(".circle").data([0])
+          .enter().append('circle')
+            .attr("class", "circle")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", variantHeight + 2)                    
+            .style("opacity", 0);
+
+      }
 
       
       
       // add a arrow on the x-axis
-      svg.selectAll("g.arrow").remove();
-      var garrow = svg.selectAll("g.arrow").data([0])
-                      .enter().append("g")
-                      .attr("class", "arrow")
-                      .attr("transform", "translate(2,0)");
- 
-      garrow.append('line')
-          .attr("class", "arrow arrow-line")
-          .attr("x1", 8)
-          .attr("x2", -2)
-          .attr("y1", 8)
-          .attr("y2", 0)
-          .style("opacity", 0);      
-      garrow.append('line')
-          .attr("class", "arrow arrow-line")
-          .attr("x1", 8)
-          .attr("x2", -2)
-          .attr("y1", 0)
-          .attr("y2", 8)
-          .style("opacity", 0);    
+      if (svg.selectAll(".arrow").empty()) {
+        //svg.selectAll("g.arrow").remove();
+          var garrow = svg.selectAll("g.arrow").data([0])
+                          .enter().append("g")
+                          .attr("class", "arrow")
+                          .attr("transform", "translate(2,0)");
+     
+          garrow.append('line')
+              .attr("class", "arrow arrow-line")
+              .attr("x1", 8)
+              .attr("x2", -2)
+              .attr("y1", 8)
+              .attr("y2", 0)
+              .style("opacity", 0);      
+          garrow.append('line')
+              .attr("class", "arrow arrow-line")
+              .attr("x1", 8)
+              .attr("x2", -2)
+              .attr("y1", 0)
+              .attr("y2", 8)
+              .style("opacity", 0);  
+      }  
 
 
       
@@ -648,6 +664,25 @@ function variantD3() {
 
   }
  
+
+  chart.removeBookmark = function(svg, variant) {
+    // Find the matching variant
+    var matchingVariant = null;
+    svg.selectAll(".variant").each( function (d,i) {
+       if (d.start == variant.start 
+          && d.end == variant.end 
+          && d.ref == variant.ref 
+          && d.alt == variant.alt 
+          && d.type.toLowerCase() == variant.type.toLowerCase()) {
+          matchingVariant = d;
+       }
+    });
+    if (!matchingVariant) {
+      return;
+    }
+    matchingVariant.isBookmark = 'N';
+  }
+
   function tickFormatter (d) {
     if ((d / 1000000) >= 1)
       d = d / 1000000 + "M";

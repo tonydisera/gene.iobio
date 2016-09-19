@@ -96,6 +96,9 @@ function featureMatrixD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
+          .filter(function() { 
+            return this.parentNode === container.node();
+          })
          .attr("width", parseInt(width))
          .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
 
@@ -105,11 +108,17 @@ function featureMatrixD3() {
       // Generate the column headers
       svg.selectAll("g.colhdr").remove();
       if (options.showColumnLabels) {
+        var translateColHdrGroup = "";
+        if (options.simpleColumnLabels) {
+          translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
+        } else {
+          translateColHdrGroup = "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")";
+        }
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
           .append("g")
           .attr("class", "colhdr")
-          .attr("transform",  "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")");
+          .attr("transform",  translateColHdrGroup);
 
         var colhdrs = colhdrGroup.selectAll('.colhdr').data(data);
         colhdrs.enter().append('g')
@@ -118,11 +127,15 @@ function featureMatrixD3() {
               return "translate(" + (cellSize * (i+1)) + ",0)";
             })
             .append("text")
-            .style("text-anchor", "start")
+            .style("text-anchor", options.simpleColumnLabels ? "middle" : "start")
             .attr("dx", ".8em")
             .attr("dy", ".15em")
             .attr("transform", function(d) {
-              return "rotate(-65)" ;
+              if (options.simpleColumnLabels) {
+                return "" ;
+              } else {
+                return "rotate(-65)" ;
+              }
             })
             .text( columnLabel );
 
@@ -271,7 +284,9 @@ function featureMatrixD3() {
       // Generate the cols
       var cols = g.selectAll('.col').data(data);
       cols.enter().append('g')
-          .attr('class', 'col')
+          .attr('class', function(d,i) {
+            return "col  " + d.featureClass;
+          })
           .attr('transform', function(d,i) { 
             return "translate(" + (cellSize * (i+1)) + ",0)";
           });
@@ -320,7 +335,7 @@ function featureMatrixD3() {
       cells.each( function(d,i) {
          var symbolFunction = d.symbolFunction;
          if (symbolFunction) {
-           d3.select(this).call(symbolFunction);
+           d3.select(this).call(symbolFunction, {'cellSize': cellSize});
          }
       });
 

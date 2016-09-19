@@ -2,6 +2,12 @@
   font-size: 11px
   word-break: break-word
 
+  &.danger
+    text-align: center
+    font-size: 12px
+    font-weight: bold
+    color: $danger-font-color
+
 .tooltip-header
   overflow-wrap: break-all
   text-align: right
@@ -50,46 +56,55 @@
   overflow-wrap: break-word
   float: left
   width: 180px
+  height: 25px
   
 
 .tooltip-zygosity
   float: left
   font-size: 9px
   font-weight: normal !important
-  padding-top: 2px !important
+  padding-top: 1px !important
   padding-bottom: 0px !important
-  padding-right: 2px !important
-  padding-left: 2px !important
+  padding-right: 0px !important
+  padding-left: 0px !important
   background-color: #D3D5D8 !important
-  margin-right: 6px
+  margin-right: 3px
   margin-top: 0px !important
-  width: 24px !important
+  width: 33px !important
   color: black
+  border: solid thin rgba(0, 0, 0, 0.22)
 
 .tooltip-zygosity
   &.hom 
-    background-color: rgb(165, 48, 48) !important
+    background-color: rgba(165, 48, 48, 0.76) !important
     color: white
+
 
   &.homref
     background-color: #5D809D !important
-    width: 35px !important
     color: rgba(255,255,255,1)
-    margin-left: -6px !important
-    margin-right: 1px
 
 .tooltip-subtitle
   font-size: 10px
   text-align: center
-  color: $text-color
+  color: black
   padding-top: 4px
   padding-bottom: 1px
+
+  &.selected
+    font-weight: bold
+    color: $current-color
+  
 
 .tooltip-footer
   color: $link-color !important
   margin-bottom: -2px
-  margin-top: 20px !important
+  margin-top: 35px !important
   font-size: 11px
+
+  .bookmark
+    text
+      font-size: 11px !important
 
 .tooltip a
   color: $link-color !important
@@ -167,6 +182,14 @@ text
   &.ref-count
     fill: $text-color  !important    
  
+#coverage-svg
+
+  .processing
+    margin-left: 40px
+    font-style: italic
+    font-weight: bold
+    font-size: 10px
+    color: black
 
 .tooltip.left-arrow
   &:before
@@ -310,7 +333,7 @@ text
   .tooltip-header
     overflow-wrap: break-word
     text-align: right
-    width: 50px
+    width: 60px
     display: inline-block !important
     float: none
     color: $sidebar-label-color
@@ -318,7 +341,7 @@ text
   .tooltip-row
     width: 190px
     clear: both
-    margin-bottom: 3px
+    margin-bottom: 8px
 
   .tooltip-value
     overflow-wrap: break-word
@@ -328,7 +351,10 @@ text
     display: inline-block !important
     float: none
     color: $sidebar-text-color
+    vertical-align: bottom
     
+  .tooltip-title.danger
+    width: 200px    
 
   .tooltip-footer
     margin-top: 40px !important

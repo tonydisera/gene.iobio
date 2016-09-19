@@ -15,14 +15,14 @@ function MatrixCard() {
                         'drug_response'         : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'confers_sensitivity'   : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'risk_factor'           : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'other'                 : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'other'                 : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbo},
                         'association'           : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'protective'            : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'not_provided'          : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'likely_benign'         : {value: 141, badge: false, examineBadge: true, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'benign/likely_benign'  : {value: 141, badge: false, examineBadge: true, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'benign'                : {value: 151, badge: false, examineBadge: true, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
-                        'none'                  : {value: 131, badge: false, examineBadge: false, clazz: ''}
+                        'none'                  : {value: 161, badge: false, examineBadge: false, clazz: ''}
                      };
 	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
                         MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
@@ -96,17 +96,18 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Impact - SnpEff'              ,order:3, index:0, match: 'exact', attribute: 'impact',      map: this.impactMap},
-		{name:'Zygosity'                     ,order:4, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogengicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
-		{name:'Bookmark'                     ,order:5, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Inheritance Mode'             ,order:6, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Affected Siblings'            ,order:7, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Unaffected Siblings'          ,order:8, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
-		{name:'Allele Frequency - 1000G'     ,order:9, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:10, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap}
+		{name:'Pathogenicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
+		{name:'Bookmark'                     ,order:4, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
+		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Affected Siblings'            ,order:6, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
+		{name:'Unaffected Siblings'          ,order:7, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
+		{name:'Allele Frequency - 1000G'     ,order:8, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      ,order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Zygosity'                     ,order:10, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
 
@@ -154,6 +155,13 @@ MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 			row.name = newRowLabel;
 		}
 	});
+	if (this.filteredMatrixRows) {
+		this.filteredMatrixRows.forEach( function (row) {
+			if (row.name.indexOf(searchTerm) >= 0) {
+				row.name = newRowLabel;
+			}
+		});		
+	}
 	
 }
 
@@ -163,6 +171,13 @@ MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
 			row.attribute = newRowAttribute;
 		}
 	});
+	if (this.filteredMatrixRows) {
+		this.filteredMatrixRows.forEach( function (row) {
+			if (row.name.indexOf(searchTerm) >= 0) {
+				row.attribute = newRowAttribute;
+			}
+		});		
+	}
 	
 }
 
@@ -176,6 +191,16 @@ MatrixCard.prototype.getRowAttribute = function(searchTerm) {
 	return attribute;
 }
 
+MatrixCard.prototype.getRowOrder = function(searchTerm) {
+	var order = "";
+	this.matrixRows.forEach( function (row) {
+		if (row.name.indexOf(searchTerm) >= 0) {
+			order = row.order;
+		}
+	});	
+	return order;
+}
+
 
 MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 	this.featureMatrix.tooltipHTML(tooltipFunction);
@@ -184,22 +209,55 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	var rsId = getRsId(d);
-	if (rsId != null) {
-		return rsId;
+	if (isLevelEdu) {
+		return (i+1).toString();
 	} else {
-		return d.type + ' ' + d.start;
+		var rsId = getRsId(d);
+		if (rsId != null) {
+			return rsId;
+		} else {
+			return d.type + ' ' + d.start;
+		}		
 	}
+
 }
 
 MatrixCard.prototype.init = function() {
 	var me = this;
 
+	if (isLevelEdu) {
+		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
+
+		this.removeRow('Zygosity', me.matrixRows);	
+		this.removeRow('Bookmark', me.matrixRows);
+
+		// Only show genotype on second educational tour
+		if (!isLevelEduTour || eduTourNumber != 2) {
+			this.removeRow('Genotype', me.matrixRows);
+		}				
+		// Only show inheritance on first educational tour
+		if (!isLevelEduTour || eduTourNumber != 1) {
+			this.removeRow('Inheritance Mode', me.matrixRows);
+		}
+		this.removeRow('Affected Siblings', me.matrixRows);
+		this.removeRow('Unaffected Siblings', me.matrixRows);
+		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
+		this.removeRow('Allele Frequency - ExAC', me.matrixRows);
+
+		this.setRowLabel('Impact - SnpEff',             'Severity');
+		this.setRowLabel('Impact - VEP',                'Severity');
+		this.setRowLabel('Pathogenicity - ClinVar',     'Known from research');
+		this.setRowLabel('Pathogenicity - PolyPhen',    'Predicted effect');
+		this.setRowLabel('Inheritance Mode',            'Inheritance');
+	} else {
+		this.removeRow('Genotype', me.matrixRows);
+	}
+
 	this.featureMatrix = featureMatrixD3()
-				    .margin({top: 0, right: 40, bottom: 4, left: 24})
-				    .cellSize(18)
-				    .columnLabelHeight(67)
-				    .rowLabelWidth(140)
+				    .margin({top: 0, right: 40, bottom: 7, left: 24})
+				    .cellSize(isLevelEdu ? 23 : 18)
+				    .columnLabelHeight(isLevelEdu ? 30 : 67)
+				    .rowLabelWidth(isLevelEdu ? 100 : 140)
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
@@ -235,6 +293,9 @@ MatrixCard.prototype.init = function() {
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
+				    	if (isLevelEdu) {
+				    		return;
+				    	}
 				    	var column = null;
 				    	var columnPrev = null;
 				    	me.filteredMatrixRows.forEach(function(col) {
@@ -252,6 +313,9 @@ MatrixCard.prototype.init = function() {
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
+				    	if (isLevelEdu) {
+				    		return;
+				    	}
 				    	var column = null;
 				    	var columnNext = null;
 				    	me.filteredMatrixRows.forEach(function(col) {
@@ -316,7 +380,8 @@ MatrixCard.prototype._isolateVariants = function() {
 }
 
 MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
-	var i = -1;
+	var i = 0;
+	var index = -1;
 	d3.select("#feature-matrix").datum().forEach( function(variant) {
 		if (variant.start == theVariant.start &&
 			variant.alt == theVariant.alt &&
@@ -326,13 +391,49 @@ MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
 		}
 		i++;
 	});
+	if (index >= 0) {
+		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
+		var column  = d3.select(colNode);
+		var colObject = column.datum();		
+
+		var rowIdx = this.getRowOrder("Bookmark");
+		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ")").data([{clazz: 'bookmark' }]);
+		this.showBookmarkSymbol(selection);
+	}
 
 }
+MatrixCard.prototype.removeBookmarkFlag = function(theVariant) {
+	var i = 0;
+	var index = -1;
+	d3.select("#feature-matrix").datum().forEach( function(variant) {
+		if (variant.start == theVariant.start &&
+			variant.alt == theVariant.alt &&
+			variant.end == theVariant.end) {
+			variant.isBookmark = 'Y';
+			index = i;
+		}
+		i++;
+	});
+	if (index >= 0) {
+		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
+		var column  = d3.select(colNode);
+		var colObject = column.datum();	
+		colObject.isBookmark = 'N';	
 
+		var rowIdx = this.getRowOrder("Bookmark");
+		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ") g.bookmark").remove();
+	}
+
+}
 MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	var me  = this;
 	var index = -1;
 	var i = 0;
+	// The feature matrix may not be filled yet.  In this case, just return here.
+	if (d3.select("#feature-matrix") == null || d3.select("#feature-matrix").datum() == null ) {
+		return;
+	}
+
 	d3.select("#feature-matrix").datum().forEach( function(variant) {
 		if (variant.start == theVariant.start &&
 			variant.alt == theVariant.alt &&
@@ -396,9 +497,13 @@ MatrixCard.prototype.clearSelections = function() {
 	d3.selectAll('#feature-matrix .y.axis .down').classed("faded", true);
 }
 
+MatrixCard.prototype.reset = function() {
+	this.filteredMatrixRows = null;
+}
+
 
 MatrixCard.prototype.hideTooltip = function() {
-	var tooltip = d3.select('#matrix-track .tooltip');
+	var tooltip = d3.select('#container #matrix-track .tooltip');
 	tooltip.transition()        
            .duration(500)      
            .style("opacity", 0)
@@ -420,37 +525,41 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 
 	if (lock) {
-		showSidebar("Examine");
-		examineCard.showVariant(variant);		
-		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-        .then( function(refreshedVariant) {
-			examineCard.showVariant(refreshedVariant, true);
-        });
+		if (!isLevelEdu) {
+			showSidebar("Examine");
+			examineCard.showVariant(variant);		
+			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+	        .then( function(refreshedVariant) {
+				examineCard.showVariant(refreshedVariant, true);
+	        });			
+		}
+		
+		eduTourCheckVariant(variant);
+
 		getProbandVariantCard().unpin(true);
 	}
 
 
-	var tooltip = d3.select('#matrix-track .tooltip');
+	var tooltip = d3.select('#container #matrix-track .tooltip');
 	tooltip.style("z-index", 20);
 	tooltip.transition()        
 	 .duration(1000)      
 	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
 
+	if (isLevelEdu) {
+		tooltip.classed("level-edu", "true");
+	} 
+
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip"));
 
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
+		$(tooltip[0]).find(".tooltip-title.main-header").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
-	}
-	if (variant.isBookmark) {
-		$(tooltip[0]).find(".tooltip-title:eq(0)").prepend("<svg class=\"bookmark-badge\" height=\"16\" width=\"35\">");
-		var selection = tooltip.select('.bookmark-badge').data([{clazz: "bookmark"}]);
-		matrixCard.showBookmarkSymbol(selection);
 	}
 
 	var selection = tooltip.select("#coverage-svg");
@@ -460,16 +569,24 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		showSidebar("Examine");
-		examineCard.showVariant(variant);
-		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-        .then( function(refreshedVariant) {
-			examineCard.showVariant(refreshedVariant, true);
-        });
+		if (!isLevelEdu) {
+			showSidebar("Examine");
+			examineCard.showVariant(variant);
+			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+	        .then( function(refreshedVariant) {
+				examineCard.showVariant(refreshedVariant, true);
+	        });
+
+		}
 	});
 
+	var widthSimpleTooltip = 220;
+	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
+		widthSimpleTooltip = 500;
+	}
+
+ 	var w = isLevelEdu ? widthSimpleTooltip : 300;
 	var h = tooltip[0][0].offsetHeight;
-	var w = 300;
 
 	var x = variant.screenXMatrix;
 	var y = variant.screenYMatrix + 10;
@@ -482,7 +599,11 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		x -= me.featureMatrix.cellSize()/2;
 	}
 
-	if (x < w) {
+	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
+		y -= $('#nav-edu-tour').outerHeight();
+	}
+
+	if (x < w + 50) {
 		tooltip.classed("arrow-down-left", true);
 		tooltip.classed("arrow-down-right", false);
 		tooltip.style("width", w + "px")
@@ -500,20 +621,25 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	}	
 }
 
-MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
+MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	var me = this;
 
 	if (theVcfData == null) {
 		return;
 	}
 
+	if (filterCard.shouldWarnForNonPassVariants()) {
+		$('#low-quality-legend').removeClass("hide");
+	} else {
+		$('#low-quality-legend').addClass("hide");		
+	}
 
 	// Flag any bookmarked variants
     bookmarkCard.determineVariantBookmarks(theVcfData, window.gene);
 
 
 	// Figure out if we should show the unaffected sibs row
-	if (partialRefresh == null || !partialRefresh) {
+	if (this.filteredMatrixRows == null) {
 		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);	
 		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
 			me.removeRow('Affected Siblings', me.filteredMatrixRows);
@@ -533,7 +659,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 		});
 	}
 
-	// Sort the matrix columns
+	// Sort the matrix columns	
 	this.filteredMatrixRows = this.filteredMatrixRows.sort(function(a, b) {
 		if (a.order == b.order) {
 			return 0;
@@ -543,6 +669,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 			return 1;
 		}
 	});
+    
 	
 	// Fill all features used in feature matrix for each variant
 	this.featureVcfData.features.forEach( function(variant) {
@@ -561,8 +688,13 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = 'N';
 			} 
-			if (rawValue != null && rawValue != "") {
-				if (matrixRow.match == 'exact') {
+			if (rawValue != null && rawValue != "") {				
+				if (matrixRow.match == 'field') {
+					theValue = rawValue;
+					mappedClazz = matrixRow.attribute;
+					symbolFunction = me.showTextSymbol;
+
+				} else if (matrixRow.match == 'exact') {
 					// We are going to get the mapped value through exact match,
 					// so this will involve a simple associative array lookup.
 					// Some features (like impact) are multi-value and are stored in a
@@ -573,7 +705,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 						// Keep the lowest mapped value
 						for (val in rawValue) {
 							var entry = matrixRow.map[val];
-							if (entry != null && (mappedValue == null || entry.value < mappedValue)) {
+							if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
 								mappedValue = entry.value;
 								mappedClazz = entry.clazz;
 								symbolFunction = entry.symbolFunction;
@@ -655,13 +787,14 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData, partialRefresh) {
 
 	$("#feature-matrix").removeClass("hide");
 	$("#feature-matrix-note").removeClass("hide");
+	$('#move-rows').removeClass("hide");
 	//$("#matrix-panel .loader").addClass("hide");
 
 	// Load the chart with the new data
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
@@ -702,36 +835,33 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 
 MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
-	var width = "14";
-	var height = "14";
-	var transform =  "translate(2,2)";
+	var width = options && options.cellSize && options.cellSize > 18 ? "16" : 14;
+	var height = width;
 	var clazz = null;
-	if (options) {
-		if (options.width) {
-			width = options.width;
-		}
-		if (options.height) {
-			height = options.height;
-		}
-		if (options.transform) {
-			transform = options.transform;
-		}
-		if (options.clazz) {
-			clazz = options.clazz;
-		}
+
+	if (options && options.width) {
+		width = options.width;
 	} else {
-		if (selection.datum().width) {
-			width = selection.datum().width;
-		}
-		if (selection.datum().height) {
-			height = selection.datum().height;
-		}
-		if (selection.datum().transform) {
-			transform = selection.datum().transform;
-		}
-		if (selection.datum().clazz) {
-			clazz = selection.datum().clazz;
-		}
+		width = options && options.cellSize && options.cellSize > 18 ? "15" : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14");
+	}
+	if (options && options.height) {
+		height = options.height;
+	} else {
+		height = options && options.cellSize && options.cellSize > 18 ? "15" :(selection.datum().hasOwnProperty("height") ? selection.datum().height : "14");
+	}
+	if (options && options.transform) {
+		transform = options.transform;
+	} else {
+		transform = options && options.cellSize && options.cellSize > 18 ? "translate(3,2)" : selection.datum().transform;
+	}
+	if (options && options.clazz) {
+		clazz = options.clazz;
+	} else {
+		clazz = selection.datum().clazz;
+	}
+
+	if (transform == null || transform == "") {
+		transform = "translate(2,1)";
 	}
 
 	selection.append("g")
@@ -751,9 +881,9 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 	         	} else if (clazz == 'clinvar_uc') {
 	         		return "rgba(231,186,82,1)";
 	         	} else if (clazz == 'clinvar_benign') {
-	         		return "rgba(181,207,107,1)";
+	         		return "rgba(156,194,49,1)";	         		
 	         	} else if (clazz == 'clinvar_lbenign') {
-	         		return "rgba(156,194,49,1)";
+	         		return "rgba(181,207,107,1)";
 	         	} else if (clazz == 'clinvar_other') {
 	         		return "rgb(189,189,189)";
 	         	} else if (clazz == 'clinvar_cd') {
@@ -764,15 +894,23 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
+	var transform = "translate(2,2)";
+	if (options && options.cellSize && options.cellSize > 18) {
+		transform = "translate(4,2)";
+	} else if (options && options.transform) {
+		transform = options.transform;
+	} else if (selection.datum().transform) {
+		transform = selection.datum().transform;
+	}
 	selection.append("g")
-	         .attr("transform", options ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", options ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
-	         .attr("height", options ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "14"))
+	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "13"))
+	         .attr("height", options && options.height ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "13"))
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
-	         	var clazz = options ? options.clazz : selection.datum().clazz;
+	         	var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
 
 	         	if (clazz == 'polyphen_probably_damaging') {
 	         		return "#ad494A";
@@ -786,16 +924,24 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showSiftSymbol = function (selection, options) {
+	var transform = "translate(2,2)";
+	if (options && options.cellSize && options.cellSize > 18) {
+		transform = "translate(4,2)";
+	} else if (options && options.transform) {
+		transform = options.transform;
+	} else if (selection.datum().transform) {
+		transform = selection.datum().transform;
+	}
 	selection.append("g")
-	         .attr("transform", options ? options.transform : (selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(2,2)"))
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", options ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
+	         .attr("width", options  && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
 	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
 	         .style("pointer-events", "none")
 	         .style("fill", function(d,i) {
 
-				var clazz = options ? options.clazz : selection.datum().clazz;
+				var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
 
 	         	if (clazz == 'sift_deleterious') {
 	         		return "#ad494A";
@@ -989,34 +1135,56 @@ MatrixCard.prototype.showHomSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
+	var width = "20";
+	if ( options && options.cellSize && options.cellSize > 18 ) {
+		width = "22";
+	} else if ( options && options.width ) {
+		width = options.width ;
+	}
+	var height = width;
 
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(0,0)")
+	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options ? options.width : "20")
-	         .attr("height", options ? options.height : "20")
+	         .attr("width", width)
+	         .attr("height", height)
 	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
+	var width = "20";
+	if ( options && options.cellSize && options.cellSize > 18 ) {
+		width = "22";
+	} else if ( options && options.width ) {
+		width = options.width ;
+	}
+	var height = width;
+
+	var transform = "translate(-1,0)";
+	if (options && options.cellSize && options.cellSize > 18) {
+		transform = "translate(1,0)";
+	} else if (options && options.transform) {
+		transform = options.transform; 
+	}
+
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(-1,0)")
+	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
-	         .attr("width", options ? options.width : "20")
-	         .attr("height", options ? options.height : "20")
+	         .attr("width", width)
+	         .attr("height", height)
 	         .style("pointer-events", "none");
 	
 };
 
 MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 	selection.append("g")
-	         .attr("transform", options ? options.transform : "translate(0,0)")
+	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options ? options.width : "20")
-	         .attr("height", options ? options.height : "20")
+	         .attr("width", options && options.width ? options.width : "20")
+	         .attr("height", options && options.height ? options.height : "20")
 	         .style("pointer-events", "none");
 
 	selection.append("line")
@@ -1029,6 +1197,18 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 
 
 };
+
+MatrixCard.prototype.showTextSymbol = function (selection, options) {
+	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)"
+	selection.append("g")
+	         .attr("transform", translate)
+	         .append("text")
+	         .attr("x", 0)
+	         .attr("y", 11)
+	         .text(selection.datum().value);
+	
+};
+
 
 
 MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
@@ -1117,32 +1297,48 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 
 }
 
-MatrixCard.prototype.showImpactSymbol = function(selection) {
+MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
-	var symbolScale = d3.scale.linear()
-                    .domain([1,6])
-                    .range([10,40]);
+	var symbolScale = d3.scale.ordinal()
+                    .domain([3,4,5,6,7,8])
+                    .range([9,15,25,38,54,58]);
+	var symbolScaleCircle = d3.scale.ordinal()
+			                  .domain([3,4,5,6,7,8])
+			                  .range([9,15,25,58,68,78]);                    
+	
+    var symbolSize = symbolScale(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
+    var symbolSizeCircle = symbolScaleCircle(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
 
-    var symbolSize = symbolScale(6);
+    var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ; 
+    var translateSymbol = options && options.cellSize && options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
+    var width           = options && options.cellSize && options.cellSize > 18 ? 10 : 8;
+    var height          = width;
      
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
-		         .attr("transform", "translate(4,4)")
+		         .attr("transform", translate)
 		         .append("rect")
-		         .attr("width", 8)
-		         .attr("height", 8)
+		         .attr("width", width)
+		         .attr("height", height)
 		         .attr("class", "filter-symbol " + selection.datum().clazz)
 		         .style("pointer-events", "none");		
 	} else {
 		selection
 		  .append("g")
-		  .attr("transform", "translate(8,8)")
+		  .attr("transform", translateSymbol)
 		  .append('path')
           .attr("d", function(d,i) { 
           	return d3.svg
                      .symbol()
-                     .size(symbolSize)
+                     .size( function(d,i) {
+                     	if (type.toUpperCase() == 'INS') {
+                     		return symbolSizeCircle;
+
+                     	} else {
+                     		return symbolSize;
+                     	}
+                     })
                      .type( function(d,i) {
                      	if (type.toUpperCase() == 'DEL') {
 						    return 'triangle-up';

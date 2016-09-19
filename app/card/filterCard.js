@@ -4,15 +4,33 @@ function FilterCard() {
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
 	this.recFilters = new Object();
-	this.annotationScheme = "snpEff";
+	this.annotationScheme = "vep";
 	this.pathogenicityScheme = "clinvar";
 	this.afScheme = "exac";
 
 }
 
+FilterCard.prototype.shouldWarnForNonPassVariants = function() {
+	var statusCount = 0;
+	var passStatus = false;
+	for ( key in this.recFilters) {
+		if (key == 'PASS') {
+			passStatus = true;
+		}
+		statusCount++;	
+	}
+	if (passStatus && statusCount > 1) {
+		return true;
+	}  else {
+		return false;
+	}
+}
+
 FilterCard.prototype.autoSetFilters = function() {
+	
 	this.displayRecFilters();
 	this.initFilterListeners();
+	/*
 	// If filter status has unique values of PASS + another status (e.g '.' or 'FAIL'),
 	// automatically filter variants to only include those with status PASS.
 	var statusCount = 0;
@@ -27,6 +45,7 @@ FilterCard.prototype.autoSetFilters = function() {
 		this.annotsToInclude.PASS = {key: "recfilter", state: true, value: "PASS"};		
 		d3.select("svg#PASS").classed("current", true);
 	} 
+	*/
 
 }
 
@@ -41,7 +60,8 @@ FilterCard.prototype.getFilterObject = function() {
 		'afMin': afMin,
 		'afMax': afMax,
 		'afScheme' : this.afScheme,
-		'annotsToInclude': this.annotsToInclude
+		'annotsToInclude': this.annotsToInclude,
+		'exonicOnly': $('#exonic-only-cb').is(":checked")
     };
 
     return filterObject;
@@ -49,11 +69,11 @@ FilterCard.prototype.getFilterObject = function() {
 
 
 FilterCard.prototype.onSelectAnnotationScheme = function() {
-	this.annotationScheme = $( "#select-annotation-scheme option:selected" ).text();
+	this.annotationScheme = $("#select-annotation-scheme")[0].selectize.getValue();
 
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	this.displayEffectFilters();
-	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowLabel("Impact", isLevelEdu ? "Impact" : "Impact - " + this.annotationScheme );
 	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 	window.loadTracksForGene();
 
@@ -65,30 +85,21 @@ FilterCard.prototype.getAnnotationScheme = function() {
 
 FilterCard.prototype.setAnnotationScheme = function(scheme) {
 	this.annotationScheme = scheme;
-    $('#select-annotation-scheme').val(scheme);	
-	$('#select-annotation-scheme').trigger("chosen:updated");	
-
+    $('#select-annotation-scheme')[0].selectize.setValue(scheme, true);	
+    
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	d3.select('#filter-card .impact').classed('vepImpact',this.annotationScheme.toLowerCase() == 'vep');
 	d3.select('#filter-card .vepImpact').classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
 	this.displayEffectFilters();
-	window.matrixCard.setRowLabel("Impact", "Impact - " + this.annotationScheme );
+	window.matrixCard.setRowLabel("Impact", isLevelEdu ? "Impact" : "Impact - " + this.annotationScheme );
 	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
 }
 
 
 
-FilterCard.prototype.onSelectPathogenicityScheme = function() {
-	this.pathogenicityScheme = $( "#select-pathogenicity-scheme option:selected" ).text().toLowerCase();
-	
-	var filterCardSelector = $('#filter-track');
-	d3.selectAll("#filter-track .clinvar").classed("hide", this.pathogenicityScheme != "clinvar");
-	d3.selectAll("#filter-track .sift").classed("hide", this.pathogenicityScheme != "sift");
-	d3.selectAll("#filter-track .polyphen").classed("hide", this.pathogenicityScheme != "polyphen");
-}
-
 FilterCard.prototype.onSelectAFScheme = function() {
-	this.afScheme = $( "#select-af-scheme option:selected" ).text().toLowerCase();
+	this.afScheme = $( "#select-af-scheme" )[0].selectize.getValue().toLowerCase();
+	//this.afScheme = theAfScheme.toLowerCase();
 	
 	var filterCardSelector = $('#filter-track');
 	d3.selectAll("#filter-track .afexaclevels").classed("hide", this.afScheme != "exac");
@@ -112,9 +123,29 @@ FilterCard.prototype.init = function() {
 	});
 
 
-	$('#select-annotation-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
-	$('#select-pathogenicity-scheme').chosen({width: "110px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
-	$('#select-af-scheme').chosen({width: "115px;font-size:10px;background-color:white;margin-bottom:2px;", disable_search_threshold: 10});
+	$('#select-annotation-scheme').selectize(
+		{ create: true }
+	);
+	$('#select-annotation-scheme')[0].selectize.on('change', function() {
+		me.onSelectAnnotationScheme();
+	});
+
+	$('#select-af-scheme').selectize(
+		{ create: true }
+	);
+	$('#select-af-scheme')[0].selectize.on('change', function() {
+		me.onSelectAFScheme();
+	});
+/*
+	$('#select-annotation-scheme').selectivity();
+    $('#select-annotation-scheme').on('change', function(event) {
+    	me.onSelectAnnotationScheme(event.value);
+    });
+	$('#select-af-scheme').selectivity();
+    $('#select-af-scheme').on('change', function(event) {
+    	me.onSelectAFScheme(event.value);
+    });
+ */
 
 	// Default annotation scheme to VEP
 	this.setAnnotationScheme("VEP");
@@ -156,6 +187,10 @@ FilterCard.prototype.init = function() {
 	// listen for go button on coverage
 	$('#coverage-go-button').on('click', function() {
 		window.filterVariants();
+	});
+	// listen to checkbox for filtering exonic only variants
+	$('#exonic-only-cb').click(function() {	   
+		window.filterVariants();	    
 	});
 
 
@@ -301,6 +336,14 @@ FilterCard.prototype.initFilterListeners = function() {
 	  			}
 	  		})
 	  	}
+	  	if (schemeClass.indexOf('inactive') >= 0) {
+	  		var tokens = schemeClass.split(' ');
+	  		tokens.forEach(function(clazz) {
+	  			if (clazz != 'inactive') {
+	  				schemeClass = clazz;
+	  			}
+	  		})
+	  	}
 
 	  	// If af level clicked on, reset af range filter
 	  	if (d3.select(this).attr("class").indexOf("af1000glevel") || 
@@ -323,11 +366,23 @@ FilterCard.prototype.initFilterListeners = function() {
 
 }
 
+FilterCard.prototype.setExonicOnlyFilter = function(on) {
+	if (on == null) {
+		on  = true;
+	}
+	$('#exonic-only-cb').prop('checked', on);
+}
+
+
 
 
 FilterCard.prototype.clearFilters = function() {
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = [];
+	
+	d3.selectAll('#filter-track .recfilter').classed('current', false);
+	d3.select('#recfilter-flag').classed("hide", true);
+
 	d3.selectAll('#filter-track .impact').classed('current', false);
 	d3.selectAll('#filter-track .effect').classed('current', false);
 	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
@@ -340,6 +395,7 @@ FilterCard.prototype.clearFilters = function() {
 	$('#af-amount-start').val(0);
 	$('#af-amount-end').val(100);
 	$('#coverage-min').val('');
+	this.setExonicOnlyFilter(false);
 }
 
 FilterCard.prototype.resetAfRange = function() {
@@ -433,7 +489,13 @@ FilterCard.prototype.enableClinvarFilters = function(theVcfData) {
 }
 
 FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
 	var inheritanceVariantMap = {};
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
 	theVcfData.features.forEach( function(variant) {
 		if (variant.inheritance != null && variant.inheritance != '' && variant.inheritance != 'none') {
 			inheritanceVariantMap[variant.inheritance] = 'Y';
@@ -448,6 +510,7 @@ FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
 
 FilterCard.prototype.enableCoverageFilters = function() {
 	$("#coverage-filter").removeClass("hide");
+	
 }
 
 
@@ -503,7 +566,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-	$("#af-range-filter").removeClass("hide");
+	//$("#af-range-filter").removeClass("hide");
 
 }
 
@@ -586,7 +649,7 @@ FilterCard.prototype.displayRecFilters = function() {
 		recFilterCount++;
 		var label = key == "." ? ". (unassigned)" : key;			
 		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
-                      '<text class="name" x="9" y="6" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
+                      '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
   					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
 	});

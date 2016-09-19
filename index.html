@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <head>
 	<title>gene.iobio</title>
   
 
 	<!-- libraries -->
-	<script src="assets/js/jquery.1.11.1.min.js"></script>
+  <script src="assets/js/jquery.1.11.1.min.js"></script> 
 	<script src="assets/js/handlebars-v2.0.0.min.js"></script>	
 	<script src="assets/js/typeahead.bundle.min.js"></script>	
   
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>	
+  <script src="assets/js/bootstrap.min.js"></script>	
 
 	<script src="assets/js/d3.min.js"></script>	
 
-  <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
+  <script src="assets/js/colorbrewer.v1.min.js"></script> 
+
+  <script type="text/javascript" src="assets/js/jquery.bootpag.min.js"></script>
+  
+  <script type="text/javascript" charset="utf-8" src="assets/js/edge.6.0.0.min.js"></script>
 
 
-  <!-- material design for bootstrap library
-  <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/material.min.js"></script>
-  <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/js/ripples.min.js"></script>
-   -->
 
   <!-- Bootstrap Material Design -->
   <script src="assets/js/material.js"></script>
@@ -28,11 +30,11 @@
   <!-- alertify -->
   <script src="assets/js/alertify.min.js"></script> 
 
-  <!-- chosen dropdown (type-ahead) -->
-  <script src="assets/js/chosen.jquery.min.js"></script> 
 
-  <!-- jquery ui autocomplete -->
-  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <!-- selectize dropdown (type-ahead) -->
+  <script src="assets/js/selectize.js"></script> 
+
+
   
   <!-- LZW compression for UTF-16 encoded strings -->
   <script language="javascript" src="assets/js/lz-string.min.js"></script>
@@ -55,15 +57,27 @@
   <script src="assets/js/js-bv-common.js"></script>
   <script src="assets/js/js-local-bam.js"></script>
 
-  <!-- analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  <script src="assets/js/iobio.js"></script>
 
-    ga('create', 'UA-47481907-5', 'auto');
-    ga('send', 'pageview');
+  <script src="app/globalsDeployment.js"></script>
+  <script src="app/globals.js"></script>
+
+  <!-- google analytics -->
+  <script>
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      if (isLevelEdu || isLevelEduTour) {
+        // Analytics for learngene.iobio
+        ga('create', 'UA-47481907-7', 'auto');
+      } else {
+        // Analytics for gene.iobio
+        ga('create', 'UA-47481907-5', 'auto');
+      }
+      ga('send', 'pageview');
 
   </script>
 
@@ -71,47 +85,41 @@
 
 
 
-  <!-- jquery ui -->
-	<link rel="stylesheet" href="assets/css/jquery-ui.css" />	
-
   <!-- bootstrap -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.css">
+  <link rel="stylesheet" href="assets/css/bootstrap.css">
 
   <!-- fonts -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href='http://fonts.googleapis.com/css?family=Lato:300,400|Quattrocento+Sans:400,700|Open+Sans:400,600|Montserrat|Quicksand:400|Raleway' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="assets/css/google-fonts.css">
+  <link rel="stylesheet" href="assets/css/material-icons.css">
+
+<!--  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
 
 
 
-
-  <!-- alertify -->
-  <link rel="stylesheet" href="assets/css/alertify.core.css" />
-  <link rel="stylesheet" href="assets/css/alertify.default.css" />
 
   <!-- animiate -->
   <link rel="stylesheet" href="assets/css/animate.css"/>
 
-  <!-- chosen type-ahead dropdown -->
-  <link rel="stylesheet" href="assets/css/chosen.css" />
-
  
-  <!-- material design for bootstrap  
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/ripples.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.2/css/material-wfont.min.css">
-  -->
+
   <link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
   <link href="assets/css/ripples.min.css" rel="stylesheet">
 
-  <link href="http://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet">
+  <!-- <link href="http://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet"> -->
 
+  <!-- selectize type-ahead dropdown -->
+  <link rel="stylesheet" href="assets/css/selectize.css" />
+
+
+  <!-- alertify -->
+  <link rel="stylesheet" href="assets/css/alertify.min.css" />
+  <link rel="stylesheet" href="assets/css/alertify.default.min.css" />
 
   <!-- page guide stylesheet -->
-  <link rel="stylesheet" href="assets/css/pageguide.css">
-
-    <!-- jquery ui autocomplete -->
-  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-
+  <link rel="stylesheet" href="assets/css/pageguide.css"> 
+  
+  <link rel="stylesheet" href="assets/css/customcheckbox.css"> 
+  
   <!-- site stylesheets -->
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
   <link rel="stylesheet" href="assets/css/site.css" />
@@ -126,8 +134,10 @@
 
   <div id="gene-badge-tooltip" class="tooltip" style="font-size:10px;opacity:0;overflow-y:hidden;overflow-x:hidden"></div>
 
-  
-  <div id="slide-buttons" >
+  <div id="nav-edu-tour" class="shadow-z-2 hide" >
+  </div>
+
+  <div id="slide-buttons"  class="level-edu">
     <div id="close-slide-left" class="close-button fade-in hide">
         <i class="material-icons" id="close-slide-left-glyph" style="line-height:.8;font-size: 40px;font-weight: bold;">keyboard_arrow_left</i>
     </div>
@@ -136,9 +146,24 @@
 
   <div id="slider-left" class="hide fade-in ">
      
-    <div id="slider-left-content">
+    <div id="slider-left-content" class="shadow-z-2">
     </div>
   </div>
+
+<!-- Tour visual dialog -->
+<div class="modal fade" id="edu-tour-modal" tabindex="-1" role="dialog">
+  <div id="edu-tour-modal-content" class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="padding-top:10px;">        
+      </div>
+      <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
+      </div>
+      <div class="modal-footer" style="clear-both">
+          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Disclaimer dialog -->
 <div class="modal fade" id="disclaimer-modal" tabindex="-1" role="dialog">
@@ -165,24 +190,24 @@
   <div id="manage-cache-modal-content" class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header" style="padding-top:10px;">
-        <h4>Cache of analyzed data</h4>
+        <span class="modal-title">Cache of analyzed data</span>
       </div>
       <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
      
                <div >
                  <span class="cache-label" >Data for coverage chart</span>
                  <span class="cache-size" id="coverage-size"></span>
-                 <button id="clear-coverage-cache" onclick="CacheHelper.clearCoverageCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
+                 <button id="clear-coverage-cache" onclick="cacheHelper.clearCoverageCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                </div>
                <div >
                  <span class="cache-label" >Data for genes with no badges</span>
                  <span class="cache-size" id="non-badge-size"></span>
-                 <button id="clear-coverage-cache" onclick="CacheHelper.clearNonBadgeCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
+                 <button id="clear-coverage-cache" onclick="cacheHelper.clearNonBadgeCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                </div>
                <div >
                 <span class="cache-label" >All data</span>
                 <span class="cache-size" id="cache-size"></span>
-                 <button id="clear-coverage-cache" onclick="CacheHelper.clearAll();" class="icon-button-sm btn btn-default btn-raised">Clear all</button>
+                 <button id="clear-coverage-cache" onclick="cacheHelper.clearAll();" class="icon-button-sm btn btn-default btn-raised">Clear all</button>
                </div>
       </div>
       <div class="modal-footer" style="clear-both">
@@ -192,13 +217,14 @@
   </div>
 </div>
 
+
 <!-- Data Modal -->
 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel">
   <div id="data-card" class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header" style="padding-top:10px;">
+      <div class="modal-header" style="padding-top:12px;">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Data</h4>
+        <span class="modal-title">Data</span>
 
         <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
           <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
@@ -237,15 +263,18 @@
                   <input id="datasource-relationship" class="hide" value="proband" type="text"/>
                 </div>
 
-                <div id="mother-data" class="hide" style="float:left;margin-top:10px;min-width:500px;">
+
+                <div id="mother-data" class="hide" style="float:left;margin-top:20px;min-width:500px;">
                   <input id="card-index" class="hide" value="1" type="text">
                   <input id="datasource-relationship" class="hide" value="mother" type="text"/>
                 </div>
 
-                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:10px;min-width:500px;">
+                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:20px;min-width:500px;">
                   <input id="card-index" class="hide" value="2" type="text">
                   <input id="datasource-relationship" class="hide" value="father" type="text"/>
                 </div>
+
+
               </div>
 
               <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
@@ -253,17 +282,19 @@
                     <div id="sample-data-label">
                       AFFECTED SIBLINGS
                     </div>
-                    <select id="affected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
-                      class="chosen-select">
-                    </select>
+                    <div style="width:270px;">
+                      <select id="affected-sibs-select" style="font-size:10px;"  class="selectized" multiple="multiple" placeholder="Choose sample(s)...">
+                      </select>
+                    </div>
                 </div>
                 <div id="unaffected-sibs-box" style="float:left;margin-left:10px;padding-bottom:20px;" class="hide">
                     <div id="sample-data-label">
                       UNAFFECTED SIBLINGS
                     </div>
-                    <select id="unaffected-sibs-select" style="font-size:10px;"  multiple data-placeholder="...select"
-                      class="chosen-select">
-                    </select>
+                    <div style="width:270px;">
+                      <select id="unaffected-sibs-select" style="font-size:10px;" class="selectized"  multiple="multiple" placeholder="Choose sample(s)...">
+                      </select>
+                    </div>
                 </div>
               </div>
 
@@ -275,6 +306,7 @@
       </div>
 
       <div class="modal-footer" style="clear-both">
+         
           <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
           <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
             <i class="material-icons">cloud_done</i>
@@ -287,64 +319,156 @@
 </div>
 
 
- <div id="container" class="push" style="margin-left:32px;margin-top:-10px !important;">
+<!-- Modal -->
+<div class="modal fade" id="feedback-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <span class="modal-title">Give us feedback</span>
+        </div>
+        <div class="modal-body">
+           <div>
+             <span class="feedback-small-label" style="margin-right: 4px">Your email</span><input id="feedback-email" type="text" ></input>
+          </div>
+           <div style="margin-top:10px">
+             <span class="feedback-small-label" style="margin-right: 4px">Your name</span><input id="feedback-name" type="text" ></input>
+          </div>
+          <div style="margin-top:10px; margin-bottom:10px">
+             <span class="feedback-label"</span>Description of problem<textarea id="feedback-note" ></textarea>
+          </div>
+          <div id="feedback-screen-capture-area" class="hide">
+            <span class="feedback-label"</label>Screen Capture</span>
+            <div id="feedback-screen-capture">
+          </div>
+        </div>    
+        <div class="modal-footer">
+          <span id="feedback-warning" class="hide alert alert-danger">
+          </span>          
+          <button id="report-feedback-button" type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" >
+             <i class="material-icons">email</i>
+             Send email
+          </button>
+          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+  </div>
+</div>
+</div>
 
-    <div id="nav-section" class="shadow-z-2">
 
-    	<section id="app-title-section">
-           <div style="float:left">
-      	      <a id='home' href="/">
+ <div id="container" class="push" style="margin-top:-10px !important;">
+
+    <div id="nav-section" class="fixed shadow-z-2">
+
+
+    	<section id="app-title-section" class="nav-stretch">
+        <div class="nav-left">
+      	      <a id='home' style="display:inline-block">
                 <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
               </a>
-              <a href="javascript:void(0)" id="app-disclaimer-link" onclick="$('#disclaimer-modal').modal('show')">Disclaimer</a>
-           </div>
+              <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
+                 Disclaimer
+              </a>              
+              <div id="education-title" class="level-edu"
+              style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
+                education edition
+              </div>
+        </div>
 
           <!-- iobio project link -->
+        <div class="nav-right">
           <a href="http://iobio.io" class="iobioproject">           
-            an iobio project
-          </a>   
+            an iobio project          
+          </a>
+          <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu"  onclick="$('#disclaimer-modal').modal('show')">
+            Disclaimer
+          </a>
+
+        </div>
+
+
+
 
           
-          <div id="gene-search-bar" style="display:inline-block;margin-left:150px;">
+          <div id="gene-search-bar" class="level-edu nav-center" >
 
 
             <!-- Gene search -->
             <span id="bloodhound" >
-                <input id="enter-gene-name" class="typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
+                <input id="enter-gene-name" class="level-edu typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
                 placeholder="Enter Gene Name">
             </span>     
 
             <!-- Button data modal -->
-            <button id="add-data-button" type="button" class="icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal" style="float:right;margin-left:20px;margin-right:20px;padding-top:2px;padding-bottom:1px;margin-top:15px;">
+            <button id="add-data-button" type="button" class="level-edu icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
               <i class="material-icons" style="font-size: 18px;">input</i>      
               Data
             </button>
 
-  
+             <button  id="feedback-link" class="hide icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#feedback-modal">
+              Feeback
+            </button>
+         
+    
           </div>
 
 
 
           <!-- gene badges for navigation -->
-          <div id="gene-badge-container" class="hide" style="margin-top:4px;">
-              
-
+          <div class="nav-center">
+            
             <!-- Buttons for editting gene list, done editting gene list -->
-            <div id="cache-genes-button" style="display: inline-block;font-size:11px;vertical-align: top;padding-top: 15px;padding-right: 10px;">
-              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheGenes()">
-                Analyze all
+            <div id="manage-genes" class="level-edu">
+              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
+                 <i class="material-icons">playlist_add_check</i>
+                  Analyze all
               </a>
-              <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:10px;" href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                Remove all
-              </a>             
+             
+              <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"  
+                href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                  Remove all
+              </a>
+
+             
             </div>
+            
+            <div id="gene-page-selection"></div>  
+
+            
+
+            <div id="gene-page-control" class="level-edu">              
+             
+              <div id="select-gene-container">
+                  <select id="select-gene-sort" style="font-size:10px;">                 
+                  </select>
+              </div>
+             
+               <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide" 
+                onclick="genesCard.viewDefaultsGenesPerPage()" >
+                View 40
+              </a>
+              <a href="javascript:void(0)" id="view-all-genes" class="gene-paging-link hide" 
+                onclick="genesCard.viewAllGenes()" >
+                | all
+              </a>
 
 
-
-            <div id="after-genes" style="display:inline-block;margin-top:12px;">
-               <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="CacheHelper.openDialog()" >Clear cache...</a>
+              <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
+                  Clear cached results...
+              </a>  
+                             
             </div>
+            
 
+            <div id="gene-badge-container" class="" style="clear:both;">
+
+              <div id="after-genes" style="display:inline-block;margin-top:5px;">
+                                           
+                                                         
+              </div>
+
+            </div>
           </div>
 
       </section>
@@ -352,18 +476,18 @@
 
       <div id="transcript-card" class="hide" style="background:white;">
 
+              
 
 
-        <div id="region-track"  style="clear:both;">
+
+        <div id="region-track" class="level-edu" style="clear:both;">
             <a id="gene-name" target="_genecards" class="gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-            <span id="gene-chr" class=" gene-card-label keep-case"></span>
-            <span id="gene-region" class=" gene-card-label keep-case"></span>
-            <span id="minus_strand" class="hide " style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-            <span  id="gene-plus-minus-label" class="fullview hide " style="padding-left: 15px">+  -</span>
-            <input id="gene-region-buffer-input" class="hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
-
-
-             <span style="float:right;margin-right:14px">
+            <span id="gene-chr" class=" gene-card-label keep-case" ></span>
+            <span id="gene-region" class="level-edu gene-card-label keep-case"></span>
+            <span id="minus_strand" class="level-edu" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+            <span  id="gene-plus-minus-label" class="level-edu fullview hide " style="padding-left: 15px">+  -</span>
+            <input id="gene-region-buffer-input" class="level-edu hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+            <span class="level-edu" style="float:right;margin-right:14px">
                 <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
                   <i class="material-icons">remove</i>
                 </a>
@@ -377,7 +501,7 @@
 
 
         <!-- Non protein-coding gene badges -->
-        <div id="non-protein-coding"  style="clear: both;padding-bottom: 0px;display: block;">
+        <div id="non-protein-coding" class="level-edu"  style="clear: both;padding-bottom: 0px;display: block;">
             <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
               Enter a gene name
             </div>   
@@ -386,12 +510,20 @@
             </div>   
             <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
             </div>                  
+            <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">   
+            </div>                  
         </div>  
 
-
-        <div class="fullview" style="margin-top:-25px"> 
+        <div id="gene-source-box" class="level-edu" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
+          <select id="select-gene-source" class="fullview" data-placeholder="">
+                <option value="Gencode Transcript">Gencode Transcript</option>
+                <option value="RefSeq Transcript">RefSeq Transcript</option>                   
+           </select>        
+        </div>
+        
+        <div class="level-edu fullview" style="margin-top:-25px"> 
           <div class="btn-toolbar fullview" 
-             style="display: inline-block;float: left;margin-top:-15px;margin-left: 10px;padding-top: 0px; ">
+             style="display: inline-block;float: left;margin-top:-38px;margin-left: 5px;padding-top: 0px; ">
              <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
                   <button id="transcript-dropdown-button" type="button"  
                   style="width:150px;font-size:11px"
@@ -407,24 +539,24 @@
               </div>
           </div> 
 
-          <div id="gene-source-box" class="hide" style="float:left">
-            <select class="fullview hide" id="select-gene-source" onchange="{geneToLatestTranscript={};genesCard.selectGene(window.gene.gene_name);$('#gene-source-box').toggleClass('hide')}">
-                  <option>Gencode Transcript</option>
-                  <option>RefSeq Transcript</option>                   
-             </select>        
-          </div>
 
-          <button id="gene-source-config-button" style="margin-top:0px;margin-left:4px;float:left" class="btn btn-raised btn-default dropdown-toggle icon-button-extra-sm" onclick="$('#gene-source-box').toggleClass('hide');" >
-            <i class="material-icons" style="font-size:15px;">settings</i>
-          </button>
 
-        </div>   
 
-        <div id="transcript-panel" class="fullview" >
-          <div id="gene-track" class="track hide">           
+ 
+      </div>
+
+        <div id="transcript-panel" class="level-edu fullview" >
+          <div id="gene-track" class="track hide">  
+              <div id="top-coordinate-frame" class="hide">
+                  <svg height="15" width="19"><g transform="translate(10,6),rotate(180)">
+                    <path class="coordinate-arrow" d="M0,-5.161791450287817L5.805622828269509,5.161791450287817 -5.805622828269509,5.161791450287817Z">
+                    </path>
+                  </g>
+                </svg>           
+              </div>         
               <div id="gene-viz" class="track-chart"></div>               
           </div>
-          <span id="zoom-hint" class="hint todo" style="margin-top: -15px;display: block;text-align: center;">
+          <span id="zoom-hint" class="level-edu hint todo" style="margin-top: -15px;display: block;text-align: center;">
               To zoom into region, drag over gene model.
           </span>
         </div>
@@ -439,13 +571,22 @@
 
         <div id="matrix-track"  class="track shadow-z-2 hide">
             
-              <span class="card-label" style="">Rank Variants</span>
+            <div class="card-label level-edu" style="">Rank Variants</div>
+
+            <span id="low-quality-legend" class="hide">
+                <div style="display:inline-block;width:15px;height:15px;background-color: #dedede;"></div>
+                <div style="display: inline-block;vertical-align: top;">
+                    shaded columns: flagged for not meeting filtering criteria
+                </div>
+            </span>
+
+            <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
 
     
-            <div id="matrix-panel"  style="clear:both;margin-top:-9px;"
+            <div id="matrix-panel"  style="clear:both;margin-top:-9px;min-height:30px"
               class="fullview" aria-expanded="true">
-                <div class="loader">
+                <div class="loader hide"  style="margin-top:0px;margin-bottom:10px;">
                     <span class="loader-label">Ranking variants</span>
                     <img src="assets/images/wheel.gif"/>
                 </div>
@@ -454,10 +595,18 @@
               <div id="feature-matrix" style="overflow-x: scroll;margin-top:-15px;">
               </div>
 
-              <a id="move-rows" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
+              <a id="move-rows" class="level-edu hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
 
-              <div id="feature-matrix-note" class="hide" style="padding-left: 155px;font-size:12px;margin-top:-3px;">
-                <svg style="float:left;height: 10px;width:108px">
+              <div id="feature-matrix-note" class="hide" >
+                
+                <span class="level-edu" style="color:  rgb(132,132,132);">
+                  More likely causative
+                </span>
+                <span id="matrix-harmful-note" class="hide level-edu" style="color:  rgb(132,132,132);">
+                  Most harmful
+                </span>
+
+                <svg style="height: 10px;width:108px">
                   <g transform="translate(18,6)">
                     <line x1="0" y1="0" x2="80" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
                   </g>
@@ -465,9 +614,7 @@
                     <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
                   </g>
                 </svg>
-                <span style="float:left;color:  rgb(132,132,132);">
-                More likely causative
-                </span>
+
               </div> 
             </div>
         </div>
@@ -538,7 +685,7 @@
       </div>
 
 
-      <div id="splash" class="horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
+      <div id="splash" class="hide horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
         <div class="vertical-center">
           <img id="splash-image" height="400px" class="hide" src="assets/images/gene.iobio.v2.png"   >
         </div>
@@ -547,7 +694,14 @@
     </div>
 
 
-
+<div id="animation-container-1" class="tour-animation-container hide " 
+    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:100px;vertical-align:middle;width:100%">
+      <div id="Stage"  class="EDGE-462912531 tour-animation"></div>
+</div>
+<div id="animation-container-2" class="tour-animation-container hide " 
+    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:100px;vertical-align:middle;width:100%">
+      <div id="Stage" class="EDGE-30904779 tour-animation"></div>
+</div>
 
 <div id="tourWelcome" class="customPageGuideWelcome hide" style="text-align:center;height:170px;">
   <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
@@ -567,7 +721,7 @@
 </div>
 
  
-<div id="tour-placeholder">
+<div id="tour-placeholder" class="hide">
 <div>
 
 
@@ -601,6 +755,8 @@
       </div>
 
     </div>
+
+
     
 </body>
 
@@ -616,6 +772,8 @@
         .attr("class", "tooltip")               
         .style("opacity", 0);
 </script>    
+
+<!-- All global variables that are configurable -->
 
 
 <script src="app/d3/geneList.d3.js"></script>
@@ -641,6 +799,9 @@
 <script src="app/card/bookmarkCard.js"></script>
 <script src="app/card/variantCard.js"></script>  
 
+<script src="app/timeout.js"></script>  
+<script src="app/eduTour.js"></script>  
+
 <script src="app/app.js"></script>	
 
 
@@ -648,7 +809,6 @@
   $(".material-dropdown select").dropdown();
 </script>
 
-<!-- <script src="assets/js/pageguide.min.js"></script> -->
 <script src="assets/js/pageguide.js"></script>
 
  </div>

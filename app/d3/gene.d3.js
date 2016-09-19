@@ -68,7 +68,8 @@ function geneD3() {
        brushAllowance = geneD3_showBrush ? 20 : 0;
 
        // calculate height
-       geneD3_height = data.length * (trackHeight + arrowHeight);
+       var padding = data.length > 1 ? trackHeight/2 : 0;
+       geneD3_height = data.length * (trackHeight + padding);
 
        // determine inner height (w/o margins)
        var innerHeight = geneD3_height - margin.top - margin.bottom;
@@ -108,11 +109,14 @@ function geneD3() {
       // every time we draw the chart.
       if (geneD3_widthPercent && geneD3_heightPercent) {
         d3.select(this).selectAll("svg")
+           .filter(function() { 
+              return this.parentNode === container.node();
+           })
           .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
           .attr("preserveAspectRatio", "none");
       } 
 
-      d3.select(this).selectAll("svg")
+      container.selectAll("svg")
         .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
         .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
 

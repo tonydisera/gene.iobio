@@ -115,7 +115,9 @@ tl.pg.interval = {};
         'steps_element': '#tlyPageGuide',
         'auto_refresh': false,
         'refresh_welcome': false,
-        'refresh_interval': 500
+        'refresh_interval': 500,
+        'show_numbers': true,
+        'close_button_label': "X"
     };
 
     // boilerplate markup for the message display element and shadow/index bubble container.
@@ -123,11 +125,17 @@ tl.pg.interval = {};
         '<div id="tlyPageGuideWrapper">' +
             '<div id="tlyPageGuideOverlay"></div>' +
             '<div id="tlyPageGuideMessages">' +
-                '<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
+                '<a href="#" id="pageguide-close-button" class="pageguide-close" title="Close"></a>' +
+                //'<a href="#" class="tlypageguide_close" title="Close Guide">close</a>' +
                 '<span class="tlypageguide_index"></span>' +
                 '<div class="tlypageguide_text"></div>' +
-                '<a href="#" class="tlypageguide_back" title="Previous">Previous</a>' +
-                '<a href="#" class="tlypageguide_fwd" title="Next">Next</a>' +
+                //'<a href="#" class="tlypageguide_back"  title="Previous">Previous</a>' +
+                //'<a href="#" class="tlypageguide_fwd"  title="Next">Next</a>' +
+                '<div class="pageguide-nav">' +
+                    '<a href="#" id="pageguide-prev-button" class="pageguide-prev" title="Prev step">back&nbsp;</a>' +
+                    '<a href="#" id="pageguide-next-button" class="pageguide-next" title="Next step">next&nbsp;&nbsp;</a>' +
+                '</div>' +
+
             '</div>' +
             '<div id="tlyPageGuideContent"></div>' +
             '<div id="tlyPageGuideToggles"></div>' +
@@ -167,6 +175,7 @@ tl.pg.interval = {};
         if (!$wrapper.length) {
             wrapperExists = false;
             $wrapper = $(tl.pg.wrapper_markup);
+            $wrapper.find("#pageguide-close-button").text(preferences.close_button_label);
         }
 
         if (preferences.custom_open_button == null &&
@@ -215,8 +224,12 @@ tl.pg.interval = {};
         this.preferences = preferences;
         this.$base = pg_elem;
         this.$message = this.$base.find('#tlyPageGuideMessages');
-        this.$fwd = this.$base.find('a.tlypageguide_fwd');
-        this.$back = this.$base.find('a.tlypageguide_back');
+
+        //this.$fwd = this.$base.find('a.tlypageguide_fwd');
+        //this.$back = this.$base.find('a.tlypageguide_back');
+        this.$fwd = this.$base.find('.pageguide-next');
+        this.$back = this.$base.find('.pageguide-prev');
+
         this.$content = this.$base.find('#tlyPageGuideContent');
         this.$steps = $(preferences.steps_element);
         this.uuid = tl.pg.hashCode(preferences.steps_element);
@@ -402,7 +415,8 @@ tl.pg.interval = {};
                 self.$content.append(
                     '<div class="tlypageguide_shadow tlypageguide_shadow' + hashCode +
                     '" data-selectorhash="' + hashCode + '">' +
-                        '<span class="tlyPageGuideStepIndex ' + positionClass +'"></span>' +
+                        '<span class="' + positionClass +'"></span>' +
+                        (self.preferences.show_numbers ? '<span class="tlyPageGuideStepIndex ' + positionClass +'"></span>' : '') +
                     '</div>'
                 );
             }
@@ -433,11 +447,27 @@ tl.pg.interval = {};
                     $el = $($elements[i]); // is it weird to '$($x)'?
                     newTargetData.targetStyle.display = 'block';
                     var offset = $el.offset();
+
+                    var width = null;
+                    var height = null;
+                    var top = offset.top;
+                    var left = offset.left;
+                    if (typeof($el[0].getBBox) == 'function') {
+                        width  = $el[0].getBBox().width + 20;
+                        height = $el[0].getBBox().height + 20;
+                        top -= 10;
+                        left -= 10;
+                    } else {
+                        width = $el.outerWidth() + 12;
+                        height = $el.outerHeight() + 12
+                        top -= 6;
+                        left -= 6;
+                    }
                     $.extend(newTargetData.targetStyle, {
-                        top: offset.top,
-                        left: offset.left,
-                        width: $el.outerWidth(),
-                        height: $el.outerHeight(),
+                        top:  top,
+                        left: left,
+                        width: width,
+                        height: height,
                         'z-index': $el.css('z-index')
                     });
                     visibleIndex++;
@@ -492,7 +522,7 @@ tl.pg.interval = {};
                 }
                 $el.css(style);
             }
-            if (changes.index != null) {
+            if (changes.index != null && this.preferences.show_numbers) {
                 $el.find('.tlyPageGuideStepIndex').text(changes.index);
             }
         }
@@ -557,9 +587,9 @@ tl.pg.interval = {};
             if (height < defaultHeight) {
                 height = defaultHeight;
             }
-            if (height > $(window).height()/2) {
-                height = $(window).height()/2;
-            }
+            //if (height > $(window).height()/2) {
+            //    height = $(window).height()/2;
+           //  }
 
             this.$message.show().animate({'height': height}, 500);
             if (!tl.pg.isScrolledIntoView($(targetKey), this.$message.outerHeight())) {
@@ -705,8 +735,17 @@ tl.pg.interval = {};
                 self.close();
                 return false;
         });
+        // tds
+        $('.pageguide-close', self.$message.add($('.tlypageguide_toggle')))
+            .on('click', function() {
+                self.close();
+                return false;
+        });
 
         /* interaction: item click */
+        // tds - comment out this code.  we don't want users to click on other
+        // steps when going through tour.  The tour should be followed sequentially.
+        /*
         self.$base.on('click', '.tlyPageGuideStepIndex', function () {
             var selector = self.hashTable[$(this).parent().data('selectorhash')];
             var target = self.targetData[selector];
@@ -714,9 +753,13 @@ tl.pg.interval = {};
             self.track_event('PG.specific_elt');
             self.show_message(index - 1);
         });
+        /*
 
         /* interaction: fwd/back click */
         self.$fwd.on('click', function() {
+            if ($('#pageguide-next-button').hasClass("disabled")) {
+                return false;
+            }
             if (self.is_open) {
                 self.navigateForward();
             }
@@ -759,8 +802,11 @@ tl.pg.interval = {};
      * left (boolean): whether or not to roll to the left-hand side
      **/
     tl.pg.PageGuide.prototype.roll_number = function (num_wrapper, new_text, left) {
+        var self = this;
         num_wrapper.animate({ 'text-indent': (left ? '' : '-') + '50px' }, 'fast', function() {
-            num_wrapper.html(new_text);
+            if (self.preferences.show_numbers) {
+                num_wrapper.html(new_text);
+            }
             num_wrapper.css({ 'text-indent': (left ? '-' : '') + '50px' }, 'fast').animate({ 'text-indent': "0" }, 'fast');
         });
     };

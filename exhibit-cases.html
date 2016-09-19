@@ -1,0 +1,97 @@
+<html>
+<head>
+	<!-- libraries -->
+	<script src="assets/js/jquery.1.11.1.min.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>	
+
+	<!-- Bootstrap Material Design -->
+	<script src="assets/js/material.js"></script>
+	<script src="assets/js/ripples.js"></script>
+
+	<!-- alertify -->
+	<script src="assets/js/alertify.min.js"></script> 
+
+	<!-- css animate -->
+    <link rel="stylesheet" href="assets/css/animate.css"/>
+
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="assets/css/bootstrap.css">
+
+	<!-- fonts -->
+   <link rel="stylesheet" href="assets/css/google-fonts.css">  
+   <link rel="stylesheet" href="assets/css/material-icons.css">
+
+
+	<link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
+	<link href="assets/css/ripples.min.css" rel="stylesheet">
+
+	<!-- alertify -->
+	<link rel="stylesheet" href="assets/css/alertify.min.css" />
+	<link rel="stylesheet" href="assets/css/alertify.default.min.css" />
+	<link rel="stylesheet" href="assets/css/exhibit.css"
+
+
+</head>
+<body id="edu-tour-welcome" class="edu-cases">
+	<div id="container">
+		<div id="banner">
+			<button id="start-over" onclick="startOver()" class="exhibit-button btn btn-raised">
+				Start Over
+			</button>
+		</div>
+		<h2>Use gene.iobio to help patients.</h2>
+
+		<div id="button-container">
+			<button id="case-study-1" onclick="showCaseStudy(1)" class="exhibit-button fat large btn btn-raised">
+				<div style="padding-top:0px;padding-right:0px;">
+					<svg height="38" width="38">
+		              <g transform="translate(0,0)">
+		                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="38" height="38" fill="white"></use>
+		              </g>
+		            </svg>
+				</div>
+				Hunt for a cancer gene in a family
+			</button>
+			<button id="case-study-2" onclick="showCaseStudy(2)" class="exhibit-button fat large btn btn-raised">
+				<div>
+					<i class="material-icons" style="font-size:34px;">local_pharmacy</i>
+				</div>
+				Decide how much medicine to give a patient
+			</button>
+		</div>
+
+
+
+	</div>
+		<div id="thankyou" class="">
+			<div style="text-align:center">
+				<div id="header">
+					Creators: Tonya DiSera, Alistair Ward, Yi Qiao, Mary Anne Karren, and Gabor Marth (USTAR Center for Genetic Discovery, University of Utah); Brett Thompson (Pixelcrane)
+				</div>	
+	
+			</div>
+	    </div>	
+</body>
+<svg id="symbols" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="search-dna-symbol" x="0px" y="0px" width="512px" height="512px" viewBox="0 0 48.26 48.259" style="enable-background:new 0 0 48.26 48.259;" xml:space="preserve">
+    <g>
+      <path d="M29.59,7.917l6.064,7.558c-0.844,0.065-1.75-0.048-2.654-0.496l-3.451-4.3C29.279,9.665,29.346,8.736,29.59,7.917z    M38.872,14.382l-7.494-9.339c-0.353,0.354-0.758,0.833-1.121,1.417l6.976,8.691C37.898,14.925,38.459,14.633,38.872,14.382z    M3.644,27.085l7.553,9.412c0.28-0.27,0.725-0.738,1.157-1.371l-7.186-8.955C4.572,26.453,4.05,26.785,3.644,27.085z    M13.524,31.482l-4.653-5.8c-0.788-0.192-1.552-0.159-2.263-0.006l6.484,8.082C13.369,33.078,13.548,32.312,13.524,31.482z    M15.342,25.721c-4.472-5.573,0.368-9.921,1.383-10.735c1.853-1.486,6.604-4.388,10.727,0.75c0.854,1.063,1.344,2.099,1.577,3.082   c0.718-0.144,1.457-0.22,2.218-0.225c-0.045-0.226-0.093-0.451-0.158-0.68c4.274,1.88,9.341-0.467,11.875-2.407l-1.348-1.766   c-0.312,0.236-7.642,5.714-12.005,0.276c-4.377-5.453,2.462-11.578,2.755-11.837L30.9,0.509c-2.389,2.091-5.688,6.574-4.791,11.159   c-3.731-2.11-7.808-0.797-10.775,1.585c-2.171,1.742-4.747,5.28-3.896,9.46C7.26,21.169,2.449,23.429,0,25.303l1.349,1.767   c0.31-0.236,7.641-5.713,12.004-0.275c4.377,5.455-2.461,11.579-2.755,11.836l1.464,1.67c2.263-1.979,5.349-6.102,4.912-10.424   c0.923,0.449,1.859,0.689,2.781,0.783c-0.007-0.158-0.024-0.316-0.024-0.479c0-0.588,0.058-1.16,0.143-1.727   C18.376,28.273,16.789,27.525,15.342,25.721z M31.154,40.486c-5.672,0-10.285-4.615-10.285-10.287s4.613-10.286,10.285-10.286   c5.673,0,10.287,4.614,10.287,10.286S36.827,40.486,31.154,40.486z M38.859,30.199c0-4.248-3.457-7.704-7.705-7.704   c-4.247,0-7.703,3.456-7.703,7.704s3.456,7.703,7.703,7.703C35.402,37.902,38.857,34.447,38.859,30.199z M40.357,37.574   l-2.274,2.273l7.901,7.903l2.275-2.275L40.357,37.574z M29.622,34.768h2.603v-2.475h-2.603V34.768z M33.709,26.499   c-0.258-0.255-0.596-0.464-1.014-0.625c-0.416-0.163-0.928-0.243-1.537-0.243c-0.617,0-1.141,0.094-1.568,0.279   c-0.43,0.188-0.781,0.432-1.057,0.731s-0.479,0.64-0.613,1.019c-0.133,0.38-0.211,0.766-0.236,1.158h2.613   c-0.025-0.275,0.023-0.521,0.148-0.738s0.34-0.324,0.639-0.324c0.482,0,0.727,0.213,0.727,0.637c0,0.143-0.043,0.264-0.125,0.363   c-0.084,0.102-0.188,0.188-0.307,0.256c-0.121,0.071-0.248,0.137-0.381,0.193c-0.133,0.059-0.25,0.113-0.352,0.162   c-0.242,0.135-0.424,0.301-0.549,0.5c-0.125,0.201-0.214,0.404-0.265,0.612c-0.049,0.208-0.074,0.412-0.074,0.611   c0,0.192,0.005,0.351,0.013,0.478h2.313c0-0.144,0.011-0.269,0.031-0.375c0.021-0.107,0.057-0.205,0.104-0.287   c0.051-0.084,0.121-0.164,0.213-0.238c0.09-0.074,0.207-0.15,0.351-0.225c0.207-0.109,0.411-0.216,0.612-0.319   c0.199-0.104,0.381-0.235,0.543-0.395c0.162-0.157,0.295-0.355,0.396-0.594c0.101-0.237,0.149-0.547,0.149-0.933   c-0.018-0.274-0.086-0.563-0.207-0.868C34.159,27.031,33.969,26.753,33.709,26.499z M15.095,22.252l3.45,4.299   c0.55,0.272,1.098,0.41,1.634,0.47c0.085-0.3,0.184-0.593,0.292-0.882l-5.335-6.649C14.891,20.307,14.825,21.237,15.095,22.252z    M15.803,18.031l5.323,6.634c0.295-0.545,0.642-1.057,1.018-1.544l-5.221-6.507C16.572,16.967,16.164,17.447,15.803,18.031z    M24.295,20.977L19.4,14.876c-0.597,0.282-1.119,0.613-1.525,0.914l5.102,6.358C23.385,21.724,23.827,21.335,24.295,20.977z    M27.116,19.389l-4.013-5c-0.788-0.194-1.552-0.161-2.262-0.007l4.647,5.793C26.008,19.874,26.549,19.609,27.116,19.389z" />
+    </g>
+  </symbol>
+
+</svg>
+
+<script src="app/globalsDeployment.js"></script> 
+<script src="app/globals.js"></script> 
+<script src="app/timeout.js"></script>  
+<script src="app/exhibit.js"></script> 
+<script>
+	$(document).ready(function() {
+
+
+		$('body').animateIt('fadeInLeft');	
+		
+	});
+</script>
+
+</html>

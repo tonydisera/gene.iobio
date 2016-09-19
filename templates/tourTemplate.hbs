@@ -4,8 +4,201 @@
   </div>
 </div>
 
+
+<!-- Tour for colon cancer screening case -->
+<ul id="tourEduCase1"  data-tourtitle="coloncancer">
+
+
+  <li class="tlypageguide_down" data-tourtarget="#edu-tour-label">
+  </li>
+  
+  <li class="tlypageguide_right" data-tourtarget="#phenolyzer-search-box .selectize-control.single">
+    <div>
+       Look at the father’s genome first. Select 'Colon cancer' from the ‘Phenolyzer’ box at the left of the screen.
+    </div>
+  </li>
+
+ 
+  <li class="tlypageguide_right" data-tourtarget="#phenolyzer-results">
+  </li>
+
+  <li class="tlypageguide_right" data-tourtarget="#proband-variant-card #zoom-region-chart">
+    <div> 
+      Gene model     
+    </div>
+  </li>
+
+
+
+  <li class="tlypageguide_left" data-tourtarget="#gene-badge-container">
+
+    <div style="display:inline-block;float:left;width: 50%;text-align: left;margin-left: 20px;margin-bottom:20px">
+      Examine the genes at the top of the screen for
+     harmful variants. Touch a gene’s name to search it. Variants predicted
+     to be harmful will have bright red icons. 
+     If you find a harmful variant for the father, tap the red icon.
+    </div>
+    <div style="display:inline-block;float:left">
+       <img width="300" src="assets/images/edutour/impact_legend.png">
+    </div>
+  </li>
+
+   <li class="tlypageguide_up" data-tourtarget="#edu-tour-1 #start-over">
+    <div>
+    </div>
+  </li>
+
+   <li class="tlypageguide_down" data-tourtarget="#children-buttons">
+    <div>
+    Search the APC genes of the children for the harmful variant. Touch each child’s name at the top of the screen. Based on what you find, select which children should get frequent colon cancer screenings below.
+
+      <div style="text-align:center;margin-top:0px;margin-bottom:40px;">
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox" onclick="onEduTour1Check($(this))" id="jimmy">
+            <label for="jimmy" >Jimmy</label>
+        </div>
+        <div class="custom-checkbox" style="display:inline-block;margin-right:20px">
+            <input type="checkbox"  onclick="onEduTour1Check($(this))" id="bobby">
+            <label for="bobby">Bobby</label>
+         </div>
+        <div class="custom-checkbox" style="display:inline-block">
+            <input type="checkbox"  onclick="onEduTour1Check($(this))" id="sarah">
+            <label for="sarah" >Sarah</label>
+         </div>
+      </div>
+    
+      <div style="text-align:center;margin-top: -50px;margin-bottom:10px;">
+          <div style="display:inline-block;margin-right: 45px;margin-left: -8px;">
+              <label id="jimmy-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+          </div>
+          <div style="display:inline-block;margin-right: 36px;">            
+              <label id="bobby-answer" class="incorrect edu-tour-answer" style="visibility:hidden">incorrect</label>
+           </div>
+          <div style="display:inline-block">
+              <label id="sarah-answer" class=" edu-tour-answer" style="visibility:hidden">correct</label>
+           </div>
+        </div>      
+    </div>
+  </li>
+
+   <li class="tlypageguide_down" data-tourtarget=".edu-tour-1-child-buttons">
+  </li>
+
+</ul>
+
+<!-- Tour for warfarin screening case -->
+<ul id="tourEduCase2"  data-tourtitle="warfarin">
+
+  
+  <li class="tlypageguide_up" data-tourtarget="#edu-tour-2-label">          
+  </li>
+
+  <li class="tlypageguide_up" data-tourtarget="#edu-tour-2 #start-over">  
+  </li>
+
+  <li class="tlypageguide_down" data-tourtarget="#proband-variant-card #vcf-track">
+      The variant with a red circle around it determines Warfarin sensitivity. This is the variant you need to examine in your patients. 
+  </li>  
+ 
+  <li class="tlypageguide_down" data-tourtarget="#child-buttons-tour2">
+    <div>
+    Select each patient. Determine their genotype and choose the correct dosage for them below.
+    <br><br>
+    </div>    
+    <div    style="margin-bottom:40px;margin-top:-10px;">
+      
+
+      <div id="john-answers"  class="answers selected" >
+        <div class="answer-label">John</div>
+        <div style="text-align:left;margin-top:0px;margin-bottom:0px">
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-normal">
+              <label for="john-normal" >Normal GG</label>
+          </div>
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-lower">
+              <label for="john-lower">Lower AG</label>
+           </div>
+          <div class="custom-checkbox" style="display:inline">
+              <input type="checkbox" class="john-checkbox" onclick="onEduTour2Check($(this))" id="john-lowest">
+              <label for="john-lowest" >Lowest AA</label>
+           </div>
+           <div  style="text-align:left;margin-top:-7px;margin-bottom:0px;">
+            <label id="john-normal-answer" class="john-answer incorrect hide edu-tour-answer" >incorrect</label>
+            <label id="john-lower-answer"  class="john-answer hide edu-tour-answer" >correct</label>
+            <label id="john-lowest-answer" class="john-answer hide incorrect edu-tour-answer">incorrect</label>
+           </div>
+        </div>
+      
+      </div>
+      <div  id="diego-answers" class="answers" >
+        <div class="answer-label">Diego</div>
+        <div  style="text-align:left;margin-top:0px;margin-bottom:0px">
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-normal">
+              <label for="diego-normal" >Normal GG</label>
+          </div>
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-lower">
+              <label for="diego-lower">Lower AG</label>
+           </div>
+          <div class="custom-checkbox" style="display:inline">
+              <input type="checkbox" class="diego-checkbox" onclick="onEduTour2Check($(this))" id="diego-lowest">
+              <label for="diego-lowest" >Lowest AA</label>
+           </div>
+           <div  style="text-align:left;margin-top:-7px;margin-bottom:0px;">
+            <label id="diego-normal-answer" class="diego-answer incorrect hide edu-tour-answer" >incorrect</label>
+            <label id="diego-lower-answer"  class="diego-answer hide incorrect edu-tour-answer" >incorrect</label>
+            <label id="diego-lowest-answer" class="diego-answer hide  edu-tour-answer">correct</label>
+           </div>
+        </div>
+      </div>
+
+      
+      <div  id="anna-answers"  class="answers" >
+        <div class="answer-label">Anna</div>
+        <div style="text-align:left;margin-top:0px;margin-bottom:0px">
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-normal">
+              <label for="anna-normal" >Normal GG</label>
+          </div>
+          <div class="custom-checkbox" style="display:block;">
+              <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-lower">
+              <label for="anna-lower">Lower AG</label>
+           </div>
+          <div class="custom-checkbox" style="display:inline">
+              <input type="checkbox" class="anna-checkbox" onclick="onEduTour2Check($(this))" id="anna-lowest">
+              <label for="anna-lowest" >Lowest AA</label>
+           </div>
+           <div  style="text-align:left;margin-top:-7px;margin-bottom:0px;">
+            <label id="anna-normal-answer" class="anna-answer  hide edu-tour-answer" >correct</label>
+            <label id="anna-lower-answer"  class="anna-answer hide incorrect edu-tour-answer" >incorrect</label>
+            <label id="anna-lowest-answer" class="anna-answer hide incorrect edu-tour-answer">incorrect</label>
+           </div>
+        </div>
+      </div>
+
+      <!-- <div style="margin-top:20px;float:left;width:25%;background-color:white;padding: 10px;">
+        <img width="200" src="assets/images/edutour/dose_legend.png">
+      </div>
+     -->     
+    </div>
+  </li>  
+
+  <li class="tlypageguide_up" data-tourtarget="#edu-tour-2">
+
+      <img width="450" src="assets/images/edutour/patient_to_dose_legend.png">
+
+  </li>  
+
+ 
+
+
+</ul>
+
+
 <!-- Main gene.iobio tour --->
-<ul id="tlyPageGuide" data-tourtitle="gene.iobio tour">
+<ul id="tourMain" data-tourtitle="main">
  <li class="tlypageguide_left" data-tourtarget="#enter-gene-name">
     <div>
       Type in the gene name BRCA2 and select from the drop down list.
@@ -42,7 +235,7 @@
   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
     <div>
       The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
-      Hover over the variants to see more information.  
+      The the variants symbols to see more information.  
       <br><br>
 
     </div>
@@ -72,10 +265,9 @@
       according to this transcript.
     </div>
   </li>
-  <li class="tlypageguide_top" data-tourtarget="#gene-source-config-button">
+  <li class="tlypageguide_top" data-tourtarget="#set-gene-source">
     <div>
-     The Gencode transcript set is currently loaded.  To switch to the RefSeq transcripts, click this
-     button and then it from the dropdown.
+     The Gencode transcript set is currently loaded.  To switch to the RefSeq transcripts, select it from the dropdown.
     </div>
   </li>
 
@@ -190,7 +382,7 @@
 
 
 <!-- Tour of bookmarks functionality -->
-<ul id="tlyPageGuideBookmarks" class="hide" data-tourtitle="gene.iobio Bookmarks tour">
+<ul id="tourBookmarks"  data-tourtitle="bookmarks">
 
  
 
@@ -202,7 +394,7 @@
       Do this a few times to bookmark multiple variants.
     </div>
   </li>
-  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #vcf-chart-label">
+  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #vcf-track">
     <div>
       You can also bookmark a variant by clicking on a variant and then clicking on the 'Bookmark' link in the
       tooltip.  
@@ -266,7 +458,7 @@
 
 
 <!-- Tour of phenolyzer functionality -->
-<ul id="tlyPageGuidePhenolyzer" class="hide" data-tourtitle="gene.iobio Phenolyzer tour">
+<ul id="tourPhenolyzer" data-tourtitle="phenolyzer">
 
    <li class="tlypageguide_right" data-tourtarget=".button-show-phenolyzer">
     <div>
@@ -274,7 +466,7 @@
     </div>
    </li>
    
-   <li class="tlypageguide_right" data-tourtarget="#genes-card textarea">
+   <li class="tlypageguide_right" data-tourtarget="#genes-card #phenolyzer-search-box .selectize-control">
     <div>
       Our application has integrated Phenolyzer, which produces a ranked gene list based on
       a phenotype terms.

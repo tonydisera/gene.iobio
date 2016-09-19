@@ -11,6 +11,7 @@ lineD3 = function module() {
 
   var x = null;
   var y = null;
+  var maxDepth = null;
   var container = null;
 
   var formatter = d3.format(',');
@@ -31,6 +32,9 @@ lineD3 = function module() {
         return pos + ',' + depth;
   }
   var showCircle = function(start, theDepth) {
+    if (container == null) {
+      return;
+    }
     // Find the closest position in the data
     d = null;
     if (theData) {
@@ -53,7 +57,7 @@ lineD3 = function module() {
       var invertedx = x.invert(mousex); 
       var invertedy = y.invert(mousey); 
 
-      if (theDepth == null) {
+      if (theDepth == null || theDepth == "") {
         theDepth = depthy.toString();
       }
       var circleText = formatCircleText(posx, theDepth);
@@ -101,6 +105,9 @@ lineD3 = function module() {
   };
 
   var hideCircle = function() {
+    if (container == null) {
+      return;
+    }
     container.select(".circle").transition()        
                  .duration(500)      
                  .style("opacity", 0); 
@@ -167,7 +174,10 @@ lineD3 = function module() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-         .attr('viewBox', "0 0 " + (parseInt(width) + margin.left + margin.right) + " " + parseInt(height));
+        .filter(function() { 
+           return this.parentNode === container.node();
+         })
+        .attr('viewBox', "0 0 " + (parseInt(width) + margin.left + margin.right) + " " + parseInt(height));
 
       // add a circle and label
       var circle = svg.selectAll(".circle").data([0])
@@ -257,7 +267,8 @@ lineD3 = function module() {
       } else {
         x.domain(d3.extent(data, pos));
       }
-      y.domain([0, d3.max(data, depth)]);
+      var theMaxDepth = maxDepth ? Math.max(maxDepth,d3.max(data, depth)) : d3.max(data, depth);
+      y.domain([0, theMaxDepth]);
 
       var brush = d3.svg.brush()
         .x(x)
@@ -470,7 +481,7 @@ lineD3 = function module() {
   }
 
   exports.depth = function(_) {
-    if (!arguments.length) return dept;
+    if (!arguments.length) return depth;
     depth = _;
     return exports; 
   }
@@ -479,6 +490,12 @@ lineD3 = function module() {
     if (!arguments.length) return kind;
     kind = _;
     return exports; 
+  }
+
+  exports.maxDepth = function(_) {
+    if (!arguments.length) return maxDepth;
+    maxDepth = _;
+    return exports;     
   }
 
   exports.showXAxis = function(_) {
