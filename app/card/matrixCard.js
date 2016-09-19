@@ -1365,7 +1365,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 		         .append("rect")
 		         .attr("width", width)
 		         .attr("height", height)
-		         .attr("class", "filter-symbol " + selection.datum().clazz)
+		         .attr("class", "filter-symbol " + selection.datum().clazz + " snp")
 		         .style("pointer-events", "none");		
 	} else {
 		selection
@@ -1395,7 +1395,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 						}
                      })();
           })
-          .attr("class", "filter-symbol " + selection.datum().clazz);
+          .attr("class", "filter-symbol " + selection.datum().clazz + " " + type);
 	}
 
 }

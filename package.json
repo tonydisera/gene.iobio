@@ -19,12 +19,16 @@
   },
   "homepage": "https://github.com/tonydisera/gene.iobio#readme",
   "devDependencies": {
+    "es6-promise": "^3.3.1",
     "gulp": "^3.9.1",
     "gulp-jasmine-browser": "^1.6.0",
+    "gulp-jshint": "^2.0.1",
     "gulp-nightwatch": "^0.3.0",
     "gulp-plumber": "^1.1.0",
     "gulp-watch": "^4.3.9",
     "jasmine-core": "^2.4.1",
+    "jshint": "^2.9.3",
+    "jshint-stylish": "^2.2.1",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
@@ -32,6 +36,7 @@
     "karma-phantomjs-launcher": "^1.0.1",
     "nightwatch": "^0.9.7",
     "phantomjs-prebuilt": "^2.1.12",
-    "selenium-standalone": "^5.5.0"
+    "selenium-standalone": "^5.5.0",
+    "yargs": "^5.0.0"
   }
 }
