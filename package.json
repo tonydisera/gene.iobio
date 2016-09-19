@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/tonydisera/gene.iobio#readme",
   "devDependencies": {
+    "es6-promise": "^3.3.1",
     "gulp": "^3.9.1",
     "gulp-jasmine-browser": "^1.6.0",
     "gulp-jshint": "^2.0.1",
@@ -35,6 +36,7 @@
     "karma-phantomjs-launcher": "^1.0.1",
     "nightwatch": "^0.9.7",
     "phantomjs-prebuilt": "^2.1.12",
-    "selenium-standalone": "^5.5.0"
+    "selenium-standalone": "^5.5.0",
+    "yargs": "^5.0.0"
   }
 }
