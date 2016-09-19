@@ -245,7 +245,8 @@ lineD3 = function module() {
         var tooltip = container.select('.tooltip');
         tooltip.transition()
           .duration(200)
-          .style("opacity", .9);
+          .style("opacity", .9)
+          .style("display", "block");
         tooltip.html(tooltipText)
           .style("width", width + "px")
           .style("height", height + "px")
@@ -253,14 +254,17 @@ lineD3 = function module() {
           .style("text-align", 'left')
           .style("top",  top + "px");
       })
+      .on("mouseout", function(d) {
+        var tooltip = container.select('.tooltip');
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
 
-         .on("mouseout", function(d) {       
-              container.select('.tooltip').transition()        
-                 .duration(500)      
-                 .style("opacity", 0);   
-           });     
+        tooltip.transition()
+          .delay(500)
+          .style("display", "none");
+      });
 
-        
       var innerWidth = width - margin.left - margin.right;
       x = d3.scale.linear()
           .range([0, innerWidth]);
