@@ -2810,7 +2810,7 @@ button {
   font-size: 14px; }
 
 .ibo-gene .x.axis text {
-  font-size: 14px; }
+  font-size: 12px; }
 
 .badge-label {
   font-size: 14px; }
@@ -3069,7 +3069,7 @@ button {
 #matrix-track #feature-matrix text {
   font-size: 14px; }
 #matrix-track #feature-matrix .y.axis text {
-  font-size: 12px !important; }
+  font-size: 14px !important; }
 #matrix-track #feature-matrix .colhdr text {
   font-size: 14px !important; }
 #matrix-track #feature-matrix rect.cellbox {
@@ -3089,9 +3089,9 @@ button {
   stroke: #3586c0 !important;
   stroke-width: 1.5px !important; }
 #matrix-track #feature-matrix .col rect.colbox.current {
-  stroke: #E0DDDD !important;
+  stroke: #3586c0 !important;
   opacity: 1 !important;
-  stroke-width: 1px !important; }
+  stroke-width: 1.5px !important; }
 
 .tooltip.level-mygene2 {
   display: block !important; }
