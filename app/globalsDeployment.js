@@ -13,9 +13,6 @@ var serverCacheDir        = "local_cache/"; // this is the directory from the se
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
 
-var siteGeneSource        = "gencode";      // what should the gene source default to: refseq or gencode?
-var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'
-
 var autoCall              = true;           // if only alignments are provided, should variants automatically be called?
 
 /*
@@ -33,3 +30,6 @@ var feedbackAttachScreenCapture = true;          // should the feedback include 
 var feedbackShowURL             = false;         // show the feedback email show the URL that launched gene.iobio?
 
 
+
+var siteGeneSource        = isLevelMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
+var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'
