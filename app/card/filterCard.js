@@ -56,8 +56,12 @@ FilterCard.prototype.getFilterObject = function() {
 		var annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', state: true, value: 'af1000g_rare'},
 			exac_rare:        {key: 'afexaclevels',  state: true, value: 'afexac_rare'},
-			afexac_unique_nc: {key: 'afexaclevels',  state: true, value: 'afexac_unique_nc'}
-
+			afexac_unique_nc: {key: 'afexaclevels',  state: true, value: 'afexac_unique_nc'},
+			clinvar_uc:       {key: 'clinvar',       state: true, value: 'clinvar_uc'},
+			clinvar_cd:       {key: 'clinvar',       state: true, value: 'clinvar_cd'},
+			clinvar_other:    {key: 'clinvar',       state: true, value: 'clinvar_other'},
+			clinvar_lbenign:  {key: 'clinvar',       state: true, value: 'clinvar_lbenign'},
+			clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}
 		}
 		if (this.shouldWarnForNonPassVariants()) {
 			annots.PASS =   {key: 'recfilter',     state: true, value: 'PASS'};

@@ -2689,6 +2689,10 @@ function formatCurrentDateTime(delim) {
 }
 
 function stripTranscriptPrefix(transcriptId) {
+	if (transcriptId == null) {
+		console.log("null transcript id")
+		return "";
+	}
 	var nameTokens = transcriptId.split('.');
 	return nameTokens.length > 0 ? nameTokens[0] : transcriptId;
 }

@@ -111,7 +111,7 @@ function MatrixCard() {
 	];
 
 	this.matrixRowsMygene2 = [
-		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 31, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
 		{name:'Inheritance Mode'       ,order:1,  index:1,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
 		{name:'Transcript'             ,order:2,  index:2,  match:  'field', height: 53, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      },
 		{name:'cDNA'                   ,order:3,  index:3,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
@@ -272,7 +272,7 @@ MatrixCard.prototype.init = function() {
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
 				    .cellSize(isLevelEdu ? 23 : (isLevelMygene2 ? null : 18))
-				    .cellWidth(isLevelMygene2 ? 130 : null)
+				    .cellWidth(isLevelMygene2 ? 160 : null)
 				    .cellHeights(isLevelMygene2 ? me.matrixRowsMygene2.map(function(d){return d.height}) : null)
 				    .columnLabelHeight(isLevelEdu  || isLevelMygene2 ? 30 : 67)
 				    .rowLabelWidth(isLevelEdu  ? 100 : (isLevelMygene2 ? 25 : 140))
