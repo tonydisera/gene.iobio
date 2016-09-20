@@ -1472,7 +1472,7 @@ GenesCard.prototype.setSelectedGene = function(geneName) {
 	}
 }
 
-GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
+GenesCard.prototype.selectGene = function(geneName, callback) {
 	var me = this;
 
 	// If necessary, switch from gencode to refseq or vice versa if this gene
@@ -1507,16 +1507,15 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 		    	window.geneObjects[window.gene.gene_name] = window.gene;
 
 		    	updateUrl('gene', window.gene.gene_name);
-
-				//loadTracksForGene(false, null, callbackVariantsDisplayed);
 			    	
 			    me.updateGeneInfoLink(window.gene.gene_name, function() {
 					if (!hasDataSources()) {
-						//showDataDialog();
 						firstTimeGeneLoaded = false; 
 					}
-
-
+					if (callback) {
+						callback();
+					}
+					
 			    	
 			    });
 

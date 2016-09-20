@@ -489,8 +489,9 @@ function addGeneDropdownListener() {
 	$('#select-gene')[0].selectize.on('change', function() {
 		var geneName = $('#select-gene')[0].selectize.getValue();
 		showGeneSummary(geneName);
-		genesCard.selectGene(geneName);
-		loadTracksForGene(false);
+		genesCard.selectGene(geneName, function() {
+			loadTracksForGene();
+		});
 	});	
 
 }
