@@ -2789,20 +2789,55 @@ text.ref-count {
   margin-top: 0px !important; }
 
 .nav-left {
-  padding-top: 0px; }
+  padding-top: 0px;
+  width: 260px; }
 
 .nav-right {
   right: 10px;
-  padding-top: 0px; }
+  padding-top: 0px;
+  width: 260px; }
 
 .iobioproject {
-  margin-top: 5px; }
+  margin-top: 5px;
+  font-size: 20px;
+  line-height: initial;
+  color: #5d809d; }
+
+button {
+  font-size: 14px !important; }
+
+.loader-label {
+  font-size: 14px; }
+
+.ibo-gene .x.axis text {
+  font-size: 14px; }
+
+.badge-label {
+  font-size: 14px; }
+
+.badge {
+  font-size: 14px; }
+
+#variant-heading {
+  margin-top: 0px; }
+
+.card-label {
+  font-size: 16px; }
+
+.slide-left {
+  transform: translate(244px, 0);
+  -webkit-transform: translate(244px, 0);
+  -moz-transform: translate(244px, 0);
+  -ms-transform: translate(244px, 0);
+  -o-transform: translate(244px, 0); }
 
 #slider-left {
   left: 0px !important;
-  background-color: transparent !important; }
+  background-color: transparent !important;
+  width: 244px; }
   #slider-left #slider-left-content {
-    padding-right: 10px !important; }
+    padding-right: 10px !important;
+    width: 240px; }
 
 #container {
   margin-left: 0px !important; }
@@ -2816,7 +2851,8 @@ text.ref-count {
   padding-bottom: 5px;
   padding-top: 5px;
   margin-bottom: 5px;
-  text-align: center; }
+  text-align: center;
+  color: #717171; }
   #intro h3 {
     margin-top: 5px;
     margin-bottom: 0px;
@@ -2890,7 +2926,7 @@ text.ref-count {
 #gene-summary.level-mygene2 {
   display: inline-block !important;
   text-align: left;
-  font-size: 11px;
+  font-size: 14px;
   color: #717171;
   margin-left: 10px;
   width: calc(100% - 160px); }
@@ -2903,28 +2939,21 @@ text.ref-count {
   display: block !important;
   margin-left: 0px !important; }
 
-#app-disclaimer-link-right.level-mygene2 {
-  clear: both;
-  font-size: 10px;
-  color: #717171 !important;
-  text-align: right;
-  margin-top: -2px;
-  display: block !important; }
+#app-disclaimer-link-left.level-mygene2 {
+  display: block !important;
+  font-size: 14px; }
 
 #home {
   margin-top: -9px !important; }
 
 #beginner-title.level-mygene2 {
   text-align: left;
-  font-size: 14px;
+  margin-left: 5px;
+  font-size: 15px;
   color: #717171;
   display: inline-block !important;
   vertical-align: top;
-  margin-top: 16px !important;
-  font-family: "Quicksand"; }
-
-#app-disclaimer-link-left.level-mygene2 {
-  display: none !important; }
+  margin-top: 16px !important; }
 
 #gene-badge-button {
   font-size: 14px !important;
@@ -2957,6 +2986,10 @@ text.ref-count {
     color: #717171;
     font-size: 14px !important;
     margin-right: 0px !important; }
+  #genes-card .sidebar-label.level-mygene2 {
+    display: block !important;
+    font-size: 14px;
+    color: #5d809d; }
   #genes-card #bloodhound-sidebar.level-mygene2 {
     display: block !important;
     margin-bottom: 20px; }
@@ -3034,11 +3067,11 @@ text.ref-count {
 #matrix-track #low-quality-legend {
   display: none !important; }
 #matrix-track #feature-matrix text {
-  font-size: 11px; }
+  font-size: 14px; }
 #matrix-track #feature-matrix .y.axis text {
-  font-size: 13px !important; }
+  font-size: 14px !important; }
 #matrix-track #feature-matrix .colhdr text {
-  font-size: 13px !important; }
+  font-size: 14px !important; }
 #matrix-track #feature-matrix rect.cellbox {
   stroke: #e6e6e6 !important;
   stroke-width: 0.5px !important; }

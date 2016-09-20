@@ -301,7 +301,7 @@ function featureMatrixD3() {
             for (var idx = 0; idx < i; idx++) {
               y += cellHeights[idx] ;
             }  
-            y += 4;
+            y += 8;
             d3.select(this).attr('transform', 'translate(0,' + y + ')');
         })
       }

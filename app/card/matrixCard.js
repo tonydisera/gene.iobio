@@ -111,18 +111,18 @@ function MatrixCard() {
 	];
 
 	this.matrixRowsMygene2 = [
-		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 28, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
-		{name:'Severity',               order:1,  index:1,  match:  'field', height: 18, attribute: 'highestImpactVep',            formatFunction: this.formatHighestImpact,            rankFunction: this.getImpactRank  },
-		{name:'Inheritance Mode'       ,order:2,  index:2,  match:  'field', height: 18, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
-		{name:'Protein'                ,order:3,  index:3,  match:  'field', height: 18, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
-		{name:'cDNA'                   ,order:4,  index:4,  match:  'field', height: 28, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
-		{name:'Mutation Freq 1000G'    ,order:5,  index:5,  match:  'field', height: 18, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Mutation Freq ExAC'     ,order:6,  index:6,  match:  'field', height: 18, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Chr'                    ,order:7,  index:7,  match:  'field', height: 18, attribute: 'chrom',                       },
-		{name:'Position'               ,order:8,  index:8,  match:  'field', height: 18, attribute: 'start',                       },
-		{name:'Ref'                    ,order:9,  index:9,  match:  'field', height: 18, attribute: 'ref',                         },
-		{name:'Alt'                    ,order:10, index:10, match:  'field', height: 18, attribute: 'alt'                          },
-		{name:'Transcript'             ,order:11, index:11, match:  'field', height: 50, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      }
+		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 31, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Severity',               order:1,  index:1,  match:  'field', height: 21, attribute: 'highestImpactVep',            formatFunction: this.formatHighestImpact,            rankFunction: this.getImpactRank  },
+		{name:'Inheritance Mode'       ,order:2,  index:2,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
+		{name:'Protein'                ,order:3,  index:3,  match:  'field', height: 21, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
+		{name:'cDNA'                   ,order:4,  index:4,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'Mutation Freq 1000G'    ,order:5,  index:5,  match:  'field', height: 21, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Mutation Freq ExAC'     ,order:6,  index:6,  match:  'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Chr'                    ,order:7,  index:7,  match:  'field', height: 21, attribute: 'chrom',                       },
+		{name:'Position'               ,order:8,  index:8,  match:  'field', height: 21, attribute: 'start',                       },
+		{name:'Ref'                    ,order:9,  index:9,  match:  'field', height: 21, attribute: 'ref',                         },
+		{name:'Alt'                    ,order:10, index:10, match:  'field', height: 21, attribute: 'alt'                          },
+		{name:'Transcript'             ,order:11, index:11, match:  'field', height: 53, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      }
 	];
 
 
@@ -1246,7 +1246,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("transform", translate)
 				         .append("text")
 				         .attr("x", 0)
-				         .attr("y", 11)
+				         .attr("y", isLevelMygene2 ? 14 : 11)
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
 	MatrixCard.wrap(text, options.cellSize, 3);
