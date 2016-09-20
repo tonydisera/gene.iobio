@@ -37,7 +37,15 @@ module.exports = {
     	selector: '#examine-card'
     },
     aboutPanel: {
-    	selector: '#help-card'
+    	selector: '#help-card',
+      commands: [{
+        clickDemoGene: function() {
+          return this.click('@demoGene');
+        }
+      }],
+      elements: {
+        demoGene: { selector: '#load-demo-data' }
+      }
   	},
     recallPanel: {
     	selector: '#recall-card'
