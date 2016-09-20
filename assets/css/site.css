@@ -1,5 +1,6 @@
 body {
-  font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
+  font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
+  margin-top: -5px; }
 
 h4 {
   font-size: 12px;
@@ -59,7 +60,7 @@ h5 {
   top: 0;
   text-align: left;
   padding-left: 3px;
-  padding-top: 10px;
+  padding-top: 5px;
   width: 250px; }
 
 .nav-right {
@@ -67,7 +68,7 @@ h5 {
   right: 5px;
   top: 0;
   width: 250px;
-  padding-top: 5px; }
+  padding-top: 0px; }
 
 .nav-center {
   margin: 3px 0px 0 0px;
@@ -414,7 +415,7 @@ i.material-icons {
     position: absolute;
     bottom: 10px;
     width: 100%;
-    margin-top: 3px; }
+    margin-top: 13px; }
   #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev {
     color: white !important;
     background-color: #E45C5C;
@@ -2785,17 +2786,17 @@ text.ref-count {
   display: none !important; }
 
 .nav-center {
-  margin-top: -15px !important; }
+  margin-top: 0px !important; }
 
 .nav-left {
-  padding-top: 15px; }
+  padding-top: 0px; }
 
 .nav-right {
   right: 10px;
-  padding-top: 10px; }
+  padding-top: 0px; }
 
 .iobioproject {
-  margin-top: 15px; }
+  margin-top: 5px; }
 
 #slider-left {
   left: 0px !important;
@@ -2805,6 +2806,32 @@ text.ref-count {
 
 #container {
   margin-left: 0px !important; }
+
+#intro {
+  display: block !important;
+  background-color: white;
+  width: 100%;
+  left: 0px;
+  padding: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  margin-bottom: 5px;
+  text-align: center; }
+  #intro h3 {
+    margin-top: 5px;
+    margin-bottom: 0px;
+    font-size: 18px;
+    display: inline-block; }
+  #intro #intro-link {
+    margin-left: 20px;
+    font-size: 14px; }
+  #intro #intro-less-link {
+    font-size: 14px; }
+  #intro #intro-text {
+    text-align: left;
+    margin-top: 5px; }
+  #intro p {
+    margin-bottom: 7px; }
 
 .fixed {
   left: 0px !important; }

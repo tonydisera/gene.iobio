@@ -1,5 +1,10 @@
 @import variables
 
+
+// These imports are styles for the gene.iobio education edition, with
+// a simplified interface and logic.  For running one of the special educational edition 
+// tours (e.g. a guided tour of the gene.iobio app), UNCOMMENT BOTH levelEdu and levelEduTour 
+//import statements.
 //@import levelEdu
 //@import levelEduTour
 
@@ -7,6 +12,7 @@
 
 body
   font-family: $app-font, sans-serif !important
+  margin-top: -5px 
 
 h4
   font-size: 12px
@@ -67,7 +73,7 @@ h5
   top: 0   
   text-align: left
   padding-left: 3px
-  padding-top: 10px
+  padding-top: 5px
   width:  250px
 
 .nav-right
@@ -75,7 +81,7 @@ h5
   right: 5px
   top: 0
   width: 250px
-  padding-top: 5px
+  padding-top: 0px
 
 .nav-center
   margin: 3px 0px 0 0px
@@ -487,7 +493,7 @@ i.material-icons
       position: absolute
       bottom: 10px
       width: 100%
-      margin-top: 3px
+      margin-top: 13px
 
 
     a.pageguide-prev
@@ -1625,6 +1631,8 @@ header
 
 @import feedback
 
+// This style is for the MyGene2 Beginner mode of gene.iobio, a simplified version
+// of the app. Uncomment this import to turn on styling for the Beginner mode.
 @import levelMygene2
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px)

@@ -359,222 +359,222 @@
 </div>
 
 
- <div id="container" class="push" style="margin-top:-10px !important;">
-
-    <div id="nav-section" class="fixed shadow-z-2">
-
-
-    	<section id="app-title-section" class="nav-stretch">
-        <div class="nav-left">
-      	      <a id='home' style="display:inline-block">
-                <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
-              </a>
-              <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu level-mygene2"  onclick="$('#disclaimer-modal').modal('show')">
-                 Disclaimer
-              </a>              
-              <div id="education-title" class="level-edu"
-              style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
-                education edition
-              </div>
-              <div id="beginner-title" class="level-mygene2 hide">
-                Beginner
-              </div>
-        </div>
-
-          <!-- iobio project link -->
-        <div class="nav-right">
-          <a href="http://iobio.io" class="iobioproject">           
-            an iobio project          
-          </a>
-          <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu level-mygene2"  onclick="$('#disclaimer-modal').modal('show')">
-            Disclaimer
-          </a>
-
-        </div>
-
-
-
-
-          
-          <div id="gene-search-bar" class="level-edu level-mygene2 nav-center" >
-
-
-            <!-- Gene search -->
-            <span id="bloodhound" >
-                <input id="enter-gene-name" class="level-edu typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
-                placeholder="Enter Gene Name">
-            </span>     
-
-            <!-- Button data modal -->
-            <button id="add-data-button" type="button" class="level-edu level-mygene2 icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
-              <i class="material-icons" style="font-size: 18px;">input</i>      
-              Data
-            </button>
-
-             <button  id="feedback-link" class="hide icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#feedback-modal">
-              Feeback
-            </button>
-         
+ <div id="container" class="push">
     
+    <div id="nav-section" class="fixed">
+
+      <div id="intro" class="hide level-mygene2 shadow-z-2">
+      </div>
+
+      <div id="nav-card" class="shadow-z-2">
+      	<section id="app-title-section" class="nav-stretch">
+          <div class="nav-left">
+        	      <a id='home' style="display:inline-block">
+                  <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
+                </a>
+                <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu level-mygene2"  onclick="$('#disclaimer-modal').modal('show')">
+                   Disclaimer
+                </a>              
+                <div id="education-title" class="level-edu"
+                style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
+                  education edition
+                </div>
+                <div id="beginner-title" class="level-mygene2 hide">
+                  Beginner
+                </div>
+          </div>
+
+            <!-- iobio project link -->
+          <div class="nav-right">
+            <a href="http://iobio.io" class="iobioproject">           
+              an iobio project          
+            </a>
+            <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu level-mygene2"  onclick="$('#disclaimer-modal').modal('show')">
+              Disclaimer
+            </a>
+
           </div>
 
 
 
-          <!-- gene badges for navigation -->
-          <div class="nav-center">
-            
-            <!-- Buttons for editting gene list, done editting gene list -->
-            <div id="manage-genes" class="level-edu level-mygene2">
-              <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
-                 <i class="material-icons">playlist_add_check</i>
-                  Analyze all
-              </a>
-             
-              <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"  
-                href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                  Remove all
-              </a>
 
-             
+            
+            <div id="gene-search-bar" class="level-edu level-mygene2 nav-center" >
+
+
+              <!-- Gene search -->
+              <span id="bloodhound" >
+                  <input id="enter-gene-name" class="level-edu typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
+                  placeholder="Enter Gene Name">
+              </span>     
+
+              <!-- Button data modal -->
+              <button id="add-data-button" type="button" class="level-edu level-mygene2 icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
+                <i class="material-icons" style="font-size: 18px;">input</i>      
+                Data
+              </button>
+
+               <button  id="feedback-link" class="hide icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#feedback-modal">
+                Feeback
+              </button>
+           
+      
             </div>
-            
-            <div id="gene-page-selection" class="level-mygene2"></div>  
 
-            
 
-            <div id="gene-page-control" class="level-edu level-mygene2">              
-             
-              <div id="select-gene-container">
-                  <select id="select-gene-sort" style="font-size:10px;">                 
-                  </select>
+
+            <!-- gene badges for navigation -->
+            <div class="nav-center">
+              
+              <!-- Buttons for editting gene list, done editting gene list -->
+              <div id="manage-genes" class="level-edu level-mygene2">
+                <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
+                   <i class="material-icons">playlist_add_check</i>
+                    Analyze all
+                </a>
+               
+                <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"  
+                  href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                    Remove all
+                </a>
+
+               
               </div>
-             
-               <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide" 
-                onclick="genesCard.viewDefaultsGenesPerPage()" >
-                View 40
-              </a>
-              <a href="javascript:void(0)" id="view-all-genes" class="gene-paging-link hide" 
-                onclick="genesCard.viewAllGenes()" >
-                | all
-              </a>
-
-
-              <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
-                  Clear cached results...
-              </a>  
-                             
-            </div>
-            
-
-            <div id="gene-badge-container" class="level-mygene2" style="clear:both;">
-
-              <div id="after-genes" style="display:inline-block;margin-top:5px;">
-                                           
-                                                         
-              </div>
-
-            </div>
-          </div>
-
-      </section>
-
-
-      <div id="transcript-card" class="hide" style="background:white;">
+              
+              <div id="gene-page-selection" class="level-mygene2"></div>  
 
               
 
+              <div id="gene-page-control" class="level-edu level-mygene2">              
+               
+                <div id="select-gene-container">
+                    <select id="select-gene-sort" style="font-size:10px;">                 
+                    </select>
+                </div>
+               
+                 <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide" 
+                  onclick="genesCard.viewDefaultsGenesPerPage()" >
+                  View 40
+                </a>
+                <a href="javascript:void(0)" id="view-all-genes" class="gene-paging-link hide" 
+                  onclick="genesCard.viewAllGenes()" >
+                  | all
+                </a>
 
 
-        <div id="region-track" class="level-edu level-mygene2" style="clear:both;">
+                <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
+                    Clear cached results...
+                </a>  
+                               
+              </div>
+              
 
-            <div id="select-gene-box"  class="level-mygene2 hide">
-              <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
-              </select>
-            </div>     
-            <div id="gene-summary" class="level-mygene2 hide">              
+              <div id="gene-badge-container" class="level-mygene2" style="clear:both;">
+
+                <div id="after-genes" style="display:inline-block;margin-top:5px;">
+                                             
+                                                           
+                </div>
+
+              </div>
             </div>
 
-            <a id="gene-name" target="_genecards" class="level-mygene2 gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-            <span id="gene-chr" class="level-mygene2 gene-card-label keep-case" ></span>
-            <span id="gene-region" class="level-edu level-mygene2 gene-card-label keep-case"></span>
-            <span id="minus_strand" class="level-edu level-mygene2" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-            <span  id="gene-plus-minus-label" class="level-edu level-mygene2 fullview hide " style="padding-left: 15px">+  -</span>
-            <input id="gene-region-buffer-input" class="level-edu level-mygene2 hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
-            <span class="level-edu level-mygene2" style="float:right;margin-right:14px">
-                <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                  <i class="material-icons">remove</i>
-                </a>
-                <a href="javascript:void(0)" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
-                  <i class="material-icons">crop_3_2</i>
-                </a>
-            </span>
+        </section>
 
-        </div>
+
+        <div id="transcript-card" class="hide" >
+
+                
 
 
 
-        <!-- Non protein-coding gene badges -->
-        <div id="non-protein-coding" class="level-edu level-mygene2"  style="clear: both;padding-bottom: 0px;display: block;">
-            <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
-              Enter a gene name
-            </div>   
-            <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
-              Pseudogene
-            </div>   
-            <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
-            </div>                  
-            <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">   
-            </div>                  
-        </div>  
+          <div id="region-track" class="level-edu level-mygene2" style="clear:both;">
 
-        <div id="gene-source-box" class="level-edu level-mygene2" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
-          <select id="select-gene-source" class="fullview" data-placeholder="">
-                <option value="Gencode Transcript">Gencode Transcript</option>
-                <option value="RefSeq Transcript">RefSeq Transcript</option>                   
-           </select>        
-        </div>
-        
-        <div class="level-edu level-mygene2 fullview" style="margin-top:-25px"> 
-          <div class="btn-toolbar fullview" 
-             style="display: inline-block;float: left;margin-top:-38px;margin-left: 5px;padding-top: 0px; ">
-             <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
-                  <button id="transcript-dropdown-button" type="button"  
-                  style="width:150px;font-size:11px"
-                  class="btn btn-raised btn-default dropdown-toggle icon-button-sm" 
-                  data-toggle="dropdown" aria-expanded="false" >
-                    Choose Transcript 
-                    <span class="caret" style="margin-left:4px;"></span>
-                  </button>
-                  <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
-                    <li id="transcript-menu-item">
-                    </li>
-                  </ul>
+              <div id="select-gene-box"  class="level-mygene2 hide">
+                <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
+                </select>
+              </div>     
+              <div id="gene-summary" class="level-mygene2 hide">              
               </div>
-          </div> 
 
+              <a id="gene-name" target="_genecards" class="level-mygene2 gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
+              <span id="gene-chr" class="level-mygene2 gene-card-label keep-case" ></span>
+              <span id="gene-region" class="level-edu level-mygene2 gene-card-label keep-case"></span>
+              <span id="minus_strand" class="level-edu level-mygene2" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+              <span  id="gene-plus-minus-label" class="level-edu level-mygene2 fullview hide " style="padding-left: 15px">+  -</span>
+              <input id="gene-region-buffer-input" class="level-edu level-mygene2 hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+              <span class="level-edu level-mygene2" style="float:right;margin-right:14px">
+                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="material-icons">remove</i>
+                  </a>
+                  <a href="javascript:void(0)" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
+                    <i class="material-icons">crop_3_2</i>
+                  </a>
+              </span>
 
-
-
- 
-      </div>
-
-        <div id="transcript-panel" class="level-edu fullview" >
-          <div id="gene-track" class="track hide">  
-              <div id="top-coordinate-frame" class="hide">
-                  <svg height="15" width="19"><g transform="translate(10,6),rotate(180)">
-                    <path class="coordinate-arrow" d="M0,-5.161791450287817L5.805622828269509,5.161791450287817 -5.805622828269509,5.161791450287817Z">
-                    </path>
-                  </g>
-                </svg>           
-              </div>         
-              <div id="gene-viz" class="track-chart"></div>               
           </div>
-          <span id="zoom-hint" class="level-edu hint todo" style="margin-top: -15px;display: block;text-align: center;">
-              To zoom into region, drag over gene model.
-          </span>
+
+
+
+          <!-- Non protein-coding gene badges -->
+          <div id="non-protein-coding" class="level-edu level-mygene2"  style="clear: both;padding-bottom: 0px;display: block;">
+              <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+                Enter a gene name
+              </div>   
+              <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+                Pseudogene
+              </div>   
+              <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
+              </div>                  
+              <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">   
+              </div>                  
+          </div>  
+
+          <div id="gene-source-box" class="level-edu level-mygene2" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
+            <select id="select-gene-source" class="fullview" data-placeholder="">
+                  <option value="Gencode Transcript">Gencode Transcript</option>
+                  <option value="RefSeq Transcript">RefSeq Transcript</option>                   
+             </select>        
+          </div>
+          
+          <div class="level-edu level-mygene2 fullview" style="margin-top:-25px"> 
+            <div class="btn-toolbar fullview" 
+               style="display: inline-block;float: left;margin-top:-38px;margin-left: 5px;padding-top: 0px; ">
+                <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
+                    <button id="transcript-dropdown-button" type="button"  
+                    style="width:150px;font-size:11px"
+                    class="btn btn-raised btn-default dropdown-toggle icon-button-sm" 
+                    data-toggle="dropdown" aria-expanded="false" >
+                      Choose Transcript 
+                      <span class="caret" style="margin-left:4px;"></span>
+                    </button>
+                    <ul id="transcript-menu" class="dropdown-menu" role="menu" style="min-width: 610px">
+                      <li id="transcript-menu-item">
+                      </li>
+                    </ul>
+                </div>
+            </div> 
+          </div>
+
+          <div id="transcript-panel" class="level-edu fullview" >
+            <div id="gene-track" class="track hide">  
+                <div id="top-coordinate-frame" class="hide">
+                    <svg height="15" width="19"><g transform="translate(10,6),rotate(180)">
+                      <path class="coordinate-arrow" d="M0,-5.161791450287817L5.805622828269509,5.161791450287817 -5.805622828269509,5.161791450287817Z">
+                      </path>
+                    </g>
+                  </svg>           
+                </div>         
+                <div id="gene-viz" class="track-chart">
+                </div>               
+            </div>
+            <span id="zoom-hint" class="level-edu hint todo" style="margin-top: -15px;display: block;text-align: center;">
+                To zoom into region, drag over gene model.
+            </span>
+          </div>
+
         </div>
       </div>
-
 
     </div>  
 
@@ -708,11 +708,11 @@
 
 
 <div id="animation-container-1" class="tour-animation-container hide " 
-    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:100px;vertical-align:middle;width:100%">
+    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
       <div id="Stage"  class="EDGE-462912531 tour-animation"></div>
 </div>
 <div id="animation-container-2" class="tour-animation-container hide " 
-    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:100px;vertical-align:middle;width:100%">
+    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
       <div id="Stage" class="EDGE-30904779 tour-animation"></div>
 </div>
 

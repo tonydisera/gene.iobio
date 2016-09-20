@@ -83,6 +83,10 @@ GenesCard.prototype.init = function() {
 		$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
 			$('#select-phenotypes')[0].selectize.close();
 			if (isLevelMygene2) {
+				// Clear out the gene search box
+				$('#enter-gene-name-sidebar').val("")
+
+				// Get the phenolyzer genes based on the condition typed in or selected
 				me.getPhenolyzerGenes(value);
 			}
 		});
@@ -456,14 +460,14 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
 		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
-		if (isLevelMygene2) {
-			$('#select-gene')[0].selectize.setValue(geneNameToSelect);
+		if (isLevelMygene2) {		
+			selectGeneInDropdown(geneNameToSelect);
 		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
 		if (isLevelMygene2) {
-			$('#select-gene')[0].selectize.setValue(geneNames[0]);
+			selectGeneInDropdown(geneNames[0]);
 		}
 	}
 
@@ -890,6 +894,8 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
 	                var geneInfo = sumData.result[uid];
 
 					geneAnnots[geneName] = geneInfo;
+					showGeneSummary(geneName);
+
 					d3.select(geneBadgeSelector).data([geneInfo]);
 
 	                resolve(geneInfo);
@@ -995,7 +1001,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	if (isLevelMygene2) {
 		$('#select-gene')[0].selectize.addOption({value:geneName});
 		if (!bypassSelecting) {
-			$('#select-gene')[0].selectize.setValue(geneName);
+			selectGeneInDropdown(geneName);
 		}
 	}
 
@@ -1502,13 +1508,15 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 		    	updateUrl('gene', window.gene.gene_name);
 
+				//loadTracksForGene(false, null, callbackVariantsDisplayed);
+			    	
 			    me.updateGeneInfoLink(window.gene.gene_name, function() {
 					if (!hasDataSources()) {
 						//showDataDialog();
 						firstTimeGeneLoaded = false; 
 					}
 
-			    	loadTracksForGene(false, null, callbackVariantsDisplayed);
+
 			    	
 			    });
 
@@ -1552,7 +1560,7 @@ GenesCard.prototype.refreshGene = function(geneName) {
 		    	}
 		    	adjustGeneRegion(window.gene);
 		    	window.geneObjects[window.gene.gene_name] = window.gene;
-		    	loadTracksForGene(false);
+		    	// loadTracksForGene(false);
 	    	} else {
 	    		alertify.error("Gene " + geneName + " not found. ",
 				      		    function (e) {

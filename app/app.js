@@ -23,6 +23,7 @@ var helpTemplateHTML = null;
 var eduTourTemplateHTML = null;
 var iconbarTemplate = null;
 var tourTemplate = null;
+var introTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -59,6 +60,8 @@ var geneSource = "gencode";
 
 var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
+var readyToHideIntro = false;
+var keepShowingIntro = false;
 
 
 // bookmark card
@@ -161,6 +164,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/tourTemplate.hbs').then(function(compiledTemplate) {
 		tourTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/introTemplate.hbs').then(function(compiledTemplate) {
+		introTemplate = compiledTemplate;
+	}));
 	promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
 		svgGlyphsTemplate = compiledTemplate;
 	}));
@@ -207,6 +213,10 @@ function init() {
 		var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
 		window.location.assign(exhibitUrl);
 		return;			
+	}
+
+	if (isLevelMygene2) {
+		$('#intro').append(introTemplate());
 	}
 
 
@@ -437,9 +447,7 @@ function init() {
 		    	searchField: ['value']
 	    	}
 		);	
-		$('#select-gene')[0].selectize.on('change', function() {
-			genesCard.selectGene($('#select-gene')[0].selectize.getValue());
-		});	
+		addGeneDropdownListener();
 	}
 
 	// In cases where timeout=true, restart app after n seconds of inactivity
@@ -453,6 +461,37 @@ function init() {
 		$('#feedback-link').on('click', showFeedback);
 	    $('#report-feedback-button').on('click', emailFeedback);
 	}
+
+}
+
+function showGeneSummary(theGeneName) {
+	if (isLevelMygene2 && geneAnnots[theGeneName] && geneAnnots[theGeneName].summary) {
+		$('#gene-summary').text(geneAnnots[theGeneName].summary);
+	}	
+}
+
+function selectGeneInDropdown(theGeneName) {
+	removeGeneDropdownListener();
+
+	$('#select-gene')[0].selectize.setValue(theGeneName);
+
+	showGeneSummary(theGeneName);
+
+	addGeneDropdownListener();
+
+}
+
+function removeGeneDropdownListener() {
+	$('#select-gene')[0].selectize.off('change');	
+}
+
+function addGeneDropdownListener() {
+	$('#select-gene')[0].selectize.on('change', function() {
+		var geneName = $('#select-gene')[0].selectize.getValue();
+		showGeneSummary(geneName);
+		genesCard.selectGene(geneName);
+		loadTracksForGene(false);
+	});	
 
 }
 
@@ -678,7 +717,7 @@ function hideCoordinateFrame() {
 
 function readjustCards() {
 	var top = +$('#nav-section').height();
-	d3.select('#track-section').style("padding-top", top+3 + "px");
+	d3.select('#track-section').style("padding-top", top+6 + "px");
 }
 
 
@@ -1040,7 +1079,7 @@ function loadUrlSources() {
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
-	if (!isLevelEdu) {
+	if (!isLevelEdu  && !isLevelMygene2) {
 		loadTracksForGene(true);
 	}
 
@@ -1738,6 +1777,8 @@ function getRidOfDuplicates(genes) {
 */
 function loadTracksForGene(bypassVariantCards) {
 
+	hideIntro();
+
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
 	if (window.gene == null || window.gene == "") {
@@ -1792,7 +1833,6 @@ function loadTracksForGene(bypassVariantCards) {
     $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
     $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);   
     $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
-	$('#gene-summary').text(isLevelMygene2 && geneAnnots[window.gene.gene_name] ? geneAnnots[window.gene.gene_name].summary : "");
     
 
 	if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
@@ -1896,6 +1936,8 @@ function loadTracksForGene(bypassVariantCards) {
 
 
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
+
+	justLaunched = false;
 
 
 	
@@ -2563,6 +2605,29 @@ function bookmarkVariant() {
 		this.bookmarkCard.bookmarkVariant(examineCard.examinedVariant);
 		this.bookmarkCard.refreshBookmarkList();
 	}
+}
+
+function hideIntro() {
+	if (isLevelMygene2 && !keepShowingIntro) {
+		// If we are showing info on a gene and the intro panel still shows the full
+		// intro text, hide it.
+		if ($('#intro-text.hide').length == 0 && readyToHideIntro) {
+			toggleIntro();
+		}
+		readyToHideIntro = true;
+	}	
+}
+
+function toggleIntro() {
+	if ($('#intro-text.hide').length == 1) {
+		$('#intro-text').removeClass("hide");
+		$('#intro-link').addClass("hide");
+	} else {
+		$('#intro-text').addClass("hide");
+		$('#intro-link').removeClass("hide");
+	}
+	readjustCards();
+
 }
 
 
