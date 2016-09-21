@@ -1451,7 +1451,9 @@ GenesCard.prototype.selectGeneBadge = function(badgeElement) {
 	var badge = $(badgeElement).parent();
 	if (badge) {
 		var theGeneName = badge.find("#gene-badge-name").text();
-		me.selectGene(theGeneName);
+		me.selectGene(theGeneName, function() {
+
+		});
 	}
 
 }
@@ -1511,6 +1513,10 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
 		    	window.geneObjects[window.gene.gene_name] = window.gene;
 
 		    	updateUrl('gene', window.gene.gene_name);
+
+		    	if (!isLevelBasic) {
+					loadTracksForGene();		    		
+		    	}
 			    	
 			    me.updateGeneInfoLink(window.gene.gene_name, function() {
 					if (!hasDataSources()) {

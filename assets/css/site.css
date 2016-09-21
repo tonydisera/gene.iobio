@@ -2776,6 +2776,24 @@ text.ref-count {
     height: auto;
     margin: 0px; }
 
+#advanced-mode-title {
+  display: inline-block !important;
+  text-align: left;
+  margin-left: 5px;
+  font-size: 15px;
+  color: #717171;
+  vertical-align: top;
+  margin-top: 8px !important; }
+
+#basic-mode-title {
+  display: none !important; }
+
+.nav-left {
+  width: 280px; }
+
+.nav-right {
+  width: 280px; }
+
 #intro {
   display: block !important;
   background-color: white;
@@ -2788,6 +2806,8 @@ text.ref-count {
   text-align: center;
   color: #717171; }
   #intro #button-launch-advanced-mode {
+    display: none !important; }
+  #intro #button-launch-basic-mode {
     display: inline-block !important;
     margin-top: 5px;
     margin-bottom: 0px;
@@ -2811,6 +2831,27 @@ text.ref-count {
     margin-bottom: 7px; }
 
 .level-basic {
+  display: none !important; }
+
+#basic-mode-title {
+  display: inline-block !important;
+  text-align: left;
+  margin-left: 5px;
+  font-size: 15px;
+  color: #717171;
+  vertical-align: top;
+  margin-top: 16px !important; }
+
+#advanced-mode-title {
+  display: none !important; }
+
+#intro #button-launch-advanced-mode {
+  display: inline-block !important;
+  margin-top: 5px;
+  margin-bottom: 0px;
+  float: left;
+  cursor: pointer; }
+#intro #button-launch-basic-mode {
   display: none !important; }
 
 .filter-flag {
@@ -3016,15 +3057,6 @@ button {
 
 #home {
   margin-top: -9px !important; }
-
-#beginner-title.level-basic {
-  text-align: left;
-  margin-left: 5px;
-  font-size: 15px;
-  color: #717171;
-  display: inline-block !important;
-  vertical-align: top;
-  margin-top: 16px !important; }
 
 #gene-badge-button {
   font-size: 14px !important;

@@ -221,6 +221,10 @@ function init() {
 
 	if (isMygene2) {
 		$('#intro').append(introTemplate());
+		if (isLevelBasic) {
+			$('#intro-link').addClass("hide");
+			$('#intro-text').removeClass("hide");
+		}
 	}
 
 
@@ -1485,7 +1489,7 @@ function switchToAdvancedMode() {
 
 	location.assign(origin + pathname + search);
 }
-function switchToBeginnerMode() {
+function switchToBasicMode() {
 	var origin   = window.location.origin;
 	origin = origin.replace("advanced", "beginner");
 
@@ -2613,7 +2617,7 @@ function bookmarkVariant() {
 }
 
 function hideIntro() {
-	if (isLevelBasic && !keepShowingIntro) {
+	if (isMygene2 && !keepShowingIntro) {
 		// If we are showing info on a gene and the intro panel still shows the full
 		// intro text, hide it.
 		if ($('#intro-text.hide').length == 0 && readyToHideIntro) {

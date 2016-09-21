@@ -1,11 +1,12 @@
 <div style="padding-bottom:5px">
 	<h3>Welcome to Gene.iobio on MyGene2</h3>
 	
-	<a id="intro-link" class="hide" href="javascript:void(0)" onclick="keepShowingIntro=true;toggleIntro()">Tell me more...</a>
+	<a id="intro-link" class="" href="javascript:void(0)" onclick="keepShowingIntro=true;toggleIntro()">Tell me more...</a>
 
-	<a id="button-launch-advanced-mode" class="hide level-basic"  onclick="switchToAdvancedMode()">Go to advanced mode</a>
+	<a id="button-launch-advanced-mode" class="hide"  onclick="switchToAdvancedMode()">Go to Advanced mode</a>
+	<a id="button-launch-basic-mode"    class="hide"  onclick="switchToBasicMode()">Go to Basic mode</a>
 </div>
-<div id="intro-text" >
+<div id="intro-text" class="hide" >
 	<p>
 		You can view your raw sequence data (VCF file) in multiple ways. In the left sidebar, you can search by name of gene (example: KDM1A) or by name of condition (examples: cystic fibrosis, breast cancer). When you search for the name of a condition, you may find a list of one or more genes reported to underlie that condition.
 	</p>
