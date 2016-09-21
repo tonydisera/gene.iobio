@@ -1480,10 +1480,10 @@ function adjustGeneRegion(geneObject) {
 
 function switchToAdvancedMode() {
 	var origin   = window.location.origin;
-	origin = origin.replace("beginner", "advanced");
+	origin = origin.replace("basic", "advanced");
 
 	var pathname = window.location.pathname;
-	pathname = pathname.replace("/beginner", "/advanced");
+	pathname = pathname.replace("/basic", "/advanced");
 	
 	var search   = window.location.search;
 
@@ -1491,10 +1491,10 @@ function switchToAdvancedMode() {
 }
 function switchToBasicMode() {
 	var origin   = window.location.origin;
-	origin = origin.replace("advanced", "beginner");
+	origin = origin.replace("advanced", "basic");
 
 	var pathname = window.location.pathname;
-	pathname = pathname.replace("/advanced", "/beginner");
+	pathname = pathname.replace("/advanced", "/basic");
 	
 	var search   = window.location.search;
 
