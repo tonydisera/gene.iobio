@@ -473,8 +473,9 @@ function init() {
 }
 
 function showGeneSummary(theGeneName) {
-	if (isLevelBasic && geneAnnots[theGeneName] && geneAnnots[theGeneName].summary) {
-		$('#gene-summary').text(geneAnnots[theGeneName].summary);
+	var summary = geneAnnots[theGeneName] ? geneAnnots[theGeneName].summary : null;
+	if (isLevelBasic && summary && $('#gene-summary').text() != summary ) {
+		$('#gene-summary').text(summary);
 	}	
 }
 
