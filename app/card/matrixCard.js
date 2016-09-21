@@ -110,10 +110,10 @@ function MatrixCard() {
 		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
-	this.matrixRowsMygene2 = [
+	this.matrixRowsBasic = [
 		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
 		{name:'Inheritance Mode'       ,order:1,  index:1,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
-		{name:'Transcript'             ,order:2,  index:2,  match:  'field', height: 53, attribute: 'highestImpactVep',            formatFunction: this.formatTranscriptHighestImpact      },
+		{name:'Transcript'             ,order:2,  index:2,  match:  'field', height: 21, attribute: 'vepImpact',                   formatFunction: this.formatCanonicalTranscript},
 		{name:'cDNA'                   ,order:3,  index:3,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
 		{name:'Protein'                ,order:4,  index:4,  match:  'field', height: 21, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
 		{name:'Chr'                    ,order:5,  index:5,  match:  'field', height: 21, attribute: 'chrom',                       },
@@ -121,7 +121,7 @@ function MatrixCard() {
 		{name:'Ref'                    ,order:7,  index:7,  match:  'field', height: 21, attribute: 'ref',                         },
 		{name:'Alt'                    ,order:8,  index:8,  match:  'field', height: 21, attribute: 'alt'                          },
 		{name:'Mutation Freq 1000G'    ,order:9,  index:9,  match:  'field', height: 21, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Mutation Freq ExAC'     ,order:10, index:10,  match:  'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
+		{name:'Mutation Freq ExAC'     ,order:10, index:10,  match: 'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
 	];
 
 
@@ -240,7 +240,7 @@ MatrixCard.prototype.init = function() {
 	var me = this;
 
 	if (isLevelBasic) {
-		this.matrixRows = this.matrixRowsMygene2;
+		this.matrixRows = this.matrixRowsBasic;
 	} else if (isLevelEdu || isLevelBasic) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
@@ -273,7 +273,7 @@ MatrixCard.prototype.init = function() {
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
 				    .cellSize(isLevelEdu ? 23 : (isLevelBasic ? null : 18))
 				    .cellWidth(isLevelBasic ? 160 : null)
-				    .cellHeights(isLevelBasic ? me.matrixRowsMygene2.map(function(d){return d.height}) : null)
+				    .cellHeights(isLevelBasic ? me.matrixRowsBasic.map(function(d){return d.height}) : null)
 				    .columnLabelHeight(isLevelEdu  || isLevelBasic ? 30 : 67)
 				    .rowLabelWidth(isLevelEdu  ? 100 : (isLevelBasic ? 25 : 140))
 				    .columnLabel( me.getVariantLabel )
@@ -1501,6 +1501,10 @@ MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
 }
 MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) {
 	return value && value != "" && +value >= 0 ? this.percentage(+value,2) : "";
+}
+
+MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
+	return stripTranscriptPrefix(selectedTranscript.transcript_id);
 }
 
 MatrixCard.prototype.formatTranscriptHighestImpact = function(variant, highestImpactVep) {
