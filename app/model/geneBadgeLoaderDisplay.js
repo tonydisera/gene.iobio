@@ -10,7 +10,7 @@
 				geneName: geneName,
 				pageNumber: pageNumber
 			});
-			this.setText();
+			setText.call(this);
 		},
 		removeGene: function(geneName) {
 			for(var i = this.queue.length - 1; i >= 0; i--) {
@@ -19,30 +19,29 @@
 			  	break;
 			  }
 			}
-			this.queue.length === 0 ? this.clearText() : this.setText();
-		},
-		lastGene: function() {
-			return this.queue[this.queue.length - 1];
-		},
-		clearText: function() {
-			this.elm.text("");
-		},
-		setText: function() {
-			var lastGene = this.lastGene();
-			this.elm.text("Analyzing: Page " + lastGene.pageNumber + " - " + lastGene.geneName);
+			this.queue.length === 0 ? clearText.call(this) : setText.call(this);
 		}
 	};
+
+	function lastGene(queue) {
+		return queue[queue.length - 1];
+	}
+
+	function clearText() {
+		this.elm.html("");
+	}
+
+	function setText() {
+		var gene = lastGene(this.queue);
+		var spinner = '<img src="assets/images/wheel.gif" style="width:15px;height:15px;"/>'
+		this.elm.html('Analyzing ' + spinner + ' Page ' + gene.pageNumber + ' - ' + gene.geneName);
+	}
 
 	global.geneBadgeLoaderDisplay = geneBadgeLoaderDisplay;
 }(window, jQuery));
 
 // do not show page number when there is only one page
-// private functions
-// test sorted genes
 // refactor genesCard with getGeneNames function
-// set Loading text at start and clear when ends in cacheHelper?
-// add rubik's cube spinner
-// css
 
 
 

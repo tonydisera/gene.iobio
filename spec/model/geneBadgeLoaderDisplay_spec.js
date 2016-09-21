@@ -2,7 +2,7 @@ describe('geneBadgeLoaderDisplay', function() {
 	var display;
 
 	beforeEach(function() {
-		setFixtures('<div id="loading-display"></div>');
+		setFixtures('<div id="loading-display"><div id="blah"></div></div>');
 		display = new geneBadgeLoaderDisplay('#loading-display');
 	});
 
