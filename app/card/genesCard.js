@@ -872,8 +872,6 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
    	  } else {
    	  	  // Search NCBI based on the gene name to obtain the gene ID
 	      var url = NCBI_GENE_SEARCH_URL + "&term=" + "(" + geneName + "[Gene name]" + " AND 9606[Taxonomy ID]";
-
-	      var clinvarVariants = null;
 	      $.ajax( url )
 	        .done(function(data) {
 
