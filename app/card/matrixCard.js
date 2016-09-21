@@ -223,7 +223,7 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	if (isLevelEdu || isLevelMygene2) {
+	if (isLevelEdu || isLevelBasic) {
 		return (i+1).toString();
 	} else {
 		var rsId = getRsId(d);
@@ -239,9 +239,9 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 MatrixCard.prototype.init = function() {
 	var me = this;
 
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		this.matrixRows = this.matrixRowsMygene2;
-	} else if (isLevelEdu || isLevelMygene2) {
+	} else if (isLevelEdu || isLevelBasic) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
 		this.removeRow('Zygosity', me.matrixRows);	
@@ -271,19 +271,19 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
-				    .cellSize(isLevelEdu ? 23 : (isLevelMygene2 ? null : 18))
-				    .cellWidth(isLevelMygene2 ? 160 : null)
-				    .cellHeights(isLevelMygene2 ? me.matrixRowsMygene2.map(function(d){return d.height}) : null)
-				    .columnLabelHeight(isLevelEdu  || isLevelMygene2 ? 30 : 67)
-				    .rowLabelWidth(isLevelEdu  ? 100 : (isLevelMygene2 ? 25 : 140))
+				    .cellSize(isLevelEdu ? 23 : (isLevelBasic ? null : 18))
+				    .cellWidth(isLevelBasic ? 160 : null)
+				    .cellHeights(isLevelBasic ? me.matrixRowsMygene2.map(function(d){return d.height}) : null)
+				    .columnLabelHeight(isLevelEdu  || isLevelBasic ? 30 : 67)
+				    .rowLabelWidth(isLevelEdu  ? 100 : (isLevelBasic ? 25 : 140))
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
 				    		me.unpin();
 				    	} else {
 					    	if (variant != clickedVariant) {
-					    		clickedVariant = isLevelMygene2 ? null : variant;
-					    		me.showTooltip(variant, isLevelMygene2 ? false : true);
+					    		clickedVariant = isLevelBasic ? null : variant;
+					    		me.showTooltip(variant, isLevelBasic ? false : true);
 						    	variantCards.forEach(function(variantCard) {
 						    		variantCard.showVariantCircle(variant);
 						    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
@@ -311,7 +311,7 @@ MatrixCard.prototype.init = function() {
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
-				    	if (isLevelEdu  || isLevelMygene2) {
+				    	if (isLevelEdu  || isLevelBasic) {
 				    		return;
 				    	}
 				    	var column = null;
@@ -331,7 +331,7 @@ MatrixCard.prototype.init = function() {
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
-				    	if (isLevelEdu  || isLevelMygene2) {
+				    	if (isLevelEdu  || isLevelBasic) {
 				    		return;
 				    	}
 				    	var column = null;
@@ -542,13 +542,13 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var me = this;
 
 	// Don't show the tooltip for mygene2 beginner mode
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		return;
 	}
 
 
 	if (lock) {
-		if (!isLevelEdu && !isLevelMygene2) {
+		if (!isLevelEdu && !isLevelBasic) {
 			showSidebar("Examine");
 			examineCard.showVariant(variant);		
 			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
@@ -570,7 +570,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
 
-	if (isLevelEdu || isLevelMygene2) {
+	if (isLevelEdu || isLevelBasic) {
 		tooltip.classed("level-edu", "true");
 	} 
 
@@ -592,7 +592,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		if (!isLevelEdu && !isLevelMygene2) {
+		if (!isLevelEdu && !isLevelBasic) {
 			showSidebar("Examine");
 			examineCard.showVariant(variant);
 			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
@@ -608,7 +608,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu  || isLevelMygene2 ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 300;
 	var h = tooltip[0][0].offsetHeight;
 
 	var x = variant.screenXMatrix;
@@ -674,7 +674,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	
 	resizeCardWidths();
 
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
 			$('#matrix-track').addClass("hide");
 		} else {
@@ -834,7 +834,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu || isLevelMygene2});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu || isLevelBasic});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
@@ -1245,7 +1245,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("transform", translate)
 				         .append("text")
 				         .attr("x", 0)
-				         .attr("y", isLevelMygene2 ? 14 : 11)
+				         .attr("y", isLevelBasic ? 14 : 11)
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
 	MatrixCard.wrap(text, options.cellSize, 3);
@@ -1460,7 +1460,7 @@ MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
 
 		} else {
 			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
-			if (isLevelMygene2) {
+			if (isLevelBasic) {
 				if (key.indexOf("pathogenic") >= 0) {
 					if (variant.featureClass == null) {
 						variant.featureClass = "";
@@ -1547,7 +1547,7 @@ MatrixCard.prototype.formatHighestImpact = function(variant, highestImpactVep) {
 		return "";
 	} else {
 			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
-			if (isLevelMygene2) {
+			if (isLevelBasic) {
 				for (key in highestImpactVep) {
 					if (key == 'HIGH') {
 						if (variant.featureClass == null) {

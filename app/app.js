@@ -219,7 +219,7 @@ function init() {
 		return;			
 	}
 
-	if (isLevelMygene2) {
+	if (isMygene2) {
 		$('#intro').append(introTemplate());
 	}
 
@@ -303,11 +303,11 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: isLevelMygene2 || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelMygene2 || isLevelEduTour ? 9 : 4})
+	    .margin({top:20, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEduTour ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEduTour || isLevelMygene2 ? 32 : 16)
-	    .cdsHeight(isLevelEduTour  || isLevelMygene2  ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelBasic ? 32 : 16)
+	    .cdsHeight(isLevelEduTour  || isLevelBasic  ? 24 : 12)
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
@@ -364,8 +364,8 @@ function init() {
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
-	    .trackHeight(isLevelEduTour || isLevelMygene2  ? 36 : 16)
-	    .cdsHeight(isLevelEduTour || isLevelMygene2 ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelBasic  ? 36 : 16)
+	    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 12)
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
@@ -442,7 +442,7 @@ function init() {
 	});
 	getGeneBloodhoundElement().focus();
 
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		$('#select-gene').selectize(
 			{ 
 				create: false, 			
@@ -469,7 +469,7 @@ function init() {
 }
 
 function showGeneSummary(theGeneName) {
-	if (isLevelMygene2 && geneAnnots[theGeneName] && geneAnnots[theGeneName].summary) {
+	if (isLevelBasic && geneAnnots[theGeneName] && geneAnnots[theGeneName].summary) {
 		$('#gene-summary').text(geneAnnots[theGeneName].summary);
 	}	
 }
@@ -845,9 +845,9 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelMygene2 ? 0 : 40));
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelMygene2 ? 0 : 60));
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelMygene2 ? 0 : 60));
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 0 : 40));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
 }
 
 function closeSlideLeft() {
@@ -985,14 +985,14 @@ function toggleSampleTrio(show) {
 }
 
 function getGeneBloodhoundElement() {
-	return isLevelMygene2 ? $('#bloodhound-sidebar .typeahead') : $('#bloodhound .typeahead');	
+	return isLevelBasic ? $('#bloodhound-sidebar .typeahead') : $('#bloodhound .typeahead');	
 }
 
 function getGeneBloodhoundInputElement() {
-	return isLevelMygene2 ? $('#bloodhound-sidebar .typeahead.tt-input') : $('#bloodhound .typeahead.tt-input');	
+	return isLevelBasic ? $('#bloodhound-sidebar .typeahead.tt-input') : $('#bloodhound .typeahead.tt-input');	
 }
 function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
-	if (!isLevelMygene2) {
+	if (!isLevelBasic) {
 		getGeneBloodhoundInputElement().val(geneName);
 	}
 	if (trigger) {
@@ -1033,7 +1033,7 @@ function loadGeneFromUrl() {
 		
 	} else {
 		// Open the sidebar 
-		if (isLevelEdu || isLevelMygene2) {
+		if (isLevelEdu || isLevelBasic) {
 			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
@@ -1084,7 +1084,7 @@ function loadUrlSources() {
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
-	if (!isLevelEdu  && !isLevelMygene2) {
+	if (!isLevelEdu  && !isLevelBasic) {
 		loadTracksForGene(true);
 	}
 
@@ -1157,7 +1157,7 @@ function loadUrlSources() {
 				
 				loadTracksForGene( false );
 
-				if ((isLevelEdu || isLevelMygene2) && $('#slider-left').hasClass("hide")) {
+				if ((isLevelEdu || isLevelBasic) && $('#slider-left').hasClass("hide")) {
 					if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 						showSidebar("Phenolyzer");
 					}
@@ -2090,7 +2090,7 @@ function showTranscripts(regionStart, regionEnd) {
 
 	// Show the gene transcripts.
     // Compress the tracks if we have more than 10 transcripts
-    if (!isLevelEduTour && !isLevelMygene2) {
+    if (!isLevelEduTour && !isLevelBasic) {
 	    if (transcripts.length > 10) {
 	    	transcriptChart.trackHeight(10);
 	    	transcriptChart.cdsHeight(8);
@@ -2613,7 +2613,7 @@ function bookmarkVariant() {
 }
 
 function hideIntro() {
-	if (isLevelMygene2 && !keepShowingIntro) {
+	if (isLevelBasic && !keepShowingIntro) {
 		// If we are showing info on a gene and the intro panel still shows the full
 		// intro text, hide it.
 		if ($('#intro-text.hide').length == 0 && readyToHideIntro) {

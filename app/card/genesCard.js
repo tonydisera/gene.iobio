@@ -22,7 +22,7 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		$("#genes-card #legend-placeholder").html(legendTemplate());
 	}
 
@@ -56,7 +56,7 @@ GenesCard.prototype.init = function() {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	} else {
 
-		if (isLevelMygene2) {
+		if (isLevelBasic) {
 			$('#select-phenotypes').attr("placeholder", "Name of condition")
 		}
 
@@ -67,7 +67,7 @@ GenesCard.prototype.init = function() {
 		    labelField: 'value',
 		    searchField: 'value',
 		    create: true,
-		    maxItems: isLevelMygene2 ? 1 : null,  
+		    maxItems: isLevelBasic ? 1 : null,  
 		    maxOptions: 500,  
 		    load: function(query, callback) {
 		        if (!query.length) return callback();
@@ -86,7 +86,7 @@ GenesCard.prototype.init = function() {
 		});
 		$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
 			$('#select-phenotypes')[0].selectize.close();
-			if (isLevelMygene2) {
+			if (isLevelBasic) {
 				// Clear out the gene search box
 				$('#enter-gene-name-sidebar').val("")
 
@@ -132,7 +132,7 @@ GenesCard.prototype.init = function() {
 		}
 	});
 
-	if (isLevelEdu || isLevelMygene2) {
+	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
 	}
 
@@ -385,7 +385,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	var me = this;
 
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		$('#select-gene')[0].selectize.clearOptions();
 	}
 
@@ -464,13 +464,13 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
 		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
-		if (isLevelMygene2) {		
+		if (isLevelBasic) {		
 			selectGeneInDropdown(geneNameToSelect);
 		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
-		if (isLevelMygene2) {
+		if (isLevelBasic) {
 			selectGeneInDropdown(geneNames[0]);
 		}
 	}
@@ -776,7 +776,7 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 
 	// Now create a comma delimited list of all existing genes + selected phenolyzer genes
 	var genesString = geneNames.join(",");
-	if (isLevelEdu || isLevelMygene2) {
+	if (isLevelEdu || isLevelBasic) {
 		genesString = "";
 	}
 	selectedPhenoGenes.forEach( function(g) {
@@ -1002,7 +1002,7 @@ GenesCard.prototype.addGene = function(geneName) {
 GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	var me = this;
 
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		$('#select-gene')[0].selectize.addOption({value:geneName});
 		if (!bypassSelecting) {
 			selectGeneInDropdown(geneName);

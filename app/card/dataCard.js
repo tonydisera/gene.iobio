@@ -199,7 +199,7 @@ DataCard.prototype.loadDemoData = function() {
 	}
 
 	
-	if (isLevelMygene2) {		
+	if (isLevelBasic) {		
 		window.updateUrl("gene",  this.mygene2Genes[0]);
 		window.updateUrl("genes", this.mygene2Genes.join(","));
 

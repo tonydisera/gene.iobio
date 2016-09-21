@@ -19,11 +19,20 @@ var autoCall              = true;           // if only alignments are provided, 
 * These variables control special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  For running one of the special educational edition 
 * tours (e.g. a guided tour of the gene.iobio app), TURN ON BOTH isLevelEdu and isLevelEduTour.
+* See @import statements for levelEdu and levelEduTour in css/assets/sass.
 */
 var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
 var isLevelEduTour        = false;   // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
-var isLevelMygene2        = true;  // is gene.iobio the mygene2 beginner version
 
+/*
+* These variables control special behavior for running gene.iobio basic mode, with
+* a simplified interface and logic.  For running the Mygene2 gene.iobio basic mode, 
+* TURN ON BOTH isLevelBasic and isMygene2.  For running Mygene2 gene.iobio advanced mode,
+* TURN ON only isMygene2. 
+* See @import statements for levelEdu and levelEduTour in css/assets/sass.
+*/
+var isLevelBasic          = true;    // is gene.iobio basic mode?
+var isMygene2             = true;    // show the mygene2 intro panel?
 
 var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emails should feedback be sent to?   if no emails are provided, the feedback link will be hidden
 var feedbackAttachScreenCapture = true;          // should the feedback include a screen capture?
@@ -31,5 +40,5 @@ var feedbackShowURL             = false;         // show the feedback email show
 
 
 
-var siteGeneSource        = isLevelMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
+var siteGeneSource        = isLevelBasic ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
 var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'

@@ -52,7 +52,7 @@ FilterCard.prototype.autoSetFilters = function() {
 FilterCard.prototype.getFilterObject = function() {
 
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
-	if (isLevelMygene2) {
+	if (isLevelBasic) {
 		var annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', state: true, value: 'af1000g_rare'},
 			exac_rare:        {key: 'afexaclevels',  state: true, value: 'afexac_rare'},
@@ -713,7 +713,7 @@ FilterCard.prototype.classifyByImpact = function(d) {
       }
     }
     var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
-    if (isLevelMygene2) {
+    if (isLevelBasic) {
     	impactList = d.highestImpactVep;
     }
     for (key in impactList) {
