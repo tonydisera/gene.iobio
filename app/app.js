@@ -24,6 +24,7 @@ var eduTourTemplateHTML = null;
 var iconbarTemplate = null;
 var tourTemplate = null;
 var introTemplate = null;
+var legendTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -166,6 +167,9 @@ $(document).ready(function(){
 	}));
 	promises.push(promiseLoadTemplate('templates/introTemplate.hbs').then(function(compiledTemplate) {
 		introTemplate = compiledTemplate;
+	}));
+	promises.push(promiseLoadTemplate('templates/legendTemplate.hbs').then(function(compiledTemplate) {
+		legendTemplate = compiledTemplate;
 	}));
 	promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
 		svgGlyphsTemplate = compiledTemplate;

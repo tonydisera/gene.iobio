@@ -25,6 +25,43 @@
   line-height: initial
   color:  $app-color
 
+#legend-placeholder.level-mygene2
+  display: block !important
+
+#legend.level-mygene2
+  display: block !important
+  margin-top: 20px 
+
+.legend-symbol
+  stroke: #000 !important
+  stroke-width: 1.5px !important
+  stroke-opacity: 0.3 !important
+
+#legend
+  .vepImpact
+    pointer-events: none
+
+  .type
+    pointer-events: none
+
+  .vepImpact.inactive
+    pointer-events: none
+    opacity: 1
+
+  .type.inactive
+    pointer-events: none
+    opacity: 1
+
+  .legend-symbol.exon
+    cursor: pointer
+    fill: rgba(93, 128, 157, 0.63)
+    stroke: rgb(93, 128, 157)
+
+  .exon-symbol
+    text
+      font-size: 14px
+      fill: $text-color
+
 
 //
 // Font size is 14px across all text
@@ -83,6 +120,12 @@ button
   margin-bottom: 5px
   text-align: center
   color: $text-color
+
+  #button-launch-advanced-mode
+    display: inline-block !important
+    margin-top: 0px
+    margin-bottom: 0px
+    float: right
 
   h3
     margin-top: 5px
@@ -214,9 +257,7 @@ button
 #genes-card
   padding-top: 10px !important
 
-  #button-launch-advanced-mode
-    display: block !important
-    margin-top: 40px
+
 
   .tt-dropdown-menu
     width: 100% !important

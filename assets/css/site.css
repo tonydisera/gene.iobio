@@ -2803,6 +2803,36 @@ text.ref-count {
   line-height: initial;
   color: #5d809d; }
 
+#legend-placeholder.level-mygene2 {
+  display: block !important; }
+
+#legend.level-mygene2 {
+  display: block !important;
+  margin-top: 20px; }
+
+.legend-symbol {
+  stroke: #000 !important;
+  stroke-width: 1.5px !important;
+  stroke-opacity: 0.3 !important; }
+
+#legend .vepImpact {
+  pointer-events: none; }
+#legend .type {
+  pointer-events: none; }
+#legend .vepImpact.inactive {
+  pointer-events: none;
+  opacity: 1; }
+#legend .type.inactive {
+  pointer-events: none;
+  opacity: 1; }
+#legend .legend-symbol.exon {
+  cursor: pointer;
+  fill: rgba(93, 128, 157, 0.63);
+  stroke: #5d809d; }
+#legend .exon-symbol text {
+  font-size: 14px;
+  fill: #717171; }
+
 button {
   font-size: 14px !important; }
 
@@ -2853,6 +2883,11 @@ button {
   margin-bottom: 5px;
   text-align: center;
   color: #717171; }
+  #intro #button-launch-advanced-mode {
+    display: inline-block !important;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    float: right; }
   #intro h3 {
     margin-top: 5px;
     margin-bottom: 0px;
@@ -2970,9 +3005,6 @@ button {
 
 #genes-card {
   padding-top: 10px !important; }
-  #genes-card #button-launch-advanced-mode {
-    display: block !important;
-    margin-top: 40px; }
   #genes-card .tt-dropdown-menu {
     width: 100% !important;
     color: #717171;

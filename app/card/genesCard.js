@@ -22,6 +22,10 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
+	if (isLevelMygene2) {
+		$("#genes-card #legend-placeholder").html(legendTemplate());
+	}
+
 	 // init bootpag
     $('#gene-page-selection').bootpag({
         total: 0,
@@ -1515,7 +1519,7 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
 					if (callback) {
 						callback();
 					}
-					
+
 			    	
 			    });
 
