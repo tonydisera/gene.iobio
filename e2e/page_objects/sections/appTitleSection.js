@@ -3,7 +3,9 @@ module.exports = {
   commands: [{
     selectGene: function(gene) {
       this.clearValue('@enterGeneName');
-      return this.setValue('@enterGeneName', [gene, this.api.Keys.ARROW_DOWN, this.api.Keys.ENTER]);
+      this.setValue('@enterGeneName', [gene, this.api.Keys.ARROW_DOWN, this.api.Keys.ENTER]);
+      this.api.pause(2000);
+      return this;
     },
     openDataMenu: function() {
       this.click('@addDataButton');
