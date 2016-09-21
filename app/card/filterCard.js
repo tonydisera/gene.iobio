@@ -713,9 +713,6 @@ FilterCard.prototype.classifyByImpact = function(d) {
       }
     }
     var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
-    if (isLevelBasic) {
-    	impactList = d.highestImpactVep;
-    }
     for (key in impactList) {
       impacts += " " + key;
       colorimpacts += " " + 'impact_'+key;
