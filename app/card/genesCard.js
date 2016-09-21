@@ -133,6 +133,15 @@ GenesCard.prototype.sortGenes = function(sortBy) {
 	this._initPaging(this.sortedGeneNames, true);
 }
 
+GenesCard.prototype.getGeneNames = function() {
+	return this.sortedGeneNames || window.geneNames;
+}
+
+GenesCard.prototype.pageNumberForGene = function(geneName) {
+	var geneNames = this.getGeneNames();
+	var position = geneNames.indexOf(geneName) + 1;
+	return Math.ceil(position / this.GENES_PER_PAGE);
+}
 
 GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
