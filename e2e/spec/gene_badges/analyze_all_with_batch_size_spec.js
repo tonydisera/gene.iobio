@@ -28,6 +28,7 @@ module.exports = {
 
     client.url(function(url) {
       client.url(url.value + '&batchSize=10');
+      client.acceptAlert();
       appTitleSection.assertGeneBadgesLoaded(['BRCA1']);
       appTitleSection.clickAnalyzeAll();
       appTitleSection.assertGeneBadgesLoaded([
