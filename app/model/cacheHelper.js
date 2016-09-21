@@ -25,7 +25,7 @@ CacheHelper.prototype.analyzeAll = function() {
 			me.genesToCache.push(geneName);
 		}
 	});
-	me.cacheGenes();	
+	me.cacheGenes();
 }
 
 
@@ -81,6 +81,7 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 	    	// load and annotate the variants for each
 	    	// sample (e.g. each variant card)
 	    	if (response[0].hasOwnProperty('gene_name')) {
+	    		me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount());
 	    		me.geneBadgeLoaderDisplay.addGene(geneName, genesCard.pageNumberForGene(geneName));
 
 		    	var geneObject = response[0];
@@ -190,6 +191,7 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 }
 
 CacheHelper.prototype.cacheNextGene = function(geneName) {
+	this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount());
 	this.geneBadgeLoaderDisplay.removeGene(geneName);
 	// Take the analyzed (and cached) gene off of the cache queue
 	var idx = this.cacheQueue.indexOf(geneName);

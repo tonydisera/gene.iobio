@@ -6,6 +6,13 @@ describe('geneBadgeLoaderDisplay', function() {
 		display = new geneBadgeLoaderDisplay('#loading-display');
 	});
 
+	describe('#setPageCount', function() {
+		it('sets the page count as a property', function() {
+			display.setPageCount(99);
+			expect(display.pageCount).toEqual(99);
+		});
+	});
+
 
 	describe('#addGene', function() {
 		it('should display the added gene', function() {
@@ -13,10 +20,22 @@ describe('geneBadgeLoaderDisplay', function() {
 			expect($('#loading-display')).toContainText('BRCA1');
 		});
 
-		it('should display the correct page number', function() {
-			display.addGene('BRCA1', 1001);
-			expect($('#loading-display')).toContainText('1001');
+		describe('when the page count is greater than 1', function() {
+			it('should display the correct page number', function() {
+				display.setPageCount(67);
+				display.addGene('BRCA1', 66);
+				expect($('#loading-display')).toContainText('Page 66');
+			});
 		});
+
+		describe('when the page count is 1', function() {
+			it('should not display the page number', function() {
+				display.setPageCount(1);
+				display.addGene('BRAF', 1);
+				expect($('#loading-display')).not.toContainText('Page 1');
+			});
+		});
+
 	});
 
 	describe('#removeGene', function() {
@@ -40,13 +59,26 @@ describe('geneBadgeLoaderDisplay', function() {
 			display.addGene('ACTA', 3);
 			display.removeGene('BRAF');
 			expect($('#loading-display')).toContainText('ACTA');
-		})
+		});
 
-		it('should display the correct page number', function() {
-			display.addGene('BRCA1', 1004);
-			display.addGene('BRAF', 1005);
-			display.removeGene('BRAF');
-			expect($('#loading-display')).toContainText('1004');
+		describe('when the page count is greater than 1', function() {
+			it('should display the correct page number', function() {
+				display.setPageCount(1006);
+				display.addGene('BRCA1', 1004);
+				display.addGene('BRAF', 1005);
+				display.removeGene('BRAF');
+				expect($('#loading-display')).toContainText('Page 1004');
+			});
+		});
+
+		describe('when the page count is 1', function() {
+			it('should not display the page number', function() {
+				display.setPageCount(1);
+				display.addGene('BRAF', 1);
+				display.addGene('ACTA', 1);
+				display.removeGene('BRAF');
+				expect($('#loading-display')).not.toContainText('Page 1');
+			});
 		});
 
 		it('clears out the text when there are no more genes to display', function() {

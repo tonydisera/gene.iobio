@@ -5,6 +5,9 @@
 	}
 
 	geneBadgeLoaderDisplay.prototype = {
+		setPageCount: function(pageCount) {
+			this.pageCount = pageCount;
+		},
 		addGene: function(geneName, pageNumber) {
 			this.queue.push({
 				geneName: geneName,
@@ -33,8 +36,9 @@
 
 	function setText() {
 		var gene = lastGene(this.queue);
-		var spinner = '<img src="assets/images/wheel.gif" style="width:15px;height:15px;"/>'
-		this.elm.html('Analyzing ' + spinner + ' Page ' + gene.pageNumber + ' - ' + gene.geneName);
+		var spinner = '<img src="assets/images/wheel.gif" style="width:15px;height:15px;"/>';
+		var page = this.pageCount > 1 ? ' Page ' + gene.pageNumber + ' - ' : ' ';
+		this.elm.html('Analyzing ' + spinner + page + gene.geneName);
 	}
 
 	global.geneBadgeLoaderDisplay = geneBadgeLoaderDisplay;

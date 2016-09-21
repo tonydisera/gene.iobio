@@ -143,6 +143,10 @@ GenesCard.prototype.pageNumberForGene = function(geneName) {
 	return Math.ceil(position / this.GENES_PER_PAGE);
 }
 
+GenesCard.prototype.getPageCount = function() {
+	return Math.ceil(window.geneNames.length / this.GENES_PER_PAGE);
+}
+
 GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
 	var danger2 = getProbandVariantCard().getDangerSummaryForGene(geneName2);
