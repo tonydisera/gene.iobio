@@ -468,6 +468,8 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 		var colObject = column.datum();
       	column.classed("active", true);
       	column.select(".colbox").classed("current", true);
+
+      	$("#feature-matrix").scrollLeft(160 * index+1);
 	
       	if (showTooltip) {
 	      	// Get screen coordinates of column.  We will use this to position the
@@ -1604,8 +1606,9 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 			}
 			if (tokens.length == 2) {
 				var basicNotation = tokens[1];
-				var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
-				buf += simpleNotation;
+				buf += basicNotation;
+				//var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
+				//buf += simpleNotation;
 			} 		
 		}
 		return buf;
