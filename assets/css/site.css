@@ -2890,6 +2890,9 @@ text.ref-count {
   stroke-width: 1.5px !important;
   stroke-opacity: 0.3 !important; }
 
+#legend .legend-label {
+  font-size: 14px;
+  color: #717171; }
 #legend .vepImpact {
   pointer-events: none; }
 #legend .type {
