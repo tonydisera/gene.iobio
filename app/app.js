@@ -185,7 +185,8 @@ function promiseLoadTemplate(templateName) {
 
 function init() {
 	var me = this;
-	cacheHelper = new CacheHelper();
+	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
+	cacheHelper = new CacheHelper(loaderDisplay);
 
 	window.onbeforeunload = function () {
 	    launchTimestampToClear = cacheHelper.launchTimestamp;

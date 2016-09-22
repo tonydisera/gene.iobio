@@ -133,6 +133,19 @@ GenesCard.prototype.sortGenes = function(sortBy) {
 	this._initPaging(this.sortedGeneNames, true);
 }
 
+GenesCard.prototype.getGeneNames = function() {
+	return this.sortedGeneNames || window.geneNames;
+}
+
+GenesCard.prototype.pageNumberForGene = function(geneName) {
+	var geneNames = this.getGeneNames();
+	var position = geneNames.indexOf(geneName) + 1;
+	return Math.ceil(position / this.GENES_PER_PAGE);
+}
+
+GenesCard.prototype.getPageCount = function() {
+	return Math.ceil(window.geneNames.length / this.GENES_PER_PAGE);
+}
 
 GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
@@ -270,34 +283,29 @@ GenesCard.prototype.initCopyPasteGenes = function() {
 	}
 }
 
-GenesCard.prototype.validateGeneSource = function(geneName) {
-
-}
-
-
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
 	if (geneNames && geneNames.length > this.GENES_PER_PAGE) {
 		var pos = geneNames.indexOf(geneName) + 1;
 		if (pos > this.GENES_PER_PAGE) {
 			var pageNumber = Math.ceil(pos / this.GENES_PER_PAGE);
-			me._goToPage(pageNumber);
-			me._initPaging();
+			this.currentPageNumber = pageNumber;
+			me._initPaging(window.geneNames);
 		} else {
-			me._goToPage(1);
-			me._initPaging();
+			this.currentPageNumber = 1;
+			me._initPaging(window.geneNames);
 		}
 	}
 }
 
 GenesCard.prototype.viewDefaultsGenesPerPage = function() {
 	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
-	this._initPaging(null, true);
+	this._initPaging(window.geneNames, true);
 }
 
 GenesCard.prototype.viewAllGenes = function() {
-	this.GENES_PER_PAGE = geneNames.length;
-	this._initPaging(null, true);
+	this.GENES_PER_PAGE = 1000000;
+	this._initPaging(window.geneNames, true);
 }
 
 GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
@@ -336,9 +344,6 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 
 GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 	var me = this;
-	if (theGeneNames == null) {
-		theGeneNames = window.geneNames;
-	}
 	var pageCount = Math.ceil(theGeneNames.length / this.GENES_PER_PAGE);
 	if (theGeneNames.length > this.GENES_PER_PAGE) {
 		this.currentPageNumber = startOver ? 1 : Math.min(me.currentPageNumber, pageCount);
@@ -1635,11 +1640,11 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  .on('d3click', function(phenolyzerGene) {
 							  	if (phenolyzerGene.selected) {
 							  		me.addGene(phenolyzerGene.geneName);
-							  		me._initPaging();
+							  		me._initPaging(window.geneNames);
 							  		me.highlightPhenolyzerGenes();
 							  	} else {
 							  		me.removeGeneBadgeByName(phenolyzerGene.geneName);
-							  		me._initPaging();
+							  		me._initPaging(window.geneNames);
 							  		me.highlightPhenolyzerGenes();
 							  	}
 							  });
