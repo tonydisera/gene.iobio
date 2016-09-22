@@ -7,6 +7,7 @@
 	geneBadgeLoaderDisplay.prototype = {
 		setPageCount: function(pageCount) {
 			this.pageCount = pageCount;
+			return this;
 		},
 		addGene: function(geneName, pageNumber) {
 			this.queue.push({
@@ -14,6 +15,7 @@
 				pageNumber: pageNumber
 			});
 			setText.call(this);
+			return this;
 		},
 		removeGene: function(geneName) {
 			for(var i = this.queue.length - 1; i >= 0; i--) {
@@ -23,6 +25,7 @@
 			  }
 			}
 			this.queue.length === 0 ? clearText.call(this) : setText.call(this);
+			return this;
 		}
 	};
 

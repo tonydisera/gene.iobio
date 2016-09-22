@@ -22,16 +22,16 @@ describe('geneBadgeLoaderDisplay', function() {
 
 		describe('when the page count is greater than 1', function() {
 			it('should display the correct page number', function() {
-				display.setPageCount(67);
-				display.addGene('BRCA1', 66);
+				display.setPageCount(67)
+							 .addGene('BRCA1', 66);
 				expect($('#loading-display')).toContainText('Page 66');
 			});
 		});
 
 		describe('when the page count is 1', function() {
 			it('should not display the page number', function() {
-				display.setPageCount(1);
-				display.addGene('BRAF', 1);
+				display.setPageCount(1)
+							 .addGene('BRAF', 1);
 				expect($('#loading-display')).not.toContainText('Page 1');
 			});
 		});
@@ -40,50 +40,50 @@ describe('geneBadgeLoaderDisplay', function() {
 
 	describe('#removeGene', function() {
 		it('should not display the gene name once the gene has been removed', function() {
-			display.addGene('BRCA1', 1);
-			display.addGene('BRAF', 2);
-			display.removeGene('BRAF');
+			display.addGene('BRCA1', 1)
+						 .addGene('BRAF', 2)
+						 .removeGene('BRAF');
 			expect($('#loading-display')).not.toContainText('BRAF');
 		});
 
 		it('should display the gene that was last added', function() {
-			display.addGene('BRCA1', 1);
-			display.addGene('BRAF', 2);
-			display.removeGene('BRAF');
+			display.addGene('BRCA1', 1)
+			       .addGene('BRAF', 2)
+			       .removeGene('BRAF');
 			expect($('#loading-display')).toContainText('BRCA1');
 		});
 
 		it('should display the gene that was last added even if the removed gene was not the one being displayed', function() {
-			display.addGene('BRCA1', 1);
-			display.addGene('BRAF', 2);
-			display.addGene('ACTA', 3);
-			display.removeGene('BRAF');
+			display.addGene('BRCA1', 1)
+						 .addGene('BRAF', 2)
+						 .addGene('ACTA', 3)
+						 .removeGene('BRAF');
 			expect($('#loading-display')).toContainText('ACTA');
 		});
 
 		describe('when the page count is greater than 1', function() {
 			it('should display the correct page number', function() {
-				display.setPageCount(1006);
-				display.addGene('BRCA1', 1004);
-				display.addGene('BRAF', 1005);
-				display.removeGene('BRAF');
+				display.setPageCount(1006)
+							 .addGene('BRCA1', 1004)
+							 .addGene('BRAF', 1005)
+							 .removeGene('BRAF');
 				expect($('#loading-display')).toContainText('Page 1004');
 			});
 		});
 
 		describe('when the page count is 1', function() {
 			it('should not display the page number', function() {
-				display.setPageCount(1);
-				display.addGene('BRAF', 1);
-				display.addGene('ACTA', 1);
-				display.removeGene('BRAF');
+				display.setPageCount(1)
+							 .addGene('BRAF', 1)
+							 .addGene('ACTA', 1)
+							 .removeGene('BRAF');
 				expect($('#loading-display')).not.toContainText('Page 1');
 			});
 		});
 
 		it('clears out the text when there are no more genes to display', function() {
-			display.addGene('BRCA1', 1004);
-			display.removeGene('BRCA1');
+			display.addGene('BRCA1', 1004)
+			       .removeGene('BRCA1');
 			expect($('#loading-display')).toBeEmpty();
 		});
 	});
