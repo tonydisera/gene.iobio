@@ -1570,7 +1570,7 @@ MatrixCard.prototype.formatHighestImpact = function(variant, highestImpactVep) {
 
 }
 
-MatrixCard.prototype.formatHgvsP = function(variant, value) {
+MatrixCard.prototype.formatSimpleHgvsP = function(variant, value) {
 	if (value == null || value == '' || Object.keys(value).length == 0) {
 		return "";
 	} else {
@@ -1581,7 +1581,7 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
 				buf += " ";
 			}
 			if (tokens.length == 2) {
-				var basicNotation = tokens[1];
+				var basicNotation = "p." + tokens[1];
 				var simpleNotation = basicNotation.replace(/[0-9]/g, '');
 				var aminoAcids = simpleNotation.split(/([A-Z][^A-Z]*)/g).filter(function(part) {return part.length != 0});;
 				if (aminoAcids.length == 2) {
@@ -1594,7 +1594,25 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
 		return buf;
 	}
 }
-MatrixCard.prototype.formatHgvsC = function(variant, value) {
+MatrixCard.prototype.formatHgvsP = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":p.");
+			if (buf.length > 0) {
+				buf += " ";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = "p." + tokens[1];
+				buf += basicNotation;
+			} 		
+		}
+		return buf;
+	}
+}
+MatrixCard.prototype.formatSimpleHgvsC = function(variant, value) {
 	if (value == null || value == '' || Object.keys(value).length == 0) {
 		return "";
 	} else {
@@ -1606,9 +1624,27 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 			}
 			if (tokens.length == 2) {
 				var basicNotation = tokens[1];
+				var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
+				buf += simpleNotation;
+			} 		
+		}
+		return buf;
+	}
+
+}
+MatrixCard.prototype.formatHgvsC = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":c.");
+			if (buf.length > 0) {
+				buf += " ";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = "c." + tokens[1];
 				buf += basicNotation;
-				//var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
-				//buf += simpleNotation;
 			} 		
 		}
 		return buf;
