@@ -1027,7 +1027,7 @@ var effectCategories = [
           .then(  function() {   
                      
           }, function(error) {
-            reject();
+            reject("Error accessing ClinVar");
           });
           clinvarPromises.push(promise);
 
@@ -1129,7 +1129,7 @@ var effectCategories = [
       // clinvar records number
       var sourceIndex = -1;
       var clinvarIndex = 0;
-      var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
+      var url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
       url += "(" + refName + "[Chromosome]" + " AND ";
       // clinvarToSourceMap = new Object();
       variants.forEach(function(variant) {
@@ -1180,7 +1180,7 @@ var effectCategories = [
             } else {
               var webenv = data["esearchresult"]["webenv"];
               var queryKey = data["esearchresult"]["querykey"];
-              var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
+              var summaryUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
               $.ajax( summaryUrl )
                 .done(function(sumData) {
 
