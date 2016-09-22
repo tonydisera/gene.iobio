@@ -46,9 +46,3 @@
 
 	global.geneBadgeLoaderDisplay = geneBadgeLoaderDisplay;
 }(window, jQuery));
-
-// refactor genesCard with getGeneNames function
-
-
-
-
