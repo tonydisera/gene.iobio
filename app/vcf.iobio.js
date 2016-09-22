@@ -121,7 +121,7 @@ var effectCategories = [
 
 
   var errorMessageMap =  {
-    "tabix Could not load .tbi": { 
+    "tabix Could not load .tbi": {
         regExp: /tabix\sError:\s.*:\sstderr\s-\sCould not load .tbi.*/,
         message:  "Unable to load the index (.tbi) file, which has to exist in same directory and be given the same name as the .vcf.gz with the file extension of .vcf.gz.tbi.  "
     },
@@ -205,7 +205,7 @@ var effectCategories = [
 
   exports.ignoreErrorMessage = function(error) {
     var me = this;
-    var ignore = false;    
+    var ignore = false;
     ignoreMessages.forEach( function(regExp) {
       if (error.match(regExp)) {
         ignore = true;
@@ -1015,17 +1015,17 @@ var effectCategories = [
 
         if (isClinvarOffline) {
           var promise = me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
-          .then(  function() {  
+          .then(  function() {
 
           }, function(error) {
-            reject();
+            reject("Error accessing Clinvar");
           });
           clinvarPromises.push(promise);
 
         } else {
           var promise = me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
-          .then(  function() {   
-                     
+          .then(  function() {
+
           }, function(error) {
             reject("Error accessing ClinVar");
           });
