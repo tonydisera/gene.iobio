@@ -1,10 +1,11 @@
 var recordedCacheErrors = {};
 
-function CacheHelper() {
+function CacheHelper(loaderDisplay) {
 
 	this.genesToCache = [];
 	this.cacheQueue = [];
 	this.batchSize = null;
+	this.geneBadgeLoaderDisplay = loaderDisplay;
 }
 
 CacheHelper.prototype.isolateSession = function() {
@@ -19,12 +20,12 @@ CacheHelper.prototype.analyzeAll = function() {
 	// is all of the genes that need to be analyzed (and cached.)
 	me.genesToCache = [];
 	me.cacheQueue = [];
-	geneNames.forEach(function(geneName) {
+	genesCard.getGeneNames().forEach(function(geneName) {
 		if (geneName != window.gene.gene_name) {
 			me.genesToCache.push(geneName);
 		}
 	});
-	me.cacheGenes();	
+	me.cacheGenes();
 }
 
 
@@ -76,17 +77,17 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 	    type: "GET",
 	    dataType: "jsonp",
 	    success: function( response ) {
-
 	    	// Now that we have the gene model,
 	    	// load and annotate the variants for each
 	    	// sample (e.g. each variant card)
 	    	if (response[0].hasOwnProperty('gene_name')) {
+	    		me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+	    														 .addGene(geneName, genesCard.pageNumberForGene(geneName));
 
 		    	var geneObject = response[0];
 		    	adjustGeneRegion(geneObject);
 		    	var transcript = getCanonicalTranscript(geneObject);
 		    	window.geneObjects[geneObject.gene_name] = geneObject;
-			   
 
 			    if (me.isCachedForCards(geneObject.gene_name, transcript)) {
 			    	// take this gene off of the queue and see
@@ -190,16 +191,17 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 }
 
 CacheHelper.prototype.cacheNextGene = function(geneName) {
-	var me = this;
+	this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+														 .removeGene(geneName);
 	// Take the analyzed (and cached) gene off of the cache queue
-	var idx = me.cacheQueue.indexOf(geneName);
+	var idx = this.cacheQueue.indexOf(geneName);
 	if (idx >= 0) {
-		me.cacheQueue.splice(idx,1);
+		this.cacheQueue.splice(idx,1);
 	}
 	// Invoke cacheGenes, which will kick off the next batch
 	// of genes to analyze once all of the genes in
 	// the current batch have been analyzed.
-	me.cacheGenes();		
+	this.cacheGenes();
 }
 
 CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
