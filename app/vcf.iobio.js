@@ -121,7 +121,7 @@ var effectCategories = [
 
 
   var errorMessageMap =  {
-    "tabix Could not load .tbi": { 
+    "tabix Could not load .tbi": {
         regExp: /tabix\sError:\s.*:\sstderr\s-\sCould not load .tbi.*/,
         message:  "Unable to load the index (.tbi) file, which has to exist in same directory and be given the same name as the .vcf.gz with the file extension of .vcf.gz.tbi.  "
     },
@@ -205,7 +205,7 @@ var effectCategories = [
 
   exports.ignoreErrorMessage = function(error) {
     var me = this;
-    var ignore = false;    
+    var ignore = false;
     ignoreMessages.forEach( function(regExp) {
       if (error.match(regExp)) {
         ignore = true;
@@ -1019,19 +1019,19 @@ var effectCategories = [
 
         if (isClinvarOffline) {
           var promise = me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
-          .then(  function() {  
+          .then(  function() {
 
           }, function(error) {
-            reject();
+            reject("Unable to get clinvar annotations for variants");
           });
           clinvarPromises.push(promise);
 
         } else {
           var promise = me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
-          .then(  function() {   
-                     
+          .then(  function() {
+
           }, function(error) {
-            reject();
+            reject("Unable to get clinvar annotations for variants");
           });
           clinvarPromises.push(promise);
 
@@ -1133,7 +1133,7 @@ var effectCategories = [
       // clinvar records number
       var sourceIndex = -1;
       var clinvarIndex = 0;
-      var url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
+      var url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&usehistory=y&retmode=json&term=";
       url += "(" + refName + "[Chromosome]" + " AND ";
       // clinvarToSourceMap = new Object();
       variants.forEach(function(variant) {
@@ -1184,7 +1184,7 @@ var effectCategories = [
             } else {
               var webenv = data["esearchresult"]["webenv"];
               var queryKey = data["esearchresult"]["querykey"];
-              var summaryUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
+              var summaryUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&query_key=" + queryKey + "&retmode=json&WebEnv=" + webenv + "&usehistory=y"
               $.ajax( summaryUrl )
                 .done(function(sumData) {
 
