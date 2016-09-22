@@ -1018,7 +1018,7 @@ var effectCategories = [
           .then(  function() {
 
           }, function(error) {
-            reject("Error accessing Clinvar");
+            reject("Unable to get clinvar annotations for variants");
           });
           clinvarPromises.push(promise);
 
@@ -1027,7 +1027,7 @@ var effectCategories = [
           .then(  function() {
 
           }, function(error) {
-            reject("Error accessing ClinVar");
+            reject("Unable to get clinvar annotations for variants");
           });
           clinvarPromises.push(promise);
 
