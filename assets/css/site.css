@@ -2556,6 +2556,12 @@ text.ref-count {
   padding-top: 2px;
   padding-bottom: 2px; }
 
+#gene-badge-loading-display {
+  display: inline-block;
+  margin-left: 140px;
+  margin-top: 5px;
+  margin-bottom: 5px; }
+
 .call-variants-count {
   font-size: 11px;
   margin-top: 5px; }

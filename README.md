@@ -1,6 +1,13 @@
 # gene.iobio
 An iobio app for examining gene variants
 
+## Compiling stylesheets
+
+```
+cd gene.iobio/assets/css
+sass --update sass/site.sass:site.css
+```
+
 ## Testing
 
 #### Setup
