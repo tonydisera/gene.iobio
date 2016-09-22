@@ -2564,7 +2564,8 @@ text.ref-count {
 
 .call-variants-count {
   font-size: 11px;
-  margin-top: 5px; }
+  margin-top: 5px;
+  color: #717171; }
 
 #slider-left a.help-link {
   font-size: 13px !important;
