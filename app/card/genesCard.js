@@ -283,11 +283,6 @@ GenesCard.prototype.initCopyPasteGenes = function() {
 	}
 }
 
-GenesCard.prototype.validateGeneSource = function(geneName) {
-
-}
-
-
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
 	if (geneNames && geneNames.length > this.GENES_PER_PAGE) {
