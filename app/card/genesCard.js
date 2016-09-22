@@ -382,7 +382,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 
 }
 
-GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
+GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
 	var me = this;
 
 	if (isLevelBasic) {
@@ -465,13 +465,13 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
 		if (isLevelBasic) {		
-			selectGeneInDropdown(geneNameToSelect);
+			selectGeneInDropdown(geneNameToSelect, selectTheGene);
 		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
 		if (isLevelBasic) {
-			selectGeneInDropdown(geneNames[0]);
+			selectGeneInDropdown(geneNames[0], selectTheGene);
 		}
 	}
 
@@ -787,7 +787,8 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 	})
 	$('#genes-to-copy').val(genesString);
 
-	me.copyPasteGenes();
+	me.copyPasteGenes(selectedPhenoGenes.length > 0 ? selectedPhenoGenes[0].geneName : null, true);
+
 	me.highlightPhenolyzerGenes();
 }
 

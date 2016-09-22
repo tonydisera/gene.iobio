@@ -479,14 +479,18 @@ function showGeneSummary(theGeneName) {
 	}	
 }
 
-function selectGeneInDropdown(theGeneName) {
-	removeGeneDropdownListener();
+function selectGeneInDropdown(theGeneName, select) {
+	if (!select) {
+		removeGeneDropdownListener();
+	}
 
 	$('#select-gene')[0].selectize.setValue(theGeneName);
 
 	showGeneSummary(theGeneName);
 
-	addGeneDropdownListener();
+	if (!select) {
+		addGeneDropdownListener();
+	}
 
 }
 
