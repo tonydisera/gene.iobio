@@ -44,7 +44,6 @@
 	global.geneBadgeLoaderDisplay = geneBadgeLoaderDisplay;
 }(window, jQuery));
 
-// do not show page number when there is only one page
 // refactor genesCard with getGeneNames function
 
 
