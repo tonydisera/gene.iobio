@@ -197,15 +197,15 @@ function init() {
 	var me = this;
 	cacheHelper = new CacheHelper();
 
-	window.onbeforeunload = function () {
-	    launchTimestampToClear = cacheHelper.launchTimestamp;
-	    console.log("SAVING TIMESTAMP " + launchTimestampToClear);
-	    return "Are you sure you want to exit gene.iobio?";
-	};
-	window.onunload = function () {
-		console.log("CLEARING CACHE for " + launchTimestampToClear);
-    	cacheHelper.clearCache(launchTimestampToClear);
-	};
+	if (!isLevelEdu && !isLevelEduTour && !isLevelBasic) {
+		window.onbeforeunload = function () {
+		    launchTimestampToClear = cacheHelper.launchTimestamp;
+		    return "Are you sure you want to exit gene.iobio?";
+		};
+		window.onunload = function () {
+	    	cacheHelper.clearCache(launchTimestampToClear);
+		};		
+	}
 
 
 	cacheHelper.isolateSession();
