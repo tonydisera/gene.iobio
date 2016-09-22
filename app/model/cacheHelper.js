@@ -20,7 +20,7 @@ CacheHelper.prototype.analyzeAll = function() {
 	// is all of the genes that need to be analyzed (and cached.)
 	me.genesToCache = [];
 	me.cacheQueue = [];
-	geneNames.forEach(function(geneName) {
+	genesCard.getGeneNames().forEach(function(geneName) {
 		if (geneName != window.gene.gene_name) {
 			me.genesToCache.push(geneName);
 		}
