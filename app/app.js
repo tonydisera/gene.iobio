@@ -202,10 +202,10 @@ function init() {
 		    launchTimestampToClear = cacheHelper.launchTimestamp;
 		    return "Are you sure you want to exit gene.iobio?";
 		};
-		window.onunload = function () {
-	    	cacheHelper.clearCache(launchTimestampToClear);
-		};		
 	}
+	window.onunload = function () {
+    	cacheHelper.clearCache(launchTimestampToClear);
+	};		
 
 
 	cacheHelper.isolateSession();
