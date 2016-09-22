@@ -2883,7 +2883,7 @@ text.ref-count {
 
 #legend.level-basic {
   display: block !important;
-  margin-top: 20px; }
+  margin-top: 40px; }
 
 .legend-symbol {
   stroke: #000 !important;
@@ -2892,7 +2892,8 @@ text.ref-count {
 
 #legend .legend-label {
   font-size: 14px;
-  color: #717171; }
+  color: #717171;
+  margin-bottom: 5px; }
 #legend .vepImpact {
   pointer-events: none; }
 #legend .type {
@@ -2949,6 +2950,12 @@ button {
   #slider-left #slider-left-content {
     padding-right: 10px !important;
     width: 240px; }
+
+#filter-explanation {
+  display: block !important;
+  font-size: 14px;
+  color: #717171;
+  margin-top: 30px; }
 
 #container {
   margin-left: 0px !important; }
@@ -3099,7 +3106,7 @@ button {
     color: #5d809d; }
   #genes-card #bloodhound-sidebar.level-basic {
     display: block !important;
-    margin-bottom: 20px; }
+    margin-bottom: 30px; }
     #genes-card #bloodhound-sidebar.level-basic .twitter-typeahead {
       width: 100%; }
     #genes-card #bloodhound-sidebar.level-basic #enter-gene-name-sidebar.level-basic {
