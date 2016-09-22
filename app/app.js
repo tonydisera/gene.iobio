@@ -473,9 +473,13 @@ function init() {
 }
 
 function showGeneSummary(theGeneName) {
-	var summary = geneAnnots[theGeneName] ? geneAnnots[theGeneName].summary : null;
-	if (isLevelBasic && summary && $('#gene-summary').text() != summary ) {
-		$('#gene-summary').text(summary);
+	if (theGeneName != window.gene.gene_name) {
+		return;
+	}
+	var title = geneAnnots[theGeneName] ? "<span class='gene-title'>" + geneAnnots[theGeneName].description + ".</span>" : "";
+	var summary = geneAnnots[theGeneName] ? title + "  " + geneAnnots[theGeneName].summary  : "";
+	if (isLevelBasic && $('#gene-summary').text() != summary ) {
+		$('#gene-summary').html(summary);
 	}	
 }
 
@@ -487,7 +491,7 @@ function selectGeneInDropdown(theGeneName, select) {
 	$('#select-gene')[0].selectize.setValue(theGeneName);
 
 	showGeneSummary(theGeneName);
-
+	
 	if (!select) {
 		addGeneDropdownListener();
 	}
@@ -501,8 +505,8 @@ function removeGeneDropdownListener() {
 function addGeneDropdownListener() {
 	$('#select-gene')[0].selectize.on('change', function() {
 		var geneName = $('#select-gene')[0].selectize.getValue();
-		showGeneSummary(geneName);
 		genesCard.selectGene(geneName, function() {
+			showGeneSummary(geneName, true);
 			loadTracksForGene();
 		});
 	});	
