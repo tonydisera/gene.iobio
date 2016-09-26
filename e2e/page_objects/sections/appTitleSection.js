@@ -61,6 +61,12 @@ module.exports = {
       });
       this.api.useCss();
       return this;
+    },
+    assertGeneBadgeHasWarning: function(gene) {
+      this.api.useXpath();
+      this.waitForElementVisible("//div[@id='gene-badge']//*[@id='gene-badge-name' and text()='" + gene + "']/../*[@id='gene-badge-warning']");
+      this.api.useCss();
+      return this;
     }
   }],
   elements: {
@@ -76,7 +82,8 @@ module.exports = {
       selector: '#gene-badge.selected',
       elements: {
         name: { selector: '#gene-badge-name' },
-        remove: { selector: '#gene-badge-remove' }
+        remove: { selector: '#gene-badge-remove' },
+        warning: { selector: '#gene-badge-warning' }
       }
     },
     firstGeneBadge: {

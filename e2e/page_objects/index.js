@@ -2,7 +2,8 @@ var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var sliderIconBar = require('./sections/sliderIconBar.js');
 var sliderLeft = require('./sections/sliderLeft.js');
-var matrixTrack = require('./sections/matrixTrack.js')
+var matrixTrack = require('./sections/matrixTrack.js');
+var probandVariantCard = require('./sections/probandVariantCard.js');
 
 module.exports = {
   url: function() {
@@ -32,18 +33,12 @@ module.exports = {
     sliderIconBar: sliderIconBar,
     sliderLeft: sliderLeft,
     matrixTrack: matrixTrack,
+    probandVariantCard: probandVariantCard,
 
     transcriptCard: {
       selector: '#transcript-card',
       elements: {
         geneName: { selector: '#gene-name' }
-      }
-    },
-
-    probandVariantCard: {
-      selector: '#proband-variant-card',
-      elements: {
-
       }
     },
 
