@@ -657,7 +657,7 @@ var Bam = Class.extend({
       //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
 
       // Filter out anything with qual <= 0
-      //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+      cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-']);
 
 
       //

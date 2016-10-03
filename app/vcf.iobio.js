@@ -1896,15 +1896,15 @@ var effectCategories = [
               }
             }
 
-            genotypeDepthForSample = genotypeDepths[gtFieldIndex];
-            genotypeFilteredDepthForSample = genotypeFilteredDepths[gtFieldIndex];
-            genotypeRefCountForSample = genotypeRefCounts[gtFieldIndex];
-            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtFieldIndex];
-            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtFieldIndex];
+            genotypeDepthForSample = genotypeDepths[sampleIndex];
+            genotypeFilteredDepthForSample = genotypeFilteredDepths[sampleIndex];
+            genotypeRefCountForSample = genotypeRefCounts[sampleIndex];
+            genotypeRefForwardCountForSample = genotypeRefForwardCounts[sampleIndex];
+            genotypeRefReverseCountForSample = genotypeRefReverseCounts[sampleIndex];
 
-            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[gtFieldIndex], ",");
-            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtFieldIndex];
-            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtFieldIndex];
+            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[sampleIndex], ",");
+            genotypeAltForwardCountForSample = genotypeAltForwardCounts[sampleIndex];
+            genotypeAltReverseCountForSample = genotypeAltReverseCounts[sampleIndex];
 
             var eduGenotype = "";
             if (isLevelEdu) {

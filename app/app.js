@@ -49,7 +49,7 @@ var loadedUrl = false;
 
 // Transcript data and chart
 var selectedTranscript = null;
-var selectedTranscriptCodingRegions = [];
+var transcriptCodingRegions = [];
 var transcriptChart =  null;
 var transcriptViewMode = "single";
 var transcriptMenuChart = null;
@@ -304,7 +304,7 @@ function init() {
 				regionEnd   = d3.round(brush.extent()[1]);
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
-					cacheCodingRegions();
+					getCodingRegions(selectedTranscript);
 
 				}
 			} else {
@@ -357,7 +357,7 @@ function init() {
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
 	    	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-	    	cacheCodingRegions();
+	    	getCodingRegions(window.selectedTranscript);
 
 	    	showTranscripts();
 
@@ -1188,7 +1188,7 @@ function onCloseTranscriptMenuEvent() {
 			selectedTranscript = transcriptMenuChart.selectedTranscript();
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 			d3.selectAll("#gene-viz .transcript").remove();
-		 	cacheCodingRegions();
+		 	getCodingRegions(window.selectedTranscript);
 		 	loadTracksForGene();
 		 }		
 	}
@@ -1342,15 +1342,24 @@ function getCanonicalTranscriptOld(theGeneObject) {
 	return canonical;
 }
 
-function cacheCodingRegions() {
-	selectedTranscriptCodingRegions.length = 0;
+function getCodingRegions(transcript) {
 
-	if (window.selectedTranscript != null && window.selectedTranscript.features != null) {
-		window.selectedTranscript.features.forEach( function(feature) {
-			if (feature.feature_type == 'CDS' || feature.feature_type == 'UTR') {
-				selectedTranscriptCodingRegions.push({start: feature.start, end: feature.end});
-			}
-		});		
+	if (transcript != null && transcript.features != null) {
+		var codingRegions = transcriptCodingRegions[transcript.transcript_id];
+		if (codingRegions) {
+			return codingRegions;
+		} else {
+			codingRegions = [];
+			transcript.features.forEach( function(feature) {
+				if (feature.feature_type == 'EXON' || feature.feature_type == 'CDS' || feature.feature_type == 'UTR') {
+					codingRegions.push({start: feature.start, end: feature.end});
+				}
+			});		
+			transcriptCodingRegions[transcript.transcript_id] = codingRegions;			return codingRegions;
+
+		}
+	} else {
+		return [];
 	}
 
 }
@@ -1847,8 +1856,94 @@ function loadTracksForGene(bypassVariantCards) {
 	
 }
 
+function promptForAutoCall(callback) {
+	if (autoCall == null) {
+		alertify.confirm("Automatically call variants from alignments?",
+	        function () {	
+	        	// ok		     
+	        	autoCall = true;  
+	        	callback(autoCall);
+	    	},
+			function () {
+				// cancel
+				autoCall = false;
+				callback(autoCall)
+			}).set('labels', {ok:'Yes', cancel:'No'}); 
+	} else {
+		callback(autoCall);
+	}
+
+}
+
+function isJointCallOnly(callback) {
+
+	var shouldJointCall = false;
+	var cards = getRelevantVariantCards().filter(function(vc) {
+		return !vc.model.isVcfReadyToLoad() && vc.model.isBamLoaded();
+	});
+	if (cards.length == getRelevantVariantCards().length) {
+		shouldJointCall = true;
+	}			
+		
+	if (shouldJointCall) {
+		promptForAutoCall( function() {
+			callback(autoCall);
+		});
+	} else {
+		callback(false);
+	}
+}
+
+
+function hasCalledVariants() {
+	var cards = getRelevantVariantCards().filter(function(vc) {
+		return vc.model.hasCalledVariants();
+	});
+	return cards.length == getRelevantVariantCards().length;
+}
+
 function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
+	relevantVariantCards.forEach(function(vc) {
+		vc.prepareToShowVariants(filterCard.classifyByImpact);
+	});
+	isJointCallOnly(function(shouldJointCall) {
+		if (shouldJointCall && !hasCalledVariants()) {
+			var coveragePromises = [];
+			var allMaxDepth = 0;
+			relevantVariantCards.forEach(function(vc) {
+				vc.clearBamChart();
+			});
+			jointCallVariants(function() {
+				relevantVariantCards.forEach(function(vc) {
+					var cp = vc.promiseLoadBamDepth()
+					           .then( function(coverageData) {
+									if (coverageData) {
+										var max = d3.max(coverageData, function(d,i) { return d[1]});
+										if (max > allMaxDepth) {
+											allMaxDepth = max;
+										}						
+									}
+																							
+					           });
+					coveragePromises.push(cp); 
+					Promise.all(coveragePromises).then(function() {
+						relevantVariantCards.forEach(function(vc) {
+							vc.showBamDepth(allMaxDepth);
+						});
+					});
+				});
+			});
+
+		} else {
+			loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+		}
+	});
+}
+
+function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 	if (bypassVariantCards == null || !bypassVariantCards) {
+
+
 
 		// Load the variants in the variant cards first. After each sample's
 		// variants are shown, load the coverage from the alignment file for
@@ -1861,13 +1956,16 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 		var coveragePromises = [];
 		var allMaxDepth = 0;
 	 	relevantVariantCards.forEach(function(vc) {
+	 		
+	 		vc.clearBamChart();
+
 	 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
 				vc.hide();
 			} else {
-				var vPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact)
+				var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
                   .then( function() {
 
-					var cPromise = vc.promiseLoadBamDepth()
+					var coveragePromise = vc.promiseLoadBamDepth()
 					                 .then( function(coverageData) {
 											if (coverageData) {
 												var max = d3.max(coverageData, function(d,i) { return d[1]});
@@ -1877,12 +1975,14 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 											}
 																							
 					                 });
-					coveragePromises.push(cPromise); 
+					coveragePromises.push(coveragePromise); 
+
 
 				  });				 
-				  variantPromises.push(vPromise);		 
+				  variantPromises.push(variantPromise);		 
 			}
-		});
+		});			
+
 
 
 	 	//
@@ -1981,7 +2081,7 @@ function showTranscripts(regionStart, regionEnd) {
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-			cacheCodingRegions();
+			getCodingRegions(window.selectedTranscript);
 
 		}
 	}
@@ -2058,45 +2158,6 @@ function addVariantCard() {
 
 }
 
-function callVariants() {
-	if (dataCard.mode == 'trio') {
-		jointCallVariants();
-	} else {
-		singleCallVariants();
-	}
-}
-
-function singleCallVariants() {
-
-	fulfilledTrioPromise = false;
-	getRelevantVariantCards().forEach(function(vc) {
-		vc.clearCalledVariants();
-		vc.callVariants(regionStart, regionEnd, function() {
-			promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
-
-				// After all samples (in the case of a trio) have had their variants called,
-				// compare to deterimine inheritance mode for proband.  
-				// After that, we will loop through all of the variant
-				// cards to refresh the content since the allele counts reflect
-				// the full trio.
-				getRelevantVariantCards().forEach(function(variantCard) {
-
-					// Reflect me new info in the freebayes variants.
-					variantCard.model.loadCalledTrioGenotypes();
-
-					//  Refresh the feature matrix (proband only) and variant cards
-					if (variantCard.getRelationship() == 'proband') {
-						variantCard.fillFeatureMatrix(regionStart, regionEnd);
-					} else {
-						variantCard._showVariants(regionStart, regionEnd, null, false);
-					}
-
-				});				
-			});
-
-		});
-	});
-}
 
 function jointCallVariants(callback) {
 	fulfilledTrioPromise = false;
@@ -2158,17 +2219,82 @@ function jointCallVariants(callback) {
 						vc.showCallVariantsProgress('counting');
 						vc.showCallVariantsProgress('done');
 
-						//  Refresh the feature matrix (proband only) and variant cards
-						if (vc.getRelationship() == 'proband') {
-							vc.fillFeatureMatrix(window.gene.start, window.gene.end);
-						} 
-						vc._showVariants(window.gene.start, window.gene.end, null, false);
+						var alignmentsOnly =  !vc.model.isVcfReadyToLoad() && vc.model.isBamLoaded();
+						vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, !alignmentsOnly); 
+
+						if (!alignmentsOnly && vc.getRelationship() == 'proband') {
+							vc.fillFeatureMatrix(regionStart, regionEnd);
+						}
+						
 
 					});
 					if (callback) {
 						callback();
 					}
 				});				
+			});
+		}
+	);
+
+}
+
+function cacheJointCallVariants(geneObject, transcript, callback) {
+
+
+	var bams = [];
+	var cards = getRelevantVariantCards();
+	cards.forEach(function(vc) {
+		bams.push(vc.model.bam);
+	});
+
+	
+	var sampleIndex = 0;
+	var jointVcfRecs = null;
+	var translatedRefName = null;
+
+	var parseNextCalledVariants = function(afterParseCallback) {
+		if (sampleIndex >= cards.length) {
+			if (afterParseCallback) {
+				afterParseCallback();
+			}
+			return;
+		}		
+		var vc = cards[sampleIndex];
+		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, geneObject, transcript, sampleIndex)
+	                .then(function(data) {
+	                	var theFbData = data[1];
+
+						vc.model._determineVariantAfLevels(theFbData, transcript);
+
+			        	// Pileup the variants
+			        	var pileupObject = vc.model._pileupVariants(theFbData.features, geneObject.start, geneObject.end);
+						theFbData.maxLevel = pileupObject.maxLevel + 1;
+						theFbData.featureWidth = pileupObject.featureWidth;				    
+
+						vc.model._cacheData(theFbData, "fbData", geneObject.gene_name, transcript);
+						vc.model._cacheData(theFbData, "vcfData", geneObject.gene_name, transcript);
+						
+						sampleIndex++;
+						parseNextCalledVariants(afterParseCallback);					    				    
+				    });
+	}
+	
+	getProbandVariantCard().model.bam.freebayesJointCall(
+		geneObject.chr, 
+		geneObject.start, 
+		geneObject.end, 
+		geneObject.strand, 
+		bams, 
+		window.geneSource == 'refseq' ? true : false, 
+		function(theData, trRefName) {
+
+			translatedRefName = trRefName;
+			jointVcfRecs = 	theData.split("\n");		
+
+			parseNextCalledVariants(function() {
+				if (callback) {
+					callback();
+				}
 			});
 		}
 	);

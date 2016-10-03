@@ -91,7 +91,7 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	}
 
 	if (theGetRefNameFunction) {
-		if (me.vcfData != null) {
+		if (me.vcfData != null && me.vcfData.features && me.vcfData.features.length > 0) {
 			if (theGetRefNameFunction(geneObject.chr) == me.vcfData.ref &&
 				geneObject.start == me.vcfData.start &&
 				geneObject.end == me.vcfData.end &&
@@ -147,17 +147,18 @@ VariantModel.prototype.getVariantCount = function(data) {
 	if (theVcfData == null || theVcfData.features == null) {
 		return "0";
 	} else {
-		var homRefCount = 0;
-		var fbVariantCount = 0;
+		var loadedVariantCount = 0;
 		theVcfData.features.forEach(function(variant) {
-			if (variant.zygosity != null && variant.zygosity.toLowerCase() == "homref") {
-				homRefCount++;
-			}
 			if (variant.fbCalled && variant.fbCalled == 'Y') {
-				fbVariantCount++;
+	
+			} else if (variant.zygosity != null && variant.zygosity.toLowerCase() == "homref") {
+	
+			} else {
+				loadedVariantCount++;
+
 			}
 		});
-		return theVcfData.features.length - homRefCount - fbVariantCount;
+		return loadedVariantCount;
 	}
 }
 
@@ -932,7 +933,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		if (me.getRelationship() == 'proband') {
 					    		me.pruneIntronVariants(data);
 				    		}
-				    		me._pruneHomRefVariants(data);
+				    		//me._pruneHomRefVariants(data);
 	
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
@@ -1193,7 +1194,7 @@ VariantModel.prototype._promiseCacheCalledVariants = function(ref, geneObject, t
 
 		        	// Filter the freebayes variants to only keep the ones
 		        	// not present in the vcf variant set.
-					me._determineVariantAfLevels(data);
+					me._determineVariantAfLevels(data, transcript);
 
 		        	// Pileup the variants
 		        	var pileupObject = me._pileupVariants(data.features, geneObject.start, geneObject.end);
@@ -1298,7 +1299,7 @@ VariantModel.prototype.pruneIntronVariants = function(data) {
 }
 
 VariantModel.prototype._pruneHomRefVariants = function(data) {
-	if (this.relationship == 'proband') {
+	//if (this.relationship == 'proband') {
 		data.features = data.features.filter(function(d) {
 			// Filter homozygous reference for proband only
 			var meetsZygosity = true;
@@ -1307,7 +1308,7 @@ VariantModel.prototype._pruneHomRefVariants = function(data) {
 			}
 			return meetsZygosity;
 		});
-	}
+	//}
 }
 
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, onVcfData) {
@@ -1353,13 +1354,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 					me.pruneIntronVariants(theVcfData);
 		    	}
 
-				// Get rid of any homozygous reference from proband
-				me._pruneHomRefVariants(theVcfData);
-					
-
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 			    // can be filtered by range.
-			    me._determineVariantAfLevels(theVcfData );
+			    me._determineVariantAfLevels(theVcfData, transcript );
 
 
 			    // Show the snpEff effects / vep consequences in the filter card
@@ -1504,7 +1501,7 @@ VariantModel.prototype._populateRecFilters  = function(variants) {
 
 
 
-VariantModel.prototype._determineVariantAfLevels = function(theVcfData) {
+VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcript) {
 	var me = this;
     // Post processing:
     // We have the af1000g and afexac, so now determine the level for filtering
@@ -1514,7 +1511,7 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData) {
     	// coding region (level = private) and af not found and intronic (non-coding) 
     	// region (level = unknown)
     	if (variant.afExAC == 0) {
-        	window.selectedTranscriptCodingRegions.forEach(function(codingRegion) {
+        	getCodingRegions(transcript).forEach(function(codingRegion) {
         		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			
         		} else {
         			variant.afExAC = -100;
@@ -1980,13 +1977,14 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) 
 		});
 	}	
 
+
 	// We are done getting the clinvar data for called variants.
 	// Now merge called data with variant set and display.
 	// Prepare vcf and fb data for comparisons
 	me._prepareVcfAndFbData();
 
 	// Determine allele freq levels
-	me._determineVariantAfLevels(me.fbData);
+	me._determineVariantAfLevels(me.fbData, window.selectedTranscript);
 
 	// Filter the freebayes variants to only keep the ones
 	// not present in the vcf variant set.
@@ -2136,6 +2134,9 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function() {
     pileupObject = me._pileupVariants(me.fbData.features, gene.start, gene.end);
 	me.fbData.maxLevel = pileupObject.maxLevel + 1;
 	me.fbData.featureWidth = pileupObject.featureWidth;
+
+	// Re-cache the vcf data now that the called variants have been merged
+	me._cacheData(me.vcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
 }
 
 
@@ -2146,7 +2147,7 @@ VariantModel.prototype.filterFreebayesVariants = function(filterObject) {
 	} else {
 		return null;
 	}
-}
+} 
 
 
 
@@ -2173,6 +2174,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		coverageMin = +filterObject.coverageMin;
 	}
 	data.intronsExcludedCount = 0;
+
+	// Get rid of any homozygous reference from proband
+	me._pruneHomRefVariants(data);		
+
 	   
 	var filteredFeatures = data.features.filter(function(d) {
 

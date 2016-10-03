@@ -517,6 +517,15 @@ VariantCard.prototype.minimizeCard = function(minimize) {
 	this.d3CardSelector.select('#minimize-button').classed("disabled", true);
 }
 
+VariantCard.prototype.clearBamChart = function() {
+	this.cardSelector.find("#bam-depth svg").remove();
+	this.cardSelector.find('#bam-depth').css("visibility", "hidden");
+	this.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
+	this.cardSelector.find('#bam-chart-label').css("margin-bottom", "0px");
+	this.cardSelector.find('#fb-chart-label').addClass("hide");
+	this.cardSelector.find('#fb-separator').addClass("hide");
+}
+
 VariantCard.prototype.showBamProgress = function(message) {
 	this.cardSelector.find("#bam-track").removeClass("hide");
 	this.cardSelector.find(".covloader").removeClass("hide");
@@ -562,83 +571,17 @@ VariantCard.prototype.clearWarnings = function() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
+VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, fullRefresh) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
-		// Reset any previous locked variant
-		clickedVariant = null;
-		clickedVariantCard = null;
-		window.hideCircleRelatedVariants();
-		me.unpin();
-
-
-		// Clear out the previous gene's data
-		me.model.wipeGeneData();
-
-		me.cardSelector.find(".filter-flag").addClass("hide");
-		me.clearWarnings();
-
+		if (fullRefresh) {
+			me.prepareToShowVariants(classifyClazz);
+		}
+		
+		// Clear out previous variant data and set up variant card
+		// to show that loading messages.
 		if (me.isViewable()) {
-			filterCard.clearFilters();
-
-			me.vcfChart.clazz(classifyClazz);
-			me.fbChart.clazz(classifyClazz);
-
-			if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
-				me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
-
-				// Workaround.  For some reason, d3 doesn't clean up previous transcript
-				// as expected.  So we will just force the svg to be removed so that we
-				// start with a clean slate to avoid the bug where switching between transcripts
-				// resulted in last transcripts features not clearing out.
-				me.d3CardSelector.select('#zoom-region-chart svg').remove();
-
-				selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-				me.zoomRegionChart.regionStart(+window.gene.start);
-				me.zoomRegionChart.regionEnd(+window.gene.end);
-				me.zoomRegionChart(selection);
-
-			}
-			me.cardSelector.find('#bam-depth').css("visibility", "hidden");
-			me.cardSelector.find('#bam-chart-label').css("visibility", "hidden");
-			me.cardSelector.find('#bam-chart-label').css("margin-bottom", "0px");
-
-	    	me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
-	    	me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
-	    	me.cardSelector.find('#displayed-variant-count').text("");
-	    	me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-	    	me.cardSelector.find('#vcf-variant-count').text("");
-	    	me.cardSelector.find('#called-variant-count-label').addClass("hide");
-	    	me.cardSelector.find('#called-variant-count').text("");
-	    	me.cardSelector.find('#gene-box').text("");
-	    	me.cardSelector.find('#gene-box').css("visibility", "hidden");
-	    	if (isLevelEduTour && eduTourNumber == "1") {
-		    	me.cardSelector.find("#gene-box").addClass("deemphasize");
-	    	}
-
-
-
-			me.cardSelector.find('#vcf-track').removeClass("hide");
-			me.cardSelector.find('#vcf-variants').css("display", "none");
-			me.cardSelector.find('#vcf-chart-label').addClass("hide");
-			me.cardSelector.find('#vcf-name').addClass("hide");	
-
-			me.cardSelector.find('#fb-variants').addClass("hide");
-
-			if (me.getRelationship() == 'proband') {
-				$("#feature-matrix").addClass("hide");
-				$("#feature-matrix-note").addClass("hide");
-				$('#move-rows').addClass("hide");			
-			}
-
-			if (me.model.isVcfLoaded()) {
-				me.cardSelector.find(".vcfloader").removeClass("hide");
-				me.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
-			} else {
-				$("#filter-and-rank-card").addClass("hide");
-			}
-
 
 			// Load the variant chart.			
 			me._showVariants( regionStart, 
@@ -648,9 +591,6 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 					resolve();
 				},
 				true);
-			
-
-
 		} else {
 			resolve();
 		}
@@ -659,6 +599,84 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz) {
 	});
 	
 	
+}
+
+VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
+	var me = this;
+
+	me.cardSelector.removeClass("hide");
+
+	// Reset any previous locked variant
+	clickedVariant = null;
+	clickedVariantCard = null;
+	window.hideCircleRelatedVariants();
+	me.unpin();
+
+
+	// Clear out the previous gene's data
+	me.model.wipeGeneData();
+
+	me.cardSelector.find(".filter-flag").addClass("hide");
+	me.clearWarnings();
+
+	if (me.isViewable()) {
+		filterCard.clearFilters();
+
+		me.vcfChart.clazz(classifyClazz);
+		me.fbChart.clazz(classifyClazz);
+
+		if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
+			me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+
+			// Workaround.  For some reason, d3 doesn't clean up previous transcript
+			// as expected.  So we will just force the svg to be removed so that we
+			// start with a clean slate to avoid the bug where switching between transcripts
+			// resulted in last transcripts features not clearing out.
+			me.d3CardSelector.select('#zoom-region-chart svg').remove();
+
+			selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
+			me.zoomRegionChart.regionStart(+window.gene.start);
+			me.zoomRegionChart.regionEnd(+window.gene.end);
+			me.zoomRegionChart(selection);
+
+		}
+
+
+    	me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
+    	me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
+    	me.cardSelector.find('#displayed-variant-count').text("");
+    	me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+    	me.cardSelector.find('#vcf-variant-count').text("");
+    	me.cardSelector.find('#called-variant-count-label').addClass("hide");
+    	me.cardSelector.find('#called-variant-count').text("");
+    	me.cardSelector.find('#gene-box').text("");
+    	me.cardSelector.find('#gene-box').css("visibility", "hidden");
+    	if (isLevelEduTour && eduTourNumber == "1") {
+	    	me.cardSelector.find("#gene-box").addClass("deemphasize");
+    	}
+
+
+
+		me.cardSelector.find('#vcf-track').removeClass("hide");
+		me.cardSelector.find('#vcf-variants').css("display", "none");
+		me.cardSelector.find('#vcf-chart-label').addClass("hide");
+		me.cardSelector.find('#vcf-name').addClass("hide");	
+
+		me.cardSelector.find('#fb-variants').addClass("hide");
+
+		if (me.getRelationship() == 'proband') {
+			$("#feature-matrix").addClass("hide");
+			$("#feature-matrix-note").addClass("hide");
+			$('#move-rows').addClass("hide");			
+		}
+
+		if (me.model.isVcfLoaded()) {
+			me.cardSelector.find(".vcfloader").removeClass("hide");
+			me.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
+		} else {
+			$("#filter-and-rank-card").addClass("hide");
+		}
+	}	
 }
 
 VariantCard.prototype.setLoadState = function(theState) {
@@ -751,49 +769,39 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			
 			// If no vcf supplied, automatically call variants (then get coverage)
 			if (autoCall && !me.model.isVcfReadyToLoad() && !me.model.hasCalledVariants()) {	
-				if (dataCard.mode == 'trio' ) {
-					if (me.getRelationship() == 'proband') {
-						jointCallVariants(function() {
-							loadCoverage();
-						});						
-					} else {
-						loadCoverage();
-					}
+				
+				me.callVariants(regionStart, regionEnd, function() {
+					loadCoverage();
 
-				} else {
-					me.callVariants(regionStart, regionEnd, function() {
-						loadCoverage();
+					// For the proband, we need to determine the inheritance and then
+					// fill in the mother/father genotype and allele counts on the
+					// proband's variants.  So we do this first before caching
+					// the called variants and resolving this promise.
+					
+					// Once all variant cards have freebayes variants,
+					// the app will determine in the inheritance mode
+					// for the freebayes variants
+					promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+	
+						variantCards.forEach(function(variantCard) {
+							// Reflect me new info in the freebayes variants.
+							variantCard.model.loadCalledTrioGenotypes();
 
-						// For the proband, we need to determine the inheritance and then
-						// fill in the mother/father genotype and allele counts on the
-						// proband's variants.  So we do this first before caching
-						// the called variants and resolving this promise.
-						
-						// Once all variant cards have freebayes variants,
-						// the app will determine in the inheritance mode
-						// for the freebayes variants
-						promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
-		
-							variantCards.forEach(function(variantCard) {
-								// Reflect me new info in the freebayes variants.
-								variantCard.model.loadCalledTrioGenotypes();
+							//  Refresh the feature matrix (proband only) and variant cards
+							if (variantCard.getRelationship() == 'proband') {
+								variantCard.fillFeatureMatrix(regionStart, regionEnd);
+							} else {
+								variantCard._showVariants(regionStart, regionEnd, null, false);
+							}
 
-								//  Refresh the feature matrix (proband only) and variant cards
-								if (variantCard.getRelationship() == 'proband') {
-									variantCard.fillFeatureMatrix(regionStart, regionEnd);
-								} else {
-									variantCard._showVariants(regionStart, regionEnd, null, false);
-								}
+						})
 
-							})
-
-						}, function(error) {
-							console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
-						});
-
+					}, function(error) {
+						console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
 					});
 
-				}
+				});
+
 			} else {
 				// Otherwise, if a vcf was loaded, just get the coverage
 				//me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
@@ -951,10 +959,7 @@ VariantCard.prototype.showFinalizedVariants = function() {
 		// Variant cards.
 		me._showVariants(regionStart, regionEnd, null, false);
 	}
-	// Show called variants as well.
-	if (me.model.isBamLoaded()) {
-		me._fillFreebayesChart(me.model.getCalledVariants(), regionStart, regionEnd);
-	}	
+
 }
 
 
@@ -988,8 +993,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 		} else {
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
-			if (me.model.isBamLoaded()) {				
-				me._fillFreebayesChart(me.model.getCalledVariants(), 
+			if (me.model.isBamLoaded()) {	
+				var filteredFBData = me.filterCalledVariants();			
+				me._fillFreebayesChart(filteredFBData, 
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
 				me.cardSelector.find('#called-variant-count').removeClass("hide");
@@ -1041,7 +1047,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
-				me._fillFreebayesChart(me.model.getCalledVariants(), 
+				var filteredFBData = me.filterCalledVariants();			
+				me._fillFreebayesChart(filteredFBData, 
 									   regionStart ? regionStart : window.gene.start, 
 									   regionEnd ? regionEnd : window.gene.end);
 			}	
@@ -1340,6 +1347,8 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 		// Set the vertical layer count so that the height of the chart can be recalculated	    
 		this.fbChart.verticalLayers(data.maxLevel);
 		this.fbChart.lowestWidth(data.featureWidth);
+
+		this.d3CardSelector.select("#fb-variants svg").remove();
 
 		// Load the chart with the new data
 		var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    

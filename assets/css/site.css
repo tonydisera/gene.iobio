@@ -1016,7 +1016,7 @@ section {
     fill: #ff7d7d; }
 
 .variant-card {
-  min-height: 32px;
+  min-height: 60px;
   padding-bottom: 0px;
   background-color: white; }
   .variant-card .vcfloader {
@@ -1137,7 +1137,8 @@ header {
 
 #bam-depth {
   text-align: left;
-  margin-top: 0px; }
+  margin-top: 0px;
+  min-height: 30px; }
   #bam-depth .circle {
     stroke: none;
     fill: #3586c0;
