@@ -13,23 +13,33 @@ var serverCacheDir        = "local_cache/"; // this is the directory from the se
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
 
-var siteGeneSource        = "gencode";      // what should the gene source default to: refseq or gencode?
-var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'
-
 var autoCall              = null;           // if only alignments are provided, should variants automatically be called? 
  											// set to null if app should prompt first before autocalling
 
 /*
 * These variables control special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  For running one of the special educational edition 
-* tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
+* tours (e.g. a guided tour of the gene.iobio app), TURN ON BOTH isLevelEdu and isLevelEduTour.
+* See @import statements for levelEdu and levelEduTour in css/assets/sass.
 */
-var isLevelEdu            = false; // is gene.iobio educational version, simplified version of app
-var isLevelEduTour        = false; // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
+var isLevelEduTour        = false;   // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 
+/*
+* These variables control special behavior for running gene.iobio basic mode, with
+* a simplified interface and logic.  For running the Mygene2 gene.iobio basic mode, 
+* TURN ON BOTH isLevelBasic and isMygene2.  For running Mygene2 gene.iobio advanced mode,
+* TURN ON only isMygene2. 
+* See @import statements for levelEdu and levelEduTour in css/assets/sass.
+*/
+var isLevelBasic          = false;    // is gene.iobio basic mode?
+var isMygene2             = false;    // show the mygene2 intro panel?
 
 var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emails should feedback be sent to?   if no emails are provided, the feedback link will be hidden
 var feedbackAttachScreenCapture = true;          // should the feedback include a screen capture?
 var feedbackShowURL             = false;         // show the feedback email show the URL that launched gene.iobio?
 
 
+
+var siteGeneSource        = isMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
+var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'

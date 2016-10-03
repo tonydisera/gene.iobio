@@ -1317,9 +1317,9 @@ var effectCategories = [
 
 
   exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleIndex) {
+
       var me = this;
-      var nameTokens = selectedTranscript.transcript_id.split('.');
-      var selectedTranscriptID = nameTokens.length > 0 ? nameTokens[0] : selectedTranscript;
+      var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
 
       // Use the sample index to grab the right genotype column from the vcf record
       // If it isn't provided, assume that the first genotype column is the one
@@ -1952,7 +1952,8 @@ var effectCategories = [
                 var transcripts = transcriptObject[key];
                 var found = false;
                 for (var transcriptId in transcripts) {
-                  if (theTranscriptId.indexOf(transcriptId) == 0) {
+                  var strippedTranscriptId = stripTranscriptPrefix(transcriptId);
+                  if (theTranscriptId.indexOf(strippedTranscriptId) == 0) {
                     found = true;
                   }
                 }

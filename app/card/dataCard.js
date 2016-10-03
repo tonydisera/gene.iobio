@@ -137,6 +137,9 @@ function DataCard() {
 		[],
 		['VKORC1']
 	];
+	this.mygene2Genes = [
+		'KDM1A'
+	];
 	
 
 
@@ -196,8 +199,16 @@ DataCard.prototype.loadDemoData = function() {
 	}
 
 	
+	if (isLevelBasic) {		
+		window.updateUrl("gene",  this.mygene2Genes[0]);
+		window.updateUrl("genes", this.mygene2Genes.join(","));
 
-	if (!window.isLevelEdu) {
+		cacheHelper.clearCache();
+		window.matrixCard.reset();
+		window.loadedUrl = false;
+
+		reloadGeneFromUrl();
+	} else if (!window.isLevelEdu) {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 

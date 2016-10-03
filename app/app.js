@@ -23,6 +23,8 @@ var helpTemplateHTML = null;
 var eduTourTemplateHTML = null;
 var iconbarTemplate = null;
 var tourTemplate = null;
+var introTemplate = null;
+var legendTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -59,6 +61,8 @@ var geneSource = "gencode";
 
 var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
+var readyToHideIntro = false;
+var keepShowingIntro = false;
 
 
 // bookmark card
@@ -161,6 +165,12 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/tourTemplate.hbs').then(function(compiledTemplate) {
 		tourTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/introTemplate.hbs').then(function(compiledTemplate) {
+		introTemplate = compiledTemplate;
+	}));
+	promises.push(promiseLoadTemplate('templates/legendTemplate.hbs').then(function(compiledTemplate) {
+		legendTemplate = compiledTemplate;
+	}));
 	promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
 		svgGlyphsTemplate = compiledTemplate;
 	}));
@@ -188,15 +198,15 @@ function init() {
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
 
-	window.onbeforeunload = function () {
-	    launchTimestampToClear = cacheHelper.launchTimestamp;
-	    console.log("SAVING TIMESTAMP " + launchTimestampToClear);
-	    return "Are you sure you want to exit gene.iobio?";
-	};
+	if (!isLevelEdu && !isLevelEduTour && !isLevelBasic) {
+		window.onbeforeunload = function () {
+		    launchTimestampToClear = cacheHelper.launchTimestamp;
+		    return "Are you sure you want to exit gene.iobio?";
+		};
+	}
 	window.onunload = function () {
-		console.log("CLEARING CACHE for " + launchTimestampToClear);
     	cacheHelper.clearCache(launchTimestampToClear);
-	};
+	};		
 
 
 	cacheHelper.isolateSession();
@@ -208,6 +218,14 @@ function init() {
 		var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
 		window.location.assign(exhibitUrl);
 		return;			
+	}
+
+	if (isMygene2) {
+		$('#intro').append(introTemplate());
+		if (isLevelBasic) {
+			$('#intro-link').addClass("hide");
+			$('#intro-text').removeClass("hide");
+		}
 	}
 
 
@@ -290,11 +308,11 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: 2, bottom: 0, left: 4})
+	    .margin({top:20, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEduTour ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEduTour ? 32 : 16)
-	    .cdsHeight(isLevelEduTour ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelBasic ? 32 : 16)
+	    .cdsHeight(isLevelEduTour  || isLevelBasic  ? 24 : 12)
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
@@ -351,8 +369,8 @@ function init() {
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
-	    .trackHeight(isLevelEduTour ? 36 : 16)
-	    .cdsHeight(isLevelEduTour ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelBasic  ? 36 : 16)
+	    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 12)
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
@@ -427,7 +445,19 @@ function init() {
 			loadGeneFromUrl();
 		}
 	});
-	$('#bloodhound .typeahead').focus();
+	getGeneBloodhoundElement().focus();
+
+	if (isLevelBasic) {
+		$('#select-gene').selectize(
+			{ 
+				create: false, 			
+				valueField: 'value',
+		    	labelField: 'value',
+		    	searchField: ['value']
+	    	}
+		);	
+		addGeneDropdownListener();
+	}
 
 	// In cases where timeout=true, restart app after n seconds of inactivity
 	// (e.g. no mouse move, button click, etc.). 
@@ -440,6 +470,47 @@ function init() {
 		$('#feedback-link').on('click', showFeedback);
 	    $('#report-feedback-button').on('click', emailFeedback);
 	}
+
+}
+
+function showGeneSummary(theGeneName) {
+	if (theGeneName != window.gene.gene_name) {
+		return;
+	}
+	var title = geneAnnots[theGeneName] ? "<span class='gene-title'>" + geneAnnots[theGeneName].description + ".</span>" : "";
+	var summary = geneAnnots[theGeneName] ? title + "  " + geneAnnots[theGeneName].summary  : "";
+	if (isLevelBasic && $('#gene-summary').text() != summary ) {
+		$('#gene-summary').html(summary);
+	}	
+}
+
+function selectGeneInDropdown(theGeneName, select) {
+	if (!select) {
+		removeGeneDropdownListener();
+	}
+
+	$('#select-gene')[0].selectize.setValue(theGeneName);
+
+	showGeneSummary(theGeneName);
+	
+	if (!select) {
+		addGeneDropdownListener();
+	}
+
+}
+
+function removeGeneDropdownListener() {
+	$('#select-gene')[0].selectize.off('change');	
+}
+
+function addGeneDropdownListener() {
+	$('#select-gene')[0].selectize.on('change', function() {
+		var geneName = $('#select-gene')[0].selectize.getValue();
+		genesCard.selectGene(geneName, function() {
+			showGeneSummary(geneName, true);
+			loadTracksForGene();
+		});
+	});	
 
 }
 
@@ -665,7 +736,7 @@ function hideCoordinateFrame() {
 
 function readjustCards() {
 	var top = +$('#nav-section').height();
-	d3.select('#track-section').style("padding-top", top+3 + "px");
+	d3.select('#track-section').style("padding-top", top+6 + "px");
 }
 
 
@@ -788,9 +859,9 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 40));
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 60));
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu ? 0 : 60));
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 0 : 40));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
 }
 
 function closeSlideLeft() {
@@ -927,6 +998,22 @@ function toggleSampleTrio(show) {
 
 }
 
+function getGeneBloodhoundElement() {
+	return isLevelBasic ? $('#bloodhound-sidebar .typeahead') : $('#bloodhound .typeahead');	
+}
+
+function getGeneBloodhoundInputElement() {
+	return isLevelBasic ? $('#bloodhound-sidebar .typeahead.tt-input') : $('#bloodhound .typeahead.tt-input');	
+}
+function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
+	if (!isLevelBasic) {
+		getGeneBloodhoundInputElement().val(geneName);
+	}
+	if (trigger) {
+		getGeneBloodhoundInputElement().trigger('typeahead:selected', {"name": geneName, loadFromUrl: loadFromUrl});
+	}
+}
+
 function loadGeneFromUrl() {
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
@@ -953,13 +1040,14 @@ function loadGeneFromUrl() {
 
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
-	if (gene != undefined) {
+    if (gene != undefined) {
 		// Type in the gene name, this will trigger the event to get the
 		// gene info and then call loadUrlSources()
-		$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+		setGeneBloodhoundInputElement(gene, true, true);
+		
 	} else {
 		// Open the sidebar 
-		if (isLevelEdu) {
+		if (isLevelEdu || isLevelBasic) {
 			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
@@ -993,7 +1081,7 @@ function reloadGeneFromUrl() {
 		genesCard.copyPasteGenes(gene);
 	}
 
-	$('#bloodhound .typeahead.tt-input').val(gene).trigger('typeahead:selected', {"name": gene, loadFromUrl: true});
+	setGeneBloodhoundInputElement(gene, true, true);
 	genesCard._geneBadgeLoading(gene, true, true);
 }
 
@@ -1010,7 +1098,7 @@ function loadUrlSources() {
 
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
-	if (!isLevelEdu) {
+	if (!isLevelEdu  && !isLevelBasic) {
 		loadTracksForGene(true);
 	}
 
@@ -1083,7 +1171,7 @@ function loadUrlSources() {
 				
 				loadTracksForGene( false );
 
-				if (isLevelEdu && $('#slider-left').hasClass("hide")) {
+				if ((isLevelEdu || isLevelBasic) && $('#slider-left').hasClass("hide")) {
 					if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 						showSidebar("Phenolyzer");
 					}
@@ -1387,7 +1475,7 @@ function adjustGeneRegionBuffer() {
 		alert("Up to 50 kb upstream/downstream regions can be displayed.")
 	} else {
 		GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
-		$('#bloodhound .typeahead.tt-input').val(gene.gene_name).trigger('typeahead:selected', {"name": gene.gene_name, loadFromUrl: false});		
+		setGeneBloodhoundInputElement(gene.gene_name, false, true);		
 	}
 	cacheHelper.clearCache();
 
@@ -1408,6 +1496,29 @@ function adjustGeneRegion(geneObject) {
 
 }
 
+
+function switchToAdvancedMode() {
+	var origin   = window.location.origin;
+	origin = origin.replace("basic", "advanced");
+
+	var pathname = window.location.pathname;
+	pathname = pathname.replace("/basic", "/advanced");
+	
+	var search   = window.location.search;
+
+	location.assign(origin + pathname + search);
+}
+function switchToBasicMode() {
+	var origin   = window.location.origin;
+	origin = origin.replace("advanced", "basic");
+
+	var pathname = window.location.pathname;
+	pathname = pathname.replace("/advanced", "/basic");
+	
+	var search   = window.location.search;
+
+	location.assign(origin + pathname + search);
+}
 
 function updateUrl(paramName, value) {
 	var params = {};
@@ -1480,7 +1591,7 @@ function loadGeneWidget(callback) {
 	gene_engine.initialize();
 
 
-	var typeahead = $('#bloodhound .typeahead').typeahead({
+	var typeahead = getGeneBloodhoundElement().typeahead({
 	  hint: true,
 	  highlight: true,
 	  minLength: 1
@@ -1547,7 +1658,7 @@ function loadGeneWidget(callback) {
 		    	}
 		    	
 		    	// set all searches to correct gene	
-		    	$('.typeahead.tt-input').val(window.gene.gene_name);
+			    setGeneBloodhoundInputElement(window.gene.gene_name);
 		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
 		    	
 
@@ -1694,6 +1805,8 @@ function getRidOfDuplicates(genes) {
 */
 function loadTracksForGene(bypassVariantCards) {
 
+	hideIntro();
+
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
 	if (window.gene == null || window.gene == "") {
@@ -1748,7 +1861,7 @@ function loadTracksForGene(bypassVariantCards) {
     $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
     $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);   
     $('#gene-region').text(addCommas(window.gene.startOrig) + "-" + addCommas(window.gene.endOrig));
-
+    
 
 	if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
 		$('#non-protein-coding #gene-type-badge').addClass("hide");
@@ -1851,6 +1964,8 @@ function loadTracksForGene(bypassVariantCards) {
 
 
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
+
+	justLaunched = false;
 
 
 	
@@ -2089,7 +2204,7 @@ function showTranscripts(regionStart, regionEnd) {
 
 	// Show the gene transcripts.
     // Compress the tracks if we have more than 10 transcripts
-    if (!isLevelEduTour) {
+    if (!isLevelEduTour && !isLevelBasic) {
 	    if (transcripts.length > 10) {
 	    	transcriptChart.trackHeight(10);
 	    	transcriptChart.cdsHeight(8);
@@ -2722,6 +2837,29 @@ function bookmarkVariant() {
 	}
 }
 
+function hideIntro() {
+	if (isMygene2 && !keepShowingIntro) {
+		// If we are showing info on a gene and the intro panel still shows the full
+		// intro text, hide it.
+		if ($('#intro-text.hide').length == 0 && readyToHideIntro) {
+			toggleIntro();
+		}
+		readyToHideIntro = true;
+	}	
+}
+
+function toggleIntro() {
+	if ($('#intro-text.hide').length == 1) {
+		$('#intro-text').removeClass("hide");
+		$('#intro-link').addClass("hide");
+	} else {
+		$('#intro-text').addClass("hide");
+		$('#intro-link').removeClass("hide");
+	}
+	readjustCards();
+
+}
+
 
 function switchGenotype(gt) {
 	if (gt != null && gt.length == 3) {
@@ -2780,7 +2918,14 @@ function formatCurrentDateTime(delim) {
 	return today;
 }
 
-
+function stripTranscriptPrefix(transcriptId) {
+	if (transcriptId == null) {
+		console.log("null transcript id")
+		return "";
+	}
+	var nameTokens = transcriptId.split('.');
+	return nameTokens.length > 0 ? nameTokens[0] : transcriptId;
+}
 
 function showFeedback() {
 	

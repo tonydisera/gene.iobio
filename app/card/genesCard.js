@@ -22,6 +22,10 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
+	if (isLevelBasic) {
+		$("#genes-card #legend-placeholder").html(legendTemplate());
+	}
+
 	 // init bootpag
     $('#gene-page-selection').bootpag({
         total: 0,
@@ -51,15 +55,20 @@ GenesCard.prototype.init = function() {
 	if (isLevelEdu) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	} else {
-	  	// Selectize combo for phenotype terms
+
+		if (isLevelBasic) {
+			$('#select-phenotypes').attr("placeholder", "Name of condition")
+		}
+
+	  	// Selectize combo for phenotype terms    
 		$('#select-phenotypes').selectize({
 			//plugins: ['remove_button'],
 		    valueField: 'value',
 		    labelField: 'value',
 		    searchField: 'value',
 		    create: true,
-		    maxItems: null,
-		    maxOptions: 500,
+		    maxItems: isLevelBasic ? 1 : null,  
+		    maxOptions: 500,  
 		    load: function(query, callback) {
 		        if (!query.length) return callback();
 		        $.ajax({
@@ -77,6 +86,13 @@ GenesCard.prototype.init = function() {
 		});
 		$('#select-phenotypes')[0].selectize.on("item_add", function(value, item) {
 			$('#select-phenotypes')[0].selectize.close();
+			if (isLevelBasic) {
+				// Clear out the gene search box
+				$('#enter-gene-name-sidebar').val("")
+
+				// Get the phenolyzer genes based on the condition typed in or selected
+				me.getPhenolyzerGenes(value);
+			}
 		});
 
 	}
@@ -116,7 +132,7 @@ GenesCard.prototype.init = function() {
 		}
 	});
 
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
 	}
 
@@ -371,8 +387,12 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 
 }
 
-GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
+GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
 	var me = this;
+
+	if (isLevelBasic) {
+		$('#select-gene')[0].selectize.clearOptions();
+	}
 
 
 	var genesString = $('#genes-to-copy').val();
@@ -439,7 +459,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
 			me.addGeneBadge(name, true);
-		} else {
+	} else {
 			me._setBookmarkBadge(name);
 		}
 	}
@@ -449,9 +469,15 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect) {
 	if (geneNames.length > 0 && geneNameToSelect && geneNames.indexOf(geneNameToSelect) >= 0) {
 		var geneBadge = me._getGeneBadge(geneNameToSelect);
 		geneBadge.addClass("selected");
+		if (isLevelBasic) {		
+			selectGeneInDropdown(geneNameToSelect, selectTheGene);
+		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
 		me.selectGene(geneNames[0]);
+		if (isLevelBasic) {
+			selectGeneInDropdown(geneNames[0], selectTheGene);
+		}
 	}
 
 	me._onGeneBadgeUpdate();
@@ -755,7 +781,7 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 
 	// Now create a comma delimited list of all existing genes + selected phenolyzer genes
 	var genesString = geneNames.join(",");
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelBasic) {
 		genesString = "";
 	}
 	selectedPhenoGenes.forEach( function(g) {
@@ -766,7 +792,8 @@ GenesCard.prototype.refreshSelectedPhenolyzerGenes = function() {
 	})
 	$('#genes-to-copy').val(genesString);
 
-	me.copyPasteGenes();
+	me.copyPasteGenes(selectedPhenoGenes.length > 0 ? selectedPhenoGenes[0].geneName : null, true);
+
 	me.highlightPhenolyzerGenes();
 }
 
@@ -851,8 +878,6 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
    	  } else {
    	  	  // Search NCBI based on the gene name to obtain the gene ID
 	      var url = NCBI_GENE_SEARCH_URL + "&term=" + "(" + geneName + "[Gene name]" + " AND 9606[Taxonomy ID]";
-
-	      var clinvarVariants = null;
 	      $.ajax( url )
 	        .done(function(data) {
 
@@ -877,6 +902,8 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
 	                var geneInfo = sumData.result[uid];
 
 					geneAnnots[geneName] = geneInfo;
+					showGeneSummary(geneName);
+
 					d3.select(geneBadgeSelector).data([geneInfo]);
 
 	                resolve(geneInfo);
@@ -978,6 +1005,13 @@ GenesCard.prototype.addGene = function(geneName) {
 
 GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	var me = this;
+
+	if (isLevelBasic) {
+		$('#select-gene')[0].selectize.addOption({value:geneName});
+		if (!bypassSelecting) {
+			selectGeneInDropdown(geneName);
+		}
+	}
 
 	var gb = me._getGeneBadge(geneName);
 	if (gb == null || gb.length == 0) {
@@ -1421,7 +1455,9 @@ GenesCard.prototype.selectGeneBadge = function(badgeElement) {
 	var badge = $(badgeElement).parent();
 	if (badge) {
 		var theGeneName = badge.find("#gene-badge-name").text();
-		me.selectGene(theGeneName);
+		me.selectGene(theGeneName, function() {
+
+		});
 	}
 
 }
@@ -1446,15 +1482,14 @@ GenesCard.prototype.setSelectedGene = function(geneName) {
 	}
 }
 
-GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
+GenesCard.prototype.selectGene = function(geneName, callback) {
 	var me = this;
 
 	// If necessary, switch from gencode to refseq or vice versa if this gene
 	// only has transcripts in only one of the gene sets
 	checkGeneSource(geneName);
 
-	$('.typeahead.tt-input').val(geneName);
-
+	setGeneBloodhoundInputElement(geneName);
 	me.setSelectedGene(geneName);
 
 	var url = geneInfoServer + 'api/gene/' + geneName;
@@ -1483,14 +1518,21 @@ GenesCard.prototype.selectGene = function(geneName, callbackVariantsDisplayed) {
 
 		    	updateUrl('gene', window.gene.gene_name);
 
-			    me.updateGeneInfoLink(window.gene.gene_name);
+		    	if (!isLevelBasic) {
+					loadTracksForGene();		    		
+		    	}
+			    	
+			    me.updateGeneInfoLink(window.gene.gene_name, function() {
+					if (!hasDataSources()) {
+						firstTimeGeneLoaded = false; 
+					}
+					if (callback) {
+						callback();
+					}
 
-				if (!hasDataSources()) {
-					//showDataDialog();
-					firstTimeGeneLoaded = false;
-				}
+			    	
+			    });
 
-		    	loadTracksForGene(false, null, callbackVariantsDisplayed);
 	    	} else {
 	    		console.log("Gene " + geneName + " not found");
 	    		me.setGeneBadgeError(geneName);
@@ -1531,7 +1573,7 @@ GenesCard.prototype.refreshGene = function(geneName) {
 		    	}
 		    	adjustGeneRegion(window.gene);
 		    	window.geneObjects[window.gene.gene_name] = window.gene;
-		    	loadTracksForGene(false);
+		    	// loadTracksForGene(false);
 	    	} else {
 	    		alertify.error("Gene " + geneName + " not found. ",
 				      		    function (e) {
@@ -1541,7 +1583,7 @@ GenesCard.prototype.refreshGene = function(geneName) {
 	    }
 	 });
 }
-GenesCard.prototype.updateGeneInfoLink = function(geneName) {
+GenesCard.prototype.updateGeneInfoLink = function(geneName, callback) {
 	var me = this;
 
 	var setSelectedGeneLink = function(geneAnnot) {
@@ -1557,12 +1599,18 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName) {
 				geneAnnot = data;
 				setSelectedGeneLink(geneAnnot);
 			}
+			if (callback) {
+				callback.call(me);
+			}
 		}, function(error) {
 			console.log("error getting gene annot gene gene badge selected. " + error)
 		});
 
 	} else {
 		setSelectedGeneLink(geneAnnot);
+		if (callback) {
+			callback.call(me);
+		}
 	}
 
 }

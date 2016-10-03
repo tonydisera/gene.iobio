@@ -1,5 +1,6 @@
 body {
-  font-family: "Quattrocento Sans", sans-serif, sans-serif !important; }
+  font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
+  margin-top: -5px; }
 
 h4 {
   font-size: 12px;
@@ -59,7 +60,7 @@ h5 {
   top: 0;
   text-align: left;
   padding-left: 3px;
-  padding-top: 10px;
+  padding-top: 5px;
   width: 250px; }
 
 .nav-right {
@@ -67,7 +68,7 @@ h5 {
   right: 5px;
   top: 0;
   width: 250px;
-  padding-top: 5px; }
+  padding-top: 0px; }
 
 .nav-center {
   margin: 3px 0px 0 0px;
@@ -414,7 +415,7 @@ i.material-icons {
     position: absolute;
     bottom: 10px;
     width: 100%;
-    margin-top: 3px; }
+    margin-top: 13px; }
   #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-prev {
     color: white !important;
     background-color: #E45C5C;
@@ -2498,7 +2499,7 @@ text.ref-count {
   padding-bottom: 0px;
   vertical-align: top;
   font-size: 0px;
-  margin-left: 140px;
+  margin-left: -175px;
   margin-top: 2px; }
 
 #manage-cache-link {
@@ -2524,7 +2525,8 @@ text.ref-count {
 #clear-gene-list {
   color: #717171 !important;
   font-size: 11px;
-  margin-left: 0px; }
+  margin-left: 0px;
+  margin-right: 10px; }
 
 #select-gene-container {
   display: inline-block;
@@ -2559,9 +2561,10 @@ text.ref-count {
 
 #gene-badge-loading-display {
   display: inline-block;
-  margin-left: 140px;
-  margin-top: 5px;
-  margin-bottom: 5px; }
+  padding-left: 5px;
+  font-size: 11px;
+  text-align: left;
+  width: 300px; }
 
 .call-variants-count {
   font-size: 11px;

@@ -192,11 +192,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: 0, left: 4})
+				    .margin({top: 0, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEduTour ? 9 : 4})
 				    .showXAxis(false)
 				    .showBrush(false)
-				    .trackHeight(isLevelEduTour ? 32 : 16)
-				    .cdsHeight(isLevelEduTour ? 24 : 12)
+				    .trackHeight(isLevelEduTour || isLevelBasic ? 32 : 16)
+				    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 12)
 		    		.showLabel(false)
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 		    				    			
@@ -220,7 +220,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
-							.margin( {top: 10, right: 2, bottom: 20, left: 4} )
+							.margin( {top: 10, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEduTour ? 9 : 4} )
 							.showXAxis(true)
 							.showYAxis(false)
 							.showTooltip(true)
@@ -234,9 +234,9 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: isLevelEdu ? 12 : 17, left: 4})
-				    .showXAxis(isLevelEdu ? false : true)
-				    .variantHeight(isLevelEdu ? EDU_TOUR_VARIANT_SIZE : 6)
+				    .margin({top: 0, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 17, left: isLevelBasic || isLevelEduTour ? 9 : 4})
+				    .showXAxis(isLevelEdu  || isLevelBasic ? false : true)
+				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 6)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(this.variantTooltipHTML)
@@ -245,7 +245,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    })
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
-					    	clickedVariant = d;
+					    	clickedVariant = isLevelBasic ? null : d;
 					    	clickedVariantCard = me;
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
@@ -273,7 +273,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// variant set from vcf
 		this.fbChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: 2, bottom: 10, left: 4}) // bottom margin for missing variant x when no vcf variants loaded
+				    .margin({top: 0, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEduTour ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
 				    .variantHeight(6)
 				    .verticalPadding(2)
@@ -284,7 +284,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    })	
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
-					    	clickedVariant = d;
+					    	clickedVariant = isLevelBasic ? null : d;
 					    	clickedVariantCard = me;
 					    	me.showCoverageCircle(d, me);
 					    	window.showCircleRelatedVariants(d, me);
@@ -1755,7 +1755,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 
 		eduTourCheckVariant(variant);
 
-		if (!isLevelEdu) {
+		if (!isLevelEdu && !isLevelBasic) {
 		    showSidebar("Examine");
 			examineCard.showVariant(variant);
 
@@ -1791,6 +1791,11 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 	matrixCard.clearSelections();
 	matrixCard.highlightVariant(variant);
+
+	// Don't show the tooltip for mygene2 beginner mode
+	if (isLevelBasic) {
+		return;
+	}
 	
 	var x = variant.screenX;
 	var y = variant.screenY;
@@ -1876,7 +1881,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu || isLevelBasic ? widthSimpleTooltip : 300;
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {

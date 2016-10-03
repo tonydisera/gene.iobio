@@ -4,7 +4,7 @@
 
 
 
-    <div id="get-genes-dropdown" class="level-edu" style="margin-top:-5px;width: 125px;">
+    <div id="get-genes-dropdown" class="level-edu level-basic" style="margin-top:-5px;width: 125px;">
       <div class="btn-toolbar">
         <div class="btn-group" style="display:inline;">
 
@@ -33,32 +33,48 @@
 
   <!-- ACMG genes -->
   
-          <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
+          <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu level-basic icon-button-sm btn btn-default btn-raised" style="width:120px;font-size:11px; margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
             <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">format_list_numbered</i>ACMG56 Genes<span style="margin-left:6px"></span>
           </button>
+
+
+  <!-- Gene search box (mygene2 only) -->
+  <div class="sidebar-label hide level-basic">Search for a gene (example: KDM1A)</div>
+  <span id="bloodhound-sidebar" class="level-basic hide" >
+      <input id="enter-gene-name-sidebar" class="level-edu typeahead" style="cursor:pointer;margin-top:0px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
+      placeholder="Gene">
+  </span>     
+
+
+  <!-- Phenolyzer -->          
    
     <div id="phenolyzer-search-box" >
       <div>
-        <h4 class="level-edu">Phenolyzer</h4>
+        <h4 class="level-edu level-basic">Phenolyzer</h4>
+        <div class="sidebar-label hide level-basic">Search for a condition (examples: cystic fibrosis, breast cancer)</div>
         <h4 id="phenolyzer-title" class="hide">Phenolyzer</h4>
         
 
         <select id="select-phenotypes" class="level-edu" placeholder="Enter phenotype terms..."/>
 
 
-        <select id="select-phenotype-edutour" placeholder="Choose disease..." style="display:none;">
+        <select id="select-phenotype-edutour" class="level-basic" placeholder="Choose disease..." style="display:none;">
                 <option value="breast_cancer">Breast cancer</option>
                 <option value="colon_cancer">Colon cancer</option>                   
                 <option value="b_cell_deficiency" >B Cell deficiency</option>                   
         </select>
         
-        <div style="font-size:10px;margin-bottom:5px;">For academic and non-profit use. 
-          <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
+        <div style="font-size:10px;margin-bottom:5px;">          
+          <span id="powered-by-phenolyzer" class="hide level-basic">Powered by Phenolyzer</span>
+          <div>
+            For academic and non-profit use. 
+            <a href="javascript:void(0)" data-toggle="collapse" data-target="#disclaimer" class="collapsed" aria-expanded="false">Disclaimer</a>
+          </div>
         </div>
 
         <div style="text-align:center;">
         
-          <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="level-edu icon-button-sm btn btn-default btn-raised" style="line-height:normal;width:120px;margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom: 10px;">
+          <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="level-edu level-basic icon-button-sm btn btn-default btn-raised" style="line-height:normal;width:120px;margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom: 10px;">
             <svg height="18" width="19">
               <g transform="translate(0,1)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="18" height="18" fill="#5d809d"></use>
@@ -66,8 +82,8 @@
             </svg>
 
 
-            <span id="phenolyzer-run-label" class="level-edu">Run</span>
-            <span id="phenolyzer-run-label-long" class="level-edu hide">Get Genes</span>
+            <span id="phenolyzer-run-label" class="level-edu level-basic">Run</span>
+            <span id="phenolyzer-run-label-long" class="level-edu level-basic hide">Get Genes</span>
 
           </button>
         </div>
@@ -86,15 +102,15 @@
 
     <!-- loader gif for phenolyzer -->
     <div class="phenolyzer loader hide" style="margin-top: 20px;margin-bottom: 10px;">
-        <span class="loader-label" style="font-size:12px !important">Running Phenolyzer...</span>
+        <span class="loader-label">Running Phenolyzer...</span>
         <img src="assets/images/wheel.gif"/>
     </div>
 
     <div style="text-align:center">
 
-  	 <div id="phenolyzer-heading" class="hide">
+  	 <div id="phenolyzer-heading" class="hide level-basic">
 
-        <div class="level-edu style="font-size: 11px;margin-bottom: 10px;margin-right: 5px;">
+        <div class="level-edu level-basic style="font-size: 11px;margin-bottom: 10px;margin-right: 5px;">
     
           <span style="float:left" class="phenolyzer-label">select top</span>
 
@@ -108,9 +124,9 @@
         </div>
 
         <div style="text-align:center;clear:both">
-            <h5 class="level-edu">Rank</h5>
+            <h5 class="level-edu level-basic">Rank</h5>
             <h5 class="" style="width: 75px;">Genes</h5>
-            <h5 class="level-edu" style="margin-right:25px">Score</h5>
+            <h5 class="level-edu level-basic" style="margin-right:25px">Score</h5>
         </div>
 
       </div>
@@ -124,6 +140,16 @@
           <strong>Warning:  </strong>The Phenolyzer services was unable to return results within 5 minutes.  Consider using a  different search term.
 
       </div>
+
     </div>
+
+    <div id="filter-explanation" class="level-basic hide">
+      <div class="sidebar-label level-basic">Variant filters</div>
+      Variants with a ClinVar classification and a frequency < %1 in the general population
+    </div>
+
+    <div id="legend-placeholder" class="level-basic">
+    </div>
+
 
 </div>
