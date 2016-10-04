@@ -32,21 +32,26 @@
 
   <div style="text-align:left;display: block;margin-top: 10px;">
     <div class="legend-label">Type of variant</div>
-      <svg id="snp" class="type" width="80" height="24" transform="translate(0,0)">
-        <text class="name" x="20" y="14" style="fill-opacity: 1;font-size: 14px;">SNP</text>
+      <svg id="snp" class="type" width="180" height="24" transform="translate(0,0)">
+        <text class="name" x="20" y="14" style="fill-opacity: 1;font-size: 14px;">Single nucleotide variant</text>
         <rect class="legend-symbol snp" rx="2" ry="1" x="1" width="14" y="2" height="14" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
       </svg>
-      <svg id="ins" class="type inactive" width="80" height="24" transform="translate(0,0)">
+      <svg id="ins" class="type inactive" width="180" height="24" transform="translate(0,0)">
         <text class="name" x="20" y="14" style="fill-opacity: 1;font-size: 14px;"> Insertion</text>
         <circle class="legend-symbol ins" cx="8" cy="8" r="8" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
       </svg>
 
-      <svg id="del" class="type inactive" width="80" height="24" transform="translate(0,0)">
+      <svg id="del" class="type inactive" width="180" height="24" transform="translate(0,0)">
         <text class="name" x="18" y="14" style="fill-opacity: 1;font-size: 14px;">Deletion</text>       
         
-      <polygon class="legend-symbol del" points="0,14 7,0 14,14" rx="1" ry="1" x="1" y="2" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon></svg><svg id="complex" class="type inactive" width="80" height="30" transform="translate(0,0)">
-        <text class="name" x="21" y="18" style="fill-opacity: 1;font-size: 14px;">Complex</text><g transform="translate(10,12)">                 
-        <path d="M0,-11.771323825530848L6.79617697938849,0 0,11.771323825530848 -6.79617697938849,0Z" class="legend-symbol complex" style="opacity: 1;fill: none;stroke-width: 1.5px !important;"></path>
+        <polygon class="legend-symbol del" points="0,14 7,0 14,14" rx="1" ry="1" x="1" y="2" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;">
+        </polygon>
+      </svg>
+
+      <svg id="complex" class="type inactive" width="180" height="30" transform="translate(0,0)">
+        <text class="name" x="18" y="18" style="fill-opacity: 1;font-size: 14px;">Complex</text>
+        <g transform="translate(7,12)">                 
+          <path d="M0,-11.771323825530848L6.79617697938849,0 0,11.771323825530848 -6.79617697938849,0Z" class="legend-symbol complex" style="opacity: 1;fill: none;stroke-width: 1.5px !important;"></path>
         </g>
       </svg>
     </div>

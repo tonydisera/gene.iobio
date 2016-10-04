@@ -1665,7 +1665,13 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 }
 
 MatrixCard.prototype.formatInheritance = function(variant, value) {
-	return (value == null || value == 'none') ? '' : value;
+	if (value == null || value == 'none') {
+		return '';
+	} else if (value == 'denovo') {
+		return 'de novo';
+	} else {
+		return value;
+	}
 }
 
 

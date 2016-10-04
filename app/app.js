@@ -1919,12 +1919,14 @@ function loadTracksForGene(bypassVariantCards) {
  	//$('#matrix-track').removeClass("hide");
  	if (isLevelEdu) {
 	 	$('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
+ 	} else if (isLevelBasic) {
+ 		$('#rank-variants-title').text('Table of Variants');
  	}
 	//mat $("#matrix-panel .loader").removeClass("hide");
 	$("#feature-matrix").addClass("hide");
 	$("#feature-matrix-note").addClass("hide");
 	$('#matrix-track #no-variants').addClass("hide");
-	
+
 	readjustCards();
 
 	filterCard.disableFilters();
