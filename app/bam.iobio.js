@@ -593,15 +593,6 @@ var Bam = Class.extend({
 
    },
 
-   writeStream: function(stream) {
-      var me = this;
-      // TODO:  Need to figure out how to pass in trRefName, regionStart, regionEnd
-      stream.write(me.header.toStr);
-      me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
-          stream.write(data);
-          stream.end();
-      }, {noHeader:true});
-   },
 
    freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
     var me = this;
@@ -623,85 +614,120 @@ var Bam = Class.extend({
       }
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
-      var freebayesArgs = [];
-      bams.forEach( function(bam) {
-        if (bam.sourceType == "url") {
-          //cmd = new iobio.cmd("nv-green.IOBIO.io/samtools/", ['view', '-b', me.bamUri, regionArg],
-          var bamCmd = new iobio.cmd(samtools, ['view', '-b', bam.bamUri, regionArg],
-          {
-            'urlparams': {'encoding':'binary'}
-          });
-          freebayesArgs.push("-b");
-          freebayesArgs.push(bamCmd)
-        } else {          
-          var bamCmd = new iobio.cmd(samtools, ['view -b',  bam.writeStream ],
-            {
-              'urlparams': {'encoding':'binary'}
-            });
-          freebayesArgs.push("-b");
-          freebayesArgs.push(bamCmd)
-        }
-      });
-      freebayesArgs.push("-f");
-      freebayesArgs.push(refFile);
+      var getBamCmds = [];
+      var nextBamCmd = function(bams, idx, callback) {
 
-      
-      var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs);
-      
+          if (idx == bams.length) {
 
-      // Normalize variants
-      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+            callback(getBamCmds);
 
-      // Subset on all samples (this will get rid of low quality cases where no sample 
-      // is actually called as having the alt) 
-      //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
+          } else {
 
-      // Filter out anything with qual <= 0
-      cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-']);
+            var bam = bams[idx];
 
+            if (bam.sourceType == "url") {
 
-      //
-      // Annotate variants that were just called from freebayes
-      //
-     
-      // bcftools to append header rec for contig
-      var contigStr = "";
-      getHumanRefNames(refName).split(" ").forEach(function(ref) {
-          contigStr += "##contig=<ID=" + ref + ">\n";
-      })
-      var contigNameFile = new Blob([contigStr])
-      cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
+              var bamCmd = new iobio.cmd(samtools, ['view', '-b', bam.bamUri, regionArg],
+              {
+                'urlparams': {'encoding':'binary'}
+              });
+              getBamCmds.push(bamCmd);
 
-      // Get Allele Frequencies from 1000G and ExAC
-      cmd = cmd.pipe(IOBIO.af)
+              idx++;
+              nextBamCmd(bams, idx, callback);
 
-      // VEP to annotate
-      var vepArgs = "";
-      if (isRefSeq) {
-        vepArgs = " --refseq "
-      }
-      cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+            } else {
 
+              bam.convert('sam', trRefName, regionStart, regionEnd, 
+                function(data,e) {
+                  var bamBlob = new Blob([bam.header.toStr + "\n" + data]);  
+                  var bamCmd = new iobio.cmd(samtools, ['view', '-b', bamBlob],
+                  {
+                    'urlparams': {'encoding':'binary'}
+                  });
+                  getBamCmds.push(bamCmd);
 
-      
-      var variantData = "";
-      cmd.on('data', function(data) {
-          if (data == undefined) {
-            return;
+                  idx++;
+                  nextBamCmd(bams, idx, callback);
+                }, 
+                {noHeader:true}
+              );
+
+            } 
+
           }
 
-          variantData += data;
+      }
+
+      var index = 0;
+      nextBamCmd(bams, index, function(getBamCmds) {
+        var freebayesArgs = [];
+        getBamCmds.forEach( function(bamCmd) {
+          freebayesArgs.push("-b");
+          freebayesArgs.push(bamCmd);
+        });
+        freebayesArgs.push("-f");
+        freebayesArgs.push(refFile);
+
+        
+        var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs);
+        
+
+        // Normalize variants
+        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+
+        // Subset on all samples (this will get rid of low quality cases where no sample 
+        // is actually called as having the alt) 
+        //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
+
+        // Filter out anything with qual <= 0
+        cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-']);
+
+
+        //
+        // Annotate variants that were just called from freebayes
+        //
+       
+        // bcftools to append header rec for contig
+        var contigStr = "";
+        getHumanRefNames(refName).split(" ").forEach(function(ref) {
+            contigStr += "##contig=<ID=" + ref + ">\n";
+        })
+        var contigNameFile = new Blob([contigStr])
+        cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
+
+        // Get Allele Frequencies from 1000G and ExAC
+        cmd = cmd.pipe(IOBIO.af)
+
+        // VEP to annotate
+        var vepArgs = "";
+        if (isRefSeq) {
+          vepArgs = " --refseq "
+        }
+        cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+
+
+        
+        var variantData = "";
+        cmd.on('data', function(data) {
+            if (data == undefined) {
+              return;
+            }
+
+            variantData += data;
+        });
+
+        cmd.on('end', function() {
+          callback(variantData, trRefName);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+
+        cmd.run();
       });
 
-      cmd.on('end', function() {
-        callback(variantData, trRefName);
-      });
-
-      cmd.on('error', function(error) {
-        console.log(error);
-      });
-
-      cmd.run();
 
     });
 
