@@ -504,8 +504,8 @@ function removeGeneDropdownListener() {
 }
 
 function addGeneDropdownListener() {
-	$('#select-gene')[0].selectize.on('change', function() {
-		var geneName = $('#select-gene')[0].selectize.getValue();
+	$('#select-gene')[0].selectize.on('change', function(value) {
+		var geneName = value;
 		genesCard.selectGene(geneName, function() {
 			showGeneSummary(geneName, true);
 			loadTracksForGene();

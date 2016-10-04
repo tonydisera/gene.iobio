@@ -2786,22 +2786,458 @@ text.ref-count {
     height: auto;
     margin: 0px; }
 
+#advanced-mode-title {
+  display: inline-block !important;
+  text-align: left;
+  margin-left: 5px;
+  font-size: 15px;
+  color: #717171;
+  vertical-align: top;
+  margin-top: 8px !important; }
+
+#basic-mode-title {
+  display: none !important; }
+
+.nav-left {
+  width: 280px; }
+
+.nav-right {
+  width: 280px; }
+
+#intro {
+  display: block !important;
+  background-color: white;
+  width: 100%;
+  left: 0px;
+  padding: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+  color: #717171; }
+  #intro #button-launch-advanced-mode {
+    display: none !important; }
+  #intro #button-launch-basic-mode {
+    display: inline-block !important;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    float: left;
+    cursor: pointer; }
+  #intro h3 {
+    margin-top: 5px;
+    margin-bottom: 0px;
+    font-size: 18px;
+    display: inline-block;
+    margin-left: -70px; }
+  #intro #intro-link {
+    margin-left: 20px;
+    font-size: 14px; }
+  #intro #intro-less-link {
+    font-size: 14px; }
+  #intro #intro-text {
+    text-align: left;
+    margin-top: 5px; }
+  #intro p {
+    margin-bottom: 7px; }
+
+.level-basic {
+  display: none !important; }
+
+#basic-mode-title {
+  display: inline-block !important;
+  text-align: left;
+  margin-left: 5px;
+  font-size: 15px;
+  color: #717171;
+  vertical-align: top;
+  margin-top: 16px !important; }
+
+#advanced-mode-title {
+  display: none !important; }
+
+#intro #button-launch-advanced-mode {
+  display: inline-block !important;
+  margin-top: 5px;
+  margin-bottom: 0px;
+  float: left;
+  cursor: pointer; }
+#intro #button-launch-basic-mode {
+  display: none !important; }
+
+.filter-flag {
+  display: none !important; }
+
+#feedback-link {
+  display: none !important; }
+
+.nav-center {
+  margin-top: 0px !important; }
+
+.nav-left {
+  padding-top: 0px;
+  width: 260px; }
+
+.nav-right {
+  right: 10px;
+  padding-top: 0px;
+  width: 260px; }
+
+.iobioproject {
+  margin-top: 5px;
+  font-size: 20px;
+  line-height: initial;
+  color: #5d809d; }
+
+#legend-placeholder.level-basic {
+  display: block !important; }
+
+#legend.level-basic {
+  display: block !important;
+  margin-top: 40px; }
+
+.legend-symbol {
+  stroke: #000 !important;
+  stroke-width: 1.5px !important;
+  stroke-opacity: 0.3 !important; }
+
+#legend .legend-label {
+  font-size: 14px;
+  color: #717171;
+  margin-bottom: 5px; }
+#legend .vepImpact {
+  pointer-events: none; }
+#legend .type {
+  pointer-events: none; }
+#legend .vepImpact.inactive {
+  pointer-events: none;
+  opacity: 1; }
+#legend .type.inactive {
+  pointer-events: none;
+  opacity: 1; }
+#legend .legend-symbol.exon {
+  cursor: pointer;
+  fill: rgba(93, 128, 157, 0.63);
+  stroke: #5d809d; }
+#legend .exon-symbol text {
+  font-size: 14px;
+  fill: #717171; }
+
+button {
+  font-size: 14px !important; }
+
+.loader-label {
+  font-size: 14px; }
+
+.ibo-gene .x.axis text {
+  font-size: 12px; }
+
+.badge-label {
+  font-size: 14px; }
+
+.badge {
+  font-size: 14px; }
+
+#variant-heading {
+  margin-top: 0px; }
+
+.card-label {
+  font-size: 16px; }
+
+.gene-title {
+  font-size: 14px;
+  color: #5d809d; }
+
+.alert {
+  font-size: 14px; }
+
+.slide-left {
+  transform: translate(244px, 0);
+  -webkit-transform: translate(244px, 0);
+  -moz-transform: translate(244px, 0);
+  -ms-transform: translate(244px, 0);
+  -o-transform: translate(244px, 0); }
+
+#slider-left {
+  left: 0px !important;
+  background-color: transparent !important;
+  width: 244px; }
+  #slider-left #slider-left-content {
+    padding-right: 10px !important;
+    width: 240px; }
+
+#filter-explanation {
+  display: block !important;
+  font-size: 14px;
+  color: #717171;
+  margin-top: 30px; }
+
+#container {
+  margin-left: 0px !important; }
+
+#intro {
+  display: block !important;
+  background-color: white;
+  width: 100%;
+  left: 0px;
+  padding: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+  color: #717171; }
+  #intro #button-launch-advanced-mode {
+    display: inline-block !important;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    float: left;
+    cursor: pointer; }
+  #intro h3 {
+    margin-top: 5px;
+    margin-bottom: 0px;
+    font-size: 18px;
+    display: inline-block;
+    margin-left: -70px; }
+  #intro #intro-link {
+    margin-left: 20px;
+    font-size: 14px; }
+  #intro #intro-less-link {
+    font-size: 14px; }
+  #intro #intro-text {
+    text-align: left;
+    margin-top: 5px; }
+  #intro p {
+    margin-bottom: 7px; }
+
+.fixed {
+  left: 0px !important; }
+
+#coordinate-frame {
+  width: 25px !important;
+  display: none !important; }
+
+.selectize-input {
+  font-size: 14px !important;
+  line-height: 17px !important; }
+
+.selectize-input input {
+  font-size: 14px !important;
+  line-height: 17px !important; }
+
+.selectize-dropdown {
+  font-size: 14px !important;
+  line-height: 17px !important; }
+
+.iobio {
+  font-size: 32px !important;
+  padding-top: 12px !important;
+  margin-top: -5px !important; }
+
+.iobioapp {
+  font-size: 32px !important;
+  padding-top: 12px !important;
+  margin-top: -5px !important; }
+
+.card-label {
+  text-transform: none !important; }
+
+.track-expand {
+  padding-top: 4px !important;
+  padding-bottom: 8px !important; }
+
+#region-track {
+  margin-bottom: 4px !important;
+  text-align: left;
+  padding-left: 10px; }
+
+#transcript-panel {
+  margin-top: -16px !important; }
+
+#select-gene-box.level-basic {
+  display: inline-block !important;
+  width: 130px;
+  vertical-align: top; }
+  #select-gene-box.level-basic .selectize-input {
+    font-size: 14px !important; }
+  #select-gene-box.level-basic .selectize-dropdown-content {
+    font-size: 14px !important;
+    max-height: initial !important; }
+
+#gene-summary.level-basic {
+  display: inline-block !important;
+  text-align: left;
+  font-size: 14px;
+  color: #717171;
+  margin-left: 10px;
+  width: calc(100% - 160px); }
+
+#variant-heading {
+  min-width: 140px !important;
+  max-width: 140px !important; }
+
+#region-track.level-basic {
+  display: block !important;
+  margin-left: 0px !important; }
+
+#app-disclaimer-link-left.level-basic {
+  display: block !important;
+  font-size: 14px;
+  font-style: normal; }
+
+#home {
+  margin-top: -9px !important; }
+
+#gene-badge-button {
+  font-size: 14px !important;
+  padding: 3px 6px 3px 6px !important; }
+  #gene-badge-button .glyph {
+    padding-top: 2px !important;
+    font-size: 14px !important; }
+  #gene-badge-button #gene-badge-symbols.glyph {
+    padding-top: 0px !important;
+    font-size: 14px !important; }
+  #gene-badge-button #gene-badge-name {
+    padding-left: 2px;
+    padding-right: 2px; }
+
+#genes-card {
+  padding-top: 10px !important; }
+  #genes-card .tt-dropdown-menu {
+    width: 100% !important;
+    color: #717171;
+    font-size: 14px !important; }
+  #genes-card .tt-hint {
+    width: 100% !important;
+    font-size: 14px !important;
+    margin-right: 0px !important; }
+  #genes-card .tt-input {
+    width: 100% !important;
+    color: #717171;
+    font-size: 14px !important;
+    margin-right: 0px !important; }
+  #genes-card .sidebar-label.level-basic {
+    display: block !important;
+    font-size: 14px;
+    color: #5d809d; }
+  #genes-card #bloodhound-sidebar.level-basic {
+    display: block !important;
+    margin-bottom: 30px; }
+    #genes-card #bloodhound-sidebar.level-basic .twitter-typeahead {
+      width: 100%; }
+    #genes-card #bloodhound-sidebar.level-basic #enter-gene-name-sidebar.level-basic {
+      display: block !important; }
+  #genes-card #phenolyzer-search-box .selectize-input input {
+    padding: 4px !important;
+    width: 100% !important; }
+  #genes-card #phenolyzer-search-box .selectize-input .item {
+    padding: 4px !important; }
+  #genes-card #phenolyzer-title {
+    display: block !important;
+    font-size: 18px !important; }
+  #genes-card #phenolyzer-run-label-long.level-basic {
+    display: inline-block !important;
+    vertical-align: top;
+    margin-top: 4px; }
+  #genes-card #phenolyzer-run-label.level-basic {
+    display: none !important; }
+  #genes-card #phenolyzer-title {
+    display: none !important; }
+  #genes-card #phenolyzer-results {
+    display: none !important; }
+  #genes-card #powered-by-phenolyzer.level-basic {
+    display: inline-block !important;
+    color: #717171;
+    font-style: italic;
+    font-size: 14px; }
+
+.nav li.level-basic {
+  display: none !important; }
+
+#displayed-variant-count-label-simple {
+  display: none; }
+
+#displayed-variant-count-label-simple.level-basic {
+  display: inline-block !important; }
+
+.variant-card {
+  padding-bottom: 1px !important; }
+  .variant-card #bottom-white-space {
+    display: none !important; }
+  .variant-card #bottom-white-space.level-basic {
+    display: block !important;
+    height: 5px; }
+  .variant-card #gene-box {
+    display: none !important;
+    background-color: rgba(93, 128, 157, 0.63);
+    border: solid thin #5d809d;
+    margin-left: 0px;
+    text-align: center;
+    color: white;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    font-size: 16px !important; }
+    .variant-card #gene-box.deemphasize {
+      color: #5d809d !important;
+      border: solid thin transparent !important;
+      background-color: transparent !important;
+      font-size: 16px !important; }
+  .variant-card #gene-box.level-basic {
+    display: block !important; }
+  .variant-card #zoom-region-chart {
+    display: block;
+    margin-top: -20px !important;
+    padding-top: 0px !important; }
+
+#matrix-track #rank-variants-title {
+  display: block !important; }
+#matrix-track #feature-matrix-note {
+  padding-left: 182px !important;
+  font-size: 14px; }
+#matrix-track #matrix-harmful-note.level-basic {
+  display: inline-block !important; }
+#matrix-track #low-quality-legend {
+  display: none !important; }
+#matrix-track #feature-matrix text {
+  font-size: 14px; }
+#matrix-track #feature-matrix .y.axis text {
+  font-size: 14px !important; }
+#matrix-track #feature-matrix .colhdr text {
+  font-size: 14px !important; }
+#matrix-track #feature-matrix rect.cellbox {
+  stroke: #e6e6e6 !important;
+  stroke-width: 0.5px !important; }
+#matrix-track #feature-matrix rect.colbox {
+  stroke: #E0DDDD;
+  opacity: 1 !important;
+  stroke-width: 1px !important; }
+#matrix-track #feature-matrix .col.danger rect.cellbox {
+  fill: rgba(187, 0, 0, 0.31) !important; }
+#matrix-track #feature-matrix .col.danger .cell text {
+  fill: black !important; }
+#matrix-track #feature-matrix .col.low-quality rect.cellbox {
+  fill: transparent !important; }
+#matrix-track #feature-matrix .col.active rect.colbox {
+  stroke: #3586c0 !important;
+  stroke-width: 1.5px !important; }
+#matrix-track #feature-matrix .col rect.colbox.current {
+  stroke: #3586c0 !important;
+  opacity: 1 !important;
+  stroke-width: 1.5px !important; }
+
+.tooltip.level-basic {
+  display: block !important; }
+  .tooltip.level-basic .row {
+    line-height: 20px !important; }
+    .tooltip.level-basic .row .col-sm-4.tooltip-title {
+      line-height: 15px; }
+    .tooltip.level-basic .row .col-sm-8.tooltip-title {
+      line-height: 15px; }
+    .tooltip.level-basic .row .tooltip-title {
+      font-size: 15px; }
+
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {
     margin-left: 200px !important; } }
 @media screen and (max-device-width: 800px), screen and (max-width: 800px) {
-  .iobio, .iobioapp {
-    font-size: 22px !important; }
-
-  .iobioproject {
-    font-size: 16px; }
-
-  #gene-search-bar {
-    display: block !important;
-    clear: both !important;
-    width: 400px;
-    text-align: center !important; }
-
   #region-track {
     margin-left: 200px !important; } }
 
