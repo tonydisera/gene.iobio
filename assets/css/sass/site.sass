@@ -215,6 +215,8 @@ h5
     border: none 
 
 
+
+
 #recfilter-flag
   background-color: #5881AD !important
 
@@ -1611,6 +1613,21 @@ header
         margin-left:  5px  
 
 
+.col-container
+  display: flex
+  flex-direction: column
+  align-content: space-between
+  height: 100%
+
+.col-main
+  flex: 1
+  flex-grow: 1
+
+.col-footer
+  flex: 2
+  flex-grow: 0
+  align-self: flex-end
+
 
 @import slideout
 
@@ -1631,6 +1648,8 @@ header
 @import info
 
 @import feedback
+
+@import legend
 
 // This style adds a panel to the top of the main view, explaining how
 // gene.iobio works in Mygene2.  There are nav buttons to go

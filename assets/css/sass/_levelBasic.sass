@@ -1,28 +1,40 @@
+
+
 .level-basic
   display: none !important
+
+#main-panel-title.level-basic
+  display: inline-block !important
+  padding-top: 40px
+
 
 #basic-mode-title
   display: inline-block !important
   text-align: left
-  margin-left: 5px
-  font-size: 15px
+  margin-left: 2px
+  font-size: 22px
   color: $text-color  
   vertical-align: top
-  margin-top: 16px !important  
+  margin-top: 8px !important
+  font-family: Quicksand
 
 #advanced-mode-title
   display: none !important
 
-#intro  
-  #button-launch-advanced-mode
-    display: inline-block !important
-    margin-top: 5px
-    margin-bottom: 0px
-    float: left
-    cursor: pointer
+#button-launch-advanced-mode
+  display: block !important
+  margin-top: -7px
+  margin-left: 2px
+  margin-bottom: 0px
+  cursor: pointer
 
-  #button-launch-basic-mode
-    display: none !important
+#button-launch-basic-mode
+  display: none !important
+
+#app-disclaimer-link-right
+  padding-top: 6px
+  font-size: 14px
+
 
 .filter-flag
   display: none !important
@@ -43,52 +55,14 @@
   width: 260px
   
 .iobioproject
-  margin-top:  5px
-  font-size: 20px
+  margin-top:  10px
+  font-size: 22px
   line-height: initial
   color:  $app-color
 
-#legend-placeholder.level-basic
-  display: block !important
+#legend-tooltip.tooltip
+  font-size: 14px !important
 
-#legend.level-basic
-  display: block !important
-  margin-top: 40px 
-
-.legend-symbol
-  stroke: #000 !important
-  stroke-width: 1.5px !important
-  stroke-opacity: 0.3 !important
-
-#legend
-  .legend-label
-    font-size: 14px
-    color: $text-color
-    margin-bottom: 5px
-
-  .vepImpact
-    pointer-events: none
-
-  .type
-    pointer-events: none
-
-  .vepImpact.inactive
-    pointer-events: none
-    opacity: 1
-
-  .type.inactive
-    pointer-events: none
-    opacity: 1
-
-  .legend-symbol.exon
-    cursor: pointer
-    fill: rgba(93, 128, 157, 0.63)
-    stroke: rgb(93, 128, 157)
-
-  .exon-symbol
-    text
-      font-size: 14px
-      fill: $text-color
 
 
 //
@@ -262,12 +236,6 @@ button
   display: block !important
   margin-left: 0px !important
 
-
-#app-disclaimer-link-left.level-basic
-  display: block !important
-  font-size: 14px
-  font-style: normal
-
 #home
   margin-top: -9px !important
 
@@ -372,6 +340,10 @@ button
 
 .variant-card
   padding-bottom: 1px !important
+
+  #displayed-variant-count-label-basic
+    display: inline-block !important
+    color: $text-color
   
   #bottom-white-space
     display: none !important
@@ -404,6 +376,24 @@ button
     display: block
     margin-top: -20px !important
     padding-top: 0px !important
+
+  #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
+    stroke: $current-color
+    stroke-width: 3
+
+    fill: none
+    pointer-events: none
+
+  #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
+    stroke: $current-color
+    fill: none
+    stroke-width: 3
+    pointer-events: none
+
+  #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
+    stroke-width: 3
+    stroke: $current-color
+    pointer-events: none    
 
 
 #matrix-track

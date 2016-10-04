@@ -87,6 +87,9 @@ var matrixCard = new MatrixCard();
 var cacheHelper = null;
 var launchTimestampToClear = null;
 
+// legend
+var legend = new Legend();
+
 
 // clicked variant
 var clickedVariant = null;
@@ -300,9 +303,6 @@ function init() {
 
 
 	
-
-
-	
 	// Create transcript chart
 	transcriptChart = geneD3()
 	    .width(1000)
@@ -392,6 +392,7 @@ function init() {
 	// Initialize genes card
 	genesCard = new GenesCard();
 	genesCard.init();
+
 
 	// Initialize Matrix card
 	matrixCard = new MatrixCard();
@@ -859,9 +860,11 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 0 : 40));
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 10 : 40));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
+
+	$('#slider-left-content').css('height', window.innerHeight);
 }
 
 function closeSlideLeft() {
@@ -3095,6 +3098,7 @@ function sendFeedbackReceivedEmail(email) {
 	  stream.end();
 	});
 }
+
 
 
  

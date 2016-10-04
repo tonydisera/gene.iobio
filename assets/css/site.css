@@ -1394,6 +1394,21 @@ header {
       margin-top: -5px;
       margin-left: 5px; }
 
+.col-container {
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  height: 100%; }
+
+.col-main {
+  flex: 1;
+  flex-grow: 1; }
+
+.col-footer {
+  flex: 2;
+  flex-grow: 0;
+  align-self: flex-end; }
+
 /* Bootstrap accordion */
 #slider-left a {
   color: #5d809d !important; }
@@ -2358,19 +2373,28 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 11px; }
 
-#genes-card .phenolyzer-label {
-  color: #717171 !important;
-  font-size: 11px;
-  float: left; }
-#genes-card #phenolyzer-run-label {
-  display: inline-block !important;
-  vertical-align: top;
-  margin-top: 4px; }
-#genes-card #phenolyzer-heading {
-  margin-top: 20px; }
-  #genes-card #phenolyzer-heading h5 {
-    display: inline-block;
-    font-size: 12px; }
+#genes-card {
+  height: 100%; }
+  #genes-card .phenolyzer-label {
+    color: #717171 !important;
+    font-size: 11px;
+    float: left; }
+  #genes-card #phenolyzer-run-label {
+    display: inline-block !important;
+    vertical-align: top;
+    margin-top: 4px; }
+  #genes-card #phenolyzer-heading {
+    margin-top: 20px; }
+    #genes-card #phenolyzer-heading h5 {
+      display: inline-block;
+      font-size: 12px; }
+  #genes-card #phenolyzer-use {
+    font-style: italic !important;
+    color: text-color !important;
+    font-size: 11px !important; }
+  #genes-card #phenolyzer-disclaimer {
+    color: #717171 !important;
+    font-style: italic !important; }
 
 #get-genes-copy-paste-button.btn.btn-raised, #phenolyzer-go-button.btn.btn-raised {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12) !important;
@@ -2785,6 +2809,39 @@ text.ref-count {
     width: 210px;
     height: auto;
     margin: 0px; }
+
+#legend-tooltip.tooltip {
+  font-size: 11px; }
+
+#legend-placeholder.level-basic {
+  display: block !important; }
+
+#legend.level-basic {
+  display: block !important;
+  margin-top: 40px; }
+
+.legend-symbol {
+  stroke: #000 !important;
+  stroke-width: 1.5px !important;
+  stroke-opacity: 0.3 !important; }
+
+#legend .legend-element {
+  cursor: pointer;
+  padding: 1px; }
+  #legend .legend-element text {
+    cursor: pointer;
+    fill: #717171; }
+#legend .legend-label {
+  font-size: 14px;
+  color: #717171;
+  margin-bottom: 5px; }
+#legend .legend-symbol.exon {
+  cursor: pointer;
+  fill: rgba(93, 128, 157, 0.63);
+  stroke: #5d809d; }
+#legend .exon-symbol text {
+  font-size: 14px;
+  fill: #717171; }
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {

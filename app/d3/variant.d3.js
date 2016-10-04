@@ -565,17 +565,17 @@ function variantD3() {
      
           garrow.append('line')
               .attr("class", "arrow arrow-line")
-              .attr("x1", 8)
+              .attr("x1", variantHeight + 2)
               .attr("x2", -2)
-              .attr("y1", 8)
+              .attr("y1", variantHeight + 2)
               .attr("y2", 0)
               .style("opacity", 0);      
           garrow.append('line')
               .attr("class", "arrow arrow-line")
-              .attr("x1", 8)
+              .attr("x1", variantHeight + 2)
               .attr("x2", -2)
               .attr("y1", 0)
-              .attr("y2", 8)
+              .attr("y2", variantHeight + 2)
               .style("opacity", 0);  
       }  
 

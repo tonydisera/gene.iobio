@@ -132,6 +132,8 @@
 
 
 <body>
+  <div id="legend-tooltip" class="tooltip" style="opacity:0"></div>
+
   <div id="bookmark-gene-tooltip" class="tooltip" style="opacity:0"></div>
 
   <div id="gene-badge-tooltip" class="tooltip" style="font-size:10px;opacity:0;overflow-y:hidden;overflow-x:hidden"></div>
@@ -373,11 +375,14 @@
                   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
                 </a>
                 <div id="basic-mode-title" class="level-mygene2 hide">
-                  Basic
+                  basic
                 </div>
                 <div id="advanced-mode-title" class="level-mygene2 hide">
-                  Advanced
+                  advanced
                 </div>
+                <a id="button-launch-advanced-mode" class="hide"  onclick="switchToAdvancedMode()">Go to Advanced mode</a>
+                <a id="button-launch-basic-mode"    class="hide"  onclick="switchToBasicMode()">Go to Basic mode</a>
+
                 <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu level-basic"  onclick="$('#disclaimer-modal').modal('show')">
                    Disclaimer
                 </a>              
@@ -387,6 +392,7 @@
                 </div>
 
           </div>
+          <span id="main-panel-title" class="card-label level-basic hide">Gene info</span>
 
             <!-- iobio project link -->
           <div class="nav-right">
@@ -795,6 +801,8 @@
 <script src="app/model/stringCompress.js"></script>  
 <script src="app/model/variantModel.js"></script>  
 <script src="app/model/variantTrioModel.js"></script>  
+
+<script src="app/legend.js"></script>
 
 <script src="app/card/examineCard.js"></script>
 <script src="app/card/dataCard.js"></script>
