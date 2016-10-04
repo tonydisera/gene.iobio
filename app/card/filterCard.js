@@ -670,8 +670,9 @@ FilterCard.prototype.displayRecFilters = function() {
 	
 	recFilterKeys.forEach(function(key) {
 		recFilterCount++;
-		var label = key == "." ? ". (unassigned)" : key;			
-		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
+		var label = key === "." ? ". (unassigned)" : key;
+		var elmId = key === "." ? "unassigned" : key;
+		var svgElem = '<svg id="' + elmId + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
                       '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
   					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
