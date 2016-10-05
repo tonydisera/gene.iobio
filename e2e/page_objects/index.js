@@ -2,6 +2,7 @@ var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var sliderIconBar = require('./sections/sliderIconBar.js');
 var matrixTrack = require('./sections/matrixTrack.js');
+var matrixTooltip = require('./sections/matrixTooltip.js');
 var filterPanel = require('./sections/filterPanel.js');
 var findGenesPanel = require('./sections/findGenesPanel.js');
 var aboutPanel = require('./sections/aboutPanel.js');
@@ -25,6 +26,7 @@ module.exports = {
     appTitleSection: '#app-title-section',
     dataCard: '#data-card',
     matrixTrack: '#matrix-track',
+    matrixTooltip: '#feature-matrix .tooltip',
     transcriptCard: '#transcript-card',
     probandVariantCard: '#proband-variant-card',
     motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
@@ -48,6 +50,7 @@ module.exports = {
     recallPanel: recallPanel,
     bookmarkPanel: bookmarkPanel,
     matrixTrack: matrixTrack,
+    matrixTooltip: matrixTooltip,
     transcriptCard: {
       selector: '#transcript-card',
       elements: {

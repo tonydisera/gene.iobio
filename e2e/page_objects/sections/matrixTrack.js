@@ -75,28 +75,6 @@ var ZYGOSITY = {
   GT_UNKNOWN: ''
 };
 
-function precedingSiblingsToLabel(label) {
-  return [
-    "//div[@id='feature-matrix']",
-    "/*[local-name()='svg']",
-    "/*[local-name()='g' and @class='y axis']",
-    "/*[local-name()='g']/*[local-name()='text' and text()='" + label + "']",
-    "/..",
-    "/preceding-sibling::*"
-  ].join("");
-}
-
-function precedingSiblingsToVariant(variant) {
-  return [
-    "//div[@id='feature-matrix']",
-    "/*[local-name()='svg']",
-    "/*[local-name()='g' and @class='colhdr']",
-    "/*[local-name()='g']/*[local-name()='text' and text()='" + variant + "']",
-    "/..",
-    "/preceding-sibling::*"
-  ].join("");
-}
-
 module.exports = {
   selector: '#matrix-track',
   commands: [{
@@ -305,6 +283,15 @@ module.exports = {
     },
     waitForMatrixLoaded: function() {
       this.waitForElementVisible('@featureMatrix', 60000);
+    },
+    clickColumn: function(variant) {
+      var self = this;
+      this.api.elements('xpath', precedingSiblingsToVariant(variant), function(precedingVariantElements) {
+        var variantIndex = precedingVariantElements.value.length + 1;
+        var column = "/*[local-name()='g'][" + variantIndex + "]/*[local-name()='g'][1]";
+        var pathToColumn = "//div[@id='feature-matrix']/*[local-name()='svg']/*[@class='group']" + column;
+        self.click('xpath', pathToColumn);
+      });
     }
   }],
   elements: {
@@ -312,5 +299,24 @@ module.exports = {
   }
 };
 
+function precedingSiblingsToLabel(label) {
+  return [
+    "//div[@id='feature-matrix']",
+    "/*[local-name()='svg']",
+    "/*[local-name()='g' and @class='y axis']",
+    "/*[local-name()='g']/*[local-name()='text' and text()='" + label + "']",
+    "/..",
+    "/preceding-sibling::*"
+  ].join("");
+}
 
-
+function precedingSiblingsToVariant(variant) {
+  return [
+    "//div[@id='feature-matrix']",
+    "/*[local-name()='svg']",
+    "/*[local-name()='g' and @class='colhdr']",
+    "/*[local-name()='g']/*[local-name()='text' and text()='" + variant + "']",
+    "/..",
+    "/preceding-sibling::*"
+  ].join("");
+}
