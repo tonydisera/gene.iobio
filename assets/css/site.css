@@ -1002,19 +1002,19 @@ section {
 
 #top-coordinate-frame {
   border: none;
-  width: 19px;
   position: relative;
   pointer-events: none;
   top: 0px;
-  height: 12px;
-  visibility: visible; }
+  height: 18px;
+  visibility: visible;
+  width: 26px; }
   #top-coordinate-frame.hide {
     visibility: hidden !important;
     display: block !important; }
   #top-coordinate-frame .coordinate-arrow {
     stroke-width: 1px !important;
     stroke: black !important;
-    fill: #ff7d7d; }
+    fill: #61a041; }
 
 .variant-card {
   min-height: 60px;
@@ -1146,24 +1146,24 @@ header {
     pointer-events: none; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
-  stroke: #3586c0;
+  stroke: #61a041;
   stroke-width: 2;
   fill: none;
   pointer-events: none; }
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize {
-  stroke: #3586c0;
+  stroke: #61a041;
   fill: none;
   stroke-width: 3;
   pointer-events: none; }
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize {
   stroke-width: 3;
-  stroke: #3586c0;
+  stroke: #61a041;
   pointer-events: none; }
 
 #bam-depth .circle-label {
-  fill: #3586c0;
+  fill: #61a041;
   font-size: 9px;
   font-weight: bold;
   stroke: none;
