@@ -87,6 +87,9 @@ var matrixCard = new MatrixCard();
 var cacheHelper = null;
 var launchTimestampToClear = null;
 
+// legend
+var legend = new Legend();
+
 
 // clicked variant
 var clickedVariant = null;
@@ -300,9 +303,6 @@ function init() {
 
 
 	
-
-
-	
 	// Create transcript chart
 	transcriptChart = geneD3()
 	    .width(1000)
@@ -392,6 +392,7 @@ function init() {
 	// Initialize genes card
 	genesCard = new GenesCard();
 	genesCard.init();
+
 
 	// Initialize Matrix card
 	matrixCard = new MatrixCard();
@@ -712,7 +713,10 @@ function showCoordinateFrame(x) {
 
 	if (regionStart == gene.start && regionEnd == gene.end) {
 
-		$('#top-coordinate-frame').css("left", topX - d3.round(width/2) - 2 - 10);
+		var pointerWidth =  +$('#top-coordinate-frame').outerWidth();
+		var paddingLeft = 10;
+		var svgMarginLeft = isLevelEdu || isLevelBasic ? 9 : 4;
+		$('#top-coordinate-frame').css("left", topX - d3.round(pointerWidth/2) - paddingLeft - svgMarginLeft);
 		$('#top-coordinate-frame').removeClass("hide");
 	} 
 
@@ -859,9 +863,11 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 0 : 40));
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 10 : 40));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
+
+	$('#slider-left-content').css('height', window.innerHeight);
 }
 
 function closeSlideLeft() {
@@ -1919,10 +1925,14 @@ function loadTracksForGene(bypassVariantCards) {
  	//$('#matrix-track').removeClass("hide");
  	if (isLevelEdu) {
 	 	$('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
+ 	} else if (isLevelBasic) {
+ 		$('#rank-variants-title').text('Table of Variants');
  	}
 	//mat $("#matrix-panel .loader").removeClass("hide");
 	$("#feature-matrix").addClass("hide");
 	$("#feature-matrix-note").addClass("hide");
+	$('#matrix-track #no-variants').addClass("hide");
+
 	readjustCards();
 
 	filterCard.disableFilters();
@@ -3091,6 +3101,7 @@ function sendFeedbackReceivedEmail(email) {
 	  stream.end();
 	});
 }
+
 
 
  

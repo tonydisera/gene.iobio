@@ -7,6 +7,7 @@ function GenesCard() {
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
 	this.sortedGeneNames = null;
+	this.legend = null;
 }
 
 GenesCard.prototype.split = function( val )  {
@@ -23,7 +24,9 @@ GenesCard.prototype.init = function() {
 	var hpoUrl = hpoServer + "hot/lookup";
 
 	if (isLevelBasic) {
-		$("#genes-card #legend-placeholder").html(legendTemplate());
+		$("#genes-card #legend-placeholder").html(legendTemplate());	
+		this.legend = new Legend();
+		legend.init();	
 	}
 
 	 // init bootpag

@@ -678,9 +678,11 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 	if (isLevelBasic) {
 		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
-			$('#matrix-track').addClass("hide");
+			$('#matrix-track #no-variants.level-basic').removeClass("hide");
+			$('#matrix-panel').addClass("hide");
 		} else {
-			$('#matrix-track').removeClass("hide");		
+			$('#matrix-track #no-variants.level-basic').addClass("hide");		
+			$('#matrix-panel').removeClass("hide");
 		}		
 	}
 
@@ -1607,7 +1609,17 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
 			if (tokens.length == 2) {
 				var basicNotation = "p." + tokens[1];
 				buf += basicNotation;
-			} 		
+			} else if (tokens.length == 1 && endsWith(tokens[0],"(p.=)")) {
+				// If synoymous variants, show p.(=) in cell
+				if (variant.vepConsequence && Object.keys(variant.vepConsequence).length > 0) {
+					for( consequence in variant.vepConsequence) {
+						if (consequence == "synonymous_variant") {
+							buf += "p.(=)";
+						}
+					}
+				} 
+				
+			}		
 		}
 		return buf;
 	}
@@ -1653,7 +1665,13 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 }
 
 MatrixCard.prototype.formatInheritance = function(variant, value) {
-	return (value == null || value == 'none') ? '' : value;
+	if (value == null || value == 'none') {
+		return '';
+	} else if (value == 'denovo') {
+		return 'de novo';
+	} else {
+		return value;
+	}
 }
 
 

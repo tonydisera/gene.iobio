@@ -644,6 +644,7 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 
     	me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
     	me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
+    	me.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
     	me.cardSelector.find('#displayed-variant-count').text("");
     	me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
     	me.cardSelector.find('#vcf-variant-count').text("");
@@ -695,12 +696,15 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 			this.cardSelector.find("#displayed-variant-count").addClass("hide");
 	    	this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
+	    	this.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
 		}
 	} else {
 		this.cardSelector.find("#region-flag").removeClass("hide");
 		this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 		this.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
+		this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+
 
 	}
 
@@ -1124,11 +1128,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 			    	// Show the variant count
 					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
 			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());
-			        /*	
-					me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
-					me.cardSelector.find('#displayed-variant-count').text(me.model.getVariantCount());
-					me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
-					*/
+
 					me.cardSelector.find('#gene-box').css("visibility", "hidden");
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
@@ -1535,12 +1535,16 @@ VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
 			this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(filteredVcfData));
-			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");			
+			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
+			this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+		
 		} else {
 			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 			this.cardSelector.find('#displayed-variant-count').addClass("hide");
 			this.cardSelector.find('#displayed-variant-count').text("");
-			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");			
+			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");	
+			this.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
+		
 		}
 
 
@@ -1563,18 +1567,6 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	}
 
 	me.cardSelector.find(".filter-flag").addClass("hide");
-
-
-	
-
-	// Only hide displayed variant count if we haven't already zoomed
-	/*
-	if (this.cardSelector.find("#region-flag.hide").length > 0) {
-		this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
-	    this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
-		this.cardSelector.find("#displayed-variant-count").addClass("hide");
-	}
-	*/
 
 
 	// Show a badge when the intronic variants have been removed

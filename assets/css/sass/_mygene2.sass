@@ -1,20 +1,57 @@
+$link-color: #698e01
+
+a
+  color: $link-color !important
+
+  &:hover, &:focus
+    color: $link-color !important
+
+#app-disclaimer-link-left
+  display: none !important
+
+#app-disclaimer-link-right
+  display: block !important
+  font-size: 12px
+  font-style: italic
+  clear: both
+  text-align: right
+  margin-right: 2px
+  padding-top: 0px
+  color:  $text-color !important
+  font-size: 12px
+
+
 #advanced-mode-title
   display: inline-block !important
   text-align: left
-  margin-left: 5px
-  font-size: 15px
+  margin-left: 2px
+  font-size: 18px
   color: $text-color  
   vertical-align: top
-  margin-top: 8px !important  
+  margin-top: 5px !important
+  font-family: Quicksand
 
 #basic-mode-title
   display: none !important  
+
+.nav-center
+  margin-top: 6px
 
 .nav-left
   width: 280px
 
 .nav-right 
   width: 280px
+
+#button-launch-advanced-mode
+  display: none !important
+
+#button-launch-basic-mode
+  display: block !important
+  margin-top: -7px
+  margin-left: 2px
+  margin-bottom: 0px
+  cursor: pointer
 
 #intro
   display: block !important
@@ -28,22 +65,12 @@
   text-align: center
   color: $text-color
 
-  #button-launch-advanced-mode
-    display: none !important
-
-  #button-launch-basic-mode
-    display: inline-block !important
-    margin-top: 5px
-    margin-bottom: 0px
-    float: left
-    cursor: pointer
-
   h3
     margin-top: 5px
     margin-bottom: 0px
     font-size: 18px
     display: inline-block
-    margin-left: -70px
+    margin-left: 80px
 
   #intro-link
     margin-left: 20px

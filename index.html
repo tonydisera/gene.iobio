@@ -132,6 +132,8 @@
 
 
 <body>
+  <div id="legend-tooltip" class="tooltip" style="opacity:0"></div>
+
   <div id="bookmark-gene-tooltip" class="tooltip" style="opacity:0"></div>
 
   <div id="gene-badge-tooltip" class="tooltip" style="font-size:10px;opacity:0;overflow-y:hidden;overflow-x:hidden"></div>
@@ -373,11 +375,14 @@
                   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
                 </a>
                 <div id="basic-mode-title" class="level-mygene2 hide">
-                  Basic
+                  basic
                 </div>
                 <div id="advanced-mode-title" class="level-mygene2 hide">
-                  Advanced
+                  advanced
                 </div>
+                <a id="button-launch-advanced-mode" class="hide"  onclick="switchToAdvancedMode()">Go to Advanced mode</a>
+                <a id="button-launch-basic-mode"    class="hide"  onclick="switchToBasicMode()">Go to Basic mode</a>
+
                 <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu level-basic"  onclick="$('#disclaimer-modal').modal('show')">
                    Disclaimer
                 </a>              
@@ -387,6 +392,7 @@
                 </div>
 
           </div>
+          <span id="main-panel-title" class="card-label level-basic hide">Gene info</span>
 
             <!-- iobio project link -->
           <div class="nav-right">
@@ -555,11 +561,12 @@
           <div id="transcript-panel" class="level-edu fullview" >
             <div id="gene-track" class="track hide">  
                 <div id="top-coordinate-frame" class="hide">
-                    <svg height="15" width="19"><g transform="translate(10,6),rotate(180)">
-                      <path class="coordinate-arrow" d="M0,-5.161791450287817L5.805622828269509,5.161791450287817 -5.805622828269509,5.161791450287817Z">
-                      </path>
-                    </g>
-                  </svg>           
+                  <svg height="22" width="28">
+                      <g transform="translate(24,19),rotate(180)">
+                        <polygon class="coordinate-arrow" points="0,14 10,0 20,14" x="0" y="0">
+                        </polygon>
+                      </g>
+                  </svg>        
                 </div>         
                 <div id="gene-viz" class="track-chart">
                 </div>               
@@ -591,7 +598,9 @@
 
             <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
-
+            <div id="no-variants" class="level-basic hide">
+              No clinvar variants under 1% population frequency found
+            </div>
     
             <div id="matrix-panel"  style="clear:both;margin-top:-9px;min-height:30px"
               class="fullview" aria-expanded="true">
@@ -793,6 +802,8 @@
 <script src="app/model/stringCompress.js"></script>  
 <script src="app/model/variantModel.js"></script>  
 <script src="app/model/variantTrioModel.js"></script>  
+
+<script src="app/legend.js"></script>
 
 <script src="app/card/examineCard.js"></script>
 <script src="app/card/dataCard.js"></script>
