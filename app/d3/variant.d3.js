@@ -112,7 +112,7 @@ function variantD3() {
       
 
       var garrow = svgContainer.select("g.arrow");
-      garrow.attr("transform", "translate(" + (mousex + margin.left) + "," + (mousey + margin.top - 6) + ")");
+      garrow.attr("transform", "translate(" + (mousex + margin.left - variantHeight/2) + "," + (mousey + margin.top - 6) + ")");
       garrow.selectAll('.arrow').transition()
             .duration(200)
             .style("opacity", 1);
@@ -561,7 +561,7 @@ function variantD3() {
           var garrow = svg.selectAll("g.arrow").data([0])
                           .enter().append("g")
                           .attr("class", "arrow")
-                          .attr("transform", "translate(2,0)");
+                          .attr("transform", "translate(1,0)");
      
           garrow.append('line')
               .attr("class", "arrow arrow-line")

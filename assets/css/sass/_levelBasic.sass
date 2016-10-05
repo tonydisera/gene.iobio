@@ -332,17 +332,18 @@ button
   li.level-basic 
     display: none !important
 
-#displayed-variant-count-label-simple
-  display:  none
-
-#displayed-variant-count-label-simple.level-basic
-  display:  inline-block !important
 
 .variant-card
   padding-bottom: 1px !important
 
+  #displayed-variant-count-label
+    display:  none !important
+
+  #displayed-variant-count-label-simple
+    display:  none !important
+
   #displayed-variant-count-label-basic
-    display: inline-block !important
+    display: inline-block 
     color: $text-color
   
   #bottom-white-space
@@ -378,21 +379,21 @@ button
     padding-top: 0px !important
 
   #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
-    stroke: $current-color
+    stroke: $arrow-color
     stroke-width: 3
 
     fill: none
     pointer-events: none
 
   #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
-    stroke: $current-color
+    stroke: $arrow-color
     fill: none
     stroke-width: 3
     pointer-events: none
 
   #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
     stroke-width: 3
-    stroke: $current-color
+    stroke: $arrow-color
     pointer-events: none    
 
 

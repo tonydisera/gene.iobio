@@ -713,7 +713,10 @@ function showCoordinateFrame(x) {
 
 	if (regionStart == gene.start && regionEnd == gene.end) {
 
-		$('#top-coordinate-frame').css("left", topX - d3.round(width/2) - 2 - 10);
+		var pointerWidth =  +$('#top-coordinate-frame').outerWidth();
+		var paddingLeft = 10;
+		var svgMarginLeft = isLevelEdu || isLevelBasic ? 9 : 4;
+		$('#top-coordinate-frame').css("left", topX - d3.round(pointerWidth/2) - paddingLeft - svgMarginLeft);
 		$('#top-coordinate-frame').removeClass("hide");
 	} 
 
