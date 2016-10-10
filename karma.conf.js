@@ -20,6 +20,7 @@ module.exports = function(config) {
         'app/globalsDeployment.js',
         'app/globals.js',
         'app/**/*.js',
+        'app/app.js',
         'spec/spec_helpers/jasmine-jquery.js',
         'spec/spec_helpers/fixture.conf.js',
         'spec/spec_helpers/**/*',
@@ -30,7 +31,7 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-        'app/app.js',
+
     ],
 
 
