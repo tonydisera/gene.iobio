@@ -11,19 +11,11 @@ function FilterCard() {
 }
 
 FilterCard.prototype.shouldWarnForNonPassVariants = function() {
-	var statusCount = 0;
-	var passStatus = false;
-	for ( key in this.recFilters) {
-		if (key == 'PASS') {
-			passStatus = true;
-		}
-		statusCount++;	
-	}
-	if (passStatus && statusCount > 1) {
-		return true;
-	}  else {
-		return false;
-	}
+	var recFilterKeys = Object.keys(this.recFilters);
+	var passStatus = recFilterKeys.some(function(key) {
+		return key === 'PASS';
+	});
+	return (passStatus && recFilterKeys.length > 1);
 }
 
 FilterCard.prototype.autoSetFilters = function() {
@@ -50,7 +42,6 @@ FilterCard.prototype.autoSetFilters = function() {
 }
 
 FilterCard.prototype.getFilterObject = function() {
-
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
 	if (isLevelBasic) {
 		var annots = 	{
@@ -64,30 +55,23 @@ FilterCard.prototype.getFilterObject = function() {
 			clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}
 		}
 		if (this.shouldWarnForNonPassVariants()) {
-			annots.PASS =   {key: 'recfilter',     state: true, value: 'PASS'};
+			annots.PASS = {key: 'recfilter', state: true, value: 'PASS'};
 		}
 
-		var filterObject = {
-			annotsToInclude: annots
-		};
-			
-		return filterObject;
+		return { annotsToInclude: annots };
 	}
-
 
 	var afMin = $('#af-amount-start').val() != '' ? +$('#af-amount-start').val() / 100 : null;
 	var afMax = $('#af-amount-end').val()   != '' ? +$('#af-amount-end').val()   / 100 : null;
 
-	var filterObject = {
+	return {
 		'coverageMin': +$('#coverage-min').val(),
 		'afMin': afMin,
 		'afMax': afMax,
 		'afScheme' : this.afScheme,
 		'annotsToInclude': this.annotsToInclude,
 		'exonicOnly': $('#exonic-only-cb').is(":checked")
-    };
-
-    return filterObject;
+  };
 }
 
 
