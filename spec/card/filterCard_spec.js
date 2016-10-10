@@ -84,6 +84,10 @@ describe('filterCard', function() {
 				isLevelBasic = true;
 			});
 
+			afterEach(function() {
+				isLevelBasic = false;
+			});
+
 			it('returns a preset filter object', function() {
 				spyOn(filterCard, 'shouldWarnForNonPassVariants').and.returnValue(false);
 				expect(filterCard.getFilterObject()).toEqual(expectedFilterObject);
