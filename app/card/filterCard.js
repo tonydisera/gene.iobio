@@ -385,7 +385,7 @@ FilterCard.prototype.setExonicOnlyFilter = function(on) {
 
 FilterCard.prototype.clearFilters = function() {
 	this.clickedAnnotIds = [];
-	this.annotsToInclude = [];
+	this.annotsToInclude = {};
 	
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
 	d3.select('#recfilter-flag').classed("hide", true);
