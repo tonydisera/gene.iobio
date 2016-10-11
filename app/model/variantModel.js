@@ -2154,67 +2154,35 @@ VariantModel.prototype.filterFreebayesVariants = function(filterObject) {
 VariantModel.prototype.filterVariants = function(data, filterObject) {
 	var me = this;
 
-	if (filterObject.afScheme == 'exac') {
-		afField = "afExAC";
-	} else {
-		afField = "af1000G";
-	}
+	var afField = filterObject.afScheme === 'exac' ? "afExAC" : "af1000G";
+	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : 'vepImpact';
+	var effectField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'effect' : 'vepConsequence';
 
-
-
-	var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
-	var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
-
-
-	var afLowerVal = filterObject.afMin;
-	var afUpperVal = filterObject.afMax;
-
-	var coverageMin = null;
-	if (filterObject.coverageMin != null && filterObject.coverageMin != '') {
-		coverageMin = +filterObject.coverageMin;
-	}
+	// coverageMin is always an integer or NaN
+	var	coverageMin = filterObject.coverageMin;
 	data.intronsExcludedCount = 0;
 
 	// Get rid of any homozygous reference from proband
-	me._pruneHomRefVariants(data);		
+	me._pruneHomRefVariants(data);
 
-	   
 	var filteredFeatures = data.features.filter(function(d) {
 
 		if (filterCard.shouldWarnForNonPassVariants()) {
-			if (d.recfilter != 'PASS') {
-					d.featureClass = 'low-quality';
-			} else {
-				d.featureClass = '';
-			}
+			d.featureClass = d.recfilter === 'PASS' ? '' : 'low-quality';
 		}
 
 		var meetsRegion = true;
-		if (window.regionStart != null && window.regionEnd != null ) {			
+		if (window.regionStart != null && window.regionEnd != null ) {
 			meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
 		}
 
-		var meetsAf = false;
 		// Treat null and blank af as 0
-		if (d[afField] == null || d[afField] == '') {
-			variantAf = 0;
-		} else {
-			variantAf = d[afField];
-		}
-		if (afLowerVal != null && afUpperVal != null) {
-			if (afLowerVal <= 0 && afUpperVal == 1) {
-				meetsAf = true;
-			} else {
-				
-				meetsAf =  (variantAf >= afLowerVal && variantAf <= afUpperVal);
-			}
-		} else {
-			meetsAf = true;
+		var variantAf = d[afField] || 0;
+		var meetsAf = true;
+		if ($.isNumeric(filterObject.afMin) && $.isNumeric(filterObject.afMax)) {
+			meetsAf = (variantAf >= filterObject.afMin && variantAf <= filterObject.afMax);
 		}
 
-
-	
-			
 		var meetsExonic = false;
 		if (filterObject.exonicOnly) {
 			for (key in d[impactField]) {
@@ -2227,7 +2195,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 					if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
 						meetsExonic = true;
 					}
-				}				
+				}
 			}
 			if (!meetsExonic) {
 				data.intronsExcludedCount++;
@@ -2240,15 +2208,15 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		// Evaluate the coverage for the variant to see if it meets min.
 		var meetsCoverage = true;
 		if (coverageMin && coverageMin > 0) {
-			if (d.bamDepth != null && d.bamDepth != '') {
+			if ($.isNumeric(d.bamDepth)) {
 				meetsCoverage = d.bamDepth >= coverageMin;
-			} else if (d.genotypeDepth != null && d.genotypeDepth != '') {
+			} else if ($.isNumeric(d.genotypeDepth)) {
 				meetsCoverage = d.genotypeDepth >= coverageMin;
-			}  
+			}
 		}
 
 		// Iterate through the clicked annotations for each variant. The variant
-		// needs to match needs to match
+		// needs to match
 		// at least one of the selected values (e.g. HIGH or MODERATE for IMPACT)
 		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
 		var matchCount = 0;
@@ -2260,7 +2228,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 					evalAttributes[annot.key] = 0;
 				}
 
-				var annotValue = d[annot.key] ? d[annot.key] : '';				
+				var annotValue = d[annot.key] ? d[annot.key] : '';
 				var match = false;
 				if (matrixCard.isDictionary(annotValue)) {
 					for (avKey in annotValue) {
