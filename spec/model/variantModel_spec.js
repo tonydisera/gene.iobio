@@ -59,6 +59,7 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 		window.regionStart = null;
 		window.regionEnd = null;
+		variantModel.setRelationship('proband');
 	});
 
 	describe('#_pruneHomRefVariants', function() {
@@ -250,5 +251,73 @@ describe('variantModel', function() {
 			});
 		});
 
+		describe('when filtering on annotations', function() {
+			it('filters out all variants that do not meet the value of each annotation', function() {
+				filterObject.annotsToInclude = {
+					afexac_rare: { key: "afexaclevels", state: true, value: "afexac_rare" }
+				};
+				variant_1.afexaclevels = { afexac_rare: 'afexac_rare' };
+				variant_2.afexaclevels = {};
+				variant_3.afexaclevels = '';
+				variant_4.afexaclevels = 'afexac_rare';
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_4]);
+			});
+
+			it('does not filter on any annotations that have a state of false', function() {
+				filterObject.annotsToInclude = {
+					afexac_rare: { key: "afexaclevels", state: false, value: "afexac_rare" }
+				};
+				variant_1.afexaclevels = { afexac_rare: 'afexac_rare' };
+				variant_2.afexaclevels = {};
+				variant_3.afexaclevels = '';
+				variant_4.afexaclevels = 'afexac_rare';
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
+			});
+
+			it('filters correctly on multiple annotations', function() {
+				filterObject.annotsToInclude = {
+					afexac_rare: { key: "afexaclevels", state: true, value: "afexac_rare" },
+					MODERATE: { key: "vepImpact", state: true, value: "MODERATE" },
+					downstream_gene_variant: { key: "vepConsequence", state: false, value: "downstream_gene_variant" }
+				};
+				variant_1.afexaclevels = { afexac_rare: 'afexac_rare' };
+				variant_1.vepImpact = { MODERATE: 'MODERATE' };
+				variant_2.afexaclevels = {};
+				variant_2.vepImpact = {};
+				variant_3.afexaclevels = '';
+				variant_2.vepImpact = '';
+				variant_4.afexaclevels = { afexac_rare: 'afexac_rare' };
+				variant_4.vepImpact = { LOW: 'LOW' };
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1]);
+			});
+
+			it('does not filter on inheritance when the relationship is not proband', function() {
+				filterObject.annotsToInclude = {
+					denovo: { key: "inheritance", state: true, value: "denovo" }
+				};
+				variantModel.setRelationship('mother');
+				variant_1.inheritance = { denovo: "denovo" };
+				variant_2.inheritance = "denovo";
+				variant_3.inheritance = {};
+				variant_4.inheritance = {};
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
+			});
+
+			it('filters on inheritance when the relationship is proband', function() {
+				filterObject.annotsToInclude = {
+					denovo: { key: "inheritance", state: true, value: "denovo" }
+				};
+				variant_1.inheritance = { denovo: "denovo" };
+				variant_2.inheritance = "denovo";
+				variant_3.inheritance = {};
+				variant_4.inheritance = {};
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_2]);
+			});
+		});
 	});
 });

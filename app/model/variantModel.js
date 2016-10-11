@@ -2219,7 +2219,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		// needs to match
 		// at least one of the selected values (e.g. HIGH or MODERATE for IMPACT)
 		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
-		var matchCount = 0;
 		var evalAttributes = {};
 		for (key in filterObject.annotsToInclude) {
 			var annot = filterObject.annotsToInclude[key];
@@ -2236,7 +2235,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 							match = true;
 						}
 					}
-				} else  if (annotValue.toLowerCase() == annot.value.toLowerCase()){
+				} else if (annotValue.toLowerCase() == annot.value.toLowerCase()){
 					match = true;
 				}
 				if (match) {
@@ -2244,7 +2243,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 					count++;
 					evalAttributes[annot.key] = count;
 				}
-			} else {
 			}
 		}
 
@@ -2267,24 +2265,24 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
 	});
 
-	
-	var pileupObject = this._pileupVariants(filteredFeatures, 
-		regionStart ? regionStart : window.gene.start, 
-		regionEnd   ? regionEnd   : window.gene.end);		
+	var pileupObject = this._pileupVariants(filteredFeatures,
+		regionStart ? regionStart : window.gene.start,
+		regionEnd   ? regionEnd   : window.gene.end);
 
-	var vcfDataFiltered = {	count: data.count,
-							countMatch: data.countMatch,
-							countUnique: data.countUnique,
-							sampleCount : data.sampleCount,
-							end: regionEnd,
-							features: filteredFeatures,
-							maxLevel: pileupObject.maxLevel + 1,
-							featureWidth: pileupObject.featureWidth,
-							name: data.name,
-							start: regionStart,
-							strand: data.strand,							
-							variantRegionStart: regionStart
-						};
+	var vcfDataFiltered = {
+		count: data.count,
+		countMatch: data.countMatch,
+		countUnique: data.countUnique,
+		sampleCount : data.sampleCount,
+		end: regionEnd,
+		features: filteredFeatures,
+		maxLevel: pileupObject.maxLevel + 1,
+		featureWidth: pileupObject.featureWidth,
+		name: data.name,
+		start: regionStart,
+		strand: data.strand,
+		variantRegionStart: regionStart
+	};
 	return vcfDataFiltered;
 }
 
