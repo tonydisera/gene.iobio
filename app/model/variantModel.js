@@ -2223,25 +2223,17 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		for (key in filterObject.annotsToInclude) {
 			var annot = filterObject.annotsToInclude[key];
 			if (annot.state) {
-				if (evalAttributes[annot.key] == null) {
-					evalAttributes[annot.key] = 0;
-				}
+				evalAttributes[annot.key] = evalAttributes[annot.key] || 0;
 
-				var annotValue = d[annot.key] ? d[annot.key] : '';
-				var match = false;
-				if (matrixCard.isDictionary(annotValue)) {
+				var annotValue = d[annot.key] || '';
+				if ($.isPlainObject(annotValue)) {
 					for (avKey in annotValue) {
 						if (avKey.toLowerCase() == annot.value.toLowerCase()) {
-							match = true;
+							evalAttributes[annot.key]++;
 						}
 					}
-				} else if (annotValue.toLowerCase() == annot.value.toLowerCase()){
-					match = true;
-				}
-				if (match) {
-					var count = evalAttributes[annot.key];
-					count++;
-					evalAttributes[annot.key] = count;
+				} else if (annotValue.toLowerCase() == annot.value.toLowerCase()) {
+					evalAttributes[annot.key]++;
 				}
 			}
 		}

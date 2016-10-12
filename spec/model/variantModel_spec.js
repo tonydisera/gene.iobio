@@ -52,7 +52,7 @@ describe('variantModel', function() {
 			'afMin': 0,
 			'afMax': 1,
 			'afScheme' : "exac",
-			'annotsToInclude': [],
+			'annotsToInclude': {},
 			'exonicOnly': false
 	  };
 
@@ -62,16 +62,14 @@ describe('variantModel', function() {
 		variantModel.setRelationship('proband');
 	});
 
-	describe('#_pruneHomRefVariants', function() {
+	describe('#filterVariants', function() {
+		beforeEach(function() {
+			spyOn(variantModel, '_pileupVariants').and.returnValue({ maxLevel: 10, featureWidth: 100 });
+		});
+
 		it('removes all the variants that have a zygosity of homref', function() {
 			variantModel._pruneHomRefVariants(data);
 			expect(data.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
-		});
-	});
-
-	fdescribe('#filterVariants', function() {
-		beforeEach(function() {
-			spyOn(variantModel, '_pileupVariants').and.returnValue({ maxLevel: 10, featureWidth: 100 });
 		});
 
 		describe('when there is a PASS filter applied to the vcf records', function() {
@@ -293,6 +291,19 @@ describe('variantModel', function() {
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1]);
 			});
+
+			it('filters correctly on annotations that allow for multiple values for the same key', function() {
+				filterObject.annotsToInclude = {
+					MODERATE: { key: "vepImpact", state: true, value: "MODERATE" },
+					HIGH: { key: "vepImpact", state: true, value: "HIGH" }
+				};
+				variant_1.vepImpact = { MODERATE: 'MODERATE' };
+				variant_2.vepImpact = { HIGH: 'HIGH' };
+				variant_3.vepImpact = { LOW: 'LOW' };
+				variant_4.vepImpact = { MODERATE: 'MODERATE' };
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_2, variant_4]);
+			})
 
 			it('does not filter on inheritance when the relationship is not proband', function() {
 				filterObject.annotsToInclude = {
