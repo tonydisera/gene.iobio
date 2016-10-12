@@ -10,7 +10,8 @@ var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_
 
 
 // http services
-var geneInfoServer            = iobio_http_services + "geneinfo/";
+//var geneInfoServer            = iobio_http_services + "geneinfo/";
+var geneInfoServer            = "http://localhost:3000/";
 var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";

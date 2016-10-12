@@ -68,7 +68,10 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 
 
 	var url = geneInfoServer + 'api/gene/' + geneName;
-	url += "?source=" + geneSource;
+	url += "?source="  + geneSource;
+	url += "&species=" + dataCard.species;
+	url += "&build="   + dataCard.build;
+
 
 	// Get the gene model 		
 	$.ajax({

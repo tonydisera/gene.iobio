@@ -192,6 +192,9 @@
 
                     var searchType = 'gene';
                     var url = geneInfoServer + 'api/' + searchType + '/' + geneName + "?source=" + geneSource;
+                    url += "&species=" + dataCard.species;
+                    url += "&build="   + dataCard.build;
+
 
                     $.ajax({
                         url: url,

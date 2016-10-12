@@ -1637,6 +1637,8 @@ function loadGeneWidget(callback) {
 		checkGeneSource(data.name);
 
 		url += "?source=" + geneSource;
+		url += "&species=" + dataCard.species;
+		url += "&build="   + dataCard.build;
 
 
 

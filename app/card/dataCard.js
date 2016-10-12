@@ -1,4 +1,6 @@
 function DataCard() {
+	this.species = 'homo_sapiens';
+	this.build   = 'GRCh37';
 	this.defaultNames = {
 		proband: 'NA12878',
 		mother:  'NA12892',
