@@ -2110,7 +2110,7 @@ var effectCategories = [
 
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
-      var results = {'ref': refName, 'start': +geneObject.start, 'end': +geneObject.end, 'strand': geneObject.strand, 'transcript': selectedTranscript,
+      var results = {'ref': refName, 'gene': geneObject.gene_name, 'start': +geneObject.start, 'end': +geneObject.end, 'strand': geneObject.strand, 'transcript': selectedTranscript,
         'variantRegionStart': variantRegionStart, 'name': 'vcf track',
         'homCount': homCount, 'hetCount': hetCount, 'sampleCount' : sampleCount,
         'features': variants};
