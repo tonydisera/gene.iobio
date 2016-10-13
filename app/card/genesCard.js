@@ -474,6 +474,8 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
 		geneBadge.addClass("selected");
 		if (isLevelBasic) {		
 			selectGeneInDropdown(geneNameToSelect, selectTheGene);
+		} else if (isMygene2) {
+			me.selectGene(geneNameToSelect);
 		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
