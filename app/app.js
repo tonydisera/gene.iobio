@@ -124,6 +124,8 @@ var widthFactors = [
 
 $(document).ready(function(){
 
+	determineStyle();
+
 	if (detectIE() != false) {
 		alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
 	}
@@ -194,14 +196,34 @@ function promiseLoadTemplate(templateName) {
 	
 }
 
+function determineStyle() {
+
+	var mygene2Parm = getUrlParameter("mygene2");
+	if ( mygene2Parm && mygene2Parm != "" ) {
+		isMygene2   = mygene2Parm == "false" || mygene2Parm.toUpperCase() == "N" ? false : true;
+	}
+	var modeParm = getUrlParameter("mode");
+	if (modeParm && modeParm != "") {
+		isLevelBasic = modeParm == "basic" ? true : false;
+	}
+
+	if (isMygene2 && isLevelBasic) {
+		changeSiteStylesheet("assets/css/site-mygene2-basic.css");
+	} else if (isMygene2) {
+		changeSiteStylesheet("assets/css/site-mygene2-advanced.css");		
+	}
+
+}
+
 
 
 function init() {
 	var me = this;
+
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
 
-	if (!isLevelEdu && !isLevelEduTour && !isLevelBasic) {
+	if (!isLevelEdu && !isLevelEduTour && !isMygene2) {
 		window.onbeforeunload = function () {
 		    launchTimestampToClear = cacheHelper.launchTimestamp;
 		    return "Are you sure you want to exit gene.iobio?";
@@ -229,6 +251,7 @@ function init() {
 			$('#intro-link').addClass("hide");
 			$('#intro-text').removeClass("hide");
 		}
+
 	}
 
 
@@ -1035,6 +1058,10 @@ function loadGeneFromUrl() {
 		DEFAULT_BATCH_SIZE = batchSize;
 	}
 
+	if (isMygene2) {
+		dataCard.loadMygene2Data();
+	}
+
 	// Get the gene list from the url.  Add the gene badges, selecting
 	// the gene that was passed in the url parameter
 	var genes = getUrlParameter("genes");
@@ -1053,7 +1080,7 @@ function loadGeneFromUrl() {
 		
 	} else {
 		// Open the sidebar 
-		if (isLevelEdu || isLevelBasic) {
+		if (isLevelEdu) {
 			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 				showSidebar("Phenolyzer");
 			}
@@ -1504,26 +1531,16 @@ function adjustGeneRegion(geneObject) {
 
 
 function switchToAdvancedMode() {
-	var origin   = window.location.origin;
-	origin = origin.replace("basic", "advanced");
-
-	var pathname = window.location.pathname;
-	pathname = pathname.replace("/basic", "/advanced");
-	
-	var search   = window.location.search;
-
-	location.assign(origin + pathname + search);
+	changeSiteStylesheet("css/assets/site-mygene2-advanced.css");
+	updateUrl("mygene2", "true");
+	updateUrl("mode",    "advanced");
+	location.reload();
 }
 function switchToBasicMode() {
-	var origin   = window.location.origin;
-	origin = origin.replace("advanced", "basic");
-
-	var pathname = window.location.pathname;
-	pathname = pathname.replace("/advanced", "/basic");
-	
-	var search   = window.location.search;
-
-	location.assign(origin + pathname + search);
+	changeSiteStylesheet("css/assets/mygene2-basic.css");
+	updateUrl("mygene2",  "true");
+	updateUrl("mode",     "basic");
+	location.reload();
 }
 
 function updateUrl(paramName, value) {
@@ -3102,6 +3119,19 @@ function sendFeedbackReceivedEmail(email) {
 	  var stream = client.createStream(emailObject);	
 	  stream.end();
 	});
+}
+
+function changeSiteStylesheet(cssHref) {
+
+    var oldlink = $("#site-stylesheet")[0];
+
+    var newlink = document.createElement("link");
+    newlink.setAttribute("rel",  "stylesheet");
+    newlink.setAttribute("id",   "site-stylesheet");
+    newlink.setAttribute("type", "text/css");
+    newlink.setAttribute("href", cssHref);
+
+    document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
 }
 
 

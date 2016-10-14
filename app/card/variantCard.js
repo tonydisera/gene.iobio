@@ -447,10 +447,12 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 	this.model.setName(dataSourceName);
 	$('#add-datasource-container').css('display', 'none');
 
-	var title = this.model.getRelationship();
-	if (title == null || title == '' || title == 'NONE') {
-		title = 'Sample';
-	}
+    var title = isLevelBasic && this.model.getRelationship() == "proband" ? "" : this.model.getRelationship();
+    if (!isLevelBasic) {
+	    if (title == null || title == '' || title == 'NONE') {
+			title = 'Sample';
+		}    	
+    }
 
 	this.setVariantCardLabel();
    	this.cardSelector.find('#card-relationship-label').text(title);
@@ -462,6 +464,8 @@ VariantCard.prototype.setVariantCardLabel = function() {
 	
 	if (isLevelEdu) {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName() + "'s Variants"  );
+	} else if (isLevelBasic) {
+		this.cardSelector.find('#variant-card-label').text(this.model.getName());
 	} else {
 		this.cardSelector.find('#variant-card-label').text(
    			this.model.getName() == this.model.getSampleName()  ? 
@@ -2590,7 +2594,9 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var qualityWarningRow = "";
 	if (filterCard.shouldWarnForNonPassVariants()) {
 		if (variant.recfilter != 'PASS') {
-			qualityWarningRow = me._tooltipLowQualityHeaderRow();
+			if (!variant.hasOwnProperty('fbCalled') || variant.fbCalled != 'Y') {
+				qualityWarningRow = me._tooltipLowQualityHeaderRow();
+			}
 		}
 	}
 

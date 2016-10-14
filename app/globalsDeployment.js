@@ -16,6 +16,12 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var autoCall              = null;           // if only alignments are provided, should variants automatically be called? 
  											// set to null if app should prompt first before autocalling
 
+
+// MyGene2 deployment variables;
+var mygene2Endpoint       = "";
+var mygene2XAuthToken     = "";
+
+
 /*
 * These variables control special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  For running one of the special educational edition 
