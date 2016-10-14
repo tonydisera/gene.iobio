@@ -474,6 +474,8 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
 		geneBadge.addClass("selected");
 		if (isLevelBasic) {		
 			selectGeneInDropdown(geneNameToSelect, selectTheGene);
+		} else if (isMygene2) {
+			me.selectGene(geneNameToSelect);
 		}
 
 	} else if (geneNames.length > 0 && geneNameToSelect == null) {
@@ -1497,6 +1499,8 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
 
 	var url = geneInfoServer + 'api/gene/' + geneName;
 	url += "?source=" + geneSource;
+	url += "&species=" + dataCard.species;
+	url += "&build="   + dataCard.build;
 
 	$.ajax({
 	    url: url,
