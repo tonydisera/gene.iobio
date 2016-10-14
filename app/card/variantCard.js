@@ -2560,7 +2560,9 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var qualityWarningRow = "";
 	if (filterCard.shouldWarnForNonPassVariants()) {
 		if (variant.recfilter != 'PASS') {
-			qualityWarningRow = me._tooltipLowQualityHeaderRow();
+			if (!variant.hasOwnProperty('fbCalled') || variant.fbCalled != 'Y') {
+				qualityWarningRow = me._tooltipLowQualityHeaderRow();
+			}
 		}
 	}
 
