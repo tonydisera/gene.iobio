@@ -2160,7 +2160,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 
 	// coverageMin is always an integer or NaN
 	var	coverageMin = filterObject.coverageMin;
-	data.intronsExcludedCount = 0;
+	var intronsExcludedCount = 0;
 
 	// Get rid of any homozygous reference from proband
 	me._pruneHomRefVariants(data);
@@ -2198,7 +2198,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 				}
 			}
 			if (!meetsExonic) {
-				data.intronsExcludedCount++;
+				intronsExcludedCount++;
 			}
 		} else {
 			meetsExonic = true;
@@ -2266,6 +2266,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		countMatch: data.countMatch,
 		countUnique: data.countUnique,
 		sampleCount : data.sampleCount,
+		intronsExcludedCount: intronsExcludedCount,
 		end: regionEnd,
 		features: filteredFeatures,
 		maxLevel: pileupObject.maxLevel + 1,

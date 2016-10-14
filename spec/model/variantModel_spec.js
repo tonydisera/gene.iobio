@@ -68,7 +68,7 @@ describe('variantModel', function() {
 		});
 
 		it('removes all the variants that have a zygosity of homref', function() {
-			variantModel._pruneHomRefVariants(data);
+			variantModel.filterVariants(data, filterObject);
 			expect(data.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 		});
 
@@ -214,7 +214,7 @@ describe('variantModel', function() {
 				});
 			});
 
-			it('increments the intronsExcludedCount in the data for each variant that does not meet the exonic only filter', function() {
+			it('increments the intronsExcludedCount in the filtered data for each variant that does not meet the exonic only filter', function() {
 				filterCard.annotationScheme = 'snpeff';
 				variant_1.impact = { HIGH: 'HIGH' };
 				variant_2.impact = { MODERATE: 'MODERATE' };
@@ -222,7 +222,7 @@ describe('variantModel', function() {
 				variant_3.effect = { EXON: 'EXON' };
 				variant_4.impact = { LOW: 'LOW' };
 				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(data.intronsExcludedCount).toEqual(1);
+				expect(filteredData.intronsExcludedCount).toEqual(1);
 			});
 		});
 

@@ -1563,8 +1563,6 @@ VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
 VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	var me = this;
 
-
-
 	var data = dataToFilter ? dataToFilter : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (data == null || data.features == null || data.features.length == 0) {
 		return;
@@ -1572,17 +1570,17 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 
 	me.cardSelector.find(".filter-flag").addClass("hide");
 
-
-	// Show a badge when the intronic variants have been removed
-	if ($('#exonic-only-cb').is(":checked")) {
-		me.cardSelector.find("#too-many-variants-flag").removeClass("hide");
-		me.cardSelector.find("#excluded-variant-count").text(data.intronsExcludedCount);
-	} 
 	// Filter variants
 	var filterObject = filterCard.getFilterObject();
 	var filteredData = this.model.filterVariants(data, filterObject);
 
-	// Set the filter badges 
+	// Show a badge when the intronic variants have been removed
+	if ($('#exonic-only-cb').is(":checked")) {
+		me.cardSelector.find("#too-many-variants-flag").removeClass("hide");
+		me.cardSelector.find("#excluded-variant-count").text(filteredData.intronsExcludedCount);
+	}
+
+	// Set the filter badges
 	if (filterCard.afScheme == 'exac') {
 		afField = "afExAC";
 	} else {
