@@ -2160,7 +2160,7 @@ var effectCategories = [
     return annotValue;
   };
 
-  exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
+  exports.pileupVcfRecordsImproved = function(variants, regionStart, posToPixelFactor, widthFactor) {
     var pileup = pileupLayout().sort(null).size(800); // 1860
     var maxlevel = pileup(variants);
     return maxLevel;
