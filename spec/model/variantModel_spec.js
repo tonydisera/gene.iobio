@@ -5,7 +5,7 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 	});
 
-	fdescribe('#_pileupVariants', function() {
+	describe('#_pileupVariants', function() {
 		it('returns the correct maxLevel and featureWidth', function() {
 			window.gene = { start: 100 };
 			var start = 1;
@@ -71,21 +71,13 @@ describe('variantModel', function() {
 
 			data = {
 				count: 33,
-				end: 17715767,
+				countMatch: 10,
+				countUnique: 2,
 				features: [variant_1, variant_2, variant_3, variant_4, variant_5],
-				gene: {},
-				hetCount: 15,
-				homCount: 18,
-				intronsExcludedCount: 0,
-				loadState: {},
 				name: "vcf track",
-				ref: "17",
 				sampleCount: 2,
-				start: 17583787,
-				strand: "+",
-				transcript: {},
-				variantRegionStart: 17583787,
-			}
+				strand: "+"
+			};
 
 			filterObject = {
 				'coverageMin': 100,
@@ -99,6 +91,28 @@ describe('variantModel', function() {
 			window.regionEnd = null;
 			variantModel.setRelationship('proband');
 			spyOn(variantModel, '_pileupVariants').and.returnValue({ maxLevel: 10, featureWidth: 100 });
+		});
+
+		it('returns an object containing all the filtered vcf data', function() {
+			data.features = [];
+			window.regionStart = 100;
+			window.regionEnd = 200;
+			var vcfDataFiltered = variantModel.filterVariants(data, filterObject);
+			expect(vcfDataFiltered).toEqual({
+				count: 33,
+				countMatch: 10,
+				countUnique: 2,
+				sampleCount: 2,
+				intronsExcludedCount: 0,
+				end: 200,
+				features: [],
+				maxLevel: 11,
+				featureWidth: 100,
+				name: "vcf track",
+				start: 100,
+				strand: "+",
+				variantRegionStart: 100
+			})
 		});
 
 		it('removes all the variants that have a zygosity of homref', function() {
