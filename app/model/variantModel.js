@@ -158,7 +158,7 @@ VariantModel.prototype.getVariantCount = function(data) {
 	return loadedVariantCount;
 }
 
-VariantModel.summarizeDanger = function(geneName, theVcfData) {
+VariantModel.summarizeDanger = function(theVcfData) {
 	dangerCounts = {};
 	if (theVcfData == null || theVcfData.features.length == null) {
 		console.log("unable to summarize danger due to null data");
