@@ -2168,7 +2168,15 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 	var filteredFeatures = data.features.filter(function(d) {
 
 		if (filterCard.shouldWarnForNonPassVariants()) {
-			d.featureClass = d.recfilter === 'PASS' ? '' : 'low-quality';
+			if (d.recfilter != 'PASS') {
+				if (!d.hasOwnProperty('fbCalled') || d.fbCalled != 'Y') {
+					d.featureClass = 'low-quality';
+				} else {
+					d.featureClass = '';
+				}
+			} else {
+				d.featureClass = '';
+			}
 		}
 
 		var meetsRegion = true;
