@@ -26,6 +26,20 @@ describe('variantModel', function() {
 		});
 	});
 
+	describe('#getCalledVariantCount', function() {
+		it('returns the correct count of called variants', function() {
+			variantModel.fbData = {
+				features: [{ zygosity: 'HET' }, { zygosity: 'HOMREF' }, { zygosity: 'HOM'}]
+			};
+			expect(variantModel.getCalledVariantCount()).toEqual(2);
+		});
+
+		it('returns 0 when there are no called variants', function() {
+			variantModel.fbData = {};
+			expect(variantModel.getCalledVariantCount()).toEqual(0);
+		});
+	});
+
 	describe('#_pileupVariants', function() {
 		it('returns the correct maxLevel and featureWidth', function() {
 			window.gene = { start: 100 };

@@ -278,21 +278,16 @@ VariantModel.summarizeDanger = function(geneName, theVcfData) {
 
 VariantModel.prototype.getCalledVariantCount = function() {
 	if (this.fbData.features ) {
-		return this.fbData.features
-		                  .filter(function(d) {
-							// Filter homozygous reference for proband only
-							var meetsZygosity = true;
-							if (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') {
-								meetsZygosity = false;
-							}
-							return meetsZygosity;
-						  }).length;
-	} else {
-		return "0";
+		return this.fbData.features.filter(function(d) {
+			// Filter homozygous reference for proband only
+			if (d.zygosity && d.zygosity.toLowerCase() == 'homref') {
+				return false;
+			}
+			return true;
+	  }).length;
 	}
+	return 0;
 }
-
-
 
 VariantModel.prototype.filterBamDataByRegion = function(coverage, regionStart, regionEnd) {
 	return coverage.filter(function(d) { 
