@@ -171,28 +171,16 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	var consequenceClasses = {};
 	var inheritanceClasses = {};
 	theVcfData.features.forEach( function(variant) {
-	    for (key in variant.highestImpactSnpeff ) {
-	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
-	    		var types = impactClasses[key];
-	    		if (types == null) {
-	    			types = {};
-	    		}
-	    		var effectObject = variant.highestImpactSnpeff[key];
-	    		types[variant.type] = effectObject; // key = effect, value = transcript id
-	    		impactClasses[key] = types;	
-
+	    for (key in variant.highestImpactSnpeff) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		impactClasses[key] = impactClasses[key] || {};
+	    		impactClasses[key][variant.type] = variant.highestImpactSnpeff[key]; // key = effect, value = transcript id
 	    	}
 	    }
-	    for (key in variant.highestImpactVep ) {
-	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
-	    		var types = consequenceClasses[key];
-	    		if (types == null) {
-	    			types = {};
-	    		}
-	    		var consequenceObject = variant.highestImpactVep[key];
-	    		types[variant.type] = consequenceObject; // key = consequence, value = transcript id
-	    		consequenceClasses[key] = types;	
-
+	    for (key in variant.highestImpactVep) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		consequenceClasses[key] = consequenceClasses[key] || {};
+	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
 	    	}
 	    }
 	    for (key in variant.highestSIFT) {

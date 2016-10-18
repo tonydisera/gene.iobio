@@ -5,6 +5,83 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 	});
 
+	describe('#summarizeDanger', function() {
+
+		it('returns a danger object with the correct impact when the annotation scheme is snpeff', function() {
+			filterCard.annotationScheme = 'snpeff';
+			var vcfData = {
+				features: [
+					{ type: 'snp', highestImpactSnpeff: { MODERATE: { missense_variant: {} } } },
+					{ type: 'snp', highestImpactSnpeff: { MODERATE: { missense_variant: { ENST000001: "ENST000001" } } } },
+					{ type: 'del', highestImpactSnpeff: { MODERATE: { missense_variant: { ENST000001: "ENST000001" } } } },
+					{ type: 'snp', highestImpactSnpeff: { MODIFIER: { intron_variant: {} } } },
+					{ type: 'snp', highestImpactSnpeff: { MODIFIER: { downstream_gene_variant: {} } } }
+				]
+			};
+			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+				CLINVAR: null,
+				INHERITANCE: {},
+				IMPACT: {
+					MODERATE: {
+						snp: { missense_variant: { ENST000001: "ENST000001" } },
+						del: { missense_variant: { ENST000001: "ENST000001" } }
+					}
+				},
+				CONSEQUENCE: {}
+			});
+		});
+
+		it('returns a danger object with the correct consequence and impact when the annotation scheme is vep', function() {
+			filterCard.annotationScheme = 'vep';
+			var vcfData = {
+				features: [
+					{ type: 'snp', highestImpactVep: { MODERATE: { missense_variant: {} } } },
+					{ type: 'snp', highestImpactVep: { MODERATE: { missense_variant: { ENST000001: "ENST000001" } } } },
+					{ type: 'del', highestImpactVep: { MODERATE: { missense_variant: { ENST000001: "ENST000001" } } } },
+					{ type: 'snp', highestImpactVep: { MODIFIER: { intron_variant: {} } } },
+					{ type: 'snp', highestImpactVep: { MODIFIER: { downstream_gene_variant: {} } } }
+				]
+			};
+			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+				CLINVAR: null,
+				INHERITANCE: {},
+				IMPACT: {
+					MODERATE: {
+						snp: { missense_variant: { ENST000001: "ENST000001" } },
+						del: { missense_variant: { ENST000001: "ENST000001" } }
+					}
+				},
+				CONSEQUENCE: {
+					MODERATE: {
+						snp: { missense_variant: { ENST000001: "ENST000001" } },
+						del: { missense_variant: { ENST000001: "ENST000001" } }
+					}
+				}
+			});
+		});
+	});
+
+	// { MODERATE: { snp: { missense_variant: { ENST00000261641: "ENST00000261641" } } } }
+
+	// expect(variantModel.summarizeDanger(vcfData)).toEqual({
+	// 	CLINVAR: null,
+	// 	CONSEQUENCE: { MODERATE: { snp: { missense_variant: { ENST00000261641: "ENST00000261641" } } } }, // badge missense
+	// 	IMPACT: { MODERATE: { snp: { missense_variant: { ENST00000261641: "ENST00000261641" } } } },
+	// 	INHERITANCE: { denovo: "denovo" }, // badge
+	// 	POLYPHEN: { polyphen_possibly_damaging: { possibly_damaging: {} } }, // badge
+	// 	SIFT: { sift_deleterious: { deleterious: {} } } // badge
+	// });
+
+	// {
+	// 	uncertain_significance: {
+	// 		badge: true,
+	// 		clazz: 'clinvar_uc',
+	// 		examineBadge: true,
+	// 		symbolFunction: function() {},
+	// 		value: 4
+	// 	}
+	// }
+
 	describe('#getVariantCount', function() {
 		it('returns the correct count of loaded variants', function() {
 			window.gene = 'BRCA1';
