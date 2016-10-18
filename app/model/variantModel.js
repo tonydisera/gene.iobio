@@ -142,24 +142,20 @@ VariantModel.prototype.getDangerSummaryForGene = function(geneName) {
 }
 
 VariantModel.prototype.getVariantCount = function(data) {
-
 	var theVcfData = data != null ? data : this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData == null || theVcfData.features == null) {
-		return "0";
-	} else {
-		var loadedVariantCount = 0;
+	var loadedVariantCount = 0;
+	if (theVcfData && theVcfData.features) {
 		theVcfData.features.forEach(function(variant) {
-			if (variant.fbCalled && variant.fbCalled == 'Y') {
-	
-			} else if (variant.zygosity != null && variant.zygosity.toLowerCase() == "homref") {
-	
+			if (variant.fbCalled == 'Y') {
+
+			} else if (variant.zygosity && variant.zygosity.toLowerCase() == "homref") {
+
 			} else {
 				loadedVariantCount++;
-
 			}
 		});
-		return loadedVariantCount;
 	}
+	return loadedVariantCount;
 }
 
 VariantModel.summarizeDanger = function(geneName, theVcfData) {

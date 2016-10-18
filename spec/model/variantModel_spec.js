@@ -5,6 +5,27 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 	});
 
+	describe('#getVariantCount', function() {
+		it('returns the correct count of loaded variants', function() {
+			window.gene = 'BRCA1';
+			window.selectedTranscript = 'transcript';
+			spyOn(variantModel, 'getVcfDataForGene').and.returnValue({
+				features: [{ fbCalled: 'Y' }, { zygosity: 'HOMREF' }, { zygosity: null }, { zygosity: 'HET' }]
+			});
+			expect(variantModel.getVariantCount()).toBe(2);
+			expect(variantModel.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+		});
+
+		it('returns 0 when there are no variants', function() {
+			expect(variantModel.getVariantCount({})).toBe(0);
+		});
+
+		it('returns 0 when there is no vcf data', function() {
+			spyOn(variantModel, 'getVcfDataForGene').and.returnValue(null);
+			expect(variantModel.getVariantCount()).toBe(0);
+		});
+	});
+
 	describe('#_pileupVariants', function() {
 		it('returns the correct maxLevel and featureWidth', function() {
 			window.gene = { start: 100 };
