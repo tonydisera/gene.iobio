@@ -7,7 +7,7 @@ describe('variantModel', function() {
 
 	describe('#summarizeDanger', function() {
 
-		it('returns a danger object with the correct impact when the annotation scheme is snpeff', function() {
+		it('returns a danger counts object with the correct impact when the annotation scheme is snpeff', function() {
 			filterCard.annotationScheme = 'snpeff';
 			var vcfData = {
 				features: [
@@ -31,7 +31,7 @@ describe('variantModel', function() {
 			});
 		});
 
-		it('returns a danger object with the correct consequence and impact when the annotation scheme is vep', function() {
+		it('returns a danger counts object with the correct consequence and impact when the annotation scheme is vep', function() {
 			filterCard.annotationScheme = 'vep';
 			var vcfData = {
 				features: [
@@ -59,28 +59,79 @@ describe('variantModel', function() {
 				}
 			});
 		});
+
+		it('returns a danger counts object with the correct SIFT', function() {
+			var vcfData = {
+				features: [
+					{ type: 'snp', highestSIFT: { deleterious: {} } },
+					{ type: 'snp', highestSIFT: { deleterious_low_confidence: {} } },
+					{ type: 'snp', highestSIFT: { tolerated: {} } },
+					{ type: 'snp', highestSIFT: { "": {} } }
+				]
+			};
+			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+				CLINVAR: null,
+				INHERITANCE: {},
+				IMPACT: {},
+				CONSEQUENCE: {},
+				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } }
+			});
+		});
+
+		it('returns a danger counts object with the correct POLYPHEN', function() {
+			var vcfData = {
+				features: [
+					{ type: 'snp', highestPolyphen: { probably_damaging: {} } },
+					{ type: 'snp', highestPolyphen: { possibly_damaging: {} } },
+					{ type: 'snp', highestPolyphen: { benign: {} } },
+					{ type: 'snp', highestPolyphen: { "": {} } }
+				]
+			};
+			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+				CLINVAR: null,
+				INHERITANCE: {},
+				IMPACT: {},
+				CONSEQUENCE: {},
+				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } }
+			});
+		});
+
+		it('returns a danger counts object with the correct clinvar', function() {
+			var vcfData = {
+				features: [
+					{ type: 'snp', clinVarClinicalSignificance: { none: "Y", "benign/likely_benign": "Y" } },
+					{ type: 'snp', clinVarClinicalSignificance: { pathogenic: {} } },
+					{ type: 'snp', clinVarClinicalSignificance: { uncertain_significance: {} } },
+					{ type: 'snp', clinVarClinicalSignificance: { "": {} } }
+				]
+			};
+			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+				CLINVAR: {
+					pathogenic: { value: 1, badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: jasmine.any(Function) }
+				},
+				INHERITANCE: {},
+				IMPACT: {},
+				CONSEQUENCE: {}
+			});
+		});
+
+		it('returns a danger counts object with the correct inheritance', function() {
+			var vcfData = {
+				features: [
+					{ type: 'snp', inheritance: "none" },
+					{ type: 'snp', inheritance: "denovo" },
+					{ type: 'snp', inheritance: "" },
+					{ type: 'snp', inheritance: "recessive" }
+				]
+			};
+			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+				CLINVAR: null,
+				INHERITANCE: { denovo: "denovo", recessive: "recessive" },
+				IMPACT: {},
+				CONSEQUENCE: {}
+			});
+		});
 	});
-
-	// { MODERATE: { snp: { missense_variant: { ENST00000261641: "ENST00000261641" } } } }
-
-	// expect(variantModel.summarizeDanger(vcfData)).toEqual({
-	// 	CLINVAR: null,
-	// 	CONSEQUENCE: { MODERATE: { snp: { missense_variant: { ENST00000261641: "ENST00000261641" } } } }, // badge missense
-	// 	IMPACT: { MODERATE: { snp: { missense_variant: { ENST00000261641: "ENST00000261641" } } } },
-	// 	INHERITANCE: { denovo: "denovo" }, // badge
-	// 	POLYPHEN: { polyphen_possibly_damaging: { possibly_damaging: {} } }, // badge
-	// 	SIFT: { sift_deleterious: { deleterious: {} } } // badge
-	// });
-
-	// {
-	// 	uncertain_significance: {
-	// 		badge: true,
-	// 		clazz: 'clinvar_uc',
-	// 		examineBadge: true,
-	// 		symbolFunction: function() {},
-	// 		value: 4
-	// 	}
-	// }
 
 	describe('#getVariantCount', function() {
 		it('returns the correct count of loaded variants', function() {
