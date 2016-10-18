@@ -961,15 +961,6 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 
 }
 
-VariantModel.prototype.loadVariantCount = function(regionStart, regionEnd, callback) {
-	var me = this;
-
-	me._promiseVcfRefName(window.gene.chr).then( function() {
-		me.vcf.getVariantCount(me.getVcfRefName(window.gene.chr), 
-			regionStart, regionEnd, me.sampleName, callback);
-	});
-}
-
 VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, regionStart, regionEnd, onVcfData) {
 	var me = this;
 
