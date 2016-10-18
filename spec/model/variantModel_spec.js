@@ -1,69 +1,103 @@
 describe('variantModel', function() {
-	var variantModel, dataCopy, filterObjectCopy;
-	var variant_1, variant_2, variant_3, variant_4;
-	var data, filterObject;
+	var variantModel;
 
 	beforeEach(function() {
-		variant_1 = {
-			zygosity: 'HOM',
-			recfilter: 'PASS'
-		};
-
-		variant_2 = {
-			zygosity: 'HET',
-			recfilter: 'PASS'
-		};
-
-		variant_3 = {
-			zygosity: 'HET',
-			recfilter: '.'
-		};
-
-		variant_4 = {
-			zygosity: 'HOM',
-			recfilter: '.'
-		};
-
-		variant_5 = {
-			zygosity: 'HOMREF',
-			recfilter: 'PASS'
-		}
-
-		data = {
-			count: 33,
-			end: 17715767,
-			features: [variant_1, variant_2, variant_3, variant_4, variant_5],
-			gene: {},
-			hetCount: 15,
-			homCount: 18,
-			intronsExcludedCount: 0,
-			loadState: {},
-			name: "vcf track",
-			ref: "17",
-			sampleCount: 2,
-			start: 17583787,
-			strand: "+",
-			transcript: {},
-			variantRegionStart: 17583787,
-		}
-
-		filterObject = {
-			'coverageMin': 100,
-			'afMin': 0,
-			'afMax': 1,
-			'afScheme' : "exac",
-			'annotsToInclude': {},
-			'exonicOnly': false
-	  };
-
 		variantModel = new VariantModel();
-		window.regionStart = null;
-		window.regionEnd = null;
-		variantModel.setRelationship('proband');
+	});
+
+	fdescribe('#_pileupVariants', function() {
+		it('returns the correct maxLevel and featureWidth', function() {
+			window.gene = { start: 100 };
+			var start = 1;
+			var end = 1001;
+			var variants = [{}, {}, {}, {}];
+			var vcf = { pileupVcfRecords: jasmine.createSpy().and.returnValue(30) };
+			variantModel.vcf = vcf;
+			var result = variantModel._pileupVariants(variants, start, end);
+			expect(vcf.pileupVcfRecords).toHaveBeenCalledWith(variants, 100, 1, 8);
+			expect(result.maxLevel).toBe(30);
+			expect(result.featureWidth).toBe(4);
+		});
+
+		describe('when maxLevel is greater than 30', function() {
+			it('returns the correct maxLevel and featureWidth', function() {
+				window.gene = { start: 100 };
+				var start = 1;
+				var end = 6001;
+				var variants = [{}, {}, {}, {}];
+				var i = 0;
+				var returnValues = [31, 51, 52, 51, 51, 49];
+				var spy = jasmine.createSpy().and.callFake(function() { return returnValues[i++]; });
+				var vcf = { pileupVcfRecords: spy };
+				variantModel.vcf = vcf;
+				var result = variantModel._pileupVariants(variants, start, end);
+				expect(vcf.pileupVcfRecords.calls.count()).toEqual(6);
+				expect(result.maxLevel).toBe(49);
+				expect(result.featureWidth).toBe(1);
+			});
+		});
 	});
 
 	describe('#filterVariants', function() {
+		var dataCopy, filterObjectCopy;
+		var variant_1, variant_2, variant_3, variant_4;
+		var data, filterObject;
+
 		beforeEach(function() {
+			variant_1 = {
+				zygosity: 'HOM',
+				recfilter: 'PASS'
+			};
+
+			variant_2 = {
+				zygosity: 'HET',
+				recfilter: 'PASS'
+			};
+
+			variant_3 = {
+				zygosity: 'HET',
+				recfilter: '.'
+			};
+
+			variant_4 = {
+				zygosity: 'HOM',
+				recfilter: '.'
+			};
+
+			variant_5 = {
+				zygosity: 'HOMREF',
+				recfilter: 'PASS'
+			}
+
+			data = {
+				count: 33,
+				end: 17715767,
+				features: [variant_1, variant_2, variant_3, variant_4, variant_5],
+				gene: {},
+				hetCount: 15,
+				homCount: 18,
+				intronsExcludedCount: 0,
+				loadState: {},
+				name: "vcf track",
+				ref: "17",
+				sampleCount: 2,
+				start: 17583787,
+				strand: "+",
+				transcript: {},
+				variantRegionStart: 17583787,
+			}
+
+			filterObject = {
+				'coverageMin': 100,
+				'afMin': 0,
+				'afMax': 1,
+				'afScheme' : "exac",
+				'annotsToInclude': {},
+				'exonicOnly': false
+		  };
+			window.regionStart = null;
+			window.regionEnd = null;
+			variantModel.setRelationship('proband');
 			spyOn(variantModel, '_pileupVariants').and.returnValue({ maxLevel: 10, featureWidth: 100 });
 		});
 

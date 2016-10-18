@@ -1552,11 +1552,10 @@ VariantModel.prototype._pileupVariants = function(features, start, end) {
 
 	var featureWidth = isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 4;
 	var posToPixelFactor = Math.round((end - start) / width);
-	var widthFactor = featureWidth + (isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE*2 : 4);
+	var widthFactor = featureWidth + (isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE * 2 : 4);
 	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, widthFactor);
-
 	if ( maxLevel > 30) {
-		for( var i = 1; i < posToPixelFactor; i++) {
+		for(var i = 1; i < posToPixelFactor; i++) {
 			// TODO:  Devise a more sensible approach to setting the min width.  We want the 
 			// widest width possible without increasing the levels beyond 30.
 			if (i > 4) {
