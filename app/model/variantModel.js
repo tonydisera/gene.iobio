@@ -309,8 +309,6 @@ VariantModel.prototype.getName = function() {
 VariantModel.prototype.setName = function(theName) {
 	if (theName) {
 		this.name = theName;
-	} else {
-		return theName;
 	}
 }
 
