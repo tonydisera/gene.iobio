@@ -271,11 +271,10 @@ VariantModel.prototype.getCalledVariantCount = function() {
 }
 
 VariantModel.prototype.filterBamDataByRegion = function(coverage, regionStart, regionEnd) {
-	return coverage.filter(function(d) { 
+	return coverage.filter(function(d) {
 		return (d[0] >= regionStart && d[0] <= regionEnd);
-	}); 	
+	});
 }
-
 
 VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 	var factor = d3.round(coverageData.length / numberOfPoints);

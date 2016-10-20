@@ -5,6 +5,16 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 	});
 
+	describe('#filterBamDataByRegion', function() {
+		it('returns an array of all bam data that falls within the specified start and end regions', function() {
+			var bamDataCoverage = [[80, 0], [90, 0], [100, 0], [150, 0], [200, 0], [201, 0]];
+			var regionStart = 100;
+			var regionEnd = 200;
+			var filteredData = variantModel.filterBamDataByRegion(bamDataCoverage, regionStart, regionEnd);
+			expect(filteredData).toEqual([[100, 0], [150, 0], [200, 0]]);
+		});
+	});
+
 	describe('#summarizeDanger', function() {
 
 		it('returns a danger counts object with the correct impact when the annotation scheme is snpeff', function() {
