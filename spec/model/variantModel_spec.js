@@ -15,6 +15,15 @@ describe('variantModel', function() {
 		});
 	});
 
+	describe('#reduceBamData', function() {
+		it('shortens bam data to a specified number of points using the correct calculated factor of reduction', function() {
+			variantModel.bam = { reducePoints: jasmine.createSpy() };
+			var bamDataCoverage = [[80, 0], [90, 0], [100, 0], [150, 0], [200, 0]];
+			variantModel.reduceBamData(bamDataCoverage, 3);
+			expect(variantModel.bam.reducePoints).toHaveBeenCalledWith(bamDataCoverage, 2, jasmine.any(Function), jasmine.any(Function));
+		});
+	});
+
 	describe('#summarizeDanger', function() {
 
 		it('returns a danger counts object with the correct impact when the annotation scheme is snpeff', function() {

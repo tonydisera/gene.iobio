@@ -5,7 +5,7 @@ describe('bam.iobio', function() {
 		bam = new Bam();
 	});
 
-	fdescribe('#reducePoints', function() {
+	describe('#reducePoints', function() {
 
 		it('reduces the number of points in the array by a given factor', function() {
 			var bamDataCoverage = [[1, 2], [3, 6], [5, 2], [7, 0], [9, 10], [11, 8], [13, 6]];

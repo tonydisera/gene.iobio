@@ -278,14 +278,9 @@ VariantModel.prototype.filterBamDataByRegion = function(coverage, regionStart, r
 
 VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 	var factor = d3.round(coverageData.length / numberOfPoints);
-	return this.bam.reducePoints(coverageData, 
-		                         factor, 
-		                         function(d) {
-		                         	return d[0]
-		                         }, 
-		                         function(d) {
-		                         	return d[1]
-		                         });
+	var xValue = function(d) { return d[0]; };
+	var yValue = function(d) { return d[1]; };
+	return this.bam.reducePoints(coverageData, factor, xValue, yValue);
 }
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
