@@ -24,6 +24,28 @@ describe('variantModel', function() {
 		});
 	});
 
+	describe('#getMatchingVariant', function() {
+		it('returns the variant with matching properties to the given variant', function() {
+			var variant_1 = { start: 2, end: 3, ref: 'A', alt: 'G', type: 'snp' };
+			var variant_2 = { start: 1, end: 4, ref: 'A', alt: 'G', type: 'snp' };
+			var variant_3 = { start: 1, end: 3, ref: 'T', alt: 'G', type: 'snp' };
+			var variant_4 = { start: 1, end: 3, ref: 'A', alt: 'C', type: 'snp' };
+			var variant_5 = { start: 1, end: 3, ref: 'A', alt: 'G', type: 'del' };
+			var variant_6 = { start: 1, end: 3, ref: 'A', alt: 'G', type: 'SNP' };
+			var variants = [variant_1, variant_2, variant_3, variant_4, variant_5, variant_6];
+			window.gene = 'BRCA1';
+			window.selectedTranscript = 'transcript';
+			spyOn(variantModel, 'getVcfDataForGene').and.returnValue({ features: variants });
+			expect(variantModel.getMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })).toEqual(variant_6);
+			expect(variantModel.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+		});
+
+		it('returns null when there is no vcfdata', function() {
+			spyOn(variantModel, 'getVcfDataForGene').and.returnValue(null);
+			expect(variantModel.getMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })).toBeNull();
+		})
+	});
+
 	describe('#summarizeDanger', function() {
 
 		it('returns a danger counts object with the correct impact when the annotation scheme is snpeff', function() {

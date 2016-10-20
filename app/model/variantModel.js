@@ -628,28 +628,22 @@ VariantModel.prototype._stripRefName = function(refName) {
 
 VariantModel.prototype.getMatchingVariant = function(variant) {
 	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData == null) {
-		return null;
-	}
-
 	var matchingVariant = null;
 	if (theVcfData && theVcfData.features) {
-
-		theVcfData.features.forEach( function( v ) {
+		theVcfData.features.forEach(function(v) {
 			if (v.start == variant.start 
-	          && v.end == variant.end 
-	          && v.ref == variant.ref 
-	          && v.alt == variant.alt 
-	          && v.type.toLowerCase() == variant.type.toLowerCase()) {
-	          matchingVariant = v;
-	       }
+          && v.end == variant.end 
+          && v.ref == variant.ref 
+          && v.alt == variant.alt 
+          && v.type.toLowerCase() == variant.type.toLowerCase()) {
+	      matchingVariant = v;
+	    }
 		});
 	}
 	return matchingVariant;
 }
 
-
-/* 
+/*
 * A gene has been selected. Clear out the model's state
 * in preparation for getting data.
 */
