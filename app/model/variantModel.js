@@ -1392,7 +1392,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 
 	var maxAlleleCount = 0;
 	var setMaxAlleleCount = function(depth) {
-		if (depth != null && depth != "") {
+		if (depth) {
 			if ((+depth) > maxAlleleCount) {
 				maxAlleleCount = +depth;
 			}
@@ -1405,7 +1405,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 			setMaxAlleleCount(variant.genotypeDepthMother);
 			setMaxAlleleCount(variant.genotypeDepthFather);
 		});
-		theVcfData.maxAlleleCount = maxAlleleCount;			
+		theVcfData.maxAlleleCount = maxAlleleCount;
 	} else if (dataCard.mode == 'trio') {
 		// If the gene doesn't have any variants for the proband, determine the
 		// max allele count by iterating through the mom and data variant

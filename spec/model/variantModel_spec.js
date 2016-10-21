@@ -583,4 +583,42 @@ describe('variantModel', function() {
 			});
 		});
 	});
+
+	describe('#determineMaxAlleleCount', function() {
+		describe('when the proband has variants in the gene', function() {
+			it('it sets the max allele count on the vcf data', function() {
+				dataCard.mode = 'single';
+				var variants = [
+					{ genotypeDepth: 1, genotypeDepthMother: "2", genotypeDepthFather: "3"},
+					{ genotypeDepth: 1, genotypeDepthMother: "5", genotypeDepthFather: "2"},
+				];
+				var vcfData = { features: variants };
+				expect(variantModel.determineMaxAlleleCount(vcfData)).toEqual({ features: variants, maxAlleleCount: 5 });
+			});
+		});
+
+		describe('when the proband does not have variants in the gene', function() {
+			it('it sets the max allele count on the vcf data based on the mother and father', function() {
+				window.gene = 'BRCA1';
+				window.selectedTranscript = 'transcript';
+				dataCard.mode = 'trio';
+				var motherVariants = [{ genotypeDepth: 1 }, { genotypeDepth: 8 }];
+				var fatherVariants = [{ genotypeDepth: '10' }, { genotypeDepth: '5' }];
+				window.variantCards = [
+					{
+						getRelationship: function() { return 'mother'; },
+						model: { getVcfDataForGene: jasmine.createSpy().and.returnValue({ features: motherVariants }) }
+					},
+					{
+						getRelationship: function() { return 'father'; },
+						model: { getVcfDataForGene: jasmine.createSpy().and.returnValue({ features: fatherVariants }) }
+					}
+				];
+				var vcfData = { features: [] };
+				expect(variantModel.determineMaxAlleleCount(vcfData)).toEqual({ features: [], maxAlleleCount: 10 });
+				expect(window.variantCards[0].model.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+				expect(window.variantCards[1].model.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+			});
+		});
+	});
 });
