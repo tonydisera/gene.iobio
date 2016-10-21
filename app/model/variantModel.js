@@ -1424,7 +1424,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 
 }
 
-VariantModel.prototype.populateEffectFilters = function(variants) {
+VariantModel.prototype.populateEffectFilters = function() {
 	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData && theVcfData.features) {
 		this._populateEffectFilters(theVcfData.features);
@@ -1432,14 +1432,14 @@ VariantModel.prototype.populateEffectFilters = function(variants) {
 }
 
 VariantModel.prototype._populateEffectFilters  = function(variants) {
-	variants.forEach( function(variant) {
+	variants.forEach(function(variant) {
 		for (effect in variant.effect) {
 			filterCard.snpEffEffects[effect] = effect;
 		}
 		for (vepConsequence in variant.vepConsequence) {
 			filterCard.vepConsequences[vepConsequence] = vepConsequence;
 		}
-	});	
+	});
 }
 
 VariantModel.prototype._populateRecFilters  = function(variants) {

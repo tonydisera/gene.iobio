@@ -621,4 +621,22 @@ describe('variantModel', function() {
 			});
 		});
 	});
+
+	describe('#populateEffectFilters', function() {
+		it('sets the snpEffEffects on the filterCard', function() {
+			window.filterCard = { snpEffEffects: {} };
+			var variants = [{ effect: { EFFECT_1: 'EFFECT_1', EFFECT_2: 'EFFECT_2' } }, { effect: { EFFECT_3: 'EFFECT_3' } }];
+			spyOn(variantModel, 'getVcfDataForGene').and.returnValue({ features: variants });
+			variantModel.populateEffectFilters();
+			expect(window.filterCard.snpEffEffects).toEqual({ EFFECT_1: 'EFFECT_1', EFFECT_2: 'EFFECT_2', EFFECT_3: 'EFFECT_3' });
+		});
+
+		it('sets the vepConsequences on the filterCard', function() {
+			window.filterCard = { vepConsequences: {} };
+			var variants = [{ vepConsequence: { C_1: 'C_1', C_2: 'C_2' } }, { vepConsequence: { C_3: 'C_3' } }];
+			spyOn(variantModel, 'getVcfDataForGene').and.returnValue({ features: variants });
+			variantModel.populateEffectFilters();
+			expect(window.filterCard.vepConsequences).toEqual({ C_1: 'C_1', C_2: 'C_2', C_3: 'C_3' });
+		});
+	});
 });
