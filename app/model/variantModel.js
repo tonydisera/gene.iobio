@@ -1454,28 +1454,28 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcri
 	var me = this;
     // Post processing:
     // We have the af1000g and afexac, so now determine the level for filtering
-    // by range.  
-    theVcfData.features.forEach(function(variant) {
-    	// For ExAC levels, differentiate between af not found and in 
-    	// coding region (level = private) and af not found and intronic (non-coding) 
-    	// region (level = unknown)
-    	if (variant.afExAC == 0) {
-        	getCodingRegions(transcript).forEach(function(codingRegion) {
-        		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			
-        		} else {
-        			variant.afExAC = -100;
-        		}
-        	});
-    	}
+    // by range.
+   theVcfData.features.forEach(function(variant) {
+  	// For ExAC levels, differentiate between af not found and in
+  	// coding region (level = private) and af not found and intronic (non-coding)
+  	// region (level = unknown)
+  	if (variant.afExAC == 0) {
+      	getCodingRegions(transcript).forEach(function(codingRegion) {
+      		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
+      		} else {
+      			variant.afExAC = -100;
+      		}
+      	});
+  	}
 
-    	variant.afexaclevels = {};
+    variant.afexaclevels = {};
 		matrixCard.afExacMap.forEach( function(rangeEntry) {
 			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
 				variant.afexaclevel = rangeEntry.clazz;
 				variant.afexaclevels[rangeEntry.clazz] = rangeEntry.clazz;
 			}
 		});
-		
+
 		variant.af1000glevels = {};
 		matrixCard.af1000gMap.forEach( function(rangeEntry) {
 			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
@@ -1483,10 +1483,7 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcri
 				variant.af1000glevels[rangeEntry.clazz] = rangeEntry.clazz;
 			}
 		});
-
-
 	});
-
 }
 
 

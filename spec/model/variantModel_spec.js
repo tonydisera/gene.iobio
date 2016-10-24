@@ -639,4 +639,55 @@ describe('variantModel', function() {
 			expect(window.filterCard.vepConsequences).toEqual({ C_1: 'C_1', C_2: 'C_2', C_3: 'C_3' });
 		});
 	});
+
+	describe('#_determineVariantAfLevels', function() {
+		it('sets afExAC to -100 on variants whose allele frequency are not found and intronic to distinguish them', function() {
+			var transcript = 'transcript';
+			var variant_1 = { afExAC: 0, start: 150, end: 160 };
+			var variant_2 = { afExAC: 0, start: 320, end: 330 };
+			var variant_3 = { afExAC: 0, start: 410, end: 420 };
+			var vcfData = { features: [variant_1, variant_2, variant_3] };
+			spyOn(window, 'getCodingRegions').and.returnValue([{ start: 100, end: 200 }, { start: 400, end: 500 }]);
+			variantModel._determineVariantAfLevels(vcfData, transcript);
+			expect(window.getCodingRegions).toHaveBeenCalledWith('transcript');
+			expect(variant_1.afExAC).toEqual(0);
+			expect(variant_2.afExAC).toEqual(-100);
+			expect(variant_3.afExAC).toEqual(0);
+		});
+
+		it('sets afexaclevel and afexaclevels on the variant depending on the afExAC of the variant', function() {
+			var transcript = 'transcript';
+			var variant_1 = { afExAC: ".0005" };
+			var variant_2 = { afExAC: ".05" };
+			var variant_3 = { afExAC: -100 };
+			var vcfData = { features: [variant_1, variant_2, variant_3] };
+			variantModel._determineVariantAfLevels(vcfData, transcript);
+			expect(variant_1.afexaclevel).toEqual('afexac_rare');
+			expect(variant_1.afexaclevels).toEqual({ 'afexac_superrare': 'afexac_superrare', 'afexac_rare': 'afexac_rare'});
+			expect(variant_2.afexaclevel).toEqual('afexac_uncommon');
+			expect(variant_2.afexaclevels).toEqual({ 'afexac_uncommon': 'afexac_uncommon' });
+			expect(variant_3.afexaclevel).toEqual('afexac_unique_nc');
+			expect(variant_3.afexaclevels).toEqual({ 'afexac_unique_nc': 'afexac_unique_nc' });
+		});
+
+		it('sets af1000glevel and af1000glevels on the variant depending on the af1000G of the variant', function() {
+			var transcript = 'transcript';
+			var variant_1 = { af1000G: ".0005" };
+			var variant_2 = { af1000G: ".05" };
+			var variant_3 = { af1000G: 0 };
+			var vcfData = { features: [variant_1, variant_2, variant_3] };
+			variantModel._determineVariantAfLevels(vcfData, transcript);
+			expect(variant_1.af1000glevel).toEqual('af1000g_rare');
+			expect(variant_1.af1000glevels).toEqual({ 'af1000g_superrare': 'af1000g_superrare', 'af1000g_rare': 'af1000g_rare'});
+			expect(variant_2.af1000glevel).toEqual('af1000g_uncommon');
+			expect(variant_2.af1000glevels).toEqual({ 'af1000g_uncommon': 'af1000g_uncommon' });
+			expect(variant_3.af1000glevel).toEqual('af1000g_rare');
+			expect(variant_3.af1000glevels).toEqual({
+				'af1000g_unique': 'af1000g_unique',
+				'af1000g_uberrare': 'af1000g_uberrare',
+				'af1000g_superrare': 'af1000g_superrare',
+				'af1000g_rare': 'af1000g_rare'
+			});
+		});
+	});
 });

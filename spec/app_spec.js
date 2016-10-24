@@ -1,5 +1,5 @@
 describe('app', function() {
-	fdescribe('#getCodingRegions', function() {
+	describe('#getCodingRegions', function() {
 		it('returns an array of coding regions when the transcript_id is not cached', function() {
 			transcriptCodingRegions = {};
 			var variants = [
