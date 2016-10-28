@@ -233,12 +233,16 @@ DataCard.prototype.loadMygene2Data = function() {
 
 	var loadProband = function(vcfFilePath) {
 
-		var probandUrl = vcfFilePath  != null 
-							? "http://" + serverInstance + vcfFilePath 
-							: "https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz";
-		var variantCardName = vcfFilePath ? "Variants" : "DEMO DATA";
-
-		me.setVcfUrl("proband", variantCardName, probandUrl);
+		if (vcfFilePath != null) {
+			var probandUrl = "http://" + serverInstance + vcfFilePath;
+			me.setVcfUrl("proband", "Variants", sampleName, probandUrl);
+		} else {
+			// Load full demo wgs trio data if vcf file path was not provided via mygene2 data exchange
+			me.mode = "trio";
+			me.setVcfUrl("proband", "DEMO DATA", me.demoSampleNames.proband, me.demoUrls.proband);
+			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
+			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
+		}
 
 		var genes = getUrlParameter("genes");
 		if (genes != null && genes.length > 0) {
@@ -993,7 +997,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 
 
-DataCard.prototype.setVcfUrl = function(relationship, name, vcfUrl) {
+DataCard.prototype.setVcfUrl = function(relationship, name, sampleName, vcfUrl) {
 	var me = this;
 	
 	var variantCard = getVariantCard(relationship);
@@ -1002,6 +1006,7 @@ DataCard.prototype.setVcfUrl = function(relationship, name, vcfUrl) {
 	variantCard.setVariantCardLabel();
 	variantCard.showDataSources(name);
 	variantCard.onVcfUrlEntered(vcfUrl, function(success, sampleNames) {
+		variantCard.setSampleName(sampleName);
 	});
 }
 DataCard.prototype.setDataSourceName = function(panelSelector) {	
