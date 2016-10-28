@@ -35,6 +35,8 @@ vcfiobio = function module() {
   var regionIndex = 0;
   var stream = null;
 
+  var header = null;
+
 
   var refLengths_GRCh37 =
   {
@@ -184,6 +186,7 @@ var effectCategories = [
         success = true;
       }
       if (success && buffer.length > 0) {
+        header = buffer;
         callback(success);
       }
     });
@@ -201,6 +204,14 @@ var effectCategories = [
     });
 
     cmd.run();
+  }
+
+
+  exports.getBuildFromHeader = function() {
+    var me = this;
+    me.getReferenceLengths(function(refData) {
+      
+    })
   }
 
   exports.ignoreErrorMessage = function(error) {
@@ -359,23 +370,64 @@ var effectCategories = [
   }
 
 
-  exports.getReferenceNames = function(callback) {
-      vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
-        var tbiIdx = tbiR;
 
-        var refNames = [];
-        refNames.length = 0;
-
-        for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
-          var ref   = tbiIdx.idxContent.head.names[i];
-          refNames.push(ref);
-        }
-        callback(refNames);
-      });
+  exports.getReferenceLengths = function(callback) {
+    if (sourceType == SOURCE_TYPE_URL) {
+      this._getRemoteReferenceLengths(callback);
+    } else {
+      this._getLocalReferenceLengths(callback);
+    }
   }
 
 
-  exports.loadRemoteIndex = function(callback, callbackError) {
+
+
+  exports._getLocalReferenceLengths = function(callback, callbackError) {
+    var me = this;
+ 
+    vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
+      var tbiIdx = tbiR;
+      refDensity.length = 0;
+
+      if (tbiIdx.idxContent.head.n_ref == 0) {
+        var errorMsg = "Invalid index file.  The number of references is set to zero.  Try recompressing the vcf with bgzip and regenerating the index with tabix."
+        if (callbackError) {
+          callbackError(errorMsg);
+        }
+        console.log(errorMsg);
+        return;
+      }
+
+      var referenceNames = [];
+      for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
+        var ref   = tbiIdx.idxContent.head.names[i];
+        referenceNames.push(ref);
+      }      
+
+      for (var i = 0; i < referenceNames.length; i++) {
+        var ref   = referenceNames[i];
+
+        var indexseq = tbiIdx.idxContent.indexseq[i];
+        var calcRefLength = indexseq.n_intv * size16kb;
+
+
+        // Load the reference density data.  Exclude reference if 0 points.
+        refData.push( {"name": ref, "refLength": calcRefLength, "idx": i});
+      }
+
+      // Sort ref data so that refs are ordered numerically
+      refData = me.sortRefData(refData);
+    
+      if (callback) {
+        callback(refData);
+      }
+    
+    });
+
+  }
+
+
+  exports._getRemoteReferenceLengths = function(callback, callbackError) {
     var me = this;
     var buffer = "";
     var refName;
@@ -393,6 +445,12 @@ var effectCategories = [
 
       data = buffer + data;
 
+    })
+
+    // All data has been streamed.
+    cmd.on('end', function() {
+
+
       var recs = data.split("\n");
       if (recs.length > 0) {
         for (var i=0; i < recs.length; i++)  {
@@ -402,14 +460,13 @@ var effectCategories = [
 
           var success = true;
           if ( recs[i][0] == '#' ) {
-          var tokens = recs[i].substr(1).split("\t");
+            var tokens = recs[i].substr(1).split("\t");
             if (tokens.length >= 3) {
               var refNamePrev = refName;
               refIndex = tokens[0];
               refName = tokens[1];
 
               var calcRefLength = tokens[2];
-              var refLength = refLengths_GRCh37[me.stripChr(refName)];
               if (refLength == null) {
                  refLength = calcRefLength;
               }
@@ -418,12 +475,9 @@ var effectCategories = [
               // data we have loaded so far.
               if (refData.length > 0) {
                 var refDataPrev = refData[refData.length - 1];
-                me.zeroFillPointData(refDataPrev);
-
               }
 
-              refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "calcRefLength": +calcRefLength, "idx": +refIndex});
-              refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};
+              refData.push({"name": refName,  "refLength": +calcRefLength, "idx": +refIndex});
 
 
             } else {
@@ -431,22 +485,7 @@ var effectCategories = [
             }
           }
           else {
-             if (recs[i] != "") {
-                if (refDensity[refName] == null) {
-                  //console.log("Invalid reference " + refName + " for point data " + recs[i]);
-                  success = false;
-                } else {
-                  var fields = recs[i].split("\t");
-                  if (fields.length >= 2) {
-                    var point = [ parseInt(fields[0]), parseInt(fields[1]) ];
-                    refDensity[refName].points.push(point);
-                    refDensity[refName].intervalPoints.push(point);
-                  } else {
-                    success = false;
-                  }
-                }
-
-             }
+            // We only care about getting the reference lengths, not the density data
           }
           if (success) {
             buffer = "";
@@ -458,12 +497,6 @@ var effectCategories = [
         buffer += data;
       }
 
-
-
-    })
-
-    // All data has been streamed.
-    cmd.on('end', function() {
       // sort refData so references or ordered numerically
       refData = me.sortRefData(refData);
 
@@ -472,7 +505,6 @@ var effectCategories = [
       // for the last reference that was loaded
       if (refData.length > 0) {
         var refDataPrev = refData[refData.length - 1];
-        me.zeroFillPointData(refDataPrev);
       }
       if (callback) {
         callback(refData);
@@ -495,30 +527,6 @@ var effectCategories = [
 
   };
 
-
-
-  exports.zeroFillPointData = function(refObject) {
-
-        var refDensityObject = refDensity[refObject.name];
-
-        // If we have sparse data, keep track of these regions
-        var realPointCount = 0;
-        refDensityObject.points.forEach( function (point) {
-          if (point[1] > 0) {
-            realPointCount++;
-          }
-        });
-        if (realPointCount < 100) {
-          refObject.sparsePointData = [];
-          refDensityObject.points.forEach( function (point) {
-          if (point[1] > 0) {
-            refObject.sparsePointData.push( {pos: point[0], depth: point[1]});
-          }
-        });
-        }
-
-
-  };
 
 
   exports.sortRefData = function(refData) {

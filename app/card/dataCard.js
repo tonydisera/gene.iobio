@@ -1,6 +1,9 @@
 function DataCard() {
 	this.species = 'homo_sapiens';
 	this.build   = 'GRCh37';
+	this.speciesList = [];
+	this.buildMap = {};
+
 	this.defaultNames = {
 		proband: 'NA12878',
 		mother:  'NA12892',
@@ -387,6 +390,100 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 }
 
+DataCard.prototype.loadSpeciesAndBuilds = function() {
+	var me = this;
+    $.ajax({
+        url: genomeBuildServer,
+        jsonp: "callback",
+		type: "GET",
+		dataType: "jsonp",
+        error: function( xhr, status, errorThrown ) {
+		        
+		        console.log( "Error: " + errorThrown );
+		        console.log( "Status: " + status );
+		        console.log( xhr );
+		},
+        success: function(allSpecies) {
+        	
+        	allSpecies.forEach(function(species) {
+        		me.speciesList.push({name: species.name, value: species.latin_name});
+        		species.genomeBuilds.forEach(function(genomeBuild) {
+        			var builds = me.buildMap[species.latin_name];
+        			if (builds == null) {
+        				builds = [];
+        				me.buildMap[species.latin_name] = builds;
+        			}
+        			builds.push(genomeBuild);
+        		})
+        	})
+			$('#select-species').selectize(
+				{	
+					create: true, 			
+					valueField: 'value',
+			    	labelField: 'name',
+			    	searchField: ['name'],
+			    	maxItems: 1,
+			    	options: me.speciesList,
+			    	onChange: function(value) {
+				        if (!value.length) return;
+				        me.species = value;
+				        var selectizeBuild = $('#select-build')[0].selectize;
+				        selectizeBuild.disable();
+				        selectizeBuild.clearOptions();
+				        selectizeBuild.load(function(callback) {
+				        	selectizeBuild.enable();
+				        	callback(me.buildMap[value]);
+				        });
+				    }
+		    	}
+			);
+			$('#select-build').selectize(
+				{
+					create: true, 			
+					valueField: 'name',
+			    	labelField: 'name',
+			    	searchField: ['name'],
+			    	onChange: function(value) {
+			    		if (!value.length) return;
+			    		me.build = value;
+
+			    		me.getBuildFromData(function(buildInfo) {
+			    			console.log("build info returned = " + buildInfo);
+			    		});
+
+			    		// TODO:  get geneinfo for selected gene, validate that compatible
+			    		// genome build according to vcf and bam headers was selected.
+			    	}
+		    	}
+			);
+
+        }
+    });
+
+}
+
+DataCard.prototype.getBuildFromData = function(callback) {
+	var buildInfo = {};
+	var cardCount = 0;
+	variantCards.forEach(function(variantCard) {
+		if (variantCard.model.bam) {
+			var buildName = variantCard.model.bam.getBuildFromHeader(function(buildName) {
+				buildInfo[buildName] = buildName;
+				cardCount++;
+				if (cardCount == variantCards.length) {
+					callback(buildInfo);
+				}
+
+			});
+		} else {
+			cardCount++;
+			if (cardCount == variantCards.length) {
+				callback(buildInfo);
+			}
+		}
+	});
+}
+
 
 DataCard.prototype.init = function() {
 	var me = this;
@@ -394,7 +491,7 @@ DataCard.prototype.init = function() {
 	if (this.isLevelEdu) {
 		this.demoNames
 	}
-
+	me.loadSpeciesAndBuilds();
 	$('#proband-data').append(dataCardEntryTemplate());
 	$('#proband-data #vcf-sample-select').selectize(
 		{ 

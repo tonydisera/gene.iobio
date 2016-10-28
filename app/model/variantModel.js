@@ -1508,8 +1508,8 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcri
     // by range.  
     theVcfData.features.forEach(function(variant) {
     	// For ExAC levels, differentiate between af not found and in 
-    	// coding region (level = private) and af not found and intronic (non-coding) 
-    	// region (level = unknown)
+    	// coding region (level = private, 0% freq) and af not found and intronic (non-coding) 
+    	// region (level = -100, not applicable because intronic)
     	if (variant.afExAC == 0) {
         	getCodingRegions(transcript).forEach(function(codingRegion) {
         		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			

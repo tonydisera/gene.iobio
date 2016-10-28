@@ -112,6 +112,19 @@ var Bam = Class.extend({
     }
   },
 
+  getBuildFromHeader: function(callback) {
+    // @SQ  SN:1  LN:249250621  M5:1b22b98cdeb4a9304cb5d48026a85128 
+    // UR:ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz 
+    // AS:NCBI37 
+    // SP:Human
+    this.getHeader(function(header) {
+      console.log("bam header: " + header.buildAlias);
+      callback({species: header.species, buildAlias: header.buildAlias});
+    });
+
+
+  },
+
 
 
   ignoreErrorMessage: function(error) {
@@ -351,6 +364,8 @@ var Bam = Class.extend({
               fHash[ values[0] ] = values[1]
             })
             header.sq.push({name:fHash["SN"], end:1+parseInt(fHash["LN"])});
+            header.species = fHash["SP"];
+            header.buildAlias = fHash["AS"];
          }
       }
       this.header = header;
