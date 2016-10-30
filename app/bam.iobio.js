@@ -118,8 +118,7 @@ var Bam = Class.extend({
     // AS:NCBI37 
     // SP:Human
     this.getHeader(function(header) {
-      console.log("bam header: " + header.buildAlias);
-      callback({species: header.species, buildAlias: header.buildAlias});
+      callback({species: header.species, build: header.assembly});
     });
 
 
@@ -365,7 +364,7 @@ var Bam = Class.extend({
             })
             header.sq.push({name:fHash["SN"], end:1+parseInt(fHash["LN"])});
             header.species = fHash["SP"];
-            header.buildAlias = fHash["AS"];
+            header.assembly = fHash["AS"];
          }
       }
       this.header = header;

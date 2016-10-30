@@ -443,7 +443,7 @@ var effectCategories = [
         return;
       }
 
-      data = buffer + data;
+      buffer += data;
 
     })
 
@@ -451,7 +451,7 @@ var effectCategories = [
     cmd.on('end', function() {
 
 
-      var recs = data.split("\n");
+      var recs = buffer.split("\n");
       if (recs.length > 0) {
         for (var i=0; i < recs.length; i++)  {
           if (recs[i] == undefined) {
@@ -465,11 +465,7 @@ var effectCategories = [
               var refNamePrev = refName;
               refIndex = tokens[0];
               refName = tokens[1];
-
-              var calcRefLength = tokens[2];
-              if (refLength == null) {
-                 refLength = calcRefLength;
-              }
+              var refLength = tokens[2];
 
               // Zero fill the previous reference point data and callback with the
               // data we have loaded so far.
@@ -477,7 +473,7 @@ var effectCategories = [
                 var refDataPrev = refData[refData.length - 1];
               }
 
-              refData.push({"name": refName,  "refLength": +calcRefLength, "idx": +refIndex});
+              refData.push({"name": refName,  "refLength": +refLength, "idx": +refIndex});
 
 
             } else {

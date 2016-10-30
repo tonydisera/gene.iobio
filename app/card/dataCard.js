@@ -2,7 +2,9 @@ function DataCard() {
 	this.species = 'homo_sapiens';
 	this.build   = 'GRCh37';
 	this.speciesList = [];
-	this.buildMap = {};
+	this.speciesNameToSpecies = {}; // map species name to the species object
+	this.speciesToBuilds = {};      // map species to its genome builds
+	this.buildNameToBuild = {};     // map genome build name to the full genome build object
 
 	this.defaultNames = {
 		proband: 'NA12878',
@@ -410,14 +412,25 @@ DataCard.prototype.loadSpeciesAndBuilds = function() {
         success: function(allSpecies) {
         	
         	allSpecies.forEach(function(species) {
+        		// Map the species latin name to its species object
+        		me.speciesNameToSpecies[species.latin_name] = species;
+
+        		// Collect all species into a list to use for dropdown
         		me.speciesList.push({name: species.name, value: species.latin_name});
+
         		species.genomeBuilds.forEach(function(genomeBuild) {
-        			var builds = me.buildMap[species.latin_name];
+
+        			// Map the build name to its build object
+        			me.buildNameToBuild[genomeBuild.name] = genomeBuild;
+
+        			// Map the species to its genome builds
+        			var builds = me.speciesToBuilds[species.latin_name];
         			if (builds == null) {
         				builds = [];
-        				me.buildMap[species.latin_name] = builds;
+        				me.speciesToBuilds[species.latin_name] = builds;
         			}
         			builds.push(genomeBuild);
+        		
         		})
         	})
 			$('#select-species').selectize(
@@ -427,62 +440,261 @@ DataCard.prototype.loadSpeciesAndBuilds = function() {
 			    	labelField: 'name',
 			    	searchField: ['name'],
 			    	maxItems: 1,
-			    	options: me.speciesList,
-			    	onChange: function(value) {
-				        if (!value.length) return;
-				        me.species = value;
-				        var selectizeBuild = $('#select-build')[0].selectize;
-				        selectizeBuild.disable();
-				        selectizeBuild.clearOptions();
-				        selectizeBuild.load(function(callback) {
-				        	selectizeBuild.enable();
-				        	callback(me.buildMap[value]);
-				        });
-				    }
+			    	options: me.speciesList
 		    	}
 			);
+			me.addSpeciesListener();
 			$('#select-build').selectize(
 				{
 					create: true, 			
 					valueField: 'name',
 			    	labelField: 'name',
-			    	searchField: ['name'],
-			    	onChange: function(value) {
-			    		if (!value.length) return;
-			    		me.build = value;
-
-			    		me.getBuildFromData(function(buildInfo) {
-			    			console.log("build info returned = " + buildInfo);
-			    		});
-
-			    		// TODO:  get geneinfo for selected gene, validate that compatible
-			    		// genome build according to vcf and bam headers was selected.
-			    	}
+			    	searchField: ['name']
 		    	}
 			);
-
+			me.addBuildListener();
+			me.setDefaultBuildFromData();
         }
     });
 
 }
 
-DataCard.prototype.getBuildFromData = function(callback) {
-	var buildInfo = {};
+DataCard.prototype.removeSpeciesListener = function() {
+	if ($('#select-species')[0].selectize) {
+		$('#select-species')[0].selectize.off('change');
+	}
+}
+
+DataCard.prototype.addSpeciesListener = function() {
+	var me = this;
+	if ($('#select-species')[0].selectize) {
+		$('#select-species')[0].selectize.on('change', function(value) {
+	        if (!value.length) {
+	        	return;
+	        }
+	        me.species = value;
+	        var selectizeBuild = $('#select-build')[0].selectize;
+	        selectizeBuild.disable();
+	        selectizeBuild.clearOptions();
+	        selectizeBuild.load(function(callback) {
+	        	selectizeBuild.enable();
+	        	callback(me.speciesToBuilds[value]);
+	        });
+	    });
+	}
+
+}
+
+
+DataCard.prototype.removeBuildListener = function() {
+	if ($('#select-build')[0].selectize) {
+		$('#select-build')[0].selectize.off('change');
+	}
+
+}
+
+DataCard.prototype.addBuildListener = function() {
+	var me = this;
+	if ($('#select-build')[0].selectize) {
+	    $('#select-build')[0].selectize.on('change', function(value) {
+			if (!value.length) {
+				return;
+			}
+			me.build = value;
+			me.validateBuildFromData(function(success, message) {
+				if (success) {
+					$('#species-build-warning').addClass("hide");
+					window.enableLoadButton();
+				} else {
+					$('#species-build-warning').html(message);
+					$('#species-build-warning').removeClass("hide");
+					window.disableLoadButton();
+				}
+			});
+			// TODO:  get geneinfo for selected gene, validate that compatible
+			// genome build according to vcf and bam headers was selected.
+		});
+	}
+
+}
+
+
+DataCard.prototype.setDefaultBuildFromData = function() {
+	var me = this;
+	if ($('#select-species')[0].selectize && $('#select-build')[0].selectize) {
+		me.getAggregateBuildFromData(function(aggregate) {
+			if (aggregate.length == 0) {
+
+			} else if (aggregate.length == 1) {			
+				var buildInfo = aggregate[0];
+				me.removeBuildListener();
+				$('#select-species')[0].selectize.setValue(buildInfo.species.latin_name);
+				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
+				me.addBuildListener();		
+			} 
+		});		
+	}
+
+}
+
+DataCard.prototype.validateBuildFromData = function(callback) {
+	var me = this;
+	me.getAggregateBuildFromData(function(aggregate) {
+		if (aggregate.length == 0) {
+			callback(true);
+
+		} else if (aggregate.length == 1) {
+			var buildInfo = aggregate[0];
+			if (me.species == buildInfo.species.latin_name && me.build == buildInfo.build.name) {
+				callback(true);
+			} else {
+				callback(false, 'Incompatible build. Data files specify the genome build ' + buildInfo.species.name + ' ' + buildInfo.build.name);
+			}
+		} else {
+			var message = "Imcompatible builds in files.";
+			aggregate.forEach(function(buildInfo) {
+				message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
+				var fromCount = 0;
+				buildInfo.from.forEach(function(fileInfo) {
+					if (fromCount > 0) {
+						message += ", ";
+					}
+					message += fileInfo.relationship + " " + fileInfo.type;
+					fromCount++;
+				});
+				message += ".";
+			});
+			callback(false, message);
+		}
+	});
+}
+
+/*
+  Look at all of the bams and vcfs and determine the species and builds.
+  The aggregate object is an array of all species/build combos found
+  in the headers.
+  When all files are consistent, there will be one row in the aggregate array:
+  	[{species: homo_sapiens, build: GRCh37}]
+
+  When there are there are different species or builds in headers, the aggregate will
+  container more than one row
+    [{species: homo_sapiens, build: GRCh37},
+     {species: homo_sapiens, build: GRCh38}]
+
+*/
+DataCard.prototype.getAggregateBuildFromData = function(callback) {
+	var me = this;
+	var aggregate = [];
+
+	// First review all of the bams
+	var bamCount = 0;
+	me.getBuildFromBams(function(bamBuilds) {
+		for (relationship in bamBuilds) {
+			var buildInfo = bamBuilds[relationship];
+			if (buildInfo == null || buildInfo.species == null || buildInfo.build == null) {
+
+			} else {
+				var speciesBuild = me.getProperSpeciesAndBuild(buildInfo);
+				if (aggregate.length == 0) {
+					// TODO:  Need to indicate which data files (proband-bam, mother-bam, father-vcf, etc)
+					// that have this build
+					aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: 'bam', relationship: relationship}]});
+				} else {
+					var foundAggregate = null;
+					aggregate.forEach(function(aggregateSpeciesBuild) {
+						if (aggregateSpeciesBuild.species == speciesBuild.species && aggregateSpeciesBuild.build == speciesBuild.build) {
+							foundAggregate = aggregateSpeciesBuild;
+						}
+					});
+					if (foundAggregate) {
+						from = foundAggregate.from;
+						from.push({type: 'bam', relationship: relationship});
+
+					} else {
+						aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: 'bam', relationship: relationship}]});
+
+					}
+
+				}
+			}
+			bamCount++;
+			if (bamCount == Object.keys(bamBuilds).length) {
+				callback(aggregate);
+				// Now we look at all of the vcf files
+			}
+		}
+
+	});	
+}
+
+/*
+	Given the species and build names in the file header, try to find the corresponding
+	species and genome build based on matching the header names to the names (name, binomialName, latin_name)
+	of the species and the names (name and aliases) of genome build. 
+*/
+DataCard.prototype.getProperSpeciesAndBuild = function(buildInfo) {
+	var me = this;
+	var matchedSpecies = null;
+	var matchedBuild = null;
+
+	if (buildInfo != null) {
+		// If the bam header provided a species, make sure it matches the
+		// selected species name (or latin or binomial name).
+		if (buildInfo.species) {
+			for (speciesName in me.speciesNameToSpecies) {
+				if (!matchedSpecies) {
+					var species = me.speciesNameToSpecies[speciesName];
+					if (species.name == buildInfo.species || species.binomialName == buildInfo.species || species.latin_name ==  buildInfo.species ) {
+						matchedSpecies = species;
+					} 					
+				}
+			} 
+		}
+
+		// Make sure each bam has a build that matches the selected
+		// build name or one of its aliases
+		if (matchedSpecies) {
+			if (buildInfo.build) {
+				species.genomeBuilds.forEach(function(build) {
+					if (!matchedBuild) {
+						if (build.name == buildInfo.build) {
+							matchedBuild = build;
+						} else {
+							build.aliases.forEach(function(gbAlias) {
+								if (gbAlias.alias == buildInfo.build) {
+									matchedBuild = build;
+								}
+							})
+						}																
+					}
+				})
+							
+			} 
+		}
+	}
+	return {species: matchedSpecies, build: matchedBuild};
+
+
+}
+
+DataCard.prototype.getBuildFromBams = function(callback) {
+	var bamBuilds = {};
 	var cardCount = 0;
 	variantCards.forEach(function(variantCard) {
 		if (variantCard.model.bam) {
-			var buildName = variantCard.model.bam.getBuildFromHeader(function(buildName) {
-				buildInfo[buildName] = buildName;
+			variantCard.model.bam.getBuildFromHeader(function(buildInfo) {
+				bamBuilds[variantCard.getRelationship()] = buildInfo;
 				cardCount++;
 				if (cardCount == variantCards.length) {
-					callback(buildInfo);
+					callback(bamBuilds);
 				}
 
 			});
 		} else {
 			cardCount++;
+			bamBuilds[variantCard.getRelationship()] = null;
 			if (cardCount == variantCards.length) {
-				callback(buildInfo);
+				callback(bamBuilds);
 			}
 		}
 	});
@@ -654,6 +866,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 
 
 DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
+	this.setDefaultBuildFromData();
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}

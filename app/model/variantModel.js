@@ -578,64 +578,36 @@ VariantModel.prototype._promiseVcfRefName = function(ref) {
 			}
 		} else {
 			me.vcfRefNamesMap = {};
-			if (me.vcf.isFile()) {
-				me.vcf.getReferenceNames(function(refNames) {
-					var foundRef = false;
-					refNames.forEach( function(refName) {					
-			    		
-				 		if (refName == theRef) {
-				 			me.getVcfRefName = me._getRefName;
-				 			foundRef = true;
-				 		} else if (refName == me._stripRefName(theRef)) {
-				 			me.getVcfRefName = me._stripRefName;
-				 			foundRef = true;
-				 		}
-	
-			    	});
-			    	// Load up a lookup table.  We will use me for validation when
-			    	// a new gene is loaded to make sure the ref exists.
-			    	if (foundRef) {
-			    		refNames.forEach( function(refName) {
-			    			var theRefName = me.getVcfRefName(refName);
-			    			me.vcfRefNamesMap[theRefName] = refName; 
-			    		});
-			    		resolve();
-			    	} else  {
+			me.vcf.getReferenceLengths(function(refData) {
+				var foundRef = false;
+				refData.forEach( function(refObject) {		
+					var refName = refObject.name;			
+		    		
+			 		if (refName == theRef) {
+			 			me.getVcfRefName = me._getRefName;
+			 			foundRef = true;
+			 		} else if (refName == me._stripRefName(theRef)) {
+			 			me.getVcfRefName = me._stripRefName;
+			 			foundRef = true;
+			 		}
 
-			    	// If we didn't find the matching ref name, show a warning.
-						reject();
-					}
-
-				});
-
-			} else {
-
-				me.vcf.loadRemoteIndex(function(refData) {
-					var foundRef = false;
-			    	refData.forEach( function(ref) {
-				 		if (ref.name == theRef) {
-				 			me.getVcfRefName = me._getRefName;
-				 			foundRef = true;
-				 		} else if (ref.name == me._stripRefName(theRef)) {
-				 			me.getVcfRefName = me._stripRefName;
-				 			foundRef = true;
-				 		}
-			    	});
-			    	// Load up a lookup table.  We will use me for validation when
-			    	// a new gene is loaded to make sure the ref exists.
-			    	if (foundRef) {
-			    		refData.forEach( function(ref) {
-			    			var theRefName = me.getVcfRefName(ref.name);
-			    			me.vcfRefNamesMap[theRefName] = ref.name; 
-			    		});
-			    		resolve();
-
-			    	} else {
-			    		reject();
-					} 
-		    	}, function(error) {
 		    	});
-			} 		
+		    	// Load up a lookup table.  We will use me for validation when
+		    	// a new gene is loaded to make sure the ref exists.
+		    	if (foundRef) {
+		    		refData.forEach( function(refObject) {
+		    			var refName = refObject.name;
+		    			var theRefName = me.getVcfRefName(refName);
+		    			me.vcfRefNamesMap[theRefName] = refName; 
+		    		});
+		    		resolve();
+		    	} else  {
+
+		    	// If we didn't find the matching ref name, show a warning.
+					reject();
+				}
+
+			});
 		}
 	});
 
