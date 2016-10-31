@@ -207,10 +207,16 @@ var effectCategories = [
   }
 
 
-  exports.getBuildFromHeader = function() {
+  exports.getBuildFromHeader = function(callback) {
     var me = this;
     me.getReferenceLengths(function(refData) {
-      
+      var buildInfo = {species: null, build: null, references: {}};
+      refData.forEach(function(refObject) {
+        buildInfo.references[refObject.name] = refObject.refLength;
+      });
+      if (callback) {
+        callback(buildInfo);
+      } 
     })
   }
 
@@ -372,7 +378,7 @@ var effectCategories = [
 
 
   exports.getReferenceLengths = function(callback) {
-    if (sourceType == SOURCE_TYPE_URL) {
+    if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase()) {
       this._getRemoteReferenceLengths(callback);
     } else {
       this._getLocalReferenceLengths(callback);

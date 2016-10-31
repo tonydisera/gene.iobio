@@ -1086,6 +1086,9 @@ function loadGeneFromUrl() {
 			}
 			dataCard.loadDemoData();
 		} else {
+			// If a gene wasn't provided, go ahead and just set the data sources, etc for
+			// other url parameters.
+			loadUrlSources();
 			showSidebar("Help");
 		}
 	

@@ -574,31 +574,46 @@ DataCard.prototype.validateBuildFromData = function(callback) {
   The aggregate object is an array of all species/build combos found
   in the headers.
   When all files are consistent, there will be one row in the aggregate array:
-  	[{species: homo_sapiens, build: GRCh37}]
+  	[{species: homo_sapiens, build: GRCh37, from: [array_of_all_bams_and_probands]}]
 
   When there are there are different species or builds in headers, the aggregate will
   container more than one row
-    [{species: homo_sapiens, build: GRCh37},
-     {species: homo_sapiens, build: GRCh38}]
+    [{species: homo_sapiens, build: GRCh37, from:[type:bam, relationship: 'proband']},
+     {species: homo_sapiens, build: GRCh38, from[type:vcf, relationship: 'proband']}
+    ]
 
 */
 DataCard.prototype.getAggregateBuildFromData = function(callback) {
 	var me = this;
-	var aggregate = [];
 
 	// First review all of the bams
-	var bamCount = 0;
-	me.getBuildFromBams(function(bamBuilds) {
-		for (relationship in bamBuilds) {
-			var buildInfo = bamBuilds[relationship];
-			if (buildInfo == null || buildInfo.species == null || buildInfo.build == null) {
+	me.getBuildFromBams(function(buildInfos) {
+		var aggregate = [];
+		me.parseBuildInfos(buildInfos, 'bam', aggregate);
 
-			} else {
-				var speciesBuild = me.getProperSpeciesAndBuild(buildInfo);
+		// Now review all of the vcfs
+		me.getBuildFromVcfs(function(buildInfos) {
+			me.parseBuildInfos(buildInfos, 'vcf', aggregate);
+			callback(aggregate);
+		})
+	});	
+}
+
+DataCard.prototype.parseBuildInfos = function(buildInfos, type, aggregate) {
+	var me = this;
+	for (relationship in buildInfos) {			
+
+		var buildInfo = buildInfos[relationship];
+		if (buildInfo == null || (buildInfo.species == null && buildInfo.build == null && (buildInfo.references == null || Object.keys(buildInfo.references).length == 0))) {
+			// We don't have any information in the file to find the species and build
+		} else {
+			// We have build info from the file.  Now try to match it to a known species and build
+			var speciesBuild = me.getProperSpeciesAndBuild(buildInfo);
+			if (speciesBuild.species && speciesBuild.build) {
 				if (aggregate.length == 0) {
 					// TODO:  Need to indicate which data files (proband-bam, mother-bam, father-vcf, etc)
 					// that have this build
-					aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: 'bam', relationship: relationship}]});
+					aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: type, relationship: relationship}]});
 				} else {
 					var foundAggregate = null;
 					aggregate.forEach(function(aggregateSpeciesBuild) {
@@ -608,23 +623,17 @@ DataCard.prototype.getAggregateBuildFromData = function(callback) {
 					});
 					if (foundAggregate) {
 						from = foundAggregate.from;
-						from.push({type: 'bam', relationship: relationship});
+						from.push({type: type, relationship: relationship});
 
 					} else {
-						aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: 'bam', relationship: relationship}]});
-
+						aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: type, relationship: relationship}]});
 					}
 
-				}
+				}				
 			}
-			bamCount++;
-			if (bamCount == Object.keys(bamBuilds).length) {
-				callback(aggregate);
-				// Now we look at all of the vcf files
-			}
-		}
 
-	});	
+		}
+	}
 }
 
 /*
@@ -651,11 +660,16 @@ DataCard.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 			} 
 		}
 
+		// For now, just default to Human if species can't be determined from file headers
+		if (!matchedSpecies) {
+			matchedSpecies = me.speciesNameToSpecies["homo_sapiens"];
+		}
+
 		// Make sure each bam has a build that matches the selected
 		// build name or one of its aliases
 		if (matchedSpecies) {
 			if (buildInfo.build) {
-				species.genomeBuilds.forEach(function(build) {
+				matchedSpecies.genomeBuilds.forEach(function(build) {
 					if (!matchedBuild) {
 						if (build.name == buildInfo.build) {
 							matchedBuild = build;
@@ -669,7 +683,43 @@ DataCard.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 					}
 				})
 							
-			} 
+			} else {
+				// If a build wasn't specified, try to match to a genome build based on reference lengths
+				matchedSpecies.genomeBuilds.forEach(function(build) {
+					if (!matchedBuild) {
+						var matchedCount = 0;
+						var notMatchedCount = 0;
+						var notFoundCount = 0;
+						build.references.forEach(function(reference) {
+							var refLength = null;
+							if (buildInfo.references[reference.name]) {
+								refLength = buildInfo.references[reference.name];
+							} else if (buildInfo.references[reference.alias]) {
+								refLength = buildInfo.references[reference.name];
+							}
+							if (refLength && refLength == reference.length) {
+								matchedCount++;
+							} else if (refLength && refLength == reference.length - 1) {
+								matchedCount++;
+							} else if (refLength && refLength == reference.length + 1) {
+								matchedCount++;
+							} else if (refLength && refLength != reference.length) {
+								notMatchedCount++;
+							} else {
+								notFoundCount++;
+							}
+						});
+						if (build.references.length == matchedCount) {
+							matchedBuild = build;
+						} else if (matchedCount > 0 && notMatchedCount == 0 && notFoundCount == 0) {
+							matchedBuild = build;
+						}
+
+					}
+
+				})
+
+			}
 		}
 	}
 	return {species: matchedSpecies, build: matchedBuild};
@@ -678,28 +728,52 @@ DataCard.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 }
 
 DataCard.prototype.getBuildFromBams = function(callback) {
-	var bamBuilds = {};
+	var buildInfos = {};
 	var cardCount = 0;
 	variantCards.forEach(function(variantCard) {
 		if (variantCard.model.bam) {
 			variantCard.model.bam.getBuildFromHeader(function(buildInfo) {
-				bamBuilds[variantCard.getRelationship()] = buildInfo;
+				buildInfos[variantCard.getRelationship()] = buildInfo;
 				cardCount++;
 				if (cardCount == variantCards.length) {
-					callback(bamBuilds);
+					callback(buildInfos);
 				}
 
 			});
 		} else {
 			cardCount++;
-			bamBuilds[variantCard.getRelationship()] = null;
+			buildInfos[variantCard.getRelationship()] = null;
 			if (cardCount == variantCards.length) {
-				callback(bamBuilds);
+				callback(buildInfos);
 			}
 		}
 	});
 }
 
+
+
+DataCard.prototype.getBuildFromVcfs = function(callback) {
+	var buildInfos = {};
+	var cardCount = 0;
+	variantCards.forEach(function(variantCard) {
+		if (variantCard.model.vcf) {
+			variantCard.model.vcf.getBuildFromHeader(function(buildInfo) {
+				buildInfos[variantCard.getRelationship()] = buildInfo;
+				cardCount++;
+				if (cardCount == variantCards.length) {
+					callback(buildInfos);
+				}
+
+			});
+		} else {
+			cardCount++;
+			buildInfos[variantCard.getRelationship()] = null;
+			if (cardCount == variantCards.length) {
+				callback(buildInfos);
+			}
+		}
+	});
+}
 
 DataCard.prototype.init = function() {
 	var me = this;
@@ -866,7 +940,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 
 
 DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
-	this.setDefaultBuildFromData();
+	var me = this;
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -893,6 +967,8 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 		if (success) {
 			variantCard.setName(variantCard.getName());
 			window.updateUrl('bam' + cardIndex, bamUrl);
+			me.setDefaultBuildFromData();
+
 			enableLoadButton();			
 		} else {
 			window.disableLoadButton();

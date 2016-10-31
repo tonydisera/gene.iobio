@@ -118,7 +118,11 @@ var Bam = Class.extend({
     // AS:NCBI37 
     // SP:Human
     this.getHeader(function(header) {
-      callback({species: header.species, build: header.assembly});
+        var refLengthMap = {};
+        header.sq.forEach(function(ref) {
+          refLengthMap[ref.name] = ref.end;
+        })
+        callback({species: header.species, build: header.assembly, references: refLengthMap});        
     });
 
 
