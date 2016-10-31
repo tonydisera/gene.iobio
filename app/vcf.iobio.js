@@ -2160,7 +2160,7 @@ var effectCategories = [
     return annotValue;
   };
 
-  exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
+  exports.pileupVcfRecordsImproved = function(variants, regionStart, posToPixelFactor, widthFactor) {
     var pileup = pileupLayout().sort(null).size(800); // 1860
     var maxlevel = pileup(variants);
     return maxLevel;
@@ -2170,17 +2170,18 @@ var effectCategories = [
       widthFactor = widthFactor ? widthFactor : 1;
       // Variant's can overlap each over.  Set a field called variant.level which determines
       // how to stack the variants vertically in these cases.
-      var posLevels = [];
-      posLevels.length = 0;
+      var posLevels = {};
       var maxLevel = 0;
+      var posUnitsForEachVariant = posToPixelFactor * widthFactor;
       variants.forEach(function(variant) {
 
         // get next available vertical spot starting at level 0
-        var idx = (variant.start - regionStart);// + i;
+        var startIdx = (variant.start - regionStart);// + i;
         var posLevel = 0;
-        if (posLevels[idx] != undefined) {
-          for ( var k=0; k <= posLevels[idx].length; k++ ) {
-            if (posLevels[idx][k] == undefined) {
+        var stackAtStart = posLevels[startIdx];
+        if (stackAtStart) {
+          for (var k = 0; k <= stackAtStart.length; k++ ) {
+            if (stackAtStart[k] == undefined) {
               posLevel = k;
               break;
             }
@@ -2191,15 +2192,15 @@ var effectCategories = [
         variant.level = posLevel;
 
         // Now set new level for each positions comprised of this variant.
-        for (var i = 0; i < variant.len + (posToPixelFactor * widthFactor); i++) {
+        for (var i = 0; i < variant.len + posUnitsForEachVariant; i++) {
           var idx = (variant.start - regionStart) + i;
           var stack = posLevels[idx] || [];
           stack[variant.level] = true;
           posLevels[idx] = stack;
 
           // Capture the max level of the entire region.
-          if (posLevels[idx].length-1 > maxLevel) {
-            maxLevel = posLevels[idx].length - 1;
+          if (stack.length - 1 > maxLevel) {
+            maxLevel = stack.length - 1;
           }
         }
       });

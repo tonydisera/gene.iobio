@@ -19,7 +19,16 @@ module.exports = function(config) {
         'assets/js/**/*.js',
         'app/globalsDeployment.js',
         'app/globals.js',
-        'app/**/*.js',
+        'app/bam.iobio.js',
+        'app/eduTour.js',
+        'app/exhibit.js',
+        'app/legend.js',
+        'app/timeout.js',
+        'app/vcf.iobio.js',
+        'app/card/*.js',
+        'app/d3/*.js',
+        'app/app.js',
+        'app/model/*.js',
         'spec/spec_helpers/jasmine-jquery.js',
         'spec/spec_helpers/fixture.conf.js',
         'spec/spec_helpers/**/*',
@@ -30,13 +39,17 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-        'app/app.js',
+
     ],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+    },
+
+    proxies: {
+        '/templates': '/templates'
     },
 
     // test results reporter to use
