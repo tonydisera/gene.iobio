@@ -51,7 +51,7 @@ var loadedUrl = false;
 
 // Transcript data and chart
 var selectedTranscript = null;
-var transcriptCodingRegions = [];
+var transcriptCodingRegions = {};
 var transcriptChart =  null;
 var transcriptViewMode = "single";
 var transcriptMenuChart = null;
@@ -1467,29 +1467,22 @@ function getCanonicalTranscriptOld(theGeneObject) {
 }
 
 function getCodingRegions(transcript) {
-
-	if (transcript != null && transcript.features != null) {
+	if (transcript && transcript.features) {
 		var codingRegions = transcriptCodingRegions[transcript.transcript_id];
 		if (codingRegions) {
 			return codingRegions;
-		} else {
-			codingRegions = [];
-			transcript.features.forEach( function(feature) {
-				if (feature.feature_type == 'EXON' || feature.feature_type == 'CDS' || feature.feature_type == 'UTR') {
-					codingRegions.push({start: feature.start, end: feature.end});
-				}
-			});		
-			transcriptCodingRegions[transcript.transcript_id] = codingRegions;			return codingRegions;
-
 		}
-	} else {
-		return [];
+		codingRegions = [];
+		transcript.features.forEach( function(feature) {
+			if ($.inArray(feature.feature_type, ['EXON', 'CDS', 'UTR']) !== -1) {
+				codingRegions.push({ start: feature.start, end: feature.end });
+			}
+		});
+		transcriptCodingRegions[transcript.transcript_id] = codingRegions;
+		return codingRegions;
 	}
-
+	return [];
 }
-
-
-
 
 function hasDataSources() {
 	var hasDataSource = false;

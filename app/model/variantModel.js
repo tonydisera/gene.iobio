@@ -142,29 +142,25 @@ VariantModel.prototype.getDangerSummaryForGene = function(geneName) {
 }
 
 VariantModel.prototype.getVariantCount = function(data) {
-
 	var theVcfData = data != null ? data : this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData == null || theVcfData.features == null) {
-		return "0";
-	} else {
-		var loadedVariantCount = 0;
+	var loadedVariantCount = 0;
+	if (theVcfData && theVcfData.features) {
 		theVcfData.features.forEach(function(variant) {
-			if (variant.fbCalled && variant.fbCalled == 'Y') {
-	
-			} else if (variant.zygosity != null && variant.zygosity.toLowerCase() == "homref") {
-	
+			if (variant.fbCalled == 'Y') {
+
+			} else if (variant.zygosity && variant.zygosity.toLowerCase() == "homref") {
+
 			} else {
 				loadedVariantCount++;
-
 			}
 		});
-		return loadedVariantCount;
 	}
+	return loadedVariantCount;
 }
 
-VariantModel.summarizeDanger = function(geneName, theVcfData) {
-	dangerCounts = {};
-	if (theVcfData == null || theVcfData.features.length == null) {
+VariantModel.summarizeDanger = function(theVcfData) {
+	var dangerCounts = {};
+	if (theVcfData == null || theVcfData.features.length == 0) {
 		console.log("unable to summarize danger due to null data");
 		return dangerCounts;
 	}
@@ -175,70 +171,55 @@ VariantModel.summarizeDanger = function(geneName, theVcfData) {
 	var consequenceClasses = {};
 	var inheritanceClasses = {};
 	theVcfData.features.forEach( function(variant) {
-	    for (key in variant.highestImpactSnpeff ) {
-	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
-	    		var types = impactClasses[key];
-	    		if (types == null) {
-	    			types = {};
-	    		}
-	    		var effectObject = variant.highestImpactSnpeff[key];
-	    		types[variant.type] = effectObject; // key = effect, value = transcript id
-	    		impactClasses[key] = types;	
 
-	    	}
-	    }
-	    for (key in variant.highestImpactVep ) {
-	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge == true) {
-	    		var types = consequenceClasses[key];
-	    		if (types == null) {
-	    			types = {};
-	    		}
-	    		var consequenceObject = variant.highestImpactVep[key];
-	    		types[variant.type] = consequenceObject; // key = consequence, value = transcript id
-	    		consequenceClasses[key] = types;	
+    for (key in variant.highestImpactSnpeff) {
+    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+    		impactClasses[key] = impactClasses[key] || {};
+    		impactClasses[key][variant.type] = variant.highestImpactSnpeff[key]; // key = effect, value = transcript id
+    	}
+    }
 
-	    	}
-	    }
-	    for (key in variant.highestSIFT) {
-			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge == true) {
+    for (key in variant.highestImpactVep) {
+    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+    		consequenceClasses[key] = consequenceClasses[key] || {};
+    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
+    	}
+    }
+
+    for (key in variant.highestSIFT) {
+			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
 				var clazz = matrixCard.siftMap[key].clazz;
-				var order = matrixCard.siftMap[key].value;
-				var siftObject = {};
-				siftObject[key] = variant.highestSIFT[key];
-				var dangerSift = new Object();
-				dangerSift[clazz] = siftObject;
-				dangerCounts.SIFT = dangerSift;
+				dangerCounts.SIFT = {};
+				dangerCounts.SIFT[clazz] = {};
+				dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
 			}
-	    }
-	    for (key in variant.highestPolyphen) {
-	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge == true) {
+    }
+
+    for (key in variant.highestPolyphen) {
+    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
 				var clazz = matrixCard.polyphenMap[key].clazz;
-				var order = matrixCard.polyphenMap[key].value;
-				var polyphenObject = {};
-				polyphenObject[key] = variant.highestPolyphen[key];
-				var dangerPolyphen = new Object();
-				dangerPolyphen[clazz] = polyphenObject;
-				dangerCounts.POLYPHEN = dangerPolyphen;
-	    	}
-	    }
-	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
-	    	for (key in variant.clinVarClinicalSignificance) {
-		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge == true) {
-				    var clinvarObject = matrixCard.clinvarMap[key];
-					clinvarClasses[key] = clinvarObject ;	    		    		
-		    	}
+				dangerCounts.POLYPHEN = {};
+				dangerCounts.POLYPHEN[clazz] = {};
+				dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+    	}
+    }
 
+    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
+    	for (key in variant.clinVarClinicalSignificance) {
+	    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
+					clinvarClasses[key] = matrixCard.clinvarMap[key];
 	    	}
-	    }
-	    if (variant.inheritance != null && variant.inheritance != 'none' && variant.inheritance != '') {
-	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
-	    	inheritanceClasses[clazz] = variant.inheritance;
-	    }
+    	}
+    }
 
+    if (variant.inheritance && variant.inheritance != 'none') {
+    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
+    	inheritanceClasses[clazz] = variant.inheritance;
+    }
 	});
 
 	var getLowestClinvarClazz = function(clazzes) {
-		var lowestOrder = +9999;
+		var lowestOrder = 9999;
 		var lowestClazz = null;
 		var dangerObject = null;
 		for (clazz in clazzes) {
@@ -256,65 +237,50 @@ VariantModel.summarizeDanger = function(geneName, theVcfData) {
 	}
 
 	var getLowestImpact = function(impactClasses) {
-		if (impactClasses.HIGH != null) {
-			return {HIGH: impactClasses.HIGH};
-		} else if (impactClasses.MODERATE != null) {
-			return {MODERATE: impactClasses.MODERATE};
-		} else if (impactClasses.MODIFIER != null) {
-			return {MODIFIER: impactClasses.MODIFIER};
-		} else if (impactClasses.LOW != null) {
-			return {LOW: impactClasses.LOW};
-		} else {
-			return {};
+		var classes = ['HIGH', 'MODERATE', 'MODIFIER', 'LOW'];
+		for(var i = 0; i < classes.length; i++) {
+			var impactClass = classes[i];
+			if (impactClasses[impactClass]) {
+				var lowestImpact = {};
+				lowestImpact[impactClass] = impactClasses[impactClass];
+				return lowestImpact;
+			}
 		}
+		return {};
 	}
-	dangerCounts.IMPACT      = getLowestImpact(impactClasses);
+
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
-	if (filterCard.getAnnotationScheme().toLowerCase() == 'vep') {
-		dangerCounts.IMPACT = dangerCounts.CONSEQUENCE;
-	}
-	dangerCounts.CLINVAR     = getLowestClinvarClazz(clinvarClasses);
+	dangerCounts.IMPACT = filterCard.getAnnotationScheme().toLowerCase() == 'vep' ? dangerCounts.CONSEQUENCE : getLowestImpact(impactClasses);
+	dangerCounts.CLINVAR = getLowestClinvarClazz(clinvarClasses);
 	dangerCounts.INHERITANCE = inheritanceClasses;
-	
 
 	return dangerCounts;
 }
 
 VariantModel.prototype.getCalledVariantCount = function() {
 	if (this.fbData.features ) {
-		return this.fbData.features
-		                  .filter(function(d) {
-							// Filter homozygous reference for proband only
-							var meetsZygosity = true;
-							if (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') {
-								meetsZygosity = false;
-							}
-							return meetsZygosity;
-						  }).length;
-	} else {
-		return "0";
+		return this.fbData.features.filter(function(d) {
+			// Filter homozygous reference for proband only
+			if (d.zygosity && d.zygosity.toLowerCase() == 'homref') {
+				return false;
+			}
+			return true;
+	  }).length;
 	}
+	return 0;
 }
-
-
 
 VariantModel.prototype.filterBamDataByRegion = function(coverage, regionStart, regionEnd) {
-	return coverage.filter(function(d) { 
+	return coverage.filter(function(d) {
 		return (d[0] >= regionStart && d[0] <= regionEnd);
-	}); 	
+	});
 }
-
 
 VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 	var factor = d3.round(coverageData.length / numberOfPoints);
-	return this.bam.reducePoints(coverageData, 
-		                         factor, 
-		                         function(d) {
-		                         	return d[0]
-		                         }, 
-		                         function(d) {
-		                         	return d[1]
-		                         });
+	var xValue = function(d) { return d[0]; };
+	var yValue = function(d) { return d[1]; };
+	return this.bam.reducePoints(coverageData, factor, xValue, yValue);
 }
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
@@ -343,8 +309,6 @@ VariantModel.prototype.getName = function() {
 VariantModel.prototype.setName = function(theName) {
 	if (theName) {
 		this.name = theName;
-	} else {
-		return theName;
 	}
 }
 
@@ -636,28 +600,22 @@ VariantModel.prototype._stripRefName = function(refName) {
 
 VariantModel.prototype.getMatchingVariant = function(variant) {
 	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData == null) {
-		return null;
-	}
-
 	var matchingVariant = null;
 	if (theVcfData && theVcfData.features) {
-
-		theVcfData.features.forEach( function( v ) {
+		theVcfData.features.forEach(function(v) {
 			if (v.start == variant.start 
-	          && v.end == variant.end 
-	          && v.ref == variant.ref 
-	          && v.alt == variant.alt 
-	          && v.type.toLowerCase() == variant.type.toLowerCase()) {
-	          matchingVariant = v;
-	       }
+          && v.end == variant.end 
+          && v.ref == variant.ref 
+          && v.alt == variant.alt 
+          && v.type.toLowerCase() == variant.type.toLowerCase()) {
+	      matchingVariant = v;
+	    }
 		});
 	}
 	return matchingVariant;
 }
 
-
-/* 
+/*
 * A gene has been selected. Clear out the model's state
 * in preparation for getting data.
 */
@@ -931,15 +889,6 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 		}
 	});
 
-}
-
-VariantModel.prototype.loadVariantCount = function(regionStart, regionEnd, callback) {
-	var me = this;
-
-	me._promiseVcfRefName(window.gene.chr).then( function() {
-		me.vcf.getVariantCount(me.getVcfRefName(window.gene.chr), 
-			regionStart, regionEnd, me.sampleName, callback);
-	});
 }
 
 VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, regionStart, regionEnd, onVcfData) {
@@ -1415,7 +1364,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 
 	var maxAlleleCount = 0;
 	var setMaxAlleleCount = function(depth) {
-		if (depth != null && depth != "") {
+		if (depth) {
 			if ((+depth) > maxAlleleCount) {
 				maxAlleleCount = +depth;
 			}
@@ -1428,7 +1377,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 			setMaxAlleleCount(variant.genotypeDepthMother);
 			setMaxAlleleCount(variant.genotypeDepthFather);
 		});
-		theVcfData.maxAlleleCount = maxAlleleCount;			
+		theVcfData.maxAlleleCount = maxAlleleCount;
 	} else if (dataCard.mode == 'trio') {
 		// If the gene doesn't have any variants for the proband, determine the
 		// max allele count by iterating through the mom and data variant
@@ -1447,7 +1396,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 
 }
 
-VariantModel.prototype.populateEffectFilters = function(variants) {
+VariantModel.prototype.populateEffectFilters = function() {
 	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData && theVcfData.features) {
 		this._populateEffectFilters(theVcfData.features);
@@ -1455,14 +1404,14 @@ VariantModel.prototype.populateEffectFilters = function(variants) {
 }
 
 VariantModel.prototype._populateEffectFilters  = function(variants) {
-	variants.forEach( function(variant) {
+	variants.forEach(function(variant) {
 		for (effect in variant.effect) {
 			filterCard.snpEffEffects[effect] = effect;
 		}
 		for (vepConsequence in variant.vepConsequence) {
 			filterCard.vepConsequences[vepConsequence] = vepConsequence;
 		}
-	});	
+	});
 }
 
 VariantModel.prototype._populateRecFilters  = function(variants) {
@@ -1477,28 +1426,28 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcri
 	var me = this;
     // Post processing:
     // We have the af1000g and afexac, so now determine the level for filtering
-    // by range.  
-    theVcfData.features.forEach(function(variant) {
-    	// For ExAC levels, differentiate between af not found and in 
-    	// coding region (level = private, 0% freq) and af not found and intronic (non-coding) 
-    	// region (level = -100, not applicable because intronic)
-    	if (variant.afExAC == 0) {
-        	getCodingRegions(transcript).forEach(function(codingRegion) {
-        		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {		        			
-        		} else {
-        			variant.afExAC = -100;
-        		}
-        	});
-    	}
+    // by range.
+   theVcfData.features.forEach(function(variant) {
+  	// For ExAC levels, differentiate between af not found and in
+  	// coding region (level = private) and af not found and intronic (non-coding)
+  	// region (level = unknown)
+  	if (variant.afExAC == 0) {
+		variant.afExAC = -100;
+    	getCodingRegions(transcript).forEach(function(codingRegion) {
+    		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
+    			variant.afExAC = 0;
+    		}
+    	});
+  	}
 
-    	variant.afexaclevels = {};
+    variant.afexaclevels = {};
 		matrixCard.afExacMap.forEach( function(rangeEntry) {
 			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
 				variant.afexaclevel = rangeEntry.clazz;
 				variant.afexaclevels[rangeEntry.clazz] = rangeEntry.clazz;
 			}
 		});
-		
+
 		variant.af1000glevels = {};
 		matrixCard.af1000gMap.forEach( function(rangeEntry) {
 			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
@@ -1506,10 +1455,7 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcri
 				variant.af1000glevels[rangeEntry.clazz] = rangeEntry.clazz;
 			}
 		});
-
-
 	});
-
 }
 
 
@@ -1524,10 +1470,10 @@ VariantModel.prototype._pileupVariants = function(features, start, end) {
 
 	var featureWidth = isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 4;
 	var posToPixelFactor = Math.round((end - start) / width);
-	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, featureWidth + (isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE*2 : 4));
-
+	var widthFactor = featureWidth + (isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE * 2 : 4);
+	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, widthFactor);
 	if ( maxLevel > 30) {
-		for( var i = 1; i < posToPixelFactor; i++) {
+		for(var i = 1; i < posToPixelFactor; i++) {
 			// TODO:  Devise a more sensible approach to setting the min width.  We want the 
 			// widest width possible without increasing the levels beyond 30.
 			if (i > 4) {
@@ -2126,31 +2072,17 @@ VariantModel.prototype.filterFreebayesVariants = function(filterObject) {
 VariantModel.prototype.filterVariants = function(data, filterObject) {
 	var me = this;
 
-	if (filterObject.afScheme == 'exac') {
-		afField = "afExAC";
-	} else {
-		afField = "af1000G";
-	}
+	var afField = filterObject.afScheme === 'exac' ? "afExAC" : "af1000G";
+	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : 'vepImpact';
+	var effectField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'effect' : 'vepConsequence';
 
-
-
-	var effectField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
-	var impactField = filterCard.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';
-
-
-	var afLowerVal = filterObject.afMin;
-	var afUpperVal = filterObject.afMax;
-
-	var coverageMin = null;
-	if (filterObject.coverageMin != null && filterObject.coverageMin != '') {
-		coverageMin = +filterObject.coverageMin;
-	}
-	data.intronsExcludedCount = 0;
+	// coverageMin is always an integer or NaN
+	var	coverageMin = filterObject.coverageMin;
+	var intronsExcludedCount = 0;
 
 	// Get rid of any homozygous reference from proband
-	me._pruneHomRefVariants(data);		
+	me._pruneHomRefVariants(data);
 
-	   
 	var filteredFeatures = data.features.filter(function(d) {
 
 		if (filterCard.shouldWarnForNonPassVariants()) {
@@ -2166,31 +2098,17 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		}
 
 		var meetsRegion = true;
-		if (window.regionStart != null && window.regionEnd != null ) {			
+		if (window.regionStart != null && window.regionEnd != null ) {
 			meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
 		}
 
-		var meetsAf = false;
 		// Treat null and blank af as 0
-		if (d[afField] == null || d[afField] == '') {
-			variantAf = 0;
-		} else {
-			variantAf = d[afField];
-		}
-		if (afLowerVal != null && afUpperVal != null) {
-			if (afLowerVal <= 0 && afUpperVal == 1) {
-				meetsAf = true;
-			} else {
-				
-				meetsAf =  (variantAf >= afLowerVal && variantAf <= afUpperVal);
-			}
-		} else {
-			meetsAf = true;
+		var variantAf = d[afField] || 0;
+		var meetsAf = true;
+		if ($.isNumeric(filterObject.afMin) && $.isNumeric(filterObject.afMax)) {
+			meetsAf = (variantAf >= filterObject.afMin && variantAf <= filterObject.afMax);
 		}
 
-
-	
-			
 		var meetsExonic = false;
 		if (filterObject.exonicOnly) {
 			for (key in d[impactField]) {
@@ -2203,10 +2121,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 					if (key.toLowerCase() != 'intron_variant' && key.toLowerCase() != 'intron variant' && key.toLowerCase() != "intron") {
 						meetsExonic = true;
 					}
-				}				
+				}
 			}
 			if (!meetsExonic) {
-				data.intronsExcludedCount++;
+				intronsExcludedCount++;
 			}
 		} else {
 			meetsExonic = true;
@@ -2216,43 +2134,33 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		// Evaluate the coverage for the variant to see if it meets min.
 		var meetsCoverage = true;
 		if (coverageMin && coverageMin > 0) {
-			if (d.bamDepth != null && d.bamDepth != '') {
+			if ($.isNumeric(d.bamDepth)) {
 				meetsCoverage = d.bamDepth >= coverageMin;
-			} else if (d.genotypeDepth != null && d.genotypeDepth != '') {
+			} else if ($.isNumeric(d.genotypeDepth)) {
 				meetsCoverage = d.genotypeDepth >= coverageMin;
-			}  
+			}
 		}
 
 		// Iterate through the clicked annotations for each variant. The variant
-		// needs to match needs to match
+		// needs to match
 		// at least one of the selected values (e.g. HIGH or MODERATE for IMPACT)
 		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
-		var matchCount = 0;
 		var evalAttributes = {};
 		for (key in filterObject.annotsToInclude) {
 			var annot = filterObject.annotsToInclude[key];
 			if (annot.state) {
-				if (evalAttributes[annot.key] == null) {
-					evalAttributes[annot.key] = 0;
-				}
+				evalAttributes[annot.key] = evalAttributes[annot.key] || 0;
 
-				var annotValue = d[annot.key] ? d[annot.key] : '';				
-				var match = false;
-				if (matrixCard.isDictionary(annotValue)) {
+				var annotValue = d[annot.key] || '';
+				if ($.isPlainObject(annotValue)) {
 					for (avKey in annotValue) {
 						if (avKey.toLowerCase() == annot.value.toLowerCase()) {
-							match = true;
+							evalAttributes[annot.key]++;
 						}
 					}
-				} else  if (annotValue.toLowerCase() == annot.value.toLowerCase()){
-					match = true;
+				} else if (annotValue.toLowerCase() == annot.value.toLowerCase()) {
+					evalAttributes[annot.key]++;
 				}
-				if (match) {
-					var count = evalAttributes[annot.key];
-					count++;
-					evalAttributes[annot.key] = count;
-				}
-			} else {
 			}
 		}
 
@@ -2275,24 +2183,25 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
 	});
 
-	
-	var pileupObject = this._pileupVariants(filteredFeatures, 
-		regionStart ? regionStart : window.gene.start, 
-		regionEnd   ? regionEnd   : window.gene.end);		
+	var pileupObject = this._pileupVariants(filteredFeatures,
+		regionStart ? regionStart : window.gene.start,
+		regionEnd   ? regionEnd   : window.gene.end);
 
-	var vcfDataFiltered = {	count: data.count,
-							countMatch: data.countMatch,
-							countUnique: data.countUnique,
-							sampleCount : data.sampleCount,
-							end: regionEnd,
-							features: filteredFeatures,
-							maxLevel: pileupObject.maxLevel + 1,
-							featureWidth: pileupObject.featureWidth,
-							name: data.name,
-							start: regionStart,
-							strand: data.strand,							
-							variantRegionStart: regionStart
-						};
+	var vcfDataFiltered = {
+		count: data.count,
+		countMatch: data.countMatch,
+		countUnique: data.countUnique,
+		sampleCount : data.sampleCount,
+		intronsExcludedCount: intronsExcludedCount,
+		end: regionEnd,
+		features: filteredFeatures,
+		maxLevel: pileupObject.maxLevel + 1,
+		featureWidth: pileupObject.featureWidth,
+		name: data.name,
+		start: regionStart,
+		strand: data.strand,
+		variantRegionStart: regionStart
+	};
 	return vcfDataFiltered;
 }
 

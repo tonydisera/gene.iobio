@@ -753,43 +753,24 @@ var Bam = Class.extend({
 
 
 
-   reducePoints: function(data, factor, xvalue, yvalue) {
-      if (factor <= 1 ) {
-        return data;
-      }
-      var i, j, results = [], sum = 0, length = data.length, avgWindow;
-
-      if (!factor || factor <= 0) {
-        factor = 1;
-      }
-
-      // Create a sliding window of averages
-      for(i = 0; i < length; i+= factor) {
-        // Slice from i to factor
-        avgWindow = data.slice(i, i+factor);
-        var min = 999999;
-        var max = 0;
-        for (j = 0; j < avgWindow.length; j++) {
-            var y = yvalue(avgWindow[j]);
-            sum += y != null ? d3.round(y) : 0;
-
-            if (y > max) {
-              max = y;
-            }
-            if (y < min) {
-              min = y;
-            }
-        }
-        var average = d3.round(sum / factor);
-        results.push([xvalue(data[i]), average])
-        sum = 0;
-      }
-      return results;
-   }
-
- 
-
-
-
+  reducePoints: function(data, factor, xvalue, yvalue) {
+    if (!factor || factor <= 1 ) {
+      return data;
+    }
+    var results = [];
+    // Create a sliding window of averages
+    for (var i = 0; i < data.length; i+= factor) {
+      // Slice from i to factor
+      var avgWindow = data.slice(i, i + factor);
+      var sum = 0;
+      avgWindow.forEach(function(point) {
+        var y = yvalue(point);
+        if (y) { sum += d3.round(y); }
+      });
+      var average = d3.round(sum / avgWindow.length);
+      results.push([xvalue(data[i]), average])
+    }
+    return results;
+  }
 
 });
