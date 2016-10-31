@@ -40,6 +40,8 @@ var Bam = Class.extend({
          }
       }
 
+      this.headerStr = null;
+
 
 
 
@@ -52,13 +54,16 @@ var Bam = Class.extend({
     this.bamUri = null;
    },
 
-   makeBamBlob: function() {
+   makeBamBlob: function(callback) {
      var me = this;
      this.bamBlob = new BlobFetchable(this.bamFile);
      this.baiBlob = new BlobFetchable(this.baiFile); // *** add if statement if here ***         
      makeBam(this.bamBlob, this.baiBlob, function(bam) {
         me.setHeader(bam.header);
         me.provide(bam);
+        if (callback) {
+          callback();
+        }
      });
    }, 
 
@@ -110,22 +115,6 @@ var Bam = Class.extend({
       cmd.run();      
       
     }
-  },
-
-  getBuildFromHeader: function(callback) {
-    // @SQ  SN:1  LN:249250621  M5:1b22b98cdeb4a9304cb5d48026a85128 
-    // UR:ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz 
-    // AS:NCBI37 
-    // SP:Human
-    this.getHeader(function(header) {
-        var refLengthMap = {};
-        header.sq.forEach(function(ref) {
-          refLengthMap[ref.name] = ref.end;
-        })
-        callback({species: header.species, build: header.assembly, references: refLengthMap});        
-    });
-
-
   },
 
 
@@ -207,8 +196,9 @@ var Bam = Class.extend({
       return;
     }
     me.sourceType = "file";
-    me.makeBamBlob();
-    callback(true);
+    me.makeBamBlob( function() {
+      callback(true);
+    });
     return;
   },
 
@@ -317,6 +307,42 @@ var Bam = Class.extend({
    },
 
 
+   getHeaderStr: function(callback) {
+      var me = this;
+      if (me.headerStr) {
+         callback(me.headerStr);        
+      }
+      else if (me.sourceType == 'file') {
+        console.log('Error: header not set for local bam file');
+        callback(null);
+      } else {
+
+        var success = null;
+        var cmd = new iobio.cmd(
+            IOBIO.samtools,
+            ['view', '-H', me.bamUri]
+        );
+        var rawHeader = "";
+        cmd.on('data', function(data) {
+          if (data != undefined) {
+            rawHeader += data;
+          }
+        });
+
+        cmd.on('end', function() {
+          me.setHeader(rawHeader);
+          callback(me.headerStr);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+        cmd.run();    
+
+        
+      }
+   },
+
    getHeader: function(callback) {
       var me = this;
       if (me.header) {
@@ -356,6 +382,7 @@ var Bam = Class.extend({
 
 
    setHeader: function(headerStr) {
+      this.headerStr = headerStr;
       var header = { sq:[], toStr : headerStr };
       var lines = headerStr.split("\n");
       for ( var i=0; i<lines.length > 0; i++) {

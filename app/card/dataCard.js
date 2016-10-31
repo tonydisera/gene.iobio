@@ -1,10 +1,6 @@
 function DataCard() {
 	this.species = 'homo_sapiens';
 	this.build   = 'GRCh37';
-	this.speciesList = [];
-	this.speciesNameToSpecies = {}; // map species name to the species object
-	this.speciesToBuilds = {};      // map species to its genome builds
-	this.buildNameToBuild = {};     // map genome build name to the full genome build object
 
 	this.defaultNames = {
 		proband: 'NA12878',
@@ -398,64 +394,30 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 DataCard.prototype.loadSpeciesAndBuilds = function() {
 	var me = this;
-    $.ajax({
-        url: genomeBuildServer,
-        jsonp: "callback",
-		type: "GET",
-		dataType: "jsonp",
-        error: function( xhr, status, errorThrown ) {
-		        
-		        console.log( "Error: " + errorThrown );
-		        console.log( "Status: " + status );
-		        console.log( xhr );
-		},
-        success: function(allSpecies) {
-        	
-        	allSpecies.forEach(function(species) {
-        		// Map the species latin name to its species object
-        		me.speciesNameToSpecies[species.latin_name] = species;
+	genomeBuildHelper.promiseInit().then( function() {
+		$('#select-species').selectize(
+			{	
+				create: true, 			
+				valueField: 'value',
+		    	labelField: 'name',
+		    	searchField: ['name'],
+		    	maxItems: 1,
+		    	options: genomeBuildHelper.speciesList
+	    	}
+		);
+		me.addSpeciesListener();
+		$('#select-build').selectize(
+			{
+				create: true, 			
+				valueField: 'name',
+		    	labelField: 'name',
+		    	searchField: ['name']
+	    	}
+		);
+		me.addBuildListener();
+		me.setDefaultBuildFromData();
 
-        		// Collect all species into a list to use for dropdown
-        		me.speciesList.push({name: species.name, value: species.latin_name});
-
-        		species.genomeBuilds.forEach(function(genomeBuild) {
-
-        			// Map the build name to its build object
-        			me.buildNameToBuild[genomeBuild.name] = genomeBuild;
-
-        			// Map the species to its genome builds
-        			var builds = me.speciesToBuilds[species.latin_name];
-        			if (builds == null) {
-        				builds = [];
-        				me.speciesToBuilds[species.latin_name] = builds;
-        			}
-        			builds.push(genomeBuild);
-        		
-        		})
-        	})
-			$('#select-species').selectize(
-				{	
-					create: true, 			
-					valueField: 'value',
-			    	labelField: 'name',
-			    	searchField: ['name'],
-			    	maxItems: 1,
-			    	options: me.speciesList
-		    	}
-			);
-			me.addSpeciesListener();
-			$('#select-build').selectize(
-				{
-					create: true, 			
-					valueField: 'name',
-			    	labelField: 'name',
-			    	searchField: ['name']
-		    	}
-			);
-			me.addBuildListener();
-			me.setDefaultBuildFromData();
-        }
-    });
+	});
 
 }
 
@@ -478,7 +440,7 @@ DataCard.prototype.addSpeciesListener = function() {
 	        selectizeBuild.clearOptions();
 	        selectizeBuild.load(function(callback) {
 	        	selectizeBuild.enable();
-	        	callback(me.speciesToBuilds[value]);
+	        	callback(genomeBuildHelper.speciesToBuilds[value]);
 	        });
 	    });
 	}
@@ -522,12 +484,12 @@ DataCard.prototype.addBuildListener = function() {
 DataCard.prototype.setDefaultBuildFromData = function() {
 	var me = this;
 	if ($('#select-species')[0].selectize && $('#select-build')[0].selectize) {
-		me.getAggregateBuildFromData(function(aggregate) {
-			if (aggregate.length == 0) {
+		me.getBuildsFromData(function(buildsInData) {
+			if (buildsInData.length == 0) {
 				$('#species-build-warning').addClass("hide");
 				window.enableLoadButton();
-			} else if (aggregate.length == 1) {			
-				var buildInfo = aggregate[0];
+			} else if (buildsInData.length == 1) {			
+				var buildInfo = buildsInData[0];
 				me.removeBuildListener();
 				$('#select-species')[0].selectize.setValue(buildInfo.species.latin_name);
 				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
@@ -537,7 +499,7 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 				window.enableLoadButton();		
 			} else {
 				var message = "Imcompatible builds in files.";
-				aggregate.forEach(function(buildInfo) {
+				buildsInData.forEach(function(buildInfo) {
 					message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
 					var fromCount = 0;
 					buildInfo.from.forEach(function(fileInfo) {
@@ -560,12 +522,12 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 
 DataCard.prototype.validateBuildFromData = function(callback) {
 	var me = this;
-	me.getAggregateBuildFromData(function(aggregate) {
-		if (aggregate.length == 0) {
+	me.getBuildsFromData(function(buildsInData) {
+		if (buildsInData.length == 0) {
 			callback(true);
 
-		} else if (aggregate.length == 1) {
-			var buildInfo = aggregate[0];
+		} else if (buildsInData.length == 1) {
+			var buildInfo = buildsInData[0];
 			if (me.species == buildInfo.species.latin_name && me.build == buildInfo.build.name) {
 				callback(true);
 			} else {
@@ -573,7 +535,7 @@ DataCard.prototype.validateBuildFromData = function(callback) {
 			}
 		} else {
 			var message = "Imcompatible builds in files.";
-			aggregate.forEach(function(buildInfo) {
+			buildsInData.forEach(function(buildInfo) {
 				message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
 				var fromCount = 0;
 				buildInfo.from.forEach(function(fileInfo) {
@@ -590,211 +552,67 @@ DataCard.prototype.validateBuildFromData = function(callback) {
 	});
 }
 
-/*
-  Look at all of the bams and vcfs and determine the species and builds.
-  The aggregate object is an array of all species/build combos found
-  in the headers.
-  When all files are consistent, there will be one row in the aggregate array:
-  	[{species: homo_sapiens, build: GRCh37, from: [array_of_all_bams_and_probands]}]
 
-  When there are there are different species or builds in headers, the aggregate will
-  container more than one row
-    [{species: homo_sapiens, build: GRCh37, from:[type:bam, relationship: 'proband']},
-     {species: homo_sapiens, build: GRCh38, from[type:vcf, relationship: 'proband']}
-    ]
-
-*/
-DataCard.prototype.getAggregateBuildFromData = function(callback) {
+DataCard.prototype.getBuildsFromData = function(callback) {
 	var me = this;
 
-	// First review all of the bams
-	me.getBuildFromBams(function(buildInfos) {
-		var aggregate = [];
-		me.parseBuildInfos(buildInfos, 'bam', aggregate);
+	me.getHeadersFromBams(function(bamHeaderMap) {
+		me.getHeadersFromVcfs(function(vcfHeaderMap) {
+			var buildsInHeaders = genomeBuildHelper.getBuildsInHeaders(bamHeaderMap, vcfHeaderMap);
+			callback(buildsInHeaders);
 
-		// Now review all of the vcfs
-		me.getBuildFromVcfs(function(buildInfos) {
-			me.parseBuildInfos(buildInfos, 'vcf', aggregate);
-			callback(aggregate);
 		})
-	});	
+	});
 }
 
-DataCard.prototype.parseBuildInfos = function(buildInfos, type, aggregate) {
-	var me = this;
-	for (relationship in buildInfos) {			
-
-		var buildInfo = buildInfos[relationship];
-		if (buildInfo == null || (buildInfo.species == null && buildInfo.build == null && (buildInfo.references == null || Object.keys(buildInfo.references).length == 0))) {
-			// We don't have any information in the file to find the species and build
-		} else {
-			// We have build info from the file.  Now try to match it to a known species and build
-			var speciesBuild = me.getProperSpeciesAndBuild(buildInfo);
-			if (speciesBuild.species && speciesBuild.build) {
-				if (aggregate.length == 0) {
-					// TODO:  Need to indicate which data files (proband-bam, mother-bam, father-vcf, etc)
-					// that have this build
-					aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: type, relationship: relationship}]});
-				} else {
-					var foundAggregate = null;
-					aggregate.forEach(function(aggregateSpeciesBuild) {
-						if (aggregateSpeciesBuild.species == speciesBuild.species && aggregateSpeciesBuild.build == speciesBuild.build) {
-							foundAggregate = aggregateSpeciesBuild;
-						}
-					});
-					if (foundAggregate) {
-						from = foundAggregate.from;
-						from.push({type: type, relationship: relationship});
-
-					} else {
-						aggregate.push( {species: speciesBuild.species, build: speciesBuild.build, from: [{type: type, relationship: relationship}]});
-					}
-
-				}				
-			}
-
-		}
-	}
-}
-
-/*
-	Given the species and build names in the file header, try to find the corresponding
-	species and genome build based on matching the header names to the names (name, binomialName, latin_name)
-	of the species and the names (name and aliases) of genome build. 
-*/
-DataCard.prototype.getProperSpeciesAndBuild = function(buildInfo) {
-	var me = this;
-	var matchedSpecies = null;
-	var matchedBuild = null;
-
-	if (buildInfo != null) {
-		// If the bam header provided a species, make sure it matches the
-		// selected species name (or latin or binomial name).
-		if (buildInfo.species) {
-			for (speciesName in me.speciesNameToSpecies) {
-				if (!matchedSpecies) {
-					var species = me.speciesNameToSpecies[speciesName];
-					if (species.name == buildInfo.species || species.binomialName == buildInfo.species || species.latin_name ==  buildInfo.species ) {
-						matchedSpecies = species;
-					} 					
-				}
-			} 
-		}
-
-		// For now, just default to Human if species can't be determined from file headers
-		if (!matchedSpecies) {
-			matchedSpecies = me.speciesNameToSpecies["homo_sapiens"];
-		}
-
-		// Make sure each bam has a build that matches the selected
-		// build name or one of its aliases
-		if (matchedSpecies) {
-			if (buildInfo.build) {
-				matchedSpecies.genomeBuilds.forEach(function(build) {
-					if (!matchedBuild) {
-						if (build.name == buildInfo.build) {
-							matchedBuild = build;
-						} else {
-							build.aliases.forEach(function(gbAlias) {
-								if (gbAlias.alias == buildInfo.build) {
-									matchedBuild = build;
-								}
-							})
-						}																
-					}
-				})
-							
-			} else {
-				// If a build wasn't specified, try to match to a genome build based on reference lengths
-				matchedSpecies.genomeBuilds.forEach(function(build) {
-					if (!matchedBuild) {
-						var matchedCount = 0;
-						var notMatchedCount = 0;
-						var notFoundCount = 0;
-						build.references.forEach(function(reference) {
-							var refLength = null;
-							if (buildInfo.references[reference.name]) {
-								refLength = buildInfo.references[reference.name];
-							} else if (buildInfo.references[reference.alias]) {
-								refLength = buildInfo.references[reference.name];
-							}
-							if (refLength && refLength == reference.length) {
-								matchedCount++;
-							} else if (refLength && refLength == reference.length - 1) {
-								matchedCount++;
-							} else if (refLength && refLength == reference.length + 1) {
-								matchedCount++;
-							} else if (refLength && refLength != reference.length) {
-								notMatchedCount++;
-							} else {
-								notFoundCount++;
-							}
-						});
-						if (build.references.length == matchedCount) {
-							matchedBuild = build;
-						} else if (matchedCount > 0 && notMatchedCount == 0 && notFoundCount == 0) {
-							matchedBuild = build;
-						}
-
-					}
-
-				})
-
-			}
-		}
-	}
-	return {species: matchedSpecies, build: matchedBuild};
 
 
-}
-
-DataCard.prototype.getBuildFromBams = function(callback) {
-	var buildInfos = {};
+DataCard.prototype.getHeadersFromBams = function(callback) {
+	var headerMap = {};
 	var cardCount = 0;
 	variantCards.forEach(function(variantCard) {
 		if (variantCard.model.bam) {
-			variantCard.model.bam.getBuildFromHeader(function(buildInfo) {
-				buildInfos[variantCard.getRelationship()] = buildInfo;
+			variantCard.model.bam.getHeaderStr(function(header) {
+				headerMap[variantCard.getRelationship()] = header;
 				cardCount++;
 				if (cardCount == variantCards.length) {
-					callback(buildInfos);
+					callback(headerMap);
 				}
 
 			});
 		} else {
 			cardCount++;
-			buildInfos[variantCard.getRelationship()] = null;
+			headerMap[variantCard.getRelationship()] = null;
 			if (cardCount == variantCards.length) {
-				callback(buildInfos);
+				callback(headerMap);
 			}
 		}
 	});
 }
 
-
-
-DataCard.prototype.getBuildFromVcfs = function(callback) {
-	var buildInfos = {};
+DataCard.prototype.getHeadersFromVcfs = function(callback) {
+	var headerMap = {};
 	var cardCount = 0;
 	variantCards.forEach(function(variantCard) {
 		if (variantCard.model.vcf) {
-			variantCard.model.vcf.getBuildFromHeader(function(buildInfo) {
-				buildInfos[variantCard.getRelationship()] = buildInfo;
+			variantCard.model.vcf.getHeader(function(header) {
+				headerMap[variantCard.getRelationship()] = header;
 				cardCount++;
 				if (cardCount == variantCards.length) {
-					callback(buildInfos);
+					callback(headerMap);
 				}
 
 			});
 		} else {
 			cardCount++;
-			buildInfos[variantCard.getRelationship()] = null;
+			headerMap[variantCard.getRelationship()] = null;
 			if (cardCount == variantCards.length) {
-				callback(buildInfos);
+				callback(headerMap);
 			}
 		}
 	});
 }
+
 
 DataCard.prototype.init = function() {
 	var me = this;
@@ -954,6 +772,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 	variantCard.onBamFilesSelected(event, function(bamFileName) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
+		me.setDefaultBuildFromData();
 		enableLoadButton();
 	});
 
@@ -1161,6 +980,8 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	variantCard.onVcfFilesSelected(
 		event, 
 		function(vcfFileName, sampleNames) {
+			me.setDefaultBuildFromData();
+
 			me.panelSelectorFilesSelected.find('.vcf-sample.loader').addClass('hide');
 
 			me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');

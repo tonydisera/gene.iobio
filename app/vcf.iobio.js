@@ -246,50 +246,6 @@ var effectCategories = [
     cmd.run();
   }
 
-
-  exports.getBuildFromHeader = function(callback) {
-    var me = this;
-
-    // #contig=<ID=20,length=62435964,assembly=B36,md5=f126cdf8a6e0c7f379d618ff66beb2da,species="Homo sapiens",taxonomy=x>
-    me.getHeader(function(header) {
-      var buildInfo = {species: null, build: null, references: {}};
-      if (header) {
-        header.split("\n").forEach(function(headerRec) {
-          if (headerRec.indexOf("##contig=<") == 0) {
-            var allFields = headerRec.split("##contig=<")[1];
-
-            var fields = allFields.split(/[,>]/);
-            var refName = null;
-            var refLength = null;
-            fields.forEach(function(field) {
-              if (field.indexOf("ID=") == 0) {
-                refName = field.split("ID=")[1];
-              }
-              if (field.indexOf("length=") == 0) {
-                refLength = field.split("length=")[1];
-              }
-              if (!buildInfo.build && field.indexOf("assembly=") == 0) {
-                buildInfo.build = field.split("assembly=")[1];
-              }
-              if (!buildInfo.species && field.indexOf("species=") == 0) {
-                var speciesString = field.split("species=")[1];
-                if (speciesString.indexOf("\"") == 0) {
-                  buildInfo.species = speciesString.split("\"")[1];
-                } else {
-                  buildInfo.species = speciesString;
-                }
-              }
-            })
-            if (refName && refLength) {
-              buildInfo.references[refName] = refLength;
-            }
-          }
-        });
-      }
-      callback(buildInfo);
-    });
-  }
-
   exports.ignoreErrorMessage = function(error) {
     var me = this;
     var ignore = false;

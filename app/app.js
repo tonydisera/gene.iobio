@@ -87,6 +87,9 @@ var matrixCard = new MatrixCard();
 var cacheHelper = null;
 var launchTimestampToClear = null;
 
+// genomeBuild helper
+var genomeBuildHelper = null;
+
 // legend
 var legend = new Legend();
 
@@ -220,6 +223,9 @@ function determineStyle() {
 function init() {
 	var me = this;
 
+	// Initialize genomeBuild helper
+	genomeBuildHelper = new GenomeBuildHelper();
+
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
 
@@ -322,7 +328,8 @@ function init() {
 
 	// Initialize data card
 	dataCard = new DataCard();
-	dataCard.init();
+	dataCard.init();	
+
 
 
 	
