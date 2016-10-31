@@ -163,6 +163,46 @@ var effectCategories = [
 
   }
 
+  exports.getHeader = function(callback) {
+    if (header) {
+      callback(header);
+    } else if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
+
+      var cmd = new iobio.cmd(
+            IOBIO.tabix,
+            ['-H', vcfURL]
+        );
+
+        cmd.on('data', function(data) {
+          if (data != undefined) {
+            success = true;
+            buffer += data;
+          }
+        });
+
+        cmd.on('end', function() {
+          if (success == null) {
+            success = true;
+          }
+          if (success && buffer.length > 0) {
+            header = buffer;
+            callback(header);
+          }
+        });
+        
+      } else if (vcfFile) {
+          var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
+            vcfReader.getHeader( function(theHeader) {
+              header = theHeader;
+              callback(header);
+            });
+          });
+      } else {
+        callback(null);
+      }
+
+  }
+
 
   exports.checkVcfUrl = function(url, callback) {
     var me = this;
@@ -209,15 +249,45 @@ var effectCategories = [
 
   exports.getBuildFromHeader = function(callback) {
     var me = this;
-    me.getReferenceLengths(function(refData) {
+
+    // #contig=<ID=20,length=62435964,assembly=B36,md5=f126cdf8a6e0c7f379d618ff66beb2da,species="Homo sapiens",taxonomy=x>
+    me.getHeader(function(header) {
       var buildInfo = {species: null, build: null, references: {}};
-      refData.forEach(function(refObject) {
-        buildInfo.references[refObject.name] = refObject.refLength;
-      });
-      if (callback) {
-        callback(buildInfo);
-      } 
-    })
+      if (header) {
+        header.split("\n").forEach(function(headerRec) {
+          if (headerRec.indexOf("##contig=<") == 0) {
+            var allFields = headerRec.split("##contig=<")[1];
+
+            var fields = allFields.split(/[,>]/);
+            var refName = null;
+            var refLength = null;
+            fields.forEach(function(field) {
+              if (field.indexOf("ID=") == 0) {
+                refName = field.split("ID=")[1];
+              }
+              if (field.indexOf("length=") == 0) {
+                refLength = field.split("length=")[1];
+              }
+              if (!buildInfo.build && field.indexOf("assembly=") == 0) {
+                buildInfo.build = field.split("assembly=")[1];
+              }
+              if (!buildInfo.species && field.indexOf("species=") == 0) {
+                var speciesString = field.split("species=")[1];
+                if (speciesString.indexOf("\"") == 0) {
+                  buildInfo.species = speciesString.split("\"")[1];
+                } else {
+                  buildInfo.species = speciesString;
+                }
+              }
+            })
+            if (refName && refLength) {
+              buildInfo.references[refName] = refLength;
+            }
+          }
+        });
+      }
+      callback(buildInfo);
+    });
   }
 
   exports.ignoreErrorMessage = function(error) {
@@ -418,7 +488,7 @@ var effectCategories = [
 
 
         // Load the reference density data.  Exclude reference if 0 points.
-        refData.push( {"name": ref, "refLength": calcRefLength, "idx": i});
+        refData.push( {"name": ref, "calcRefLength": calcRefLength, "idx": i});
       }
 
       // Sort ref data so that refs are ordered numerically
@@ -479,7 +549,7 @@ var effectCategories = [
                 var refDataPrev = refData[refData.length - 1];
               }
 
-              refData.push({"name": refName,  "refLength": +refLength, "idx": +refIndex});
+              refData.push({"name": refName,  "calcRefLength": +refLength, "idx": +refIndex});
 
 
             } else {

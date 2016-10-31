@@ -524,14 +524,35 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 	if ($('#select-species')[0].selectize && $('#select-build')[0].selectize) {
 		me.getAggregateBuildFromData(function(aggregate) {
 			if (aggregate.length == 0) {
-
+				$('#species-build-warning').addClass("hide");
+				window.enableLoadButton();
 			} else if (aggregate.length == 1) {			
 				var buildInfo = aggregate[0];
 				me.removeBuildListener();
 				$('#select-species')[0].selectize.setValue(buildInfo.species.latin_name);
 				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
-				me.addBuildListener();		
-			} 
+				me.addBuildListener();
+
+				$('#species-build-warning').addClass("hide");				
+				window.enableLoadButton();		
+			} else {
+				var message = "Imcompatible builds in files.";
+				aggregate.forEach(function(buildInfo) {
+					message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
+					var fromCount = 0;
+					buildInfo.from.forEach(function(fileInfo) {
+						if (fromCount > 0) {
+							message += ", ";
+						}
+						message += fileInfo.relationship + " " + fileInfo.type;
+						fromCount++;
+					});
+					message += ".";
+				});
+				$('#species-build-warning').html(message);
+				$('#species-build-warning').removeClass("hide");
+				window.disableLoadButton();
+			}
 		});		
 	}
 
@@ -1258,6 +1279,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 		panelSelector.find('.vcf-sample.loader').addClass('hide');
 
 		if (success) {
+			me.setDefaultBuildFromData();
 			
 			// Only show the sample dropdown if there is more than one sample
 			if (sampleNames.length > 1) {
