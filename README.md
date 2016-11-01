@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/tonydisera/gene.iobio.svg?branch=dev)](https://travis-ci.org/tonydisera/gene.iobio)
+[![Coverage Status](https://coveralls.io/repos/github/tonydisera/gene.iobio/badge.svg?branch=dev)](https://coveralls.io/github/tonydisera/gene.iobio?branch=dev)
 
 # gene.iobio
 An iobio app for examining gene variants
