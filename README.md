@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tonydisera/gene.iobio.svg?branch=dev)](https://travis-ci.org/tonydisera/gene.iobio)
+
 # gene.iobio
 An iobio app for examining gene variants
 
