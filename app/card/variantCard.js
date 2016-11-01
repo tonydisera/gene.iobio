@@ -1137,28 +1137,34 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
 
+					// At this point, the variants should be cached.  If they aren't,
+					// an error occurred
+					var theVcfData = me.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+					if (theVcfData) {
+			  			// Here we call this method again and since we
+						// have vcf data, the variant chart will be filled
+			  			me._showVariants(regionStart ? regionStart : window.gene.start, 
+										 regionEnd ? regionEnd : window.gene.end,
+										 onVariantsDisplayed,
+										 true);
 
-		  			// Here we call this method again and since we
-					// have vcf data, the variant chart will be filled
-		  			me._showVariants(regionStart ? regionStart : window.gene.start, 
-									 regionEnd ? regionEnd : window.gene.end,
-									 onVariantsDisplayed,
-									 true);
+			  			// Enable the variant filters 
+			  			if (me.getRelationship() == 'proband') {
+					    	filterCard.enableClinvarFilters(data);
+					    }
 
-		  			// Enable the variant filters 
-		  			if (me.getRelationship() == 'proband') {
-				    	filterCard.enableClinvarFilters(data);
-				    }
+						// Show the 'Call from alignments' button if we a bam file/url was specified
+						if (me.isBamLoaded() && me.isViewable()) {
+							me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
+						} else {
+							me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
+						}	 				
+				   	    if (me.getRelationship() == 'proband') {
+							genesCard.refreshCurrentGeneBadge();
+						}
 
-					// Show the 'Call from alignments' button if we a bam file/url was specified
-					if (me.isBamLoaded() && me.isViewable()) {
-						me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
-					} else {
-						me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
-					}	 				
-			   	    if (me.getRelationship() == 'proband') {
-						genesCard.refreshCurrentGeneBadge();
 					}
+
 
 			    }
 
@@ -1172,7 +1178,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				
 				if (error && error == "missing reference") {
 					me._displayRefNotFoundWarning();
-				} else if (error && error.toLowerCase() == "no variants") {
+				} else if (error == "No variants") {
 					if (me.isViewable()) {
 					   $('#matrix-track').addClass("hide");
 					    me.cardSelector.find("#vcf-track").addClass("hide");

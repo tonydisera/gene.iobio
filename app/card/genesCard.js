@@ -1499,8 +1499,8 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
 
 	var url = geneInfoServer + 'api/gene/' + geneName;
 	url += "?source=" + geneSource;
-	url += "&species=" + dataCard.species;
-	url += "&build="   + dataCard.build;
+	url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
+	url += "&build="   + genomeBuildHelper.getCurrentBuildName();
 
 	$.ajax({
 	    url: url,

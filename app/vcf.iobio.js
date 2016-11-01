@@ -661,17 +661,15 @@ var effectCategories = [
 
     // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
-    if (refName.indexOf('chr') == 0) {
-      refFile = "./data/references_hg19/" + refName + ".fa";
-    } else {
-      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }
+    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+    
 
-    // If we are getting the hgvs notation, we need an extra command line arg for vep
-    var vepArgs = "";
+    // Get the vep args
+    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
     if (isRefSeq) {
       vepArgs = " --refseq ";
     }
+    // If we are getting the hgvs notation, we need an extra command line arg for vep
     if (hgvsNotation) {
       vepArgs += " --hgvs ";
     }
@@ -699,7 +697,7 @@ var effectCategories = [
     }
 
     // normalize variants
-    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'])
 
     // get allele frequencies from 1000G and ExAC
     cmd = cmd.pipe(IOBIO.af);
@@ -1092,10 +1090,16 @@ var effectCategories = [
       var regionEnd = geneObject.end;
 
 
+      var clinvarUrl = null;
+      if (isOffline) {
+        clinvarUrl = OFFLINE_CLINVAR_VCF_BASE_URL + genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_OFFLINE)
+      } else {
+        clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+      }
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm]);
+      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', clinvarUrl, regionParm]);
 
 
       var clinvarData = "";
@@ -1200,7 +1204,8 @@ var effectCategories = [
         }
       });
 
-      url = url.slice(0,url.length-1) + '[c37])'
+      var clinvarBuild = genomeBuildHelper.getBuildAlias(genomeBuildHelper.ALIAS_CLINVAR);
+      url = url.slice(0,url.length-1) + '[' + clinvarBuild + '])';
 
       var clinvarVariants = null;
       var requestClinvarSummaryTries = 0;
@@ -1269,15 +1274,11 @@ var effectCategories = [
   exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
     var me = this;
 
-
     //  Figure out the reference sequence file path
-    if (refName.indexOf('chr') == 0) {
-      refFile = "./data/references_hg19/" + refName + ".fa";
-    } else {
-      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }
+    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+
     // Figure out the vep args
-    var vepArgs = "";
+    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
     if (isRefSeq) {
       vepArgs = " --refseq "
     }
@@ -1288,19 +1289,16 @@ var effectCategories = [
       vepArgs += "  --check_existing ";
     }
 
-
-
     var writeStream = function(stream) {
-        records.forEach( function(record) {
-          if (record.trim() == "") {
-          } else {
-            stream.write(record + "\n");
-          }
-        });
+      records.forEach( function(record) {
+        if (record.trim() == "") {
+        } else {
+          stream.write(record + "\n");
+        }
+      });
 
-        stream.end();
-      }
-
+      stream.end();
+    }
 
     //  Streamed vcf recs first go through contig appender to add mandatory header recs
     var contigStr = "";
@@ -1318,7 +1316,7 @@ var effectCategories = [
     }
 
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFastaFile, '-'])
 
     // Get Allele Frequencies from 1000G and ExAC
     cmd = cmd.pipe(IOBIO.af)

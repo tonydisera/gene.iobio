@@ -1302,10 +1302,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {
-		    		// We bypass getting clinvar records for unaffected siblings
-		    		return new Promise( function(resolve, reject) {
-		    			resolve(theVcfData);
-		    		});
+		    		
+		    		resolve(theVcfData);
 		    	}	
 
 
@@ -1316,9 +1314,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		    	if (onVcfData) {
 		    		onVcfData(theVcfData);
 		    	}
-		    	return new Promise( function(resolve, reject) {
-		    		resolve(theVcfData);
-		    	});
+		    	resolve(theVcfData);
+
 
 	    	} else {
 	    		reject("_promiseGetAndAnnotateVariants() No variants");
@@ -1327,9 +1324,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		
 	    }, 
 	    function(error) {
-	    	// If error when getting clinvar records	    	
+	    	// If error when annotating clinvar records	    	
 	    	console.log("an error occurred when annotating vcf records " + error);
-	    	reject();
+	    	reject(error);
 
 	    }).then( function(data) {
 	    	// We are done getting clinvar records.

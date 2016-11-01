@@ -1,6 +1,5 @@
 function DataCard() {
-	this.species = 'homo_sapiens';
-	this.build   = 'GRCh37';
+
 
 	this.defaultNames = {
 		proband: 'NA12878',
@@ -392,34 +391,7 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 }
 
-DataCard.prototype.loadSpeciesAndBuilds = function() {
-	var me = this;
-	genomeBuildHelper.promiseInit().then( function() {
-		$('#select-species').selectize(
-			{	
-				create: true, 			
-				valueField: 'value',
-		    	labelField: 'name',
-		    	searchField: ['name'],
-		    	maxItems: 1,
-		    	options: genomeBuildHelper.speciesList
-	    	}
-		);
-		me.addSpeciesListener();
-		$('#select-build').selectize(
-			{
-				create: true, 			
-				valueField: 'name',
-		    	labelField: 'name',
-		    	searchField: ['name']
-	    	}
-		);
-		me.addBuildListener();
-		me.setDefaultBuildFromData();
 
-	});
-
-}
 
 DataCard.prototype.removeSpeciesListener = function() {
 	if ($('#select-species')[0].selectize) {
@@ -434,7 +406,7 @@ DataCard.prototype.addSpeciesListener = function() {
 	        if (!value.length) {
 	        	return;
 	        }
-	        me.species = value;
+	        genomeBuildHelper.setCurrentSpecies(value);
 	        var selectizeBuild = $('#select-build')[0].selectize;
 	        selectizeBuild.disable();
 	        selectizeBuild.clearOptions();
@@ -462,7 +434,7 @@ DataCard.prototype.addBuildListener = function() {
 			if (!value.length) {
 				return;
 			}
-			me.build = value;
+			genomeBuildHelper.setCurrentBuild(value);
 			me.validateBuildFromData(function(success, message) {
 				if (success) {
 					$('#species-build-warning').addClass("hide");
@@ -473,8 +445,7 @@ DataCard.prototype.addBuildListener = function() {
 					window.disableLoadButton();
 				}
 			});
-			// TODO:  get geneinfo for selected gene, validate that compatible
-			// genome build according to vcf and bam headers was selected.
+			
 		});
 	}
 
@@ -491,26 +462,16 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 			} else if (buildsInData.length == 1) {			
 				var buildInfo = buildsInData[0];
 				me.removeBuildListener();
-				$('#select-species')[0].selectize.setValue(buildInfo.species.latin_name);
+				genomeBuildHelper.setCurrentSpecies(buildInfo.species.name);
+				genomeBuildHelper.setCurrentBuild(buildInfo.build.name);
+				$('#select-species')[0].selectize.setValue(buildInfo.species.name);
 				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
 				me.addBuildListener();
 
 				$('#species-build-warning').addClass("hide");				
 				window.enableLoadButton();		
 			} else {
-				var message = "Imcompatible builds in files.";
-				buildsInData.forEach(function(buildInfo) {
-					message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
-					var fromCount = 0;
-					buildInfo.from.forEach(function(fileInfo) {
-						if (fromCount > 0) {
-							message += ", ";
-						}
-						message += fileInfo.relationship + " " + fileInfo.type;
-						fromCount++;
-					});
-					message += ".";
-				});
+				var message = genomeBuildHelper.formatIncompatibleBuildsMessage(buildsInData);
 				$('#species-build-warning').html(message);
 				$('#species-build-warning').removeClass("hide");
 				window.disableLoadButton();
@@ -528,26 +489,13 @@ DataCard.prototype.validateBuildFromData = function(callback) {
 
 		} else if (buildsInData.length == 1) {
 			var buildInfo = buildsInData[0];
-			if (me.species == buildInfo.species.latin_name && me.build == buildInfo.build.name) {
+			if (genomeBuildHelper.currentSpecies.name == buildInfo.species.name && genomeBuildHelper.currentBuild.name == buildInfo.build.name) {
 				callback(true);
 			} else {
 				callback(false, 'Incompatible build. Data files specify the genome build ' + buildInfo.species.name + ' ' + buildInfo.build.name);
 			}
 		} else {
-			var message = "Imcompatible builds in files.";
-			buildsInData.forEach(function(buildInfo) {
-				message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
-				var fromCount = 0;
-				buildInfo.from.forEach(function(fileInfo) {
-					if (fromCount > 0) {
-						message += ", ";
-					}
-					message += fileInfo.relationship + " " + fileInfo.type;
-					fromCount++;
-				});
-				message += ".";
-			});
-			callback(false, message);
+			callback(false, genomeBuildHelper.formatIncompatibleBuildsMessage(buildsInData));
 		}
 	});
 }
@@ -617,10 +565,30 @@ DataCard.prototype.getHeadersFromVcfs = function(callback) {
 DataCard.prototype.init = function() {
 	var me = this;
 
-	if (this.isLevelEdu) {
-		this.demoNames
-	}
-	me.loadSpeciesAndBuilds();
+
+	$('#select-species').selectize(
+		{	
+			create: true, 			
+			valueField: 'name',
+	    	labelField: 'name',
+	    	searchField: ['name'],
+	    	maxItems: 1,
+	    	options: genomeBuildHelper.speciesList
+    	}
+	);
+	me.addSpeciesListener();
+	$('#select-build').selectize(
+		{
+			create: true, 			
+			valueField: 'name',
+	    	labelField: 'name',
+	    	searchField: ['name']
+    	}
+	);
+	me.addBuildListener();
+	me.setDefaultBuildFromData();
+
+
 	$('#proband-data').append(dataCardEntryTemplate());
 	$('#proband-data #vcf-sample-select').selectize(
 		{ 

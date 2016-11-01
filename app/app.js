@@ -184,7 +184,11 @@ $(document).ready(function(){
 	}));
 
 	Promise.all(promises).then(function() {
-		init();
+		// Initialize genomeBuild helper
+		genomeBuildHelper = new GenomeBuildHelper();
+		genomeBuildHelper.promiseInit().then(function() {
+			init();
+		});
 	});
 
 	
@@ -223,8 +227,7 @@ function determineStyle() {
 function init() {
 	var me = this;
 
-	// Initialize genomeBuild helper
-	genomeBuildHelper = new GenomeBuildHelper();
+
 
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
@@ -1657,8 +1660,8 @@ function loadGeneWidget(callback) {
 		checkGeneSource(data.name);
 
 		url += "?source=" + geneSource;
-		url += "&species=" + dataCard.species;
-		url += "&build="   + dataCard.build;
+		url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
+		url += "&build="   + genomeBuildHelper.getCurrentBuildName();
 
 
 

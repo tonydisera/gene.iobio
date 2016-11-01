@@ -544,17 +544,10 @@ var Bam = Class.extend({
     this.transformRefName(refName, function(trRefName){
 
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
+      
+      //  Figure out the reference sequence file path
+      var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+      
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
       var cmd = null;
@@ -567,7 +560,7 @@ var Bam = Class.extend({
          {
             'urlparams': {'encoding':'binary'}
           });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFastaFile]);
       } else {
 
         var writeStream = function(stream) {
@@ -582,12 +575,12 @@ var Bam = Class.extend({
             {
               'urlparams': {'encoding':'binary'}
             });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFastaFile]);
          
       }
 
 
-      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-']);
       //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
 
 
@@ -646,17 +639,7 @@ var Bam = Class.extend({
     this.transformRefName(refName, function(trRefName){
 
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
+      var refFastaFile = genomeBuildHelper.getFastaPath(refName);
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
       var getBamCmds = [];
@@ -712,14 +695,14 @@ var Bam = Class.extend({
           freebayesArgs.push(bamCmd);
         });
         freebayesArgs.push("-f");
-        freebayesArgs.push(refFile);
+        freebayesArgs.push(refFastaFile);
 
         
         var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs);
         
 
         // Normalize variants
-        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-']);
 
         // Subset on all samples (this will get rid of low quality cases where no sample 
         // is actually called as having the alt) 

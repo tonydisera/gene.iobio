@@ -28,7 +28,7 @@ IOBIO.vcfReadDepther          = new_iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = new_iobio_services  + "snpeff/";
 IOBIO.vt                      = new_iobio_services  + "vt/";
 IOBIO.af                      = new_iobio_services  + "af/";
-IOBIO.vep                     = new_iobio_services  + "vep/";
+IOBIO.vep                     = dev_iobio_services  + "vep/";
 IOBIO.contigAppender          = new_iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = new_iobio_services  + "bcftools/";
 IOBIO.coverage                = new_iobio_services + "coverage/ ";
@@ -42,7 +42,7 @@ IOBIO.vcflib                  = new_iobio_services + "vcflib/";
 var OFFLINE_PHENOLYZER_CACHE_URL  = isOffline ?  (serverCacheDir) : ("../" + serverCacheDir);
 
 // Url for offline Clinvar URL
-var OFFLINE_CLINVAR_VCF_URL       = isOffline ?  ("http://" + serverInstance + serverCacheDir + "clinvar.vcf.gz") : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
+var OFFLINE_CLINVAR_VCF_BASE_URL  = isOffline ?  ("http://" + serverInstance + serverCacheDir) : "";
 
 var NCBI_GENE_SEARCH_URL          = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json";
 var NCBI_GENE_SUMMARY_URL         = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&usehistory=y&retmode=json"; 

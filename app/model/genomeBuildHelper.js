@@ -1,8 +1,19 @@
 function GenomeBuildHelper() {
+	this.currentSpecies = null;
+	this.currentBuild = null;
 	this.speciesList = [];
 	this.speciesNameToSpecies = {}; // map species name to the species object
 	this.speciesToBuilds = {};      // map species to its genome builds
 	this.buildNameToBuild = {};     // 
+
+	this.DEFAULT_SPECIES = "Human";
+	this.DEFAULT_BUILD   = "GRCh37";
+
+	this.ALIAS_CLINVAR = "CLINVAR";
+
+	this.RESOURCE_CLINVAR_VCF_S3      = "CLINVAR VCF S3";
+	this.RESOURCE_CLINVAR_VCF_OFFLINE = "CLINVAR VCF OFFLINE";
+
 }
 
 GenomeBuildHelper.prototype.promiseInit = function() {
@@ -25,10 +36,10 @@ GenomeBuildHelper.prototype.promiseInit = function() {
 	        	
 	        	allSpecies.forEach(function(species) {
 	        		// Map the species latin name to its species object
-	        		me.speciesNameToSpecies[species.latin_name] = species;
+	        		me.speciesNameToSpecies[species.name] = species;
 
 	        		// Collect all species into a list to use for dropdown
-	        		me.speciesList.push({name: species.name, value: species.latin_name});
+	        		me.speciesList.push({name: species.name, value: species.name});
 
 	        		species.genomeBuilds.forEach(function(genomeBuild) {
 
@@ -36,15 +47,23 @@ GenomeBuildHelper.prototype.promiseInit = function() {
 	        			me.buildNameToBuild[genomeBuild.name] = genomeBuild;
 
 	        			// Map the species to its genome builds
-	        			var builds = me.speciesToBuilds[species.latin_name];
+	        			var builds = me.speciesToBuilds[species.name];
 	        			if (builds == null) {
 	        				builds = [];
-	        				me.speciesToBuilds[species.latin_name] = builds;
+	        				me.speciesToBuilds[species.name] = builds;
 	        			}
 	        			builds.push(genomeBuild);
 	        		
 	        		})
 	        	});
+
+	        	// Default the species and build
+	        	if (me.currentSpecies == null) {
+	        		me.currentSpecies = me.speciesNameToSpecies[me.DEFAULT_SPECIES];
+	        	}
+	        	if (me.currentBuild == null) {
+	        		me.currentBuild = me.buildNameToBuild[me.DEFAULT_BUILD];
+	        	}
 
 	        	resolve();
 	        }
@@ -52,6 +71,64 @@ GenomeBuildHelper.prototype.promiseInit = function() {
 
 	});
 
+}
+GenomeBuildHelper.prototype.setCurrentSpecies = function(speciesName) {
+	this.currentSpecies = this.speciesNameToSpecies[speciesName];
+}
+
+GenomeBuildHelper.prototype.setCurrentBuild = function(buildName) {
+	this.currentBuild = this.buildNameToBuild[buildName];
+}
+
+
+GenomeBuildHelper.prototype.getCurrentSpeciesName = function() {
+	return this.currentSpecies ? this.currentSpecies.name : null;
+}
+
+GenomeBuildHelper.prototype.getCurrentSpeciesLatinName = function() {
+	return this.currentSpecies ? this.currentSpecies.latin_name : null;
+}
+
+GenomeBuildHelper.prototype.getCurrentBuildName = function() {
+	return this.currentBuild ? this.currentBuild.name : null;
+}
+
+GenomeBuildHelper.prototype.getFastaPath = function(ref) {
+	var fastaPath = null;
+	if (this.currentBuild) {
+		this.currentBuild.references.forEach(function(theReference) {
+			if (!fastaPath) {
+				if (theReference.name == ref || theReference.alias == ref) {
+					fastaPath = theReference.fastaPath;
+				}
+			}
+		})
+	}
+	return fastaPath;
+}
+
+GenomeBuildHelper.prototype.getBuildAlias = function(aliasType) {
+	var theAlias = null;
+	if (this.currentBuild) {
+		this.currentBuild.aliases.forEach(function(gbAlias)) {
+			if (!theAlias && gbAlias.type == aliasType) {
+				theAlias = gbAlias.alias;
+			}
+		}
+	}
+	return theAlias;
+}
+
+GenomeBuildHelper.prototype.getBuildResource = function(resourceType) {
+	var theResource = null;
+	if (this.currentBuild) {
+		this.currentBuild.resources.forEach(function(gbResource)) {
+			if (!theResource && gbResource.type == resourceType) {
+				theResource = gbAlias.resource;
+			}
+		}
+	}
+	return theResource;
 }
 
 
@@ -222,7 +299,7 @@ GenomeBuildHelper.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 
 		// For now, just default to Human if species can't be determined from file headers
 		if (!matchedSpecies) {
-			matchedSpecies = me.speciesNameToSpecies["homo_sapiens"];
+			matchedSpecies = me.speciesNameToSpecies[me.DEFAULT_SPECIES];
 		}
 
 		// Make sure each bam has a build that matches the selected
@@ -285,6 +362,23 @@ GenomeBuildHelper.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 	return {species: matchedSpecies, build: matchedBuild};
 
 
+}
+
+GenomeBuildHelper.prototype.formatIncompatibleBuildsMessage = function(buildsInData) {
+	var message = "Imcompatible builds in files.";	
+	buildsInData.forEach(function(buildInfo) {
+		message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
+		var fromCount = 0;
+		buildInfo.from.forEach(function(fileInfo) {
+			if (fromCount > 0) {
+				message += ", ";
+			}
+			message += fileInfo.relationship + " " + fileInfo.type;
+			fromCount++;
+		});
+		message += ".";
+	});
+	return message;	
 }
 
 
