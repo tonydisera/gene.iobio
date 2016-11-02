@@ -187,6 +187,7 @@ $(document).ready(function(){
 		// Initialize genomeBuild helper
 		genomeBuildHelper = new GenomeBuildHelper();
 		genomeBuildHelper.promiseInit().then(function() {
+			$('#build-link').text(genomeBuildHelper.getCurrentBuildName());
 			init();
 		});
 	});
@@ -1054,6 +1055,12 @@ function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
 }
 
 function loadGeneFromUrl() {
+	// Get the genome build
+	var build = getUrlParameter('build');
+	if (build != null && build != "") {
+		dataCard.setCurrentBuild(build);
+	}
+
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
 
@@ -1114,7 +1121,7 @@ function loadGeneFromUrl() {
 }
 
 function reloadGeneFromUrl() {
-	
+
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
 

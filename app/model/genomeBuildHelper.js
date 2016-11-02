@@ -99,10 +99,14 @@ GenomeBuildHelper.prototype.getFastaPath = function(ref) {
 		this.currentBuild.references.forEach(function(theReference) {
 			if (!fastaPath) {
 				if (theReference.name == ref || theReference.alias == ref) {
-					fastaPath = theReference.fastaPath;
+					if (ref.indexOf('chr') == 0) {
+						fastaPath = theReference.fastaPathUCSC;
+					} else {
+						fastaPath = theReference.fastaPathEnsembl;
+					}
 				}
 			}
-		})
+		});
 	}
 	return fastaPath;
 }
@@ -124,7 +128,7 @@ GenomeBuildHelper.prototype.getBuildResource = function(resourceType) {
 	if (this.currentBuild) {
 		this.currentBuild.resources.forEach(function(gbResource) {
 			if (!theResource && gbResource.type == resourceType) {
-				theResource = gbAlias.resource;
+				theResource = gbResource.resource;
 			}
 		});
 	}

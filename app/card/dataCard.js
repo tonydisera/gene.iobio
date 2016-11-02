@@ -1,4 +1,5 @@
 function DataCard() {
+	this.buildDefaulted = false;
 
 
 	this.defaultNames = {
@@ -391,6 +392,14 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 }
 
+DataCard.prototype.setCurrentBuild = function(buildName) {
+	if ($('#select-build')[0].selectize) {
+		$('#select-build')[0].selectize.addItem(buildName);
+		genomeBuildHelper.setCurrentBuild(buildName);
+		$('#build-link').text(value);
+	}
+}
+
 
 
 DataCard.prototype.removeSpeciesListener = function() {
@@ -407,13 +416,16 @@ DataCard.prototype.addSpeciesListener = function() {
 	        	return;
 	        }
 	        genomeBuildHelper.setCurrentSpecies(value);
+	        updateUrl("species", value);
 	        var selectizeBuild = $('#select-build')[0].selectize;
 	        selectizeBuild.disable();
 	        selectizeBuild.clearOptions();
+	        
 	        selectizeBuild.load(function(callback) {
 	        	selectizeBuild.enable();
 	        	callback(genomeBuildHelper.speciesToBuilds[value]);
 	        });
+			
 	    });
 	}
 
@@ -435,6 +447,8 @@ DataCard.prototype.addBuildListener = function() {
 				return;
 			}
 			genomeBuildHelper.setCurrentBuild(value);
+			updateUrl("build", value);
+			$('#build-link').text(value);
 			me.validateBuildFromData(function(success, message) {
 				if (success) {
 					$('#species-build-warning').addClass("hide");
@@ -459,8 +473,10 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 			if (buildsInData.length == 0) {
 				$('#species-build-warning').addClass("hide");
 				window.enableLoadButton();
+
 			} else if (buildsInData.length == 1) {			
 				var buildInfo = buildsInData[0];
+				
 				me.removeBuildListener();
 				genomeBuildHelper.setCurrentSpecies(buildInfo.species.name);
 				genomeBuildHelper.setCurrentBuild(buildInfo.build.name);
@@ -576,15 +592,22 @@ DataCard.prototype.init = function() {
 	    	options: genomeBuildHelper.speciesList
     	}
 	);
-	me.addSpeciesListener();
 	$('#select-build').selectize(
 		{
 			create: true, 			
 			valueField: 'name',
 	    	labelField: 'name',
-	    	searchField: ['name']
+	    	searchField: ['name'],
+	    	onOptionAdd: function(value) {
+	    		if (!me.buildDefaulted) {
+	    			$('#select-build')[0].selectize.addItem(genomeBuildHelper.currentBuild.name, false);
+	    			me.buildDefaulted = true; 
+	    		}
+	    	}
     	}
 	);
+	me.addSpeciesListener();
+	$('#select-species')[0].selectize.addItem(genomeBuildHelper.getCurrentSpeciesName());
 	me.addBuildListener();
 	me.setDefaultBuildFromData();
 
@@ -621,6 +644,7 @@ DataCard.prototype.init = function() {
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
+	    	
     	}
 	);
 
