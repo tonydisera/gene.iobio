@@ -110,11 +110,11 @@ GenomeBuildHelper.prototype.getFastaPath = function(ref) {
 GenomeBuildHelper.prototype.getBuildAlias = function(aliasType) {
 	var theAlias = null;
 	if (this.currentBuild) {
-		this.currentBuild.aliases.forEach(function(gbAlias)) {
+		this.currentBuild.aliases.forEach(function(gbAlias) {
 			if (!theAlias && gbAlias.type == aliasType) {
 				theAlias = gbAlias.alias;
 			}
-		}
+		});
 	}
 	return theAlias;
 }
@@ -122,11 +122,11 @@ GenomeBuildHelper.prototype.getBuildAlias = function(aliasType) {
 GenomeBuildHelper.prototype.getBuildResource = function(resourceType) {
 	var theResource = null;
 	if (this.currentBuild) {
-		this.currentBuild.resources.forEach(function(gbResource)) {
+		this.currentBuild.resources.forEach(function(gbResource) {
 			if (!theResource && gbResource.type == resourceType) {
 				theResource = gbAlias.resource;
 			}
-		}
+		});
 	}
 	return theResource;
 }
