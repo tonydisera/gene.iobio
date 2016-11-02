@@ -5,3 +5,5 @@ before_script:
   - npm install -g gulp
 after_script:
   - cat ./spec/coverage/**/*.info | node ./node_modules/coveralls/bin/coveralls.js
+addons:
+  firefox: "latest"
