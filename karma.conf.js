@@ -16,6 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
         'assets/js/jquery.1.11.1.min.js',
+        { pattern: 'templates/*.hbs', watched: false, included: false, served: true, nocache: false },
         'assets/js/**/*.js',
         'app/globalsDeployment.js',
         'app/globals.js',
@@ -55,7 +56,7 @@ module.exports = function(config) {
     },
 
     proxies: {
-        '/templates': '/templates'
+        '/templates/': '/base/templates/'
     },
 
     // test results reporter to use
