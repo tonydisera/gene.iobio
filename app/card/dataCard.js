@@ -396,7 +396,7 @@ DataCard.prototype.setCurrentBuild = function(buildName) {
 	if ($('#select-build')[0].selectize) {
 		$('#select-build')[0].selectize.addItem(buildName);
 		genomeBuildHelper.setCurrentBuild(buildName);
-		$('#build-link').text(value);
+		$('#build-link').text(buildName);
 	}
 }
 

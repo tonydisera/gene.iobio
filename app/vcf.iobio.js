@@ -667,7 +667,7 @@ var effectCategories = [
     // Get the vep args
     var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
     if (isRefSeq) {
-      vepArgs = " --refseq ";
+      vepArgs += " --refseq ";
     }
     // If we are getting the hgvs notation, we need an extra command line arg for vep
     if (hgvsNotation) {
@@ -1204,7 +1204,7 @@ var effectCategories = [
         }
       });
 
-      var clinvarBuild = genomeBuildHelper.getBuildAlias(genomeBuildHelper.ALIAS_CLINVAR);
+      var clinvarBuild = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_POSITION);
       url = url.slice(0,url.length-1) + '[' + clinvarBuild + '])';
 
       var clinvarVariants = null;
@@ -1239,8 +1239,8 @@ var effectCategories = [
                     resolve();
                   } else {
                     var sorted = sumData.result.uids.sort(function(a,b){
-                      var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                      var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                      var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].start);
+                      var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].start);
                       if ( aStart > bStart)
                         return 1;
                       else
@@ -1280,7 +1280,7 @@ var effectCategories = [
     // Figure out the vep args
     var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
     if (isRefSeq) {
-      vepArgs = " --refseq "
+      vepArgs += " --refseq "
     }
     if (hgvsNotation) {
       vepArgs += " --hgvs ";
