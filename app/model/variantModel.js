@@ -1576,9 +1576,9 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 	var loadClinvarProperties = function(recs) {
 		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinVarIds.length; null) {
 			var uid = clinVarIds[clinvarIter];
-			var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start;
-			var clinVarAlt   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].alt;
-			var clinVarRef   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].ref;
+			var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].start;
+			var clinVarAlt   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].alt;
+			var clinVarRef   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].ref;
 
 			
 			// compare curr variant and curr clinVar record
@@ -2177,7 +2177,8 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		}
 
 
-		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
+		//return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
+		return meetsRegion  && meetsCoverage && meetsAnnot && meetsExonic;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures,

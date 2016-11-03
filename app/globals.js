@@ -34,7 +34,7 @@ IOBIO.bcftools                = new_iobio_services  + "bcftools/";
 IOBIO.coverage                = new_iobio_services + "coverage/ ";
 IOBIO.samtools                = new_iobio_services +  "samtools/";
 IOBIO.samtoolsOnDemand        = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.freebayes               = new_iobio_services + "freebayes/";
+IOBIO.freebayes               = dev_iobio_services + "freebayes/";
 IOBIO.vcflib                  = new_iobio_services + "vcflib/";
 
 

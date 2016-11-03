@@ -546,7 +546,7 @@ var Bam = Class.extend({
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
       
       //  Figure out the reference sequence file path
-      var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
       
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
@@ -600,9 +600,9 @@ var Bam = Class.extend({
       //cmd = cmd.pipe(IOBIO.af)
 
       // VEP to annotate
-      var vepArgs = "";
+      var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
       if (isRefSeq) {
-        vepArgs = " --refseq "
+        vepArgs += " --refseq "
       }
       //cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
 
@@ -639,7 +639,7 @@ var Bam = Class.extend({
     this.transformRefName(refName, function(trRefName){
 
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
       var getBamCmds = [];
@@ -709,7 +709,7 @@ var Bam = Class.extend({
         //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
 
         // Filter out anything with qual <= 0
-        cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-']);
+        cmd = cmd.pipe(IOBIO.vt, ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-']);
 
 
         //
@@ -728,9 +728,9 @@ var Bam = Class.extend({
         cmd = cmd.pipe(IOBIO.af)
 
         // VEP to annotate
-        var vepArgs = "";
+        var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
         if (isRefSeq) {
-          vepArgs = " --refseq "
+          vepArgs += " --refseq "
         }
         cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
 
