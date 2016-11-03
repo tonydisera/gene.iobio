@@ -2177,8 +2177,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		}
 
 
-		//return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
-		return meetsRegion  && meetsCoverage && meetsAnnot && meetsExonic;
+		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures,
