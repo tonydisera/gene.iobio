@@ -1636,7 +1636,7 @@ var effectCategories = [
 
                       var valueUrl = "";
                       if (feature != "" && feature != null) {
-                        var url = "http://grch37.ensembl.org/Homo_sapiens/Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
+                        var url = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_ENSEMBL_URL) + "Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
                         valueUrl = '<a href="' + url + '" target="_reg">' + reg.split("_").join(" ").toLowerCase() + '</a>';
                       } else {
                         valueUrl = reg.split("_").join(" ").toLowerCase();
