@@ -1497,99 +1497,44 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
 	setGeneBloodhoundInputElement(geneName);
 	me.setSelectedGene(geneName);
 
-	var url = geneInfoServer + 'api/gene/' + geneName;
-	url += "?source=" + geneSource;
-	url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
-	url += "&build="   + genomeBuildHelper.getCurrentBuildName();
+	promiseGetGeneModel(geneName).then(function(geneModel) {
+		 
+    	// We have successfully return the gene model data.
+    	// Load all of the tracks for the gene's region.
+    	window.gene = geneModel;
 
-	$.ajax({
-	    url: url,
-	    jsonp: "callback",
-	    type: "GET",
-	    dataType: "jsonp",
-	    success: function( response ) {
+    	if (!validateGeneTranscripts()) {
+    		return;
+    	}
 
-	    	if (response[0].hasOwnProperty('gene_name')) {
-		    	// We have successfully return the gene model data.
-		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];
+    	adjustGeneRegion(window.gene);
 
-		    	if (!validateGeneTranscripts()) {
-		    		return;
-		    	}
+    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
+    	window.geneObjects[window.gene.gene_name] = window.gene;
 
-		    	adjustGeneRegion(window.gene);
+    	updateUrl('gene', window.gene.gene_name);
 
-		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
-		    	window.geneObjects[window.gene.gene_name] = window.gene;
+    	if (!isLevelBasic) {
+			loadTracksForGene();		    		
+    	}
+	    	
+	    me.updateGeneInfoLink(window.gene.gene_name, function() {
+			if (!hasDataSources()) {
+				firstTimeGeneLoaded = false; 
+			}
+			if (callback) {
+				callback();
+			}
+	    });
+	}, 
+	function(error) {
+		me.setGeneBadgeError(geneName);
 
-		    	updateUrl('gene', window.gene.gene_name);
-
-		    	if (!isLevelBasic) {
-					loadTracksForGene();		    		
-		    	}
-			    	
-			    me.updateGeneInfoLink(window.gene.gene_name, function() {
-					if (!hasDataSources()) {
-						firstTimeGeneLoaded = false; 
-					}
-					if (callback) {
-						callback();
-					}
-
-			    	
-			    });
-
-	    	} else {
-	    		console.log("Gene " + geneName + " not found");
-	    		me.setGeneBadgeError(geneName);
-
-	    	}
-
-	    }
-	 });
+	});
 }
 
-/**
-*
-* For some unknown reason, when chosen.js was swapped out with selectize.js, the
-* browser would hang in selectGene() after a gene source (refseq vs gencode) was
-* selected from the dropdown.  It seemed to happen when the dom was changed, so
-* to workaround this problem, refreshGene() is called when the gene source
-* changes.
-*/
-GenesCard.prototype.refreshGene = function(geneName) {
-	var me = this;
 
-	var url = geneInfoServer + 'api/gene/' + window.gene.gene_name;
-	url += "?source=" + geneSource;
 
-	$.ajax({
-	    url: url,
-	    jsonp: "callback",
-	    type: "GET",
-	    dataType: "jsonp",
-	    success: function( response ) {
-
-	    	if (response[0].hasOwnProperty('gene_name')) {
-		    	// We have successfully return the gene model data.
-		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];
-		    	if (!validateGeneTranscripts()) {
-		    		return;
-		    	}
-		    	adjustGeneRegion(window.gene);
-		    	window.geneObjects[window.gene.gene_name] = window.gene;
-		    	// loadTracksForGene(false);
-	    	} else {
-	    		alertify.error("Gene " + geneName + " not found. ",
-				      		    function (e) {
-				     			});
-	    	}
-
-	    }
-	 });
-}
 GenesCard.prototype.updateGeneInfoLink = function(geneName, callback) {
 	var me = this;
 

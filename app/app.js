@@ -1620,6 +1620,44 @@ function getUrlParameter(sParam) {
     	return hits;
 }
 
+function promiseGetGeneModel(geneName) {
+	return new Promise(function(resolve, reject) {
+
+		var url = geneInfoServer + 'api/gene/' + geneName;
+
+		url += "?source="  + geneSource;
+		url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
+		url += "&build="   + genomeBuildHelper.getCurrentBuildName();
+
+
+		$.ajax({
+		    url: url,
+		    jsonp: "callback",
+		    type: "GET",
+		    dataType: "jsonp",
+		    success: function( response ) {
+		    	if (response.length > 0 && response[0].hasOwnProperty('gene_name')) {
+		    		var geneModel = response[0];
+			    	resolve(geneModel);
+		    	} else {
+					console.log("Gene " + geneName + " not found.  Empty results returned from " + url);
+	    			reject();
+		    	}
+		    },
+			error: function( xhr, status, errorThrown ) {
+		        
+		        console.log("Gene " +  geneName + " not found.  Error occurred.");
+		        console.log( "Error: " + errorThrown );
+		        console.log( "Status: " + status );
+		        console.log( xhr );
+	    		reject();
+
+		    }		
+		});
+
+	});
+}
+
 
 
 function loadGeneWidget(callback) {
@@ -1657,117 +1695,94 @@ function loadGeneWidget(callback) {
 		} else if (data.loadFromUrl) {
 			loadedUrl = true;
 		}
-		
-		if (data.name.indexOf(':') != -1) var searchType = 'region';
-		else var searchType = 'gene';
-		var url = geneInfoServer + 'api/' + searchType + '/' + data.name;
 
+		var theGeneName = data.name;
+		
+		
 		// If necessary, switch from gencode to refseq or vice versa if this gene
 		// only has transcripts in only one of the gene sets
-		checkGeneSource(data.name);
+		checkGeneSource(theGeneName);
 
-		url += "?source=" + geneSource;
-		url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
-		url += "&build="   + genomeBuildHelper.getCurrentBuildName();
+		promiseGetGeneModel(data.name).then( function(geneModel) {
+	    	// We have successfully return the gene model data.
+	    	// Load all of the tracks for the gene's region.
+	    	window.gene = geneModel;	
+	    	
+	    	adjustGeneRegion(window.gene);	
 
-
-
-		$.ajax({
-		    url: url,
-		    jsonp: "callback",
-		    type: "GET",
-		    dataType: "jsonp",
-		    success: function( response ) {
-
-		    	// We have successfully return the gene model data.
-		    	// Load all of the tracks for the gene's region.
-		    	window.gene = response[0];	
+	    	// Add the gene badge
+	    	genesCard.addGene(window.gene.gene_name);	
 		    	
-		    	adjustGeneRegion(window.gene);	
+	    	    
+	    	window.geneObjects[window.gene.gene_name] = window.gene;
 
-		    	// Add the gene badge
-		    	genesCard.addGene(window.gene.gene_name);	
-			    	
-		    	    
-		    	window.geneObjects[window.gene.gene_name] = window.gene;
+	    	if (!validateGeneTranscripts()) {
+	    		return;
+	    	}
+	    	
+	    	// set all searches to correct gene	
+		    setGeneBloodhoundInputElement(window.gene.gene_name);
+	    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
+	    	
 
-		    	if (!validateGeneTranscripts()) {
-		    		return;
+	    	if (data.loadFromUrl) {
+
+	    		var bam  = getUrlParameter(/bam*/);
+				var vcf  = getUrlParameter(/vcf*/);	
+
+				if (vcf != null && vcf.length > 0) {
+					firstTimeGeneLoaded = false;
+				}
+
+				if (bam == null && vcf == null) {
+					// Open the 'About' sidebar by default if there is no data loaded when gene is launched
+					if (isLevelEdu) {
+						if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+							showSidebar("Phenolyzer");
+						}							
+					} else {
+						showSidebar("Help");
+					}
+
+					//$('#tourWelcome').addClass("open");
+				}
+
+				if (!isOffline) {
+			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
+				}
+
+	    		// Autoload data specified in url
+				loadUrlSources();
+
+				enableCallVariantsButton();	
+			} else {
+
+				$('#splash').addClass("hide");
+
+				genesCard.setSelectedGene(window.gene.gene_name);
+		    	loadTracksForGene();
+
+		    	// add gene to url params
+		    	updateUrl('gene', window.gene.gene_name);
+
+		    	if (!isOffline) {
+			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
 		    	}
-		    	
-		    	// set all searches to correct gene	
-			    setGeneBloodhoundInputElement(window.gene.gene_name);
-		    	window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
-		    	
 
-		    	if (data.loadFromUrl) {
+				if (firstTimeGeneLoaded && !hasDataSources()) {
+					//showDataDialog();
+					firstTimeGeneLoaded = false; 
+				}
 
-		    		var bam  = getUrlParameter(/bam*/);
-					var vcf  = getUrlParameter(/vcf*/);	
+		    	if(data.callback != undefined) data.callback();
 
-					if (vcf != null && vcf.length > 0) {
-						firstTimeGeneLoaded = false;
-					}
+		    }					
 
-					if (bam == null && vcf == null) {
-						// Open the 'About' sidebar by default if there is no data loaded when gene is launched
-						if (isLevelEdu) {
-							if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-								showSidebar("Phenolyzer");
-							}							
-						} else {
-							showSidebar("Help");
-						}
 
-						//$('#tourWelcome').addClass("open");
-					}
+		}, function(error) {
+			genesCard.setGeneBadgeError(theGeneName);
 
-					if (!isOffline) {
-				    	genesCard.updateGeneInfoLink(window.gene.gene_name);
-					}
-
-		    		// Autoload data specified in url
-					loadUrlSources();
-
-					enableCallVariantsButton();						
-		    	} else {
-	
-					$('#splash').addClass("hide");
-
-					genesCard.setSelectedGene(window.gene.gene_name);
-			    	loadTracksForGene();
-
-			    	// add gene to url params
-			    	updateUrl('gene', window.gene.gene_name);
-
-			    	if (!isOffline) {
-				    	genesCard.updateGeneInfoLink(window.gene.gene_name);
-			    	}
-
-					if (firstTimeGeneLoaded && !hasDataSources()) {
-						//showDataDialog();
-						firstTimeGeneLoaded = false; 
-					}
-
-			    	if(data.callback != undefined) data.callback();
-
-		    	}
-		    	
-
-	       	},
-		    error: function( xhr, status, errorThrown ) {
-		        
-		        console.log( "Error: " + errorThrown );
-		        console.log( "Status: " + status );
-		        console.log( xhr );
-		        console.log("Gene " + data.name + " not found");
-	    		genesCard.setGeneBadgeError(data.name);
-
-		    },
-		    complete: function( xhr, status ) {
-		    }
 		});
-
 		
 		
 	});	
