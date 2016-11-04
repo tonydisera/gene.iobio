@@ -2597,7 +2597,9 @@ text.ref-count {
   padding-left: 5px;
   font-size: 11px;
   text-align: left;
-  width: 300px; }
+  width: 230px;
+  color: #717171;
+  font-style: italic; }
 
 .call-variants-count {
   font-size: 11px;
