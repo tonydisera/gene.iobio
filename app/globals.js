@@ -11,8 +11,8 @@ var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_
 
 // http services
 //var geneInfoServer            = iobio_http_services + "geneinfo/";
-var geneInfoServer            = "http://" + dev_iobio_services + "geneinfo/";
-var genomeBuildServer         = "http://" + dev_iobio_services + "genomebuild/";
+var geneInfoServer            = "http://" + dev_iobio_services + "geneinfo/";   // !pointed to nv-dev
+var genomeBuildServer         = "http://" + dev_iobio_services + "genomebuild/"; // !pointed to nv-dev
 var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
@@ -26,15 +26,15 @@ var IOBIO = {};
 IOBIO.tabix                   = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
 IOBIO.vcfReadDepther          = new_iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = new_iobio_services  + "snpeff/";
-IOBIO.vt                      = dev_iobio_services  + "vt/";
-IOBIO.af                      = new_iobio_services  + "af/";
-IOBIO.vep                     = dev_iobio_services  + "vep/";
+IOBIO.vt                      = dev_iobio_services  + "vt/";  // !pointed to nv-dev
+IOBIO.af                      = dev_iobio_services  + "af/";  // !pointed to nv-dev
+IOBIO.vep                     = dev_iobio_services  + "vep/"; // !pointed to nv-dev
 IOBIO.contigAppender          = new_iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = new_iobio_services  + "bcftools/";
 IOBIO.coverage                = new_iobio_services + "coverage/ ";
 IOBIO.samtools                = new_iobio_services +  "samtools/";
 IOBIO.samtoolsOnDemand        = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.freebayes               = dev_iobio_services + "freebayes/";
+IOBIO.freebayes               = dev_iobio_services + "freebayes/"; // !pointed to nv-dev
 IOBIO.vcflib                  = new_iobio_services + "vcflib/";
 
 

@@ -700,7 +700,7 @@ var effectCategories = [
     cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'])
 
     // get allele frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af);
+    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()]);
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (isRefSeq || annotationEngine == 'vep') {
@@ -1319,7 +1319,7 @@ var effectCategories = [
     cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFastaFile, '-'])
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af)
+    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()])
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
