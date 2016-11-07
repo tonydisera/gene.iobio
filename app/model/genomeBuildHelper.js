@@ -9,6 +9,8 @@ function GenomeBuildHelper() {
 	this.DEFAULT_SPECIES = "Human";
 	this.DEFAULT_BUILD   = "GRCh37";
 
+	this.ALIAS_UCSC                   = "UCSC";
+
 	this.RESOURCE_CLINVAR_VCF_S3      = "CLINVAR VCF S3";
 	this.RESOURCE_CLINVAR_VCF_OFFLINE = "CLINVAR VCF OFFLINE";
 	this.RESOURCE_CLINVAR_POSITION    = "CLINVAR EUTILS BASE POSITION";
@@ -34,36 +36,7 @@ GenomeBuildHelper.prototype.promiseInit = function() {
 			},
 	        success: function(allSpecies) {
 	        	
-	        	allSpecies.forEach(function(species) {
-	        		// Map the species latin name to its species object
-	        		me.speciesNameToSpecies[species.name] = species;
-
-	        		// Collect all species into a list to use for dropdown
-	        		me.speciesList.push({name: species.name, value: species.name});
-
-	        		species.genomeBuilds.forEach(function(genomeBuild) {
-
-	        			// Map the build name to its build object
-	        			me.buildNameToBuild[genomeBuild.name] = genomeBuild;
-
-	        			// Map the species to its genome builds
-	        			var builds = me.speciesToBuilds[species.name];
-	        			if (builds == null) {
-	        				builds = [];
-	        				me.speciesToBuilds[species.name] = builds;
-	        			}
-	        			builds.push(genomeBuild);
-	        		
-	        		})
-	        	});
-
-	        	// Default the species and build
-	        	if (me.currentSpecies == null) {
-	        		me.currentSpecies = me.speciesNameToSpecies[me.DEFAULT_SPECIES];
-	        	}
-	        	if (me.currentBuild == null) {
-	        		me.currentBuild = me.buildNameToBuild[me.DEFAULT_BUILD];
-	        	}
+	        	me.init(allSpecies);
 
 	        	resolve();
 	        }
@@ -72,6 +45,41 @@ GenomeBuildHelper.prototype.promiseInit = function() {
 	});
 
 }
+
+GenomeBuildHelper.prototype.init = function(allSpecies) {
+	var me = this;
+	allSpecies.forEach(function(species) {
+		// Map the species latin name to its species object
+		me.speciesNameToSpecies[species.name] = species;
+
+		// Collect all species into a list to use for dropdown
+		me.speciesList.push({name: species.name, value: species.name});
+
+		species.genomeBuilds.forEach(function(genomeBuild) {
+
+			// Map the build name to its build object
+			me.buildNameToBuild[genomeBuild.name] = genomeBuild;
+
+			// Map the species to its genome builds
+			var builds = me.speciesToBuilds[species.name];
+			if (builds == null) {
+				builds = [];
+				me.speciesToBuilds[species.name] = builds;
+			}
+			builds.push(genomeBuild);
+		
+		})
+	});
+
+	// Default the species and build
+	if (me.currentSpecies == null) {
+		me.currentSpecies = me.speciesNameToSpecies[me.DEFAULT_SPECIES];
+	}
+	if (me.currentBuild == null) {
+		me.currentBuild = me.buildNameToBuild[me.DEFAULT_BUILD];
+	}	
+}
+
 GenomeBuildHelper.prototype.setCurrentSpecies = function(speciesName) {
 	this.currentSpecies = this.speciesNameToSpecies[speciesName];
 }
