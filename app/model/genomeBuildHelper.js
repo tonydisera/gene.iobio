@@ -228,12 +228,21 @@ GenomeBuildHelper.prototype.getBuildFromVcfHeader = function(header) {
 		        refLength = field.split("length=")[1];
 		      }
 		      if (!buildInfo.build && field.indexOf("assembly=") == 0) {
-		        buildInfo.build = field.split("assembly=")[1];
+		        var buildString = field.split("assembly=")[1];
+		        if (buildString.indexOf("\"") == 0) {
+		          buildInfo.build = buildString.split("\"")[1];
+		        } else if (buildString.indexOf("'") == 0) {
+		          buildInfo.build = buildString.split("'")[1];
+		        } else {
+		          buildInfo.build = buildString;
+		        }
 		      }
 		      if (!buildInfo.species && field.indexOf("species=") == 0) {
 		        var speciesString = field.split("species=")[1];
 		        if (speciesString.indexOf("\"") == 0) {
 		          buildInfo.species = speciesString.split("\"")[1];
+		        } else if (speciesString.indexOf("'") == 0) {
+		          buildInfo.species = speciesString.split("'")[1];
 		        } else {
 		          buildInfo.species = speciesString;
 		        }
