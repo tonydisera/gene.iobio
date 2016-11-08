@@ -193,6 +193,27 @@ describe('genomeBuildHelper', function() {
 			expect(speciesBuild.species.name).toEqual("Human");
 			expect(speciesBuild.build.name).toEqual("GRCh38");
 
+			// With quotes around species and assembly
+			vcfHeader = "##contig=<ID=1,species=\"Human\",assembly=\"NCBI38\">";
+			buildInfo = genomeBuildHelper.getBuildFromVcfHeader(vcfHeader);
+			expect(Object.keys(buildInfo.references).length).toEqual(0);
+			expect(buildInfo.species).toEqual('Human');
+			expect(buildInfo.build).toEqual('NCBI38');
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild(buildInfo);
+			expect(speciesBuild.species.name).toEqual("Human");
+			expect(speciesBuild.build.name).toEqual("GRCh38");
+
+			// With single quotes around species and assembly
+			vcfHeader = "##contig=<ID=1,species='Human',assembly='NCBI38'>";
+			buildInfo = genomeBuildHelper.getBuildFromVcfHeader(vcfHeader);
+			expect(Object.keys(buildInfo.references).length).toEqual(0);
+			expect(buildInfo.species).toEqual('Human');
+			expect(buildInfo.build).toEqual('NCBI38');
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild(buildInfo);
+			expect(speciesBuild.species.name).toEqual("Human");
+			expect(speciesBuild.build.name).toEqual("GRCh38");
+
+
 		});
 	});
 
