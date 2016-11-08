@@ -64,6 +64,111 @@ describe('genomeBuildHelper', function() {
 		});
 	});
 
+	describe('#getProperSpeciesAndBuild', function() {
+		it('get the matching species and build for build info', function() {
+			var speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'hg19'});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build.name).toEqual('GRCh37');
+			
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'NCBI37'});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build.name).toEqual('GRCh37');
+			
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'hg38'});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build.name).toEqual('GRCh38');
+
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'xx'});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build).toBeNull();
+		});
+	});
+
+	describe('#getProperSpeciesAndBuildForReferences', function() {
+		it('get the matching species and build for build info containing only reference lengths', function() {
+			var speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: null, build: null, references: {1:249250621}});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build.name).toEqual('GRCh37');
+
+			// Make sure it works when reference name starts with chr
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: null, build: null, references: {'chr1':249250621}});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build.name).toEqual('GRCh37');
+
+			// Make sure it works when reference length off by 1
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: null, build: null, references: {'chr1':249250620}});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build.name).toEqual('GRCh37');
+
+			// When a wrong reference length is supplied, the build is not found
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: null, build: null, references: {1:249250621, 2: 20}});
+			expect(speciesBuild.species.name).toEqual('Human');
+			expect(speciesBuild.build).toBeNull();
+		});
+	});
+
+	describe('#parseBuildInfo', function() {
+		it('show all species/builds found from build infos', function() {
+			var theBuilds = [];
+			genomeBuildHelper.parseBuildInfo({species:'Human', build: 'NCBI37'}, 'proband', 'bam', theBuilds);
+			expect(theBuilds.length).toEqual(1);
+			expect(theBuilds[0].species.name).toEqual('Human');
+			expect(theBuilds[0].build.name).toEqual('GRCh37');
+			expect(theBuilds[0].from.length).toEqual(1);
+			expect(theBuilds[0].from[0].relationship).toEqual('proband');
+			expect(theBuilds[0].from[0].type).toEqual('bam');
+
+
+			// Now add another build.  Now theBuilds should have two elements for the different builds
+			genomeBuildHelper.parseBuildInfo({species:'Human', build: 'hg38'}, 'mother', 'bam', theBuilds);
+			expect(theBuilds.length).toEqual(2);
+			expect(theBuilds[0].species.name).toEqual('Human');
+			expect(theBuilds[0].build.name).toEqual('GRCh37');
+			expect(theBuilds[1].species.name).toEqual('Human');
+			expect(theBuilds[1].build.name).toEqual('GRCh38');
+			expect(theBuilds[1].from.length).toEqual(1);
+			expect(theBuilds[1].from[0].relationship).toEqual('mother');
+			expect(theBuilds[1].from[0].type).toEqual('bam');
+
+			// Now we match to a build we have already encountered.  theBuilds will still have
+			// 2 elements, but the from field on the first element will contain 2 entries
+			genomeBuildHelper.parseBuildInfo({species:'Human', build: 'hg19'}, 'father', 'vcf', theBuilds);
+			expect(theBuilds.length).toEqual(2);
+			expect(theBuilds[0].species.name).toEqual('Human');
+			expect(theBuilds[0].build.name).toEqual('GRCh37');
+			expect(theBuilds[0].from.length).toEqual(2);
+			expect(theBuilds[0].from[0].relationship).toEqual('proband');
+			expect(theBuilds[0].from[0].type).toEqual('bam');
+			expect(theBuilds[0].from[1].relationship).toEqual('father');
+			expect(theBuilds[0].from[1].type).toEqual('vcf');
+
+		});
+	});
+
+	describe('#getBuildFromVcfHeader', function() {
+		it('get the build info from the vcf header', function() {
+			var vcfHeader = "##contig=<ID=1,length=249250621>\n##contig=<ID=chr2,length=243199373>";
+			var buildInfo = genomeBuildHelper.getBuildFromVcfHeader(vcfHeader);
+			expect(Object.keys(buildInfo.references).length).toEqual(2);
+			expect(buildInfo.references["1"]).toEqual("249250621");
+			expect(buildInfo.references["chr2"]).toEqual("243199373");
+			var speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild(buildInfo);
+			expect(speciesBuild.species.name).toEqual("Human");
+			expect(speciesBuild.build.name).toEqual("GRCh37");
+
+
+			vcfHeader = "##contig=<ID=1,species=Human,assembly=NCBI38>";
+			buildInfo = genomeBuildHelper.getBuildFromVcfHeader(vcfHeader);
+			expect(Object.keys(buildInfo.references).length).toEqual(0);
+			expect(buildInfo.species).toEqual('Human');
+			expect(buildInfo.build).toEqual('NCBI38');
+			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild(buildInfo);
+			expect(speciesBuild.species.name).toEqual("Human");
+			expect(speciesBuild.build.name).toEqual("GRCh38");
+
+		});
+	});
+
 
 
 });

@@ -344,7 +344,7 @@ GenomeBuildHelper.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 							if (buildInfo.references[reference.name]) {
 								refLength = buildInfo.references[reference.name];
 							} else if (buildInfo.references[reference.alias]) {
-								refLength = buildInfo.references[reference.name];
+								refLength = buildInfo.references[reference.alias];
 							}
 							if (refLength && refLength == reference.length) {
 								matchedCount++;
@@ -360,7 +360,7 @@ GenomeBuildHelper.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 						});
 						if (build.references.length == matchedCount) {
 							matchedBuild = build;
-						} else if (matchedCount > 0 && notMatchedCount == 0 && notFoundCount == 0) {
+						} else if (matchedCount > 0 && notMatchedCount == 0 && (matchedCount + notFoundCount == build.references.length)) {
 							matchedBuild = build;
 						}
 
