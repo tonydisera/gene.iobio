@@ -169,7 +169,8 @@ var effectCategories = [
     var recordCount = 0;
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-H', url]
+        ['-H', url],
+        {ssl: useSSL}
     );
 
     cmd.on('data', function(data) {
@@ -382,7 +383,8 @@ var effectCategories = [
 
     var cmd = new iobio.cmd(
         IOBIO.vcfReadDepther,
-        ['-i', vcfURL + '.tbi']
+        ['-i', vcfURL + '.tbi'],
+        {ssl: useSSL}
     );
 
     cmd.on('data', function(data) {
@@ -652,32 +654,32 @@ var effectCategories = [
     var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
-    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm])
-      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
+    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm], {ssl: useSSL})
+      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
     // filter sample(s)
     if (sampleName != null && sampleName != "") {
 
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'])
+      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
     }
 
     // normalize variants
-    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'], {ssl: useSSL})
 
     // get allele frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af);
+    cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL});
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (isRefSeq || annotationEngine == 'vep') {
     } else {
-      cmd = cmd.pipe(IOBIO.snpEff);
+      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
     if (vepArgs == "") {
-      cmd = cmd.pipe(IOBIO.vep);
+      cmd = cmd.pipe(IOBIO.vep, [], {ssl: useSSL});
     } else {
-      cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+      cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
     }
 
 
@@ -798,7 +800,8 @@ var effectCategories = [
 
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-h', vcfURL, '1:1-1']);
+        ['-h', vcfURL, '1:1-1'],
+        {ssl: useSSL});
 
 
     var headerData = "";
@@ -843,16 +846,16 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region]);
+    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region], {ssl: useSSL});
 
-    cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
+    cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
     if (sampleName != null && sampleName != "") {
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-'], {ssl: useSSL});
     }
 
-    cmd = cmd.pipe(IOBIO.bcftools, ['stats']);
+    cmd = cmd.pipe(IOBIO.bcftools, ['stats'], {ssl: useSSL});
 
 
     var statsData = "";
@@ -1059,7 +1062,7 @@ var effectCategories = [
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm]);
+      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm], {ssl: useSSL});
 
 
       var clinvarData = "";
@@ -1273,27 +1276,27 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(IOBIO.bcftools, ['annotate', '-h', contigNameFile, writeStream ])
+    var cmd = new iobio.cmd(IOBIO.bcftools, ['annotate', '-h', contigNameFile, writeStream ], {ssl: useSSL})
 
     // Filter samples
     if (sampleName != null && sampleName != "") {
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-'], {ssl: useSSL});
     }
 
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'], {ssl: useSSL})
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af)
+    cmd = cmd.pipe(IOBIO.af, {ssl: useSSL})
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
     } else {
-      cmd = cmd.pipe(IOBIO.snpEff);
+      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-    cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+    cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
 
 
     var buffer = "";

@@ -16,6 +16,7 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var autoCall              = null;           // if only alignments are provided, should variants automatically be called? 
  											// set to null if app should prompt first before autocalling
 
+var useSSL                = true;
 
 // MyGene2 deployment variables;
 var mygene2Endpoint       = "";
@@ -38,8 +39,8 @@ var isLevelEduTour        = false;   // is gene.iobio exhibit version, a simplif
 * TURN ON only isMygene2. 
 * See @import statements for levelEdu and levelEduTour in css/assets/sass.
 */
-var isLevelBasic          = false;    // is gene.iobio basic mode?
-var isMygene2             = false;    // show the mygene2 intro panel?
+var isLevelBasic          = true;    // is gene.iobio basic mode?
+var isMygene2             = true;    // show the mygene2 intro panel?
 
 var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emails should feedback be sent to?   if no emails are provided, the feedback link will be hidden
 var feedbackAttachScreenCapture = true;          // should the feedback include a screen capture?

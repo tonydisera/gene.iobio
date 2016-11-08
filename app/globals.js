@@ -6,7 +6,7 @@ var dev_iobio_services        = "nv-dev-new.iobio.io/";
 var prod_iobio_services       = "nv-prod.iobio.io/";
 
 var new_iobio_services        = isOffline              ? serverInstance : stage_iobio_services;
-var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_iobio_services);
+var iobio_http_services       = (useSSL ? "https://" : "http://") + (isOffline ? serverInstance : stage_iobio_services);
 
 
 // http services
@@ -17,7 +17,7 @@ var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazon
 var phenolyzerOnlyServer      = iobio_http_services + "phenolyzer/";
 
 // email service
-var emailServer               = "ws://" +   new_iobio_services + "email/";
+var emailServer               = (useSSL ? "wss://" : "ws://") +   new_iobio_services + "email/";
 
 // iobio services
 var IOBIO = {};

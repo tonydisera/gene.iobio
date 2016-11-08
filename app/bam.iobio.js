@@ -75,7 +75,8 @@ var Bam = Class.extend({
       var success = null;
       var cmd = new iobio.cmd(
           IOBIO.samtools,
-          ['view', '-H', url]
+          ['view', '-H', url],
+          {ssl: useSSL}
       );
 
       cmd.on('data', function(data) {
@@ -314,7 +315,8 @@ var Bam = Class.extend({
         var success = null;
         var cmd = new iobio.cmd(
             IOBIO.samtools,
-            ['view', '-H', me.bamUri]
+            ['view', '-H', me.bamUri],
+            {ssl: useSSL}
         );
         var rawHeader = "";
         cmd.on('data', function(data) {
@@ -413,11 +415,12 @@ var Bam = Class.extend({
         // When bam file is read as a local file, just stream sam records for region to
         // samtools mpileup.
         if (me.sourceType == "url") {
-          cmd = new iobio.cmd(samtools, ['view', '-b',       me.bamUri, regionArg],
+          cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
             {
-              'urlparams': {'encoding':'binary'}
+              'urlparams': {'encoding':'binary'},
+              ssl: useSSL
             });
-          cmd = cmd.pipe(samtools, ["mpileup", "-"]);
+          cmd = cmd.pipe(samtools, ["mpileup", "-"], {ssl: useSSL});
         } else {
 
           function writeSamFile (stream) {
@@ -430,13 +433,14 @@ var Bam = Class.extend({
 
           cmd = new iobio.cmd(samtools, ['mpileup',  writeSamFile ],
             {
-              'urlparams': {'encoding':'utf8'}
+              'urlparams': {'encoding':'utf8'},
+              ssl: useSSL
             });
 
         }
 
         // After running samtools mpileup, run coverage service to summarize point data.
-        cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg]);
+        cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
 
         var samData = "";
         cmd.on('data', function(data) {
@@ -520,9 +524,10 @@ var Bam = Class.extend({
         //cmd = new iobio.cmd("nv-green.IOBIO.io/samtools/", ['view', '-b', me.bamUri, regionArg],
         cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
          {
-            'urlparams': {'encoding':'binary'}
+            'urlparams': {'encoding':'binary'},
+            ssl: useSSL
           });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile], {ssl: useSSL});
       } else {
 
         var writeStream = function(stream) {
@@ -535,14 +540,15 @@ var Bam = Class.extend({
         
         cmd = new iobio.cmd(samtools, ['view -b',  writeStream ],
             {
-              'urlparams': {'encoding':'binary'}
+              'urlparams': {'encoding':'binary'},
+              ssl: useSSL
             });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile], {ssl: useSSL});
          
       }
 
 
-      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-'], {ssl: useSSL});
       //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
 
 
@@ -629,7 +635,8 @@ var Bam = Class.extend({
 
               var bamCmd = new iobio.cmd(samtools, ['view', '-b', bam.bamUri, regionArg],
               {
-                'urlparams': {'encoding':'binary'}
+                'urlparams': {'encoding':'binary'},
+                ssl: useSSL
               });
               getBamCmds.push(bamCmd);
 
@@ -643,7 +650,8 @@ var Bam = Class.extend({
                   var bamBlob = new Blob([bam.header.toStr + "\n" + data]);  
                   var bamCmd = new iobio.cmd(samtools, ['view', '-b', bamBlob],
                   {
-                    'urlparams': {'encoding':'binary'}
+                    'urlparams': {'encoding':'binary'},
+                    ssl: useSSL
                   });
                   getBamCmds.push(bamCmd);
 
@@ -670,18 +678,18 @@ var Bam = Class.extend({
         freebayesArgs.push(refFile);
 
         
-        var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs);
+        var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs, {ssl: useSSL});
         
 
         // Normalize variants
-        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
+        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-'], {ssl: useSSL});
 
         // Subset on all samples (this will get rid of low quality cases where no sample 
         // is actually called as having the alt) 
         //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
 
         // Filter out anything with qual <= 0
-        cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-']);
+        cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-'], {ssl: useSSL});
 
 
         //
@@ -694,17 +702,17 @@ var Bam = Class.extend({
             contigStr += "##contig=<ID=" + ref + ">\n";
         })
         var contigNameFile = new Blob([contigStr])
-        cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
+        cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile], {ssl: useSSL})
 
         // Get Allele Frequencies from 1000G and ExAC
-        cmd = cmd.pipe(IOBIO.af)
+        cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
 
         // VEP to annotate
         var vepArgs = "";
         if (isRefSeq) {
           vepArgs = " --refseq "
         }
-        cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+        cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
 
 
         
