@@ -2879,8 +2879,10 @@ a {
   display: none !important; }
 
 .nav-center {
-  margin-top: 6px;
-  padding-left: 0px; }
+  margin-top: 6px; }
+
+#gene-search-bar {
+  padding-left: 0px !important; }
 
 .nav-left {
   width: 280px; }

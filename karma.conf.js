@@ -16,6 +16,8 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
         'assets/js/jquery.1.11.1.min.js',
+        { pattern: 'templates/*.hbs', watched: false, included: false, served: true, nocache: false },
+        { pattern: 'assets/images/**/*.*', watched: false, included: false, served: true, nocache: false },
         'assets/js/**/*.js',
         'app/globalsDeployment.js',
         'app/globals.js',
@@ -55,7 +57,8 @@ module.exports = function(config) {
     },
 
     proxies: {
-        '/templates': '/templates'
+        '/templates/': '/base/templates/',
+        '/assets/images/': '/base/assets/images/'
     },
 
     // test results reporter to use
@@ -83,7 +86,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['Firefox'],
 
 
     // Continuous Integration mode

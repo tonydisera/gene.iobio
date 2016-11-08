@@ -16,6 +16,7 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var autoCall              = null;           // if only alignments are provided, should variants automatically be called? 
  											// set to null if app should prompt first before autocalling
 
+var useSSL                = true;
 
 // MyGene2 deployment variables;
 var mygene2Endpoint       = "";
