@@ -169,6 +169,30 @@ describe('genomeBuildHelper', function() {
 		});
 	});
 
+	describe('#getBuildFromBamHeader', function() {
+
+		it('get the build info from the bam header', function() {
+			var bamHeader = "@HD	VN:1.3	SO:coordinate\n"
+							+ "@SQ	SN:1	LN:249250621\n"
+							+ "@SQ	SN:2	LN:243199373\n"
+							+ "@SQ	SN:3	LN:198022430\n"
+							+ "@SQ	SN:4	LN:191154276\n"
+							+ "@SQ	SN:5	LN:180915260\n"
+							+ "@SQ	SN:6	LN:171115067\n"
+							+ "@SQ	SN:X	LN:155270560\n"
+							+ "@SQ	SN:Y	LN:59373566";
+			var buildInfo = genomeBuildHelper.getBuildFromBamHeader(bamHeader);
+			expect(Object.keys(buildInfo.references).length).toEqual(8);
+			expect(buildInfo.references["1"]).toEqual(249250622);
+			expect(buildInfo.references["Y"]).toEqual(59373567);
+			var speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild(buildInfo);
+			expect(speciesBuild.species.name).toEqual("Human");
+			expect(speciesBuild.build.name).toEqual("GRCh37");
+
+
+		})
+	});
+
 
 
 });
