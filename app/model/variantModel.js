@@ -2134,6 +2134,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		var variantAf = d[afField] || 0;
 		var meetsAf = true;
 		if ($.isNumeric(filterObject.afMin) && $.isNumeric(filterObject.afMax)) {
+			// Exclude n/a ExAC allele freq (for intronic variants, af=-100) from range criteria
 			meetsAf = (variantAf >= filterObject.afMin && variantAf <= filterObject.afMax);
 		}
 
