@@ -386,19 +386,22 @@ GenomeBuildHelper.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 }
 
 GenomeBuildHelper.prototype.formatIncompatibleBuildsMessage = function(buildsInData) {
-	var message = "Imcompatible builds in files.";	
-	buildsInData.forEach(function(buildInfo) {
-		message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
-		var fromCount = 0;
-		buildInfo.from.forEach(function(fileInfo) {
-			if (fromCount > 0) {
-				message += ", ";
-			}
-			message += fileInfo.relationship + " " + fileInfo.type;
-			fromCount++;
+	var message = "Incompatible builds in files.";	
+	if (buildsInData && buildsInData.length > 1) {
+		buildsInData.forEach(function(buildInfo) {
+			message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
+			var fromCount = 0;
+			buildInfo.from.forEach(function(fileInfo) {
+				if (fromCount > 0) {
+					message += ", ";
+				}
+				message += fileInfo.relationship + " " + fileInfo.type;
+				fromCount++;
+			});
+			message += ".";
 		});
-		message += ".";
-	});
+
+	}
 	return message;	
 }
 
