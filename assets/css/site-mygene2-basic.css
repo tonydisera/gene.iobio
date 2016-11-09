@@ -3221,7 +3221,7 @@ button {
   .variant-card #displayed-variant-count-label-simple {
     display: none !important; }
   .variant-card #displayed-variant-count-label-basic {
-    display: inline-block;
+    display: inline-block !important;
     color: #717171; }
   .variant-card #bottom-white-space {
     display: none !important; }
