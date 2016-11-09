@@ -707,7 +707,9 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 		this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 		this.cardSelector.find("#displayed-variant-count").removeClass("hide");
 		this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
-		this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+		if (isLevelBasic) {
+			this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+		}
 
 
 	}
@@ -1546,7 +1548,9 @@ VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
 			this.cardSelector.find('#displayed-variant-count').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(filteredVcfData));
 			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
-			this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+			if (isLevelBasic) {
+				this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+			}
 		
 		} else {
 			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");

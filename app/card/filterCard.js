@@ -399,15 +399,15 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
-	$('#af-amount-start').val(0);
-	$('#af-amount-end').val(100);
+	$('#af-amount-start').val("");
+	$('#af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
 }
 
 FilterCard.prototype.resetAfRange = function() {
-	$('#af-amount-start').val("0");
-	$('#af-amount-end').val("100");	
+	$('#af-amount-start').val("");
+	$('#af-amount-end').val("");	
 
 	$("#af1000grange-flag").addClass("hide");
 	$("#afexacrange-flag").addClass("hide");
@@ -573,7 +573,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-	//$("#af-range-filter").removeClass("hide");
+	$("#af-range-filter").removeClass("hide");
 
 }
 
