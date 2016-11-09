@@ -386,8 +386,9 @@ GenomeBuildHelper.prototype.getProperSpeciesAndBuild = function(buildInfo) {
 }
 
 GenomeBuildHelper.prototype.formatIncompatibleBuildsMessage = function(buildsInData) {
-	var message = "Incompatible builds in files.";	
+	var message = null;	
 	if (buildsInData && buildsInData.length > 1) {
+		message = "Incompatible builds in files.";
 		buildsInData.forEach(function(buildInfo) {
 			message += "<br>Build " + buildInfo.species.name + " " + buildInfo.build.name + " specified in ";
 			var fromCount = 0;

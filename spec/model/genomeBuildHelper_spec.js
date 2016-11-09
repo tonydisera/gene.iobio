@@ -87,7 +87,7 @@ describe('genomeBuildHelper', function() {
 			var speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'hg19'});
 			expect(speciesBuild.species.name).toEqual('Human');
 			expect(speciesBuild.build.name).toEqual('GRCh37');
-			
+
 			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'NCBI37'});
 			expect(speciesBuild.species.name).toEqual('Human');
 			expect(speciesBuild.build.name).toEqual('GRCh37');
@@ -144,6 +144,8 @@ describe('genomeBuildHelper', function() {
 			expect(theBuilds[0].from.length).toEqual(1);
 			expect(theBuilds[0].from[0].relationship).toEqual('proband');
 			expect(theBuilds[0].from[0].type).toEqual('bam');
+			var htmlMessage = genomeBuildHelper.formatIncompatibleBuildsMessage(theBuilds);
+			expect(htmlMessage).toBeNull();
 
 
 			// Now add another build.  Now theBuilds should have two elements for the different builds
@@ -168,6 +170,11 @@ describe('genomeBuildHelper', function() {
 			expect(theBuilds[0].from[0].type).toEqual('bam');
 			expect(theBuilds[0].from[1].relationship).toEqual('father');
 			expect(theBuilds[0].from[1].type).toEqual('vcf');
+			htmlMessage = genomeBuildHelper.formatIncompatibleBuildsMessage(theBuilds);
+			expect(htmlMessage).not.toBeNull();
+			expect(htmlMessage).toContain("Incompatible");
+			expect(htmlMessage).toContain("GRCh37");
+			expect(htmlMessage).toContain("GRCh38");
 
 		});
 	});
@@ -305,6 +312,12 @@ describe('genomeBuildHelper', function() {
 			expect(speciesBuilds[1].from.length).toEqual(1);
 			expect(speciesBuilds[1].from[0].relationship).toEqual('mother');
 			expect(speciesBuilds[1].from[0].type).toEqual('bam');
+
+		});
+	});
+
+	describe('#getBuildFromVcfHeader', function() {
+		it('get the build info from the vcf header', function() {
 
 		});
 	});
