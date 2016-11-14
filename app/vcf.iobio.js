@@ -1288,7 +1288,7 @@ var effectCategories = [
     cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'], {ssl: useSSL})
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af, {ssl: useSSL})
+    cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
