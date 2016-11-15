@@ -392,6 +392,14 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 }
 
+DataCard.prototype.setCurrentSpecies = function(speciesName) {
+	if ($('#select-species')[0].selectize) {
+		$('#select-species')[0].selectize.addItem(speciesName);
+		genomeBuildHelper.setCurrentSpecies(speciesName);
+	}
+}
+
+
 DataCard.prototype.setCurrentBuild = function(buildName) {
 	if ($('#select-build')[0].selectize) {
 		$('#select-build')[0].selectize.addItem(buildName);
@@ -472,7 +480,12 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 		me.getBuildsFromData(function(buildsInData) {
 			if (buildsInData.length == 0) {
 				$('#species-build-warning').addClass("hide");
-				window.enableLoadButton();
+				if (genomeBuildHelper.getCurrentBuild() == null) {
+					window.disableLoadButton();
+					$('#select-build')[0].selectize.clear();
+				} else {
+					window.enableLoadButton();
+				}
 
 			} else if (buildsInData.length == 1) {			
 				var buildInfo = buildsInData[0];
@@ -598,9 +611,10 @@ DataCard.prototype.init = function() {
 			valueField: 'name',
 	    	labelField: 'name',
 	    	searchField: ['name'],
+	    	allowEmptyOption: true,
 	    	onOptionAdd: function(value) {
 	    		if (!me.buildDefaulted) {
-	    			$('#select-build')[0].selectize.addItem(genomeBuildHelper.currentBuild.name, false);
+	    			// You can default the build in the dropdown here
 	    			me.buildDefaulted = true; 
 	    		}
 	    	}
@@ -714,7 +728,15 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		window.loadTracksForGene();		
+		// If the genome build was missing, the user was forced into the data dialog to select
+		// the genome build.  Now we want to load the gene if it was provided in the URL parameter
+		// list.
+		if ((window.gene == null || window.gene.length == 0) && getUrlParameter("gene")) {
+			setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
+		} else {
+			window.loadTracksForGene();		
+		}
+
 
 	});
 

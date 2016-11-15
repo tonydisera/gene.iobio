@@ -186,8 +186,9 @@ $(document).ready(function(){
 	Promise.all(promises).then(function() {
 		// Initialize genomeBuild helper
 		genomeBuildHelper = new GenomeBuildHelper();
-		genomeBuildHelper.promiseInit().then(function() {
-			$('#build-link').text(genomeBuildHelper.getCurrentBuildName());
+		genomeBuildHelper.promiseInit({DEFAULT_BUILD: null}).then(function() {
+			var buildName = genomeBuildHelper.getCurrentBuildName();
+			$('#build-link').text(buildName && buildName.length > 0 ? buildName : "");
 			init();
 		});
 	});
@@ -880,7 +881,10 @@ function showSidebar(sidebar) {
 
 
 function showDataDialog() {
-	$('#dataModal').modal('show')
+	$('#dataModal').modal('show');
+	if (genomeBuildHelper.getCurrentBuild() == null) {
+		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
+	} 
 
 }
 
@@ -1055,11 +1059,18 @@ function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
 }
 
 function loadGeneFromUrl() {
+	// Get the species
+	var species = getUrlParameter('species');
+	if (species != null && species != "") {
+		dataCard.setCurrentSpecies(species);
+	}
+
 	// Get the genome build
 	var build = getUrlParameter('build');
 	if (build != null && build != "") {
 		dataCard.setCurrentBuild(build);
 	}
+
 
 	// Get the gene parameger
 	var gene = getUrlParameter('gene');
@@ -1091,9 +1102,17 @@ function loadGeneFromUrl() {
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
     if (gene != undefined) {
-		// Type in the gene name, this will trigger the event to get the
-		// gene info and then call loadUrlSources()
-		setGeneBloodhoundInputElement(gene, true, true);
+		// If the species and build have been specified, type in the gene name; this will 
+		// trigger the event to get the gene info and then call loadUrlSources()
+		if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
+			setGeneBloodhoundInputElement(gene, true, true);
+		} else {
+			// The build wasn't specified in the URL parameters, so force the user
+			// to select the gemome build from the data dialog.
+
+			loadUrlSources();
+			showDataDialog();
+		}
 		
 	} else {
 		// Open the sidebar 
