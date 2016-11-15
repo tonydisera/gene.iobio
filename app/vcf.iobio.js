@@ -35,37 +35,6 @@ vcfiobio = function module() {
   var regionIndex = 0;
   var stream = null;
 
-  var header = null;
-
-
-  var refLengths_GRCh37 =
-  {
-        "1":   +249250621,
-        "2":   +243199373,
-        "3":   +198022430,
-        "4":   +191154276,
-        "5":   +180915260,
-        "6":   +171115067,
-        "7":   +159138663,
-        "8":   +146364022,
-        "9":   +141213431,
-        "10":  +135534747,
-        "11":  +135006516,
-        "12":  +133851895,
-        "13":  +115169878,
-        "14":  +107349540,
-        "15":  +102531392,
-        "16":  +90354753,
-        "17":  +81195210,
-        "18":  +78077248,
-        "19":  +59128983,
-        "20":  +63025520,
-        "21":  +48129895,
-        "22":  +51304566,
-        "X":   +155270560,
-        "Y":   +59373566
-      };
-
 
 var effectCategories = [
 ['coding_sequence_variant', 'coding'],
@@ -164,10 +133,9 @@ var effectCategories = [
   }
 
   exports.getHeader = function(callback) {
-    if (header) {
-      callback(header);
-    } else if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
+    if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
 
+      var buffer = "";
       var cmd = new iobio.cmd(
             IOBIO.tabix,
             ['-H', vcfURL]
@@ -185,21 +153,20 @@ var effectCategories = [
             success = true;
           }
           if (success && buffer.length > 0) {
-            header = buffer;
-            callback(header);
+            callback(buffer);
           }
         });
+        cmd.run();
         
-      } else if (vcfFile) {
-          var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
-            vcfReader.getHeader( function(theHeader) {
-              header = theHeader;
-              callback(header);
-            });
+    } else if (vcfFile) {
+        var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
+          vcfReader.getHeader( function(theHeader) {
+            callback(theHeader);
           });
-      } else {
-        callback(null);
-      }
+        });
+    } else {
+      callback(null);
+    }
 
   }
 
@@ -227,7 +194,6 @@ var effectCategories = [
         success = true;
       }
       if (success && buffer.length > 0) {
-        header = buffer;
         callback(success);
       }
     });
