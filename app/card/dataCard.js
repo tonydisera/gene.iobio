@@ -230,7 +230,7 @@ DataCard.prototype.loadMygene2Data = function() {
 
 		if (vcfFilePath != null) {
 			var probandUrl = "http://" + serverInstance + vcfFilePath;
-			me.setVcfUrl("proband", "Variants", sampleName, probandUrl);
+			me.setVcfUrl("proband", "Variants", null, probandUrl);
 		} else {
 			// Load full demo wgs trio data if vcf file path was not provided via mygene2 data exchange
 			me.mode = "trio";
@@ -907,7 +907,9 @@ DataCard.prototype.setVcfUrl = function(relationship, name, sampleName, vcfUrl) 
 	variantCard.setVariantCardLabel();
 	variantCard.showDataSources(name);
 	variantCard.onVcfUrlEntered(vcfUrl, function(success, sampleNames) {
-		variantCard.setSampleName(sampleName);
+		if (sampleName) {
+			variantCard.setSampleName(sampleName);
+		}
 	});
 }
 DataCard.prototype.setDataSourceName = function(panelSelector) {	
