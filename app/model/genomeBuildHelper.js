@@ -119,6 +119,26 @@ GenomeBuildHelper.prototype.getFastaPath = function(ref) {
 	return fastaPath;
 }
 
+
+GenomeBuildHelper.prototype.getReferenceLength = function(ref) {
+	var theRef =  this.getReference(ref);
+	return theRef ? theRef.length : null;
+}
+
+GenomeBuildHelper.prototype.getReference = function(ref) {
+	var theRef = null;
+	if (this.currentBuild) {
+		this.currentBuild.references.forEach(function(reference) {
+			if (!theRef) {
+				if (reference.name == ref || reference.alias == ref) {
+					theRef = reference;
+				}
+			}
+		});
+	}
+	return theRef;
+}
+
 GenomeBuildHelper.prototype.getBuildAlias = function(aliasType) {
 	var theAlias = null;
 	if (this.currentBuild) {
