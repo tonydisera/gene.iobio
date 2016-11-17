@@ -4,6 +4,15 @@ function MatrixCard() {
 	this.sourceVcfData = null;
 	this.featureMatrix  = null;
 
+	this.CELL_SIZE                 = 23;
+	this.CELL_WIDTH_BASIC          = 160;
+
+	this.COLUMN_LABEL_HEIGHT       = 67;
+	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
+
+	this.ROW_LABEL_WIDTH           = 140;
+	this.ROW_LABEL_WIDTH_BASIC     = 25;
+	this.ROW_LABEL_WIDTH_EDU       = 100;
 
 	this.clinvarMap     = {  
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
@@ -271,11 +280,11 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
-				    .cellSize(isLevelEdu ? 23 : (isLevelBasic ? null : 18))
-				    .cellWidth(isLevelBasic ? 160 : null)
+				    .cellSize(isLevelEdu ? me.CELL_SIZE : (isLevelBasic ? null : 18))
+				    .cellWidth(isLevelBasic ? me.CELL_WIDTH_BASIC : null)
 				    .cellHeights(isLevelBasic ? me.matrixRowsBasic.map(function(d){return d.height}) : null)
-				    .columnLabelHeight(isLevelEdu  || isLevelBasic ? 30 : 67)
-				    .rowLabelWidth(isLevelEdu  ? 100 : (isLevelBasic ? 25 : 140))
+				    .columnLabelHeight(isLevelEdu  || isLevelBasic ?  me.COLUMN_LABEL_HEIGHT_BASIC : me.COLUMN_LABEL_HEIGHT)
+				    .rowLabelWidth(isLevelEdu  ? me.ROW_LABEL_WIDTH_EDU : (isLevelBasic ? me.ROW_LABEL_WIDTH_BASIC : me.ROW_LABEL_WIDTH))
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
@@ -469,7 +478,10 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
       	column.classed("active", true);
       	column.select(".colbox").classed("current", true);
 
-      	$("#feature-matrix").scrollLeft(160 * index+1);
+      	var left =   ((isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1)  
+      			   - (isLevelEdu  ? me.ROW_LABEL_WIDTH_EDU : (isLevelBasic ? me.ROW_LABEL_WIDTH_BASIC : me.ROW_LABEL_WIDTH))
+      			   - (+$("#feature-matrix")[0].offsetWidth / 2);
+      	$("#feature-matrix").scrollLeft(left);
 	
       	if (showTooltip) {
 	      	// Get screen coordinates of column.  We will use this to position the
