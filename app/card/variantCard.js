@@ -1354,7 +1354,7 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 		this.fbChart.verticalLayers(data.maxLevel);
 		this.fbChart.lowestWidth(data.featureWidth);
 
-		this.d3CardSelector.select("#fb-variants svg").remove();
+		this.d3CardSelector.selectAll("#fb-variants").selectAll("svg").remove();
 
 		// Load the chart with the new data
 		var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    
