@@ -28,6 +28,8 @@ function VariantModel() {
 
 	this.lastVcfAlertify = null;
 	this.lastBamAlertify = null;
+
+	this.debugMe = false;
 }
 
 
@@ -1205,6 +1207,9 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 
     	if (success) {
 	    	try {
+	    		if (me.debugMe) {
+		    		console.log("caching "  + dataKind + ' ' + me.relationship + ' ' + geneName + " = " + dataString.length + '->' + dataStringCompressed.length);
+	    		}
 		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    		
 	    	} catch(error) {
@@ -1228,10 +1233,14 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
       	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind, geneName, transcript));
       	if (dataCompressed != null) {
 			var dataString = null;
+			var start = Date.now();
 			try {
 				//dataString = stringCdompress.inflate(dataCompressed);
 				 dataString = LZString.decompressFromUTF16(dataCompressed);
-	 			 data =  JSON.parse(dataString);      		
+	 			 data =  JSON.parse(dataString); 
+	 			 if (me.debugMe) {     		
+				 	console.log("time to decompress cache " + dataKind + " = " + (Date.now() - start));
+				 }
 			} catch(e) {
 				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey(dataKind, geneName, transcript));
 			}
