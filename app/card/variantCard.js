@@ -1004,6 +1004,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		} else {
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {	
+				filterCard.enableVariantFilters(true);
+				me.populateEffectFilters();
+				filterCard.enableClinvarFilters();
 				var filteredFBData = me.filterCalledVariants();			
 				me._fillFreebayesChart(filteredFBData, 
 									   regionStart ? regionStart : window.gene.start, 
