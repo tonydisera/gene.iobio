@@ -1953,17 +1953,32 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) 
 	me._populateRecFilters(me.fbData.features);
 
 
-	if (callback) {
-		callback(me.fbData);
-	}
-
 	var theVcfData = me.getVcfDataForGene(window.gene, window.selectedTranscript);
 	
 	// Now get the clinvar data		    	
-	return me.vcf.promiseGetClinvarRecords(
+	me.vcf.promiseGetClinvarRecords(
 	    		me.fbData, 
 	    		me._stripRefName(window.gene.chr), window.gene, 
-	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, me.fbData) : me._refreshVariantsWithClinvar.bind(me, me.fbData)
+	    ).then( function() {
+	    	if (callback) {
+
+	    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
+				me.fbData.features.forEach(function (fbVariant) {
+					if (fbVariant.source) {
+						fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
+						fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
+						fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
+						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
+						fbVariant.source.clinvar                     = fbVariant.clinvar;
+						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+					}					
+				});	 
+
+
+	    		callback(me.fbData);
+	    	}
+	    });
 
 
 }

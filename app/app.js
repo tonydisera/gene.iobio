@@ -2323,10 +2323,11 @@ function jointCallVariants(callback) {
 	                	var theFbData = data[1];
 				    
 					    // Get the unique freebayes variants and set up the allele counts
-					    vc.model.processFreebayesVariants(theFbData);
+					    vc.model.processFreebayesVariants(theFbData, function() {
+							sampleIndex++;
+							parseNextCalledVariants(afterParseCallback);					    				    
+					    });
 						
-						sampleIndex++;
-						parseNextCalledVariants(afterParseCallback);					    				    
 				    });
 	}
 	
