@@ -795,12 +795,18 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 	return new Promise( function(resolve, reject) {
 
+
 		// Create a gene object with start and end reduced to the variants coordinates.
 		var fakeGeneObject = $().extend({}, theGene);
 		fakeGeneObject.start = variant.start;
 		fakeGeneObject.end = variant.end;
 
-		if ( variant.extraAnnot ) {
+
+		if (variant.fbCalled == 'Y') {
+			// We already have the hgvs and rsid if this is a called variant
+			resolve(variant);
+		} else if ( variant.extraAnnot ) {
+			// We have already retrieved the extra annot for this variant,
 			resolve(variant);
 		} else {	
 			me._promiseVcfRefName(theGene.chr).then( function() {				
