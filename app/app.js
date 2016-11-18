@@ -220,6 +220,8 @@ function determineStyle() {
 function init() {
 	var me = this;
 
+	detectWindowResize();
+
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
 
@@ -874,6 +876,18 @@ function showDataDialog() {
 }
 
 
+function detectWindowResize() {
+	$(window).resize(function() {
+	    if(this.resizeTO) clearTimeout(this.resizeTO);
+	    this.resizeTO = setTimeout(function() {
+	        $(this).trigger('resizeEnd');
+	    }, 500);
+	});
+
+	$(window).bind('resizeEnd', function() {
+		resizeCardWidths();
+	});	
+}
 
 
 function resizeCardWidths() {
@@ -890,7 +904,7 @@ function resizeCardWidths() {
 	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
 	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
 
-	$('#slider-left-content').css('height', window.innerHeight);
+	//$('#slider-left-content').css('height', window.innerHeight);
 }
 
 function closeSlideLeft() {
