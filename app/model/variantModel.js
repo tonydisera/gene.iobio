@@ -83,6 +83,16 @@ VariantModel.prototype.isInheritanceLoaded = function() {
 
 VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
 	var me = this;
+	return me._getDataForGene("vcfData", geneObject, selectedTranscript);
+}
+
+VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscript) {
+	var me = this;
+	return me._getDataForGene("fbData", geneObject, selectedTranscript);
+}
+
+VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
+	var me = this;
 	var data = null;
 	// If only alignments have specified, but not variant files, we will need to use the
 	// getBamRefName function instead of the getVcfRefName function.
@@ -93,20 +103,20 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	}
 
 	if (theGetRefNameFunction) {
-		if (me.vcfData != null && me.vcfData.features && me.vcfData.features.length > 0) {
-			if (theGetRefNameFunction(geneObject.chr) == me.vcfData.ref &&
-				geneObject.start == me.vcfData.start &&
-				geneObject.end == me.vcfData.end &&
-				geneObject.strand == me.vcfData.strand) {
-				data = me.vcfData;
+		if (me[dataKind] != null && me[dataKind].features && me[dataKind].features.length > 0) {
+			if (theGetRefNameFunction(geneObject.chr) == me[dataKind].ref &&
+				geneObject.start == me[dataKind].start &&
+				geneObject.end == me[dataKind].end &&
+				geneObject.strand == me[dataKind].strand) {
+				data = me[dataKind];
 			}		
 		} 
 
 		if (data == null) {
 			// Find in cache
-			data = this._getCachedData("vcfData", geneObject.gene_name, selectedTranscript);
+			data = this._getCachedData(dataKind, geneObject.gene_name, selectedTranscript);
 			if (data != null && data != '') {
-				me.vcfData = data;
+				me[dataKind] = data;
 			}
 		} 		
 	} else {
@@ -286,7 +296,7 @@ VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 }
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
-	var fbData = this._getCachedData("fbData", window.gene.gene_name, window.selectedTranscript);
+	var fbData = this.getFbDataForGene(window.gene, window.selectedTranscript);
 	if (fbData != null) {
 		this.fbData = fbData;
 	}
@@ -2015,6 +2025,8 @@ VariantModel.prototype.loadCalledTrioGenotypes = function() {
 		// Re-Cache the freebayes variants for proband now that we have mother/father genotype
 		// and allele counts.							
 		me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+
+
 
 	}
 }
