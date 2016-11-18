@@ -4,7 +4,8 @@ function MatrixCard() {
 	this.sourceVcfData = null;
 	this.featureMatrix  = null;
 
-	this.CELL_SIZE                 = 23;
+	this.CELL_SIZE                 = 18;
+	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
 	this.COLUMN_LABEL_HEIGHT       = 67;
@@ -280,7 +281,7 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
-				    .cellSize(isLevelEdu ? me.CELL_SIZE : (isLevelBasic ? null : 18))
+				    .cellSize(isLevelEdu ? me.CELL_SIZE_EDU : (isLevelBasic ? null : me.CELL_SIZE))
 				    .cellWidth(isLevelBasic ? me.CELL_WIDTH_BASIC : null)
 				    .cellHeights(isLevelBasic ? me.matrixRowsBasic.map(function(d){return d.height}) : null)
 				    .columnLabelHeight(isLevelEdu  || isLevelBasic ?  me.COLUMN_LABEL_HEIGHT_BASIC : me.COLUMN_LABEL_HEIGHT)
@@ -478,9 +479,7 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
       	column.classed("active", true);
       	column.select(".colbox").classed("current", true);
 
-      	var left =   ((isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1)  
-      			   - (isLevelEdu  ? me.ROW_LABEL_WIDTH_EDU : (isLevelBasic ? me.ROW_LABEL_WIDTH_BASIC : me.ROW_LABEL_WIDTH))
-      			   - (+$("#feature-matrix")[0].offsetWidth / 2);
+      	var left = (isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1; 
       	$("#feature-matrix").scrollLeft(left);
 	
       	if (showTooltip) {
