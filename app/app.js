@@ -2356,9 +2356,10 @@ function jointCallVariants(callback) {
 						vc.showCallVariantsProgress('done');
 
 						var alignmentsOnly =  !vc.model.isVcfReadyToLoad() && vc.model.isBamLoaded();
-						vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, !alignmentsOnly); 
+						vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
 
 						if (!alignmentsOnly && vc.getRelationship() == 'proband') {
+
 							vc.fillFeatureMatrix(regionStart, regionEnd);
 						}
 						
