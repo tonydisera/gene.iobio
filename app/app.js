@@ -2379,10 +2379,11 @@ function jointCallVariants(callback) {
 	                	var theFbData = data[1];
 				    
 					    // Get the unique freebayes variants and set up the allele counts
-					    vc.model.processFreebayesVariants(theFbData);
+					    vc.model.processFreebayesVariants(theFbData, function() {
+							sampleIndex++;
+							parseNextCalledVariants(afterParseCallback);					    				    
+					    });
 						
-						sampleIndex++;
-						parseNextCalledVariants(afterParseCallback);					    				    
 				    });
 	}
 	
@@ -2411,9 +2412,10 @@ function jointCallVariants(callback) {
 						vc.showCallVariantsProgress('done');
 
 						var alignmentsOnly =  !vc.model.isVcfReadyToLoad() && vc.model.isBamLoaded();
-						vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, !alignmentsOnly); 
+						vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
 
 						if (!alignmentsOnly && vc.getRelationship() == 'proband') {
+
 							vc.fillFeatureMatrix(regionStart, regionEnd);
 						}
 						

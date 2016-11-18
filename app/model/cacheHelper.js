@@ -157,11 +157,8 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript) {
 	var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 	trioModel.compareVariantsToMotherFather(function() {
 
-		getVariantCard("proband").model._cacheData(probandVcfData, "fbData",  geneObject.gene_name, transcript);
 		getVariantCard("proband").model._cacheData(probandVcfData, "vcfData", geneObject.gene_name, transcript);					
-		getVariantCard("mother" ).model._cacheData(motherVcfData,  "fbData",  geneObject.gene_name, transcript);
 		getVariantCard("mother" ).model._cacheData(motherVcfData,  "vcfData", geneObject.gene_name, transcript);					
-		getVariantCard("father" ).model._cacheData(fatherVcfData,  "fbData",  geneObject.gene_name, transcript);
 		getVariantCard("father" ).model._cacheData(fatherVcfData,  "vcfData", geneObject.gene_name, transcript);					
 
 		// Now that inheritance has been determined,
