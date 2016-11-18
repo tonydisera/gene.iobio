@@ -893,7 +893,6 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		if (me.getRelationship() == 'proband') {
 					    		me.pruneIntronVariants(data);
 				    		}
-				    		//me._pruneHomRefVariants(data);
 	
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
@@ -1256,18 +1255,6 @@ VariantModel.prototype.pruneIntronVariants = function(data) {
 	}	
 }
 
-VariantModel.prototype._pruneHomRefVariants = function(data) {
-	//if (this.relationship == 'proband') {
-		data.features = data.features.filter(function(d) {
-			// Filter homozygous reference for proband only
-			var meetsZygosity = true;
-			if (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') {
-				meetsZygosity = false;
-			}
-			return meetsZygosity;
-		});
-	//}
-}
 
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, onVcfData) {
 	var me = this;
@@ -1694,6 +1681,7 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
             }       
 		})
 	}
+
 
 	var loadClinvarProperties = function(recs) {
 		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarVariants.length; null) {
@@ -2132,8 +2120,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 	var	coverageMin = filterObject.coverageMin;
 	var intronsExcludedCount = 0;
 
-	// Get rid of any homozygous reference from proband
-	me._pruneHomRefVariants(data);
 
 	var filteredFeatures = data.features.filter(function(d) {
 
@@ -2148,6 +2134,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 				d.featureClass = '';
 			}
 		}
+
+		// We don't want to display homozygous reference variants in the variant chart
+		// or feature matrix (but we want to keep it to show trio allele counts).
+		var isHomRef = d.zygosity != null && d.zygosity.toLowerCase() == 'homref' ? true : false;
 
 		var meetsRegion = true;
 		if (window.regionStart != null && window.regionEnd != null ) {
