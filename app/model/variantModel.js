@@ -1185,6 +1185,11 @@ VariantModel.prototype.cacheDangerSummary = function(dangerSummary, geneName) {
 	this._cacheData(dangerSummary, "dangerSummary", geneName);
 }
 
+VariantModel.prototype.clearCacheItem = function(dataKind, geneName, transcript) {
+	var me = this;
+	cacheHelper.clearCacheItem(me._getCacheKey(dataKind, geneName, transcript));
+}
+
 VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
 	var me = this;
 	if (localStorage) {

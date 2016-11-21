@@ -201,6 +201,18 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript) {
 			}
 		})
 
+		CacheHelper._logCacheSize();
+
+		// Now clear out mother and father from cache
+		getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+		getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+
+		getVariantCard("mother" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
+		getVariantCard("father" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
+
+
+		CacheHelper._logCacheSize();
+
 
 		// take this gene off of the queue and see
 		// if next batch of genes should be analyzed
@@ -332,6 +344,13 @@ CacheHelper._logCacheContents = function() {
 			log.unshift("Total = " + total.toFixed(2)+ " KB");}; 
 			console.log(log.join("\n")
 	);	
+}
+
+CacheHelper.prototype.clearCacheItem = function(key) {
+	var me = this;
+	if (localStorage) {
+		localStorage.removeItem(key);			
+	}
 }
 
 CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
