@@ -28,6 +28,8 @@ function VariantModel() {
 
 	this.lastVcfAlertify = null;
 	this.lastBamAlertify = null;
+
+	this.debugMe = false;
 }
 
 
@@ -81,6 +83,16 @@ VariantModel.prototype.isInheritanceLoaded = function() {
 
 VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
 	var me = this;
+	return me._getDataForGene("vcfData", geneObject, selectedTranscript);
+}
+
+VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscript) {
+	var me = this;
+	return me._getDataForGene("fbData", geneObject, selectedTranscript);
+}
+
+VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
+	var me = this;
 	var data = null;
 	// If only alignments have specified, but not variant files, we will need to use the
 	// getBamRefName function instead of the getVcfRefName function.
@@ -91,20 +103,20 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	}
 
 	if (theGetRefNameFunction) {
-		if (me.vcfData != null && me.vcfData.features && me.vcfData.features.length > 0) {
-			if (theGetRefNameFunction(geneObject.chr) == me.vcfData.ref &&
-				geneObject.start == me.vcfData.start &&
-				geneObject.end == me.vcfData.end &&
-				geneObject.strand == me.vcfData.strand) {
-				data = me.vcfData;
+		if (me[dataKind] != null && me[dataKind].features && me[dataKind].features.length > 0) {
+			if (theGetRefNameFunction(geneObject.chr) == me[dataKind].ref &&
+				geneObject.start == me[dataKind].start &&
+				geneObject.end == me[dataKind].end &&
+				geneObject.strand == me[dataKind].strand) {
+				data = me[dataKind];
 			}		
 		} 
 
 		if (data == null) {
 			// Find in cache
-			data = this._getCachedData("vcfData", geneObject.gene_name, selectedTranscript);
+			data = this._getCachedData(dataKind, geneObject.gene_name, selectedTranscript);
 			if (data != null && data != '') {
-				me.vcfData = data;
+				me[dataKind] = data;
 			}
 		} 		
 	} else {
@@ -284,7 +296,7 @@ VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 }
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
-	var fbData = this._getCachedData("fbData", window.gene.gene_name, window.selectedTranscript);
+	var fbData = this.getFbDataForGene(window.gene, window.selectedTranscript);
 	if (fbData != null) {
 		this.fbData = fbData;
 	}
@@ -783,12 +795,18 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 	return new Promise( function(resolve, reject) {
 
+
 		// Create a gene object with start and end reduced to the variants coordinates.
 		var fakeGeneObject = $().extend({}, theGene);
 		fakeGeneObject.start = variant.start;
 		fakeGeneObject.end = variant.end;
 
-		if ( variant.extraAnnot ) {
+
+		if (variant.fbCalled == 'Y') {
+			// We already have the hgvs and rsid if this is a called variant
+			resolve(variant);
+		} else if ( variant.extraAnnot ) {
+			// We have already retrieved the extra annot for this variant,
 			resolve(variant);
 		} else {	
 			me._promiseVcfRefName(theGene.chr).then( function() {				
@@ -891,7 +909,6 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		if (me.getRelationship() == 'proband') {
 					    		me.pruneIntronVariants(data);
 				    		}
-				    		//me._pruneHomRefVariants(data);
 	
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
@@ -1210,6 +1227,9 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 
     	if (success) {
 	    	try {
+	    		if (me.debugMe) {
+		    		console.log("caching "  + dataKind + ' ' + me.relationship + ' ' + geneName + " = " + dataString.length + '->' + dataStringCompressed.length);
+	    		}
 		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    		
 	    	} catch(error) {
@@ -1233,10 +1253,14 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
       	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind, geneName, transcript));
       	if (dataCompressed != null) {
 			var dataString = null;
+			var start = Date.now();
 			try {
 				//dataString = stringCdompress.inflate(dataCompressed);
 				 dataString = LZString.decompressFromUTF16(dataCompressed);
-	 			 data =  JSON.parse(dataString);      		
+	 			 data =  JSON.parse(dataString); 
+	 			 if (me.debugMe) {     		
+				 	console.log("time to decompress cache " + dataKind + " = " + (Date.now() - start));
+				 }
 			} catch(e) {
 				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey(dataKind, geneName, transcript));
 			}
@@ -1252,18 +1276,6 @@ VariantModel.prototype.pruneIntronVariants = function(data) {
 	}	
 }
 
-VariantModel.prototype._pruneHomRefVariants = function(data) {
-	//if (this.relationship == 'proband') {
-		data.features = data.features.filter(function(d) {
-			// Filter homozygous reference for proband only
-			var meetsZygosity = true;
-			if (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') {
-				meetsZygosity = false;
-			}
-			return meetsZygosity;
-		});
-	//}
-}
 
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, onVcfData) {
 	var me = this;
@@ -1691,6 +1703,7 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 		})
 	}
 
+
 	var loadClinvarProperties = function(recs) {
 		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarVariants.length; null) {
 
@@ -1949,17 +1962,32 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) 
 	me._populateRecFilters(me.fbData.features);
 
 
-	if (callback) {
-		callback(me.fbData);
-	}
-
 	var theVcfData = me.getVcfDataForGene(window.gene, window.selectedTranscript);
 	
 	// Now get the clinvar data		    	
-	return me.vcf.promiseGetClinvarRecords(
+	me.vcf.promiseGetClinvarRecords(
 	    		me.fbData, 
 	    		me._stripRefName(window.gene.chr), window.gene, 
-	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, me.fbData) : me._refreshVariantsWithClinvar.bind(me, me.fbData)
+	    ).then( function() {
+	    	if (callback) {
+
+	    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
+				me.fbData.features.forEach(function (fbVariant) {
+					if (fbVariant.source) {
+						fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
+						fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
+						fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
+						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
+						fbVariant.source.clinvar                     = fbVariant.clinvar;
+						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+					}					
+				});	 
+
+
+	    		callback(me.fbData);
+	    	}
+	    });
 
 
 }
@@ -2008,6 +2036,8 @@ VariantModel.prototype.loadCalledTrioGenotypes = function() {
 		// Re-Cache the freebayes variants for proband now that we have mother/father genotype
 		// and allele counts.							
 		me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+
+
 
 	}
 }
@@ -2113,8 +2143,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 	var	coverageMin = filterObject.coverageMin;
 	var intronsExcludedCount = 0;
 
-	// Get rid of any homozygous reference from proband
-	me._pruneHomRefVariants(data);
 
 	var filteredFeatures = data.features.filter(function(d) {
 
@@ -2129,6 +2157,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 				d.featureClass = '';
 			}
 		}
+
+		// We don't want to display homozygous reference variants in the variant chart
+		// or feature matrix (but we want to keep it to show trio allele counts).
+		var isHomRef = (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') ? true : false;
 
 		var meetsRegion = true;
 		if (window.regionStart != null && window.regionEnd != null ) {
@@ -2214,7 +2246,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		}
 
 
-		return meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
+		return !isHomRef && meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures,

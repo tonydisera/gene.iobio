@@ -320,8 +320,8 @@ describe('variantModel', function() {
 		});
 
 		it('removes all the variants that have a zygosity of homref', function() {
-			variantModel.filterVariants(data, filterObject);
-			expect(data.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
+			var filteredData = variantModel.filterVariants(data, filterObject);
+			expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 		});
 
 		describe('when there is a PASS filter applied to the vcf records', function() {
@@ -472,9 +472,9 @@ describe('variantModel', function() {
 				variant_2.impact = { MODERATE: 'MODERATE' };
 				variant_3.impact = { LOW: 'LOW' };
 				variant_3.effect = { EXON: 'EXON' };
-				variant_4.impact = { LOW: 'LOW' };
+				variant_4.effect = { INTRON_VARIANT: 'intron_variant' };
 				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.intronsExcludedCount).toEqual(1);
+				expect(filteredData.intronsExcludedCount).toEqual(2);
 			});
 		});
 
