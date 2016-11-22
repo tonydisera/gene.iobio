@@ -204,10 +204,14 @@ function determineStyle() {
 	}
 	var modeParm = getUrlParameter("mode");
 	if (modeParm && modeParm != "") {
-		isLevelBasic = modeParm == "basic" ? true : false;
-	}
+		isLevelBasic     = modeParm == "basic" ? true : false;
+		isLevelEduTour   = modeParm == "edutour" ? true : false;
+		isLevelEdu       = modeParm == "edutour" ? true : false;
+	} 
 
-	if (isMygene2 && isLevelBasic) {
+	if (isLevelEduTour) {
+		changeSiteStylesheet("assets/css/site-edutour.css");
+	} else if (isMygene2 && isLevelBasic) {
 		changeSiteStylesheet("assets/css/site-mygene2-basic.css");
 	} else if (isMygene2) {
 		changeSiteStylesheet("assets/css/site-mygene2-advanced.css");		
