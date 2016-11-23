@@ -624,7 +624,7 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 	me.clearWarnings();
 
 	if (me.isViewable()) {
-		filterCard.clearFilters();
+		//filterCard.clearFilters();
 
 		me.vcfChart.clazz(classifyClazz);
 		me.fbChart.clazz(classifyClazz);
@@ -1295,7 +1295,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 	this.cardSelector.find('#no-ref-found-warning #message').text("Unable to find reference " + window.gene.chr + " in vcf header.");
 	this.cardSelector.find('#no-ref-found-warning').removeClass("hide");
 
-	filterCard.clearFilters();	
+	//filterCard.clearFilters();	
 }
 
 

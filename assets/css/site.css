@@ -680,7 +680,7 @@ a {
   padding-left: 10px; }
   #variant-control-track #filters {
     padding-bottom: 5px;
-    color: text-color; }
+    color: #717171; }
   #variant-control-track .filter-flag.label-primary {
     background-color: rgba(165, 48, 48, 0.76);
     color: white; }

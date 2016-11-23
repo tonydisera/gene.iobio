@@ -417,27 +417,34 @@ FilterCard.prototype.setExonicOnlyFilter = function(on) {
 
 
 FilterCard.prototype.clearFilters = function() {
-	/*
+	
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = {};
 	
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
 	d3.select('#recfilter-flag').classed("hide", true);
 
+	d3.selectAll('#filter-track .vepImpact').classed('current', false);
+	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
 	d3.selectAll('#filter-track .impact').classed('current', false);
 	d3.selectAll('#filter-track .effect').classed('current', false);
-	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
+	d3.selectAll('#filter-track .af1000glevels').classed('current', false);
+	d3.selectAll('#filter-track .afexaclevels').classed('current', false);
 	d3.selectAll('#filter-track .type').classed('current', false);
 	d3.selectAll('#filter-track .zygosity').classed('current', false);
 	d3.selectAll('#filter-track .sift').classed('current', false);
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
+	d3.selectAll('#filter-track .clinvar').classed('current', false);
+	d3.selectAll('#filter-track .inheritance').classed('current', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
 	$('#af-amount-start').val("");
 	$('#af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
-	*/
+
+	this.displayFilters();
+	
 }
 
 FilterCard.prototype.resetAfRange = function() {
@@ -800,7 +807,7 @@ FilterCard.prototype._getFilterString = function() {
 
 	if (filterObject.coverageMin && filterObject.coverageMin > 0) {
 		if (filterString.length > 0) {
-			filterString += AND(filterString) +  filterBox("coverage between " + filterObject.coverageMin + " and " + filterObject.coverageMax);
+			filterString += AND(filterString) +  filterBox("coverage at least " + filterObject.coverageMin + "X");
 		}
 	}
 
@@ -820,11 +827,11 @@ FilterCard.prototype._getFilterString = function() {
 
 	for (key in annots) {
 		var annotObject = annots[key];
-		var eval   = annotObject.values.length == 1 ? " = " : " in ";
+		var eval   = " = ";
 		var theValues = "";
 		annotObject.values.forEach(function(theValue) {
 			if (theValues.length > 0) {
-				theValues += ","
+				theValues += ", "
 			} else if (annotObject.values.length > 1) {
 				theValues +=  "(";
 			}
