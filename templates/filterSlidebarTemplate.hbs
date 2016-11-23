@@ -7,42 +7,115 @@
   </button>
 
 
-  <!-- VCF Record Filters -->
-  <div id="rec-filter-panel"  style="clear:both">
-      <h4>
-          <span style="float:left;padding-bottom:8px">VCF Filter status </span> 
-          <a id="import-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" style="font-size:10px;float: left;margin-left: 10px;" data-toggle="tooltip" title="What is this field?">
-            <span id="filter-status-help-icon" class="material-icons" style="font-size: 14px;">help</span> 
-          </a>         
 
-          <div id="vcf-filter-status-info" class="collapse" aria-expanded="false" style="clear:both;font-size:10px;padding-top:4px;color:rgb(132,132,132)">
-            The 'Filter status' is a tag set by filtering software to explain the result of
-            filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
-            recommended to display variants marked with 'PASS' if present. Often, if some variants
-            are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
-            For more detailed information, with examples, see the blog post on 'Filter status'.
-          </div>          
+ <!-- Inheritance -->
+  <div >
+   
+    <h4 >
+        Inheritance mode        
+    </h4>
+   
+    <div style="display:table-cell;">
 
-      </h4>
-      <div style="clear:both;">
-          <div id="rec-filter-box" style="display:table-cell;text-align:left;width:120px;"></div>
+
+      <!-- inheritance -->
+       <div style="text-align:left;display:table-cell;" >
+
+           
+             <svg id="denovo" class="inheritance" width="90" height="18" transform="translate(0,0)">
+              <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="20" height="20"></use>
+              </g>
+              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Denovo</text></svg>
+            </svg>
+       </div>
+       <div style="text-align:left;display:table-cell">
+
+            <svg id="recessive" class="inheritance" width="90" height="18" transform="translate(0,0)">
+              <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
+                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="20" height="20"></use>
+              </g>
+              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Recessive</text></svg>
+            </svg>
       </div>
+    </div>
+    
   </div>
 
-  <!-- Exonic and Intronic -->
-  <div style="margin-bottom:20px">
-    <h4 style="margin-bottom:-1px"> Coding vs non-coding</h4>
-     <div class="checkbox">
-      <label>
-        <input id="exonic-only-cb" type="checkbox"> Exclude non-coding intronic variants
-      </label>
+
+<!-- ClinVar -->
+  <div >
+    
+    <h4  >
+      ClinVar
+    </h4>
+    <div style="display:table;text-align:left;">
+
+      <div style="display:table-cell;width:110px;">
+      <!-- ClinVar -->
+        
+        <svg id="clinvar_path" class="clinvar" width="110" height="17" transform="translate(0,0)">
+          <g class="clinvar_path" transform="translate(1,0)" style="opacity: 1;">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: #ad494A;"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Pathogenic</text>
+
+        </svg>
+        <svg id="clinvar_lpath" class="clinvar" width="110" height="17" transform="translate(0,0)">
+          <g class="clinvar_lpath" transform="translate(1,0)" style="opacity: 1;">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: #FB7737;"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Likely Pathogenic</text>
+        </svg>
+         <svg id="clinvar_uc" class="clinvar" width="110" height="17" transform="translate(0,0)">
+            <g class="clinvar_uc" transform="translate(1,0)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill:rgba(231, 186, 82, 1);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Unknown significance </text>
+          </svg>
+
+          <svg id="clinvar_cd" class="clinvar" width="110" height="17" transform="translate(0,0)">
+            <g class="clinvar_cd" transform="translate(1,0)" style="opacity: 1;">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgb(111, 182, 180);"></use>
+            </g>
+            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Conflicting data</text>
+          </svg>
+        
+      </div>
+
+      <div style="display:table-cell;width:73px;">
+
+        <svg id="clinvar_other" class="clinvar" width="73" height="17" transform="translate(0,0)">
+          <g class="clinvar_other" transform="translate(1,0)" style="opacity: 1;">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgb(189, 189, 189);"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Other </text>
+        </svg>
+
+        <svg id="clinvar_benign" class="clinvar" width="73" height="17" transform="translate(0,0)">
+          <g class="clinvar_benign" transform="translate(1,0)" style="opacity: 1;">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgba(156, 194, 49, 1);"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Benign</text>
+        </svg>
+
+        <svg id="clinvar_lbenign" class="clinvar" width="73" height="17" transform="translate(0,0)">
+          <g class="clinvar_lbenign" transform="translate(1,0)" style="opacity: 1;">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgba(181, 207, 107, 1);"></use>
+          </g>
+          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Likely Benign</text>
+        </svg>
+ 
+      </div>
+      
     </div>
+
   </div>
 
   <!-- SnpEff/VEP Impact and Effect -->
   <div >
     
-    <h4>
+    <h4 >
         VEP Functional impact       
     </h4>  
 
@@ -103,7 +176,7 @@
  
  <!-- Allele Frequency -->
   <div >
-    <h4>
+    <h4 >
       Allele Frequency
     </h4>
     <div style="width:100px;margin-right:10px;margin-bottom:4px;">
@@ -215,7 +288,7 @@
         
 
         <!-- allele freq range -->
-        <div id="af-range-filter" style="clear:both;text-align:left">
+        <div id="af-range-filter" style="clear:both;text-align:left;margin-top:-8px;margin-bottom:18px;">
           <input  type="number"  id="af-amount-start" value=""                           
            style="width: 45px;font-size: 9px;margin-bottom: 1px;"/>
           -
@@ -232,73 +305,10 @@
 
 
 
- <!-- Inheritance -->
-  <div >
-   
-    <h4>
-        Inheritance mode        
-    </h4>
-   
-    <div style="display:table-cell;">
-
-
-      <!-- inheritance -->
-       <div style="text-align:left;display:table-cell;" >
-
-           
-             <svg id="denovo" class="inheritance" width="90" height="18" transform="translate(0,0)">
-              <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="20" height="20"></use>
-              </g>
-              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Denovo</text></svg>
-            </svg>
-       </div>
-       <div style="text-align:left;display:table-cell">
-
-            <svg id="recessive" class="inheritance" width="90" height="18" transform="translate(0,0)">
-              <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
-                <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="20" height="20"></use>
-              </g>
-              <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Recessive</text></svg>
-            </svg>
-      </div>
-    </div>
-    
-  </div>
-
-
-
- <!-- Zygosity -->
-  <div >
-    <h4>
-      
-      Zygosity
-      <a id="zygosity-scheme" href="javascript:(0)" >
-            <i class="material-icons" style="font-size:14px">color_lens</i>            
-      </a>
-    </h4>
-
-    <div style="display:table;">
-
-
-      <!-- zygosity -->
-      <div style="text-align:left;display:table-cell;padding-right: 0px;">
-
-        <div class="tooltip-zygosity nocolor filter-symbol zyg_hom hom zygosity " id="hom" style="width:28px !important">Hom</div>
-        <div class="tooltip-zygosity nocolor filter-symbol zyg_het het zygosity " id="het">Het</div>
-
-      </div>
-
-    </div>
-  </div>
-
-
-
-
  <!-- Coverage -->
   <div >
     
-    <h4 class="panel-title">
+    <h4 >
       Coverage (minimum)
     </h4>
 
@@ -316,120 +326,9 @@
   </div>
 
 
-
- <!-- Type -->
-  <div>
-    <h4 >
-      Type        
-    </h4>
-    <div  style="display:table;">
-
-
-      <!-- type -->
-      <div style="text-align:left;display:table-cell;width:70px;">
-        <svg id="snp" class="type" width="70" height="15" transform="translate(0,0)">
-          <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">SNP</text>
-          <rect class="filter-symbol snp" rx="2" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
-        </svg>
-        <svg id="ins" class="type" width="70" height="15" transform="translate(0,0)">
-          <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;"> Insertion</text>
-          <circle class="filter-symbol ins" cx="4.5" cy="5" r="4.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
-        </svg>
-      </div>
-
-      <div style="text-align:left;display:table-cell;width:70px;">
-
-        <svg id="del" class="type" width="70" height="15" transform="translate(0,0)">
-          <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;">Deletion</text>       
-          <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
-        </svg>
-
-        <svg id="complex" class="type" width="54" height="15" transform="translate(0,0)">
-          <g transform="translate(1,0)">
-            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Complex</text>       
-            <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
-            </path>
-          </g>
-        </svg>
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- ClinVar -->
-  <div >
-    
-    <h4 >
-      ClinVar
-    </h4>
-    <div style="display:table;text-align:left;">
-
-      <div style="display:table-cell;width:110px;">
-      <!-- ClinVar -->
-        
-        <svg id="clinvar_path" class="clinvar" width="110" height="17" transform="translate(0,0)">
-          <g class="clinvar_path" transform="translate(1,0)" style="opacity: 1;">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: #ad494A;"></use>
-          </g>
-          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Pathogenic</text>
-
-        </svg>
-        <svg id="clinvar_lpath" class="clinvar" width="110" height="17" transform="translate(0,0)">
-          <g class="clinvar_lpath" transform="translate(1,0)" style="opacity: 1;">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: #FB7737;"></use>
-          </g>
-          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Likely Pathogenic</text>
-        </svg>
-         <svg id="clinvar_uc" class="clinvar" width="110" height="17" transform="translate(0,0)">
-            <g class="clinvar_uc" transform="translate(1,0)" style="opacity: 1;">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill:rgba(231, 186, 82, 1);"></use>
-            </g>
-            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Unknown significance </text>
-          </svg>
-
-          <svg id="clinvar_cd" class="clinvar" width="110" height="17" transform="translate(0,0)">
-            <g class="clinvar_cd" transform="translate(1,0)" style="opacity: 1;">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgb(111, 182, 180);"></use>
-            </g>
-            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Conflicting data</text>
-          </svg>
-        
-      </div>
-
-      <div style="display:table-cell;width:73px;">
-
-        <svg id="clinvar_other" class="clinvar" width="73" height="17" transform="translate(0,0)">
-          <g class="clinvar_other" transform="translate(1,0)" style="opacity: 1;">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgb(189, 189, 189);"></use>
-          </g>
-          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Other </text>
-        </svg>
-
-        <svg id="clinvar_benign" class="clinvar" width="73" height="17" transform="translate(0,0)">
-          <g class="clinvar_benign" transform="translate(1,0)" style="opacity: 1;">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgba(156, 194, 49, 1);"></use>
-          </g>
-          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Benign</text>
-        </svg>
-
-        <svg id="clinvar_lbenign" class="clinvar" width="73" height="17" transform="translate(0,0)">
-          <g class="clinvar_lbenign" transform="translate(1,0)" style="opacity: 1;">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgba(181, 207, 107, 1);"></use>
-          </g>
-          <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Likely Benign</text>
-        </svg>
- 
-      </div>
-      
-    </div>
-
-  </div>
-
    <!-- PolyPhen  -->
   <div>
-    <h4>
+    <h4 >
       <span>PolyPhen</span><span style="padding-left:55px;">SIFT</span>
     </h4>
 
@@ -502,9 +401,113 @@
   </div>
 
 
+ <!-- Zygosity -->
+  <div >
+    <h4 >
+      
+      Zygosity
+      <a id="zygosity-scheme" href="javascript:(0)" >
+            <i class="material-icons" style="font-size:14px">color_lens</i>            
+      </a>
+    </h4>
+
+    <div style="display:table;">
+
+
+      <!-- zygosity -->
+      <div style="text-align:left;display:table-cell;padding-right: 0px;">
+
+        <div class="tooltip-zygosity nocolor filter-symbol zyg_hom hom zygosity " id="hom" style="width:28px !important">Hom</div>
+        <div class="tooltip-zygosity nocolor filter-symbol zyg_het het zygosity " id="het">Het</div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+ <!-- Type -->
+  <div>
+    <h4  >
+      Type        
+    </h4>
+    <div  style="display:table;">
+
+
+      <!-- type -->
+      <div style="text-align:left;display:table-cell;width:70px;">
+        <svg id="snp" class="type" width="70" height="15" transform="translate(0,0)">
+          <text class="name" x="10" y="9" style="fill-opacity: 1;font-size: 9px;">SNP</text>
+          <rect class="filter-symbol snp" rx="2" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+        </svg>
+        <svg id="ins" class="type" width="70" height="15" transform="translate(0,0)">
+          <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;"> Insertion</text>
+          <circle class="filter-symbol ins" cx="4.5" cy="5" r="4.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+        </svg>
+      </div>
+
+      <div style="text-align:left;display:table-cell;width:70px;">
+
+        <svg id="del" class="type" width="70" height="15" transform="translate(0,0)">
+          <text class="name" x="11" y="9" style="fill-opacity: 1;font-size: 9px;">Deletion</text>       
+          <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+        </svg>
+
+        <svg id="complex" class="type" width="54" height="15" transform="translate(0,0)">
+          <g transform="translate(1,0)">
+            <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Complex</text>       
+            <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
+            </path>
+          </g>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- VCF Record Filters -->
+  <div id="rec-filter-panel"  style="clear:both">
+      <h4  style="overflow:auto">
+          <span style="float:left;">VCF Filter status </span> 
+          <a id="import-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" style="font-size:10px;float: left;margin-left: 10px;" data-toggle="tooltip" title="What is this field?">
+            <span id="filter-status-help-icon" class="material-icons" style="font-size: 14px;">help</span> 
+          </a>         
+
+          <div id="vcf-filter-status-info" class="collapse" aria-expanded="false" style="clear:both;font-size:10px;padding-top:4px;color:rgb(132,132,132)">
+            The 'Filter status' is a tag set by filtering software to explain the result of
+            filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
+            recommended to display variants marked with 'PASS' if present. Often, if some variants
+            are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
+            For more detailed information, with examples, see the blog post on 'Filter status'.
+          </div>          
+
+      </h4>
+      <div style="clear:both;">
+          <div id="rec-filter-box" style="display:table-cell;text-align:left;width:120px;"></div>
+      </div>
+  </div>
+
+  <!-- Exonic and Intronic -->
+  <div style="margin-bottom:20px">
+    <h4 > Coding vs non-coding</h4>
+     <div class="checkbox">
+      <label>
+        <input id="exonic-only-cb" type="checkbox"> Exclude non-coding intronic variants
+      </label>
+    </div>
+  </div>
+
+
+  
+
  <!-- Regulatory -->
   <div>
-    <h4>
+    <h4 >
         Regulatory
     </h4>
 
