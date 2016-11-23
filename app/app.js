@@ -2851,6 +2851,7 @@ function getRsId(variant) {
 
 
 function filterVariants() {
+	filterCard.displayFilters();
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
 

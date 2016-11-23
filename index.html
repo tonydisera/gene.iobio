@@ -585,6 +585,12 @@
 
     <div id="track-section" class="push" style="margin-top:5px;">
 
+        <div id="variant-control-track" class="shadow-z-2 hide">
+          <div id="filters">
+          </div>
+        </div>
+
+
         <div id="matrix-track"  class="track shadow-z-2 hide">
             
             <div class="card-label level-edu level-basic" style="">Rank Variants</div>
@@ -636,53 +642,6 @@
               </div> 
             </div>
         </div>
-      </div>
-
-      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;" class="hide todo shadow-z-2">
-
-        <div id="toolbar" style="width:100%"  >
-                <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
-
-
-
-                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;" class="hide">
-                  <i class="mdi-action-settings"></i>
-                </a>
-
-
-                <a href="javascript:void(0)" id="button-show-filter-card" class=" btn btn-default btn-raised icon-button" style="margin-left:10px;margin-top:4px;padding-top:2px;padding-bottom:2px;" onclick="showFilterSlideLeft()">     
-                  <i class="material-icons" style="font-size: 18px;">donut_small</i>          
-                      Filter
-                </a>
-
-
-                <a href="javascript:void(0)" id="button-show-bookmarks-variant" class=" btn btn-default btn-raised icon-button" style="margin-left:10px;margin-top:4px;padding-top:2px;padding-bottom:2px;" onclick="showBookmarkSlideLeft()">       
-                 <i class="material-icons" style="font-size: 18px;">bookmark</i>                
-                    Bookmarks 
-                </a>
-         
-
-
-
-
-                <span style="margin-left:20px;">                  
-                    <select id="select-intron-display" onchange="" >
-                          <option>Exons + Introns</option>
-                          <option>Exons Only</option>                   
-                     </select>
-                </span>
-
-                 <span style="margin-left:20px;">                  
-                    <select id="select-color-scheme" onchange="" >
-                          <option>Color by Impact</option>
-                          <option>Color by Effect</option>                   
-                          <option>Color by Hom / Het</option>                   
-                     </select>
-                </span>
-
-
-          </div>
-
       </div>
 
       <div id="coordinate-frame" class="">

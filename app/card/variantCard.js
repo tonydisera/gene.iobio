@@ -1538,9 +1538,7 @@ VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
 
 		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
 		// this by checking if the number filter flags exceed those that are hidden
-		if (this.cardSelector.find(".filter-flag").length > this.cardSelector.find(".filter-flag.hide").length 
-			|| this.cardSelector.find("#region-flag").length > this.cardSelector.find("#region-flag.hide").length
-			|| this.cardSelector.find("#recfilter-flag").length > this.cardSelector.find("#recfilter-flag.hide").length) {
+		if (filterCard.hasFilters()) {
 			this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(filteredVcfData));
@@ -1574,7 +1572,12 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	if (data == null || data.features == null || data.features.length == 0) {
 		return;
 	}
+	
+	// Filter variants
+	var filterObject = filterCard.getFilterObject();
+	var filteredData = this.model.filterVariants(data, filterObject);
 
+/*
 	me.cardSelector.find(".filter-flag").addClass("hide");
 
 	// Filter variants
@@ -1640,6 +1643,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 		}
 
 	}
+	*/
 
 	return filteredData;
 

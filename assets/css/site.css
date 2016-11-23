@@ -671,6 +671,20 @@ a {
 .material-dropdown li:hover {
   background: #c8c8c8; }
 
+#variant-control-track {
+  background: white;
+  padding-right: 10px;
+  padding-top: 5px;
+  margin-bottom: 7px;
+  margin-top: 0px;
+  padding-left: 10px; }
+  #variant-control-track #filters {
+    padding-bottom: 5px;
+    color: text-color; }
+  #variant-control-track .filter-flag.label-primary {
+    background-color: rgba(165, 48, 48, 0.76);
+    color: white; }
+
 #matrix-track #low-quality-legend {
   float: left;
   margin-top: -20px;
