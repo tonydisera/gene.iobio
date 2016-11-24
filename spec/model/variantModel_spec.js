@@ -285,9 +285,8 @@ describe('variantModel', function() {
 
 			filterObject = {
 				'coverageMin': 100,
-				'afMin': 0,
-				'afMax': 1,
-				'afScheme' : "exac",
+				'afMinExac': 0,
+				'afMaxExac': 1,
 				'annotsToInclude': {},
 				'exonicOnly': false
 		  };
@@ -363,8 +362,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.8;
-				filterObject.afMin = 0.6;
-				filterObject.afMax = 1;
+				filterObject.afMinExac = 0.6;
+				filterObject.afMaxExac = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_4]);
 			});
@@ -374,8 +373,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = 0;
-				filterObject.afMax = 0.7;
+				filterObject.afMinExac = 0;
+				filterObject.afMaxExac = 0.7;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3]);
 			});
@@ -385,8 +384,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = null;
-				filterObject.afMax = null;
+				filterObject.afMinExac = null;
+				filterObject.afMaxExac = null;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
@@ -396,8 +395,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = NaN;
-				filterObject.afMax = NaN;
+				filterObject.afMinExac = NaN;
+				filterObject.afMaxExac = NaN;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
@@ -407,8 +406,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = 0;
-				filterObject.afMax = 1;
+				filterObject.afMinExac = 0;
+				filterObject.afMaxExac = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
@@ -416,13 +415,12 @@ describe('variantModel', function() {
 
 		describe('when filtering out variants that do not meet the specifed af1000G allele frequency', function() {
 			it('filters out variants that are not in the specified range', function() {
-				filterObject.afScheme = "1000g";
 				variant_1.af1000G = null;
 				variant_2.af1000G = '';
 				variant_3.af1000G = 0.5;
 				variant_4.af1000G = 0.8;
-				filterObject.afMin = 0.6;
-				filterObject.afMax = 1;
+				filterObject.afMin1000g = 0.6;
+				filterObject.afMax1000g = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_4]);
 			});

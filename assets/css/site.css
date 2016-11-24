@@ -1468,7 +1468,7 @@ header {
   position: fixed;
   top: 0;
   left: 36px;
-  width: 214px;
+  width: 314px;
   height: 100%;
   transition: width 0.6s ease;
   -webkit-transition: width 0.6s ease;
@@ -1479,7 +1479,7 @@ header {
 
 #slider-left-content {
   height: 100%;
-  width: 210px;
+  width: 310px;
   background-color: white;
   overflow-y: scroll;
   margin-top: 0px;
@@ -1492,7 +1492,7 @@ header {
 
 #close-slide-left {
   position: fixed;
-  left: 210px;
+  left: 310px;
   top: 0px; }
 
 .icon-button.sidebar-button {
@@ -1568,11 +1568,11 @@ header {
   margin-left: 36px; }
 
 .slide-left {
-  transform: translate(214px, 0);
-  -webkit-transform: translate(214px, 0);
-  -moz-transform: translate(214px, 0);
-  -ms-transform: translate(214px, 0);
-  -o-transform: translate(214px, 0); }
+  transform: translate(314px, 0);
+  -webkit-transform: translate(314px, 0);
+  -moz-transform: translate(314px, 0);
+  -ms-transform: translate(314px, 0);
+  -o-transform: translate(314px, 0); }
 
 /* make keyframes that tell the start state and the end state of our object */
 @-webkit-keyframes fadeIn {
@@ -1608,7 +1608,7 @@ header {
 #filter-track h4 {
   font-size: 12px;
   color: #5d809d !important;
-  margin-top: 15px;
+  margin-top: 13px;
   margin-bottom: 5px; }
 #filter-track #clear-filters-link {
   padding-top: 0px;
