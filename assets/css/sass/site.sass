@@ -215,6 +215,8 @@ h5
     border: none 
 
 
+
+
 #recfilter-flag
   background-color: #5881AD !important
 
@@ -1168,13 +1170,13 @@ section
   opacity: 0
 
 #top-coordinate-frame 
-  border: none
-  width: 19px
+  border: none 
   position: relative
   pointer-events: none
   top: 0px
-  height: 12px
+  height: 18px
   visibility: visible
+  width:  26px
 
   &.hide
     visibility:  hidden !important
@@ -1183,10 +1185,10 @@ section
   .coordinate-arrow
     stroke-width: 1px !important
     stroke: black !important
-    fill: #ff7d7d
+    fill: $arrow-color
 
 .variant-card
-  min-height: 32px
+  min-height: 60px
   padding-bottom: 0px
   background-color: white
 
@@ -1320,6 +1322,7 @@ header
 #bam-depth
   text-align: left
   margin-top: 0px
+  min-height: 30px
 
   .circle
     stroke: none
@@ -1327,25 +1330,25 @@ header
     pointer-events: none
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
-  stroke: $current-color
+  stroke: $arrow-color
   stroke-width: 2
 
   fill: none
   pointer-events: none
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
-  stroke: $current-color
+  stroke: $arrow-color
   fill: none
   stroke-width: 3
   pointer-events: none
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
   stroke-width: 3
-  stroke: $current-color
+  stroke: $arrow-color
   pointer-events: none
 
 #bam-depth .circle-label
-  fill: $current-color
+  fill: $arrow-color
   font-size: 9px
   font-weight: bold
   stroke: none
@@ -1610,6 +1613,21 @@ header
         margin-left:  5px  
 
 
+.col-container
+  display: flex
+  flex-direction: column
+  align-content: space-between
+  height: 100%
+
+.col-main
+  flex: 1
+  flex-grow: 1
+
+.col-footer
+  flex: 2
+  flex-grow: 0
+  align-self: flex-end
+
 
 @import slideout
 
@@ -1631,6 +1649,8 @@ header
 
 @import feedback
 
+@import legend
+
 // This style adds a panel to the top of the main view, explaining how
 // gene.iobio works in Mygene2.  There are nav buttons to go
 // from beginner to advanced modes
@@ -1647,19 +1667,7 @@ header
     margin-left: 200px !important
 
 @media screen and (max-device-width: 800px), screen and (max-width: 800px)
-  .iobio, .iobioapp
-    font-size: 22px !important
 
-  .iobioproject
-    font-size: 16px
-
-  #learn-more-dropdown
-
-  #gene-search-bar
-    display: block !important
-    clear: both !important
-    width: 400px
-    text-align: center !important
 
   #region-track
     margin-left: 200px !important

@@ -6,3 +6,4 @@ node_modules
 e2e/logs
 e2e/screenshots
 phantomjsdriver.log
+spec/coverage

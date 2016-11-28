@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, sliderIconBar, sliderLeft;
+var indexPage, appTitleSection, dataCard, matrixTrack, sliderIconBar, findGenesPanel;
 
 module.exports = {
   tags: [],
@@ -11,7 +11,7 @@ module.exports = {
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
-    sliderLeft = indexPage.section.sliderLeft;
+    findGenesPanel = indexPage.section.findGenesPanel;
     sliderIconBar = indexPage.section.sliderIconBar;
   },
 
@@ -22,7 +22,7 @@ module.exports = {
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
     sliderIconBar.clickFindGenes();
-    sliderLeft.section.findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);
+    findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);
     appTitleSection.clickAnalyzeAll();
     matrixTrack.waitForMatrixLoaded();
     appTitleSection.assertGeneBadgesLoaded(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);

@@ -23,6 +23,14 @@ module.exports = {
     clickRemoveAll: function() {
       return this.click('@removeAll');
     },
+    selectGencodeTranscript: function() {
+      return this.click('#select-gene-source + div .selectize-input')
+                 .click('#select-gene-source + div .selectize-dropdown-content [data-value="Gencode Transcript"]');
+    },
+    selectRefSeqTranscript: function() {
+      return this.click('#select-gene-source + div .selectize-input')
+                 .click('#select-gene-source + div .selectize-dropdown-content [data-value="RefSeq Transcript"]');
+    },
     orderGenesByOriginalOrder: function() {
       return this.click('#select-gene-container .selectize-control input')
                  .click('#select-gene-container .selectize-dropdown-content [data-value="(original order)"]');

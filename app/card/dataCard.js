@@ -199,16 +199,7 @@ DataCard.prototype.loadDemoData = function() {
 	}
 
 	
-	if (isLevelBasic) {		
-		window.updateUrl("gene",  this.mygene2Genes[0]);
-		window.updateUrl("genes", this.mygene2Genes.join(","));
-
-		cacheHelper.clearCache();
-		window.matrixCard.reset();
-		window.loadedUrl = false;
-
-		reloadGeneFromUrl();
-	} else if (!window.isLevelEdu) {
+	if (!window.isLevelEdu) {
 		window.updateUrl("gene", "RAI1");
 		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
 
@@ -228,6 +219,96 @@ DataCard.prototype.loadDemoData = function() {
 	}
 
 	
+
+}
+
+DataCard.prototype.loadMygene2Data = function() {
+	var me = this;
+
+
+	var loadProband = function(vcfFilePath) {
+
+		if (vcfFilePath != null) {
+			// Get rid of leading "/" in file path when server instance already ends with "/"
+			if (endsWith(serverInstance, "/") && vcfFilePath.indexOf("/") == 0) {
+				vcfFilePath = vcfFilePath.slice(1);
+			}
+			// Create a URL that only the IOBIO service has access to
+			var probandUrl = window.location.protocol + "//" + serverInstance + vcfFilePath;
+			me.setVcfUrl("proband", "Variants", null, probandUrl);
+		} else {
+			// Load full demo wgs trio data if vcf file path was not provided via mygene2 data exchange
+			me.mode = "trio";
+			me.setVcfUrl("proband", "DEMO DATA", me.demoSampleNames.proband, me.demoUrls.proband);
+			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
+			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
+		}
+
+		var genes = getUrlParameter("genes");
+		if (genes != null && genes.length > 0) {
+			window.geneNames = genes.split(",");
+		} else {
+			window.geneNames = me.mygene2Genes;
+		}
+		var geneToSelect = getUrlParameter("gene");
+		if (geneToSelect == null && geneToSelect == "") {
+			geneToSelect = window.geneNames[0];
+		}
+
+		genesCard.initCopyPasteGenes();
+		genesCard.copyPasteGenes(geneToSelect, true);
+		window.showSidebar("Phenolyzer");
+
+		window.cacheHelper.clearCache();
+		window.matrixCard.reset();		
+	};
+
+
+	var missingVariables = "";
+	if (mygene2Endpoint == "") {
+		missingVariables += "mygene2Endpoint ";
+	} 
+	if (mygene2XAuthToken == "") {
+		missingVariables += "mygene2XAuthToken ";
+	} 
+	if (missingVariables.length > 0) {
+		alertify.confirm("Cannot load data files until the following variables are initialized in globalDeployments.js: " + missingVariables + ".",
+					    function(){ 
+					    }, 
+					    function(){ 
+					    	loadProband();
+					    }
+					 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});   		
+	} else {
+		
+		var endpointUrl = mygene2Endpoint + "?token=" + getUrlParameter("token");
+		$.ajax({
+		    url : endpointUrl,
+		    headers: {
+		        'X-Auth-Token' : mygene2XAuthToken,
+		        'Content-Type':'application/x-www-form-urlencoded; charset=utf-8'
+		    },
+		    crossDomain: true,
+		    type: "GET",
+			success: function(response) {
+				loadProband(response);	    	
+		    },
+		    error: function( xhr, status, errorThrown ) {
+		        console.log( "Error: " + errorThrown );
+		        console.log( "Status: " + status );
+		        console.log( xhr );
+		        console.log("Unable to get MyGene2 endpoint filenames");
+
+		        alertify.confirm("Unable to obtain variant files using MyGene2 token.",
+				    function(){ 
+				    }, 
+				    function(){ 
+				    	loadProband();
+				    }
+				 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'}); ;   
+		    }
+		});
+	}
 
 }
 
@@ -821,6 +902,21 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 }
 
 
+
+DataCard.prototype.setVcfUrl = function(relationship, name, sampleName, vcfUrl) {
+	var me = this;
+	
+	var variantCard = getVariantCard(relationship);
+	variantCard.setRelationship(relationship);		
+	variantCard.setName(name);
+	variantCard.setVariantCardLabel();
+	variantCard.showDataSources(name);
+	variantCard.onVcfUrlEntered(vcfUrl, function(success, sampleNames) {
+		if (sampleName) {
+			variantCard.setSampleName(sampleName);
+		}
+	});
+}
 DataCard.prototype.setDataSourceName = function(panelSelector) {	
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');

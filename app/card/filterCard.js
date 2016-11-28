@@ -11,19 +11,11 @@ function FilterCard() {
 }
 
 FilterCard.prototype.shouldWarnForNonPassVariants = function() {
-	var statusCount = 0;
-	var passStatus = false;
-	for ( key in this.recFilters) {
-		if (key == 'PASS') {
-			passStatus = true;
-		}
-		statusCount++;	
-	}
-	if (passStatus && statusCount > 1) {
-		return true;
-	}  else {
-		return false;
-	}
+	var recFilterKeys = Object.keys(this.recFilters);
+	var passStatus = recFilterKeys.some(function(key) {
+		return key === 'PASS';
+	});
+	return (passStatus && recFilterKeys.length > 1);
 }
 
 FilterCard.prototype.autoSetFilters = function() {
@@ -50,7 +42,6 @@ FilterCard.prototype.autoSetFilters = function() {
 }
 
 FilterCard.prototype.getFilterObject = function() {
-
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
 	if (isLevelBasic) {
 		var annots = 	{
@@ -64,30 +55,23 @@ FilterCard.prototype.getFilterObject = function() {
 			clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}
 		}
 		if (this.shouldWarnForNonPassVariants()) {
-			annots.PASS =   {key: 'recfilter',     state: true, value: 'PASS'};
+			annots.PASS = {key: 'recfilter', state: true, value: 'PASS'};
 		}
 
-		var filterObject = {
-			annotsToInclude: annots
-		};
-			
-		return filterObject;
+		return { annotsToInclude: annots };
 	}
-
 
 	var afMin = $('#af-amount-start').val() != '' ? +$('#af-amount-start').val() / 100 : null;
 	var afMax = $('#af-amount-end').val()   != '' ? +$('#af-amount-end').val()   / 100 : null;
 
-	var filterObject = {
+	return {
 		'coverageMin': +$('#coverage-min').val(),
 		'afMin': afMin,
 		'afMax': afMax,
 		'afScheme' : this.afScheme,
 		'annotsToInclude': this.annotsToInclude,
 		'exonicOnly': $('#exonic-only-cb').is(":checked")
-    };
-
-    return filterObject;
+  };
 }
 
 
@@ -401,7 +385,7 @@ FilterCard.prototype.setExonicOnlyFilter = function(on) {
 
 FilterCard.prototype.clearFilters = function() {
 	this.clickedAnnotIds = [];
-	this.annotsToInclude = [];
+	this.annotsToInclude = {};
 	
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
 	d3.select('#recfilter-flag').classed("hide", true);
@@ -415,15 +399,15 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
-	$('#af-amount-start').val(0);
-	$('#af-amount-end').val(100);
+	$('#af-amount-start').val("");
+	$('#af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
 }
 
 FilterCard.prototype.resetAfRange = function() {
-	$('#af-amount-start').val("0");
-	$('#af-amount-end').val("100");	
+	$('#af-amount-start').val("");
+	$('#af-amount-end').val("");	
 
 	$("#af1000grange-flag").addClass("hide");
 	$("#afexacrange-flag").addClass("hide");
@@ -589,7 +573,7 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
 		d3.select(this).classed("inactive", count == 0);
 	});
-	//$("#af-range-filter").removeClass("hide");
+	$("#af-range-filter").removeClass("hide");
 
 }
 
@@ -670,8 +654,9 @@ FilterCard.prototype.displayRecFilters = function() {
 	
 	recFilterKeys.forEach(function(key) {
 		recFilterCount++;
-		var label = key == "." ? ". (unassigned)" : key;			
-		var svgElem = '<svg id="' + key + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
+		var label = key === "." ? ". (unassigned)" : key;
+		var elmId = key === "." ? "unassigned" : key;
+		var svgElem = '<svg id="' + elmId + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
                       '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
   					  '</svg>';
   		$('#rec-filter-box').append(svgElem);

@@ -59,8 +59,16 @@ gulp.task('jasmine', function() {
 
 function getKarmaFiles() {
 	// Hack to get array of files from karma.conf.js
-	var files, excludes;
-	var mockConfig = { set: function(obj) { files = obj.files; excludes = obj.exclude; } }
+	var files = [];
+	var excludes;
+	var mockConfig = {
+		set: function(obj) {
+			obj.files.forEach(function(file) {
+				if (typeof file === 'string') { files.push(file); }
+			});
+			excludes = obj.exclude;
+		}
+	}
 	require('./karma.conf.js')(mockConfig);
 	var excludedFiles = excludes.map(function(excludedFile) {
 		return '!' + excludedFile;

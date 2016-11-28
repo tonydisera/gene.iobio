@@ -169,7 +169,8 @@ var effectCategories = [
     var recordCount = 0;
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-H', url]
+        ['-H', url],
+        {ssl: useSSL}
     );
 
     cmd.on('data', function(data) {
@@ -382,7 +383,8 @@ var effectCategories = [
 
     var cmd = new iobio.cmd(
         IOBIO.vcfReadDepther,
-        ['-i', vcfURL + '.tbi']
+        ['-i', vcfURL + '.tbi'],
+        {ssl: useSSL}
     );
 
     cmd.on('data', function(data) {
@@ -652,32 +654,32 @@ var effectCategories = [
     var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
-    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm])
-      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
+    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm], {ssl: useSSL})
+      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
     // filter sample(s)
     if (sampleName != null && sampleName != "") {
 
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'])
+      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
     }
 
     // normalize variants
-    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'], {ssl: useSSL})
 
     // get allele frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af);
+    cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL});
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (isRefSeq || annotationEngine == 'vep') {
     } else {
-      cmd = cmd.pipe(IOBIO.snpEff);
+      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
     if (vepArgs == "") {
-      cmd = cmd.pipe(IOBIO.vep);
+      cmd = cmd.pipe(IOBIO.vep, [], {ssl: useSSL});
     } else {
-      cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+      cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
     }
 
 
@@ -798,7 +800,8 @@ var effectCategories = [
 
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-h', vcfURL, '1:1-1']);
+        ['-h', vcfURL, '1:1-1'],
+        {ssl: useSSL});
 
 
     var headerData = "";
@@ -843,16 +846,16 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region]);
+    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region], {ssl: useSSL});
 
-    cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'])
+    cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
     if (sampleName != null && sampleName != "") {
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-'], {ssl: useSSL});
     }
 
-    cmd = cmd.pipe(IOBIO.bcftools, ['stats']);
+    cmd = cmd.pipe(IOBIO.bcftools, ['stats'], {ssl: useSSL});
 
 
     var statsData = "";
@@ -897,7 +900,7 @@ var effectCategories = [
 
   }
 
-  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript) {
+  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript, sampleIndex) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -908,7 +911,9 @@ var effectCategories = [
       var vepFields = {};
 
       annotatedRecs.forEach(function(record) {
-        if (record.charAt(0) == "#") {
+        if (record == null || record == "") {
+
+        } else if (record.charAt(0) == "#") {
           // Figure out how the vep fields positions
           if (record.indexOf("INFO=<ID=CSQ") > 0) {
             vepFields = me.parseHeaderFieldForVep(record);
@@ -936,11 +941,13 @@ var effectCategories = [
                            'qual': qual, 'filter': filter, 'info': info, 'format': format, 'genotypes': genotypes};
           vcfObjects.push(vcfObject);
         }
-
-        // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
-        resolve([annotatedRecs, results]);
       });
+
+
+      // Parse the vcf object into a variant object that is visualized by the client.
+      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleIndex);
+      resolve([annotatedRecs, results]);
+
     });
   }
 
@@ -1055,7 +1062,7 @@ var effectCategories = [
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm]);
+      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm], {ssl: useSSL});
 
 
       var clinvarData = "";
@@ -1269,27 +1276,27 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(IOBIO.bcftools, ['annotate', '-h', contigNameFile, writeStream ])
+    var cmd = new iobio.cmd(IOBIO.bcftools, ['annotate', '-h', contigNameFile, writeStream ], {ssl: useSSL})
 
     // Filter samples
     if (sampleName != null && sampleName != "") {
       var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-']);
+      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-'], {ssl: useSSL});
     }
 
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'])
+    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'], {ssl: useSSL})
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af)
+    cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
     } else {
-      cmd = cmd.pipe(IOBIO.snpEff);
+      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-    cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+    cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
 
 
     var buffer = "";
@@ -1312,10 +1319,17 @@ var effectCategories = [
   }
 
 
+  exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleIndex) {
 
-  exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields) {
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
+
+      // Use the sample index to grab the right genotype column from the vcf record
+      // If it isn't provided, assume that the first genotype column is the one
+      // to be evaluated and parsed.
+      if (sampleIndex == null) {
+        sampleIndex = 0;
+      }
 
 
       // The variant region may span more than the specified region.
@@ -1698,8 +1712,8 @@ var effectCategories = [
 
               } else {
                 var tokens = genotype.split(":");
-                gtIndex = gtTokens["GT"];
-                genotypes.push(tokens[gtIndex]);
+                gtFieldIndex = gtTokens["GT"];
+                genotypes.push(tokens[gtFieldIndex]);
 
                 gtDepthIndex = gtTokens["DP"];
                 if (gtDepthIndex) {
@@ -1830,8 +1844,7 @@ var effectCategories = [
             }
 
 
-            var gtIndex = 0;
-            genotypeForSample = genotypes[gtIndex];
+            genotypeForSample = genotypes[sampleIndex];
 
             if (genotypeForSample == null) {
               keepAlt = true;
@@ -1886,15 +1899,15 @@ var effectCategories = [
               }
             }
 
-            genotypeDepthForSample = genotypeDepths[gtIndex];
-            genotypeFilteredDepthForSample = genotypeFilteredDepths[gtIndex];
-            genotypeRefCountForSample = genotypeRefCounts[gtIndex];
-            genotypeRefForwardCountForSample = genotypeRefForwardCounts[gtIndex];
-            genotypeRefReverseCountForSample = genotypeRefReverseCounts[gtIndex];
+            genotypeDepthForSample = genotypeDepths[sampleIndex];
+            genotypeFilteredDepthForSample = genotypeFilteredDepths[sampleIndex];
+            genotypeRefCountForSample = genotypeRefCounts[sampleIndex];
+            genotypeRefForwardCountForSample = genotypeRefForwardCounts[sampleIndex];
+            genotypeRefReverseCountForSample = genotypeRefReverseCounts[sampleIndex];
 
-            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[gtIndex], ",");
-            genotypeAltForwardCountForSample = genotypeAltForwardCounts[gtIndex];
-            genotypeAltReverseCountForSample = genotypeAltReverseCounts[gtIndex];
+            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[sampleIndex], ",");
+            genotypeAltForwardCountForSample = genotypeAltForwardCounts[sampleIndex];
+            genotypeAltReverseCountForSample = genotypeAltReverseCounts[sampleIndex];
 
             var eduGenotype = "";
             if (isLevelEdu) {
@@ -2100,7 +2113,7 @@ var effectCategories = [
 
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
-      var results = {'ref': refName, 'start': +geneObject.start, 'end': +geneObject.end, 'strand': geneObject.strand, 'transcript': selectedTranscript,
+      var results = {'ref': refName, 'gene': geneObject.gene_name, 'start': +geneObject.start, 'end': +geneObject.end, 'strand': geneObject.strand, 'transcript': selectedTranscript,
         'variantRegionStart': variantRegionStart, 'name': 'vcf track',
         'homCount': homCount, 'hetCount': hetCount, 'sampleCount' : sampleCount,
         'features': variants};
@@ -2150,7 +2163,7 @@ var effectCategories = [
     return annotValue;
   };
 
-  exports.pileupVcfRecords = function(variants, regionStart, posToPixelFactor, widthFactor) {
+  exports.pileupVcfRecordsImproved = function(variants, regionStart, posToPixelFactor, widthFactor) {
     var pileup = pileupLayout().sort(null).size(800); // 1860
     var maxlevel = pileup(variants);
     return maxLevel;
@@ -2160,17 +2173,18 @@ var effectCategories = [
       widthFactor = widthFactor ? widthFactor : 1;
       // Variant's can overlap each over.  Set a field called variant.level which determines
       // how to stack the variants vertically in these cases.
-      var posLevels = [];
-      posLevels.length = 0;
+      var posLevels = {};
       var maxLevel = 0;
+      var posUnitsForEachVariant = posToPixelFactor * widthFactor;
       variants.forEach(function(variant) {
 
         // get next available vertical spot starting at level 0
-        var idx = (variant.start - regionStart);// + i;
+        var startIdx = (variant.start - regionStart);// + i;
         var posLevel = 0;
-        if (posLevels[idx] != undefined) {
-          for ( var k=0; k <= posLevels[idx].length; k++ ) {
-            if (posLevels[idx][k] == undefined) {
+        var stackAtStart = posLevels[startIdx];
+        if (stackAtStart) {
+          for (var k = 0; k <= stackAtStart.length; k++ ) {
+            if (stackAtStart[k] == undefined) {
               posLevel = k;
               break;
             }
@@ -2181,15 +2195,15 @@ var effectCategories = [
         variant.level = posLevel;
 
         // Now set new level for each positions comprised of this variant.
-        for (var i = 0; i < variant.len + (posToPixelFactor * widthFactor); i++) {
+        for (var i = 0; i < variant.len + posUnitsForEachVariant; i++) {
           var idx = (variant.start - regionStart) + i;
           var stack = posLevels[idx] || [];
           stack[variant.level] = true;
           posLevels[idx] = stack;
 
           // Capture the max level of the entire region.
-          if (posLevels[idx].length-1 > maxLevel) {
-            maxLevel = posLevels[idx].length - 1;
+          if (stack.length - 1 > maxLevel) {
+            maxLevel = stack.length - 1;
           }
         }
       });

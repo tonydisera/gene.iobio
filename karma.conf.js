@@ -16,12 +16,24 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
         'assets/js/jquery.1.11.1.min.js',
+        { pattern: 'templates/*.hbs', watched: false, included: false, served: true, nocache: false },
+        { pattern: 'assets/images/**/*.*', watched: false, included: false, served: true, nocache: false },
         'assets/js/**/*.js',
         'app/globalsDeployment.js',
         'app/globals.js',
-        'app/**/*.js',
+        'app/bam.iobio.js',
+        'app/eduTour.js',
+        'app/exhibit.js',
+        'app/legend.js',
+        'app/timeout.js',
+        'app/vcf.iobio.js',
+        'app/card/*.js',
+        'app/d3/*.js',
+        'app/app.js',
+        'app/model/*.js',
         'spec/spec_helpers/jasmine-jquery.js',
         'spec/spec_helpers/fixture.conf.js',
+        'spec/spec_helpers/color.js',
         'spec/spec_helpers/**/*',
         'spec/fixtures/**/*',
         'spec/**/*_spec.js'
@@ -30,19 +42,30 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-        'app/app.js',
+
     ],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+        'app/**/*.js': ['coverage']
+    },
+
+    coverageReporter: {
+        type: 'lcov',
+        dir: 'spec/coverage/'
+    },
+
+    proxies: {
+        '/templates/': '/base/templates/',
+        '/assets/images/': '/base/assets/images/'
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
 
 
     // web server port
