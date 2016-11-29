@@ -29,4 +29,115 @@ describe('app', function() {
 			expect(transcriptCodingRegions).toEqual({ 123: [{ start: 1, end: 2 }] });
 		});
 	});
+
+	describe('#showSidebar', function() {
+		beforeEach(function() {
+			jasmine.addMatchers(jasmineColorMatchers);
+			setFixtures(
+				'<div class="sidebar-button selected"></div>' +
+				'<div id="search-dna-glyph"></div>' +
+				'<div id="slider-left-content">' +
+					'<div id="filter-track"></div>' +
+					'<div id="genes-card"></div>' +
+					'<div id="bookmark-card"></div>' +
+					'<div id="examine-card"></div>' +
+					'<div id="recall-card"></div>' +
+					'<div id="help-card"></div>' +
+				'</div>' +
+				'<div id="button-show-filters"></div>' +
+				'<div id="button-show-phenolyzer"></div>' +
+				'<div id="button-show-bookmarks"></div>' +
+				'<div id="button-show-examine"></div>' +
+				'<div id="button-find-missing-variants"></div>' +
+				'<div id="button-show-help"></div>'
+			);
+		});
+
+		it('sets the fill on the glyph to blue when Find Genes panel is open', function() {
+			showSidebar('Phenolyzer');
+			expect($('#search-dna-glyph').attr('fill')).toEqual('#5d809d');
+		});
+
+		it('sets the fill on the glyph to white when Find Genes panel is not open', function() {
+			showSidebar('Filter');
+			expect($('#search-dna-glyph').attr('fill')).toEqual('white');
+		});
+
+		it('removes the selected class from sidebar buttons', function() {
+			showSidebar('Filter');
+			expect($('.sidebar-button')).not.toHaveClass('selected');
+		});
+
+		it('shows the filter track when Filter is selected', function() {
+			$('#filter-track').addClass('hide');
+			showSidebar('Filter');
+			expect($('#filter-track')).not.toHaveClass('hide');
+			expect($('#genes-card')).toHaveClass('hide');
+			expect($('#bookmark-card')).toHaveClass('hide');
+			expect($('#examine-card')).toHaveClass('hide');
+			expect($('#recall-card')).toHaveClass('hide');
+			expect($('#help-card')).toHaveClass('hide');
+			expect($('#button-show-filters')).toHaveClass('selected');
+		});
+
+		it('shows genes card when Phenolyzer is selected', function() {
+			$('#genes-card').addClass('hide');
+			showSidebar('Phenolyzer');
+			expect($('#filter-track')).toHaveClass('hide');
+			expect($('#genes-card')).not.toHaveClass('hide');
+			expect($('#bookmark-card')).toHaveClass('hide');
+			expect($('#examine-card')).toHaveClass('hide');
+			expect($('#recall-card')).toHaveClass('hide');
+			expect($('#help-card')).toHaveClass('hide');
+			expect($('#button-show-phenolyzer')).toHaveClass('selected');
+		});
+
+		it('shows bookmark card when Bookmarks is selected', function() {
+			$('#bookmark-card').addClass('hide');
+			showSidebar('Bookmarks');
+			expect($('#filter-track')).toHaveClass('hide');
+			expect($('#genes-card')).toHaveClass('hide');
+			expect($('#bookmark-card')).not.toHaveClass('hide');
+			expect($('#examine-card')).toHaveClass('hide');
+			expect($('#recall-card')).toHaveClass('hide');
+			expect($('#help-card')).toHaveClass('hide');
+			expect($('#button-show-bookmarks')).toHaveClass('selected');
+		});
+
+		it('shows examine card when Examine is selected', function() {
+			$('#examine-card').addClass('hide');
+			showSidebar('Examine');
+			expect($('#filter-track')).toHaveClass('hide');
+			expect($('#genes-card')).toHaveClass('hide');
+			expect($('#bookmark-card')).toHaveClass('hide');
+			expect($('#examine-card')).not.toHaveClass('hide');
+			expect($('#recall-card')).toHaveClass('hide');
+			expect($('#help-card')).toHaveClass('hide');
+			expect($('#button-show-examine')).toHaveClass('selected');
+		});
+
+		it('shows recall card when Recall is selected', function() {
+			$('#recall-card').addClass('hide');
+			showSidebar('Recall');
+			expect($('#filter-track')).toHaveClass('hide');
+			expect($('#genes-card')).toHaveClass('hide');
+			expect($('#bookmark-card')).toHaveClass('hide');
+			expect($('#examine-card')).toHaveClass('hide');
+			expect($('#recall-card')).not.toHaveClass('hide');
+			expect($('#help-card')).toHaveClass('hide');
+			expect($('#button-find-missing-variants')).toHaveClass('selected');
+		});
+
+		it('shows help card when Help is selected', function() {
+			$('#help-card').addClass('hide');
+			showSidebar('Help');
+			expect($('#filter-track')).toHaveClass('hide');
+			expect($('#genes-card')).toHaveClass('hide');
+			expect($('#bookmark-card')).toHaveClass('hide');
+			expect($('#examine-card')).toHaveClass('hide');
+			expect($('#recall-card')).toHaveClass('hide');
+			expect($('#help-card')).not.toHaveClass('hide');
+			expect($('#button-show-help')).toHaveClass('selected');
+		});
+	});
 });

@@ -774,68 +774,34 @@ function readjustCards() {
 
 
 function showSidebar(sidebar) {
-	//closeSlideLeft(); 	
-
-
 	if (sidebar == "Phenolyzer") {
-		$('#search-dna-glyph').attr('fill', '#5d809d');	
+		$('#search-dna-glyph').attr('fill', '#5d809d');
 	} else {
-		$('#search-dna-glyph').attr('fill', 'white');	
+		$('#search-dna-glyph').attr('fill', 'white');
 	}
 
-
 	$('.sidebar-button').removeClass('selected');
+	$('#slider-left-content #filter-track').toggleClass("hide", sidebar !== 'Filter');
+	$('#slider-left-content #genes-card').toggleClass("hide", sidebar !== 'Phenolyzer');
+	$('#slider-left-content #bookmark-card').toggleClass("hide", sidebar !== 'Bookmarks');
+	$('#slider-left-content #examine-card').toggleClass("hide", sidebar !== 'Examine');
+	$('#slider-left-content #recall-card').toggleClass("hide", sidebar !== 'Recall');
+	$('#slider-left-content #help-card').toggleClass("hide", sidebar !== 'Help');
+
 	if (sidebar == "Filter") {
-		$('#slider-left-content #filter-track').toggleClass("hide", false);	
-		$('#slider-left-content #genes-card').toggleClass("hide", true);	
-		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
-		$('#slider-left-content #examine-card').toggleClass("hide", true);			
-		$('#slider-left-content #recall-card').toggleClass("hide", true);	
-		$('#slider-left-content #help-card').toggleClass("hide", true);	
-		$('#button-show-filters').toggleClass('selected', true);			
+		$('#button-show-filters').toggleClass('selected', true);
 	} else if (sidebar == "Phenolyzer") {
-		$('#slider-left-content #filter-track').toggleClass("hide", true);	
-		$('#slider-left-content #genes-card').toggleClass("hide", false);	
-		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
-		$('#slider-left-content #examine-card').toggleClass("hide", true);					
-		$('#slider-left-content #recall-card').toggleClass("hide", true);	
-		$('#slider-left-content #help-card').toggleClass("hide", true);	
-		$('#button-show-phenolyzer').toggleClass('selected', true);	
+		$('#button-show-phenolyzer').toggleClass('selected', true);
 	} else if (sidebar == "Bookmarks") {
-		$('#slider-left-content #filter-track').toggleClass("hide", true);	
-		$('#slider-left-content #genes-card').toggleClass("hide", true);	
-		$('#slider-left-content #bookmark-card').toggleClass("hide", false);	
-		$('#slider-left-content #examine-card').toggleClass("hide", true);			
-		$('#slider-left-content #recall-card').toggleClass("hide", true);		
-		$('#slider-left-content #help-card').toggleClass("hide", true);	
-		$('#button-show-bookmarks').toggleClass('selected', true);		
+		$('#button-show-bookmarks').toggleClass('selected', true);
 		window.bookmarkCard.refreshBookmarkList();
 	} else if (sidebar == "Examine") {
-		$('#slider-left-content #filter-track').toggleClass("hide", true);	
-		$('#slider-left-content #genes-card').toggleClass("hide", true);	
-		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
-		$('#slider-left-content #examine-card').toggleClass("hide", false);			
-		$('#slider-left-content #recall-card').toggleClass("hide", true);	
-		$('#slider-left-content #help-card').toggleClass("hide", true);	
-		$('#button-show-examine').toggleClass('selected', true);			
+		$('#button-show-examine').toggleClass('selected', true);
 	} else if (sidebar == "Recall") {
-		$('#slider-left-content #filter-track').toggleClass("hide", true);	
-		$('#slider-left-content #genes-card').toggleClass("hide", true);	
-		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
-		$('#slider-left-content #examine-card').toggleClass("hide", true);			
-		$('#slider-left-content #recall-card').toggleClass("hide", false);	
-		$('#slider-left-content #help-card').toggleClass("hide", true);	
-		$('#button-find-missing-variants').toggleClass('selected', true);			
+		$('#button-find-missing-variants').toggleClass('selected', true);
 	} else if (sidebar == "Help") {
-		$('#slider-left-content #filter-track').toggleClass("hide", true);	
-		$('#slider-left-content #genes-card').toggleClass("hide", true);	
-		$('#slider-left-content #bookmark-card').toggleClass("hide", true);	
-		$('#slider-left-content #examine-card').toggleClass("hide", true);			
-		$('#slider-left-content #recall-card').toggleClass("hide", true);	
-		$('#slider-left-content #help-card').toggleClass("hide", false);	
-		$('#button-show-help').toggleClass('selected', true);		
-	} 
-
+		$('#button-show-help').toggleClass('selected', true);
+	}
 
 	if ($('#slider-left').hasClass("hide")) {
 		$('#slider-left').removeClass("hide");
@@ -852,24 +818,15 @@ function showSidebar(sidebar) {
 		var transitionEvent = whichTransitionEvent();
 		$('.slide-left').one(transitionEvent, function(event) {
 			readjustCards();
-
-			
 			$('#slider-left').trigger("open");
-
 			if (!$('#splash').hasClass("hide") && !isDataLoaded() && (gene == null || gene == "") ) {
 				//$('#splash-image').animateSplash('zoomIn');
-			} 
+			}
 			if (isDataLoaded() || (gene != null && gene != "")) {
 				$('#splash').addClass("hide");
 			}
-
-
 		});
-
-	} 
-
-
-
+	}
 }
 
 
