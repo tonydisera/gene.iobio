@@ -1644,9 +1644,14 @@ function promiseGetGeneModel(geneName) {
 
 		var url = geneInfoServer + 'api/gene/' + geneName;
 
+		// If current build not specified, default to GRCh37
+		var buildName = genomeBuildHelper.getCurrentBuildName() ? genomeBuildHelper.getCurrentBuildName() : "GRCh37";
+		$('#build-link').text(buildName);
+
+
 		url += "?source="  + geneSource;
 		url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
-		url += "&build="   + genomeBuildHelper.getCurrentBuildName();
+		url += "&build="   + buildName;
 
 
 		$.ajax({
