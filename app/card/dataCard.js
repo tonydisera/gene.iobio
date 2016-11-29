@@ -232,7 +232,12 @@ DataCard.prototype.loadMygene2Data = function() {
 	var loadProband = function(vcfFilePath) {
 
 		if (vcfFilePath != null) {
-			var probandUrl = "http://" + serverInstance + vcfFilePath;
+			// Get rid of leading "/" in file path when server instance already ends with "/"
+			if (endsWith(serverInstance, "/") && vcfFilePath.indexOf("/") == 0) {
+				vcfFilePath = vcfFilePath.slice(1);
+			}
+			// Create a URL that only the IOBIO service has access to
+			var probandUrl = window.location.protocol + "//" + serverInstance + vcfFilePath;
 			me.setVcfUrl("proband", "Variants", null, probandUrl);
 		} else {
 			// Load full demo wgs trio data if vcf file path was not provided via mygene2 data exchange

@@ -213,10 +213,14 @@ function determineStyle() {
 	}
 	var modeParm = getUrlParameter("mode");
 	if (modeParm && modeParm != "") {
-		isLevelBasic = modeParm == "basic" ? true : false;
-	}
+		isLevelBasic     = modeParm == "basic" ? true : false;
+		isLevelEduTour   = modeParm == "edutour" ? true : false;
+		isLevelEdu       = modeParm == "edutour" ? true : false;
+	} 
 
-	if (isMygene2 && isLevelBasic) {
+	if (isLevelEduTour) {
+		changeSiteStylesheet("assets/css/site-edutour.css");
+	} else if (isMygene2 && isLevelBasic) {
 		changeSiteStylesheet("assets/css/site-mygene2-basic.css");
 	} else if (isMygene2) {
 		changeSiteStylesheet("assets/css/site-mygene2-advanced.css");		
@@ -229,7 +233,7 @@ function determineStyle() {
 function init() {
 	var me = this;
 
-
+	detectWindowResize();
 
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
@@ -889,6 +893,18 @@ function showDataDialog() {
 }
 
 
+function detectWindowResize() {
+	$(window).resize(function() {
+	    if(this.resizeTO) clearTimeout(this.resizeTO);
+	    this.resizeTO = setTimeout(function() {
+	        $(this).trigger('resizeEnd');
+	    }, 500);
+	});
+
+	$(window).bind('resizeEnd', function() {
+		resizeCardWidths();
+	});	
+}
 
 
 function resizeCardWidths() {
@@ -905,7 +921,7 @@ function resizeCardWidths() {
 	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
 	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
 
-	$('#slider-left-content').css('height', window.innerHeight);
+	//$('#slider-left-content').css('height', window.innerHeight);
 }
 
 function closeSlideLeft() {

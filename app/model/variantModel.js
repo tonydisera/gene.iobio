@@ -767,12 +767,18 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 	return new Promise( function(resolve, reject) {
 
+
 		// Create a gene object with start and end reduced to the variants coordinates.
 		var fakeGeneObject = $().extend({}, theGene);
 		fakeGeneObject.start = variant.start;
 		fakeGeneObject.end = variant.end;
 
-		if ( variant.extraAnnot ) {
+
+		if (variant.fbCalled == 'Y') {
+			// We already have the hgvs and rsid if this is a called variant
+			resolve(variant);
+		} else if ( variant.extraAnnot ) {
+			// We have already retrieved the extra annot for this variant,
 			resolve(variant);
 		} else {	
 			me._promiseVcfRefName(theGene.chr).then( function() {				
@@ -2118,7 +2124,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 
 		// We don't want to display homozygous reference variants in the variant chart
 		// or feature matrix (but we want to keep it to show trio allele counts).
-		var isHomRef = d.zygosity != null && d.zygosity.toLowerCase() == 'homref' ? true : false;
+		var isHomRef = (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') ? true : false;
 
 		var meetsRegion = true;
 		if (window.regionStart != null && window.regionEnd != null ) {

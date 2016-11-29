@@ -178,117 +178,77 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 		return 1;
 	}
 
+	var dangers = [danger1, danger2];
+
 	// lowest clinvar value = highest relevance
-	var clinvar1 = 9999;
-	if (danger1.CLINVAR) {
-		for (key in danger1.CLINVAR) {
-			var showBadge = matrixCard.clinvarMap[key].badge;
-			if (showBadge) {
-				clinvar1 = danger1.CLINVAR[key].value;
-			}
-		}
-	}
-	var clinvar2 = 9999;
-	if (danger2.CLINVAR) {
-		for (key in danger2.CLINVAR) {
-			var showBadge = matrixCard.clinvarMap[key].badge;
-			if (showBadge) {
-				clinvar2 = danger2.CLINVAR[key].value;
-			}
-		}
-	}
-
-
-	// sift
-	var sift1 = 9999;
-	if (danger1.SIFT) {
-		for (key in danger1.SIFT) {
-			var siftClass = Object.keys(danger1.SIFT[key])[0];
-			var showBadge = matrixCard.siftMap[siftClass].badge;
-			if (showBadge) {
-				sift1 = matrixCard.siftMap[siftClass].value;
-			}
-		}
-	}
-	var sift2 = 9999;
-	if (danger2.SIFT) {
-		for (key in danger2.SIFT) {
-			var siftClass = Object.keys(danger2.SIFT[key])[0];
-			var showBadge = matrixCard.siftMap[siftClass].badge;
-			if (showBadge) {
-				sift2 = matrixCard.siftMap[siftClass].value;
-			}
-		}
-	}
-
-
-	// polyphen
-	var polyphen1 = 9999;
-	if (danger1.POLYPHEN) {
-		for (key in danger1.POLYPHEN) {
-			var polyphenClass = Object.keys(danger1.POLYPHEN[key])[0];
-			var showBadge = matrixCard.polyphenMap[polyphenClass].badge;
-			if (showBadge) {
-				polyphen1 = matrixCard.polyphenMap[polyphenClass].value;
-			}
-		}
-	}
-	var polyphen2 = 9999;
-	if (danger2.POLYPHEN) {
-		for (key in danger2.POLYPHEN) {
-			var polyphenClass = Object.keys(danger2.POLYPHEN[key])[0];
-			var showBadge = matrixCard.polyphenMap[polyphenClass].badge;
-			if (showBadge) {
-				polyphen2 = matrixCard.polyphenMap[polyphenClass].value;
-			}
-		}
-	}
-	// lowest impact value = highest relevance
-	var impact1 = 9999;
-	if (danger1.IMPACT) {
-		for (key in danger1.IMPACT) {
-			impact1 = matrixCard.impactMap[key].value;
-		}
-	}
-	var impact2 = 9999;
-	if (danger2.IMPACT) {
-		for (key in danger2.IMPACT) {
-			impact2 = matrixCard.impactMap[key].value;
-		}
-	}
-
-	if (clinvar1 < clinvar2) {
-		return -1;
-	} else if (clinvar2 < clinvar1) {
-		return 1;
-	} else {
-		if (sift1 < sift2) {
-			return -1;
-		} else if (sift2 < sift1) {
-			return 1;
-		} else {
-			if (polyphen1 < polyphen2) {
-				return -1;
-			} else if (polyphen2 < polyphen1) {
-				return 1;
-			} else {
-				if (impact1 < impact2) {
-					return -1;
-				} else if (impact2 < impact1) {
-					return 1;
-				} else {
-					if (geneName1 < geneName2) {
-						return -1;
-					} else if (geneName2 < geneName1) {
-						return 1;
-					} else {
-						return 0;
-					}
+	var clinvarValues = [9999, 9999];
+	dangers.forEach(function(danger, index) {
+		if (danger.CLINVAR) {
+			for (key in danger.CLINVAR) {
+				var showBadge = matrixCard.clinvarMap[key].badge;
+				if (showBadge) {
+					clinvarValues[index] = danger.CLINVAR[key].value;
 				}
 			}
 		}
-
+	});
+	if (clinvarValues[0] !== clinvarValues[1]) {
+		return clinvarValues[0] - clinvarValues[1];
 	}
+
+	// sift
+	var siftValues = [9999, 9999];
+	dangers.forEach(function(danger, index) {
+		if (danger.SIFT) {
+			for (key in danger.SIFT) {
+				var siftClass = Object.keys(danger.SIFT[key])[0];
+				var showBadge = matrixCard.siftMap[siftClass].badge;
+				if (showBadge) {
+					siftValues[index] = matrixCard.siftMap[siftClass].value;
+				}
+			}
+		}
+	});
+	if (siftValues[0] !== siftValues[1]) {
+		return siftValues[0] - siftValues[1];
+	}
+
+	// polyphen
+	var polyphenValues = [9999, 9999];
+	dangers.forEach(function(danger, index) {
+		if (danger.POLYPHEN) {
+			for (key in danger.POLYPHEN) {
+				var polyphenClass = Object.keys(danger.POLYPHEN[key])[0];
+				var showBadge = matrixCard.polyphenMap[polyphenClass].badge;
+				if (showBadge) {
+					polyphenValues[index] = matrixCard.polyphenMap[polyphenClass].value;
+				}
+			}
+		}
+	});
+	if (polyphenValues[0] !== polyphenValues[1]) {
+		return polyphenValues[0] - polyphenValues[1];
+	}
+
+	// lowest impact value = highest relevance
+	var impactValues = [9999, 9999];
+	dangers.forEach(function(danger, index) {
+		if (danger.IMPACT) {
+			for (key in danger.IMPACT) {
+				impactValues[index] = matrixCard.impactMap[key].value;
+			}
+		}
+	});
+	if (impactValues[0] !== impactValues[1]) {
+		return impactValues[0] - impactValues[1];
+	}
+
+	if (geneName1 < geneName2) {
+		return -1;
+	} else if (geneName2 < geneName1) {
+		return 1;
+	}
+	return 0;
 }
 
 

@@ -740,6 +740,9 @@ var Bam = Class.extend({
         if (isRefSeq) {
           vepArgs += " --refseq "
         }
+        // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+        // since we won't have the original vcf records as input
+        vepArgs += " --hgvs  --check_existing ";
         cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
 
 
