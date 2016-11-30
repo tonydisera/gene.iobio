@@ -1142,26 +1142,32 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 					me.cardSelector.find('.vcfloader').addClass("hide");
 				    
 
+					// At this point, the variants should be cached.  If they aren't,
+ 					// an error occurred
+					var theVcfData = me.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+ 					if (theVcfData) {
 
-		  			// Here we call this method again and since we
-					// have vcf data, the variant chart will be filled
-		  			me._showVariants(regionStart ? regionStart : window.gene.start, 
-									 regionEnd ? regionEnd : window.gene.end,
-									 onVariantsDisplayed,
-									 true);
+			  			// Here we call this method again and since we
+						// have vcf data, the variant chart will be filled
+			  			me._showVariants(regionStart ? regionStart : window.gene.start, 
+										 regionEnd ? regionEnd : window.gene.end,
+										 onVariantsDisplayed,
+										 true);
 
-		  			// Enable the variant filters 
-		  			if (me.getRelationship() == 'proband') {
-				    	filterCard.enableClinvarFilters(data);
-				    }
+			  			// Enable the variant filters 
+			  			if (me.getRelationship() == 'proband') {
+					    	filterCard.enableClinvarFilters(data);
+					    }
 
-					// Show the 'Call from alignments' button if we a bam file/url was specified
-					if (me.isBamLoaded() && me.isViewable()) {
-						me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
-					} else {
-						me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
-					}	 				
-			   	    if (me.getRelationship() == 'proband') {
+						// Show the 'Call from alignments' button if we a bam file/url was specified
+						if (me.isBamLoaded() && me.isViewable()) {
+							me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
+						} else {
+							me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
+						}	 				
+				   	    
+					}
+					if (me.getRelationship() == 'proband') {
 						genesCard.refreshCurrentGeneBadge();
 					}
 
