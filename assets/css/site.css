@@ -2,14 +2,39 @@ body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   margin-top: -5px; }
 
+.navbar {
+  background-color: #5d809d !important;
+  margin-bottom: 0px !important;
+  min-height: 50px; }
+  .navbar .navbar-brand {
+    height: 50px; }
+  .navbar .navbar-form {
+    margin-top: 10px; }
+  .navbar .form-group.is-focused .form-control {
+    background-image: linear-gradient(#53b2ff, #9ef4ff), linear-gradient(#D2D2D2, #D2D2D2); }
+  .navbar ul.nav > li > a {
+    color: white !important;
+    padding-top: 15px !important;
+    padding-bottom: 10px !important; }
+    .navbar ul.nav > li > a:hover {
+      color: #9ef4ff !important; }
+      .navbar ul.nav > li > a:hover #search-dna-glyph {
+        fill: #9ef4ff !important; }
+  .navbar ul.nav > li.active {
+    color: white !important; }
+    .navbar ul.nav > li.active > a {
+      color: white !important; }
+      .navbar ul.nav > li.active > a #search-dna-glyph {
+        fill: white !important; }
+
 h4 {
-  font-size: 12px;
+  font-size: 13px;
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
 
 h5 {
-  font-size: 11px;
+  font-size: 12px;
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
@@ -23,6 +48,9 @@ h5 {
 .alertify-notifier .ajs-message.ajs-error {
   background: rgba(191, 64, 64, 0.95);
   text-shadow: none; }
+
+#nav-card {
+  padding-top: 3px; }
 
 .pagination {
   margin: 0px 0; }
@@ -71,7 +99,7 @@ h5 {
   padding-top: 0px; }
 
 .nav-center {
-  margin: 3px 0px 0 0px;
+  margin: 10px 0px 0 0px;
   position: relative; }
 
 .modal-title {
@@ -95,12 +123,12 @@ h5 {
   background-color: #3586c0; }
 
 .selectize-dropdown {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px;
   color: #717171; }
 
 .selectize-input {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px;
   padding: 5px 4px 4px 4px;
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
@@ -123,7 +151,7 @@ h5 {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
 .selectize-input input {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px; }
 
 .selectize-control.single .selectize-input:after {
@@ -215,7 +243,7 @@ h5 {
   color: #5d809d !important; }
 
 #filter-track a.chosen-single {
-  font-size: 10px !important; }
+  font-size: 12px !important; }
 
 .shadow-z-2 {
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.17), 0px 1px 6px rgba(0, 0, 0, 0.17); }
@@ -278,7 +306,7 @@ i.material-icons {
 
 /* autocomplete */
 .ui-menu .ui-menu-item {
-  font-size: 10px;
+  font-size: 12px;
   color: #717171; }
 
 .ui-state-hover {
@@ -328,7 +356,7 @@ i.material-icons {
   background-color: transparent !important;
   color: #b32f2f !important;
   font-weight: normal !important;
-  font-size: 11px !important; }
+  font-size: 12px !important; }
 
 .label-primary {
   background-color: #6D9652; }
@@ -399,7 +427,7 @@ i.material-icons {
     -o-border-radius: 3px 3px 3px 3px;
     border-radius: 3px 3px 3px 3px;
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     height: 24px;
     line-height: 26px;
     text-align: center;
@@ -503,12 +531,15 @@ html {
 body {
   margin-bottom: 70px; }
 
+#intro {
+  height: 60px; }
+
 #education-title {
   display: none; }
 
 #app-disclaimer-link-left {
-  font-size: 10px;
-  color: #717171 !important;
+  font-size: 12px;
+  color: white !important;
   text-align: left;
   margin-right: 10px;
   padding-top: 15px;
@@ -522,15 +553,15 @@ body {
   display: none; }
 
 #app-disclaimer {
-  font-size: 10px;
+  font-size: 12px;
   color: #848484; }
 
 #credits {
-  font-size: 10px;
+  font-size: 12px;
   color: #848484; }
 
 #versions {
-  font-size: 10px;
+  font-size: 14px;
   color: #848484;
   padding-top: 5px;
   margin-bottom: 20px !important; }
@@ -538,7 +569,7 @@ body {
     margin-bottom: 0px !important;
     clear: both; }
     #versions div .title {
-      width: 70px;
+      width: 230px;
       float: left;
       padding-right: 5px;
       clear: none;
@@ -546,7 +577,7 @@ body {
       color: #717171;
       font-weight: 600; }
     #versions div .number {
-      width: 90px;
+      width: 220px;
       float: left;
       padding-bottom: 7px;
       clear: none; }
@@ -568,7 +599,7 @@ body {
   background-color: #636161 !important; }
 
 .icon-credit {
-  font-size: 10px;
+  font-size: 12px;
   color: #eee;
   margin-top: 3px; }
   .icon-credit a {
@@ -621,12 +652,12 @@ a {
 .chart-label {
   color: #717171;
   margin-left: 4px;
-  font-size: 11px; }
+  font-size: 12px; }
 
 .togglebutton label {
   font-weight: 400;
   cursor: pointer;
-  font-size: 11px; }
+  font-size: 12px; }
 
 .checkbox label .check {
   display: inline-block;
@@ -644,7 +675,7 @@ a {
   display: inline-block;
   min-width: 10px;
   padding: 2px 7px 1px 7px !important;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1;
   color: #717171;
@@ -659,7 +690,7 @@ a {
 
 .badge-label {
   color: #717171;
-  font-size: 12px; }
+  font-size: 13px; }
 
 .material-dropdown .form-control {
   background: white; }
@@ -702,7 +733,7 @@ a {
 #matrix-track #feature-matrix .col.low-quality rect.cellbox {
   fill: rgba(0, 0, 0, 0.13); }
 #matrix-track #feature-matrix .colhdr text {
-  font-size: 9px;
+  font-size: 12px;
   pointer-events: none; }
 #matrix-track #feature-matrix rect.cellbox:hover {
   cursor: pointer;
@@ -723,7 +754,7 @@ a {
   stroke-width: 1px;
   opacity: 1; }
 #matrix-track #feature-matrix text {
-  font-size: 10px;
+  font-size: 12px;
   fill: #787878;
   pointer-events: none; }
 #matrix-track #feature-matrix .axis .tick text.current {
@@ -750,7 +781,7 @@ a {
   margin-top: 0px; }
 #matrix-track #move-rows {
   float: left;
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: #717171 !important;
   margin-top: 0px; }
 
@@ -760,9 +791,8 @@ a {
   background: #eee; }
 
 #nav-section {
-  position: fixed;
   z-index: 2;
-  right: 5px;
+  margin-top: 0px;
   background-color: white;
   margin-bottom: 6px; }
 
@@ -773,7 +803,7 @@ section {
   clear: both; }
 
 #color-scheme {
-  font-size: 11px;
+  font-size: 12px;
   margin-bottom: 10px;
   color: #66585c; }
 
@@ -787,7 +817,7 @@ section {
     padding-left: 30px;
     position: relative;
     padding-top: 2px;
-    font-size: 11px; }
+    font-size: 12px; }
 
 .checkbox {
   position: relative;
@@ -854,10 +884,9 @@ section {
 
 .iobio {
   font-size: 30px;
-  color: #717171;
+  color: white;
   font-family: "Quicksand";
-  float: left;
-  margin-top: -8px; }
+  float: left; }
 
 .beta {
   background: #F06767;
@@ -868,14 +897,13 @@ section {
 
 .iobioapp {
   font-size: 30px;
-  color: #5d809d;
+  color: white;
   font-family: "Quicksand";
-  float: left;
-  margin-top: -8px; }
+  float: left; }
 
 .iobioproject {
   font-size: 18px;
-  color: #717171 !important;
+  color: white4 !important;
   font-family: "Quicksand";
   float: right;
   margin-top: 5px;
@@ -914,13 +942,6 @@ section {
 #gene-search-bar {
   display: inline-block;
   padding-left: 160px; }
-
-#add-data-button {
-  margin-left: 20px;
-  margin-right: 20px;
-  padding-top: 2px;
-  padding-bottom: 1px;
-  margin-top: 15px; }
 
 #gene-name {
   font-size: 16px;
@@ -979,7 +1000,7 @@ section {
   display: block; }
 
 #filter-panel {
-  font-size: 11px;
+  font-size: 12px;
   color: #66585c;
   fill: #66585c;
   margin-top: 2px;
@@ -1178,7 +1199,7 @@ header {
 
 #bam-depth .circle-label {
   fill: #61a041;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: bold;
   stroke: none;
   pointer-events: none; }
@@ -1340,8 +1361,8 @@ header {
   color: #5d809d !important; }
 
 #bloodhound .typeahead {
-  min-width: 170px;
-  max-width: 170px;
+  min-width: 150px;
+  max-width: 150px;
   font-size: 18px;
   vertical-align: middle !important; }
 
@@ -1353,9 +1374,8 @@ header {
   padding: 5px 8px !important;
   font-size: 18px !important;
   line-height: 24px;
-  border: 1px solid #ccc !important;
-  border-radius: 0px !important;
-  outline: none !important; }
+  outline: none !important;
+  border: none !important; }
 
 .tt-input {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
@@ -1364,14 +1384,15 @@ header {
   color: #999; }
 
 .tt-dropdown-menu {
-  width: 170px;
+  width: 150px;
   margin-top: 2px;
   padding: 4px 0;
   background-color: #fff;
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 8px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); }
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  color: #717171; }
 
 .tt-dataset-name {
   max-height: 400px;
@@ -1392,8 +1413,8 @@ header {
   .checkbox input[type=checkbox]:checked + .checkbox-material .check:before {
     color: #5d809d; }
 .checkbox label {
-  font-size: 11px;
-  line-height: 12px;
+  font-size: 12px;
+  line-height: 13px;
   color: #717171; }
   .checkbox label .check {
     margin-right: 0px; }
@@ -1424,8 +1445,39 @@ header {
   align-self: flex-end; }
 
 /* Bootstrap accordion */
-#slider-left a {
-  color: #5d809d !important; }
+#slider-left #slider-left-content {
+  padding-top: 10px; }
+  #slider-left #slider-left-content a {
+    color: #5d809d !important; }
+#slider-left .navbar {
+  background-color: #636161 !important;
+  min-height: 30px !important; }
+  #slider-left .navbar .navbar-collapse {
+    margin-left: -22px;
+    margin-right: -18px; }
+  #slider-left .navbar .container-fluid {
+    margin: 0px;
+    padding: 0px; }
+#slider-left .nav li {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  max-width: inherit;
+  margin-left: 7px;
+  margin-right: 7px;
+  text-align: center; }
+  #slider-left .nav li a {
+    font-size: 14px;
+    padding: 4px 8px 0px 2px !important; }
+    #slider-left .nav li a:hover {
+      background-color: initial; }
+    #slider-left .nav li a:focus {
+      background-color: initial; }
+  #slider-left .nav li.active {
+    background-color: white !important; }
+    #slider-left .nav li.active a {
+      color: #5d809d !important; }
+      #slider-left .nav li.active a #search-dna-glyph {
+        fill: #5d809d !important; }
 #slider-left .btn.btn-raised {
   background-color: transparent !important;
   color: #717171 !important; }
@@ -1441,8 +1493,14 @@ header {
 #slider-left .card-label {
   display: none; }
 
+#close-slide-left-glyph {
+  color: #636161;
+  line-height: 0.8;
+  font-size: 36px;
+  font-weight: bold; }
+
 .close-button {
-  padding-top: 0px;
+  padding-top: 50px;
   z-index: 100;
   font-size: 14px;
   cursor: pointer;
@@ -1454,7 +1512,7 @@ header {
 
 #slide-buttons {
   position: absolute;
-  top: 0;
+  top: 50px;
   left: 0;
   transition: all 0.6s ease;
   -webkit-transition: all 0.6s ease;
@@ -1466,9 +1524,9 @@ header {
 
 #slider-left {
   position: fixed;
-  top: 0;
-  left: 36px;
-  width: 314px;
+  top: 53px;
+  left: 0px;
+  width: 356px;
   height: 100%;
   transition: width 0.6s ease;
   -webkit-transition: width 0.6s ease;
@@ -1479,7 +1537,7 @@ header {
 
 #slider-left-content {
   height: 100%;
-  width: 310px;
+  width: 352px;
   background-color: white;
   overflow-y: scroll;
   margin-top: 0px;
@@ -1492,8 +1550,8 @@ header {
 
 #close-slide-left {
   position: fixed;
-  left: 310px;
-  top: 0px; }
+  left: 324px;
+  top: 4px; }
 
 .icon-button.sidebar-button {
   margin-bottom: 0px !important;
@@ -1547,32 +1605,35 @@ header {
   left: 1px;
   top: 0px;
   background-color: #636161;
-  width: 36px;
+  width: 0px;
   height: 100%;
   z-index: 400; }
   #slider-icon-bar.closed {
-    width: 36px; }
+    width: 0px; }
 
 .push {
   transition: all 0.6s ease;
   -webkit-transition: all 0.6s ease;
-  -moz-transition: all 0.6s ease;
+  -moz-transition: 0.6s ease;
   -ms-transition: all 0.6s ease;
   -o-transition: all 0.6s ease;
   z-index: 1; }
 
 .fixed {
-  left: 36px; }
+  left: 0px; }
 
 #container {
-  margin-left: 36px; }
+  margin-left: 0px;
+  position: relative !important;
+  top: 58px !important;
+  z-index: 1031; }
 
 .slide-left {
-  transform: translate(314px, 0);
-  -webkit-transform: translate(314px, 0);
-  -moz-transform: translate(314px, 0);
-  -ms-transform: translate(314px, 0);
-  -o-transform: translate(314px, 0); }
+  transform: translate(356px, 0);
+  -webkit-transform: translate(356px, 0);
+  -moz-transform: translate(356px, 0);
+  -ms-transform: translate(356px, 0);
+  -o-transform: translate(356px, 0); }
 
 /* make keyframes that tell the start state and the end state of our object */
 @-webkit-keyframes fadeIn {
@@ -1605,20 +1666,27 @@ header {
   -moz-animation-duration: 0.6s;
   animation-duration: 0.6s; }
 
-#filter-track h4 {
-  font-size: 12px;
-  color: #5d809d !important;
-  margin-top: 13px;
-  margin-bottom: 5px; }
-#filter-track #clear-filters-link {
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  color: #717171 !important; }
-#filter-track .checkbox label {
-  font-size: 10px;
-  line-height: 11px; }
+#filter-track {
+  margin-bottom: 80px; }
+  #filter-track h4 {
+    font-size: 13px;
+    color: #5d809d !important;
+    margin-top: 13px;
+    margin-bottom: 5px; }
+  #filter-track #clear-filters-link {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    color: #717171 !important; }
+  #filter-track .checkbox label {
+    font-size: 12px;
+    line-height: 13px; }
+  #filter-track svg {
+    height: 18px; }
+    #filter-track svg text {
+      font-size: 12px !important;
+      fill: #717171 !important; }
 
 #recessive-symbol .parent .left {
   stroke: #F49A73;
@@ -1939,7 +2007,7 @@ header {
   padding-bottom: 0px; }
 
 .tooltip-title {
-  font-size: 11px;
+  font-size: 12px;
   word-break: break-word; }
   .tooltip-title.danger {
     text-align: center;
@@ -1957,16 +2025,16 @@ header {
 
 .tooltip-section-header {
   fill: #484343 !important;
-  font-size: 11px !important; }
+  font-size: 12px !important; }
 
 .tooltip-label {
   color: #888787;
   fill: #888787; }
 
 .tooltip-row {
-  width: 300px;
+  width: 330px;
   clear: both;
-  line-height: 11px !important; }
+  line-height: 13px !important; }
 
 .tooltip-value {
   overflow-wrap: break-word;
@@ -1985,7 +2053,7 @@ header {
 .tooltip-header-small {
   overflow-wrap: break-word;
   text-align: left;
-  width: 40px;
+  width: 50px;
   float: left;
   color: #888787;
   fill: #888787; }
@@ -2019,9 +2087,9 @@ header {
   color: white; }
 
 .tooltip-subtitle {
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
-  color: black;
+  color: #717171;
   padding-top: 4px;
   padding-bottom: 1px; }
   .tooltip-subtitle.selected {
@@ -2032,23 +2100,23 @@ header {
   color: #2E73AB !important;
   margin-bottom: -2px;
   margin-top: 35px !important;
-  font-size: 11px; }
+  font-size: 12px; }
   .tooltip-footer .bookmark text {
-    font-size: 11px !important; }
+    font-size: 12px !important; }
 
 .tooltip a {
   color: #2E73AB !important;
-  font-size: 11px !important; }
+  font-size: 12px !important; }
   .tooltip a:hover, .tooltip a:focus {
     color: #2E73AB !important;
-    font-size: 11px !important; }
+    font-size: 12px !important; }
 
 .tooltip a:hover, .tooltip a:focus {
   color: #2E73AB !important;
-  font-size: 11px !important; }
+  font-size: 12px !important; }
 
 .tooltip .row {
-  line-height: 11px !important; }
+  line-height: 12px !important; }
 
 .tooltip {
   position: absolute;
@@ -2056,7 +2124,7 @@ header {
   background-color: white;
   color: #484343;
   padding: 4px 6px 4px 6px;
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 4px;
   pointer-events: none;
   text-align: left;
@@ -2101,8 +2169,8 @@ text.ref-count {
   margin-left: 40px;
   font-style: italic;
   font-weight: bold;
-  font-size: 10px;
-  color: black; }
+  font-size: 11px;
+  color: #717171; }
 
 .tooltip.left-arrow:before {
   position: absolute;
@@ -2221,33 +2289,29 @@ text.ref-count {
   width: 105px; }
 
 #examine-card {
-  font-size: 10px;
-  color: #717171;
-  padding-top: 10px; }
+  font-size: 12px;
+  color: #717171; }
   #examine-card .tooltip-title {
-    font-size: 11px; }
+    font-size: 12px; }
   #examine-card .tooltip-header {
     overflow-wrap: break-word;
     text-align: right;
-    width: 60px;
+    width: 110px;
     display: inline-block !important;
     float: none;
     color: #888787; }
   #examine-card .tooltip-row {
-    width: 190px;
     clear: both;
     margin-bottom: 8px; }
   #examine-card .tooltip-value {
     overflow-wrap: break-word;
     margin-left: 10px;
-    width: 115px;
+    width: 175px;
     margin-right: 5px;
     display: inline-block !important;
     float: none;
     color: #717171;
     vertical-align: bottom; }
-  #examine-card .tooltip-title.danger {
-    width: 200px; }
   #examine-card .tooltip-footer {
     margin-top: 40px !important; }
   #examine-card .tooltip-footer #unpin {
@@ -2270,12 +2334,12 @@ text.ref-count {
 
 #examine-card a {
   color: #5d809d !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: #5d809d !important;
-  font-size: 11px !important; }
+  font-size: 12px !important; }
   #examine-card a:hover, #examine-card a:focus {
     color: #5d809d !important;
-    font-size: 11px !important; }
+    font-size: 12px !important; }
 
 #bookmark-card a {
   margin-right: 5px;
@@ -2293,7 +2357,7 @@ text.ref-count {
     color: #5d809d !important;
     margin-left: 2px; }
 #bookmark-card .bookmark {
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
   display: inline-block;
   float: left;
@@ -2307,7 +2371,7 @@ text.ref-count {
   clear: both;
   padding-top: 10px; }
 #bookmark-card a.bookmark-gene {
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   display: inline-block;
   text-align: left;
@@ -2349,7 +2413,7 @@ text.ref-count {
   display: inline; }
 #bookmark-card li {
   color: #717171 !important;
-  font-size: 11px; }
+  font-size: 12px; }
 
 #bookmark-panel i#remove-bookmark {
   color: #E0292B !important;
@@ -2385,13 +2449,13 @@ text.ref-count {
   font-size: 12px; }
 #phenolyzer-results text.score {
   fill: #717171 !important;
-  font-size: 11px; }
+  font-size: 12px; }
 
 #genes-card {
   height: 100%; }
   #genes-card .phenolyzer-label {
     color: #717171 !important;
-    font-size: 11px;
+    font-size: 13px;
     float: left; }
   #genes-card #phenolyzer-run-label {
     display: inline-block !important;
@@ -2401,7 +2465,7 @@ text.ref-count {
     margin-top: 20px; }
     #genes-card #phenolyzer-heading h5 {
       display: inline-block;
-      font-size: 12px; }
+      font-size: 13px; }
   #genes-card #phenolyzer-use {
     font-style: italic !important;
     color: text-color !important;
@@ -2416,13 +2480,13 @@ text.ref-count {
 
 #copy-paste-li, #phenolyzer-search-box {
   color: #717171 !important;
-  font-size: 11px; }
+  font-size: 12px; }
 
 #get-genes-copy-paste-button, #phenolyzer-go-button {
-  font-size: 11px; }
+  font-size: 12px; }
 
 #gene-badge-button {
-  font-size: 11px;
+  font-size: 13px;
   padding: 2px 4px 2px 4px;
   margin: 0px;
   color: #717171; }
@@ -2506,7 +2570,7 @@ text.ref-count {
   display: inline-block;
   padding-bottom: 4px;
   margin-right: 10px;
-  font-size: 11px; }
+  font-size: 12px; }
 
 #gene-badge-container {
   display: flex;
@@ -2542,7 +2606,7 @@ text.ref-count {
 
 #manage-cache-link {
   color: #717171 !important;
-  font-size: 11px;
+  font-size: 12px;
   display: inline-block;
   vertical-align: top;
   margin-left: 12px;
@@ -2552,7 +2616,7 @@ text.ref-count {
   float: right; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
-    font-size: 11px;
+    font-size: 12px;
     display: inline-block;
     vertical-align: top;
     margin-left: 0px;
@@ -2562,7 +2626,7 @@ text.ref-count {
 
 #clear-gene-list {
   color: #717171 !important;
-  font-size: 11px;
+  font-size: 12px;
   margin-left: 0px;
   margin-right: 10px; }
 
@@ -2703,11 +2767,6 @@ text.ref-count {
     color: #787878;
     margin-top: 7px;
     margin-bottom: 16px; }
-
-#feedback-link {
-  padding-top: 2px;
-  padding-bottom: 1px;
-  margin-top: 15px; }
 
 .feedback-label {
   width: 150px;

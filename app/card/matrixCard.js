@@ -8,7 +8,7 @@ function MatrixCard() {
 	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
-	this.COLUMN_LABEL_HEIGHT       = 67;
+	this.COLUMN_LABEL_HEIGHT       = 30;
 	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
 
 	this.ROW_LABEL_WIDTH           = 140;
@@ -238,9 +238,9 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 	} else {
 		var rsId = getRsId(d);
 		if (rsId != null) {
-			return rsId;
+			return (i+1).toString() + ".  " + rsId;
 		} else {
-			return d.type + ' ' + d.start;
+			return (i+1).toString();
 		}		
 	}
 
@@ -621,11 +621,11 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 360;
 	var h = tooltip[0][0].offsetHeight;
 
 	var x = variant.screenXMatrix;
-	var y = variant.screenYMatrix + 10;
+	var y = variant.screenYMatrix -  +$('body #container').css('top').split("px")[0] + 10;
 
 	x = sidebarAdjustX(x);
 
@@ -1046,11 +1046,11 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 	         	} else if (selection.datum().clazz == 'afexac_superrare') {
 	         		return "rgb(203,174,95)";
 	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "rgb(158,186,194)";
+	         		return "rgb(231, 186, 82)";
 	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
 	         		return "rgb(145,191,219)";
 	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "rgb(69,117,180)";
+	         		return "rgb(126, 161, 56)";
 	         	}
 	         })
 	         .style("stroke", function(d,i) {
@@ -1130,11 +1130,11 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
 	         		return "rgb(203,174,95)";
 	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "rgb(158,186,194)";
+	         		return "rgb(231, 186, 82)";
 	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
 	         		return "rgb(145,191,219)";
 	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "rgb(69,117,180)";
+	         		return "rgb(126, 161, 56)";
 	         	}
 	         })
 	         .attr("width", function(d,i) {
