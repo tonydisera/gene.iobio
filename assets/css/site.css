@@ -743,7 +743,7 @@ a {
 #matrix-track #feature-matrix .col.low-quality rect.cellbox {
   fill: rgba(0, 0, 0, 0.13); }
 #matrix-track #feature-matrix .colhdr text {
-  font-size: 12px;
+  font-size: 11px;
   pointer-events: none; }
 #matrix-track #feature-matrix rect.cellbox:hover {
   cursor: pointer;

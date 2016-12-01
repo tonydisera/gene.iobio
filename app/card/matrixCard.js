@@ -8,7 +8,7 @@ function MatrixCard() {
 	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
-	this.COLUMN_LABEL_HEIGHT       = 30;
+	this.COLUMN_LABEL_HEIGHT       = 15;
 	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
 
 	this.ROW_LABEL_WIDTH           = 140;
@@ -852,7 +852,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu || isLevelBasic});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
