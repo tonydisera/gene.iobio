@@ -716,6 +716,16 @@ a {
     background-color: rgba(165, 48, 48, 0.76);
     color: white; }
 
+#welcome-panel {
+  text-align: center; }
+  #welcome-panel #welcome-label {
+    padding-top: 40px;
+    color: #5d809d;
+    font-size: 16px; }
+  #welcome-panel #load-demo-data {
+    color: #717171;
+    font-size: 13px; }
+
 #matrix-track #low-quality-legend {
   float: left;
   margin-top: -20px;

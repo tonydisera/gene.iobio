@@ -1105,6 +1105,11 @@ function loadGeneFromUrl() {
 		genesCard.copyPasteGenes(gene);
 	}
 
+	// Show the 'Load demo data button' if no data sources specified
+	if (!hasDataSources()) {
+		$('#welcome-panel').removeClass("hide");
+	}	
+
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
     if (gene != undefined) {
@@ -1120,7 +1125,7 @@ function loadGeneFromUrl() {
 			}
 			dataCard.loadDemoData();
 		} else {
-			//showSidebar("Help");
+			
 		}
 	
 
@@ -1857,6 +1862,9 @@ function loadTracksForGene(bypassVariantCards) {
 
 	hideIntro();
 
+	$('#nav-section').removeClass("hide");
+
+
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
 	if (window.gene == null || window.gene == "") {
@@ -2072,6 +2080,12 @@ function hasCalledVariants() {
 }
 
 function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
+	if (!hasDataSources()) {
+		return;
+	}
+
+	$('#welcome-panel').addClass("hide");
+
 	relevantVariantCards.forEach(function(vc) {
 		vc.prepareToShowVariants(filterCard.classifyByImpact);
 	});
