@@ -1010,163 +1010,49 @@ MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 	         });
 
 };
+
 MatrixCard.prototype.showAfExacSymbol = function(selection) {
+	var symbolAttrs = {
+		afexac_unique_nc: { transform: "translate(4,4)", fill: "none", stroke: "black", sideLength: "9" },
+		afexac_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", stroke: "none", sideLength: "9" },
+		afexac_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", stroke: "none", sideLength: "10" },
+		afexac_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", stroke: "none", sideLength: "10" },
+		afexac_rare: { transform: "translate(2,2)", fill: "rgb(158,186,194)", stroke: "none", sideLength: "10" },
+		afexac_uncommon: { transform: "translate(2,2)", fill: "rgb(145,191,219)", stroke: "none", sideLength: "12" },
+		afexac_common: { transform: "translate(1,1)", fill: "rgb(69,117,180)", stroke: "none", sideLength: "14"  }
+	}
 	selection.append("g")
-	         .attr("class", selection.datum().clazz)
-	         .attr("transform", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "translate(3,3)";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "translate(1,1)";
-	         	}
-	         	
-	         })
-	         .append("use")
-	         .attr("xlink:href", "#af-symbol")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "none";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "rgb(203,174,95)";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "rgb(158,186,194)";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "rgb(69,117,180)";
-	         	}
-	         })
-	         .style("stroke", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "black";
-	         	} else {
-	         		return "none";
-	         	}
-	         })
-	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "14";
-	         	}
-	         })
-	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "14";
-	         	}
-	         });
+		.attr("class", function(d, i) { return d.clazz; })
+		.attr("transform", function(d,i) {
+			return symbolAttrs[d.clazz].transform;
+		})
+		.append("use")
+		.attr("xlink:href", "#af-symbol")
+		.style("pointer-events", "none")
+		.style("fill", function(d,i) { return symbolAttrs[d.clazz].fill; })
+		.style("stroke", function(d,i) { return symbolAttrs[d.clazz].stroke; })
+		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
 };
 
 MatrixCard.prototype.showAf1000gSymbol = function(selection) {
+	var symbolAttrs = {
+		af1000g_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", sideLength: "9" },
+		af1000g_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", sideLength: "9" },
+		af1000g_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", sideLength: "10" },
+		af1000g_rare: { transform: "translate(2,2)", fill: "rgb(158,186,194)", sideLength: "10" },
+		af1000g_uncommon: { transform: "translate(1,1)", fill: "rgb(145,191,219)", sideLength: "12" },
+		af1000g_common: { transform: "translate(0,0)", fill: "rgb(69,117,180)", sideLength: "14"  }
+	}
 	selection.append("g")
-	         .attr("class", selection.datum().clazz)
-	          .attr("transform", function(d,i) {
-	         	if (selection.datum().clazz == 'af100g_unique_nc') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "translate(3,3)";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "translate(1,1)";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "translate(0,0)";
-	         	}
-	         	
-	         })
-	         .append("use")
-	         .attr("xlink:href", "#af-symbol")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "rgb(203,174,95)";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "rgb(158,186,194)";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "rgb(69,117,180)";
-	         	}
-	         })
-	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "14";
-	         	}
-	         })
-	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "14";
-	         	}
-	         });
+		.attr("class", function(d, i) { return d.clazz; })
+		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
+		.append("use")
+		.attr("xlink:href", "#af-symbol")
+		.style("pointer-events", "none")
+		.style("fill", function(d,i) { return symbolAttrs[d.clazz].fill; })
+		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
 };
 
 MatrixCard.prototype.showHomSymbol = function (selection, options) {
