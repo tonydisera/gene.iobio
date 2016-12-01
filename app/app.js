@@ -265,7 +265,9 @@ function init() {
 	} 
 
 
-	$('body').prepend(navbarTemplate());
+	if (!isLevelEduTour) {
+		$('body').prepend(navbarTemplate());
+	}
 
 
 
@@ -776,10 +778,10 @@ function hideCoordinateFrame() {
 
 
 function readjustCards() {
-	if (isLevelEdu) {
-		var top = +$('#nav-section').height();
-		d3.select('#track-section').style("padding-top", top+6 + "px");
-	}
+	//if (isLevelEdu) {
+	//	var top = +$('#nav-section').height();
+	//	d3.select('#track-section').style("padding-top", top+6 + "px");
+	//}
 }
 
 
