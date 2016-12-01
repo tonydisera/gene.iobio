@@ -1143,9 +1143,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				    
 
 					// At this point, the variants should be cached.  If they aren't,
-					// an error occurred
+ 					// an error occurred
 					var theVcfData = me.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-					if (theVcfData) {
+ 					if (theVcfData) {
+
 			  			// Here we call this method again and since we
 						// have vcf data, the variant chart will be filled
 			  			me._showVariants(regionStart ? regionStart : window.gene.start, 
@@ -1164,10 +1165,10 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						} else {
 							me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
 						}	 				
-				   	    if (me.getRelationship() == 'proband') {
-							genesCard.refreshCurrentGeneBadge();
-						}
-
+				   	    
+					}
+					if (me.getRelationship() == 'proband') {
+						genesCard.refreshCurrentGeneBadge();
 					}
 
 
