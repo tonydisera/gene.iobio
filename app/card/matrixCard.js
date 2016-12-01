@@ -626,6 +626,9 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 	var x = variant.screenXMatrix;
 	var y = variant.screenYMatrix -  +$('body #container').css('top').split("px")[0] + 10;
+	if (y - h < 0) {
+		y = h;
+	}
 
 	x = sidebarAdjustX(x);
 

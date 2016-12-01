@@ -2101,8 +2101,7 @@ header {
 #container {
   margin-left: 0px;
   position: relative !important;
-  top: 58px !important;
-  z-index: 1031; }
+  top: 58px !important; }
 
 .slide-left {
   transform: translate(356px, 0);

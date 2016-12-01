@@ -2568,7 +2568,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
-		siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen');
+		siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen', 'padding-top:5px;');
 	}
 
 	var clinvarRow = '';
@@ -2768,8 +2768,9 @@ VariantCard.prototype._tooltipHeaderLeftJustifySimpleRow = function(value1) {
 	      + '</div>';	
 }
 
-VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, class2) {
-	return '<div class="row">'
+VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, class2, style) {
+	var theStyle = style ? style : '';
+	return '<div class="row" style="' + theStyle + '">'
 	      +  '<div class="col-md-12 tooltip-title" style="text-align:center">' 
 	      +    "<span class='" + class1 + "'>" + value1 + '</span>' 
 	      +    "<span class='" + class2 + "'>" + value2 + '</span>' 
