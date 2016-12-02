@@ -1668,6 +1668,8 @@ function loadGeneWidget(callback) {
 							if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 								showSidebar("Phenolyzer");
 							}							
+						} else if (isLevelBasic) {
+							showSidebar("Phenolyzer");
 						} else {
 							showSidebar("Help");
 						}
