@@ -156,6 +156,10 @@ var effectCategories = [
             callback(buffer);
           }
         });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        })
         cmd.run();
         
     } else if (vcfFile) {
