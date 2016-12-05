@@ -2132,7 +2132,7 @@ VariantModel.prototype.filterFreebayesVariants = function(filterObject) {
 
 
 
-VariantModel.prototype.filterVariants = function(data, filterObject) {
+VariantModel.prototype.filterVariants = function(data, filterObject, bypassRangeFilter) {
 	var me = this;
 
 	var afFieldExac  = "afExAC";
@@ -2164,8 +2164,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		var isHomRef = (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') ? true : false;
 
 		var meetsRegion = true;
-		if (window.regionStart != null && window.regionEnd != null ) {
-			meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+		if (!bypassRangeFilter) {
+			if (window.regionStart != null && window.regionEnd != null ) {
+				meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+			}			
 		}
 
 		// Allele frequency Exac - Treat null and blank af as 0

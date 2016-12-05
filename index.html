@@ -442,23 +442,33 @@
                     Analyze all
                 </a>
 
-                <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"
-                  href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                    Remove all
+                
+                <a id="refresh-badges-button" onclick="cacheHelper.refreshCachedVariants()">                  
+                   <i class="material-icons">cached</i>
+                  Filter &amp; order all
                 </a>
-                <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
-              </div>
-
-              <div id="gene-page-selection" class="level-basic"></div>
-
-              <div id="gene-page-control" class="level-edu level-basic">
-
+                
+                <span id="order-by-label">Order by</span>
                 <div id="select-gene-container">
-                    <select id="select-gene-sort" style="font-size:10px;">
+                    <select id="select-gene-sort">
                     </select>
                 </div>
 
-                 <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide"
+                 <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
+
+              </div>
+
+              <div style="display:inline-block">
+
+              </div>
+
+
+              <div id="gene-page-control" class="level-edu level-basic">
+
+                <div id="gene-page-selection" class="level-basic"></div>
+               
+
+                <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide"
                   onclick="genesCard.viewDefaultsGenesPerPage()" >
                   View 40
                 </a>
@@ -466,16 +476,21 @@
                   onclick="genesCard.viewAllGenes()" >
                   | all
                 </a>
-
-
-                <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
-                    Clear cached results...
+                <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"
+                    href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                      Clear list
+                 </a>
+                  <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
+                    Clear analysis...
                 </a>
+
+               
 
               </div>
             </div>
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
+                
             </div>
           </div>
       </section>
@@ -532,7 +547,7 @@
               </div>                  
           </div>  
 
-          <div id="gene-source-box" class="level-edu level-basic" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
+          <div id="gene-source-box" class="level-edu level-basic" style="width:120px;float:left;margin-left: 10px;margin-top: -28px;">
             <select id="select-gene-source" class="fullview" data-placeholder="">
                   <option value="Gencode Transcript">Gencode Transcript</option>
                   <option value="RefSeq Transcript">RefSeq Transcript</option>                   

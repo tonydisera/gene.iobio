@@ -37,16 +37,17 @@ GenesCard.prototype.init = function() {
          me._goToPage(pageNumber, me.sortedGeneNames);
     });
 
-    $('#select-gene-sort').attr("placeholder", "Order genes by");
+    
 	$('#select-gene-sort').selectize({
 	    valueField: 'value',
 	    labelField: 'value',
 	    searchField: 'value',
 	    create: true
 	});
+	$('#select-gene-sort')[0].selectize.addOption({value:"relevance"});
+	$('#select-gene-sort')[0].selectize.setValue("relevance");
+	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
 	$('#select-gene-sort')[0].selectize.addOption({value:"(original order)"});
-	$('#select-gene-sort')[0].selectize.addOption({value:"By relevance"});
-	$('#select-gene-sort')[0].selectize.addOption({value: "By gene name"});
 	$('#select-gene-sort')[0].selectize.on('item_add', function(selectedValue) {
 		me.sortGenes(selectedValue);
 	});
@@ -143,6 +144,9 @@ GenesCard.prototype.init = function() {
 
 GenesCard.prototype.sortGenes = function(sortBy) {
 	this.sortedGeneNames = null;
+	if (sortBy == null) {
+		sortBy = $('#select-gene-sort')[0].selectize.getValue();
+	}
 	if (sortBy.indexOf("gene name") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort();
 	}
@@ -1104,6 +1108,7 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 			var theGeneName = data[1];
 			if (theGeneName != null && phenotypes != null && phenotypes.length > 0) {
 				var geneBadge = me._getGeneBadge(theGeneName);
+				geneBadge.find("#gene-badge-phenotype-symbol svg").remove();
 				geneBadge.find("#gene-badge-phenotype-symbol").append("<svg class=\"phenotype-badge\" height=\"14\" width=\"14\">");
 				var selection = d3.select(geneBadge.find('#gene-badge-phenotype-symbol .phenotype-badge')[0]).data([{width:13, height:13,clazz: 'phenotype', phenotypes: phenotypes}]);
 				matrixCard.showPhenotypeSymbol(selection);

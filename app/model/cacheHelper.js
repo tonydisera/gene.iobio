@@ -254,6 +254,31 @@ CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
 
 
 
+CacheHelper.prototype.refreshCachedVariants = function() {  
+	var me = this;
+	$('#gene-badges-loader').removeClass("hide");
+	for (var i=0; i<=localStorage.length-1; i++)  
+	{  
+		key = localStorage.key(i);  
+		keyObject = CacheHelper._parseCacheKey(key);
+		if (keyObject.launchTimestamp == me.launchTimestamp) {
+
+		  	var cacheObject = CacheHelper._parseCacheKey(key);
+		  	if (cacheObject.dataKind == 'vcfData' && cacheObject.relationship == "proband") {
+		  		var theVcfData = CacheHelper.getCachedData(key);
+		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
+		
+				genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
+		  	}
+		}
+	}  
+	genesCard.sortGenes();
+	$('#gene-badges-loader').addClass("hide");
+
+}
+
 CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 	var me = this;
 	if (keepLocalStorage) {

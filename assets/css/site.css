@@ -9,7 +9,7 @@ h4 {
   margin-top: 10px; }
 
 h5 {
-  font-size: 11px;
+  font-size: 12px;
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
@@ -95,12 +95,12 @@ h5 {
   background-color: #3586c0; }
 
 .selectize-dropdown {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px;
   color: #717171; }
 
 .selectize-input {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px;
   padding: 5px 4px 4px 4px;
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
@@ -123,7 +123,7 @@ h5 {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
 .selectize-input input {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px; }
 
 .selectize-control.single .selectize-input:after {
@@ -773,7 +773,7 @@ section {
   clear: both; }
 
 #color-scheme {
-  font-size: 11px;
+  font-size: 12px;
   margin-bottom: 10px;
   color: #66585c; }
 
@@ -787,7 +787,7 @@ section {
     padding-left: 30px;
     position: relative;
     padding-top: 2px;
-    font-size: 11px; }
+    font-size: 12px; }
 
 .checkbox {
   position: relative;
@@ -979,7 +979,7 @@ section {
   display: block; }
 
 #filter-panel {
-  font-size: 11px;
+  font-size: 12px;
   color: #66585c;
   fill: #66585c;
   margin-top: 2px;
@@ -1392,7 +1392,7 @@ header {
   .checkbox input[type=checkbox]:checked + .checkbox-material .check:before {
     color: #5d809d; }
 .checkbox label {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 12px;
   color: #717171; }
   .checkbox label .check {
@@ -2495,8 +2495,7 @@ text.ref-count {
   display: inline; }
 
 #manage-genes {
-  float: left;
-  padding-top: 2px; }
+  float: left; }
   #manage-genes a {
     color: #717171 !important; }
     #manage-genes a:hover {
@@ -2505,8 +2504,7 @@ text.ref-count {
 #manage-gene-list {
   display: inline-block;
   padding-bottom: 4px;
-  margin-right: 10px;
-  font-size: 11px; }
+  font-size: 12px; }
 
 #gene-badge-container {
   display: flex;
@@ -2537,14 +2535,13 @@ text.ref-count {
   padding-bottom: 0px;
   vertical-align: top;
   font-size: 0px;
-  margin-left: -175px;
-  margin-top: 2px; }
+  margin-top: 2px;
+  margin-right: 10px; }
 
 #manage-cache-link {
   color: #717171 !important;
   font-size: 11px;
   display: inline-block;
-  vertical-align: top;
   margin-left: 12px;
   padding-top: 2px; }
 
@@ -2556,7 +2553,7 @@ text.ref-count {
     display: inline-block;
     vertical-align: top;
     margin-left: 0px;
-    padding-top: 2px; }
+    padding-top: 4px; }
     #gene-page-control a.gene-paging-link:hover {
       text-decoration: underline !important; }
 
@@ -2566,14 +2563,18 @@ text.ref-count {
   margin-left: 0px;
   margin-right: 10px; }
 
+#order-by-label {
+  font-size: 12px;
+  color: #717171; }
+
 #select-gene-container {
   display: inline-block;
-  width: 115px;
-  vertical-align: bottom;
-  margin-right: 5px; }
+  width: 90px;
+  vertical-align: bottom; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
-    padding-top: 2px; }
+    padding-top: 2px;
+    line-height: 17px; }
 
 #manage-cache-modal .modal-dialog {
   width: 500px; }
@@ -2597,12 +2598,20 @@ text.ref-count {
   padding-top: 2px;
   padding-bottom: 2px; }
 
+#refresh-badges-button {
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 15px;
+  font-size: 15px;
+  cursor: pointer;
+  font-size: 12px; }
+
 #gene-badge-loading-display {
   display: inline-block;
   padding-left: 5px;
   font-size: 11px;
   text-align: left;
-  width: 300px; }
+  color: #717171; }
 
 .call-variants-count {
   font-size: 11px;

@@ -2823,6 +2823,7 @@ function filterVariants() {
 		}
 
 	});
+	cacheHelper.filterCachedVariants();
 
 }
 
