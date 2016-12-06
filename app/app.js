@@ -2523,6 +2523,8 @@ function promiseDetermineInheritance(promise) {
 					trioModel.compareVariantsToMotherFather(function() {
 
 						probandVariantCard.determineMaxAlleleCount();
+
+						probandVariantCard.model._cacheData(probandVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
 						
 						// Enable inheritance filters
 						filterCard.enableInheritanceFilters(getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript));
@@ -2823,7 +2825,7 @@ function filterVariants() {
 		}
 
 	});
-	cacheHelper.filterCachedVariants();
+	$('#refresh-badges-button').animateIt('tada', 'animate-twice');
 
 }
 
