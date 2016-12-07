@@ -59,7 +59,6 @@ var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 var geneSource = "gencode";
 
-var firstTimeGeneLoaded = true;
 var firstTimeShowVariants = true;
 var readyToHideIntro = false;
 var keepShowingIntro = false;
@@ -1153,11 +1152,11 @@ function reloadGeneFromUrl() {
 
 function loadUrlSources() {
 
-	var bam  = getUrlParameter(/bam*/);
-	var vcf  = getUrlParameter(/vcf*/);	
-	var rel  = getUrlParameter(/rel*/);
-	var dsname = getUrlParameter(/name*/);	
-	var sample = getUrlParameter(/sample*/);	
+	var bam  = getUrlParameter(/(bam)*/);
+	var vcf  = getUrlParameter(/(vcf)*/);	
+	var rel  = getUrlParameter(/(rel)*/);
+	var dsname = getUrlParameter(/(name)*/);	
+	var sample = getUrlParameter(/(sample)*/);	
 	var affectedSibsString = getUrlParameter("affectedSibs");
 	var unaffectedSibsString = getUrlParameter("unaffectedSibs");
 
@@ -1612,6 +1611,24 @@ function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
     var hits = {};
+
+    var matchExact = function(r, str) {
+   		var match = str.match(r);
+   		return match != null && str.indexOf(match[0]) == 0;
+	}
+
+	var getMatch = function(string, regex, index) {
+      index || (index = 1); // default to the first capturing group
+      var matches = [];
+      var match = regex.exec(string);
+      if (match && match.length > index && match[index]) {
+      	return match[index];	
+      } else {
+      	return null;
+      }
+    }
+
+
     for (var i = 0; i < sURLVariables.length; i++) 
     {    	
         var sParameterName = sURLVariables[i].split('=');        
@@ -1621,8 +1638,8 @@ function getUrlParameter(sParam) {
 	            return sParameterName[1];
 	        }
 	    } else {
-	    	var matches = sParameterName[0].match(sParam);
-	    	if ( matches != undefined && matches.length > 0 ) {
+	    	var match = getMatch(sParameterName[0], sParam)
+	    	if ( match) {
 	    		hits[sParameterName[0]] = sParameterName[1];
 	    	}
 	    }
@@ -1745,12 +1762,8 @@ function loadGeneWidget(callback) {
 
 	    	if (data.loadFromUrl) {
 
-	    		var bam  = getUrlParameter(/bam*/);
-				var vcf  = getUrlParameter(/vcf*/);	
-
-				if (vcf != null && vcf.length > 0) {
-					firstTimeGeneLoaded = false;
-				}
+	    		var bam  = getUrlParameter(/(bam)*/);
+				var vcf  = getUrlParameter(/(vcf)*/);	
 
 
 				if (bam == null && vcf == null) {
@@ -1787,11 +1800,6 @@ function loadGeneWidget(callback) {
 		    	if (!isOffline) {
 			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
 		    	}
-
-				if (firstTimeGeneLoaded && !hasDataSources()) {
-					//showDataDialog();
-					firstTimeGeneLoaded = false; 
-				}
 
 		    	if(data.callback != undefined) data.callback();
 
