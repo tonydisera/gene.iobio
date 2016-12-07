@@ -511,6 +511,9 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 		for (var i=0; i<=localStorage.length-1; i++)  {  
 			var key = localStorage.key(i); 	
 			keyObject = CacheHelper._parseCacheKey(key);
+			if (keyObject.gene && keyObject.relationship == 'proband') {
+				genesCard.clearGeneGlyphs(keyObject.gene);
+			}
 			if (keyObject.launchTimestamp == theLaunchTimeStamp) {
 				keysToRemove.push(key);
 			} 

@@ -1230,6 +1230,16 @@ GenesCard.prototype.setGeneBadgeError = function(geneName, select) {
 	}
 }
 
+GenesCard.prototype.clearGeneGlyphs = function(geneName) {
+	var me = this;
+
+	var geneBadge = me._getGeneBadge(geneName);
+	me._setGeneBadgeLoading(geneBadge, false);
+	geneBadge.find('#gene-badge-button #gene-badge-symbols svg').remove();
+	geneBadge.removeClass("visited");
+	geneBadge.removeClass("selected");
+}
+
 GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
 	var me = this;
 
