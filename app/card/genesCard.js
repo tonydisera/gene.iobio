@@ -283,12 +283,12 @@ GenesCard.prototype.pageToGene = function(geneName) {
 
 GenesCard.prototype.viewDefaultsGenesPerPage = function() {
 	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
-	this._initPaging(window.geneNames, true);
+	this.sortGenes();
 }
 
 GenesCard.prototype.viewAllGenes = function() {
 	this.GENES_PER_PAGE = 1000000;
-	this._initPaging(window.geneNames, true);
+	this.sortGenes();
 }
 
 GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {

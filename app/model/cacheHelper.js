@@ -25,13 +25,47 @@ CacheHelper.prototype.analyzeAll = function() {
 			me.genesToCache.push(geneName);
 		}
 	});
-	me.cacheGenes();
+	me.cacheGenes(function() {
+		me.getAnalyzeAllCounts(function(counts) {
+			if (counts.unanalyzed == 0) {
+				alertify.confirm("Analysis is complete. Refresh badges?", function (e) {
+				    if (e) {
+						// user clicked "ok"
+						me.refreshCachedVariants();
+				        
+				    } else {
+				        // user clicked "cancel"
+				    }
+				});	
+
+			} else if (counts.unanalyzed > 0) {
+				alertify.confirm("Analysis incomplete.  Only " + counts.analyzed + " of the " + counts.total + " genes have been analyzed.", function (e) {
+				    if (e) {
+				    	// ok
+				    } else {
+				    	//cancel
+				    }
+				});	
+			} 
+		});		
+	});
+
+
 }
 
 
 
-CacheHelper.prototype.cacheGenes = function() {
+CacheHelper.prototype.cacheGenes = function(callback) {
 	var me = this;
+
+	// If there are no more genes to cache, 
+	if (me.genesToCache.length == 0 && me.cacheQueue.length == 0) {
+		if (callback) {
+			callback();
+		}
+	}
+
+
 
 	// If we still have genes in the cache queue, exit. (Wait to kick off next batch 
 	// of genes to analyze until all genes in last batch are analyzed.)
@@ -39,7 +73,7 @@ CacheHelper.prototype.cacheGenes = function() {
 		return;
 	}
 
-	
+
 	// Determine the batch size.  (It will be smaller that the
 	// default batch size if the genes remaining to be cached is
 	// smaller than the batch size.)
@@ -55,7 +89,7 @@ CacheHelper.prototype.cacheGenes = function() {
 	}
 	// Invoke method to cache each of the genes in the queue
 	for (var i = 0; i < me.batchSize; i++) {
-		me.cacheGene(me.cacheQueue[i]);
+		me.cacheGene(me.cacheQueue[i], callback);
 	}
 
 
@@ -63,7 +97,7 @@ CacheHelper.prototype.cacheGenes = function() {
 
 
 
-CacheHelper.prototype.cacheGene = function(geneName) {
+CacheHelper.prototype.cacheGene = function(geneName, callback) {
 	var me = this;
 
 
@@ -94,12 +128,12 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 				    	// take this gene off of the queue and see
 				    	// if next batch of genes should be analyzed
 				    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
-				    	me.cacheNextGene(geneObject.gene_name);
+				    	me.cacheNextGene(geneObject.gene_name, callback);
 				    } else if (shouldJointCall) {
 				    	genesCard._geneBadgeLoading(geneObject.gene_name, true);
 						cacheJointCallVariants(geneObject, transcript, function() {
 
-							me.processCachedTrio(geneObject, transcript)						
+							me.processCachedTrio(geneObject, transcript, callback)						
 						});
 					} else {
 
@@ -119,7 +153,7 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 					    			// (if this is a trio)
 					    			if (me.isCachedForCards(geneObject.gene_name, transcript)) {
 
-						    			me.processCachedTrio(geneObject, transcript);
+						    			me.processCachedTrio(geneObject, transcript, callback);
 
 
 					    			}
@@ -132,7 +166,7 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 
 			    					// take this gene off of the queue and see
 			    					// if next batch of genes should be analyzed
-						    		me.cacheNextGene(geneObject.gene_name);					
+						    		me.cacheNextGene(geneObject.gene_name, callback);					
 					    		});
 
 				    		}
@@ -149,7 +183,7 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 				genesCard.setGeneBadgeError(geneName);			    				
 				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
     			genesCard._geneBadgeLoading(geneName, false);
-	    		me.cacheNextGene(geneName);
+	    		me.cacheNextGene(geneName, callback);
     		}		    	
 
 
@@ -159,7 +193,7 @@ CacheHelper.prototype.cacheGene = function(geneName) {
 				
 }
 
-CacheHelper.prototype.processCachedTrio = function(geneObject, transcript) {
+CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callback) {
 	var me = this;
 
 	// we need to compare the proband variants to mother and father variants to determine
@@ -213,17 +247,17 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript) {
 
 		// take this gene off of the queue and see
 		// if next batch of genes should be analyzed
-		me.cacheNextGene(geneObject.gene_name);
+		me.cacheNextGene(geneObject.gene_name, callback);
 	}, 
 	function(error) {
 		console.log("problem determining inheritance for " + geneObject.gene_name + ". " + error);
 		// take this gene off of the queue and see
 		// if next batch of genes should be analyzed
-		me.cacheNextGene(geneObject.gene_name);
+		me.cacheNextGene(geneObject.gene_name, callback);
 	});
 }
 
-CacheHelper.prototype.cacheNextGene = function(geneName) {
+CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 	this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
 														 .removeGene(geneName);
 	// Take the analyzed (and cached) gene off of the cache queue
@@ -234,7 +268,7 @@ CacheHelper.prototype.cacheNextGene = function(geneName) {
 	// Invoke cacheGenes, which will kick off the next batch
 	// of genes to analyze once all of the genes in
 	// the current batch have been analyzed.
-	this.cacheGenes();
+	this.cacheGenes(callback);
 }
 
 CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
@@ -253,29 +287,122 @@ CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
 }
 
 
+CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
+	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0};
+	genesCard.getGeneNames().forEach(function(geneName) {
+		//genesToCount.push(geneName);
+		
+		var key = getProbandVariantCard().model._getCacheKey("dangerSummary", geneName);
+    	var dangerSummary = CacheHelper.getCachedData(key);
+		if (dangerSummary != null) {
+			countObject.analyzed++;
+		} else {
+			countObject.unanalyzed++;						
+		}
+		countObject.total++;
+	});
+	callback(countObject);
+
+
+
+/*
+	var genesToCount = [];
+	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0};
+	genesCard.getGeneNames().forEach(function(geneName) {
+		genesToCount.push(geneName);
+	});
+	var countNextGeneTranscript = function(callback) {
+		if (genesToCount.length == 0) {
+			callback();
+		}
+		var geneName = genesToCount.splice(0,1);
+		var url = geneInfoServer + 'api/gene/'  + geneName;
+		$.ajax({
+		    url: url,
+		    jsonp: "callback",
+		    type: "GET",
+		    dataType: "jsonp",
+		    success: function( response ) {
+		    	// Now that we have the gene model,
+		    	// load and annotate the variants for each
+		    	// sample (e.g. each variant card)
+		    	if (response[0].hasOwnProperty('gene_name')) {
+			    	var geneObject = response[0];
+			    	adjustGeneRegion(geneObject);
+			    	var transcript = getCanonicalTranscript(geneObject);
+			    	var key = getProbandVariantCard().model._getCacheKey("dangerSummary", geneObject.gene_name);
+			    	var dangerSummary = CacheHelper.getCachedData(key);
+					if (dangerSummary != null) {
+						countObject.analyzed++;
+					} else {
+						countObject.unanalyzed++;						
+					}
+					countObject.total++;
+					countNextGeneTranscript(callback);
+			    }
+			},
+			error: function( xhr, status, errorThrown ) {
+				countObject.total++;
+				countObject.error++;
+				countNextGeneTranscript(callback);
+			}
+		});
+
+	}
+
+	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0};
+	countNextGene(function() {
+		callback(countObject);
+	});
+*/
+}
+
+
 
 CacheHelper.prototype.refreshCachedVariants = function() {  
 	var me = this;
-	$('#gene-badges-loader').removeClass("hide");
-	for (var i=0; i<=localStorage.length-1; i++)  
-	{  
-		key = localStorage.key(i);  
-		keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject.launchTimestamp == me.launchTimestamp) {
 
-		  	var cacheObject = CacheHelper._parseCacheKey(key);
-		  	if (cacheObject.dataKind == 'vcfData' && cacheObject.relationship == "proband") {
-		  		var theVcfData = CacheHelper.getCachedData(key);
-		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+	var doRefresh  = function() {
+		$('#gene-badges-loader').removeClass("hide");
+		for (var i=0; i<=localStorage.length-1; i++)  
+		{  
+			key = localStorage.key(i);  
+			keyObject = CacheHelper._parseCacheKey(key);
+			if (keyObject.launchTimestamp == me.launchTimestamp) {
 
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
-		
-				genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
-		  	}
+			  	var cacheObject = CacheHelper._parseCacheKey(key);
+			  	if (cacheObject.dataKind == 'vcfData' && cacheObject.relationship == "proband") {
+			  		var theVcfData = CacheHelper.getCachedData(key);
+			  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+
+			  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
+			
+					genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
+			  	}
+			}
+		}  
+		genesCard.sortGenes();
+		$('#gene-badges-loader').addClass("hide");
+
+	}
+
+	me.getAnalyzeAllCounts(function(counts) {
+		if (counts.unanalyzed > 0) {
+			alertify.confirm("Analysis incomplete.  Only " + counts.analyzed + " of the " + counts.total + " genes have been analyzed.  Refresh badges anyways?", function (e) {
+			    if (e) {
+					// user clicked "ok"
+					doRefresh();
+			        
+			    } else {
+			        // user clicked "cancel"
+			    }
+			});	
+		} else {
+			doRefresh();
 		}
-	}  
-	genesCard.sortGenes();
-	$('#gene-badges-loader').addClass("hide");
+	});
+	
+
 
 }
 
