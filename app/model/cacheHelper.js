@@ -31,7 +31,7 @@ CacheHelper.prototype.analyzeAll = function() {
 				alertify.confirm("Analysis is complete. Refresh badges?", function (e) {
 				    if (e) {
 						// user clicked "ok"
-						me.refreshCachedVariants();
+						me.refreshGeneBadges();
 				        
 				    } else {
 				        // user clicked "cancel"
@@ -359,7 +359,7 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 
 
 
-CacheHelper.prototype.refreshCachedVariants = function() {  
+CacheHelper.prototype.refreshGeneBadges = function() {  
 	var me = this;
 
 	var doRefresh  = function() {
