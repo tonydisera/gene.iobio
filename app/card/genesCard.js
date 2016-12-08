@@ -3,7 +3,8 @@ function GenesCard() {
 	this.NUMBER_PHENOLYZER_GENES = 300;
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
 	this.GENES_PER_PAGE_DEFAULT = 40;
-	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
+	this.GENES_PER_PAGE = isLevelBasic || isLevelEduTour ? 99999 :  this.GENES_PER_PAGE_DEFAULT;
+	this.ACMG56_GENES = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYLK", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S"];
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
 	this.sortedGeneNames = null;
@@ -333,9 +334,9 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		$('.gene-paging-link').removeClass("hide");
 		$('#gene-page-selection').bootpag({
 			page: me.currentPageNumber,
-      total: pageCount,
-      maxVisible: pageCount
-    });
+	        total: pageCount,
+	        maxVisible: pageCount
+	    });
 		this._goToPage(this.currentPageNumber, theGeneNames);
 	} else if (theGeneNames.length > 0) {
 		if (this.GENES_PER_PAGE > this.GENES_PER_PAGE_DEFAULT) {
@@ -458,7 +459,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
 GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	var me = this;
 
-	geneNames = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYLK", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S"];
+	geneNames = me.ACMG56_GENES;
 
 	// Remove gene badges not specified in the text area
 	var geneBadgesToRemove = [];
@@ -1453,6 +1454,10 @@ GenesCard.prototype.setSelectedGene = function(geneName) {
 
 GenesCard.prototype.selectGene = function(geneName, callback) {
 	var me = this;
+
+	if (geneName == null || geneName.length == 0) {
+		return;
+	}
 
 	// If necessary, switch from gencode to refseq or vice versa if this gene
 	// only has transcripts in only one of the gene sets
