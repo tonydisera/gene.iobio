@@ -953,6 +953,15 @@ section {
   display: inline-block;
   padding-left: 160px; }
 
+#build-link {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: bottom;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #5d809d !important;
+  font-weight: bold; }
+
 #gene-name {
   font-size: 16px;
   color: #5d809d;
@@ -2675,7 +2684,9 @@ text.ref-count {
   padding-left: 5px;
   font-size: 11px;
   text-align: left;
-  width: 300px; }
+  width: 230px;
+  color: #717171;
+  font-style: italic; }
 
 .call-variants-count {
   font-size: 11px;

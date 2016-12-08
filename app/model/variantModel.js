@@ -554,64 +554,36 @@ VariantModel.prototype._promiseVcfRefName = function(ref) {
 			}
 		} else {
 			me.vcfRefNamesMap = {};
-			if (me.vcf.isFile()) {
-				me.vcf.getReferenceNames(function(refNames) {
-					var foundRef = false;
-					refNames.forEach( function(refName) {					
-			    		
-				 		if (refName == theRef) {
-				 			me.getVcfRefName = me._getRefName;
-				 			foundRef = true;
-				 		} else if (refName == me._stripRefName(theRef)) {
-				 			me.getVcfRefName = me._stripRefName;
-				 			foundRef = true;
-				 		}
-	
-			    	});
-			    	// Load up a lookup table.  We will use me for validation when
-			    	// a new gene is loaded to make sure the ref exists.
-			    	if (foundRef) {
-			    		refNames.forEach( function(refName) {
-			    			var theRefName = me.getVcfRefName(refName);
-			    			me.vcfRefNamesMap[theRefName] = refName; 
-			    		});
-			    		resolve();
-			    	} else  {
+			me.vcf.getReferenceLengths(function(refData) {
+				var foundRef = false;
+				refData.forEach( function(refObject) {		
+					var refName = refObject.name;			
+		    		
+			 		if (refName == theRef) {
+			 			me.getVcfRefName = me._getRefName;
+			 			foundRef = true;
+			 		} else if (refName == me._stripRefName(theRef)) {
+			 			me.getVcfRefName = me._stripRefName;
+			 			foundRef = true;
+			 		}
 
-			    	// If we didn't find the matching ref name, show a warning.
-						reject();
-					}
-
-				});
-
-			} else {
-
-				me.vcf.loadRemoteIndex(function(refData) {
-					var foundRef = false;
-			    	refData.forEach( function(ref) {
-				 		if (ref.name == theRef) {
-				 			me.getVcfRefName = me._getRefName;
-				 			foundRef = true;
-				 		} else if (ref.name == me._stripRefName(theRef)) {
-				 			me.getVcfRefName = me._stripRefName;
-				 			foundRef = true;
-				 		}
-			    	});
-			    	// Load up a lookup table.  We will use me for validation when
-			    	// a new gene is loaded to make sure the ref exists.
-			    	if (foundRef) {
-			    		refData.forEach( function(ref) {
-			    			var theRefName = me.getVcfRefName(ref.name);
-			    			me.vcfRefNamesMap[theRefName] = ref.name; 
-			    		});
-			    		resolve();
-
-			    	} else {
-			    		reject();
-					} 
-		    	}, function(error) {
 		    	});
-			} 		
+		    	// Load up a lookup table.  We will use me for validation when
+		    	// a new gene is loaded to make sure the ref exists.
+		    	if (foundRef) {
+		    		refData.forEach( function(refObject) {
+		    			var refName = refObject.name;
+		    			var theRefName = me.getVcfRefName(refName);
+		    			me.vcfRefNamesMap[theRefName] = refName; 
+		    		});
+		    		resolve();
+		    	} else  {
+
+		    	// If we didn't find the matching ref name, show a warning.
+					reject();
+				}
+
+			});
 		}
 	});
 
@@ -1347,10 +1319,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
 
 		    	} else {
-		    		// We bypass getting clinvar records for unaffected siblings
-		    		return new Promise( function(resolve, reject) {
-		    			resolve(theVcfData);
-		    		});
+		    		
+		    		resolve(theVcfData);
 		    	}	
 
 
@@ -1361,9 +1331,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		    	if (onVcfData) {
 		    		onVcfData(theVcfData);
 		    	}
-		    	return new Promise( function(resolve, reject) {
-		    		resolve(theVcfData);
-		    	});
+		    	resolve(theVcfData);
+
 
 	    	} else {
 	    		reject("_promiseGetAndAnnotateVariants() No variants");
@@ -1372,9 +1341,9 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		
 	    }, 
 	    function(error) {
-	    	// If error when getting clinvar records	    	
+	    	// If error when annotating clinvar records	    	
 	    	console.log("an error occurred when annotating vcf records " + error);
-	    	reject();
+	    	reject(error);
 
 	    }).then( function(data) {
 	    	// We are done getting clinvar records.
@@ -1477,7 +1446,7 @@ VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcri
   	// coding region (level = private) and af not found and intronic (non-coding)
   	// region (level = unknown)
   	if (variant.afExAC == 0) {
-			variant.afExAC = -100;
+		variant.afExAC = -100;
     	getCodingRegions(transcript).forEach(function(codingRegion) {
     		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
     			variant.afExAC = 0;
@@ -1624,9 +1593,9 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 	var loadClinvarProperties = function(recs) {
 		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinVarIds.length; null) {
 			var uid = clinVarIds[clinvarIter];
-			var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start;
-			var clinVarAlt   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].alt;
-			var clinVarRef   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].ref;
+			var clinVarStart = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].start;
+			var clinVarAlt   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].alt;
+			var clinVarRef   = clinVars[uid].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].ref;
 
 			
 			// compare curr variant and curr clinVar record

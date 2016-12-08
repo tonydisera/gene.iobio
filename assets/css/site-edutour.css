@@ -1192,6 +1192,16 @@ a {
     background-color: rgba(165, 48, 48, 0.76);
     color: white; }
 
+#welcome-panel {
+  text-align: center; }
+  #welcome-panel #welcome-label {
+    padding-top: 40px;
+    color: #5d809d;
+    font-size: 16px; }
+  #welcome-panel #load-demo-data {
+    color: #717171;
+    font-size: 13px; }
+
 #matrix-track #low-quality-legend {
   float: left;
   margin-top: -20px;
@@ -1209,7 +1219,7 @@ a {
 #matrix-track #feature-matrix .col.low-quality rect.cellbox {
   fill: rgba(0, 0, 0, 0.13); }
 #matrix-track #feature-matrix .colhdr text {
-  font-size: 12px;
+  font-size: 11px;
   pointer-events: none; }
 #matrix-track #feature-matrix rect.cellbox:hover {
   cursor: pointer;
@@ -1418,6 +1428,15 @@ section {
 #gene-search-bar {
   display: inline-block;
   padding-left: 160px; }
+
+#build-link {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: bottom;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #5d809d !important;
+  font-weight: bold; }
 
 #gene-name {
   font-size: 16px;
@@ -3141,7 +3160,9 @@ text.ref-count {
   padding-left: 5px;
   font-size: 11px;
   text-align: left;
-  width: 300px; }
+  width: 230px;
+  color: #717171;
+  font-style: italic; }
 
 .call-variants-count {
   font-size: 11px;

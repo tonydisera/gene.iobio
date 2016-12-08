@@ -304,7 +304,10 @@ function geneD3() {
           .attr('d', centerArrow);      
 
       var filterFeatures = null;
-      if (transcript.datum().transcript_type == 'protein_coding') {
+      if ( transcript.datum().transcript_type == 'protein_coding' 
+        || transcript.datum().transcript_type == 'mRNA' 
+        || transcript.datum().transcript_type == 'transcript'
+        || transcript.datum().transcript_type == 'primary_transcript') {
         filterFeatures = function(d) {
            var ft = d.feature_type.toLowerCase(); 
            return  (ft == 'utr' || ft == 'cds');
@@ -324,8 +327,12 @@ function geneD3() {
           .attr('class', function(d) { return d.feature_type.toLowerCase();})          
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
-          .attr('x', function(d) { return d3.round(x(d.start))})
-          .attr('width', function(d) { return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start))) })
+          .attr('x', function(d) { 
+            return d3.round(x(d.start))
+          })
+          .attr('width', function(d) { 
+            return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start))) 
+          })
           .attr('y', trackHeight /2)
           .attr('height', 0)
           .attr("pointer-events", "all")

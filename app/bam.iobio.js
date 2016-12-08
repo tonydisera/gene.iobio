@@ -40,6 +40,8 @@ var Bam = Class.extend({
          }
       }
 
+      this.headerStr = null;
+
 
 
 
@@ -52,13 +54,16 @@ var Bam = Class.extend({
     this.bamUri = null;
    },
 
-   makeBamBlob: function() {
+   makeBamBlob: function(callback) {
      var me = this;
      this.bamBlob = new BlobFetchable(this.bamFile);
      this.baiBlob = new BlobFetchable(this.baiFile); // *** add if statement if here ***         
      makeBam(this.bamBlob, this.baiBlob, function(bam) {
         me.setHeader(bam.header);
         me.provide(bam);
+        if (callback) {
+          callback();
+        }
      });
    }, 
 
@@ -192,8 +197,9 @@ var Bam = Class.extend({
       return;
     }
     me.sourceType = "file";
-    me.makeBamBlob();
-    callback(true);
+    me.makeBamBlob( function() {
+      callback(true);
+    });
     return;
   },
 
@@ -302,6 +308,42 @@ var Bam = Class.extend({
    },
 
 
+   getHeaderStr: function(callback) {
+      var me = this;
+      if (me.headerStr) {
+         callback(me.headerStr);        
+      }
+      else if (me.sourceType == 'file') {
+        console.log('Error: header not set for local bam file');
+        callback(null);
+      } else {
+
+        var success = null;
+        var cmd = new iobio.cmd(
+            IOBIO.samtools,
+            ['view', '-H', me.bamUri]
+        );
+        var rawHeader = "";
+        cmd.on('data', function(data) {
+          if (data != undefined) {
+            rawHeader += data;
+          }
+        });
+
+        cmd.on('end', function() {
+          me.setHeader(rawHeader);
+          callback(me.headerStr);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+        cmd.run();    
+
+        
+      }
+   },
+
    getHeader: function(callback) {
       var me = this;
       if (me.header) {
@@ -342,6 +384,7 @@ var Bam = Class.extend({
 
 
    setHeader: function(headerStr) {
+      this.headerStr = headerStr;
       var header = { sq:[], toStr : headerStr };
       var lines = headerStr.split("\n");
       for ( var i=0; i<lines.length > 0; i++) {
@@ -353,6 +396,8 @@ var Bam = Class.extend({
               fHash[ values[0] ] = values[1]
             })
             header.sq.push({name:fHash["SN"], end:1+parseInt(fHash["LN"])});
+            header.species = fHash["SP"];
+            header.assembly = fHash["AS"];
          }
       }
       this.header = header;
@@ -503,17 +548,10 @@ var Bam = Class.extend({
     this.transformRefName(refName, function(trRefName){
 
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
+      
+      //  Figure out the reference sequence file path
+      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
+      
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
       var cmd = null;
@@ -527,6 +565,7 @@ var Bam = Class.extend({
             'urlparams': {'encoding':'binary'},
             ssl: useSSL
           });
+
         cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile], {ssl: useSSL});
       } else {
 
@@ -543,12 +582,11 @@ var Bam = Class.extend({
               'urlparams': {'encoding':'binary'},
               ssl: useSSL
             });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile], {ssl: useSSL});
-         
+        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFastaFile], {ssl: useSSL});
       }
 
 
-      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-'], {ssl: useSSL});
+      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-'], {ssl: useSSL});
       //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
 
 
@@ -568,9 +606,9 @@ var Bam = Class.extend({
       //cmd = cmd.pipe(IOBIO.af)
 
       // VEP to annotate
-      var vepArgs = "";
+      var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
       if (isRefSeq) {
-        vepArgs = " --refseq "
+        vepArgs += " --refseq "
       }
       //cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
 
@@ -607,17 +645,7 @@ var Bam = Class.extend({
     this.transformRefName(refName, function(trRefName){
 
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
+      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
       var getBamCmds = [];
@@ -675,21 +703,21 @@ var Bam = Class.extend({
           freebayesArgs.push(bamCmd);
         });
         freebayesArgs.push("-f");
-        freebayesArgs.push(refFile);
+        freebayesArgs.push(refFastaFile);
 
         
         var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs, {ssl: useSSL});
         
 
         // Normalize variants
-        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-'], {ssl: useSSL});
+        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-'], {ssl: useSSL});
 
         // Subset on all samples (this will get rid of low quality cases where no sample 
         // is actually called as having the alt) 
         //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
 
         // Filter out anything with qual <= 0
-        cmd = cmd.pipe("nv-dev.iobio.io/vt/", ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-'], {ssl: useSSL});
+        cmd = cmd.pipe(IOBIO.vt, ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-'], {ssl: useSSL});
 
 
         //
@@ -708,9 +736,9 @@ var Bam = Class.extend({
         cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
 
         // VEP to annotate
-        var vepArgs = "";
+        var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
         if (isRefSeq) {
-          vepArgs = " --refseq "
+          vepArgs += " --refseq "
         }
         // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
         // since we won't have the original vcf records as input

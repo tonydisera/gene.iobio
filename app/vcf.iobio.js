@@ -36,35 +36,6 @@ vcfiobio = function module() {
   var stream = null;
 
 
-  var refLengths_GRCh37 =
-  {
-        "1":   +249250621,
-        "2":   +243199373,
-        "3":   +198022430,
-        "4":   +191154276,
-        "5":   +180915260,
-        "6":   +171115067,
-        "7":   +159138663,
-        "8":   +146364022,
-        "9":   +141213431,
-        "10":  +135534747,
-        "11":  +135006516,
-        "12":  +133851895,
-        "13":  +115169878,
-        "14":  +107349540,
-        "15":  +102531392,
-        "16":  +90354753,
-        "17":  +81195210,
-        "18":  +78077248,
-        "19":  +59128983,
-        "20":  +63025520,
-        "21":  +48129895,
-        "22":  +51304566,
-        "X":   +155270560,
-        "Y":   +59373566
-      };
-
-
 var effectCategories = [
 ['coding_sequence_variant', 'coding'],
 ['chromosome' ,'chromosome'],
@@ -157,6 +128,48 @@ var effectCategories = [
       this.checkVcfUrl(url,function(success, message) {
           callback(success, message);
       });
+    }
+
+  }
+
+  exports.getHeader = function(callback) {
+    if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
+
+      var buffer = "";
+      var cmd = new iobio.cmd(
+            IOBIO.tabix,
+            ['-H', vcfURL]
+        );
+
+        cmd.on('data', function(data) {
+          if (data != undefined) {
+            success = true;
+            buffer += data;
+          }
+        });
+
+        cmd.on('end', function() {
+          if (success == null) {
+            success = true;
+          }
+          if (success && buffer.length > 0) {
+            callback(buffer);
+          }
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        })
+        cmd.run();
+        
+    } else if (vcfFile) {
+        var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
+          vcfReader.getHeader( function(theHeader) {
+            callback(theHeader);
+          });
+        });
+    } else {
+      callback(null);
     }
 
   }
@@ -360,23 +373,64 @@ var effectCategories = [
   }
 
 
-  exports.getReferenceNames = function(callback) {
-      vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
-        var tbiIdx = tbiR;
 
-        var refNames = [];
-        refNames.length = 0;
-
-        for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
-          var ref   = tbiIdx.idxContent.head.names[i];
-          refNames.push(ref);
-        }
-        callback(refNames);
-      });
+  exports.getReferenceLengths = function(callback) {
+    if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase()) {
+      this._getRemoteReferenceLengths(callback);
+    } else {
+      this._getLocalReferenceLengths(callback);
+    }
   }
 
 
-  exports.loadRemoteIndex = function(callback, callbackError) {
+
+
+  exports._getLocalReferenceLengths = function(callback, callbackError) {
+    var me = this;
+ 
+    vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
+      var tbiIdx = tbiR;
+      refDensity.length = 0;
+
+      if (tbiIdx.idxContent.head.n_ref == 0) {
+        var errorMsg = "Invalid index file.  The number of references is set to zero.  Try recompressing the vcf with bgzip and regenerating the index with tabix."
+        if (callbackError) {
+          callbackError(errorMsg);
+        }
+        console.log(errorMsg);
+        return;
+      }
+
+      var referenceNames = [];
+      for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
+        var ref   = tbiIdx.idxContent.head.names[i];
+        referenceNames.push(ref);
+      }      
+
+      for (var i = 0; i < referenceNames.length; i++) {
+        var ref   = referenceNames[i];
+
+        var indexseq = tbiIdx.idxContent.indexseq[i];
+        var calcRefLength = indexseq.n_intv * size16kb;
+
+
+        // Load the reference density data.  Exclude reference if 0 points.
+        refData.push( {"name": ref, "calcRefLength": calcRefLength, "idx": i});
+      }
+
+      // Sort ref data so that refs are ordered numerically
+      refData = me.sortRefData(refData);
+    
+      if (callback) {
+        callback(refData);
+      }
+    
+    });
+
+  }
+
+
+  exports._getRemoteReferenceLengths = function(callback, callbackError) {
     var me = this;
     var buffer = "";
     var refName;
@@ -393,9 +447,15 @@ var effectCategories = [
         return;
       }
 
-      data = buffer + data;
+      buffer += data;
 
-      var recs = data.split("\n");
+    })
+
+    // All data has been streamed.
+    cmd.on('end', function() {
+
+
+      var recs = buffer.split("\n");
       if (recs.length > 0) {
         for (var i=0; i < recs.length; i++)  {
           if (recs[i] == undefined) {
@@ -404,28 +464,20 @@ var effectCategories = [
 
           var success = true;
           if ( recs[i][0] == '#' ) {
-          var tokens = recs[i].substr(1).split("\t");
+            var tokens = recs[i].substr(1).split("\t");
             if (tokens.length >= 3) {
               var refNamePrev = refName;
               refIndex = tokens[0];
               refName = tokens[1];
-
-              var calcRefLength = tokens[2];
-              var refLength = refLengths_GRCh37[me.stripChr(refName)];
-              if (refLength == null) {
-                 refLength = calcRefLength;
-              }
+              var refLength = tokens[2];
 
               // Zero fill the previous reference point data and callback with the
               // data we have loaded so far.
               if (refData.length > 0) {
                 var refDataPrev = refData[refData.length - 1];
-                me.zeroFillPointData(refDataPrev);
-
               }
 
-              refData.push({"name": refName, "value": +refLength, "refLength": +refLength, "calcRefLength": +calcRefLength, "idx": +refIndex});
-              refDensity[refName] =  {"idx": refIndex, "points": [], "intervalPoints": []};
+              refData.push({"name": refName,  "calcRefLength": +refLength, "idx": +refIndex});
 
 
             } else {
@@ -433,22 +485,7 @@ var effectCategories = [
             }
           }
           else {
-             if (recs[i] != "") {
-                if (refDensity[refName] == null) {
-                  //console.log("Invalid reference " + refName + " for point data " + recs[i]);
-                  success = false;
-                } else {
-                  var fields = recs[i].split("\t");
-                  if (fields.length >= 2) {
-                    var point = [ parseInt(fields[0]), parseInt(fields[1]) ];
-                    refDensity[refName].points.push(point);
-                    refDensity[refName].intervalPoints.push(point);
-                  } else {
-                    success = false;
-                  }
-                }
-
-             }
+            // We only care about getting the reference lengths, not the density data
           }
           if (success) {
             buffer = "";
@@ -460,12 +497,6 @@ var effectCategories = [
         buffer += data;
       }
 
-
-
-    })
-
-    // All data has been streamed.
-    cmd.on('end', function() {
       // sort refData so references or ordered numerically
       refData = me.sortRefData(refData);
 
@@ -474,7 +505,6 @@ var effectCategories = [
       // for the last reference that was loaded
       if (refData.length > 0) {
         var refDataPrev = refData[refData.length - 1];
-        me.zeroFillPointData(refDataPrev);
       }
       if (callback) {
         callback(refData);
@@ -497,30 +527,6 @@ var effectCategories = [
 
   };
 
-
-
-  exports.zeroFillPointData = function(refObject) {
-
-        var refDensityObject = refDensity[refObject.name];
-
-        // If we have sparse data, keep track of these regions
-        var realPointCount = 0;
-        refDensityObject.points.forEach( function (point) {
-          if (point[1] > 0) {
-            realPointCount++;
-          }
-        });
-        if (realPointCount < 100) {
-          refObject.sparsePointData = [];
-          refDensityObject.points.forEach( function (point) {
-          if (point[1] > 0) {
-            refObject.sparsePointData.push( {pos: point[0], depth: point[1]});
-          }
-        });
-        }
-
-
-  };
 
 
   exports.sortRefData = function(refData) {
@@ -627,17 +633,15 @@ var effectCategories = [
 
     // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
-    if (refName.indexOf('chr') == 0) {
-      refFile = "./data/references_hg19/" + refName + ".fa";
-    } else {
-      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }
+    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+    
 
-    // If we are getting the hgvs notation, we need an extra command line arg for vep
-    var vepArgs = "";
+    // Get the vep args
+    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
     if (isRefSeq) {
-      vepArgs = " --refseq ";
+      vepArgs += " --refseq ";
     }
+    // If we are getting the hgvs notation, we need an extra command line arg for vep
     if (hgvsNotation) {
       vepArgs += " --hgvs ";
     }
@@ -665,10 +669,10 @@ var effectCategories = [
     }
 
     // normalize variants
-    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFile, '-'], {ssl: useSSL})
+    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
 
     // get allele frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL});
+    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (isRefSeq || annotationEngine == 'vep') {
@@ -1059,10 +1063,16 @@ var effectCategories = [
       var regionEnd = geneObject.end;
 
 
+      var clinvarUrl = null;
+      if (isOffline) {
+        clinvarUrl = OFFLINE_CLINVAR_VCF_BASE_URL + genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_OFFLINE)
+      } else {
+        clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+      }
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', OFFLINE_CLINVAR_VCF_URL, regionParm], {ssl: useSSL});
+      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', clinvarUrl, regionParm], {ssl: useSSL});
 
 
       var clinvarData = "";
@@ -1167,7 +1177,8 @@ var effectCategories = [
         }
       });
 
-      url = url.slice(0,url.length-1) + '[c37])'
+      var clinvarBuild = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_POSITION);
+      url = url.slice(0,url.length-1) + '[' + clinvarBuild + '])';
 
       var clinvarVariants = null;
       var requestClinvarSummaryTries = 0;
@@ -1201,8 +1212,8 @@ var effectCategories = [
                     resolve();
                   } else {
                     var sorted = sumData.result.uids.sort(function(a,b){
-                      var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
-                      var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == "GRCh37"})[0].start);
+                      var aStart = parseInt(sumData.result[a].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].start);
+                      var bStart = parseInt(sumData.result[b].variation_set[0].variation_loc.filter(function(v){return v["assembly_name"] == genomeBuildHelper.getCurrentBuildName()})[0].start);
                       if ( aStart > bStart)
                         return 1;
                       else
@@ -1236,17 +1247,13 @@ var effectCategories = [
   exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
     var me = this;
 
-
     //  Figure out the reference sequence file path
-    if (refName.indexOf('chr') == 0) {
-      refFile = "./data/references_hg19/" + refName + ".fa";
-    } else {
-      refFile = "./data/references/hs_ref_chr" + refName + ".fa";
-    }
+    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+
     // Figure out the vep args
-    var vepArgs = "";
+    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
     if (isRefSeq) {
-      vepArgs = " --refseq "
+      vepArgs += " --refseq "
     }
     if (hgvsNotation) {
       vepArgs += " --hgvs ";
@@ -1255,19 +1262,16 @@ var effectCategories = [
       vepArgs += "  --check_existing ";
     }
 
-
-
     var writeStream = function(stream) {
-        records.forEach( function(record) {
-          if (record.trim() == "") {
-          } else {
-            stream.write(record + "\n");
-          }
-        });
+      records.forEach( function(record) {
+        if (record.trim() == "") {
+        } else {
+          stream.write(record + "\n");
+        }
+      });
 
-        stream.end();
-      }
-
+      stream.end();
+    }
 
     //  Streamed vcf recs first go through contig appender to add mandatory header recs
     var contigStr = "";
@@ -1285,10 +1289,10 @@ var effectCategories = [
     }
 
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFile, '-'], {ssl: useSSL})
+    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFastaFile, '-'], {ssl: useSSL})
 
     // Get Allele Frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
+    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL})
 
     // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
     if (annotationEngine == 'vep' || isRefSeq) {
@@ -1605,7 +1609,7 @@ var effectCategories = [
 
                       var valueUrl = "";
                       if (feature != "" && feature != null) {
-                        var url = "http://grch37.ensembl.org/Homo_sapiens/Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
+                        var url = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_ENSEMBL_URL) + "Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
                         valueUrl = '<a href="' + url + '" target="_reg">' + reg.split("_").join(" ").toLowerCase() + '</a>';
                       } else {
                         valueUrl = reg.split("_").join(" ").toLowerCase();

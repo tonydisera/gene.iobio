@@ -33,6 +33,7 @@ module.exports = function(config) {
         'app/model/*.js',
         'spec/spec_helpers/jasmine-jquery.js',
         'spec/spec_helpers/fixture.conf.js',
+        'spec/spec_helpers/color.js',
         'spec/spec_helpers/**/*',
         'spec/fixtures/**/*',
         'spec/**/*_spec.js'
