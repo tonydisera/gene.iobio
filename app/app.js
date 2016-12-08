@@ -493,7 +493,8 @@ function init() {
 				create: false, 			
 				valueField: 'value',
 		    	labelField: 'value',
-		    	searchField: ['value']
+		    	searchField: ['value'],
+		    	maxOptions: 5000
 	    	}
 		);	
 		addGeneDropdownListener();
@@ -1059,18 +1060,14 @@ function loadGeneFromUrl() {
 		DEFAULT_BATCH_SIZE = batchSize;
 	}
 
+	loadGeneNamesFromUrl(gene);
+
+
+
 	if (isMygene2) {
 		dataCard.loadMygene2Data();
 	}
 
-	// Get the gene list from the url.  Add the gene badges, selecting
-	// the gene that was passed in the url parameter
-	var genes = getUrlParameter("genes");
-	if (genes != null && genes.length > 0) {
-		geneNames = genes.split(",");
-		$('#genes-to-copy').val(genes);
-		genesCard.copyPasteGenes(gene);
-	}
 
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
@@ -1112,6 +1109,35 @@ function loadGeneFromUrl() {
 	
 }
 
+function loadGeneNamesFromUrl(geneNameToSelect) {
+	geneNames = [];
+
+
+	// If a gene list name was provided (e.g. ACMG56, load these genes)
+	var geneList = getUrlParameter("geneList");
+	if (geneList != null && geneList.length > 0 && geneList == 'ACMG56') {
+		genesCard.ACMG56_GENES.sort().forEach(function(geneName) {
+			geneNames.push(geneName);
+		});
+	}
+
+	// Get the gene list from the url.  Add the gene badges, selecting
+	// the gene that was passed in the url parameter
+	var genes = getUrlParameter("genes");
+	if (genes != null && genes.length > 0) {
+		genes.split(",").forEach( function(geneName) {
+			if ( geneNames.indexOf(geneName) < 0 ) {
+				geneNames.push(geneName);
+			}
+		});
+	}
+
+	if (geneNames.length > 0) {		
+		$('#genes-to-copy').val(geneNames.join(","));
+		genesCard.copyPasteGenes(geneNameToSelect);
+	}	
+}
+
 function reloadGeneFromUrl() {
 
 	// Get the gene parameger
@@ -1119,12 +1145,7 @@ function reloadGeneFromUrl() {
 
 	// Get the gene list from the url.  Add the gene badges, selecting
 	// the gene that was passed in the url parameter
-	var genes = getUrlParameter("genes");
-	if (genes != null && genes.length > 0) {
-		geneNames = genes.split(",");
-		$('#genes-to-copy').val(genes);
-		genesCard.copyPasteGenes(gene);
-	}
+	loadGeneNamesFromUrl(gene);
 
 	setGeneBloodhoundInputElement(gene, true, true);
 	genesCard._geneBadgeLoading(gene, true, true);

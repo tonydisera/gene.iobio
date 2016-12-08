@@ -1166,9 +1166,14 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 							me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
 						}	 				
 				   	    
-					}
-					if (me.getRelationship() == 'proband') {
-						genesCard.refreshCurrentGeneBadge();
+						if (me.getRelationship() == 'proband') {
+							genesCard.refreshCurrentGeneBadge();
+						}
+					} else {
+						if (me.getRelationship() == 'proband') {
+							genesCard._geneBadgeLoading(window.gene.gene_name, false);
+							genesCard.setGeneBadgeWarning(window.gene.gene_name);
+						}
 					}
 
 

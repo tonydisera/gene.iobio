@@ -246,20 +246,7 @@ DataCard.prototype.loadMygene2Data = function() {
 			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
 			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
 		}
-
-		var genes = getUrlParameter("genes");
-		if (genes != null && genes.length > 0) {
-			window.geneNames = genes.split(",");
-		} else {
-			window.geneNames = me.mygene2Genes;
-		}
-		var geneToSelect = getUrlParameter("gene");
-		if (geneToSelect == null && geneToSelect == "") {
-			geneToSelect = window.geneNames[0];
-		}
-
-		genesCard.initCopyPasteGenes();
-		genesCard.copyPasteGenes(geneToSelect, true);
+		window.loadTracksForGene();
 		window.showSidebar("Phenolyzer");
 
 		window.cacheHelper.clearCache();
