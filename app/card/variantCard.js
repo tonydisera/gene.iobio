@@ -1856,6 +1856,17 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 	}
 
+	var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
+	if ($(tooltip[0]).find(".tooltip-title.highest-impact-badge").length > 0) {
+		for (impact in highestImpactList) {
+			var theClazz = 'impact_' + impact;	
+			$(tooltip[0]).find(".tooltip-title.highest-impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+			var selection = tooltip.select('.tooltip-title.highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
+			matrixCard.showImpactBadge(selection);	
+
+		}		
+	}
+
 	if (variant.inheritance && variant.inheritance != '') {
 		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
@@ -2464,6 +2475,41 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			vepImpactDisplay += key;
 		}
 	} 
+
+	// If the highest impact occurs in a non-canonical transcript, show the impact followed by
+	// the consequence and corresponding transcripts
+	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
+	var vepHighestImpactDisplay = "";	
+	for (impactKey in vepHighestImpacts) {
+		var nonCanonicalEffects = vepHighestImpacts[impactKey];
+		if (vepHighestImpactDisplay.length > 0) {
+		  	vepHighestImpactDisplay += ", ";
+		}
+
+		// Only show the Impact (e.g. HIGH, MODERATE, etc) if there
+		// is more that one impact category for the variant (that is more
+		// severe than the impact for the canonical transcript)
+		if (Object.keys(vepHighestImpacts).length > 1) {
+			vepHighestImpactDisplay += impactKey;
+		}
+
+		nonCanonicalEffects.forEach(function(nonCanonicalEffect) {
+			vepHighestImpactDisplay += " ("; 
+			for (effectKey in nonCanonicalEffect) {
+				var transcriptString = nonCanonicalEffect[effectKey].url;
+				vepHighestImpactDisplay += effectKey.split("\&").join(" & ") + ' in ' + transcriptString;
+			}
+			vepHighestImpactDisplay += ")"; 
+		})
+	}
+
+	var vepHighestImpactRow = "";
+	var vepHighestImpactExamineRow = "";
+	if (vepHighestImpactDisplay.length > 0) {
+		vepHighestImpactRow = me._tooltipHeaderRow(vepHighestImpactDisplay, '', '', '', 'highest-impact-badge');
+		vepHighestImpactExamineRow = me._tooltipRow('Most severe impact', vepHighestImpactDisplay, null, true, 'highest-impact-badge');
+	}
+
 	var vepConsequenceDisplay = "";
 	for (var key in variant.vepConsequence) {
 		if (vepConsequenceDisplay.length > 0) {
@@ -2634,6 +2680,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			  qualityWarningRow
 			+  me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
+			+ vepHighestImpactRow
 			+ inheritanceModeRow
 			+ siftPolyphenRow
 			+ me._tooltipShortTextRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), 
@@ -2655,7 +2702,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? effectDisplay : vepConsequenceDisplay),
 					        "10px")
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
-					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay : vepImpactDisplay))
+					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
+			+ vepHighestImpactExamineRow			
 			+ me._tooltipRow('SIFT', vepSIFTDisplay)
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay)
 			+ me._tooltipRow('ClinVar', clinvarUrl)
@@ -2751,9 +2799,13 @@ VariantCard.prototype._tooltipBlankRow = function() {
 	  + '</div>';
 }
 
-VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value4) {
+VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value4, clazz) {
+	var clazzList = "col-md-12 tooltip-title";
+	if (clazz) {
+		clazzList += " " + clazz;
+	}
 	return '<div class="row">'
-	      + '<div class="col-md-12 tooltip-title" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '<div class="' + clazzList + '" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
 VariantCard.prototype._tooltipMainHeaderRow = function(value1, value2, value3, value4) {
@@ -2820,12 +2872,16 @@ VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, va
 
 
 
-VariantCard.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow) {
+VariantCard.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow, valueClazz) {
 	if (alwaysShow || (value && value != '')) {
 		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
+		var valueClazzes = "tooltip-value";
+		if (valueClazz) {
+			valueClazzes += " " + valueClazz;
+		}
 		return '<div class="tooltip-row"' + style + '>'
 		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
-		      + '<div class="tooltip-value">' + value.toLowerCase() + '</div>'
+		      + '<div class="' + valueClazzes + '">' + value + '</div>'
 		      + '</div>';
 	} else {
 		return "";

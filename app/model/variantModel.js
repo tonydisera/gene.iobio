@@ -2137,7 +2137,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, bypassRange
 
 	var afFieldExac  = "afExAC";
 	var afField1000g = "af1000G";
-	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : 'vepImpact';
+	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;
 	var effectField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'effect' : 'vepConsequence';
 
 	// coverageMin is always an integer or NaN
@@ -2339,6 +2339,66 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 	});
 
 
+}
+
+/*
+*  Evaluate the highest impacts for a variant across all transcripts.
+*  Cull the impact if it already annotated for the canonical transcript
+*  or the impact is less severe than the one for the canonical
+*  transcripts.  Returns an object that looks like this:
+*  {HIGH: {frameshift: 
+*            {
+*			  transcripts: [ENST000245.1,ENSTxxxx],
+*			  display: 'ENST000241.1,ENSTxxxx'
+*			} 
+*		  stop_gain: 
+*			  {
+*			  transcripts: [ENST000245.1,ENSTxxxx],
+*			  display: 'ENST000241.1,ENSTxxxx'
+*			} 
+*		  }
+*	}
+*/
+VariantModel.getNonCanonicalHighestImpactsVep = function(variant) {
+	var vepHighestImpacts = {};
+	for (var impactKey in variant.highestImpactVep) {
+		var nonCanonicalEffects = [];
+		var allEffects = variant.highestImpactVep[impactKey];
+		
+		var lowestImpactValue = 99;
+		for (key in variant.vepImpact) {
+			var value = matrixCard.impactMap[key].value;
+			if (value < lowestImpactValue) {
+				lowestImpactValue = value;
+			}
+		}	
+
+		var theValue = matrixCard.impactMap[impactKey].value;
+		if (theValue < lowestImpactValue) {
+			for (effectKey in allEffects) {
+				var allTranscripts = allEffects[effectKey];
+				if (Object.keys(allTranscripts).length > 0) {
+					var ncObject = {};
+					var transcriptUrls = "";
+					for(transcriptId in allTranscripts) {
+						if (transcriptUrls.length > 0) {
+							transcriptUrls += ", ";
+						}
+						var url = '<a href="javascript:void(0)" onclick="selectTranscript(\'' + transcriptId + '\')">' + transcriptId + '</a>'; 
+						transcriptUrls += url;
+					}
+					ncObject[effectKey] = {transcripts: Object.keys(allTranscripts), display: Object.keys(allTranscripts).join(","), url: transcriptUrls};
+					nonCanonicalEffects.push(ncObject);
+				}
+
+			}
+
+			if (nonCanonicalEffects.length > 0) {
+				vepHighestImpacts[impactKey] = nonCanonicalEffects;
+			}
+		}
+	}	
+	return vepHighestImpacts;
 }
 
 

@@ -39,6 +39,12 @@ function MatrixCard() {
                         MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showImpactSymbol},
                         LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
                      };
+	this.highestImpactMap = {  
+		                HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showHighestImpactSymbol},    
+                        MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showHighestImpactSymbol},  
+                        MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showHighestImpactSymbol},
+                        LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showHighestImpactSymbol}
+                     };
 	this.siftMap = {  
                         deleterious:                 {value: 1, badge: true, clazz: 'sift_deleterious', symbolFunction: this.showSiftSymbol},
                         deleterious_low_confidence:  {value: 2, badge: true, clazz: 'sift_deleterious_low_confidence', symbolFunction: this.showSiftSymbol},
@@ -106,32 +112,33 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogenicity - PolyPhen'     ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
-		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
-		{name:'Bookmark'                     ,order:4, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Affected Siblings'            ,order:6, index:7, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Unaffected Siblings'          ,order:7, index:8, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
-		{name:'Allele Frequency - 1000G'     ,order:8, index:3, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      ,order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Zygosity'                     ,order:10, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
-		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
+		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:0, index:2, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Pathogenecity - SIFT'         , id:'sift',           order:1, index:6, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:2, index:7, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Impact (VEP)'                 , id:'impact',         order:3, index:0, match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
+		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:4, index:1, match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
+		{name:'Bookmark'                     , id:'bookmark',       order:5, index:10, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
+		{name:'Inheritance Mode'             , id:'inheritance',    order:6, index:3, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Affected Siblings'            , id:'affected-sibs',  order:7, index:8, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
+		{name:'Unaffected Siblings'          , id:'unaffected-sibs',order:8, index:9, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
+		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:9, index:4, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:10, index:5, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Zygosity'                     , id:'zygosity',       order:11, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Genotype'                     , id:'genotype',       order:12, index:12, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
 	this.matrixRowsBasic = [
-		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
-		{name:'Inheritance Mode'       ,order:1,  index:1,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
-		{name:'Transcript'             ,order:2,  index:2,  match:  'field', height: 21, attribute: 'vepImpact',                   formatFunction: this.formatCanonicalTranscript},
-		{name:'cDNA'                   ,order:3,  index:3,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
-		{name:'Protein'                ,order:4,  index:4,  match:  'field', height: 21, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
-		{name:'Chr'                    ,order:5,  index:5,  match:  'field', height: 21, attribute: 'chrom',                       },
-		{name:'Position'               ,order:6,  index:6,  match:  'field', height: 21, attribute: 'start',                       },
-		{name:'Ref'                    ,order:7,  index:7,  match:  'field', height: 21, attribute: 'ref',                         },
-		{name:'Alt'                    ,order:8,  index:8,  match:  'field', height: 21, attribute: 'alt'                          },
-		{name:'Mutation Freq 1000G'    ,order:9,  index:9,  match:  'field', height: 21, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Mutation Freq ExAC'     ,order:10, index:10,  match: 'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
+		{name:'Pathogenicity - ClinVar',id:'clinvar',         order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Inheritance Mode'       ,id:'inheritance',     order:1,  index:1,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
+		{name:'Transcript'             ,id:'transcript',      order:2,  index:2,  match:  'field', height: 21, attribute: 'start',                       formatFunction: this.formatCanonicalTranscript},
+		{name:'cDNA'                   ,id:'cdna',            order:3,  index:3,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'Protein'                ,id:'protien',         order:4,  index:4,  match:  'field', height: 21, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
+		{name:'Chr'                    ,id:'chr',             order:5,  index:5,  match:  'field', height: 21, attribute: 'chrom',                       },
+		{name:'Position'               ,id:'position',        order:6,  index:6,  match:  'field', height: 21, attribute: 'start',                       },
+		{name:'Ref'                    ,id:'ref',             order:7,  index:7,  match:  'field', height: 21, attribute: 'ref',                         },
+		{name:'Alt'                    ,id:'alt',             order:8,  index:8,  match:  'field', height: 21, attribute: 'alt'                          },
+		{name:'Mutation Freq 1000G'    ,id:'af-1000g',        order:9,  index:9,  match:  'field', height: 21, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Mutation Freq ExAC'     ,id:'af-exac',         order:10, index:10,  match: 'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
 	];
 
 
@@ -172,6 +179,27 @@ MatrixCard.prototype.removeRow = function(searchTerm, theMatrixRows) {
 		});
 	} 
 }
+MatrixCard.prototype.removeRowById = function(id, theMatrixRows) {
+	var delIdx = -1;
+	var idx = 0;
+	var removedOrder = -1;
+	theMatrixRows.forEach( function (row) {
+		if (row.id == id) {
+			delIdx = idx;
+			removedOrder = row.order;
+		}
+		idx++;
+	});
+
+	if (delIdx >= 0) {
+		theMatrixRows.splice(delIdx, 1);
+		theMatrixRows.forEach( function(row) {
+			if (+row.order > +removedOrder) {
+				row.order--;
+			}
+		});
+	} 
+}
 
 MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 	this.matrixRows.forEach( function (row) {
@@ -188,6 +216,21 @@ MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 	}
 	
 }
+MatrixCard.prototype.setRowLabelById = function(id, newRowLabel) {
+	this.matrixRows.forEach( function (row) {
+		if (row.id == id) {
+			row.name = newRowLabel;
+		}
+	});
+	if (this.filteredMatrixRows) {
+		this.filteredMatrixRows.forEach( function (row) {
+			if (row.id == id) {
+				row.name = newRowLabel;
+			}
+		});		
+	}
+	
+}
 
 MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
 	this.matrixRows.forEach( function (row) {
@@ -198,6 +241,21 @@ MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
 	if (this.filteredMatrixRows) {
 		this.filteredMatrixRows.forEach( function (row) {
 			if (row.name.indexOf(searchTerm) >= 0) {
+				row.attribute = newRowAttribute;
+			}
+		});		
+	}
+	
+}
+MatrixCard.prototype.setRowAttributeById = function(id, newRowAttribute) {
+	this.matrixRows.forEach( function (row) {
+		if (row.id == id) {
+			row.attribute = newRowAttribute;
+		}
+	});
+	if (this.filteredMatrixRows) {
+		this.filteredMatrixRows.forEach( function (row) {
+			if (row.id == id) {
 				row.attribute = newRowAttribute;
 			}
 		});		
@@ -589,13 +647,25 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip"));
 
-	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
+	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
 		$(tooltip[0]).find(".tooltip-title.main-header").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
 
+	}
+
+
+	if ($(tooltip[0]).find(".tooltip-title.highest-impact-badge").length > 0) {
+		var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
+		for (impact in highestImpactList) {
+			var theClazz = 'impact_' + impact;	
+			$(tooltip[0]).find(".tooltip-title.highest-impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+			var selection = tooltip.select('.highest-impact-badge .impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
+			matrixCard.showImpactBadge(selection);	
+
+		}		
 	}
 
 	var selection = tooltip.select("#coverage-svg");
@@ -1299,6 +1369,15 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 	}
 
 }
+
+MatrixCard.prototype.showHighestImpactSymbol = function(selection, options) {
+	var variant = d3.select(selection.node().parentNode).datum();
+	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
+	if (Object.keys(vepHighestImpacts).length > 0) {
+		matrixCard.showImpactSymbol(selection, options);
+	}
+}
+
 
 
 MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz) {

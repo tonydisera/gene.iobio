@@ -6,7 +6,7 @@ function FilterCard() {
 	this.recFilters = new Object();
 	this.annotationScheme = "vep";
 	this.pathogenicityScheme = "clinvar";
-	this.annotClasses     = ".type, .impact, .vepImpact, .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter";
+	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter";
 	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Allele Freq ExAC, Allele Freq 1000G, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
 
 }
@@ -85,8 +85,8 @@ FilterCard.prototype.onSelectAnnotationScheme = function() {
 
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	this.displayEffectFilters();
-	window.matrixCard.setRowLabel("Impact", isLevelEdu ? "Impact" : "Impact - " + this.annotationScheme );
-	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
+	window.matrixCard.setRowLabelById("impact", isLevelEdu ? "Impact" : "Impact (" + this.annotationScheme + ")" );
+	window.matrixCard.setRowAttributeById("impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_COLOR );
 	window.loadTracksForGene();
 
 }
@@ -100,11 +100,11 @@ FilterCard.prototype.setAnnotationScheme = function(scheme) {
     $('#select-annotation-scheme')[0].selectize.setValue(scheme, true);	
     
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
-	d3.select('#filter-card .impact').classed('vepImpact',this.annotationScheme.toLowerCase() == 'vep');
-	d3.select('#filter-card .vepImpact').classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
+	d3.select('#filter-card .impact').classed(IMPACT_FIELD_TO_FILTER,this.annotationScheme.toLowerCase() == 'vep');
+	d3.select('#filter-card .' + IMPACT_FIELD_TO_FILTER).classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
 	this.displayEffectFilters();
-	window.matrixCard.setRowLabel("Impact", isLevelEdu ? "Impact" : "Impact - " + this.annotationScheme );
-	window.matrixCard.setRowAttribute("Impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact' );
+	window.matrixCard.setRowLabelById("impact", isLevelEdu ? "Impact" : "Impact (" + this.annotationScheme + ")");
+	window.matrixCard.setRowAttributeById("impact", this.annotationScheme.toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_COLOR );
 }
 
 
@@ -419,6 +419,7 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
 	d3.select('#recfilter-flag').classed("hide", true);
 
+	d3.selectAll('#filter-track .highestImpactVep').classed('current', false);
 	d3.selectAll('#filter-track .vepImpact').classed('current', false);
 	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
 	d3.selectAll('#filter-track .impact').classed('current', false);
@@ -474,6 +475,9 @@ FilterCard.prototype.enableFilters = function() {
 	d3.selectAll(".impact").each( function(d,i) {		
 		d3.select(this).classed("inactive", false);
 	});
+	d3.selectAll(".highestImpactVep").each( function(d,i) {		
+		d3.select(this).classed("inactive", false);
+	});
 	d3.selectAll(".vepImpact").each( function(d,i) {		
 		d3.select(this).classed("inactive", false);
 	});
@@ -518,6 +522,9 @@ FilterCard.prototype.enableFilters = function() {
 FilterCard.prototype.disableFilters = function() {
 	/*
 	d3.selectAll(".impact").each( function(d,i) {		
+		d3.select(this).classed("inactive", true);
+	});
+	d3.selectAll(".highestImpactVep").each( function(d,i) {		
 		d3.select(this).classed("inactive", true);
 	});
 	d3.selectAll(".vepImpact").each( function(d,i) {		
@@ -628,6 +635,11 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	var me = this;
 
 	d3.selectAll(".impact").each( function(d,i) {
+		var impact = d3.select(this).attr("id");
+		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
+		d3.select(this).classed("inactive", count == 0);
+	});
+	d3.selectAll(".highestImpactVep").each( function(d,i) {
 		var impact = d3.select(this).attr("id");
 		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
 		d3.select(this).classed("inactive", count == 0);
@@ -896,9 +908,12 @@ FilterCard.prototype.classifyByImpact = function(d) {
 	      effects += " " + key;	      
       }
     }
-    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d[IMPACT_FIELD_TO_FILTER]);
     for (key in impactList) {
       impacts += " " + key;
+    }
+    var colorImpactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d[IMPACT_FIELD_TO_COLOR]);
+    for (key in colorImpactList) {
       colorimpacts += " " + 'impact_'+key;
     }
     if (colorimpacts == "") {
@@ -948,7 +963,7 @@ FilterCard.prototype.classifyByEffect = function(d) {
     if (coloreffects == "") {
     	coloreffects = "effect_none";
     }
-    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d[IMPACT_FIELD_TO_FILTER]);
     for (key in impactList) {
       impacts += " " + key;
     }
@@ -993,7 +1008,7 @@ FilterCard.prototype.classifyByZygosity = function(d) {
 	      effects += " " + key;
       }
     }
-    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d.vepImpact);
+    var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d[IMPACT_FIELD_TO_FILTER]);
     for (key in impactList) {
       impacts += " " + key;
     }

@@ -1759,20 +1759,20 @@ header {
   fill: #D3D5D8;
   stroke: rgba(0, 0, 0, 0.26); }
 
-.impact, .vepImpact, .effect, .vepConsequence, .type, .zygosity, .recfilter {
+.impact, .vepImpact, .highestImpactVep,  .effect, .vepConsequence, .type, .zygosity, .recfilter {
   border: solid 2px white;
   padding: 1px; }
-  .impact text, .vepImpact text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
+  .impact text, .vepImpact text, .highestImpactVep text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
     fill: #717171; }
 
-.impact.nocolor rect, .vepImpact.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
+.impact.nocolor rect, .vepImpact.nocolor rect, .highestImpactVep.nocolor rect,  .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
   stroke: grey; }
 
 .afexaclevels.nocolor, .af1000glevels.nocolor {
   display: none !important; }
 
-.impact:hover, .vepImpact:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .tooltip-zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover {
+.impact:hover, .vepImpact:hover, .highestImpactVep:hover, .effect:hover, .vepConsequence:hover, .regulatory:hover, .polyphen:hover, .sift:hover, .regulatory:hover, .tooltip-zygosity:hover, .type:hover, .afexaclevels:hover, .af1000glevels:hover, .inheritance:hover, .clinvar:hover, .uasibs:hover, .recfilter:hover {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
@@ -1783,7 +1783,7 @@ header {
   border-radius: 0px;
   border: solid 2.5px #969696; }
 
-.impact.current:hover, .vepImpact.current:hover, .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
+.impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover,  .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
   border: solid 2.5px #3586c0;
@@ -1819,7 +1819,7 @@ header {
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme, #uasibs-scheme {
   padding-top: 2px; }
 
-.impact.inactive, .vepImpact.inactive, .zygosity.inactive, .afexaclevels.inactive, .af1000glevels.inactive, .inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive {
+.impact.inactive, .vepImpact.inactive, .highestImpactVep.inactive,  .zygosity.inactive, .afexaclevels.inactive, .af1000glevels.inactive, .inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive {
   pointer-events: none;
   opacity: 0.4; }
 

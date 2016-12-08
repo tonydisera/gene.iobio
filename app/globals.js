@@ -1,3 +1,7 @@
+// Fields
+var IMPACT_FIELD_TO_FILTER    = 'highestImpactVep'; 
+var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
+
 //
 // URLS
 //

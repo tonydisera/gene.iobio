@@ -454,6 +454,7 @@ describe('variantModel', function() {
 			describe('when the annotation scheme is not snpeff', function() {
 				it('keeps the variants that have a high or moderate impact OR an effect that is not an intron', function() {
 					filterCard.annotationScheme = 'vep';
+					IMPACT_FIELD_TO_FILTER = 'vepImpact';
 					variant_1.vepImpact = { HIGH: 'HIGH' };
 					variant_2.vepImpact = { MODERATE: 'MODERATE' };
 					variant_3.vepImpact = { LOW: 'LOW' };

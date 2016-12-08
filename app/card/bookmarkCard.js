@@ -484,7 +484,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          .each( function(entry, i) {
 		    var selection = d3.select(this);
          	var variant = entry.value;	   
-         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';      
+         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_COLOR;      
          	if (variant[impactField]) {
 	         	for (var impact in variant[impactField]) {		         		
          			var svg = selection.append("svg")

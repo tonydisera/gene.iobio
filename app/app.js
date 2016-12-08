@@ -408,10 +408,7 @@ function init() {
 
 	    	showTranscripts();
 
-			variantCards.forEach(function(variantCard) {
-		    	variantCard.loadTracksForGene();
-			});
-
+	    	loadTracksForGene();
 	    });
 
 
@@ -2178,6 +2175,27 @@ function addCommas(nStr)
 		x1 = x1.replace(rgx, '$1' + ',' + '$2');
 	}
 	return x1 + x2;
+}
+
+function selectTranscript(transcriptId) {
+	var found = false;
+	window.gene.transcripts.forEach(function(transcript) {
+		if (transcript.transcript_id == transcriptId) {
+			window.selectedTranscript = transcript;
+			found = true;
+		} else if (transcript.transcript_id.indexOf(transcriptId.toUpperCase()) == 0) {
+			window.selectedTranscript = transcript;
+			found = true;
+		}
+	})
+	if (found) {
+		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+    	getCodingRegions(window.selectedTranscript);
+
+    	showTranscripts();
+
+    	loadTracksForGene();
+	}
 }
 
 

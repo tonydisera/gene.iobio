@@ -23,12 +23,24 @@ ExamineCard.prototype.showVariant = function(variant, isRefresh) {
 
 	$('#examine-card #examine-card-content').html(getProbandVariantCard().variantDetailHTML(variant));
 
-	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
+	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 	for (impact in impactList) {
 		var theClazz = 'impact_' + impact;	
-		$("#examine-card .tooltip-header:contains('Impact')").next().prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
-		var selection = d3.select('#examine-card .impact-badge ').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
+		$("#examine-card .tooltip-value.impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"11\">");
+		var selection = d3.select('#examine-card .impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 		matrixCard.showImpactBadge(selection);	
+
+	}		
+
+	if ($("#examine-card .tooltip-value.highest-impact-badge").length > 0) {
+		var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
+		for (impact in highestImpactList) {
+			var theClazz = 'impact_' + impact;	
+			$("#examine-card .tooltip-value.highest-impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+			var selection = d3.select('#examine-card .highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
+			matrixCard.showImpactBadge(selection);	
+
+		}
 
 	}
 
