@@ -27,9 +27,7 @@ module.exports = {
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 
-    probandVariantCard.waitForBamDepthLoaded();
-
-    appTitleSection.section.selectedGeneBadge.expect.element('@warning').to.be.visible;
+    appTitleSection.section.selectedGeneBadge.waitForElementVisible('@warning');
     appTitleSection.goToPage(2);
     appTitleSection.goToPage(1);
 
