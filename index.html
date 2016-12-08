@@ -260,6 +260,20 @@
       <div class="modal-body" style="padding-top:0px;padding-bottom:0px">
           <div  >
 
+            <div style="overflow:visible;margin-bottom:10px;">
+              <div id="select-species-box" style="width:170px;float:left;">
+                <span id="sample-data-label">Species</span>
+                <select id="select-species" class="selectized" placeholder="select species...">
+                </select>
+              </div>
+              <div id="select-build-box" style="width:170px;float:left;margin-left:20px;">
+                <span id="sample-data-label">Genome Build</span>
+                <select id="select-build" class="selectized" placeholder="select genome build...">
+                </select>
+              </div>
+              <div id="species-build-warning" class="alert alert-danger hide" style="float:left;width:100%">                
+              </div>              
+            </div>
 
               <div>
                 <div id="proband-data" style="float:left;min-width:500px;">
@@ -417,6 +431,9 @@
                   <input id="enter-gene-name" class="level-edu typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
                   placeholder="Enter Gene Name">
               </span>     
+
+              <!-- Genome build link -->
+              <a href="javascript:void(0)" id="build-link" class="level-edu-tour level-basic" data-toggle="modal" data-target="#dataModal"></a>
 
               <!-- Button data modal -->
               <button id="add-data-button" type="button" class="level-edu mygene2 icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
@@ -779,6 +796,7 @@
 <script src="app/model/stringCompress.js"></script>  
 <script src="app/model/variantModel.js"></script>  
 <script src="app/model/variantTrioModel.js"></script>  
+<script src="app/model/genomeBuildHelper.js"></script>  
 
 <script src="app/legend.js"></script>
 

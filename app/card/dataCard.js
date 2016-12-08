@@ -1,4 +1,7 @@
 function DataCard() {
+	this.buildDefaulted = false;
+
+
 	this.defaultNames = {
 		proband: 'NA12878',
 		mother:  'NA12892',
@@ -243,20 +246,7 @@ DataCard.prototype.loadMygene2Data = function() {
 			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
 			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
 		}
-
-		var genes = getUrlParameter("genes");
-		if (genes != null && genes.length > 0) {
-			window.geneNames = genes.split(",");
-		} else {
-			window.geneNames = me.mygene2Genes;
-		}
-		var geneToSelect = getUrlParameter("gene");
-		if (geneToSelect == null && geneToSelect == "") {
-			geneToSelect = window.geneNames[0];
-		}
-
-		genesCard.initCopyPasteGenes();
-		genesCard.copyPasteGenes(geneToSelect, true);
+		window.loadTracksForGene();
 		window.showSidebar("Phenolyzer");
 
 		window.cacheHelper.clearCache();
@@ -394,13 +384,239 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
 
 }
 
+DataCard.prototype.setCurrentSpecies = function(speciesName) {
+	if ($('#select-species')[0].selectize) {
+		$('#select-species')[0].selectize.addItem(speciesName);
+		genomeBuildHelper.setCurrentSpecies(speciesName);
+	}
+}
+
+
+DataCard.prototype.setCurrentBuild = function(buildName) {
+	if ($('#select-build')[0].selectize) {
+		$('#select-build')[0].selectize.addItem(buildName);
+		genomeBuildHelper.setCurrentBuild(buildName);
+		$('#build-link').text(buildName);
+	}
+}
+
+
+
+DataCard.prototype.removeSpeciesListener = function() {
+	if ($('#select-species')[0].selectize) {
+		$('#select-species')[0].selectize.off('change');
+	}
+}
+
+DataCard.prototype.addSpeciesListener = function() {
+	var me = this;
+	if ($('#select-species')[0].selectize) {
+		$('#select-species')[0].selectize.on('change', function(value) {
+	        if (!value.length) {
+	        	return;
+	        }
+	        genomeBuildHelper.setCurrentSpecies(value);
+	        updateUrl("species", value);
+	        var selectizeBuild = $('#select-build')[0].selectize;
+	        selectizeBuild.disable();
+	        selectizeBuild.clearOptions();
+	        
+	        selectizeBuild.load(function(callback) {
+	        	selectizeBuild.enable();
+	        	callback(genomeBuildHelper.speciesToBuilds[value]);
+	        });
+			
+	    });
+	}
+
+}
+
+
+DataCard.prototype.removeBuildListener = function() {
+	if ($('#select-build')[0].selectize) {
+		$('#select-build')[0].selectize.off('change');
+	}
+
+}
+
+DataCard.prototype.addBuildListener = function() {
+	var me = this;
+	if ($('#select-build')[0].selectize) {
+	    $('#select-build')[0].selectize.on('change', function(value) {
+			if (!value.length) {
+				return;
+			}
+			genomeBuildHelper.setCurrentBuild(value);
+			updateUrl("build", value);
+			$('#build-link').text(value);
+			me.validateBuildFromData(function(success, message) {
+				if (success) {
+					$('#species-build-warning').addClass("hide");
+					window.enableLoadButton();
+				} else {
+					$('#species-build-warning').html(message);
+					$('#species-build-warning').removeClass("hide");
+					window.disableLoadButton();
+				}
+			});
+			
+		});
+	}
+
+}
+
+
+DataCard.prototype.setDefaultBuildFromData = function() {
+	var me = this;
+	if ($('#select-species')[0].selectize && $('#select-build')[0].selectize) {
+		me.getBuildsFromData(function(buildsInData) {
+			if (buildsInData.length == 0) {
+				$('#species-build-warning').addClass("hide");
+				if (genomeBuildHelper.getCurrentBuild() == null) {
+					window.disableLoadButton();
+					$('#select-build')[0].selectize.clear();
+				} else {
+					window.enableLoadButton();
+				}
+
+			} else if (buildsInData.length == 1) {			
+				var buildInfo = buildsInData[0];
+				
+				me.removeBuildListener();
+				genomeBuildHelper.setCurrentSpecies(buildInfo.species.name);
+				genomeBuildHelper.setCurrentBuild(buildInfo.build.name);
+				$('#select-species')[0].selectize.setValue(buildInfo.species.name);
+				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
+				me.addBuildListener();
+
+				$('#species-build-warning').addClass("hide");				
+				window.enableLoadButton();		
+			} else {
+				var message = genomeBuildHelper.formatIncompatibleBuildsMessage(buildsInData);
+				$('#species-build-warning').html(message);
+				$('#species-build-warning').removeClass("hide");
+				window.disableLoadButton();
+			}
+		});		
+	}
+
+}
+
+DataCard.prototype.validateBuildFromData = function(callback) {
+	var me = this;
+	me.getBuildsFromData(function(buildsInData) {
+		if (buildsInData.length == 0) {
+			callback(true);
+
+		} else if (buildsInData.length == 1) {
+			var buildInfo = buildsInData[0];
+			if (genomeBuildHelper.currentSpecies.name == buildInfo.species.name && genomeBuildHelper.currentBuild.name == buildInfo.build.name) {
+				callback(true);
+			} else {
+				callback(false, 'Incompatible build. Data files specify the genome build ' + buildInfo.species.name + ' ' + buildInfo.build.name);
+			}
+		} else {
+			callback(false, genomeBuildHelper.formatIncompatibleBuildsMessage(buildsInData));
+		}
+	});
+}
+
+
+DataCard.prototype.getBuildsFromData = function(callback) {
+	var me = this;
+
+	me.getHeadersFromBams(function(bamHeaderMap) {
+		me.getHeadersFromVcfs(function(vcfHeaderMap) {
+			var buildsInHeaders = genomeBuildHelper.getBuildsInHeaders(bamHeaderMap, vcfHeaderMap);
+			callback(buildsInHeaders);
+
+		})
+	});
+}
+
+
+
+DataCard.prototype.getHeadersFromBams = function(callback) {
+	var headerMap = {};
+	var cardCount = 0;
+	variantCards.forEach(function(variantCard) {
+		if (variantCard.model.bam) {
+			variantCard.model.bam.getHeaderStr(function(header) {
+				headerMap[variantCard.getRelationship()] = header;
+				cardCount++;
+				if (cardCount == variantCards.length) {
+					callback(headerMap);
+				}
+
+			});
+		} else {
+			cardCount++;
+			headerMap[variantCard.getRelationship()] = null;
+			if (cardCount == variantCards.length) {
+				callback(headerMap);
+			}
+		}
+	});
+}
+
+DataCard.prototype.getHeadersFromVcfs = function(callback) {
+	var headerMap = {};
+	var cardCount = 0;
+	variantCards.forEach(function(variantCard) {
+		if (variantCard.model.vcf) {
+			variantCard.model.vcf.getHeader(function(header) {
+				headerMap[variantCard.getRelationship()] = header;
+				cardCount++;
+				if (cardCount == variantCards.length) {
+					callback(headerMap);
+				}
+
+			});
+		} else {
+			cardCount++;
+			headerMap[variantCard.getRelationship()] = null;
+			if (cardCount == variantCards.length) {
+				callback(headerMap);
+			}
+		}
+	});
+}
+
 
 DataCard.prototype.init = function() {
 	var me = this;
 
-	if (this.isLevelEdu) {
-		this.demoNames
-	}
+
+	$('#select-species').selectize(
+		{	
+			create: true, 			
+			valueField: 'name',
+	    	labelField: 'name',
+	    	searchField: ['name'],
+	    	maxItems: 1,
+	    	options: genomeBuildHelper.speciesList
+    	}
+	);
+	$('#select-build').selectize(
+		{
+			create: true, 			
+			valueField: 'name',
+	    	labelField: 'name',
+	    	searchField: ['name'],
+	    	allowEmptyOption: true,
+	    	onOptionAdd: function(value) {
+	    		if (!me.buildDefaulted) {
+	    			// You can default the build in the dropdown here
+	    			me.buildDefaulted = true; 
+	    		}
+	    	}
+    	}
+	);
+	me.addSpeciesListener();
+	$('#select-species')[0].selectize.addItem(genomeBuildHelper.getCurrentSpeciesName());
+	me.addBuildListener();
+	me.setDefaultBuildFromData();
+
 
 	$('#proband-data').append(dataCardEntryTemplate());
 	$('#proband-data #vcf-sample-select').selectize(
@@ -434,6 +650,7 @@ DataCard.prototype.init = function() {
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
+	    	
     	}
 	);
 
@@ -503,7 +720,15 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		window.loadTracksForGene();		
+		// If the genome build was missing, the user was forced into the data dialog to select
+		// the genome build.  Now we want to load the gene if it was provided in the URL parameter
+		// list.
+		if ((window.gene == null || window.gene.length == 0) && getUrlParameter("gene")) {
+			setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
+		} else {
+			window.loadTracksForGene();		
+		}
+
 
 	});
 
@@ -553,6 +778,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 	variantCard.onBamFilesSelected(event, function(bamFileName) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
+		me.setDefaultBuildFromData();
 		enableLoadButton();
 	});
 
@@ -560,6 +786,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 
 
 DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
+	var me = this;
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -586,6 +813,8 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 		if (success) {
 			variantCard.setName(variantCard.getName());
 			window.updateUrl('bam' + cardIndex, bamUrl);
+			me.setDefaultBuildFromData();
+
 			enableLoadButton();			
 		} else {
 			window.disableLoadButton();
@@ -757,6 +986,8 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	variantCard.onVcfFilesSelected(
 		event, 
 		function(vcfFileName, sampleNames) {
+			me.setDefaultBuildFromData();
+
 			me.panelSelectorFilesSelected.find('.vcf-sample.loader').addClass('hide');
 
 			me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
@@ -875,6 +1106,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 		panelSelector.find('.vcf-sample.loader').addClass('hide');
 
 		if (success) {
+			me.setDefaultBuildFromData();
 			
 			// Only show the sample dropdown if there is more than one sample
 			if (sampleNames.length > 1) {

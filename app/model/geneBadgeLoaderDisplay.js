@@ -40,8 +40,8 @@
 	function setText() {
 		var gene = lastGene(this.queue);
 		var spinner = '<img src="assets/images/wheel.gif" style="width:15px;height:15px;"/>';
-		var page = this.pageCount > 1 ? ' Page ' + gene.pageNumber + ' - ' : ' ';
-		this.elm.html('Analyzing ' + spinner + page + gene.geneName);
+		var page = this.pageCount > 1 ? ' (Page ' + gene.pageNumber + ')' : ' ';
+		this.elm.html(spinner + 'Analyzing ' + gene.geneName +  page );
 	}
 
 	global.geneBadgeLoaderDisplay = geneBadgeLoaderDisplay;

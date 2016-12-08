@@ -1189,6 +1189,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				if (error && error == "missing reference") {
 					me._displayRefNotFoundWarning();
 				} else if (error && ($.type(error) === "string") && error.toLowerCase() == "no variants") {
+
 					if (me.isViewable()) {
 					   $('#matrix-track').addClass("hide");
 					    me.cardSelector.find("#vcf-track").addClass("hide");

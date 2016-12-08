@@ -100,96 +100,81 @@ CacheHelper.prototype.cacheGenes = function(callback) {
 CacheHelper.prototype.cacheGene = function(geneName, callback) {
 	var me = this;
 
-
-	var url = geneInfoServer + 'api/gene/' + geneName;
-	url += "?source=" + geneSource;
-
-	// Get the gene model 		
-	$.ajax({
-	    url: url,
-	    jsonp: "callback",
-	    type: "GET",
-	    dataType: "jsonp",
-	    success: function( response ) {
-	    	// Now that we have the gene model,
-	    	// load and annotate the variants for each
-	    	// sample (e.g. each variant card)
-	    	if (response[0].hasOwnProperty('gene_name')) {
-	    		me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
-	    														 .addGene(geneName, genesCard.pageNumberForGene(geneName));
-
-		    	var geneObject = response[0];
-		    	adjustGeneRegion(geneObject);
-		    	var transcript = getCanonicalTranscript(geneObject);
-		    	window.geneObjects[geneObject.gene_name] = geneObject;
-
-		    	isJointCallOnly( function(shouldJointCall) {
-				    if (me.isCachedForCards(geneObject.gene_name, transcript)) {
-				    	// take this gene off of the queue and see
-				    	// if next batch of genes should be analyzed
-				    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
-				    	me.cacheNextGene(geneObject.gene_name, callback);
-				    } else if (shouldJointCall) {
-				    	genesCard._geneBadgeLoading(geneObject.gene_name, true);
-						cacheJointCallVariants(geneObject, transcript, function() {
-
-							me.processCachedTrio(geneObject, transcript, callback)						
-						});
-					} else {
-
-						genesCard._geneBadgeLoading(geneObject.gene_name, true);
-					    // For each sample, get and annotate the genes and
-					    // cache the variants
-				    	getRelevantVariantCards().forEach(function(variantCard) {
-
-				    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-					    		variantCard.promiseCacheVariants(
-					    			geneObject.chr,
-					    			geneObject, 
-								 	transcript)
-					    		.then( function(vcfData) {
-					    			// Once all analysis of the gene variants for each of
-					    			// the samples is complete, determine the inheritance 
-					    			// (if this is a trio)
-					    			if (me.isCachedForCards(geneObject.gene_name, transcript)) {
-
-						    			me.processCachedTrio(geneObject, transcript, callback);
+	promiseGetGeneModel(geneName).then( function(geneModel) {
+	    var geneObject = geneModel;
+    	// Now that we have the gene model,
+    	// load and annotate the variants for each
+    	// sample (e.g. each variant card)
+		me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+														 .addGene(geneName, genesCard.pageNumberForGene(geneName));
 
 
-					    			}
+    	adjustGeneRegion(geneObject);
+    	var transcript = getCanonicalTranscript(geneObject);
+    	window.geneObjects[geneObject.gene_name] = geneObject;
 
-					    		}, function(error) {
-					    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-				    				var message = error.hasOwnProperty("message") ? error.message : error;
-					    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-					    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+    	isJointCallOnly( function(shouldJointCall) {
+		    if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+		    	// take this gene off of the queue and see
+		    	// if next batch of genes should be analyzed
+		    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
+		    	me.cacheNextGene(geneObject.gene_name, callback);
+		    } else if (shouldJointCall) {
+		    	genesCard._geneBadgeLoading(geneObject.gene_name, true);
+				cacheJointCallVariants(geneObject, transcript, function() {
 
-			    					// take this gene off of the queue and see
-			    					// if next batch of genes should be analyzed
-						    		me.cacheNextGene(geneObject.gene_name, callback);					
-					    		});
+					me.processCachedTrio(geneObject, transcript, callback)						
+				});
+			} else {
 
-				    		}
+				genesCard._geneBadgeLoading(geneObject.gene_name, true);
+			    // For each sample, get and annotate the genes and
+			    // cache the variants
+		    	getRelevantVariantCards().forEach(function(variantCard) {
 
-				    	});				    	
-				    }
+		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
+			    		variantCard.promiseCacheVariants(
+			    			geneObject.chr,
+			    			geneObject, 
+						 	transcript)
+			    		.then( function(vcfData) {
+			    			// Once all analysis of the gene variants for each of
+			    			// the samples is complete, determine the inheritance 
+			    			// (if this is a trio)
+			    			if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+
+				    			me.processCachedTrio(geneObject, transcript, callback);
 
 
-		    	});
+			    			}
+
+			    		}, function(error) {
+			    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
+		    				var message = error.hasOwnProperty("message") ? error.message : error;
+			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
+			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+
+	    					// take this gene off of the queue and see
+	    					// if next batch of genes should be analyzed
+				    		me.cacheNextGene(geneObject.gene_name, callback);					
+			    		});
+
+		    		}
+
+		    	});				    	
+		    }
 
 
+    	});
 
-		    } else {
-				genesCard.setGeneBadgeError(geneName);			    				
-				console.log("problem caching data for gene " + geneName + ". Cannot find gene " + url);
-    			genesCard._geneBadgeLoading(geneName, false);
-	    		me.cacheNextGene(geneName, callback);
-    		}		    	
-
-
-		}
+	},
+	function(error) {
+		genesCard.setGeneBadgeError(geneName);			    				
+		console.log("problem caching data for gene " + geneName + ".");
+		genesCard._geneBadgeLoading(geneName, false);
+    	me.cacheNextGene(geneName, callback);
 	});
-	
+
 				
 }
 
