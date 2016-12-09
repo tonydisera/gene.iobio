@@ -320,11 +320,7 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		// set the appropriate gene badges.
 		var geneSummary = getProbandVariantCard().getDangerSummaryForGene(name);
 		if (geneSummary) {
-			if ($.isEmptyObject(geneSummary)) {
-				me.setGeneBadgeWarning(name, false);
-			} else {
-				me.setGeneBadgeGlyphs(name, geneSummary);
-			}
+			me.setGeneBadgeGlyphs(name, geneSummary);
 		}
 	}
 
@@ -1155,9 +1151,9 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		}
 
-		if (theVcfData != null && theVcfData.features.length == 0) {
+		if (theVcfData == null ) {
 			me.setGeneBadgeWarning(window.gene.gene_name, true);
-		} else {
+		} else if (theVcfData.features && theVcfData.features.length > 0) {
 			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 

@@ -203,7 +203,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 		
 		genesCard._geneBadgeLoading(geneObject.gene_name, false);
 		if (probandVcfData.features.length == 0) {
-			genesCard.setGeneBadgeWarning(geneObject.gene_name);
+			//genesCard.setGeneBadgeWarning(geneObject.gene_name);
 		} else {
 			genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 		}
