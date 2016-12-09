@@ -2580,11 +2580,14 @@ text.ref-count {
     #manage-genes a:hover {
       text-decoration: underline !important; }
 
+.manage-gene-links {
+  font-size: 13px;
+  color: #717171 !important;
+  cursor: pointer; }
+
 #manage-gene-list {
   display: inline-block;
-  padding-bottom: 4px;
-  margin-right: 10px;
-  font-size: 12px; }
+  padding-bottom: 4px; }
 
 #gene-badge-container {
   display: flex;
@@ -2619,8 +2622,6 @@ text.ref-count {
   margin-right: 10px; }
 
 #manage-cache-link {
-  color: #717171 !important;
-  font-size: 12px;
   display: inline-block;
   padding-top: 2px; }
 
@@ -2640,14 +2641,10 @@ text.ref-count {
       text-decoration: underline !important; }
 
 #clear-gene-list {
-  color: #717171 !important;
-  font-size: 12px;
   margin-left: 0px;
   margin-right: 10px; }
 
 #order-by-label {
-  font-size: 12px;
-  color: #717171;
   margin-left: 10px; }
 
 #select-gene-container {
@@ -2682,10 +2679,7 @@ text.ref-count {
   padding-bottom: 2px; }
 
 #refresh-badges-button {
-  display: inline-block;
-  cursor: pointer;
-  font-size: 12px;
-  color: #717171 !important; }
+  display: inline-block; }
 
 #gene-badge-loading-display {
   font-size: 11px;
