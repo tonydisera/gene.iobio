@@ -8,7 +8,7 @@ var accessNCBIGeneSummary = true;           // is it okay to access NCBI web res
 
 var useOnDemand           = true;           // use on demand tabix and samtools
 
-var serverInstance        = "@hostname@/";  // this will be replace with the name of the server used for this deployement
+var serverInstance        = "mygene2-dev.gs.washington.edu:8081/";  // this will be replace with the name of the server used for this deployement
 var serverCacheDir        = "local_cache/"; // this is the directory from the server instance where resource files (like clinvar vcf) will be served
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
@@ -19,8 +19,8 @@ var autoCall              = null;           // if only alignments are provided, 
 var useSSL                = true;
 
 // MyGene2 deployment variables;
-var mygene2Endpoint       = "";
-var mygene2XAuthToken     = "";
+var mygene2Endpoint       = "https://mygene2-dev.gs.washington.edu/MyGene2/geneiobio";
+var mygene2XAuthToken     = "Zj58QVA5VZ8CJXkO";
 
 
 /*
