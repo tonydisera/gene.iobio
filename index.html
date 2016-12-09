@@ -252,10 +252,10 @@
 
 
         <div id="versions" >
-          <div><span class="title">gene.iobio</span><span class="number">2.10</span></div>
-          <div><span class="title">Human Genome Reference</span><span class="number">GRCh37</span></div>
-          <div><span class="title">Gencode Human Reference</span><span class="number">19</span></div>
-          <div><span class="title">REFSEQ Human Reference</span><span class="number">BUILD.37.3 ref_GRCh37.p5</span></div>
+          <div><span class="title">gene.iobio</span><span class="number">2.1.2</span></div>
+          <div><span class="title">Human Genome Reference</span><span class="number">GRCh37, GRCh38</span></div>
+          <div><span class="title">Gencode Human Reference</span><span class="number">19, 25</span></div>
+          <div><span class="title">REFSEQ Human Reference</span><span class="number">ref_GRCh37.p5, ref_GRCh38.p7</span></div>
           <div><span class="title">Human Phenotype Ontology</span><span class="number">Build #102 (12-15-2015)</span></div>
           <div><div class="title">Phenolyzer</div><div class="number">1.0.5 (02-21-2015)</div></div>
           <div><div class="title">Variant Effect Predictor</div><div class="number">Version 85</div></div>
@@ -561,14 +561,14 @@
           <div class="nav-center">
             <div>
               <!-- Buttons for editting gene list, done editting gene list -->
-              <div id="manage-genes" class="level-edu level-basic">
+              <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
                    <i class="material-icons">playlist_add_check</i>
                     Analyze all
                 </a>
 
                 
-                <span id="order-by-label">Order by</span>
+                <span id="order-by-label" class="manage-gene-links">Order by</span>
                 <div id="select-gene-container">
                     <select id="select-gene-sort">
                     </select>
@@ -577,7 +577,7 @@
 
               <div style="display:inline-block">
                 
-                <a id="refresh-badges-button" onclick="cacheHelper.refreshGeneBadges()">                  
+                <a id="refresh-badges-button" class="manage-gene-links" onclick="cacheHelper.refreshGeneBadges()">                  
                    <i class="material-icons">cached</i>
                   Refresh badges
                 </a>
@@ -588,11 +588,11 @@
              
               <div style="float:right;text-align:right;display:inline-block;width:270px">
                
-                <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"
+                <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;padding-left:5px;"
                     href="javascript:void(0)" onclick="genesCard.clearGenes()">
                       Clear list
                  </a>
-                  <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
+                  <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
                     Clear analysis...
                 </a>
               </div>
