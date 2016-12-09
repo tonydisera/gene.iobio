@@ -1,6 +1,7 @@
 var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var sliderIconBar = require('./sections/sliderIconBar.js');
+var probandVariantCard = require('./sections/probandVariantCard.js');
 var matrixTrack = require('./sections/matrixTrack.js');
 var matrixTooltip = require('./sections/matrixTooltip.js');
 var filterPanel = require('./sections/filterPanel.js');
@@ -50,18 +51,12 @@ module.exports = {
     recallPanel: recallPanel,
     bookmarkPanel: bookmarkPanel,
     matrixTrack: matrixTrack,
+    probandVariantCard: probandVariantCard,
     matrixTooltip: matrixTooltip,
     transcriptCard: {
       selector: '#transcript-card',
       elements: {
         geneName: { selector: '#gene-name' }
-      }
-    },
-
-    probandVariantCard: {
-      selector: '#proband-variant-card',
-      elements: {
-
       }
     },
 

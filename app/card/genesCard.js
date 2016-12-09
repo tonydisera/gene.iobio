@@ -316,7 +316,11 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		// set the appropriate gene badges.
 		var geneSummary = getProbandVariantCard().getDangerSummaryForGene(name);
 		if (geneSummary) {
-			me.setGeneBadgeGlyphs(name, geneSummary);
+			if ($.isEmptyObject(geneSummary)) {
+				me.setGeneBadgeWarning(name, false);
+			} else {
+				me.setGeneBadgeGlyphs(name, geneSummary);
+			}
 		}
 	}
 

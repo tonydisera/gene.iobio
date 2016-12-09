@@ -1173,6 +1173,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						if (me.getRelationship() == 'proband') {
 							genesCard._geneBadgeLoading(window.gene.gene_name, false);
 							genesCard.setGeneBadgeWarning(window.gene.gene_name);
+							me.model.cacheDangerSummary({}, window.gene.gene_name);
 						}
 					}
 

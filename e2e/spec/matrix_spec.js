@@ -18,9 +18,7 @@ module.exports = {
     appTitleSection.openDataMenu();
     dataCard.selectSingle();
     // dataCard.section.probandData.selectPlatinumTrio();
-    dataCard.section.probandData.inputUrl(client.globals.variantFileUrl);
-    dataCard.section.probandData.selectSample('NA12878');
-    dataCard.section.probandData.inputAlignmentsUrl(client.globals.NA12878SampleFileUrl);
+    dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 
     appTitleSection.selectGene('BRCA1');
