@@ -295,7 +295,8 @@ module.exports = {
     }
   }],
   elements: {
-    featureMatrix: { selector: '#feature-matrix' }
+    featureMatrix: { selector: '#feature-matrix' },
+    featureMatrixNote: { selector: '#feature-matrix-note' }
   }
 };
 
