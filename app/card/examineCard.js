@@ -94,10 +94,14 @@ ExamineCard.prototype.showVariant = function(variant, isRefresh) {
 		var rawValue = variant.afExAC;
 		var afClazz = null;
 		var afSymbolFunction = null;
+		var lowestValue = 999;
 		matrixCard.afExacMap.forEach( function(rangeEntry) {
 			if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-				afClazz = rangeEntry.clazz;
-				afSymbolFunction = rangeEntry.symbolFunction;
+				if (rangeEntry.value < lowestValue) {
+					lowestValue = rangeEntry.value;
+					afClazz = rangeEntry.clazz;
+					afSymbolFunction = rangeEntry.symbolFunction;					
+				}
 			}
 		});
 		if (afClazz) {
@@ -111,10 +115,14 @@ ExamineCard.prototype.showVariant = function(variant, isRefresh) {
 		var rawValue = variant.af1000G;
 		var afClazz = null;
 		var afSymbolFunction = null;
+		var lowestValue = 999;
 		matrixCard.afExacMap.forEach( function(rangeEntry) {
 			if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-				afClazz = rangeEntry.clazz;
-				afSymbolFunction = rangeEntry.symbolFunction;
+				if (rangeEntry.value < lowestValue) {
+					lowestValue = rangeEntry.value;
+					afClazz = rangeEntry.clazz;
+					afSymbolFunction = rangeEntry.symbolFunction;
+				}
 			}
 		});
 		if (afClazz) {

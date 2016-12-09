@@ -121,8 +121,8 @@ function MatrixCard() {
 		{name:'Inheritance Mode'             , id:'inheritance',    order:6, index:3, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
 		{name:'Affected Siblings'            , id:'affected-sibs',  order:7, index:8, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
 		{name:'Unaffected Siblings'          , id:'unaffected-sibs',order:8, index:9, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
-		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:9, index:4, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:10, index:5, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:10, index:5, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
 		{name:'Zygosity'                     , id:'zygosity',       order:11, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Genotype'                     , id:'genotype',       order:12, index:12, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
@@ -807,7 +807,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = 'N';
 			} 
-			if (rawValue != null && rawValue != "") {				
+			if (rawValue != null && (me.isNumeric(rawValue) || rawValue != "")) {				
 				if (matrixRow.match == 'field') {
 					if (matrixRow.formatFunction) {
 						theValue = matrixRow.formatFunction.call(me, variant, rawValue);
@@ -856,11 +856,15 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 					// value is within a min-max range.
 					if (me.isNumeric(rawValue)) {
 						theValue = d3.format(",.3%")(+rawValue);
+						var lowestValue = 9999;
 						matrixRow.map.forEach( function(rangeEntry) {
 							if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-								mappedValue = rangeEntry.value;
-								mappedClazz = rangeEntry.clazz;
-								symbolFunction = rangeEntry.symbolFunction;
+								if (rangeEntry.value < lowestValue) {
+									lowestValue = rangeEntry.value;
+									mappedValue = rangeEntry.value;
+									mappedClazz = rangeEntry.clazz;
+									symbolFunction = rangeEntry.symbolFunction;
+								}
 							}
 						});
 					}
@@ -1086,13 +1090,13 @@ MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 
 MatrixCard.prototype.showAfExacSymbol = function(selection) {
 	var symbolAttrs = {
-		afexac_unique_nc: { transform: "translate(4,4)", fill: "none", stroke: "black", sideLength: "9" },
-		afexac_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", stroke: "none", sideLength: "9" },
-		afexac_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", stroke: "none", sideLength: "10" },
-		afexac_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", stroke: "none", sideLength: "10" },
-		afexac_rare: { transform: "translate(2,2)", fill: "rgb(231, 186, 82)", stroke: "none", sideLength: "10" },
-		afexac_uncommon: { transform: "translate(2,2)", fill: "rgb(145,191,219)", stroke: "none", sideLength: "12" },
-		afexac_common: { transform: "translate(1,1)", fill: "rgb(126, 161, 56)", stroke: "none", sideLength: "14"  }
+		afexac_unique_nc: { transform: "translate(2,2)", fill: "none", stroke: "#6b6666", sideLength: "11" },
+		afexac_unique: { transform: "translate(2,2)",    fill: "rgb(199, 0, 1)", stroke: "none", sideLength: "12" },
+		afexac_uberrare: { transform: "translate(2,2)",  fill: "rgba(204, 28, 29, 0.79)", stroke: "none", sideLength: "12" },
+		afexac_superrare: { transform: "translate(2,2)", fill: "rgba(255, 44, 0, 0.76)", stroke: "none", sideLength: "12" },
+		afexac_rare: { transform: "translate(2,2)",      fill: "rgb(247, 138, 31)", stroke: "none", sideLength: "12" },
+		afexac_uncommon: { transform: "translate(2,2)",  fill: "rgb(224, 195, 128)", stroke: "none", sideLength: "12" },
+		afexac_common: { transform: "translate(2,2)",    fill: "rgb(189,189,189)", stroke: "none", sideLength: "12"  }
 	}
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
@@ -1111,12 +1115,12 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 
 MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 	var symbolAttrs = {
-		af1000g_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", sideLength: "9" },
-		af1000g_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", sideLength: "9" },
-		af1000g_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", sideLength: "10" },
-		af1000g_rare: { transform: "translate(2,2)", fill: "rgb(231, 186, 82)", sideLength: "10" },
-		af1000g_uncommon: { transform: "translate(1,1)", fill: "rgb(145,191,219)", sideLength: "12" },
-		af1000g_common: { transform: "translate(0,0)", fill: "rgb(126, 161, 56)", sideLength: "14"  }
+		af1000g_unique: { transform: "translate(2,2)",    fill: "rgb(199, 0, 1)", sideLength: "12" },
+		af1000g_uberrare: { transform: "translate(2,2)",  fill: "rgba(204, 28, 29, 0.79)", sideLength: "12" },
+		af1000g_superrare: { transform: "translate(2,2)", fill: "rgba(255, 44, 0, 0.76)", sideLength: "12" },
+		af1000g_rare: { transform: "translate(2,2)",      fill: "rgb(247, 138, 31)", sideLength: "12" },
+		af1000g_uncommon: { transform: "translate(2,2)",  fill: "rgb(224, 195, 128)", sideLength: "12" },
+		af1000g_common: { transform: "translate(2,2)",    fill: "rgb(189,189,189)", sideLength: "12"  }
 	}
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
