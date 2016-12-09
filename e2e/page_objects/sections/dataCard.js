@@ -36,6 +36,11 @@ module.exports = {
         },
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
+        },
+        inputDefaults: function() {
+          this.inputUrl(this.api.globals.variantFileUrl);
+          this.selectSample('NA12878');
+          this.inputAlignmentsUrl(this.api.globals.NA12878SampleFileUrl);
         }
       }],
       elements: {
