@@ -718,8 +718,8 @@ FilterCard.prototype.displayEffectFilters = function() {
 			var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
 			var svgElem = null;
 			if (effectLabel.length < 20) {
-				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="15" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
+				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
+                          '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
         				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
       					  '</svg>';
 

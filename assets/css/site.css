@@ -1461,10 +1461,8 @@ header {
   align-self: flex-end; }
 
 /* Bootstrap accordion */
-#slider-left #slider-left-content {
-  padding-top: 10px; }
-  #slider-left #slider-left-content a {
-    color: #5d809d !important; }
+#slider-left #slider-left-content a {
+  color: #5d809d !important; }
 #slider-left .navbar {
   background-color: #636161 !important;
   min-height: 30px !important; }
@@ -1686,7 +1684,7 @@ header {
   #filter-track h4 {
     font-size: 13px;
     color: #5d809d !important;
-    margin-top: 13px;
+    margin-top: 12px;
     margin-bottom: 5px; }
   #filter-track #clear-filters-link {
     padding-top: 0px;

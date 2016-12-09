@@ -1,4 +1,4 @@
-<div id="filter-track" style="padding-top:5px;">
+<div id="filter-track">
  
   <div class="card-label">Filter Variants</div>
 
@@ -22,13 +22,13 @@
                 <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
                   <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="20" height="20"></use>
                 </g>
-                <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Denovo</text></svg>
+                <text class="name" style="fill-opacity: 1;" x="20" y="11">Denovo</text></svg>
               </svg>
               <svg id="recessive" class="inheritance" width="90" height="18" transform="translate(0,0)">
                 <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
                   <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="20" height="20"></use>
                 </g>
-                <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">Recessive</text></svg>
+                <text class="name" style="fill-opacity: 1;" x="20" y="11">Recessive</text></svg>
               </svg>
       </div>
       
@@ -85,7 +85,7 @@
           <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Likely Pathogenic</text>
           </svg>
 
-          <svg id="clinvar_uc" class="clinvar" width="110" height="17" transform="translate(0,0)">
+          <svg id="clinvar_uc" class="clinvar" width="140" height="17" transform="translate(0,0)">
             <g class="clinvar_uc" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill:rgba(231, 186, 82, 1);"></use>
             </g>
@@ -118,7 +118,7 @@
             <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Benign</text>
           </svg>
 
-          <svg id="clinvar_lbenign" class="clinvar" width="73" height="17" transform="translate(0,0)">
+          <svg id="clinvar_lbenign" class="clinvar" width="93" height="17" transform="translate(0,0)">
             <g class="clinvar_lbenign" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgba(181, 207, 107, 1);"></use>
             </g>
@@ -134,10 +134,7 @@
 
   <!-- SnpEff/VEP Impact and Effect -->
   <div >
-    
-    <h4 >
-        VEP       
-    </h4>  
+
 
 
 
@@ -151,30 +148,30 @@
 
 
     <div style="display:table;margin-top:-3px">
-      <div style="width:125px;display:table-cell;">
+      <div style="width:135px;display:table-cell;">
 
-          <div style="font-size:11px;text-align:left;width:120px;">
-            Most severe impact
+          <h4 style="width:135px;">
+            VEP<br>Most severe impact
             <a id="impact-scheme" href="javascript:(0)" class="current">
               <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>            
             </a>
-          </div>
+          </h4>
 
           <div style="text-align:left;display:flex;flex-direction:column">
-            <svg id="HIGH" class="highestImpactVep" width="60" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">High</text>
+            <svg id="HIGH" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
+              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">High</text>
               <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
-            <svg id="MODERATE" class="highestImpactVep" width="60" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">Moderate</text>
+            <svg id="MODERATE" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
+              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Moderate</text>
               <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
-            <svg id="MODIFIER" class="highestImpactVep" width="60" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">Modifier</text>
+            <svg id="MODIFIER" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
+              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Modifier</text>
               <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
-            <svg id="LOW" class="highestImpactVep" width="60" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">Low</text>
+            <svg id="LOW" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
+              <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Low</text>
               <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
             </svg>
           </div>
@@ -182,8 +179,8 @@
       </div>
        
       <div id="effect-filter-box" style=display:table-cell;text-align:left;width:120px;">
-        <div style="font-size:11px;">
-            Consequence
+        <h4>
+            VEP<br>Consequence
           <a id="effect-scheme" href="javascript:(0)" >
             <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>            
           </a>
@@ -191,7 +188,7 @@
           <div id="effect-filters" style="display: flex;flex-direction: row;flex-wrap: wrap;width: 210px;">
           </div>     
 
-        </div>
+        </h4>
       </div>
 
     </div>
@@ -239,9 +236,9 @@
                 <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="18" height="18" style="fill: rgb(126, 161, 56)"></use>
               </g>
               <text class="name" style="fill-opacity: 1;font-size: 9px;" x="20" y="10">&gt; 5%</text>
-            </svg><svg id="afexac_unique_nc" class="afexaclevels" width="83" height="18" transform="translate(0,0)">
-              <text class="name" x="12" y="9" style="fill-opacity: 1;font-size: 9px;">n/a (noncoding)</text>
-              <g class=" afexac_unique_nc">
+            </svg><svg id="afexac_unique_nc" class="afexaclevels" width="100" height="21" transform="translate(0,0)">
+              <text class="name" x="12" y="11" style="fill-opacity: 1;font-size: 9px;">n/a (noncoding)</text>
+              <g transform="translate(0,3)" class=" afexac_unique_nc">
                 <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="11" height="11" style="fill:none;stroke:black"></use>
               </g>
             </svg>
@@ -325,21 +322,21 @@
 
           <div style="display:flex;flex-direction:column">
 
-            <svg id="polyphen_probably_damaging" class="polyphen " width="92" height="17" transform="translate(0,0)">
+            <svg id="polyphen_probably_damaging" class="polyphen " width="120" height="17" transform="translate(0,0)">
               <g class="polyphen_probably_damaging" transform="translate(1,0)" style="opacity: 1;">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#biohazard-symbol" width="12" height="12" style="fill: #ad494A"></use>
               </g>
               <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="10">Probably damaging</text>
             </svg>
 
-            <svg id="polyphen_possibly_damaging" class="polyphen " width="92" height="17" transform="translate(0,0)">
+            <svg id="polyphen_possibly_damaging" class="polyphen " width="120" height="17" transform="translate(0,0)">
               <g class="polyphen_possibly_damaging" transform="translate(1,0)" style="opacity: 1;">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#biohazard-symbol" width="12" height="12" style="fill: #FB7737"></use>
               </g>
               <text class="name" style="fill-opacity: 1;font-size: 9px;" x="17" y="10">Possibly damaging</text>
             </svg>
 
-            <svg id="polyphen_benign" class="polyphen " width="92" height="17" transform="translate(0,0)">
+            <svg id="polyphen_benign" class="polyphen " width="120" height="17" transform="translate(0,0)">
               <g class="polyphen_benign" transform="translate(1,0)" style="opacity: 1;">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#biohazard-symbol" width="12" height="12" style="fill: rgba(181, 207, 107,1)"></use>
               </g>
@@ -353,34 +350,32 @@
         <h4 style="">SIFT</h4>
         <div style="display:flex;flex-direction: row;flex-wrap: wrap;">
 
-          <svg id="sift_deleterious" class="sift " width="67" height="17" transform="translate(0,0)">
+          <svg id="sift_deleterious" class="sift " width="110" height="17" transform="translate(0,0)">
             <g class="sift_deleterious" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="12" height="12" style="fill: #ad494A"></use>
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 9px;" x="16" y="9">Deleterious</text>
           </svg>
 
-          <svg id="sift_deleterious_low_confidence" class="sift " width="87" height="26" transform="translate(0,0)">
+          <svg id="sift_deleterious_low_confidence" class="sift " width="175"  transform="translate(0,0)">
             <g class="sift_deleterious_low_confidence" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="12" height="12" style="fill: #FB7737"></use>
             </g>
-            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="9">Deleterious</text>
-            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="19">(low confidence)</text>
+            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="9">Deleterious (low confidence)</text>
           </svg>
 
-          <svg id="sift_tolerated" class="sift " width="67" height="17" transform="translate(0,0)">
+          <svg id="sift_tolerated" class="sift " width="67" height="110" transform="translate(0,0)">
             <g class="sift_tolerated" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="12" height="12" style="fill: rgba(181, 207, 107,1)"></use>
             </g>
             <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="9">Tolerated</text>
           </svg>
 
-          <svg id="sift_tolerated_low_confidence" class="sift " width="87" height="26" transform="translate(0,0)">
+          <svg id="sift_tolerated_low_confidence" class="sift " width="180" transform="translate(0,0)">
             <g class="sift_tolerated_low_confidence" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#danger-symbol" width="12" height="12" style="fill: rgba(231,186,82,1)"></use>
             </g>
-            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="9">Tolerated</text>
-            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="19">(low confidence)</text>
+            <text class="name" style="fill-opacity: 1;font-size: 9px;" x="15" y="9">Tolerated (low confidence)</text>
           </svg>
 
         </div>
@@ -434,7 +429,7 @@
             <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
           </svg>
 
-          <svg id="complex" class="type" width="54" height="15" transform="translate(0,0)">
+          <svg id="complex" class="type" width="70" height="15" transform="translate(0,0)">
             <g transform="translate(1,0)">
               <text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">Complex</text>       
               <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
@@ -456,20 +451,20 @@
             <text class="name" x="2" y="8" style="fill-opacity: 1;font-size: 9px;">Promoter</text>
           </svg>
 
-          <svg id="reg_promoter_flanking_region" class="regulatory nocolor" width="110" height="15" transform="translate(0,0)">
-            <text class="name" x="2" y="8" style="fill-opacity: 1;font-size: 9px;">Promoter flanking region</text>
+          <svg id="reg_promoter_flanking_region" class="regulatory nocolor" width="140" height="15" transform="translate(0,0)">
+            <text class="name" x="2" y="11" style="fill-opacity: 1;font-size: 9px;">Promoter flanking region</text>
           </svg>
 
           <svg id="reg_tf_binding_site" class="regulatory nocolor" width="110" height="15" transform="translate(0,0)">
-            <text class="name" x="2" y="8" style="fill-opacity: 1;font-size: 9px;">TF binding site</text>
+            <text class="name" x="2" y="11" style="fill-opacity: 1;font-size: 9px;">TF binding site</text>
           </svg>
 
-          <svg id="reg_ctcf_binding_site" class="regulatory nocolor" width="78" height="15" transform="translate(0,0)">
-            <text class="name" x="2" y="8" style="fill-opacity: 1;font-size: 9px;">CTCF binding site</text>
+          <svg id="reg_ctcf_binding_site" class="regulatory nocolor" width="140" height="15" transform="translate(0,0)">
+            <text class="name" x="2" y="11" style="fill-opacity: 1;font-size: 9px;">CTCF binding site</text>
           </svg>
 
-          <svg id="mot_tf_binding_site_variant" class="regulatory nocolor" width="78" height="15" transform="translate(0,0)">
-            <text class="name" x="2" y="8" style="fill-opacity: 1;font-size: 9px;">TF Motif feature</text>
+          <svg id="mot_tf_binding_site_variant" class="regulatory nocolor" width="140" height="15" transform="translate(0,0)">
+            <text class="name" x="2" y="11" style="fill-opacity: 1;font-size: 9px;">TF Motif feature</text>
           </svg>
       </div>
     </div>
