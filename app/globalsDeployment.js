@@ -19,8 +19,8 @@ var autoCall              = null;           // if only alignments are provided, 
 var useSSL                = true;
 
 // MyGene2 deployment variables;
-var mygene2Endpoint       = "https://mygene2-dev.gs.washington.edu/MyGene2/geneiobio";
-var mygene2XAuthToken     = "Zj58QVA5VZ8CJXkO";
+var mygene2Endpoint       = "";
+var mygene2XAuthToken     = "";
 
 
 /*
