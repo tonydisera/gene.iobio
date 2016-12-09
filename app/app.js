@@ -19,7 +19,6 @@ var genesCardTemplateHTML = null;
 var bookmarkTemplateHTML = null;
 var examineTemplateHTML = null;
 var recallTemplateHTML = null;
-var helpTemplateHTML = null;
 var eduTourTemplateHTML = null;
 var iconbarTemplate = null;
 var tourTemplate = null;
@@ -161,9 +160,6 @@ $(document).ready(function(){
 	}));
 	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
 		recallTemplateHTML = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/helpCardTemplate.hbs').then(function(compiledTemplate) {
-		helpTemplateHTML = compiledTemplate;
 	}));
 	promises.push(promiseLoadTemplate('templates/eduTourCardTemplate.hbs').then(function(compiledTemplate) {
 		eduTourTemplateHTML = compiledTemplate;
@@ -308,7 +304,6 @@ function init() {
 	$('#slider-left-content').append(genesCardTemplateHTML);
 	$('#slider-left-content').append(bookmarkTemplateHTML);
 	$('#slider-left-content').append(examineTemplateHTML);
-	$('#slider-left-content').append(helpTemplateHTML);
 	$('#slider-left-content').append(recallTemplateHTML);
 	$('#close-slide-left').click(function() {
 		closeSlideLeft();
