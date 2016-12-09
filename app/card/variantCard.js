@@ -1815,7 +1815,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	}
 	
 	var x = variant.screenX;
-	var y = variant.screenY;
+	var y = variant.screenY - +$('body #container').css('top').split("px")[0];
 
 	x = sidebarAdjustX(x);
 
@@ -2626,7 +2626,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
-		siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen');
+		siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen', 'padding-top:5px;');
 	}
 
 	var clinvarRow = '';
@@ -2638,7 +2638,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	var clinvarRow2 = '';
 	if (clinSigDisplay) {
 		if (isLevelEdu) {
-			clinvarRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay);		
+			clinvarRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '10px');		
 		} else {
 			clinvarRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinSigDisplay);		
 		}
@@ -2651,7 +2651,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 		}
 	}
 
-	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Predicted effect', vepPolyPhenDisplay + ' to protein') : "";
+	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Predicted effect', vepPolyPhenDisplay + ' to protein', '3px') : "";
 
 	
 	var dbSnpId = getRsId(variant);	
@@ -2684,8 +2684,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
 			+ siftPolyphenRow
-			+ me._tooltipShortTextRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), 
-									  'Allele Freq 1000G', percentage(variant.af1000G))
+			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '10px')
+			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null, '10px')
 			+ clinvarRow1
 			+ clinvarRow2
 			+ me._tooltipRowAlleleCounts() 
@@ -2832,8 +2832,9 @@ VariantCard.prototype._tooltipHeaderLeftJustifySimpleRow = function(value1) {
 	      + '</div>';	
 }
 
-VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, class2) {
-	return '<div class="row">'
+VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, class2, style) {
+	var theStyle = style ? style : '';
+	return '<div class="row" style="' + theStyle + '">'
 	      +  '<div class="col-md-12 tooltip-title" style="text-align:center">' 
 	      +    "<span class='" + class1 + "'>" + value1 + '</span>' 
 	      +    "<span class='" + class2 + "'>" + value2 + '</span>' 
@@ -2841,28 +2842,41 @@ VariantCard.prototype._tooltipClassedRow = function(value1, class1, value2, clas
 	      + '</div>';	
 }
 
-VariantCard.prototype._tooltipWideHeadingRow = function(value1, value2) {
-	return '<div class="row" style="padding-bottom:5px;padding-top:3px;">'
-	      + '<div class="col-sm-4 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
-	      + '</div>';	
-}
-VariantCard.prototype._tooltipWideHeadingSecondRow = function(value1, value2) {
-	return '<div class="row" style="padding-bottom:5px;">'
-	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+VariantCard.prototype._tooltipLabeledRow = function(value1, value2, paddingTop, paddingBottom) {
+	var thePaddingTop    = paddingTop    ? "padding-top:"    + paddingTop    + ";" : "";
+	var thePaddingBottom = paddingBottom ? "padding-bottom:" + paddingBottom + ";" : "";
+	return '<div class="row" style="' + thePaddingTop + thePaddingBottom + '">'
+	      + '<div class="col-sm-6 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-6 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 
-VariantCard.prototype._tooltipLongTextRow = function(value1, value2) {
-	return '<div class="row" style="padding-top:5px;">'
+VariantCard.prototype._tooltipWideHeadingRow = function(value1, value2, paddingTop) {
+	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
+	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
+	      + '<div class="col-sm-3 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '</div>';	
+}
+VariantCard.prototype._tooltipWideHeadingSecondRow = function(value1, value2, paddingTop) {
+	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
+	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
+	      + '<div class="col-sm-3 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '</div>';	
+}
+
+VariantCard.prototype._tooltipLongTextRow = function(value1, value2, paddingTop) {
+	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
+	return '<div class="row" style="' + thePaddingTop + '">'
 	      + '<div class="col-sm-3 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
-VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, value4) {
+VariantCard.prototype._tooltipShortTextRow = function(value1, value2, value3, value4, paddingTop) {
+	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
 
-	return '<div class="row" style="padding-top:5px;padding-bottom:5px;">'
+	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
 	      + '<div class="col-sm-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value1  +'</div>'
 	      + '<div class="col-sm-2 " style="text-align:left;word-break:normal;padding-left:0px;">' + value2 + '</div>'
 	      + '<div class="col-sm-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
@@ -2909,7 +2923,7 @@ VariantCard.prototype._tooltipRowAF = function(label, afExAC, af1000g) {
 }
 
 VariantCard.prototype._tooltipRowAlleleCounts = function(label) {
-	return '<div  id="coverage-svg">'
+	return '<div  id="coverage-svg" style="padding-top:0px">'
 		 + '</div>';
 }
 

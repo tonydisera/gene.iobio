@@ -1063,7 +1063,7 @@ GenesCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 			       .style("left", x - w + "px")
 			       .style("text-align", 'left')
 			       .style("top", y + "px")
-			       .style("z-index", 200)
+			       .style("z-index", 1032)
 			       .style("overflow-y", "hidden");
 
 
@@ -1072,7 +1072,7 @@ GenesCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 			       .style("left", x + "px")
 			       .style("text-align", 'left')
 			       .style("top", (y) + "px")
-			       .style("z-index", 200)
+			       .style("z-index", 1032)
 			       .style("overflow-y", "hidden");
 
 	}
@@ -1694,7 +1694,7 @@ GenesCard.prototype.formatGeneDescriptionHTML = function(title, description) {
 
 GenesCard.prototype.formatPhenotypesHTML = function(phenotypes) {
 	var html = "";
-html += "<div style='font-weight:bold;text-align:center;padding-bottom:4px;'>HPO gene-to-phenotype</div>";
+html += "<div style='font-size:13px;font-weight:bold;text-align:center;padding-bottom:4px;'>HPO gene-to-phenotype</div>";
 	if (phenotypes.length < 20) {
 		phenotypes.forEach(function(phenotype) {
 			html += "<div style='max-width:200px'>";
@@ -1706,7 +1706,7 @@ html += "<div style='font-weight:bold;text-align:center;padding-bottom:4px;'>HPO
 	} else {
 		var phenotypeCols = splitArray(phenotypes, 4);
 		phenotypeCols.forEach(function(phenotypeElements) {
-			html += "<div style='float:left;max-width:130px;margin-right:5px;font-size:9px;'>";
+			html += "<div style='float:left;max-width:130px;margin-right:5px;font-size:11px;'>";
 				phenotypeElements.forEach(function(phenotype) {
 					html += "<div>";
 					html += phenotype.hpo_term_name;

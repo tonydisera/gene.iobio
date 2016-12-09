@@ -1,8 +1,51 @@
 /* Bootstrap accordion
 
 #slider-left
-  a
-    color: $sidebar-link-color !important
+
+  #slider-left-content
+    padding-top: 10px
+    a
+      color: $sidebar-link-color !important
+
+  .navbar
+    background-color: $sidebar-color !important
+    min-height: 30px !important
+
+    .navbar-collapse
+      margin-left: -22px
+      margin-right: -18px
+
+    .container-fluid
+      margin: 0px
+      padding: 0px
+
+  .nav
+    li
+      padding-top: 4px
+      padding-bottom: 4px
+      max-width: inherit
+      margin-left: 7px
+      margin-right: 7px
+      text-align: center
+
+      a
+        font-size: 14px
+        padding: 4px 8px 0px 2px  !important
+
+        &:hover
+          background-color: initial
+        &:focus
+          background-color: initial
+
+      &.active
+        background-color: white  !important
+        
+        a
+          color: $app-color !important
+
+          #search-dna-glyph
+            fill: $app-color !important          
+
 
   .btn.btn-raised 
     background-color: $sidebar-button-color !important
@@ -29,8 +72,14 @@
   .card-label
     display: none
 
+#close-slide-left-glyph
+  color: $sidebar-color
+  line-height: .8
+  font-size: 36px
+  font-weight: bold
+
 .close-button
-  padding-top: 0px
+  padding-top: 50px
   z-index: 100
   font-size: 14px
   cursor: pointer
@@ -43,7 +92,7 @@
 
 #slide-buttons
   position: absolute
-  top: 0
+  top: 50px
   left: 0
   transition: all 0.6s ease
   -webkit-transition: all 0.6s ease
@@ -55,9 +104,9 @@
 
 #slider-left
   position: fixed
-  top: 0
-  left: 36px
-  width: 314px
+  top: 53px
+  left: 0px
+  width: 356px
   height: 100%
   transition: width 0.6s ease
   -webkit-transition: width 0.6s ease
@@ -69,7 +118,7 @@
 
 #slider-left-content
   height: 100%
-  width: 310px
+  width: 352px
   background-color: $sidebar-body-color
   overflow-y: scroll
   margin-top: 0px
@@ -83,8 +132,8 @@
 
 #close-slide-left
   position: fixed
-  left: 310px
-  top: 0px
+  left: 324px
+  top: 4px
 
 .icon-button.sidebar-button
   margin-bottom: 0px !important
@@ -144,34 +193,38 @@
   left: 1px
   top: 0px
   background-color: $sidebar-color
-  width: 36px
+  width: 0px
   height: 100%
   z-index: 400
 
   &.closed
-    width: 36px
+    width: 0px
 
 .push
   transition: all 0.6s ease
   -webkit-transition: all 0.6s ease
-  -moz-transition: all 0.6s ease
+  -moz-transition:  0.6s ease
   -ms-transition: all 0.6s ease
   -o-transition: all 0.6s ease
   z-index: 1
   
 
 .fixed
-  left: 36px
+  left: 0px
 
 #container
-  margin-left: 36px
+  margin-left: 0px
+  position: relative !important
+  top: 58px !important 
 
 .slide-left
-  transform: translate(314px, 0)
-  -webkit-transform: translate(314px, 0)
-  -moz-transform: translate(314px, 0)
-  -ms-transform: translate(314px, 0)
-  -o-transform: translate(314px, 0)
+  transform: translate(356px, 0)
+  -webkit-transform: translate(356px, 0)
+  -moz-transform: translate(356px, 0)
+  -ms-transform: translate(356px, 0)
+  -o-transform: translate(356px, 0)
+
+
 
 /* make keyframes that tell the start state and the end state of our object
 @-webkit-keyframes fadeIn

@@ -25,6 +25,7 @@ var iconbarTemplate = null;
 var tourTemplate = null;
 var introTemplate = null;
 var legendTemplate = null;
+var navbarTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -182,6 +183,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
 		svgGlyphsTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/navbarTemplate.hbs').then(function(compiledTemplate) {
+		navbarTemplate = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		// Initialize genomeBuild helper
@@ -259,7 +263,7 @@ function init() {
 		window.location.assign(exhibitUrl);
 		return;			
 	}
-
+	
 	if (isMygene2) {
 		$('#intro').append(introTemplate());
 		if (isLevelBasic) {
@@ -267,7 +271,13 @@ function init() {
 			$('#intro-text').removeClass("hide");
 		}
 
+	} 
+
+
+	if (!isLevelEduTour) {
+		$('body').prepend(navbarTemplate());
 	}
+
 
 
 	alertify.defaults.glossary.title = "";
@@ -408,8 +418,8 @@ function init() {
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
-	    .trackHeight(isLevelEduTour || isLevelBasic  ? 36 : 16)
-	    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 12)
+	    .trackHeight(isLevelEduTour || isLevelBasic  ? 36 : 20)
+	    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 18)
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
@@ -776,8 +786,10 @@ function hideCoordinateFrame() {
 
 
 function readjustCards() {
-	var top = +$('#nav-section').height();
-	d3.select('#track-section').style("padding-top", top+6 + "px");
+	//if (isLevelEdu) {
+	//	var top = +$('#nav-section').height();
+	//	d3.select('#track-section').style("padding-top", top+6 + "px");
+	//}
 }
 
 
@@ -787,6 +799,11 @@ function showSidebar(sidebar) {
 	} else {
 		$('#search-dna-glyph').attr('fill', 'white');
 	}
+
+	$('#slider-left .navbar').find('li').removeClass("active");
+	$('#slider-left .navbar').find('li').addClass("hide");
+	$('#slider-left .navbar').find('li#' + sidebar.toLowerCase() + "-tab").removeClass("hide");
+	$('#slider-left .navbar').find('li#' + sidebar.toLowerCase() + "-tab").addClass("active");
 
 	$('.sidebar-button').removeClass('selected');
 	$('#slider-left-content #filter-track').toggleClass("hide", sidebar !== 'Filter');
@@ -872,15 +889,15 @@ function resizeCardWidths() {
 		$('#nav-section').css("width", '');
 	}
 	
-	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 10 : 40));
-	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
-	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 40 : 60));
+	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 10 : 0));
+	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
+	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
 
 	//$('#slider-left-content').css('height', window.innerHeight);
 }
 
 function closeSlideLeft() {
-	$('#nav-section').css("left", "32px");
+	
 	$('.footer').removeClass("hide");
 	$('.slide-button').removeClass("hide");
 	$('#close-slide-left').addClass("hide");
@@ -1066,6 +1083,11 @@ function loadGeneFromUrl() {
 	}
 
 
+	// Show the 'Load demo data button' if no data sources specified
+	if (!hasDataSources()) {
+		$('#welcome-panel').removeClass("hide");
+	}	
+
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
     if (gene != undefined) {
@@ -1089,10 +1111,7 @@ function loadGeneFromUrl() {
 			}
 			dataCard.loadDemoData();
 		} else {
-			// If a gene wasn't provided, go ahead and just set the data sources, etc for
-			// other url parameters.
-			loadUrlSources();
-			showSidebar("Help");
+
 		}
 	
 
@@ -1777,11 +1796,19 @@ function loadGeneWidget(callback) {
 						}							
 					} else if (isLevelBasic) {
 						showSidebar("Phenolyzer");
-					} else {
-						showSidebar("Help");
-					}
+					} 
 				}
 
+
+				if (bam == null && vcf == null) {
+					// Open the 'About' sidebar by default if there is no data loaded when gene is launched
+					if (isLevelEdu) {
+						if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+							showSidebar("Phenolyzer");
+						}							
+					} 
+				}
+				
 				if (!isOffline) {
 			    	genesCard.updateGeneInfoLink(window.gene.gene_name);
 				}
@@ -1894,6 +1921,9 @@ function getRidOfDuplicates(genes) {
 function loadTracksForGene(bypassVariantCards) {
 
 	hideIntro();
+
+	$('#nav-section').removeClass("hide");
+
 
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
@@ -2110,6 +2140,12 @@ function hasCalledVariants() {
 }
 
 function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
+	if (!hasDataSources()) {
+		return;
+	}
+
+	$('#welcome-panel').addClass("hide");
+
 	relevantVariantCards.forEach(function(vc) {
 		vc.prepareToShowVariants(filterCard.classifyByImpact);
 	});
@@ -2319,11 +2355,11 @@ function showTranscripts(regionStart, regionEnd) {
     // Compress the tracks if we have more than 10 transcripts
     if (!isLevelEduTour && !isLevelBasic) {
 	    if (transcripts.length > 10) {
-	    	transcriptChart.trackHeight(10);
-	    	transcriptChart.cdsHeight(8);
+	    	transcriptChart.trackHeight(14);
+	    	transcriptChart.cdsHeight(10);
 	    } else {
-	    	transcriptChart.trackHeight(16);
-	    	transcriptChart.cdsHeight(12);
+	    	transcriptChart.trackHeight(20);
+	    	transcriptChart.cdsHeight(16);
 	    }
 
     }

@@ -8,7 +8,7 @@ function MatrixCard() {
 	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
-	this.COLUMN_LABEL_HEIGHT       = 67;
+	this.COLUMN_LABEL_HEIGHT       = 15;
 	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
 
 	this.ROW_LABEL_WIDTH           = 140;
@@ -296,9 +296,9 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 	} else {
 		var rsId = getRsId(d);
 		if (rsId != null) {
-			return rsId;
+			return (i+1).toString() + ".  " + rsId;
 		} else {
-			return d.type + ' ' + d.start;
+			return (i+1).toString();
 		}		
 	}
 
@@ -691,11 +691,14 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 360;
 	var h = tooltip[0][0].offsetHeight;
 
 	var x = variant.screenXMatrix;
-	var y = variant.screenYMatrix + 10;
+	var y = variant.screenYMatrix -  +$('body #container').css('top').split("px")[0] + 10;
+	if (y - h < 0) {
+		y = h;
+	}
 
 	x = sidebarAdjustX(x);
 
@@ -919,7 +922,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu || isLevelBasic});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
@@ -1087,9 +1090,9 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 		afexac_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", stroke: "none", sideLength: "9" },
 		afexac_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", stroke: "none", sideLength: "10" },
 		afexac_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", stroke: "none", sideLength: "10" },
-		afexac_rare: { transform: "translate(2,2)", fill: "rgb(158,186,194)", stroke: "none", sideLength: "10" },
+		afexac_rare: { transform: "translate(2,2)", fill: "rgb(231, 186, 82)", stroke: "none", sideLength: "10" },
 		afexac_uncommon: { transform: "translate(2,2)", fill: "rgb(145,191,219)", stroke: "none", sideLength: "12" },
-		afexac_common: { transform: "translate(1,1)", fill: "rgb(69,117,180)", stroke: "none", sideLength: "14"  }
+		afexac_common: { transform: "translate(1,1)", fill: "rgb(126, 161, 56)", stroke: "none", sideLength: "14"  }
 	}
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
@@ -1103,6 +1106,7 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 		.style("stroke", function(d,i) { return symbolAttrs[d.clazz].stroke; })
 		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
 		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
+
 };
 
 MatrixCard.prototype.showAf1000gSymbol = function(selection) {
@@ -1110,9 +1114,9 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 		af1000g_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", sideLength: "9" },
 		af1000g_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", sideLength: "9" },
 		af1000g_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", sideLength: "10" },
-		af1000g_rare: { transform: "translate(2,2)", fill: "rgb(158,186,194)", sideLength: "10" },
+		af1000g_rare: { transform: "translate(2,2)", fill: "rgb(231, 186, 82)", sideLength: "10" },
 		af1000g_uncommon: { transform: "translate(1,1)", fill: "rgb(145,191,219)", sideLength: "12" },
-		af1000g_common: { transform: "translate(0,0)", fill: "rgb(69,117,180)", sideLength: "14"  }
+		af1000g_common: { transform: "translate(0,0)", fill: "rgb(126, 161, 56)", sideLength: "14"  }
 	}
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
