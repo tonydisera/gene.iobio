@@ -20,7 +20,7 @@ var POLYPHEN = {
 };
 
 var IMPACT = {
-  LABEL: 'Impact - VEP',
+  LABEL: 'Impact (VEP)',
   SYMBOL: "/*[local-name()='g']",
   HIGH: "/*[local-name()='text' and text()='HIGH']",
   MODERATE: "/*[local-name()='text' and text()='MODERATE']",
@@ -31,6 +31,9 @@ var IMPACT = {
   DEL_TRIANGLE: "/*[local-name()='g']/*[contains(concat(' ', normalize-space(@class), ' '), ' del ')]",
   SNP_RECT: "/*[local-name()='g']/*[contains(concat(' ', normalize-space(@class), ' '), ' snp ')]"
 };
+
+var MOST_SEVERE_IMPACT = JSON.parse(JSON.stringify(IMPACT));
+MOST_SEVERE_IMPACT.LABEL = 'Most severe impact (VEP)';
 
 var BOOKMARK = {
   LABEL: 'Bookmark',
@@ -144,6 +147,43 @@ module.exports = {
 
     assertImpactNull: function(variants) {
       this.assertSymbolsNotPresent(IMPACT.LABEL, variants, IMPACT.SYMBOL);
+    },
+
+    // Most Severe Impact - VEP
+    assertMostSevereImpactHigh: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.HIGH);
+    },
+
+    assertMostSevereImpactModerate: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.MODERATE);
+    },
+
+    assertMostSevereImpactModifier: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.MODIFIER);
+    },
+
+    assertMostSevereImpactLow: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.LOW);
+    },
+
+    assertMostSevereImpactComplexDiamond: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.COMPLEX_DIAMOND);
+    },
+
+    assertMostSevereImpactInsCircle: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.INS_CIRCLE);
+    },
+
+    assertMostSevereImpactDelTriangle: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.DEL_TRIANGLE);
+    },
+
+    assertMostSevereImpactSnpRect: function(variants) {
+      this.assertSymbolsPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.SNP_RECT);
+    },
+
+    assertMostSevereImpactNull: function(variants) {
+      this.assertSymbolsNotPresent(MOST_SEVERE_IMPACT.LABEL, variants, MOST_SEVERE_IMPACT.SYMBOL);
     },
 
     // BOOKMARK
