@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, sliderIconBar, findGenesPanel, probandVariantCard;
+var indexPage, appTitleSection, dataCard, matrixTrack, nav, findGenesPanel, probandVariantCard;
 
 module.exports = {
   tags: [],
@@ -8,22 +8,22 @@ module.exports = {
 
   before: function(client) {
     indexPage = client.page.index();
+    nav = client.page.nav();
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
     findGenesPanel = indexPage.section.findGenesPanel;
-    sliderIconBar = indexPage.section.sliderIconBar;
     probandVariantCard = indexPage.section.probandVariantCard;
   },
 
   'Paginating should not remove warning label on badge': function(client) {
     indexPage.load();
-    sliderIconBar.clickFindGenes();
+    nav.clickGenes();
     findGenesPanel.clickACMG56Genes();
     client.pause(3000);
-    appTitleSection.selectGene('STK11');
+    nav.searchGene('STK11');
 
-    appTitleSection.openDataMenu();
+    nav.clickData();
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 
