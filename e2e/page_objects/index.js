@@ -36,7 +36,7 @@ module.exports = {
 
   commands: [{
     load: function() {
-      return this.navigate().waitForElementVisible('@sliderLeft');
+      return this.navigate();
     }
   }],
 
