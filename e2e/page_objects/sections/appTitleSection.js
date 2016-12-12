@@ -54,7 +54,7 @@ module.exports = {
       var self = this;
       this.api.useXpath();
       genes.forEach(function(gene) {
-        self.waitForElementVisible("//div[@id='gene-badge']//*[@id='gene-badge-name' and text()='" + gene + "']/../*[@id='gene-badge-loaded']", 60000);
+        self.waitForElementVisible("//div[@id='gene-badge']//*[@id='gene-badge-name' and text()='" + gene + "']/../*[@id='gene-badge-loaded']", 100000);
       });
       this.api.useCss();
       return this;
