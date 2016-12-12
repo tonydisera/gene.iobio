@@ -12,6 +12,7 @@ module.exports = {
                  .api.pause(1000)
     },
     selectGenomeBuild: function(build) {
+      build = build || 'GRCh37';
       return this.click('@genomeBuildSelectBox')
                  .click("#select-build-box .selectize-dropdown-content [data-value='" + build + "']");
     }
