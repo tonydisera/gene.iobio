@@ -10,12 +10,18 @@ module.exports = {
     clickLoad: function() {
       return this.click('@loadButton')
                  .api.pause(1000)
+    },
+    selectGenomeBuild: function(build) {
+      build = build || 'GRCh37';
+      return this.click('@genomeBuildSelectBox')
+                 .click("#select-build-box .selectize-dropdown-content [data-value='" + build + "']");
     }
   }],
   elements: {
     loadButton: { selector: '#ok-button' },
     singleProbandButton: { selector: '#single-proband-button' },
-    trioButton: { selector: '#trio-button' }
+    trioButton: { selector: '#trio-button' },
+    genomeBuildSelectBox: { selector: '#select-build-box .selectize-input' },
   },
   sections: {
     probandData: {

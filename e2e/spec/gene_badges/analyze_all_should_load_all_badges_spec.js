@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, sliderIconBar, findGenesPanel;
+var indexPage, appTitleSection, dataCard, matrixTrack, findGenesPanel, nav;
 
 module.exports = {
   tags: [],
@@ -8,20 +8,21 @@ module.exports = {
 
   before: function(client) {
     indexPage = client.page.index();
+    nav = client.page.nav();
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
     findGenesPanel = indexPage.section.findGenesPanel;
-    sliderIconBar = indexPage.section.sliderIconBar;
   },
 
   'Analyzing all in batch sizes of 1 should load all badges': function(client) {
     indexPage.load();
-    appTitleSection.openDataMenu();
+    nav.clickData();
     dataCard.selectSingle();
+    dataCard.selectGenomeBuild();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
-    sliderIconBar.clickFindGenes();
+    nav.clickGenes();
     findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);
     appTitleSection.clickAnalyzeAll();
     matrixTrack.waitForMatrixLoaded();
