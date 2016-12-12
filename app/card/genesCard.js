@@ -1431,6 +1431,18 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 
 	}
 
+	if (dangerObject.AF) {
+		var clazz = Object.keys(dangerObject.AF)[0];
+		var afField = dangerObject.AF[clazz];
+		if (clazz && afField) {
+			geneBadge.find('#gene-badge-symbols').append("<svg class=\"af-badge\" height=\"12\" width=\"12\">");
+			var options = {width:11, height:11, transform: 'translate(0,0)'};
+			var selection = d3.select(geneBadge.find('#gene-badge-symbols .af-badge')[0]).data([{clazz: clazz}]);
+			var symbolFunction = afField == 'afExAC' ? matrixCard.showAfExacSymbol : matrixCard.showAf1000gSymbol;
+			symbolFunction(selection, options);			
+		}
+	}
+
 	readjustCards();
 }
 

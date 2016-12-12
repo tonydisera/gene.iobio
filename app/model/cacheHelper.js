@@ -361,6 +361,7 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 			  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
 
 			  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
+					getVariantCard('proband').model.cacheDangerSummary(dangerObject, cacheObject.gene);
 			
 					genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
 			  	}

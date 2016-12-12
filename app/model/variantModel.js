@@ -182,53 +182,99 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	var impactClasses = {};
 	var consequenceClasses = {};
 	var inheritanceClasses = {};
+	var afClazz = null;
+	var afField = null;
+	var lowestAf = 999;
+
+
 	theVcfData.features.forEach( function(variant) {
 
-    for (key in variant.highestImpactSnpeff) {
-    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
-    		impactClasses[key] = impactClasses[key] || {};
-    		impactClasses[key][variant.type] = variant.highestImpactSnpeff[key]; // key = effect, value = transcript id
-    	}
-    }
-
-    for (key in variant.highestImpactVep) {
-    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
-    		consequenceClasses[key] = consequenceClasses[key] || {};
-    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
-    	}
-    }
-
-    for (key in variant.highestSIFT) {
-			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
-				var clazz = matrixCard.siftMap[key].clazz;
-				dangerCounts.SIFT = {};
-				dangerCounts.SIFT[clazz] = {};
-				dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-			}
-    }
-
-    for (key in variant.highestPolyphen) {
-    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
-				var clazz = matrixCard.polyphenMap[key].clazz;
-				dangerCounts.POLYPHEN = {};
-				dangerCounts.POLYPHEN[clazz] = {};
-				dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-    	}
-    }
-
-    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
-    	for (key in variant.clinVarClinicalSignificance) {
-	    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
-					clinvarClasses[key] = matrixCard.clinvarMap[key];
+	    for (key in variant.highestImpactSnpeff) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		impactClasses[key] = impactClasses[key] || {};
+	    		impactClasses[key][variant.type] = variant.highestImpactSnpeff[key]; // key = effect, value = transcript id
 	    	}
-    	}
-    }
+	    }
 
-    if (variant.inheritance && variant.inheritance != 'none') {
-    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
-    	inheritanceClasses[clazz] = variant.inheritance;
-    }
-	});
+	    for (key in variant.highestImpactVep) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		consequenceClasses[key] = consequenceClasses[key] || {};
+	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
+	    	}
+	    }
+
+	    for (key in variant.highestSIFT) {
+				if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
+					var clazz = matrixCard.siftMap[key].clazz;
+					dangerCounts.SIFT = {};
+					dangerCounts.SIFT[clazz] = {};
+					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
+				}
+	    }
+
+	    for (key in variant.highestPolyphen) {
+	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
+					var clazz = matrixCard.polyphenMap[key].clazz;
+					dangerCounts.POLYPHEN = {};
+					dangerCounts.POLYPHEN[clazz] = {};
+					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+	    	}
+	    }
+
+	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
+	    	for (key in variant.clinVarClinicalSignificance) {
+		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
+						clinvarClasses[key] = matrixCard.clinvarMap[key];
+		    	}
+	    	}
+	    }
+
+	    if (variant.inheritance && variant.inheritance != 'none') {
+	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
+	    	inheritanceClasses[clazz] = variant.inheritance;
+	    }
+
+
+
+	    var evaluateAf = function(af, afMap) {
+			afMap.forEach( function(rangeEntry) {
+				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
+					if (rangeEntry.value < lowestAf) {
+						lowestAf = rangeEntry.value;
+						afClazz = rangeEntry.clazz;	
+						afField = af;					
+					}
+				}
+			});
+		}
+
+		// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
+		// as 'lowest' af for all variants in gene
+		var af = null;
+		var afMap = null;
+		if (matrixCard.isNumeric(variant.afExAC) && matrixCard.isNumeric(variant.af1000G)) {
+			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
+			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
+				af = 'afExAC';
+				afMap = matrixCard.afExacMap;
+			} else {
+				af = 'af1000G';
+				afMap = matrixCard.af1000gMap;
+			}			 
+		} else if (matrixCard.isNumeric(variant.afExAC)) {
+			af = 'afExAC';
+			afMap = matrixCard.afExacMap;
+
+		} else if (matrixCard.isNumeric(variant.af1000G)) {
+			af = 'af1000G';
+			afMap = matrixCard.af1000gMap;
+		}
+		if (af && afMap) {
+			evaluateAf(af, afMap);
+		}
+
+
+	});	
 
 	var getLowestClinvarClazz = function(clazzes) {
 		var lowestOrder = 9999;
@@ -265,6 +311,12 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	dangerCounts.IMPACT = filterCard.getAnnotationScheme().toLowerCase() == 'vep' ? dangerCounts.CONSEQUENCE : getLowestImpact(impactClasses);
 	dangerCounts.CLINVAR = getLowestClinvarClazz(clinvarClasses);
 	dangerCounts.INHERITANCE = inheritanceClasses;
+
+	var afSummaryObject = {};
+	if (afClazz != null) {
+		afSummaryObject[afClazz] = afField;
+	}
+	dangerCounts.AF = afSummaryObject;
 
 	return dangerCounts;
 }
