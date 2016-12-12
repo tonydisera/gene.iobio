@@ -702,17 +702,17 @@ a {
 .material-dropdown li:hover {
   background: #c8c8c8; }
 
-#variant-control-track {
+#genes-control-track {
   background: white;
   padding-right: 10px;
   padding-top: 5px;
   margin-bottom: 7px;
   margin-top: 0px;
   padding-left: 10px; }
-  #variant-control-track #filters {
+  #genes-control-track #filters {
     padding-bottom: 5px;
     color: #717171; }
-  #variant-control-track .filter-flag.label-primary {
+  #genes-control-track .filter-flag.label-primary {
     background-color: rgba(165, 48, 48, 0.76);
     color: white; }
 

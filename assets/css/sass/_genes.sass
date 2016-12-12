@@ -60,9 +60,10 @@
 
 #gene-badge-button
   font-size: 13px
-  padding: 2px 4px 2px 4px
+  padding: 4px 1px 0px 1px
   margin: 0px
   color: $text-color
+  line-height: 13px
 
   #gene-badge-symbols
     height: 14px
@@ -72,11 +73,13 @@
 
 #gene-badge
   margin-top: 0px
-  margin-bottom: 9px
-  margin-right: 3px
+  margin-bottom: 8px
+  margin-right: 6px
+  height: 20px
 
 #gene-badge.loading
   border-left: #dad26c solid 12px
+
 
 #gene-badge.loading.selected
   border-left: #dad26c solid 12px
@@ -85,7 +88,7 @@
 #gene-badge.selected
   border-left: #7ea238 solid 12px
   #gene-badge-button
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19)
+    //box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19)
 
   #gene-badge-name, #gene-badge-danger-count, #gene-badge-remove i
     font-weight: bold
@@ -176,7 +179,8 @@
   -webkit-justify-content: center
   max-height: 150px
   overflow-y: auto
-  padding-bottom: 4px
+  padding-bottom: 0px
+  padding-top: 5px
 
   a
     color:  $sidebar-text-color !important
@@ -200,7 +204,7 @@
 
 #gene-page-selection
   display: inline-block
-  margin-bottom: 10px
+  margin-bottom: 0px
   padding-bottom: 0px
   vertical-align: top
   font-size: 0px
@@ -212,7 +216,8 @@
   padding-top: 2px
 
 #gene-page-control
-  margin-bottom: 0px
+  margin-top: -3px
+  margin-bottom: 3px
 
   #gene-paging-links
     display: inline-block

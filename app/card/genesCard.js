@@ -269,6 +269,15 @@ GenesCard.prototype.initCopyPasteGenes = function() {
 
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
+	
+	if (geneNames.length > 1) {
+		$('#genes-control-track').removeClass("hide");
+		$('#genes-panel').removeClass("hide");
+	} else {
+		$('#genes-control-track').addClass("hide");
+		$('#genes-panel').addClass("hide");
+	}
+
 	if (geneNames && geneNames.length > this.GENES_PER_PAGE) {
 		var pos = geneNames.indexOf(geneName) + 1;
 		if (pos > this.GENES_PER_PAGE) {
@@ -357,6 +366,14 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		$('#gene-page-selection').html("");
 	}
 
+	if (geneNames.length > 1) {
+		$('#genes-control-track').removeClass("hide");
+		$('#genes-panel').removeClass("hide");
+	} else {
+		$('#genes-control-track').addClass("hide");
+		$('#genes-panel').addClass("hide");
+	}
+
 }
 
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
@@ -415,6 +432,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
 		$('#manage-gene-list').removeClass("hide");
 		$('#clear-gene-list').removeClass("hide");
 		$('#manage-cache-link').removeClass("hide");
+
 	} else {
 		$('#manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
@@ -971,6 +989,7 @@ GenesCard.prototype.addGene = function(geneName) {
 	if (geneNames.indexOf(geneName) < 0) {
 		geneNames.push(geneName);
 	}
+	
 	me.addGeneBadge(geneName);
 	me.pageToGene(geneName);
 
@@ -1304,7 +1323,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 			for (clazz in dangerSift) {
 				var siftObject = dangerSift[clazz];
 				geneBadge.find('#gene-badge-symbols').append("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[symbolIndex]).data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz, siftObject: siftObject }]);
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .sift-badge')[symbolIndex]).data([{width:11, height:11, transform: 'translate(0,0)', clazz: clazz, siftObject: siftObject }]);
 				matrixCard.showSiftSymbol(selection);
 				symbolIndex++;
 				selection.on("mouseover", function(d,i) {
@@ -1336,7 +1355,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 			for (clazz in dangerPolyphen) {
 				var polyphenObject = dangerPolyphen[clazz];
 				geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz, polyphenObject: polyphenObject}]);
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,0)', clazz: clazz, polyphenObject: polyphenObject}]);
 				matrixCard.showPolyPhenSymbol(selection);
 				symbolIndex++;
 				selection.on("mouseover", function(d,i) {
@@ -1370,7 +1389,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 				var theClazz = 'impact_' + impactClass;
 				var effectObject = types[type];
 				geneBadge.find('#gene-badge-symbols').append("<svg class=\"impact-badge\" height=\"12\" width=\"12\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[symbolIndex]).data([{width:10, height:10,clazz: theClazz, type:  type, effectObject: effectObject}]);
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .impact-badge')[symbolIndex]).data([{width:10, height:10, clazz: theClazz, type:  type, effectObject: effectObject}]);
 				symbolIndex++;
 				matrixCard.showImpactBadge(selection);
 				selection.on("mouseover", function(d,i) {

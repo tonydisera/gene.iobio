@@ -872,10 +872,10 @@ FilterCard.prototype._getFilterString = function() {
 FilterCard.prototype.displayFilters = function() {
 	var filterString = this._getFilterString();
 	if (filterString.length > 0) {
-		$('#variant-control-track').removeClass("hide");
-		$('#variant-control-track #filters').html(filterString);		
+		$('#genes-control-track #filters').removeClass("hide");
+		$('#genes-control-track #filters').html(filterString);		
 	} else {
-		$('#variant-control-track').addClass("hide");
+		$('#genes-control-track #filters').addClass("hide");
 	}
 }
 

@@ -1302,9 +1302,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 VariantCard.prototype._displayRefNotFoundWarning = function() {
 	this.cardSelector.find('#vcf-track').addClass("hide");
 	this.cardSelector.find(".vcfloader").addClass("hide");
-	//$('#filter-track').addClass("hide");
 	$('#matrix-track').addClass("hide");
-	// todo $('#variant-control-track').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning #message').text("Unable to find reference " + window.gene.chr + " in vcf header.");
 	this.cardSelector.find('#no-ref-found-warning').removeClass("hide");
 

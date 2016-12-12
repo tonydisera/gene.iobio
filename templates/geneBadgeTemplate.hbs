@@ -1,7 +1,6 @@
 <div id="gene-badge"  >
 
-	<button id="gene-badge-button" type="button" onclick="genesCard.selectGeneBadge(this)" 
-		class="btn btn-raised btn-default" 
+	<a id="gene-badge-button" style="display:inline-block" onclick="genesCard.selectGeneBadge(this)" 
 		rel="tooltip"   data-html="true" href="#"
 		data-placement="bottom">
         <i id="gene-badge-loaded" class="material-icons glyph">done</i>
@@ -13,14 +12,13 @@
         <span id="gene-badge-phenotype-symbol" class="glyph" style="float:right;height:14px;"></span>
   		<span id="gene-badge-symbols" class="glyph"></span>
 
-	</button>	
+	</a>	
 
-	<a id="gene-badge-remove" href="javascript:void(0)" 
-		onclick="genesCard.removeGeneBadge(this)" class="btn btn-flatbtn-default" 
-		style="padding: 0;margin-top: 0px;margin-bottom: 0px;color: grey !important;font-size: 11px;margin-left: -2px;margin-left: -3px;padding-top: 3px;">
+	<div id="gene-badge-remove" href="javascript:void(0)" 
+		onclick="genesCard.removeGeneBadge(this)" 
+		style="display: inline-block;cursor: pointer;float:right">
+	  	<i style="vertical-align:middle" class="material-icons">close</i>
 
-	  	<i class="material-icons">close</i>
-
-	</a>
+	</div>
 	
 </div>

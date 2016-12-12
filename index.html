@@ -148,7 +148,7 @@
 
   </div>
 
-  <div id="slider-left" class="hide fade-in ">
+  <div id="slider-left" class="hide fade-in shadow-z-2">
      
 
     <div class="navbar navbar-default level-basic level-edu">
@@ -548,18 +548,15 @@
 
 
  <div id="container" class="push">
-    
-    <div id="nav-section" class="fixed hide">
+       <div id="genes-control-track" class="hide shadow-z-2">
+          <div id="filters">
+          </div>
 
-      <div id="intro" class="hide level-basic shadow-z-2">
-      </div>
-
-      <div id="nav-card" class="shadow-z-2">
-      	<section id="app-title-section" class="nav-stretch level-basic">
+        <section id="app-title-section" class="nav-stretch level-basic">
 
           <!-- gene badges for navigation -->
-          <div class="nav-center">
-            <div>
+          <div id="genes-panel" class="hide nav-center">
+            <div style="text-align:center">
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
@@ -576,10 +573,8 @@
               </div>
 
               <div style="display:inline-block">
-                
                 <a id="refresh-badges-button" class="manage-gene-links" onclick="cacheHelper.refreshGeneBadges()">                  
-                   <i class="material-icons">cached</i>
-                  Refresh badges
+                  Refresh all genes
                 </a>
 
               </div>
@@ -621,7 +616,16 @@
               </a>
             </div>
           </div>
-      </section>
+      </section>          
+        </div>
+    
+    <div id="nav-section" class="fixed hide">
+
+      <div id="intro" class="hide level-basic shadow-z-2">
+      </div>
+
+      <div id="nav-card" class="shadow-z-2">
+
 
 
 
@@ -736,10 +740,7 @@
 
     <div id="track-section" class="push" style="margin-top:5px;">
 
-        <div id="variant-control-track" class="shadow-z-2 hide">
-          <div id="filters">
-          </div>
-        </div>
+
 
 
         <div id="matrix-track"  class="track shadow-z-2 hide">

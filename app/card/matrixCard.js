@@ -1088,7 +1088,7 @@ MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 
 };
 
-MatrixCard.prototype.showAfExacSymbol = function(selection) {
+MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
 	var symbolAttrs = {
 		afexac_unique_nc: { transform: "translate(2,2)", fill: "none", stroke: "#6b6666", sideLength: "11" },
 		afexac_unique: { transform: "translate(2,2)",    fill: "rgb(199, 0, 1)", stroke: "none", sideLength: "12" },
@@ -1097,6 +1097,13 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 		afexac_rare: { transform: "translate(2,2)",      fill: "rgb(247, 138, 31)", stroke: "none", sideLength: "12" },
 		afexac_uncommon: { transform: "translate(2,2)",  fill: "rgb(224, 195, 128)", stroke: "none", sideLength: "12" },
 		afexac_common: { transform: "translate(2,2)",    fill: "rgb(189,189,189)", stroke: "none", sideLength: "12"  }
+	}
+	// For the gene badge, we will display in a smaller size
+	if (options && options.hasOwnProperty('transform')) {
+		symbolAttrs[selection.datum().clazz].transform = options.transform;
+	}
+	if (options && options.hasOwnProperty('height')) {
+		symbolAttrs[selection.datum().clazz].sideLength = options.height;
 	}
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
@@ -1113,7 +1120,7 @@ MatrixCard.prototype.showAfExacSymbol = function(selection) {
 
 };
 
-MatrixCard.prototype.showAf1000gSymbol = function(selection) {
+MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
 	var symbolAttrs = {
 		af1000g_unique: { transform: "translate(2,2)",    fill: "rgb(199, 0, 1)", sideLength: "12" },
 		af1000g_uberrare: { transform: "translate(2,2)",  fill: "rgba(204, 28, 29, 0.79)", sideLength: "12" },
@@ -1121,6 +1128,13 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection) {
 		af1000g_rare: { transform: "translate(2,2)",      fill: "rgb(247, 138, 31)", sideLength: "12" },
 		af1000g_uncommon: { transform: "translate(2,2)",  fill: "rgb(224, 195, 128)", sideLength: "12" },
 		af1000g_common: { transform: "translate(2,2)",    fill: "rgb(189,189,189)", sideLength: "12"  }
+	}
+	// For the gene badge, we will display in a smaller size
+	if (options && options.hasOwnProperty('transform')) {
+		symbolAttrs[selection.datum().clazz].transform = options.transform;
+	}
+	if (options && options.hasOwnProperty('height')) {
+		symbolAttrs[selection.datum().clazz].sideLength = options.height;
 	}
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
@@ -1302,7 +1316,7 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 
 	var width = selection.datum().width ? selection.datum().width : 13;
 	var height = selection.datum().height ? selection.datum().width : 13;
-	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,1)";
+	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,-1)";
 
     
 	if (selection.datum().clazz != '') {
@@ -1399,8 +1413,8 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
 	} else {
 		type = selection.datum().type;
-		transform1 = selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,3)";
-		transform2 =  selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,6)";
+		transform1 = selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,1)";
+		transform2 =  selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)";
 		clazz = selection.datum().clazz;
 	}
 	var symbolScale = d3.scale.linear()
