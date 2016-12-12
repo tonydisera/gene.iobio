@@ -21,16 +21,16 @@ module.exports = {
                  .click('#select-gene-source + div .selectize-dropdown-content [data-value="RefSeq Transcript"]');
     },
     orderGenesByOriginalOrder: function() {
-      return this.click('#select-gene-container .selectize-control input')
+      return this.click('#select-gene-container .selectize-control .selectize-input')
                  .click('#select-gene-container .selectize-dropdown-content [data-value="(original order)"]');
     },
     orderGenesByRelevance: function() {
-      return this.click('#select-gene-container .selectize-control input')
-                 .click('#select-gene-container .selectize-dropdown-content [data-value="By relevance"]');
+      return this.click('#select-gene-container .selectize-control .selectize-input')
+                 .click('#select-gene-container .selectize-dropdown-content [data-value="relevance"]');
     },
     orderGenesByGeneName: function() {
-      return this.click('#select-gene-container .selectize-control input')
-                 .click('#select-gene-container .selectize-dropdown-content [data-value="By gene name"]');
+      return this.click('#select-gene-container .selectize-control .selectize-input')
+                 .click('#select-gene-container .selectize-dropdown-content [data-value="gene name"]');
     },
     goToPage: function(num) {
       return this.click('#gene-page-selection li[data-lp="' + num + '"]:not(.prev):not(.next) a');
