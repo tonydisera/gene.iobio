@@ -1,6 +1,5 @@
 var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
-var sliderIconBar = require('./sections/sliderIconBar.js');
 var probandVariantCard = require('./sections/probandVariantCard.js');
 var matrixTrack = require('./sections/matrixTrack.js');
 var matrixTooltip = require('./sections/matrixTooltip.js');
@@ -43,7 +42,6 @@ module.exports = {
   sections: {
     appTitleSection: appTitleSection,
     dataCard: dataCard,
-    sliderIconBar: sliderIconBar,
     filterPanel: filterPanel,
     findGenesPanel: findGenesPanel,
     aboutPanel: aboutPanel,
