@@ -963,9 +963,7 @@ section {
   color: #9ef4ff !important;
   padding-left: 0px;
   display: inline-block;
-  margin-top: 1px;
-  font-size: 18px;
-  font-style: italic; }
+  margin-top: 1px; }
 
 #gene-name {
   font-size: 16px;
@@ -2279,6 +2277,26 @@ text.ref-count {
   content: "";
   right: 10px; }
 
+.tooltip-wide.arrow-down-center:before {
+  position: absolute;
+  display: inline-block;
+  border-top: 10px solid #A7A5A5;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.2);
+  bottom: -10px;
+  content: "";
+  right: 328px; }
+.tooltip-wide.arrow-down-center:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 9px solid #FFFFFF;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  bottom: -8px;
+  content: "";
+  right: 330px; }
+
 .tooltip.black-arrow-left:after {
   position: absolute;
   display: inline-block;
@@ -2302,6 +2320,59 @@ text.ref-count {
   -webkit-transform: rotate(152deg);
   transform: rotate(152deg);
   content: ""; }
+
+.tooltip-wide {
+  font-size: 13px; }
+  .tooltip-wide .tooltip-title {
+    font-size: 14px; }
+  .tooltip-wide .tooltip-row {
+    clear: both;
+    padding-bottom: 6px; }
+  .tooltip-wide .tooltip-footer {
+    margin-top: 0px !important; }
+    .tooltip-wide .tooltip-footer .bookmark-badge {
+      height: 14px;
+      width: 100px; }
+      .tooltip-wide .tooltip-footer .bookmark-badge text {
+        font-size: 14px !important; }
+  .tooltip-wide .tooltip-left-column {
+    float: left;
+    padding-top: 10px;
+    padding-bottom: 0px; }
+    .tooltip-wide .tooltip-left-column .tooltip-row {
+      width: 360px;
+      overflow: auto; }
+      .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
+        width: 110px; }
+      .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
+        width: 240px; }
+  .tooltip-wide .tooltip-right-column {
+    float: right;
+    padding-top: 10px;
+    padding-bottom: 0px; }
+    .tooltip-wide .tooltip-right-column .tooltip-row {
+      width: 270px;
+      overflow: auto; }
+      .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-header {
+        width: 110px; }
+      .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-value {
+        width: 150px; }
+  .tooltip-wide a {
+    font-size: 13px !important; }
+    .tooltip-wide a:hover, .tooltip-wide a:focus {
+      font-size: 13px !important; }
+  .tooltip-wide a:hover, .tooltip-wide a:focus {
+    font-size: 13px !important; }
+  .tooltip-wide .tooltip-footer {
+    clear: both; }
+    .tooltip-wide .tooltip-footer a {
+      font-size: 14px !important; }
+      .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
+        font-size: 14px !important; }
+    .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
+      font-size: 14px !important; }
+  .tooltip-wide .row {
+    line-height: 14px !important; }
 
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
@@ -2521,7 +2592,7 @@ text.ref-count {
 #gene-badge {
   margin-top: 0px;
   margin-bottom: 8px;
-  margin-right: 6px;
+  margin-right: 12px;
   height: 20px; }
 
 #gene-badge.loading {
