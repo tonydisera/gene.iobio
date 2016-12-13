@@ -26,6 +26,32 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#setRowLabel', function() {
+		var mc, row_1, row_2, row_3, filtered_row_1, filtered_row_2, filtered_row_3, matrixRows;
+
+		beforeEach(function() {
+			row_1 = { name: 'Row 1', order: 0 };
+			row_2 = { name: 'Row 2', order: 1 };
+			row_3 = { name: 'Row 3', order: 2 };
+			filtered_row_1 = { name: 'Row 1', order: 0 };
+			filtered_row_2 = { name: 'Row 2', order: 1 };
+			filtered_row_3 = { name: 'Row 3', order: 2 };
+			mc = new MatrixCard();
+			mc.matrixRows = [row_1, row_2, row_3];
+			mc.filteredMatrixRows = [filtered_row_1, filtered_row_2, filtered_row_3];
+		});
+
+		it('sets a new label on the correct matrix row identified by its name', function() {
+			mc.setRowLabel('Row 2', 'New Label');
+			expect(row_2.name).toEqual('New Label');
+		});
+
+		it('sets a new label on the correct filtered matrix row identified by its name', function() {
+			mc.setRowLabel('Row 2', 'New Label');
+			expect(filtered_row_2.name).toEqual('New Label');
+		});
+	});
+
 	describe('#showAfExacSymbol', function() {
 		var data;
 
