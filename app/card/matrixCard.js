@@ -174,28 +174,6 @@ MatrixCard.prototype.removeRow = function(searchTerm, theMatrixRows) {
 	}
 }
 
-MatrixCard.prototype.removeRowById = function(id, theMatrixRows) {
-	var delIdx = -1;
-	var idx = 0;
-	var removedOrder = -1;
-	theMatrixRows.forEach( function (row) {
-		if (row.id == id) {
-			delIdx = idx;
-			removedOrder = row.order;
-		}
-		idx++;
-	});
-
-	if (delIdx >= 0) {
-		theMatrixRows.splice(delIdx, 1);
-		theMatrixRows.forEach( function(row) {
-			if (+row.order > +removedOrder) {
-				row.order--;
-			}
-		});
-	} 
-}
-
 MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 	this.matrixRows.forEach( function (row) {
 		if (row.name.indexOf(searchTerm) >= 0) {
