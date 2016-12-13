@@ -4,6 +4,28 @@ describe('MatrixCard', function() {
 		jasmine.addMatchers(jasmineColorMatchers);
 	});
 
+	describe('#removeRow', function() {
+		var row_1, row_2, row_3, matrixRows;
+
+		beforeEach(function() {
+			row_1 = { name: 'Row 1', order: 0 };
+			row_2 = { name: 'Row 2', order: 1 };
+			row_3 = { name: 'Row 3', order: 2 };
+			matrixRows = [row_1, row_2, row_3];
+		});
+
+		it('removes a matrix row by its name', function() {
+			matrixCard.removeRow('Row 2', matrixRows);
+			expect(matrixRows).toEqual([row_1, row_3]);
+		});
+
+		it('ensures the order is renumbered correctly', function() {
+			matrixCard.removeRow('Row 2', matrixRows);
+			expect(row_1.order).toEqual(0);
+			expect(row_3.order).toEqual(1);
+		});
+	});
+
 	describe('#showAfExacSymbol', function() {
 		var data;
 

@@ -159,26 +159,21 @@ MatrixCard.prototype.toogleMoveRows = function() {
 }
 
 MatrixCard.prototype.removeRow = function(searchTerm, theMatrixRows) {
-	var delIdx = -1;
-	var idx = 0;
-	var removedOrder = -1;
-	theMatrixRows.forEach( function (row) {
-		if (row.name.indexOf(searchTerm) >= 0) {
-			delIdx = idx;
-			removedOrder = row.order;
-		}
-		idx++;
+	var idx = theMatrixRows.findIndex(function(row) {
+		return row.name === searchTerm;
 	});
 
-	if (delIdx >= 0) {
-		theMatrixRows.splice(delIdx, 1);
-		theMatrixRows.forEach( function(row) {
+	if (idx >= 0) {
+		var removedOrder = theMatrixRows[idx].order;
+		theMatrixRows.splice(idx, 1);
+		theMatrixRows.forEach(function(row) {
 			if (+row.order > +removedOrder) {
 				row.order--;
 			}
 		});
-	} 
+	}
 }
+
 MatrixCard.prototype.removeRowById = function(id, theMatrixRows) {
 	var delIdx = -1;
 	var idx = 0;
