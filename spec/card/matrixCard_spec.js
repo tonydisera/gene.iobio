@@ -52,6 +52,32 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#setRowLabelById', function() {
+		var mc, row_1, row_2, row_3, filtered_row_1, filtered_row_2, filtered_row_3, matrixRows;
+
+		beforeEach(function() {
+			row_1 = { name: 'Row 1', id: 'id_1' };
+			row_2 = { name: 'Row 2', id: 'id_2' };
+			row_3 = { name: 'Row 3', id: 'id_3' };
+			filtered_row_1 = { name: 'Row 1', id: 'id_1' };
+			filtered_row_2 = { name: 'Row 2', id: 'id_2' };
+			filtered_row_3 = { name: 'Row 3', id: 'id_3' };
+			mc = new MatrixCard();
+			mc.matrixRows = [row_1, row_2, row_3];
+			mc.filteredMatrixRows = [filtered_row_1, filtered_row_2, filtered_row_3];
+		});
+
+		it('sets a new label on the correct matrix row identified by its id', function() {
+			mc.setRowLabelById('id_2', 'New Label');
+			expect(row_2.name).toEqual('New Label');
+		});
+
+		it('sets a new label on the correct filtered matrix row identified by its id', function() {
+			mc.setRowLabelById('id_2', 'New Label');
+			expect(filtered_row_2.name).toEqual('New Label');
+		});
+	});
+
 	describe('#showAfExacSymbol', function() {
 		var data;
 
