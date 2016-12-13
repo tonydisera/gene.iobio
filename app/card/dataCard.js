@@ -228,8 +228,6 @@ DataCard.prototype.loadMygene2Data = function() {
 
 	var loadProband = function(vcfFilePath) {
 
-		me.setVcfUrl("proband", "Variants", "https://s3-us-west-2.amazonaws.com/michigan-genome/Sample13_combined_filtered_normalized.vcf.gz", null);
-/*
 		if (vcfFilePath != null) {
 			// Get rid of leading "/" in file path when server instance already ends with "/"
 			if (endsWith(serverInstance, "/") && vcfFilePath.indexOf("/") == 0) {
@@ -245,7 +243,6 @@ DataCard.prototype.loadMygene2Data = function() {
 			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
 			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
 		}
-		*/
 		window.loadTracksForGene();
 		window.showSidebar("Phenolyzer");
 
@@ -288,13 +285,6 @@ DataCard.prototype.loadMygene2Data = function() {
 		        console.log( "Status: " + status );
 		        console.log( xhr );
 		        console.log("Unable to get MyGene2 endpoint filenames");
-
-
-
-
-		        loadProband();
-
-/*
 		        alertify.confirm("Unable to obtain variant files using MyGene2 token.",
 				    function(){ 
 				    }, 
@@ -302,7 +292,6 @@ DataCard.prototype.loadMygene2Data = function() {
 				    	loadProband();
 				    }
 				 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'}); ;   
-*/
 		    }
 		});
 	}
