@@ -205,21 +205,6 @@ MatrixCard.prototype.setRowLabelById = function(id, newRowLabel) {
 	
 }
 
-MatrixCard.prototype.setRowAttribute = function(searchTerm, newRowAttribute) {
-	this.matrixRows.forEach( function (row) {
-		if (row.name.indexOf(searchTerm) >= 0) {
-			row.attribute = newRowAttribute;
-		}
-	});
-	if (this.filteredMatrixRows) {
-		this.filteredMatrixRows.forEach( function (row) {
-			if (row.name.indexOf(searchTerm) >= 0) {
-				row.attribute = newRowAttribute;
-			}
-		});		
-	}
-	
-}
 MatrixCard.prototype.setRowAttributeById = function(id, newRowAttribute) {
 	this.matrixRows.forEach( function (row) {
 		if (row.id == id) {
