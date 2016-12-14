@@ -15,12 +15,12 @@ function MatrixCard() {
 	this.ROW_LABEL_WIDTH_BASIC     = 25;
 	this.ROW_LABEL_WIDTH_EDU       = 100;
 
-	this.clinvarMap     = {  
+	this.clinvarMap     = {
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
 			  		    'pathogenic/likely_pathogenic' : {value: 2,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
                         'likely_pathogenic'     : {value: 3,   badge: true, examineBadge: true, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
                         'uncertain_significance': {value: 4,   badge: true, examineBadge: true, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  {value: 4, badge: false, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},                       
+						'conflicting_interpretations_of_pathogenicity':  {value: 4, badge: false, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
                         'conflicting_data_from_submitters': {value: 5, badge: false, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
                         'drug_response'         : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'confers_sensitivity'   : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
@@ -34,49 +34,49 @@ function MatrixCard() {
                         'benign'                : {value: 151, badge: false, examineBadge: true, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
                         'none'                  : {value: 161, badge: false, examineBadge: false, clazz: ''}
                      };
-	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},    
-                        MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},  
+	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},
+                        MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},
                         MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showImpactSymbol},
                         LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
                      };
-	this.highestImpactMap = {  
-		                HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showHighestImpactSymbol},    
-                        MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showHighestImpactSymbol},  
+	this.highestImpactMap = {
+		                HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showHighestImpactSymbol},
+                        MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showHighestImpactSymbol},
                         MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showHighestImpactSymbol},
                         LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showHighestImpactSymbol}
                      };
-	this.siftMap = {  
+	this.siftMap = {
                         deleterious:                 {value: 1, badge: true, clazz: 'sift_deleterious', symbolFunction: this.showSiftSymbol},
                         deleterious_low_confidence:  {value: 2, badge: true, clazz: 'sift_deleterious_low_confidence', symbolFunction: this.showSiftSymbol},
-		                tolerated_low_confidence: {value: 3, badge: false, clazz: 'sift_tolerated_low_confidence',symbolFunction: this.showSiftSymbol},  
-		                tolerated:    {value: 102, badge: false, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},  
+		                tolerated_low_confidence: {value: 3, badge: false, clazz: 'sift_tolerated_low_confidence',symbolFunction: this.showSiftSymbol},
+		                tolerated:    {value: 102, badge: false, clazz: 'sift_tolerated',symbolFunction: this.showSiftSymbol},
                         unknown:      {value: 103, badge: false, clazz: ''},
                         none:         {value: 103, badge: false, clazz: ''}
                      };
-	this.polyphenMap = {  
+	this.polyphenMap = {
                         probably_damaging:    {value: 1, badge: true, clazz: 'polyphen_probably_damaging', symbolFunction: this.showPolyPhenSymbol},
-		                possibly_damaging:    {value: 2, badge: true, clazz: 'polyphen_possibly_damaging', symbolFunction: this.showPolyPhenSymbol},  
+		                possibly_damaging:    {value: 2, badge: true, clazz: 'polyphen_possibly_damaging', symbolFunction: this.showPolyPhenSymbol},
                         benign:               {value: 103, badge: false, clazz: 'polyphen_benign',            symbolFunction:this.showPolyPhenSymbol},
                         unknown:              {value: 104, badge: false, clazz: ''},
                         none:                 {value: 104, badge: false, clazz: ''}
                      };
-	this.inheritanceMap = {  
-		                denovo:    {value: 1, badge: true, clazz: 'denovo',    symbolFunction: this.showDeNovoSymbol},  
+	this.inheritanceMap = {
+		                denovo:    {value: 1, badge: true, clazz: 'denovo',    symbolFunction: this.showDeNovoSymbol},
                         recessive: {value: 2, badge: true, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
                         none:      {value: 3, badge: false, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
                      };
-	this.zygosityMap = {  
-		                HOM:        {value: 1, badge: true,  clazz: 'zyg_hom',        symbolFunction: this.showHomSymbol},  
+	this.zygosityMap = {
+		                HOM:        {value: 1, badge: true,  clazz: 'zyg_hom',        symbolFunction: this.showHomSymbol},
                         HET:        {value: 2, badge: false, clazz: 'het'        },
                         HOMREF:     {value: 3, badge: false, clazz: 'homref'     },
                         gt_unknown: {value: 4, badge: false, clazz: 'gt_unknown' }
                      };
-	this.bookmarkMap = {  
-		                Y: {value: 1, badge: true,  clazz: 'bookmark',  symbolFunction: this.showBookmarkSymbol},  
+	this.bookmarkMap = {
+		                Y: {value: 1, badge: true,  clazz: 'bookmark',  symbolFunction: this.showBookmarkSymbol},
                         N: {value: 2, badge: false, clazz: '',          symbolFunction: this.showBookmarkSymbol}
                      };
-	this.unaffectedMap = {  
-		                recessive_none: {value: 1,   badge: true,  clazz: 'unaffected', symbolFunction: this.showSibNotRecessiveSymbol},  
+	this.unaffectedMap = {
+		                recessive_none: {value: 1,   badge: true,  clazz: 'unaffected', symbolFunction: this.showSibNotRecessiveSymbol},
                         recessive_some: {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
                         recessive_all:  {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
                         present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
@@ -84,8 +84,8 @@ function MatrixCard() {
                         present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''},
                         none:           {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''}
                  };
-	this.affectedMap = {  
-		                recessive_all:  {value: 1,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},  
+	this.affectedMap = {
+		                recessive_all:  {value: 1,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
                         recessive_some: {value: 2,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
                         present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
                         present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
@@ -93,21 +93,21 @@ function MatrixCard() {
                         none:           {value: 104, badge: false, clazz: 'affected',  symbolFunction: ''}
                  };
 	// For af range, value must be > min and <= max
-	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, badge: false, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},	
-                       {min: -1.1,   max: +0,     value: +2,  badge: false, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},	
-                       {min: -1.1,   max: +.0001, value: +3,  badge: false, clazz: 'afexac_uberrare',   symbolFunction: this.showAfExacSymbol},	
-                       {min: -1.1,   max: +.001,  value: +4,  badge: false, clazz: 'afexac_superrare',  symbolFunction: this.showAfExacSymbol},	
-                       {min: -1.1,   max: +.01,   value: +5,  badge: false, clazz: 'afexac_rare',       symbolFunction: this.showAfExacSymbol},	
-                       {min: +.01,   max: +.05,   value: +6,  badge: false, clazz: 'afexac_uncommon',   symbolFunction: this.showAfExacSymbol},	
-                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'afexac_common',     symbolFunction: this.showAfExacSymbol},	
+	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, badge: false, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},
+                       {min: -1.1,   max: +0,     value: +2,  badge: false, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},
+                       {min: -1.1,   max: +.0001, value: +3,  badge: false, clazz: 'afexac_uberrare',   symbolFunction: this.showAfExacSymbol},
+                       {min: -1.1,   max: +.001,  value: +4,  badge: false, clazz: 'afexac_superrare',  symbolFunction: this.showAfExacSymbol},
+                       {min: -1.1,   max: +.01,   value: +5,  badge: false, clazz: 'afexac_rare',       symbolFunction: this.showAfExacSymbol},
+                       {min: +.01,   max: +.05,   value: +6,  badge: false, clazz: 'afexac_uncommon',   symbolFunction: this.showAfExacSymbol},
+                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'afexac_common',     symbolFunction: this.showAfExacSymbol},
                       ];
-	this.af1000gMap= [ {min: -1.1,   max: +0,     value: +2,  badge: false, clazz: 'af1000g_unique',     symbolFunction: this.showAf1000gSymbol},	
-                       {min: -1.1,   max: +.0001, value: +3,  badge: false, clazz: 'af1000g_uberrare',   symbolFunction: this.showAf1000gSymbol},	
-                       {min: -1.1,   max: +.001,  value: +4,  badge: false, clazz: 'af1000g_superrare',  symbolFunction: this.showAf1000gSymbol},	
-                       {min: -1.1,   max: +.01,   value: +5,  badge: false, clazz: 'af1000g_rare',       symbolFunction: this.showAf1000gSymbol},	
-                       {min: +.01,   max: +.05,   value: +6,  badge: false, clazz: 'af1000g_uncommon',   symbolFunction: this.showAf1000gSymbol},	
-                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'af1000g_common',     symbolFunction: this.showAf1000gSymbol},	
-                      ];                      
+	this.af1000gMap= [ {min: -1.1,   max: +0,     value: +2,  badge: false, clazz: 'af1000g_unique',     symbolFunction: this.showAf1000gSymbol},
+                       {min: -1.1,   max: +.0001, value: +3,  badge: false, clazz: 'af1000g_uberrare',   symbolFunction: this.showAf1000gSymbol},
+                       {min: -1.1,   max: +.001,  value: +4,  badge: false, clazz: 'af1000g_superrare',  symbolFunction: this.showAf1000gSymbol},
+                       {min: -1.1,   max: +.01,   value: +5,  badge: false, clazz: 'af1000g_rare',       symbolFunction: this.showAf1000gSymbol},
+                       {min: +.01,   max: +.05,   value: +6,  badge: false, clazz: 'af1000g_uncommon',   symbolFunction: this.showAf1000gSymbol},
+                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'af1000g_common',     symbolFunction: this.showAf1000gSymbol},
+                      ];
 
 
 
@@ -153,7 +153,7 @@ MatrixCard.prototype.toogleMoveRows = function() {
 	if ($('#feature-matrix.shift-rows').length > 0) {
 		$('#move-rows').text("Reorder");
 	} else {
-		$('#move-rows').text("Done");		
+		$('#move-rows').text("Done");
 	}
 	$('#feature-matrix').toggleClass("shift-rows");
 }
@@ -185,9 +185,9 @@ MatrixCard.prototype.setRowLabel = function(searchTerm, newRowLabel) {
 			if (row.name.indexOf(searchTerm) >= 0) {
 				row.name = newRowLabel;
 			}
-		});		
+		});
 	}
-	
+
 }
 MatrixCard.prototype.setRowLabelById = function(id, newRowLabel) {
 	this.matrixRows.forEach( function (row) {
@@ -200,9 +200,9 @@ MatrixCard.prototype.setRowLabelById = function(id, newRowLabel) {
 			if (row.id == id) {
 				row.name = newRowLabel;
 			}
-		});		
+		});
 	}
-	
+
 }
 
 MatrixCard.prototype.setRowAttributeById = function(id, newRowAttribute) {
@@ -216,9 +216,9 @@ MatrixCard.prototype.setRowAttributeById = function(id, newRowAttribute) {
 			if (row.id == id) {
 				row.attribute = newRowAttribute;
 			}
-		});		
+		});
 	}
-	
+
 }
 
 MatrixCard.prototype.getRowAttribute = function(searchTerm) {
@@ -227,7 +227,7 @@ MatrixCard.prototype.getRowAttribute = function(searchTerm) {
 		if (row.name.indexOf(searchTerm) >= 0) {
 			attribute = row.attribute;
 		}
-	});	
+	});
 	return attribute;
 }
 
@@ -237,7 +237,7 @@ MatrixCard.prototype.getRowOrder = function(searchTerm) {
 		if (row.name.indexOf(searchTerm) >= 0) {
 			order = row.order;
 		}
-	});	
+	});
 	return order;
 }
 
@@ -257,7 +257,7 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 			return (i+1).toString() + ".  " + rsId;
 		} else {
 			return (i+1).toString();
-		}		
+		}
 	}
 
 }
@@ -270,13 +270,13 @@ MatrixCard.prototype.init = function() {
 	} else if (isLevelEdu || isLevelBasic) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
-		this.removeRow('Zygosity', me.matrixRows);	
+		this.removeRow('Zygosity', me.matrixRows);
 		this.removeRow('Bookmark', me.matrixRows);
 
 		// Only show genotype on second educational tour
 		if (!isLevelEduTour || eduTourNumber != 2) {
 			this.removeRow('Genotype', me.matrixRows);
-		}				
+		}
 		// Only show inheritance on first educational tour
 		if (!isLevelEduTour || eduTourNumber != 1) {
 			this.removeRow('Inheritance Mode', me.matrixRows);
@@ -314,12 +314,12 @@ MatrixCard.prototype.init = function() {
 						    		variantCard.showVariantCircle(variant);
 						    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
 						    	});
-						    	
+
 					    	} else {
 					    		me.unpin();
-					    	}				    		
+					    	}
 				    	}
-				    	
+
 				    })
 				     .on('d3mouseover', function(variant) {
 				     	if (clickedVariant == null) {
@@ -328,12 +328,12 @@ MatrixCard.prototype.init = function() {
 					    		variantCard.showVariantCircle(variant);
 					    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
 					    	});
-					    	
+
 				     	}
 				    })
 				    .on('d3mouseout', function() {
 				    	if (clickedVariant == null) {
-				    		unpinAll();		    		
+				    		unpinAll();
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
@@ -354,7 +354,7 @@ MatrixCard.prototype.init = function() {
 				    		columnPrev.order = columnPrev.order + 1;
 				    	}
 				    	getProbandVariantCard().sortFeatureMatrix();
-				    	
+
 				    })
 				    .on('d3rowdown', function(i) {
 				    	if (isLevelEdu  || isLevelBasic) {
@@ -438,7 +438,7 @@ MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
 	if (index >= 0) {
 		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
 		var column  = d3.select(colNode);
-		var colObject = column.datum();		
+		var colObject = column.datum();
 
 		var rowIdx = this.getRowOrder("Bookmark");
 		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ")").data([{clazz: 'bookmark' }]);
@@ -461,8 +461,8 @@ MatrixCard.prototype.removeBookmarkFlag = function(theVariant) {
 	if (index >= 0) {
 		var colNode = d3.selectAll('#feature-matrix .col')[0][index];
 		var column  = d3.select(colNode);
-		var colObject = column.datum();	
-		colObject.isBookmark = 'N';	
+		var colObject = column.datum();
+		colObject.isBookmark = 'N';
 
 		var rowIdx = this.getRowOrder("Bookmark");
 		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ") g.bookmark").remove();
@@ -495,9 +495,9 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
       	column.classed("active", true);
       	column.select(".colbox").classed("current", true);
 
-      	var left = (isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1; 
+      	var left = (isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1;
       	$("#feature-matrix").scrollLeft(left);
-	
+
       	if (showTooltip) {
 	      	// Get screen coordinates of column.  We will use this to position the
 	      	// tooltip above the column and scroll left if necessary
@@ -518,8 +518,8 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	        		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
 			// Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
             // so instead the app will use getBoundingClientRect() method instead which does take into consideration
-            // the transform. 
-            var boundRect = column.node().getBoundingClientRect();   
+            // the transform.
+            var boundRect = column.node().getBoundingClientRect();
             colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + me.featureMatrix.margin().left;
 	      	//colObject.screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
 	      	colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
@@ -551,8 +551,8 @@ MatrixCard.prototype.reset = function() {
 
 MatrixCard.prototype.hideTooltip = function() {
 	var tooltip = d3.select('#container #matrix-track .tooltip');
-	tooltip.transition()        
-           .duration(500)      
+	tooltip.transition()
+           .duration(500)
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
@@ -577,13 +577,13 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	if (lock && !isLevelEdu && !isLevelBasic) {
 		getProbandVariantCard().unpin(true);
 		eduTourCheckVariant(variant);
-		
+
 		var xMatrix = variant.screenXMatrix;
 		var yMatrix = variant.screenYMatrix;
-		
+
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(variant, true)
-		
+
 		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
 	        .then( function(refreshedVariant) {
 
@@ -599,7 +599,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 				}
 
 
-	        });			
+	        });
 	} else {
 		me._showTooltipImpl(variant, lock);
 	}
@@ -637,7 +637,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	if (filterCard.shouldWarnForNonPassVariants()) {
 		$('#low-quality-legend').removeClass("hide");
 	} else {
-		$('#low-quality-legend').addClass("hide");		
+		$('#low-quality-legend').addClass("hide");
 	}
 
 	// Flag any bookmarked variants
@@ -646,7 +646,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 	// Figure out if we should show the unaffected sibs row
 	if (this.filteredMatrixRows == null) {
-		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);	
+		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);
 		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
 			me.removeRow('Affected Siblings', me.filteredMatrixRows);
 		}
@@ -654,7 +654,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			me.removeRow('Unaffected Siblings', me.filteredMatrixRows);
 		}
 	}
-	
+
 	resizeCardWidths();
 
 	if (isLevelBasic) {
@@ -662,9 +662,9 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			$('#matrix-track #no-variants.level-basic').removeClass("hide");
 			$('#matrix-panel').addClass("hide");
 		} else {
-			$('#matrix-track #no-variants.level-basic').addClass("hide");		
+			$('#matrix-track #no-variants.level-basic').addClass("hide");
 			$('#matrix-panel').removeClass("hide");
-		}		
+		}
 	}
 
 	if (theVcfData != null) {
@@ -675,7 +675,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 		});
 	}
 
-	// Sort the matrix columns	
+	// Sort the matrix columns
 	this.filteredMatrixRows = this.filteredMatrixRows.sort(function(a, b) {
 		if (a.order == b.order) {
 			return 0;
@@ -685,8 +685,8 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			return 1;
 		}
 	});
-    
-	
+
+
 	// Fill all features used in feature matrix for each variant
 	this.featureVcfData.features.forEach( function(variant) {
 		var features = [];
@@ -703,14 +703,14 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			// Don't fill in clinvar for now
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = 'N';
-			} 
-			if (rawValue != null && (me.isNumeric(rawValue) || rawValue != "")) {				
+			}
+			if (rawValue != null && (me.isNumeric(rawValue) || rawValue != "")) {
 				if (matrixRow.match == 'field') {
 					if (matrixRow.formatFunction) {
 						theValue = matrixRow.formatFunction.call(me, variant, rawValue);
 					} else {
 						theValue = rawValue;
-					}					
+					}
 					mappedClazz = matrixRow.attribute;
 					if (matrixRow.rankFunction) {
 						mappedValue = matrixRow.rankFunction.call(me, variant, rawValue);
@@ -742,7 +742,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 							mappedValue = matrixRow.map[rawValue].value;
 							mappedClazz = matrixRow.map[rawValue].clazz;
 							symbolFunction = matrixRow.map[rawValue].symbolFunction;
-							theValue = rawValue;							
+							theValue = rawValue;
 						} else {
 							console.log("No matrix value to map to " + rawValue + " for " + matrixRow.attribute);
 						}
@@ -771,9 +771,9 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 				rawValue = '';
 				mappedClazz = '';
 			}
-			features[matrixRow.order] = { 
-				                    'value': theValue, 
-				                    'rank': (mappedValue ? mappedValue : me.featureUnknown), 
+			features[matrixRow.order] = {
+				                    'value': theValue,
+				                    'rank': (mappedValue ? mappedValue : me.featureUnknown),
 				                    'clazz': mappedClazz,
 				                    'symbolFunction': symbolFunction
 				                  };
@@ -821,28 +821,22 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 	// Load the chart with the new data
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
-	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
+	var selection = d3.select("#feature-matrix").data([sortedFeatures]);
 
     this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
-    // We have new properties to filter on (for inheritance), so refresh the 
+    // We have new properties to filter on (for inheritance), so refresh the
     //proband variant chart.
 	/*variantCards.forEach(function(variantCard) {
 		if (variantCard.getRelationship() == 'proband') {
 			variantCard.showVariants(regionStart, regionEnd);
 		}
 	});*/
-	
-	
 }
 
 MatrixCard.prototype.setFeatureMatrixSource = function(theVcfData) {
 	this.sourceVcfData = theVcfData;
 }
-
-
-
-
 
 MatrixCard.prototype.isNumeric = function(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -851,7 +845,7 @@ MatrixCard.prototype.isNumeric = function(n) {
 MatrixCard.prototype.isDictionary = function(obj) {
   if(!obj) {
   	return false;
-  } 
+  }
   if(Array.isArray(obj)) {
   	return false;
   }
@@ -910,7 +904,7 @@ MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
 	         	} else if (clazz == 'clinvar_uc') {
 	         		return "rgba(231,186,82,1)";
 	         	} else if (clazz == 'clinvar_benign') {
-	         		return "rgba(156,194,49,1)";	         		
+	         		return "rgba(156,194,49,1)";
 	         	} else if (clazz == 'clinvar_lbenign') {
 	         		return "rgba(181,207,107,1)";
 	         	} else if (clazz == 'clinvar_other') {
@@ -947,7 +941,7 @@ MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
 	         		return "#FB7737";
 	         	} else if (clazz == 'polyphen_benign') {
 	         		return "rgba(181, 207, 107,1)";
-	         	} 
+	         	}
 	         });
 
 };
@@ -980,7 +974,7 @@ MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 	         		return "rgba(231,186,82,1)";
 	         	} else if (clazz == 'sift_tolerated') {
 	         		return "rgba(181, 207, 107,1)";
-	         	} 
+	         	}
 	         });
 
 };
@@ -1061,7 +1055,7 @@ MatrixCard.prototype.showHomSymbol = function (selection, options) {
 	         .style("fill", "white")
 	         .style("font-weight", "bold")
 	         .style("font-size", "6.5px")
-	         .text("Hom");		
+	         .text("Hom");
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
@@ -1095,7 +1089,7 @@ MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
 	if (options && options.cellSize && options.cellSize > 18) {
 		transform = "translate(1,0)";
 	} else if (options && options.transform) {
-		transform = options.transform; 
+		transform = options.transform;
 	}
 
 	selection.append("g")
@@ -1105,7 +1099,7 @@ MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
 	         .attr("width", width)
 	         .attr("height", height)
 	         .style("pointer-events", "none");
-	
+
 };
 
 MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
@@ -1139,7 +1133,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
 	MatrixCard.wrap(text, options.cellSize, 3);
-	
+
 };
 
 
@@ -1180,11 +1174,11 @@ MatrixCard.prototype.showSibPresentSymbol = function (selection) {
 };
 
 MatrixCard.prototype.showNoInheritSymbol = function (selection) {
-	
+
 };
 
 MatrixCard.prototype.getSymbol = function(d,i) {
-	 
+
 };
 
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
@@ -1193,7 +1187,7 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	var width = selection.datum().width ? selection.datum().width : 12;
 	var height = selection.datum().height ? selection.datum().width : 12;
 	var translate = selection.datum().translate ? selection.datum().translate : "translate(2,2)";
-    
+
 	if (selection.datum().clazz != '') {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
@@ -1202,7 +1196,7 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	         .attr("xlink:href", '#bookmark-symbol')
 	         .attr("width",  width)
 	         .attr("height", height);
-	         
+
 	}
 
 
@@ -1215,7 +1209,7 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 	var height = selection.datum().height ? selection.datum().width : 13;
 	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,-1)";
 
-    
+
 	if (selection.datum().clazz != '') {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
@@ -1224,7 +1218,7 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 	         .attr("xlink:href", '#phenotype-symbol')
 	         .attr("width",  width)
 	         .attr("height", height);
-	         
+
 	}
 
 
@@ -1238,16 +1232,16 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
                     .range([9,15,25,38,54,58]);
 	var symbolScaleCircle = d3.scale.ordinal()
 			                  .domain([3,4,5,6,7,8])
-			                  .range([9,15,25,58,68,78]);                    
-	
+			                  .range([9,15,25,58,68,78]);
+
     var symbolSize = symbolScale(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
     var symbolSizeCircle = symbolScaleCircle(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
 
-    var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ; 
+    var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ;
     var translateSymbol = options && options.cellSize && options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
     var width           = options && options.cellSize && options.cellSize > 18 ? 10 : 8;
     var height          = width;
-     
+
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
 		         .attr("transform", translate)
@@ -1255,13 +1249,13 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 		         .attr("width", width)
 		         .attr("height", height)
 		         .attr("class", "filter-symbol " + selection.datum().clazz + " snp")
-		         .style("pointer-events", "none");		
+		         .style("pointer-events", "none");
 	} else {
 		selection
 		  .append("g")
 		  .attr("transform", translateSymbol)
 		  .append('path')
-          .attr("d", function(d,i) { 
+          .attr("d", function(d,i) {
           	return d3.svg
                      .symbol()
                      .size( function(d,i) {
@@ -1319,7 +1313,7 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
                     .range([10,40]);
 
     var symbolSize = symbolScale(6);
-     
+
 	if (type.toUpperCase() == 'SNP') {
 		selection.append("g")
 		          .attr("transform", transform1)
@@ -1327,13 +1321,13 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 		         .attr("width", 8)
 		         .attr("height", 8)
 		         .attr("class", "filter-symbol " + clazz)
-		         .style("pointer-events", "none");		
+		         .style("pointer-events", "none");
 	} else {
 		selection
 		  .append("g")
 		  .attr("transform", transform2)
 		  .append('path')
-          .attr("d", function(d,i) { 
+          .attr("d", function(d,i) {
           	return d3.svg
                      .symbol()
                      .size(symbolSize)
@@ -1409,91 +1403,6 @@ MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
 	return stripTranscriptPrefix(selectedTranscript.transcript_id);
 }
 
-MatrixCard.prototype.formatTranscriptHighestImpact = function(variant, highestImpactVep) {
-	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
-		return "";
-	} else {
-		var transcripts = [];
-		for( impactKey in highestImpactVep) {
-			var consequenceObject = highestImpactVep[impactKey];
-			for (consequenceKey in consequenceObject) {
-				var transcriptObject = consequenceObject[consequenceKey];
-				if (transcriptObject == null || transcriptObject == '' || Object.keys(transcriptObject).length == 0) {
-					// Use canonical transcript
-					transcripts.push(stripTranscriptPrefix(selectedTranscript.transcript_id));
-				} else {
-					// Show all non-canonical transcripts that this highest impact applies to
-					for (transcript in transcriptObject) {
-						transcripts.push(stripTranscriptPrefix(transcript));
-					}
-				}
-			}
-		}
-		return transcripts.sort().join(" ");
-	}
-
-}
-MatrixCard.prototype.formatConsequenceHighestImpact = function(variant, highestImpactVep) {
-	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
-		return "";
-	} else {
-		var consequences = [];
-		for( impactKey in highestImpactVep) {
-			var consequenceObject = highestImpactVep[impactKey];
-			for (consequenceKey in consequenceObject) {
-				consequences.push(consequenceKey.split('_variant').join(' ').split('_').join(' '));
-			}
-		}
-		return consequences.join(",");
-	}
-
-}
-MatrixCard.prototype.formatHighestImpact = function(variant, highestImpactVep) {
-	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
-		return "";
-	} else {
-			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
-			if (isLevelBasic) {
-				for (key in highestImpactVep) {
-					if (key == 'HIGH') {
-						if (variant.featureClass == null) {
-							variant.featureClass = "";
-						}
-						variant.featureClass += " danger";
-					}
-
-				}
-
-			}		
-		return Object.keys(highestImpactVep).join(" ");
-	}
-
-}
-
-MatrixCard.prototype.formatSimpleHgvsP = function(variant, value) {
-	if (value == null || value == '' || Object.keys(value).length == 0) {
-		return "";
-	} else {
-		var buf = "";
-		for(var key in value) {
-			var tokens = key.split(":p.");
-			if (buf.length > 0) {
-				buf += " ";
-			}
-			if (tokens.length == 2) {
-				var basicNotation = "p." + tokens[1];
-				var simpleNotation = basicNotation.replace(/[0-9]/g, '');
-				var aminoAcids = simpleNotation.split(/([A-Z][^A-Z]*)/g).filter(function(part) {return part.length != 0});;
-				if (aminoAcids.length == 2) {
-					buf += aminoAcids.join('>');
-				} else {
-					buf += simpleNotation;
-				}
-			} 		
-		}
-		return buf;
-	}
-}
 MatrixCard.prototype.formatHgvsP = function(variant, value) {
 	if (value == null || value == '' || Object.keys(value).length == 0) {
 		return "";
@@ -1515,28 +1424,8 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
 							buf += "p.(=)";
 						}
 					}
-				} 
-				
-			}		
-		}
-		return buf;
-	}
-}
-MatrixCard.prototype.formatSimpleHgvsC = function(variant, value) {
-	if (value == null || value == '' || Object.keys(value).length == 0) {
-		return "";
-	} else {
-		var buf = "";
-		for(var key in value) {
-			var tokens = key.split(":c.");
-			if (buf.length > 0) {
-				buf += " ";
+				}
 			}
-			if (tokens.length == 2) {
-				var basicNotation = tokens[1];
-				var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
-				buf += simpleNotation;
-			} 		
 		}
 		return buf;
 	}
@@ -1555,7 +1444,7 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 			if (tokens.length == 2) {
 				var basicNotation = "c." + tokens[1];
 				buf += basicNotation;
-			} 		
+			}
 		}
 		return buf;
 	}
@@ -1605,7 +1494,7 @@ MatrixCard.wrap = function(text, width, maxLines) {
 	        line = [word];
 	        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
 	      }
-      } 
+      }
     }
   });
 }
