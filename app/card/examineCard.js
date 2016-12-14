@@ -82,11 +82,13 @@ ExamineCard.prototype.injectVariantGlyphs = function(tooltip, variant, selector)
 			}
 		}		
 	} else {
+		var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(0,2)' : 'translate(5,6)';
+		
 		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 		for (impact in impactList) {
 			var theClazz = 'impact_' + impact;	
-			$(selector + " .tooltip-value.impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"11\" width=\"11\">");
-			var selection = d3.select(selector + ' .impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: 'translate(0,2)', type: variant.type}]);
+			$(selector + " .tooltip-value.impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
+			var selection = d3.select(selector + ' .impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: translate, type: variant.type}]);
 			matrixCard.showImpactBadge(selection);	
 		}		
 
@@ -94,8 +96,8 @@ ExamineCard.prototype.injectVariantGlyphs = function(tooltip, variant, selector)
 			var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
 			for (impact in highestImpactList) {
 				var theClazz = 'impact_' + impact;	
-				$(selector + " .tooltip-value.highest-impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"11\" width=\"14\">");
-				var selection = d3.select(selector + ' .highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: 'translate(0,2)', type: variant.type}]);
+				$(selector + " .tooltip-value.highest-impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
+				var selection = d3.select(selector + ' .highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: translate, type: variant.type}]);
 				matrixCard.showImpactBadge(selection);	
 			}
 		}
@@ -194,7 +196,7 @@ ExamineCard.prototype.injectVariantGlyphs = function(tooltip, variant, selector)
 	}	
 }
 
-ExamineCard.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, html) {
+ExamineCard.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html) {
 	var me = this;
 	tooltip.style("z-index", 20);
 	tooltip.transition()        
@@ -205,9 +207,9 @@ ExamineCard.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, 
 	if (isLevelEdu || isLevelBasic) {
 		tooltip.classed("level-edu", "true");
 	} 
-	
-	tooltip.classed("tooltip-wide", lock);
 
+	tooltip.classed("tooltip-wide", lock);
+	
 	if (html == null) {
 		if (lock) {
 			html = window.getProbandVariantCard().variantDetailHTML(variant, null, 'tooltip-wide');
@@ -215,14 +217,16 @@ ExamineCard.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, 
 			html = window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip")
 		}		
 	}
-
 	tooltip.html(html);
-
 	me.injectVariantGlyphs(tooltip, variant, lock ? '.tooltip-wide' : '.tooltip');
 
-
+	
+	if (variantCard == null) {
+		variantCard = window.getProbandVariantCard();
+	}
 	var selection = tooltip.select("#coverage-svg");
-	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant, lock ? 150 : null);
+	variantCard.createAlleleCountSVGTrio(selection, variant, lock ? 150 : null);
+
 
 	var widthSimpleTooltip = 220;
 	if ($(tooltip[0]).find('.col-sm-8').length > 0) {

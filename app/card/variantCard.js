@@ -1828,13 +1828,8 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		y -= $('#nav-edu-tour').outerHeight();
 	}
 
-
-	var html = null;
-    if (this != sourceVariantCard) {
-		html = me.variantTooltipMinimalHTML(variant);
-    }
 	
-	examineCard.fillAndPositionTooltip(tooltip, variant, lock, x, y, html);
+	examineCard.fillAndPositionTooltip(tooltip, variant, lock, x, y, me);
 
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
