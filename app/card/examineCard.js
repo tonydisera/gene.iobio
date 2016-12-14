@@ -232,13 +232,11 @@ ExamineCard.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, 
  	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : (lock ? 650 : 360);
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
-	console.log("   before y=" + screenY + " offsetHeight=" + h);
 	var x = screenX;
 	var y = screenY -  +$('body #container').css('top').split("px")[0] + 10;
 	if (y - h < 0) {
 		y = h + 5;
 	}
-	console.log("   after y=" + y);
 
 	x = sidebarAdjustX(x);
 
@@ -246,7 +244,6 @@ ExamineCard.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, 
 	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
 		y -= $('#nav-edu-tour').outerHeight();
 	}
-	console.log("   after y=" + y + " height=" + h);
 
 	if (x-33 > 0 && (x-33+w) < $('#matrix-panel').outerWidth()) {
 		tooltip.classed("arrow-down-left", true);
