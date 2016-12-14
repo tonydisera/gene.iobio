@@ -1776,12 +1776,14 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		var screenX = variant.screenX;
 		var screenY = variant.screenY;
+		console.log("first show tooltip " + "x=" + variant.screenY + " y=" + variant.screenY);
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);
 		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
 		        .then( function(refreshedVariant) {
 					refreshedVariant.screenX= screenX;
 		        	refreshedVariant.screenY = screenY;
 
+					console.log("second show tooltip " + "x=" + refreshedVariant.screenX + " y=" + refreshedVariant.screenY);
 					me._showTooltipImpl(tooltip, refreshedVariant, sourceVariantCard, true)
 
 					eduTourCheckVariant(variant);
@@ -1822,6 +1824,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 		html = me.variantTooltipMinimalHTML(variant);
     }
 	
+	console.log("x=" + x + " y=" + y);
 	examineCard.fillAndPositionTooltip(tooltip, variant, lock, x, y, html);
 
 	tooltip.select("#unpin").on('click', function() {
