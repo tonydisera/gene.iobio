@@ -620,7 +620,7 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
 		screenX -= me.featureMatrix.cellSize()/2;
 	}
 
-	examineCard.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
+	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});

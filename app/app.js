@@ -17,7 +17,6 @@ var variantCardTemplate = null;
 var filterCardTemplateHTML = null;
 var genesCardTemplateHTML = null;
 var bookmarkTemplateHTML = null;
-var examineTemplateHTML = null;
 var recallTemplateHTML = null;
 var eduTourTemplateHTML = null;
 var iconbarTemplate = null;
@@ -77,8 +76,8 @@ var filterCard = new FilterCard();
 // genes card
 var genesCard = new GenesCard();
 
-// examine variant card
-var examineCard = new ExamineCard();
+// variant tooltip
+var variantTooltip = new VariantTooltip();
 
 // matrix card
 var matrixCard = new MatrixCard();
@@ -154,9 +153,6 @@ $(document).ready(function(){
 	}));
 	promises.push(promiseLoadTemplate('templates/bookmarkCardTemplate.hbs').then(function(compiledTemplate) {
 		bookmarkTemplateHTML = compiledTemplate();
-	}));
-	promises.push(promiseLoadTemplate('templates/examineCardTemplate.hbs').then(function(compiledTemplate) {
-		examineTemplateHTML = compiledTemplate;
 	}));
 	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
 		recallTemplateHTML = compiledTemplate;
@@ -303,7 +299,6 @@ function init() {
 	$('#slider-left-content').append(filterCardTemplateHTML);
 	$('#slider-left-content').append(genesCardTemplateHTML);
 	$('#slider-left-content').append(bookmarkTemplateHTML);
-	$('#slider-left-content').append(examineTemplateHTML);
 	$('#slider-left-content').append(recallTemplateHTML);
 	$('#close-slide-left').click(function() {
 		closeSlideLeft();
@@ -430,6 +425,9 @@ function init() {
 	// Initialize material bootstrap
     $.material.init();
 
+   	// Initialize variant tooltip
+	variantTooltip = new VariantTooltip();
+
 	// Initialize genes card
 	genesCard = new GenesCard();
 	genesCard.init();
@@ -439,7 +437,7 @@ function init() {
 	matrixCard = new MatrixCard();
 	matrixCard.init();
 	// Set the tooltip generator now that we have a variant card instance
-	matrixCard.setTooltipGenerator(getProbandVariantCard().variantTooltipHTML);
+	matrixCard.setTooltipGenerator(variantTooltip.variantTooltipHTML);
 
 	// Initialize the Filter card
 	filterCard = new FilterCard();
@@ -448,10 +446,6 @@ function init() {
 	// Initialize the bookmark card
 	bookmarkCard = new BookmarkCard();
 	bookmarkCard.init();
-
-	// Initialize examine card
-	examineCard = new ExamineCard();
-	examineCard.init();
 
 
 
@@ -804,7 +798,6 @@ function showSidebar(sidebar) {
 	$('#slider-left-content #filter-track').toggleClass("hide", sidebar !== 'Filter');
 	$('#slider-left-content #genes-card').toggleClass("hide", sidebar !== 'Phenolyzer');
 	$('#slider-left-content #bookmark-card').toggleClass("hide", sidebar !== 'Bookmarks');
-	$('#slider-left-content #examine-card').toggleClass("hide", sidebar !== 'Examine');
 	$('#slider-left-content #recall-card').toggleClass("hide", sidebar !== 'Recall');
 	$('#slider-left-content #help-card').toggleClass("hide", sidebar !== 'Help');
 
@@ -815,8 +808,6 @@ function showSidebar(sidebar) {
 	} else if (sidebar == "Bookmarks") {
 		$('#button-show-bookmarks').toggleClass('selected', true);
 		window.bookmarkCard.refreshBookmarkList();
-	} else if (sidebar == "Examine") {
-		$('#button-show-examine').toggleClass('selected', true);
 	} else if (sidebar == "Recall") {
 		$('#button-find-missing-variants').toggleClass('selected', true);
 	} else if (sidebar == "Help") {
@@ -2995,10 +2986,7 @@ function bookmarkVariant() {
 	if (clickedVariant) {
 		this.bookmarkCard.bookmarkVariant(clickedVariant);
 		this.bookmarkCard.refreshBookmarkList();
-	} else if (examineCard.examinedVariant != null) {
-		this.bookmarkCard.bookmarkVariant(examineCard.examinedVariant);
-		this.bookmarkCard.refreshBookmarkList();
-	}
+	} 
 }
 
 function hideIntro() {
