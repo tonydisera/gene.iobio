@@ -284,6 +284,28 @@ text
     bottom: -8px
     content: ""
     right: 10px
+
+.tooltip-wide.arrow-down-center
+  &:before 
+    position: absolute
+    display: inline-block
+    border-top: 10px solid #A7A5A5
+    border-left: 10px solid transparent
+    border-right: 10px solid transparent
+    border-top-color: rgba(0, 0, 0, 0.2)
+    bottom: -10px
+    content: ""
+    right: 328px
+
+  &:after
+    position: absolute
+    display: inline-block
+    border-top: 9px solid #FFFFFF
+    border-left: 9px solid transparent
+    border-right: 9px solid transparent
+    bottom: -8px
+    content: ""
+    right: 330px
  
 .tooltip.black-arrow-left
   &:after
@@ -310,6 +332,79 @@ text
     -webkit-transform: rotate(152deg)
     transform: rotate(152deg)
     content: ""
+
+.tooltip-wide
+  font-size: 13px 
+
+  .tooltip-title
+    font-size: 14px
+
+  .tooltip-row
+    clear: both
+    padding-bottom: 6px
+
+  .tooltip-footer
+    margin-top: 0px !important
+
+    .bookmark-badge
+      height: 14px
+      width: 100px
+
+      text
+        font-size: 14px !important
+
+  .tooltip-left-column
+    float: left
+    padding-top: 10px
+    padding-bottom: 0px
+    .tooltip-row
+      width: 360px
+      overflow: auto
+      .tooltip-header
+        width: 110px
+      .tooltip-value
+        width: 240px
+
+    
+  .tooltip-right-column
+    float: right
+    padding-top: 10px
+    padding-bottom: 0px
+    .tooltip-row
+      width: 270px    
+      overflow: auto
+      .tooltip-header
+        width: 110px
+      .tooltip-value
+        width: 150px      
+
+  a
+    font-size: 13px !important
+
+    &:hover, &:focus
+      font-size: 13px !important
+     
+  a
+    &:hover, &:focus
+      font-size: 13px !important      
+
+  .tooltip-footer
+    clear: both
+
+    a
+      font-size: 14px !important
+
+      &:hover, &:focus
+        font-size: 14px !important
+       
+    a
+      &:hover, &:focus
+        font-size: 14px !important
+
+  .row
+    line-height: 14px !important
+
+
     
 
 #examine-card .tooltip-allele-count-bar

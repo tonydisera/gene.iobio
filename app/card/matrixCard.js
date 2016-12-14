@@ -566,7 +566,6 @@ MatrixCard.prototype.adjustTooltip = function(variant) {
 	}
 }
 
-
 MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var me = this;
 
@@ -575,117 +574,45 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		return;
 	}
 
-
-	if (lock) {
-		if (!isLevelEdu && !isLevelBasic) {
-			showSidebar("Examine");
-			examineCard.showVariant(variant);		
-			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-	        .then( function(refreshedVariant) {
-				examineCard.showVariant(refreshedVariant, true);
-	        });			
-		}
-		
-		eduTourCheckVariant(variant);
-
+	if (lock && !isLevelEdu && !isLevelBasic) {
 		getProbandVariantCard().unpin(true);
-	}
+		var xMatrix = variant.screenXMatrix;
+		var yMatrix = variant.screenYMatrix;
+		me._showTooltipImpl(variant, true)
+		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+	        .then( function(refreshedVariant) {
+	        	refreshedVariant.screenXMatrix = xMatrix;
+	        	refreshedVariant.screenYMatrix = yMatrix;
+				me._showTooltipImpl(refreshedVariant, true)
 
+				eduTourCheckVariant(variant);
+
+	        });			
+	} else {
+		me._showTooltipImpl(variant, lock);
+	}
+}
+
+
+
+MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
+	var me = this;
 
 	var tooltip = d3.select('#container #matrix-track .tooltip');
-	tooltip.style("z-index", 20);
-	tooltip.transition()        
-	 .duration(1000)      
-	 .style("opacity", .9)	
-	 .style("pointer-events", "all");
 
-	if (isLevelEdu || isLevelBasic) {
-		tooltip.classed("level-edu", "true");
-	} 
 
-	tooltip.html(window.getProbandVariantCard().variantTooltipHTML(variant, "Click on column to lock tooltip"));
-
-	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
-	for (impact in impactList) {
-		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title.main-header").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
-		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
-		matrixCard.showImpactBadge(selection);	
-
+	var screenX = variant.screenXMatrix;
+	if (detectSafari()) {
+		screenX += me.featureMatrix.cellSize()/2;
+	} else {
+		screenX -= me.featureMatrix.cellSize()/2;
 	}
 
-
-	if ($(tooltip[0]).find(".tooltip-title.highest-impact-badge").length > 0) {
-		var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
-		for (impact in highestImpactList) {
-			var theClazz = 'impact_' + impact;	
-			$(tooltip[0]).find(".tooltip-title.highest-impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
-			var selection = tooltip.select('.highest-impact-badge .impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
-			matrixCard.showImpactBadge(selection);	
-
-		}		
-	}
-
-	var selection = tooltip.select("#coverage-svg");
-	window.getProbandVariantCard().createAlleleCountSVGTrio(selection, variant);
-   
+	examineCard.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});
-	tooltip.select("#examine").on('click', function() {
-		if (!isLevelEdu && !isLevelBasic) {
-			showSidebar("Examine");
-			examineCard.showVariant(variant);
-			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-	        .then( function(refreshedVariant) {
-				examineCard.showVariant(refreshedVariant, true);
-	        });
 
-		}
-	});
-
-	var widthSimpleTooltip = 220;
-	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
-		widthSimpleTooltip = 500;
-	}
-
- 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 360;
-	var h = tooltip[0][0].offsetHeight;
-
-	var x = variant.screenXMatrix;
-	var y = variant.screenYMatrix -  +$('body #container').css('top').split("px")[0] + 10;
-	if (y - h < 0) {
-		y = h;
-	}
-
-	x = sidebarAdjustX(x);
-
-	if (detectSafari()) {
-		x += me.featureMatrix.cellSize()/2;
-	} else {
-		x -= me.featureMatrix.cellSize()/2;
-	}
-
-	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
-		y -= $('#nav-edu-tour').outerHeight();
-	}
-
-	if (x < w + 50) {
-		tooltip.classed("arrow-down-left", true);
-		tooltip.classed("arrow-down-right", false);
-		tooltip.style("width", w + "px")
-		       .style("left", x - 33 + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", (y - h) + "px");   
-
-	} else {
-		tooltip.classed("arrow-down-right", true);
-		tooltip.classed("arrow-down-left", false);
-		tooltip.style("width", w + "px")
-		       .style("left", (x - w + 2) + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", (y - h) + "px");   
-	}	
 }
 
 MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {

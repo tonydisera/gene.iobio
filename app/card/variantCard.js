@@ -1757,6 +1757,8 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	
 }
 
+
+
 VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
 	var me = this;
 
@@ -1765,22 +1767,26 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
     	return;
     }
 
-	if (lock) {
+	// Don't show the tooltip for mygene2 beginner mode
+	if (isLevelBasic) {
+		return;
+	}
+
+	if (lock  && !isLevelEdu && !isLevelBasic)  {
 		matrixCard.unpin(true);
-		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
+		var screenX = variant.screenX;
+		var screenY = variant.screenY;
+		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);
+		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+		        .then( function(refreshedVariant) {
+					refreshedVariant.screenX= screenX;
+		        	refreshedVariant.screenY = screenY;
 
-		eduTourCheckVariant(variant);
+					me._showTooltipImpl(tooltip, refreshedVariant, sourceVariantCard, true)
 
-		if (!isLevelEdu && !isLevelBasic) {
-		    showSidebar("Examine");
-			examineCard.showVariant(variant);
+					eduTourCheckVariant(variant);
+		        });
 
-			me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-			        .then( function(refreshedVariant) {
-						examineCard.showVariant(refreshedVariant, true);
-			        });
-
-		}
 				
 	} else {
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
@@ -1794,144 +1800,33 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVariantCard, lock) {
 	var me = this;
 
-
 	if (lock) {
 		tooltip.style("pointer-events", "all");
 	} else {
 		tooltip.style("pointer-events", "none");          
 	}
 
-	if (isLevelEdu) {
-		tooltip.classed("level-edu", "true");
-	} 
-
 	matrixCard.clearSelections();
 	matrixCard.highlightVariant(variant);
 
-	// Don't show the tooltip for mygene2 beginner mode
-	if (isLevelBasic) {
-		return;
-	}
-	
-	var x = variant.screenX;
-	var y = variant.screenY - +$('body #container').css('top').split("px")[0];
 
-	x = sidebarAdjustX(x);
-
-
-    tooltip.transition()        
-           .duration(1000)      
-           .style("opacity", .9)
-           .style("z-index", 20)
-           .style("pointer-events", "all");
-
-	
-    if (this == sourceVariantCard) {
-		tooltip.html(me.variantTooltipHTML(variant));
-    } else {
-    	tooltip.html(me.variantTooltipMinimalHTML(variant));
-    }
-	tooltip.select("#unpin").on('click', function() {
-		me.unpin();
-	});
-	tooltip.select("#examine").on('click', function() {
-		showSidebar("Examine");
-		examineCard.showVariant(variant);
-		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-		        .then( function(refreshedVariant) {
-					examineCard.showVariant(refreshedVariant, true);
-		        });
-	});
-
-	var selection = tooltip.select("#coverage-svg");
-	me.createAlleleCountSVGTrio(selection, variant);
-
-
-	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant.vepImpact);
-	for (impact in impactList) {
-		var theClazz = 'impact_' + impact;	
-		$(tooltip[0]).find(".tooltip-title.main-header").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
-		var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
-		matrixCard.showImpactBadge(selection);	
-
-	}
-
-	var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
-	if ($(tooltip[0]).find(".tooltip-title.highest-impact-badge").length > 0) {
-		for (impact in highestImpactList) {
-			var theClazz = 'impact_' + impact;	
-			$(tooltip[0]).find(".tooltip-title.highest-impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
-			var selection = tooltip.select('.tooltip-title.highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
-			matrixCard.showImpactBadge(selection);	
-
-		}		
-	}
-
-	if (variant.inheritance && variant.inheritance != '') {
-		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
-		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
-		$(tooltip[0]).find(".tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\" height=\"12\" width=\"14\">");
-		var options = {width:18, height:20, transform: 'translate(-2,-2)'};
-		var selection = tooltip.select('.inheritance-badge').data([{clazz: clazz}]);
-		symbolFunction(selection, options);		
-	}	
-
-	for (key in variant.vepSIFT) {
-		if (matrixCard.siftMap[key]) {
-			var clazz = matrixCard.siftMap[key].clazz;
-			if (clazz) {
-				if (!tooltip.select(".sift").empty()) {
-					$(tooltip[0]).find(".sift").prepend("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
-					var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
-					matrixCard.showSiftSymbol(selection);				
-				}
-			}			
-		}
-
-	}
-
-	for (key in variant.vepPolyPhen) {
-		if (matrixCard.polyphenMap[key]) {
-			var clazz = matrixCard.polyphenMap[key].clazz;
-			if (clazz) {
-				if (!tooltip.select(".polyphen").empty()) {
-					$(tooltip[0]).find(".polyphen").prepend("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
-					var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
-					matrixCard.showPolyPhenSymbol(selection);				
-				}
-			}
-		}
-	}
-
-	var widthSimpleTooltip = 220;
-	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
-		widthSimpleTooltip = 500;
-	}
-
- 	var w = isLevelEdu || isLevelBasic ? widthSimpleTooltip : 300;
-	var h = d3.round(tooltip[0][0].offsetHeight);
-
+	var x = variant.screenX + 7;
+	var y = variant.screenY - 27;
 	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
 		y -= $('#nav-edu-tour').outerHeight();
 	}
 
-    if (x < w + 50) {
-    	tooltip.classed("left-arrow", true);
-		tooltip.classed("right-arrow", false);
-		tooltip.style("width", w + "px")
-		       .style("left", d3.round(x+13) + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", d3.round(y - h - 19) + "px");   
 
-    } else {
-	  tooltip.classed("left-arrow", false);
-	  tooltip.classed("right-arrow", true);
-      tooltip.style("width", w + "px")
-             .style("left", d3.round(x - w - 20) + "px") 
-             .style("text-align", 'left')    
-             .style("top", d3.round(y - h - 20) + "px");   
+	var html = null;
+    if (this != sourceVariantCard) {
+		html = me.variantTooltipMinimalHTML(variant);
     }
+	
+	examineCard.fillAndPositionTooltip(tooltip, variant, lock, x, y, html);
 
+	tooltip.select("#unpin").on('click', function() {
+		me.unpin();
+	});
 
 
 }
@@ -2480,33 +2375,35 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 	// the consequence and corresponding transcripts
 	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
 	var vepHighestImpactDisplay = "";	
+	var vepHighestImpactDisplaySimple = "";
 	for (impactKey in vepHighestImpacts) {
+
+
 		var nonCanonicalEffects = vepHighestImpacts[impactKey];
 		if (vepHighestImpactDisplay.length > 0) {
 		  	vepHighestImpactDisplay += ", ";
+		  	vepHighestImpactDisplaySimple += ", ";
 		}
 
-		// Only show the Impact (e.g. HIGH, MODERATE, etc) if there
-		// is more that one impact category for the variant (that is more
-		// severe than the impact for the canonical transcript)
-		if (Object.keys(vepHighestImpacts).length > 1) {
-			vepHighestImpactDisplay += impactKey;
-		}
-
+		vepHighestImpactDisplay += impactKey.toLowerCase();
+		vepHighestImpactDisplaySimple += impactKey.toLowerCase();
+		
 		nonCanonicalEffects.forEach(function(nonCanonicalEffect) {
 			vepHighestImpactDisplay += " ("; 
 			for (effectKey in nonCanonicalEffect) {
 				var transcriptString = nonCanonicalEffect[effectKey].url;
-				vepHighestImpactDisplay += effectKey.split("\&").join(" & ") + ' in ' + transcriptString;
+				vepHighestImpactDisplay += " " + effectKey.split("\&").join(" & ") + ' in ' + transcriptString;
+				//vepHighestImpactDisplaySimple += effectKey.split("\&").join(" & ") + "  ";
 			}
 			vepHighestImpactDisplay += ")"; 
 		})
+		vepHighestImpactDisplaySimple += " in non-canonical transcripts";
 	}
 
 	var vepHighestImpactRow = "";
 	var vepHighestImpactExamineRow = "";
 	if (vepHighestImpactDisplay.length > 0) {
-		vepHighestImpactRow = me._tooltipHeaderRow(vepHighestImpactDisplay, '', '', '', 'highest-impact-badge');
+		vepHighestImpactRow = me._tooltipHeaderRow(vepHighestImpactDisplaySimple, '', '', '', 'highest-impact-badge');
 		vepHighestImpactExamineRow = me._tooltipRow('Most severe impact', vepHighestImpactDisplay, null, true, 'highest-impact-badge');
 	}
 
@@ -2606,7 +2503,7 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 
 	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
 	                          ? ''
-						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '');
+						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '', null, 'padding-top:6px;');
 
 	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
 	                  ? effectDisplay 
@@ -2691,6 +2588,46 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ me._linksRow(variant, pinMessage)
 		);                  
 
+	} else if (type == 'tooltip-wide') {
+
+		var leftDiv =  
+		    '<div class="tooltip-left-column">' 
+		    + me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  
+					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? effectDisplay : vepConsequenceDisplay))
+			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
+					        ' ' + (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
+			+ vepHighestImpactExamineRow			
+			+ me._tooltipRow('SIFT', vepSIFTDisplay)
+			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay)
+			+ me._tooltipRowURL('Regulatory', vepRegDisplay)
+			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarUrl + '</span>')
+			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
+			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
+			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
+			+ "</div>";
+
+		var rightDiv = 
+			'<div class="tooltip-right-column">' 
+			+ me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'))
+			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
+			+ me._tooltipRow('Qual', variant.qual) 
+			+ me._tooltipRow('Filter', variant.recfilter) 
+			+ me._tooltipRowAlleleCounts() 
+			+ "</div>";
+
+		var div =
+		    '<div class="tooltip-wide">'
+	        + qualityWarningRow
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
+			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
+			+ inheritanceModeRow
+			+ leftDiv
+			+ rightDiv
+			+ me._linksRow(variant)	
+			+ "</div>";
+
+		return div;
+
 	} else {
 		return (
 			qualityWarningRow
@@ -2754,7 +2691,7 @@ VariantCard.prototype._linksRow = function(variant, pinMessage) {
 
 	var examineCol = '<div class="col-sm-4" style="text-align:left;"></div>';
 
-	var bookmarkBadge = '<svg class="bookmark-badge" height="11" width="82"><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="9" style="fill: black;">Bookmarked</text></g></svg>';
+	var bookmarkBadge = '<svg class="bookmark-badge" height="14" width="100"><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="11" style="fill: black;">Bookmarked</text></g></svg>';
 	showAsBookmarked = function(container) {
 		$(container).parent().html(bookmarkBadge);
 	};
@@ -2799,12 +2736,13 @@ VariantCard.prototype._tooltipBlankRow = function() {
 	  + '</div>';
 }
 
-VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value4, clazz) {
+VariantCard.prototype._tooltipHeaderRow = function(value1, value2, value3, value4, clazz, style) {
+	var theStyle = style ? style : '';
 	var clazzList = "col-md-12 tooltip-title";
 	if (clazz) {
 		clazzList += " " + clazz;
 	}
-	return '<div class="row">'
+	return '<div class="row" style="' + theStyle + '">'
 	      + '<div class="' + clazzList + '" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
@@ -3004,6 +2942,14 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 	}
 }
 
+VariantCard.prototype.hideTooltip = function() {
+	var tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
+	tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0)
+           .style("z-index", 0)
+           .style("pointer-events", "none");
+}
 
 
 VariantCard.prototype.unpin = function(saveClickedVariant) {
@@ -3011,6 +2957,8 @@ VariantCard.prototype.unpin = function(saveClickedVariant) {
 		clickedVariant = null;
 		clickedVariantCard = null;
 	}
+
+	this.hideTooltip();
 	this.hideCoverageCircle();
 	window.hideCircleRelatedVariants();	
 	window.hideCoordinateFrame();
