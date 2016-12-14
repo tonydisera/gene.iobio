@@ -5,9 +5,10 @@ describe('MatrixCard', function() {
 	});
 
 	describe('#removeRow', function() {
-		var row_1, row_2, row_3, matrixRows;
+		var row_1, row_2, row_3, matrixRows, mc;
 
 		beforeEach(function() {
+			mc = new MatrixCard();
 			row_1 = { name: 'Row 1', order: 0 };
 			row_2 = { name: 'Row 2', order: 1 };
 			row_3 = { name: 'Row 3', order: 2 };
@@ -15,12 +16,12 @@ describe('MatrixCard', function() {
 		});
 
 		it('removes a matrix row by its name', function() {
-			matrixCard.removeRow('Row 2', matrixRows);
+			mc.removeRow('Row 2', matrixRows);
 			expect(matrixRows).toEqual([row_1, row_3]);
 		});
 
 		it('ensures the order is renumbered correctly', function() {
-			matrixCard.removeRow('Row 2', matrixRows);
+			mc.removeRow('Row 2', matrixRows);
 			expect(row_1.order).toEqual(0);
 			expect(row_3.order).toEqual(1);
 		});
@@ -145,21 +146,25 @@ describe('MatrixCard', function() {
 	});
 
 	describe('#getVariantLabel', function() {
+		var mc;
+
 		it('returns the one-based index and rsid as the label when the variant has a rsid', function() {
+			mc = new MatrixCard();
 			spyOn(window, 'getRsId').and.returnValue('rs123');
 			var variant = {};
-			expect(matrixCard.getVariantLabel(variant, 0)).toEqual("1.  rs123");
+			expect(mc.getVariantLabel(variant, 0)).toEqual("1.  rs123");
 		});
 
 		it('returns the one-based index when the variant has no rsid', function() {
+			mc = new MatrixCard();
 			spyOn(window, 'getRsId').and.returnValue(null);
 			var variant = {};
-			expect(matrixCard.getVariantLabel(variant, 0)).toEqual("1");
+			expect(mc.getVariantLabel(variant, 0)).toEqual("1");
 		});
 	});
 
 	describe('#showAfExacSymbol', function() {
-		var data;
+		var data, mc;
 
 		beforeEach(function() {
 			setFixtures(
@@ -181,11 +186,12 @@ describe('MatrixCard', function() {
 				{ clazz: "afexac_common" }
 			];
 			d3.selectAll('.cell').data(data);
+			mc = new MatrixCard();
 		});
 
 		it('sets the correct transform to each symbol group', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection);
 			expect($('g.afexac_unique_nc')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.afexac_unique')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.afexac_uberrare')).toHaveAttr('transform', 'translate(2,2)');
@@ -197,7 +203,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct fill to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection);
 			expect($('g.afexac_unique_nc > use')).toHaveFill('none');
 			expect($('g.afexac_unique > use')).toHaveFill('rgb(199, 0, 1)');
 			expect($('g.afexac_uberrare > use')).toHaveFill('rgb(204, 28, 29)');
@@ -209,7 +215,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct stroke to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection);
 			expect($('g.afexac_unique_nc > use')).toHaveStroke('#6b6666');
 			expect($('g.afexac_unique > use')).toHaveStroke('none');
 			expect($('g.afexac_uberrare > use')).toHaveStroke('none');
@@ -221,7 +227,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct width on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection);
 			expect($('g.afexac_unique_nc > use')).toHaveAttr('width', '11');
 			expect($('g.afexac_unique > use')).toHaveAttr('width', '12');
 			expect($('g.afexac_uberrare > use')).toHaveAttr('width', '12');
@@ -233,7 +239,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct height on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection);
 			expect($('g.afexac_unique_nc > use')).toHaveAttr('height', '11');
 			expect($('g.afexac_unique > use')).toHaveAttr('height', '12');
 			expect($('g.afexac_uberrare > use')).toHaveAttr('height', '12');
@@ -245,7 +251,7 @@ describe('MatrixCard', function() {
 	});
 
 	describe('#showAf1000gSymbol', function() {
-		var data;
+		var data, mc;
 
 		beforeEach(function() {
 			setFixtures(
@@ -265,11 +271,12 @@ describe('MatrixCard', function() {
 				{ clazz: "af1000g_common" }
 			];
 			d3.selectAll('.cell').data(data);
+			mc = new MatrixCard();
 		});
 
 		it('sets the correct transform to each symbol group', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection);
 			expect($('g.af1000g_unique')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.af1000g_uberrare')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.af1000g_superrare')).toHaveAttr('transform', 'translate(2,2)');
@@ -280,7 +287,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct fill to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection);
 			expect($('g.af1000g_unique > use')).toHaveFill('rgb(199, 0, 1)');
 			expect($('g.af1000g_uberrare > use')).toHaveFill('rgb(204, 28, 29)');
 			expect($('g.af1000g_superrare > use')).toHaveFill('rgb(255, 44, 0)');
@@ -291,7 +298,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct width on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection);
 			expect($('g.af1000g_unique > use')).toHaveAttr('width', '12');
 			expect($('g.af1000g_uberrare > use')).toHaveAttr('width', '12');
 			expect($('g.af1000g_superrare > use')).toHaveAttr('width', '12');
@@ -302,7 +309,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct height on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			matrixCard.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection);
 			expect($('g.af1000g_unique > use')).toHaveAttr('height', '12');
 			expect($('g.af1000g_uberrare > use')).toHaveAttr('height', '12');
 			expect($('g.af1000g_superrare > use')).toHaveAttr('height', '12');
