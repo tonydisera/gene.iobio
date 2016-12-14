@@ -78,6 +78,52 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#setRowAttributeById', function() {
+		var mc, row_1, row_2, row_3, filtered_row_1, filtered_row_2, filtered_row_3, matrixRows;
+
+		beforeEach(function() {
+			row_1 = { name: 'Row 1', id: 'id_1' };
+			row_2 = { name: 'Row 2', id: 'id_2' };
+			row_3 = { name: 'Row 3', id: 'id_3' };
+			filtered_row_1 = { name: 'Row 1', id: 'id_1' };
+			filtered_row_2 = { name: 'Row 2', id: 'id_2' };
+			filtered_row_3 = { name: 'Row 3', id: 'id_3' };
+			mc = new MatrixCard();
+			mc.matrixRows = [row_1, row_2, row_3];
+			mc.filteredMatrixRows = [filtered_row_1, filtered_row_2, filtered_row_3];
+		});
+
+		it('sets a new attribute on the correct matrix row identified by its id', function() {
+			mc.setRowAttributeById('id_2', 'New Attribute');
+			expect(row_2.attribute).toEqual('New Attribute');
+		});
+
+		it('sets a new attribute on the correct filtered matrix row identified by its id', function() {
+			mc.setRowAttributeById('id_2', 'New Attribute');
+			expect(filtered_row_2.attribute).toEqual('New Attribute');
+		});
+	});
+
+	describe('#getRowAttribute', function() {
+		var mc, row_1, row_2, row_3, matrixRows;
+
+		beforeEach(function() {
+			row_1 = { name: 'Row 1', id: 'id_1', attribute: 'attribute_1' };
+			row_2 = { name: 'Row 2', id: 'id_2', attribute: 'attribute_2' };
+			row_3 = { name: 'Row 3', id: 'id_3', attribute: 'attribute_3' };
+			mc = new MatrixCard();
+			mc.matrixRows = [row_1, row_2, row_3];
+		});
+
+		it('returns the attribute of the row found by its name', function() {
+			expect(mc.getRowAttribute('Row 2')).toEqual('attribute_2');
+		});
+
+		it('returns an empty string when none of the names of the rows match the search term', function() {
+			expect(mc.getRowAttribute('Row 500')).toEqual('');
+		});
+	});
+
 	describe('#showAfExacSymbol', function() {
 		var data;
 
