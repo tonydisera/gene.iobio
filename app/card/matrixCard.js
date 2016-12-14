@@ -576,16 +576,28 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 	if (lock && !isLevelEdu && !isLevelBasic) {
 		getProbandVariantCard().unpin(true);
+		eduTourCheckVariant(variant);
+		
 		var xMatrix = variant.screenXMatrix;
 		var yMatrix = variant.screenYMatrix;
+		
+		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(variant, true)
+		
 		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
 	        .then( function(refreshedVariant) {
-	        	refreshedVariant.screenXMatrix = xMatrix;
-	        	refreshedVariant.screenYMatrix = yMatrix;
-				me._showTooltipImpl(refreshedVariant, true)
 
-				eduTourCheckVariant(variant);
+        		// Now show tooltip again with the hgvs notations.  Only show
+	        	// if we haven't clicked on another variant
+	        	if (clickedVariant.start == refreshedVariant.start &&
+	        		clickedVariant.ref == refreshedVariant.ref &&
+	        		clickedVariant.alt == refreshedVariant.alt) {
+
+		        	refreshedVariant.screenXMatrix = xMatrix;
+		        	refreshedVariant.screenYMatrix = yMatrix;
+					me._showTooltipImpl(refreshedVariant, true);
+				}
+
 
 	        });			
 	} else {

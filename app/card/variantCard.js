@@ -1776,15 +1776,27 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		matrixCard.unpin(true);
 		var screenX = variant.screenX;
 		var screenY = variant.screenY;
+		eduTourCheckVariant(variant);
+		
+		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);
+		
 		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
 		        .then( function(refreshedVariant) {
-					refreshedVariant.screenX= screenX;
-		        	refreshedVariant.screenY = screenY;
 
-					me._showTooltipImpl(tooltip, refreshedVariant, sourceVariantCard, true)
+		        	// Now show tooltip again with the hgvs notations.  Only show
+		        	// if we haven't clicked on another variant
+		        	if (clickedVariant.start == refreshedVariant.start &&
+		        		clickedVariant.ref == refreshedVariant.ref &&
+		        		clickedVariant.alt == refreshedVariant.alt) {
 
-					eduTourCheckVariant(variant);
+						refreshedVariant.screenX= screenX;
+			        	refreshedVariant.screenY = screenY;
+
+						me._showTooltipImpl(tooltip, refreshedVariant, sourceVariantCard, true)
+
+
+		        	}
 		        });
 
 				
@@ -2597,10 +2609,10 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
 					        ' ' + (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
 			+ vepHighestImpactExamineRow			
-			+ me._tooltipRow('SIFT', vepSIFTDisplay)
-			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay)
-			+ me._tooltipRowURL('Regulatory', vepRegDisplay)
-			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarUrl + '</span>')
+			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true)
+			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true)
+			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
+			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarUrl + '</span>', null, true)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
@@ -2610,8 +2622,8 @@ VariantCard.prototype.variantDetailHTML = function(variant, pinMessage, type) {
 			'<div class="tooltip-right-column">' 
 			+ me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'))
 			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
-			+ me._tooltipRow('Qual', variant.qual) 
-			+ me._tooltipRow('Filter', variant.recfilter) 
+			+ me._tooltipRow('Qual', variant.qual, null, true) 
+			+ me._tooltipRow('Filter', variant.recfilter, null, true) 
 			+ me._tooltipRowAlleleCounts() 
 			+ "</div>";
 
