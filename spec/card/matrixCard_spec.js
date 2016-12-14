@@ -318,4 +318,111 @@ describe('MatrixCard', function() {
 			expect($('g.af1000g_common > use')).toHaveAttr('height', '12');
 		});
 	});
+
+	describe('#formatClinvar', function() {
+		it('returns a string representation of clinvar significance for a variant', function() {
+			window.isLevelBasic = true;
+			var mc = new MatrixCard();
+			var variant = {
+				featureClass: null
+			};
+			var clinvarSig = {
+      	"pathogenic": "Y",
+      	"benign/likely_benign": "N",
+      	"none": "N",
+      	"not_provided": "N"
+    	};
+    	expect(mc.formatClinvar(variant, clinvarSig)).toEqual("pathogenic,benign/likely benign");
+    	expect(variant.featureClass).toEqual(" danger");
+    	window.isLevelBasic = false;
+		});
+	});
+
+	describe('#getClinvarRank', function() {
+		it('gets the lowest rank clinvar significance from a variant', function() {
+			var mc = new MatrixCard();
+			var variant = {};
+			var clinvarSig = {
+      	"pathogenic/likely_pathogenic": "Y",
+      	"benign/likely_benign": "N",
+      	"none": "N",
+      	"not_provided": "N"
+    	};
+    	expect(mc.getClinvarRank(variant, clinvarSig)).toEqual(2);
+		});
+	});
+
+	describe('#getImpactRank', function() {
+		it('gets the lowest rank of the highest impact from a variant', function() {
+			var mc = new MatrixCard();
+			var variant = {};
+			var highestImpactVep = {
+      	"MODIFIER": {},
+      	"MODERATE": {}
+    	};
+    	expect(mc.getImpactRank(variant, highestImpactVep)).toEqual(2);
+		});
+	});
+
+	describe('#formatAlleleFrequencyPercentage', function() {
+		it('converts a value to a percentage', function() {
+			var mc = new MatrixCard();
+			var variant = {};
+			expect(mc.formatAlleleFrequencyPercentage(variant, 0.23)).toEqual("23%");
+		});
+	});
+
+	describe('#formatCanonicalTranscript', function() {
+		it('returns the prefix from the selected transcript id', function() {
+			var mc = new MatrixCard();
+			var variant = {};
+			window.selectedTranscript = { transcript_id: "ENST00000265849.7" };
+			expect(mc.formatCanonicalTranscript(variant, "")).toEqual("ENST00000265849");
+		});
+	});
+
+	describe('#formatHgvsP', function() {
+		it('gives a string representation of a vepHGVSp object', function() {
+			var mc = new MatrixCard();
+			var variant = {
+				vepConsequence: { "synonymous_variant": "synonymous_variant" }
+			};
+			var value = {
+      	"ENSP00000323074.4:p.Pro1477His": "",
+      	"ENSP00000323074.4:p.Gly90Ala": "",
+      	"asdf(p.=)": "",
+    	};
+    	expect(mc.formatHgvsP(variant, value)).toEqual("p.Pro1477His p.Gly90Ala p.(=)");
+		});
+	});
+
+	describe('#formatHgvsC', function() {
+		it('gives a string representation of a vepHGVSc object', function() {
+			var mc = new MatrixCard();
+			var variant = {};
+			var value = {
+      	"ENST00000353383.1:c.4430C>A": "",
+      	"ENST00000353383.1:c.269G>C": ""
+    	};
+    	expect(mc.formatHgvsC(variant, value)).toEqual("c.4430C>A c.269G>C");
+		});
+	});
+
+	describe('#formatInheritance', function() {
+		it('returns an empty string when there is no inheritance value', function() {
+			var mc = new MatrixCard();
+			expect(mc.formatInheritance({}, 'none')).toEqual('');
+		});
+
+		it('returns de novo when the value is denovo', function() {
+			var mc = new MatrixCard();
+			expect(mc.formatInheritance({}, 'denovo')).toEqual('de novo');
+		});
+
+		it('returns the value when there is a value but it is not denovo', function() {
+			var mc = new MatrixCard();
+			expect(mc.formatInheritance({}, 'asdf')).toEqual('asdf');
+		});
+	});
+
 });

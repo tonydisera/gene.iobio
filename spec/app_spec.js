@@ -13,6 +13,13 @@ describe('app', function() {
 		});
 	});
 
+	describe('#stripTranscriptPrefix', function() {
+		it('returns the prefix from a transcript id', function() {
+			var transcriptId = "ENST00000265849.7";
+			expect(stripTranscriptPrefix(transcriptId)).toEqual('ENST00000265849');
+		});
+	});
+
 	describe('#getCodingRegions', function() {
 		it('returns an array of coding regions when the transcript_id is not cached', function() {
 			transcriptCodingRegions = {};

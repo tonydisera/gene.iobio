@@ -1376,6 +1376,7 @@ MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
 	}
 	return buf;
 }
+
 MatrixCard.prototype.getClinvarRank = function(variant, clinvarSig) {
 	var me = this;
 	var lowestRank = 9999;
@@ -1384,9 +1385,10 @@ MatrixCard.prototype.getClinvarRank = function(variant, clinvarSig) {
 		if (rank < lowestRank) {
 			lowestRank = rank;
 		}
-	}	
+	}
 	return lowestRank;
 }
+
 MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
 	var me = this;
 	var lowestRank = 99;
@@ -1395,11 +1397,12 @@ MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
 		if (rank < lowestRank) {
 			lowestRank = rank;
 		}
-	}	
+	}
 	return lowestRank;
 }
+
 MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) {
-	return value && value != "" && +value >= 0 ? this.percentage(+value,2) : "";
+	return value && value != "" && +value >= 0 ? round(+value * 100, 2) + "%" : "";
 }
 
 MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
@@ -1537,8 +1540,8 @@ MatrixCard.prototype.formatSimpleHgvsC = function(variant, value) {
 		}
 		return buf;
 	}
-
 }
+
 MatrixCard.prototype.formatHgvsC = function(variant, value) {
 	if (value == null || value == '' || Object.keys(value).length == 0) {
 		return "";
@@ -1567,12 +1570,6 @@ MatrixCard.prototype.formatInheritance = function(variant, value) {
 	} else {
 		return value;
 	}
-}
-
-
-MatrixCard.prototype.percentage = function(a, places) {
-	var pct = a * 100;
-	return round(pct, places) + "%";
 }
 
 MatrixCard.wrap = function(text, width, maxLines) {
