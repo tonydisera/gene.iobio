@@ -9,6 +9,10 @@ describe('genesCard', function() {
 	});
 
 	describe('#compareDangerSummary', function() {
+		beforeEach(function() {
+			window.matrixCard = new MatrixCard();
+		});
+
 		it('returns 0 when danger summaries are null for both genes', function() {
 			dangerSummary1 = null;
 			dangerSummary2 = null;
