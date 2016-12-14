@@ -1078,11 +1078,6 @@ function loadGeneFromUrl() {
 	}
 
 
-	// Show the 'Load demo data button' if no data sources specified
-	if (!hasDataSources()) {
-		$('#welcome-panel').removeClass("hide");
-	}	
-
 	// Load the gene
 	var showTour = getUrlParameter('showTour');
     if (gene != undefined) {
@@ -1114,6 +1109,7 @@ function loadGeneFromUrl() {
 			//pageGuide.open();
 		} else {
 			//$('#tourWelcome').addClass("open");
+			showWelcomePanel();
 		}
 
 	}
@@ -1160,6 +1156,23 @@ function reloadGeneFromUrl() {
 
 	setGeneBloodhoundInputElement(gene, true, true);
 	genesCard._geneBadgeLoading(gene, true, true);
+}
+
+function showWelcomePanel() {
+
+	var bam  = getUrlParameter(/(bam)*/);
+	var vcf  = getUrlParameter(/(vcf)*/);	
+
+	var bamCount = bam != null ? Object.keys(bam).length : 0;
+	var vcfCount = vcf != null ? Object.keys(vcf).length : 0;
+
+	if (bamCount == 0 && vcfCount == 0) {
+		$('#welcome-panel').removeClass("hide");
+	} else {
+		$('#welcome-panel').addClass("hide");
+	}
+
+
 }
 
 function loadUrlSources() {
@@ -1224,6 +1237,7 @@ function loadUrlSources() {
 
 	var bamCount = bam != null ? Object.keys(bam).length : 0;
 	var vcfCount = vcf != null ? Object.keys(vcf).length : 0;
+
 
 	var loadTracks = function() {
 		if (vcf != null || bam != null) {
