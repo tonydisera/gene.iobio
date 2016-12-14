@@ -24,6 +24,7 @@ var tourTemplate = null;
 var introTemplate = null;
 var legendTemplate = null;
 var navbarTemplate = null;
+var modalsTemplate = null;
 
 
 // The selected (sub-) region of the gene.  Null
@@ -178,6 +179,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/navbarTemplate.hbs').then(function(compiledTemplate) {
 		navbarTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/modalsTemplate.hbs').then(function(compiledTemplate) {
+		modalsTemplate = compiledTemplate;
+	}));
 
 	Promise.all(promises).then(function() {
 		// Initialize genomeBuild helper
@@ -276,7 +280,7 @@ function init() {
 	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
 	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
 
-
+	$('#modals-placeholder').append(modalsTemplate());
 	$('#tour-placeholder').append(tourTemplate());
 	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
 
@@ -437,7 +441,7 @@ function init() {
 	matrixCard = new MatrixCard();
 	matrixCard.init();
 	// Set the tooltip generator now that we have a variant card instance
-	matrixCard.setTooltipGenerator(variantTooltip.variantTooltipHTML);
+	matrixCard.setTooltipGenerator(variantTooltip.formatContent);
 
 	// Initialize the Filter card
 	filterCard = new FilterCard();
