@@ -124,6 +124,26 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#getRowOrder', function() {
+		var mc, row_1, row_2, row_3, matrixRows;
+
+		beforeEach(function() {
+			row_1 = { name: 'Row 1', id: 'id_1', order: 1 };
+			row_2 = { name: 'Row 2', id: 'id_2', order: 2 };
+			row_3 = { name: 'Row 3', id: 'id_3', order: 3 };
+			mc = new MatrixCard();
+			mc.matrixRows = [row_1, row_2, row_3];
+		});
+
+		it('returns the order of the row found by its name', function() {
+			expect(mc.getRowOrder('Row 2')).toEqual(2);
+		});
+
+		it('returns an empty string when none of the names of the rows match the search term', function() {
+			expect(mc.getRowOrder('Row 500')).toEqual('');
+		});
+	})
+
 	describe('#showAfExacSymbol', function() {
 		var data;
 
