@@ -142,7 +142,21 @@ describe('MatrixCard', function() {
 		it('returns an empty string when none of the names of the rows match the search term', function() {
 			expect(mc.getRowOrder('Row 500')).toEqual('');
 		});
-	})
+	});
+
+	describe('#getVariantLabel', function() {
+		it('returns the one-based index and rsid as the label when the variant has a rsid', function() {
+			spyOn(window, 'getRsId').and.returnValue('rs123');
+			var variant = {};
+			expect(matrixCard.getVariantLabel(variant, 0)).toEqual("1.  rs123");
+		});
+
+		it('returns the one-based index when the variant has no rsid', function() {
+			spyOn(window, 'getRsId').and.returnValue(null);
+			var variant = {};
+			expect(matrixCard.getVariantLabel(variant, 0)).toEqual("1");
+		});
+	});
 
 	describe('#showAfExacSymbol', function() {
 		var data;
