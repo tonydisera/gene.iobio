@@ -2942,7 +2942,7 @@ function splitArray(a, n) {
 
 function getRsId(variant) {
 	var rsId = null;
-	if (variant.hasOwnProperty('vepVariationIds') && variant.vepVariationIds != null) {
+	if (variant.vepVariationIds) {
 		for (var key in variant.vepVariationIds) {
 			if (key != 0 && key != '') {
 				var tokens = key.split("&");

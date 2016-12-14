@@ -1,4 +1,18 @@
 describe('app', function() {
+
+	describe('#getRsId', function() {
+		it('returns an id string based on the vepVariationIds of a variant', function() {
+			var variant = {
+				vepVariationIds: { '1&rs123&3': {} }
+			};
+			expect(getRsId(variant)).toEqual('rs123');
+		});
+
+		it('returns null when the vepVariationIds of the variant are not present', function() {
+			expect(getRsId({})).toBeNull();
+		});
+	});
+
 	describe('#getCodingRegions', function() {
 		it('returns an array of coding regions when the transcript_id is not cached', function() {
 			transcriptCodingRegions = {};
