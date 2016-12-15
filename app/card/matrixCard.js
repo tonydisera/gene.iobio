@@ -1165,10 +1165,6 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 
 };
 
-MatrixCard.prototype.getSymbol = function(d,i) {
-
-};
-
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	var me = this;
 
@@ -1186,8 +1182,6 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	         .attr("height", height);
 
 	}
-
-
 }
 
 MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
