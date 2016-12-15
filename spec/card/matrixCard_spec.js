@@ -548,6 +548,45 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showDeNovoSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when cellSize > 18', function() {
+			var options = { cellSize: 20 };
+			mc.showDeNovoSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,0)');
+			expect(useElem.attr('xlink:href')).toEqual('#denovo-symbol');
+			expect(useElem.attr('width')).toEqual('22');
+			expect(useElem.attr('height')).toEqual('22');
+			expect(useElem.style('pointer-events')).toEqual('none');
+		});
+
+		it('appends an svg symbol with the correct attributes when there are options', function() {
+			var options = { width: "333", transform: "translate(1,12)" };
+			mc.showDeNovoSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,12)');
+			expect(useElem.attr('width')).toEqual('333');
+			expect(useElem.attr('height')).toEqual('333');
+		});
+
+		it('appends an svg symbol with the default attributes when there are no options', function() {
+			var options = {};
+			mc.showDeNovoSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
+			expect(useElem.attr('width')).toEqual('20');
+			expect(useElem.attr('height')).toEqual('20');
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;

@@ -1061,28 +1061,19 @@ MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 	         .style("pointer-events", "none");
 };
 
-MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
-	var width = "20";
-	if ( options && options.cellSize && options.cellSize > 18 ) {
-		width = "22";
-	} else if ( options && options.width ) {
-		width = options.width ;
-	}
-	var height = width;
+MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
+	options = options || {};
 
-	var transform = "translate(-1,0)";
-	if (options && options.cellSize && options.cellSize > 18) {
-		transform = "translate(1,0)";
-	} else if (options && options.transform) {
-		transform = options.transform;
-	}
+	var width = (options.cellSize > 18) ? "22" : (options.width || "20");
+
+	var transform = (options.cellSize > 18) ? "translate(1,0)" : (options.transform || "translate(-1,0)");
 
 	selection.append("g")
 	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
 	         .attr("width", width)
-	         .attr("height", height)
+	         .attr("height", width)
 	         .style("pointer-events", "none");
 
 };
