@@ -935,36 +935,38 @@ MatrixCard.prototype.showPolyPhenSymbol = function(selection, options) {
 };
 
 MatrixCard.prototype.showSiftSymbol = function(selection, options) {
-	var transform = "translate(2,2)";
-	if (options && options.cellSize && options.cellSize > 18) {
-		transform = "translate(4,2)";
-	} else if (options && options.transform) {
-		transform = options.transform;
-	} else if (selection.datum().transform) {
-		transform = selection.datum().transform;
+	options = options || {};
+	var attrs = {
+		transform: "translate(2,2)",
+		width: "14",
+		height: "14",
+		clazz: ""
+	};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.transform = "translate(4,2)";
 	}
+
+	var datumAttrs = selection.datum() || {};
+
+	$.extend(attrs, datumAttrs, options, cellSizeAttrs);
+
+	var colors = {
+		sift_deleterious: "#ad494A",
+		sift_deleterious_low_confidence: "#FB7737",
+		sift_tolerated_low_confidence: "rgba(231,186,82,1)",
+		sift_tolerated: "rgba(181, 207, 107,1)"
+	};
+
 	selection.append("g")
-	         .attr("transform", transform)
+	         .attr("transform", attrs.transform)
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", options  && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
-	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
 	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-				var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
-
-	         	if (clazz == 'sift_deleterious') {
-	         		return "#ad494A";
-	         	} else if (clazz == 'sift_deleterious_low_confidence') {
-	         		return "#FB7737";
-	         	} else if (clazz == 'sift_tolerated_low_confidence') {
-	         		return "rgba(231,186,82,1)";
-	         	} else if (clazz == 'sift_tolerated') {
-	         		return "rgba(181, 207, 107,1)";
-	         	}
-	         });
-
+	         .style("fill", colors[attrs.clazz]);
 };
 
 MatrixCard.prototype.showAfExacSymbol = function(selection, options) {

@@ -217,7 +217,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	fdescribe('#showPolyPhenSymbol', function() {
+	describe('#showPolyPhenSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -275,7 +275,63 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showSiftSymbol', function() {
+		var selection, mc;
 
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with attributes from options when there are options', function() {
+			var options = {
+				width: "111",
+				height: "222",
+				transform: "translate(100,200)",
+				clazz: "sift_deleterious"
+			};
+			mc.showSiftSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual(options.transform);
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual("#danger-symbol");
+			expect(useElem.attr('width')).toEqual(options.width);
+			expect(useElem.attr('height')).toEqual(options.height);
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill("#ad494A");
+		});
+
+		it('appends an svg element with the correct transform when the cellSize is greater than 18', function() {
+			var options = {
+				cellSize: 20,
+				width: "111",
+				height: "222",
+				transform: "translate(12,12)",
+				clazz: "sift_tolerated_low_confidence"
+			};
+			mc.showSiftSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(4,2)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem[0]).toHaveFill("rgb(231, 186, 82)");
+		});
+
+		it('appends an svg element with attributes from attached data when there are no options', function() {
+			var options = {};
+			var data = {
+				width: "222",
+				height: "111",
+				transform: "translate(11,12)",
+				clazz: "sift_tolerated"
+			};
+			selection.datum(data);
+			mc.showSiftSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(11,12)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('width')).toEqual("222");
+			expect(useElem.attr('height')).toEqual("111");
+			expect(useElem[0]).toHaveFill("rgb(181, 207, 107)");
+		});
+	});
 
 
 	describe('#showAfExacSymbol', function() {
