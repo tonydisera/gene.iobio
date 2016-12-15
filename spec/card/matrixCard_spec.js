@@ -163,6 +163,177 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showClinVarSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with attributes from options when there are options', function() {
+			var options = {
+				width: "10",
+				height: "12",
+				transform: "translate(1,2)",
+				clazz: "clinvar_uc"
+			};
+			mc.showClinVarSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual(options.transform);
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual('#clinvar-symbol');
+			expect(useElem.attr('width')).toEqual(options.width);
+			expect(useElem.attr('height')).toEqual(options.height);
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill('rgb(231,186,82)');
+		});
+
+		it('appends an svg element with the correct attributes when the cellSize is greater than 18 and there are no option overrides', function() {
+			var options = { cellSize: 20, clazz: "clinvar_path" };
+			mc.showClinVarSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(3,2)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('width')).toEqual("15");
+			expect(useElem.attr('height')).toEqual("15");
+			expect(useElem[0]).toHaveFill("#ad494A");
+		});
+
+		it('appends an svg element with attributes from attached data when there are no options', function() {
+			var options = {};
+			var data = {
+				width: "222",
+				height: "111",
+				transform: "translate(11,12)",
+				clazz: "clinvar_cd"
+			};
+			selection.datum(data);
+			mc.showClinVarSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(11,12)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('width')).toEqual("222");
+			expect(useElem.attr('height')).toEqual("111");
+			expect(useElem[0]).toHaveFill("rgb(111, 182, 180)");
+		});
+	});
+
+	describe('#showPolyPhenSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with attributes from options when there are options', function() {
+			var options = {
+				width: "111",
+				height: "222",
+				transform: "translate(100,200)",
+				clazz: "polyphen_probably_damaging"
+			};
+			mc.showPolyPhenSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual(options.transform);
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual("#biohazard-symbol");
+			expect(useElem.attr('width')).toEqual(options.width);
+			expect(useElem.attr('height')).toEqual(options.height);
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill("#ad494A");
+		});
+
+		it('appends an svg element with the correct transform when the cellSize is greater than 18', function() {
+			var options = {
+				cellSize: 20,
+				width: "111",
+				height: "222",
+				transform: "translate(12,12)",
+				clazz: "polyphen_possibly_damaging"
+			};
+			mc.showPolyPhenSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(4,2)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem[0]).toHaveFill("#FB7737");
+		});
+
+		it('appends an svg element with attributes from attached data when there are no options', function() {
+			var options = {};
+			var data = {
+				width: "222",
+				height: "111",
+				transform: "translate(11,12)",
+				clazz: "polyphen_benign"
+			};
+			selection.datum(data);
+			mc.showPolyPhenSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(11,12)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('width')).toEqual("222");
+			expect(useElem.attr('height')).toEqual("111");
+			expect(useElem[0]).toHaveFill("rgb(181, 207, 107)");
+		});
+	});
+
+	describe('#showSiftSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with attributes from options when there are options', function() {
+			var options = {
+				width: "111",
+				height: "222",
+				transform: "translate(100,200)",
+				clazz: "sift_deleterious"
+			};
+			mc.showSiftSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual(options.transform);
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual("#danger-symbol");
+			expect(useElem.attr('width')).toEqual(options.width);
+			expect(useElem.attr('height')).toEqual(options.height);
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill("#ad494A");
+		});
+
+		it('appends an svg element with the correct transform when the cellSize is greater than 18', function() {
+			var options = {
+				cellSize: 20,
+				width: "111",
+				height: "222",
+				transform: "translate(12,12)",
+				clazz: "sift_tolerated_low_confidence"
+			};
+			mc.showSiftSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(4,2)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem[0]).toHaveFill("rgb(231, 186, 82)");
+		});
+
+		it('appends an svg element with attributes from attached data when there are no options', function() {
+			var options = {};
+			var data = {
+				width: "222",
+				height: "111",
+				transform: "translate(11,12)",
+				clazz: "sift_tolerated"
+			};
+			selection.datum(data);
+			mc.showSiftSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(11,12)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('width')).toEqual("222");
+			expect(useElem.attr('height')).toEqual("111");
+			expect(useElem[0]).toHaveFill("rgb(181, 207, 107)");
+		});
+	});
+
+
 	describe('#showAfExacSymbol', function() {
 		var data, mc;
 
@@ -316,6 +487,103 @@ describe('MatrixCard', function() {
 			expect($('g.af1000g_rare > use')).toHaveAttr('height', '12');
 			expect($('g.af1000g_uncommon > use')).toHaveAttr('height', '12');
 			expect($('g.af1000g_common > use')).toHaveAttr('height', '12');
+		});
+	});
+
+	describe('#showHomSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends the right rect and text svg elements', function() {
+			var data = { clazz: 'whatever' };
+			selection.datum(data);
+			mc.showHomSymbol(selection);
+			expect($('#test rect')).toHaveClass('zyg_hom');
+			expect($('#test rect')).toHaveClass('whatever');
+			expect($('#test text').text()).toEqual("Hom");
+		});
+	});
+
+	describe('#showRecessiveSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when cellSize > 18', function() {
+			var options = { cellSize: 20 };
+			mc.showRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
+			expect(useElem.attr('width')).toEqual('22');
+			expect(useElem.attr('height')).toEqual('22');
+			expect(useElem.style('pointer-events')).toEqual('none');
+		});
+
+		it('appends an svg symbol with the correct attributes when there are options', function() {
+			var options = { width: "333", transform: "translate(1,12)" };
+			mc.showRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,12)');
+			expect(useElem.attr('width')).toEqual('333');
+			expect(useElem.attr('height')).toEqual('333');
+		});
+
+		it('appends an svg symbol with the default attributes when there are no options', function() {
+			var options = {};
+			mc.showRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(useElem.attr('width')).toEqual('20');
+			expect(useElem.attr('height')).toEqual('20');
+		});
+	});
+
+	describe('#showDeNovoSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when cellSize > 18', function() {
+			var options = { cellSize: 20 };
+			mc.showDeNovoSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,0)');
+			expect(useElem.attr('xlink:href')).toEqual('#denovo-symbol');
+			expect(useElem.attr('width')).toEqual('22');
+			expect(useElem.attr('height')).toEqual('22');
+			expect(useElem.style('pointer-events')).toEqual('none');
+		});
+
+		it('appends an svg symbol with the correct attributes when there are options', function() {
+			var options = { width: "333", transform: "translate(1,12)" };
+			mc.showDeNovoSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,12)');
+			expect(useElem.attr('width')).toEqual('333');
+			expect(useElem.attr('height')).toEqual('333');
+		});
+
+		it('appends an svg symbol with the default attributes when there are no options', function() {
+			var options = {};
+			mc.showDeNovoSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
+			expect(useElem.attr('width')).toEqual('20');
+			expect(useElem.attr('height')).toEqual('20');
 		});
 	});
 

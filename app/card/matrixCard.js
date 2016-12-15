@@ -857,126 +857,116 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 
 
-MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
-	var width = options && options.cellSize && options.cellSize > 18 ? "16" : 14;
-	var height = width;
-	var clazz = null;
+MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
+	var width, height, clazz;
+	options = options || {};
 
-	if (options && options.width) {
-		width = options.width;
-	} else {
-		width = options && options.cellSize && options.cellSize > 18 ? "15" : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14");
-	}
-	if (options && options.height) {
-		height = options.height;
-	} else {
-		height = options && options.cellSize && options.cellSize > 18 ? "15" :(selection.datum().hasOwnProperty("height") ? selection.datum().height : "14");
-	}
-	if (options && options.transform) {
-		transform = options.transform;
-	} else {
-		transform = options && options.cellSize && options.cellSize > 18 ? "translate(3,2)" : selection.datum().transform;
-	}
-	if (options && options.clazz) {
-		clazz = options.clazz;
-	} else {
-		clazz = selection.datum().clazz;
+	var attrs = {
+		width: "14",
+		height: "14",
+		transform: "translate(2,1)",
+		clazz: ""
+	};
+
+	var datumAttrs = selection.datum() || {};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.width = "15",
+		cellSizeAttrs.height = "15",
+		cellSizeAttrs.transform = "translate(3,2)"
 	}
 
-	if (transform == null || transform == "") {
-		transform = "translate(2,1)";
-	}
+	$.extend(attrs, datumAttrs, cellSizeAttrs, options);
+
+	var colors = {
+		clinvar_path: "#ad494A",
+		clinvar_lpath: "#FB7737",
+		clinvar_uc: "rgba(231,186,82,1)",
+		clinvar_benign: "rgba(156,194,49,1)",
+		clinvar_lbenign: "rgba(181,207,107,1)",
+		clinvar_other: "rgb(189,189,189)",
+		clinvar_cd: "rgb(111, 182, 180)"
+	};
 
 	selection.append("g")
-	         .attr("transform", transform)
+	         .attr("transform", attrs.transform)
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
-	         .attr("width", width)
-	         .attr("height", height)
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
 	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (clazz == 'clinvar_path') {
-	         		return "#ad494A";
-	         	} else if (clazz == 'clinvar_lpath') {
-	         		return "#FB7737";
-	         	} else if (clazz == 'clinvar_uc') {
-	         		return "rgba(231,186,82,1)";
-	         	} else if (clazz == 'clinvar_benign') {
-	         		return "rgba(156,194,49,1)";
-	         	} else if (clazz == 'clinvar_lbenign') {
-	         		return "rgba(181,207,107,1)";
-	         	} else if (clazz == 'clinvar_other') {
-	         		return "rgb(189,189,189)";
-	         	} else if (clazz == 'clinvar_cd') {
-	         		return "rgb(111, 182, 180)";
-	         	}
-	         });
-
+	         .style("fill", colors[attrs.clazz]);
 };
 
-MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
-	var transform = "translate(2,2)";
-	if (options && options.cellSize && options.cellSize > 18) {
-		transform = "translate(4,2)";
-	} else if (options && options.transform) {
-		transform = options.transform;
-	} else if (selection.datum().transform) {
-		transform = selection.datum().transform;
+MatrixCard.prototype.showPolyPhenSymbol = function(selection, options) {
+	options = options || {};
+	var attrs = {
+		transform: "translate(2,2)",
+		width: "13",
+		height: "13",
+		clazz: ""
+	};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.transform = "translate(4,2)";
 	}
+
+	var datumAttrs = selection.datum() || {};
+
+	$.extend(attrs, datumAttrs, options, cellSizeAttrs);
+
+	var colors = {
+		polyphen_probably_damaging: "#ad494A",
+		polyphen_possibly_damaging: "#FB7737",
+		polyphen_benign: "rgba(181, 207, 107,1)"
+	};
+
 	selection.append("g")
-	         .attr("transform", transform)
+	         .attr("transform", attrs.transform)
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "13"))
-	         .attr("height", options && options.height ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "13"))
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
 	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-	         	var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
-
-	         	if (clazz == 'polyphen_probably_damaging') {
-	         		return "#ad494A";
-	         	} else if (clazz == 'polyphen_possibly_damaging') {
-	         		return "#FB7737";
-	         	} else if (clazz == 'polyphen_benign') {
-	         		return "rgba(181, 207, 107,1)";
-	         	}
-	         });
+	         .style("fill", colors[attrs.clazz]);
 
 };
 
-MatrixCard.prototype.showSiftSymbol = function (selection, options) {
-	var transform = "translate(2,2)";
-	if (options && options.cellSize && options.cellSize > 18) {
-		transform = "translate(4,2)";
-	} else if (options && options.transform) {
-		transform = options.transform;
-	} else if (selection.datum().transform) {
-		transform = selection.datum().transform;
+MatrixCard.prototype.showSiftSymbol = function(selection, options) {
+	options = options || {};
+	var attrs = {
+		transform: "translate(2,2)",
+		width: "14",
+		height: "14",
+		clazz: ""
+	};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.transform = "translate(4,2)";
 	}
+
+	var datumAttrs = selection.datum() || {};
+
+	$.extend(attrs, datumAttrs, options, cellSizeAttrs);
+
+	var colors = {
+		sift_deleterious: "#ad494A",
+		sift_deleterious_low_confidence: "#FB7737",
+		sift_tolerated_low_confidence: "rgba(231,186,82,1)",
+		sift_tolerated: "rgba(181, 207, 107,1)"
+	};
+
 	selection.append("g")
-	         .attr("transform", transform)
+	         .attr("transform", attrs.transform)
 	         .append("use")
 	         .attr("xlink:href", "#danger-symbol")
-	         .attr("width", options  && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14"))
-	         .attr("height", selection.datum().hasOwnProperty("height") ? selection.datum().height : "14")
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
 	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-				var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
-
-	         	if (clazz == 'sift_deleterious') {
-	         		return "#ad494A";
-	         	} else if (clazz == 'sift_deleterious_low_confidence') {
-	         		return "#FB7737";
-	         	} else if (clazz == 'sift_tolerated_low_confidence') {
-	         		return "rgba(231,186,82,1)";
-	         	} else if (clazz == 'sift_tolerated') {
-	         		return "rgba(181, 207, 107,1)";
-	         	}
-	         });
-
+	         .style("fill", colors[attrs.clazz]);
 };
 
 MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
@@ -1038,66 +1028,52 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
 		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
 };
 
-MatrixCard.prototype.showHomSymbol = function (selection, options) {
+MatrixCard.prototype.showHomSymbol = function(selection, options) {
 
 	var g = selection.append("g")
-	         .attr("transform", "translate(1,4)");
+	         				 .attr("transform", "translate(1,4)");
 
-	        g.append("rect")
-	         .attr("width", 15)
-	         .attr("height", 10)
-	         .attr("class", "zyg_hom " + selection.datum().clazz)
-	         .style("pointer-events", "none");
+  g.append("rect")
+   .attr("width", 15)
+   .attr("height", 10)
+   .attr("class", "zyg_hom " + selection.datum().clazz)
+   .style("pointer-events", "none");
 
-	        g.append("text")
-	         .attr("x", 0)
-	         .attr("y", 7)
-	         .style("fill", "white")
-	         .style("font-weight", "bold")
-	         .style("font-size", "6.5px")
-	         .text("Hom");
+  g.append("text")
+   .attr("x", 0)
+   .attr("y", 7)
+   .style("fill", "white")
+   .style("font-weight", "bold")
+   .style("font-size", "6.5px")
+   .text("Hom");
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
-	var width = "20";
-	if ( options && options.cellSize && options.cellSize > 18 ) {
-		width = "22";
-	} else if ( options && options.width ) {
-		width = options.width ;
-	}
-	var height = width;
+	options = options || {};
+	var width = (options.cellSize > 18) ? "22" : (options.width || "20");
 
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
+	         .attr("transform", options.transform || "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
 	         .attr("width", width)
-	         .attr("height", height)
+	         .attr("height", width)
 	         .style("pointer-events", "none");
 };
 
-MatrixCard.prototype.showDeNovoSymbol = function (selection, options) {
-	var width = "20";
-	if ( options && options.cellSize && options.cellSize > 18 ) {
-		width = "22";
-	} else if ( options && options.width ) {
-		width = options.width ;
-	}
-	var height = width;
+MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
+	options = options || {};
 
-	var transform = "translate(-1,0)";
-	if (options && options.cellSize && options.cellSize > 18) {
-		transform = "translate(1,0)";
-	} else if (options && options.transform) {
-		transform = options.transform;
-	}
+	var width = (options.cellSize > 18) ? "22" : (options.width || "20");
+
+	var transform = (options.cellSize > 18) ? "translate(1,0)" : (options.transform || "translate(-1,0)");
 
 	selection.append("g")
 	         .attr("transform", transform)
 	         .append("use")
 	         .attr("xlink:href", '#denovo-symbol')
 	         .attr("width", width)
-	         .attr("height", height)
+	         .attr("height", width)
 	         .style("pointer-events", "none");
 
 };
@@ -1177,10 +1153,6 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 
 };
 
-MatrixCard.prototype.getSymbol = function(d,i) {
-
-};
-
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	var me = this;
 
@@ -1198,8 +1170,6 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 	         .attr("height", height);
 
 	}
-
-
 }
 
 MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
