@@ -7,6 +7,7 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 //
 var stage_iobio_services      = "nv-green.iobio.io/";
 var dev_iobio_services        = "nv-dev.iobio.io/";
+var dev_new_iobio_services    = "nv-dev-new.iobio.io/";
 var prod_iobio_services       = "nv-prod.iobio.io/";
 
 var new_iobio_services        = isOffline              ? serverInstance : stage_iobio_services;
@@ -32,7 +33,7 @@ IOBIO.vcfReadDepther          = new_iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = new_iobio_services  + "snpeff/";
 IOBIO.vt                      = dev_iobio_services  + "vt/";  // !pointed to nv-dev
 IOBIO.af                      = dev_iobio_services  + "af/";  // !pointed to nv-dev
-IOBIO.vep                     = dev_iobio_services  + "vep/"; // !pointed to nv-dev
+IOBIO.vep                     = dev_new_iobio_services  + "vep/"; // !pointed to nv-dev
 IOBIO.contigAppender          = new_iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = new_iobio_services  + "bcftools/";
 IOBIO.coverage                = new_iobio_services + "coverage/ ";

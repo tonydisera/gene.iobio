@@ -550,14 +550,14 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -568,7 +568,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -583,7 +583,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, cache, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -625,11 +625,32 @@ var effectCategories = [
 
   }
 
+  exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
+    var key = 
+      cacheHelper.launchTimestamp 
+      + "-" + (vcfURL ? vcfURL : (vcfFile ? vcfFile.name : ""))
+      + "-" + service
+      + "-" + refName
+      + "-" + geneObject.start.toString()
+      + "-" + geneObject.end.toString()
+      + "-" + geneObject.strand
+      + "-" + sampleName;
+
+    if (miscObject) {
+      for (miscKey in miscObject) {
+        key += "-" + miscKey + "=" + miscObject[miscKey];
+      }
+    }
+    return key;
+  }
 
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
 
     var me = this;
+
+
 
     // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
@@ -649,6 +670,11 @@ var effectCategories = [
     if (getRsId) {
       vepArgs += "  --check_existing ";
     }
+    vepArgList = [];
+    if (vepArgs != "") {
+      varArgList = [vepArgs];
+    }
+
 
 
     var contigStr = "";
@@ -680,11 +706,29 @@ var effectCategories = [
       cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-    if (vepArgs == "") {
-      cmd = cmd.pipe(IOBIO.vep, [], {ssl: useSSL});
-    } else {
-      cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
+    /*
+      SERVER SIDE CACHING
+
+      you turn it on with the following parameters
+      cache - the key name
+      partialCache - can be true or false; if false the cache will be deleted if the command does not finish, if true it will not
+
+      Example:
+            cmd = cmd.pipe(
+              this.iobio.bamstatsAlive,
+              ['-u', '500', '-k', '1', '-r', regStr],
+              { ssl:this.ssl, urlparams: {cache:'stats.json', partialCache:true}}
+            );
+    */
+    var cacheKey = null;
+    var urlParameters = {};
+    if (cache) {
+        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        urlParameters.cache = 'vep.json';
+        urlParameters.partialCache = true;
     }
+    cmd = cmd.pipe(IOBIO.vep, vepArgList, {ssl: useSSL, urlparams: urlParameters});
+    
 
 
     var annotatedData = "";
