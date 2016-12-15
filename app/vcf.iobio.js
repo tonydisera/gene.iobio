@@ -672,7 +672,7 @@ var effectCategories = [
     }
     vepArgList = [];
     if (vepArgs != "") {
-      varArgList = [vepArgs];
+      vepArgList = [vepArgs];
     }
 
 
@@ -723,7 +723,7 @@ var effectCategories = [
     var cacheKey = null;
     var urlParameters = {};
     if (cache) {
-        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        //cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
         urlParameters.cache = 'vep.json';
         urlParameters.partialCache = true;
     }
