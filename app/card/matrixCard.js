@@ -1049,20 +1049,15 @@ MatrixCard.prototype.showHomSymbol = function(selection, options) {
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
-	var width = "20";
-	if ( options && options.cellSize && options.cellSize > 18 ) {
-		width = "22";
-	} else if ( options && options.width ) {
-		width = options.width ;
-	}
-	var height = width;
+	options = options || {};
+	var width = (options.cellSize > 18) ? "22" : (options.width || "20");
 
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
+	         .attr("transform", options.transform || "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
 	         .attr("width", width)
-	         .attr("height", height)
+	         .attr("height", width)
 	         .style("pointer-events", "none");
 };
 
