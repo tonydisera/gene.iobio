@@ -868,13 +868,7 @@ MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
 		clazz: ""
 	};
 
-	var datumAttrs = {}
-	if (selection.datum()) {
-		datumAttrs.width = selection.datum().width;
-		datumAttrs.height = selection.datum().height;
-		datumAttrs.transform = selection.datum().transform;
-		datumAttrs.clazz = selection.datum().clazz;
-	}
+	var datumAttrs = selection.datum() || {};
 
 	var cellSizeAttrs = {};
 	if (options.cellSize > 18) {
@@ -905,37 +899,42 @@ MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
 	         .style("fill", colors[attrs.clazz]);
 };
 
-MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {
-	var transform = "translate(2,2)";
-	if (options && options.cellSize && options.cellSize > 18) {
-		transform = "translate(4,2)";
-	} else if (options && options.transform) {
-		transform = options.transform;
-	} else if (selection.datum().transform) {
-		transform = selection.datum().transform;
+MatrixCard.prototype.showPolyPhenSymbol = function(selection, options) {
+	options = options || {};
+	var attrs = {
+		transform: "translate(2,2)",
+		width: "13",
+		height: "13",
+		clazz: ""
+	};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.transform = "translate(4,2)";
 	}
+
+	var datumAttrs = selection.datum() || {};
+
+	$.extend(attrs, datumAttrs, options, cellSizeAttrs);
+
+	var colors = {
+		polyphen_probably_damaging: "#ad494A",
+		polyphen_possibly_damaging: "#FB7737",
+		polyphen_benign: "rgba(181, 207, 107,1)"
+	};
+
 	selection.append("g")
-	         .attr("transform", transform)
+	         .attr("transform", attrs.transform)
 	         .append("use")
 	         .attr("xlink:href", "#biohazard-symbol")
-	         .attr("width", options && options.width ? options.width : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "13"))
-	         .attr("height", options && options.height ? options.height : (selection.datum().hasOwnProperty("height") ? selection.datum().height : "13"))
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
 	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-	         	var clazz = options && options.clazz ? options.clazz : selection.datum().clazz;
-
-	         	if (clazz == 'polyphen_probably_damaging') {
-	         		return "#ad494A";
-	         	} else if (clazz == 'polyphen_possibly_damaging') {
-	         		return "#FB7737";
-	         	} else if (clazz == 'polyphen_benign') {
-	         		return "rgba(181, 207, 107,1)";
-	         	}
-	         });
+	         .style("fill", colors[attrs.clazz]);
 
 };
 
-MatrixCard.prototype.showSiftSymbol = function (selection, options) {
+MatrixCard.prototype.showSiftSymbol = function(selection, options) {
 	var transform = "translate(2,2)";
 	if (options && options.cellSize && options.cellSize > 18) {
 		transform = "translate(4,2)";
