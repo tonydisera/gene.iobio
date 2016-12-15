@@ -490,6 +490,25 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showHomSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends the right rect and text svg elements', function() {
+			var data = { clazz: 'whatever' };
+			selection.datum(data);
+			mc.showHomSymbol(selection);
+			expect($('#test rect')).toHaveClass('zyg_hom');
+			expect($('#test rect')).toHaveClass('whatever');
+			expect($('#test text').text()).toEqual("Hom");
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;

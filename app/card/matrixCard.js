@@ -1028,24 +1028,24 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
 		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
 };
 
-MatrixCard.prototype.showHomSymbol = function (selection, options) {
+MatrixCard.prototype.showHomSymbol = function(selection, options) {
 
 	var g = selection.append("g")
-	         .attr("transform", "translate(1,4)");
+	         				 .attr("transform", "translate(1,4)");
 
-	        g.append("rect")
-	         .attr("width", 15)
-	         .attr("height", 10)
-	         .attr("class", "zyg_hom " + selection.datum().clazz)
-	         .style("pointer-events", "none");
+  g.append("rect")
+   .attr("width", 15)
+   .attr("height", 10)
+   .attr("class", "zyg_hom " + selection.datum().clazz)
+   .style("pointer-events", "none");
 
-	        g.append("text")
-	         .attr("x", 0)
-	         .attr("y", 7)
-	         .style("fill", "white")
-	         .style("font-weight", "bold")
-	         .style("font-size", "6.5px")
-	         .text("Hom");
+  g.append("text")
+   .attr("x", 0)
+   .attr("y", 7)
+   .style("fill", "white")
+   .style("font-weight", "bold")
+   .style("font-size", "6.5px")
+   .text("Hom");
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
