@@ -857,63 +857,52 @@ MatrixCard.prototype.isDictionary = function(obj) {
 
 
 
-MatrixCard.prototype.showClinVarSymbol = function (selection, options) {
-	var width = options && options.cellSize && options.cellSize > 18 ? "16" : 14;
-	var height = width;
-	var clazz = null;
+MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
+	var width, height, clazz;
+	options = options || {};
 
-	if (options && options.width) {
-		width = options.width;
-	} else {
-		width = options && options.cellSize && options.cellSize > 18 ? "15" : (selection.datum().hasOwnProperty("width") ? selection.datum().width : "14");
-	}
-	if (options && options.height) {
-		height = options.height;
-	} else {
-		height = options && options.cellSize && options.cellSize > 18 ? "15" :(selection.datum().hasOwnProperty("height") ? selection.datum().height : "14");
-	}
-	if (options && options.transform) {
-		transform = options.transform;
-	} else {
-		transform = options && options.cellSize && options.cellSize > 18 ? "translate(3,2)" : selection.datum().transform;
-	}
-	if (options && options.clazz) {
-		clazz = options.clazz;
-	} else {
-		clazz = selection.datum().clazz;
+	var attrs = {
+		width: "14",
+		height: "14",
+		transform: "translate(2,1)",
+		clazz: ""
+	};
+
+	var datumAttrs = {}
+	if (selection.datum()) {
+		datumAttrs.width = selection.datum().width;
+		datumAttrs.height = selection.datum().height;
+		datumAttrs.transform = selection.datum().transform;
+		datumAttrs.clazz = selection.datum().clazz;
 	}
 
-	if (transform == null || transform == "") {
-		transform = "translate(2,1)";
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.width = "15",
+		cellSizeAttrs.height = "15",
+		cellSizeAttrs.transform = "translate(3,2)"
 	}
+
+	$.extend(attrs, datumAttrs, cellSizeAttrs, options);
+
+	var colors = {
+		clinvar_path: "#ad494A",
+		clinvar_lpath: "#FB7737",
+		clinvar_uc: "rgba(231,186,82,1)",
+		clinvar_benign: "rgba(156,194,49,1)",
+		clinvar_lbenign: "rgba(181,207,107,1)",
+		clinvar_other: "rgb(189,189,189)",
+		clinvar_cd: "rgb(111, 182, 180)"
+	};
 
 	selection.append("g")
-	         .attr("transform", transform)
+	         .attr("transform", attrs.transform)
 	         .append("use")
 	         .attr("xlink:href", "#clinvar-symbol")
-	         .attr("width", width)
-	         .attr("height", height)
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
 	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (clazz == 'clinvar_path') {
-	         		return "#ad494A";
-	         	} else if (clazz == 'clinvar_lpath') {
-	         		return "#FB7737";
-	         	} else if (clazz == 'clinvar_uc') {
-	         		return "rgba(231,186,82,1)";
-	         	} else if (clazz == 'clinvar_benign') {
-	         		return "rgba(156,194,49,1)";
-	         	} else if (clazz == 'clinvar_lbenign') {
-	         		return "rgba(181,207,107,1)";
-	         	} else if (clazz == 'clinvar_other') {
-	         		return "rgb(189,189,189)";
-	         	} else if (clazz == 'clinvar_cd') {
-	         		return "rgb(111, 182, 180)";
-	         	}
-	         });
-
+	         .style("fill", colors[attrs.clazz]);
 };
 
 MatrixCard.prototype.showPolyPhenSymbol = function (selection, options) {

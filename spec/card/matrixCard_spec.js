@@ -163,6 +163,69 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	fdescribe('#showClinVarSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with attributes from options when there are options', function() {
+			var options = {
+				width: "10",
+				height: "12",
+				transform: "translate(1,2)",
+				clazz: "clinvar_uc"
+			};
+			mc.showClinVarSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual(options.transform);
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual('#clinvar-symbol');
+			expect(useElem.attr('width')).toEqual(options.width);
+			expect(useElem.attr('height')).toEqual(options.height);
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill('rgb(231,186,82)');
+		});
+
+		it('appends an svg element with the correct attributes when the cellSize is greater than 18 and there are no option overrides', function() {
+			var options = { cellSize: 20, clazz: "clinvar_path" };
+			mc.showClinVarSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(3,2)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual('#clinvar-symbol');
+			expect(useElem.attr('width')).toEqual("15");
+			expect(useElem.attr('height')).toEqual("15");
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill("#ad494A");
+		});
+
+		it('appends an svg element with attributes from attached data when there are no options', function() {
+			var options = {};
+			var data = {
+				width: "222",
+				height: "111",
+				transform: "translate(11,12)",
+				clazz: "clinvar_cd"
+			};
+			selection.datum(data);
+			mc.showClinVarSymbol(selection, options);
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(11,12)");
+			var useElem = d3.select('#test > g > use');
+			expect(useElem.attr('xlink:href')).toEqual('#clinvar-symbol');
+			expect(useElem.attr('width')).toEqual("222");
+			expect(useElem.attr('height')).toEqual("111");
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem[0]).toHaveFill("rgb(111, 182, 180)");
+		})
+	});
+
+
+
+
+
+
 	describe('#showAfExacSymbol', function() {
 		var data, mc;
 
