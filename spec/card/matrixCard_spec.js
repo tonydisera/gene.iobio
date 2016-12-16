@@ -745,9 +745,44 @@ describe('MatrixCard', function() {
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('class')).toEqual('blahblah');
 			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
-			expect(useElem.attr('xlink:href')).toEqual('#bookmark-symbol');
 			expect(useElem.attr('width')).toEqual('12');
 			expect(useElem.attr('height')).toEqual('12');
+		});
+	});
+
+	describe('#showPhenotypeSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes from the underlying data', function() {
+			selection.datum({
+				translate: 'translate(123,123)',
+				width: '100',
+				height: '100',
+				clazz: 'blahblah'
+			});
+			mc.showPhenotypeSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(123,123)');
+			expect(useElem.attr('xlink:href')).toEqual('#phenotype-symbol');
+			expect(useElem.attr('width')).toEqual('100');
+			expect(useElem.attr('height')).toEqual('100');
+		});
+
+		it('appends an svg symbol with the default attributes they are no in the underlying data', function() {
+			selection.datum({ clazz: 'blahblah' });
+			mc.showPhenotypeSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(0,-1)');
+			expect(useElem.attr('width')).toEqual('13');
+			expect(useElem.attr('height')).toEqual('13');
 		});
 	});
 

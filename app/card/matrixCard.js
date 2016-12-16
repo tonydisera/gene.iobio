@@ -1159,25 +1159,16 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection) {
 }
 
 MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
-	var me = this;
-
-	var width = selection.datum().width ? selection.datum().width : 13;
-	var height = selection.datum().height ? selection.datum().width : 13;
-	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,-1)";
-
-
-	if (selection.datum().clazz != '') {
+	if (selection.datum().clazz) {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
-	         .attr("transform", translate)
+	         .attr("transform", selection.datum().translate || "translate(0,-1)")
 	         .append("use")
 	         .attr("xlink:href", '#phenotype-symbol')
-	         .attr("width",  width)
-	         .attr("height", height);
+	         .attr("width",  selection.datum().width || 13)
+	         .attr("height", selection.datum().width || 13);
 
 	}
-
-
 }
 
 MatrixCard.prototype.showImpactSymbol = function(selection, options) {
