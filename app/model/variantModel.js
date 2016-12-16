@@ -314,7 +314,7 @@ VariantModel.summarizeDanger = function(theVcfData) {
 
 	var afSummaryObject = {};
 	if (afClazz != null) {
-		afSummaryObject[afClazz] = afField;
+		afSummaryObject[afClazz] = {field: afField, value: lowestAf};
 	}
 	dangerCounts.AF = afSummaryObject;
 

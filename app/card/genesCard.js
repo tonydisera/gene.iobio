@@ -248,6 +248,21 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 		return impactValues[0] - impactValues[1];
 	}
 
+	// lowest allele frequency = highest relevance
+	var afValues = [9999,9999];
+	dangers.forEach(function(danger, index) {
+		if (danger.AF && Object.keys(danger.AF).length > 0) {
+			var clazz   = Object.keys(danger.AF)[0];
+			var afValue  = danger.AF[clazz].value;
+			afValues[index] = afValue;
+		}
+	});
+	if (afValues[0] !== afValues[1]) {
+		return afValues[0] - afValues[1];
+	}
+
+
+
 	if (geneName1 < geneName2) {
 		return -1;
 	} else if (geneName2 < geneName1) {
@@ -1306,8 +1321,8 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		if (dangerClinvar) {
 			for (key in dangerClinvar) {
 				var clinvarObject = dangerClinvar[key];
-				geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"12\" width=\"14\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,1)', clinvarName: key, clinvarObject: clinvarObject, clazz: clinvarObject.clazz}]);
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"clinvar-badge\" height=\"13\" width=\"14\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .clinvar-badge')[0]).data([{width:10, height:10, transform: 'translate(0,0)', clinvarName: key, clinvarObject: clinvarObject, clazz: clinvarObject.clazz}]);
 				matrixCard.showClinVarSymbol(selection);
 				selection.on("mouseover", function(d,i) {
 								var x = d3.event.pageX;
@@ -1457,11 +1472,12 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	}
 
 	if (dangerObject.AF) {
-		var clazz = Object.keys(dangerObject.AF)[0];
-		var afField = dangerObject.AF[clazz];
+		var clazz   = Object.keys(dangerObject.AF)[0];
+		var afField = dangerObject.AF[clazz].field;
+		var afValue  = dangerObject.AF[clazz].value;
 		if (clazz && afField) {
 			geneBadge.find('#gene-badge-symbols').append("<svg class=\"af-badge\" height=\"12\" width=\"12\">");
-			var options = {width:11, height:11, transform: 'translate(0,0)'};
+			var options = {width:10, height:10, transform: 'translate(0,-1)'};
 			var selection = d3.select(geneBadge.find('#gene-badge-symbols .af-badge')[0]).data([{clazz: clazz}]);
 			var symbolFunction = afField == 'afExAC' ? matrixCard.showAfExacSymbol : matrixCard.showAf1000gSymbol;
 			symbolFunction(selection, options);			
