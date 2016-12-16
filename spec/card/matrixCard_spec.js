@@ -833,6 +833,38 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showHighestImpactSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="parent"><div id="child"></div></div>');
+			selection = d3.select('#child');
+			mc = new MatrixCard();
+			window.matrixCard = new MatrixCard();
+			spyOn(matrixCard, 'showImpactSymbol');
+		});
+
+		it('shows the impact symbol when there is a vep highest impact', function() {
+			spyOn(VariantModel, 'getNonCanonicalHighestImpactsVep').and.returnValue({ 1: 1, 2: 2 });
+			var variant = { blah: 'blah' };
+			var options = { asdf: 'asdf' }
+			d3.select('#parent').datum(variant);
+			mc.showHighestImpactSymbol(selection, options);
+			expect(VariantModel.getNonCanonicalHighestImpactsVep).toHaveBeenCalledWith(variant);
+			expect(matrixCard.showImpactSymbol).toHaveBeenCalledWith(selection, options);
+		});
+
+		it('does not show the impact symbol when there is not a vep highest impact', function() {
+			spyOn(VariantModel, 'getNonCanonicalHighestImpactsVep').and.returnValue({});
+			var variant = { blah: 'blah' };
+			var options = { asdf: 'asdf' }
+			d3.select('#parent').datum(variant);
+			mc.showHighestImpactSymbol(selection, options);
+			expect(VariantModel.getNonCanonicalHighestImpactsVep).toHaveBeenCalledWith(variant);
+			expect(matrixCard.showImpactSymbol).not.toHaveBeenCalled();
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;

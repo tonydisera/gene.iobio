@@ -1228,7 +1228,6 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
           })
           .attr("class", "filter-symbol " + selection.datum().clazz + " " + type);
 	}
-
 }
 
 MatrixCard.prototype.showHighestImpactSymbol = function(selection, options) {
@@ -1238,8 +1237,6 @@ MatrixCard.prototype.showHighestImpactSymbol = function(selection, options) {
 		matrixCard.showImpactSymbol(selection, options);
 	}
 }
-
-
 
 MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz) {
 	var me = this;
