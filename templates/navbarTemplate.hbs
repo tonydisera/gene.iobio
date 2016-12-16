@@ -28,7 +28,7 @@
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
 
-      <ul class="nav navbar-nav ">
+      <ul class="nav navbar-nav" style="margin-left:20px">
         <li class="level-basic">
           <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')">
             <span class="material-icons">tune</span> 
@@ -62,10 +62,12 @@
             <span class="material-icons">dialpad</span> 
             Call variants
           </a>
-        </li>  
+        </li>
+
+        <li class="vertical-divider"></li>  
 
         <li class="level-basic">
-          <form class="navbar-form navbar-left" style="margin-left:5px;margin-right:5px">
+          <form class="navbar-form navbar-left" >
             <div id="bloodhound" class="form-group">
               <input id="enter-gene-name" type="text" class="form-control col-sm-8 typeahead" data-toggle="tooltip" data-placement="bottom"  placeholder="Enter Gene name">
             </div>           
