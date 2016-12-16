@@ -786,6 +786,53 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showImpactSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="parent"><div id="child"></div></div>');
+			selection = d3.select('#child');
+			mc = new MatrixCard();
+		});
+
+		it('appends a rect when the type is SNP', function() {
+			selection.datum({ clazz: 'blah' });
+			d3.select('#parent').datum({ type: 'snp' });
+			var options = { cellSize: 20 };
+			mc.showImpactSymbol(selection, options);
+			var rectElem = d3.select('#child > g > rect');
+			expect($('#child g').attr('transform')).toEqual('translate(6,5)');
+			expect(rectElem.attr('width')).toEqual('10');
+			expect(rectElem.attr('height')).toEqual('10');
+			expect(rectElem[0]).toHaveClass('filter-symbol');
+			expect(rectElem[0]).toHaveClass('blah');
+			expect(rectElem[0]).toHaveClass('snp');
+		});
+
+		it('appends a rect when the type is MNP', function() {
+			selection.datum({ clazz: 'blah' });
+			d3.select('#parent').datum({ type: 'mnp' });
+			var options = {};
+			mc.showImpactSymbol(selection, options);
+			var rectElem = d3.select('#child > g > rect');
+			expect($('#child g').attr('transform')).toEqual('translate(4,4)');
+			expect(rectElem.attr('width')).toEqual('8');
+			expect(rectElem.attr('height')).toEqual('8');
+		});
+
+		it('appends a path when the type is not SNP or MNP', function() {
+			selection.datum({ clazz: 'blah' });
+			d3.select('#parent').datum({ type: 'asdf' });
+			var options = { cellSize: 20 };
+			mc.showImpactSymbol(selection, options);
+			var pathElem = d3.select('#child > g > path');
+			expect($('#child g').attr('transform')).toEqual("translate(9,9)");
+			expect(pathElem[0]).toHaveClass('filter-symbol');
+			expect(pathElem[0]).toHaveClass('blah');
+			expect(pathElem[0]).toHaveClass('asdf');
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;

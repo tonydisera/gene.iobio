@@ -1172,6 +1172,7 @@ MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
 }
 
 MatrixCard.prototype.showImpactSymbol = function(selection, options) {
+	options = options || {};
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
 	var symbolScale = d3.scale.ordinal()
@@ -1181,13 +1182,13 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 			                  .domain([3,4,5,6,7,8])
 			                  .range([9,15,25,58,68,78]);
 
-    var symbolSize = symbolScale(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
-    var symbolSizeCircle = symbolScaleCircle(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
+  var symbolSize = symbolScale(options.cellSize > 18 ? 8 : 6);
+  var symbolSizeCircle = symbolScaleCircle(options.cellSize > 18 ? 8 : 6);
 
-    var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ;
-    var translateSymbol = options && options.cellSize && options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
-    var width           = options && options.cellSize && options.cellSize > 18 ? 10 : 8;
-    var height          = width;
+  var translate       = options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)";
+  var translateSymbol = options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
+  var width           = options.cellSize > 18 ? 10 : 8;
+  var height          = width;
 
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
