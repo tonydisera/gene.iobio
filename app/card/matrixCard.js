@@ -1100,8 +1100,7 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
 };
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
-	var me = this;
-	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)"
+	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)";
 	var text =  selection.append("g")
 				         .attr("transform", translate)
 				         .append("text")
@@ -1110,10 +1109,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
 	MatrixCard.wrap(text, options.cellSize, 3);
-
 };
-
-
 
 MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
 	var options = {};
@@ -1134,9 +1130,6 @@ MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
 	         .attr("width", options.width)
 	         .attr("height", options.height)
 	         .style("pointer-events", "none");
-
-
-
 };
 
 MatrixCard.prototype.showSibPresentSymbol = function (selection) {

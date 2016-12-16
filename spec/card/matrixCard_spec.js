@@ -587,7 +587,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	fdescribe('#showSibNotRecessiveSymbol', function() {
+	describe('#showSibNotRecessiveSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -615,6 +615,39 @@ describe('MatrixCard', function() {
 			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
 			expect(useElem.attr('width')).toEqual('20');
 			expect(useElem.attr('height')).toEqual('20');
+		});
+	});
+
+	fdescribe('#showTextSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			selection.datum({ value: 'hi' });
+			mc = new MatrixCard();
+			spyOn(MatrixCard, 'wrap');
+		});
+
+		it('appends a text svg element with the right attributes when cellSize > 18', function() {
+			var options = { cellSize: 20 };
+			window.isLevelBasic = true;
+			mc.showTextSymbol(selection, options);
+			var textElem = d3.select('#test text');
+			expect($('#test g').attr('transform')).toEqual('translate(3,0)');
+			expect(textElem.attr('y')).toEqual('14');
+			expect(textElem.text()).toEqual('hi');
+			expect(MatrixCard.wrap).toHaveBeenCalledWith(jasmine.any(Array), 20, 3);
+		});
+
+		it('appends a text svg element with the right attributes when cellSize is not > 18', function() {
+			var options = { cellSize: 15 };
+			window.isLevelBasic = false;
+			mc.showTextSymbol(selection, options);
+			var textElem = d3.select('#test text');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(textElem.attr('y')).toEqual('11');
+			expect(MatrixCard.wrap).toHaveBeenCalledWith(jasmine.any(Array), 15, 3);
 		});
 	});
 
