@@ -1146,20 +1146,14 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 };
 
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
-	var me = this;
-
-	var width = selection.datum().width ? selection.datum().width : 12;
-	var height = selection.datum().height ? selection.datum().width : 12;
-	var translate = selection.datum().translate ? selection.datum().translate : "translate(2,2)";
-
-	if (selection.datum().clazz != '') {
+	if (selection.datum().clazz) {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
-	         .attr("transform", translate)
+	         .attr("transform", selection.datum().translate || "translate(2,2)")
 	         .append("use")
 	         .attr("xlink:href", '#bookmark-symbol')
-	         .attr("width",  width)
-	         .attr("height", height);
+	         .attr("width",  selection.datum().width || 12)
+	         .attr("height", selection.datum().height || 12);
 
 	}
 }
