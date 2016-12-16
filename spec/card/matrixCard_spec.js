@@ -618,7 +618,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	fdescribe('#showTextSymbol', function() {
+	describe('#showTextSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -648,6 +648,35 @@ describe('MatrixCard', function() {
 			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
 			expect(textElem.attr('y')).toEqual('11');
 			expect(MatrixCard.wrap).toHaveBeenCalledWith(jasmine.any(Array), 15, 3);
+		});
+	});
+
+	fdescribe('#showSibRecessiveSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when there are some recessive variants', function() {
+			selection.datum({ value: 'recessive_some' });
+			mc.showSibRecessiveSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
+			expect(useElem.attr('width')).toEqual('17');
+			expect(useElem.attr('height')).toEqual('17');
+		});
+
+		it('appends an svg symbol with the correct attributes when there are no recessive variants', function() {
+			selection.datum({ value: 'asdf' });
+			mc.showSibRecessiveSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(useElem.attr('width')).toEqual('22');
+			expect(useElem.attr('height')).toEqual('22');
 		});
 	});
 

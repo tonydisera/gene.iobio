@@ -1113,7 +1113,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 
 MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
 	var options = {};
-	if (selection.datum() != null && selection.datum().value == 'recessive_some') {
+	if (selection.datum() && selection.datum().value == 'recessive_some') {
 		options.transform = "translate(1,2)";
 		options.width = "17";
 		options.height = "17";
