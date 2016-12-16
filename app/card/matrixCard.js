@@ -1095,8 +1095,6 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
 	         .attr("y2", 15)
 	         .style("stroke-width", "2px")
 	         .style("stroke", "rgb(144, 148, 169)");
-
-
 };
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {

@@ -651,7 +651,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	fdescribe('#showSibRecessiveSymbol', function() {
+	describe('#showSibRecessiveSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -677,6 +677,40 @@ describe('MatrixCard', function() {
 			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
 			expect(useElem.attr('width')).toEqual('22');
 			expect(useElem.attr('height')).toEqual('22');
+		});
+	});
+
+	describe('#showSibPresentSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when sibling data is all present', function() {
+			selection.datum({
+				value: 'present_all',
+				clazz: 'affected'
+			});
+			mc.showSibPresentSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,1)');
+			expect(useElem.attr('xlink:href')).toEqual('#checkmark-symbol');
+			expect(useElem.attr('width')).toEqual('15');
+			expect(useElem.attr('height')).toEqual('15');
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem.attr('fill')).toEqual('#81A966');
+		});
+
+		it('appends an svg symbol with the default attributes when sibling data is not all present', function() {
+			mc.showSibPresentSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(3,3)');
+			expect(useElem.attr('width')).toEqual('10');
+			expect(useElem.attr('height')).toEqual('10');
+			expect(useElem.attr('fill')).toEqual('#ABAFC1');
 		});
 	});
 
