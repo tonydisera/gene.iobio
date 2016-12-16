@@ -12,6 +12,10 @@ body {
     margin-top: 10px; }
   .navbar .form-group.is-focused .form-control {
     background-image: linear-gradient(#53b2ff, #9ef4ff), linear-gradient(#D2D2D2, #D2D2D2); }
+  .navbar .vertical-divider {
+    height: 34px;
+    margin: 10px 17px;
+    border-left: 1px solid #aba9a9; }
   .navbar ul.nav > li > a {
     color: white !important;
     padding-top: 15px !important;
@@ -2582,10 +2586,14 @@ text.ref-count {
 
 #gene-badge-button {
   font-size: 13px;
-  padding: 4px 1px 0px 1px;
+  padding: 5px 1px 1px 1px;
   margin: 0px;
   color: #717171;
-  line-height: 13px; }
+  line-height: 13px;
+  border: thin solid #e8e6e6; }
+  #gene-badge-button.user-visited {
+    border: 2px solid #c5c4c4;
+    padding: 4px 1px 0px 1px; }
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-top: 1px;
@@ -2595,8 +2603,8 @@ text.ref-count {
 #gene-badge {
   margin-top: 0px;
   margin-bottom: 8px;
-  margin-right: 12px;
-  height: 20px; }
+  margin-right: 10px;
+  height: 22px; }
 
 #gene-badge.loading {
   border-left: #dad26c solid 12px; }

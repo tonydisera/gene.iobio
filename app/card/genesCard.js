@@ -331,6 +331,9 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		if (geneSummary) {
 			me.setGeneBadgeGlyphs(name, geneSummary);
 		}
+		if (geneUserVisits[name]) {
+			me.flagUserVisitedGene(name);
+		}
 	}
 
 }
@@ -925,6 +928,7 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 	}
 	delete geneObjects[theGeneName];
 	delete geneAnnots[theGeneName];
+	delete geneUserVisits[theGeneName];
 	me._initPaging(geneNames);
 
 }
@@ -958,6 +962,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 
 		delete geneObjects[theGeneName];
 		delete geneAnnots[theGeneName];
+		delete geneUserVisits[theGeneName];
 	};
 	me._onGeneBadgeUpdate();
 	me._initPaging(geneNames);
@@ -979,6 +984,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 	}
 	delete geneObjects[theGeneName];
 	delete geneAnnots[theGeneName];
+	delete geneUserVisits[theGeneName];
 	me._initPaging(geneNames);
 
 }
@@ -1476,6 +1482,13 @@ GenesCard.prototype.selectGeneBadge = function(badgeElement) {
 		});
 	}
 
+}
+
+GenesCard.prototype.flagUserVisitedGene = function(geneName) {
+	var me = this;
+	var geneBadge = me._getGeneBadge(geneName);
+	geneBadge.find("#gene-badge-button").addClass("user-visited");
+	geneUserVisits[geneName] = true;
 }
 
 GenesCard.prototype.setSelectedGene = function(geneName) {

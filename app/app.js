@@ -40,6 +40,7 @@ var geneNames = [];
 var phenolyzerGenes = [];
 var geneObjects = {};
 var geneAnnots = {};
+var geneUserVisits = {};
 var genePhenotypes = {};
 var geneToLatestTranscript = {};
 var refseqOnly = {};
@@ -2147,6 +2148,8 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 	if (!hasDataSources()) {
 		return;
 	}
+
+	genesCard.flagUserVisitedGene(window.gene.gene_name);
 
 	$('#welcome-panel').addClass("hide");
 
