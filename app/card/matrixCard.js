@@ -1078,13 +1078,14 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 
 };
 
-MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
+MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
+	options = options || {};
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
+	         .attr("transform", options.transform || "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options && options.width ? options.width : "20")
-	         .attr("height", options && options.height ? options.height : "20")
+	         .attr("width", options.width || "20")
+	         .attr("height", options.height || "20")
 	         .style("pointer-events", "none");
 
 	selection.append("line")

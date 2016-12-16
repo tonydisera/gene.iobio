@@ -587,6 +587,37 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	fdescribe('#showSibNotRecessiveSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol and line with the correct attributes when there are options', function() {
+			var options = { width: "333", height: "444", transform: "translate(1,12)" };
+			mc.showSibNotRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,12)');
+			expect(useElem.attr('width')).toEqual('333');
+			expect(useElem.attr('height')).toEqual('444');
+			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect($('#test > line')).toBeInDOM();
+		});
+
+		it('appends an svg symbol with the default attributes when there are no options', function() {
+			var options = {};
+			mc.showSibNotRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(useElem.attr('width')).toEqual('20');
+			expect(useElem.attr('height')).toEqual('20');
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;
