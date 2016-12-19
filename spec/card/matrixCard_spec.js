@@ -865,6 +865,53 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showImpactBadge', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends a rect svg when the variant type is SNP', function() {
+			var variant = { type: "snp" };
+			var impactClazz = "impact_HIGH";
+			mc.showImpactBadge(selection, variant, impactClazz);
+			var rectElem = d3.select('#test rect');
+			expect($('#test g').attr('transform')).toEqual('translate(1,3)');
+			expect(rectElem[0]).toHaveClass('filter-symbol');
+			expect(rectElem[0]).toHaveClass('impact_HIGH');
+		});
+
+		it('appends a path svg when the variant type is not SNP', function() {
+			var variant = { type: "del", impact: ['low'] };
+			var impactClazz = undefined;
+			mc.showImpactBadge(selection, variant, impactClazz);
+			var pathElem = d3.select('#test path');
+			expect($('#test g').attr('transform')).toEqual("translate(5,6)");
+			expect(pathElem[0]).toHaveClass('filter-symbol');
+			expect(pathElem[0]).toHaveClass('impact_LOW');
+		});
+
+		describe('when there is no variant', function() {
+			it('uses the underlying selection data for the attributes of the svg', function() {
+				var variant = null;
+				var impactClazz = undefined;
+				selection.datum({
+					type: 'snp',
+					transform: "translate(100,100)",
+					clazz: 'impact_MODERATE'
+				});
+				mc.showImpactBadge(selection, variant, impactClazz);
+				var rectElem = d3.select('#test rect');
+				expect($('#test g').attr('transform')).toEqual("translate(100,100)");
+				expect(rectElem[0]).toHaveClass('filter-symbol');
+				expect(rectElem[0]).toHaveClass('impact_MODERATE');
+			});
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;

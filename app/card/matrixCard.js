@@ -1249,8 +1249,8 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
 	} else {
 		type = selection.datum().type;
-		transform1 = selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,1)";
-		transform2 =  selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)";
+		transform1 = selection.datum().transform || "translate(1,1)";
+		transform2 = selection.datum().transform || "translate(5,5)";
 		clazz = selection.datum().clazz;
 	}
 	var symbolScale = d3.scale.linear()
