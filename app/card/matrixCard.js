@@ -249,18 +249,9 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	if (isLevelEdu || isLevelBasic) {
-		return (i+1).toString();
-	} else {
-		var rsId = getRsId(d);
-		if (rsId != null) {
-			return (i+1).toString() + ".  " + rsId;
-		} else {
-			return (i+1).toString();
-		}
-	}
-
+	return (i+1).toString();
 }
+
 
 MatrixCard.prototype.init = function() {
 	var me = this;
