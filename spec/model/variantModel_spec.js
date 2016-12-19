@@ -5,6 +5,31 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 	});
 
+	describe('#setLoadState', function() {
+		it('sets the load state on the vcf data object', function() {
+			var theVcfData = {};
+			var taskName = 'clinvar';
+			variantModel.setLoadState(theVcfData, taskName);
+			expect(theVcfData).toEqual({ loadState: { clinvar: true } });
+		});
+	});
+
+	describe('#isLoaded', function() {
+		it('returns true when both the vcf and vcfData are present', function() {
+			variantModel.vcf = {};
+			variantModel.vcfData = {};
+			expect(variantModel.isLoaded()).toBeTruthy();
+		});
+
+		it('returns false when either the vcf or vcfData are not present', function() {
+			variantModel.vcfData = {};
+			expect(variantModel.isLoaded()).toBeFalsy();
+			variantModel.vcfData = null;
+			variantModel.vcf = {};
+			expect(variantModel.isLoaded()).toBeFalsy();
+		});
+	});
+
 	describe('#filterBamDataByRegion', function() {
 		it('returns an array of all bam data that falls within the specified start and end regions', function() {
 			var bamDataCoverage = [[80, 0], [90, 0], [100, 0], [150, 0], [200, 0], [201, 0]];
