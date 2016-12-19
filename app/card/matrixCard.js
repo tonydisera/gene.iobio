@@ -1069,13 +1069,14 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 
 };
 
-MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
+MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
+	options = options || {};
 	selection.append("g")
-	         .attr("transform", options && options.transform ? options.transform : "translate(0,0)")
+	         .attr("transform", options.transform || "translate(0,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options && options.width ? options.width : "20")
-	         .attr("height", options && options.height ? options.height : "20")
+	         .attr("width", options.width || "20")
+	         .attr("height", options.height || "20")
 	         .style("pointer-events", "none");
 
 	selection.append("line")
@@ -1085,13 +1086,10 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 	         .attr("y2", 15)
 	         .style("stroke-width", "2px")
 	         .style("stroke", "rgb(144, 148, 169)");
-
-
 };
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
-	var me = this;
-	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)"
+	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)";
 	var text =  selection.append("g")
 				         .attr("transform", translate)
 				         .append("text")
@@ -1100,14 +1098,11 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
 	MatrixCard.wrap(text, options.cellSize, 3);
-
 };
-
-
 
 MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
 	var options = {};
-	if (selection.datum() != null && selection.datum().value == 'recessive_some') {
+	if (selection.datum() && selection.datum().value == 'recessive_some') {
 		options.transform = "translate(1,2)";
 		options.width = "17";
 		options.height = "17";
@@ -1124,9 +1119,6 @@ MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
 	         .attr("width", options.width)
 	         .attr("height", options.height)
 	         .style("pointer-events", "none");
-
-
-
 };
 
 MatrixCard.prototype.showSibPresentSymbol = function (selection) {
@@ -1145,47 +1137,33 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 };
 
 MatrixCard.prototype.showBookmarkSymbol = function(selection) {
-	var me = this;
-
-	var width = selection.datum().width ? selection.datum().width : 12;
-	var height = selection.datum().height ? selection.datum().width : 12;
-	var translate = selection.datum().translate ? selection.datum().translate : "translate(2,2)";
-
-	if (selection.datum().clazz != '') {
+	if (selection.datum().clazz) {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
-	         .attr("transform", translate)
+	         .attr("transform", selection.datum().translate || "translate(2,2)")
 	         .append("use")
 	         .attr("xlink:href", '#bookmark-symbol')
-	         .attr("width",  width)
-	         .attr("height", height);
+	         .attr("width",  selection.datum().width || 12)
+	         .attr("height", selection.datum().height || 12);
 
 	}
 }
 
 MatrixCard.prototype.showPhenotypeSymbol = function(selection) {
-	var me = this;
-
-	var width = selection.datum().width ? selection.datum().width : 13;
-	var height = selection.datum().height ? selection.datum().width : 13;
-	var translate = selection.datum().translate ? selection.datum().translate : "translate(0,-1)";
-
-
-	if (selection.datum().clazz != '') {
+	if (selection.datum().clazz) {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
-	         .attr("transform", translate)
+	         .attr("transform", selection.datum().translate || "translate(0,-1)")
 	         .append("use")
 	         .attr("xlink:href", '#phenotype-symbol')
-	         .attr("width",  width)
-	         .attr("height", height);
+	         .attr("width",  selection.datum().width || 13)
+	         .attr("height", selection.datum().width || 13);
 
 	}
-
-
 }
 
 MatrixCard.prototype.showImpactSymbol = function(selection, options) {
+	options = options || {};
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
 	var symbolScale = d3.scale.ordinal()
@@ -1195,13 +1173,13 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 			                  .domain([3,4,5,6,7,8])
 			                  .range([9,15,25,58,68,78]);
 
-    var symbolSize = symbolScale(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
-    var symbolSizeCircle = symbolScaleCircle(options && options.cellSize && options.cellSize > 18 ? 8 : 6);
+  var symbolSize = symbolScale(options.cellSize > 18 ? 8 : 6);
+  var symbolSizeCircle = symbolScaleCircle(options.cellSize > 18 ? 8 : 6);
 
-    var translate       = options && options.cellSize && options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)" ;
-    var translateSymbol = options && options.cellSize && options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
-    var width           = options && options.cellSize && options.cellSize > 18 ? 10 : 8;
-    var height          = width;
+  var translate       = options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)";
+  var translateSymbol = options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
+  var width           = options.cellSize > 18 ? 10 : 8;
+  var height          = width;
 
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
@@ -1241,7 +1219,6 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
           })
           .attr("class", "filter-symbol " + selection.datum().clazz + " " + type);
 	}
-
 }
 
 MatrixCard.prototype.showHighestImpactSymbol = function(selection, options) {
@@ -1251,8 +1228,6 @@ MatrixCard.prototype.showHighestImpactSymbol = function(selection, options) {
 		matrixCard.showImpactSymbol(selection, options);
 	}
 }
-
-
 
 MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz) {
 	var me = this;
@@ -1265,8 +1240,8 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
 	} else {
 		type = selection.datum().type;
-		transform1 = selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(1,1)";
-		transform2 =  selection.datum().hasOwnProperty("transform") ? selection.datum().transform : "translate(5,5)";
+		transform1 = selection.datum().transform || "translate(1,1)";
+		transform2 = selection.datum().transform || "translate(5,5)";
 		clazz = selection.datum().clazz;
 	}
 	var symbolScale = d3.scale.linear()

@@ -587,6 +587,331 @@ describe('MatrixCard', function() {
 		});
 	});
 
+	describe('#showSibNotRecessiveSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol and line with the correct attributes when there are options', function() {
+			var options = { width: "333", height: "444", transform: "translate(1,12)" };
+			mc.showSibNotRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,12)');
+			expect(useElem.attr('width')).toEqual('333');
+			expect(useElem.attr('height')).toEqual('444');
+			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect($('#test > line')).toBeInDOM();
+		});
+
+		it('appends an svg symbol with the default attributes when there are no options', function() {
+			var options = {};
+			mc.showSibNotRecessiveSymbol(selection, options);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(useElem.attr('width')).toEqual('20');
+			expect(useElem.attr('height')).toEqual('20');
+		});
+	});
+
+	describe('#showTextSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			selection.datum({ value: 'hi' });
+			mc = new MatrixCard();
+			spyOn(MatrixCard, 'wrap');
+		});
+
+		it('appends a text svg element with the right attributes when cellSize > 18', function() {
+			var options = { cellSize: 20 };
+			window.isLevelBasic = true;
+			mc.showTextSymbol(selection, options);
+			var textElem = d3.select('#test text');
+			expect($('#test g').attr('transform')).toEqual('translate(3,0)');
+			expect(textElem.attr('y')).toEqual('14');
+			expect(textElem.text()).toEqual('hi');
+			expect(MatrixCard.wrap).toHaveBeenCalledWith(jasmine.any(Array), 20, 3);
+		});
+
+		it('appends a text svg element with the right attributes when cellSize is not > 18', function() {
+			var options = { cellSize: 15 };
+			window.isLevelBasic = false;
+			mc.showTextSymbol(selection, options);
+			var textElem = d3.select('#test text');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(textElem.attr('y')).toEqual('11');
+			expect(MatrixCard.wrap).toHaveBeenCalledWith(jasmine.any(Array), 15, 3);
+		});
+	});
+
+	describe('#showSibRecessiveSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when there are some recessive variants', function() {
+			selection.datum({ value: 'recessive_some' });
+			mc.showSibRecessiveSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
+			expect(useElem.attr('width')).toEqual('17');
+			expect(useElem.attr('height')).toEqual('17');
+		});
+
+		it('appends an svg symbol with the correct attributes when there are no recessive variants', function() {
+			selection.datum({ value: 'asdf' });
+			mc.showSibRecessiveSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect(useElem.attr('width')).toEqual('22');
+			expect(useElem.attr('height')).toEqual('22');
+		});
+	});
+
+	describe('#showSibPresentSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes when sibling data is all present', function() {
+			selection.datum({
+				value: 'present_all',
+				clazz: 'affected'
+			});
+			mc.showSibPresentSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(1,1)');
+			expect(useElem.attr('xlink:href')).toEqual('#checkmark-symbol');
+			expect(useElem.attr('width')).toEqual('15');
+			expect(useElem.attr('height')).toEqual('15');
+			expect(useElem.style('pointer-events')).toEqual('none');
+			expect(useElem.attr('fill')).toEqual('#81A966');
+		});
+
+		it('appends an svg symbol with the default attributes when sibling data is not all present', function() {
+			mc.showSibPresentSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('transform')).toEqual('translate(3,3)');
+			expect(useElem.attr('width')).toEqual('10');
+			expect(useElem.attr('height')).toEqual('10');
+			expect(useElem.attr('fill')).toEqual('#ABAFC1');
+		});
+	});
+
+	describe('#showBookmarkSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes from the underlying data', function() {
+			selection.datum({
+				translate: 'translate(123,123)',
+				width: '100',
+				height: '100',
+				clazz: 'blahblah'
+			});
+			mc.showBookmarkSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(123,123)');
+			expect(useElem.attr('xlink:href')).toEqual('#bookmark-symbol');
+			expect(useElem.attr('width')).toEqual('100');
+			expect(useElem.attr('height')).toEqual('100');
+		});
+
+		it('appends an svg symbol with the default attributes they are no in the underlying data', function() {
+			selection.datum({ clazz: 'blahblah' });
+			mc.showBookmarkSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
+			expect(useElem.attr('width')).toEqual('12');
+			expect(useElem.attr('height')).toEqual('12');
+		});
+	});
+
+	describe('#showPhenotypeSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends an svg symbol with the correct attributes from the underlying data', function() {
+			selection.datum({
+				translate: 'translate(123,123)',
+				width: '100',
+				height: '100',
+				clazz: 'blahblah'
+			});
+			mc.showPhenotypeSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(123,123)');
+			expect(useElem.attr('xlink:href')).toEqual('#phenotype-symbol');
+			expect(useElem.attr('width')).toEqual('100');
+			expect(useElem.attr('height')).toEqual('100');
+		});
+
+		it('appends an svg symbol with the default attributes they are no in the underlying data', function() {
+			selection.datum({ clazz: 'blahblah' });
+			mc.showPhenotypeSymbol(selection);
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(0,-1)');
+			expect(useElem.attr('width')).toEqual('13');
+			expect(useElem.attr('height')).toEqual('13');
+		});
+	});
+
+	describe('#showImpactSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="parent"><div id="child"></div></div>');
+			selection = d3.select('#child');
+			mc = new MatrixCard();
+		});
+
+		it('appends a rect when the type is SNP', function() {
+			selection.datum({ clazz: 'blah' });
+			d3.select('#parent').datum({ type: 'snp' });
+			var options = { cellSize: 20 };
+			mc.showImpactSymbol(selection, options);
+			var rectElem = d3.select('#child > g > rect');
+			expect($('#child g').attr('transform')).toEqual('translate(6,5)');
+			expect(rectElem.attr('width')).toEqual('10');
+			expect(rectElem.attr('height')).toEqual('10');
+			expect(rectElem[0]).toHaveClass('filter-symbol');
+			expect(rectElem[0]).toHaveClass('blah');
+			expect(rectElem[0]).toHaveClass('snp');
+		});
+
+		it('appends a rect when the type is MNP', function() {
+			selection.datum({ clazz: 'blah' });
+			d3.select('#parent').datum({ type: 'mnp' });
+			var options = {};
+			mc.showImpactSymbol(selection, options);
+			var rectElem = d3.select('#child > g > rect');
+			expect($('#child g').attr('transform')).toEqual('translate(4,4)');
+			expect(rectElem.attr('width')).toEqual('8');
+			expect(rectElem.attr('height')).toEqual('8');
+		});
+
+		it('appends a path when the type is not SNP or MNP', function() {
+			selection.datum({ clazz: 'blah' });
+			d3.select('#parent').datum({ type: 'asdf' });
+			var options = { cellSize: 20 };
+			mc.showImpactSymbol(selection, options);
+			var pathElem = d3.select('#child > g > path');
+			expect($('#child g').attr('transform')).toEqual("translate(9,9)");
+			expect(pathElem[0]).toHaveClass('filter-symbol');
+			expect(pathElem[0]).toHaveClass('blah');
+			expect(pathElem[0]).toHaveClass('asdf');
+		});
+	});
+
+	describe('#showHighestImpactSymbol', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="parent"><div id="child"></div></div>');
+			selection = d3.select('#child');
+			mc = new MatrixCard();
+			window.matrixCard = new MatrixCard();
+			spyOn(matrixCard, 'showImpactSymbol');
+		});
+
+		it('shows the impact symbol when there is a vep highest impact', function() {
+			spyOn(VariantModel, 'getNonCanonicalHighestImpactsVep').and.returnValue({ 1: 1, 2: 2 });
+			var variant = { blah: 'blah' };
+			var options = { asdf: 'asdf' }
+			d3.select('#parent').datum(variant);
+			mc.showHighestImpactSymbol(selection, options);
+			expect(VariantModel.getNonCanonicalHighestImpactsVep).toHaveBeenCalledWith(variant);
+			expect(matrixCard.showImpactSymbol).toHaveBeenCalledWith(selection, options);
+		});
+
+		it('does not show the impact symbol when there is not a vep highest impact', function() {
+			spyOn(VariantModel, 'getNonCanonicalHighestImpactsVep').and.returnValue({});
+			var variant = { blah: 'blah' };
+			var options = { asdf: 'asdf' }
+			d3.select('#parent').datum(variant);
+			mc.showHighestImpactSymbol(selection, options);
+			expect(VariantModel.getNonCanonicalHighestImpactsVep).toHaveBeenCalledWith(variant);
+			expect(matrixCard.showImpactSymbol).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('#showImpactBadge', function() {
+		var selection, mc;
+
+		beforeEach(function() {
+			setFixtures('<div id="test"></div>');
+			selection = d3.select('#test');
+			mc = new MatrixCard();
+		});
+
+		it('appends a rect svg when the variant type is SNP', function() {
+			var variant = { type: "snp" };
+			var impactClazz = "impact_HIGH";
+			mc.showImpactBadge(selection, variant, impactClazz);
+			var rectElem = d3.select('#test rect');
+			expect($('#test g').attr('transform')).toEqual('translate(1,3)');
+			expect(rectElem[0]).toHaveClass('filter-symbol');
+			expect(rectElem[0]).toHaveClass('impact_HIGH');
+		});
+
+		it('appends a path svg when the variant type is not SNP', function() {
+			var variant = { type: "del", impact: ['low'] };
+			var impactClazz = undefined;
+			mc.showImpactBadge(selection, variant, impactClazz);
+			var pathElem = d3.select('#test path');
+			expect($('#test g').attr('transform')).toEqual("translate(5,6)");
+			expect(pathElem[0]).toHaveClass('filter-symbol');
+			expect(pathElem[0]).toHaveClass('impact_LOW');
+		});
+
+		describe('when there is no variant', function() {
+			it('uses the underlying selection data for the attributes of the svg', function() {
+				var variant = null;
+				var impactClazz = undefined;
+				selection.datum({
+					type: 'snp',
+					transform: "translate(100,100)",
+					clazz: 'impact_MODERATE'
+				});
+				mc.showImpactBadge(selection, variant, impactClazz);
+				var rectElem = d3.select('#test rect');
+				expect($('#test g').attr('transform')).toEqual("translate(100,100)");
+				expect(rectElem[0]).toHaveClass('filter-symbol');
+				expect(rectElem[0]).toHaveClass('impact_MODERATE');
+			});
+		});
+	});
+
 	describe('#formatClinvar', function() {
 		it('returns a string representation of clinvar significance for a variant', function() {
 			window.isLevelBasic = true;
