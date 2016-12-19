@@ -2984,7 +2984,9 @@ function filterVariants() {
 		}
 
 	});
-	$('#refresh-badges-button').animateIt('tada', 'animate-twice');
+	// After the filter has been applied to the current gene's variants,
+	// refresh all of the gene badges based on the filter
+	cacheHelper.refreshGeneBadges();
 
 }
 

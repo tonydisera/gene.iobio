@@ -718,8 +718,9 @@ a {
   margin-top: 0px;
   padding-left: 10px; }
   #genes-control-track #filters {
-    margin-bottom: 5px;
-    color: #717171; }
+    margin-bottom: 10px;
+    color: #717171;
+    display: inline-block; }
   #genes-control-track .filter-flag.label-primary {
     background-color: #fff5d9;
     color: #888888;
@@ -2550,6 +2551,25 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 12px; }
 
+#genes-panel {
+  margin-bottom: 5px; }
+  #genes-panel #analyze-all-progress {
+    background-color: #efefef;
+    color: #888888;
+    border: #fdecbe;
+    border-style: solid;
+    border-width: thin;
+    font-size: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px; }
+    #genes-panel #analyze-all-progress.done {
+      background-color: #ffffff;
+      color: #7ea238;
+      border: thin solid #7ea238 !important; }
+
 #genes-card {
   height: 100%; }
   #genes-card .phenolyzer-label {
@@ -2618,7 +2638,10 @@ text.ref-count {
     font-weight: bold; }
 
 #gene-badge.phenolyzer #gene-badge-button {
-  border: solid 1px #9FC2D0; }
+  border: solid 1px #9FC2D0;
+  height: 22px; }
+  #gene-badge.phenolyzer #gene-badge-button.user-visited {
+    border: solid 2px #9FC2D0; }
 
 #gene-badge-loaded {
   font-size: 14px;
@@ -2735,7 +2758,7 @@ text.ref-count {
   margin-right: 10px; }
 
 #order-by-label {
-  margin-left: 10px; }
+  margin-left: 20px; }
 
 #select-gene-container {
   display: inline-block;
@@ -2769,7 +2792,11 @@ text.ref-count {
   padding-bottom: 2px; }
 
 #refresh-badges-button {
-  display: inline-block; }
+  display: inline-block;
+  margin-left: 20px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  line-height: 12px; }
 
 #gene-badge-loading-display {
   font-size: 11px;

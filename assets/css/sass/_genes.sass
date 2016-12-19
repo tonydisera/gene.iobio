@@ -16,6 +16,28 @@
       fill: $sidebar-text-color !important
       font-size: 12px
 
+#genes-panel
+  margin-bottom: 5px 
+
+  #analyze-all-progress
+    background-color: #efefef
+    color: #888888
+    border: #fdecbe
+    border-style: solid
+    border-width: thin
+    font-size: 12px
+    padding-top: 2px
+    padding-bottom: 2px
+    padding-left: 5px
+    padding-right: 5px
+    margin-left: 5px
+
+    &.done
+      background-color: #ffffff
+      color: #7ea238
+      border: thin solid #7ea238 !important
+
+
 #genes-card
   height: 100%
 
@@ -101,6 +123,10 @@
 #gene-badge.phenolyzer
   #gene-badge-button
     border: solid 1px #9FC2D0
+    height: 22px
+
+    &.user-visited
+      border: solid 2px #9FC2D0
 
 
 #gene-badge-loaded
@@ -246,7 +272,7 @@
 
       
 #order-by-label
-  margin-left: 10px
+  margin-left: 20px
 
 #select-gene-container
   display: inline-block
@@ -289,6 +315,10 @@
 
 #refresh-badges-button
   display: inline-block
+  margin-left: 20px
+  margin-bottom: 0px
+  margin-top: 0px
+  line-height: 12px
 
 #gene-badge-loading-display
   font-size: 11px

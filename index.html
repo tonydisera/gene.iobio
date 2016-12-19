@@ -212,8 +212,12 @@
 
   <div id="container" class="push">
     <div id="genes-control-track" class="hide shadow-z-2">
-          <div id="filters">
+          <div id="filters" class="hide">
+
           </div>
+          <button id="refresh-badges-button" class="hide btn btn-default icon-button-sm btn-raised" onclick="cacheHelper.refreshGeneBadges()">
+            Refresh all
+          </button>
 
       <section id="app-title-section" class="nav-stretch level-basic">
 
@@ -227,6 +231,7 @@
                     Analyze all
                 </a>
 
+                <span id="analyze-all-progress" class="hide"></span>
                 
                 <span id="order-by-label" class="manage-gene-links">Order by</span>
                 <div id="select-gene-container">
@@ -236,9 +241,7 @@
               </div>
 
               <div style="display:inline-block">
-                <a id="refresh-badges-button" class="manage-gene-links" onclick="cacheHelper.refreshGeneBadges()">                  
-                  Refresh all genes
-                </a>
+
 
               </div>
 

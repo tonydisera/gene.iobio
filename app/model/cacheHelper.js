@@ -12,10 +12,26 @@ CacheHelper.prototype.isolateSession = function() {
 	this.launchTimestamp = Date.now().valueOf();	
 }
 
+CacheHelper.prototype.showAnalyzeAllProgress = function() {
+	var me = this;
+	me.getAnalyzeAllCounts(function(counts) {
+		$('#analyze-all-progress').removeClass("hide");
+		if (counts.analyzed == counts.total) {
+			$('#analyze-all-progress').addClass("done");
+			$('#analyze-all-progress').text(counts.analyzed + ' analyzed');
+		} else {
+			$('#analyze-all-progress').removeClass("done");
+			$('#analyze-all-progress').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
+		}
+	});	
+}
+
 
 CacheHelper.prototype.analyzeAll = function() {
-
 	var me = this;
+
+	me.showAnalyzeAllProgress();
+
 	// Start over with a new queue of genes to be analyzed
 	// is all of the genes that need to be analyzed (and cached.)
 	me.genesToCache = [];
@@ -26,28 +42,10 @@ CacheHelper.prototype.analyzeAll = function() {
 		}
 	});
 	me.cacheGenes(function() {
-		me.getAnalyzeAllCounts(function(counts) {
-			if (counts.unanalyzed == 0) {
-				alertify.confirm("Analysis is complete. Refresh badges?", function (e) {
-				    if (e) {
-						// user clicked "ok"
-						me.refreshGeneBadges();
-				        
-				    } else {
-				        // user clicked "cancel"
-				    }
-				});	
-
-			} else if (counts.unanalyzed > 0) {
-				alertify.confirm("Analysis incomplete.  Only " + counts.analyzed + " of the " + counts.total + " genes have been analyzed.", function (e) {
-				    if (e) {
-				    	// ok
-				    } else {
-				    	//cancel
-				    }
-				});	
-			} 
-		});		
+		// After all genes have been cached, refresh the gene badges in case
+		// filters were applied while genes were still in the process of being
+		// analyzed.
+		me.refreshGeneBadges();
 	});
 
 
@@ -243,6 +241,8 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 }
 
 CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
+	this.showAnalyzeAllProgress();
+
 	this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
 														 .removeGene(geneName);
 	// Take the analyzed (and cached) gene off of the cache queue
@@ -347,49 +347,27 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 CacheHelper.prototype.refreshGeneBadges = function() {  
 	var me = this;
 
-	var doRefresh  = function() {
-		$('#gene-badges-loader').removeClass("hide");
-		for (var i=0; i<=localStorage.length-1; i++)  
-		{  
-			key = localStorage.key(i);  
-			keyObject = CacheHelper._parseCacheKey(key);
-			if (keyObject.launchTimestamp == me.launchTimestamp) {
+	$('#gene-badges-loader').removeClass("hide");
+	for (var i=0; i<=localStorage.length-1; i++)  
+	{  
+		key = localStorage.key(i);  
+		keyObject = CacheHelper._parseCacheKey(key);
+		if (keyObject.launchTimestamp == me.launchTimestamp) {
 
-			  	var cacheObject = CacheHelper._parseCacheKey(key);
-			  	if (cacheObject.dataKind == 'vcfData' && cacheObject.relationship == "proband") {
-			  		var theVcfData = CacheHelper.getCachedData(key);
-			  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+		  	var cacheObject = CacheHelper._parseCacheKey(key);
+		  	if (cacheObject.dataKind == 'vcfData' && cacheObject.relationship == "proband") {
+		  		var theVcfData = CacheHelper.getCachedData(key);
+		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
 
-			  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
-					getVariantCard('proband').model.cacheDangerSummary(dangerObject, cacheObject.gene);
-			
-					genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
-			  	}
-			}
-		}  
-		genesCard.sortGenes();
-		$('#gene-badges-loader').addClass("hide");
-
-	}
-
-	me.getAnalyzeAllCounts(function(counts) {
-		if (counts.unanalyzed > 0) {
-			alertify.confirm("Analysis incomplete.  Only " + counts.analyzed + " of the " + counts.total + " genes have been analyzed.  Refresh badges anyways?", function (e) {
-			    if (e) {
-					// user clicked "ok"
-					doRefresh();
-			        
-			    } else {
-			        // user clicked "cancel"
-			    }
-			});	
-		} else {
-			doRefresh();
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
+				getVariantCard('proband').model.cacheDangerSummary(dangerObject, cacheObject.gene);
+		
+				genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
+		  	}
 		}
-	});
-	
-
-
+	}  
+	genesCard.sortGenes();
+	$('#gene-badges-loader').addClass("hide");
 }
 
 CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
