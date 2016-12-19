@@ -241,8 +241,8 @@ VariantModel.summarizeDanger = function(theVcfData) {
 				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
 					if (rangeEntry.value < lowestAf) {
 						lowestAf = rangeEntry.value;
-						afClazz = rangeEntry.clazz;	
-						afField = af;					
+						afClazz = rangeEntry.clazz;
+						afField = af;
 					}
 				}
 			});
@@ -252,7 +252,7 @@ VariantModel.summarizeDanger = function(theVcfData) {
 		// as 'lowest' af for all variants in gene
 		var af = null;
 		var afMap = null;
-		if (matrixCard.isNumeric(variant.afExAC) && matrixCard.isNumeric(variant.af1000G)) {
+		if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
 			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
 			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
 				af = 'afExAC';
@@ -260,21 +260,19 @@ VariantModel.summarizeDanger = function(theVcfData) {
 			} else {
 				af = 'af1000G';
 				afMap = matrixCard.af1000gMap;
-			}			 
-		} else if (matrixCard.isNumeric(variant.afExAC)) {
+			}
+		} else if ($.isNumeric(variant.afExAC)) {
 			af = 'afExAC';
 			afMap = matrixCard.afExacMap;
 
-		} else if (matrixCard.isNumeric(variant.af1000G)) {
+		} else if ($.isNumeric(variant.af1000G)) {
 			af = 'af1000G';
 			afMap = matrixCard.af1000gMap;
 		}
 		if (af && afMap) {
 			evaluateAf(af, afMap);
 		}
-
-
-	});	
+	});
 
 	var getLowestClinvarClazz = function(clazzes) {
 		var lowestOrder = 9999;

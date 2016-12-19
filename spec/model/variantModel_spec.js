@@ -178,6 +178,90 @@ describe('variantModel', function() {
 				AF: {}
 			});
 		});
+
+		describe('when afExAC is higher than af1000G', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', afExAC: 0.04, af1000G: 0.03 }, // value of 6
+						{ type: 'snp', afExAC: 0.005, af1000G: 0.001 }, // value of 5
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						afexac_rare: { field: 'afExAC', value: 5 }
+					}
+				});
+			});
+		});
+
+		describe('when af1000G is higher than afExAC', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', afExAC: -1.05, af1000G: -1 }, // value of 2
+						{ type: 'snp', afExAC: 0.01, af1000G: 0.02 }, // value of 6
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						af1000g_unique: { field: 'af1000G', value: 2 }
+					}
+				});
+			});
+		});
+
+		describe('when afExAC is present but not af1000G', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', afExAC: 0.04 }, // value of 6
+						{ type: 'snp', afExAC: 0.005 }, // value of 5
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						afexac_rare: { field: 'afExAC', value: 5 }
+					}
+				});
+			});
+		});
+
+		describe('when af1000G is present but not afExAC', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', af1000G: -1 }, // value of 2
+						{ type: 'snp', af1000G: 0.02 }, // value of 6
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						af1000g_unique: { field: 'af1000G', value: 2 }
+					}
+				});
+			});
+		});
 	});
 
 	describe('#getVariantCount', function() {
