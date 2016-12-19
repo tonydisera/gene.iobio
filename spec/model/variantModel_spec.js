@@ -68,7 +68,8 @@ describe('variantModel', function() {
 						del: { missense_variant: { ENST000001: "ENST000001" } }
 					}
 				},
-				CONSEQUENCE: {}
+				CONSEQUENCE: {},
+				AF: {}
 			});
 		});
 
@@ -97,7 +98,8 @@ describe('variantModel', function() {
 						snp: { missense_variant: { ENST000001: "ENST000001" } },
 						del: { missense_variant: { ENST000001: "ENST000001" } }
 					}
-				}
+				},
+				AF: {}
 			});
 		});
 
@@ -115,7 +117,8 @@ describe('variantModel', function() {
 				INHERITANCE: {},
 				IMPACT: {},
 				CONSEQUENCE: {},
-				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } }
+				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } },
+				AF: {}
 			});
 		});
 
@@ -133,7 +136,8 @@ describe('variantModel', function() {
 				INHERITANCE: {},
 				IMPACT: {},
 				CONSEQUENCE: {},
-				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } }
+				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } },
+				AF: {}
 			});
 		});
 
@@ -152,7 +156,8 @@ describe('variantModel', function() {
 				},
 				INHERITANCE: {},
 				IMPACT: {},
-				CONSEQUENCE: {}
+				CONSEQUENCE: {},
+				AF: {}
 			});
 		});
 
@@ -169,7 +174,8 @@ describe('variantModel', function() {
 				CLINVAR: null,
 				INHERITANCE: { denovo: "denovo", recessive: "recessive" },
 				IMPACT: {},
-				CONSEQUENCE: {}
+				CONSEQUENCE: {},
+				AF: {}
 			});
 		});
 	});
