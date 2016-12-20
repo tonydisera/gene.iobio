@@ -2554,21 +2554,37 @@ text.ref-count {
 #genes-panel {
   margin-bottom: 5px; }
   #genes-panel #analyze-all-progress {
-    background-color: #efefef;
-    color: #888888;
-    border: #fdecbe;
+    position: relative;
+    background-color: white;
+    color: #717070;
+    border: #bdbcbc;
     border-style: solid;
     border-width: thin;
     font-size: 12px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    padding-left: 5px;
-    padding-right: 5px;
-    margin-left: 5px; }
-    #genes-panel #analyze-all-progress.done {
-      background-color: #ffffff;
-      color: #7ea238;
-      border: thin solid #7ea238 !important; }
+    margin-left: 5px;
+    padding: 0px 0px 0px 0px !important;
+    display: inline-block;
+    width: 130px;
+    vertical-align: middle;
+    height: 18px; }
+    #genes-panel #analyze-all-progress .bar {
+      background-color: rgba(65, 176, 220, 0.45);
+      height: 17px;
+      position: absolute;
+      left: 0;
+      top: 0%;
+      width: 0%;
+      text-align: center; }
+    #genes-panel #analyze-all-progress .text {
+      position: absolute;
+      left: 0;
+      top: 0%;
+      width: 100%;
+      text-align: center; }
+    #genes-panel #analyze-all-progress.done .bar {
+      background-color: rgba(53, 145, 181, 0.66); }
+    #genes-panel #analyze-all-progress.done .text {
+      color: white; }
 
 #genes-card {
   height: 100%; }

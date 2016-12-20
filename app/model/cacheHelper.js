@@ -17,13 +17,22 @@ CacheHelper.prototype.showAnalyzeAllProgress = function() {
 	me.getAnalyzeAllCounts(function(counts) {
 		$('#analyze-all-progress').removeClass("hide");
 		if (counts.analyzed == counts.total) {
+			$('#analyze-all-progress .bar').css("width", "0%");
 			$('#analyze-all-progress').addClass("done");
-			$('#analyze-all-progress').text(counts.analyzed + ' analyzed');
+			$('#analyze-all-progress .bar').css("width", "100%");
+			$('#analyze-all-progress .text').text(counts.analyzed + ' analyzed');
 		} else {
 			$('#analyze-all-progress').removeClass("done");
-			$('#analyze-all-progress').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
+			$('#analyze-all-progress .bar').css("width", percentage(counts.analyzed / counts.total));
+			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
 		}
 	});	
+}
+
+CacheHelper.prototype.hideAnalyzeAllProgress = function() {
+	$("#analyze-all-progress").addClass("hide");
+	$("#analyze-all-progress .text").text("");
+	$("#analyze-all-progress .bar").css("width", "0%");	
 }
 
 
@@ -485,6 +494,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 		keysToRemove.forEach( function(key) {
 			localStorage.removeItem(key);			
 		})
+		me.hideAnalyzeAllProgress();
 		//CacheHelper._logCacheSize();
 		//CacheHelper._logCacheContents();
 	}
