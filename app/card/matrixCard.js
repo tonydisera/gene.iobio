@@ -580,7 +580,8 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
         		// Now show tooltip again with the hgvs notations.  Only show
 	        	// if we haven't clicked on another variant
-	        	if (clickedVariant.start == refreshedVariant.start &&
+	        	if (clickedVariant &&
+	        		clickedVariant.start == refreshedVariant.start &&
 	        		clickedVariant.ref == refreshedVariant.ref &&
 	        		clickedVariant.alt == refreshedVariant.alt) {
 

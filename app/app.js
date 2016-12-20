@@ -2971,10 +2971,14 @@ function getRsId(variant) {
 
 
 function filterVariants() {
+	clickedVariant = null;
+	matrixCard.unpin();
+
 	filterCard.displayFilters();
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
 
+			variantCard.unpin();
 			variantCard.filterVariants();
   			variantCard.filterCalledVariants();
   			
