@@ -403,7 +403,6 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 	var me = this;
 	var size = 0;
 	var coverageSize = 0;
-	var nonBadgeSize = 0;
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  
 		key = localStorage.key(i);  
@@ -416,14 +415,11 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 		  	if (cacheObject.dataKind == 'bamData') {
 		  		coverageSize +=  dataSize;
 		  	}
-		  	if (!me._hasBadgeOfInterest(key)) {
-		  		nonBadgeSize += dataSize;
-		  	}  		
+		  	
 		}
 	}  
 	return {total:     (CacheHelper._sizeMB(size) + " MB"), 
-	      coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
-	  	  nonBadge:  (CacheHelper._sizeMB(nonBadgeSize) + " MB")};
+	        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB")};
 }
 
 CacheHelper._logCacheSize = function() {
@@ -545,7 +541,6 @@ CacheHelper.prototype.refreshDialog = function() {
 	var sizes = this.getCacheSize();
 	$("#cache-size").text(sizes.total);
 	$("#coverage-size").text(sizes.coverage);
-	$("#non-badge-size").text(sizes.nonBadge);	
 }
 
 CacheHelper.prototype.openDialog = function() {
@@ -577,52 +572,6 @@ CacheHelper.prototype._getKeysForGene = function(geneName) {
 		}
 	}
 	return keys;
-}
-
-CacheHelper.prototype._hasBadgeOfInterest = function(key) {
-	var me = this;
-	hasBadge = false;
-	var cacheObject = CacheHelper._parseCacheKey(key);
-	var probandKey = null;
-	if (me._isProbandVariantCache(key)) {
-		probandKey = key;
-	} else {
-		var keys = me._getKeysForGene(cacheObject.gene);
-		keys.forEach( function(theKey) {
-			if (probandKey == null && me._isProbandVariantCache(theKey)) {
-				probandKey = theKey;
-			}
-		});
-		if (probandKey == null) {
-			console.log("Cannot find proband variant cache for gene " + cacheObject.gene);
-			return true;
-		}
-	}
-
-	var probandCacheObject = CacheHelper._parseCacheKey(probandKey);
-	var dangerCacheObject = $().extend(probandCacheObject);
-	dangerCacheObject.dataKind   = "dangerSummary";
-	dangerCacheObject.transcript = "null";
-
-	var dangerObject = CacheHelper.getCachedData(me.getCacheKey(dangerCacheObject));
-	if (dangerObject) {
-		for(dangerKey in dangerObject) {
-			var dangerValue = dangerObject[dangerKey];
-			if (dangerValue != null && dangerValue != "" && !$.isEmptyObject(dangerValue)) {
-				hasBadge = true;
-			}
-		}
-		// Now check to see if the gene has any bookmarked variants
-		if (!hasBadge) {	
-			if (bookmarkCard.isBookmarkedGene(cacheObject.gene)) {
-				hasBadge = true;
-			}		
-		}
-	} else {
-		hasBadge = false;
-	}
-	return hasBadge;
-
 }
 
 

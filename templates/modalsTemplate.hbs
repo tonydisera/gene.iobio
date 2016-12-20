@@ -159,6 +159,7 @@
   <div id="manage-cache-modal-content" class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header" style="padding-top:10px;">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>        
         <span class="modal-title">Cache of analyzed data</span>
       </div>
       <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
@@ -169,18 +170,12 @@
                  <button id="clear-coverage-cache" onclick="cacheHelper.clearCoverageCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                </div>
                <div >
-                 <span class="cache-label" >Data for genes with no badges</span>
-                 <span class="cache-size" id="non-badge-size"></span>
-                 <button id="clear-coverage-cache" onclick="cacheHelper.clearNonBadgeCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
-               </div>
-               <div >
                 <span class="cache-label" >All data</span>
                 <span class="cache-size" id="cache-size"></span>
                  <button id="clear-coverage-cache" onclick="cacheHelper.clearAll();" class="icon-button-sm btn btn-default btn-raised">Clear all</button>
                </div>
       </div>
       <div class="modal-footer" style="clear-both">
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

@@ -250,15 +250,46 @@
 
 
              
-              <div style="float:right;text-align:right;display:inline-block;width:270px">
-               
-                <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;padding-left:5px;"
-                    href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                      Clear list
-                 </a>
-                  <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
-                    Clear analysis...
-                </a>
+              <div style="float:right;text-align:right;display:inline-block;width:270px">               
+                <div id="manage-genes-dropdown" class="level-edu level-basic" style="float:right;margin-top:-8px;">
+                  <div class="btn-toolbar">
+                    <div class="btn-group" style="display:inline;">
+
+                      <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          Manage
+                          <span style="margin-left:6px" class="caret"></span>
+                      </button>
+                       
+                      <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
+                         <li>
+                            <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
+                              href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                                Remove all genes
+                           </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
+                              Clear all analysis on genes...
+                          </a>
+                        </li>
+
+                       
+                        <li id="edit-list-li">
+                           <div >Edit gene list</div>
+                           <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
+                              <textarea  id="genes-to-edit"></textarea>
+                              <div style="text-align:right">
+                                <button id="edit-genes-button" type="submit" onclick="genesCard.editGenes()" class="icon-button-sm btn btn-default btn-raised">
+                                  Done
+                                </button>
+                              </div>
+                          </div>
+                        </li>
+                        
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
                
 

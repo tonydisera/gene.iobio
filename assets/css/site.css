@@ -110,6 +110,10 @@ h5 {
   font-size: 16px;
   color: #5d809d; }
 
+.modal-header .close {
+  opacity: 0.5;
+  font-size: 32px; }
+
 .form-control,
 .form-group .form-control {
   background-image: -webkit-gradient(linear, left top, left bottom, from(#3586c0), to(#3586c0)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
@@ -411,7 +415,7 @@ i.material-icons {
     color: white !important; }
 
 .dropdown-menu > li > a {
-  color: #333 !important; }
+  color: #717171 !important; }
 
 .tlypageguide_text {
   padding-bottom: 10px !important; }
@@ -2552,7 +2556,8 @@ text.ref-count {
   font-size: 12px; }
 
 #genes-panel {
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  margin-top: 3px; }
   #genes-panel #analyze-all-progress {
     position: relative;
     background-color: white;
@@ -2616,6 +2621,22 @@ text.ref-count {
 #copy-paste-li, #phenolyzer-search-box {
   color: #717171 !important;
   font-size: 12px; }
+
+#edit-list-li {
+  color: #717171 !important;
+  font-size: 13px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 5px; }
+  #edit-list-li textarea {
+    width: 250px;
+    height: 180px; }
+  #edit-list-li button {
+    margin-left: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 0px;
+    margin-bottom: 1px; }
 
 #get-genes-copy-paste-button, #phenolyzer-go-button {
   font-size: 12px; }
@@ -2790,6 +2811,10 @@ text.ref-count {
 #manage-cache-modal .modal-body {
   margin-top: 30px;
   margin-bottom: 30px; }
+  #manage-cache-modal .modal-body button {
+    width: 100px;
+    padding-top: 2px;
+    padding-bottom: 2px; }
 #manage-cache-modal .cache-label {
   width: 220px;
   display: inline-block;
@@ -2802,10 +2827,6 @@ text.ref-count {
   margin-right: 50px;
   color: #5d809d;
   text-align: right; }
-#manage-cache-modal button {
-  width: 100px;
-  padding-top: 2px;
-  padding-bottom: 2px; }
 
 #refresh-badges-button {
   display: inline-block;

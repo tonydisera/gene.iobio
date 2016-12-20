@@ -120,6 +120,19 @@ GenesCard.prototype.init = function() {
 
 	    }
 	});
+	// We have a similar dropdown on the genes nav card
+	$('#manage-genes-dropdown').click(function () {
+	    if($(this).hasClass('open')) {
+	        // dropdown just closed
+	    } else {
+	    	// dropdown will open
+	    	me.initEditGenes();
+	    	setTimeout(function() {
+			  $('#genes-to-edit').focus();
+			}, 0);
+
+	    }
+	});
 
 	// Stop event propogation to get genes dropdown
 	// so that clicks in text area for copy/paste
@@ -282,6 +295,15 @@ GenesCard.prototype.initCopyPasteGenes = function() {
 	}
 }
 
+GenesCard.prototype.initEditGenes = function() {
+	var me = this;
+	if (geneNames.length == 0 || geneNames == null) {
+		$('#genes-to-edit').val("");
+	} else {
+		$('#genes-to-edit').val(geneNames.join(", "));
+	}
+}
+
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
 	
@@ -394,15 +416,21 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 
 }
 
-GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene) {
+GenesCard.prototype.editGenes = function() {
+	var genesString = $('#genes-to-edit').val();
+	this.copyPasteGenes(null, false, genesString);
+}
+
+GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, genesString) {
 	var me = this;
 
 	if (isLevelBasic) {
 		$('#select-gene')[0].selectize.clearOptions();
 	}
 
-
-	var genesString = $('#genes-to-copy').val();
+	if (genesString == null) {
+		genesString = $('#genes-to-copy').val();
+	}
 	// trim newline at very end
 	genesString = genesString.replace(/\s*$/, "");
 	var geneNameList = null;
