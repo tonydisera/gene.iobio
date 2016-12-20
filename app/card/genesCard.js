@@ -1194,7 +1194,8 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 		if (theVcfData == null ) {
 			me.setGeneBadgeWarning(window.gene.gene_name, true);
 		} else if (theVcfData.features && theVcfData.features.length > 0) {
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData);
+			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
 		}

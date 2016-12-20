@@ -204,7 +204,8 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 		// summarize the variants for the proband to
 		// create the gene badges, representing the
 		// most pathogenic variants for this gene
-		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, probandVcfData);
+		var filteredVcfData = getVariantCard('proband').model.filterVariants(probandVcfData, filterCard.getFilterObject(), true);
+		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData);
 		
 		genesCard._geneBadgeLoading(geneObject.gene_name, false);
 		if (probandVcfData.features.length == 0) {
