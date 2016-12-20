@@ -498,13 +498,8 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	      	var screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
 	      	var screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
 
-	      	var featureMatrixWidth = +$("#feature-matrix")[0].offsetWidth;
-	      	if (screenXMatrix > featureMatrixWidth) {
-	      		$('#feature-matrix').scrollLeft(screenXMatrix - featureMatrixWidth);
-	      	} else {
-	      		$('#feature-matrix').scrollLeft(0);
-	      	}
-	     	matrix = column.node()
+	      
+	      	matrix = column.node()
 	          			   .getScreenCTM()
 	        		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
 			// Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
@@ -512,10 +507,10 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
             // the transform.
             var boundRect = column.node().getBoundingClientRect();
             colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + me.featureMatrix.margin().left;
-	      	//colObject.screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
 	      	colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
 
-	      	me.showTooltip(colObject, false);
+	      	clickedVariant = colObject;
+	      	me.showTooltip(colObject, true);
 
       	}
 
@@ -606,11 +601,8 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
 
 
 	var screenX = variant.screenXMatrix;
-	if (detectSafari()) {
-		screenX += me.featureMatrix.cellSize()/2;
-	} else {
-		screenX -= me.featureMatrix.cellSize()/2;
-	}
+	screenX    -= me.featureMatrix.cellSize()/2;
+
 
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
 	tooltip.select("#unpin").on('click', function() {
