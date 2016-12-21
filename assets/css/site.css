@@ -7,7 +7,11 @@ body {
   margin-bottom: 0px !important;
   min-height: 50px; }
   .navbar .navbar-brand {
-    height: 50px; }
+    height: 50px;
+    margin-top: -6px;
+    padding-top: 15px; }
+    .navbar .navbar-brand #home {
+      margin-top: 6px; }
   .navbar .navbar-form {
     margin-top: 10px; }
   .navbar .form-group.is-focused .form-control {
@@ -16,6 +20,11 @@ body {
     height: 34px;
     margin: 10px 17px;
     border-left: 1px solid #aba9a9; }
+  .navbar ul.nav > li #genes-menu-item {
+    overflow: auto;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 1px; }
   .navbar ul.nav > li > a {
     color: white !important;
     padding-top: 15px !important;
@@ -1392,8 +1401,8 @@ header {
   color: #5d809d !important; }
 
 #bloodhound .typeahead {
-  min-width: 150px;
-  max-width: 150px;
+  min-width: 140px;
+  max-width: 140px;
   font-size: 18px;
   vertical-align: middle !important; }
 
@@ -3119,5 +3128,58 @@ text.ref-count {
 @media screen and (max-device-width: 800px), screen and (max-width: 800px) {
   #region-track {
     margin-left: 200px !important; } }
+@media screen and (max-device-width: 1100px), screen and (max-width: 1100px) {
+  .navbar ul.nav > li #genes-menu-item {
+    vertical-align: initial;
+    padding-top: 0px; }
+  .navbar ul.nav > li > a {
+    padding-right: 25px;
+    padding-left: 2px; }
+    .navbar ul.nav > li > a .material-icons {
+      display: none; }
+    .navbar ul.nav > li > a svg {
+      display: none; } }
+@media screen and (max-device-width: 960px), screen and (max-width: 960px) {
+  .navbar .navbar-brand {
+    margin-top: 0px;
+    padding-top: 10px;
+    margin-right: 0px; }
+    .navbar .navbar-brand #home {
+      margin-right: 10px; }
+    .navbar .navbar-brand .iobio {
+      font-size: 28px; }
+    .navbar .navbar-brand .iobioapp {
+      font-size: 28px; }
+  .navbar .navbar-form {
+    margin-left: 0px;
+    margin-right: 10px; }
+  .navbar #bloodhound .typeahead {
+    min-width: 125px;
+    max-width: 125px;
+    font-size: 16px !important; }
+  .navbar .tt-input, .navbar .tt-hint {
+    padding: 1px 1px !important;
+    font-size: 16px !important;
+    line-height: 22px; }
+  .navbar ul.nav > li.optional {
+    display: none; }
+  .navbar ul.nav > li > a {
+    padding-right: 15px;
+    padding-left: 2px; }
+    .navbar ul.nav > li > a .material-icons {
+      display: none; }
+    .navbar ul.nav > li > a svg {
+      display: none; }
+  .navbar ul.nav > li .navbar-form {
+    padding-right: 5px;
+    padding-left: 2px; } }
+@media screen and (max-device-width: 800px), screen and (max-width: 800px) {
+  .navbar ul.nav > li > a {
+    padding-right: 15px;
+    padding-left: 2px; } }
+@media screen and (max-device-width: 790px), screen and (max-width: 790px) {
+  .navbar ul.nav > li > a {
+    padding-right: 10px;
+    padding-left: 2px; } }
 
 /*# sourceMappingURL=site.css.map */
