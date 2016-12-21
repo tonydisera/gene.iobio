@@ -171,6 +171,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/introTemplate.hbs').then(function(compiledTemplate) {
 		introTemplate = compiledTemplate;
 	}));
+	promises.push(promiseLoadTemplate('templates/legendBasicTemplate.hbs').then(function(compiledTemplate) {
+		legendBasicTemplate = compiledTemplate;
+	}));
 	promises.push(promiseLoadTemplate('templates/legendTemplate.hbs').then(function(compiledTemplate) {
 		legendTemplate = compiledTemplate;
 	}));
@@ -452,7 +455,8 @@ function init() {
 	bookmarkCard = new BookmarkCard();
 	bookmarkCard.init();
 
-
+	// Initialize the legend content
+	$('#legend-track #legend-placeholder').html(legendTemplate());
 
 	// Initialize transcript view buttons
 	initTranscriptControls();
@@ -786,6 +790,18 @@ function readjustCards() {
 	//}
 }
 
+
+function showLegend() {
+	$('#show-legend').addClass("hide");
+	$('#legend-track').removeClass("hide");
+	$('#matrix-track').css("width", "50%");
+}
+
+function hideLegend() {
+	$('#show-legend').removeClass("hide");
+	$('#legend-track').addClass("hide");
+	$('#matrix-track').css("width", "100%");
+}
 
 function showSidebar(sidebar) {
 	if (sidebar == "Phenolyzer") {

@@ -12,6 +12,10 @@ body {
     margin-top: 10px; }
   .navbar .form-group.is-focused .form-control {
     background-image: linear-gradient(#53b2ff, #9ef4ff), linear-gradient(#D2D2D2, #D2D2D2); }
+  .navbar .vertical-divider {
+    height: 34px;
+    margin: 10px 17px;
+    border-left: 1px solid #aba9a9; }
   .navbar ul.nav > li > a {
     color: white !important;
     padding-top: 15px !important;
@@ -99,12 +103,16 @@ h5 {
   padding-top: 0px; }
 
 .nav-center {
-  margin: 10px 0px 0 0px;
+  margin: 0px 0px 0 0px;
   position: relative; }
 
 .modal-title {
   font-size: 16px;
   color: #5d809d; }
+
+.modal-header .close {
+  opacity: 0.5;
+  font-size: 32px; }
 
 .form-control,
 .form-group .form-control {
@@ -250,6 +258,9 @@ h5 {
 
 .shadow-z-1 {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16); }
+
+.shadow-z-nav {
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.37), 0px 1px 6px rgba(0, 0, 0, 0.37); }
 
 i.material-icons {
   color: #5d809d; }
@@ -404,7 +415,7 @@ i.material-icons {
     color: white !important; }
 
 .dropdown-menu > li > a {
-  color: #333 !important; }
+  color: #717171 !important; }
 
 .tlypageguide_text {
   padding-bottom: 10px !important; }
@@ -706,15 +717,20 @@ a {
   background: white;
   padding-right: 10px;
   padding-top: 5px;
-  margin-bottom: 7px;
+  padding-bottom: 3px;
+  margin-bottom: 5px;
   margin-top: 0px;
   padding-left: 10px; }
   #genes-control-track #filters {
-    padding-bottom: 5px;
-    color: #717171; }
+    margin-bottom: 10px;
+    color: #717171;
+    display: inline-block; }
   #genes-control-track .filter-flag.label-primary {
-    background-color: rgba(165, 48, 48, 0.76);
-    color: white; }
+    background-color: #fff5d9;
+    color: #888888;
+    border: #fdecbe;
+    border-style: solid;
+    border-width: thin; }
 
 #welcome-panel {
   text-align: center; }
@@ -922,8 +938,7 @@ section {
 #app-title-section {
   text-align: center;
   background: white;
-  padding-bottom: 0px !important;
-  min-height: 70px; }
+  padding-bottom: 0px !important; }
 
 .chart rect {
   fill: #316693; }
@@ -952,6 +967,12 @@ section {
 #gene-search-bar {
   display: inline-block;
   padding-left: 160px; }
+
+#build-link {
+  color: #9ef4ff !important;
+  padding-left: 0px;
+  display: inline-block;
+  margin-top: 1px; }
 
 #gene-name {
   font-size: 16px;
@@ -1455,10 +1476,8 @@ header {
   align-self: flex-end; }
 
 /* Bootstrap accordion */
-#slider-left #slider-left-content {
-  padding-top: 10px; }
-  #slider-left #slider-left-content a {
-    color: #5d809d !important; }
+#slider-left #slider-left-content a {
+  color: #5d809d !important; }
 #slider-left .navbar {
   background-color: #636161 !important;
   min-height: 30px !important; }
@@ -1534,7 +1553,7 @@ header {
 
 #slider-left {
   position: fixed;
-  top: 53px;
+  top: 55px;
   left: 0px;
   width: 356px;
   height: 100%;
@@ -1635,7 +1654,7 @@ header {
 #container {
   margin-left: 0px;
   position: relative !important;
-  top: 58px !important; }
+  top: 60px !important; }
 
 .slide-left {
   transform: translate(356px, 0);
@@ -1680,7 +1699,7 @@ header {
   #filter-track h4 {
     font-size: 13px;
     color: #5d809d !important;
-    margin-top: 13px;
+    margin-top: 12px;
     margin-bottom: 5px; }
   #filter-track #clear-filters-link {
     padding-top: 0px;
@@ -1850,7 +1869,7 @@ header {
   fill: #D3D5D8;
   stroke: rgba(0, 0, 0, 0.26); }
 
-.impact, .vepImpact, .highestImpactVep,  .effect, .vepConsequence, .type, .zygosity, .recfilter {
+.impact, .vepImpact, .highestImpactVep, .effect, .vepConsequence, .type, .zygosity, .recfilter {
   border: solid 2px white;
   padding: 1px; }
   .impact text, .vepImpact text, .highestImpactVep text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
@@ -1910,7 +1929,7 @@ header {
 #type-scheme, #zygosity-scheme, #inheritance-scheme, #af-scheme, #clinvar-scheme, #regulatory-scheme, #uasibs-scheme {
   padding-top: 2px; }
 
-.impact.inactive, .vepImpact.inactive, .highestImpactVep.inactive,  .zygosity.inactive, .afexaclevels.inactive, .af1000glevels.inactive, .inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive {
+.impact.inactive, .vepImpact.inactive, .highestImpactVep.inactive, .zygosity.inactive, .afexaclevels.inactive, .af1000glevels.inactive, .inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive {
   pointer-events: none;
   opacity: 0.4; }
 
@@ -2071,7 +2090,7 @@ header {
   overflow-wrap: break-word;
   float: left;
   width: 180px;
-  height: 25px; }
+  min-height: 25px; }
 
 .tooltip-zygosity {
   float: left;
@@ -2158,7 +2177,7 @@ rect.other-count {
   fill: #848484 !important; }
 
 .tooltip-allele-count-bar text {
-  font-size: 9px !important;
+  font-size: 11px !important;
   fill: #717171; }
 
 text.alt-count {
@@ -2267,6 +2286,26 @@ text.ref-count {
   content: "";
   right: 10px; }
 
+.tooltip-wide.arrow-down-center:before {
+  position: absolute;
+  display: inline-block;
+  border-top: 10px solid #A7A5A5;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.2);
+  bottom: -10px;
+  content: "";
+  right: 328px; }
+.tooltip-wide.arrow-down-center:after {
+  position: absolute;
+  display: inline-block;
+  border-top: 9px solid #FFFFFF;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  bottom: -8px;
+  content: "";
+  right: 330px; }
+
 .tooltip.black-arrow-left:after {
   position: absolute;
   display: inline-block;
@@ -2290,6 +2329,62 @@ text.ref-count {
   -webkit-transform: rotate(152deg);
   transform: rotate(152deg);
   content: ""; }
+
+.tooltip.tooltip-wide {
+  width: 650px !important; }
+
+.tooltip-wide {
+  font-size: 13px; }
+  .tooltip-wide .tooltip-title {
+    font-size: 14px; }
+  .tooltip-wide .tooltip-row {
+    clear: both;
+    padding-bottom: 6px; }
+  .tooltip-wide .tooltip-footer {
+    margin-top: 0px !important; }
+    .tooltip-wide .tooltip-footer .bookmark-badge {
+      height: 14px;
+      width: 100px; }
+      .tooltip-wide .tooltip-footer .bookmark-badge text {
+        font-size: 14px !important; }
+  .tooltip-wide .tooltip-left-column {
+    float: left;
+    padding-top: 10px;
+    padding-bottom: 0px; }
+    .tooltip-wide .tooltip-left-column .tooltip-row {
+      width: 360px;
+      overflow: auto; }
+      .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
+        width: 110px; }
+      .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
+        width: 240px; }
+  .tooltip-wide .tooltip-right-column {
+    float: right;
+    padding-top: 10px;
+    padding-bottom: 0px; }
+    .tooltip-wide .tooltip-right-column .tooltip-row {
+      width: 270px;
+      overflow: auto; }
+      .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-header {
+        width: 110px; }
+      .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-value {
+        width: 150px; }
+  .tooltip-wide a {
+    font-size: 13px !important; }
+    .tooltip-wide a:hover, .tooltip-wide a:focus {
+      font-size: 13px !important; }
+  .tooltip-wide a:hover, .tooltip-wide a:focus {
+    font-size: 13px !important; }
+  .tooltip-wide .tooltip-footer {
+    clear: both; }
+    .tooltip-wide .tooltip-footer a {
+      font-size: 14px !important; }
+      .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
+        font-size: 14px !important; }
+    .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
+      font-size: 14px !important; }
+  .tooltip-wide .row {
+    line-height: 14px !important; }
 
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
@@ -2460,6 +2555,42 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 12px; }
 
+#genes-panel {
+  margin-bottom: 5px;
+  margin-top: 3px; }
+  #genes-panel #analyze-all-progress {
+    position: relative;
+    background-color: white;
+    color: #717070;
+    border: #bdbcbc;
+    border-style: solid;
+    border-width: thin;
+    font-size: 12px;
+    margin-left: 5px;
+    padding: 0px 0px 0px 0px !important;
+    display: inline-block;
+    width: 130px;
+    vertical-align: middle;
+    height: 18px; }
+    #genes-panel #analyze-all-progress .bar {
+      background-color: rgba(65, 176, 220, 0.45);
+      height: 17px;
+      position: absolute;
+      left: 0;
+      top: 0%;
+      width: 0%;
+      text-align: center; }
+    #genes-panel #analyze-all-progress .text {
+      position: absolute;
+      left: 0;
+      top: 0%;
+      width: 100%;
+      text-align: center; }
+    #genes-panel #analyze-all-progress.done .bar {
+      background-color: rgba(53, 145, 181, 0.66); }
+    #genes-panel #analyze-all-progress.done .text {
+      color: white; }
+
 #genes-card {
   height: 100%; }
   #genes-card .phenolyzer-label {
@@ -2491,14 +2622,35 @@ text.ref-count {
   color: #717171 !important;
   font-size: 12px; }
 
+#edit-list-li {
+  color: #717171 !important;
+  font-size: 13px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 5px; }
+  #edit-list-li textarea {
+    width: 250px;
+    height: 180px; }
+  #edit-list-li button {
+    margin-left: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 0px;
+    margin-bottom: 1px; }
+
 #get-genes-copy-paste-button, #phenolyzer-go-button {
   font-size: 12px; }
 
 #gene-badge-button {
   font-size: 13px;
-  padding: 2px 4px 2px 4px;
+  padding: 5px 1px 1px 1px;
   margin: 0px;
-  color: #717171; }
+  color: #717171;
+  line-height: 13px;
+  border: thin solid #e8e6e6; }
+  #gene-badge-button.user-visited {
+    border: 2px solid #c5c4c4;
+    padding: 4px 1px 0px 1px; }
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-top: 1px;
@@ -2507,8 +2659,9 @@ text.ref-count {
 
 #gene-badge {
   margin-top: 0px;
-  margin-bottom: 9px;
-  margin-right: 3px; }
+  margin-bottom: 8px;
+  margin-right: 10px;
+  height: 22px; }
 
 #gene-badge.loading {
   border-left: #dad26c solid 12px; }
@@ -2518,13 +2671,14 @@ text.ref-count {
 
 #gene-badge.selected {
   border-left: #7ea238 solid 12px; }
-  #gene-badge.selected #gene-badge-button {
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19); }
   #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
     font-weight: bold; }
 
 #gene-badge.phenolyzer #gene-badge-button {
-  border: solid 1px #9FC2D0; }
+  border: solid 1px #9FC2D0;
+  height: 22px; }
+  #gene-badge.phenolyzer #gene-badge-button.user-visited {
+    border: solid 2px #9FC2D0; }
 
 #gene-badge-loaded {
   font-size: 14px;
@@ -2568,18 +2722,20 @@ text.ref-count {
   display: inline; }
 
 #manage-genes {
-  float: left;
-  padding-top: 2px; }
+  float: left; }
   #manage-genes a {
     color: #717171 !important; }
     #manage-genes a:hover {
       text-decoration: underline !important; }
 
+.manage-gene-links {
+  font-size: 13px;
+  color: #717171 !important;
+  cursor: pointer; }
+
 #manage-gene-list {
   display: inline-block;
-  padding-bottom: 4px;
-  margin-right: 10px;
-  font-size: 12px; }
+  padding-bottom: 4px; }
 
 #gene-badge-container {
   display: flex;
@@ -2590,7 +2746,8 @@ text.ref-count {
   -webkit-justify-content: center;
   max-height: 150px;
   overflow-y: auto;
-  padding-bottom: 4px; }
+  padding-bottom: 0px;
+  padding-top: 5px; }
   #gene-badge-container a {
     color: #717171 !important; }
     #gene-badge-container a:hover {
@@ -2610,49 +2767,54 @@ text.ref-count {
   padding-bottom: 0px;
   vertical-align: top;
   font-size: 0px;
-  margin-left: -175px;
-  margin-top: 2px; }
+  margin-top: 2px;
+  margin-right: 10px; }
 
 #manage-cache-link {
-  color: #717171 !important;
-  font-size: 12px;
   display: inline-block;
-  vertical-align: top;
-  margin-left: 12px;
   padding-top: 2px; }
 
 #gene-page-control {
-  float: right; }
+  margin-top: -3px;
+  margin-bottom: 3px; }
+  #gene-page-control #gene-paging-links {
+    display: inline-block;
+    width: 160px; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
     font-size: 12px;
     display: inline-block;
     vertical-align: top;
     margin-left: 0px;
-    padding-top: 2px; }
+    padding-top: 4px; }
     #gene-page-control a.gene-paging-link:hover {
       text-decoration: underline !important; }
 
 #clear-gene-list {
-  color: #717171 !important;
-  font-size: 12px;
   margin-left: 0px;
   margin-right: 10px; }
 
+#order-by-label {
+  margin-left: 20px; }
+
 #select-gene-container {
   display: inline-block;
-  width: 115px;
-  vertical-align: bottom;
-  margin-right: 5px; }
+  width: 110px;
+  vertical-align: bottom; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
-    padding-top: 2px; }
+    padding-top: 2px;
+    line-height: 17px; }
 
 #manage-cache-modal .modal-dialog {
   width: 500px; }
 #manage-cache-modal .modal-body {
   margin-top: 30px;
   margin-bottom: 30px; }
+  #manage-cache-modal .modal-body button {
+    width: 100px;
+    padding-top: 2px;
+    padding-bottom: 2px; }
 #manage-cache-modal .cache-label {
   width: 220px;
   display: inline-block;
@@ -2665,17 +2827,20 @@ text.ref-count {
   margin-right: 50px;
   color: #5d809d;
   text-align: right; }
-#manage-cache-modal button {
-  width: 100px;
-  padding-top: 2px;
-  padding-bottom: 2px; }
+
+#refresh-badges-button {
+  display: inline-block;
+  margin-left: 20px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  line-height: 12px; }
 
 #gene-badge-loading-display {
-  display: inline-block;
-  padding-left: 5px;
   font-size: 11px;
-  text-align: left;
-  width: 300px; }
+  text-align: center;
+  color: #717171;
+  width: 160px;
+  display: inline-block; }
 
 .call-variants-count {
   font-size: 11px;
@@ -2900,7 +3065,8 @@ text.ref-count {
 
 #legend.level-basic {
   display: block !important;
-  margin-top: 40px; }
+  margin-top: 40px;
+  margin-bottom: 40px; }
 
 .legend-symbol {
   stroke: #000 !important;

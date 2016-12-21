@@ -211,7 +211,7 @@
   <div id="modals-placeholder"></div>
 
   <div id="container" class="push">
-    <div id="genes-control-track" class="hide shadow-z-2">
+    <div id="genes-control-track" class="hide level-basic level-edu shadow-z-2">
           <div id="filters" class="hide">
 
           </div>
@@ -438,13 +438,15 @@
       </button>
     </div>
 
-    <div id="track-section" class="push" style="margin-top:5px;">
+    <div id="track-section" class="push" style="display:flex;margin-top:5px;">
 
-        <div id="matrix-track"  class="track shadow-z-2 hide">
+        <div id="matrix-track" style="width:100%;overflow-x:scroll" class="track shadow-z-2 hide">
             
-            <div class="card-label level-edu level-basic" style="">Rank Variants</div>
-
-            <span id="low-quality-legend" class="hide">
+            <div style="overflow:auto">
+              <div class="card-label level-edu level-basic" style="float:left">Rank Variants</div>
+              <a id="show-legend"  onclick="showLegend()" href="javascript:void(0)">Show legend</a>
+            </div>
+            <span id="low-quality-legend" style="clear:both" class="hide">
                 <div style="display:inline-block;width:15px;height:15px;background-color: #dedede;"></div>
                 <div style="display: inline-block;vertical-align: top;">
                     shaded columns: flagged for not meeting filtering criteria
@@ -490,6 +492,16 @@
 
               </div> 
             </div>
+        </div>
+
+        <div id="legend-track" style="width:50%;margin-left:5px" class="hide track shadow-z-2 level-basic level-edu">
+          <div style="overflow:auto">
+            <div class="card-label" style="float:left">Legend</div>
+            <a id="close-legend"  onclick="hideLegend()" href="javascript:void(0)">x</a>
+          </div>
+
+          <div id="legend-placeholder">
+          </div>
         </div>
     </div>
 

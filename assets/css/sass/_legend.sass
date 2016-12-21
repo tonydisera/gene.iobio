@@ -1,6 +1,6 @@
+
 #legend-tooltip.tooltip
-  font-size: 11px 
-  
+  font-size: 11px   
 
 #legend-placeholder.level-basic
   display: block !important
@@ -8,11 +8,29 @@
 #legend.level-basic
   display: block !important
   margin-top: 40px 
+  margin-bottom: 40px
 
 .legend-symbol
   stroke: #000 !important
   stroke-width: 1.5px !important
   stroke-opacity: 0.3 !important
+
+#close-legend
+  float: right
+  color: $text-color !important
+  font-size: 18px
+
+#show-legend
+  float: right
+  color: $text-color !important
+  font-size: 13px
+  margin-right: 50px
+
+
+#close-legend
+  float: right
+  color: $text-color
+  font-size: 18px
 
 #legend
   .legend-element
@@ -22,12 +40,23 @@
     text
       cursor: pointer
       fill:  $text-color
+      font-size: 12px
 
   .legend-label
-    font-size: 14px
+    font-size: 13px
     color: $text-color
     margin-bottom: 5px
 
+
+#legend.level-basic  
+  .legend-element
+   
+    text
+      font-size: initial
+
+  .legend-label
+    font-size: 14px
+    
 
   .legend-symbol.exon
     cursor: pointer

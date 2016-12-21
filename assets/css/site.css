@@ -3065,28 +3065,51 @@ text.ref-count {
 
 #legend.level-basic {
   display: block !important;
-  margin-top: 40px; }
+  margin-top: 40px;
+  margin-bottom: 40px; }
 
 .legend-symbol {
   stroke: #000 !important;
   stroke-width: 1.5px !important;
   stroke-opacity: 0.3 !important; }
 
+#close-legend {
+  float: right;
+  color: #717171 !important;
+  font-size: 18px; }
+
+#show-legend {
+  float: right;
+  color: #717171 !important;
+  font-size: 13px;
+  margin-right: 50px; }
+
+#close-legend {
+  float: right;
+  color: #717171;
+  font-size: 18px; }
+
 #legend .legend-element {
   cursor: pointer;
   padding: 1px; }
   #legend .legend-element text {
     cursor: pointer;
-    fill: #717171; }
+    fill: #717171;
+    font-size: 12px; }
 #legend .legend-label {
-  font-size: 14px;
+  font-size: 13px;
   color: #717171;
   margin-bottom: 5px; }
-#legend .legend-symbol.exon {
+
+#legend.level-basic .legend-element text {
+  font-size: initial; }
+#legend.level-basic .legend-label {
+  font-size: 14px; }
+#legend.level-basic .legend-symbol.exon {
   cursor: pointer;
   fill: rgba(93, 128, 157, 0.63);
   stroke: #5d809d; }
-#legend .exon-symbol text {
+#legend.level-basic .exon-symbol text {
   font-size: 14px;
   fill: #717171; }
 

@@ -25,7 +25,7 @@ GenesCard.prototype.init = function() {
 	var hpoUrl = hpoServer + "hot/lookup";
 
 	if (isLevelBasic) {
-		$("#genes-card #legend-placeholder").html(legendTemplate());	
+		$("#genes-card #legend-placeholder").html(legendBasicTemplate());	
 		this.legend = new Legend();
 		legend.init();	
 	}
