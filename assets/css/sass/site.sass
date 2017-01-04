@@ -902,12 +902,9 @@ a
 
 #matrix-track
   #low-quality-legend
-    float: left
-    margin-top: -20px
     font-size: 12px
-    margin-left: 160px
+    margin-left: 20px
     font-style: italic
-    vertical-align: top
     color:  $text-color
 
   #feature-matrix
@@ -991,7 +988,7 @@ a
 
     
   #feature-matrix-note
-    padding-left: 165px
+    padding-left: 155px
     font-size: 12px
     margin-top: 0px
 
@@ -1781,12 +1778,15 @@ header
     margin-left: 200px !important
 
 
-@media screen and (max-device-width: 1100px), screen and (max-width: 1100px)
+@media screen and (max-device-width: 1140px), screen and (max-width: 1140px)
   .navbar
 
     ul.nav 
 
       > li 
+
+        .navbar-form
+          margin-right: 25px
 
         #genes-menu-item
           vertical-align: initial
@@ -1802,10 +1802,45 @@ header
           svg
             display: none
 
+li.media1
+  display: none
+  color: black
+li.media2
+  display: none
+  color: black
+li.media3
+  display: none
+  color: black
+li.media4
+  display: none
+  color: black
+li.media5
+  display: none
+  color: black
+li.media6
+  display: none
+  color: black
 
-@media screen and (max-device-width: 960px), screen and (max-width: 960px)
+@media screen and (max-width: 1000px)
+  .navbar
+
+    li.media1
+      display: inline-block
+    
+    ul.nav 
+
+      > li 
+        &.optional
+          display: none    
+
+
+@media screen and (max-width: 980px)
 
   .navbar
+
+    li.media2
+      display: inline-block
+    
     .navbar-brand
       margin-top: 0px
       padding-top: 10px
@@ -1819,9 +1854,6 @@ header
       .iobioapp
         font-size: 28px
 
-    .navbar-form
-      margin-left: 0px
-      margin-right: 10px
 
     #bloodhound .typeahead
       min-width: 125px
@@ -1838,12 +1870,13 @@ header
     ul.nav 
 
       > li 
-        &.optional
-          display: none    
 
+        .navbar-form
+          margin-left: 0px
+          margin-right: 10px
 
         > a 
-          padding-right: 15px
+          padding-right: 35px
           padding-left:  2px
 
           .material-icons
@@ -1857,9 +1890,43 @@ header
           padding-left: 2px
 
 
-@media screen and (max-device-width: 800px), screen and (max-width: 800px)
+
+@media screen and (max-width: 920px)
 
   .navbar
+    li.media3
+      display: inline-block
+    
+
+    ul.nav 
+
+      > li
+
+        > a 
+          padding-right: 25px
+          padding-left:  2px
+
+@media screen and (max-width: 850px)
+
+  .navbar
+    li.media4
+      display: inline-block
+    
+
+    ul.nav 
+
+      > li
+
+        > a 
+          padding-right: 20px
+          padding-left:  2px
+
+@media screen and (max-width: 815px)
+
+  .navbar
+    li.media5
+      display: inline-block
+
     ul.nav 
 
       > li
@@ -1868,9 +1935,11 @@ header
           padding-right: 15px
           padding-left:  2px
 
-@media screen and (max-device-width: 790px), screen and (max-width: 790px)
+@media screen and (max-width: 790px)
 
   .navbar
+    li.media6
+      display: inline-block
     ul.nav 
 
       > li

@@ -227,7 +227,6 @@
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
-                   <i class="material-icons">playlist_add_check</i>
                     Analyze all
                 </a>
 
@@ -442,16 +441,14 @@
 
         <div id="matrix-track" style="width:100%;overflow-x:scroll" class="track shadow-z-2 hide">
             
-            <div style="overflow:auto">
+            <div style="overflow:auto;text-align:left;margin-bottom: 5px;">
               <div class="card-label level-edu level-basic" style="float:left">Rank Variants</div>
-              <a id="show-legend"  onclick="showLegend()" href="javascript:void(0)">Show legend</a>
+              <a id="show-legend"  onclick="showLegend()" href="javascript:void(0)">
+                <i style="font-size:18px" class="material-icons">map</i>
+                Show legend
+              </a>
             </div>
-            <span id="low-quality-legend" style="clear:both" class="hide">
-                <div style="display:inline-block;width:15px;height:15px;background-color: #dedede;"></div>
-                <div style="display: inline-block;vertical-align: top;">
-                    shaded columns: flagged for not meeting filtering criteria
-                </div>
-            </span>
+
 
             <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
@@ -459,7 +456,7 @@
               No clinvar variants under 1% population frequency found
             </div>
     
-            <div id="matrix-panel"  style="clear:both;margin-top:-9px;min-height:30px"
+            <div id="matrix-panel"  style="clear:both;min-height:30px"
               class="fullview" aria-expanded="true">
                 <div class="loader hide"  style="margin-top:0px;margin-bottom:10px;">
                     <span class="loader-label">Ranking variants</span>
@@ -467,10 +464,13 @@
                 </div>
 
 
-              <div id="feature-matrix" style="overflow-x: scroll;margin-top:-15px;">
+              <div id="feature-matrix" style="overflow-x: scroll;">
               </div>
 
-              <a id="move-rows" class="level-edu level-basic hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
+              <a id="move-rows" class="level-edu level-basic hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">
+                 <i class="material-icons">swap_vert</i>
+                Reorder
+              </a>
 
               <div id="feature-matrix-note" class="hide" >
                 
@@ -481,15 +481,20 @@
                   Most harmful
                 </span>
 
-                <svg style="height: 10px;width:108px">
+                <svg style="height: 10px;width:78px">
                   <g transform="translate(18,6)">
-                    <line x1="0" y1="0" x2="80" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
+                    <line x1="0" y1="0" x2="50" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
                   </g>
                   <g transform="translate(0,0),rotate(-90,10,0)">
                     <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
                   </g>
                 </svg>
-
+                <span id="low-quality-legend" style="clear:both" class="hide">
+                    <div style="display:inline-block;width:15px;height:15px;background-color: #dedede;vertical-align:bottom"></div>
+                    <div style="display: inline-block;vertical-align: bottom;">
+                        shaded columns: flagged for not meeting filtering criteria
+                    </div>
+                </span>
               </div> 
             </div>
         </div>
@@ -497,7 +502,7 @@
         <div id="legend-track" style="width:50%;margin-left:5px" class="hide track shadow-z-2 level-basic level-edu">
           <div style="overflow:auto">
             <div class="card-label" style="float:left">Legend</div>
-            <a id="close-legend"  onclick="hideLegend()" href="javascript:void(0)">x</a>
+            <a id="close-legend"  onclick="hideLegend()" href="javascript:void(0)">X</a>
           </div>
 
           <div id="legend-placeholder">

@@ -752,12 +752,9 @@ a {
     font-size: 13px; }
 
 #matrix-track #low-quality-legend {
-  float: left;
-  margin-top: -20px;
   font-size: 12px;
-  margin-left: 160px;
+  margin-left: 20px;
   font-style: italic;
-  vertical-align: top;
   color: #717171; }
 #matrix-track #feature-matrix rect.cellbox {
   fill: white;
@@ -811,7 +808,7 @@ a {
     cursor: pointer;
     fill: #3586c0; }
 #matrix-track #feature-matrix-note {
-  padding-left: 165px;
+  padding-left: 155px;
   font-size: 12px;
   margin-top: 0px; }
 #matrix-track #move-rows {
@@ -3084,14 +3081,14 @@ text.ref-count {
 
 #close-legend {
   float: right;
-  color: #717171 !important;
-  font-size: 18px; }
+  font-size: 15px;
+  color: #717171 !important; }
 
 #show-legend {
-  float: right;
   color: #717171 !important;
   font-size: 13px;
-  margin-right: 50px; }
+  margin-left: 55px;
+  float: left; }
 
 #close-legend {
   float: right;
@@ -3128,7 +3125,9 @@ text.ref-count {
 @media screen and (max-device-width: 800px), screen and (max-width: 800px) {
   #region-track {
     margin-left: 200px !important; } }
-@media screen and (max-device-width: 1100px), screen and (max-width: 1100px) {
+@media screen and (max-device-width: 1140px), screen and (max-width: 1140px) {
+  .navbar ul.nav > li .navbar-form {
+    margin-right: 25px; }
   .navbar ul.nav > li #genes-menu-item {
     vertical-align: initial;
     padding-top: 0px; }
@@ -3139,7 +3138,38 @@ text.ref-count {
       display: none; }
     .navbar ul.nav > li > a svg {
       display: none; } }
-@media screen and (max-device-width: 960px), screen and (max-width: 960px) {
+li.media1 {
+  display: none;
+  color: black; }
+
+li.media2 {
+  display: none;
+  color: black; }
+
+li.media3 {
+  display: none;
+  color: black; }
+
+li.media4 {
+  display: none;
+  color: black; }
+
+li.media5 {
+  display: none;
+  color: black; }
+
+li.media6 {
+  display: none;
+  color: black; }
+
+@media screen and (max-width: 1000px) {
+  .navbar li.media1 {
+    display: inline-block; }
+  .navbar ul.nav > li.optional {
+    display: none; } }
+@media screen and (max-width: 980px) {
+  .navbar li.media2 {
+    display: inline-block; }
   .navbar .navbar-brand {
     margin-top: 0px;
     padding-top: 10px;
@@ -3150,9 +3180,6 @@ text.ref-count {
       font-size: 28px; }
     .navbar .navbar-brand .iobioapp {
       font-size: 28px; }
-  .navbar .navbar-form {
-    margin-left: 0px;
-    margin-right: 10px; }
   .navbar #bloodhound .typeahead {
     min-width: 125px;
     max-width: 125px;
@@ -3161,10 +3188,11 @@ text.ref-count {
     padding: 1px 1px !important;
     font-size: 16px !important;
     line-height: 22px; }
-  .navbar ul.nav > li.optional {
-    display: none; }
+  .navbar ul.nav > li .navbar-form {
+    margin-left: 0px;
+    margin-right: 10px; }
   .navbar ul.nav > li > a {
-    padding-right: 15px;
+    padding-right: 35px;
     padding-left: 2px; }
     .navbar ul.nav > li > a .material-icons {
       display: none; }
@@ -3173,11 +3201,27 @@ text.ref-count {
   .navbar ul.nav > li .navbar-form {
     padding-right: 5px;
     padding-left: 2px; } }
-@media screen and (max-device-width: 800px), screen and (max-width: 800px) {
+@media screen and (max-width: 920px) {
+  .navbar li.media3 {
+    display: inline-block; }
+  .navbar ul.nav > li > a {
+    padding-right: 25px;
+    padding-left: 2px; } }
+@media screen and (max-width: 850px) {
+  .navbar li.media4 {
+    display: inline-block; }
+  .navbar ul.nav > li > a {
+    padding-right: 20px;
+    padding-left: 2px; } }
+@media screen and (max-width: 815px) {
+  .navbar li.media5 {
+    display: inline-block; }
   .navbar ul.nav > li > a {
     padding-right: 15px;
     padding-left: 2px; } }
-@media screen and (max-device-width: 790px), screen and (max-width: 790px) {
+@media screen and (max-width: 790px) {
+  .navbar li.media6 {
+    display: inline-block; }
   .navbar ul.nav > li > a {
     padding-right: 10px;
     padding-left: 2px; } }
