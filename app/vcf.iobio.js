@@ -650,31 +650,9 @@ var effectCategories = [
 
     var me = this;
 
-
-
     // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
     var refFastaFile = genomeBuildHelper.getFastaPath(refName);
-    
-
-    // Get the vep args
-    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
-    if (isRefSeq) {
-      vepArgs += " --refseq ";
-    }
-    // If we are getting the hgvs notation, we need an extra command line arg for vep
-    if (hgvsNotation) {
-      vepArgs += " --hgvs ";
-    }
-    // If we are getting the rsID, we need an extra command line arg for vep
-    if (getRsId) {
-      vepArgs += "  --check_existing ";
-    }
-    vepArgList = [];
-    if (vepArgs != "") {
-      vepArgList = [vepArgs];
-    }
-
 
 
     var contigStr = "";
@@ -706,20 +684,32 @@ var effectCategories = [
       cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
+    // VEP
+    var vepArgs = [];
+    vepArgs.push(" --assembly");
+    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+    vepArgs.push(" --format vcf");
+    if (isRefSeq) {
+      vepArgs.push("--refseq");
+    }
+    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+    // since we won't have the original vcf records as input
+    if (hgvsNotation) {
+      vepArgs.push("--hgvs");
+    }
+    if (getRsId) {
+      vepArgs.push("--check_existing");
+    }
+    if (hgvsNotation || getRsId) {
+      vepArgs.push("--fasta");
+      vepArgs.push(refFastaFile);
+    }
+    cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
+
+    //
+    //  SERVER SIDE CACHING
+    //
     /*
-      SERVER SIDE CACHING
-
-      you turn it on with the following parameters
-      cache - the key name
-      partialCache - can be true or false; if false the cache will be deleted if the command does not finish, if true it will not
-
-      Example:
-            cmd = cmd.pipe(
-              this.iobio.bamstatsAlive,
-              ['-u', '500', '-k', '1', '-r', regStr],
-              { ssl:this.ssl, urlparams: {cache:'stats.json', partialCache:true}}
-            );
-    */
     var cacheKey = null;
     var urlParameters = {};
     if (cache) {
@@ -728,7 +718,8 @@ var effectCategories = [
         urlParameters.partialCache = true;
     }
     cmd = cmd.pipe(IOBIO.vep, vepArgList, {ssl: useSSL, urlparams: urlParameters});
-    
+    */
+
 
 
     var annotatedData = "";

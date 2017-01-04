@@ -548,7 +548,6 @@ var Bam = Class.extend({
    },
 
 
-
    freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
     var me = this;
 
