@@ -62,6 +62,16 @@ body
           #search-dna-glyph
             fill: $navbar-hover-color   !important
 
+        p.wrapped
+          width: 50px
+          word-wrap: break-word
+          line-height: 14px
+          display: inline-block
+          vertical-align: top
+          margin-bottom: 0px 
+
+          &.wide
+            width: 70px       
 
     >li.active
       color: white !important  
@@ -1800,6 +1810,15 @@ header
   #region-track
     margin-left: 200px !important
 
+@media screen and (max-device-width: 1250px), screen and (max-width: 1250px)
+  .navbar
+    ul.nav 
+      > li 
+        > a 
+          padding-right: 13px
+          padding-left:  13px
+
+
 
 @media screen and (max-device-width: 1140px), screen and (max-width: 1140px)
   .navbar
@@ -1816,8 +1835,8 @@ header
           padding-top: 0px
 
         > a 
-          padding-right: 25px
-          padding-left:  2px
+          padding-right: 11px
+          padding-left:  11px
 
           .material-icons
             display: none
@@ -1825,45 +1844,12 @@ header
           svg
             display: none
 
-li.media1
-  display: none
-  color: black
-li.media2
-  display: none
-  color: black
-li.media3
-  display: none
-  color: black
-li.media4
-  display: none
-  color: black
-li.media5
-  display: none
-  color: black
-li.media6
-  display: none
-  color: black
-
-@media screen and (max-width: 1000px)
-  .navbar
-
-    li.media1
-      display: inline-block
-    
-    ul.nav 
-
-      > li 
-        &.optional
-          display: none    
 
 
-@media screen and (max-width: 980px)
+@media screen and (max-width: 990px)
 
   .navbar
 
-    li.media2
-      display: inline-block
-    
     .navbar-brand
       margin-top: 0px
       padding-top: 10px
@@ -1893,14 +1879,16 @@ li.media6
     ul.nav 
 
       > li 
+        &.optional
+          display: none  
 
         .navbar-form
-          margin-left: 0px
+          margin-left: 10px
           margin-right: 10px
 
         > a 
-          padding-right: 35px
-          padding-left:  2px
+          padding-right: 11px
+          padding-left:  11px
 
           .material-icons
             display: none
@@ -1914,61 +1902,20 @@ li.media6
 
 
 
-@media screen and (max-width: 920px)
+@media screen and (max-width: 934px)
 
   .navbar
-    li.media3
-      display: inline-block
-    
 
     ul.nav 
 
       > li
 
         > a 
-          padding-right: 25px
-          padding-left:  2px
+          font-size: 12px
+          padding-right: 6px
+          padding-left:  6px
 
-@media screen and (max-width: 850px)
-
-  .navbar
-    li.media4
-      display: inline-block
-    
-
-    ul.nav 
-
-      > li
-
-        > a 
-          padding-right: 20px
-          padding-left:  2px
-
-@media screen and (max-width: 815px)
-
-  .navbar
-    li.media5
-      display: inline-block
-
-    ul.nav 
-
-      > li
-
-        > a 
-          padding-right: 15px
-          padding-left:  2px
-
-@media screen and (max-width: 790px)
-
-  .navbar
-    li.media6
-      display: inline-block
-    ul.nav 
-
-      > li
-
-        > a 
-          padding-right: 10px
-          padding-left:  2px
-
+          p.wrapped
+            &.wide
+              width: 60px
 
