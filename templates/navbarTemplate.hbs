@@ -45,27 +45,29 @@
                 <use id="search-dna-glyph" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="22" height="22" fill="white"></use>
               </g>
             </svg>   
-            <span id="genes-menu-item">Genes</span>
+            <span id="genes-menu-item">
+              <p class="wrapped">Select Genes</p>
+            </span>
           </a>
         </li > 
         <li class="level-basic">
           <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')">
             <span class="material-icons">tune</span> 
-            Filter
+            <p class="wrapped">Filter Variants</p>
           </a>
         </li>
 
 
         <li class="level-basic">
-          <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
+          <a  href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
             <span class="material-icons">bookmark</span> 
-            Bookmarks
+            <p class="wrapped wide">Bookmark variants</p>
           </a>
         </li> 
         <li class="level-basic">
           <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Recall')">
             <span class="material-icons">dialpad</span> 
-            Call variants
+            <p class="wrapped">Call Variants</p>
           </a>
         </li>
 
@@ -77,7 +79,7 @@
               <!-- Button data modal -->
               <a href="javascript:void(0)" id="add-data-button"  class="level-edu mygene2 " onclick="$('#dataModal').modal('show')">
                 <span class="material-icons">input</span>    
-                Data  
+                <p class="wrapped">Select Data</p>  
               </a>
 
         </li>
