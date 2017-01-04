@@ -607,6 +607,7 @@ var Bam = Class.extend({
 
       // VEP to annotate
       var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
+      vepArgs += " --format vcf ";
       if (isRefSeq) {
         vepArgs += " --refseq "
       }
@@ -736,14 +737,20 @@ var Bam = Class.extend({
         cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
 
         // VEP to annotate
-        var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
+        var vepArgs = [];
+        vepArgs.push(" --assembly");
+        vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+        vepArgs.push(" --format vcf");
         if (isRefSeq) {
-          vepArgs += " --refseq "
+          vepArgs.push("--refseq");
         }
         // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
         // since we won't have the original vcf records as input
-        vepArgs += " --hgvs  --check_existing ";
-        cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
+        vepArgs.push("--hgvs");
+        vepArgs.push("--check_existing");
+        vepArgs.push("--fasta");
+        vepArgs.push(refFastaFile);
+        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
 
 
         

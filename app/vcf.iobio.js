@@ -636,20 +636,6 @@ var effectCategories = [
     var refFastaFile = genomeBuildHelper.getFastaPath(refName);
     
 
-    // Get the vep args
-    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
-    if (isRefSeq) {
-      vepArgs += " --refseq ";
-    }
-    // If we are getting the hgvs notation, we need an extra command line arg for vep
-    if (hgvsNotation) {
-      vepArgs += " --hgvs ";
-    }
-    // If we are getting the rsID, we need an extra command line arg for vep
-    if (getRsId) {
-      vepArgs += "  --check_existing ";
-    }
-
 
     var contigStr = "";
     getHumanRefNames(refName).split(" ").forEach(function(ref) {
@@ -680,11 +666,28 @@ var effectCategories = [
       cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-    if (vepArgs == "") {
-      cmd = cmd.pipe(IOBIO.vep, [], {ssl: useSSL});
-    } else {
-      cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
+
+    // VEP
+    var vepArgs = [];
+    vepArgs.push(" --assembly");
+    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+    vepArgs.push(" --format vcf");
+    if (isRefSeq) {
+      vepArgs.push("--refseq");
     }
+    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+    // since we won't have the original vcf records as input
+    if (hgvsNotation) {
+      vepArgs.push("--hgvs");
+    }
+    if (getRsId) {
+      vepArgs.push("--check_existing");
+    }
+    if (hgvsNotation || getRsId) {
+      vepArgs.push("--fasta");
+      vepArgs.push(refFastaFile);
+    }
+    cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
 
 
     var annotatedData = "";
