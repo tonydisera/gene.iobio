@@ -751,11 +751,30 @@ a {
     color: #717171;
     font-size: 13px; }
 
+#matrix-track .matrix-note-text {
+  margin-top: -7px;
+  color: #969696;
+  font-style: italic; }
 #matrix-track #low-quality-legend {
   font-size: 12px;
   margin-left: 20px;
   font-style: italic;
-  color: #717171; }
+  overflow: visible;
+  float: left; }
+  #matrix-track #low-quality-legend #low-quality-legend-box {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-color: #dedede;
+    vertical-align: bottom; }
+#matrix-track #low-quality-legend-text {
+  width: 160px;
+  float: left;
+  margin-left: 5px;
+  margin-bottom: 0px;
+  color: #969696;
+  font-style: italic;
+  line-height: 13px; }
 #matrix-track #feature-matrix rect.cellbox {
   fill: white;
   stroke: #e6e6e6;
@@ -810,10 +829,10 @@ a {
 #matrix-track #feature-matrix-note {
   padding-left: 155px;
   font-size: 12px;
-  margin-top: 0px; }
+  margin-top: -5px; }
 #matrix-track #move-rows {
   float: left;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: #717171 !important;
   margin-top: 0px; }
 
