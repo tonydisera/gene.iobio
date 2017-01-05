@@ -11,15 +11,17 @@
     </span>
     
     <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
-      <li class="level-edu">                       
-        <span id="vcf-variant-count-label" class="level-edu badge-label hide">Variants Loaded</span>
+      <li class="level-edu level-basic">                       
+        <span id="vcf-variant-count-label" class="level-edu level-basic badge-label hide">Variants Loaded</span>
         <span id="vcf-variant-count" class="badge"></span>
       </li>
 
 
       <li>           
-        <span id="displayed-variant-count-label" class="level-edu badge-label hide" style="margin-left:2px">Displayed</span>
-         <span id="displayed-variant-count-label-simple" class="level-edu hide badge-label" style="margin-left:2px"></span>            
+        <span id="displayed-variant-count-label" class="level-edu level-basic badge-label hide" style="margin-left:2px">Displayed</span>
+         <span id="displayed-variant-count-label-simple" class="level-edu  hide badge-label" style="margin-left:2px">Number of variants</span>            
+         <span id="displayed-variant-count-label-basic" class="hide level-basic" >Variants in clinvar with < 1% population frequency</span>
+
         <span id="displayed-variant-count" class="badge hide"></span>
       </li>
 
@@ -30,7 +32,7 @@
         <span id="called-variant-count" class="hide badge"></span>
       </li>
       <li>           
-        <span id="displayed-called-variant-count-label" class="hide level-edu badge-label" style="margin-left:2px">Displayed</span>
+        <span id="displayed-called-variant-count-label" class="hide level-edu level-basic badge-label" style="margin-left:2px">Displayed</span>
         <span id="displayed-called-variant-count" class="badge hide"></span>
       </li>
 
@@ -47,28 +49,28 @@
             <span id="polyphen-flag" class="filter-flag hide label label-primary">PolyPhen</span>
             <span id="sift-flag" class="filter-flag hide label label-primary">SIFT</span>
             <span id="regulatory-flag" class="filter-flag hide label label-primary">Regulatory</span>
-            <span id="afexaclevels-flag" class="filter-flag hide label label-primary">AF ExAC</span>
-            <span id="af1000glevels-flag" class="filter-flag hide label label-primary">AF 1000G</span>
+            <span id="afexaclevels-flag" class="filter-flag level-basic hide label label-primary">AF ExAC</span>
+            <span id="af1000glevels-flag" class="filter-flag level-basic hide label label-primary">AF 1000G</span>
             <span id="afexacrange-flag" class="hide label label-primary">AF ExAC range</span>
             <span id="af1000grange-flag" class="hide label label-primary">AF 1000G range</span>
             <span id="inheritance-flag" class="filter-flag hide label label-primary">Inheritance</span>
             <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
             <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
             <span id="region-flag" class="hide label label-info">Zoom into region</span>
-            <span id="recfilter-flag" class="level-edu hide label label-info">VCF Filter status</span>            
+            <span id="recfilter-flag" class="level-edu level-basic hide label label-info">VCF Filter status</span>            
 
       </li>
 
     </ul>
 
 
-    <a href="javascript:void(0)" class="level-edu" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+    <a href="javascript:void(0)" class="level-edu level-basic" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">remove</i>
     </a>
-    <a href="javascript:void(0)" class="level-edu" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
+    <a href="javascript:void(0)" class="level-edu level-basic" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
       <i class="material-icons">crop_7_5</i>
     </a>
-    <a href="javascript:void(0)" class="level-edu" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
+    <a href="javascript:void(0)" class="level-edu level-basic" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">crop_3_2</i>
     </a>
 
@@ -144,7 +146,7 @@
             <hr id="fb-separator" class="hide" style="margin-top: 0px;margin-bottom: 0px;">
           </div>
           <div >
-            <div id="vcf-chart-label" class="level-edu chart-label hide" 
+            <div id="vcf-chart-label" class="level-edu level-basic chart-label hide" 
              style="margin-top: 4px;margin-bottom: -30px;">
               Variants loaded
             </div>
@@ -160,7 +162,7 @@
     <div id="gene-box" class="level-edu hide" >
     </div>
 
-    <div id="bam-track" class="track hide level-edu">
+    <div id="bam-track" class="track hide level-edu level-basic">
       <div class="track-chart">
 
       

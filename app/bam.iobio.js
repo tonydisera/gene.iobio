@@ -40,6 +40,8 @@ var Bam = Class.extend({
          }
       }
 
+      this.headerStr = null;
+
 
 
 
@@ -52,13 +54,16 @@ var Bam = Class.extend({
     this.bamUri = null;
    },
 
-   makeBamBlob: function() {
+   makeBamBlob: function(callback) {
      var me = this;
      this.bamBlob = new BlobFetchable(this.bamFile);
      this.baiBlob = new BlobFetchable(this.baiFile); // *** add if statement if here ***         
      makeBam(this.bamBlob, this.baiBlob, function(bam) {
         me.setHeader(bam.header);
         me.provide(bam);
+        if (callback) {
+          callback();
+        }
      });
    }, 
 
@@ -75,7 +80,8 @@ var Bam = Class.extend({
       var success = null;
       var cmd = new iobio.cmd(
           IOBIO.samtools,
-          ['view', '-H', url]
+          ['view', '-H', url],
+          {ssl: useSSL}
       );
 
       cmd.on('data', function(data) {
@@ -191,8 +197,9 @@ var Bam = Class.extend({
       return;
     }
     me.sourceType = "file";
-    me.makeBamBlob();
-    callback(true);
+    me.makeBamBlob( function() {
+      callback(true);
+    });
     return;
   },
 
@@ -301,6 +308,42 @@ var Bam = Class.extend({
    },
 
 
+   getHeaderStr: function(callback) {
+      var me = this;
+      if (me.headerStr) {
+         callback(me.headerStr);        
+      }
+      else if (me.sourceType == 'file') {
+        console.log('Error: header not set for local bam file');
+        callback(null);
+      } else {
+
+        var success = null;
+        var cmd = new iobio.cmd(
+            IOBIO.samtools,
+            ['view', '-H', me.bamUri]
+        );
+        var rawHeader = "";
+        cmd.on('data', function(data) {
+          if (data != undefined) {
+            rawHeader += data;
+          }
+        });
+
+        cmd.on('end', function() {
+          me.setHeader(rawHeader);
+          callback(me.headerStr);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+        cmd.run();    
+
+        
+      }
+   },
+
    getHeader: function(callback) {
       var me = this;
       if (me.header) {
@@ -314,7 +357,8 @@ var Bam = Class.extend({
         var success = null;
         var cmd = new iobio.cmd(
             IOBIO.samtools,
-            ['view', '-H', me.bamUri]
+            ['view', '-H', me.bamUri],
+            {ssl: useSSL}
         );
         var rawHeader = "";
         cmd.on('data', function(data) {
@@ -340,6 +384,7 @@ var Bam = Class.extend({
 
 
    setHeader: function(headerStr) {
+      this.headerStr = headerStr;
       var header = { sq:[], toStr : headerStr };
       var lines = headerStr.split("\n");
       for ( var i=0; i<lines.length > 0; i++) {
@@ -351,6 +396,8 @@ var Bam = Class.extend({
               fHash[ values[0] ] = values[1]
             })
             header.sq.push({name:fHash["SN"], end:1+parseInt(fHash["LN"])});
+            header.species = fHash["SP"];
+            header.assembly = fHash["AS"];
          }
       }
       this.header = header;
@@ -413,11 +460,12 @@ var Bam = Class.extend({
         // When bam file is read as a local file, just stream sam records for region to
         // samtools mpileup.
         if (me.sourceType == "url") {
-          cmd = new iobio.cmd(samtools, ['view', '-b',       me.bamUri, regionArg],
+          cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
             {
-              'urlparams': {'encoding':'binary'}
+              'urlparams': {'encoding':'binary'},
+              ssl: useSSL
             });
-          cmd = cmd.pipe(samtools, ["mpileup", "-"]);
+          cmd = cmd.pipe(samtools, ["mpileup", "-"], {ssl: useSSL});
         } else {
 
           function writeSamFile (stream) {
@@ -430,13 +478,14 @@ var Bam = Class.extend({
 
           cmd = new iobio.cmd(samtools, ['mpileup',  writeSamFile ],
             {
-              'urlparams': {'encoding':'utf8'}
+              'urlparams': {'encoding':'utf8'},
+              ssl: useSSL
             });
 
         }
 
         // After running samtools mpileup, run coverage service to summarize point data.
-        cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg]);
+        cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
 
         var samData = "";
         cmd.on('data', function(data) {
@@ -493,101 +542,142 @@ var Bam = Class.extend({
    },
 
 
-   getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback) {
 
+   freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
     var me = this;
+
+        
     this.transformRefName(refName, function(trRefName){
 
       var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFile = null;
-      // TODO:  This is a workaround until we introduce a genome build dropdown.  For
-      // now, we support Grch37 and hg19.  For now, this lame code simply looks at
-      // the reference name to determine if the references should be hg19 (starts with 'chr;)
-      // or Crch37 (just the number, no 'chr' prefix).  Based on the reference,
-      // we point freebayes to a particular directory for the reference files.
-      if (trRefName.indexOf('chr') == 0) {
-        refFile = "./data/references_hg19/" + trRefName + ".fa";
-      } else {
-        refFile = "./data/references/hs_ref_chr" + trRefName + ".fa";
-      }
+      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
       var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
-      var cmd = null;
-      // When file served remotely, first run samtools view, then run samtools mpileup.
-      // When bam file is read as a local file, just stream sam records for region to
-      // samtools mpileup.
-      if (me.sourceType == "url") {
-        //cmd = new iobio.cmd("nv-green.IOBIO.io/samtools/", ['view', '-b', me.bamUri, regionArg],
-        cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
-         {
-            'urlparams': {'encoding':'binary'}
-          });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
-      } else {
+      var getBamCmds = [];
+      var nextBamCmd = function(bams, idx, callback) {
 
-        var writeStream = function(stream) {
-           stream.write(me.header.toStr);
-           me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
-              stream.write(data);
-              stream.end();
-           }, {noHeader:true});
-        }
-        
-        cmd = new iobio.cmd(samtools, ['view -b',  writeStream ],
-            {
-              'urlparams': {'encoding':'binary'}
-            });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile]);
-         
-      }
+          if (idx == bams.length) {
 
+            callback(getBamCmds);
 
-      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFile, '-']);
-      cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
+          } else {
 
+            var bam = bams[idx];
 
-      //
-      // NEW CODE - Annotate variants that were just called from freebayes
-      //
-     
-      // bcftools to append header rec for contig
-      var contigStr = "";
-      getHumanRefNames(refName).split(" ").forEach(function(ref) {
-          contigStr += "##contig=<ID=" + ref + ">\n";
-      })
-      var contigNameFile = new Blob([contigStr])
-      //cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
+            if (bam.sourceType == "url") {
 
-      // Get Allele Frequencies from 1000G and ExAC
-      //cmd = cmd.pipe(IOBIO.af)
+              var bamCmd = new iobio.cmd(samtools, ['view', '-b', bam.bamUri, regionArg],
+              {
+                'urlparams': {'encoding':'binary'},
+                ssl: useSSL
+              });
+              getBamCmds.push(bamCmd);
 
-      // VEP to annotate
-      var vepArgs = "";
-      if (isRefSeq) {
-        vepArgs = " --refseq "
-      }
-      //cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
+              idx++;
+              nextBamCmd(bams, idx, callback);
 
+            } else {
 
-      
-      var variantData = "";
-      cmd.on('data', function(data) {
-          if (data == undefined) {
-            return;
+              bam.convert('sam', trRefName, regionStart, regionEnd, 
+                function(data,e) {
+                  var bamBlob = new Blob([bam.header.toStr + "\n" + data]);  
+                  var bamCmd = new iobio.cmd(samtools, ['view', '-b', bamBlob],
+                  {
+                    'urlparams': {'encoding':'binary'},
+                    ssl: useSSL
+                  });
+                  getBamCmds.push(bamCmd);
+
+                  idx++;
+                  nextBamCmd(bams, idx, callback);
+                }, 
+                {noHeader:true}
+              );
+
+            } 
+
           }
 
-          variantData += data;
+      }
+
+      var index = 0;
+      nextBamCmd(bams, index, function(getBamCmds) {
+        var freebayesArgs = [];
+        getBamCmds.forEach( function(bamCmd) {
+          freebayesArgs.push("-b");
+          freebayesArgs.push(bamCmd);
+        });
+        freebayesArgs.push("-f");
+        freebayesArgs.push(refFastaFile);
+
+        
+        var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs, {ssl: useSSL});
+        
+
+        // Normalize variants
+        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-'], {ssl: useSSL});
+
+        // Subset on all samples (this will get rid of low quality cases where no sample 
+        // is actually called as having the alt) 
+        //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
+
+        // Filter out anything with qual <= 0
+        cmd = cmd.pipe(IOBIO.vt, ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-'], {ssl: useSSL});
+
+
+        //
+        // Annotate variants that were just called from freebayes
+        //
+       
+        // bcftools to append header rec for contig
+        var contigStr = "";
+        getHumanRefNames(refName).split(" ").forEach(function(ref) {
+            contigStr += "##contig=<ID=" + ref + ">\n";
+        })
+        var contigNameFile = new Blob([contigStr])
+        cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile], {ssl: useSSL})
+
+        // Get Allele Frequencies from 1000G and ExAC
+        cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
+
+        // VEP to annotate
+        var vepArgs = [];
+        vepArgs.push(" --assembly");
+        vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+        vepArgs.push(" --format vcf");
+        if (isRefSeq) {
+          vepArgs.push("--refseq");
+        }
+        // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+        // since we won't have the original vcf records as input
+        vepArgs.push("--hgvs");
+        vepArgs.push("--check_existing");
+        vepArgs.push("--fasta");
+        vepArgs.push(refFastaFile);
+        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
+
+
+        
+        var variantData = "";
+        cmd.on('data', function(data) {
+            if (data == undefined) {
+              return;
+            }
+
+            variantData += data;
+        });
+
+        cmd.on('end', function() {
+          callback(variantData, trRefName);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+
+        cmd.run();
       });
 
-      cmd.on('end', function() {
-        callback(variantData);
-      });
-
-      cmd.on('error', function(error) {
-        console.log(error);
-      });
-
-      cmd.run();
 
     });
 
@@ -595,45 +685,24 @@ var Bam = Class.extend({
 
 
 
-
-
-   reducePoints: function(data, factor, xvalue, yvalue) {
-      if (factor <= 1 ) {
-        return data;
-      }
-      var i, j, results = [], sum = 0, length = data.length, avgWindow;
-
-      if (!factor || factor <= 0) {
-        factor = 1;
-      }
-
-      // Create a sliding window of averages
-      for(i = 0; i < length; i+= factor) {
-        // Slice from i to factor
-        avgWindow = data.slice(i, i+factor);
-        var min = 999999;
-        var max = 0;
-        for (j = 0; j < avgWindow.length; j++) {
-            var y = yvalue(avgWindow[j]);
-            sum += y != null ? d3.round(y) : 0;
-
-            if (y > max) {
-              max = y;
-            }
-            if (y < min) {
-              min = y;
-            }
-        }
-        var average = d3.round(sum / factor);
-        results.push([xvalue(data[i]), average])
-        sum = 0;
-      }
-      return results;
-   }
-
- 
-
-
-
+  reducePoints: function(data, factor, xvalue, yvalue) {
+    if (!factor || factor <= 1 ) {
+      return data;
+    }
+    var results = [];
+    // Create a sliding window of averages
+    for (var i = 0; i < data.length; i+= factor) {
+      // Slice from i to factor
+      var avgWindow = data.slice(i, i + factor);
+      var sum = 0;
+      avgWindow.forEach(function(point) {
+        var y = yvalue(point);
+        if (y) { sum += d3.round(y); }
+      });
+      var average = d3.round(sum / avgWindow.length);
+      results.push([xvalue(data[i]), average])
+    }
+    return results;
+  }
 
 });

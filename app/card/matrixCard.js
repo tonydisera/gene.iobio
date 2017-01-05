@@ -4,6 +4,16 @@ function MatrixCard() {
 	this.sourceVcfData = null;
 	this.featureMatrix  = null;
 
+	this.CELL_SIZE                 = 18;
+	this.CELL_SIZE_EDU             = 23;
+	this.CELL_WIDTH_BASIC          = 160;
+
+	this.COLUMN_LABEL_HEIGHT       = 67;
+	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
+
+	this.ROW_LABEL_WIDTH           = 140;
+	this.ROW_LABEL_WIDTH_BASIC     = 25;
+	this.ROW_LABEL_WIDTH_EDU       = 100;
 
 	this.clinvarMap     = {  
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
@@ -98,7 +108,7 @@ function MatrixCard() {
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      ,order:0, index:1, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenecity - SIFT'         ,order:1, index:5, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogenicity - PolyPhen'    ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenicity - PolyPhen'     ,order:2, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
 		{name:'Impact - VEP'                 ,order:3, index:0, match: 'exact', attribute: 'vepImpact',      map: this.impactMap},
 		{name:'Bookmark'                     ,order:4, index:9, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Inheritance Mode'             ,order:5, index:2, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
@@ -108,6 +118,20 @@ function MatrixCard() {
 		{name:'Allele Frequency - ExAC'      ,order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Zygosity'                     ,order:10, index:10, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Genotype'                     ,order:11, index:11, match: 'field', attribute: 'eduGenotypeReversed' }
+	];
+
+	this.matrixRowsBasic = [
+		{name:'Pathogenicity - ClinVar',order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Inheritance Mode'       ,order:1,  index:1,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
+		{name:'Transcript'             ,order:2,  index:2,  match:  'field', height: 21, attribute: 'vepImpact',                   formatFunction: this.formatCanonicalTranscript},
+		{name:'cDNA'                   ,order:3,  index:3,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
+		{name:'Protein'                ,order:4,  index:4,  match:  'field', height: 21, attribute: 'vepHGVSp',                    formatFunction: this.formatHgvsP    },
+		{name:'Chr'                    ,order:5,  index:5,  match:  'field', height: 21, attribute: 'chrom',                       },
+		{name:'Position'               ,order:6,  index:6,  match:  'field', height: 21, attribute: 'start',                       },
+		{name:'Ref'                    ,order:7,  index:7,  match:  'field', height: 21, attribute: 'ref',                         },
+		{name:'Alt'                    ,order:8,  index:8,  match:  'field', height: 21, attribute: 'alt'                          },
+		{name:'Mutation Freq 1000G'    ,order:9,  index:9,  match:  'field', height: 21, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
+		{name:'Mutation Freq ExAC'     ,order:10, index:10,  match: 'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
 	];
 
 
@@ -209,7 +233,7 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelBasic) {
 		return (i+1).toString();
 	} else {
 		var rsId = getRsId(d);
@@ -225,7 +249,9 @@ MatrixCard.prototype.getVariantLabel = function(d, i) {
 MatrixCard.prototype.init = function() {
 	var me = this;
 
-	if (isLevelEdu) {
+	if (isLevelBasic) {
+		this.matrixRows = this.matrixRowsBasic;
+	} else if (isLevelEdu || isLevelBasic) {
 		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
 
 		this.removeRow('Zygosity', me.matrixRows);	
@@ -255,17 +281,19 @@ MatrixCard.prototype.init = function() {
 
 	this.featureMatrix = featureMatrixD3()
 				    .margin({top: 0, right: 40, bottom: 7, left: 24})
-				    .cellSize(isLevelEdu ? 23 : 18)
-				    .columnLabelHeight(isLevelEdu ? 30 : 67)
-				    .rowLabelWidth(isLevelEdu ? 100 : 140)
+				    .cellSize(isLevelEdu ? me.CELL_SIZE_EDU : (isLevelBasic ? null : me.CELL_SIZE))
+				    .cellWidth(isLevelBasic ? me.CELL_WIDTH_BASIC : null)
+				    .cellHeights(isLevelBasic ? me.matrixRowsBasic.map(function(d){return d.height}) : null)
+				    .columnLabelHeight(isLevelEdu  || isLevelBasic ?  me.COLUMN_LABEL_HEIGHT_BASIC : me.COLUMN_LABEL_HEIGHT)
+				    .rowLabelWidth(isLevelEdu  ? me.ROW_LABEL_WIDTH_EDU : (isLevelBasic ? me.ROW_LABEL_WIDTH_BASIC : me.ROW_LABEL_WIDTH))
 				    .columnLabel( me.getVariantLabel )
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
 				    		me.unpin();
 				    	} else {
 					    	if (variant != clickedVariant) {
-					    		clickedVariant = variant;
-					    		me.showTooltip(variant, true);
+					    		clickedVariant = isLevelBasic ? null : variant;
+					    		me.showTooltip(variant, isLevelBasic ? false : true);
 						    	variantCards.forEach(function(variantCard) {
 						    		variantCard.showVariantCircle(variant);
 						    		variantCard.showCoverageCircle(variant, getProbandVariantCard());
@@ -293,7 +321,7 @@ MatrixCard.prototype.init = function() {
 				    	}
 				    })
 				    .on('d3rowup', function(i) {
-				    	if (isLevelEdu) {
+				    	if (isLevelEdu  || isLevelBasic) {
 				    		return;
 				    	}
 				    	var column = null;
@@ -313,7 +341,7 @@ MatrixCard.prototype.init = function() {
 				    	
 				    })
 				    .on('d3rowdown', function(i) {
-				    	if (isLevelEdu) {
+				    	if (isLevelEdu  || isLevelBasic) {
 				    		return;
 				    	}
 				    	var column = null;
@@ -450,6 +478,9 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 		var colObject = column.datum();
       	column.classed("active", true);
       	column.select(".colbox").classed("current", true);
+
+      	var left = (isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1; 
+      	$("#feature-matrix").scrollLeft(left);
 	
       	if (showTooltip) {
 	      	// Get screen coordinates of column.  We will use this to position the
@@ -523,9 +554,14 @@ MatrixCard.prototype.adjustTooltip = function(variant) {
 MatrixCard.prototype.showTooltip = function(variant, lock) {
 	var me = this;
 
+	// Don't show the tooltip for mygene2 beginner mode
+	if (isLevelBasic) {
+		return;
+	}
+
 
 	if (lock) {
-		if (!isLevelEdu) {
+		if (!isLevelEdu && !isLevelBasic) {
 			showSidebar("Examine");
 			examineCard.showVariant(variant);		
 			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
@@ -547,7 +583,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	 .style("opacity", .9)	
 	 .style("pointer-events", "all");
 
-	if (isLevelEdu) {
+	if (isLevelEdu || isLevelBasic) {
 		tooltip.classed("level-edu", "true");
 	} 
 
@@ -569,7 +605,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		me.unpin();
 	});
 	tooltip.select("#examine").on('click', function() {
-		if (!isLevelEdu) {
+		if (!isLevelEdu && !isLevelBasic) {
 			showSidebar("Examine");
 			examineCard.showVariant(variant);
 			getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
@@ -585,7 +621,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		widthSimpleTooltip = 500;
 	}
 
- 	var w = isLevelEdu ? widthSimpleTooltip : 300;
+ 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : 300;
 	var h = tooltip[0][0].offsetHeight;
 
 	var x = variant.screenXMatrix;
@@ -651,6 +687,16 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	
 	resizeCardWidths();
 
+	if (isLevelBasic) {
+		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
+			$('#matrix-track #no-variants.level-basic').removeClass("hide");
+			$('#matrix-panel').addClass("hide");
+		} else {
+			$('#matrix-track #no-variants.level-basic').addClass("hide");		
+			$('#matrix-panel').removeClass("hide");
+		}		
+	}
+
 	if (theVcfData != null) {
 		this.featureVcfData = {};
 		this.featureVcfData.features = [];
@@ -690,8 +736,17 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			} 
 			if (rawValue != null && rawValue != "") {				
 				if (matrixRow.match == 'field') {
-					theValue = rawValue;
+					if (matrixRow.formatFunction) {
+						theValue = matrixRow.formatFunction.call(me, variant, rawValue);
+					} else {
+						theValue = rawValue;
+					}					
 					mappedClazz = matrixRow.attribute;
+					if (matrixRow.rankFunction) {
+						mappedValue = matrixRow.rankFunction.call(me, variant, rawValue);
+					} else {
+						mappedValue = theValue;
+					}
 					symbolFunction = me.showTextSymbol;
 
 				} else if (matrixRow.match == 'exact') {
@@ -794,7 +849,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);  
 
-    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu});
+    this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: isLevelEdu || isLevelBasic});
 
     // We have new properties to filter on (for inheritance), so refresh the 
     //proband variant chart.
@@ -955,163 +1010,49 @@ MatrixCard.prototype.showSiftSymbol = function (selection, options) {
 	         });
 
 };
+
 MatrixCard.prototype.showAfExacSymbol = function(selection) {
+	var symbolAttrs = {
+		afexac_unique_nc: { transform: "translate(4,4)", fill: "none", stroke: "black", sideLength: "9" },
+		afexac_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", stroke: "none", sideLength: "9" },
+		afexac_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", stroke: "none", sideLength: "10" },
+		afexac_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", stroke: "none", sideLength: "10" },
+		afexac_rare: { transform: "translate(2,2)", fill: "rgb(158,186,194)", stroke: "none", sideLength: "10" },
+		afexac_uncommon: { transform: "translate(2,2)", fill: "rgb(145,191,219)", stroke: "none", sideLength: "12" },
+		afexac_common: { transform: "translate(1,1)", fill: "rgb(69,117,180)", stroke: "none", sideLength: "14"  }
+	}
 	selection.append("g")
-	         .attr("class", selection.datum().clazz)
-	         .attr("transform", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "translate(3,3)";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "translate(1,1)";
-	         	}
-	         	
-	         })
-	         .append("use")
-	         .attr("xlink:href", "#af-symbol")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "none";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "rgb(203,174,95)";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "rgb(158,186,194)";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "rgb(69,117,180)";
-	         	}
-	         })
-	         .style("stroke", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "black";
-	         	} else {
-	         		return "none";
-	         	}
-	         })
-	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "14";
-	         	}
-	         })
-	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'afexac_unique_nc') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'afexac_uberrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'afexac_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'afexac_common') {
-	         		return "14";
-	         	}
-	         });
+		.attr("class", function(d, i) { return d.clazz; })
+		.attr("transform", function(d,i) {
+			return symbolAttrs[d.clazz].transform;
+		})
+		.append("use")
+		.attr("xlink:href", "#af-symbol")
+		.style("pointer-events", "none")
+		.style("fill", function(d,i) { return symbolAttrs[d.clazz].fill; })
+		.style("stroke", function(d,i) { return symbolAttrs[d.clazz].stroke; })
+		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
 };
 
 MatrixCard.prototype.showAf1000gSymbol = function(selection) {
+	var symbolAttrs = {
+		af1000g_unique: { transform: "translate(4,4)", fill: "rgb(215,48,39)", sideLength: "9" },
+		af1000g_uberrare: { transform: "translate(3,3)", fill: "rgb(252,141,89)", sideLength: "9" },
+		af1000g_superrare: { transform: "translate(2,2)", fill: "rgb(203,174,95)", sideLength: "10" },
+		af1000g_rare: { transform: "translate(2,2)", fill: "rgb(158,186,194)", sideLength: "10" },
+		af1000g_uncommon: { transform: "translate(1,1)", fill: "rgb(145,191,219)", sideLength: "12" },
+		af1000g_common: { transform: "translate(0,0)", fill: "rgb(69,117,180)", sideLength: "14"  }
+	}
 	selection.append("g")
-	         .attr("class", selection.datum().clazz)
-	          .attr("transform", function(d,i) {
-	         	if (selection.datum().clazz == 'af100g_unique_nc') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "translate(4,4)";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "translate(3,3)";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "translate(2,2)";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "translate(1,1)";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "translate(0,0)";
-	         	}
-	         	
-	         })
-	         .append("use")
-	         .attr("xlink:href", "#af-symbol")
-	         .style("pointer-events", "none")
-	         .style("fill", function(d,i) {
-
-
-	         if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "rgb(215,48,39)";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "rgb(252,141,89)";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "rgb(203,174,95)";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "rgb(158,186,194)";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "rgb(145,191,219)";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "rgb(69,117,180)";
-	         	}
-	         })
-	         .attr("width", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "14";
-	         	}
-	         })
-	         .attr("height", function(d,i) {
-	         	if (selection.datum().clazz == 'af1000g_unique') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_uberrare') {
-	         		return "9";
-	         	} else if (selection.datum().clazz == 'af1000g_superrare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_rare') {
-	         		return "10";
-	         	} else if (selection.datum().clazz == 'af1000g_uncommon') {
-	         		return "12";
-	         	} else if (selection.datum().clazz == 'af1000g_common') {
-	         		return "14";
-	         	}
-	         });
+		.attr("class", function(d, i) { return d.clazz; })
+		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
+		.append("use")
+		.attr("xlink:href", "#af-symbol")
+		.style("pointer-events", "none")
+		.style("fill", function(d,i) { return symbolAttrs[d.clazz].fill; })
+		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
 };
 
 MatrixCard.prototype.showHomSymbol = function (selection, options) {
@@ -1199,13 +1140,16 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function (selection, options) {
 };
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
+	var me = this;
 	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)"
-	selection.append("g")
-	         .attr("transform", translate)
-	         .append("text")
-	         .attr("x", 0)
-	         .attr("y", 11)
-	         .text(selection.datum().value);
+	var text =  selection.append("g")
+				         .attr("transform", translate)
+				         .append("text")
+				         .attr("x", 0)
+				         .attr("y", isLevelBasic ? 14 : 11)
+				         .attr("dy", "0em")
+				         .text(selection.datum().value);
+	MatrixCard.wrap(text, options.cellSize, 3);
 	
 };
 
@@ -1321,7 +1265,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 		         .append("rect")
 		         .attr("width", width)
 		         .attr("height", height)
-		         .attr("class", "filter-symbol " + selection.datum().clazz)
+		         .attr("class", "filter-symbol " + selection.datum().clazz + " snp")
 		         .style("pointer-events", "none");		
 	} else {
 		selection
@@ -1351,7 +1295,7 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 						}
                      })();
           })
-          .attr("class", "filter-symbol " + selection.datum().clazz);
+          .attr("class", "filter-symbol " + selection.datum().clazz + " " + type);
 	}
 
 }
@@ -1409,3 +1353,266 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 	}
 
 }
+
+MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
+	var buf = "";
+	for (key in clinvarSig) {
+		if (key == "none" || key == "not_provided") {
+
+		} else {
+			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
+			if (isLevelBasic) {
+				if (key.indexOf("pathogenic") >= 0) {
+					if (variant.featureClass == null) {
+						variant.featureClass = "";
+					}
+					variant.featureClass += " danger";
+				}
+
+			}
+			if (buf.length > 0) {
+				buf += ",";
+			}
+			buf += key.split("_").join(' ');
+		}
+	}
+	return buf;
+}
+MatrixCard.prototype.getClinvarRank = function(variant, clinvarSig) {
+	var me = this;
+	var lowestRank = 9999;
+	for (key in clinvarSig) {
+		var rank = me.clinvarMap[key].value;
+		if (rank < lowestRank) {
+			lowestRank = rank;
+		}
+	}	
+	return lowestRank;
+}
+MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
+	var me = this;
+	var lowestRank = 99;
+	for (key in highestImpactVep) {
+		var rank = me.impactMap[key].value;
+		if (rank < lowestRank) {
+			lowestRank = rank;
+		}
+	}	
+	return lowestRank;
+}
+MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) {
+	return value && value != "" && +value >= 0 ? this.percentage(+value,2) : "";
+}
+
+MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
+	return stripTranscriptPrefix(selectedTranscript.transcript_id);
+}
+
+MatrixCard.prototype.formatTranscriptHighestImpact = function(variant, highestImpactVep) {
+	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
+		return "";
+	} else {
+		var transcripts = [];
+		for( impactKey in highestImpactVep) {
+			var consequenceObject = highestImpactVep[impactKey];
+			for (consequenceKey in consequenceObject) {
+				var transcriptObject = consequenceObject[consequenceKey];
+				if (transcriptObject == null || transcriptObject == '' || Object.keys(transcriptObject).length == 0) {
+					// Use canonical transcript
+					transcripts.push(stripTranscriptPrefix(selectedTranscript.transcript_id));
+				} else {
+					// Show all non-canonical transcripts that this highest impact applies to
+					for (transcript in transcriptObject) {
+						transcripts.push(stripTranscriptPrefix(transcript));
+					}
+				}
+			}
+		}
+		return transcripts.sort().join(" ");
+	}
+
+}
+MatrixCard.prototype.formatConsequenceHighestImpact = function(variant, highestImpactVep) {
+	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
+		return "";
+	} else {
+		var consequences = [];
+		for( impactKey in highestImpactVep) {
+			var consequenceObject = highestImpactVep[impactKey];
+			for (consequenceKey in consequenceObject) {
+				consequences.push(consequenceKey.split('_variant').join(' ').split('_').join(' '));
+			}
+		}
+		return consequences.join(",");
+	}
+
+}
+MatrixCard.prototype.formatHighestImpact = function(variant, highestImpactVep) {
+	if (highestImpactVep == null || highestImpactVep == '' || Object.keys(highestImpactVep).length == 0) { 
+		return "";
+	} else {
+			// Highlight the column as 'danger' if variant is considered pathogenic or likely pathogenic
+			if (isLevelBasic) {
+				for (key in highestImpactVep) {
+					if (key == 'HIGH') {
+						if (variant.featureClass == null) {
+							variant.featureClass = "";
+						}
+						variant.featureClass += " danger";
+					}
+
+				}
+
+			}		
+		return Object.keys(highestImpactVep).join(" ");
+	}
+
+}
+
+MatrixCard.prototype.formatSimpleHgvsP = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":p.");
+			if (buf.length > 0) {
+				buf += " ";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = "p." + tokens[1];
+				var simpleNotation = basicNotation.replace(/[0-9]/g, '');
+				var aminoAcids = simpleNotation.split(/([A-Z][^A-Z]*)/g).filter(function(part) {return part.length != 0});;
+				if (aminoAcids.length == 2) {
+					buf += aminoAcids.join('>');
+				} else {
+					buf += simpleNotation;
+				}
+			} 		
+		}
+		return buf;
+	}
+}
+MatrixCard.prototype.formatHgvsP = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":p.");
+			if (buf.length > 0) {
+				buf += " ";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = "p." + tokens[1];
+				buf += basicNotation;
+			} else if (tokens.length == 1 && endsWith(tokens[0],"(p.=)")) {
+				// If synoymous variants, show p.(=) in cell
+				if (variant.vepConsequence && Object.keys(variant.vepConsequence).length > 0) {
+					for( consequence in variant.vepConsequence) {
+						if (consequence == "synonymous_variant") {
+							buf += "p.(=)";
+						}
+					}
+				} 
+				
+			}		
+		}
+		return buf;
+	}
+}
+MatrixCard.prototype.formatSimpleHgvsC = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":c.");
+			if (buf.length > 0) {
+				buf += " ";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = tokens[1];
+				var simpleNotation = basicNotation.replace(/[0-9_\+\-]/g, '');
+				buf += simpleNotation;
+			} 		
+		}
+		return buf;
+	}
+
+}
+MatrixCard.prototype.formatHgvsC = function(variant, value) {
+	if (value == null || value == '' || Object.keys(value).length == 0) {
+		return "";
+	} else {
+		var buf = "";
+		for(var key in value) {
+			var tokens = key.split(":c.");
+			if (buf.length > 0) {
+				buf += " ";
+			}
+			if (tokens.length == 2) {
+				var basicNotation = "c." + tokens[1];
+				buf += basicNotation;
+			} 		
+		}
+		return buf;
+	}
+
+}
+
+MatrixCard.prototype.formatInheritance = function(variant, value) {
+	if (value == null || value == 'none') {
+		return '';
+	} else if (value == 'denovo') {
+		return 'de novo';
+	} else {
+		return value;
+	}
+}
+
+
+MatrixCard.prototype.percentage = function(a, places) {
+	var pct = a * 100;
+	return round(pct, places) + "%";
+}
+
+MatrixCard.wrap = function(text, width, maxLines) {
+  if (maxLines == null) {
+  	maxLines = 10;
+  }
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text()
+                    .split(/\s+/)
+                    .filter( function(d,i) {
+                    	return d != null && d != '' && d.trim() != '';
+        			})
+                    .reverse();
+    var wordCount = words.length;
+    var word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      if (lineNumber < maxLines) {
+      	  if (lineNumber == maxLines-1) {
+      	  	word = " more ...";
+      	  }
+	      tspan.text(line.join(" "));
+	      if (tspan.node().getComputedTextLength() > width && wordCount > 1) {
+	        line.pop();
+	        tspan.text(line.join(" "));
+	        line = [word];
+	        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+	      }
+      } 
+    }
+  });
+}
+
+

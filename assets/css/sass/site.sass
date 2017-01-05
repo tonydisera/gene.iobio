@@ -1,11 +1,18 @@
 @import variables
 
+
+// These imports are styles for the gene.iobio education edition, with
+// a simplified interface and logic.  For running one of the special educational edition 
+// tours (e.g. a guided tour of the gene.iobio app), UNCOMMENT BOTH levelEdu and levelEduTour 
+//import statements.
 //@import levelEdu
 //@import levelEduTour
 
 
+
 body
   font-family: $app-font, sans-serif !important
+  margin-top: -5px 
 
 h4
   font-size: 12px
@@ -66,7 +73,7 @@ h5
   top: 0   
   text-align: left
   padding-left: 3px
-  padding-top: 10px
+  padding-top: 5px
   width:  250px
 
 .nav-right
@@ -74,7 +81,7 @@ h5
   right: 5px
   top: 0
   width: 250px
-  padding-top: 5px
+  padding-top: 0px
 
 .nav-center
   margin: 3px 0px 0 0px
@@ -206,6 +213,8 @@ h5
   .ajs-footer
     background-color: white
     border: none 
+
+
 
 
 #recfilter-flag
@@ -486,7 +495,7 @@ i.material-icons
       position: absolute
       bottom: 10px
       width: 100%
-      margin-top: 3px
+      margin-top: 13px
 
 
     a.pageguide-prev
@@ -1062,6 +1071,14 @@ section
   padding-bottom: 1px
   margin-top: 15px
 
+#build-link
+  cursor: pointer
+  display: inline-block
+  vertical-align: bottom
+  margin-bottom: 10px
+  font-size: 16px
+  color: #5d809d !important
+  font-weight: bold
 
 #gene-name
   font-size: 16px 
@@ -1161,13 +1178,13 @@ section
   opacity: 0
 
 #top-coordinate-frame 
-  border: none
-  width: 19px
+  border: none 
   position: relative
   pointer-events: none
   top: 0px
-  height: 12px
+  height: 18px
   visibility: visible
+  width:  26px
 
   &.hide
     visibility:  hidden !important
@@ -1176,10 +1193,10 @@ section
   .coordinate-arrow
     stroke-width: 1px !important
     stroke: black !important
-    fill: #ff7d7d
+    fill: $arrow-color
 
 .variant-card
-  min-height: 32px
+  min-height: 60px
   padding-bottom: 0px
   background-color: white
 
@@ -1313,6 +1330,7 @@ header
 #bam-depth
   text-align: left
   margin-top: 0px
+  min-height: 30px
 
   .circle
     stroke: none
@@ -1320,25 +1338,25 @@ header
     pointer-events: none
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
-  stroke: $current-color
+  stroke: $arrow-color
   stroke-width: 2
 
   fill: none
   pointer-events: none
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize
-  stroke: $current-color
+  stroke: $arrow-color
   fill: none
   stroke-width: 3
   pointer-events: none
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize
   stroke-width: 3
-  stroke: $current-color
+  stroke: $arrow-color
   pointer-events: none
 
 #bam-depth .circle-label
-  fill: $current-color
+  fill: $arrow-color
   font-size: 9px
   font-weight: bold
   stroke: none
@@ -1603,6 +1621,21 @@ header
         margin-left:  5px  
 
 
+.col-container
+  display: flex
+  flex-direction: column
+  align-content: space-between
+  height: 100%
+
+.col-main
+  flex: 1
+  flex-grow: 1
+
+.col-footer
+  flex: 2
+  flex-grow: 0
+  align-self: flex-end
+
 
 @import slideout
 
@@ -1624,25 +1657,25 @@ header
 
 @import feedback
 
+@import legend
+
+// This style adds a panel to the top of the main view, explaining how
+// gene.iobio works in Mygene2.  There are nav buttons to go
+// from beginner to advanced modes
+//@import mygene2
+
+// This style is for  Beginner mode of gene.iobio, a simplified version
+// of the app. Uncomment this import to turn on styling for the Beginner mode.
+//@import levelBasic
+
+
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px)
   #region-track
     margin-left: 200px !important
 
 @media screen and (max-device-width: 800px), screen and (max-width: 800px)
-  .iobio, .iobioapp
-    font-size: 22px !important
 
-  .iobioproject
-    font-size: 16px
-
-  #learn-more-dropdown
-
-  #gene-search-bar
-    display: block !important
-    clear: both !important
-    width: 400px
-    text-align: center !important
 
   #region-track
     margin-left: 200px !important

@@ -2,10 +2,13 @@
 // Code courtesy of  Jorrit Duin
 // http://j0rr1t.blogspot.com.es/2013/02/optimal-compression-for-client-side.html
 //
-function StringCompress() {
-}
 
-StringCompress.prototype.deflate = function(s) {
+(function(global) {
+
+  function StringCompress() {
+  }
+
+  StringCompress.prototype.deflate = function(s) {
     var out = '', i, len, val;
     len = s.length;
     if(len < 1 || typeof s !== 'string'){
@@ -25,10 +28,10 @@ StringCompress.prototype.deflate = function(s) {
       out += String.fromCharCode(val);
     }
     return out;
-}
+  }
 
 
-StringCompress.prototype.inflate = function(s) {
+  StringCompress.prototype.inflate = function(s) {
     if(s.length < 1 || typeof s !== 'string'){
       return s;
     }
@@ -47,5 +50,9 @@ StringCompress.prototype.inflate = function(s) {
       }
 
     }
-    return decodeURIComponent(escape(out));  
-}
+    return decodeURIComponent(escape(out));
+  }
+
+  global.StringCompress = StringCompress;
+
+}(window));

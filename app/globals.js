@@ -1,50 +1,52 @@
 //
 // URLS
 //
-var stage_iobio_services      = "nv-green.iobio.io/";
-var dev_iobio_services        = "nv-dev-new.iobio.io/";
-var prod_iobio_services       = "nv-prod.iobio.io/";
+var stage_iobio_services      = "nv-purple.iobio.io/";
+var dev_iobio_services        = "nv-dev.iobio.io/";
+var prod_iobio_services       = "nv-green.iobio.io/";
 
-var new_iobio_services        = isOffline              ? serverInstance : stage_iobio_services;
-var iobio_http_services       = "http://" + (isOffline ? serverInstance : stage_iobio_services);
+var current_iobio_services    = stage_iobio_services;
+
+var iobio_services            = isOffline ? serverInstance : current_iobio_services;
+var iobio_http_services       = (useSSL ? "https://" : "http://") + (isOffline ? serverInstance : current_iobio_services);
 
 
 // http services
 var geneInfoServer            = iobio_http_services + "geneinfo/";
+var genomeBuildServer         = iobio_http_services + "genomebuild/"; // !pointed to nv-dev
 var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
 var phenolyzerOnlyServer      = iobio_http_services + "phenolyzer/";
 
-// email services
-var emailServer                 = "ws://nv-dev.iobio.io/email/";
-
+// email service
+var emailServer               = (useSSL ? "wss://" : "ws://") +   iobio_services + "email/";
 
 // iobio services
 var IOBIO = {};
-IOBIO.tabix                   = new_iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-IOBIO.vcfReadDepther          = new_iobio_services  + "vcfdepther/";
-IOBIO.snpEff                  = new_iobio_services  + "snpeff/";
-IOBIO.vt                      = new_iobio_services  + "vt/";
-IOBIO.af                      = new_iobio_services  + "af/";
-IOBIO.vep                     = new_iobio_services  + "vep/";
-IOBIO.contigAppender          = new_iobio_services  + "ctgapndr/";
-IOBIO.bcftools                = new_iobio_services  + "bcftools/";
-IOBIO.coverage                = new_iobio_services + "coverage/ ";
-IOBIO.samtools                = new_iobio_services +  "samtools/";
-IOBIO.samtoolsOnDemand        = new_iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.freebayes               = new_iobio_services + "freebayes/";
-IOBIO.vcflib                  = new_iobio_services + "vcflib/";
+IOBIO.tabix                   = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+IOBIO.vcfReadDepther          = iobio_services  + "vcfdepther/";
+IOBIO.snpEff                  = iobio_services  + "snpeff/";
+IOBIO.vt                      = iobio_services  + "vt/";  // !pointed to nv-dev
+IOBIO.af                      = iobio_services  + "af/";  // !pointed to nv-dev
+IOBIO.vep                     = iobio_services  + "vep/"; // !pointed to nv-dev
+IOBIO.contigAppender          = iobio_services  + "ctgapndr/";
+IOBIO.bcftools                = iobio_services  + "bcftools/";
+IOBIO.coverage                = iobio_services + "coverage/ ";
+IOBIO.samtools                = iobio_services +  "samtools/";
+IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
+IOBIO.freebayes               = iobio_services + "freebayes/"; // !pointed to nv-dev
+IOBIO.vcflib                  = iobio_services + "vcflib/";
 
 
 // URL for Phenolyzer
 var OFFLINE_PHENOLYZER_CACHE_URL  = isOffline ?  (serverCacheDir) : ("../" + serverCacheDir);
 
 // Url for offline Clinvar URL
-var OFFLINE_CLINVAR_VCF_URL       = isOffline ?  ("http://" + serverInstance + serverCacheDir + "clinvar.vcf.gz") : "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar.vcf.gz";
+var OFFLINE_CLINVAR_VCF_BASE_URL  = isOffline ?  ("http://" + serverInstance + serverCacheDir) : "";
 
-var NCBI_GENE_SEARCH_URL          = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json";
-var NCBI_GENE_SUMMARY_URL         = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&usehistory=y&retmode=json"; 
+var NCBI_GENE_SEARCH_URL          = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json";
+var NCBI_GENE_SUMMARY_URL         = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&usehistory=y&retmode=json"; 
 //
 //  EDUCATIONAL / EXHIBIT
 //
