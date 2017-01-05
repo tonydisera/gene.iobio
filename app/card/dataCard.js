@@ -551,7 +551,7 @@ DataCard.prototype.getHeadersFromBams = function(callback) {
 	var headerMap = {};
 	var cardCount = 0;
 	variantCards.forEach(function(variantCard) {
-		if (variantCard.model.bam) {
+		if (variantCard.model.bam && !variantCard.model.bam.isEmpty()) {
 			variantCard.model.bam.getHeaderStr(function(header) {
 				headerMap[variantCard.getRelationship()] = header;
 				cardCount++;
