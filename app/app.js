@@ -77,8 +77,6 @@ var filterCard = new FilterCard();
 // genes card
 var genesCard = new GenesCard();
 
-// examine variant card
-var examineCard = new ExamineCard();
 
 // matrix card
 var matrixCard = new MatrixCard();
@@ -1065,59 +1063,58 @@ function loadGeneFromUrl() {
 
 
 	if (isMygene2) {
+		showSidebar("Phenolyzer");
 		dataCard.loadMygene2Data();
-	}
-
-
-	// Load the gene
-	var showTour = getUrlParameter('showTour');
-    if (gene != undefined) {
-		// If the species and build have been specified, type in the gene name; this will 
-		// trigger the event to get the gene info and then call loadUrlSources()
-		if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
-			setGeneBloodhoundInputElement(gene, true, true);
-		} else {
-			// The build wasn't specified in the URL parameters, so force the user
-			// to select the gemome build from the data dialog.
-
-			loadUrlSources();
-			showDataDialog();
+	} else if (isLevelEdu) {
+		if (isLevelEduTour && eduTourShowPhenolyzer[+eduTourNumber-1]) {
+			showSidebar("Phenolyzer");
 		}
-		
+		dataCard.loadDemoData();
 	} else {
-		// Open the sidebar 
-		if (isLevelEdu) {
-			if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-				showSidebar("Phenolyzer");
+
+		// Load the gene
+	    if (gene != undefined) {
+			// If the species and build have been specified, type in the gene name; this will 
+			// trigger the event to get the gene info and then call loadUrlSources()
+			if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
+				setGeneBloodhoundInputElement(gene, true, true);
+			} else {
+				// The build wasn't specified in the URL parameters, so force the user
+				// to select the gemome build from the data dialog.
+				loadUrlSources();
+				showDataDialog();
 			}
-			dataCard.loadDemoData();
 		} else {
 			// If a gene wasn't provided, go ahead and just set the data sources, etc for
 			// other url parameters.
 			loadUrlSources();
-			showSidebar("Help");
-		}
-	
-
-		if (showTour != null && showTour == 'Y') {
-			//pageGuide.open();
-		} else {
-			//$('#tourWelcome').addClass("open");
+			showSidebar("Help");		
 		}
 
 	}
+
+
+
+
 	
 }
 
 function loadGeneNamesFromUrl(geneNameToSelect) {
 	geneNames = [];
 
+	// Add the gene to select to the gene list
+	if (geneNameToSelect && geneNameToSelect.length > 0) {
+		geneNames.push(geneNameToSelect);
+	}
+
 
 	// If a gene list name was provided (e.g. ACMG56, load these genes)
 	var geneList = getUrlParameter("geneList");
 	if (geneList != null && geneList.length > 0 && geneList == 'ACMG56') {
 		genesCard.ACMG56_GENES.sort().forEach(function(geneName) {
-			geneNames.push(geneName);
+			if ( geneNames.indexOf(geneName) < 0 ) {
+				geneNames.push(geneName);
+			}
 		});
 	}
 
@@ -1132,9 +1129,12 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 		});
 	}
 
-	if (geneNames.length > 0) {		
+	if (geneNames.length > 0) {	
+		if (!geneNameToSelect) {
+			geneNameToSelect = geneNames[0];
+		}	
 		$('#genes-to-copy').val(geneNames.join(","));
-		genesCard.copyPasteGenes(geneNameToSelect);
+		genesCard.copyPasteGenes(geneNameToSelect, true);
 	}	
 }
 
@@ -1881,7 +1881,7 @@ function loadTracksForGene(bypassVariantCards) {
 
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
-	if (window.gene == null || window.gene == "") {
+	if (window.gene == null || window.gene == "" && !isLevelBasic) {
 		$('.twitter-typeahead').animateIt('tada');
 		return;
 	} 

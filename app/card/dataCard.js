@@ -24,6 +24,7 @@ function DataCard() {
 	};
 
 
+	this.demoBuild = "GRCh37";
 	this.demoMode = 'trio';
 	this.demoCards = {
 		proband: true,
@@ -154,6 +155,7 @@ function DataCard() {
 DataCard.prototype.loadDemoData = function() {
 	var me = this;
 
+
 	if (isLevelEdu) {
 		var idx = isLevelEduTour ? +eduTourNumber : 0;
 		this.demoCards      = this.eduTourCards[idx];
@@ -171,6 +173,9 @@ DataCard.prototype.loadDemoData = function() {
 	var unaffectedSibIds = [];
 	window.loadSibs(affectedSibIds, 'affected');
 	window.loadSibs(unaffectedSibIds, 'unaffected');
+
+	window.updateUrl("build", me.demoBuild);
+	genomeBuildHelper.setCurrentBuild(me.demoBuild);
 
 	window.updateUrl('rel0', "proband");	
 	window.updateUrl('rel', "mother");	
@@ -238,10 +243,17 @@ DataCard.prototype.loadMygene2Data = function() {
 			}
 			// Create a URL that only the IOBIO service has access to
 			var probandUrl = window.location.protocol + "//" + serverInstance + vcfFilePath;
-			me.setVcfUrl("proband", "Variants", null, probandUrl);
+
+			// If the genome build was specified, load the endpoint variant file
+			if (genomeBuildHelper.getCurrentBuild()) {
+				me.setVcfUrl("proband", "Variants", null, probandUrl);
+			} else {
+				alertify.alert("Cannot load data.  The genome build must be specified.");
+			}
 		} else {
 			// Load full demo wgs trio data if vcf file path was not provided via mygene2 data exchange
 			me.mode = "trio";
+			genomeBuildHelper.setCurrentBuild(me.demoBuild);
 			me.setVcfUrl("proband", "DEMO DATA", me.demoSampleNames.proband, me.demoUrls.proband);
 			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
 			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
@@ -252,7 +264,6 @@ DataCard.prototype.loadMygene2Data = function() {
 		window.cacheHelper.clearCache();
 		window.matrixCard.reset();		
 	};
-
 
 	var missingVariables = "";
 	if (mygene2Endpoint == "") {
@@ -288,7 +299,6 @@ DataCard.prototype.loadMygene2Data = function() {
 		        console.log( "Status: " + status );
 		        console.log( xhr );
 		        console.log("Unable to get MyGene2 endpoint filenames");
-
 		        alertify.confirm("Unable to obtain variant files using MyGene2 token.",
 				    function(){ 
 				    }, 
@@ -299,6 +309,7 @@ DataCard.prototype.loadMygene2Data = function() {
 		    }
 		});
 	}
+	
 
 }
 
