@@ -1294,17 +1294,6 @@ var effectCategories = [
     //  Figure out the reference sequence file path
     var refFastaFile = genomeBuildHelper.getFastaPath(refName);
 
-    // Figure out the vep args
-    var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
-    if (isRefSeq) {
-      vepArgs += " --refseq "
-    }
-    if (hgvsNotation) {
-      vepArgs += " --hgvs ";
-    }
-    if (getRsId) {
-      vepArgs += "  --check_existing ";
-    }
 
     var writeStream = function(stream) {
       records.forEach( function(record) {
@@ -1344,7 +1333,27 @@ var effectCategories = [
       cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-    cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
+    // VEP
+    var vepArgs = [];
+    vepArgs.push(" --assembly");
+    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+    vepArgs.push(" --format vcf");
+    if (isRefSeq) {
+      vepArgs.push("--refseq");
+    }
+    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+    // since we won't have the original vcf records as input
+    if (hgvsNotation) {
+      vepArgs.push("--hgvs");
+    }
+    if (getRsId) {
+      vepArgs.push("--check_existing");
+    }
+    if (hgvsNotation || getRsId) {
+      vepArgs.push("--fasta");
+      vepArgs.push(refFastaFile);
+    }
+    cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
 
 
     var buffer = "";
