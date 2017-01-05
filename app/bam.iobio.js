@@ -52,6 +52,12 @@ var Bam = Class.extend({
     this.bamFile = null;
     this.baiFile = null;
     this.bamUri = null;
+    this.header = null;
+    this.headerStr =  null;
+   },
+
+   isEmpty: function() {
+    return this.bamFile == null && this.bamUri == null;
    },
 
    makeBamBlob: function(callback) {
