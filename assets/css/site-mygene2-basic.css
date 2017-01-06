@@ -7,7 +7,11 @@ body {
   margin-bottom: 0px !important;
   min-height: 50px; }
   .navbar .navbar-brand {
-    height: 50px; }
+    height: 50px;
+    margin-top: -6px;
+    padding-top: 15px; }
+    .navbar .navbar-brand #home {
+      margin-top: 6px; }
   .navbar .navbar-form {
     margin-top: 10px; }
   .navbar .form-group.is-focused .form-control {
@@ -16,6 +20,11 @@ body {
     height: 34px;
     margin: 10px 17px;
     border-left: 1px solid #aba9a9; }
+  .navbar ul.nav > li #genes-menu-item {
+    overflow: auto;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 1px; }
   .navbar ul.nav > li > a {
     color: white !important;
     padding-top: 15px !important;
@@ -24,6 +33,15 @@ body {
       color: #9ef4ff !important; }
       .navbar ul.nav > li > a:hover #search-dna-glyph {
         fill: #9ef4ff !important; }
+    .navbar ul.nav > li > a p.wrapped {
+      width: 50px;
+      word-wrap: break-word;
+      line-height: 14px;
+      display: inline-block;
+      vertical-align: top;
+      margin-bottom: 0px; }
+      .navbar ul.nav > li > a p.wrapped.wide {
+        width: 70px; }
   .navbar ul.nav > li.active {
     color: white !important; }
     .navbar ul.nav > li.active > a {
@@ -742,14 +760,30 @@ a {
     color: #717171;
     font-size: 13px; }
 
+#matrix-track .matrix-note-text {
+  margin-top: -7px;
+  color: #969696;
+  font-style: italic; }
 #matrix-track #low-quality-legend {
-  float: left;
-  margin-top: -20px;
   font-size: 12px;
-  margin-left: 160px;
+  margin-left: 20px;
   font-style: italic;
-  vertical-align: top;
-  color: #717171; }
+  overflow: visible;
+  float: left; }
+  #matrix-track #low-quality-legend #low-quality-legend-box {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-color: #dedede;
+    vertical-align: bottom; }
+#matrix-track #low-quality-legend-text {
+  width: 160px;
+  float: left;
+  margin-left: 5px;
+  margin-bottom: 0px;
+  color: #969696;
+  font-style: italic;
+  line-height: 13px; }
 #matrix-track #feature-matrix rect.cellbox {
   fill: white;
   stroke: #e6e6e6;
@@ -802,12 +836,12 @@ a {
     cursor: pointer;
     fill: #3586c0; }
 #matrix-track #feature-matrix-note {
-  padding-left: 165px;
+  padding-left: 155px;
   font-size: 12px;
-  margin-top: 0px; }
+  margin-top: -5px; }
 #matrix-track #move-rows {
   float: left;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: #717171 !important;
   margin-top: 0px; }
 
@@ -1392,8 +1426,8 @@ header {
   color: #5d809d !important; }
 
 #bloodhound .typeahead {
-  min-width: 150px;
-  max-width: 150px;
+  min-width: 140px;
+  max-width: 140px;
   font-size: 18px;
   vertical-align: middle !important; }
 
@@ -2557,7 +2591,7 @@ text.ref-count {
 
 #genes-panel {
   margin-bottom: 5px;
-  margin-top: 3px; }
+  margin-top: 8px; }
   #genes-panel #analyze-all-progress {
     position: relative;
     background-color: white;
@@ -2653,7 +2687,6 @@ text.ref-count {
     padding: 4px 1px 0px 1px; }
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
-    padding-top: 1px;
     padding-left: 3px;
     float: right; }
 
@@ -2800,7 +2833,7 @@ text.ref-count {
 #select-gene-container {
   display: inline-block;
   width: 110px;
-  vertical-align: bottom; }
+  vertical-align: middle; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
     padding-top: 2px;
@@ -3073,21 +3106,43 @@ text.ref-count {
   stroke-width: 1.5px !important;
   stroke-opacity: 0.3 !important; }
 
+#close-legend {
+  float: right;
+  font-size: 15px;
+  color: #717171 !important; }
+
+#show-legend {
+  color: #717171 !important;
+  font-size: 13px;
+  margin-left: 55px;
+  float: left; }
+
+#close-legend {
+  float: right;
+  color: #717171;
+  font-size: 18px; }
+
 #legend .legend-element {
   cursor: pointer;
   padding: 1px; }
   #legend .legend-element text {
     cursor: pointer;
-    fill: #717171; }
+    fill: #717171;
+    font-size: 12px; }
 #legend .legend-label {
-  font-size: 14px;
+  font-size: 13px;
   color: #717171;
   margin-bottom: 5px; }
-#legend .legend-symbol.exon {
+
+#legend.level-basic .legend-element text {
+  font-size: initial; }
+#legend.level-basic .legend-label {
+  font-size: 14px; }
+#legend.level-basic .legend-symbol.exon {
   cursor: pointer;
   fill: rgba(93, 128, 157, 0.63);
   stroke: #5d809d; }
-#legend .exon-symbol text {
+#legend.level-basic .exon-symbol text {
   font-size: 14px;
   fill: #717171; }
 
@@ -3114,13 +3169,13 @@ a {
   font-size: 12px; }
 
 #advanced-mode-title {
-  display: inline-block !important;
+  display: none !important;
   text-align: left;
-  margin-left: 2px;
-  font-size: 18px;
+  margin-left: 8px;
+  font-size: 16px;
   color: white;
   vertical-align: top;
-  margin-top: -5px !important;
+  padding-top: 5px !important;
   font-family: Quicksand; }
 
 #basic-mode-title {
@@ -3175,6 +3230,19 @@ a {
   #intro p {
     margin-bottom: 7px; }
 
+.navbar ul.nav > li > a {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important; }
+  .navbar ul.nav > li > a p.wrapped {
+    width: 50px;
+    word-wrap: break-word;
+    line-height: 14px;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0px; }
+    .navbar ul.nav > li > a p.wrapped.wide {
+      width: 70px; }
+
 .level-basic {
   display: none !important; }
 
@@ -3185,11 +3253,11 @@ a {
 #basic-mode-title {
   display: inline-block !important;
   text-align: left;
-  margin-left: 2px;
-  font-size: 18px;
+  margin-left: 8px;
+  font-size: 20px;
   color: white;
   vertical-align: top;
-  margin-top: -4px !important;
+  margin-top: 0px !important;
   font-family: Quicksand; }
 
 #advanced-mode-title {
@@ -3197,7 +3265,6 @@ a {
 
 #button-launch-advanced-mode {
   display: inline-block !important;
-  margin-top: 3px;
   margin-bottom: 0px;
   cursor: pointer; }
 
@@ -3338,13 +3405,11 @@ button {
 
 .iobio {
   font-size: 32px !important;
-  padding-top: 12px !important;
-  margin-top: -8px !important; }
+  margin-top: -4px !important; }
 
 .iobioapp {
   font-size: 32px !important;
-  padding-top: 12px !important;
-  margin-top: -8px !important; }
+  margin-top: -4px !important; }
 
 .card-label {
   text-transform: none !important; }
@@ -3566,5 +3631,63 @@ button {
 @media screen and (max-device-width: 800px), screen and (max-width: 800px) {
   #region-track {
     margin-left: 200px !important; } }
+@media screen and (max-device-width: 1250px), screen and (max-width: 1250px) {
+  .navbar ul.nav > li > a {
+    padding-right: 13px;
+    padding-left: 13px; } }
+@media screen and (max-device-width: 1140px), screen and (max-width: 1140px) {
+  .navbar ul.nav > li .navbar-form {
+    margin-right: 25px; }
+  .navbar ul.nav > li #genes-menu-item {
+    vertical-align: initial;
+    padding-top: 0px; }
+  .navbar ul.nav > li > a {
+    padding-right: 11px;
+    padding-left: 11px; }
+    .navbar ul.nav > li > a .material-icons {
+      display: none; }
+    .navbar ul.nav > li > a svg {
+      display: none; } }
+@media screen and (max-width: 990px) {
+  .navbar .navbar-brand {
+    margin-top: 0px;
+    padding-top: 10px;
+    margin-right: 0px; }
+    .navbar .navbar-brand #home {
+      margin-right: 10px; }
+    .navbar .navbar-brand .iobio {
+      font-size: 28px; }
+    .navbar .navbar-brand .iobioapp {
+      font-size: 28px; }
+  .navbar #bloodhound .typeahead {
+    min-width: 125px;
+    max-width: 125px;
+    font-size: 16px !important; }
+  .navbar .tt-input, .navbar .tt-hint {
+    padding: 1px 1px !important;
+    font-size: 16px !important;
+    line-height: 22px; }
+  .navbar ul.nav > li.optional {
+    display: none; }
+  .navbar ul.nav > li .navbar-form {
+    margin-left: 10px;
+    margin-right: 10px; }
+  .navbar ul.nav > li > a {
+    padding-right: 11px;
+    padding-left: 11px; }
+    .navbar ul.nav > li > a .material-icons {
+      display: none; }
+    .navbar ul.nav > li > a svg {
+      display: none; }
+  .navbar ul.nav > li .navbar-form {
+    padding-right: 5px;
+    padding-left: 2px; } }
+@media screen and (max-width: 934px) {
+  .navbar ul.nav > li > a {
+    font-size: 12px;
+    padding-right: 6px;
+    padding-left: 6px; }
+    .navbar ul.nav > li > a p.wrapped.wide {
+      width: 60px; } }
 
 /*# sourceMappingURL=site-mygene2-basic.css.map */
