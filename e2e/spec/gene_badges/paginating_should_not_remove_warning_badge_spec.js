@@ -24,6 +24,7 @@ module.exports = {
     appTitleSection.selectGene('STK11');
 
     appTitleSection.openDataMenu();
+    dataCard.selectBuild();
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 

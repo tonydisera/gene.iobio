@@ -19,7 +19,7 @@ module.exports = {
     indexPage.load();
     sliderIconBar.clickFindGenes();
     findGenesPanel.clickACMG56Genes();
-    indexPage.waitForElementVisible('@matrixTrack', 60000);
+    indexPage.waitForElementVisible('@transcriptCard', 60000);
     appTitleSection.orderGenesByGeneName();
     appTitleSection.section.firstGeneBadge.expect.element('@name').text.to.equal('ACTA2');
     appTitleSection.goToPage(2);

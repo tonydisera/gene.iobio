@@ -17,6 +17,7 @@ module.exports = {
   'Loading Platinum Single shows the correct cards (only proband)': function(client) {
     indexPage.load();
     appTitleSection.openDataMenu();
+    dataCard.selectBuild();
     dataCard.selectSingle();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();

@@ -19,6 +19,7 @@ module.exports = {
     indexPage.load();
     appTitleSection.openDataMenu();
     dataCard.selectSingle();
+    dataCard.selectBuild();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
     sliderIconBar.clickFindGenes();
