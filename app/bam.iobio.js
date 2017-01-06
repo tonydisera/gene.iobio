@@ -52,6 +52,12 @@ var Bam = Class.extend({
     this.bamFile = null;
     this.baiFile = null;
     this.bamUri = null;
+    this.header = null;
+    this.headerStr =  null;
+   },
+
+   isEmpty: function() {
+    return this.bamFile == null && this.bamUri == null;
    },
 
    makeBamBlob: function(callback) {
@@ -542,101 +548,6 @@ var Bam = Class.extend({
    },
 
 
-   getFreebayesVariants: function(refName, regionStart, regionEnd, regionStrand, isRefSeq, callback) {
-
-    var me = this;
-    this.transformRefName(refName, function(trRefName){
-
-      var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      
-      //  Figure out the reference sequence file path
-      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
-      
-      var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
-
-      var cmd = null;
-      // When file served remotely, first run samtools view, then run samtools mpileup.
-      // When bam file is read as a local file, just stream sam records for region to
-      // samtools mpileup.
-      if (me.sourceType == "url") {
-        //cmd = new iobio.cmd("nv-green.IOBIO.io/samtools/", ['view', '-b', me.bamUri, regionArg],
-        cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
-         {
-            'urlparams': {'encoding':'binary'},
-            ssl: useSSL
-          });
-
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFile], {ssl: useSSL});
-      } else {
-
-        var writeStream = function(stream) {
-           stream.write(me.header.toStr);
-           me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
-              stream.write(data);
-              stream.end();
-           }, {noHeader:true});
-        }
-        
-        cmd = new iobio.cmd(samtools, ['view -b',  writeStream ],
-            {
-              'urlparams': {'encoding':'binary'},
-              ssl: useSSL
-            });
-        cmd = cmd.pipe(IOBIO.freebayes, [ '--stdin', '-f', refFastaFile], {ssl: useSSL});
-      }
-
-
-      cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-'], {ssl: useSSL});
-      //cmd = cmd.pipe(IOBIO.vcflib, ['vcffilter', '-f', '\"QUAL > 1\"']);
-
-
-      //
-      // NEW CODE - Annotate variants that were just called from freebayes
-      //
-     
-      // bcftools to append header rec for contig
-      var contigStr = "";
-      getHumanRefNames(refName).split(" ").forEach(function(ref) {
-          contigStr += "##contig=<ID=" + ref + ">\n";
-      })
-      var contigNameFile = new Blob([contigStr])
-      //cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile])
-
-      // Get Allele Frequencies from 1000G and ExAC
-      //cmd = cmd.pipe(IOBIO.af)
-
-      // VEP to annotate
-      var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
-      if (isRefSeq) {
-        vepArgs += " --refseq "
-      }
-      //cmd = cmd.pipe(IOBIO.vep, [vepArgs]);
-
-
-      
-      var variantData = "";
-      cmd.on('data', function(data) {
-          if (data == undefined) {
-            return;
-          }
-
-          variantData += data;
-      });
-
-      cmd.on('end', function() {
-        callback(variantData);
-      });
-
-      cmd.on('error', function(error) {
-        console.log(error);
-      });
-
-      cmd.run();
-
-    });
-
-   },
-
 
    freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
     var me = this;
@@ -736,14 +647,20 @@ var Bam = Class.extend({
         cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
 
         // VEP to annotate
-        var vepArgs = " --assembly " + genomeBuildHelper.getCurrentBuildName();
+        var vepArgs = [];
+        vepArgs.push(" --assembly");
+        vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+        vepArgs.push(" --format vcf");
         if (isRefSeq) {
-          vepArgs += " --refseq "
+          vepArgs.push("--refseq");
         }
         // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
         // since we won't have the original vcf records as input
-        vepArgs += " --hgvs  --check_existing ";
-        cmd = cmd.pipe(IOBIO.vep, [vepArgs], {ssl: useSSL});
+        vepArgs.push("--hgvs");
+        vepArgs.push("--check_existing");
+        vepArgs.push("--fasta");
+        vepArgs.push(refFastaFile);
+        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
 
 
         

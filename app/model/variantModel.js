@@ -1055,63 +1055,55 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 
 		// Is the data already cached?  If so, we are done
 		var vcfData = me._getCachedData("vcfData", geneObject.gene_name, transcript);
-		if (vcfData != null && vcfData != '') {			
+		if (vcfData != null && vcfData != '') {	
+			// Do we already have the variants cached?  If so, just return that data.		
 			resolve(vcfData);
+		}  else if (autoCall && !me.isVcfReadyToLoad()) {	
+			// We should never get to this condition because if no vcf was supplied, then
+			// cacheHelper would have performed joint calling on bams
+			reject();
 		} else {
+			// We don't have the variants for the gene in cache, 
+			// so call the iobio services to retreive the variants for the gene region 
+			// and annotate them.
+			me._promiseVcfRefName(ref).then( function() {
+				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
+				.then( function(data) {
+					// Associate the correct gene with the data
+			    	var theGeneObject = null;
+			    	for( var key in window.geneObjects) {
+			    		var go = geneObjects[key];
+			    		if (me.getVcfRefName(go.chr) == data.ref &&
+			    			go.start == data.start &&
+			    			go.end == data.end &&
+			    			go.strand == data.strand) {
+			    			theGeneObject = go;
+			    			data.gene = theGeneObject;
+			    		}
+			    	}
+			    	if (theGeneObject) {
+			    		// Flag any bookmarked variants
+					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
 
-			
-			// If no vcf supplied (only alignments provided), automatically call variants 
-			if (autoCall && !me.isVcfReadyToLoad()) {	
-				me._promiseCacheCalledVariants(ref, geneObject, transcript).then(function (data) {
-					resolve(data);
-				});
-			} else {
+				    	// Cache the data
+					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+						resolve(data);				    	
+				    } else {
+				    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
+				    }
+			    	
 
-				// We don't have the variants for the gene in cache, 
-				// so call the iobio services to retreive the variants for the gene region 
-				// and annotate them.
-				me._promiseVcfRefName(ref).then( function() {
-					me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
-					.then( function(data) {
-						// Associate the correct gene with the data
-				    	var theGeneObject = null;
-				    	for( var key in window.geneObjects) {
-				    		var go = geneObjects[key];
-				    		if (me.getVcfRefName(go.chr) == data.ref &&
-				    			go.start == data.start &&
-				    			go.end == data.end &&
-				    			go.strand == data.strand) {
-				    			theGeneObject = go;
-				    			data.gene = theGeneObject;
-				    		}
-				    	}
-				    	if (theGeneObject) {
-				    		// Flag any bookmarked variants
-						    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+			    }, function(error) {
+			    });
+			}, function(error) {
+				var isValid = false;
+				// for caching, treat missing chrX as a normal case.
+				if (ref != null && ref.toUpperCase().indexOf("X")) {
+					isValid = true;
+				}
 
-					    	// Cache the data
-						   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
-							resolve(data);				    	
-					    } else {
-					    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
-					    }
-				    	
-
-				    }, function(error) {
-				    });
-				}, function(error) {
-					var isValid = false;
-					// for caching, treat missing chrX as a normal case.
-					if (ref != null && ref.toUpperCase().indexOf("X")) {
-						isValid = true;
-					}
-
-					reject({isValid: isValid, message: "missing reference"});
-				});
-
-
-			}
-
+				reject({isValid: isValid, message: "missing reference"});
+			});
 		}
 
 	});
