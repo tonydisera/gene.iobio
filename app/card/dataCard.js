@@ -265,8 +265,7 @@ DataCard.prototype.loadMygene2Data = function() {
 		window.matrixCard.reset();		
 	};
 
-	loadProband();
-	/*
+
 
 	var missingVariables = "";
 	if (mygene2Endpoint == "") {
@@ -312,8 +311,6 @@ DataCard.prototype.loadMygene2Data = function() {
 		    }
 		});
 	}
-	*/
-	
 
 }
 
