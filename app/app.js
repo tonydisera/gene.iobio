@@ -1937,16 +1937,16 @@ function getRidOfDuplicates(genes) {
 function loadTracksForGene(bypassVariantCards) {
 
 	hideIntro();
-
-	$('#nav-section').removeClass("hide");
-
-
-	genesCard.showGeneBadgeLoading(window.gene.gene_name);
-
 	if (window.gene == null || window.gene == "" && !isLevelBasic) {
 		$('.twitter-typeahead').animateIt('tada');
 		return;
 	} 
+
+
+	$('#nav-section').removeClass("hide");
+
+	genesCard.showGeneBadgeLoading(window.gene.gene_name);
+
 	if (!bypassVariantCards && !isDataLoaded()) {
 		$('#add-data-button').animateIt('tada', 'animate-twice');
 	}
