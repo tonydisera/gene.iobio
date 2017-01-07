@@ -68,14 +68,18 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
 			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
-			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'}
+			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'},
+			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
+			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'}
 		}
 	} else if (filterName == me.RECESSIVE) {
 		annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
 			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
-			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'}
+			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'},
+			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
+			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'}
 		}
 	} else if (filterName == me.PREDICTED_PROTEIN_IMPACT) {
 		annots = 	{
@@ -84,8 +88,10 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			afexac_rare:      {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
 			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
 			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
-			polyphen_probably_damaging: {key: 'polyphen',label: "PolyPhen",         state: true, value: 'polyphen_probably_damaging', valueDisplay: 'probably damaging'},
-			polyphen_possibly_damaging: {key: 'polyphen',label: "Polyphen",         state: true, value: 'polyphen_possibly_damaging', valueDisplay: 'possibly damaging'}
+			polyphen_probably_damaging:      {key: 'polyphen',label: "PolyPhen",   state: true, value: 'polyphen_probably_damaging',      valueDisplay: 'probably damaging'},
+			polyphen_possibly_damaging:      {key: 'polyphen',label: "Polyphen",   state: true, value: 'polyphen_possibly_damaging',      valueDisplay: 'possibly damaging'},
+			sift_deleterious:                {key: 'sift',    label: "SIFT",       state: true, value: 'sift_deleterious',                valueDisplay: 'deleterious'},
+			sift_deleterious_low_confidence: {key: 'sift',    label: "SIFT",       state: true, value: 'sift_deleterious_low_confidence', valueDisplay: 'deleterious (low confidence)'}
 		}
 	} else if (filterName == me.FUNCTIONAL_IMPACT) {
 		annots = 	{
