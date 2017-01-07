@@ -1,4 +1,5 @@
 #filter-track
+	margin-top: 0px
 	margin-bottom: 80px
 
 	h4
@@ -8,12 +9,52 @@
 		margin-bottom: 5px
 
 
+	#filter-panel
+		font-size: 12px
+		color: rgb(102, 88, 92)
+		fill: rgb(102, 88, 92)
+		margin-top: 2px
+		overflow-y: auto
+
+	#standard-filter-panel
+		float: left
+		margin-top: -20px
+		display: flex
+		flex-direction: column
+		width: 335px
+		justify-content :space-between	
+
+		.standard-filter-btn
+			padding: 4px
+			width: 220px
+			margin-bottom: 0px
+			margin-top: 5px
+			font-size: 12px
+
+			span
+				margin-left: -17px
+
+			i.done
+				font-size: 17px
+				color: $current-color
+				font-weight: bold
+				padding-right: 1px
+				float: left
+				padding-left: 10px
+				visibility: hidden
+				display: initial
+
+			&.current
+				i.done
+					visibility: visible
+
 	#clear-filters-link
 		padding-top:  0px
 		padding-bottom: 0px
-		margin-top: 0px
+		margin-top: 4px
 		margin-bottom: 0px 
 		color: $text-color !important
+		float: right
 
 
 	.checkbox
@@ -28,3 +69,5 @@
 		text
 			font-size: 12px !important
 			fill: $text-color !important
+
+	

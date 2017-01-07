@@ -8,7 +8,13 @@ function FilterCard() {
 	this.pathogenicityScheme = "clinvar";
 	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter";
 	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Allele Freq ExAC, Allele Freq 1000G, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
-
+	
+	// standard filters
+	this.KNOWN_CAUSATIVE           = "known_causative";
+	this.DENOVO                    = "denovo";
+	this.RECESSIVE                 = "recessive";
+	this.PREDICTED_PROTEIN_IMPACT  = "predicted_protein_impact";
+	this.FUNCTIONAL_IMPACT         = "functional_impact";
 }
 
 FilterCard.prototype.shouldWarnForNonPassVariants = function() {
@@ -42,6 +48,65 @@ FilterCard.prototype.autoSetFilters = function() {
 
 }
 
+FilterCard.prototype.setStandardFilter = function(button, filterName) {
+	var me = this;
+	me.clearFilters();
+	$(button).addClass('current');
+	var annotes = null;
+	if (filterName == me.KNOWN_CAUSATIVE) {
+		annots = 	{
+			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
+			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
+			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			clinvar_path:     {key: 'clinvar',       label: "ClinVar",           state: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
+			clinvar_lpath:    {key: 'clinvar',       label: "ClinVar",           state: true, value: 'clinvar_lpath',    valueDisplay: 'likely pathogenic'}
+		}
+	} else if (filterName == me.DENOVO) {
+		annots = 	{
+			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'}
+		}
+	} else if (filterName == me.RECESSIVE) {
+		annots = 	{
+			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'}
+		}
+	} else if (filterName == me.PREDICTED_PROTEIN_IMPACT) {
+		annots = 	{
+			af1000g_rare:     {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
+			afexac_rare:      {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
+			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			polyphen_probably_damaging: {key: 'polyphen',label: "PolyPhen",         state: true, value: 'polyphen_probably_damaging', valueDisplay: 'probably damaging'},
+			polyphen_possibly_damaging: {key: 'polyphen',label: "Polyphen",         state: true, value: 'polyphen_possibly_damaging', valueDisplay: 'possibly damaging'}
+		}
+	} else if (filterName == me.FUNCTIONAL_IMPACT) {
+		annots = 	{
+			af1000g_rare:     {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
+			afexac_rare:      {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
+			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
+			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'}
+		}
+	}
+
+
+	me.annotsToInclude = annots;
+	for (var key in me.annotsToInclude) {
+		var annot = me.annotsToInclude[key];
+		d3.select('#filter-track #' + key + "." + annot.key).classed("current", true);
+	}
+}
+
 FilterCard.prototype.getFilterObject = function() {
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
 	if (isLevelBasic) {
@@ -49,6 +114,8 @@ FilterCard.prototype.getFilterObject = function() {
 			af1000g_rare:     {key: 'af1000glevels', state: true, value: 'af1000g_rare'},
 			exac_rare:        {key: 'afexaclevels',  state: true, value: 'afexac_rare'},
 			afexac_unique_nc: {key: 'afexaclevels',  state: true, value: 'afexac_unique_nc'},
+			clinvar_path:     {key: 'clinvar',       state: true, value: 'clinvar_path'},
+			clinvar_lpath:    {key: 'clinvar',       state: true, value: 'clinvar_lpath'},
 			clinvar_uc:       {key: 'clinvar',       state: true, value: 'clinvar_uc'},
 			clinvar_cd:       {key: 'clinvar',       state: true, value: 'clinvar_cd'},
 			clinvar_other:    {key: 'clinvar',       state: true, value: 'clinvar_other'},
@@ -415,6 +482,8 @@ FilterCard.prototype.clearFilters = function() {
 	
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = {};
+
+	d3.selectAll('.standard-filter-btn').classed('current', false);
 	
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
 	d3.select('#recfilter-flag').classed("hide", true);

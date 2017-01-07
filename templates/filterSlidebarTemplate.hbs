@@ -3,8 +3,37 @@
   <div class="card-label">Filter Variants</div>
 
   <button id="clear-filters-link" class="icon-button-sm btn btn-default btn-raised" onclick="filterCard.clearFilters();filterVariants()">
-    Clear filters
+    Clear 
   </button>
+
+  <div id="standard-filter-panel">
+     <button class="standard-filter-btn btn btn-default btn-raised" 
+      onclick="filterCard.setStandardFilter(this, 'known_causative');filterVariants()">
+      <i class="done material-icons glyph">done</i>
+      <span>Known Causative</span>
+     </button>
+     <button class="standard-filter-btn btn btn-default btn-raised" 
+      onclick="filterCard.setStandardFilter(this, 'denovo');filterVariants()">
+      <i class="done material-icons glyph">done</i>
+      <span>De novo, rare</span>
+     </button>
+     <button class="standard-filter-btn btn btn-default btn-raised" 
+      onclick="filterCard.setStandardFilter(this, 'recessive');filterVariants()">
+      <i class="done material-icons glyph">done</i>
+      <span>Recessive, rare</span>
+     </button>
+     <button class="standard-filter-btn btn btn-default btn-raised" 
+      onclick="filterCard.setStandardFilter(this, 'predicted_protein_impact');filterVariants()">
+      <i class="done material-icons glyph">done</i>
+      <span>Predicted protein impact, rare</span>
+     </button>
+     <button class="standard-filter-btn btn btn-default btn-raised" 
+      onclick="filterCard.setStandardFilter(this, 'functional_impact');filterVariants()">
+      <i class="done material-icons glyph">done</i>
+      <span>Functional impact, rare</span>
+     </button>
+
+  </div>
 
 
   <div style="display:flex;flex-direction:row;width:335px;justify-content:space-between">
