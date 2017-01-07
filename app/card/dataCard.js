@@ -218,9 +218,19 @@ DataCard.prototype.loadDemoData = function() {
 
 		reloadGeneFromUrl();
 	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber].length > 0) {
-		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber][0]);
-		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber].join(","));
-		reloadGeneFromUrl();
+		var theGenes       = me.eduTourGenes[+eduTourNumber];
+		window.updateUrl("gene", theGenes[0]);
+		window.updateUrl("genes", theGenes.join(",") );
+
+		me.mode = "single";
+		genomeBuildHelper.setCurrentBuild(me.demoBuild);
+		me.setVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,   me.demoSampleNames.proband, me.demoUrls.proband);
+		
+		window.loadTracksForGene();
+		window.cacheHelper.clearCache();
+		window.matrixCard.reset();	
+		genesCard.selectGene(theGenes[0]);
+	
 	} else {
 		loadUrlSources();
 

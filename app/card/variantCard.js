@@ -1772,12 +1772,17 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		return;
 	}
 
-	if (lock  && !isLevelEdu && !isLevelBasic)  {
-		matrixCard.unpin(true);
-		var screenX = variant.screenX;
-		var screenY = variant.screenY;
-		eduTourCheckVariant(variant);
+	var screenX = variant.screenX;
+	var screenY = variant.screenY;
 		
+	if (lock) {
+		matrixCard.unpin(true);		
+		if (isLevelEduTour) {
+			eduTourCheckVariant(variant);
+		}
+	}
+
+	if (lock  && !isLevelEdu && !isLevelBasic)  {
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);
 		
@@ -1825,10 +1830,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 	var x = variant.screenX + 7;
 	var y = variant.screenY - 27;
-	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
-		y -= $('#nav-edu-tour').outerHeight();
-	}
-
+	
 	
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, x, y, me);
 

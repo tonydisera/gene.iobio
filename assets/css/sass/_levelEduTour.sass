@@ -6,7 +6,10 @@ body
 	margin-top:  0px !important
 
 #container
-	margin-top: -40px !important
+	top: 102px !important
+
+#genes-control-track
+	padding-top: 0px !important
 
 #edu-tour-modal 
 	top: 5%
@@ -47,12 +50,14 @@ body
 .card-label
 	font-size: 16px !important
 
+#matrix-panel
+	margin-top: -15px !important
+
+
 
 
 #gene-badge-container
 	padding-bottom: 6px !important
-	margin-left: 200px !important
-	margin-right: 200px	 !important
 
 	#manage-genes
 //		display: inline-block !important
@@ -61,9 +66,27 @@ body
 		visibility: hidden !important
 
 
+#app-title-section
+	min-height:  initial !important
+
 #gene-badge
+	height: 28px !important
+	margin-bottom: 0px !important
+	margin-top: 8px !important
+
 	&:hover #gene-badge-remove
 		visibility: hidden !important
+
+	#gene-badge-button
+		height: 28px !important
+
+		#gene-badge-name
+			margin-top: 2px
+
+		.gene-badge-loader.glyph
+			width: 16px !important
+			height: 16px !important
+			padding-top: 0px !important
 
 #slider-left
 	top: 102px !important
@@ -84,12 +107,14 @@ body
 
 #nav-edu-tour
 	background-color:  $tour-background-color
-	margin-bottom: 12px
 	display: block !important
 	height: 100px
 	width: 100%
 	text-align: center
 	padding-top: 20px
+	position: fixed
+	top: 0px
+	z-index: 1900
 
 	#start-over
 		float: left !important
@@ -145,7 +170,15 @@ body
 	padding-top: 0px !important
 
 .nav-center
-	margin-top: -30px !important
+	margin-top: 0px !important
+
+#vcf-track
+	#vcf-variants
+		svg	
+			margin-top: -20px !important
+
+body#tlypageguide-open
+	overflow-y: hidden !important
 
 #tlyPageGuideWrapper 
 	#tlyPageGuideMessages
@@ -158,11 +191,18 @@ body
 		padding-right: 0px !important
 		padding-top: 10px !important
 		z-index: 2000 !important
-		min-height: 100px
+		min-height: 50px !important
+
+		.tlypageguide_text
+			margin-left: 10px !important
+			margin-right: 50px !important
+			margin-bottom: 0px !important
+			margin-top: 0px !important
 
 		.pageguide-nav
 			bottom:  initial !important
 			top: 30px !important
+			margin-top: 0px !important
 
 
 		a.pageguide-close

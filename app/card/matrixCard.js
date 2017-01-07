@@ -13,7 +13,7 @@ function MatrixCard() {
 
 	this.ROW_LABEL_WIDTH           = 140;
 	this.ROW_LABEL_WIDTH_BASIC     = 25;
-	this.ROW_LABEL_WIDTH_EDU       = 100;
+	this.ROW_LABEL_WIDTH_EDU       = 130;
 
 	this.clinvarMap     = {
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
@@ -272,6 +272,7 @@ MatrixCard.prototype.init = function() {
 		if (!isLevelEduTour || eduTourNumber != 1) {
 			this.removeRow('Inheritance Mode', me.matrixRows);
 		}
+		this.removeRow('Most severe impact (VEP)', me.matrixRows);
 		this.removeRow('Affected Siblings', me.matrixRows);
 		this.removeRow('Unaffected Siblings', me.matrixRows);
 		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
@@ -560,12 +561,19 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 		return;
 	}
 
-	if (lock && !isLevelEdu && !isLevelBasic) {
-		getProbandVariantCard().unpin(true);
-		eduTourCheckVariant(variant);
+	var xMatrix = variant.screenXMatrix;
+	var yMatrix = variant.screenYMatrix;
 
-		var xMatrix = variant.screenXMatrix;
-		var yMatrix = variant.screenYMatrix;
+	if (lock) {
+		getProbandVariantCard().unpin(true);
+
+		if (isLevelEduTour) {
+			eduTourCheckVariant(variant);
+		}
+	}
+	
+	if (lock && !isLevelEdu && !isLevelBasic) {
+
 
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(variant, true)
@@ -1231,7 +1239,7 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 	if (variant) {
 		type = variant.type;
 		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
-	} else {
+	} else  {
 		type = selection.datum().type;
 		transform1 = selection.datum().transform || "translate(1,1)";
 		transform2 = selection.datum().transform || "translate(5,5)";

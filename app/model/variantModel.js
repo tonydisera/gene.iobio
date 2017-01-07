@@ -1023,7 +1023,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 			    	} else {
 			    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
-			    		console(error);
+			    		console.log(error);
 			    		reject(error);
 			    	}
 

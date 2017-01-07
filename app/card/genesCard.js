@@ -307,7 +307,7 @@ GenesCard.prototype.initEditGenes = function() {
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
 	
-	if (geneNames.length > 1) {
+	if (geneNames.length > 1 || isLevelEdu) {
 		$('#genes-control-track').removeClass("hide");
 		$('#genes-panel').removeClass("hide");
 	} else {
@@ -406,7 +406,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		$('#gene-page-selection').html("");
 	}
 
-	if (geneNames.length > 1) {
+	if (geneNames.length > 1 || isLevelEdu) {
 		$('#genes-control-track').removeClass("hide");
 		$('#genes-panel').removeClass("hide");
 	} else {
@@ -507,7 +507,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 		geneBadge.addClass("selected");
 		if (isLevelBasic) {		
 			selectGeneInDropdown(geneNameToSelect, selectTheGene);
-		} else if (isMygene2) {
+		} else if (isMygene2 || isLevelEdu ) {
 			me.selectGene(geneNameToSelect);
 		}
 

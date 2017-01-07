@@ -1,5 +1,9 @@
 function VariantTooltip() {
 	this.examinedVariant = null;
+	this.WIDTH_LOCK         = 650;
+	this.WIDTH_HOVER        = 360;
+	this.WIDTH_SIMPLE       = 280;
+	this.WIDTH_SIMPLE_WIDER = 500;
 }
 
 VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html) {
@@ -14,7 +18,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		tooltip.classed("level-edu", "true");
 	} 
 
-	tooltip.classed("tooltip-wide", lock);
+	tooltip.classed("tooltip-wide", lock && !isLevelEdu);
 	
 	if (html == null) {
 		if (lock) {
@@ -34,12 +38,9 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	me.createAlleleCountSVGTrio(variantCard, selection, variant, lock ? 150 : null);
 
 
-	var widthSimpleTooltip = 220;
-	if ($(tooltip[0]).find('.col-sm-8').length > 0) {
-		widthSimpleTooltip = 500;
-	}
 
- 	var w = isLevelEdu  || isLevelBasic ? widthSimpleTooltip : (lock ? 650 : 360);
+	var hasLongText = $(tooltip[0]).find('.col-sm-8').length > 0  || $(tooltip[0]).find('.col-sm-9').length > 0;
+ 	var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? me.WIDTH_LOCK : me.WIDTH_HOVER);
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	var x = screenX;
@@ -51,9 +52,6 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	x = sidebarAdjustX(x);
 
 
-	if (isLevelEduTour && !$('#slider-left').hasClass('hide')) {
-		y -= $('#nav-edu-tour').outerHeight();
-	}
 
 	if (x-33 > 0 && (x-33+w) < $('#matrix-panel').outerWidth()) {
 		tooltip.classed("arrow-down-left", true);
@@ -139,18 +137,22 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 		for (impact in impactList) {
 			var theClazz = 'impact_' + impact;	
-			$(selector + " .tooltip-value.impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
-			var selection = d3.select(selector + ' .impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: translate, type: variant.type}]);
-			matrixCard.showImpactBadge(selection);	
+			if ($(selector + " .tooltip-value.impact-badge").length > 0) {			
+				$(selector + " .tooltip-value.impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
+				var selection = d3.select(selector + ' .impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: translate, type: variant.type}]);
+				matrixCard.showImpactBadge(selection);	
+			}
 		}		
 
 		if ($(selector + " .tooltip-value.highest-impact-badge").length > 0) {
 			var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
 			for (impact in highestImpactList) {
 				var theClazz = 'impact_' + impact;	
-				$(selector + " .tooltip-value.highest-impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
-				var selection = d3.select(selector + ' .highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: translate, type: variant.type}]);
-				matrixCard.showImpactBadge(selection);	
+				if ($(selector + " .tooltip-value.highest-impact-badge").length > 0) {				
+					$(selector + " .tooltip-value.highest-impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
+					var selection = d3.select(selector + ' .highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: translate, type: variant.type}]);
+					matrixCard.showImpactBadge(selection);	
+				}
 			}
 		}
 
@@ -757,15 +759,15 @@ VariantTooltip.prototype._tooltipLabeledRow = function(value1, value2, paddingTo
 VariantTooltip.prototype._tooltipWideHeadingRow = function(value1, value2, paddingTop) {
 	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
 	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
-	      + '<div class="col-sm-3 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '<div class="col-sm-4 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 VariantTooltip.prototype._tooltipWideHeadingSecondRow = function(value1, value2, paddingTop) {
 	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
 	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
-	      + '<div class="col-sm-3 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 

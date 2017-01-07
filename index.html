@@ -211,7 +211,7 @@
   <div id="modals-placeholder"></div>
 
   <div id="container" class="push">
-    <div id="genes-control-track" class="hide level-basic level-edu shadow-z-2">
+    <div id="genes-control-track" class="hide level-basic shadow-z-2">
           <div id="filters" class="hide">
 
           </div>
@@ -223,7 +223,7 @@
 
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
-            <div style="text-align:center">
+            <div class="level-edu" style="text-align:center">
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
@@ -318,7 +318,7 @@
       </section>          
     </div>
     
-    <div id="nav-section" class="fixed hide">
+    <div id="nav-section" class="fixed level-edu hide">
 
       <div id="intro" class="hide level-basic shadow-z-2">
       </div>
@@ -443,7 +443,7 @@
             
             <div style="overflow:auto;text-align:left;margin-bottom: 5px;">
               <div class="card-label level-edu level-basic" style="float:left">Rank Variants</div>
-              <a id="show-legend"  onclick="showLegend()" href="javascript:void(0)">
+              <a id="show-legend" class="level-edu level-basic"  onclick="showLegend()" href="javascript:void(0)">
                 <i style="font-size:18px" class="material-icons">map</i>
                 Show legend
               </a>
@@ -492,7 +492,7 @@
                   </div>
 
                 </div>
-                <div style="display: inline-block;vertical-align: top;">
+                <div class="level-edu" style="display: inline-block;vertical-align: top;">
                   <span id="low-quality-legend" >
                       <div id="low-quality-legend-box"></div>
                   </span>
