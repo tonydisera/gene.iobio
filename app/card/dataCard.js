@@ -269,7 +269,9 @@ DataCard.prototype.loadMygene2Data = function() {
 			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
 		}
 		window.loadTracksForGene();
-		window.showSidebar("Phenolyzer");
+		if (isLevelBasic) {
+			window.showSidebar("Phenolyzer");
+		}
 
 		window.cacheHelper.clearCache();
 		window.matrixCard.reset();		

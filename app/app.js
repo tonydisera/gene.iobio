@@ -1085,7 +1085,9 @@ function loadGeneFromUrl() {
 
 
 	if (isMygene2) {
-		showSidebar("Phenolyzer");
+		if (isLevelBasic) {
+			showSidebar("Phenolyzer");
+		}
 		dataCard.loadMygene2Data();
 	} else if (isLevelEdu) {
 		if (isLevelEduTour && eduTourShowPhenolyzer[+eduTourNumber-1]) {
