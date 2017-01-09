@@ -32,6 +32,8 @@ function DataCard() {
 		father: true
 	};
 
+	this.demoGenes =  ["RAI1","AIRE","MYLK2"];
+
 	this.demoNames = {
 		proband: 'NA19240',
 		mother:  'NA19238',
@@ -208,8 +210,8 @@ DataCard.prototype.loadDemoData = function() {
 
 	
 	if (!window.isLevelEdu) {
-		window.updateUrl("gene", "RAI1");
-		window.updateUrl("genes", "RAI1,AIRE,MYLK2");
+		window.updateUrl("gene", me.demoGenes[0]);
+		window.updateUrl("genes", me.demoGenes.join(","));
 
 		cacheHelper.clearCache();
 		window.matrixCard.reset();
@@ -247,22 +249,19 @@ DataCard.prototype.loadMygene2Data = function() {
 			// If the genome build was specified, load the endpoint variant file
 			if (genomeBuildHelper.getCurrentBuild()) {
 				me.setVcfUrl("proband", "Variants", null, probandUrl);
+
+				window.loadTracksForGene();
+				window.showSidebar("Phenolyzer");
+
+				window.cacheHelper.clearCache();
+				window.matrixCard.reset();		
+
 			} else {
 				alertify.alert("Cannot load data.  The genome build must be specified.");
 			}
 		} else {
-			// Load full demo wgs trio data if vcf file path was not provided via mygene2 data exchange
-			me.mode = "trio";
-			genomeBuildHelper.setCurrentBuild(me.demoBuild);
-			me.setVcfUrl("proband", "DEMO DATA", me.demoSampleNames.proband, me.demoUrls.proband);
-			me.setVcfUrl("mother",  "MOTHER",    me.demoSampleNames.mother, me.demoUrls.mother);
-			me.setVcfUrl("father",  "FATHER",    me.demoSampleNames.father, me.demoUrls.father);
+			me.loadDemoData();
 		}
-		window.loadTracksForGene();
-		window.showSidebar("Phenolyzer");
-
-		window.cacheHelper.clearCache();
-		window.matrixCard.reset();		
 	};
 
 	var missingVariables = "";
