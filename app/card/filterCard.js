@@ -48,6 +48,8 @@ FilterCard.prototype.getFilterObject = function() {
 			af1000g_rare:     {key: 'af1000glevels', state: true, value: 'af1000g_rare'},
 			exac_rare:        {key: 'afexaclevels',  state: true, value: 'afexac_rare'},
 			afexac_unique_nc: {key: 'afexaclevels',  state: true, value: 'afexac_unique_nc'},
+			clinvar_path:     {key: 'clinvar',       state: true, value: 'clinvar_path'},
+			clinvar_lpath:    {key: 'clinvar',       state: true, value: 'clinvar_lpath'},
 			clinvar_uc:       {key: 'clinvar',       state: true, value: 'clinvar_uc'},
 			clinvar_cd:       {key: 'clinvar',       state: true, value: 'clinvar_cd'},
 			clinvar_other:    {key: 'clinvar',       state: true, value: 'clinvar_other'},
