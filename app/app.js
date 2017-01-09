@@ -217,12 +217,11 @@ function determineStyle() {
 	var modeParm = getUrlParameter("mode");
 	if (modeParm && modeParm != "") {
 		isLevelBasic     = modeParm == "basic" ? true : false;
-		isLevelEduTour   = modeParm == "edutour" ? true : false;
-		isLevelEdu       = modeParm == "edutour" ? true : false;
+		isLevelEdu       = (modeParm == "edu" || modeParm == "edutour") ? true : false;
 	} 
 
-	if (isLevelEduTour) {
-		changeSiteStylesheet("assets/css/site-edutour.css");
+	if (isLevelEdu) {
+		changeSiteStylesheet("assets/css/site-edu.css");
 	} else if (isMygene2 && isLevelBasic) {
 		changeSiteStylesheet("assets/css/site-mygene2-basic.css");
 	} else if (isMygene2) {
@@ -241,7 +240,7 @@ function init() {
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
 	cacheHelper = new CacheHelper(loaderDisplay);
 
-	if (!isLevelEdu && !isLevelEduTour && !isMygene2) {
+	if (!isLevelEdu && !isMygene2) {
 		window.onbeforeunload = function () {
 		    launchTimestampToClear = cacheHelper.launchTimestamp;
 		    return "Are you sure you want to exit gene.iobio?";
@@ -257,7 +256,7 @@ function init() {
 	
 	// If we are using the gene.iobio education tour edition, automatically load 
 	// exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
-	if (isLevelEduTour && !getUrlParameter("tour")) {
+	if (isLevelEdu && !getUrlParameter("tour")) {
 		var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
 		window.location.assign(exhibitUrl);
 		return;			
@@ -273,7 +272,7 @@ function init() {
 	} 
 
 
-	if (!isLevelEduTour) {
+	if (!isLevelEdu) {
 		$('body').prepend(navbarTemplate());
 	}
 
@@ -354,11 +353,11 @@ function init() {
 	    .width(1000)
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEduTour ? 9 : 4})
+	    .margin({top:20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEduTour || isLevelBasic ? 32 : 16)
-	    .cdsHeight(isLevelEduTour  || isLevelBasic  ? 24 : 12)
+	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
+	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 12)
 	    .showLabel(false)
 	    .on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
@@ -415,8 +414,8 @@ function init() {
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 	    .showXAxis(false)
 	    .showBrush(false)
-	    .trackHeight(isLevelEduTour || isLevelBasic  ? 36 : 20)
-	    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 18)
+	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
+	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)
 	    .showLabel(true)
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
@@ -733,7 +732,7 @@ function showCoordinateFrame(x) {
 	var top = +$('#nav-section').outerHeight();
 	top    += +$('#matrix-track').outerHeight();
 	top    += 30;
-	if (isLevelEduTour && $('#slider-left').hasClass("hide")) {
+	if (isLevelEdu && $('#slider-left').hasClass("hide")) {
 		top += 50;
 	}
 
@@ -1090,7 +1089,7 @@ function loadGeneFromUrl() {
 		}
 		dataCard.loadMygene2Data();
 	} else if (isLevelEdu) {
-		if (isLevelEduTour && eduTourShowPhenolyzer[+eduTourNumber-1]) {
+		if (isLevelEdu && eduTourShowPhenolyzer[+eduTourNumber-1]) {
 			showSidebar("Phenolyzer");
 		}
 		dataCard.loadDemoData();
@@ -1282,7 +1281,7 @@ function loadUrlSources() {
 				loadTracksForGene( false );
 
 				if ((isLevelEdu || isLevelBasic) && $('#slider-left').hasClass("hide")) {
-					if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+					if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 						showSidebar("Phenolyzer");
 					}
 				}
@@ -1814,7 +1813,7 @@ function loadGeneWidget(callback) {
 				if (bam == null && vcf == null) {
 					// Open the 'About' sidebar by default if there is no data loaded when gene is launched
 					if (isLevelEdu) {
-						if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+						if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 							showSidebar("Phenolyzer");
 						}							
 					} else if (isLevelBasic) {
@@ -1826,7 +1825,7 @@ function loadGeneWidget(callback) {
 				if (bam == null && vcf == null) {
 					// Open the 'About' sidebar by default if there is no data loaded when gene is launched
 					if (isLevelEdu) {
-						if (!isLevelEduTour || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+						if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
 							showSidebar("Phenolyzer");
 						}							
 					} 
@@ -2373,7 +2372,7 @@ function showTranscripts(regionStart, regionEnd) {
 
 	// Show the gene transcripts.
     // Compress the tracks if we have more than 10 transcripts
-    if (!isLevelEduTour && !isLevelBasic) {
+    if (!isLevelEdu && !isLevelBasic) {
 	    if (transcripts.length > 10) {
 	    	transcriptChart.trackHeight(14);
 	    	transcriptChart.cdsHeight(10);

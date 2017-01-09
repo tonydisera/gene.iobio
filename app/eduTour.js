@@ -288,7 +288,7 @@ function eduTourCheckPhenolyzer() {
 	$('#select-phenotype-edutour')[0].selectize.on('change', function() {
 		var phenotype = $('#select-phenotype-edutour')[0].selectize.getValue().toLowerCase();
 		var correct = true;
-		if (isLevelEduTour && eduTourNumber == 1) {
+		if (isLevelEdu && eduTourNumber == 1) {
 			if (phenotype != 'colon_cancer') {
 				alertify.alert("Please select 'Colon cancer' to continue with this tour.")
 				correct = false;
@@ -308,7 +308,7 @@ function eduTourCheckPhenolyzer() {
 }
 
 function eduTourCheckVariant(variant) {
-	if (isLevelEduTour && eduTourNumber == "1" 
+	if (isLevelEdu && eduTourNumber == "1" 
 		&& pageGuideEduTour1.cur_idx == 4
 		&& variant.vepImpact[HIGH] != "HIGH" 
 		&& variant.start == 112116592 

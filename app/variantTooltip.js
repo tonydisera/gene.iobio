@@ -265,7 +265,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 		}formatContent
 		// Strip out "_" from effect
 		var tokens = key.split("_");
-		if (isLevelEdu || isLevelEduTour) {
+		if (isLevelEdu) {
 			effectDisplay = tokens.join(" ");
 		} else {
 			effectDisplay += tokens.join(" ");
@@ -520,7 +520,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 	
 	var dbSnpId = getRsId(variant);	
 
-	var genotypeRow = isLevelEduTour && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
+	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
 	var qualityWarningRow = "";
 	if (filterCard.shouldWarnForNonPassVariants()) {

@@ -3,7 +3,7 @@ function GenesCard() {
 	this.NUMBER_PHENOLYZER_GENES = 300;
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
 	this.GENES_PER_PAGE_DEFAULT = 40;
-	this.GENES_PER_PAGE = isLevelBasic || isLevelEduTour ? 99999 :  this.GENES_PER_PAGE_DEFAULT;
+	this.GENES_PER_PAGE = isLevelBasic || isLevelEdu ? 99999 :  this.GENES_PER_PAGE_DEFAULT;
 	this.ACMG56_GENES = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYLK", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S"];
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
@@ -56,7 +56,7 @@ GenesCard.prototype.init = function() {
 		$('#select-gene-sort')[0].selectize.setValue("");
 	});
 
-	$('#phenolyzer-select-range-end').val(isLevelEduTour ? 5 : 10);
+	$('#phenolyzer-select-range-end').val(isLevelEdu ? 5 : 10);
 	if (isLevelEdu) {
 		$('#select-phenotypes').attr("placeholder", "Enter symptoms...")
 	} else {
@@ -619,7 +619,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
    	phenolyzerGenes = [];
 
    	if (isOffline) {
-   		if (isLevelEduTour) {
+   		if (isLevelEdu) {
 			this._getPhenolyzerGenesExhibit(searchTerms)
    		} else {
 			this._getPhenolyzerGenesBasic(searchTerms)

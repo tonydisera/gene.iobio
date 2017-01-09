@@ -58,7 +58,7 @@ var NCBI_GENE_SUMMARY_URL         = "https://eutils.ncbi.nlm.nih.gov/entrez/euti
 /*
 * These variables control special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  For running one of the special educational edition 
-* tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
+* tours (e.g. a guided tour of the gene.iobio app), turn on isLevelEdu.
 */
 var hideNextButtonAnim      = false;  // is next button hidden on animations during edu tour?
 var hasTimeout              = false; // is a timeout based on n seconds of inactivity used?

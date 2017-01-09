@@ -264,12 +264,12 @@ MatrixCard.prototype.init = function() {
 		this.removeRow('Zygosity', me.matrixRows);
 		this.removeRow('Bookmark', me.matrixRows);
 
-		// Only show genotype on second educational tour
-		if (!isLevelEduTour || eduTourNumber != 2) {
+		// Only show genotype on second educational tour or level basic
+		if (!isLevelEdu || eduTourNumber != 2) {
 			this.removeRow('Genotype', me.matrixRows);
 		}
-		// Only show inheritance on first educational tour
-		if (!isLevelEduTour || eduTourNumber != 1) {
+		// Only show inheritance on first educational tour or level basic
+		if (!isLevelEdu || eduTourNumber != 1) {
 			this.removeRow('Inheritance Mode', me.matrixRows);
 		}
 		this.removeRow('Most severe impact (VEP)', me.matrixRows);
@@ -567,7 +567,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 	if (lock) {
 		getProbandVariantCard().unpin(true);
 
-		if (isLevelEduTour) {
+		if (isLevelEdu) {
 			eduTourCheckVariant(variant);
 		}
 	}

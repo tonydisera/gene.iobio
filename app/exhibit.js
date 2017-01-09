@@ -70,11 +70,11 @@ function stopVideo() {
 	//$("#stop").removeClass("disabled")
 }
 function showCaseStudy(tourNumber) {
-	var url = (isOffline ? "/?mode=edutour&tour=" : "./?mode=edutour&tour=") + tourNumber;
+	var url = (isOffline ? "/?mode=edutour&tour=" : "./?mode=edu&tour=") + tourNumber;
 	window.location.href = url;
 }
 function showNewCaseStudy() {
-	var url = (isOffline ? "/?mode=edutour&tour=" : "./?mode=edutour&tour=") + getUrlParameter("tour") + '&completedTour=' + getUrlParameter("completedTour");
+	var url = (isOffline ? "/?mode=edutour&tour=" : "./?mode=edu&tour=") + getUrlParameter("tour") + '&completedTour=' + getUrlParameter("completedTour");
 	window.location.href = url;
 }
 function showCaseStudies() {

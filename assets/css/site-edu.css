@@ -1,37 +1,12 @@
 .level-edu {
   display: none !important; }
 
-.nav-center {
-  margin-top: 0px !important; }
-
-#slider-left {
-  left: 0px !important;
-  background-color: transparent !important; }
-
-#container {
-  margin-left: 0px !important; }
-
 .fixed {
   left: 0px !important; }
-
-#slider-left.shadow-z-2 {
-  box-shadow: none !important; }
 
 #coordinate-frame {
   width: 25px !important;
   display: none !important; }
-
-.selectize-input {
-  font-size: 14px !important;
-  line-height: 17px !important; }
-
-.selectize-input input {
-  font-size: 14px !important;
-  line-height: 17px !important; }
-
-.selectize-dropdown {
-  font-size: 14px !important;
-  line-height: 17px !important; }
 
 .iobio {
   font-size: 32px !important;
@@ -43,23 +18,14 @@
   padding-top: 12px !important;
   margin-top: -5px !important; }
 
-.card-label {
-  text-transform: none !important; }
-
-.track-expand {
-  padding-top: 4px !important;
-  padding-bottom: 8px !important; }
-
 #region-track {
-  margin-bottom: 4px !important; }
+  margin-bottom: 4px !important;
+  display: block !important;
+  margin-left: 0px !important; }
 
 #variant-heading {
   min-width: 140px !important;
   max-width: 140px !important; }
-
-#region-track.level-edu {
-  display: block !important;
-  margin-left: 0px !important; }
 
 #gene-search-bar.level-edu {
   display: inline-block !important;
@@ -82,19 +48,6 @@
 
 #app-disclaimer-link-left.level-edu {
   display: none !important; }
-
-#gene-badge-button {
-  font-size: 14px !important;
-  padding: 3px 6px 3px 6px !important; }
-  #gene-badge-button .glyph {
-    padding-top: 2px !important;
-    font-size: 14px !important; }
-  #gene-badge-button #gene-badge-symbols.glyph {
-    padding-top: 0px !important;
-    font-size: 14px !important; }
-  #gene-badge-button #gene-badge-name {
-    padding-left: 2px;
-    padding-right: 2px; }
 
 #genes-card #phenolyzer-title {
   display: block !important;
@@ -125,31 +78,6 @@
 
 #displayed-variant-count-label-simple.level-edu {
   display: inline-block !important; }
-
-.variant-card {
-  padding-bottom: 1px !important; }
-  .variant-card #bottom-white-space {
-    display: none !important; }
-  .variant-card #bottom-white-space.level-edu {
-    display: block !important;
-    height: 5px; }
-  .variant-card #gene-box {
-    display: none !important;
-    background-color: rgba(93, 128, 157, 0.63);
-    border: solid thin #5d809d;
-    margin-left: 0px;
-    text-align: center;
-    color: white;
-    margin-top: -5px;
-    margin-bottom: 10px;
-    font-size: 18px !important; }
-    .variant-card #gene-box.deemphasize {
-      color: #5d809d !important;
-      border: solid thin transparent !important;
-      background-color: transparent !important;
-      font-size: 18px !important; }
-  .variant-card #gene-box.level-edu {
-    display: block !important; }
 
 #matrix-track #rank-variants-title {
   display: block !important; }
@@ -212,7 +140,8 @@ body {
   background: transparent !important; }
 
 .selectize-input {
-  font-size: 18px !important; }
+  font-size: 18px !important;
+  line-height: 20px !important; }
   .selectize-input input {
     font-size: 18px !important;
     line-height: 20px !important; }
@@ -232,13 +161,38 @@ body {
   margin-top: 3px !important;
   margin-bottom: 3px !important; }
 
-.variant-card #zoom-region-chart {
-  display: block;
-  margin-top: -20px !important;
-  padding-top: 0px !important; }
+.variant-card {
+  padding-bottom: 1px !important; }
+  .variant-card #bottom-white-space {
+    display: none !important; }
+  .variant-card #bottom-white-space.level-edu {
+    display: block !important;
+    height: 5px; }
+  .variant-card #gene-box {
+    display: none !important;
+    background-color: rgba(93, 128, 157, 0.63);
+    border: solid thin #5d809d;
+    margin-left: 0px;
+    text-align: center;
+    color: white;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    font-size: 18px !important; }
+    .variant-card #gene-box.deemphasize {
+      color: #5d809d !important;
+      border: solid thin transparent !important;
+      background-color: transparent !important;
+      font-size: 18px !important; }
+  .variant-card #gene-box.level-edu {
+    display: block !important; }
+  .variant-card #zoom-region-chart {
+    display: block;
+    margin-top: -20px !important;
+    padding-top: 0px !important; }
 
 .card-label {
-  font-size: 16px !important; }
+  font-size: 16px !important;
+  text-transform: none !important; }
 
 #matrix-panel {
   margin-top: -15px !important; }
@@ -249,23 +203,12 @@ body {
 #app-title-section {
   min-height: initial !important; }
 
-#gene-badge {
-  height: 28px !important;
-  margin-bottom: 0px !important;
-  margin-top: 8px !important; }
-  #gene-badge:hover #gene-badge-remove {
-    visibility: hidden !important; }
-  #gene-badge #gene-badge-button {
-    height: 28px !important; }
-    #gene-badge #gene-badge-button #gene-badge-name {
-      margin-top: 2px; }
-    #gene-badge #gene-badge-button .gene-badge-loader.glyph {
-      width: 16px !important;
-      height: 16px !important;
-      padding-top: 0px !important; }
-
 #slider-left {
-  top: 102px !important; }
+  top: 102px !important;
+  background-color: transparent !important; }
+
+#slider-left.shadow-z-2 {
+  box-shadow: none !important; }
 
 #edu-tour-modal .modal-content {
   background-color: rgba(81, 77, 77, 0.9) !important; }
@@ -505,19 +448,30 @@ span.arrow:after {
 .gene-card-label {
   font-size: 18px !important; }
 
-#gene-badge-button {
-  font-size: 18px !important;
-  padding: 4px 6px 2px 6px !important; }
-  #gene-badge-button .glyph {
-    padding-top: 4px !important; }
-  #gene-badge-button #gene-badge-symbols.glyph {
-    padding-top: 3px !important; }
-
-#gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
-  font-weight: bold; }
-
-#gene-badge-loaded {
-  font-size: 18px !important; }
+#gene-badge {
+  height: 28px !important;
+  margin-bottom: 0px !important;
+  margin-top: 8px !important; }
+  #gene-badge:hover #gene-badge-remove {
+    visibility: hidden !important; }
+  #gene-badge #gene-badge-loaded {
+    font-size: 18px !important; }
+  #gene-badge #gene-badge-button {
+    height: 28px !important;
+    font-size: 18px !important;
+    padding: 4px 6px 2px 6px !important; }
+    #gene-badge #gene-badge-button .glyph {
+      padding-top: 4px !important; }
+    #gene-badge #gene-badge-button #gene-badge-symbols.glyph {
+      padding-top: 3px !important; }
+    #gene-badge #gene-badge-button .gene-badge-loader.glyph {
+      width: 16px !important;
+      height: 16px !important;
+      padding-top: 0px !important; }
+    #gene-badge #gene-badge-button #gene-badge-name {
+      margin-top: 2px; }
+  #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
+    font-weight: bold; }
 
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
@@ -1299,7 +1253,9 @@ a {
     width: 15px;
     height: 15px;
     background-color: #dedede;
-    vertical-align: bottom; }
+    vertical-align: bottom;
+    float: left;
+    margin-top: 5px; }
 #matrix-track #low-quality-legend-text {
   width: 160px;
   float: left;
@@ -3240,7 +3196,7 @@ text.ref-count {
   margin-top: 0px;
   margin-bottom: 8px;
   margin-right: 10px;
-  height: 22px; }
+  height: 21px; }
 
 #gene-badge.loading {
   border-left: #dad26c solid 12px; }
@@ -3255,7 +3211,7 @@ text.ref-count {
 
 #gene-badge.phenolyzer #gene-badge-button {
   border: solid 1px #9FC2D0;
-  height: 22px; }
+  height: 21px; }
   #gene-badge.phenolyzer #gene-badge-button.user-visited {
     border: solid 2px #9FC2D0; }
 
@@ -3757,4 +3713,4 @@ text.ref-count {
     .navbar ul.nav > li > a p.wrapped.wide {
       width: 60px; } }
 
-/*# sourceMappingURL=site-edutour.css.map */
+/*# sourceMappingURL=site-edu.css.map */

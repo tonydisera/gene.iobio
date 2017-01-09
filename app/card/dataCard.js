@@ -157,7 +157,7 @@ DataCard.prototype.loadDemoData = function() {
 
 
 	if (isLevelEdu) {
-		var idx = isLevelEduTour ? +eduTourNumber : 0;
+		var idx = +eduTourNumber;
 		this.demoCards      = this.eduTourCards[idx];
 		this.demoUrls        = isOffline ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
 		this.demoNames       = this.eduTourNames[idx];
@@ -217,7 +217,7 @@ DataCard.prototype.loadDemoData = function() {
 
 
 		reloadGeneFromUrl();
-	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber].length > 0) {
+	} else if (window.isLevelEdu && this.eduTourGenes[+eduTourNumber].length > 0) {
 		var theGenes       = me.eduTourGenes[+eduTourNumber];
 		window.updateUrl("gene", theGenes[0]);
 		window.updateUrl("genes", theGenes.join(",") );

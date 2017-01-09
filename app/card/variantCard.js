@@ -177,7 +177,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 		// If the we are in guided tour mode, then clicking anywhere in the variant card unlocks
 		// any locked variant.
-		if (isLevelEduTour) {
+		if (isLevelEdu) {
 			me.cardSelector.on('click', function() {
 				//me.unpin();
 				
@@ -192,11 +192,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEduTour ? 9 : 4})
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(false)
 				    .showBrush(false)
-				    .trackHeight(isLevelEduTour || isLevelBasic ? 32 : 16)
-				    .cdsHeight(isLevelEduTour || isLevelBasic ? 24 : 12)
+				    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
+				    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 12)
 		    		.showLabel(false)
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 		    				    			
@@ -220,7 +220,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
-							.margin( {top: 10, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEduTour ? 9 : 4} )
+							.margin( {top: 10, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 							.showXAxis(true)
 							.showYAxis(false)
 							.showTooltip(true)
@@ -234,7 +234,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 17, left: isLevelBasic || isLevelEduTour ? 9 : 4})
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 17, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(isLevelEdu  || isLevelBasic ? false : true)
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 6)
 				    .verticalPadding(2)
@@ -273,7 +273,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// variant set from vcf
 		this.fbChart = variantD3()
 				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEduTour ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEduTour ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
 				    .variantHeight(6)
 				    .verticalPadding(2)
@@ -656,7 +656,7 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
     	me.cardSelector.find('#called-variant-count').text("");
     	me.cardSelector.find('#gene-box').text("");
     	me.cardSelector.find('#gene-box').css("visibility", "hidden");
-    	if (isLevelEduTour && eduTourNumber == "1") {
+    	if (isLevelEdu && eduTourNumber == "1") {
 	    	me.cardSelector.find("#gene-box").addClass("deemphasize");
     	}
 
@@ -1777,7 +1777,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		
 	if (lock) {
 		matrixCard.unpin(true);		
-		if (isLevelEduTour) {
+		if (isLevelEdu) {
 			eduTourCheckVariant(variant);
 		}
 	}

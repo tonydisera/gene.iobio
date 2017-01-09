@@ -24,13 +24,11 @@ var mygene2XAuthToken     = "";
 
 
 /*
-* These variables control special behavior for running gene.iobio education edition, with
-* a simplified interface and logic.  For running one of the special educational edition 
-* tours (e.g. a guided tour of the gene.iobio app), TURN ON BOTH isLevelEdu and isLevelEduTour.
-* See @import statements for levelEdu and levelEduTour in css/assets/sass.
+* This variable controls special behavior for running gene.iobio education edition, with
+* a simplified interface and logic.  
+* See @import statements for levelEdu  in css/assets/sass.
 */
-var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
-var isLevelEduTour        = false;   // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
+var isLevelEdu            = true;   // is gene.iobio educational version, simplified version of app
 
 /*
 * These variables control special behavior for running gene.iobio basic mode, with
