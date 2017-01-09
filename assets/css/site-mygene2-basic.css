@@ -778,7 +778,9 @@ a {
     width: 15px;
     height: 15px;
     background-color: #dedede;
-    vertical-align: bottom; }
+    vertical-align: bottom;
+    float: left;
+    margin-top: 5px; }
 #matrix-track #low-quality-legend-text {
   width: 160px;
   float: left;
@@ -2719,7 +2721,7 @@ text.ref-count {
   margin-top: 0px;
   margin-bottom: 8px;
   margin-right: 10px;
-  height: 22px; }
+  height: 21px; }
 
 #gene-badge.loading {
   border-left: #dad26c solid 12px; }
@@ -2734,7 +2736,7 @@ text.ref-count {
 
 #gene-badge.phenolyzer #gene-badge-button {
   border: solid 1px #9FC2D0;
-  height: 22px; }
+  height: 21px; }
   #gene-badge.phenolyzer #gene-badge-button.user-visited {
     border: solid 2px #9FC2D0; }
 
