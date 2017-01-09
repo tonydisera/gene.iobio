@@ -28,7 +28,7 @@ var mygene2XAuthToken     = "";
 * a simplified interface and logic.  
 * See @import statements for levelEdu  in css/assets/sass.
 */
-var isLevelEdu            = true;   // is gene.iobio educational version, simplified version of app
+var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
 
 /*
 * These variables control special behavior for running gene.iobio basic mode, with
