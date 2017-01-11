@@ -11,7 +11,7 @@ function MatrixCard() {
 	this.COLUMN_LABEL_HEIGHT       = 15;
 	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
 
-	this.ROW_LABEL_WIDTH           = 140;
+	this.ROW_LABEL_WIDTH           = 165;
 	this.ROW_LABEL_WIDTH_BASIC     = 25;
 	this.ROW_LABEL_WIDTH_EDU       = 130;
 
