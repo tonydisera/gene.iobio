@@ -164,7 +164,11 @@
           <ul class="nav ">
 
             <li id="filter-tab" class="hide">
-              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')">
+             <a href="javascript:void(0)" id="clear-filters-link" 
+               onclick="filterCard.clearFilters();filterVariants()">
+                  Clear all
+              </a>              
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:80px">
                 <span class="material-icons">tune</span> 
                 Filter
               </a>

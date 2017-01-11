@@ -233,9 +233,6 @@ h5 {
   background-color: white;
   border: none; }
 
-#recfilter-flag {
-  background-color: #5881AD !important; }
-
 .horizontal-center {
   display: -ms-Flexbox;
   -ms-box-orient: horizontal;
@@ -267,9 +264,6 @@ h5 {
 .form-group label.control-label {
   font-size: 16px !important;
   color: #5d809d !important; }
-
-#filter-track a.chosen-single {
-  font-size: 12px !important; }
 
 .shadow-z-2 {
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.17), 0px 1px 6px rgba(0, 0, 0, 0.17); }
@@ -739,19 +733,6 @@ a {
   margin-bottom: 5px;
   margin-top: 0px;
   padding-left: 10px; }
-  #genes-control-track #filters {
-    margin-bottom: 10px;
-    color: #717171;
-    display: inline-block; }
-  #genes-control-track .filter-flag.label-primary {
-    background-color: #c16464;
-    color: #ffffff;
-    border: #818283;
-    border-style: solid;
-    font-size: 12px;
-    border-width: 1px;
-    margin-top: 3px;
-    display: inline-block; }
 
 #welcome-panel {
   text-align: center; }
@@ -1722,9 +1703,37 @@ header {
   -moz-animation-duration: 0.6s;
   animation-duration: 0.6s; }
 
+#clear-filters-link {
+  float: right !important;
+  padding: 4px !important;
+  margin-top: 3px !important;
+  margin-right: 28px !important;
+  margin-bottom: 0px !important;
+  font-size: 13px !important;
+  color: #717171 !important; }
+
+#genes-control-track #filters {
+  margin-bottom: 10px;
+  color: #717171;
+  display: inline-block; }
+#genes-control-track .filter-flag.label-primary {
+  background-color: #c16464;
+  color: #ffffff;
+  border: #818283;
+  border-style: solid;
+  font-size: 12px;
+  border-width: 1px;
+  margin-top: 3px;
+  display: inline-block; }
+
+#recfilter-flag {
+  background-color: #5881AD !important; }
+
 #filter-track {
   margin-top: 0px;
   margin-bottom: 80px; }
+  #filter-track a.chosen-single {
+    font-size: 12px !important; }
   #filter-track h4 {
     font-size: 13px;
     color: #5d809d !important;
@@ -1738,16 +1747,19 @@ header {
     overflow-y: auto; }
   #filter-track #standard-filter-panel {
     float: left;
-    margin-top: -20px;
+    margin-top: 0px;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: column;
-    width: 335px; }
+    width: 335px;
+    align-items: center;
+    flex-wrap: nowrap; }
     #filter-track #standard-filter-panel .standard-filter-btn {
       padding: 4px;
-      width: 220px;
       margin-bottom: 0px;
-      margin-top: 5px;
-      font-size: 12px; }
+      margin-top: 10px;
+      font-size: 12px;
+      width: 220px; }
       #filter-track #standard-filter-panel .standard-filter-btn span {
         margin-left: -17px; }
       #filter-track #standard-filter-panel .standard-filter-btn i.done {
@@ -1761,13 +1773,6 @@ header {
         display: initial; }
       #filter-track #standard-filter-panel .standard-filter-btn.current i.done {
         visibility: visible; }
-  #filter-track #clear-filters-link {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    margin-top: 4px;
-    margin-bottom: 0px;
-    color: #717171 !important;
-    float: right; }
   #filter-track .checkbox label {
     font-size: 12px;
     line-height: 13px; }

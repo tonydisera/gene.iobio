@@ -1,4 +1,37 @@
+#clear-filters-link
+	float: right !important
+	padding: 4px !important
+	margin-top: 3px !important
+	margin-right: 28px !important
+	margin-bottom: 0px !important
+	font-size: 13px !important
+	color: $text-color !important
+
+#genes-control-track
+	#filters
+		margin-bottom: 10px
+		color: $text-color
+		display: inline-block
+
+	.filter-flag.label-primary
+		background-color: #c16464
+		color: #ffffff
+		border: #818283
+		border-style: solid
+		font-size: 12px
+		border-width: 1px
+		margin-top: 3px 
+		display: inline-block
+
+
+#recfilter-flag
+	background-color: #5881AD !important
+
 #filter-track
+
+	a.chosen-single
+		font-size: 12px !important
+
 	margin-top: 0px
 	margin-bottom: 80px
 
@@ -18,18 +51,20 @@
 
 	#standard-filter-panel
 		float: left
-		margin-top: -20px
+		margin-top: 0px
+		margin-bottom: 10px
 		display: flex
 		flex-direction: column
 		width: 335px
-		justify-content :space-between	
+		align-items: center
+		flex-wrap: nowrap
 
 		.standard-filter-btn
 			padding: 4px
-			width: 220px
 			margin-bottom: 0px
-			margin-top: 5px
+			margin-top: 10px
 			font-size: 12px
+			width: 220px
 
 			span
 				margin-left: -17px
@@ -47,14 +82,6 @@
 			&.current
 				i.done
 					visibility: visible
-
-	#clear-filters-link
-		padding-top:  0px
-		padding-bottom: 0px
-		margin-top: 4px
-		margin-bottom: 0px 
-		color: $text-color !important
-		float: right
 
 
 	.checkbox
