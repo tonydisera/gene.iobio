@@ -13,7 +13,6 @@ function FilterCard() {
 	this.KNOWN_CAUSATIVE           = "known_causative";
 	this.DENOVO                    = "denovo";
 	this.RECESSIVE                 = "recessive";
-	this.PREDICTED_PROTEIN_IMPACT  = "predicted_protein_impact";
 	this.FUNCTIONAL_IMPACT         = "functional_impact";
 }
 
@@ -69,8 +68,10 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'},
-			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
-			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'}
+			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
+			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
+			clinvar_path:     {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
+			clinvar_lpath:    {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_lpath',    valueDisplay: 'likely pathogenic'}
 		}
 	} else if (filterName == me.RECESSIVE) {
 		annots = 	{
@@ -78,20 +79,10 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'},
-			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
-			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'}
-		}
-	} else if (filterName == me.PREDICTED_PROTEIN_IMPACT) {
-		annots = 	{
-			af1000g_rare:     {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
-			af1000g_uncommon: {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
-			afexac_rare:      {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
-			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
-			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
-			polyphen_probably_damaging:      {key: 'polyphen',label: "PolyPhen",   state: true, value: 'polyphen_probably_damaging',      valueDisplay: 'probably damaging'},
-			polyphen_possibly_damaging:      {key: 'polyphen',label: "Polyphen",   state: true, value: 'polyphen_possibly_damaging',      valueDisplay: 'possibly damaging'},
-			sift_deleterious:                {key: 'sift',    label: "SIFT",       state: true, value: 'sift_deleterious',                valueDisplay: 'deleterious'},
-			sift_deleterious_low_confidence: {key: 'sift',    label: "SIFT",       state: true, value: 'sift_deleterious_low_confidence', valueDisplay: 'deleterious (low confidence)'}
+			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
+			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
+			clinvar_path:     {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
+			clinvar_lpath:    {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_lpath',    valueDisplay: 'likely pathogenic'}
 		}
 	} else if (filterName == me.FUNCTIONAL_IMPACT) {
 		annots = 	{
@@ -101,7 +92,9 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
 			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
-			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'}
+			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
+			clinvar_path:     {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
+			clinvar_lpath:    {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_lpath',    valueDisplay: 'likely pathogenic'}
 		}
 	}
 
@@ -919,13 +912,12 @@ FilterCard.prototype._getFilterString = function() {
 				annotObject = {values: [], label: annot.label};
 				annots[annot.key] = annotObject;
 			}
-			annotObject.values.push(annot.valueDisplay);
+			annotObject.values.push((annot.not ? "NOT " : "") + annot.valueDisplay);
 		}
 	}
 
 	for (key in annots) {
 		var annotObject = annots[key];
-		var eval   = " = ";
 		var theValues = "";
 		annotObject.values.forEach(function(theValue) {
 			if (theValues.length > 0) {
@@ -939,7 +931,7 @@ FilterCard.prototype._getFilterString = function() {
 			theValues += ")";
 		}
 		
-		filterString += AND(filterString) + filterBox(annotObject.label + eval + theValues);
+		filterString += AND(filterString) + filterBox(annotObject.label + '&nbsp;&nbsp;' + theValues);
 	}
 	return filterString;
 }

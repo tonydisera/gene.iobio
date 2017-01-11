@@ -2228,46 +2228,112 @@ VariantModel.prototype.filterVariants = function(data, filterObject, bypassRange
 			}
 		}
 
+		if (d.clinvar && !$.isPlainObject(d.clinvar) && d.clinvar) {
+			console.log(Object.keys(d.clinvar));
+		}
+
+		var incrementEqualityCount = function(condition, counterObject) {
+			var countAttribute = condition ? 'matchCount' : 'notMatchCount';
+			counterObject[countAttribute]++;
+		}
 		// Iterate through the clicked annotations for each variant. The variant
 		// needs to match
 		// at least one of the selected values (e.g. HIGH or MODERATE for IMPACT)
 		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
-		var evalAttributes = {};
+		var evaluations = {};
 		for (key in filterObject.annotsToInclude) {
 			var annot = filterObject.annotsToInclude[key];
 			if (annot.state) {
-				evalAttributes[annot.key] = evalAttributes[annot.key] || 0;
+				var evalObject = evaluations[annot.key];
+				if (!evalObject) {
+					evalObject = {};
+					evaluations[annot.key] = evalObject;
+				}
 
 				var annotValue = d[annot.key] || '';
+
+				// Keep track of counts where critera should be true vs counts
+				// for critera that should be false.  
+				//
+				// In the simplest case,
+				// the filter is evalated for equals, for example,
+				// clinvar == pathogenic or clinvar == likely pathogenic.
+				// In this case, if a variant's clinvar = pathogenic, the
+				// evaluations will look like this:
+				//  evalEquals: {matchCount: 1, notMatchCount: 0}
+				// When variant's clinvar = benign
+				//  evalEquals: {matchCount: 0, notMatchCount: 1}
+	  		    //
+				// In a case where the filter is set to clinvar NOT EQUAL 'pathogenic'
+				// AND NOT EQUAL 'likely pathogenic'
+				// the evaluation will be true on if the variant's clinvar is NOT 'pathogenic'
+				// AND NOT 'likely pathogenic'
+				// When variant's clinvar is blank:
+				//  evalNotEquals: {matchCount: 0, notMatchCount: 2}
+				//
+				// If variant's clinvar is equal to pathogenic
+				//  evalNotEquals: {matchCount: 1, notMatchCount 1}
+				//
+				var evalKey = 'equals';
+				if (annot.hasOwnProperty("not") && annot.not) {
+					evalKey = 'notEquals';
+				} 
+				if (!evalObject.hasOwnProperty(evalKey)) {
+					evalObject[evalKey] = {matchCount: 0, notMatchCount: 0};
+				}
 				if ($.isPlainObject(annotValue)) {
 					for (avKey in annotValue) {
-						if (avKey.toLowerCase() == annot.value.toLowerCase()) {
-							evalAttributes[annot.key]++;
-						}
+						var doesMatch = avKey.toLowerCase() == annot.value.toLowerCase();
+						incrementEqualityCount(doesMatch, evalObject[evalKey])
 					}
-				} else if (annotValue.toLowerCase() == annot.value.toLowerCase()) {
-					evalAttributes[annot.key]++;
+				} else {
+					var doesMatch = annotValue.toLowerCase() == annot.value.toLowerCase();
+					incrementEqualityCount(doesMatch, evalObject[evalKey])
 				}
 			}
 		}
 
 		// If zero annots to evaluate, the variant meets the criteria.
 		// If annots are to be evaluated, the variant must match
-		// at least one value for each annot to consider.
+		// at least one value for each annot to meet criteria
 		var meetsAnnot = true;
-		for (key in evalAttributes) {
-			var count = evalAttributes[key];
-			if (count == 0) {
-				if (key == 'inheritance' && me.getRelationship() != 'proband') {
- 					// bypass filtering on inheritance if non-proband variant card
- 				} else {
-					meetsAnnot = false;
- 				}
+		for (key in evaluations) {
+			var evalObject = evaluations[key];
+
+			// Bypass evaluation for non-proband on inheritance mode.  This only
+			// applied to proband.
+			if (key == 'inheritance' && me.getRelationship() != 'proband') {
+				continue;
+			}
+			if (evalObject.hasOwnProperty("equals") && evalObject["equals"].matchCount == 0) {
+				meetsAnnot = false;
+				break;
+			}
+		}
+
+		// For annotations set to 'not equal', any case where the annotation matches (matchCount > 0),
+		// we set that the annotation critera was not met.  Example:  When filter is 
+		// clinvar 'not equal' pathogenic, and variant.clinvar == 'pathogenic' matchCount > 0,
+		// so the variants does not meet the annotation criteria
+		var meetsNotEqualAnnot = true
+		for (key in evaluations) {
+			var evalObject = evaluations[key];
+
+			// Bypass evaluation for non-proband on inheritance mode.  This only
+			// applied to proband.
+			if (key == 'inheritance' && me.getRelationship() != 'proband') {
+				continue;
+			}
+			// Any case where the variant attribute matches value on a 'not equal' filter, 
+			// we have encountered a condition where the criteria is not met.
+			if (evalObject.hasOwnProperty("notEquals") && evalObject["notEquals"].matchCount > 0) {
+				meetsNotEqualAnnot = false;
+				break;
 			}
 		}
 
 
-		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsExonic;
+		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures,
