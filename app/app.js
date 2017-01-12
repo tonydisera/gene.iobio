@@ -235,6 +235,7 @@ function determineStyle() {
 function init() {
 	var me = this;
 
+
 	detectWindowResize();
 
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
@@ -285,6 +286,10 @@ function init() {
 	$('#modals-placeholder').append(modalsTemplate());
 	$('#tour-placeholder').append(tourTemplate());
 	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
+
+	// Set version number on About menu and the Version dialog
+	$('.version-number').text(version);
+
 
 	// Clear the local cache
  	cacheHelper.clearCache();

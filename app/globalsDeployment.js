@@ -2,6 +2,8 @@
     with for a local deployment.  This entire .js can be replaced or modified to suit the 
     specific iobio deployment environment.
 */
+var version               = "2.0.0";
+
 var isOffline             = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
 var accessNCBIGeneSummary = true;           // is it okay to access NCBI web resources to obtain the refseq gene summary?  In cases where the server and client are COMPLETELY offline, set this to false.
