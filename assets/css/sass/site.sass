@@ -851,6 +851,13 @@ a
       fill: rgb(120, 120, 120)
       pointer-events: none
 
+      &.clickable
+        text-decoration: underline
+        fill: $app-color !important
+
+        &:hover
+          fill: $current-color !important
+
     .axis .tick text.current
       font-weight: bold !important
       fill: black !important
