@@ -712,6 +712,11 @@ a {
   font-size: 10px;
   fill: #787878;
   pointer-events: none; }
+  #matrix-track #feature-matrix text.clickable {
+    text-decoration: underline;
+    fill: #5d809d !important; }
+    #matrix-track #feature-matrix text.clickable:hover {
+      fill: #3586c0 !important; }
 #matrix-track #feature-matrix .axis .tick text.current {
   font-weight: bold !important;
   fill: black !important; }
