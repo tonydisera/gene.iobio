@@ -411,7 +411,8 @@ function featureMatrixD3() {
 
           }) 
           .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
-     
+
+
       g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  
               var colObject = d3.select(this.parentNode.parentNode).datum();
@@ -445,6 +446,10 @@ function featureMatrixD3() {
             })
             .on("click", function(d, i) {                
               var colObject = d3.select(this.parentNode.parentNode).datum();
+
+              if (d.clickFunction) {
+                d.clickFunction(colObject, d);
+              }
 
               var colIndex = Math.floor(i / matrixRowNames.length);  
               var on = !(d3.select(this.parentNode.parentNode).select(".colbox").attr("class").indexOf("current") > -1);

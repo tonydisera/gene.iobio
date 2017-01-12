@@ -128,7 +128,7 @@ function MatrixCard() {
 	];
 
 	this.matrixRowsBasic = [
-		{name:'Pathogenicity - ClinVar',id:'clinvar',         order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar,                  rankFunction: this.getClinvarRank  },
+		{name:'Pathogenicity - ClinVar',id:'clinvar',         order:0,  index:0,  match:  'field', height: 33, attribute: 'clinVarClinicalSignificance', formatFunction: this.formatClinvar, clickFunction: this.clickClinvar,  rankFunction: this.getClinvarRank  },
 		{name:'Inheritance Mode'       ,id:'inheritance',     order:1,  index:1,  match:  'field', height: 21, attribute: 'inheritance',                 formatFunction: this.formatInheritance},
 		{name:'Transcript'             ,id:'transcript',      order:2,  index:2,  match:  'field', height: 21, attribute: 'start',                       formatFunction: this.formatCanonicalTranscript},
 		{name:'cDNA'                   ,id:'cdna',            order:3,  index:3,  match:  'field', height: 31, attribute: 'vepHGVSc',                    formatFunction: this.formatHgvsC    },
@@ -692,6 +692,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			var mappedValue = null;
 			var mappedClazz = null;
 			var symbolFunction = null;
+			var clickFunction = matrixRow.clickFunction;
 			// Don't fill in clinvar for now
 			if (matrixRow.attribute == 'clinvar') {
 				rawValue = 'N';
@@ -767,7 +768,8 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 				                    'value': theValue,
 				                    'rank': (mappedValue ? mappedValue : me.featureUnknown),
 				                    'clazz': mappedClazz,
-				                    'symbolFunction': symbolFunction
+				                    'symbolFunction': symbolFunction,
+				                    'clickFunction': clickFunction
 				                  };
 		});
 
@@ -1094,6 +1096,13 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	var text =  selection.append("g")
 				         .attr("transform", translate)
 				         .append("text")
+				         .attr("class", function(d,i) {
+				         	if (selection.datum().clickFunction) {
+				         		return "clickable";
+				         	} else {
+				         		return "";
+				         	}
+				     	 })
 				         .attr("x", 0)
 				         .attr("y", isLevelBasic ? 14 : 11)
 				         .attr("dy", "0em")
@@ -1283,8 +1292,15 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 
 }
 
+MatrixCard.prototype.clickClinvar = function(variant, cell) {
+	if (variant.clinVarUid != null && variant.clinVarUid != '') {
+		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
+		window.open(url);
+	} 	
+}
+
 MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
-	var buf = "";
+	var display = "";
 	for (key in clinvarSig) {
 		if (key == "none" || key == "not_provided") {
 
@@ -1297,15 +1313,14 @@ MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {
 					}
 					variant.featureClass += " danger";
 				}
-
 			}
-			if (buf.length > 0) {
-				buf += ",";
+			if (display.length > 0) {
+				display += ",";
 			}
-			buf += key.split("_").join(' ');
+			display += key.split("_").join(' ');
 		}
 	}
-	return buf;
+	return display;
 }
 
 MatrixCard.prototype.getClinvarRank = function(variant, clinvarSig) {
