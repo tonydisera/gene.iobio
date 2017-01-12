@@ -222,37 +222,49 @@ lineD3 = function module() {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // Tooltip     
-      svgGroup.on("mouseover", function(d) {  
-             var tooltipText = '';  
-             mousex = d3.mouse(this)[0];
-             mousey = d3.mouse(this)[1];
-             var invertedx = x.invert(mousex); 
-             var invertedy = y.invert(mousey); 
-             
-             tooltipText += 'position ' + formatter(parseInt(invertedx));
-             tooltipText += '<br>depth ' + parseInt(invertedy);
-             
-             var tooltip = container.select('.tooltip');
-              tooltip.transition()        
-                 .duration(200)      
-                 .style("opacity", .9);      
-              tooltip.html(tooltipText)    
-                 .style("width", "130px")                    
-                 .style("height", "40px")                    
-                 .style("left", (d3.event.pageX - 130) + "px") 
-                 .style("text-align", 'left')    
-                 .style("top", (d3.event.pageY - 42) + "px");    
+      svgGroup.on("mouseover", function(d) {
+        var tooltipText = '';
+        mousex = d3.mouse(this)[0];
+        mousey = d3.mouse(this)[1];
+        var invertedx = x.invert(mousex);
+        var invertedy = y.invert(mousey);
 
+        tooltipText += 'position ' + formatter(parseInt(invertedx));
+        tooltipText += '<br>depth ' + parseInt(invertedy);
 
-          })    
-                
-         .on("mouseout", function(d) {       
-              container.select('.tooltip').transition()        
-                 .duration(500)      
-                 .style("opacity", 0);   
-           });     
+        var width = 130;
+        var height = 40;
+        var left = sidebarAdjustX(d3.event.pageX - 130);
+        var top = d3.event.pageY - 42;
 
-        
+        // if the tooltip approaches the left sidebar, flip it to the right side
+        if (left < 50) {
+          left = d3.round(left + width);
+        }
+
+        var tooltip = container.select('.tooltip');
+        tooltip.transition()
+          .duration(200)
+          .style("opacity", .9)
+          .style("display", "block");
+        tooltip.html(tooltipText)
+          .style("width", width + "px")
+          .style("height", height + "px")
+          .style("left",  left + "px")
+          .style("text-align", 'left')
+          .style("top",  top + "px");
+      })
+      .on("mouseout", function(d) {
+        var tooltip = container.select('.tooltip');
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+
+        tooltip.transition()
+          .delay(500)
+          .style("display", "none");
+      });
+
       var innerWidth = width - margin.left - margin.right;
       x = d3.scale.linear()
           .range([0, innerWidth]);

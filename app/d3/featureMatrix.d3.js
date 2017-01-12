@@ -28,6 +28,9 @@ function featureMatrixD3() {
       matrixRows = null,
       matrixRowNames = null;
       cellSize = 10,
+      cellWidth = null,
+      cellHeight = null,
+      cellHeights = null,
       rowLabelWidth = 100,
       columnLabelHeight = 100;
       
@@ -42,7 +45,17 @@ function featureMatrixD3() {
 
     selection.each(function(data) {
       // Calculate height of matrix
-      height = matrixRowNames.length * cellSize;   
+
+      var firstCellHeight = null;
+      var matrixHeight = null;
+      if (cellHeights && cellHeights.length > 0) {
+        matrixHeight = cellHeights.reduce(function(pv, cv) { return pv + cv; }, 0);
+        firstCellHeight = cellHeights[0];
+      } else {
+        matrixHeight  = matrixRowNames.length * (cellHeight != null ? cellHeight : cellSize);   
+        firstCellHeight = (cellHeight != null ? cellHeight : cellSize);
+      }
+      height = matrixHeight;
       height += margin.top + margin.bottom;
       if (options.showColumnLabels) {
         height += columnLabelHeight;
@@ -52,8 +65,8 @@ function featureMatrixD3() {
         innerHeight -= columnLabelHeight;
       } 
 
-      width = data.length * cellSize;   
-      width += margin.left + margin.right + rowLabelWidth;
+      width = data.length *  (cellWidth != null ? cellWidth : cellSize);   
+      width += margin.left + margin.right + rowLabelWidth +  (cellWidth != null ? cellWidth : cellSize);
       var innerWidth = width - margin.left - margin.right - rowLabelWidth;
 
       container = d3.select(this);
@@ -80,6 +93,9 @@ function featureMatrixD3() {
                         .orient("left")
                         .outerTickSize(0)   
                         .ticks(matrixRowNames.length);
+
+
+
                        
                         
       
@@ -110,9 +126,13 @@ function featureMatrixD3() {
       if (options.showColumnLabels) {
         var translateColHdrGroup = "";
         if (options.simpleColumnLabels) {
-          translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
+          if (cellWidth) {
+            translateColHdrGroup = "translate(" + (+rowLabelWidth + (cellWidth/2) - 4) + "," + (columnLabelHeight-4) + ")";
+          } else {
+            translateColHdrGroup = "translate(" + (+rowLabelWidth) + "," + (columnLabelHeight-4) + ")";
+          }
         } else {
-          translateColHdrGroup = "translate(" + (+rowLabelWidth+(cellSize/2)) + "," + (columnLabelHeight) + ")";
+          translateColHdrGroup = "translate(" + (+rowLabelWidth+( (cellWidth != null ? cellWidth : cellSize) / 2 )) + "," + (columnLabelHeight) + ")";
         }
         var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
           .enter()
@@ -124,7 +144,7 @@ function featureMatrixD3() {
         colhdrs.enter().append('g')
             .attr('class', 'colhdr')
             .attr('transform', function(d,i) { 
-              return "translate(" + (cellSize * (i+1)) + ",0)";
+              return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
             })
             .append("text")
             .style("text-anchor", options.simpleColumnLabels ? "middle" : "start")
@@ -144,7 +164,7 @@ function featureMatrixD3() {
 
       var translate = "translate(" + rowLabelWidth + ",";
       if (options.showColumnLabels) {
-        translate += (+columnLabelHeight - cellSize) + ")";
+        translate += (+columnLabelHeight - firstCellHeight) + ")";
       } else {
         translate += "-30)"
       }
@@ -161,8 +181,7 @@ function featureMatrixD3() {
       svg.selectAll("g.y").data([matrixRowNames]).enter()
           .append("g")
           .attr("class", "y axis")
-          //.attr("transform", "translate(1," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
-          .attr("transform", "translate(20," + (options.showColumnLabels ? columnLabelHeight : "0") + ")")
+          .attr("transform", "translate(20," + (options.showColumnLabels ? columnLabelHeight + (cellHeights != null && cellHeights.length > 0 ? 4 : 0) : "0") + ")")
           .call(yAxis)
           .selectAll("text")
           .style("text-anchor", "start")
@@ -274,6 +293,19 @@ function featureMatrixD3() {
       svg.selectAll("g.y.axis .tick line").classed("hide", true);
       svg.selectAll("g.y.axis path").classed("hide", true);
 
+      // Adjust the y-axis transform attribute so that translate(x,y) changes y
+      // to cell heights
+      if (cellHeights != null && cellHeights.length > 0) {
+        svg.selectAll("g.y.axis g.tick").each( function(d,i) {
+            var y = 0;
+            for (var idx = 0; idx < i; idx++) {
+              y += cellHeights[idx] ;
+            }  
+            y += 8;
+            d3.select(this).attr('transform', 'translate(0,' + y + ')');
+        })
+      }
+
       // add tooltip div
       var tooltip = container.selectAll(".tooltip").data([0])
         .enter().append('div')
@@ -288,7 +320,7 @@ function featureMatrixD3() {
             return "col  " + d.featureClass;
           })
           .attr('transform', function(d,i) { 
-            return "translate(" + (cellSize * (i+1)) + ",0)";
+            return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
           });
       
 
@@ -298,7 +330,20 @@ function featureMatrixD3() {
       }).enter().append('g')
           .attr('class', "cell") 
           .attr('transform', function(d,i) {
-            return 'translate(0,' +  +(y(matrixRowNames[i]) + +y.rangeBand()) + ')';
+            var yPos = 0;
+            if (cellHeights && cellHeights.length > 0) {
+              var pos = (i+1) % matrixRows.length;
+              if (pos == 0) {
+                pos = matrixRows.length;
+              } 
+              for (var idx = 0; idx < pos-1; idx++) {
+                yPos += cellHeights[idx] ;
+              }  
+              yPos = yPos + firstCellHeight;            
+            } else {
+              yPos = y(matrixRowNames[i]) + y.rangeBand();
+            }
+            return 'translate(0,' +  yPos + ')';
         });
 
 
@@ -311,10 +356,20 @@ function featureMatrixD3() {
             return 0;
           })
           .attr('height', function(d, i) { 
-            return cellSize - 1; 
+            if (cellHeights && cellHeights.length > 0) {
+              var pos = (i+1) % matrixRows.length;
+              if (pos == 0) {
+                pos = matrixRows.length -1;
+              } else {
+                pos = pos - 1;
+              }
+              return cellHeights[pos] - 1;
+            } else {
+              return  (cellHeight != null ? cellHeight : cellSize) - 1; 
+            }
           })
           .attr('y', 0)
-          .attr('width', cellSize - 1);
+          .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
          
 
 
@@ -335,7 +390,7 @@ function featureMatrixD3() {
       cells.each( function(d,i) {
          var symbolFunction = d.symbolFunction;
          if (symbolFunction) {
-           d3.select(this).call(symbolFunction, {'cellSize': cellSize});
+           d3.select(this).call(symbolFunction, {'cellSize': (cellWidth != null ? cellWidth : cellSize)});
          }
       });
 
@@ -345,11 +400,19 @@ function featureMatrixD3() {
             return 0;
           })
           .attr('height', function(d, i) { 
-            return (cellSize * matrixRowNames.length) - 1;
+            return matrixHeight - 1;
           })
-          .attr('y', y(matrixRowNames[0]) + y.rangeBand())
-          .attr('width', cellSize - 1);
-     
+          .attr('y', function(d,i) {
+            if (cellHeights && cellHeights.length > 0) {
+              return firstCellHeight;
+            } else {
+              return y(matrixRowNames[0]) + y.rangeBand();
+            }
+
+          }) 
+          .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
+
+
       g.selectAll('rect.cellbox')
            .on("mouseover", function(d) {  
               var colObject = d3.select(this.parentNode.parentNode).datum();
@@ -383,6 +446,10 @@ function featureMatrixD3() {
             })
             .on("click", function(d, i) {                
               var colObject = d3.select(this.parentNode.parentNode).datum();
+
+              if (d.clickFunction) {
+                d.clickFunction(colObject, d);
+              }
 
               var colIndex = Math.floor(i / matrixRowNames.length);  
               var on = !(d3.select(this.parentNode.parentNode).select(".colbox").attr("class").indexOf("current") > -1);
@@ -513,6 +580,35 @@ function featureMatrixD3() {
     cellSize = _;
     return chart;
   }
+
+
+  chart.cellWidth = function(_) {
+    if (!arguments.length) {
+      return cellWidth;
+    } else {
+      cellWidth = _;
+      return chart;
+    }
+  }
+
+  chart.cellHeight = function(_) {
+    if (!arguments.length) {
+      return cellHeight;
+    } else {
+      cellHeight = _;
+      return chart;
+    }
+  }
+
+  chart.cellHeights = function(_) {
+    if (!arguments.length) {
+      return cellHeights;
+    } else {
+      cellHeights = _;
+      return chart;
+    }
+  }
+
   chart.rowLabelWidth = function(_) {
     if (!arguments.length) return rowLabelWidth;
     rowLabelWidth = _;

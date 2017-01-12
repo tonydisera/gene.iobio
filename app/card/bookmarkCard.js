@@ -97,7 +97,7 @@ BookmarkCard.prototype.importBookmarks = function() {
 
 BookmarkCard.prototype.reviseCoord = function(bookmarkEntry, gene) {
 	var me = this;
-	var revisedBookmarkEntry = $().extend(bookmarkEntry);
+	var revisedBookmarkEntry = $().extend({}, bookmarkEntry);
 
 	// TODO:  Figure out coordinate space for GEMINI
 	revisedBookmarkEntry.start++;
