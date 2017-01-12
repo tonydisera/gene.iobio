@@ -822,7 +822,7 @@ a {
     cursor: pointer;
     fill: #3586c0; }
 #matrix-track #feature-matrix-note {
-  padding-left: 155px;
+  padding-left: 180px;
   font-size: 12px;
   margin-top: -5px; }
 #matrix-track #move-rows {
@@ -1713,7 +1713,7 @@ header {
   color: #717171 !important; }
 
 #genes-control-track #filters {
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   color: #717171;
   display: inline-block; }
 #genes-control-track .filter-flag.label-primary {
@@ -1759,7 +1759,8 @@ header {
       margin-bottom: 0px;
       margin-top: 10px;
       font-size: 12px;
-      width: 220px; }
+      width: 190px;
+      margin-left: 40px; }
       #filter-track #standard-filter-panel .standard-filter-btn span {
         margin-left: -17px; }
       #filter-track #standard-filter-panel .standard-filter-btn i.done {
@@ -1773,6 +1774,14 @@ header {
         display: initial; }
       #filter-track #standard-filter-panel .standard-filter-btn.current i.done {
         visibility: visible; }
+    #filter-track #standard-filter-panel .standard-filter-count {
+      float: right;
+      display: inline-block;
+      padding-top: 15px;
+      padding-left: 4px;
+      font-size: 12px;
+      color: #717171;
+      width: 95px; }
   #filter-track .checkbox label {
     font-size: 12px;
     line-height: 13px; }
@@ -3146,7 +3155,7 @@ text.ref-count {
 #show-legend {
   color: #717171 !important;
   font-size: 13px;
-  margin-left: 55px;
+  margin-left: 80px;
   float: left; }
 
 #close-legend {

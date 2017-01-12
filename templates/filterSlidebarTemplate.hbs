@@ -5,26 +5,38 @@
   
 
   <div id="standard-filter-panel">
-     <button class="standard-filter-btn btn btn-default btn-raised" 
-      onclick="filterCard.setStandardFilter(this, 'known_causative');filterVariants()">
-      <i class="done material-icons glyph">done</i>
-      <span>Known Causative</span>
-     </button>
-     <button class="standard-filter-btn btn btn-default btn-raised" 
-      onclick="filterCard.setStandardFilter(this, 'denovo');filterVariants()">
-      <i class="done material-icons glyph">done</i>
-      <span>De novo VUS</span>
-     </button>
-     <button class="standard-filter-btn btn btn-default btn-raised" 
-      onclick="filterCard.setStandardFilter(this, 'recessive');filterVariants()">
-      <i class="done material-icons glyph">done</i>
-      <span>Recessive VUS</span>
-     </button>
-     <button class="standard-filter-btn btn btn-default btn-raised" 
-      onclick="filterCard.setStandardFilter(this, 'functional_impact');filterVariants()">
-      <i class="done material-icons glyph">done</i>
-      <span>High or moderate impact</span>
-     </button>
+     <div>
+       <button class="standard-filter-btn btn btn-default btn-raised" 
+        onclick="filterCard.applyStandardFilter(this, 'known_causative')">
+        <i class="done material-icons glyph">done</i>
+        <span>Known Causative</span>
+       </button>
+       <span id="known_causative_count" class="standard-filter-count"></span>
+     </div>
+     <div>
+       <button class="standard-filter-btn btn btn-default btn-raised" 
+        onclick="filterCard.applyStandardFilter(this, 'denovo')">
+        <i class="done material-icons glyph">done</i>
+        <span>De novo VUS</span>
+       </button>
+       <span id="denovo_count" class="standard-filter-count"></span>
+     </div>
+     <div>
+       <button class="standard-filter-btn btn btn-default btn-raised" 
+        onclick="filterCard.applyStandardFilter(this, 'recessive')">
+        <i class="done material-icons glyph">done</i>
+        <span>Recessive VUS</span>
+       </button>
+       <span id="recessive_count" class="standard-filter-count"></span>
+     </div>
+     <div>
+       <button class="standard-filter-btn btn btn-default btn-raised" 
+        onclick="filterCard.applyStandardFilter(this, 'functional_impact')">
+        <i class="done material-icons glyph">done</i>
+        <span>High or moderate impact</span>
+       </button>
+       <span id="functional_impact_count" class="standard-filter-count"></span>
+     </div>
   </div>
 
 
