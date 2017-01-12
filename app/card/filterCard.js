@@ -47,11 +47,23 @@ FilterCard.prototype.autoSetFilters = function() {
 
 }
 
+FilterCard.prototype.applyStandardFilter = function(button, filterName) {
+	var me = this;
+	filterCard.setStandardFilter(button, filterName);
+	var genesCount = filterVariants();
+	me.setStandardFilterCount(button, genesCount)
+}
+
+FilterCard.prototype.setStandardFilterCount = function(button, genesCount) {
+	var label = genesCount.pass + " of " + genesCount.total + " genes";
+	$(button.parentNode).find("span.standard-filter-count").text(label);
+}
+
 FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	var me = this;
 	me.clearFilters();
 	$(button).addClass('current');
-	var annotes = null;
+	var annots = null;
 	if (filterName == me.KNOWN_CAUSATIVE) {
 		annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},

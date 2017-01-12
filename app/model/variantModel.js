@@ -2228,10 +2228,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject, bypassRange
 			}
 		}
 
-		if (d.clinvar && !$.isPlainObject(d.clinvar) && d.clinvar) {
-			console.log(Object.keys(d.clinvar));
-		}
-
 		var incrementEqualityCount = function(condition, counterObject) {
 			var countAttribute = condition ? 'matchCount' : 'notMatchCount';
 			counterObject[countAttribute]++;

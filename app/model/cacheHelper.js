@@ -354,6 +354,7 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 
 CacheHelper.prototype.refreshGeneBadges = function() {  
 	var me = this;
+	var geneCount = {total: 0, pass: 0};
 
 	$('#gene-badges-loader').removeClass("hide");
 	for (var i=0; i<=localStorage.length-1; i++)  
@@ -367,6 +368,11 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  		var theVcfData = CacheHelper.getCachedData(key);
 		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
 
+		  		geneCount.total++;
+		  		if (filteredVcfData.features.length > 0) {
+		  			geneCount.pass++;
+		  		}
+
 		  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, cacheObject.gene);
 		
@@ -376,6 +382,7 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 	}  
 	genesCard.sortGenes();
 	$('#gene-badges-loader').addClass("hide");
+	return geneCount;
 }
 
 CacheHelper.prototype.clearCache = function(launchTimestampToClear) {

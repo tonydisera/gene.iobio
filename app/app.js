@@ -3002,7 +3002,8 @@ function filterVariants() {
 	});
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
-	cacheHelper.refreshGeneBadges();
+	var geneCounts = cacheHelper.refreshGeneBadges();
+	return geneCounts;
 
 }
 
