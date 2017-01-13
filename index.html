@@ -263,23 +263,23 @@
                     <div class="btn-group" style="display:inline;">
 
                       <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          Manage
+                          Manage genes
                           <span style="margin-left:6px" class="caret"></span>
                       </button>
                        
                       <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
-                         <li>
+                        <li style="margin-bottom: 10px">
+                            <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
+                              Manage cache of analyzed genes...
+                          </a>
+                        </li>
+
+                         <li  style="margin-bottom: 10px">
                             <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
                               href="javascript:void(0)" onclick="genesCard.clearGenes()">
                                 Remove all genes
                            </a>
                         </li>
-                        <li>
-                            <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
-                              Clear all analysis on genes...
-                          </a>
-                        </li>
-
                        
                         <li id="edit-list-li">
                            <div >Edit gene list</div>

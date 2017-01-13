@@ -396,7 +396,8 @@ CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 }
 
 CacheHelper.prototype.getCacheKey = function(cacheObject) {
-	return        this.launchTimestamp
+	return      "gene.iobio"  
+		+ "---" + this.launchTimestamp
 	    + "---" + cacheObject.relationship 
 		+ "---" + cacheObject.sample
 		+ "---" + cacheObject.gene
@@ -409,24 +410,31 @@ CacheHelper.prototype.getCacheKey = function(cacheObject) {
 CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes of the data currently stored
 	var me = this;
 	var size = 0;
+	var otherSize = 0;
 	var coverageSize = 0;
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  
 		key = localStorage.key(i);  
 		keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject.launchTimestamp == me.launchTimestamp) {
-		  	var dataSize = localStorage.getItem(key).length;
-		  	size     += dataSize;
+		if (keyObject) {			
+			if (keyObject.launchTimestamp == me.launchTimestamp) {
+			  	var dataSize = localStorage.getItem(key).length;
+			  	size     += dataSize;
 
-		  	var cacheObject = CacheHelper._parseCacheKey(key);
-		  	if (cacheObject.dataKind == 'bamData') {
-		  		coverageSize +=  dataSize;
-		  	}
-		  	
+			  	var cacheObject = CacheHelper._parseCacheKey(key);
+			  	if (cacheObject.dataKind == 'bamData') {
+			  		coverageSize +=  dataSize;
+			  	}
+			  	
+			} else {
+				var dataSize = localStorage.getItem(key).length;
+				otherSize += dataSize;
+			}
 		}
 	}  
 	return {total:     (CacheHelper._sizeMB(size) + " MB"), 
-	        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB")};
+	        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
+	        other:     (CacheHelper._sizeMB(otherSize) + " MB")};
 }
 
 CacheHelper._logCacheSize = function() {
@@ -477,7 +485,7 @@ CacheHelper.prototype.clearCacheItem = function(key) {
 	}
 }
 
-CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
+CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther) {
 	var me = this;
 	var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
 	if (localStorage) {
@@ -486,12 +494,16 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 		for (var i=0; i<=localStorage.length-1; i++)  {  
 			var key = localStorage.key(i); 	
 			keyObject = CacheHelper._parseCacheKey(key);
-			if (keyObject.gene && keyObject.relationship == 'proband') {
-				genesCard.clearGeneGlyphs(keyObject.gene);
+			if (keyObject) {
+				if (keyObject.launchTimestamp == theLaunchTimeStamp && !clearOther) {
+					keysToRemove.push(key);
+					if (keyObject.gene && keyObject.relationship == 'proband') {
+						genesCard.clearGeneGlyphs(keyObject.gene);
+					}
+				} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther) {
+					keysToRemove.push(key);
+				}				
 			}
-			if (keyObject.launchTimestamp == theLaunchTimeStamp) {
-				keysToRemove.push(key);
-			} 
 		}	
 		keysToRemove.forEach( function(key) {
 			localStorage.removeItem(key);			
@@ -505,10 +517,24 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear) {
 CacheHelper.prototype.clearAll = function() {
 	var me = this;
 	// confirm dialog
-	alertify.confirm("Clear all cached data?", function (e) {
+	alertify.confirm("Clear all cached data for this session?", function (e) {
 	    if (e) {
 			// user clicked "ok"
 			me._clearCache();
+  			me.refreshDialog();
+	        
+	    } else {
+	        // user clicked "cancel"
+	    }
+	});
+}
+CacheHelper.prototype.clearOther = function() {
+	var me = this;
+	// confirm dialog
+	alertify.confirm("Clear all cached data for other gene.iobio sessions?", function (e) {
+	    if (e) {
+			// user clicked "ok"
+			me._clearCache(null, true);
   			me.refreshDialog();
 	        
 	    } else {
@@ -548,6 +574,7 @@ CacheHelper.prototype.refreshDialog = function() {
 	var sizes = this.getCacheSize();
 	$("#cache-size").text(sizes.total);
 	$("#coverage-size").text(sizes.coverage);
+	$("#other-cache-size").text(sizes.other);
 }
 
 CacheHelper.prototype.openDialog = function() {
@@ -601,15 +628,26 @@ CacheHelper._sizeMB = function(size) {
 
 
 CacheHelper._parseCacheKey = function(cacheKey) {
-	var tokens = cacheKey.split("---");
-	return { launchTimestamp: tokens[0],
-		     relationship: tokens[1], 
-		     sample: tokens[2], 
-		     gene: tokens[3], 
-		     transcript: tokens[4], 
-		     annotationScheme: tokens[5], 
-		     dataKind: tokens[6]
-		    };
+	if (cacheKey.indexOf("---") > 0) {
+		var tokens = cacheKey.split("---");
+		if (tokens.length == 8 && tokens[0] == "gene.iobio") {
+			return { app: tokens[0],
+				     launchTimestamp: tokens[1],
+				     relationship: tokens[2], 
+				     sample: tokens[3], 
+				     gene: tokens[4], 
+				     transcript: tokens[5], 
+				     annotationScheme: tokens[6], 
+				     dataKind: tokens[7]
+				    };
+
+		} else {
+			return null;
+		}
+
+	} else {
+		return null;
+	}
 
 }
 
