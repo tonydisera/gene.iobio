@@ -192,6 +192,13 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 	var motherVcfData  = getVariantCard("mother" ).model.getVcfDataForGene(geneObject, transcript);
 	var fatherVcfData  = getVariantCard("father" ).model.getVcfDataForGene(geneObject, transcript);
 
+	if (dataCard.mode == 'trio' && (probandVcfData == null || motherVcfData == null || fatherVcfData == null)) {
+		console.log("Unable to determine inheritance during Analyze All for gene " + geneObject.gene_name + " because full trio data not available");
+		genesCard.clearGeneGlyphs(geneObject.gene_name);
+		genesCard.setGeneBadgeError(geneObject.gene_name);		
+		me.cacheNextGene(geneObject.gene_name, callback);
+		return;
+	} 
 
 	var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 	trioModel.compareVariantsToMotherFather(function() {
@@ -223,17 +230,16 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 			}
 		})
 
-		CacheHelper._logCacheSize();
+		
+		// Now clear out mother and father from cache.  Don't clear cache for currently selected
+		// gene though as this will result in no inheritance mode being detected.
+		if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
+			getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+			getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
 
-		// Now clear out mother and father from cache
-		getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-		getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-
-		getVariantCard("mother" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
-		getVariantCard("father" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
-
-
-		CacheHelper._logCacheSize();
+			getVariantCard("mother" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
+			getVariantCard("father" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);								
+		}
 
 
 		// take this gene off of the queue and see

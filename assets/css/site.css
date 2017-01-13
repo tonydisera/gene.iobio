@@ -2779,8 +2779,9 @@ text.ref-count {
   float: left;
   font-size: 12px;
   color: rgba(204, 29, 7, 0.67);
-  padding-top: 1px;
+  padding-top: 0px;
   padding-right: 2px;
+  padding-left: 1px;
   display: none; }
 
 #gene-badge.visited #gene-badge-loaded {

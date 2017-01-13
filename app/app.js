@@ -2678,7 +2678,11 @@ function promiseDetermineInheritance(promise) {
 					}
 				});
 
-				if (dataCard.mode == 'trio') {
+				if (dataCard.mode == 'trio' && (probandVcfData == null || motherVcfData == null || fatherVcfData == null)) {
+					genesCard.clearGeneGlyphs(window.gene.gene_name);
+					genesCard.setGeneBadgeError(window.gene.gene_name);		
+					reject("Unable to determine inheritance for gene " + window.gene.gene_name + " because full trio data for gene is not available");
+				} else if (dataCard.mode == 'trio') {					
 
 					probandVariantCard.determineMaxAlleleCount();
 
