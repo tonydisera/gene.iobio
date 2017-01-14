@@ -626,8 +626,8 @@ var effectCategories = [
   }
 
   exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
-    var key = 
-      cacheHelper.launchTimestamp 
+    var key =  "backend.gene.iobio"  
+      + "-" + cacheHelper.launchTimestamp 
       + "-" + (vcfURL ? vcfURL : (vcfFile ? vcfFile.name : ""))
       + "-" + service
       + "-" + refName
@@ -704,21 +704,22 @@ var effectCategories = [
       vepArgs.push("--fasta");
       vepArgs.push(refFastaFile);
     }
-    cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
 
     //
     //  SERVER SIDE CACHING
     //
-    /*
     var cacheKey = null;
     var urlParameters = {};
     if (cache) {
-        //cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
-        urlParameters.cache = 'vep.json';
+        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        console.log(cacheKey);
+        urlParameters.cache = cacheKey;
         urlParameters.partialCache = true;
+        cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
+    } else {
+        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
     }
-    cmd = cmd.pipe(IOBIO.vep, vepArgList, {ssl: useSSL, urlparams: urlParameters});
-    */
+
 
 
 

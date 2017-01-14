@@ -741,7 +741,7 @@ VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callback
 		}
 
 	} else {
-		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 5000, 
+		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 5000, useServerCache,
 	 	  function(coverageForRegion, coverageForPoints) {
 	 	  	if (coverageForRegion != null) {
 				me.bamData = {gene: gene.gene_name,
@@ -750,7 +750,11 @@ VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callback
 					          end: gene.end, 
 					          coverage: coverageForRegion};
 
-				me._cacheData(me.bamData, "bamData", gene.gene_name);	 	  		
+				// Use browser cache for storage coverage data if app is not relying on
+				// server-side cache
+				if (!useServerCache) {
+					me._cacheData(me.bamData, "bamData", gene.gene_name);	 	  		
+				}
 	 	  	}
 
 			if (regions.length > 0) {
@@ -840,7 +844,8 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
 			       true,
-			       true
+			       true,
+			       useServerCache
 			    ).then( function(data) {
 			    	var theVcfData = data[1];	
 

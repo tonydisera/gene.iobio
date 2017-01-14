@@ -19,6 +19,7 @@ var autoCall              = null;           // if only alignments are provided, 
  											// set to null if app should prompt first before autocalling
 
 var useSSL                = false;
+var useServerCache        = false;
 
 // MyGene2 deployment variables;
 var mygene2Endpoint       = "";

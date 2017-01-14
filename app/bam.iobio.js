@@ -424,6 +424,22 @@ var Bam = Class.extend({
     })
    },
 
+  _getCacheKey: function(service, refName, start, end, miscObject) {
+    var me = this;
+    var key =  "backend.gene.iobio"  
+      + "-" + cacheHelper.launchTimestamp 
+      + "-" + (me.bamUri ? me.bamUri : (me.bamFile ? me.bamFile.name : "?"))
+      + "-" + service
+      + "-" + refName
+      + "-" + start.toString()
+      + "-" + end.toString();
+    if (miscObject) {
+      for (miscKey in miscObject) {
+        key += "-" + miscKey + "=" + miscObject[miscKey];
+      }
+    }
+    return key;
+  },
 
    /*
    *  This method will return coverage as point data.  It takes the reference name along
@@ -435,7 +451,7 @@ var Bam = Class.extend({
    *  the second for coverage of specific positions.  The latter can then be matched to vcf records
    *  , for example, to obtain the coverage for each variant.
    */
-   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, callback, callbackError) {
+   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, cache, callback, callbackError) {
       var me = this;
       this.transformRefName(refName, function(trRefName){
         var samtools = me.sourceType == "url" ?  IOBIO.samtoolsOnDemand : IOBIO.samtools;
@@ -490,8 +506,22 @@ var Bam = Class.extend({
 
         }
 
-        // After running samtools mpileup, run coverage service to summarize point data.
-        cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
+
+        //
+        //  SERVER SIDE CACHING for coverage service
+        //
+        var cacheKey = null;
+        var urlParameters = {};
+        if (cache) {
+            cacheKey = me._getCacheKey("coverage", refName, regionStart, regionEnd, {maxPoints: maxPoints});
+            console.log(cacheKey);
+            urlParameters.cache = cacheKey;
+            urlParameters.partialCache = true;
+            cmd = cmd.pipe("nv-dev-new.iobio.io/coverage/", [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL, urlparams: urlParameters});
+        } else {
+          // After running samtools mpileup, run coverage service to summarize point data.
+          cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
+        }
 
         var samData = "";
         cmd.on('data', function(data) {
