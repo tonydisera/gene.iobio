@@ -203,9 +203,15 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 	var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
 	trioModel.compareVariantsToMotherFather(function() {
 
-		getVariantCard("proband").model._cacheData(probandVcfData, "vcfData", geneObject.gene_name, transcript);					
-		getVariantCard("mother" ).model._cacheData(motherVcfData,  "vcfData", geneObject.gene_name, transcript);					
-		getVariantCard("father" ).model._cacheData(fatherVcfData,  "vcfData", geneObject.gene_name, transcript);					
+		if (!getVariantCard("proband").model._cacheData(probandVcfData, "vcfData", geneObject.gene_name, transcript)) {
+			return;
+		}		
+		if (!getVariantCard("mother" ).model._cacheData(motherVcfData,  "vcfData", geneObject.gene_name, transcript)) {
+			return;
+		}		
+		if (!getVariantCard("father" ).model._cacheData(fatherVcfData,  "vcfData", geneObject.gene_name, transcript)) {					
+			return;
+		}		
 
 		// Now that inheritance has been determined,
 		// summarize the variants for the proband to
@@ -678,7 +684,7 @@ CacheHelper.getCachedData = function(key) {
 
 CacheHelper.showError = function(key, cacheError) {
 	var cacheObject = CacheHelper._parseCacheKey(key);
-	var errorType = cacheError.hasOwnProperty("name") ? cacheError.name : "A problem";
+	var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
 	var errorKey = cacheObject.gene + "---" + errorType;
 
 	var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
@@ -687,8 +693,10 @@ CacheHelper.showError = function(key, cacheError) {
     
     // Only show the error once
     if (!recordedCacheErrors[errorKey]) {
-	    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes"
-		alertify.alert(message);	
     	recordedCacheErrors[errorKey] = message;
+	    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes."
+		alertify.alert(message, function() {
+			recordedCacheErrors[errorKey] = null;			
+		});	
     }
 }

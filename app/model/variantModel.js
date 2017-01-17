@@ -1021,7 +1021,9 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 				    	// Cache the data (if there are variants)
 				    	if (data.features.length > 0) {
-					    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+					    	if (!me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript)) {
+					    		reject("Unable to cache annotated variants for gene " + data.gene.gene_name);
+					    	};	
 				    	}
 				    	me.vcfData = data;		    	
 						resolve(me.vcfData);
@@ -1238,10 +1240,10 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
     	try {
 			dataStringCompressed = LZString.compressToUTF16(dataString);
     	} catch (e) {    		
+	   		success = false;
 	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
     		alertify.set('notifier','position', 'top-right');
 	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);
-	   		success = false;
     	}
 
     	if (success) {
@@ -1252,14 +1254,25 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    		
 	    	} catch(error) {
+	    		success = false;
 		      	CacheHelper.showError(me._getCacheKey(dataKind, geneName, transcript), error);
-		    	success = false;
+		      	genesCard.hideGeneBadgeLoading(geneName);
 	    	}    		
+    	}
+
+    	if (!success) {
+	   		genesCard.hideGeneBadgeLoading(geneName);
+	   		genesCard.clearGeneGlyphs(geneName);
+	   		genesCard.setGeneBadgeError(geneName);    		
     	}
 
     	
       	return success;
     } else {
+   		genesCard.hideGeneBadgeLoading(geneName);
+   		genesCard.clearGeneGlyphs(geneName);
+   		genesCard.setGeneBadgeError(geneName);    		
+
     	return false;
     }
 }
