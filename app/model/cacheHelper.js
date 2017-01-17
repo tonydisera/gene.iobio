@@ -687,8 +687,8 @@ CacheHelper.showError = function(key, cacheError) {
     
     // Only show the error once
     if (!recordedCacheErrors[errorKey]) {
-	    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Click on 'Clear cache...' to clear cache."
-		alertify.notify(message, 'error', 60);	
+	    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes"
+		alertify.alert(message);	
     	recordedCacheErrors[errorKey] = message;
     }
 }

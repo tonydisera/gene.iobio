@@ -120,19 +120,6 @@ GenesCard.prototype.init = function() {
 
 	    }
 	});
-	// We have a similar dropdown on the genes nav card
-	$('#manage-genes-dropdown').click(function () {
-	    if($(this).hasClass('open')) {
-	        // dropdown just closed
-	    } else {
-	    	// dropdown will open
-	    	me.initEditGenes();
-	    	setTimeout(function() {
-			  $('#genes-to-edit').focus();
-			}, 0);
-
-	    }
-	});
 
 	// Stop event propogation to get genes dropdown
 	// so that clicks in text area for copy/paste
@@ -149,6 +136,42 @@ GenesCard.prototype.init = function() {
 			event.stopPropagation();
 		}
 	});
+
+
+	// When the manage-genes dropdown opens, init the edit genes text area
+	$('#manage-genes-dropdown').click(function () {
+	    if($(this).find(".btn-group").hasClass('open')) {
+	        // dropdown just closed
+	    } else {
+	    	// dropdown will open
+	    	me.initEditGenes();
+	    	setTimeout(function() {
+			  $('#genes-to-edit').focus();
+			}, 0);
+
+	    }
+	});
+	// Prevent dropdown from automatically closing when user clicks on anywhere inside the dropdown
+	$('#manage-genes-dropdown .dropdown-menu').click( function(event) {
+	    event.stopPropagation();
+    });
+	// Stop event propogation to manage-genes dropdown
+	// so that clicks in text area for copy/paste
+	// don't cause dropdown to close
+	$('#manage-genes-dropdown ul li#edit-list-li').on('click', function(event){
+	    //The event won't be propagated to the document NODE and
+	    // therefore events delegated to document won't be fired
+	    event.stopPropagation();
+	});
+	// Enter in edit genes textarea should function as newline
+	$('#manage-genes-dropdown ul li#edit-list-li').keyup(function(event){
+
+		if((event.which== 13) && ($(event.target)[0]== $("textarea#genes-to-edit")[0])) {
+			event.stopPropagation();
+		}
+	});
+
+
 
 	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
@@ -419,6 +442,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 GenesCard.prototype.editGenes = function() {
 	var genesString = $('#genes-to-edit').val();
 	this.copyPasteGenes(null, false, genesString);
+	$('#manage-genes-dropdown .btn-group').removeClass('open');
 }
 
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, genesString) {
