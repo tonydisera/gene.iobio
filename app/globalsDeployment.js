@@ -2,6 +2,8 @@
     with for a local deployment.  This entire .js can be replaced or modified to suit the 
     specific iobio deployment environment.
 */
+var version               = "2.0.0";
+
 var isOffline             = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
 var accessNCBIGeneSummary = true;           // is it okay to access NCBI web resources to obtain the refseq gene summary?  In cases where the server and client are COMPLETELY offline, set this to false.
@@ -17,6 +19,7 @@ var autoCall              = null;           // if only alignments are provided, 
  											// set to null if app should prompt first before autocalling
 
 var useSSL                = false;
+var useServerCache        = false;
 
 // MyGene2 deployment variables;
 var mygene2Endpoint       = "";
@@ -24,13 +27,11 @@ var mygene2XAuthToken     = "";
 
 
 /*
-* These variables control special behavior for running gene.iobio education edition, with
-* a simplified interface and logic.  For running one of the special educational edition 
-* tours (e.g. a guided tour of the gene.iobio app), TURN ON BOTH isLevelEdu and isLevelEduTour.
-* See @import statements for levelEdu and levelEduTour in css/assets/sass.
+* This variable controls special behavior for running gene.iobio education edition, with
+* a simplified interface and logic.  
+* See @import statements for levelEdu  in css/assets/sass.
 */
 var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
-var isLevelEduTour        = false;   // is gene.iobio exhibit version, a simplified version of the app w/ guided tour
 
 /*
 * These variables control special behavior for running gene.iobio basic mode, with

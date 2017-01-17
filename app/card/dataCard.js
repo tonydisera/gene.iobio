@@ -159,7 +159,7 @@ DataCard.prototype.loadDemoData = function() {
 
 
 	if (isLevelEdu) {
-		var idx = isLevelEduTour ? +eduTourNumber : 0;
+		var idx = +eduTourNumber;
 		this.demoCards      = this.eduTourCards[idx];
 		this.demoUrls        = isOffline ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
 		this.demoNames       = this.eduTourNames[idx];
@@ -219,10 +219,20 @@ DataCard.prototype.loadDemoData = function() {
 
 
 		reloadGeneFromUrl();
-	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber].length > 0) {
-		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber][0]);
-		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber].join(","));
-		reloadGeneFromUrl();
+	} else if (window.isLevelEdu && this.eduTourGenes[+eduTourNumber].length > 0) {
+		var theGenes       = me.eduTourGenes[+eduTourNumber];
+		window.updateUrl("gene", theGenes[0]);
+		window.updateUrl("genes", theGenes.join(",") );
+
+		me.mode = "single";
+		genomeBuildHelper.setCurrentBuild(me.demoBuild);
+		me.setVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,   me.demoSampleNames.proband, me.demoUrls.proband);
+		
+		window.loadTracksForGene();
+		window.cacheHelper.clearCache();
+		window.matrixCard.reset();	
+		genesCard.selectGene(theGenes[0]);
+	
 	} else {
 		loadUrlSources();
 
@@ -238,6 +248,9 @@ DataCard.prototype.loadMygene2Data = function() {
 
 	var loadProband = function(vcfFilePath) {
 
+		if (isLevelBasic) {
+			window.showSidebar("Phenolyzer");
+		}
 		if (vcfFilePath != null) {
 			// Get rid of leading "/" in file path when server instance already ends with "/"
 			if (endsWith(serverInstance, "/") && vcfFilePath.indexOf("/") == 0) {
@@ -249,13 +262,9 @@ DataCard.prototype.loadMygene2Data = function() {
 			// If the genome build was specified, load the endpoint variant file
 			if (genomeBuildHelper.getCurrentBuild()) {
 				me.setVcfUrl("proband", "Variants", null, probandUrl);
-
 				window.loadTracksForGene();
-				window.showSidebar("Phenolyzer");
-
 				window.cacheHelper.clearCache();
 				window.matrixCard.reset();		
-
 			} else {
 				alertify.alert("Cannot load data.  The genome build must be specified.");
 			}
@@ -263,6 +272,8 @@ DataCard.prototype.loadMygene2Data = function() {
 			me.loadDemoData();
 		}
 	};
+
+
 
 	var missingVariables = "";
 	if (mygene2Endpoint == "") {
@@ -308,7 +319,6 @@ DataCard.prototype.loadMygene2Data = function() {
 		    }
 		});
 	}
-	
 
 }
 

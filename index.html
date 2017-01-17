@@ -72,7 +72,7 @@
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-      if (isLevelEdu || isLevelEduTour) {
+      if (isLevelEdu) {
         // Analytics for learngene.iobio
         ga('create', 'UA-47481907-7', 'auto');
       } else {
@@ -136,366 +136,202 @@
 
   <div id="bookmark-gene-tooltip" class="tooltip" style="opacity:0"></div>
 
-  <div id="gene-badge-tooltip" class="tooltip" style="font-size:10px;opacity:0;overflow-y:hidden;overflow-x:hidden"></div>
+  <div id="gene-badge-tooltip" class="tooltip" style="font-size:12px;opacity:0;overflow-y:hidden;overflow-x:hidden"></div>
 
   <div id="nav-edu-tour" class="shadow-z-2 hide" >
   </div>
 
   <div id="slide-buttons"  class="level-edu level-basic">
     <div id="close-slide-left" class="close-button fade-in hide">
-        <i class="material-icons" id="close-slide-left-glyph" style="line-height:.8;font-size: 40px;font-weight: bold;">keyboard_arrow_left</i>
+        <i class="material-icons" id="close-slide-left-glyph" >keyboard_arrow_left</i>
     </div>
 
   </div>
 
-  <div id="slider-left" class="hide fade-in ">
+  <div id="slider-left" class="hide fade-in shadow-z-2">
      
+
+    <div class="navbar navbar-default level-basic level-edu">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>     
+        </div>
+        <div class="navbar-collapse collapse navbar-responsive-collapse" >
+          <ul class="nav ">
+
+            <li id="filter-tab" class="hide">
+             <a href="javascript:void(0)" id="clear-filters-link" 
+               onclick="filterCard.clearFilters();filterVariants()">
+                  Clear all
+              </a>              
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:80px">
+                <span class="material-icons">tune</span> 
+                Filter
+              </a>
+            </li>
+            <li id="examine-tab" class="hide">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Examine')">
+                <span class="material-icons">remove_red_eye</span> 
+                Inspect
+              </a>
+            </li>
+            <li id="phenolyzer-tab" class="hide">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Phenolyzer')">
+                <svg height="22" width="22">
+                  <g transform="translate(0,0)">
+                    <use id="search-dna-glyph" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="22" height="22" fill="white"></use>
+                  </g>
+                </svg>   
+                <span style="overflow:auto;display:inline-block">Genes</span>
+              </a>
+            </li> 
+            <li id="bookmarks-tab" class="hide">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
+                <span class="material-icons">bookmark</span> 
+                Bookmarks
+              </a>
+            </li> 
+            <li id="recall-tab" class="hide">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Recall')">
+                <span class="material-icons">dialpad</span> 
+                Call variants
+              </a>
+            </li>        
+          </ul>
+        </div>
+      </div>
+    </div>    
+
     <div id="slider-left-content" class="shadow-z-2">
     </div>
+
   </div>
 
-<!-- Tour visual dialog -->
-<div class="modal fade" id="edu-tour-modal" tabindex="-1" role="dialog">
-  <div id="edu-tour-modal-content" class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="padding-top:10px;">        
-      </div>
-      <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
-      </div>
-      <div class="modal-footer" style="clear-both">
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Close</button>
-      </div>
+
+  <div id="modals-placeholder"></div>
+
+  <div id="container" class="push">
+
+    <div id="intro" class="hide level-basic shadow-z-2">
     </div>
-  </div>
-</div>
 
-<!-- Disclaimer dialog -->
-<div class="modal fade" id="disclaimer-modal" tabindex="-1" role="dialog">
-  <div id="disclaimer-modal-content" class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="padding-top:10px;">
-        <h4>Disclaimer</h4>
-      </div>
-      <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
-     
-                The University of Utah makes no claims that iobio applications, including gene.iobio are approved for clinical use. All users of iobio applications including gene.iobio understand and accept that any information gained by using these applications, whether the information comes from visualization, processing, internal or external databases, or analysis, may not in any way be used for clinical purposes. The University of Utah makes no representation that iobio or gene.iobio is either safe or effective for any intended use for which research may currently be performed.
-
-                iobio, or any iobio applications ARE TO BE USED FOR RESEARCH PURPOSES ONLY. USE FOR CLINICAL PURPOSES IS EXPRESSLY FORBIDDEN. Approval of iobio applications for clinical use has neither been applied for, nor received, in any country, including the United States of America.
-      </div>
-      <div class="modal-footer" style="clear-both">
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Manage cache dialog -->
-<div class="modal fade" id="manage-cache-modal" tabindex="-1" role="dialog">
-  <div id="manage-cache-modal-content" class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="padding-top:10px;">
-        <span class="modal-title">Cache of analyzed data</span>
-      </div>
-      <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
-     
-               <div >
-                 <span class="cache-label" >Data for coverage chart</span>
-                 <span class="cache-size" id="coverage-size"></span>
-                 <button id="clear-coverage-cache" onclick="cacheHelper.clearCoverageCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
-               </div>
-               <div >
-                 <span class="cache-label" >Data for genes with no badges</span>
-                 <span class="cache-size" id="non-badge-size"></span>
-                 <button id="clear-coverage-cache" onclick="cacheHelper.clearNonBadgeCache();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
-               </div>
-               <div >
-                <span class="cache-label" >All data</span>
-                <span class="cache-size" id="cache-size"></span>
-                 <button id="clear-coverage-cache" onclick="cacheHelper.clearAll();" class="icon-button-sm btn btn-default btn-raised">Clear all</button>
-               </div>
-      </div>
-      <div class="modal-footer" style="clear-both">
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Data Modal -->
-<div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel">
-  <div id="data-card" class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="padding-top:12px;">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <span class="modal-title">Data</span>
-
-        <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
-          <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-            <i class="mdi-social-person"></i>
-            Single
-          </button>
-          <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <div style="float:left;">
-              <img src="assets/images/family.png" style="height:27px"/>
-            </div>
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-          </button>            
-          <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <div style="float:left;">
-              <img src="assets/images/pedigree.png" style="height:22px"/>
-            </div>
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-          </button>
-          <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <i class="mdi-editor-format-align-justify"></i>                
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-          </button>
-        </div>
+    <div id="genes-control-track" class="hide level-basic shadow-z-2">
+      <div id="filters" class="hide">
 
       </div>
-      <div class="modal-body" style="padding-top:0px;padding-bottom:0px">
-          <div  >
-
-            <div style="overflow:visible;margin-bottom:10px;">
-              <div id="select-species-box" style="width:170px;float:left;">
-                <span id="sample-data-label">Species</span>
-                <select id="select-species" class="selectized" placeholder="select species...">
-                </select>
-              </div>
-              <div id="select-build-box" style="width:170px;float:left;margin-left:20px;">
-                <span id="sample-data-label">Genome Build</span>
-                <select id="select-build" class="selectized" placeholder="select genome build...">
-                </select>
-              </div>
-              <div id="species-build-warning" class="alert alert-danger hide" style="float:left;width:100%">                
-              </div>              
-            </div>
-
-              <div>
-                <div id="proband-data" style="float:left;min-width:500px;">
-                  <input id="card-index" class="hide" value="0" type="text">
-                  <input id="datasource-relationship" class="hide" value="proband" type="text"/>
-                </div>
+      <button id="refresh-badges-button" class="hide btn btn-default icon-button-sm btn-raised" onclick="cacheHelper.refreshGeneBadges()">
+        Refresh all
+      </button>
 
 
-                <div id="mother-data" class="hide" style="float:left;margin-top:20px;min-width:500px;">
-                  <input id="card-index" class="hide" value="1" type="text">
-                  <input id="datasource-relationship" class="hide" value="mother" type="text"/>
-                </div>
-
-                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:20px;min-width:500px;">
-                  <input id="card-index" class="hide" value="2" type="text">
-                  <input id="datasource-relationship" class="hide" value="father" type="text"/>
-                </div>
-
-
-              </div>
-
-              <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
-                <div id="affected-sibs-box" style="float:left;" class="hide">
-                    <div id="sample-data-label">
-                      AFFECTED SIBLINGS
-                    </div>
-                    <div style="width:270px;">
-                      <select id="affected-sibs-select" style="font-size:10px;"  class="selectized" multiple="multiple" placeholder="Choose sample(s)...">
-                      </select>
-                    </div>
-                </div>
-                <div id="unaffected-sibs-box" style="float:left;margin-left:10px;padding-bottom:20px;" class="hide">
-                    <div id="sample-data-label">
-                      UNAFFECTED SIBLINGS
-                    </div>
-                    <div style="width:270px;">
-                      <select id="unaffected-sibs-select" style="font-size:10px;" class="selectized"  multiple="multiple" placeholder="Choose sample(s)...">
-                      </select>
-                    </div>
-                </div>
-              </div>
-
-          </div>   
-
-          
-
-
-      </div>
-
-      <div class="modal-footer" style="clear-both">
-         
-          <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
-          <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
-            <i class="material-icons">cloud_done</i>
-            Load
-          </button>
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Modal -->
-<div class="modal fade" id="feedback-modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          <span class="modal-title">Give us feedback</span>
-        </div>
-        <div class="modal-body">
-           <div>
-             <span class="feedback-small-label" style="margin-right: 4px">Your email</span><input id="feedback-email" type="text" ></input>
-          </div>
-           <div style="margin-top:10px">
-             <span class="feedback-small-label" style="margin-right: 4px">Your name</span><input id="feedback-name" type="text" ></input>
-          </div>
-          <div style="margin-top:10px; margin-bottom:10px">
-             <span class="feedback-label"</span>Description of problem<textarea id="feedback-note" ></textarea>
-          </div>
-          <div id="feedback-screen-capture-area" class="hide">
-            <span class="feedback-label"</label>Screen Capture</span>
-            <div id="feedback-screen-capture">
-          </div>
-        </div>    
-        <div class="modal-footer">
-          <span id="feedback-warning" class="hide alert alert-danger">
-          </span>          
-          <button id="report-feedback-button" type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" >
-             <i class="material-icons">email</i>
-             Send email
-          </button>
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
-        </div>
-    </div>
-  </div>
-</div>
-</div>
-
-
- <div id="container" class="push">
-    
-    <div id="nav-section" class="fixed">
-
-      <div id="intro" class="hide level-basic shadow-z-2">
-      </div>
-
-      <div id="nav-card" class="shadow-z-2">
-      	<section id="app-title-section" class="nav-stretch">
-          <div class="nav-left">
-        	      <a id='home' style="display:inline-block">
-                  <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
-                </a>
-                <div id="basic-mode-title" class="level-mygene2 hide">
-                  basic
-                </div>
-                <div id="advanced-mode-title" class="level-mygene2 hide">
-                  advanced
-                </div>
-                <a id="button-launch-advanced-mode" class="hide"  onclick="switchToAdvancedMode()">Go to Advanced mode</a>
-                <a id="button-launch-basic-mode"    class="hide"  onclick="switchToBasicMode()">Go to Basic mode</a>
-
-                <a href="javascript:void(0)" id="app-disclaimer-link-left" class="level-edu level-basic"  onclick="$('#disclaimer-modal').modal('show')">
-                   Disclaimer
-                </a>              
-                <div id="education-title" class="level-edu"
-                style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
-                  education edition
-                </div>
-
-          </div>
-          <span id="main-panel-title" class="card-label level-basic hide">Gene info</span>
-
-            <!-- iobio project link -->
-          <div class="nav-right">
-            <a href="http://iobio.io" class="iobioproject">           
-              an iobio project          
-            </a>
-            <a href="javascript:void(0)" id="app-disclaimer-link-right" class="level-edu level-basic"  onclick="$('#disclaimer-modal').modal('show')">
-              Disclaimer
-            </a>
-
-          </div>
-
-
-
-
-            
-          <div id="gene-search-bar" class="level-edu level-basic nav-center" >
-
-
-              <!-- Gene search -->
-              <span id="bloodhound" >
-                  <input id="enter-gene-name" class="level-edu typeahead" style="cursor:pointer;margin-top:10px;margin-bottom:0px;margin-right:10px" type="text" data-toggle="tooltip" data-placement="bottom" 
-                  placeholder="Enter Gene Name">
-              </span>     
-
-              <!-- Genome build link -->
-              <a href="javascript:void(0)" id="build-link" class="level-edutour level-basic" data-toggle="modal" data-target="#dataModal"></a>
-
-              <!-- Button data modal -->
-              <button id="add-data-button" type="button" class="level-edu mygene2 icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#dataModal">
-                <i class="material-icons" style="font-size: 18px;">input</i>      
-                Data
-              </button>
-
-               <button  id="feedback-link" class="hide level-edu level-edu-tour mygene2 icon-button-sm btn btn-default btn-raised" data-toggle="modal" data-target="#feedback-modal">
-                Feedback
-              </button>
-           
-      
-            </div>
-
+      <section id="app-title-section" class="nav-stretch level-basic">
 
           <!-- gene badges for navigation -->
-          <div class="nav-center">
-            <div>
+          <div id="genes-panel" class="hide nav-center">
+            <div class="level-edu" style="text-align:center">
               <!-- Buttons for editting gene list, done editting gene list -->
-              <div id="manage-genes" class="level-edu level-basic">
+              <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
-                   <i class="material-icons">playlist_add_check</i>
                     Analyze all
                 </a>
 
-                <a class="hide" id="clear-gene-list" style="cursor:pointer;padding-left:5px;"
-                  href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                    Remove all
-                </a>
-                <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
-              </div>
-
-              <div id="gene-page-selection" class="level-basic"></div>
-
-              <div id="gene-page-control" class="level-edu level-basic">
-
+                <div id="analyze-all-progress" class="hide">
+                  <div class="bar"></div>
+                  <div class="text"></div>
+                </div>
+                
+                <span id="order-by-label" class="manage-gene-links">Order by</span>
                 <div id="select-gene-container">
-                    <select id="select-gene-sort" style="font-size:10px;">
+                    <select id="select-gene-sort">
                     </select>
                 </div>
+              </div>
 
-                 <a href="javascript:void(0)" id="view-50-genes" class="gene-paging-link hide"
-                  onclick="genesCard.viewDefaultsGenesPerPage()" >
-                  View 40
-                </a>
-                <a href="javascript:void(0)" id="view-all-genes" class="gene-paging-link hide"
-                  onclick="genesCard.viewAllGenes()" >
-                  | all
-                </a>
+              <div style="display:inline-block">
 
-
-                <a href="javascript:void(0)" id="manage-cache-link" class="hide" onclick="cacheHelper.openDialog()" >
-                    Clear cached results...
-                </a>
 
               </div>
+
+
+             
+              <div style="float:right;text-align:right;display:inline-block;width:270px">               
+                <div id="manage-genes-dropdown" class="level-edu level-basic" style="float:right;margin-top:-8px;">
+                  <div class="btn-toolbar">
+                    <div class="btn-group" style="display:inline;">
+
+                      <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          Manage genes
+                          <span style="margin-left:6px" class="caret"></span>
+                      </button>
+                       
+                      <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
+                        <li style="margin-bottom: 10px">
+                            <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
+                              Manage cache of analyzed genes...
+                          </a>
+                        </li>
+
+                         <li  style="margin-bottom: 10px">
+                            <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
+                              href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                                Remove all genes
+                           </a>
+                        </li>
+                       
+                        <li id="edit-list-li">
+                           <div >Edit gene list</div>
+                           <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
+                              <textarea  id="genes-to-edit"></textarea>
+                              <div style="text-align:right">
+                                <button id="edit-genes-button" type="submit" onclick="genesCard.editGenes()" class="icon-button-sm btn btn-default btn-raised">
+                                  Done
+                                </button>
+                              </div>
+                          </div>
+                        </li>
+                        
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               
+
+              
             </div>
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
+                
             </div>
           </div>
-      </section>
+          <div id="gene-page-control" class="hide level-edu level-basic">
+            <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
+            
+            <div id="gene-page-selection" class="level-basic"></div>
+
+            <div id="gene-paging-links" class="hide">
+              <a href="javascript:void(0)" id="view-50-genes" 
+                 class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
+                    View 40
+              </a>
+              <a href="javascript:void(0)" id="view-all-genes" 
+                 class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
+                | all
+              </a>
+            </div>
+          </div>
+      </section>          
+    </div>
+    
+    <div id="nav-section" class="fixed level-edu hide">
+
+
+      <div id="nav-card" class="shadow-z-2">
+
 
 
 
@@ -549,7 +385,7 @@
               </div>                  
           </div>  
 
-          <div id="gene-source-box" class="level-edu level-basic" style="width:113px;float:left;margin-left: 10px;margin-top: -28px;">
+          <div id="gene-source-box" class="level-edu level-basic" style="width:123px;float:left;margin-left: 10px;margin-top: -28px;">
             <select id="select-gene-source" class="fullview" data-placeholder="">
                   <option value="Gencode Transcript">Gencode Transcript</option>
                   <option value="RefSeq Transcript">RefSeq Transcript</option>                   
@@ -599,19 +435,27 @@
     </div>  
 
 
+    <div id="welcome-panel" class="hide">
+      <div id="welcome-label">
+        Welcome to gene.iobio
+      </div>  
+      <button id="load-demo-data" class="btn btn-raised btn-default" onclick="dataCard.loadDemoData()">
+        <span style="">Load Demo data</span>
+      </button>
+    </div>
 
-    <div id="track-section" class="push" style="margin-top:5px;">
+    <div id="track-section" class="push" style="display:flex;margin-top:5px;">
 
-        <div id="matrix-track"  class="track shadow-z-2 hide">
+        <div id="matrix-track" style="width:100%;overflow-x:scroll" class="track shadow-z-2 hide">
             
-            <div class="card-label level-edu level-basic" style="">Rank Variants</div>
+            <div style="overflow:auto;text-align:left;margin-bottom: 5px;">
+              <div class="card-label level-edu level-basic" style="float:left">Rank Variants</div>
+              <a id="show-legend" class="level-edu level-basic"  onclick="showLegend()" href="javascript:void(0)">
+                <i style="font-size:18px" class="material-icons">map</i>
+                Show legend
+              </a>
+            </div>
 
-            <span id="low-quality-legend" class="hide">
-                <div style="display:inline-block;width:15px;height:15px;background-color: #dedede;"></div>
-                <div style="display: inline-block;vertical-align: top;">
-                    shaded columns: flagged for not meeting filtering criteria
-                </div>
-            </span>
 
             <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
@@ -619,7 +463,7 @@
               No clinvar variants under 1% population frequency found
             </div>
     
-            <div id="matrix-panel"  style="clear:both;margin-top:-9px;min-height:30px"
+            <div id="matrix-panel"  style="clear:both;min-height:30px"
               class="fullview" aria-expanded="true">
                 <div class="loader hide"  style="margin-top:0px;margin-bottom:10px;">
                     <span class="loader-label">Ranking variants</span>
@@ -627,162 +471,140 @@
                 </div>
 
 
-              <div id="feature-matrix" style="overflow-x: scroll;margin-top:-15px;">
+              <div id="feature-matrix" style="overflow-x: scroll;">
               </div>
 
-              <a id="move-rows" class="level-edu level-basic hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">Reorder</a>
+              <a id="move-rows" class="level-edu level-basic hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">
+                 <i class="material-icons">swap_vert</i>
+                Reorder
+              </a>
 
               <div id="feature-matrix-note" class="hide" >
                 
-                <span class="level-edu level-basic" style="color:  rgb(132,132,132);">
-                  More likely causative
-                </span>
-                <span id="matrix-harmful-note" class="hide level-basic level-edu" style="color:  rgb(132,132,132);">
-                  Most harmful
-                </span>
+                <div style="display:inline-block">
+                  <svg style="height: 10px;width:108px">
+                    <g transform="translate(8,6)">
+                      <line x1="0" y1="0" x2="100" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
+                    </g>
+                    <g transform="translate(-10,0),rotate(-90,10,0)">
+                      <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
+                    </g>
+                  </svg>
 
-                <svg style="height: 10px;width:108px">
-                  <g transform="translate(18,6)">
-                    <line x1="0" y1="0" x2="80" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
-                  </g>
-                  <g transform="translate(0,0),rotate(-90,10,0)">
-                    <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
-                  </g>
-                </svg>
+                  <div class="matrix-note-text level-edu level-basic">
+                    More likely causative
+                  </div>
+                  <div id="matrix-harmful-note" class="matrix-note-text hide level-basic level-edu">
+                    Most harmful
+                  </div>
+
+                </div>
+                <div class="level-edu level-basic" style="display: inline-block;vertical-align: top;">
+                  <span id="low-quality-legend" >
+                      <div id="low-quality-legend-box"></div>
+                      <p id="low-quality-legend-text">
+                          shaded columns: flagged for not meeting filtering criteria
+                      </p>
+                  </span>
+                           
+                </div>
 
               </div> 
             </div>
         </div>
-      </div>
 
-      <div id="variant-control-track" style="background:white;padding-right:10px;padding-top:5px;margin-bottom: 7px;margin-top:8px;padding-left: 10px;" class="hide todo shadow-z-2">
-
-        <div id="toolbar" style="width:100%"  >
-                <span style="float:left;padding-top:5px;" class="card-label" >SHOW VARIANTS</span>
-
-
-
-                <a href="javascript:void(0)" style="margin-left:2px;margin-top:2px;" class="hide">
-                  <i class="mdi-action-settings"></i>
-                </a>
-
-
-                <a href="javascript:void(0)" id="button-show-filter-card" class=" btn btn-default btn-raised icon-button" style="margin-left:10px;margin-top:4px;padding-top:2px;padding-bottom:2px;" onclick="showFilterSlideLeft()">     
-                  <i class="material-icons" style="font-size: 18px;">donut_small</i>          
-                      Filter
-                </a>
-
-
-                <a href="javascript:void(0)" id="button-show-bookmarks-variant" class=" btn btn-default btn-raised icon-button" style="margin-left:10px;margin-top:4px;padding-top:2px;padding-bottom:2px;" onclick="showBookmarkSlideLeft()">       
-                 <i class="material-icons" style="font-size: 18px;">bookmark</i>                
-                    Bookmarks 
-                </a>
-         
-
-
-
-
-                <span style="margin-left:20px;">                  
-                    <select id="select-intron-display" onchange="" >
-                          <option>Exons + Introns</option>
-                          <option>Exons Only</option>                   
-                     </select>
-                </span>
-
-                 <span style="margin-left:20px;">                  
-                    <select id="select-color-scheme" onchange="" >
-                          <option>Color by Impact</option>
-                          <option>Color by Effect</option>                   
-                          <option>Color by Hom / Het</option>                   
-                     </select>
-                </span>
-
-
+        <div id="legend-track" style="width:50%;margin-left:5px" class="hide track shadow-z-2 level-basic level-edu">
+          <div style="overflow:auto">
+            <div class="card-label" style="float:left">Legend</div>
+            <a id="close-legend"  onclick="hideLegend()" href="javascript:void(0)">X</a>
           </div>
 
-      </div>
-
-      <div id="coordinate-frame" class="">
-      </div>
-
-      <div id="proband-variant-card"  >
-      </div>
-
-
-      <div id="other-variant-cards">
-      </div>
-
-
-      <div id="splash" class="hide horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
-        <div class="vertical-center">
-          <img id="splash-image" height="400px" class="hide" src="assets/images/gene.iobio.v2.png"   >
+          <div id="legend-placeholder">
+          </div>
         </div>
-      </div>
+    </div>
 
+    <div id="coordinate-frame" class="">
+    </div>
+
+    <div id="proband-variant-card"  >
     </div>
 
 
-<div id="animation-container-1" class="tour-animation-container hide " 
-    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
-      <div id="Stage"  class="EDGE-462912531 tour-animation"></div>
-</div>
-<div id="animation-container-2" class="tour-animation-container hide " 
-    style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
-      <div id="Stage" class="EDGE-30904779 tour-animation"></div>
-</div>
+    <div id="other-variant-cards">
+    </div>
 
-<div id="tourWelcome" class="customPageGuideWelcome hide" style="text-align:center;height:170px;">
-  <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
-        float: right;
-        background-color: transparent !important;
-        font-size: 17px;
-        margin-top: -10px;
-    ">X</button>
 
-  <h3>Welcome to gene.iobio</h3>
-  <p>An app for interrogating disease-causing variants</p>
-  <div class="modal-button-container" style="text-align: center;margin-top: 20px;">
-    <button class="screencasts" style="margin-left:5px;" onclick="$('#tourWelcome').removeClass('open');showSidebar('Help');" class="tlypageguide_ignore">Learn more</button>
-    <button  style="margin-left:10px" onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add your data</button>
-          
+    <div id="splash" class="hide horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
+      <div class="vertical-center">
+        <img id="splash-image" height="400px" class="hide" src="assets/images/gene.iobio.v2.png"   >
+      </div>
+    </div>
+
   </div>
-</div>
+
+
+  <div id="animation-container-1" class="tour-animation-container hide " 
+      style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
+        <div id="Stage"  class="EDGE-462912531 tour-animation"></div>
+  </div>
+  <div id="animation-container-2" class="tour-animation-container hide " 
+      style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
+        <div id="Stage" class="EDGE-30904779 tour-animation"></div>
+  </div>
+
+  <div id="tourWelcome" class="customPageGuideWelcome hide" style="text-align:center;height:170px;">
+    <button onclick="$('#tourWelcome').removeClass('open');" class="tlypageguide_ignore" style="
+          float: right;
+          background-color: transparent !important;
+          font-size: 17px;
+          margin-top: -10px;
+      ">X</button>
+
+    <h3>Welcome to gene.iobio</h3>
+    <p>An app for interrogating disease-causing variants</p>
+    <div class="modal-button-container" style="text-align: center;margin-top: 20px;">
+      <button class="screencasts" style="margin-left:5px;" onclick="$('#tourWelcome').removeClass('open');showSidebar('Help');" class="tlypageguide_ignore">Learn more</button>
+      <button  style="margin-left:10px" onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add your data</button>
+            
+    </div>
+  </div>
+
+   
+  <div id="tour-placeholder" class="hide">
+  <div>
+
 
  
-<div id="tour-placeholder" class="hide">
-<div>
 
+  <div id="footer" class="footer text-center" >
+    <div class="poweredbyheader">gene.iobio is powered by</div>
+    <div>
+        <a class="poweredby" href="http://phenolyzer.usc.edu/" target="_poweredby">Phenolyzer</a>
+        <a class="poweredby" href="http://human-phenotype-ontology.github.io/about.html" target="_poweredby">Human Phenotype Ontology</a>
+        <a class="poweredby" href="http://snpeff.sourceforge.net/" target="_poweredby">SnpEff</a>
+        <a class="poweredby"  href="http://uswest.ensembl.org/info/docs/tools/vep/index.html?redirect=nop" target="_poweredby">Variant Effect Predictor</a>
+        <a class="poweredby" href="http://genetics.bwh.harvard.edu/pph/index.html" target="_poweredby">PolyPhen</a>
+        <a class="poweredby" href="http://sift.jcvi.org/" target="_poweredby">SIFT</a>
 
- 
-
-    <div id="footer" class="footer text-center" >
-      <div class="poweredbyheader">gene.iobio is powered by</div>
-      <div>
-          <a class="poweredby" href="http://phenolyzer.usc.edu/" target="_poweredby">Phenolyzer</a>
-          <a class="poweredby" href="http://human-phenotype-ontology.github.io/about.html" target="_poweredby">Human Phenotype Ontology</a>
-          <a class="poweredby" href="http://snpeff.sourceforge.net/" target="_poweredby">SnpEff</a>
-          <a class="poweredby"  href="http://uswest.ensembl.org/info/docs/tools/vep/index.html?redirect=nop" target="_poweredby">Variant Effect Predictor</a>
-          <a class="poweredby" href="http://genetics.bwh.harvard.edu/pph/index.html" target="_poweredby">PolyPhen</a>
-          <a class="poweredby" href="http://sift.jcvi.org/" target="_poweredby">SIFT</a>
-
-          <a class="poweredby" href="https://github.com/ekg/freebayes" target="_poweredby">FreeBayes</a>
-          <a class="poweredby" href="http://www.ncbi.nlm.nih.gov/clinvar/" target="_poweredby">ClinVar</a>
-          <a class="poweredby" href="http://samtools.sourceforge.net/" target="_poweredby">samtools</a>
-          <a class="poweredby" href="https://github.com/pezmaster31/bamtools" target="_poweredby">bamtools</a>
-          <a class="poweredby" href="http://genome.sph.umich.edu/wiki/Vt" target="_poweredby">VT</a>
-          <a class="poweredby" href="http://exac.broadinstitute.org/" target="_poweredby">ExAC</a>
-          <a class="poweredby" href="http://www.1000genomes.org/home" target="_poweredby">1000G</a>
-          <span class="icon-credit" >
-              <a  id="icon-credit" href="javascript:void(0)" onclick="$('#freepik-info').toggleClass('hide')">Freepik icons...</a> 
-              <span id="freepik-info" class="hide" >
-                <a  href="http://www.freepik.com" title="Freepik"  >Freepik icons</a> 
-                from <a   href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
-              </span>
-          </span>
-
-      </div>
+        <a class="poweredby" href="https://github.com/ekg/freebayes" target="_poweredby">FreeBayes</a>
+        <a class="poweredby" href="http://www.ncbi.nlm.nih.gov/clinvar/" target="_poweredby">ClinVar</a>
+        <a class="poweredby" href="http://samtools.sourceforge.net/" target="_poweredby">samtools</a>
+        <a class="poweredby" href="https://github.com/pezmaster31/bamtools" target="_poweredby">bamtools</a>
+        <a class="poweredby" href="http://genome.sph.umich.edu/wiki/Vt" target="_poweredby">VT</a>
+        <a class="poweredby" href="http://exac.broadinstitute.org/" target="_poweredby">ExAC</a>
+        <a class="poweredby" href="http://www.1000genomes.org/home" target="_poweredby">1000G</a>
+        <span class="icon-credit" >
+            <a  id="icon-credit" href="javascript:void(0)" onclick="$('#freepik-info').toggleClass('hide')">Freepik icons...</a> 
+            <span id="freepik-info" class="hide" >
+              <a  href="http://www.freepik.com" title="Freepik"  >Freepik icons</a> 
+              from <a   href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
+            </span>
+        </span>
 
     </div>
+
+  </div>
 
 
     
@@ -822,8 +644,8 @@
 <script src="app/model/genomeBuildHelper.js"></script>  
 
 <script src="app/legend.js"></script>
+<script src="app/variantTooltip.js"></script>
 
-<script src="app/card/examineCard.js"></script>
 <script src="app/card/dataCard.js"></script>
 <script src="app/card/matrixCard.js"></script>
 <script src="app/card/filterCard.js"></script>

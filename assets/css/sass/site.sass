@@ -1,28 +1,97 @@
 @import variables
 
 
-// These imports are styles for the gene.iobio education edition, with
-// a simplified interface and logic.  For running one of the special educational edition 
-// tours (e.g. a guided tour of the gene.iobio app), UNCOMMENT BOTH levelEdu and levelEduTour 
-//import statements.
+// These  are styles for the gene.iobio education edition, with
+// a simplified interface and logic.  Remember to set the isLevelEdu flag
+// in app/globalsDeployment.js
 //@import levelEdu
-//@import levelEduTour
 
-
+ 
 
 body
   font-family: $app-font, sans-serif !important
   margin-top: -5px 
 
+
+
+.navbar 
+  background-color: $app-color !important
+  margin-bottom: 0px !important
+  min-height: 50px
+  
+
+  .navbar-brand
+    height: 50px
+    margin-top: -6px
+    padding-top: 15px
+
+    #home
+      margin-top: 6px
+
+  .navbar-form
+    margin-top: 10px
+
+  .form-group.is-focused 
+    .form-control
+      background-image: linear-gradient($navbar-lowlight-color, $navbar-hover-color), linear-gradient($navbar-underline-color, $navbar-underline-color)
+
+  .vertical-divider    
+    height: 34px
+    margin: 10px 17px
+    border-left: 1px solid #aba9a9
+      
+  ul.nav
+    >li
+
+      #genes-menu-item
+        overflow: auto
+        display: inline-block
+        vertical-align: top
+        padding-top: 1px
+      
+      >a
+        color: white !important
+        padding-top: 15px !important
+        padding-bottom: 10px !important
+
+        &:hover
+          color: $navbar-hover-color  !important
+          
+          #search-dna-glyph
+            fill: $navbar-hover-color   !important
+
+        p.wrapped
+          width: 50px
+          word-wrap: break-word
+          line-height: 14px
+          display: inline-block
+          vertical-align: top
+          margin-bottom: 0px 
+
+          &.wide
+            width: 70px       
+
+    >li.active
+      color: white !important  
+
+      >a
+        color: white !important
+
+        #search-dna-glyph
+          fill: white !important
+
+
+
+
 h4
-  font-size: 12px
+  font-size: 13px
   color: $app-color
   margin-bottom: 4px
   margin-top: 10px
 
 
 h5
-  font-size: 11px
+  font-size: 12px
   color: $app-color
   margin-bottom: 4px
   margin-top: 10px
@@ -36,6 +105,9 @@ h5
 .alertify-notifier .ajs-message.ajs-error 
   background: rgba(191, 64, 64, 0.95)
   text-shadow: none 
+
+#nav-card
+  padding-top: 3px
 
 .pagination
   margin: 0px 0
@@ -84,7 +156,7 @@ h5
   padding-top: 0px
 
 .nav-center
-  margin: 3px 0px 0 0px
+  margin: 0px 0px 0 0px
   position: relative
 
 
@@ -92,6 +164,10 @@ h5
   font-size: 16px
   color:  $app-color
 
+.modal-header 
+  .close 
+    opacity: .5
+    font-size: 32px
 
 .form-control,
 .form-group .form-control 
@@ -111,12 +187,12 @@ h5
   background-color: $current-color
 
 .selectize-dropdown
-  font-size: 11px
+  font-size: 12px
   line-height: 15px
   color: $text-color
 
 .selectize-input
-  font-size: 11px
+  font-size: 12px
   line-height: 15px
   padding: 5px 4px 4px 4px
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
@@ -144,7 +220,7 @@ h5
   
 .selectize-input 
   input 
-    font-size: 11px
+    font-size: 12px
     line-height: 15px
 
 .selectize-control.single 
@@ -214,12 +290,6 @@ h5
     background-color: white
     border: none 
 
-
-
-
-#recfilter-flag
-  background-color: #5881AD !important
-
 .horizontal-center
   display: -ms-Flexbox
   -ms-box-orient: horizontal
@@ -255,15 +325,14 @@ h5
     color: $app-color !important
 
 
-
-#filter-track a.chosen-single
-  font-size: 10px !important
-
 .shadow-z-2
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.17), 0px 1px 6px rgba(0, 0, 0, 0.17)
 
 .shadow-z-1 
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16)
+
+.shadow-z-nav
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.37), 0px 1px 6px rgba(0, 0, 0, 0.37)
 
 i.material-icons
   color:  $app-color
@@ -332,7 +401,7 @@ i.material-icons
 /* autocomplete */
 .ui-menu 
   .ui-menu-item 
-    font-size: 10px
+    font-size: 12px
     color: $text-color
 
 .ui-state-hover
@@ -391,7 +460,7 @@ i.material-icons
   background-color: transparent !important
   color: $danger-font-color !important
   font-weight: normal !important
-  font-size: 11px !important
+  font-size: 12px !important
 
 .label-primary
   background-color: #6D9652
@@ -448,7 +517,8 @@ i.material-icons
     color: white !important
 
 .dropdown-menu > li > a
-  color: #333 !important
+  color: $text-color !important
+
 
 .tlypageguide_text
   padding-bottom: 10px !important
@@ -476,7 +546,7 @@ i.material-icons
       -o-border-radius: 3px 3px 3px 3px
       border-radius: 3px 3px 3px 3px
       display: block
-      font-size: 11px
+      font-size: 12px
       height: 24px
       line-height: 26px
       text-align: center
@@ -603,13 +673,15 @@ html
 body
   margin-bottom: 70px
 
+#intro
+  height: 60px
+
 #education-title
   display: none
 
-
 #app-disclaimer-link-left
-  font-size: 10px
-  color: $text-color !important
+  font-size: 12px
+  color: white !important
   text-align: left
   margin-right: 10px
   padding-top: 15px
@@ -623,15 +695,15 @@ body
   display: none
 
 #app-disclaimer
-  font-size: 10px
+  font-size: 12px
   color: rgb(132,132,132)
 
 #credits
-  font-size: 10px
+  font-size: 12px
   color:  rgb(132,132,132)
 
 #versions
-  font-size: 10px
+  font-size: 14px
   color:  rgb(132,132,132)
   padding-top: 5px
   margin-bottom: 20px !important
@@ -641,7 +713,7 @@ body
     clear: both
 
     .title
-      width: 70px
+      width: 230px
       float: left
       padding-right: 5px
       clear: none
@@ -650,7 +722,7 @@ body
       font-weight: 600
 
     .number
-      width: 90px
+      width: 220px
       float: left
       padding-bottom: 7px
       clear: none
@@ -672,7 +744,7 @@ body
   background-color: $footer-color !important
 
 .icon-credit
-  font-size: 10px
+  font-size: 12px
   color: #eee
   margin-top: 3px
 
@@ -737,12 +809,12 @@ a
 .chart-label
   color: $text-color
   margin-left: 4px
-  font-size: 11px
+  font-size: 12px
 
 .togglebutton label
   font-weight: 400
   cursor: pointer
-  font-size: 11px
+  font-size: 12px
 
 .checkbox label .check
   display: inline-block
@@ -760,7 +832,7 @@ a
   display: inline-block
   min-width: 10px
   padding: 2px 7px 1px 7px !important
-  font-size: 12px
+  font-size: 13px
   font-weight: 700
   line-height: 1
   color: $text-color
@@ -775,7 +847,7 @@ a
 
 .badge-label
   color: $text-color
-  font-size: 12px
+  font-size: 13px
 
 .material-dropdown
   .form-control
@@ -792,15 +864,61 @@ a
     &:hover
       background: rgb(200, 200, 200)
 
+#genes-control-track
+  background: white
+  padding-right: 10px
+  padding-top: 5px
+  padding-bottom: 3px
+  margin-bottom: 5px
+  margin-top: 0px
+  padding-left: 10px
+
+  
+#welcome-panel
+  text-align: center
+
+  #welcome-label
+    padding-top: 40px
+    color: $app-color
+    font-size: 16px
+
+  #load-demo-data
+    color: $text-color
+    font-size: 13px 
+
+
 #matrix-track
-  #low-quality-legend
-    float: left
-    margin-top: -20px
-    font-size: 12px
-    margin-left: 160px
+  .matrix-note-text
+    margin-top: -7px
+    color: $hint-color
     font-style: italic
-    vertical-align: top
-    color:  $text-color
+
+  #low-quality-legend
+    font-size: 12px
+    margin-left: 20px
+    font-style: italic
+    clear:both
+    overflow: visible
+    float: left    
+
+    #low-quality-legend-box
+      display: inline-block
+      width: 15px
+      height: 15px
+      background-color: #dedede
+      vertical-align: bottom  
+      float: left 
+      margin-top: 5px
+
+
+  #low-quality-legend-text
+    width: 160px
+    float: left
+    margin-left: 5px
+    margin-bottom: 0px  
+    color:  $hint-color
+    font-style: italic
+    line-height: 13px
 
   #feature-matrix
     rect.cellbox
@@ -818,7 +936,7 @@ a
           fill: rgba(0, 0, 0, 0.13) 
 
     .colhdr text
-      font-size: 9px
+      font-size: 11px
       pointer-events: none
 
     rect.cellbox:hover
@@ -847,7 +965,7 @@ a
         opacity: 1
 
     text
-      font-size: 10px
+      font-size: 12px
       fill: rgb(120, 120, 120)
       pointer-events: none
 
@@ -890,13 +1008,13 @@ a
 
     
   #feature-matrix-note
-    padding-left: 165px
+    padding-left: 180px
     font-size: 12px
-    margin-top: 0px
+    margin-top: -5px
 
   #move-rows
     float: left
-    font-size: 11px !important
+    font-size: 13px !important
     color: $text-color !important
     margin-top: 0px
 
@@ -906,9 +1024,8 @@ a
   background: #eee
 
 #nav-section
-  position: fixed
   z-index: 2
-  right: 5px
+  margin-top: 0px
   background-color: white
   margin-bottom: 6px
 
@@ -919,7 +1036,7 @@ section
   clear: both
 
 #color-scheme
-  font-size: 11px
+  font-size: 12px
   margin-bottom: 10px
   color: rgb(102, 88, 92)
 
@@ -929,7 +1046,7 @@ section
     padding-left: 30px
     position: relative
     padding-top: 2px
-    font-size: 11px
+    font-size: 12px
 
   position: relative
   display: inline
@@ -946,6 +1063,7 @@ section
   margin-top: 0px
   margin-bottom: 10px
   margin-right: 4px
+
 
 .hide
   display: none !important
@@ -1006,10 +1124,10 @@ section
 
 .iobio
   font-size: 30px
-  color: $text-color
+  color: white
   font-family: $iobio-font
   float: left
-  margin-top: -8px
+
 
 .beta
   background: #F06767
@@ -1020,14 +1138,15 @@ section
 
 .iobioapp
   font-size: 30px
-  color: $app-color
+  color: white
   font-family: $iobio-font
   float: left
-  margin-top: -8px
+
+
 
 .iobioproject
   font-size: 18px
-  color: $text-color !important
+  color: white4 !important
   font-family: $iobio-font
   float: right
   margin-top: 5px
@@ -1037,7 +1156,7 @@ section
   text-align: center
   background: white
   padding-bottom: 0px !important
-  min-height: 70px
+
 
 .chart rect
   fill: rgb(49, 102, 147)
@@ -1071,21 +1190,12 @@ section
   display: inline-block
   padding-left: 160px
 
-#add-data-button
-  margin-left: 20px
-  margin-right: 20px
-  padding-top: 2px
-  padding-bottom: 1px
-  margin-top: 15px
 
 #build-link
-  cursor: pointer
+  color: $navbar-hover-color  !important
+  padding-left: 0px
   display: inline-block
-  vertical-align: bottom
-  margin-bottom: 10px
-  font-size: 16px
-  color: #5d809d !important
-  font-weight: bold
+  margin-top: 1px
 
 #gene-name
   font-size: 16px 
@@ -1136,21 +1246,11 @@ section
   display: table
   margin-top: 8px
 
-#filter-track
-  max-width: 214px
-  margin-top: 0px
-  margin-bottom: 0px
 
 #matrix-track
   width: 100%
   display: block
 
-#filter-panel
-  font-size: 11px
-  color: rgb(102, 88, 92)
-  fill: rgb(102, 88, 92)
-  margin-top: 2px
-  overflow-y: auto
 
 #fb-track
 
@@ -1159,8 +1259,9 @@ section
 
 .loader
   img
-    height: 16px
-    width: 16px
+    height: 15px
+    width: 15px
+    margin-top: -2px
 
   text-align: center
   background-color: white
@@ -1364,7 +1465,7 @@ header
 
 #bam-depth .circle-label
   fill: $arrow-color
-  font-size: 9px
+  font-size: 13px
   font-weight: bold
   stroke: none
   pointer-events: none
@@ -1546,8 +1647,8 @@ header
 #button-find-missing-variants
 
 #bloodhound .typeahead
-  min-width: 170px
-  max-width: 170px
+  min-width: 140px
+  max-width: 140px
   font-size: 18px
   vertical-align: middle !important
 
@@ -1560,9 +1661,8 @@ header
   padding: 5px 8px !important
   font-size: 18px !important
   line-height: 24px
-  border: 1px solid #ccc !important
-  border-radius: 0px !important
   outline: none !important
+  border: none !important
 
 .tt-input
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075)
@@ -1571,7 +1671,7 @@ header
   color: #999
 
 .tt-dropdown-menu
-  width: 170px
+  width: 150px
   margin-top: 2px
   padding: 4px 0
   background-color: #fff
@@ -1579,6 +1679,7 @@ header
   border: 1px solid rgba(0, 0, 0, 0.2)
   border-radius: 8px
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2)
+  color: $text-color
 
 .tt-dataset-name
   max-height: 400px
@@ -1607,8 +1708,8 @@ header
       color:  $app-color
   
   label
-    font-size:    11px
-    line-height:  12px
+    font-size:    12px
+    line-height:  13px
     color:        $text-color  
 
     .check
@@ -1687,4 +1788,112 @@ header
   #region-track
     margin-left: 200px !important
 
+@media screen and (max-device-width: 1250px), screen and (max-width: 1250px)
+  .navbar
+    ul.nav 
+      > li 
+        > a 
+          padding-right: 13px
+          padding-left:  13px
+
+
+
+@media screen and (max-device-width: 1140px), screen and (max-width: 1140px)
+  .navbar
+
+    ul.nav 
+
+      > li 
+
+        .navbar-form
+          margin-right: 25px
+
+        #genes-menu-item
+          vertical-align: initial
+          padding-top: 0px
+
+        > a 
+          padding-right: 11px
+          padding-left:  11px
+
+          .material-icons
+            display: none
+
+          svg
+            display: none
+
+
+
+@media screen and (max-width: 990px)
+
+  .navbar
+
+    .navbar-brand
+      margin-top: 0px
+      padding-top: 10px
+      margin-right: 0px
+
+      #home
+        margin-right: 10px
+        
+      .iobio
+        font-size: 28px
+      .iobioapp
+        font-size: 28px
+
+
+    #bloodhound .typeahead
+      min-width: 125px
+      max-width: 125px
+      font-size: 16px !important
+
+    .tt-input, .tt-hint
+      padding: 1px 1px !important
+      font-size: 16px !important
+      line-height: 22px
+
+
+
+    ul.nav 
+
+      > li 
+        &.optional
+          display: none  
+
+        .navbar-form
+          margin-left: 10px
+          margin-right: 10px
+
+        > a 
+          padding-right: 11px
+          padding-left:  11px
+
+          .material-icons
+            display: none
+
+          svg
+            display: none
+
+        .navbar-form
+          padding-right: 5px
+          padding-left: 2px
+
+
+
+@media screen and (max-width: 934px)
+
+  .navbar
+
+    ul.nav 
+
+      > li
+
+        > a 
+          font-size: 12px
+          padding-right: 6px
+          padding-left:  6px
+
+          p.wrapped
+            &.wide
+              width: 60px
 

@@ -27,6 +27,7 @@ module.exports = function(config) {
         'app/legend.js',
         'app/timeout.js',
         'app/vcf.iobio.js',
+        'app/variantTooltip.js',
         'app/card/*.js',
         'app/d3/*.js',
         'app/app.js',

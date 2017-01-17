@@ -484,7 +484,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          .each( function(entry, i) {
 		    var selection = d3.select(this);
          	var variant = entry.value;	   
-         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : 'vepImpact';      
+         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_COLOR;      
          	if (variant[impactField]) {
 	         	for (var impact in variant[impactField]) {		         		
          			var svg = selection.append("svg")
@@ -629,7 +629,7 @@ BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 	var me = this;
 
 	var tooltip = d3.select('#bookmark-gene-tooltip');
-	tooltip.style("z-index", 20);
+	tooltip.style("z-index", 1032);
 	tooltip.transition()        
 	 .duration(1000)      
 	 .style("opacity", .9)	
@@ -647,7 +647,7 @@ BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 			       .style("left", x + "px") 
 			       .style("text-align", 'left')    
 			       .style("top", (y - h) + "px")
-			       .style("z-index", 200)
+			       .style("z-index", 1032)
 			       .style("overflow-y", "hidden");
 			       
 
@@ -656,7 +656,7 @@ BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 			       .style("left", x + "px") 
 			       .style("text-align", 'left')    
 			       .style("top", (y) + "px")
-			       .style("z-index", 200)
+			       .style("z-index", 1032)
 			       .style("overflow-y", "hidden");
 
 	}

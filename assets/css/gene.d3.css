@@ -63,17 +63,17 @@
 }
 
 #transcript-menu-item.ibo-gene .name { 
-  font-size: 11px; 
+  font-size: 14px; 
   fill: rgb(120,120,120); 
 }
 #transcript-menu-item.ibo-gene .type { 
-  font-size: 11px; 
+  font-size: 14px; 
   fill: rgb(205, 71, 40);
   font-style: italic;
 }
 .ibo-gene .arrow { stroke: rgb(150,150,150); fill: none; }
 .ibo-gene .axis path, .ibo-gene .axis line { fill: none; stroke: lightgrey; shape-rendering: crispEdges; }
-.ibo-gene .x.axis text{ font-size: 10px; }
+.ibo-gene .x.axis text{ font-size: 9px; }
 .ibo-gene .tooltip {   
   position: absolute;           
   text-align: center;           

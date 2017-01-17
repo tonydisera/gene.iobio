@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, matrixTooltip, sliderIconBar, filterPanel, aboutPanel, inspectPanel;
+var indexPage, appTitleSection, dataCard, matrixTrack, matrixTooltip, filterPanel, inspectPanel;
 
 module.exports = {
   tags: [],
@@ -12,21 +12,21 @@ module.exports = {
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
     matrixTooltip = indexPage.section.matrixTooltip;
-    sliderIconBar = indexPage.section.sliderIconBar;
     filterPanel = indexPage.section.filterPanel;
-    aboutPanel = indexPage.section.aboutPanel;
     inspectPanel = indexPage.section.inspectPanel;
   },
 
   'Variant tooltip title in the matrix should be in sync with HGVSc in the inspect panel': function(client) {
     indexPage.load();
-    aboutPanel.clickDemoGene();
+    client.pause(2000);
+    indexPage.clickDemoGene();
     client.pause(1000);
     appTitleSection.selectRefSeqTranscript();
     matrixTrack.waitForMatrixLoaded();
-    matrixTrack.clickColumn('snp 17700692');
+    matrixTrack.clickColumn(1);
+    client.pause(4000);
     matrixTooltip.assertTitleContains('C->A');
-    inspectPanel.assertHGVScContains('c>a');
+    inspectPanel.assertHGVScContains('C>A');
     client.end();
   },
 }

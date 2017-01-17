@@ -18,14 +18,14 @@ var eduTour1Steps = {
 			showFunction: showEduTourAnimation, 
 			delay: 0}
 		},
-	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false, disableTourButtons: true},
-	'#phenolyzer-results':                              {index: 2, disableTourButtons: true,
+	'#phenolyzer-search-box .selectize-control.single': {index: 1, height: '20px', disableNext: true, correct: false, disableTourButtons: true},
+	'#phenolyzer-results':                              {index: 2, disableTourButtons: true, 
 		audio: '#tour1-recording2'
 	},
-	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px', disableTourButtons: true},
+	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '0px', disableTourButtons: true},
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false, disableTourButtons: true},
 	'#edu-tour-1 #start-over':                          {index: 5, audio: '#tour1-recording4', noElement: true, disableTourButtons: true},
-	'#children-buttons':                                {index: 6, disableNext: true, correct: false, disableTourButtons: false},
+	'#children-buttons':                                {index: 6, disableNext: true, height: '100px', correct: false, disableTourButtons: false},
 	'.edu-tour-1-child-buttons':                        {index: 7, close: true, noElement: true, disableTourButtons: false,
 		audio: '#tour1-recording5', 
 		height: 'full', 		
@@ -66,7 +66,7 @@ var eduTour2Steps = {
 				}
 		},
 	'#proband-variant-card #vcf-track':      {index: 2, noElement: true, disableTourButtons: true},
-	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false, disableTourButtons: false},
+	'#child-buttons-tour2':          {index: 3, disableNext: true, height: '120px', correct: false, disableTourButtons: false},
 	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true, disableTourButtons: false}
 };
 
@@ -188,10 +188,12 @@ function initializeTours() {
 				customizeEduTourStep(pageGuideEduTour2, step);
 
 				if (currentTour == "#proband-variant-card #vcf-track") {
-					var variant = getProbandVariantCard().model.vcfData.features[2];
-					var tooltip = getProbandVariantCard().d3CardSelector.select("#vcf-variants .tooltip");
-					getProbandVariantCard().showTooltip(tooltip, variant, getProbandVariantCard(), false );
-					getProbandVariantCard().showVariantCircle(variant, getProbandVariantCard());
+					if (getProbandVariantCard().model.vcfData && getProbandVariantCard().model.vcfData.features && getProbandVariantCard().model.vcfData.features.length > 2) {
+						var variant = getProbandVariantCard().model.vcfData.features[2];
+						var tooltip = getProbandVariantCard().d3CardSelector.select("#vcf-variants .tooltip");
+						getProbandVariantCard().showTooltip(tooltip, variant, getProbandVariantCard(), false );
+						getProbandVariantCard().showVariantCircle(variant, getProbandVariantCard());						
+					}
 				}
 
 			}
@@ -286,7 +288,7 @@ function eduTourCheckPhenolyzer() {
 	$('#select-phenotype-edutour')[0].selectize.on('change', function() {
 		var phenotype = $('#select-phenotype-edutour')[0].selectize.getValue().toLowerCase();
 		var correct = true;
-		if (isLevelEduTour && eduTourNumber == 1) {
+		if (isLevelEdu && eduTourNumber == 1) {
 			if (phenotype != 'colon_cancer') {
 				alertify.alert("Please select 'Colon cancer' to continue with this tour.")
 				correct = false;
@@ -306,7 +308,7 @@ function eduTourCheckPhenolyzer() {
 }
 
 function eduTourCheckVariant(variant) {
-	if (isLevelEduTour && eduTourNumber == "1" 
+	if (isLevelEdu && eduTourNumber == "1" 
 		&& pageGuideEduTour1.cur_idx == 4
 		&& variant.vepImpact[HIGH] != "HIGH" 
 		&& variant.start == 112116592 
