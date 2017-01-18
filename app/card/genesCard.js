@@ -195,7 +195,7 @@ GenesCard.prototype.sortGenes = function(sortBy) {
 
 GenesCard.prototype.getGeneNames = function() {
 	if (this.sortedGeneNames && this.sortedGeneNames.length == window.geneNames.length) {
-		return sortedGeneNames;		
+		return this.sortedGeneNames;		
 	} else {
 		return window.geneNames;
 	}
@@ -1632,7 +1632,8 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
 	    });
 	}, 
 	function(error) {
-		me.setGeneBadgeError(geneName);
+		alertify.alert(error)
+		me.removeGeneBadgeByName(geneName);
 
 	});
 }
