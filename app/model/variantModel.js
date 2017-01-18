@@ -1055,6 +1055,11 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 	return data != null;
 }
 
+VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneName, transcript) {
+	var theVcfData = this._getCachedData("vcfData", geneName, transcript);
+	return theVcfData && theVcfData.loadState != null && theVcfData.loadState['inheritance'];
+}
+
 VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
 	var me = this;
 
@@ -1637,7 +1642,7 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, cover
 		}
 
 	}
-	this.setLoadState(theVcfData, 'coverage');
+	theVcfData.loadState['coverage'] = true;
 	callback();
 
 

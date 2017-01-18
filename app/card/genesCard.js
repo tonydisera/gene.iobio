@@ -194,7 +194,11 @@ GenesCard.prototype.sortGenes = function(sortBy) {
 }
 
 GenesCard.prototype.getGeneNames = function() {
-	return this.sortedGeneNames || window.geneNames;
+	if (this.sortedGeneNames && this.sortedGeneNames.length == window.geneNames.length) {
+		return sortedGeneNames;		
+	} else {
+		return window.geneNames;
+	}
 }
 
 GenesCard.prototype.pageNumberForGene = function(geneName) {
@@ -993,6 +997,7 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 		gb.remove();
 		me._onGeneBadgeUpdate();
 	}
+	cacheHelper.clearCacheForGene(theGeneName);
 	delete geneObjects[theGeneName];
 	delete geneAnnots[theGeneName];
 	delete geneUserVisits[theGeneName];
@@ -1027,6 +1032,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 		var gb = me._getGeneBadge(theGeneName);
 		gb.remove();
 
+		cacheHelper.clearCacheForGene(theGeneName);
 		delete geneObjects[theGeneName];
 		delete geneAnnots[theGeneName];
 		delete geneUserVisits[theGeneName];
@@ -1049,6 +1055,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 		me._onGeneBadgeUpdate();
 	}
+	cacheHelper.clearCacheForGene(theGeneName);
 	delete geneObjects[theGeneName];
 	delete geneAnnots[theGeneName];
 	delete geneUserVisits[theGeneName];

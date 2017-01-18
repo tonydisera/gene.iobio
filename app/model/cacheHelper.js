@@ -119,7 +119,7 @@ CacheHelper.prototype.cacheGene = function(geneName, callback) {
     	window.geneObjects[geneObject.gene_name] = geneObject;
 
     	isJointCallOnly( function(shouldJointCall) {
-		    if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+		    if (me.isCachedForProband(geneObject.gene_name, transcript)) {
 		    	// take this gene off of the queue and see
 		    	// if next batch of genes should be analyzed
 		    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
@@ -274,6 +274,10 @@ CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 	// of genes to analyze once all of the genes in
 	// the current batch have been analyzed.
 	this.cacheGenes(callback);
+}
+
+CacheHelper.prototype.isCachedForProband = function(geneName, transcript) {
+	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneName, transcript); 
 }
 
 CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
@@ -598,7 +602,7 @@ CacheHelper.prototype.openDialog = function() {
 
 CacheHelper.prototype.clearCacheForGene = function(geneName) {
 	var me = this;
-	var keys = me.getKeysForGene(geneName);
+	var keys = me._getKeysForGene(geneName);
 	keys.forEach( function(key) {
 		localStorage[key] = "";
 	});
