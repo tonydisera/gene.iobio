@@ -45,6 +45,7 @@ var genePhenotypes = {};
 var geneToLatestTranscript = {};
 var refseqOnly = {};
 var gencodeOnly = {};
+var allKnownGeneNames = {};
 
 
 var loadedUrl = false;
@@ -1070,7 +1071,7 @@ function loadGeneFromUrl() {
 	}
 
 
-	// Get the gene parameger
+	// Get the gene parameter
 	var gene = getUrlParameter('gene');
 
 	var theGeneSource = getUrlParameter("geneSource");
@@ -1105,7 +1106,10 @@ function loadGeneFromUrl() {
 			// If the species and build have been specified, type in the gene name; this will 
 			// trigger the event to get the gene info and then call loadUrlSources()
 			if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
-				setGeneBloodhoundInputElement(gene, true, true);
+				if (isKnownGene(gene)) {
+			    	gene = gene.toUpperCase();
+					setGeneBloodhoundInputElement(gene, true, true);
+				}
 			} else {
 				// The build wasn't specified in the URL parameters, so force the user
 				// to select the gemome build from the data dialog.
@@ -1129,12 +1133,22 @@ function loadGeneFromUrl() {
 	
 }
 
+function isKnownGene(geneName) {
+	return allKnownGeneNames[geneName] || allKnownGeneNames[geneName.toUpperCase()]	
+}
+
 function loadGeneNamesFromUrl(geneNameToSelect) {
 	geneNames = [];
+	var unknownGeneNames = {};
 
 	// Add the gene to select to the gene list
 	if (geneNameToSelect && geneNameToSelect.length > 0) {
-		geneNames.push(geneNameToSelect);
+		if (isKnownGene(geneNameToSelect)) {
+			geneNames.push(geneNameToSelect);
+		} else {
+			unknownGeneNames[geneNameToSelect] = true;
+			geneNameToSelect = null;
+		}
 	}
 
 
@@ -1154,7 +1168,11 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 	if (genes != null && genes.length > 0) {
 		genes.split(",").forEach( function(geneName) {
 			if ( geneNames.indexOf(geneName) < 0 ) {
-				geneNames.push(geneName);
+				if (isKnownGene(geneName)) {
+					geneNames.push(geneName);
+				} else {
+					unknownGeneNames[geneName] = true;
+				}
 			}
 		});
 	}
@@ -1166,6 +1184,10 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 		$('#genes-to-copy').val(geneNames.join(","));
 		genesCard.copyPasteGenes(geneNameToSelect, true);
 	}	
+	if (Object.keys(unknownGeneNames).length > 0) {
+		var message = "Bypassing unknown genes: " + Object.keys(unknownGeneNames).join(", ") + ".";
+		alertify.alert(message);
+	}
 }
 
 function reloadGeneFromUrl() {
@@ -1177,8 +1199,10 @@ function reloadGeneFromUrl() {
 	// the gene that was passed in the url parameter
 	loadGeneNamesFromUrl(gene);
 
-	setGeneBloodhoundInputElement(gene, true, true);
-	genesCard._geneBadgeLoading(gene, true, true);
+	if (isKnownGene(gene)) {
+		setGeneBloodhoundInputElement(gene, true, true);
+		genesCard._geneBadgeLoading(gene, true, true);		
+	}
 }
 
 function showWelcomePanel() {
@@ -1725,7 +1749,7 @@ function promiseGetGeneModel(geneName) {
 			    	resolve(geneModel);
 		    	} else {
 					console.log("Gene " + geneName + " not found.  Empty results returned from " + url);
-	    			reject();
+	    			reject("Gene " + geneName + " not found.");
 		    	}
 		    },
 			error: function( xhr, status, errorThrown ) {
@@ -1734,7 +1758,7 @@ function promiseGetGeneModel(geneName) {
 		        console.log( "Error: " + errorThrown );
 		        console.log( "Status: " + status );
 		        console.log( xhr );
-	    		reject();
+	    		reject("Error " + errorThrown + " occurred when attempting to get gene model for gene " + geneName);
 
 		    }		
 		});
@@ -1864,7 +1888,8 @@ function loadGeneWidget(callback) {
 
 
 		}, function(error) {
-			genesCard.setGeneBadgeError(theGeneName);
+			alertify.alert(error);
+			genesCard.removeGeneBadgeByName(theGeneName);
 
 		});
 		
@@ -1879,6 +1904,10 @@ function loadFullGeneSet(callback) {
 			data_type: 'json',
             success: function( data ) {
             	var sortedGenes = getRidOfDuplicates(data);
+            	allKnownGeneNames = {};
+            	sortedGenes.forEach(function(geneObject) {
+            		allKnownGeneNames[geneObject.name] = true;
+            	})
             	gene_engine.clear();
 				gene_engine.add(sortedGenes);
 				if (callback) {

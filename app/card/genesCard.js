@@ -451,7 +451,7 @@ GenesCard.prototype.editGenes = function() {
 
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, genesString) {
 	var me = this;
-
+	
 	if (isLevelBasic) {
 		$('#select-gene')[0].selectize.clearOptions();
 	}
@@ -476,11 +476,21 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 	}
 
 	geneNames = [];
+	var unknownGeneNames = {};
 	geneNameList.forEach( function(geneName) {
 		if (geneName.trim().length > 0) {
-			geneNames.push(geneName.trim().toUpperCase());
+			if (isKnownGene(geneName)) {
+				geneNames.push(geneName.trim().toUpperCase());
+			} else {
+				unknownGeneNames[geneName.trim().toUpperCase()] = true;
+			}
 		}
 	});
+
+	if (Object.keys(unknownGeneNames).length > 0) {
+		var message = "Bypassing unknown genes: " + Object.keys(unknownGeneNames).join(", ") + ".";
+		alertify.alert(message);
+	}
 
 	// Remove gene badges not specified in the text area
 	var geneBadgesToRemove = [];
