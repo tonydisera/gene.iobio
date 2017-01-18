@@ -334,7 +334,7 @@ GenesCard.prototype.initEditGenes = function() {
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
 	
-	if (geneNames.length > 1 || isLevelEdu) {
+	if (geneNames.length > 0 || isLevelEdu) {
 		$('#genes-control-track').removeClass("hide");
 		$('#genes-panel').removeClass("hide");
 	} else {
@@ -433,7 +433,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		$('#gene-page-selection').html("");
 	}
 
-	if (geneNames.length > 1 || isLevelEdu) {
+	if (geneNames.length > 0 || isLevelEdu) {
 		$('#genes-control-track').removeClass("hide");
 		$('#genes-panel').removeClass("hide");
 	} else {
