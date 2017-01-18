@@ -1748,13 +1748,13 @@ function promiseGetGeneModel(geneName) {
 		    		var geneModel = response[0];
 			    	resolve(geneModel);
 		    	} else {
-					console.log("Gene " + geneName + " not found.  Empty results returned from " + url);
-	    			reject("Gene " + geneName + " not found.");
+					console.log("Gene model for " + geneName + " not found.  Empty results returned from " + url);
+	    			reject("Gene model for " + geneName + " not found.");
 		    	}
 		    },
 			error: function( xhr, status, errorThrown ) {
 		        
-		        console.log("Gene " +  geneName + " not found.  Error occurred.");
+		        console.log("Gene model for " +  geneName + " not found.  Error occurred.");
 		        console.log( "Error: " + errorThrown );
 		        console.log( "Status: " + status );
 		        console.log( xhr );
