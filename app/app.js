@@ -3045,6 +3045,11 @@ function filterVariants() {
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
 	var geneCounts = cacheHelper.refreshGeneBadges();
+	if (filterCard.hasFilters()) {
+		$('#filter-progress .text').text(geneCounts.pass + " passed filter");
+		$('#filter-progress .bar').css("width", percentage(geneCounts.pass / geneCounts.total));
+		$('#filter-progress').removeClass("hide");		
+	}
 	return geneCounts;
 
 }

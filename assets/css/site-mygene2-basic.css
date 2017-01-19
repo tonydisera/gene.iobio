@@ -164,8 +164,8 @@ h5 {
   color: #717171; }
 
 #gene-source-box .selectize-input {
-  padding-top: 8px;
-  padding-bottom: 7px; }
+  padding-top: 5px;
+  padding-bottom: 6px; }
 
 #phenolyzer-search-box .selectize-input {
   -webkit-box-shadow: none;
@@ -982,11 +982,11 @@ section {
 
 #region-track {
   text-align: center;
-  margin-bottom: 0px;
+  margin-bottom: -10px;
   padding-bottom: 0px;
   color: #717171;
   font-size: 14px;
-  margin-left: 100px;
+  margin-left: 10px;
   padding-top: 3px; }
 
 #gene-search-bar {
@@ -1019,7 +1019,7 @@ section {
 
 #gene-track {
   padding-top: 0px;
-  margin-top: 15px;
+  margin-top: 0px;
   margin-bottom: 0px;
   padding-bottom: 0px;
   clear: both; }
@@ -1718,18 +1718,23 @@ header {
   color: #717171 !important; }
 
 #genes-control-track #filters {
-  margin-bottom: 4px;
+  margin-top: 4px;
+  margin-bottom: 8px;
   color: #717171;
   display: inline-block; }
-#genes-control-track .filter-flag.label-primary {
-  background-color: #c16464;
-  color: #ffffff;
-  border: #818283;
-  border-style: solid;
-  font-size: 12px;
-  border-width: 1px;
-  margin-top: 3px;
-  display: inline-block; }
+  #genes-control-track #filters .filter-label {
+    color: #717171;
+    padding-right: 8px; }
+  #genes-control-track #filters .filter-flag.label-primary {
+    background-color: #feedc8;
+    color: #717171;
+    font-weight: normal;
+    border: #878585;
+    border-style: solid;
+    font-size: 12px;
+    border-width: 1px;
+    margin-top: 3px;
+    display: inline-block; }
 
 #recfilter-flag {
   background-color: #5881AD !important; }
@@ -1979,6 +1984,8 @@ header {
   border: solid 2.5px #3586c0;
   border-radius: 4px;
   padding: 1px; }
+  .impact.current:hover.not-equal, .vepImpact.current:hover.not-equal, .highestImpactVep.current:hover.not-equal, .effect.current:hover.not-equal, .vepConsequence.current:hover.not-equal, .tooltip-zygosity.current:hover.not-equal, .regulatory.current:hover.not-equal, .polyphen.current:hover.not-equal, .sift.current:hover.not-equal, .type.current:hover.not-equal, .afexaclevels.current:hover.not-equal, .af1000glevels.current:hover.not-equal, .inheritance.current:hover.not-equal, .clinvar.current:hover.not-equal, .uasibs.current:hover.not-equal, .recfilter.current:hover.not-equal {
+    border: solid 1.5px #969696; }
 
 .tooltip-zygosity.current:hover {
   border-radius: 0px; }
@@ -1988,6 +1995,9 @@ header {
   border: solid 2.5px #3586c0;
   border-radius: 4px;
   padding: 1px; }
+  .current.not-equal {
+    background-image: linear-gradient(transparent 7px, #3586c0 7px, #3586c0 9px, transparent 9px);
+    border: none; }
 
 .tooltip-zygosity.current {
   border-radius: 0px;
@@ -2424,9 +2434,13 @@ text.ref-count {
     margin-top: 0px !important; }
     .tooltip-wide .tooltip-footer .bookmark-badge {
       height: 14px;
-      width: 100px; }
+      width: 120px; }
       .tooltip-wide .tooltip-footer .bookmark-badge text {
         font-size: 14px !important; }
+    .tooltip-wide .tooltip-footer #remove-bookmark-link {
+      vertical-align: top;
+      text-align: left;
+      display: inline-block; }
   .tooltip-wide .tooltip-left-column {
     float: left;
     padding-top: 10px;
@@ -2638,11 +2652,11 @@ text.ref-count {
 #genes-panel {
   margin-bottom: 5px;
   margin-top: 8px; }
-  #genes-panel #analyze-all-progress {
+  #genes-panel #analyze-all-progress, #genes-panel #filter-progress {
     position: relative;
     background-color: white;
     color: #717070;
-    border: #bdbcbc;
+    border: #878585;
     border-style: solid;
     border-width: thin;
     font-size: 12px;
@@ -2652,7 +2666,7 @@ text.ref-count {
     width: 130px;
     vertical-align: middle;
     height: 18px; }
-    #genes-panel #analyze-all-progress .bar {
+    #genes-panel #analyze-all-progress .bar, #genes-panel #filter-progress .bar {
       background-color: rgba(65, 176, 220, 0.45);
       height: 17px;
       position: absolute;
@@ -2660,16 +2674,12 @@ text.ref-count {
       top: 0%;
       width: 0%;
       text-align: center; }
-    #genes-panel #analyze-all-progress .text {
+    #genes-panel #analyze-all-progress .text, #genes-panel #filter-progress .text {
       position: absolute;
       left: 0;
       top: 0%;
       width: 100%;
       text-align: center; }
-    #genes-panel #analyze-all-progress.done .bar {
-      background-color: rgba(53, 145, 181, 0.66); }
-    #genes-panel #analyze-all-progress.done .text {
-      color: white; }
 
 #genes-card {
   height: 100%; }
@@ -2856,7 +2866,8 @@ text.ref-count {
 
 #gene-page-control {
   margin-top: -3px;
-  margin-bottom: 3px; }
+  margin-bottom: 3px;
+  text-align: center; }
   #gene-page-control #gene-paging-links {
     display: inline-block;
     width: 160px; }
@@ -3469,6 +3480,9 @@ button {
   margin-bottom: 4px !important;
   text-align: left;
   padding-left: 10px; }
+  #region-track .card-label {
+    padding-top: 2px;
+    margin-right: 10px; }
 
 #transcript-panel {
   margin-top: -16px !important; }
@@ -3487,7 +3501,6 @@ button {
   text-align: left;
   font-size: 14px;
   color: #717171;
-  margin-left: 10px;
   width: calc(100% - 160px); }
 
 #variant-heading {

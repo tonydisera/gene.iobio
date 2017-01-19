@@ -500,6 +500,11 @@ FilterCard.prototype.clearFilters = function() {
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = {};
 
+	$('#filter-progress').addClass("hide");
+	$('#filter-progress .text').text("");
+	$('#filter-progress .bar').css("width", "0%");
+
+
 	d3.selectAll('.standard-filter-btn').classed('current', false);
 	
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
@@ -888,7 +893,7 @@ FilterCard.prototype._getFilterString = function() {
 
 	var AND = function(filterString) {
 		if (filterString.length > 0) {
-			return   " and ";
+			return   " <span>and</span> ";
 		} else {
 			return "";
 		}
@@ -959,7 +964,8 @@ FilterCard.prototype.displayFilters = function() {
 	var filterString = this._getFilterString();
 	if (filterString.length > 0) {
 		$('#genes-control-track #filters').removeClass("hide");
-		$('#genes-control-track #filters').html(filterString);		
+		$("#genes-control-track #filters .filter-label").nextAll().remove();
+		$('#genes-control-track #filters .filter-label').after(filterString);		
 	} else {
 		$('#genes-control-track #filters').addClass("hide");
 	}
