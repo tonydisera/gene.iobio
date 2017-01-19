@@ -2429,9 +2429,13 @@ text.ref-count {
     margin-top: 0px !important; }
     .tooltip-wide .tooltip-footer .bookmark-badge {
       height: 14px;
-      width: 100px; }
+      width: 120px; }
       .tooltip-wide .tooltip-footer .bookmark-badge text {
         font-size: 14px !important; }
+    .tooltip-wide .tooltip-footer #remove-bookmark-link {
+      vertical-align: top;
+      text-align: left;
+      display: inline-block; }
   .tooltip-wide .tooltip-left-column {
     float: left;
     padding-top: 10px;

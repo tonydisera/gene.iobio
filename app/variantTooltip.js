@@ -24,7 +24,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		if (lock) {
 			html = variantTooltip.formatContent(variant, null, 'tooltip-wide');
 		} else {	
-			html = variantTooltip.formatContent(variant, "Click on column to lock tooltip")
+			html = variantTooltip.formatContent(variant, variantCard ? "click on variant to pin tooltip" : "click on column to pin tooltip");
 		}		
 	}
 	tooltip.html(html);
@@ -654,30 +654,32 @@ VariantTooltip.prototype.variantTooltipMinimalHTML = function(variant) {
 
 VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 	if (pinMessage == null) {
-		pinMessage = 'Click on variant to lock tooltip';
+		pinMessage = 'Click on variant to pin tooltip';
 	}
 
-	var examineCol = '<div class="col-sm-4" style="text-align:left;"></div>';
 
-	var bookmarkBadge = '<svg class="bookmark-badge" height="14" width="100"><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="11" style="fill: black;">Bookmarked</text></g></svg>';
+	var bookmarkLink =  '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this)">bookmark this variant</a>';
+	
+	var bookmarkBadge = '<svg class="bookmark-badge" height="14" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="11" style="fill: black;">bookmarked</text></g></svg>';
+	var removeBookmarkLink  =  '<a id="remove-bookmark-link" href="javascript:void(0)" onclick="removeBookmarkOnVariant();showAsNotBookmarked">remove bookmark</a>'
 	showAsBookmarked = function(container) {
-		$(container).parent().html(bookmarkBadge);
+		$(container).parent().html(bookmarkBadge + removeBookmarkLink);
+	};
+	showAsNotBookmarked = function(container) {
+		$(container).parent().html(bookmarkLink);
 	};
 
 	if (window.clickedVariant) {
-		var bookmarkLink = null;
 		if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
 			return '<div class="row tooltip-footer">'
-			  + examineCol
-			  + '<div class="col-sm-4" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
-			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '<div class="col-sm-8" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge + removeBookmarkLink  + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unpin</a>' + '</div>'
 			  + '</div>';
 
 		} else {
 			return '<div class="row tooltip-footer" style="">'
-			  + examineCol
-			  + '<div class="col-sm-4" style="text-align:left;">' +   '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this)">Bookmark</a>' + '</div>'
-			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '<div class="col-sm-8" style="text-align:left;">' + bookmarkLink + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unpin</a>' + '</div>'
 			  + '</div>';
 
 		}
@@ -685,9 +687,8 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 	} else {
 		if (variant.hasOwnProperty('isBookmark') && variant.isBookmark == 'Y') {
 			return '<div class="row tooltip-footer">'
-			  + '<div class="col-sm-4"></div>'
-			  + '<div class="col-sm-4 " id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge  + '</div>'
-			  + '<div class="col-md-4 " style="text-align:right;">' +  '<a id="unpin" href="javascript:void(0)">unlock</a>' + '</div>'
+			  + '<div class="col-sm-6 " id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge + '</div>'
+			  + '<div class="col-md-6 " style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
 			  + '</div>';
 
 		} else {

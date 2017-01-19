@@ -3057,6 +3057,13 @@ function bookmarkVariant() {
 	} 
 }
 
+function removeBookmarkOnVariant() {
+	if (clickedVariant) {
+		var bookmarkKey = bookmarkCard.getBookmarkKey(gene.gene_name, gene.chr, clickedVariant.start, clickedVariant.ref, clickedVariant.alt);
+		bookmarkCard.removeBookmark(bookmarkKey, clickedVariant);
+	}
+}
+
 function hideIntro() {
 	if (isMygene2 && !keepShowingIntro) {
 		// If we are showing info on a gene and the intro panel still shows the full
