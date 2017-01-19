@@ -115,6 +115,9 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	for (var key in me.annotsToInclude) {
 		var annot = me.annotsToInclude[key];
 		d3.select('#filter-track #' + key + "." + annot.key).classed("current", true);
+		if (annot.not) {
+			d3.select('#filter-track #' + key + "." + annot.key).classed("not-equal", true);
+		}
 	}
 }
 
@@ -474,6 +477,9 @@ FilterCard.prototype.initFilterListeners = function() {
 	  													  'state': on};
 
 	  	d3.select(this).classed("current", on);
+	  	if (!on) {
+		  	d3.select(this).classed("not-equal", false);
+	  	}
 	  	window.filterVariants();
 	  });
 
@@ -511,6 +517,7 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .sift').classed('current', false);
 	d3.selectAll('#filter-track .polyphen').classed('current', false);
 	d3.selectAll('#filter-track .clinvar').classed('current', false);
+	d3.selectAll('#filter-track .clinvar').classed('not-equal', false);
 	d3.selectAll('#filter-track .inheritance').classed('current', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);

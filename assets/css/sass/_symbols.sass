@@ -207,6 +207,10 @@
   border-radius: 4px
   padding: 1px
 
+  &.not-equal
+    border: solid 1.5px $current-frame-color 
+
+
 .tooltip-zygosity.current:hover
   border-radius: 0px
 
@@ -215,6 +219,11 @@
   border: solid 2.5px $current-color
   border-radius: 4px
   padding: 1px
+
+  &.not-equal
+    background-image: linear-gradient(transparent 7px,$current-color 7px,$current-color 9px,transparent 9px)
+    border: none  
+
 
 .tooltip-zygosity.current
   border-radius: 0px
