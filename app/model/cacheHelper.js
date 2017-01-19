@@ -159,6 +159,7 @@ CacheHelper.prototype.cacheGene = function(geneName, callback) {
 			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
 			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
 
+							getVariantCard("proband").summarizeError(geneObject.gene_name, error);
 	    					// take this gene off of the queue and see
 	    					// if next batch of genes should be analyzed
 				    		me.cacheNextGene(geneObject.gene_name, callback);					
@@ -177,6 +178,7 @@ CacheHelper.prototype.cacheGene = function(geneName, callback) {
 		genesCard.setGeneBadgeError(geneName);			    				
 		console.log("problem caching data for gene " + geneName + ".");
 		genesCard._geneBadgeLoading(geneName, false);
+		getVariantCard("proband").summarizeError(geneName, error);
     	me.cacheNextGene(geneName, callback);
 	});
 

@@ -1384,6 +1384,14 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	geneBadge.removeClass("error");
 	geneBadge.removeClass("warning");
 
+	if (dangerObject.ERROR) {
+		geneBadge.addClass("error");
+	}
+	if (dangerObject.WARNING) {
+		geneBadge.addClass("warning");
+	}
+
+
 	// Indicate if gene has a bookmared variants
 	me._setBookmarkBadge(geneName);
 

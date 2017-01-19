@@ -319,6 +319,18 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	return dangerCounts;
 }
 
+VariantModel.summarizeError =  function(theError) {
+	var summaryObject = {};
+
+	summaryObject.CONSEQUENCE = {};
+	summaryObject.IMPACT = {};
+	summaryObject.CLINVAR = {}
+	summaryObject.INHERITANCE = {};
+	summaryObject.ERROR = theError;	
+
+	return summaryObject;
+}
+
 VariantModel.prototype.getCalledVariantCount = function() {
 	if (this.fbData.features ) {
 		return this.fbData.features.filter(function(d) {

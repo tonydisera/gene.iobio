@@ -97,6 +97,12 @@ VariantCard.prototype.summarizeDanger = function(geneName, data) {
 	return dangerSummary;
 }
 
+VariantCard.prototype.summarizeError = function(geneName, error) {
+	var dangerSummary = VariantModel.summarizeError(error);
+	this.model.cacheDangerSummary(dangerSummary, geneName);
+	return dangerSummary;
+}
+
 VariantCard.prototype.getDangerSummaryForGene = function(geneName) {
 	return this.model.getDangerSummaryForGene(geneName);
 }
