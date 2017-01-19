@@ -1076,6 +1076,8 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 GenesCard.prototype.addGene = function(geneName) {
 	var me = this;
 
+	geneName = geneName.toUpperCase();
+
 	if (geneNames.indexOf(geneName) < 0) {
 		geneNames.push(geneName);
 	}
@@ -1327,7 +1329,7 @@ GenesCard.prototype.setGeneBadgeWarning = function(geneName, select) {
 
 GenesCard.prototype._getGeneBadge = function(geneName) {
 	return $("#gene-badge-container #gene-badge-name"). filter(function() {
-    	return $(this).text() === geneName;
+    	return $(this).text().toUpperCase() === geneName.toUpperCase();
 	}).parent().parent();
 }
 

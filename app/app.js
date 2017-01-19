@@ -1073,6 +1073,9 @@ function loadGeneFromUrl() {
 
 	// Get the gene parameter
 	var gene = getUrlParameter('gene');
+	if (gene) {
+		gene = gene.toUpperCase();
+	}
 
 	var theGeneSource = getUrlParameter("geneSource");
 	if (theGeneSource != null && theGeneSource != "") {
@@ -1107,7 +1110,6 @@ function loadGeneFromUrl() {
 			// trigger the event to get the gene info and then call loadUrlSources()
 			if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
 				if (isKnownGene(gene)) {
-			    	gene = gene.toUpperCase();
 					setGeneBloodhoundInputElement(gene, true, true);
 				}
 			} else {
@@ -1144,7 +1146,7 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 	// Add the gene to select to the gene list
 	if (geneNameToSelect && geneNameToSelect.length > 0) {
 		if (isKnownGene(geneNameToSelect)) {
-			geneNames.push(geneNameToSelect);
+			geneNames.push(geneNameToSelect.toUpperCase());
 		} else {
 			unknownGeneNames[geneNameToSelect] = true;
 			geneNameToSelect = null;
@@ -1156,8 +1158,8 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 	var geneList = getUrlParameter("geneList");
 	if (geneList != null && geneList.length > 0 && geneList == 'ACMG56') {
 		genesCard.ACMG56_GENES.sort().forEach(function(geneName) {
-			if ( geneNames.indexOf(geneName) < 0 ) {
-				geneNames.push(geneName);
+			if ( geneNames.indexOf(geneName.toUpperCase()) < 0 ) {
+				geneNames.push(geneName.toUpperCase());
 			}
 		});
 	}
@@ -1168,8 +1170,8 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 	if (genes != null && genes.length > 0) {
 		genes.split(",").forEach( function(geneName) {
 			if ( geneNames.indexOf(geneName) < 0 ) {
-				if (isKnownGene(geneName)) {
-					geneNames.push(geneName);
+				if (isKnownGene(geneName.toUpperCase())) {
+					geneNames.push(geneName.toUpperCase());
 				} else {
 					unknownGeneNames[geneName] = true;
 				}
@@ -1906,7 +1908,9 @@ function loadFullGeneSet(callback) {
             	var sortedGenes = getRidOfDuplicates(data);
             	allKnownGeneNames = {};
             	sortedGenes.forEach(function(geneObject) {
-            		allKnownGeneNames[geneObject.name] = true;
+            		if (geneObject && geneObject.name && geneObject.name.length > 0) {
+	            		allKnownGeneNames[geneObject.name.toUpperCase()] = true;
+            		}
             	})
             	gene_engine.clear();
 				gene_engine.add(sortedGenes);
