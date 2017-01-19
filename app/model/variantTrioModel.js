@@ -140,7 +140,12 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 			} 
 		});
 
-		me.probandVcfData.loadState['inheritance'] = true;
+		if (me.probandVcfData) {
+			if (!me.probandVcfData.loadState) {
+				me.probandVcfData.loadState = {};
+			}
+			me.probandVcfData.loadState['inheritance'] = true;
+		}
 		filterCard.enableInheritanceFilters(me.probandVcfData);
 
 		callback(me.probandVcfData);
