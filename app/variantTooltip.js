@@ -490,7 +490,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
-		siftPolyphenRow = me._tooltipClassedRow(siftLabel + sep, 'sift', polyphenLabel, 'polyphen', 'padding-top:5px;');
+		siftPolyphenRow = me._tooltipClassedRow(polyphenLabel + sep, 'polyphen', siftLabel, 'sift', 'padding-top:5px;');
 	}
 
 	var clinvarRow = '';
@@ -565,8 +565,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
 					        ' ' + (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
 			+ vepHighestImpactExamineRow			
-			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true)
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true)
+			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true)
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarUrl + '</span>', null, true)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)

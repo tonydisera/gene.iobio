@@ -113,8 +113,8 @@ function MatrixCard() {
 
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:0, index:2, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Pathogenecity - SIFT'         , id:'sift',           order:1, index:6, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:2, index:7, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenecity - SIFT'         , id:'sift',           order:2, index:7, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
 		{name:'Impact (VEP)'                 , id:'impact',         order:3, index:0, match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
 		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:4, index:1, match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
 		{name:'Bookmark'                     , id:'bookmark',       order:5, index:10, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },

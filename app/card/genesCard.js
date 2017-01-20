@@ -1417,6 +1417,37 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 
 	}
 
+	if (dangerObject.POLYPHEN) {
+		var dangerPolyphen = dangerObject.POLYPHEN;
+		if (dangerPolyphen != null) {
+			var symbolIndex = 0;
+			for (clazz in dangerPolyphen) {
+				var polyphenObject = dangerPolyphen[clazz];
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,0)', clazz: clazz, polyphenObject: polyphenObject}]);
+				matrixCard.showPolyPhenSymbol(selection);
+				symbolIndex++;
+				selection.on("mouseover", function(d,i) {
+								var maxPolyphen = "PolyPhen ";
+								for (key in d.polyphenObject) {
+									maxPolyphen += key + " ";
+									var transcriptObject = d.polyphenObject[key];
+									for (key in transcriptObject) {
+										maxPolyphen += key + " ";
+									}
+								}
+								var x = d3.event.pageX;
+								var y = d3.event.pageY;
+								me.showTooltip(maxPolyphen.split("_").join(" "), x, y, 170);
+							})
+							.on("mouseout", function(d,i) {
+									me.hideTooltip();
+							});
+			}
+		}
+
+	}
+
 	if (dangerObject.SIFT) {
 		var dangerSift = dangerObject.SIFT;
 		if (dangerSift != null) {
@@ -1449,36 +1480,6 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 
 	}
 
-	if (dangerObject.POLYPHEN) {
-		var dangerPolyphen = dangerObject.POLYPHEN;
-		if (dangerPolyphen != null) {
-			var symbolIndex = 0;
-			for (clazz in dangerPolyphen) {
-				var polyphenObject = dangerPolyphen[clazz];
-				geneBadge.find('#gene-badge-symbols').append("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .polyphen-badge')[symbolIndex]).data([{width:10, height:10, transform: 'translate(0,0)', clazz: clazz, polyphenObject: polyphenObject}]);
-				matrixCard.showPolyPhenSymbol(selection);
-				symbolIndex++;
-				selection.on("mouseover", function(d,i) {
-								var maxPolyphen = "PolyPhen ";
-								for (key in d.polyphenObject) {
-									maxPolyphen += key + " ";
-									var transcriptObject = d.polyphenObject[key];
-									for (key in transcriptObject) {
-										maxPolyphen += key + " ";
-									}
-								}
-								var x = d3.event.pageX;
-								var y = d3.event.pageY;
-								me.showTooltip(maxPolyphen.split("_").join(" "), x, y, 170);
-							})
-							.on("mouseout", function(d,i) {
-									me.hideTooltip();
-							});
-			}
-		}
-
-	}
 
 
 	if (dangerObject.IMPACT) {
