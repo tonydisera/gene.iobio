@@ -2444,7 +2444,9 @@ text.ref-count {
     clear: both;
     padding-bottom: 6px; }
   .tooltip-wide .tooltip-footer {
-    margin-top: 0px !important; }
+    margin-top: 0px !important;
+    padding-top: 4px !important;
+    padding-bottom: 2px; }
     .tooltip-wide .tooltip-footer .bookmark-badge {
       height: 14px;
       width: 120px; }
