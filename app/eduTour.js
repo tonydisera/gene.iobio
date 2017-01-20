@@ -5,6 +5,50 @@ var pageGuideEduTour1 = null;
 var pageGuideEduTour2 = null;
 var edgeObject = null;
 
+var mainTourSteps = {
+	'#enter-gene-name': {},
+	'#gene-track': {},
+	'#add-data-button': {},
+	'#vcf-track': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#bam-depth': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#matrix-track': {},
+	'#transcript-btn-group': {},
+	'#set-gene-source': {},
+	'#gene-viz': {},
+	'#gene-region-buffer-input': {},
+	'#call-variants-link': {},
+	'#button-call-variants': {},
+	'#proband-variant-card #fb-variants': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#show-filters-link': {},
+	'"#filter-track svg#MODERATE': {},
+	'#proband-variant-card #displayed-variant-count': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#vcf-variants .tooltip': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	"#vcf-variants .tooltip #bookmarkLink": { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#show-bookmarks-link': {},
+	'#bookmark-card #bookmark-panel': {},
+	'#bookmark-card .favorite-indicator': {},
+	'#show-select-genes-link': {},
+	'#help-link': {}
+}
+
+var bookmarkTourSteps = {
+	'#proband-variant-card #vcf-track': {
+		position: {top: '100px', bottom: 'initial'} 
+	}
+}
+
 var eduTour1Steps = {
 	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, disableTourButtons: true,
 		audio: '#tour1-recording1',
@@ -84,6 +128,14 @@ function initializeTours() {
 				
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+
+				var step = mainTourSteps[currentTour];
+				if (step) {
+					customizeStep(pageGuide, step);
+				} else {
+					$('#tlyPageGuideMessages').css("top", "initial");
+					$('#tlyPageGuideMessages').css("bottom", "0px");					
+				}
 				
 			}
 	    }); 
@@ -98,6 +150,13 @@ function initializeTours() {
 				
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+				var step = bookmarkTourSteps[currentTour];
+				if (step) {
+					customizeStep(pageGuideBookmarks, step);
+				} else {
+					$('#tlyPageGuideMessages').css("top", "initial");
+					$('#tlyPageGuideMessages').css("bottom", "0px");
+				}
 			}
 	    });     	
  
@@ -209,6 +268,17 @@ function initializeTours() {
 }
 
 
+function customizeStep(pageGuide, step) {
+	if (step.position) {
+		$('#tlyPageGuideMessages').css("top", step.position.top);
+		$('#tlyPageGuideMessages').css("bottom", step.position.bottom);
+	} else {
+		$('#tlyPageGuideMessages').css("top", "initial");
+		$('#tlyPageGuideMessages').css("bottom", "0px");
+	}
+}
+
+
 function customizeEduTourStep(pageGuide, step) {
 	if (step.hasOwnProperty('noElement') && step.noElement == true) {
 		$('.tlypageguide_shadow')[step.index].style.visibility = 'hidden';
@@ -225,6 +295,13 @@ function customizeEduTourStep(pageGuide, step) {
 		$('.edu-tour-data-button').addClass("disabled");
 	} else {
 		$('.edu-tour-data-button').removeClass("disabled");
+	}
+	if (step.position) {
+		$('#tlyPageGuideMessages').css("top", step.position.top);
+		$('#tlyPageGuideMessages').css("bottom", step.position.bottom);
+	} else {
+		$('#tlyPageGuideMessages').css("top", "initial");
+		$('#tlyPageGuideMessages').css("bottom", "0px");
 	}
 	if (step.height) {
 		if (step.height == 'full') {

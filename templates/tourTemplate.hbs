@@ -215,19 +215,22 @@
 
   <li class="tlypageguide_bottom" data-tourtarget="#add-data-button">
     <div>
-      Click on the 'Data' button to load your variant and alignment files.
+      Click on the 'Select Data' link in the navigation bar  to load your variant and alignment files.
       <br><br>
     </div>
     <div>
-      1. Click on the 'Variants' dropdown and select 'Platinum Trio'.    
+      1. Select 'GRCh37' from the genome build dropdown. <br><br>
+    </div>
+    <div>
+      2. Click on the 'Variants' dropdown and select 'Platinum Trio'.    
       <br><br>
     </div>
     <div>
-      2. Click on the 'Alignments' dropdown and select 'Platinum Trio'.
+      3. Click on the 'Alignments' dropdown and select 'Platinum Trio'.
       <br><br>
     </div>  
      <div>
-      3. Click 'Load' to load all of the selected data into the app.
+      4. Click 'Load' to load all of the selected data into the app.
       <br><br>
     </div>
   </li>
@@ -236,7 +239,7 @@
   
   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
     <div>
-      The variants for the gene are annotated using SnpEff and VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
+      The variants for the gene are annotated using VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
       The the variants symbols to see more information.  
       <br><br>
 
@@ -287,16 +290,16 @@
   </li>
 
 
-  <li class="tlypageguide_right" data-tourtarget="#button-find-missing-variants">
+  <li class="tlypageguide_right" data-tourtarget="#call-variants-link">
     <div>
       Variants can be called in the real-time when an alignment file is present.
       <br><br>
-      Push the 'Call' button on icon bar. 
+      Push the 'Call Variants' link in the the navigation bar. 
     </div> 
   </li>
   <li class="tlypageguide_right" data-tourtarget="#button-call-variants">
     <div>
-      Push the 'Call from alignments' button to call variants using Freebayes.
+      Push the 'Run Freebayes' button to call variants using Freebayes.
       <br><br>
       Variants are called in the real-time.  In a few seconds, Freebayes will return
       the called variants.
@@ -307,9 +310,9 @@
       Variants not present in the VCF file will be displayed above the loaded variants. 
     </div>
   </li>
-  <li class="tlypageguide_right" data-tourtarget="#button-show-filters">
+  <li class="tlypageguide_right" data-tourtarget="#show-filters-link">
     <div>
-      Push the 'Filter variants' button on the icon bar.
+      Push the 'Filter Variants' link in the navigation bar.
     </div>
   </li>
   <li class="tlypageguide_right" data-tourtarget="#filter-track svg#MODERATE">
@@ -330,20 +333,21 @@
   </li>
 
 
-  <li class="tlypageguide_top" data-tourtarget="#examine-card">
+  <li class="tlypageguide_top" data-tourtarget="#vcf-variants .tooltip">
     <div>
-      Variant details are shown in the left panel.      
+      Variant details are shown in the tooltip.      
     </div>
   </li>
-  <li class="tlypageguide_top" data-tourtarget="#examine-card a:contains('Bookmark')">
+  "#vcf-variants .tooltip a:contains('bookmark')": {},
+  <li class="tlypageguide_top" data-tourtarget="#vcf-variants .tooltip #bookmarkLink">
     <div>     
-      Click on the 'Bookmark' link to bookmark this variant.
+      Click on the 'bookmark this variant' link to bookmark this variant.
     </div>
   </li>
   </li>
-  <li class="tlypageguide_right" data-tourtarget="#button-show-bookmarks">
+  <li class="tlypageguide_right" data-tourtarget="#show-bookmarks-link">
     <div>
-      Click on the 'Bookmarks' to see a list of all bookmarked variants.
+      Click on the 'Bookmark Variants' link in the navigation bar to see a list of all bookmarked variants.
     </div>
   </li>
   </li>
@@ -361,9 +365,9 @@
     </div>    
   </li>
 
-   <li class="tlypageguide_right" data-tourtarget="#button-show-phenolyzer">
+   <li class="tlypageguide_right" data-tourtarget="#show-select-genes-link">
     <div>
-      Click on the 'Genes' button in the icon bar.
+      Click on the 'Select Genes' link in the navigation bar..
       <br><br>
       Our application has integrated Phenolyzer, which produces a ranked gene list based on
       a phenotype terms.
@@ -372,10 +376,10 @@
     </div>
   </li>
    
-   <li class="tlypageguide_right" data-tourtarget="#button-show-help">
+   <li class="tlypageguide_right" data-tourtarget="#help-link">
     <div>
       This completes the gene.iobio tour.  You can run the tour any time by 
-      selecting 'Tour' from the 'About' sidebar icon button.
+      selecting 'Tour gene.iobio' from the 'Help' menu.
       <br>
       <strong><em>Click the close button to end or click on next arrow > to re-run the tour.</em></strong>
     </div>
@@ -404,15 +408,15 @@
       Click on a variant and click on the 'Bookmark' link in the tooltip.
     </div>
   </li>
-  <li class="tlypageguide_top" data-tourtarget="#examine-card a:contains('Bookmark')">
+  <li class="tlypageguide_top" data-tourtarget="#vcf-variants .tooltip #bookmarkLink">
     <div>     
-      Or you can click on the 'Bookmark' link here to bookmark variant you are inspecting.
+      Or you can click on the 'bookmark variant' link here to bookmark variant you are inspecting.
     </div>
   </li>
   </li>
-  <li class="tlypageguide_right" data-tourtarget="#button-show-bookmarks">
+  <li class="tlypageguide_right" data-tourtarget="#show-bookmarks-link">
     <div>
-      To view the bookmarks, click on the 'Bookmarks' to see a list of all bookmarked variants.
+      Click on the 'Bookmark Variants' to see a list of all bookmarked variants.
     </div>
   </li>
   </li>
@@ -462,9 +466,9 @@
 <!-- Tour of phenolyzer functionality -->
 <ul id="tourPhenolyzer" data-tourtitle="phenolyzer">
 
-   <li class="tlypageguide_right" data-tourtarget=".button-show-phenolyzer">
+   <li class="tlypageguide_right" data-tourtarget="#show-select-genes-link">
     <div>
-      Click on the 'Genes' button in the icon bar.
+      Click on the 'Select Genes' link in the navigation bar.
     </div>
    </li>
    
