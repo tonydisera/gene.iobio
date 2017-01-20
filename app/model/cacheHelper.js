@@ -379,10 +379,9 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 	{  
 		key = localStorage.key(i);  
 		keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject.launchTimestamp == me.launchTimestamp) {
+		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 
-		  	var cacheObject = CacheHelper._parseCacheKey(key);
-		  	if (cacheObject.dataKind == 'vcfData' && cacheObject.relationship == "proband") {
+		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband") {
 		  		var theVcfData = CacheHelper.getCachedData(key);
 		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
 
@@ -391,10 +390,10 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  			geneCount.pass++;
 		  		}
 
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(cacheObject.gene, filteredVcfData);
-				getVariantCard('proband').model.cacheDangerSummary(dangerObject, cacheObject.gene);
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData);
+				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
 		
-				genesCard.setGeneBadgeGlyphs(cacheObject.gene, dangerObject, false);
+				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
 		  	}
 		}
 	}  
@@ -433,14 +432,13 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  
 		key = localStorage.key(i);  
-		keyObject = CacheHelper._parseCacheKey(key);
+		var keyObject = CacheHelper._parseCacheKey(key);
 		if (keyObject) {			
 			if (keyObject.launchTimestamp == me.launchTimestamp) {
 			  	var dataSize = localStorage.getItem(key).length;
 			  	size     += dataSize;
 
-			  	var cacheObject = CacheHelper._parseCacheKey(key);
-			  	if (cacheObject.dataKind == 'bamData') {
+			  	if (keyObject.dataKind == 'bamData') {
 			  		coverageSize +=  dataSize;
 			  	}
 			  	
@@ -511,7 +509,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther)
 		var keysToRemove = [];
 		for (var i=0; i<=localStorage.length-1; i++)  {  
 			var key = localStorage.key(i); 	
-			keyObject = CacheHelper._parseCacheKey(key);
+			var keyObject = CacheHelper._parseCacheKey(key);
 			if (keyObject) {
 				if (keyObject.launchTimestamp == theLaunchTimeStamp && !clearOther) {
 					keysToRemove.push(key);
@@ -566,7 +564,7 @@ CacheHelper.prototype.clearCoverageCache = function() {
 	for (var i=0; i<=localStorage.length-1; i++)  {  
   		var key = localStorage.key(i); 	
 		var keyObject = CacheHelper._parseCacheKey(key);
-	  		if (keyObject.launchTimestamp == me.launchTimestamp) {
+	  		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 				if (keyObject.dataKind == "bamData") {
 					localStorage[key] = "";
 				}
@@ -579,7 +577,7 @@ CacheHelper.prototype.clearNonBadgeCache = function() {
 	for (var i=0; i<=localStorage.length-1; i++)  {  
   		var key = localStorage.key(i); 	
   		var keyObject = CacheHelper._parseCacheKey(key);
-  		if (keyObject.launchTimestamp == me.launchTimestamp) {
+  		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 			if (me._isProbandVariantCache(key) && !me._hasBadgeOfInterest(key)) {
 				me.clearCacheForGene(keyObject.gene);
 			}  			
@@ -616,9 +614,9 @@ CacheHelper.prototype._getKeysForGene = function(geneName) {
 	var keys = [];
 	for (var i=0; i<=localStorage.length-1; i++)  {  
   		var key = localStorage.key(i); 	
-		cacheObject = CacheHelper._parseCacheKey(key);
-		if (cacheObject.launchTimestamp == me.launchTimestamp) {
-			if (cacheObject.gene == geneName) {
+		var keyObject = CacheHelper._parseCacheKey(key);
+		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+			if (keyObject.gene == geneName) {
 				keys.push(key);
 			}			
 		}
@@ -690,19 +688,22 @@ CacheHelper.getCachedData = function(key) {
 
 CacheHelper.showError = function(key, cacheError) {
 	var cacheObject = CacheHelper._parseCacheKey(key);
-	var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
-	var errorKey = cacheObject.gene + "---" + errorType;
+	if (cacheObject) {
+		var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
+		var errorKey = cacheObject.gene + "---" + errorType;
 
-	var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
-    console.log(consoleMessage);
-    console.log(cacheError.toString());
-    
-    // Only show the error once
-    if (!recordedCacheErrors[errorKey]) {
-    	recordedCacheErrors[errorKey] = message;
-	    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes."
-		alertify.alert(message, function() {
-			recordedCacheErrors[errorKey] = null;			
-		});	
-    }
+		var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
+	    console.log(consoleMessage);
+	    console.log(cacheError.toString());
+	    
+	    // Only show the error once
+	    if (!recordedCacheErrors[errorKey]) {
+	    	recordedCacheErrors[errorKey] = message;
+		    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes."
+			alertify.alert(message, function() {
+				recordedCacheErrors[errorKey] = null;			
+			});	
+	    }		
+	}
+
 }
