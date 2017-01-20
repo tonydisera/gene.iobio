@@ -453,12 +453,29 @@
 
 
     <div id="welcome-panel" class="hide">
-      <div id="welcome-label">
-        Welcome to gene.iobio
+      <div id="welcome-label" style="padding-bottom:8px">
+        Welcome to gene.iobio.
       </div>  
+      <div id="welcome-label">
+        Hunt for disease-causing genetic variants through a combination of real-time genomic data analysis and intuitive visualization. 
+      </div>  
+      <div class="description-paragraph">
+         Gene.iobio integrates many tools and data sources into a single intuitive and user-friendly web interface. The app allows a researcher to rapidly examine genetic variants in a patient sample according to predicted functional impact (determined via VEP), and in the context of the pattern of inheritance from the parents. It supports the visualization of sequence alignments in the samples to assess coverage, and even to call potentially missed variants in real time. The app also pulls in data from 1000 Genomes Project and ExAC to see if a given variant in the patient is common or rare in the general population. Additional touches include the ability to reanalyze variant impact from non-canonical transcripts / gene models.
+      </div>
+      <div class="description-paragraph">
+        Gene.iobio does not require any data upload. You can simply select the data files and the gene of interest, and the app fetches all the data in that gene in a couple of seconds.
+      </div>
+      <div class="description-paragraph">
+        To learn more about the app, take a look at our <a href="http://iobio.io/tags/gene.iobio" target="_new">blog</a>.  To learn more about the iobio project and some of our other apps, please visit the <a href="http://iobio.io" target="_new">iobio website</a>.
+      </div>
       <button id="load-demo-data" class="btn btn-raised btn-default" onclick="dataCard.loadDemoData()">
-        <span style="">Load Demo data</span>
+        <span style="">try it out</span>
       </button>
+      <button   class="btn btn-raised btn-default" onclick="pageGuide.open()">
+        <span style="">take a tour</span>
+      </button>
+      
+
     </div>
 
     <div id="track-section" class="push" style="display:flex;margin-top:5px;">

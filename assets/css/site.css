@@ -735,14 +735,27 @@ a {
   padding-left: 10px; }
 
 #welcome-panel {
-  text-align: center; }
+  text-align: center;
+  background-color: white;
+  margin-top: 50px;
+  margin-left: 200px;
+  margin-right: 200px;
+  padding-bottom: 15px;
+  padding-top: 15px; }
   #welcome-panel #welcome-label {
-    padding-top: 40px;
     color: #5d809d;
     font-size: 16px; }
   #welcome-panel #load-demo-data {
     color: #717171;
     font-size: 13px; }
+  #welcome-panel .description-paragraph {
+    text-align: left;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+    color: #717171; }
+  #welcome-panel button {
+    color: #717171; }
 
 #matrix-track .matrix-note-text {
   margin-top: -7px;
