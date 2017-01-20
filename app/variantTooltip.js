@@ -661,7 +661,7 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 	var bookmarkLink =  '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this)">bookmark this variant</a>';
 	
 	var bookmarkBadge = '<svg class="bookmark-badge" height="14" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="11" style="fill: black;">bookmarked</text></g></svg>';
-	var removeBookmarkLink  =  '<a id="remove-bookmark-link" href="javascript:void(0)" onclick="removeBookmarkOnVariant();showAsNotBookmarked">remove bookmark</a>'
+	var removeBookmarkLink  =  '<a id="remove-bookmark-link" href="javascript:void(0)" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove bookmark</a>'
 	showAsBookmarked = function(container) {
 		$(container).parent().html(bookmarkBadge + removeBookmarkLink);
 	};
