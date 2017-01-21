@@ -728,7 +728,7 @@ a {
 #genes-control-track {
   background: white;
   padding-right: 10px;
-  padding-top: 5px;
+  padding-top: 10px;
   padding-bottom: 3px;
   margin-bottom: 5px;
   margin-top: 0px;
@@ -738,24 +738,32 @@ a {
   text-align: center;
   background-color: white;
   margin-top: 50px;
-  margin-left: 200px;
-  margin-right: 200px;
+  margin-left: auto;
+  margin-right: auto;
   padding-bottom: 15px;
-  padding-top: 15px; }
+  padding-top: 15px;
+  max-width: 530px;
+  padding-left: 10px;
+  padding-right: 10px; }
   #welcome-panel #welcome-label {
     color: #5d809d;
     font-size: 16px; }
-  #welcome-panel #load-demo-data {
-    color: #717171;
-    font-size: 13px; }
   #welcome-panel .description-paragraph {
     text-align: left;
     margin-left: 20px;
     margin-right: 20px;
     margin-top: 10px;
-    color: #717171; }
+    color: #717171;
+    font-size: 15px; }
+    #welcome-panel .description-paragraph li {
+      padding-bottom: 10px; }
+      #welcome-panel .description-paragraph li li {
+        padding-bottom: 4px; }
   #welcome-panel button {
-    color: #717171; }
+    color: #5d809d;
+    font-size: 15px !important;
+    margin-left: 7px;
+    margin-right: 7px; }
 
 #matrix-track .matrix-note-text {
   margin-top: -7px;
@@ -1515,7 +1523,7 @@ header {
     margin: 0px;
     padding: 0px; }
 #slider-left .nav li {
-  padding-top: 0px;
+  padding-top: 5px;
   padding-bottom: 4px;
   max-width: inherit;
   margin-left: 7px;
@@ -1607,7 +1615,7 @@ header {
 #close-slide-left {
   position: fixed;
   left: 324px;
-  top: 4px; }
+  top: 8px; }
 
 .icon-button.sidebar-button {
   margin-bottom: 0px !important;
@@ -2840,7 +2848,12 @@ text.ref-count {
 
 #manage-gene-list {
   display: inline-block;
-  padding-bottom: 4px; }
+  padding-top: 1px;
+  padding-bottom: 0px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: 13px;
+  margin-top: 5px; }
 
 #gene-badge-container {
   display: flex;
@@ -3241,7 +3254,17 @@ text.ref-count {
     .navbar ul.nav > li > a .material-icons {
       display: none; }
     .navbar ul.nav > li > a svg {
-      display: none; } }
+      display: none; }
+
+  #slider-left .navbar ul.nav > li {
+    padding-top: 8px; }
+    #slider-left .navbar ul.nav > li > a {
+      padding-top: 3px !important; }
+    #slider-left .navbar ul.nav > li > a#clear-filters-link {
+      padding-top: 0px !important; }
+
+  #close-slide-left {
+    top: 12px; } }
 @media screen and (max-width: 990px) {
   .navbar .navbar-brand {
     margin-top: 0px;

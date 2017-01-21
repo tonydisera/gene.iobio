@@ -236,7 +236,8 @@
             <div class="level-edu" style="text-align:center">
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
-                <a class="hide" id="manage-gene-list" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
+                <a  id="manage-gene-list" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
+                   <i class="material-icons">playlist_play</i>
                     Analyze all genes
                 </a>
 
@@ -453,26 +454,35 @@
 
 
     <div id="welcome-panel" class="hide">
-      <div id="welcome-label" style="padding-bottom:8px">
+      <div id="welcome-label" style="">
         Welcome to gene.iobio.
       </div>  
       <div id="welcome-label">
-        Hunt for disease-causing genetic variants through a combination of real-time genomic data analysis and intuitive visualization. 
+        A tool for disease-causing variant discovery & interrogation 
       </div>  
       <div class="description-paragraph">
-         Gene.iobio integrates many tools and data sources into a single intuitive and user-friendly web interface. The app allows a researcher to rapidly examine genetic variants in a patient sample according to predicted functional impact (determined via VEP), and in the context of the pattern of inheritance from the parents. It supports the visualization of sequence alignments in the samples to assess coverage, and even to call potentially missed variants in real time. The app also pulls in data from 1000 Genomes Project and ExAC to see if a given variant in the patient is common or rare in the general population. Additional touches include the ability to reanalyze variant impact from non-canonical transcripts / gene models.
-      </div>
-      <div class="description-paragraph">
-        Gene.iobio does not require any data upload. You can simply select the data files and the gene of interest, and the app fetches all the data in that gene in a couple of seconds.
-      </div>
-      <div class="description-paragraph">
-        To learn more about the app, take a look at our <a href="http://iobio.io/tags/gene.iobio" target="_new">blog</a>.  To learn more about the iobio project and some of our other apps, please visit the <a href="http://iobio.io" target="_new">iobio website</a>.
-      </div>
-      <button id="load-demo-data" class="btn btn-raised btn-default" onclick="dataCard.loadDemoData()">
-        <span style="">try it out</span>
+        <ul>
+
+          <li>On the fly annotation
+            <ul>
+              <li>Functional impact (e.g. VEP, Sift, Polyphen)</li>
+              <li>Allele Frequency (e.g. 1000G, ExAC)</li>
+              <li>Inheritance Mode</li>
+            </ul>
+          </li>
+
+          <li>Visualize Variants and Read Coverage together</li>
+          <li>Analyze Trios and affected/unaffected siblings</li>
+          <li>Instantly analyze VCF and BAM files both on your hard drive or on the web with no need to upload the entire file
+          </li>
+        </ui>
+
+      </div>      
+      <button id="load-demo-data" class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');dataCard.loadDemoData()">
+        <span style="">Try it with demo data</span>
       </button>
-      <button   class="btn btn-raised btn-default" onclick="pageGuide.open()">
-        <span style="">take a tour</span>
+      <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');pageGuide.open()">
+        <span style="">Take an app tour</span>
       </button>
       
 
