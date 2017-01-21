@@ -565,7 +565,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	var me = this;
 
-	geneNames = me.ACMG56_GENES;
+	geneNames = me.ACMG56_GENES.slice(0);;
 
 	// Remove gene badges not specified in the text area
 	var geneBadgesToRemove = [];
