@@ -420,6 +420,17 @@ i.material-icons
     overflow-x: hidden
 
 
+.transcript
+  .selection-box 
+    fill: transparent
+
+#transcript-menu
+  .transcript
+    &.selected
+      .selection-box 
+        stroke: $current-color
+        stroke-width: 2px
+        cursor: pointer 
 
 #select_side_bar_chosen.chosen-container-single .chosen-single
   line-height: 30px !important

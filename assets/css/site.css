@@ -345,6 +345,14 @@ i.material-icons {
   overflow-y: auto;
   overflow-x: hidden; }
 
+.transcript .selection-box {
+  fill: transparent; }
+
+#transcript-menu .transcript.selected .selection-box {
+  stroke: #3586c0;
+  stroke-width: 2px;
+  cursor: pointer; }
+
 #select_side_bar_chosen.chosen-container-single .chosen-single {
   line-height: 30px !important;
   height: 30px !important;
