@@ -872,6 +872,12 @@ function showDataDialog() {
 	if (genomeBuildHelper.getCurrentBuild() == null) {
 		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
 	} 
+	$('#dataModal').on('hidden.bs.modal', function(e) {
+
+       e.preventDefault();
+
+   });
+
 
 }
 

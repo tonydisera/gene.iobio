@@ -418,8 +418,7 @@ i.material-icons {
     background-color: transparent !important;
     webkit-box-shadow: none !important;
     box-shadow: none !important;
-    border: #E45C5C solid 6px !important;
-    z-index: 1999 !important; }
+    border: #E45C5C solid 6px !important; }
 
 #tlyPageGuideWrapper #tlyPageGuideMessages a.tlypageguide_close {
   color: white !important; }
@@ -1680,8 +1679,7 @@ header {
   -webkit-transition: all 0.6s ease;
   -moz-transition: 0.6s ease;
   -ms-transition: all 0.6s ease;
-  -o-transition: all 0.6s ease;
-  z-index: 1; }
+  -o-transition: all 0.6s ease; }
 
 .fixed {
   left: 0px; }

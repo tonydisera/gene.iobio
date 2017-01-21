@@ -26,8 +26,11 @@ var mainTourSteps = {
 		position: {top: '100px', bottom: 'initial'} 
 	},
 	'#show-filters-link': {},
-	'"#filter-track svg#MODERATE': {},
+	'#filter-track svg#MODERATE': {},
 	'#proband-variant-card #displayed-variant-count': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#proband-variant-card #vcf-track': { 
 		position: {top: '100px', bottom: 'initial'} 
 	},
 	'#vcf-variants .tooltip': { 
@@ -122,6 +125,7 @@ function initializeTours() {
 			'auto_refresh': true, 
 			'show_numbers': false,
 			'close_button_text': 'X',
+            'default_zindex': 1031,
 			'custom_open_button': '#show-main-tour',
 			'steps_element': '#tourMain',
 			'track_events_cb': function(interactionName) {

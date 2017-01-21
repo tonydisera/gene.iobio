@@ -8,7 +8,7 @@ function VariantTooltip() {
 
 VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html) {
 	var me = this;
-	tooltip.style("z-index", 20);
+	tooltip.style("z-index", 1032);
 	tooltip.transition()        
 	 .duration(1000)      
 	 .style("opacity", .9)	

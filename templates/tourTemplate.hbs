@@ -203,8 +203,10 @@
 <ul id="tourMain" data-tourtitle="main">
  <li class="tlypageguide_left" data-tourtarget="#enter-gene-name">
     <div>
-      Type in the gene name BRCA2 and select from the drop down list.
-      <br><strong><em>Click on next arrow > to continue to next step.</em></strong>
+      Type in the gene name BRCA2 and select from the dropdown list.
+      <br><br>
+      <strong><em>Click on next arrow > to continue to next step.</em></strong>
+      <br><br>
     </div>
   </li>
     <li class="tlypageguide_top" data-tourtarget="#gene-track">
@@ -215,7 +217,7 @@
 
   <li class="tlypageguide_bottom" data-tourtarget="#add-data-button">
     <div>
-      Click on the 'Select Data' link in the navigation bar  to load your variant and alignment files.
+      Click on the 'Select Data' link in the navigation bar to load your variant and alignment files.
       <br><br>
     </div>
     <div>
@@ -235,12 +237,11 @@
     </div>
   </li>
 
-  </li>
   
   <li class="tlypageguide_top" data-tourtarget="#vcf-track">
     <div>
       The variants for the gene are annotated using VEP to determine functional impact and effect, the allele frequencies from 1000 Genomes and ExAC are retrieved, and queries to ClinVar flag any variants with clinical significance.  All of this processing occurs in real-time.
-      The the variants symbols to see more information.  
+      Hover over or click on the variants symbols to see more information.  
       <br><br>
 
     </div>
@@ -254,19 +255,26 @@
   </li>
   <li class="tlypageguide_top" data-tourtarget="#matrix-track">
     <div>
-      The variants are ranked according to different criteria. These criteria can be reordered by clicking on their respective arrows. Click on a column to see the variant in the variant chart below. Unclick
-      the column to toggle back to all variants.
+      The variants are ranked according to different criteria. 
+      <br><br>
+      Click on a column to see details about the variant.  Click the column again and the tooltip disappears.
     </div>
   </li>
+  <li class="tlypageguide_top" data-tourtarget="#matrix-panel #move-rows">
+    <div>
+     The criteria used to rank the variants can be reordered by clicking on their respective arrows. Click on 'Reorder' link and then click on the up/down arrows to reorder variants.
+    </div>
+  </li>
+  
 
 
   <li class="tlypageguide_right" data-tourtarget="#transcript-btn-group">
     <div>
-      For the gene BRCA2, the variant were annotated and ranked based on the canonical transcript.
+      For the gene BRCA2, the variants were annotated and ranked based on the canonical transcript.
       <br><br>
       Other transcripts for this gene can be selected from this dropdown.
       <br><br>
-      Click on the dropdown and select the another transcript.  Notice how the variants are re-annotated 
+      Click on the dropdown and select another transcript.  Notice how the variants are re-annotated 
       according to this transcript.
     </div>
   </li>
@@ -285,23 +293,23 @@
   </li>
   <li class="tlypageguide_right" data-tourtarget="#gene-region-buffer-input">
     <div>
-      Adjust this value to display modify the size of displayed DNA upstream and downstream of the gene.
+      Adjust this value to modify the displayed genomic region. Increasing the amount of upstream and downstream DNA analyzed increases the potential for detecting cis regulatory variants for this gene.
     </div>
   </li>
 
 
   <li class="tlypageguide_right" data-tourtarget="#call-variants-link">
     <div>
-      Variants can be called in the real-time when an alignment file is present.
+      Variants can be called in real-time when an alignment file is present.
       <br><br>
-      Push the 'Call Variants' link in the the navigation bar. 
+      Push the 'Call Variants' link in the navigation bar. 
     </div> 
   </li>
   <li class="tlypageguide_right" data-tourtarget="#button-call-variants">
     <div>
-      Push the 'Run Freebayes' button to call variants using Freebayes.
+      Push the 'Run Freebayes' button to call variants from the alignment (BAM) files.
       <br><br>
-      Variants are called in the real-time.  In a few seconds, Freebayes will return
+      Variants are called in real-time.  In a few seconds, Freebayes will return
       the called variants.
     </div>
   </li>
@@ -326,10 +334,13 @@
   <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #displayed-variant-count">
     <div>
       The proband variant card now shows one variant.
-      <br><br>
-      Click on a variant to lock the tooltip and examine the variant in more detail.
     </div>
   </li>
+
+  <li class="tlypageguide_top" data-tourtarget="#proband-variant-card #vcf-track">
+    <div>
+      Click on a variant to lock the tooltip and examine the variant in more detail.
+    </div>
   </li>
 
 
@@ -359,20 +370,46 @@
   <li class="tlypageguide_top" data-tourtarget="#bookmark-card .favorite-indicator">
     <div>
       When reviewing a number of bookmarks, you can star the ones that are noteworthy.      
-    </div>  
-    <br><br>
-      See our tour for Bookmarks for more details.
+    </div>      
+  </li>
+
+  <li class="tlypageguide_top" data-tourtarget=".navbar-fixed-top #help-link">
+    <div>
+      To learn more about the Bookmark Variants feature, select 'Tour bookmarks' from the 'Help' menu.
     </div>    
   </li>
 
    <li class="tlypageguide_right" data-tourtarget="#show-select-genes-link">
     <div>
-      Click on the 'Select Genes' link in the navigation bar..
-      <br><br>
+      Click on the 'Select Genes' link in the navigation bar.
+    </div>
+  </li>
+
+
+   <li class="tlypageguide_right" data-tourtarget="#get-genes-dropdown">
+    <div>
+      Click on 'Import Gene set' dropdown.  You can type in or copy/paste a gene list here. 
+    </div>
+  </li>
+
+
+   <li class="tlypageguide_right" data-tourtarget="#get-acmg-genes">
+    <div>
+      Click on 'ACMG 56 Genes' button.  These genes have been selected and now appear in the Select Genes panel. 
+    </div>
+  </li>
+
+
+   <li class="tlypageguide_right" data-tourtarget="#phenolyzer-search-box">
+    <div>
       Our application has integrated Phenolyzer, which produces a ranked gene list based on
       a phenotype terms.
-      <br><br>
-      See our tour for Phenolyzer for more detail.
+    </div>
+  </li>
+
+   <li class="tlypageguide_right" data-tourtarget=".navbar-fixed-top .nav #help-link">
+    <div>
+       To learn more about running Phenolyzer in gene.iobio, select  'Tour phenolyzer' from the 'Help' menu.
     </div>
   </li>
    
@@ -381,9 +418,23 @@
       This completes the gene.iobio tour.  You can run the tour any time by 
       selecting 'Tour gene.iobio' from the 'Help' menu.
       <br>
+      <br>
       <strong><em>Click the close button to end or click on next arrow > to re-run the tour.</em></strong>
+      <br>
+      <br>
     </div>
   </li>
+   <li class="tlypageguide_right" data-tourtarget=".navbar-fixed-top">
+    <div>
+      Starting the gene.iobio tour over...
+      <br>
+      <br>
+      <strong><em>To end this tour, click the close button.</em></strong>
+      <br>
+      <br>
+    </div>
+  </li>
+
 </ul>
 
 
