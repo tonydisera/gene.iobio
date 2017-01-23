@@ -35,24 +35,24 @@ function DataCard() {
 	this.demoGenes =  ["RAI1","AIRE","MYLK2"];
 
 	this.demoNames = {
-		proband: 'NA19240',
-		mother:  'NA19238',
-		father:  'NA19239' 
+		proband: 'NA12878',
+		mother:  'NA12891',
+		father:  'NA12892' 
 	};
 	this.demoUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz'
 	};
 	this.demoBamUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA19240.bam',
-		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA19238.bam',
-		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA19239.bam'
+		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
+		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
+		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
 	};
 	this.demoSampleNames = {
-		proband: 'NA19240',
-		mother:  'NA19238',
-		father:  'NA19239'
+		proband: 'NA12878',
+		mother:  'NA12891',
+		father:  'NA12892' 
 	};
 
 	this.eduTourModes = [
