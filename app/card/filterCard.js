@@ -963,9 +963,11 @@ FilterCard.prototype._getFilterString = function() {
 FilterCard.prototype.displayFilters = function() {
 	var filterString = this._getFilterString();
 	if (filterString.length > 0) {
+		$("#genes-control-track #filters").removeClass("hide")
 		$("#genes-control-track #filters .filter-label").nextAll().remove();
 		$('#genes-control-track #filters .filter-label').after(filterString);		
 	} else {
+		$("#genes-control-track #filters").addClass("hide")
 	}
 }
 
