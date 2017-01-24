@@ -333,14 +333,6 @@ GenesCard.prototype.initEditGenes = function() {
 
 GenesCard.prototype.pageToGene = function(geneName) {
 	var me = this;
-	
-	if (geneNames.length > 0 || isLevelEdu) {
-		$('#genes-control-track').removeClass("hide");
-		$('#genes-panel').removeClass("hide");
-	} else {
-		$('#genes-control-track').addClass("hide");
-		$('#genes-panel').addClass("hide");
-	}
 
 	if (geneNames && geneNames.length > this.GENES_PER_PAGE) {
 		var pos = geneNames.indexOf(geneName) + 1;
@@ -432,14 +424,6 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		$('#gene-page-control').addClass("hide");
 		$('#gene-paging-links').addClass("hide");
 		$('#gene-page-selection').html("");
-	}
-
-	if (geneNames.length > 0 || isLevelEdu) {
-		$('#genes-control-track').removeClass("hide");
-		$('#genes-panel').removeClass("hide");
-	} else {
-		$('#genes-control-track').addClass("hide");
-		$('#genes-panel').addClass("hide");
 	}
 
 }
@@ -1095,6 +1079,10 @@ GenesCard.prototype.addGene = function(geneName) {
 
 GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 	var me = this;
+
+	$('#genes-control-track').removeClass("hide");
+	$('#genes-panel').removeClass("hide");
+
 
 	if (isLevelBasic) {
 		$('#select-gene')[0].selectize.addOption({value:geneName});

@@ -2680,7 +2680,8 @@ text.ref-count {
 
 #genes-panel {
   margin-bottom: 5px;
-  margin-top: 8px; }
+  margin-top: 8px;
+  margin-bottom: 0px; }
   #genes-panel #analyze-all-progress, #genes-panel #filter-progress {
     position: relative;
     background-color: white;
@@ -2871,7 +2872,11 @@ text.ref-count {
   max-height: 150px;
   overflow-y: auto;
   padding-bottom: 0px;
-  padding-top: 5px; }
+  padding-top: 0px;
+  visibility: visible; }
+  #gene-badge-container.hide {
+    display: flex !important;
+    visibility: hidden; }
   #gene-badge-container a {
     color: #717171 !important; }
     #gene-badge-container a:hover {
@@ -2899,8 +2904,8 @@ text.ref-count {
   padding-top: 2px; }
 
 #gene-page-control {
-  margin-top: -3px;
-  margin-bottom: 3px;
+  margin-top: 0px;
+  margin-bottom: 5px;
   text-align: center; }
   #gene-page-control #gene-paging-links {
     display: inline-block;

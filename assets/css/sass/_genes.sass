@@ -19,6 +19,7 @@
 #genes-panel
   margin-bottom: 5px 
   margin-top: 8px
+  margin-bottom: 0px
 
   #analyze-all-progress, #filter-progress
     position: relative
@@ -248,7 +249,12 @@
   max-height: 150px
   overflow-y: auto
   padding-bottom: 0px
-  padding-top: 5px
+  padding-top: 0px
+  visibility: visible
+
+  &.hide
+    display: flex !important
+    visibility: hidden
 
   a
     color:  $sidebar-text-color !important
@@ -284,8 +290,8 @@
   padding-top: 2px
 
 #gene-page-control
-  margin-top: -3px
-  margin-bottom: 3px
+  margin-top: 0px
+  margin-bottom: 5px
   text-align: center
 
   #gene-paging-links
