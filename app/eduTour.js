@@ -30,7 +30,7 @@ var mainTourSteps = {
 	'#proband-variant-card #displayed-variant-count': { 
 		position: {top: '100px', bottom: 'initial'} 
 	},
-	'#proband-variant-card #vcf-track': { 
+	'#proband-variant-card #vcf-track svg g.group g.snp': { 
 		position: {top: '100px', bottom: 'initial'} 
 	},
 	'#vcf-variants .tooltip': { 
