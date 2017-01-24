@@ -493,6 +493,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 	geneBadgesToRemove.forEach( function(geneName) {
 		var gb = me._getGeneBadge(geneName);
 		gb.remove();
+		me._removeGeneHousekeeping(geneName, false, false);
 	});
 
 
@@ -985,6 +986,7 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
 GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 	var me = this;
 
+
 	var index = geneNames.indexOf(theGeneName);
 	if (index >= 0) {
 		geneNames.splice(index, 1);
@@ -992,15 +994,45 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 		gb.remove();
 		me._onGeneBadgeUpdate();
 	}
-	cacheHelper.clearCacheForGene(theGeneName);
-	delete geneObjects[theGeneName];
-	delete geneAnnots[theGeneName];
-	delete geneUserVisits[theGeneName];
-	me._initPaging(geneNames);
-	
-	cacheHelper.showAnalyzeAllProgress();
+
+	me._removeGeneHousekeeping(theGeneName);
 
 }
+GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPaging=true, updateAnalyzedCounts=true) {
+	me = this;
+	if (window.gene && theGeneName == window.gene.gene_name) {
+		me._hideCurrentGene();
+	}
+
+	cacheHelper.clearCacheForGene(theGeneName);
+
+	if (geneObjects && geneObjects.hasOwnProperty(theGeneName)) {
+		delete geneObjects[theGeneName];
+	}
+	if (geneAnnots && geneAnnots.hasOwnProperty(theGeneName)) {
+		delete geneAnnots[theGeneName];
+	}
+	if (geneUserVisits && geneUserVisits.hasOwnProperty(theGeneName)) {
+		delete geneUserVisits[theGeneName];
+	}
+
+	if (performPaging) {
+		me._initPaging(geneNames);
+	}
+	
+	if (updateAnalyzedCounts) {
+		cacheHelper.showAnalyzeAllProgress();
+	}
+
+}
+
+
+GenesCard.prototype._hideCurrentGene = function() {
+	$('#nav-section').addClass("hide");
+	$('#matrix-track').addClass("hide");
+	$('.variant-card').addClass("hide");	
+}
+
 
 GenesCard.prototype.clearGenes = function() {
 	var me = this;
@@ -1029,15 +1061,14 @@ GenesCard.prototype._clearGenesImpl = function() {
 		var gb = me._getGeneBadge(theGeneName);
 		gb.remove();
 
-		cacheHelper.clearCacheForGene(theGeneName);
-		delete geneObjects[theGeneName];
-		delete geneAnnots[theGeneName];
-		delete geneUserVisits[theGeneName];
+		me._removeGeneHousekeeping(theGeneName, false, false);
 	};
 	me._onGeneBadgeUpdate();
 	me._initPaging(geneNames);
 	readjustCards();
 	cacheHelper.showAnalyzeAllProgress();
+
+	me._hideCurrentGene();
 }
 
 
@@ -1046,6 +1077,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 	var me = this;
 
 	var theGeneName = $(badgeElement).parent().find("#gene-badge-name").text();
+	
 	var index = geneNames.indexOf(theGeneName);
 	if (index >= 0) {
 		geneNames.splice(index, 1);
@@ -1053,12 +1085,8 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 		me._onGeneBadgeUpdate();
 	}
-	cacheHelper.clearCacheForGene(theGeneName);
-	delete geneObjects[theGeneName];
-	delete geneAnnots[theGeneName];
-	delete geneUserVisits[theGeneName];
-	me._initPaging(geneNames);
-	cacheHelper.showAnalyzeAllProgress();
+
+	me._removeGeneHousekeeping(theGeneName);
 
 }
 
