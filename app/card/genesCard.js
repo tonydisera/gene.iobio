@@ -1347,6 +1347,7 @@ GenesCard.prototype.setGeneBadgeWarning = function(geneName, select) {
 		geneBadge.addClass("selected");
 	}
 	geneBadge.find("#gene-badge-warning").removeClass("hide");
+	cacheHelper.showAnalyzeAllProgress();
 }
 
 GenesCard.prototype._getGeneBadge = function(geneName) {

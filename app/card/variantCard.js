@@ -1177,9 +1177,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						}
 					} else {
 						if (me.getRelationship() == 'proband') {
+							me.model.cacheDangerSummary({}, window.gene.gene_name);
 							genesCard._geneBadgeLoading(window.gene.gene_name, false);
 							genesCard.setGeneBadgeWarning(window.gene.gene_name);
-							me.model.cacheDangerSummary({}, window.gene.gene_name);
 						}
 					}
 

@@ -276,6 +276,14 @@ CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 	var idx = this.cacheQueue.indexOf(geneName);
 	if (idx >= 0) {
 		this.cacheQueue.splice(idx,1);
+	} else {
+		idx = this.cacheQueue.indexOf(geneName.toUpperCase());
+		if (idx >= 0) {
+			this.cacheQueue.splice(idx,1);
+		} else {
+			console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
+			return;
+		}
 	}
 	// Invoke cacheGenes, which will kick off the next batch
 	// of genes to analyze once all of the genes in
@@ -284,7 +292,8 @@ CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 }
 
 CacheHelper.prototype.isCachedForProband = function(geneName, transcript) {
-	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneName, transcript); 
+	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneName, transcript)
+		|| getProbandVariantCard().model.getDangerSummaryForGene(geneName);
 }
 
 CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {

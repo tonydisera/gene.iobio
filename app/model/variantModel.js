@@ -1062,7 +1062,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 }
 
 VariantModel.prototype.isCached = function(geneName, transcript) {
-	var key = this._getCacheKey("vcfData", geneName, transcript);
+	var key = this._getCacheKey("vcfData", geneName.toUpperCase(), transcript);
 	var data = localStorage.getItem(key);
 	return data != null;
 }
@@ -1071,6 +1071,7 @@ VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneName, tra
 	var theVcfData = this._getCachedData("vcfData", geneName, transcript);
 	return theVcfData && theVcfData.loadState != null && theVcfData.loadState['inheritance'];
 }
+
 
 VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
 	var me = this;
@@ -1247,6 +1248,7 @@ VariantModel.prototype.clearCacheItem = function(dataKind, geneName, transcript)
 
 VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
 	var me = this;
+	geneName = geneName.toUpperCase();
 	if (localStorage) {
 		var success = true;
 		var dataString = JSON.stringify(data);
@@ -1296,6 +1298,8 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 
 VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript) {
 	var me = this;
+
+	geneName = geneName.toUpperCase();
 
 	var data = null;
 	if (localStorage) {
