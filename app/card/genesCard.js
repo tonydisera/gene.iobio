@@ -370,6 +370,7 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 	if (theGeneNames == null) {
 		theGeneNames = window.geneNames;
 	}
+
 	this.currentPageNumber = pageNumber;
 	$('#gene-badge-container #gene-badge').remove();
 	var end     = (this.GENES_PER_PAGE * pageNumber);
@@ -1012,6 +1013,8 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 	delete geneAnnots[theGeneName];
 	delete geneUserVisits[theGeneName];
 	me._initPaging(geneNames);
+	
+	cacheHelper.showAnalyzeAllProgress();
 
 }
 
@@ -1050,6 +1053,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 	me._onGeneBadgeUpdate();
 	me._initPaging(geneNames);
 	readjustCards();
+	cacheHelper.showAnalyzeAllProgress();
 }
 
 
@@ -1070,6 +1074,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 	delete geneAnnots[theGeneName];
 	delete geneUserVisits[theGeneName];
 	me._initPaging(geneNames);
+	cacheHelper.showAnalyzeAllProgress();
 
 }
 
@@ -1141,6 +1146,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 	}
 	me._onGeneBadgeUpdate();
+	cacheHelper.showAnalyzeAllProgress();
 
 }
 
@@ -1565,6 +1571,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		}
 	}
 
+	cacheHelper.showAnalyzeAllProgress();
 	readjustCards();
 }
 

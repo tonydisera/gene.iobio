@@ -16,7 +16,12 @@ CacheHelper.prototype.showAnalyzeAllProgress = function() {
 	var me = this;
 	me.getAnalyzeAllCounts(function(counts) {
 		$('#analyze-all-progress').removeClass("hide");
-		if (counts.analyzed == counts.total) {
+		if (counts.analyzed == 0 && counts.total > 0) {
+			$('#analyze-all-progress').removeClass("done");
+			$('#analyze-all-progress .bar').css("width", "0%");
+			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
+		}
+		else if (counts.analyzed == counts.total) {
 			$('#analyze-all-progress .bar').css("width", "0%");
 			$('#analyze-all-progress').addClass("done");
 			$('#analyze-all-progress .bar').css("width", "100%");
@@ -537,6 +542,7 @@ CacheHelper.prototype.clearAll = function() {
 	    if (e) {
 			// user clicked "ok"
 			me._clearCache();
+			cacheHelper.showAnalyzeAllProgress();
   			me.refreshDialog();
 	        
 	    } else {
