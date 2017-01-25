@@ -316,6 +316,8 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	}
 	dangerCounts.AF = afSummaryObject;
 
+	dangerCounts.featureCount = theVcfData.features.length;
+
 	return dangerCounts;
 }
 
@@ -327,6 +329,7 @@ VariantModel.summarizeError =  function(theError) {
 	summaryObject.CLINVAR = {}
 	summaryObject.INHERITANCE = {};
 	summaryObject.ERROR = theError;	
+	summaryObject.featureCount = 0;
 
 	return summaryObject;
 }

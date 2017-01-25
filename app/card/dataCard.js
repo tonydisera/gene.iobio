@@ -726,6 +726,10 @@ DataCard.prototype.init = function() {
 		// Clear the cache
 		cacheHelper.clearCache();
 
+		// Clear any filters
+		filterCard.clearFilters();
+		filterCard.resetStandardFilterCounts();
+
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father
 		// data is loaded.

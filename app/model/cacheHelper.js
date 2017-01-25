@@ -31,6 +31,13 @@ CacheHelper.prototype.showAnalyzeAllProgress = function() {
 			$('#analyze-all-progress .bar').css("width", percentage(counts.analyzed / counts.total));
 			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
 		}
+		if (filterCard.hasFilters()) {
+			$('#filter-progress .text').text(counts.pass + " passed filter");
+			$('#filter-progress .bar').css("width", percentage(counts.pass / counts.analyzed));
+			$('#filter-progress').removeClass("hide");					
+		} else {
+			$('#filter-progress').addClass("hide");					
+		}
 	});	
 }
 
@@ -313,7 +320,7 @@ CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
 
 
 CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
-	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0};
+	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0, pass: 0};
 	genesCard.getGeneNames().forEach(function(geneName) {
 		//genesToCount.push(geneName);
 		
@@ -321,6 +328,9 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
     	var dangerSummary = CacheHelper.getCachedData(key);
 		if (dangerSummary != null) {
 			countObject.analyzed++;
+			if (dangerSummary.featureCount && dangerSummary.featureCount > 0) {
+				countObject.pass++;
+			}
 		} else {
 			countObject.unanalyzed++;						
 		}
@@ -530,6 +540,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther)
 					if (keyObject.gene && keyObject.relationship == 'proband') {
 						genesCard.clearGeneGlyphs(keyObject.gene);
 						genesCard.clearGeneInfo(keyObject.gene);
+
 					}
 				} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther) {
 					keysToRemove.push(key);

@@ -59,6 +59,10 @@ FilterCard.prototype.setStandardFilterCount = function(button, genesCount) {
 	$(button.parentNode).find("span.standard-filter-count").text(label);
 }
 
+FilterCard.prototype.resetStandardFilterCounts = function() {
+	$('#standard-filter-panel span.standard-filter-count').text("");
+}
+
 FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	var me = this;
 	me.clearFilters();
@@ -883,6 +887,20 @@ FilterCard.prototype.hasFilters = function() {
 	} else {
 		return false;
 	}
+}
+
+
+FilterCard.prototype.filterGenes = function() {
+	var me = this;
+	// After the filter has been applied to the current gene's variants,
+	// refresh all of the gene badges based on the filter
+	var geneCounts = cacheHelper.refreshGeneBadges();
+	if (me.hasFilters()) {
+		$('#filter-progress .text').text(geneCounts.pass + " passed filter");
+		$('#filter-progress .bar').css("width", percentage(geneCounts.pass / geneCounts.total));
+		$('#filter-progress').removeClass("hide");		
+	}
+	return geneCounts;
 }
 
 
