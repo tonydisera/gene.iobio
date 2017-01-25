@@ -21,7 +21,7 @@ body {
     margin: 10px 17px;
     border-left: 1px solid #aba9a9; }
   .navbar ul.nav > li #genes-menu-item {
-    overflow: auto;
+    overflow: visible;
     display: inline-block;
     vertical-align: top;
     padding-top: 1px; }
