@@ -1001,9 +1001,12 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 
 GenesCard.prototype.clearGeneInfos = function() {
 	var me = this;
+	window.gene = null;
+	window.selectedTranscript = null;
 	geneNames.forEach(function(theGeneName) {
 		me.clearGeneInfo(theGeneName);
 	});
+	me._hideCurrentGene();
 }
 
 

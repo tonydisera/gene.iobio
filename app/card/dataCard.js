@@ -720,8 +720,7 @@ DataCard.prototype.init = function() {
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
 		
-		window.gene = null;
-		window.selectedTranscript = null;
+		// Clear out annotations and gene models (and transcripts)
 		genesCard.clearGeneInfos();
 		
 		// Clear the cache
