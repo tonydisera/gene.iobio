@@ -720,6 +720,9 @@ DataCard.prototype.init = function() {
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
 		
+		window.gene = null;
+		window.selectedTranscript = null;
+		genesCard.clearGeneInfos();
 		
 		// Clear the cache
 		cacheHelper.clearCache();

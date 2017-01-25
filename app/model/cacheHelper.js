@@ -529,6 +529,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther)
 					keysToRemove.push(key);
 					if (keyObject.gene && keyObject.relationship == 'proband') {
 						genesCard.clearGeneGlyphs(keyObject.gene);
+						genesCard.clearGeneInfo(keyObject.gene);
 					}
 				} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther) {
 					keysToRemove.push(key);
@@ -538,6 +539,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther)
 		keysToRemove.forEach( function(key) {
 			localStorage.removeItem(key);			
 		})
+		window.gene = null;
 		me.hideAnalyzeAllProgress();
 		//CacheHelper._logCacheSize();
 		//CacheHelper._logCacheContents();

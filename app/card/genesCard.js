@@ -998,14 +998,16 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 	me._removeGeneHousekeeping(theGeneName);
 
 }
-GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPaging=true, updateAnalyzedCounts=true) {
-	me = this;
-	if (window.gene && theGeneName == window.gene.gene_name) {
-		me._hideCurrentGene();
-	}
 
-	cacheHelper.clearCacheForGene(theGeneName);
+GenesCard.prototype.clearGeneInfos = function() {
+	var me = this;
+	geneNames.forEach(function(theGeneName) {
+		me.clearGeneInfo(theGeneName);
+	});
+}
 
+
+GenesCard.prototype.clearGeneInfo = function(theGeneName) {
 	if (geneObjects && geneObjects.hasOwnProperty(theGeneName)) {
 		delete geneObjects[theGeneName];
 	}
@@ -1014,7 +1016,20 @@ GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPagin
 	}
 	if (geneUserVisits && geneUserVisits.hasOwnProperty(theGeneName)) {
 		delete geneUserVisits[theGeneName];
+	}	
+	if (geneToLatestTranscript && geneToLatestTranscript.hasOwnProperty(theGeneName)) {
+		delete geneToLatestTranscript[theGeneName];
 	}
+}
+
+GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPaging=true, updateAnalyzedCounts=true) {
+	me = this;
+	if (window.gene && theGeneName == window.gene.gene_name) {
+		me._hideCurrentGene();
+	}
+
+	cacheHelper.clearCacheForGene(theGeneName);
+	me.clearGeneInfo(theGeneName);
 
 	if (performPaging) {
 		me._initPaging(geneNames);
