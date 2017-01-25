@@ -32,7 +32,7 @@ function DataCard() {
 		father: true
 	};
 
-	this.demoGenes =  ["RAI1","AIRE","MYLK2"];
+	this.demoGenes =  ["RAI1","AIRE","MYLK2", "PDGFB", "PDHA1"];
 
 	this.demoNames = {
 		proband: 'NA12878',
