@@ -279,6 +279,10 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 	});
 }
 
+CacheHelper.prototype.isGeneInProgress = function(geneName) {
+	return this.cacheQueue.indexOf(geneName) >= 0;
+}
+
 CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 	this.showAnalyzeAllProgress();
 
@@ -645,6 +649,11 @@ CacheHelper.prototype.clearCacheForGene = function(geneName) {
 	keys.forEach( function(key) {
 		localStorage[key] = "";
 	});
+
+	// Clear the gene out from the cache 'analyze all' queue
+	if (me.isGeneInProgress(geneName)) {
+		me.cacheNextGene(geneName);
+	}
 }
 
 

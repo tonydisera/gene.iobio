@@ -35,7 +35,7 @@ GenesCard.prototype.init = function() {
         total: 0,
         maxVisible: 0
     }).on("page", function(event, pageNumber){
-         me._goToPage(pageNumber, me.sortedGeneNames);
+         me._goToPage(pageNumber, me.getGeneNames());
     });
 
     
@@ -348,13 +348,15 @@ GenesCard.prototype.pageToGene = function(geneName) {
 }
 
 GenesCard.prototype.viewDefaultsGenesPerPage = function() {
-	this.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
-	this.sortGenes();
+	var me = this;
+	me.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
+	me._initPaging(me.getGeneNames(), true);
 }
 
 GenesCard.prototype.viewAllGenes = function() {
-	this.GENES_PER_PAGE = 1000000;
-	this.sortGenes();
+	var me = this;
+	me.GENES_PER_PAGE = 1000000;
+	me._initPaging(me.getGeneNames(), true);
 }
 
 GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
@@ -390,6 +392,9 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		}
 		if (geneUserVisits[name]) {
 			me.flagUserVisitedGene(name);
+		}
+		if (cacheHelper.isGeneInProgress(name)) {
+			me.showGeneBadgeLoading(name, true);
 		}
 	}
 
@@ -569,6 +574,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	geneBadgesToRemove.forEach( function(geneName) {
 		var gb = me._getGeneBadge(geneName);
 		gb.remove();
+		me._removeGeneHousekeeping(geneName);
 	});
 
 
