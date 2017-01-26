@@ -6,7 +6,7 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 // URLS
 //
 var DEV_IOBIO                 = "nv-dev.iobio.io/";
-var STAGE_IOBIO               = "nv-green.iobio.io/";
+var STAGE_IOBIO               = "nv-blue.iobio.io/";
 var PROD_IOBIO                = "nv-prod.iobio.io/";
 
 var CURRENT_IOBIO             = PROD_IOBIO;
@@ -16,7 +16,7 @@ var iobio_http_services       = (useSSL ? "https://" : "http://") + (isOffline ?
 
 
 // http services
-var geneInfoServer            = "http://" + STAGE_IOBIO + "geneinfo/";   // POINTED TO STAGE!!
+var geneInfoServer            = "http://" + DEV_IOBIO + "geneinfo/";   // POINTED TO STAGE!!
 //var geneInfoServer            = iobio_http_services + "geneinfo/";   
 var genomeBuildServer         = iobio_http_services + "genomebuild/"; 
 var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
