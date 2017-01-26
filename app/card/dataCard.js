@@ -719,6 +719,10 @@ DataCard.prototype.init = function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
+
+		// Save the currently select gene name before clearing
+		// out the gene info, which is necessary if the genome build or dataset(s) change
+		var theGeneName = window.gene ? window.gene.gene_name : null;
 		
 		// Clear out annotations and gene models (and transcripts)
 		genesCard.clearGeneInfos();
@@ -746,10 +750,14 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		// If the genome build was missing, the user was forced into the data dialog to select
-		// the genome build.  Now we want to load the gene if it was provided in the URL parameter
-		// list.
-		if ((window.gene == null || window.gene.length == 0) && getUrlParameter("gene")) {
+		
+		
+		if (theGeneName) {
+			setGeneBloodhoundInputElement(theGeneName, false, true);
+		} else if (getUrlParameter("gene")) {
+			// If the genome build was missing, the user was forced into the data dialog to select
+			// the genome build.  Now we want to load the gene if it was provided in the URL parameter
+			// list.
 			setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
 		} else {
 			window.loadTracksForGene();		
