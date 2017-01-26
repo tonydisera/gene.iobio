@@ -462,7 +462,9 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 
 	this.setVariantCardLabel();
    	this.cardSelector.find('#card-relationship-label').text(title);
-   	this.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);
+   	if (window.gene) {
+   		this.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);
+   	}
 
 }
 
