@@ -2783,13 +2783,15 @@ text.ref-count {
   height: 21px; }
 
 #gene-badge.loading {
-  border-left: #dad26c solid 12px; }
+  border-left: #dad26c solid 12px;
+  height: 22px; }
 
 #gene-badge.loading.selected {
   border-left: #dad26c solid 12px; }
 
 #gene-badge.selected {
-  border-left: #7ea238 solid 12px; }
+  border-left: #7ea238 solid 12px;
+  height: 22px; }
   #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
     font-weight: bold; }
 
