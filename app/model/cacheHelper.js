@@ -34,7 +34,12 @@ CacheHelper.prototype.showAnalyzeAllProgress = function() {
 		if (filterCard.hasFilters()) {
 			$('#filter-progress .text').text(counts.pass + " passed filter");
 			$('#filter-progress .bar').css("width", percentage(counts.pass / counts.analyzed));
-			$('#filter-progress').removeClass("hide");					
+			$('#filter-progress').removeClass("hide");	
+
+			// If a standard filter has been applied, update its counts
+			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find('span.standard-filter-count').text(counts.pass + ' of ' + counts.analyzed + ' genes');
+			}			
 		} else {
 			$('#filter-progress').addClass("hide");					
 		}
@@ -399,13 +404,19 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 	var geneCount = {total: 0, pass: 0};
 
 	$('#gene-badges-loader').removeClass("hide");
+
+	var theGeneNames = {};
+	genesCard.getGeneNames().forEach(function(geneName) {
+		theGeneNames[geneName] = true;
+	});
+
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  
 		key = localStorage.key(i);  
 		keyObject = CacheHelper._parseCacheKey(key);
 		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 
-		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband") {
+		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
 		  		var theVcfData = CacheHelper.getCachedData(key);
 		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
 
