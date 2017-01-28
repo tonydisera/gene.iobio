@@ -1160,10 +1160,10 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 	}
 
 
-	// If a gene list name was provided (e.g. ACMG56, load these genes)
+	// If a gene list name was provided (e.g. ACMG, load these genes)
 	var geneList = getUrlParameter("geneList");
 	if (geneList != null && geneList.length > 0 && geneList == 'ACMG56') {
-		genesCard.ACMG56_GENES.sort().forEach(function(geneName) {
+		genesCard.ACMG_GENES.sort().forEach(function(geneName) {
 			if ( geneNames.indexOf(geneName.toUpperCase()) < 0 ) {
 				geneNames.push(geneName.toUpperCase());
 			}

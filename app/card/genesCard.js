@@ -4,7 +4,7 @@ function GenesCard() {
 	this.NUMBER_PHENOLYZER_GENES_OFFLINE = 20;
 	this.GENES_PER_PAGE_DEFAULT = 40;
 	this.GENES_PER_PAGE = isLevelBasic || isLevelEdu ? 99999 :  this.GENES_PER_PAGE_DEFAULT;
-	this.ACMG56_GENES = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYLK", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S"];
+	this.ACMG_GENES = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S", "ATP7B", "BMPR1A", "SMAD4", "OTC"];
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
 	this.sortedGeneNames = null;
@@ -556,7 +556,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	var me = this;
 
-	geneNames = me.ACMG56_GENES.slice(0);;
+	geneNames = me.ACMG_GENES.slice(0);;
 
 	// Remove gene badges not specified in the text area
 	var geneBadgesToRemove = [];
