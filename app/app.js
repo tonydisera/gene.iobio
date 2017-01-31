@@ -524,7 +524,7 @@ function init() {
 }
 
 function showGeneSummary(theGeneName) {
-	if (theGeneName != window.gene.gene_name) {
+	if (window.gene == null || theGeneName != window.gene.gene_name) {
 		return;
 	}
 	var title = geneAnnots[theGeneName] ? "<span class='gene-title'>" + geneAnnots[theGeneName].description + ".</span>" : "";
