@@ -1127,7 +1127,8 @@ section {
 .variant-card {
   min-height: 60px;
   padding-bottom: 0px;
-  background-color: white; }
+  background-color: white;
+  margin-top: 0px; }
   .variant-card .vcfloader {
     text-align: center;
     background-color: white;
