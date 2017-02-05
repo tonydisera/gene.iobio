@@ -1255,8 +1255,8 @@ GenesCard.prototype._setBookmarkBadge = function(geneName) {
 	if (geneBadge) {
 		geneBadge.find("#gene-badge-bookmark svg").remove();
 		if (bookmarkCard.isBookmarkedGene(geneName)) {
-			geneBadge.find('#gene-badge-bookmark').append("<svg class=\"bookmark-badge\" height=\"12\" width=\"10\">");
-			var selection = d3.select(geneBadge.find('#gene-badge-bookmark .bookmark-badge')[0]).data([{translate: 'translate(-2,2)', width:10, height:10, clazz: 'bookmark'}]);
+			geneBadge.find('#gene-badge-bookmark').append("<svg class=\"bookmark-badge\" height=\"12\" width=\"12\">");
+			var selection = d3.select(geneBadge.find('#gene-badge-bookmark .bookmark-badge')[0]).data([{translate: 'translate(-2,-2)', width:12, height:16, clazz: 'bookmark'}]);
 			matrixCard.showBookmarkSymbol(selection);
 		}
 	}

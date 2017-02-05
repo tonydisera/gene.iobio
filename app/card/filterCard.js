@@ -537,7 +537,7 @@ FilterCard.prototype.clearFilters = function() {
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
 
-	this.displayFilters();
+	this.displayFilterSummary();
 	
 }
 
@@ -978,14 +978,14 @@ FilterCard.prototype._getFilterString = function() {
 	return filterString;
 }
 
-FilterCard.prototype.displayFilters = function() {
+FilterCard.prototype.displayFilterSummary = function() {
 	var filterString = this._getFilterString();
 	if (filterString.length > 0) {
-		$("#genes-control-track #filters").removeClass("hide")
-		$("#genes-control-track #filters .filter-label").nextAll().remove();
-		$('#genes-control-track #filters .filter-label').after(filterString);		
+		$("#filter-summary-track").removeClass("hide")
+		$("#filter-summary-track .card-label").nextAll().remove();
+		$('#filter-summary-track .card-label').after(filterString);		
 	} else {
-		$("#genes-control-track #filters").addClass("hide")
+		$("#filter-summary-track").addClass("hide")
 	}
 }
 

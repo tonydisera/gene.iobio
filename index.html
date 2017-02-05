@@ -219,25 +219,27 @@
     <div id="intro" class="hide level-basic shadow-z-2">
     </div>
 
+    <div id="filter-summary-track" class="hide shadow-z-2 track">
+      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
+    </div>
+
+
     <div id="genes-control-track" class="hide level-basic shadow-z-2">
-      <div class="card-label">Selected Genes</div>
-      <div id="filters" class="hide">
-        <span class="filter-label">Filters</span>
-      </div>
+      
       <button id="refresh-badges-button" class="hide btn btn-default icon-button-sm btn-raised" onclick="cacheHelper.refreshGeneBadges()">
         Refresh all
       </button>
 
 
-      <div  class="nav-stretch level-basic" style="margin-top:-10px;">
-
+      <div  class="nav-stretch level-basic" style="margin-top:-13px;">
+          <div class="card-label" style="float:left;padding-top:7px;margin-right:20px;">Selected Genes</div>
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
             <div class="level-edu" style="text-align:center">
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a  id="manage-gene-list" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
-                   <i class="material-icons">playlist_play</i>
+                   <i class="material-icons" style="font-size:21px">playlist_play</i>
                     Analyze all genes
                 </a>
 
@@ -266,8 +268,8 @@
 
 
              
-              <div style="float:right;text-align:right;display:inline-block;width:270px">               
-                <div id="manage-genes-dropdown" class="level-edu level-basic" style="float:right;margin-top:-8px;">
+              <div id="manage-genes-box">               
+                <div id="manage-genes-dropdown" class="level-edu level-basic" >
                   <div class="btn-toolbar">
                     <div class="btn-group" style="display:inline;">
 
