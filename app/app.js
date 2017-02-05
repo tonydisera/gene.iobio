@@ -897,7 +897,8 @@ function detectWindowResize() {
 
 
 function resizeCardWidths() {
-	var windowWidth = $(window).width();
+	var windowWidth  = $(window).width();
+	var windowHeight = $(window).height();
 	var sliderWidth    = 0;
 	if ($('#slider-left').hasClass("hide") == false) {
 		sliderWidth = +$('#slider-left').width();
@@ -909,6 +910,12 @@ function resizeCardWidths() {
 	$('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 10 : 0));
 	$('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
 	$('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 60));
+
+	if (windowHeight < 700) {
+		matrixCard.setCellSize('small');
+	} else {
+		matrixCard.setCellSize('large');
+	}
 
 	//$('#slider-left-content').css('height', window.innerHeight);
 }
@@ -3034,7 +3041,7 @@ function filterVariants() {
 	clickedVariant = null;
 	matrixCard.unpin();
 
-	filterCard.displayFilters();
+	filterCard.displayFilterSummary();
 	variantCards.forEach( function(variantCard) {
 		if (variantCard.isViewable()) {
 

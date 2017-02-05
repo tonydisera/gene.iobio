@@ -4,7 +4,9 @@ function MatrixCard() {
 	this.sourceVcfData = null;
 	this.featureMatrix  = null;
 
-	this.CELL_SIZE                 = 18;
+	this.CELL_SIZE_SMALL           = 18;
+	this.CELL_SIZE_LARGE           = 22;
+	this.CELL_SIZE                 = this.CELL_SIZE_LARGE;
 	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
@@ -146,6 +148,25 @@ function MatrixCard() {
 
 
 	this.featureUnknown = 199;
+
+}
+
+MatrixCard.prototype.setCellSize = function(sizeEnum) {
+	var toggle = false;
+	if (sizeEnum == 'small' && this.CELL_SIZE != this.CELL_SIZE_SMALL) {
+		this.CELL_SIZE = this.CELL_SIZE_SMALL;
+		toggle = true;
+	} else if (sizeEnum == 'large' && this.CELL_SIZE != this.CELL_SIZE_LARGE) {
+		this.CELL_SIZE = this.CELL_SIZE_LARGE;
+		toggle = true;
+	} 
+
+	if (toggle) {
+		this.featureMatrix.cellSize(this.CELL_SIZE);
+		if (getProbandVariantCard().model && getProbandVariantCard().model.vcfData) {
+			this.fillFeatureMatrix(getProbandVariantCard().model.vcfData);
+		}		
+	}
 
 }
 
@@ -416,6 +437,7 @@ MatrixCard.prototype._isolateVariants = function() {
 }
 
 MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
+	var me = this;
 	var i = 0;
 	var index = -1;
 	d3.select("#feature-matrix").datum().forEach( function(variant) {
@@ -434,7 +456,7 @@ MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
 
 		var rowIdx = this.getRowOrder("Bookmark");
 		var selection = column.selectAll(".cell:nth-child(" + (rowIdx+1) + ")").data([{clazz: 'bookmark' }]);
-		this.showBookmarkSymbol(selection);
+		this.showBookmarkSymbol(selection, {cellSize: me.featureMatrix.cellSize()});
 	}
 
 }
@@ -866,9 +888,9 @@ MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
 
 	var cellSizeAttrs = {};
 	if (options.cellSize > 18) {
-		cellSizeAttrs.width = "15",
-		cellSizeAttrs.height = "15",
-		cellSizeAttrs.transform = "translate(3,2)"
+		cellSizeAttrs.width = "17",
+		cellSizeAttrs.height = "17",
+		cellSizeAttrs.transform = "translate(2,2)"
 	}
 
 	$.extend(attrs, datumAttrs, cellSizeAttrs, options);
@@ -904,7 +926,9 @@ MatrixCard.prototype.showPolyPhenSymbol = function(selection, options) {
 
 	var cellSizeAttrs = {};
 	if (options.cellSize > 18) {
-		cellSizeAttrs.transform = "translate(4,2)";
+		cellSizeAttrs.width = "17",
+		cellSizeAttrs.height = "17",
+		cellSizeAttrs.transform = "translate(2,2)"		
 	}
 
 	var datumAttrs = selection.datum() || {};
@@ -939,7 +963,9 @@ MatrixCard.prototype.showSiftSymbol = function(selection, options) {
 
 	var cellSizeAttrs = {};
 	if (options.cellSize > 18) {
-		cellSizeAttrs.transform = "translate(4,2)";
+		cellSizeAttrs.width = "17",
+		cellSizeAttrs.height = "17",
+		cellSizeAttrs.transform = "translate(2,2)"		
 	}
 
 	var datumAttrs = selection.datum() || {};
@@ -964,14 +990,20 @@ MatrixCard.prototype.showSiftSymbol = function(selection, options) {
 };
 
 MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
+	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
+	var symbolDimNc = { transform: "translate(2,2)",    size: "11" };
+	if (options.cellSize > 18) {
+		symbolDim   = { transform: "translate(2,2)",    size: "17" };
+		symbolDimNc = { transform: "translate(6,6)",    size: "10" };
+	}
 	var symbolAttrs = {
-		afexac_unique_nc: { transform: "translate(2,2)", fill: "none", stroke: "#6b6666", sideLength: "11" },
-		afexac_unique: { transform: "translate(2,2)",    fill: "rgb(199, 0, 1)", stroke: "none", sideLength: "12" },
-		afexac_uberrare: { transform: "translate(2,2)",  fill: "rgba(204, 28, 29, 0.79)", stroke: "none", sideLength: "12" },
-		afexac_superrare: { transform: "translate(2,2)", fill: "rgba(255, 44, 0, 0.76)", stroke: "none", sideLength: "12" },
-		afexac_rare: { transform: "translate(2,2)",      fill: "rgb(247, 138, 31)", stroke: "none", sideLength: "12" },
-		afexac_uncommon: { transform: "translate(2,2)",  fill: "rgb(224, 195, 128)", stroke: "none", sideLength: "12" },
-		afexac_common: { transform: "translate(2,2)",    fill: "rgb(189,189,189)", stroke: "none", sideLength: "12"  }
+		afexac_unique_nc: { fill: "none",                   stroke: "#6b6666", transform: symbolDimNc.transform, size: symbolDimNc.size},
+		afexac_unique:    { fill: "rgb(199, 0, 1)",         stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
+		afexac_uberrare:  { fill: "rgba(204, 28, 29, 0.79)",stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
+		afexac_superrare: { fill: "rgba(255, 44, 0, 0.76)", stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
+		afexac_rare:      { fill: "rgb(247, 138, 31)",      stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
+		afexac_uncommon:  { fill: "rgb(224, 195, 128)",     stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
+		afexac_common:    { fill: "rgb(189,189,189)",       stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size}
 	}
 	// For the gene badge, we will display in a smaller size
 	if (options && options.hasOwnProperty('transform')) {
@@ -983,71 +1015,78 @@ MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
 	selection.append("g")
 		.attr("class", function(d, i) { return d.clazz; })
 		.attr("transform", function(d,i) {
-			return symbolAttrs[d.clazz].transform;
+			return  symbolAttrs[d.clazz].transform;
 		})
 		.append("use")
 		.attr("xlink:href", "#af-symbol")
 		.style("pointer-events", "none")
-		.style("fill", function(d,i) { return symbolAttrs[d.clazz].fill; })
+		.style("fill",   function(d,i) { return symbolAttrs[d.clazz].fill; })
 		.style("stroke", function(d,i) { return symbolAttrs[d.clazz].stroke; })
-		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
-		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
+		.attr("width",   function(d,i) { return symbolAttrs[d.clazz].size; })
+		.attr("height",  function(d,i) { return symbolAttrs[d.clazz].size; });
 
 };
 
 MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
+	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
+	if (options.cellSize > 18) {
+		symbolDim   = { transform: "translate(2,2)",    size: "17" };
+	}
 	var symbolAttrs = {
-		af1000g_unique: { transform: "translate(2,2)",    fill: "rgb(199, 0, 1)", sideLength: "12" },
-		af1000g_uberrare: { transform: "translate(2,2)",  fill: "rgba(204, 28, 29, 0.79)", sideLength: "12" },
-		af1000g_superrare: { transform: "translate(2,2)", fill: "rgba(255, 44, 0, 0.76)", sideLength: "12" },
-		af1000g_rare: { transform: "translate(2,2)",      fill: "rgb(247, 138, 31)", sideLength: "12" },
-		af1000g_uncommon: { transform: "translate(2,2)",  fill: "rgb(224, 195, 128)", sideLength: "12" },
-		af1000g_common: { transform: "translate(2,2)",    fill: "rgb(189,189,189)", sideLength: "12"  }
+		af1000g_unique:    { fill: "rgb(199, 0, 1)",          transform: symbolDim.transform,   size: symbolDim.size},
+		af1000g_uberrare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size},
+		af1000g_superrare: { fill: "rgba(255, 44, 0, 0.76)",  transform: symbolDim.transform,   size: symbolDim.size},
+		af1000g_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
+		af1000g_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
+		af1000g_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size},
 	}
 	// For the gene badge, we will display in a smaller size
 	if (options && options.hasOwnProperty('transform')) {
 		symbolAttrs[selection.datum().clazz].transform = options.transform;
 	}
 	if (options && options.hasOwnProperty('height')) {
-		symbolAttrs[selection.datum().clazz].sideLength = options.height;
+		symbolAttrs[selection.datum().clazz].size = options.height;
 	}
 	selection.append("g")
-		.attr("class", function(d, i) { return d.clazz; })
+		.attr("class", function(d, i)    { return d.clazz; })
 		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
 		.append("use")
 		.attr("xlink:href", "#af-symbol")
 		.style("pointer-events", "none")
-		.style("fill", function(d,i) { return symbolAttrs[d.clazz].fill; })
-		.attr("width", function(d,i) { return symbolAttrs[d.clazz].sideLength; })
-		.attr("height", function(d,i) { return symbolAttrs[d.clazz].sideLength; });
+		.style("fill", function(d,i)  { return symbolAttrs[d.clazz].fill; })
+		.attr("width", function(d,i)  { return symbolAttrs[d.clazz].size; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].size; });
 };
 
 MatrixCard.prototype.showHomSymbol = function(selection, options) {
-
+	var symbolOptions = {x: 0, y: 7, fontSize: "6.5px", width: 15, height: 10};
+	if (options.cellSize > 18) {
+		symbolOptions = {x: 0, y: 10, fontSize: "9px",  width: 19, height: 14};
+	} 
 	var g = selection.append("g")
 	         				 .attr("transform", "translate(1,4)");
 
-  g.append("rect")
-   .attr("width", 15)
-   .attr("height", 10)
-   .attr("class", "zyg_hom " + selection.datum().clazz)
-   .style("pointer-events", "none");
+	g.append("rect")
+	 .attr("width", symbolOptions.width)
+	 .attr("height", symbolOptions.height)
+	 .attr("class", "zyg_hom " + selection.datum().clazz)
+ 	 .style("pointer-events", "none");
 
-  g.append("text")
-   .attr("x", 0)
-   .attr("y", 7)
-   .style("fill", "white")
-   .style("font-weight", "bold")
-   .style("font-size", "6.5px")
-   .text("Hom");
+	g.append("text")
+	 .attr("x", symbolOptions.x)
+	 .attr("y", symbolOptions.y)
+	 .style("fill", "white")
+	 .style("font-weight", "bold")
+	 .style("font-size", symbolOptions.fontSize)
+	 .text("Hom");
 };
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 	options = options || {};
-	var width = (options.cellSize > 18) ? "22" : (options.width || "20");
+	var width = (options.cellSize > 18) ? "24" : (options.width || "20");
 
 	selection.append("g")
-	         .attr("transform", options.transform || "translate(0,0)")
+	         .attr("transform", options.transform || "translate(-1,0)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
 	         .attr("width", width)
@@ -1058,9 +1097,9 @@ MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 	options = options || {};
 
-	var width = (options.cellSize > 18) ? "22" : (options.width || "20");
+	var width = (options.cellSize > 18) ? "24" : (options.width || "20");
 
-	var transform = (options.cellSize > 18) ? "translate(1,0)" : (options.transform || "translate(-1,0)");
+	var transform = (options.cellSize > 18) ? "translate(0,0)" : (options.transform || "translate(-1,0)");
 
 	selection.append("g")
 	         .attr("transform", transform)
@@ -1146,15 +1185,16 @@ MatrixCard.prototype.showNoInheritSymbol = function (selection) {
 
 };
 
-MatrixCard.prototype.showBookmarkSymbol = function(selection) {
+MatrixCard.prototype.showBookmarkSymbol = function(selection, options) {
+	var optionsSize = options && options.cellSize && options.cellSize > 18 ? 16 : 11;
 	if (selection.datum().clazz) {
 		selection.append("g")
 			 .attr("class", selection.datum().clazz)
 	         .attr("transform", selection.datum().translate || "translate(2,2)")
 	         .append("use")
 	         .attr("xlink:href", '#bookmark-symbol')
-	         .attr("width",  selection.datum().width || 12)
-	         .attr("height", selection.datum().height || 12);
+	         .attr("width",  selection.datum().width || optionsSize)
+	         .attr("height", selection.datum().height || optionsSize);
 
 	}
 }
@@ -1177,18 +1217,18 @@ MatrixCard.prototype.showImpactSymbol = function(selection, options) {
 	var me = this;
 	var type = d3.select(selection.node().parentNode).datum().type;
 	var symbolScale = d3.scale.ordinal()
-                    .domain([3,4,5,6,7,8])
-                    .range([9,15,25,38,54,58]);
+                    .domain([3,4,5,6,7,8,9])
+                    .range([9,15,25,38,54,58,98]);
 	var symbolScaleCircle = d3.scale.ordinal()
-			                  .domain([3,4,5,6,7,8])
-			                  .range([9,15,25,58,68,78]);
+			                  .domain([3,4,5,6,7,8,9])
+			                  .range([9,15,25,58,68,78,128]);
 
-  var symbolSize = symbolScale(options.cellSize > 18 ? 8 : 6);
-  var symbolSizeCircle = symbolScaleCircle(options.cellSize > 18 ? 8 : 6);
+  var symbolSize = symbolScale(options.cellSize > 18 ? 9 : 6);
+  var symbolSizeCircle = symbolScaleCircle(options.cellSize > 18 ? 9 : 6);
 
-  var translate       = options.cellSize > 18 ?  "translate(6,5)" : "translate(4,4)";
-  var translateSymbol = options.cellSize > 18 ?  "translate(9,9)" : "translate(8,8)";
-  var width           = options.cellSize > 18 ? 10 : 8;
+  var translate       = options.cellSize > 18 ?  "translate(4,4)" : "translate(4,4)";
+  var translateSymbol = options.cellSize > 18 ?  "translate(10,10)" : "translate(8,8)";
+  var width           = options.cellSize > 18 ? 12 : 8;
   var height          = width;
 
 	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
