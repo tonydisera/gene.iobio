@@ -189,6 +189,16 @@
                    <button id="clear-other-cache" onclick="cacheHelper.clearOther();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                  </div>
               </div>
+              <div style="margin-top:30px">
+                 <a  style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-app-cache-panel" aria-expanded="false" aria-controls="other-app-cache-panel">
+                  Other browser apps ...
+                 </a>
+                 <div id="other-app-cache-panel" class="collapse">
+                  <span class="cache-label" >Data from other web apps</span>
+                  <span class="cache-size" id="other-app-cache-size"></span>
+                   <button id="clear-other-app-cache" onclick="cacheHelper.clearOtherApp();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
+                 </div>
+              </div>
       </div>
       <div class="modal-footer" style="clear-both">
       </div>

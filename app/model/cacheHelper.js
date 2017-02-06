@@ -446,7 +446,7 @@ CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 	if (keepLocalStorage) {
 		
 	} else {
-		me._clearCache(launchTimestampToClear);
+		me._clearCache(launchTimestampToClear, false, false);
 		me.genesToCache = [];
 	}
 }
@@ -468,6 +468,7 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 	var size = 0;
 	var otherSize = 0;
 	var coverageSize = 0;
+	var otherAppSize = 0;
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  
 		key = localStorage.key(i);  
@@ -485,11 +486,15 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 				var dataSize = localStorage.getItem(key).length;
 				otherSize += dataSize;
 			}
+		} else {
+			otherAppSize += localStorage.getItem(key).length;
 		}
 	}  
 	return {total:     (CacheHelper._sizeMB(size) + " MB"), 
 	        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
-	        other:     (CacheHelper._sizeMB(otherSize) + " MB")};
+	        other:     (CacheHelper._sizeMB(otherSize) + " MB"),
+	        otherApp:  (CacheHelper._sizeMB(otherAppSize) + " MB")
+	    };
 }
 
 CacheHelper._logCacheSize = function() {
@@ -540,7 +545,7 @@ CacheHelper.prototype.clearCacheItem = function(key) {
 	}
 }
 
-CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther) {
+CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther, clearOtherApp) {
 	var me = this;
 	var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
 	if (localStorage) {
@@ -550,16 +555,18 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther)
 			var key = localStorage.key(i); 	
 			var keyObject = CacheHelper._parseCacheKey(key);
 			if (keyObject) {
-				if (keyObject.launchTimestamp == theLaunchTimeStamp && !clearOther) {
+				if (keyObject.launchTimestamp == theLaunchTimeStamp && !clearOther && !clearOtherApp) {
 					keysToRemove.push(key);
 					if (keyObject.gene && keyObject.relationship == 'proband') {
 						genesCard.clearGeneGlyphs(keyObject.gene);
 						genesCard.clearGeneInfo(keyObject.gene);
 
 					}
-				} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther) {
+				} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther && !clearOtherApp) {
 					keysToRemove.push(key);
 				}				
+			} else if (clearOtherApp) {
+				keysToRemove.push(key);
 			}
 		}	
 		keysToRemove.forEach( function(key) {
@@ -578,7 +585,7 @@ CacheHelper.prototype.clearAll = function() {
 	alertify.confirm("Clear all cached data for this session?", function (e) {
 	    if (e) {
 			// user clicked "ok"
-			me._clearCache();
+			me._clearCache(me.launchTimestampToClear, false, false);
 			cacheHelper.showAnalyzeAllProgress();
   			me.refreshDialog();
 	        
@@ -593,7 +600,21 @@ CacheHelper.prototype.clearOther = function() {
 	alertify.confirm("Clear all cached data for other gene.iobio sessions?", function (e) {
 	    if (e) {
 			// user clicked "ok"
-			me._clearCache(null, true);
+			me._clearCache(null, true, false);
+  			me.refreshDialog();
+	        
+	    } else {
+	        // user clicked "cancel"
+	    }
+	});
+}
+CacheHelper.prototype.clearOtherApp = function() {
+	var me = this;
+	// confirm dialog
+	alertify.confirm("Clear all cached data for other web applications?", function (e) {
+	    if (e) {
+			// user clicked "ok"
+			me._clearCache(null, false, true);
   			me.refreshDialog();
 	        
 	    } else {
@@ -634,6 +655,7 @@ CacheHelper.prototype.refreshDialog = function() {
 	$("#cache-size").text(sizes.total);
 	$("#coverage-size").text(sizes.coverage);
 	$("#other-cache-size").text(sizes.other);
+	$("#other-app-cache-size").text(sizes.otherApp);
 }
 
 CacheHelper.prototype.openDialog = function() {
