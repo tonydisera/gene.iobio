@@ -12,7 +12,7 @@ CacheHelper.prototype.isolateSession = function() {
 	this.launchTimestamp = Date.now().valueOf();	
 }
 
-CacheHelper.prototype.showAnalyzeAllProgress = function() {
+CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
 	var me = this;
 	me.getAnalyzeAllCounts(function(counts) {
 		$('#analyze-all-progress').removeClass("hide");
@@ -37,6 +37,9 @@ CacheHelper.prototype.showAnalyzeAllProgress = function() {
 			$('#filter-progress').removeClass("hide");	
 
 			// If a standard filter has been applied, update its counts
+			if (clearStandardFilterCounts) {
+				$('#standard-filter-panel .standard-filter-btn').parent().find('span.standard-filter-count').text("");
+			}
 			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
 				$('#standard-filter-panel .standard-filter-btn.current').parent().find('span.standard-filter-count').text(counts.pass + ' of ' + counts.analyzed + ' genes');
 			}			

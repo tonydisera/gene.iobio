@@ -484,6 +484,8 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 
 	// Remove gene badges not specified in the text area
 	var geneBadgesToRemove = [];
+	var refreshStandardFilterCounts = false;
+
 	$('#gene-badge-container #gene-badge').each( function(index, value) {
 		var badge =  $(this);
 		var badgeGeneName = badge.find('#gene-badge-name').text();
@@ -492,6 +494,8 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 		// flag it to be removed
 		if (geneNames.indexOf(badgeGeneName) < 0) {
 			geneBadgesToRemove.push(badgeGeneName);
+			refreshStandardFilterCounts = true;
+
 		}
 
 	});
@@ -524,10 +528,11 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 		var existingBadge = me._getGeneBadge(name);
 		if ($(existingBadge).length == 0) {
 			me.addGeneBadge(name, true);
-	} else {
-			me._setBookmarkBadge(name);
+			refreshStandardFilterCounts = true;
+		} else {
+				me._setBookmarkBadge(name);
+			}
 		}
-	}
 
 	// If we are loading from the url, just add the class 'selected' to the gene specified in the
 	// url.  Otherwise if we are performing copy/paste from the dropdown, select the first gene in the list
@@ -548,6 +553,10 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 	}
 
 	me._onGeneBadgeUpdate();
+
+	if (refreshStandardFilterCounts) {
+		cacheHelper.showAnalyzeAllProgress(true);
+	}
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');
 }
@@ -1045,7 +1054,7 @@ GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPagin
 	}
 	
 	if (updateAnalyzedCounts) {
-		cacheHelper.showAnalyzeAllProgress();
+		cacheHelper.showAnalyzeAllProgress(true);
 	}
 
 }
@@ -1090,7 +1099,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 	me._onGeneBadgeUpdate();
 	me._initPaging(geneNames);
 	readjustCards();
-	cacheHelper.showAnalyzeAllProgress();
+	cacheHelper.showAnalyzeAllProgress(true);
 
 	me._hideCurrentGene();
 }
@@ -1125,6 +1134,8 @@ GenesCard.prototype.addGene = function(geneName) {
 	
 	me.addGeneBadge(geneName);
 	me.pageToGene(geneName);
+	cacheHelper.showAnalyzeAllProgress(true);
+
 
 
 }
