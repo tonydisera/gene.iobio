@@ -887,7 +887,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				    		theVariant.vepVariationIds = v.vepVariationIds;
 
 					    	// re-cache the data
-					    	me._cacheData(me.vcfData, "vcfData", theGene, theTranscript);	
+					    	me._cacheData(me.vcfData, "vcfData", theGene.gene_name, theTranscript);	
 
 					    	// return the annotated variant
 							resolve(theVariant);
