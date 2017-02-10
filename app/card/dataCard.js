@@ -986,6 +986,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
 	panelSelector.find("#vcf-file-info").val("");
+	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
 	variantCard.clearVcf();
 	me.enableLoadButtonIfBuildSet();
 
@@ -1121,9 +1122,12 @@ DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 	var sampleName = panelSelector.find('#vcf-sample-select')[0].selectize.getValue();
+	panelSelector.find('#datasource-name').val(sampleName);
 	variantCard.setSampleName(sampleName);
+	variantCard.setName(sampleName);
 	
 	window.updateUrl('sample' + cardIndex, sampleName);
+	window.updateUrl('name' + cardIndex, sampleName);
 	if (variantCard.isReadyToLoad()) {
 		me.enableLoadButtonIfBuildSet(true);
 	}
