@@ -1,5 +1,5 @@
 .tooltip-title
-  font-size: 11px
+  font-size: 12px
   word-break: break-word
 
   &.danger
@@ -18,16 +18,16 @@
 
 .tooltip-section-header
   fill:  $tooltip-text-color !important
-  font-size: 11px !important
+  font-size: 12px !important
 
 .tooltip-label
   color: $tooltip-label-color
   fill:  $tooltip-label-color
 
 .tooltip-row
-  width: 300px
+  width: 330px
   clear: both
-  line-height: 11px !important
+  line-height: 13px !important
 
 .tooltip-value
   overflow-wrap: break-word
@@ -47,7 +47,7 @@
 .tooltip-header-small
   overflow-wrap: break-word
   text-align: left
-  width: 40px
+  width: 50px
   float: left
   color: $tooltip-label-color
   fill:  $tooltip-label-color
@@ -56,7 +56,7 @@
   overflow-wrap: break-word
   float: left
   width: 180px
-  height: 25px
+  min-height: 25px
   
 
 .tooltip-zygosity
@@ -85,9 +85,9 @@
     color: rgba(255,255,255,1)
 
 .tooltip-subtitle
-  font-size: 10px
+  font-size: 12px
   text-align: center
-  color: black
+  color: $text-color
   padding-top: 4px
   padding-bottom: 1px
 
@@ -100,28 +100,28 @@
   color: $link-color !important
   margin-bottom: -2px
   margin-top: 35px !important
-  font-size: 11px
+  font-size: 12px
 
   .bookmark
     text
-      font-size: 11px !important
+      font-size: 12px !important
 
 .tooltip a
   color: $link-color !important
-  font-size: 11px !important
+  font-size: 12px !important
 
   &:hover, &:focus
     color: $link-color !important
-    font-size: 11px !important
+    font-size: 12px !important
    
 
 .tooltip a
   &:hover, &:focus
     color: $link-color !important
-    font-size: 11px !important
+    font-size: 12px !important
 
 .tooltip .row
-  line-height: 11px !important
+  line-height: 12px !important
 
 
 .tooltip
@@ -130,7 +130,7 @@
   background-color: white
   color: $tooltip-text-color
   padding: 4px 6px 4px 6px
-  font-size: 10px
+  font-size: 12px
   border-radius: 4px
   pointer-events: none
   text-align: left
@@ -161,7 +161,7 @@ rect
 
 .tooltip-allele-count-bar
   text
-    font-size: 9px !important
+    font-size: 11px !important
     fill:  $text-color
 
 text
@@ -188,8 +188,8 @@ text
     margin-left: 40px
     font-style: italic
     font-weight: bold
-    font-size: 10px
-    color: black
+    font-size: 11px
+    color: $text-color
 
 .tooltip.left-arrow
   &:before
@@ -284,6 +284,28 @@ text
     bottom: -8px
     content: ""
     right: 10px
+
+.tooltip-wide.arrow-down-center
+  &:before 
+    position: absolute
+    display: inline-block
+    border-top: 10px solid #A7A5A5
+    border-left: 10px solid transparent
+    border-right: 10px solid transparent
+    border-top-color: rgba(0, 0, 0, 0.2)
+    bottom: -10px
+    content: ""
+    right: 328px
+
+  &:after
+    position: absolute
+    display: inline-block
+    border-top: 9px solid #FFFFFF
+    border-left: 9px solid transparent
+    border-right: 9px solid transparent
+    bottom: -8px
+    content: ""
+    right: 330px
  
 .tooltip.black-arrow-left
   &:after
@@ -310,6 +332,89 @@ text
     -webkit-transform: rotate(152deg)
     transform: rotate(152deg)
     content: ""
+
+.tooltip.tooltip-wide
+  width: 650px !important
+
+.tooltip-wide
+  font-size: 13px 
+
+  .tooltip-title
+    font-size: 14px
+
+  .tooltip-row
+    clear: both
+    padding-bottom: 6px
+
+  .tooltip-footer
+    margin-top: 0px !important
+    padding-top: 4px !important
+    padding-bottom: 2px
+
+    .bookmark-badge
+      height: 14px
+      width: 120px
+
+      text
+        font-size: 14px !important
+
+    #remove-bookmark-link
+      vertical-align: top
+      text-align: left
+      display: inline-block
+
+  .tooltip-left-column
+    float: left
+    padding-top: 10px
+    padding-bottom: 0px
+    .tooltip-row
+      width: 360px
+      overflow: auto
+      .tooltip-header
+        width: 110px
+      .tooltip-value
+        width: 240px
+
+    
+  .tooltip-right-column
+    float: right
+    padding-top: 10px
+    padding-bottom: 0px
+    .tooltip-row
+      width: 270px    
+      overflow: auto
+      .tooltip-header
+        width: 110px
+      .tooltip-value
+        width: 150px      
+
+  a
+    font-size: 13px !important
+
+    &:hover, &:focus
+      font-size: 13px !important
+     
+  a
+    &:hover, &:focus
+      font-size: 13px !important      
+
+  .tooltip-footer
+    clear: both
+
+    a
+      font-size: 14px !important
+
+      &:hover, &:focus
+        font-size: 14px !important
+       
+    a
+      &:hover, &:focus
+        font-size: 14px !important
+
+  .row
+    line-height: 14px !important
+
+
     
 
 #examine-card .tooltip-allele-count-bar
@@ -320,41 +425,38 @@ text
    
 
 #examine-card
-  font-size: 10px
+  font-size: 12px
   color: $sidebar-text-color
-  padding-top: 10px
 
  
 
   .tooltip-title
-    font-size: 11px
+    font-size: 12px
    
 
   .tooltip-header
     overflow-wrap: break-word
     text-align: right
-    width: 60px
+    width: 110px
     display: inline-block !important
     float: none
     color: $sidebar-label-color
 
   .tooltip-row
-    width: 190px
     clear: both
     margin-bottom: 8px
 
   .tooltip-value
     overflow-wrap: break-word
     margin-left: 10px
-    width: 115px
+    width: 175px
     margin-right: 5px
     display: inline-block !important
     float: none
     color: $sidebar-text-color
     vertical-align: bottom
     
-  .tooltip-title.danger
-    width: 200px    
+   
 
   .tooltip-footer
     margin-top: 40px !important
@@ -390,16 +492,16 @@ text
 
 #examine-card a
   color: $sidebar-link-color !important
-  font-size: 11px !important
+  font-size: 12px !important
 
 
   &:hover, &:focus
     color: $sidebar-link-color !important
-    font-size: 11px !important
+    font-size: 12px !important
     
 
   color: $sidebar-link-color !important
-  font-size: 11px !important
+  font-size: 12px !important
 
    
 

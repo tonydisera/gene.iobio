@@ -32,27 +32,27 @@ function DataCard() {
 		father: true
 	};
 
-	this.demoGenes =  ["RAI1","AIRE","MYLK2"];
+	this.demoGenes =  ["RAI1","AIRE","MYLK2", "PDGFB", "PDHA1"];
 
 	this.demoNames = {
-		proband: 'NA19240',
-		mother:  'NA19238',
-		father:  'NA19239' 
+		proband: 'NA12878',
+		mother:  'NA12891',
+		father:  'NA12892' 
 	};
 	this.demoUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz',
-		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz',
-		father:  'https://s3.amazonaws.com/iobio/samples/vcf/exome-trio.vcf.gz'
+		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz'
 	};
 	this.demoBamUrls = {
-		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA19240.bam',
-		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA19238.bam',
-		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA19239.bam'
+		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
+		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
+		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
 	};
 	this.demoSampleNames = {
-		proband: 'NA19240',
-		mother:  'NA19238',
-		father:  'NA19239'
+		proband: 'NA12878',
+		mother:  'NA12891',
+		father:  'NA12892' 
 	};
 
 	this.eduTourModes = [
@@ -159,7 +159,7 @@ DataCard.prototype.loadDemoData = function() {
 
 
 	if (isLevelEdu) {
-		var idx = isLevelEduTour ? +eduTourNumber : 0;
+		var idx = +eduTourNumber;
 		this.demoCards      = this.eduTourCards[idx];
 		this.demoUrls        = isOffline ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
 		this.demoNames       = this.eduTourNames[idx];
@@ -219,10 +219,20 @@ DataCard.prototype.loadDemoData = function() {
 
 
 		reloadGeneFromUrl();
-	} else if (window.isLevelEduTour && this.eduTourGenes[+eduTourNumber].length > 0) {
-		window.updateUrl("gene", this.eduTourGenes[+eduTourNumber][0]);
-		window.updateUrl("genes", this.eduTourGenes[+eduTourNumber].join(","));
-		reloadGeneFromUrl();
+	} else if (window.isLevelEdu && this.eduTourGenes[+eduTourNumber].length > 0) {
+		var theGenes       = me.eduTourGenes[+eduTourNumber];
+		window.updateUrl("gene", theGenes[0]);
+		window.updateUrl("genes", theGenes.join(",") );
+
+		me.mode = "single";
+		genomeBuildHelper.setCurrentBuild(me.demoBuild);
+		me.setVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,   me.demoSampleNames.proband, me.demoUrls.proband);
+		
+		window.loadTracksForGene();
+		window.cacheHelper.clearCache();
+		window.matrixCard.reset();	
+		genesCard.selectGene(theGenes[0]);
+	
 	} else {
 		loadUrlSources();
 
@@ -238,6 +248,9 @@ DataCard.prototype.loadMygene2Data = function() {
 
 	var loadProband = function(vcfFilePath) {
 
+		if (isLevelBasic) {
+			window.showSidebar("Phenolyzer");
+		}
 		if (vcfFilePath != null) {
 			// Get rid of leading "/" in file path when server instance already ends with "/"
 			if (endsWith(serverInstance, "/") && vcfFilePath.indexOf("/") == 0) {
@@ -249,13 +262,9 @@ DataCard.prototype.loadMygene2Data = function() {
 			// If the genome build was specified, load the endpoint variant file
 			if (genomeBuildHelper.getCurrentBuild()) {
 				me.setVcfUrl("proband", "Variants", null, probandUrl);
-
 				window.loadTracksForGene();
-				window.showSidebar("Phenolyzer");
-
 				window.cacheHelper.clearCache();
 				window.matrixCard.reset();		
-
 			} else {
 				alertify.alert("Cannot load data.  The genome build must be specified.");
 			}
@@ -263,6 +272,8 @@ DataCard.prototype.loadMygene2Data = function() {
 			me.loadDemoData();
 		}
 	};
+
+
 
 	var missingVariables = "";
 	if (mygene2Endpoint == "") {
@@ -308,7 +319,6 @@ DataCard.prototype.loadMygene2Data = function() {
 		    }
 		});
 	}
-	
 
 }
 
@@ -453,22 +463,30 @@ DataCard.prototype.addBuildListener = function() {
 	var me = this;
 	if ($('#select-build')[0].selectize) {
 	    $('#select-build')[0].selectize.on('change', function(value) {
-			if (!value.length) {
-				return;
+			if (value.length) {
+				genomeBuildHelper.setCurrentBuild(value);
+				updateUrl("build", value);
+				$('#build-link').text(value);
+				me.validateBuildFromData(function(success, message) {
+					if (success) {
+						$('#species-build-warning').addClass("hide");
+						window.enableLoadButton();
+					} else {
+						$('#species-build-warning').html(message);
+						$('#species-build-warning').removeClass("hide");
+						window.disableLoadButton();
+					}
+				});
+			} else {
+				genomeBuildHelper.currentBuild = null;
+				removeUrl("build");
+				$('#build-link').text("?");
+				window.disableLoadButton();
+				setTimeout( function() { 
+					$('#select-build-box .selectize-input').animateIt('tada');
+				}, 2000);
+				
 			}
-			genomeBuildHelper.setCurrentBuild(value);
-			updateUrl("build", value);
-			$('#build-link').text(value);
-			me.validateBuildFromData(function(success, message) {
-				if (success) {
-					$('#species-build-warning').addClass("hide");
-					window.enableLoadButton();
-				} else {
-					$('#species-build-warning').html(message);
-					$('#species-build-warning').removeClass("hide");
-					window.disableLoadButton();
-				}
-			});
 			
 		});
 	}
@@ -709,10 +727,20 @@ DataCard.prototype.init = function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
 	dataCardSelector.find('#ok-button').on('click', function() {	
+
+		// Save the currently select gene name before clearing
+		// out the gene info, which is necessary if the genome build or dataset(s) change
+		var theGeneName = window.gene ? window.gene.gene_name : null;
 		
+		// Clear out annotations and gene models (and transcripts)
+		genesCard.clearGeneInfos();
 		
 		// Clear the cache
 		cacheHelper.clearCache();
+
+		// Clear any filters
+		filterCard.clearFilters();
+		filterCard.resetStandardFilterCounts();
 
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father
@@ -730,10 +758,14 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		// If the genome build was missing, the user was forced into the data dialog to select
-		// the genome build.  Now we want to load the gene if it was provided in the URL parameter
-		// list.
-		if ((window.gene == null || window.gene.length == 0) && getUrlParameter("gene")) {
+		
+		
+		if (theGeneName) {
+			setGeneBloodhoundInputElement(theGeneName, false, true);
+		} else if (getUrlParameter("gene")) {
+			// If the genome build was missing, the user was forced into the data dialog to select
+			// the genome build.  Now we want to load the gene if it was provided in the URL parameter
+			// list.
 			setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
 		} else {
 			window.loadTracksForGene();		
@@ -789,9 +821,20 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
 		me.setDefaultBuildFromData();
-		enableLoadButton();
+		me.enableLoadButtonIfBuildSet(true);
 	});
 
+}
+
+DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
+	if (genomeBuildHelper.getCurrentBuild()) {
+		window.enableLoadButton();
+	} else {		
+		if (wiggleWhenEmpty) {
+			$('#select-build-box .selectize-input').animateIt('tada');			
+		}
+		window.disableLoadButton();
+	}	
 }
 
 
@@ -824,8 +867,7 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 			variantCard.setName(variantCard.getName());
 			window.updateUrl('bam' + cardIndex, bamUrl);
 			me.setDefaultBuildFromData();
-
-			enableLoadButton();			
+			me.enableLoadButtonIfBuildSet(true);		
 		} else {
 			window.disableLoadButton();
 		}
@@ -933,6 +975,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
     this.onVcfUrlEntered(panelSelector);
 }
 DataCard.prototype.clearUrl = function(panelSelector) {
+	var me = this;
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -943,8 +986,9 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
 	panelSelector.find("#vcf-file-info").val("");
+	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
 	variantCard.clearVcf();
-	window.enableLoadButton();
+	me.enableLoadButtonIfBuildSet();
 
 
 }
@@ -1013,7 +1057,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 				variantCard.setDefaultSampleName(null);
 				window.removeUrl('sample'+cardIndex);
 				
-				window.enableLoadButton();
+				me.enableLoadButtonIfBuildSet(true);
 			}
 		},
 		function(error) {
@@ -1061,7 +1105,7 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 
 		variantCard.setSampleName(variantCard.getDefaultSampleName());
 		variantCard.setDefaultSampleName(null);
-		window.enableLoadButton();
+		me.enableLoadButtonIfBuildSet(true);
 	} else {
 		window.disableLoadButton();
 	}	
@@ -1074,14 +1118,18 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 }
 
 DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
+	var me = this;
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 	var sampleName = panelSelector.find('#vcf-sample-select')[0].selectize.getValue();
+	panelSelector.find('#datasource-name').val(sampleName);
 	variantCard.setSampleName(sampleName);
+	variantCard.setName(sampleName);
 	
 	window.updateUrl('sample' + cardIndex, sampleName);
+	window.updateUrl('name' + cardIndex, sampleName);
 	if (variantCard.isReadyToLoad()) {
-		window.enableLoadButton();
+		me.enableLoadButtonIfBuildSet(true);
 	}
 }
 
@@ -1128,7 +1176,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 				window.removeUrl('sample'+cardIndex);
 
 
-				window.enableLoadButton();			
+				me.enableLoadButtonIfBuildSet(true);			
 			}
 
 		} else {

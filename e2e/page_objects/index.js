@@ -1,12 +1,10 @@
 var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
-var sliderIconBar = require('./sections/sliderIconBar.js');
 var probandVariantCard = require('./sections/probandVariantCard.js');
 var matrixTrack = require('./sections/matrixTrack.js');
 var matrixTooltip = require('./sections/matrixTooltip.js');
 var filterPanel = require('./sections/filterPanel.js');
 var findGenesPanel = require('./sections/findGenesPanel.js');
-var aboutPanel = require('./sections/aboutPanel.js');
 var inspectPanel = require('./sections/inspectPanel.js');
 var recallPanel = require('./sections/recallPanel.js');
 var bookmarkPanel = require('./sections/bookmarkPanel.js');
@@ -17,10 +15,10 @@ module.exports = {
   },
 
   elements: {
+    demoGeneButton: 'button#load-demo-data',
     sliderLeft: '#slider-left',
     filterPanel: '#slider-left #filter-track',
     findGenesPanel: '#slider-left #genes-card',
-    aboutPanel: '#slider-left #help-card',
     inspectPanel: '#slider-left #examine-card',
     recallPanel: '#slider-left #recall-card',
     bookmarkPanel: '#slider-left #bookmark-card',
@@ -36,17 +34,18 @@ module.exports = {
 
   commands: [{
     load: function() {
-      return this.navigate().waitForElementVisible('@sliderLeft');
+      return this.navigate();
+    },
+    clickDemoGene: function() {
+      return this.click('@demoGeneButton');
     }
   }],
 
   sections: {
     appTitleSection: appTitleSection,
     dataCard: dataCard,
-    sliderIconBar: sliderIconBar,
     filterPanel: filterPanel,
     findGenesPanel: findGenesPanel,
-    aboutPanel: aboutPanel,
     inspectPanel: inspectPanel,
     recallPanel: recallPanel,
     bookmarkPanel: bookmarkPanel,

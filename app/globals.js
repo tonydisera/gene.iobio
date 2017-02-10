@@ -1,19 +1,23 @@
+// Fields
+var IMPACT_FIELD_TO_FILTER    = 'highestImpactVep'; 
+var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
+
 //
 // URLS
 //
-var stage_iobio_services      = "nv-purple.iobio.io/";
-var dev_iobio_services        = "nv-dev.iobio.io/";
-var prod_iobio_services       = "nv-prod.iobio.io/";
+var DEV_IOBIO                 = "nv-dev.iobio.io/";
+var STAGE_IOBIO               = "nv-purple.iobio.io/";
+var PROD_IOBIO                = "nv-green.iobio.io/";
 
-var current_iobio_services    = prod_iobio_services;
+var CURRENT_IOBIO             = PROD_IOBIO;
 
-var iobio_services            = isOffline ? serverInstance : current_iobio_services;
-var iobio_http_services       = (useSSL ? "https://" : "http://") + (isOffline ? serverInstance : current_iobio_services);
+var iobio_services            = isOffline              ? serverInstance : CURRENT_IOBIO;
+var iobio_http_services       = (useSSL ? "https://" : "http://") + (isOffline ? serverInstance : CURRENT_IOBIO);
 
 
 // http services
-var geneInfoServer            = iobio_http_services + "geneinfo/";
-var genomeBuildServer         = iobio_http_services + "genomebuild/"; // !pointed to nv-dev
+var geneInfoServer            = iobio_http_services + "geneinfo/";   
+var genomeBuildServer         = iobio_http_services + "genomebuild/"; 
 var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
@@ -27,15 +31,15 @@ var IOBIO = {};
 IOBIO.tabix                   = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
 IOBIO.vcfReadDepther          = iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = iobio_services  + "snpeff/";
-IOBIO.vt                      = iobio_services  + "vt/";  // !pointed to nv-dev
-IOBIO.af                      = iobio_services  + "af/";  // !pointed to nv-dev
-IOBIO.vep                     = iobio_services  + "vep/"; // !pointed to nv-dev
+IOBIO.vt                      = iobio_services  + "vt/";  
+IOBIO.af                      = iobio_services  + "af/";  
+IOBIO.vep                     = iobio_services  + "vep/"; 
 IOBIO.contigAppender          = iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = iobio_services  + "bcftools/";
 IOBIO.coverage                = iobio_services + "coverage/ ";
 IOBIO.samtools                = iobio_services +  "samtools/";
 IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.freebayes               = iobio_services + "freebayes/"; // !pointed to nv-dev
+IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
 
 
@@ -54,7 +58,7 @@ var NCBI_GENE_SUMMARY_URL         = "https://eutils.ncbi.nlm.nih.gov/entrez/euti
 /*
 * These variables control special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  For running one of the special educational edition 
-* tours (e.g. a guided tour of the gene.iobio app), turn on both isLevelEdu and isLevelEduTour.
+* tours (e.g. a guided tour of the gene.iobio app), turn on isLevelEdu.
 */
 var hideNextButtonAnim      = false;  // is next button hidden on animations during edu tour?
 var hasTimeout              = false; // is a timeout based on n seconds of inactivity used?
