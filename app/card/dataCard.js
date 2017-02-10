@@ -463,22 +463,30 @@ DataCard.prototype.addBuildListener = function() {
 	var me = this;
 	if ($('#select-build')[0].selectize) {
 	    $('#select-build')[0].selectize.on('change', function(value) {
-			if (!value.length) {
-				return;
+			if (value.length) {
+				genomeBuildHelper.setCurrentBuild(value);
+				updateUrl("build", value);
+				$('#build-link').text(value);
+				me.validateBuildFromData(function(success, message) {
+					if (success) {
+						$('#species-build-warning').addClass("hide");
+						window.enableLoadButton();
+					} else {
+						$('#species-build-warning').html(message);
+						$('#species-build-warning').removeClass("hide");
+						window.disableLoadButton();
+					}
+				});
+			} else {
+				genomeBuildHelper.currentBuild = null;
+				removeUrl("build");
+				$('#build-link').text("?");
+				window.disableLoadButton();
+				setTimeout( function() { 
+					$('#select-build-box .selectize-input').animateIt('tada');
+				}, 2000);
+				
 			}
-			genomeBuildHelper.setCurrentBuild(value);
-			updateUrl("build", value);
-			$('#build-link').text(value);
-			me.validateBuildFromData(function(success, message) {
-				if (success) {
-					$('#species-build-warning').addClass("hide");
-					window.enableLoadButton();
-				} else {
-					$('#species-build-warning').html(message);
-					$('#species-build-warning').removeClass("hide");
-					window.disableLoadButton();
-				}
-			});
 			
 		});
 	}
@@ -813,9 +821,20 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
 		me.panelSelectorFilesSelected.find('#bam-file-info').val(bamFileName);
 		me.setDefaultBuildFromData();
-		enableLoadButton();
+		me.enableLoadButtonIfBuildSet(true);
 	});
 
+}
+
+DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
+	if (genomeBuildHelper.getCurrentBuild()) {
+		window.enableLoadButton();
+	} else {		
+		if (wiggleWhenEmpty) {
+			$('#select-build-box .selectize-input').animateIt('tada');			
+		}
+		window.disableLoadButton();
+	}	
 }
 
 
@@ -848,8 +867,7 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 			variantCard.setName(variantCard.getName());
 			window.updateUrl('bam' + cardIndex, bamUrl);
 			me.setDefaultBuildFromData();
-
-			enableLoadButton();			
+			me.enableLoadButtonIfBuildSet(true);		
 		} else {
 			window.disableLoadButton();
 		}
@@ -957,6 +975,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
     this.onVcfUrlEntered(panelSelector);
 }
 DataCard.prototype.clearUrl = function(panelSelector) {
+	var me = this;
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -968,7 +987,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	panelSelector.find("#url-input").val("");
 	panelSelector.find("#vcf-file-info").val("");
 	variantCard.clearVcf();
-	window.enableLoadButton();
+	me.enableLoadButtonIfBuildSet();
 
 
 }
@@ -1037,7 +1056,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 				variantCard.setDefaultSampleName(null);
 				window.removeUrl('sample'+cardIndex);
 				
-				window.enableLoadButton();
+				me.enableLoadButtonIfBuildSet(true);
 			}
 		},
 		function(error) {
@@ -1085,7 +1104,7 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 
 		variantCard.setSampleName(variantCard.getDefaultSampleName());
 		variantCard.setDefaultSampleName(null);
-		window.enableLoadButton();
+		me.enableLoadButtonIfBuildSet(true);
 	} else {
 		window.disableLoadButton();
 	}	
@@ -1098,6 +1117,7 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 }
 
 DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
+	var me = this;
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 	var sampleName = panelSelector.find('#vcf-sample-select')[0].selectize.getValue();
@@ -1105,7 +1125,7 @@ DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	
 	window.updateUrl('sample' + cardIndex, sampleName);
 	if (variantCard.isReadyToLoad()) {
-		window.enableLoadButton();
+		me.enableLoadButtonIfBuildSet(true);
 	}
 }
 
@@ -1152,7 +1172,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 				window.removeUrl('sample'+cardIndex);
 
 
-				window.enableLoadButton();			
+				me.enableLoadButtonIfBuildSet(true);			
 			}
 
 		} else {

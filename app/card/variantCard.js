@@ -412,7 +412,7 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback, callbackErr
 }
 
 VariantCard.prototype.clearVcf = function() {
-	this.model.clearVcf();
+	this.model.clearVcf(this.cardIndex);
 
 	this.cardSelector.find('#vcf-track').addClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "none");
@@ -429,7 +429,7 @@ VariantCard.prototype.clearVcf = function() {
 }
 
 VariantCard.prototype.clearBam = function() {
-	this.model.clearBam();
+	this.model.clearBam(this.cardIndex);
 	this.cardSelector.find('#bam-track').addClass("hide");
 }
 

@@ -541,23 +541,24 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 
 }
 
-VariantModel.prototype.clearVcf = function() {
+VariantModel.prototype.clearVcf = function(cardIndex) {
 
 	this.vcfData = null;
 	this.vcfUrlEntered = false;
 	this.vcfFileOpened = false;
 	this.sampleName = null;
-	window.removeUrl('sample'+this.cardIndex);
-	window.removeUrl('vcf'+this.cardIndex);
+	window.removeUrl('sample'+ cardIndex);
+	window.removeUrl('vcf' + cardIndex);
+	window.removeUrl('name'+ cardIndex);
 	this.vcf.clear();
 }
 
-VariantModel.prototype.clearBam = function() {
+VariantModel.prototype.clearBam = function(cardIndex) {
 
 	this.bamData = null;
 	this.bamUrlEntered = false;
 	this.bamFileOpened = false;
-	window.removeUrl('bam'+this.cardIndex);
+	window.removeUrl('bam' + cardIndex);
 	if (this.bam) {
 		this.bam.clear();
 	}
