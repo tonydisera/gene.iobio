@@ -225,7 +225,31 @@ function geneD3() {
           .attr("id", function(d,i) { return 'transcript_' +  d.transcript_id.split(".").join("_"); })
           .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
       transcript.exit().remove();
-      
+
+      transcript.selectAll(".selection-box").remove();
+      transcript.selectAll(".selection-box")
+        .data(function(d) { 
+          if (geneD3_regionStart && geneD3_regionEnd) {
+            return [[geneD3_regionStart,geneD3_regionEnd]];
+          } else {
+            return [[d.start, d.end]] 
+
+          }
+        })
+        .enter().append('rect')
+          .attr('class', 'selection-box')
+          .attr('x', margin.left * -1)
+          .attr('y', 0)
+          .attr('width', margin.left + geneD3_width)
+          .attr('height', trackHeight)
+          .on("mouseover", function(d) {
+            d3.selectAll('.transcript.selected').classed("selected", false);
+            d3.select(this.parentNode).classed("selected", true);
+            selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
+          })
+          .on("mouseout", function(d) {
+            d3.select(this.parentNode).classed("selected", false);
+          });      
 
       transcript.selectAll(".reference").remove();
       transcript.selectAll('.reference')
@@ -379,7 +403,7 @@ function geneD3() {
       transcript.selectAll('.name').transition()
         .duration(700)
         .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0; })
-        .attr('y', function(d) { return margin.left > 5 ? trackHeight : -10; })   
+        .attr('y', function(d) { return margin.left > 5 ? trackHeight - (trackHeight/2) + 2 : -10; })   
         .text(function(d) { return d[1]; })                
         .style('fill-opacity', 1);
 

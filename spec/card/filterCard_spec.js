@@ -2,8 +2,15 @@ describe('filterCard', function() {
 	var filterCard;
 
 	beforeEach(function() {
-		setFixtures('<input type="number" id="af-amount-start" value="10">\
-			<input type="number" id="af-amount-end" value="55">\
+		setFixtures(
+			'<div id="afexac-range-filter">\
+			  <input type="number" id="af-amount-start" value="10">\
+			  <input type="number" id="af-amount-end" value="55">\
+			 </div>\
+			 <div id="af1000g-range-filter">\
+			  <input type="number" id="af-amount-start" value="20">\
+			  <input type="number" id="af-amount-end" value="65">\
+			 </div>\
 			<input type="number" id="coverage-min" value="1">\
 			<input id="exonic-only-cb" type="checkbox">');
 		filterCard = new FilterCard();
@@ -32,22 +39,26 @@ describe('filterCard', function() {
 		it('returns an object with the correct properties to filter on', function() {
 			expect(filterCard.getFilterObject()).toEqual({
 				coverageMin: 1,
-				afMin: 0.1,
-				afMax: 0.55,
-				afScheme: "exac",
+				afMinExac: 0.1,
+				afMaxExac: 0.55,
+				afMin1000g: 0.2,
+				afMax1000g: 0.65,
 				annotsToInclude: "blah",
 				exonicOnly: false
 			});
 		});
 
 		it('returns null properties on the filter object when the minimum or maximum allele frequency is blank', function() {
-			$('#af-amount-start').val('');
-			$('#af-amount-end').val('');
+			$('#afexac-range-filter #af-amount-start').val('');
+			$('#afexac-range-filter #af-amount-end').val('');
+			$('#af1000g-range-filter #af-amount-start').val('');
+			$('#af1000g-range-filter #af-amount-end').val('');
 			expect(filterCard.getFilterObject()).toEqual({
 				coverageMin: 1,
-				afMin: null,
-				afMax: null,
-				afScheme: "exac",
+				afMinExac: null,
+				afMaxExac: null,
+				afMin1000g: null,
+				afMax1000g: null,
 				annotsToInclude: "blah",
 				exonicOnly: false
 			});
@@ -57,9 +68,10 @@ describe('filterCard', function() {
 			$('#exonic-only-cb').click();
 			expect(filterCard.getFilterObject()).toEqual({
 				coverageMin: 1,
-				afMin: 0.1,
-				afMax: 0.55,
-				afScheme: "exac",
+				afMinExac: 0.1,
+				afMaxExac: 0.55,
+				afMin1000g: 0.2,
+				afMax1000g: 0.65,				
 				annotsToInclude: "blah",
 				exonicOnly: true
 			});

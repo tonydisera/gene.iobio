@@ -5,6 +5,31 @@ describe('variantModel', function() {
 		variantModel = new VariantModel();
 	});
 
+	describe('#setLoadState', function() {
+		it('sets the load state on the vcf data object', function() {
+			var theVcfData = {};
+			var taskName = 'clinvar';
+			variantModel.setLoadState(theVcfData, taskName);
+			expect(theVcfData).toEqual({ loadState: { clinvar: true } });
+		});
+	});
+
+	describe('#isLoaded', function() {
+		it('returns true when both the vcf and vcfData are present', function() {
+			variantModel.vcf = {};
+			variantModel.vcfData = {};
+			expect(variantModel.isLoaded()).toBeTruthy();
+		});
+
+		it('returns false when either the vcf or vcfData are not present', function() {
+			variantModel.vcfData = {};
+			expect(variantModel.isLoaded()).toBeFalsy();
+			variantModel.vcfData = null;
+			variantModel.vcf = {};
+			expect(variantModel.isLoaded()).toBeFalsy();
+		});
+	});
+
 	describe('#filterBamDataByRegion', function() {
 		it('returns an array of all bam data that falls within the specified start and end regions', function() {
 			var bamDataCoverage = [[80, 0], [90, 0], [100, 0], [150, 0], [200, 0], [201, 0]];
@@ -68,7 +93,8 @@ describe('variantModel', function() {
 						del: { missense_variant: { ENST000001: "ENST000001" } }
 					}
 				},
-				CONSEQUENCE: {}
+				CONSEQUENCE: {},
+				AF: {}
 			});
 		});
 
@@ -97,7 +123,8 @@ describe('variantModel', function() {
 						snp: { missense_variant: { ENST000001: "ENST000001" } },
 						del: { missense_variant: { ENST000001: "ENST000001" } }
 					}
-				}
+				},
+				AF: {}
 			});
 		});
 
@@ -115,7 +142,8 @@ describe('variantModel', function() {
 				INHERITANCE: {},
 				IMPACT: {},
 				CONSEQUENCE: {},
-				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } }
+				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } },
+				AF: {}
 			});
 		});
 
@@ -133,7 +161,8 @@ describe('variantModel', function() {
 				INHERITANCE: {},
 				IMPACT: {},
 				CONSEQUENCE: {},
-				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } }
+				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } },
+				AF: {}
 			});
 		});
 
@@ -152,7 +181,8 @@ describe('variantModel', function() {
 				},
 				INHERITANCE: {},
 				IMPACT: {},
-				CONSEQUENCE: {}
+				CONSEQUENCE: {},
+				AF: {}
 			});
 		});
 
@@ -169,7 +199,92 @@ describe('variantModel', function() {
 				CLINVAR: null,
 				INHERITANCE: { denovo: "denovo", recessive: "recessive" },
 				IMPACT: {},
-				CONSEQUENCE: {}
+				CONSEQUENCE: {},
+				AF: {}
+			});
+		});
+
+		describe('when afExAC is higher than af1000G', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', afExAC: 0.04, af1000G: 0.03 }, // value of 6
+						{ type: 'snp', afExAC: 0.005, af1000G: 0.001 }, // value of 5
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						afexac_rare: { field: 'afExAC', value: 5 }
+					}
+				});
+			});
+		});
+
+		describe('when af1000G is higher than afExAC', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', afExAC: -1.05, af1000G: -1 }, // value of 2
+						{ type: 'snp', afExAC: 0.01, af1000G: 0.02 }, // value of 6
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						af1000g_unique: { field: 'af1000G', value: 2 }
+					}
+				});
+			});
+		});
+
+		describe('when afExAC is present but not af1000G', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', afExAC: 0.04 }, // value of 6
+						{ type: 'snp', afExAC: 0.005 }, // value of 5
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						afexac_rare: { field: 'afExAC', value: 5 }
+					}
+				});
+			});
+		});
+
+		describe('when af1000G is present but not afExAC', function() {
+			it('returns a danger counts object with the correct allele frequency (AF)', function() {
+				window.matrixCard = new MatrixCard();
+				var vcfData = {
+					features: [
+						{ type: 'snp', af1000G: -1 }, // value of 2
+						{ type: 'snp', af1000G: 0.02 }, // value of 6
+					]
+				};
+				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+					CLINVAR: null,
+					INHERITANCE: {},
+					IMPACT: {},
+					CONSEQUENCE: {},
+					AF: {
+						af1000g_unique: { field: 'af1000G', value: 2 }
+					}
+				});
 			});
 		});
 	});
@@ -285,9 +400,8 @@ describe('variantModel', function() {
 
 			filterObject = {
 				'coverageMin': 100,
-				'afMin': 0,
-				'afMax': 1,
-				'afScheme' : "exac",
+				'afMinExac': 0,
+				'afMaxExac': 1,
 				'annotsToInclude': {},
 				'exonicOnly': false
 		  };
@@ -363,8 +477,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.8;
-				filterObject.afMin = 0.6;
-				filterObject.afMax = 1;
+				filterObject.afMinExac = 0.6;
+				filterObject.afMaxExac = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_4]);
 			});
@@ -374,8 +488,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = 0;
-				filterObject.afMax = 0.7;
+				filterObject.afMinExac = 0;
+				filterObject.afMaxExac = 0.7;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3]);
 			});
@@ -385,8 +499,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = null;
-				filterObject.afMax = null;
+				filterObject.afMinExac = null;
+				filterObject.afMaxExac = null;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
@@ -396,8 +510,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = NaN;
-				filterObject.afMax = NaN;
+				filterObject.afMinExac = NaN;
+				filterObject.afMaxExac = NaN;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
@@ -407,8 +521,8 @@ describe('variantModel', function() {
 				variant_2.afExAC = '';
 				variant_3.afExAC = 0.5;
 				variant_4.afExAC = 0.9;
-				filterObject.afMin = 0;
-				filterObject.afMax = 1;
+				filterObject.afMinExac = 0;
+				filterObject.afMaxExac = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
@@ -416,13 +530,12 @@ describe('variantModel', function() {
 
 		describe('when filtering out variants that do not meet the specifed af1000G allele frequency', function() {
 			it('filters out variants that are not in the specified range', function() {
-				filterObject.afScheme = "1000g";
 				variant_1.af1000G = null;
 				variant_2.af1000G = '';
 				variant_3.af1000G = 0.5;
 				variant_4.af1000G = 0.8;
-				filterObject.afMin = 0.6;
-				filterObject.afMax = 1;
+				filterObject.afMin1000g = 0.6;
+				filterObject.afMax1000g = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_4]);
 			});
@@ -456,6 +569,7 @@ describe('variantModel', function() {
 			describe('when the annotation scheme is not snpeff', function() {
 				it('keeps the variants that have a high or moderate impact OR an effect that is not an intron', function() {
 					filterCard.annotationScheme = 'vep';
+					IMPACT_FIELD_TO_FILTER = 'vepImpact';
 					variant_1.vepImpact = { HIGH: 'HIGH' };
 					variant_2.vepImpact = { MODERATE: 'MODERATE' };
 					variant_3.vepImpact = { LOW: 'LOW' };

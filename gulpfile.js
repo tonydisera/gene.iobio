@@ -18,7 +18,7 @@ gulp.task('start-server', function(done) {
 });
 
 gulp.task('jshint', function() {
-	return gulp.src(["./e2e/*_spec.js", "./e2e/page_objects/**/*.js"])
+	return gulp.src(["./e2e/**/*_spec.js", "./e2e/page_objects/**/*.js"])
 		.pipe(jshint('.jshintrc'))
 		.pipe(jshint.reporter('jshint-stylish'))
 })

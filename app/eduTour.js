@@ -5,6 +5,53 @@ var pageGuideEduTour1 = null;
 var pageGuideEduTour2 = null;
 var edgeObject = null;
 
+var mainTourSteps = {
+	'#enter-gene-name': {},
+	'#gene-track': {},
+	'#add-data-button': {},
+	'#vcf-track': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#bam-depth': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#matrix-track': {},
+	'#transcript-btn-group': {},
+	'#set-gene-source': {},
+	'#gene-viz': {},
+	'#gene-region-buffer-input': {},
+	'#call-variants-link': {},
+	'#button-call-variants': {},
+	'#proband-variant-card #fb-variants': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#show-filters-link': {},
+	'#filter-track svg#MODERATE': {},
+	'#proband-variant-card #displayed-variant-count': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#proband-variant-card #vcf-track #vcf-variants svg g.group g.snp': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#vcf-variants .tooltip': { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	"#vcf-variants .tooltip #bookmarkLink": { 
+		position: {top: '100px', bottom: 'initial'} 
+	},
+	'#show-bookmarks-link': {},
+	'#bookmark-card #bookmark-panel': {},
+	'#bookmark-card .favorite-indicator': {},
+	'#show-select-genes-link': {},
+	'#help-link': {}
+}
+
+var bookmarkTourSteps = {
+	'#proband-variant-card #vcf-track': {
+		position: {top: '100px', bottom: 'initial'} 
+	}
+}
+
 var eduTour1Steps = {
 	'#edu-tour-label':                                  {index: 0, first: true, noElement: true, disableTourButtons: true,
 		audio: '#tour1-recording1',
@@ -18,14 +65,14 @@ var eduTour1Steps = {
 			showFunction: showEduTourAnimation, 
 			delay: 0}
 		},
-	'#phenolyzer-search-box .selectize-control.single': {index: 1, disableNext: true, correct: false, disableTourButtons: true},
-	'#phenolyzer-results':                              {index: 2, disableTourButtons: true,
+	'#phenolyzer-search-box .selectize-control.single': {index: 1, height: '20px', disableNext: true, correct: false, disableTourButtons: true},
+	'#phenolyzer-results':                              {index: 2, disableTourButtons: true, 
 		audio: '#tour1-recording2'
 	},
-	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '50px', disableTourButtons: true},
+	'#proband-variant-card #zoom-region-chart':         {index: 3, audio: '#tour1-recording3', height: '0px', disableTourButtons: true},
 	'#gene-badge-container':                            {index: 4, disableNext: true, correct: false, disableTourButtons: true},
 	'#edu-tour-1 #start-over':                          {index: 5, audio: '#tour1-recording4', noElement: true, disableTourButtons: true},
-	'#children-buttons':                                {index: 6, disableNext: true, correct: false, disableTourButtons: false},
+	'#children-buttons':                                {index: 6, disableNext: true, height: '100px', correct: false, disableTourButtons: false},
 	'.edu-tour-1-child-buttons':                        {index: 7, close: true, noElement: true, disableTourButtons: false,
 		audio: '#tour1-recording5', 
 		height: 'full', 		
@@ -66,7 +113,7 @@ var eduTour2Steps = {
 				}
 		},
 	'#proband-variant-card #vcf-track':      {index: 2, noElement: true, disableTourButtons: true},
-	'#child-buttons-tour2':          {index: 3, disableNext: true, correct: false, disableTourButtons: false},
+	'#child-buttons-tour2':          {index: 3, disableNext: true, height: '120px', correct: false, disableTourButtons: false},
 	'#edu-tour-2':                   {index: 4, noElement: true, audio: '#tour2-recording3', close: true, disableTourButtons: false}
 };
 
@@ -78,12 +125,21 @@ function initializeTours() {
 			'auto_refresh': true, 
 			'show_numbers': false,
 			'close_button_text': 'X',
+            'default_zindex': 1031,
 			'custom_open_button': '#show-main-tour',
 			'steps_element': '#tourMain',
 			'track_events_cb': function(interactionName) {
 				
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+
+				var step = mainTourSteps[currentTour];
+				if (step) {
+					customizeStep(pageGuide, step);
+				} else {
+					$('#tlyPageGuideMessages').css("top", "initial");
+					$('#tlyPageGuideMessages').css("bottom", "0px");					
+				}
 				
 			}
 	    }); 
@@ -98,6 +154,13 @@ function initializeTours() {
 				
 			},
 			'handle_doc_switch': function(currentTour, prevTour) {
+				var step = bookmarkTourSteps[currentTour];
+				if (step) {
+					customizeStep(pageGuideBookmarks, step);
+				} else {
+					$('#tlyPageGuideMessages').css("top", "initial");
+					$('#tlyPageGuideMessages').css("bottom", "0px");
+				}
 			}
 	    });     	
  
@@ -188,10 +251,12 @@ function initializeTours() {
 				customizeEduTourStep(pageGuideEduTour2, step);
 
 				if (currentTour == "#proband-variant-card #vcf-track") {
-					var variant = getProbandVariantCard().model.vcfData.features[2];
-					var tooltip = getProbandVariantCard().d3CardSelector.select("#vcf-variants .tooltip");
-					getProbandVariantCard().showTooltip(tooltip, variant, getProbandVariantCard(), false );
-					getProbandVariantCard().showVariantCircle(variant, getProbandVariantCard());
+					if (getProbandVariantCard().model.vcfData && getProbandVariantCard().model.vcfData.features && getProbandVariantCard().model.vcfData.features.length > 2) {
+						var variant = getProbandVariantCard().model.vcfData.features[2];
+						var tooltip = getProbandVariantCard().d3CardSelector.select("#vcf-variants .tooltip");
+						getProbandVariantCard().showTooltip(tooltip, variant, getProbandVariantCard(), false );
+						getProbandVariantCard().showVariantCircle(variant, getProbandVariantCard());						
+					}
 				}
 
 			}
@@ -204,6 +269,17 @@ function initializeTours() {
 	    }
 	}
 
+}
+
+
+function customizeStep(pageGuide, step) {
+	if (step.position) {
+		$('#tlyPageGuideMessages').css("top", step.position.top);
+		$('#tlyPageGuideMessages').css("bottom", step.position.bottom);
+	} else {
+		$('#tlyPageGuideMessages').css("top", "initial");
+		$('#tlyPageGuideMessages').css("bottom", "0px");
+	}
 }
 
 
@@ -223,6 +299,13 @@ function customizeEduTourStep(pageGuide, step) {
 		$('.edu-tour-data-button').addClass("disabled");
 	} else {
 		$('.edu-tour-data-button').removeClass("disabled");
+	}
+	if (step.position) {
+		$('#tlyPageGuideMessages').css("top", step.position.top);
+		$('#tlyPageGuideMessages').css("bottom", step.position.bottom);
+	} else {
+		$('#tlyPageGuideMessages').css("top", "initial");
+		$('#tlyPageGuideMessages').css("bottom", "0px");
 	}
 	if (step.height) {
 		if (step.height == 'full') {
@@ -286,7 +369,7 @@ function eduTourCheckPhenolyzer() {
 	$('#select-phenotype-edutour')[0].selectize.on('change', function() {
 		var phenotype = $('#select-phenotype-edutour')[0].selectize.getValue().toLowerCase();
 		var correct = true;
-		if (isLevelEduTour && eduTourNumber == 1) {
+		if (isLevelEdu && eduTourNumber == 1) {
 			if (phenotype != 'colon_cancer') {
 				alertify.alert("Please select 'Colon cancer' to continue with this tour.")
 				correct = false;
@@ -306,7 +389,7 @@ function eduTourCheckPhenolyzer() {
 }
 
 function eduTourCheckVariant(variant) {
-	if (isLevelEduTour && eduTourNumber == "1" 
+	if (isLevelEdu && eduTourNumber == "1" 
 		&& pageGuideEduTour1.cur_idx == 4
 		&& variant.vepImpact[HIGH] != "HIGH" 
 		&& variant.start == 112116592 

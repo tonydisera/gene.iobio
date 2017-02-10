@@ -182,52 +182,96 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	var impactClasses = {};
 	var consequenceClasses = {};
 	var inheritanceClasses = {};
+	var afClazz = null;
+	var afField = null;
+	var lowestAf = 999;
+
+
 	theVcfData.features.forEach( function(variant) {
 
-    for (key in variant.highestImpactSnpeff) {
-    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
-    		impactClasses[key] = impactClasses[key] || {};
-    		impactClasses[key][variant.type] = variant.highestImpactSnpeff[key]; // key = effect, value = transcript id
-    	}
-    }
-
-    for (key in variant.highestImpactVep) {
-    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
-    		consequenceClasses[key] = consequenceClasses[key] || {};
-    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
-    	}
-    }
-
-    for (key in variant.highestSIFT) {
-			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
-				var clazz = matrixCard.siftMap[key].clazz;
-				dangerCounts.SIFT = {};
-				dangerCounts.SIFT[clazz] = {};
-				dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-			}
-    }
-
-    for (key in variant.highestPolyphen) {
-    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
-				var clazz = matrixCard.polyphenMap[key].clazz;
-				dangerCounts.POLYPHEN = {};
-				dangerCounts.POLYPHEN[clazz] = {};
-				dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-    	}
-    }
-
-    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
-    	for (key in variant.clinVarClinicalSignificance) {
-	    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
-					clinvarClasses[key] = matrixCard.clinvarMap[key];
+	    for (key in variant.highestImpactSnpeff) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		impactClasses[key] = impactClasses[key] || {};
+	    		impactClasses[key][variant.type] = variant.highestImpactSnpeff[key]; // key = effect, value = transcript id
 	    	}
-    	}
-    }
+	    }
 
-    if (variant.inheritance && variant.inheritance != 'none') {
-    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
-    	inheritanceClasses[clazz] = variant.inheritance;
-    }
+	    for (key in variant.highestImpactVep) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		consequenceClasses[key] = consequenceClasses[key] || {};
+	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
+	    	}
+	    }
+
+	    for (key in variant.highestSIFT) {
+				if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
+					var clazz = matrixCard.siftMap[key].clazz;
+					dangerCounts.SIFT = {};
+					dangerCounts.SIFT[clazz] = {};
+					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
+				}
+	    }
+
+	    for (key in variant.highestPolyphen) {
+	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
+					var clazz = matrixCard.polyphenMap[key].clazz;
+					dangerCounts.POLYPHEN = {};
+					dangerCounts.POLYPHEN[clazz] = {};
+					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+	    	}
+	    }
+
+	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
+	    	for (key in variant.clinVarClinicalSignificance) {
+		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
+						clinvarClasses[key] = matrixCard.clinvarMap[key];
+		    	}
+	    	}
+	    }
+
+	    if (variant.inheritance && variant.inheritance != 'none') {
+	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
+	    	inheritanceClasses[clazz] = variant.inheritance;
+	    }
+
+
+
+	    var evaluateAf = function(af, afMap) {
+			afMap.forEach( function(rangeEntry) {
+				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
+					if (rangeEntry.value < lowestAf) {
+						lowestAf = rangeEntry.value;
+						afClazz = rangeEntry.clazz;
+						afField = af;
+					}
+				}
+			});
+		}
+
+		// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
+		// as 'lowest' af for all variants in gene
+		var af = null;
+		var afMap = null;
+		if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
+			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
+			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
+				af = 'afExAC';
+				afMap = matrixCard.afExacMap;
+			} else {
+				af = 'af1000G';
+				afMap = matrixCard.af1000gMap;
+			}
+		} else if ($.isNumeric(variant.afExAC)) {
+			af = 'afExAC';
+			afMap = matrixCard.afExacMap;
+
+		} else if ($.isNumeric(variant.af1000G)) {
+			af = 'af1000G';
+			afMap = matrixCard.af1000gMap;
+		}
+		if (af && afMap) {
+			evaluateAf(af, afMap);
+		}
 	});
 
 	var getLowestClinvarClazz = function(clazzes) {
@@ -266,7 +310,28 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	dangerCounts.CLINVAR = getLowestClinvarClazz(clinvarClasses);
 	dangerCounts.INHERITANCE = inheritanceClasses;
 
+	var afSummaryObject = {};
+	if (afClazz != null) {
+		afSummaryObject[afClazz] = {field: afField, value: lowestAf};
+	}
+	dangerCounts.AF = afSummaryObject;
+
+	dangerCounts.featureCount = theVcfData.features.length;
+
 	return dangerCounts;
+}
+
+VariantModel.summarizeError =  function(theError) {
+	var summaryObject = {};
+
+	summaryObject.CONSEQUENCE = {};
+	summaryObject.IMPACT = {};
+	summaryObject.CLINVAR = {}
+	summaryObject.INHERITANCE = {};
+	summaryObject.ERROR = theError;	
+	summaryObject.featureCount = 0;
+
+	return summaryObject;
 }
 
 VariantModel.prototype.getCalledVariantCount = function() {
@@ -476,23 +541,24 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 
 }
 
-VariantModel.prototype.clearVcf = function() {
+VariantModel.prototype.clearVcf = function(cardIndex) {
 
 	this.vcfData = null;
 	this.vcfUrlEntered = false;
 	this.vcfFileOpened = false;
 	this.sampleName = null;
-	window.removeUrl('sample'+this.cardIndex);
-	window.removeUrl('vcf'+this.cardIndex);
+	window.removeUrl('sample'+ cardIndex);
+	window.removeUrl('vcf' + cardIndex);
+	window.removeUrl('name'+ cardIndex);
 	this.vcf.clear();
 }
 
-VariantModel.prototype.clearBam = function() {
+VariantModel.prototype.clearBam = function(cardIndex) {
 
 	this.bamData = null;
 	this.bamUrlEntered = false;
 	this.bamFileOpened = false;
-	window.removeUrl('bam'+this.cardIndex);
+	window.removeUrl('bam' + cardIndex);
 	if (this.bam) {
 		this.bam.clear();
 	}
@@ -691,7 +757,7 @@ VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callback
 		}
 
 	} else {
-		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 5000, 
+		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 5000, useServerCache,
 	 	  function(coverageForRegion, coverageForPoints) {
 	 	  	if (coverageForRegion != null) {
 				me.bamData = {gene: gene.gene_name,
@@ -700,7 +766,11 @@ VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callback
 					          end: gene.end, 
 					          coverage: coverageForRegion};
 
-				me._cacheData(me.bamData, "bamData", gene.gene_name);	 	  		
+				// Use browser cache for storage coverage data if app is not relying on
+				// server-side cache
+				if (!useServerCache) {
+					me._cacheData(me.bamData, "bamData", gene.gene_name);	 	  		
+				}
 	 	  	}
 
 			if (regions.length > 0) {
@@ -790,7 +860,8 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
 			       true,
-			       true
+			       true,
+			       useServerCache
 			    ).then( function(data) {
 			    	var theVcfData = data[1];	
 
@@ -816,7 +887,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				    		theVariant.vepVariationIds = v.vepVariationIds;
 
 					    	// re-cache the data
-					    	me._cacheData(me.vcfData, "vcfData", theGene, theTranscript);	
+					    	me._cacheData(me.vcfData, "vcfData", theGene.gene_name, theTranscript);	
 
 					    	// return the annotated variant
 							resolve(theVariant);
@@ -966,14 +1037,16 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 				    	// Cache the data (if there are variants)
 				    	if (data.features.length > 0) {
-					    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
+					    	if (!me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript)) {
+					    		reject("Unable to cache annotated variants for gene " + data.gene.gene_name);
+					    	};	
 				    	}
 				    	me.vcfData = data;		    	
 						resolve(me.vcfData);
 
 			    	} else {
 			    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
-			    		console(error);
+			    		console.log(error);
 			    		reject(error);
 			    	}
 
@@ -993,10 +1066,16 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 }
 
 VariantModel.prototype.isCached = function(geneName, transcript) {
-	var key = this._getCacheKey("vcfData", geneName, transcript);
+	var key = this._getCacheKey("vcfData", geneName.toUpperCase(), transcript);
 	var data = localStorage.getItem(key);
 	return data != null;
 }
+
+VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneName, transcript) {
+	var theVcfData = this._getCachedData("vcfData", geneName, transcript);
+	return theVcfData && theVcfData.loadState != null && theVcfData.loadState['inheritance'];
+}
+
 
 VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
 	var me = this;
@@ -1166,8 +1245,14 @@ VariantModel.prototype.cacheDangerSummary = function(dangerSummary, geneName) {
 	this._cacheData(dangerSummary, "dangerSummary", geneName);
 }
 
+VariantModel.prototype.clearCacheItem = function(dataKind, geneName, transcript) {
+	var me = this;
+	cacheHelper.clearCacheItem(me._getCacheKey(dataKind, geneName, transcript));
+}
+
 VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
 	var me = this;
+	geneName = geneName.toUpperCase();
 	if (localStorage) {
 		var success = true;
 		var dataString = JSON.stringify(data);
@@ -1178,10 +1263,10 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
     	try {
 			dataStringCompressed = LZString.compressToUTF16(dataString);
     	} catch (e) {    		
+	   		success = false;
 	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
     		alertify.set('notifier','position', 'top-right');
 	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);
-	   		success = false;
     	}
 
     	if (success) {
@@ -1192,20 +1277,33 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
 		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
 	    		
 	    	} catch(error) {
+	    		success = false;
 		      	CacheHelper.showError(me._getCacheKey(dataKind, geneName, transcript), error);
-		    	success = false;
+		      	genesCard.hideGeneBadgeLoading(geneName);
 	    	}    		
+    	}
+
+    	if (!success) {
+	   		genesCard.hideGeneBadgeLoading(geneName);
+	   		genesCard.clearGeneGlyphs(geneName);
+	   		genesCard.setGeneBadgeError(geneName);    		
     	}
 
     	
       	return success;
     } else {
+   		genesCard.hideGeneBadgeLoading(geneName);
+   		genesCard.clearGeneGlyphs(geneName);
+   		genesCard.setGeneBadgeError(geneName);    		
+
     	return false;
     }
 }
 
 VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript) {
 	var me = this;
+
+	geneName = geneName.toUpperCase();
 
 	var data = null;
 	if (localStorage) {
@@ -1564,7 +1662,7 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, cover
 		}
 
 	}
-	this.setLoadState(theVcfData, 'coverage');
+	theVcfData.loadState['coverage'] = true;
 	callback();
 
 
@@ -2088,11 +2186,12 @@ VariantModel.prototype.filterFreebayesVariants = function(filterObject) {
 
 
 
-VariantModel.prototype.filterVariants = function(data, filterObject) {
+VariantModel.prototype.filterVariants = function(data, filterObject, bypassRangeFilter) {
 	var me = this;
 
-	var afField = filterObject.afScheme === 'exac' ? "afExAC" : "af1000G";
-	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : 'vepImpact';
+	var afFieldExac  = "afExAC";
+	var afField1000g = "af1000G";
+	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;
 	var effectField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'effect' : 'vepConsequence';
 
 	// coverageMin is always an integer or NaN
@@ -2119,16 +2218,25 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 		var isHomRef = (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') ? true : false;
 
 		var meetsRegion = true;
-		if (window.regionStart != null && window.regionEnd != null ) {
-			meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+		if (!bypassRangeFilter) {
+			if (window.regionStart != null && window.regionEnd != null ) {
+				meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+			}			
 		}
 
-		// Treat null and blank af as 0
-		var variantAf = d[afField] || 0;
-		var meetsAf = true;
-		if ($.isNumeric(filterObject.afMin) && $.isNumeric(filterObject.afMax)) {
+		// Allele frequency Exac - Treat null and blank af as 0
+		var variantAf = d[afFieldExac] || 0;
+		var meetsAfExac = true;
+		if ($.isNumeric(filterObject.afMinExac) && $.isNumeric(filterObject.afMaxExac)) {
 			// Exclude n/a ExAC allele freq (for intronic variants, af=-100) from range criteria
-			meetsAf = (variantAf >= filterObject.afMin && variantAf <= filterObject.afMax);
+			meetsAfExac = (variantAf >= filterObject.afMinExac && variantAf <= filterObject.afMaxExac);
+		}
+		// Allele frequency 1000g - Treat null and blank af as 0
+		variantAf = d[afField1000g] || 0;
+		var meetsAf1000g = true;
+		if ($.isNumeric(filterObject.afMin1000g) && $.isNumeric(filterObject.afMax1000g)) {
+			// Exclude n/a 1000g allele freq (for intronic variants, af=-100) from range criteria
+			meetsAf1000g = (variantAf >= filterObject.afMin1000g && variantAf <= filterObject.afMax1000g);
 		}
 
 		var meetsExonic = false;
@@ -2163,46 +2271,108 @@ VariantModel.prototype.filterVariants = function(data, filterObject) {
 			}
 		}
 
+		var incrementEqualityCount = function(condition, counterObject) {
+			var countAttribute = condition ? 'matchCount' : 'notMatchCount';
+			counterObject[countAttribute]++;
+		}
 		// Iterate through the clicked annotations for each variant. The variant
 		// needs to match
 		// at least one of the selected values (e.g. HIGH or MODERATE for IMPACT)
 		// for each annotation (e.g. IMPACT and ZYGOSITY) to be included.
-		var evalAttributes = {};
+		var evaluations = {};
 		for (key in filterObject.annotsToInclude) {
 			var annot = filterObject.annotsToInclude[key];
 			if (annot.state) {
-				evalAttributes[annot.key] = evalAttributes[annot.key] || 0;
+				var evalObject = evaluations[annot.key];
+				if (!evalObject) {
+					evalObject = {};
+					evaluations[annot.key] = evalObject;
+				}
 
 				var annotValue = d[annot.key] || '';
+
+				// Keep track of counts where critera should be true vs counts
+				// for critera that should be false.  
+				//
+				// In the simplest case,
+				// the filter is evalated for equals, for example,
+				// clinvar == pathogenic or clinvar == likely pathogenic.
+				// In this case, if a variant's clinvar = pathogenic, the
+				// evaluations will look like this:
+				//  evalEquals: {matchCount: 1, notMatchCount: 0}
+				// When variant's clinvar = benign
+				//  evalEquals: {matchCount: 0, notMatchCount: 1}
+	  		    //
+				// In a case where the filter is set to clinvar NOT EQUAL 'pathogenic'
+				// AND NOT EQUAL 'likely pathogenic'
+				// the evaluation will be true on if the variant's clinvar is NOT 'pathogenic'
+				// AND NOT 'likely pathogenic'
+				// When variant's clinvar is blank:
+				//  evalNotEquals: {matchCount: 0, notMatchCount: 2}
+				//
+				// If variant's clinvar is equal to pathogenic
+				//  evalNotEquals: {matchCount: 1, notMatchCount 1}
+				//
+				var evalKey = 'equals';
+				if (annot.hasOwnProperty("not") && annot.not) {
+					evalKey = 'notEquals';
+				} 
+				if (!evalObject.hasOwnProperty(evalKey)) {
+					evalObject[evalKey] = {matchCount: 0, notMatchCount: 0};
+				}
 				if ($.isPlainObject(annotValue)) {
 					for (avKey in annotValue) {
-						if (avKey.toLowerCase() == annot.value.toLowerCase()) {
-							evalAttributes[annot.key]++;
-						}
+						var doesMatch = avKey.toLowerCase() == annot.value.toLowerCase();
+						incrementEqualityCount(doesMatch, evalObject[evalKey])
 					}
-				} else if (annotValue.toLowerCase() == annot.value.toLowerCase()) {
-					evalAttributes[annot.key]++;
+				} else {
+					var doesMatch = annotValue.toLowerCase() == annot.value.toLowerCase();
+					incrementEqualityCount(doesMatch, evalObject[evalKey])
 				}
 			}
 		}
 
 		// If zero annots to evaluate, the variant meets the criteria.
 		// If annots are to be evaluated, the variant must match
-		// at least one value for each annot to consider.
+		// at least one value for each annot to meet criteria
 		var meetsAnnot = true;
-		for (key in evalAttributes) {
-			var count = evalAttributes[key];
-			if (count == 0) {
-				if (key == 'inheritance' && me.getRelationship() != 'proband') {
- 					// bypass filtering on inheritance if non-proband variant card
- 				} else {
-					meetsAnnot = false;
- 				}
+		for (key in evaluations) {
+			var evalObject = evaluations[key];
+
+			// Bypass evaluation for non-proband on inheritance mode.  This only
+			// applied to proband.
+			if (key == 'inheritance' && me.getRelationship() != 'proband') {
+				continue;
+			}
+			if (evalObject.hasOwnProperty("equals") && evalObject["equals"].matchCount == 0) {
+				meetsAnnot = false;
+				break;
+			}
+		}
+
+		// For annotations set to 'not equal', any case where the annotation matches (matchCount > 0),
+		// we set that the annotation critera was not met.  Example:  When filter is 
+		// clinvar 'not equal' pathogenic, and variant.clinvar == 'pathogenic' matchCount > 0,
+		// so the variants does not meet the annotation criteria
+		var meetsNotEqualAnnot = true
+		for (key in evaluations) {
+			var evalObject = evaluations[key];
+
+			// Bypass evaluation for non-proband on inheritance mode.  This only
+			// applied to proband.
+			if (key == 'inheritance' && me.getRelationship() != 'proband') {
+				continue;
+			}
+			// Any case where the variant attribute matches value on a 'not equal' filter, 
+			// we have encountered a condition where the criteria is not met.
+			if (evalObject.hasOwnProperty("notEquals") && evalObject["notEquals"].matchCount > 0) {
+				meetsNotEqualAnnot = false;
+				break;
 			}
 		}
 
 
-		return !isHomRef && meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsExonic;
+		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures,
@@ -2285,6 +2455,66 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 	});
 
 
+}
+
+/*
+*  Evaluate the highest impacts for a variant across all transcripts.
+*  Cull the impact if it already annotated for the canonical transcript
+*  or the impact is less severe than the one for the canonical
+*  transcripts.  Returns an object that looks like this:
+*  {HIGH: {frameshift: 
+*            {
+*			  transcripts: [ENST000245.1,ENSTxxxx],
+*			  display: 'ENST000241.1,ENSTxxxx'
+*			} 
+*		  stop_gain: 
+*			  {
+*			  transcripts: [ENST000245.1,ENSTxxxx],
+*			  display: 'ENST000241.1,ENSTxxxx'
+*			} 
+*		  }
+*	}
+*/
+VariantModel.getNonCanonicalHighestImpactsVep = function(variant) {
+	var vepHighestImpacts = {};
+	for (var impactKey in variant.highestImpactVep) {
+		var nonCanonicalEffects = [];
+		var allEffects = variant.highestImpactVep[impactKey];
+		
+		var lowestImpactValue = 99;
+		for (key in variant.vepImpact) {
+			var value = matrixCard.impactMap[key].value;
+			if (value < lowestImpactValue) {
+				lowestImpactValue = value;
+			}
+		}	
+
+		var theValue = matrixCard.impactMap[impactKey].value;
+		if (theValue < lowestImpactValue) {
+			for (effectKey in allEffects) {
+				var allTranscripts = allEffects[effectKey];
+				if (Object.keys(allTranscripts).length > 0) {
+					var ncObject = {};
+					var transcriptUrls = "";
+					for(transcriptId in allTranscripts) {
+						if (transcriptUrls.length > 0) {
+							transcriptUrls += ", ";
+						}
+						var url = '<a href="javascript:void(0)" onclick="selectTranscript(\'' + transcriptId + '\')">' + transcriptId + '</a>'; 
+						transcriptUrls += url;
+					}
+					ncObject[effectKey] = {transcripts: Object.keys(allTranscripts), display: Object.keys(allTranscripts).join(","), url: transcriptUrls};
+					nonCanonicalEffects.push(ncObject);
+				}
+
+			}
+
+			if (nonCanonicalEffects.length > 0) {
+				vepHighestImpacts[impactKey] = nonCanonicalEffects;
+			}
+		}
+	}	
+	return vepHighestImpacts;
 }
 
 

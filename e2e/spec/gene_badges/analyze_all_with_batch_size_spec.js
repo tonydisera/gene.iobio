@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, sliderIconBar, findGenesPanel;
+var indexPage, appTitleSection, dataCard, matrixTrack, findGenesPanel, nav;
 
 module.exports = {
   tags: [],
@@ -8,21 +8,21 @@ module.exports = {
 
   before: function(client) {
     indexPage = client.page.index();
+    nav = client.page.nav();
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
     findGenesPanel = indexPage.section.findGenesPanel;
-    sliderIconBar = indexPage.section.sliderIconBar;
   },
 
   'Analyzing all in batch sizes of 10 after refreshing the page should load all badges': function(client) {
     indexPage.load();
-    appTitleSection.openDataMenu();
+    nav.clickData();
     dataCard.selectSingle();
-    dataCard.selectBuild();
+    dataCard.selectGenomeBuild();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
-    sliderIconBar.clickFindGenes();
+    nav.clickGenes();
     findGenesPanel.clickACMG56Genes();
     matrixTrack.waitForMatrixLoaded();
 
@@ -44,6 +44,7 @@ module.exports = {
         'MYL2', 'LMNA', 'RYR2', 'PKP2', 'DSP', 'DSC2', 'TMEM43', 'DSG2',
         'KCNQ1', 'KCNH2', 'SCN5A', 'LDLR', 'APOB', 'PCSK9', 'RYR1', 'CACNA1S'
       ]);
+      indexPage.click('.ajs-primary.ajs-buttons button:first-child');
       client.end();
     });
   }

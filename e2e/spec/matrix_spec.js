@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack;
+var indexPage, appTitleSection, dataCard, matrixTrack, nav;
 
 module.exports = {
   tags: [],
@@ -8,6 +8,7 @@ module.exports = {
 
   before: function(client) {
     indexPage = client.page.index();
+    nav = client.page.nav();
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
@@ -15,75 +16,57 @@ module.exports = {
 
   'Loading data should work': function(client) {
     indexPage.load();
-    appTitleSection.openDataMenu();
+    nav.clickData();
     dataCard.selectSingle();
+    dataCard.selectGenomeBuild('GRCh37');
     // dataCard.section.probandData.selectPlatinumTrio();
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 
-    appTitleSection.selectGene('BRCA1');
+    nav.searchGene('BRCA1');
     matrixTrack.waitForMatrixLoaded();
   },
 
   'ClinVar Pathogenicity row should be accurate': function(client) {
-    matrixTrack.assertClinVarBenign(['snp 41244435', 'snp 41244000', 'snp 41244936', 'snp 41223094', 'snp 41234470']);
-    matrixTrack.assertClinVarNull(['del 41256089', 'del 41256075']);
+    matrixTrack.assertClinVarBenign([1, 2, 3, 4, 6]);
+    matrixTrack.assertClinVarNull([5]);
   },
 
   'SIFT Pathogenicity row should be accurate': function(client) {
-    matrixTrack.assertSIFTTolerated(['snp 41244435', 'snp 41244000', 'snp 41244936', 'snp 41223094']);
-    matrixTrack.assertSIFTNull(['del 41256089', 'snp 41219780']);
+    matrixTrack.assertSIFTTolerated([1, 2, 3, 4]);
+    matrixTrack.assertSIFTNull([5, 6, 7, 8]);
   },
 
   'PolyPhen Pathogenicity row should be accurate': function(client) {
-    matrixTrack.assertPolyPhenPossiblyDamaging(['snp 41244435']);
-    matrixTrack.assertPolyPhenBenign(['snp 41244000', 'snp 41244936', 'snp 41223094']);
-    matrixTrack.assertPolyPhenNull(['del 41256089']);
+    matrixTrack.assertPolyPhenPossiblyDamaging([1]);
+    matrixTrack.assertPolyPhenBenign([2, 3, 4]);
+    matrixTrack.assertPolyPhenNull([5, 6, 7, 8]);
   },
 
   'Impact VEP row should be accurate': function(client) {
-    matrixTrack.assertImpactModerate(['snp 41244435', 'snp 41244000', 'snp 41244936', 'snp 41223094']);
-    matrixTrack.assertImpactModifier([
-      'del 41256089',
-      'snp 41219780',
-      'snp 41226601',
-      'del 41256075',
-      'snp 41219560',
-      'snp 41219804',
-      'snp 41231516',
-      'del 41249363',
-      'snp 41215825'
-    ]);
-    matrixTrack.assertImpactLow(['snp 41245466', 'snp 41245237', 'snp 41234470']);
+    matrixTrack.assertImpactModerate([1, 2, 3, 4]);
+    matrixTrack.assertImpactModifier([5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    matrixTrack.assertImpactLow([14, 15, 16]);
 
     // matrixTrack.assertImpactComplexDiamond([]);
     // matrixTrack.assertImpactInsCircle([]);
-    matrixTrack.assertImpactDelTriangle(['del 41256089', 'del 41256075', 'del 41249363']);
-    matrixTrack.assertImpactSnpRect([
-      'snp 41244435',
-      'snp 41244000',
-      'snp 41244936',
-      'snp 41223094',
-      'snp 41219780',
-      'snp 41226601',
-      'snp 41219560',
-      'snp 41219804',
-      'snp 41231516',
-      'snp 41215825',
-      'snp 41245466',
-      'snp 41245237',
-      'snp 41234470'
-    ]);
+    matrixTrack.assertImpactDelTriangle([5, 8, 12]);
+    matrixTrack.assertImpactSnpRect([1, 2, 3, 4, 6, 7, 9, 10, 11, 13, 14, 15, 16]);
   },
 
-  'Allele Frequency 1000G row should be accurate': function(client) {
-    matrixTrack.assertAf1000gCommon(['snp 41244435', 'snp 41244000', 'snp 41244936', 'snp 41223094']);
-    matrixTrack.assertAf1000gRare(['del 41256089']);
+  'Most Severe Impact VEP row should be accurate': function(client) {
+    matrixTrack.assertMostSevereImpactNull([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    matrixTrack.assertMostSevereImpactModifier([14, 15, 16]);
   },
 
   'Allele Frequency ExAC row should be accurate': function(client) {
-    matrixTrack.assertAfexacCommon(['snp 41244435', 'snp 41244000', 'snp 41244936', 'snp 41223094']);
-    matrixTrack.assertAfexacUniqueNc(['del 41256089', 'snp 41219780']);
+    matrixTrack.assertAfexacCommon([1, 2, 3, 4, 14, 15, 16]);
+    matrixTrack.assertAfexacUniqueNc([5, 6, 7, 8, 9, 10, 11, 12, 13]);
+  },
+
+  'Allele Frequency 1000G row should be accurate': function(client) {
+    matrixTrack.assertAf1000gCommon([1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+    matrixTrack.assertAf1000gUnique([5]);
   },
 
   'Zygosity row should be accurate': function(client) {

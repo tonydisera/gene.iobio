@@ -550,14 +550,14 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -568,7 +568,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -583,7 +583,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -625,16 +625,34 @@ var effectCategories = [
 
   }
 
+  exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
+    var key =  "backend.gene.iobio"  
+      + "-" + cacheHelper.launchTimestamp 
+      + "-" + (vcfURL ? vcfURL : (vcfFile ? vcfFile.name : ""))
+      + "-" + service
+      + "-" + refName
+      + "-" + geneObject.start.toString()
+      + "-" + geneObject.end.toString()
+      + "-" + geneObject.strand
+      + "-" + sampleName;
+
+    if (miscObject) {
+      for (miscKey in miscObject) {
+        key += "-" + miscKey + "=" + miscObject[miscKey];
+      }
+    }
+    return key;
+  }
 
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, errorCallback) {
+
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
 
     var me = this;
 
     // Figure out the file location of the reference seq files
     var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
     var refFastaFile = genomeBuildHelper.getFastaPath(refName);
-    
 
 
     var contigStr = "";
@@ -666,7 +684,6 @@ var effectCategories = [
       cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-
     // VEP
     var vepArgs = [];
     vepArgs.push(" --assembly");
@@ -687,7 +704,23 @@ var effectCategories = [
       vepArgs.push("--fasta");
       vepArgs.push(refFastaFile);
     }
-    cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
+
+    //
+    //  SERVER SIDE CACHING
+    //
+    var cacheKey = null;
+    var urlParameters = {};
+    if (cache) {
+        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        console.log(cacheKey);
+        urlParameters.cache = cacheKey;
+        urlParameters.partialCache = true;
+        cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
+    } else {
+        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
+    }
+
+
 
 
     var annotatedData = "";

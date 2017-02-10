@@ -7,28 +7,29 @@ module.exports = {
     selectTrio: function() {
       return this.click('@trioButton');
     },
-    selectBuild: function() {
-      return this.click('@genomeBuildSelectBox')
-                 .click(".selectize-dropdown-content [data-value='" + "GRCh37" + "']");                          
-    },
     clickLoad: function() {
       return this.click('@loadButton')
                  .api.pause(1000)
+    },
+    selectGenomeBuild: function(build) {
+      build = build || 'GRCh37';
+      return this.click('@genomeBuildSelectBox')
+                 .click("#select-build-box .selectize-dropdown-content [data-value='" + build + "']");
     }
   }],
   elements: {
-    genomeBuildSelectBox: { selector: '#select-build-box .selectize-input' },
     loadButton: { selector: '#ok-button' },
     singleProbandButton: { selector: '#single-proband-button' },
-    trioButton: { selector: '#trio-button' }
+    trioButton: { selector: '#trio-button' },
+    genomeBuildSelectBox: { selector: '#select-build-box .selectize-input' },
   },
   sections: {
     probandData: {
       selector: '#proband-data',
       commands: [{
-        selectPlatinumTrio: function() {          
+        selectPlatinumTrio: function() {
           return this.click('@variantsButton')
-                     .click('@platinumTrio')        
+                     .click('@platinumTrio')
                      .waitForElementVisible('@probandVcfSampleBox');
         },
         selectSample: function(sample) {
