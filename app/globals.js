@@ -16,8 +16,7 @@ var iobio_http_services       = (useSSL ? "https://" : "http://") + (isOffline ?
 
 
 // http services
-var geneInfoServer            = "http://" + DEV_IOBIO + "geneinfo/";   // POINTED TO STAGE!!
-//var geneInfoServer            = iobio_http_services + "geneinfo/";   
+var geneInfoServer            = iobio_http_services + "geneinfo/";   
 var genomeBuildServer         = iobio_http_services + "genomebuild/"; 
 var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
