@@ -148,14 +148,7 @@ describe('MatrixCard', function() {
 	describe('#getVariantLabel', function() {
 		var mc;
 
-		it('returns the one-based index and rsid as the label when the variant has a rsid', function() {
-			mc = new MatrixCard();
-			spyOn(window, 'getRsId').and.returnValue('rs123');
-			var variant = {};
-			expect(mc.getVariantLabel(variant, 0)).toEqual("1.  rs123");
-		});
-
-		it('returns the one-based index when the variant has no rsid', function() {
+		it('returns the one-based index', function() {
 			mc = new MatrixCard();
 			spyOn(window, 'getRsId').and.returnValue(null);
 			var variant = {};
@@ -190,12 +183,12 @@ describe('MatrixCard', function() {
 		});
 
 		it('appends an svg element with the correct attributes when the cellSize is greater than 18 and there are no option overrides', function() {
-			var options = { cellSize: 20, clazz: "clinvar_path" };
+			var options = { cellSize: 22, clazz: "clinvar_path" };
 			mc.showClinVarSymbol(selection, options);
-			expect(d3.select('#test > g').attr('transform')).toEqual("translate(3,2)");
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(2,2)");
 			var useElem = d3.select('#test > g > use');
-			expect(useElem.attr('width')).toEqual("15");
-			expect(useElem.attr('height')).toEqual("15");
+			expect(useElem.attr('width')).toEqual("17");
+			expect(useElem.attr('height')).toEqual("17");
 			expect(useElem[0]).toHaveFill("#ad494A");
 		});
 
@@ -245,14 +238,14 @@ describe('MatrixCard', function() {
 
 		it('appends an svg element with the correct transform when the cellSize is greater than 18', function() {
 			var options = {
-				cellSize: 20,
+				cellSize: 22,
 				width: "111",
 				height: "222",
 				transform: "translate(12,12)",
 				clazz: "polyphen_possibly_damaging"
 			};
 			mc.showPolyPhenSymbol(selection, options);
-			expect(d3.select('#test > g').attr('transform')).toEqual("translate(4,2)");
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(2,2)");
 			var useElem = d3.select('#test > g > use');
 			expect(useElem[0]).toHaveFill("#FB7737");
 		});
@@ -303,14 +296,14 @@ describe('MatrixCard', function() {
 
 		it('appends an svg element with the correct transform when the cellSize is greater than 18', function() {
 			var options = {
-				cellSize: 20,
+				cellSize: 22,
 				width: "111",
 				height: "222",
 				transform: "translate(12,12)",
 				clazz: "sift_tolerated_low_confidence"
 			};
 			mc.showSiftSymbol(selection, options);
-			expect(d3.select('#test > g').attr('transform')).toEqual("translate(4,2)");
+			expect(d3.select('#test > g').attr('transform')).toEqual("translate(2,2)");
 			var useElem = d3.select('#test > g > use');
 			expect(useElem[0]).toHaveFill("rgb(231, 186, 82)");
 		});
@@ -335,7 +328,7 @@ describe('MatrixCard', function() {
 
 
 	describe('#showAfExacSymbol', function() {
-		var data, mc;
+		var data, mc, options;
 
 		beforeEach(function() {
 			setFixtures(
@@ -356,14 +349,15 @@ describe('MatrixCard', function() {
 				{ clazz: "afexac_uncommon" },
 				{ clazz: "afexac_common" }
 			];
+			options = {cellSize: 22};
 			d3.selectAll('.cell').data(data);
 			mc = new MatrixCard();
 		});
 
 		it('sets the correct transform to each symbol group', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection);
-			expect($('g.afexac_unique_nc')).toHaveAttr('transform', 'translate(2,2)');
+			mc.showAfExacSymbol(selection, options);
+			expect($('g.afexac_unique_nc')).toHaveAttr('transform', 'translate(6,6)');
 			expect($('g.afexac_unique')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.afexac_uberrare')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.afexac_superrare')).toHaveAttr('transform', 'translate(2,2)');
@@ -374,7 +368,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct fill to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection, options);
 			expect($('g.afexac_unique_nc > use')).toHaveFill('none');
 			expect($('g.afexac_unique > use')).toHaveFill('rgb(199, 0, 1)');
 			expect($('g.afexac_uberrare > use')).toHaveFill('rgb(204, 28, 29)');
@@ -386,7 +380,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct stroke to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection, options);
 			expect($('g.afexac_unique_nc > use')).toHaveStroke('#6b6666');
 			expect($('g.afexac_unique > use')).toHaveStroke('none');
 			expect($('g.afexac_uberrare > use')).toHaveStroke('none');
@@ -398,7 +392,31 @@ describe('MatrixCard', function() {
 
 		it('sets the correct width on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection);
+			mc.showAfExacSymbol(selection, options);
+			expect($('g.afexac_unique_nc > use')).toHaveAttr('width', '10');
+			expect($('g.afexac_unique > use')).toHaveAttr('width', '17');
+			expect($('g.afexac_uberrare > use')).toHaveAttr('width', '17');
+			expect($('g.afexac_superrare > use')).toHaveAttr('width', '17');
+			expect($('g.afexac_rare > use')).toHaveAttr('width', '17');
+			expect($('g.afexac_uncommon > use')).toHaveAttr('width', '17');
+			expect($('g.afexac_common > use')).toHaveAttr('width', '17');
+		});
+
+		it('sets the correct height on each symbol <use> element', function() {
+			var selection = d3.selectAll('.cell');
+			mc.showAfExacSymbol(selection, options);
+			expect($('g.afexac_unique_nc > use')).toHaveAttr('height', '10');
+			expect($('g.afexac_unique > use')).toHaveAttr('height', '17');
+			expect($('g.afexac_uberrare > use')).toHaveAttr('height', '17');
+			expect($('g.afexac_superrare > use')).toHaveAttr('height', '17');
+			expect($('g.afexac_rare > use')).toHaveAttr('height', '17');
+			expect($('g.afexac_uncommon > use')).toHaveAttr('height', '17');
+			expect($('g.afexac_common > use')).toHaveAttr('height', '17');
+		});
+
+		it('sets the correct width on each symbol <use> element when cell size < 18', function() {
+			var selection = d3.selectAll('.cell');
+			mc.showAfExacSymbol(selection, {cellSize: 17});
 			expect($('g.afexac_unique_nc > use')).toHaveAttr('width', '11');
 			expect($('g.afexac_unique > use')).toHaveAttr('width', '12');
 			expect($('g.afexac_uberrare > use')).toHaveAttr('width', '12');
@@ -407,22 +425,10 @@ describe('MatrixCard', function() {
 			expect($('g.afexac_uncommon > use')).toHaveAttr('width', '12');
 			expect($('g.afexac_common > use')).toHaveAttr('width', '12');
 		});
-
-		it('sets the correct height on each symbol <use> element', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection);
-			expect($('g.afexac_unique_nc > use')).toHaveAttr('height', '11');
-			expect($('g.afexac_unique > use')).toHaveAttr('height', '12');
-			expect($('g.afexac_uberrare > use')).toHaveAttr('height', '12');
-			expect($('g.afexac_superrare > use')).toHaveAttr('height', '12');
-			expect($('g.afexac_rare > use')).toHaveAttr('height', '12');
-			expect($('g.afexac_uncommon > use')).toHaveAttr('height', '12');
-			expect($('g.afexac_common > use')).toHaveAttr('height', '12');
-		});
 	});
 
 	describe('#showAf1000gSymbol', function() {
-		var data, mc;
+		var data, mc, options;
 
 		beforeEach(function() {
 			setFixtures(
@@ -441,13 +447,14 @@ describe('MatrixCard', function() {
 				{ clazz: "af1000g_uncommon" },
 				{ clazz: "af1000g_common" }
 			];
+			options = {cellSize: 22};
 			d3.selectAll('.cell').data(data);
 			mc = new MatrixCard();
 		});
 
 		it('sets the correct transform to each symbol group', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection, options);
 			expect($('g.af1000g_unique')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.af1000g_uberrare')).toHaveAttr('transform', 'translate(2,2)');
 			expect($('g.af1000g_superrare')).toHaveAttr('transform', 'translate(2,2)');
@@ -458,7 +465,7 @@ describe('MatrixCard', function() {
 
 		it('sets the correct fill to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection, options);
 			expect($('g.af1000g_unique > use')).toHaveFill('rgb(199, 0, 1)');
 			expect($('g.af1000g_uberrare > use')).toHaveFill('rgb(204, 28, 29)');
 			expect($('g.af1000g_superrare > use')).toHaveFill('rgb(255, 44, 0)');
@@ -469,7 +476,28 @@ describe('MatrixCard', function() {
 
 		it('sets the correct width on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection);
+			mc.showAf1000gSymbol(selection, options);
+			expect($('g.af1000g_unique > use')).toHaveAttr('width', '17');
+			expect($('g.af1000g_uberrare > use')).toHaveAttr('width', '17');
+			expect($('g.af1000g_superrare > use')).toHaveAttr('width', '17');
+			expect($('g.af1000g_rare > use')).toHaveAttr('width', '17');
+			expect($('g.af1000g_uncommon > use')).toHaveAttr('width', '17');
+			expect($('g.af1000g_common > use')).toHaveAttr('width', '17');
+		});
+
+		it('sets the correct height on each symbol <use> element', function() {
+			var selection = d3.selectAll('.cell');
+			mc.showAf1000gSymbol(selection, options);
+			expect($('g.af1000g_unique > use')).toHaveAttr('height', '17');
+			expect($('g.af1000g_uberrare > use')).toHaveAttr('height', '17');
+			expect($('g.af1000g_superrare > use')).toHaveAttr('height', '17');
+			expect($('g.af1000g_rare > use')).toHaveAttr('height', '17');
+			expect($('g.af1000g_uncommon > use')).toHaveAttr('height', '17');
+			expect($('g.af1000g_common > use')).toHaveAttr('height', '17');
+		});
+		it('sets the correct width on each symbol <use> element', function() {
+			var selection = d3.selectAll('.cell');
+			mc.showAf1000gSymbol(selection, {cellSize: 17});
 			expect($('g.af1000g_unique > use')).toHaveAttr('width', '12');
 			expect($('g.af1000g_uberrare > use')).toHaveAttr('width', '12');
 			expect($('g.af1000g_superrare > use')).toHaveAttr('width', '12');
@@ -477,32 +505,22 @@ describe('MatrixCard', function() {
 			expect($('g.af1000g_uncommon > use')).toHaveAttr('width', '12');
 			expect($('g.af1000g_common > use')).toHaveAttr('width', '12');
 		});
-
-		it('sets the correct height on each symbol <use> element', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection);
-			expect($('g.af1000g_unique > use')).toHaveAttr('height', '12');
-			expect($('g.af1000g_uberrare > use')).toHaveAttr('height', '12');
-			expect($('g.af1000g_superrare > use')).toHaveAttr('height', '12');
-			expect($('g.af1000g_rare > use')).toHaveAttr('height', '12');
-			expect($('g.af1000g_uncommon > use')).toHaveAttr('height', '12');
-			expect($('g.af1000g_common > use')).toHaveAttr('height', '12');
-		});
 	});
 
 	describe('#showHomSymbol', function() {
-		var selection, mc;
+		var selection, mc, options;
 
 		beforeEach(function() {
 			setFixtures('<div id="test"></div>');
 			selection = d3.select('#test');
+			options = {cellSize: 22}
 			mc = new MatrixCard();
 		});
 
 		it('appends the right rect and text svg elements', function() {
 			var data = { clazz: 'whatever' };
 			selection.datum(data);
-			mc.showHomSymbol(selection);
+			mc.showHomSymbol(selection, options);
 			expect($('#test rect')).toHaveClass('zyg_hom');
 			expect($('#test rect')).toHaveClass('whatever');
 			expect($('#test text').text()).toEqual("Hom");
@@ -519,13 +537,13 @@ describe('MatrixCard', function() {
 		});
 
 		it('appends an svg symbol with the correct attributes when cellSize > 18', function() {
-			var options = { cellSize: 20 };
+			var options = { cellSize: 22};
 			mc.showRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
 			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
-			expect(useElem.attr('width')).toEqual('22');
-			expect(useElem.attr('height')).toEqual('22');
+			expect(useElem.attr('width')).toEqual('24');
+			expect(useElem.attr('height')).toEqual('24');
 			expect(useElem.style('pointer-events')).toEqual('none');
 		});
 
@@ -542,7 +560,7 @@ describe('MatrixCard', function() {
 			var options = {};
 			mc.showRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
 			expect(useElem.attr('width')).toEqual('20');
 			expect(useElem.attr('height')).toEqual('20');
 		});
@@ -558,13 +576,13 @@ describe('MatrixCard', function() {
 		});
 
 		it('appends an svg symbol with the correct attributes when cellSize > 18', function() {
-			var options = { cellSize: 20 };
+			var options = { cellSize: 22 };
 			mc.showDeNovoSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,0)');
+			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
 			expect(useElem.attr('xlink:href')).toEqual('#denovo-symbol');
-			expect(useElem.attr('width')).toEqual('22');
-			expect(useElem.attr('height')).toEqual('22');
+			expect(useElem.attr('width')).toEqual('24');
+			expect(useElem.attr('height')).toEqual('24');
 			expect(useElem.style('pointer-events')).toEqual('none');
 		});
 
@@ -741,13 +759,23 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol with the default attributes they are no in the underlying data', function() {
 			selection.datum({ clazz: 'blahblah' });
-			mc.showBookmarkSymbol(selection);
+			mc.showBookmarkSymbol(selection, );
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('class')).toEqual('blahblah');
 			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
-			expect(useElem.attr('width')).toEqual('12');
-			expect(useElem.attr('height')).toEqual('12');
+			expect(useElem.attr('width')).toEqual('11');
+			expect(useElem.attr('height')).toEqual('11');
 		});
+
+		it('appends an svg symbol with the correct attributes when cell size > 18', function() {
+			selection.datum({ clazz: 'blahblah', cellSize: 18 });
+			mc.showBookmarkSymbol(selection );
+			var useElem = d3.select('#test use');
+			expect($('#test g').attr('class')).toEqual('blahblah');
+			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
+		});		
 	});
 
 	describe('#showPhenotypeSymbol', function() {
