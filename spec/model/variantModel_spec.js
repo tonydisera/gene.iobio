@@ -94,7 +94,8 @@ describe('variantModel', function() {
 					}
 				},
 				CONSEQUENCE: {},
-				AF: {}
+				AF: {},
+				featureCount: 5
 			});
 		});
 
@@ -124,7 +125,8 @@ describe('variantModel', function() {
 						del: { missense_variant: { ENST000001: "ENST000001" } }
 					}
 				},
-				AF: {}
+				AF: {},
+				featureCount: 5
 			});
 		});
 
@@ -143,7 +145,8 @@ describe('variantModel', function() {
 				IMPACT: {},
 				CONSEQUENCE: {},
 				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } },
-				AF: {}
+				AF: {},
+				featureCount: 4
 			});
 		});
 
@@ -162,7 +165,8 @@ describe('variantModel', function() {
 				IMPACT: {},
 				CONSEQUENCE: {},
 				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } },
-				AF: {}
+				AF: {},
+				featureCount: 4
 			});
 		});
 
@@ -182,7 +186,8 @@ describe('variantModel', function() {
 				INHERITANCE: {},
 				IMPACT: {},
 				CONSEQUENCE: {},
-				AF: {}
+				AF: {},
+				featureCount: 4
 			});
 		});
 
@@ -200,7 +205,8 @@ describe('variantModel', function() {
 				INHERITANCE: { denovo: "denovo", recessive: "recessive" },
 				IMPACT: {},
 				CONSEQUENCE: {},
-				AF: {}
+				AF: {},
+				featureCount: 4
 			});
 		});
 
@@ -220,7 +226,8 @@ describe('variantModel', function() {
 					CONSEQUENCE: {},
 					AF: {
 						afexac_rare: { field: 'afExAC', value: 5 }
-					}
+					},
+					featureCount: 2
 				});
 			});
 		});
@@ -241,7 +248,8 @@ describe('variantModel', function() {
 					CONSEQUENCE: {},
 					AF: {
 						af1000g_unique: { field: 'af1000G', value: 2 }
-					}
+					},
+					featureCount: 2
 				});
 			});
 		});
@@ -262,7 +270,8 @@ describe('variantModel', function() {
 					CONSEQUENCE: {},
 					AF: {
 						afexac_rare: { field: 'afExAC', value: 5 }
-					}
+					},
+					featureCount: 2
 				});
 			});
 		});
@@ -283,7 +292,8 @@ describe('variantModel', function() {
 					CONSEQUENCE: {},
 					AF: {
 						af1000g_unique: { field: 'af1000G', value: 2 }
-					}
+					},
+					featureCount: 2
 				});
 			});
 		});
