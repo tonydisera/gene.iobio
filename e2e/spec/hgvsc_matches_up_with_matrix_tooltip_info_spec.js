@@ -13,10 +13,9 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;
     matrixTooltip = indexPage.section.matrixTooltip;
     filterPanel = indexPage.section.filterPanel;
-    inspectPanel = indexPage.section.inspectPanel;
   },
 
-  'Variant tooltip title in the matrix should be in sync with HGVSc in the inspect panel': function(client) {
+  'Variant tooltip title in the matrix should be in sync with HGVSc in the tooltip': function(client) {
     indexPage.load();
     client.pause(2000);
     indexPage.clickDemoGene();
@@ -26,7 +25,7 @@ module.exports = {
     matrixTrack.clickColumn(1);
     client.pause(4000);
     matrixTooltip.assertTitleContains('C->A');
-    inspectPanel.assertHGVScContains('C>A');
+    matrixTooltip.assertHGVScContains('C>A');
     client.end();
   },
 }

@@ -45,6 +45,7 @@ module.exports = {
         },
         inputDefaults: function() {
           this.inputUrl(this.api.globals.variantFileUrl);
+          this.selectGenomeBuild();
           this.selectSample('NA12878');
           this.inputAlignmentsUrl(this.api.globals.NA12878SampleFileUrl);
         }

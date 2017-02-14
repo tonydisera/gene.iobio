@@ -1,11 +1,11 @@
 module.exports = {
 
   elements: {
-    filter: { selector: '.nav.navbar-nav:first-child li:first-child' },
-    inspect: { selector: '.nav.navbar-nav:first-child li:nth-child(2)' },
-    genes: { selector: '.nav.navbar-nav:first-child li:nth-child(3)' },
-    bookmarks: { selector: '.nav.navbar-nav:first-child li:nth-child(4)' },
-    callVariants: { selector: '.nav.navbar-nav:first-child li:nth-child(5)' },
+    genes: { selector: '.nav.navbar-nav:first-child li:nth-child(2)' },
+    inspect: { selector: '.nav.navbar-nav:first-child li:nth-child(3)' },
+    filter: { selector: '.nav.navbar-nav:first-child li:nth-child(4)' },
+    bookmarks: { selector: '.nav.navbar-nav:first-child li:nth-child(5)' },
+    callVariants: { selector: '.nav.navbar-nav:first-child li:nth-child(6)' },
     enterGeneName: { selector: '#enter-gene-name' },
     data: { selector: '.nav.navbar-nav:first-child li:nth-child(7)' }
   },

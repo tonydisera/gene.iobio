@@ -21,17 +21,17 @@ module.exports = {
     nav.clickGenes();
     findGenesPanel.clickACMG56Genes();
     client.pause(3000);
-    nav.searchGene('STK11');
+    nav.searchGene('PLCXD1');
 
     nav.clickData();
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 
     appTitleSection.section.selectedGeneBadge.waitForElementVisible('@warning');
-    appTitleSection.goToPage(2);
     appTitleSection.goToPage(1);
+    appTitleSection.goToPage(2);
 
-    appTitleSection.assertGeneBadgeHasWarning('STK11');
+    appTitleSection.assertGeneBadgeHasWarning('PLCXD1');
     client.end();
   }
 }

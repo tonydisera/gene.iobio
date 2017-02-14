@@ -22,7 +22,7 @@ module.exports = {
     inspectPanel: '#slider-left #examine-card',
     recallPanel: '#slider-left #recall-card',
     bookmarkPanel: '#slider-left #bookmark-card',
-    appTitleSection: '#app-title-section',
+    appTitleSection: '#genes-panel',
     dataCard: '#data-card',
     matrixTrack: '#matrix-track',
     matrixTooltip: '#feature-matrix .tooltip',

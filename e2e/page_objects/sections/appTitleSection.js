@@ -1,5 +1,5 @@
 module.exports = {
-  selector: '#app-title-section',
+  selector: '#genes-panel',
   commands: [{
     removeGene: function(gene) {
       var remove_link = "//div[@id='gene-badge' and button/span/text() = '" + gene + "']/a[@id='gene-badge-remove']";
