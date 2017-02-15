@@ -1594,7 +1594,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	
 	// Filter variants
 	var filterObject = filterCard.getFilterObject();
-	var filteredData = this.model.filterVariants(data, filterObject);
+	var filteredData = this.model.filterVariants(data, filterObject, window.gene.start, window.gene.end);
 
 /*
 	me.cardSelector.find(".filter-flag").addClass("hide");

@@ -1570,7 +1570,7 @@ VariantModel.prototype._pileupVariants = function(features, start, end) {
 	var featureWidth = isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 4;
 	var posToPixelFactor = Math.round((end - start) / width);
 	var widthFactor = featureWidth + (isLevelEdu || isLevelBasic ? EDU_TOUR_VARIANT_SIZE * 2 : 4);
-	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, window.gene.start, posToPixelFactor, widthFactor);
+	var maxLevel = this.vcf.pileupVcfRecords(theFeatures, start, posToPixelFactor, widthFactor);
 	if ( maxLevel > 30) {
 		for(var i = 1; i < posToPixelFactor; i++) {
 			// TODO:  Devise a more sensible approach to setting the min width.  We want the 
@@ -2176,17 +2176,7 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function() {
 
 
 
-VariantModel.prototype.filterFreebayesVariants = function(filterObject) {
-	if (this.fbData != null) {
-		return  this.filterVariants(this.fbData, filterObject)
-	} else {
-		return null;
-	}
-} 
-
-
-
-VariantModel.prototype.filterVariants = function(data, filterObject, bypassRangeFilter) {
+VariantModel.prototype.filterVariants = function(data, filterObject, start, end, bypassRangeFilter) {
 	var me = this;
 
 	var afFieldExac  = "afExAC";
@@ -2219,8 +2209,8 @@ VariantModel.prototype.filterVariants = function(data, filterObject, bypassRange
 
 		var meetsRegion = true;
 		if (!bypassRangeFilter) {
-			if (window.regionStart != null && window.regionEnd != null ) {
-				meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
+			if (start != null && end != null ) {
+				meetsRegion = (d.start >= start && d.start <= end);
 			}			
 		}
 
@@ -2375,9 +2365,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, bypassRange
 		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic;
 	});
 
-	var pileupObject = this._pileupVariants(filteredFeatures,
-		regionStart ? regionStart : window.gene.start,
-		regionEnd   ? regionEnd   : window.gene.end);
+	var pileupObject = this._pileupVariants(filteredFeatures, start, end);
 
 	var vcfDataFiltered = {
 		count: data.count,
@@ -2385,14 +2373,14 @@ VariantModel.prototype.filterVariants = function(data, filterObject, bypassRange
 		countUnique: data.countUnique,
 		sampleCount : data.sampleCount,
 		intronsExcludedCount: intronsExcludedCount,
-		end: regionEnd,
+		end: end,
 		features: filteredFeatures,
 		maxLevel: pileupObject.maxLevel + 1,
 		featureWidth: pileupObject.featureWidth,
 		name: data.name,
-		start: regionStart,
+		start: start,
 		strand: data.strand,
-		variantRegionStart: regionStart
+		variantRegionStart: start
 	};
 	return vcfDataFiltered;
 }

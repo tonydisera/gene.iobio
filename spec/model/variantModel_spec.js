@@ -337,7 +337,7 @@ describe('variantModel', function() {
 	describe('#_pileupVariants', function() {
 		it('returns the correct maxLevel and featureWidth', function() {
 			window.gene = { start: 100 };
-			var start = 1;
+			var start = 100;
 			var end = 1001;
 			var variants = [{}, {}, {}, {}];
 			var vcf = { pileupVcfRecords: jasmine.createSpy().and.returnValue(30) };
@@ -415,17 +415,13 @@ describe('variantModel', function() {
 				'annotsToInclude': {},
 				'exonicOnly': false
 		  };
-			window.regionStart = null;
-			window.regionEnd = null;
 			variantModel.setRelationship('proband');
 			spyOn(variantModel, '_pileupVariants').and.returnValue({ maxLevel: 10, featureWidth: 100 });
 		});
 
 		it('returns an object containing all the filtered vcf data', function() {
 			data.features = [];
-			window.regionStart = 100;
-			window.regionEnd = 200;
-			var vcfDataFiltered = variantModel.filterVariants(data, filterObject);
+			var vcfDataFiltered = variantModel.filterVariants(data, filterObject, 100, 200);
 			expect(vcfDataFiltered).toEqual({
 				count: 33,
 				countMatch: 10,
@@ -460,7 +456,7 @@ describe('variantModel', function() {
 		});
 
 		describe('when there is not a PASS filter applied to the vcf records', function() {
-			it('assigns a feature class of low-quality for each variant that does not have a PASS filter record', function() {
+			it('assigns a feature class of low-quality for each variant that does not have a PASS filter record', function() {			
 				spyOn(filterCard, 'shouldWarnForNonPassVariants').and.returnValue(false);
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features[0].featureClass).toBeUndefined();
@@ -471,13 +467,13 @@ describe('variantModel', function() {
 		});
 
 		it('filters out variants that do not start within the specified region', function() {
-			window.regionStart = 5;
-			window.regionEnd = 10;
+			start = 5;
+			end = 10;
 			variant_1.start = 5;
 			variant_2.start = 8;
 			variant_3.start = 12;
 			variant_4.start = 1;
-			var filteredData = variantModel.filterVariants(data, filterObject);
+			var filteredData = variantModel.filterVariants(data, filterObject, start, end);
 			expect(filteredData.features).toEqual([variant_1, variant_2]);
 		});
 

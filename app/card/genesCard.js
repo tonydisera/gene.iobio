@@ -1322,7 +1322,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 		if (theVcfData == null ) {
 			me.setGeneBadgeWarning(window.gene.gene_name, true);
 		} else if (theVcfData.features && theVcfData.features.length > 0) {
-			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 

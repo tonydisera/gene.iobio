@@ -239,7 +239,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, callb
 		// summarize the variants for the proband to
 		// create the gene badges, representing the
 		// most pathogenic variants for this gene
-		var filteredVcfData = getVariantCard('proband').model.filterVariants(probandVcfData, filterCard.getFilterObject(), true);
+		var filteredVcfData = getVariantCard('proband').model.filterVariants(probandVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
 		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData);
 		
 		genesCard._geneBadgeLoading(geneObject.gene_name, false);
@@ -425,7 +425,8 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 
 		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
 		  		var theVcfData = CacheHelper.getCachedData(key);
-		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), true);
+		  		var geneObject = window.geneObjects[keyObject.gene];
+		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
 
 		  		geneCount.total++;
 		  		if (filteredVcfData.features.length > 0) {

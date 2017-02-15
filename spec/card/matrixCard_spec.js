@@ -759,7 +759,7 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol with the default attributes they are no in the underlying data', function() {
 			selection.datum({ clazz: 'blahblah' });
-			mc.showBookmarkSymbol(selection, );
+			mc.showBookmarkSymbol(selection );
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('class')).toEqual('blahblah');
 			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
@@ -768,8 +768,8 @@ describe('MatrixCard', function() {
 		});
 
 		it('appends an svg symbol with the correct attributes when cell size > 18', function() {
-			selection.datum({ clazz: 'blahblah', cellSize: 18 });
-			mc.showBookmarkSymbol(selection );
+			selection.datum({ clazz: 'blahblah'});
+			mc.showBookmarkSymbol(selection, {cellSize: 22} );
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('class')).toEqual('blahblah');
 			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
@@ -826,12 +826,12 @@ describe('MatrixCard', function() {
 		it('appends a rect when the type is SNP', function() {
 			selection.datum({ clazz: 'blah' });
 			d3.select('#parent').datum({ type: 'snp' });
-			var options = { cellSize: 20 };
+			var options = { cellSize: 22 };
 			mc.showImpactSymbol(selection, options);
 			var rectElem = d3.select('#child > g > rect');
-			expect($('#child g').attr('transform')).toEqual('translate(6,5)');
-			expect(rectElem.attr('width')).toEqual('10');
-			expect(rectElem.attr('height')).toEqual('10');
+			expect($('#child g').attr('transform')).toEqual('translate(4,4)');
+			expect(rectElem.attr('width')).toEqual('12');
+			expect(rectElem.attr('height')).toEqual('12');
 			expect(rectElem[0]).toHaveClass('filter-symbol');
 			expect(rectElem[0]).toHaveClass('blah');
 			expect(rectElem[0]).toHaveClass('snp');
@@ -840,21 +840,21 @@ describe('MatrixCard', function() {
 		it('appends a rect when the type is MNP', function() {
 			selection.datum({ clazz: 'blah' });
 			d3.select('#parent').datum({ type: 'mnp' });
-			var options = {};
+			var options = {cellSize: 22};
 			mc.showImpactSymbol(selection, options);
 			var rectElem = d3.select('#child > g > rect');
 			expect($('#child g').attr('transform')).toEqual('translate(4,4)');
-			expect(rectElem.attr('width')).toEqual('8');
-			expect(rectElem.attr('height')).toEqual('8');
+			expect(rectElem.attr('width')).toEqual('12');
+			expect(rectElem.attr('height')).toEqual('12');
 		});
 
 		it('appends a path when the type is not SNP or MNP', function() {
 			selection.datum({ clazz: 'blah' });
 			d3.select('#parent').datum({ type: 'asdf' });
-			var options = { cellSize: 20 };
+			var options = { cellSize: 22 };
 			mc.showImpactSymbol(selection, options);
 			var pathElem = d3.select('#child > g > path');
-			expect($('#child g').attr('transform')).toEqual("translate(9,9)");
+			expect($('#child g').attr('transform')).toEqual("translate(10,10)");
 			expect(pathElem[0]).toHaveClass('filter-symbol');
 			expect(pathElem[0]).toHaveClass('blah');
 			expect(pathElem[0]).toHaveClass('asdf');
