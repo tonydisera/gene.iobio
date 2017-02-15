@@ -494,6 +494,7 @@ FilterCard.prototype.setExonicOnlyFilter = function(on) {
 		on  = true;
 	}
 	$('#exonic-only-cb').prop('checked', on);
+	this.displayFilterSummary();
 }
 
 

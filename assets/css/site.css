@@ -2772,7 +2772,7 @@ text.ref-count {
   padding: 5px 1px 1px 1px;
   margin: 0px;
   color: #717171;
-  line-height: 13px;
+  line-height: 15px;
   border: thin solid #e8e6e6; }
   #gene-badge-button.user-visited {
     border: 2px solid #c5c4c4;
@@ -2780,7 +2780,17 @@ text.ref-count {
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-left: 3px;
+    padding-top: 1px;
     float: right; }
+  #gene-badge-button #gene-badge-phenotype-symbol {
+    float: right;
+    height: 14px;
+    padding-top: 1px; }
+  #gene-badge-button #gene-badge-loader {
+    width: 14px;
+    height: 14px;
+    float: left;
+    padding-top: 1px; }
 
 #gene-badge {
   margin-top: 0px;
@@ -2819,7 +2829,8 @@ text.ref-count {
   float: left;
   font-size: 12px;
   color: rgba(230, 126, 30, 0.84);
-  padding-top: 1px;
+  padding-top: 0px;
+  padding-bottom: 1px;
   padding-right: 2px;
   display: none; }
 

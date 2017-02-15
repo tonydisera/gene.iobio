@@ -174,6 +174,7 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	var dangerCounts = {};
 	if (theVcfData == null || theVcfData.features.length == 0) {
 		console.log("unable to summarize danger due to null data");
+		dangerCounts.error = "unable to summarize danger due to null data";
 		return dangerCounts;
 	}
 	var siftClasses = {};
@@ -949,10 +950,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		}
 				    	}
 				    	if (theGeneObject) {
-				    		if (me.getRelationship() == 'proband') {
-					    		me.pruneIntronVariants(data);
-				    		}
-	
+
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
 					    	// variants.
@@ -1036,7 +1034,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					    }
 
 				    	// Cache the data (if there are variants)
-				    	if (data.features.length > 0) {
+				    	if (data && data.features) {
 					    	if (!me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript)) {
 					    		reject("Unable to cache annotated variants for gene " + data.gene.gene_name);
 					    	};	
@@ -1372,10 +1370,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    	var theVcfData = data[1];
 
 		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-		    	// If we have more than 500 variants, exclude intron variants d
-		    	if (me.getRelationship() == 'proband') {
-					me.pruneIntronVariants(theVcfData);
-		    	}
+
 
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 			    // can be filtered by range.

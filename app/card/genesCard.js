@@ -387,8 +387,10 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		// If the danger summary has already been determined,
 		// set the appropriate gene badges.
 		var geneSummary = getProbandVariantCard().getDangerSummaryForGene(name);
-		if (geneSummary) {
+		if (geneSummary && geneSummary.error == null) {
 			me.setGeneBadgeGlyphs(name, geneSummary);
+		} else if (geneSummary && geneSummary.error) {
+			me.setGeneBadgeWarning(name);
 		}
 		if (geneUserVisits[name]) {
 			me.flagUserVisitedGene(name);
@@ -1321,6 +1323,11 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 
 		if (theVcfData == null ) {
 			me.setGeneBadgeWarning(window.gene.gene_name, true);
+		} else if (theVcfData.features && theVcfData.features.length == 0) {
+			// There are 0 variants.  Summarize danger so that we know we have
+			// analyzed this gene
+			me.setGeneBadgeWarning(window.gene.gene_name, true);
+			vc.summarizeDanger(window.gene.gene_name, theVcfData);
 		} else if (theVcfData.features && theVcfData.features.length > 0) {
 			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData);
@@ -1616,7 +1623,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		var afValue  = dangerObject.AF[clazz].value;
 		if (clazz && afField) {
 			geneBadge.find('#gene-badge-symbols').append("<svg class=\"af-badge\" height=\"12\" width=\"12\">");
-			var options = {width:10, height:10, transform: 'translate(0,-1)'};
+			var options = {width:10, height:10, transform: 'translate(0,0)'};
 			var selection = d3.select(geneBadge.find('#gene-badge-symbols .af-badge')[0]).data([{clazz: clazz}]);
 			var symbolFunction = afField == 'afExAC' ? matrixCard.showAfExacSymbol : matrixCard.showAf1000gSymbol;
 			symbolFunction(selection, options);			

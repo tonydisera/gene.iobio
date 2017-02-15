@@ -32,19 +32,14 @@ module.exports = {
       client.acceptAlert();
       appTitleSection.assertGeneBadgesLoaded(['BRCA1']);
       appTitleSection.clickAnalyzeAll();
+      appTitleSection.waitForAnalyzeAllDone();
       appTitleSection.assertGeneBadgesLoaded([
-        'BRCA2', 'TP53', 'STK11', 'MLH1', 'MSH2', 'MSH6', 'PMS2',
-        'APC', 'MUTYH', 'VHL', 'MEN1', 'RET', 'PTEN', 'RB1', 'SDHD',
-        'SDHAF2', 'SDHC', 'SDHB', 'TSC1', 'TSC2', 'WT1', 'NF2', 'COL3A1',
-        'FBN1', 'TGFBR1', 'TGFBR2', 'SMAD3', 'ACTA2', 'MYLK', 'MYH11', 'MYBPC3',
-        'MYH7', 'TNNT2', 'TNNI3', 'TPM1', 'MYL3', 'ACTC1', 'PRKAG2', 'GLA'
+         'CACNA1S', 'TNNT2', 'APOB', 'LDLR', 'SCN5A'
       ]);
       appTitleSection.goToPage(2);
       appTitleSection.assertGeneBadgesLoaded([
-        'MYL2', 'LMNA', 'RYR2', 'PKP2', 'DSP', 'DSC2', 'TMEM43', 'DSG2',
-        'KCNQ1', 'KCNH2', 'SCN5A', 'LDLR', 'APOB', 'PCSK9', 'RYR1', 'CACNA1S'
+        'SDHB', 'TGFBR2', 'TPM1', 'RYR1'
       ]);
-      indexPage.click('.ajs-primary.ajs-buttons button:first-child');
       client.end();
     });
   }
