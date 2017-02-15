@@ -950,10 +950,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				    		}
 				    	}
 				    	if (theGeneObject) {
-				    		if (me.getRelationship() == 'proband') {
-					    		me.pruneIntronVariants(data);
-				    		}
-	
+
 					    	// Cache the data if variants were retreived.  If no variants, don't
 					    	// cache so we can retry to make sure there wasn't a problem accessing
 					    	// variants.
@@ -1373,10 +1370,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    	var theVcfData = data[1];
 
 		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-		    	// If we have more than 500 variants, exclude intron variants d
-		    	if (me.getRelationship() == 'proband') {
-					me.pruneIntronVariants(theVcfData);
-		    	}
+
 
 		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
 			    // can be filtered by range.
