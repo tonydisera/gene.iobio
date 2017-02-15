@@ -9,6 +9,9 @@ module.exports = {
     clickAnalyzeAll: function() {
       return this.click('@analyzeAll');
     },
+    waitForAnalyzeAllDone: function() {
+      this.waitForElementPresent('@analyzeAllDone', 60000);
+    },
     clickRemoveAll: function() {
       return this.click('@removeAll');
     },
@@ -70,7 +73,8 @@ module.exports = {
     selectedGeneBadge: { selector: '#gene-badge.selected' },
     firstGeneBadge: { selector: '#gene-badge:first-child' },
     analyzeAll: { selector: '#manage-gene-list' },
-    removeAll: { selector: '#clear-gene-list' }
+    removeAll: { selector: '#clear-gene-list' },
+    analyzeAllDone: { selector: '#analyze-all-progress.done'}
   },
   sections: {
     selectedGeneBadge: {
