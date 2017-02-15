@@ -174,6 +174,7 @@ VariantModel.summarizeDanger = function(theVcfData) {
 	var dangerCounts = {};
 	if (theVcfData == null || theVcfData.features.length == 0) {
 		console.log("unable to summarize danger due to null data");
+		dangerCounts.error = "unable to summarize danger due to null data";
 		return dangerCounts;
 	}
 	var siftClasses = {};
@@ -1036,7 +1037,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					    }
 
 				    	// Cache the data (if there are variants)
-				    	if (data.features.length > 0) {
+				    	if (data && data.features) {
 					    	if (!me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript)) {
 					    		reject("Unable to cache annotated variants for gene " + data.gene.gene_name);
 					    	};	
