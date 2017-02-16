@@ -890,43 +890,65 @@ a
   padding-top: 5px
   width: 100%
 
-  
-#welcome-panel
+#welcome-area
   text-align: center
-  background-color: white
   margin-top: 50px
-  margin-left: auto
-  margin-right: auto
-  padding-bottom: 15px
-  padding-top: 15px  
-  max-width: 530px
-  padding-left: 10px
-  padding-right: 10px
+  display: flex
+  justify-content: space-around
 
-  #welcome-label
-    color: $app-color
-    font-size: 16px
 
-  .description-paragraph
-    text-align: left
-    margin-left: 20px
-    margin-right: 20px
-    margin-top: 10px
-    color: $text-color
-    font-size: 15px
+  #welcome-panel
+    background-color: white
+    padding-bottom: 15px
+    padding-top: 15px  
+    max-width: 800px
+    padding-left: 10px
+    padding-right: 10px
 
-    li
-      padding-bottom: 10px
-      
+    #welcome-label
+      color: $app-color
+      font-size: 16px
+
+    .description-paragraph
+      text-align: left
+      margin-left: 20px
+      margin-right: 20px
+      margin-top: 10px
+      color: $text-color
+      font-size: 15px
+      width: 50%
+
       li
-        padding-bottom: 4px
+        padding-bottom: 10px
+        
+        li
+          padding-bottom: 4px
 
-  button
-    color: $app-color
-    font-size: 15px !important
-    margin-left: 7px
-    margin-right: 7px
+    button
+      color: $app-color
+      font-size: 15px !important
+      margin-left: 7px
+      margin-right: 7px
 
+    #welcome-screencast-panel
+      width: 50%
+      margin-top: 20px
+      margin-bottom: 20px
+      background-color: grey
+      margin-left: 20px
+      margin-right: 20px
+      background-image: url('../../assets/images/screencast-multigene-analysis.png')
+      background-size: cover
+
+      #play-button
+        margin-top: 90px
+        margin-bottom: auto
+        font-size: 100px
+        cursor: pointer
+        opacity: .6
+        color: white
+        font-size: 100px
+  
 
 #matrix-track
   .matrix-note-text
