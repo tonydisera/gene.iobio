@@ -2214,7 +2214,7 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 
 	genesCard.flagUserVisitedGene(window.gene.gene_name);
 
-	$('#welcome-panel').addClass("hide");
+	$('#welcome-area').addClass("hide");
 
 	relevantVariantCards.forEach(function(vc) {
 		vc.prepareToShowVariants(filterCard.classifyByImpact);
