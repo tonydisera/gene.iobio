@@ -1229,9 +1229,9 @@ function showWelcomePanel() {
 	var vcfCount = vcf != null ? Object.keys(vcf).length : 0;
 
 	if (bamCount == 0 && vcfCount == 0) {
-		$('#welcome-panel').removeClass("hide");
+		$('#welcome-area').removeClass("hide");
 	} else {
-		$('#welcome-panel').addClass("hide");
+		$('#welcome-area').addClass("hide");
 	}
 
 
