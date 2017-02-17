@@ -172,10 +172,12 @@ VariantModel.prototype.getVariantCount = function(data) {
 
 VariantModel.summarizeDanger = function(theVcfData) {
 	var dangerCounts = {};
-	if (theVcfData == null || theVcfData.features.length == 0) {
+	if (theVcfData == null ) {
 		console.log("unable to summarize danger due to null data");
 		dangerCounts.error = "unable to summarize danger due to null data";
 		return dangerCounts;
+	} else if (theVcfData.features.length == 0) {		
+		return dangerCounts;		
 	}
 	var siftClasses = {};
 	var polyphenClasses = {};
