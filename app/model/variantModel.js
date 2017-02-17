@@ -921,12 +921,21 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 	    	
 			resolve(me.vcfData);
 		} else {	
-			me._promiseVcfRefName(theGene.chr).then( function() {				
+			me._promiseVcfRefName(theGene.chr).then( function() {		
+
+				var sampleNames = me.sampleName;
+				if (sampleNames != null && sampleNames != "") {
+					if (me.relationship != 'proband') {
+						sampleNames += "," + getProbandVariantCard().getSampleName();
+					}			
+				}
+
+
 				me.vcf.promiseGetVariants(
 				   me.getVcfRefName(theGene.chr), 
 				   theGene,
 			       theTranscript,
-			       me.sampleName,
+			       sampleNames,
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false
 			    ).then( function(data) {

@@ -917,6 +917,31 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		} else if (!trioFields.FATHER.done) {
 			column.append("span").attr("class", "processing").text("analyzing..");
 		}
+
+		container.select("div.sib-zygosity").remove();
+		var sibRowCount = {affected: 0, unaffected: 0};
+		["affected", "unaffected"].forEach(function (affectedStatus) {
+			var sibZygField = affectedStatus + "_zygosity";
+			if (variant[sibZygField] && Object.keys(variant[sibZygField]).length > 0) {
+				for (sampleName in variant[sibZygField]) {
+					row = container.append("div")
+		                           .attr("class", "tooltip-row sib-info");	
+					sibRowCount[affectedStatus]++;
+		            if (sibRowCount.affected > 0 && sibRowCount.unaffected == 1) {
+		            	row.style("padding-top", "6px");		            	
+		            }
+					var zyg = variant[sibZygField][sampleName] ? variant[sibZygField][sampleName] : "";
+					row.append("div")
+				       .attr("class", "sib-zygosity tooltip-header-small")
+				       .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(affectedStatus) + " Sib " + sampleName + "</span>");
+					row.append("div")
+					   .attr("class",  "tooltip-zygosity label " + zyg.toLowerCase())
+					   .text(capitalizeFirstLetter(zyg.toLowerCase()));
+				}
+			}
+
+		});
+
     
 	} 
 }

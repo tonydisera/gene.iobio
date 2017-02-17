@@ -378,7 +378,7 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 				 Object.keys(variant[sibZygosityAttr]).forEach( function(key) {
 				 	var sibZygosity = variant[sibZygosityAttr][key];
 					if (sibZygosity != null) {
-						if (sibZygosity.toLowerCase() != 'none') {
+						if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'homref') {
 						 	matchesCount++;
 						}
 					 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
@@ -433,11 +433,10 @@ VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, zygosityAt
 	return new Promise( function(resolve, reject) {
 
 		me.probandVcfData.features.forEach(function(variant) {
-			if (variant.uasibsZygosity) {
-				variant[zygosityAttr][unaffectedSibVcfData.name] = "none";		
-			} else {
+			if (variant[zygosityAttr] == null) {
 				variant[zygosityAttr] = {};
 			}
+			variant[zygosityAttr][sibVcfData.name] = "none";		
 		});
 				
 		var idx = 0;

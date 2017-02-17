@@ -2233,6 +2233,13 @@ header {
   width: 180px;
   min-height: 25px; }
 
+.sib-zygosity {
+  width: 140px;
+  float: left; }
+
+.tooltip-row.sib-info {
+  padding-bottom: 2px; }
+
 .tooltip-zygosity {
   float: left;
   font-size: 9px;
@@ -2481,6 +2488,8 @@ text.ref-count {
   .tooltip-wide .tooltip-row {
     clear: both;
     padding-bottom: 6px; }
+    .tooltip-wide .tooltip-row.sib-info {
+      padding-bottom: 2px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
     padding-top: 4px !important;
