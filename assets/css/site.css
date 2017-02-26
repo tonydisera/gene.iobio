@@ -41,7 +41,7 @@ body {
       vertical-align: top;
       margin-bottom: 0px; }
       .navbar ul.nav > li > a p.wrapped.wide {
-        width: 70px; }
+        width: 77px; }
   .navbar ul.nav > li.active {
     color: white !important; }
     .navbar ul.nav > li.active > a {
@@ -2675,6 +2675,12 @@ text.ref-count {
   color: #717171 !important;
   font-size: 12px; }
 
+#export-file-link {
+  font-size: 12px;
+  padding-left: 4px;
+  display: inline-block;
+  padding-top: 4px; }
+
 #bookmark-panel i#remove-bookmark {
   color: #E0292B !important;
   font-weight: bold;
@@ -3373,6 +3379,6 @@ text.ref-count {
     padding-right: 6px;
     padding-left: 6px; }
     .navbar ul.nav > li > a p.wrapped.wide {
-      width: 60px; } }
+      width: 67px; } }
 
 /*# sourceMappingURL=site.css.map */

@@ -1738,6 +1738,25 @@ function getUrlParameter(sParam) {
     	return hits;
 }
 
+
+function promiseGetCachedGeneModel(geneName) {
+	return new Promise( function(resolve, reject) {
+		var theGeneObject = window.geneObjects[geneName];
+		if (theGeneObject) {
+			resolve(theGeneObject);
+		} else {
+			promiseGetGeneModel(geneName).then(function(geneObject) {
+				resolve(theGeneObject);
+			},
+			function(error) {
+				reject(error);
+			});
+		}
+
+	});
+}
+
+
 function promiseGetGeneModel(geneName) {
 	return new Promise(function(resolve, reject) {
 
@@ -3070,7 +3089,7 @@ function bookmarkVariant() {
 
 function removeBookmarkOnVariant() {
 	if (clickedVariant) {
-		var bookmarkKey = bookmarkCard.getBookmarkKey(gene.gene_name, gene.chr, clickedVariant.start, clickedVariant.ref, clickedVariant.alt);
+		var bookmarkKey = bookmarkCard.getBookmarkKey(gene.gene_name, window.selectedTranscript.transcript_id, gene.chr, clickedVariant.start, clickedVariant.ref, clickedVariant.alt);
 		bookmarkCard.removeBookmark(bookmarkKey, clickedVariant);
 	}
 }
@@ -3341,6 +3360,22 @@ function changeSiteStylesheet(cssHref) {
     newlink.setAttribute("href", cssHref);
 
     document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
+}
+
+function createDownloadLink(anchorSelector, str, fileName) {
+	
+	if(window.navigator.msSaveOrOpenBlob) {
+		var fileData = [str];
+		blobObject = new Blob(fileData);
+		$(anchorSelector).click(function(){
+			window.navigator.msSaveOrOpenBlob(blobObject, fileName);
+		});
+	} else {
+		var url = "data:text/plain;charset=utf-8," + encodeURIComponent(str);
+		$(anchorSelector).attr("download", fileName);
+		$(anchorSelector).attr("href", url);
+	}
+	$(anchorSelector).animateIt('tada', 'animate-twice');
 }
 
 

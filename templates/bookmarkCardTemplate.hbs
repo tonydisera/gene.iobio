@@ -29,6 +29,12 @@
                     </div>
                   </div>
                 </li>
+                <li>
+                  <div class="file"  id="bookmark-file-selector-item">
+                      <input type="file" id="bookmark-file-upload" onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".csv">
+                      <label class="file-button" for="bookmark-file-upload">Choose CSV file</label>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>
@@ -64,12 +70,14 @@
             </div>
           </div>
         </div>
+        <img id="export-loader" class="hide" src="assets/images/wheel.gif" style="padding-top:2px;display:inline-block;height:20px;width:17px;">
+        <a id="export-file-link" class="hide" download="gene-iobio-variants.csv" href="#">Download file</a>
       </div>
 	</div>
 
   
    <div id="bookmarks-format" class="collapse" aria-expanded="false" style="clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
-    Each line represents a variant, described by the following columns, separated by tabs:<br>
+    Each line represents a variant, described by the following columns, separated by tabs or commas:<br>
     &nbsp;&nbsp;1. Chromosome<br>
     &nbsp;&nbsp;2. Start position (in standard chromosomal<br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coordinates, i.e. first base is 0)<br> 

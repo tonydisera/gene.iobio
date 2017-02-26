@@ -251,7 +251,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 }
 
 
-VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
+VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec) {
 	var me = this;
 
 	if (type == null) {
@@ -311,12 +311,13 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 	}
 
 	var clinvarUrl = "";
+	var clinvarLink = "";
 	if (clinSigDisplay != null && clinSigDisplay != "") {
 		if (variant.clinVarUid != null && variant.clinVarUid != '') {
-			var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
-			clinvarUrl = '<a href="' + url + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+			clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
+			clinvarLink = '<a href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
 		} else {
-			clinvarUrl = clinSigDisplay;
+			clinvarLink = clinSigDisplay;
 		}		
 	}
 
@@ -344,6 +345,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
 	var vepHighestImpactDisplay = "";	
 	var vepHighestImpactDisplaySimple = "";
+	var vepHighestImpactInfo = "";
 	for (impactKey in vepHighestImpacts) {
 
 
@@ -351,10 +353,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 		if (vepHighestImpactDisplay.length > 0) {
 		  	vepHighestImpactDisplay += ", ";
 		  	vepHighestImpactDisplaySimple += ", ";
+		  	vepHighestImpactInfo += ", ";
 		}
 
-		vepHighestImpactDisplay += impactKey.toLowerCase();
+		vepHighestImpactDisplay       += impactKey.toLowerCase();
 		vepHighestImpactDisplaySimple += impactKey.toLowerCase();
+		vepHighestImpactInfo          += impactKey.toLowerCase();
 		
 		nonCanonicalEffects.forEach(function(nonCanonicalEffect) {
 			vepHighestImpactDisplay += " ("; 
@@ -362,6 +366,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 				var transcriptString = nonCanonicalEffect[effectKey].url;
 				vepHighestImpactDisplay += " " + effectKey.split("\&").join(" & ") + ' in ' + transcriptString;
 				//vepHighestImpactDisplaySimple += effectKey.split("\&").join(" & ") + "  ";
+				vepHighestImpactInfo += " " + effectKey.split("\&").join(" & ") + " in " + nonCanonicalEffect[effectKey].display;
+
 			}
 			vepHighestImpactDisplay += ")"; 
 		})
@@ -453,17 +459,18 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 		} 		
 	}
 
+	var dbSnpLink = "";
 	var dbSnpUrl = "";
 	for (var key in variant.vepVariationIds) {
 		if (key != 0 && key != '') {
 			var tokens = key.split("&");
 			tokens.forEach( function(id) {
 				if (id.indexOf("rs") == 0) {
-					if (dbSnpUrl.length > 0) {
-						dbSnpUrl += ",";
+					if (dbSnpLink.length > 0) {
+						dbSnpLink += ",";
 					}
-					var url1 = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + id;
-					dbSnpUrl +=  '<a href="' + url1 + '" target="_dbsnp"' + '>' + id + '</a>';					
+					dbSnpUrl   = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + id;
+					dbSnpLink +=  '<a href="' + dbSnpUrl + '" target="_dbsnp"' + '>' + id + '</a>';					
 				}
 			});
 		}
@@ -494,8 +501,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 	}
 
 	var clinvarRow = '';
-	if (clinvarUrl != '') {
-		clinvarRow = me._tooltipLongTextRow('ClinVar', clinvarUrl);
+	if (clinvarLink != '') {
+		clinvarRow = me._tooltipLongTextRow('ClinVar', clinvarLink);
 	}
 
 	var clinvarRow1 = '';
@@ -531,7 +538,47 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 		}
 	}
 
-	if (isLevelEdu) {
+	if (rec) {
+		rec.inheritance      = variant.inheritance ? (variant.inheritance == 'denovo' ? 'de novo' : variant.inheritance) : "";
+		rec.impact           = vepImpactDisplay;
+ 		rec.highestImpact    = vepHighestImpactInfo;
+ 		rec.consequence      = vepConsequenceDisplay;
+		rec.polyphen         = vepPolyPhenDisplay;
+		rec.SIFT             = vepSIFTDisplay;
+		rec.regulatory       = vepRegDisplay;
+		rec.rsId             = dbSnpId;
+		rec.dbSnpUrl         = dbSnpUrl;
+		rec.clinvarUrl       = clinvarUrl;
+		rec.clinvarClinSig   = clinSigDisplay;
+		rec.clinvarPhenotype = phenotypeDisplay;
+		rec.HGVSc            = vepHGVScDisplay;
+		rec.HGVSp            = vepHGVSpDisplay;
+		rec.afExAC           = (variant.afExAC == -100 ? "n/a" : variant.afExAC);
+		rec.af1000G          = variant.af1000G;
+		rec.qual             = variant.qual;
+		rec.filter           = variant.filter;
+		rec.freebayesCalled  = variant.fbCalled;
+
+		rec.zygosityProband  = variant.zygosity;
+		rec.altCountProband  = variant.genotypeAltCount;
+		rec.refCountProband  = variant.genotypeRefCount;
+		rec.depthProband     = variant.genotypeDepth;
+		rec.bamDepthProband  = variant.bamDepth;
+
+		rec.zygosityMother   = variant.motherZygosity;
+		rec.altCountMother   = variant.genotypeAltCountMother;
+		rec.refCountMother   = variant.genotypeRefCountMother;
+		rec.depthMother      = variant.genotypeDepthMother;
+		rec.bamDepthMother   = variant.bamDepthMother;
+
+		rec.zygosityFather   = variant.fatherZygosity;
+		rec.altCountFather   = variant.genotypeAltCountFather;
+		rec.refCountFather   = variant.genotypeRefCountFather;
+		rec.depthFather      = variant.genotypeDepthFather;
+		rec.bamDepthFather   = variant.bamDepthFather;
+
+		return rec;
+	} else if (isLevelEdu) {
 		return (
 			genotypeRow
 			+ me._tooltipMainHeaderRow('Severity - ' + impactLabel , '', '', '')
@@ -568,7 +615,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true)
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true)
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
-			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarUrl + '</span>', null, true)
+			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarLink + '</span>', null, true)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
@@ -586,7 +633,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink)
 			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
 			+ inheritanceModeRow
 			+ leftDiv
@@ -599,7 +646,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 	} else {
 		return (
 			qualityWarningRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpUrl)
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink)
 			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
 			+ inheritanceModeRow
 
@@ -611,7 +658,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type) {
 			+ vepHighestImpactExamineRow			
 			+ me._tooltipRow('SIFT', vepSIFTDisplay)
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay)
-			+ me._tooltipRow('ClinVar', clinvarUrl)
+			+ me._tooltipRow('ClinVar', clinvarLink)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 			+ me._tooltipRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)))
 			+ me._tooltipRow('Allele Freq 1000G', percentage(variant.af1000G))

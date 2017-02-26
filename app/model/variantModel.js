@@ -835,7 +835,7 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant) {
+VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, bypassCaching) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -871,33 +871,40 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    	if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 			    		// Now update the hgvs notation on the variant
 			    		var v = theVcfData.features[0];
-			    		var theVariants = me.vcfData.features.filter(function(d) {
-			    			if (d.start == v.start &&
-			    				d.alt == v.alt &&
-			    				d.ref == v.ref) {
-			    				return true;
-			    			} else {
-			    				return false;
-			    			}
-			    		});
-			    		if (theVariants && theVariants.length > 0) {
-				    		var theVariant = theVariants[0];
-		
-							// set the hgvs and rsid on the existing variant
-				    		theVariant.extraAnnot = true;
-				    		theVariant.vepHGVSc = v.vepHGVSc;
-				    		theVariant.vepHGVSp = v.vepHGVSp;
-				    		theVariant.vepVariationIds = v.vepVariationIds;
 
-					    	// re-cache the data
-					    	me._cacheData(me.vcfData, "vcfData", theGene.gene_name, theTranscript);	
+			    		if (bypassCaching) {
+			    			resolve(v);
 
-					    	// return the annotated variant
-							resolve(theVariant);
 			    		} else {
-			    			console.log("Cannot find corresponding variant to update HGVS notation");
-			    			reject("Cannot find corresponding variant to update HGVS notation");
-			    		}			    		
+				    		var theVariants = me.vcfData.features.filter(function(d) {
+				    			if (d.start == v.start &&
+				    				d.alt == v.alt &&
+				    				d.ref == v.ref) {
+				    				return true;
+				    			} else {
+				    				return false;
+				    			}
+				    		});
+				    		if (theVariants && theVariants.length > 0) {
+					    		var theVariant = theVariants[0];
+			
+								// set the hgvs and rsid on the existing variant
+					    		theVariant.extraAnnot = true;
+					    		theVariant.vepHGVSc = v.vepHGVSc;
+					    		theVariant.vepHGVSp = v.vepHGVSp;
+					    		theVariant.vepVariationIds = v.vepVariationIds;
+
+						    	// re-cache the data
+						    	me._cacheData(me.vcfData, "vcfData", theGene.gene_name, theTranscript);	
+
+						    	// return the annotated variant
+								resolve(theVariant);
+				    		} else {
+				    			console.log("Cannot find corresponding variant to update HGVS notation");
+				    			reject("Cannot find corresponding variant to update HGVS notation");
+				    		}			    		
+
+			    		}
 			    	} else {
 			    		console.log("Cannot get variant to update HGVS notation");
 			    		reject("Cannot get variant to update HGVS notation");
