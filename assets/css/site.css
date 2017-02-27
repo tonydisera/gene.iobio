@@ -750,7 +750,7 @@ a {
 
 #welcome-area {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 100px;
   display: flex;
   justify-content: space-around; }
   #welcome-area #welcome-panel {
@@ -762,15 +762,15 @@ a {
     padding-right: 10px; }
     #welcome-area #welcome-panel #welcome-label {
       color: #5d809d;
-      font-size: 16px; }
+      font-size: 17px; }
     #welcome-area #welcome-panel .description-paragraph {
       text-align: left;
       margin-left: 20px;
       margin-right: 20px;
-      margin-top: 10px;
+      margin-top: 50px;
       color: #717171;
       font-size: 15px;
-      width: 50%; }
+      width: 40%; }
       #welcome-area #welcome-panel .description-paragraph li {
         padding-bottom: 10px; }
         #welcome-area #welcome-panel .description-paragraph li li {
@@ -781,7 +781,8 @@ a {
       margin-left: 7px;
       margin-right: 7px; }
     #welcome-area #welcome-panel #welcome-screencast-panel {
-      width: 50%;
+      width: 60%;
+      height: 200px;
       margin-top: 20px;
       margin-bottom: 20px;
       background-color: grey;
@@ -790,7 +791,7 @@ a {
       background-image: url("../../assets/images/screencast-multigene-analysis.png");
       background-size: cover; }
       #welcome-area #welcome-panel #welcome-screencast-panel #play-button {
-        margin-top: 90px;
+        margin-top: 50px;
         margin-bottom: auto;
         font-size: 100px;
         cursor: pointer;

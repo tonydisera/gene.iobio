@@ -469,27 +469,19 @@
 
     <div id="welcome-area" class="hide">
       <div id="welcome-panel" >
-        <div id="welcome-label" style="">
-          Welcome to gene.iobio.
-        </div>  
         <div id="welcome-label">
-          A tool for disease-causing variant discovery & interrogation 
+          A web tool for disease-causing variant interrogation 
         </div>  
         <div id="welcome-panel-content" style="display:flex;justify-content:space-around">
           <div class="description-paragraph">
             <ul>
 
-              <li>On the fly annotation
-                <ul>
-                  <li>Functional impact (e.g. VEP, Sift, Polyphen)</li>
-                  <li>Allele Frequency (e.g. 1000G, ExAC)</li>
-                  <li>Inheritance Mode</li>
-                </ul>
+              <li>Real-time analysis
               </li>
 
-              <li>Visualize Variants and Read Coverage together</li>
-              <li>Analyze Trios and affected/unaffected siblings</li>
-              <li>Instantly analyze VCF and BAM files both on your hard drive or on the web with no need to upload the entire file
+              <li>On-the-fly annotation</li>
+              <li>Integrated genomic visualizations</li>
+              <li>On-demand variant calling
               </li>
             </ui>
 
@@ -505,6 +497,9 @@
           </button>
           <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');pageGuide.open()">
             <span style="">Take an app tour</span>
+          </button>
+          <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');showDataDialog()">
+            <span style="">Start your analysis</span>
           </button>
         </div>
         <div>  
