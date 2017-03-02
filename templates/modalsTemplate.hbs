@@ -211,54 +211,73 @@
 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel"  >
   <div id="data-card" class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header" style="padding-top:12px;">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <span class="modal-title">Data</span>
+      <div class="modal-header" style="padding-top:12px;text-align:center">
+        <span class="modal-title" style="float:left;display:inline-block;font-size:18px;padding-top:5px">Files</span>
 
-        <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
-          <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-            <i class="mdi-social-person"></i>
-            Single
-          </button>
-          <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <div style="float:left;">
-              <img src="assets/images/family.png" style="height:27px"/>
-            </div>
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-          </button>            
-          <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <div style="float:left;">
-              <img src="assets/images/pedigree.png" style="height:22px"/>
-            </div>
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-          </button>
-          <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <i class="mdi-editor-format-align-justify"></i>                
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-          </button>
-        </div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-pills" style="display:inline-block;margin-top:15px" role="tablist">
+          <li role="presentation" class="active">
+            <a  href="#variants" aria-controls="variants" role="tab" data-toggle="tab">Variants and Alignments</a>
+          </li>
+          <li role="presentation">
+            <a  href="#bookmarks" aria-controls="bookmarks" role="tab" data-toggle="tab">Bookmarks</a>
+          </li>
+        </ul>
+        
+        <!-- Close button -->
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
 
       </div>
-      <div class="modal-body" style="padding-top:0px;padding-bottom:0px">
-          <div  >
+      <div class="modal-body" style="padding-top:10px;padding-bottom:0px">
 
-            <div style="overflow:visible;margin-bottom:10px;">
-              <div id="select-species-box" style="width:170px;float:left;">
-                <span id="sample-data-label">Species</span>
-                <select id="select-species" class="selectized" placeholder="select species...">
-                </select>
+          
+          <div class="tab-content">
+            <!-- Variants and alignments tabs -->
+            <div role="tabpanel" class="tab-pane active" id="variants">
+
+              <div style="text-align:left">
+                <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
+                  <i class="material-icons">person</i>
+                  Single
+                </button>
+                <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  style="padding-top: 2px;padding-bottom:1px;">
+                  <div style="float:left;">
+                    <img src="assets/images/family.png" style="height:27px"/>
+                  </div>
+                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+                </button>            
+                <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  style="padding-top: 2px;padding-bottom:1px;">
+                  <div style="float:left;">
+                    <img src="assets/images/pedigree.png" style="height:22px"/>
+                  </div>
+                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+                </button>
+                <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  style="padding-top: 2px;padding-bottom:1px;">
+                  <i class="mdi-editor-format-align-justify"></i>                
+                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
+                </button>
+                <div style="float:right;display:inline-block;overflow:visible;margin-bottom:10px;">
+                  <div id="select-build-box" style="width:100px;float:right;margin-left:20px;">
+                    <span id="sample-data-label">Genome Build</span>
+                    <select id="select-build" class="selectized" placeholder="select genome build...">
+                    </select>
+                  </div>
+                  <div id="select-species-box" style="width:100px;float:right;">
+                    <span id="sample-data-label">Species</span>
+                    <select id="select-species" class="selectized" placeholder="select species...">
+                    </select>
+                  </div>
+                  <div id="species-build-warning" class="alert alert-danger hide" style="float:left;width:100%">                
+                  </div>              
+                </div>
+
               </div>
-              <div id="select-build-box" style="width:170px;float:left;margin-left:20px;">
-                <span id="sample-data-label">Genome Build</span>
-                <select id="select-build" class="selectized" placeholder="select genome build...">
-                </select>
-              </div>
-              <div id="species-build-warning" class="alert alert-danger hide" style="float:left;width:100%">                
-              </div>              
-            </div>
+
 
               <div>
                 <div id="proband-data" style="float:left;min-width:500px;">
@@ -301,22 +320,101 @@
                 </div>
               </div>
 
-          </div>   
 
-          
 
+              <div class="modal-footer" style="clear-both">
+                 
+                  <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
+                  <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
+                    <i class="material-icons">cloud_done</i>
+                    Open
+                  </button>
+                  <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>   
+
+
+
+            <!-- Bookmarks tab -->
+            <div role="tabpanel" class="tab-pane" id="bookmarks">
+
+                <form class="form-horizontal">
+                  <fieldset>
+
+
+
+                    <div id="import-bookmarks-panel" class="form-group is-empty is-fileinput" >
+                        <label class="control-label col-md-2">
+                          Import
+
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                            <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
+                            </span>
+                          </a> 
+
+                        </label>
+
+                      <div id="bookmarks-format" class="collapse" aria-expanded="false" style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+                        Each line represents a variant, described by the following columns, separated by tabs or commas:<br>
+                        &nbsp;&nbsp;1. Chromosome<br>
+                        &nbsp;&nbsp;2. Start position (in standard chromosomal<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coordinates, i.e. first base is 0)<br> 
+                        &nbsp;&nbsp;3. End position <br>
+                        &nbsp;&nbsp;4. Reference allele<br>
+                        &nbsp;&nbsp;5. Alternate allele<br>
+                        &nbsp;&nbsp;6. Gene symbol<br>
+                        
+                        <div style="padding-top:3px;">    
+                        Examples:<br>
+                        SNP C->T on chr 21 in gene AIRE:
+                        </div>
+                        <div  style="font-style:italic">
+                        21&nbsp;&nbsp;&nbsp;&nbsp;45709338&nbsp;&nbsp;&nbsp;&nbsp;45709339&nbsp;&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;T&nbsp;&nbsp;&nbsp;&nbsp;AIRE    
+                        </div>
+                        
+                        <div style="padding-top:6px;">    
+                        Deletion of nucleotide C on chr 21, gene AIRE:
+                        </div>
+                        <div style="font-style:italic">
+                        21&nbsp;&nbsp;&nbsp;&nbsp;45712356&nbsp;&nbsp;&nbsp;&nbsp;45712357&nbsp;&nbsp;&nbsp;&nbsp;AC&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;AIRE</div>
+                      </div>
+
+                        <div class="col-md-10" style="margin-top:5px;">
+                          <input type="text" readonly="" style="padding-bottom:0px" class="form-control" placeholder="Browse...">
+                          <input type="file"  id="bookmark-csv-file-upload" onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".csv,.txt">
+                        </div>
+                    </div>
+
+                    <div id="export-bookmarks-panel" class="form-group" >
+                      <div class="col-md-12">
+                         <a id="save-bookmarks-link" href="javascript:void(0)" 
+                         class="btn btn-default btn-raised" onclick="bookmarkCard.exportBookmarks('all')">
+                          Export
+                         </a>
+                        <span style="margin-left: 20px;" id="export-loader" class="hide">
+                          <img  src="assets/images/wheel.gif" style="display:inline-block;height:16px;width:16px;">
+                          Exporting bookmarks...
+                        </span>
+
+                        <a id="export-file-link" class="hide btn btn-raised btn-default" download="gene-iobio-variants.csv" href="#">
+                          <i class="material-icons" style="font-size:20px">file_download</i>
+                          Download file
+                        </a>                        
+                      </div>
+
+                    </div>
+
+
+                    
+                  </fieldset>
+                </form>
+            </div>
+
+          <div>
 
       </div>
 
-      <div class="modal-footer" style="clear-both">
-         
-          <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
-          <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
-            <i class="material-icons">cloud_done</i>
-            Load
-          </button>
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
-      </div>
+
     </div>
   </div>
 </div>

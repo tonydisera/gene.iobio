@@ -13,8 +13,10 @@ function BookmarkCard() {
 		'transcript', 
 	    'starred',
 	    'freebayesCalled',
+	    'type',
 		'impact',
 		'highestImpact', 
+		'highestImpactInfo',
 		'consequence',
 		'afExAC',
 		'af1000G',
@@ -99,7 +101,12 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
 		// Handle errors load
 		reader.onload = function(event) {
 			var data = event.target.result;
-			me.importBookmarksCSV(data)
+			if (bookmarkFile.name.indexOf(".csv") == (bookmarkFile.name.length - 4)) {
+				me.importBookmarksCSV(data)
+			} else {
+				me.importBookmarks(data)
+			}
+			$('#dataModal').modal('hide');
 		    fileSelection.value = null;
 		}
 		reader.onerror = function(event) {
@@ -182,34 +189,38 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 
 }
 
-BookmarkCard.prototype.importBookmarks = function() {
+BookmarkCard.prototype.importBookmarks = function(data) {
 	var me = this;
-
-	//chrom	start	end	ref	alt	gene
-	var bookmarksString = $('#bookmarks-to-import').val();
-	// trim newline at very end
-	bookmarksString = bookmarksString.replace(/\s*$/, "");
 
 	
 	me.bookmarkedVariants = {};
-	var recs = bookmarksString.split("\n");
+	var recs = data.split("\n");
 	recs.forEach( function(rec) {
 		var fields = rec.split(/\s+/);
 
-		if (fields.length >= 6) {
+		if (fields.length >= 5) {
 			var chrom        = fields[0];
 			var start        = +fields[1];
 			var end          = +fields[2];
 			var ref          = fields[3];
 			var alt          = fields[4];
 			var geneName     = fields[5];
-			var transcriptId = fields[6];
+			var transcriptId = null;
+			if (fields.length > 5) {
+				transcriptId = fields[6];
+			}
+
+			// Skip the first line if it contains column names
+			if (chrom == "chrom") {
+
+			} else {
+				var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
+				if (me.bookmarkedVariants[key] == null) {
+					me.bookmarkedVariants[key] = {isProxy: true, gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
+				}
+			}
 
 			
-			var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
-			if (me.bookmarkedVariants[key] == null) {
-				me.bookmarkedVariants[key] = {isProxy: true, gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
-			}
 
 		}
 	});
@@ -659,10 +670,14 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
          	if (variant.isProxy) {
          		impact = {};
-         		if (variant.impact) {
-	         		variant.impact.split(",").forEach(function(i) {
+         		if (variant.highestImpact) {
+	         		variant.highestImpact.split(",").forEach(function(i) {
 	         			impact[i] = "";
 	         		})
+         		} else if (variant.impact) {
+	         		variant.impact.split(",").forEach(function(i) {
+	         			impact[i] = "";
+	         		})         			
          		}
          		if (variant.clinvarClinSig) {
              		clinvarClinSig = {};
@@ -683,10 +698,12 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         			sift[s.split(" ").join("_")] = "";
 	         		})
          		}
-         		inheritance = variant.inheritance.split(" ").join("");
+         		if (variant.inheritance) {
+	         		inheritance = variant.inheritance.split(" ").join("");
+         		}
 
          	} else {
-	         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_COLOR;      
+	         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;      
 	         	impact = variant[impactField];
 
 	         	clinvarClinSig = variant.clinVarClinicalSignificance;
@@ -698,7 +715,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	inheritance = variant.inheritance;
          	}
          	if (impact) {
-	         	for (var theImpact in variant[impact]) {		         		
+	         	for (var theImpact in impact) {		         		
          			var svg = selection.append("svg")
 								       .attr("class", "impact-badge")
 								       .attr("height", 12)
@@ -1043,6 +1060,7 @@ BookmarkCard.prototype.exportBookmarks = function(scope) {
 			output += "\n";
 		});
 
+		$('#save-bookmarks-link').addClass("hide");
 		$('#export-loader').addClass("hide");
 		$('#export-file-link').removeClass("hide");
 		createDownloadLink("#export-file-link", output, "gene-iobio-bookmarked-variants.csv");
@@ -1058,6 +1076,11 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, rec) {
 	return new Promise( function(resolve, reject) {
 		promiseGetCachedGeneModel(rec.gene).then(function(theGeneObject) {
 			var theTranscript = null;
+			if (theGeneObject == null || theGeneObject.transcripts == null) {
+				var msg = "Unable to export bookmark.  Invalid gene. " + rec.gene;
+				console.log(msg);
+				reject(msg);
+			}
 			theGeneObject.transcripts.forEach(function(transcript) {
 				if (!theTranscript && transcript.transcript_id == rec.transcript) {
 					theTranscript = transcript;

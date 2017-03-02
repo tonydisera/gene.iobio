@@ -345,6 +345,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
 	var vepHighestImpactDisplay = "";	
 	var vepHighestImpactDisplaySimple = "";
+	var vepHighestImpactSimple = "";
 	var vepHighestImpactInfo = "";
 	for (impactKey in vepHighestImpacts) {
 
@@ -359,6 +360,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		vepHighestImpactDisplay       += impactKey.toLowerCase();
 		vepHighestImpactDisplaySimple += impactKey.toLowerCase();
 		vepHighestImpactInfo          += impactKey.toLowerCase();
+		vepHighestImpactValue          = impactKey.toUpperCase();
 		
 		nonCanonicalEffects.forEach(function(nonCanonicalEffect) {
 			vepHighestImpactDisplay += " ("; 
@@ -541,9 +543,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	if (rec) {
 		rec.inheritance      = variant.inheritance ? (variant.inheritance == 'denovo' ? 'de novo' : variant.inheritance) : "";
 		rec.impact           = vepImpactDisplay;
- 		rec.highestImpact    = vepHighestImpactInfo;
+		rec.highestImpact    = vepHighestImpactValue;
+ 		rec.highestImpactInfo = vepHighestImpactInfo;
  		rec.consequence      = vepConsequenceDisplay;
 		rec.polyphen         = vepPolyPhenDisplay;
+		rec.type             = variant.type;
 		rec.SIFT             = vepSIFTDisplay;
 		rec.regulatory       = vepRegDisplay;
 		rec.rsId             = dbSnpId;

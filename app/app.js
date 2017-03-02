@@ -872,13 +872,27 @@ function showDataDialog() {
 	if (genomeBuildHelper.getCurrentBuild() == null) {
 		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
 	} 
-	$('#dataModal').on('hidden.bs.modal', function(e) {
+	if (bookmarkCard.bookmarkedVariants	&& Object.keys(bookmarkCard.bookmarkedVariants).length > 0) {
+		$('#export-bookmarks-panel').removeClass("hide");
+	} else {
+		$('#export-bookmarks-panel').addClass("hide");
+		$('#export-bookmarks-link').removeClass("hide");
+		$('#export-loader').addClass("hide");
+		$('#export-file-link').addClass("hide");
 
-       e.preventDefault();
-
-   });
-
-
+	}	
+}
+function showDataDialogImportBookmarks() {
+	$('#dataModal a[href="#bookmarks"]').tab('show');
+	$('#import-bookmarks-panel').removeClass("hide");
+	$('#export-bookmarks-panel').addClass("hide");
+	$('#dataModal').modal('show');
+}
+function showDataDialogExportBookmarks() {
+	$('#dataModal a[href="#bookmarks"]').tab('show')
+	$('#import-bookmarks-panel').addClass("hide");
+	$('#export-bookmarks-panel').removeClass("hide");
+	$('#dataModal').modal('show');
 }
 
 
@@ -1746,7 +1760,7 @@ function promiseGetCachedGeneModel(geneName) {
 			resolve(theGeneObject);
 		} else {
 			promiseGetGeneModel(geneName).then(function(geneObject) {
-				resolve(theGeneObject);
+				resolve(geneObject);
 			},
 			function(error) {
 				reject(error);
@@ -2226,6 +2240,13 @@ function hasCalledVariants() {
 	return cards.length == getRelevantVariantCards().length;
 }
 
+function showNavVariantLinks() {
+	$('#show-filters-link').removeClass("hide");
+	$('#show-bookmarks-link').removeClass("hide");
+	$('#call-variants-link').removeClass("hide");
+	$('#variant-links-divider').removeClass("hide");
+}
+
 function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 	if (!hasDataSources()) {
 		return;
@@ -2247,6 +2268,11 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 			});
 			jointCallVariants(function() {
 				relevantVariantCards.forEach(function(vc) {
+
+					if (vc.getRelationship() == 'proband') {
+                  		showNavVariantLinks();
+                  	}
+
 					var cp = vc.promiseLoadBamDepth()
 					           .then( function(coverageData) {
 									if (coverageData) {
@@ -2296,6 +2322,10 @@ function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 			} else {
 				var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
                   .then( function() {
+
+                  	if (vc.getRelationship() == 'proband') {
+                  		showNavVariantLinks();
+                  	}
 
 					var coveragePromise = vc.promiseLoadBamDepth()
 					                 .then( function(coverageData) {

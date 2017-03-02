@@ -900,8 +900,12 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 						    	// return the annotated variant
 								resolve(theVariant);
 				    		} else {
-				    			console.log("Cannot find corresponding variant to update HGVS notation");
-				    			reject("Cannot find corresponding variant to update HGVS notation");
+				    			if (bypassCaching) {
+				    				resolve(theVariant);
+				    			} else {			    				
+					    			console.log("Cannot find corresponding variant to update HGVS notation");
+					    			reject("Cannot find corresponding variant to update HGVS notation");
+				    			}
 				    		}			    		
 
 			    		}

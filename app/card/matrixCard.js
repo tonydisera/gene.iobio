@@ -1311,10 +1311,10 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 	var transform2 = "translate(5,6)";
 	var clazz = null;
 	if (variant) {
-		type = variant.type;
+		type = variant.type ? variant.type : 'SNP';
 		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
 	} else  {
-		type = selection.datum().type;
+		type = selection.datum().type ? selection.datum().type : 'SNP';
 		transform1 = selection.datum().transform || "translate(1,1)";
 		transform2 = selection.datum().transform || "translate(5,5)";
 		clazz = selection.datum().clazz;

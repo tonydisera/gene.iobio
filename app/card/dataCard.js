@@ -614,6 +614,16 @@ DataCard.prototype.getHeadersFromVcfs = function(callback) {
 DataCard.prototype.init = function() {
 	var me = this;
 
+	$('#dataModal').on('hidden.bs.modal', function(e) {
+
+       e.preventDefault();
+
+   	});
+	$('#dataModal').on('shown.bs.modal', function() {
+		me.onShow();
+	})
+
+
 
 	$('#select-species').selectize(
 		{	
@@ -791,6 +801,10 @@ DataCard.prototype.initSibs = function() {
     	unaffectedSibIds.push(vc.getName());
     })
     $('#data-card #unaffected-sibs-select')[0].selectize.setValue(unaffectedSibIds);
+
+}
+
+DataCard.prototype.onShow = function() {
 
 }
 
