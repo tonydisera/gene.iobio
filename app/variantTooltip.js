@@ -88,8 +88,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 		for (impact in impactList) {
 			var theClazz = 'impact_' + impact;	
-			if ($(tooltip[0]).find(".tooltip-title.main-header").length > 0) {
-				$(tooltip[0]).find(".tooltip-title.main-header").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+			if ($(tooltip[0]).find(".tooltip-title.main-header:eq(1)").length > 0) {
+				$(tooltip[0]).find(".tooltip-title.main-header:eq(1)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 				var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 				matrixCard.showImpactBadge(selection);					
 			}
@@ -595,7 +595,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	} else if (type == 'tooltip') {
 		return (
 			  qualityWarningRow
-			+  me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
+			+ me._tooltipMainHeaderRow(window.gene.gene_name, window.selectedTranscript.transcript_id, '', '')
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -638,8 +639,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
+			+ me._tooltipMainHeaderRow(window.gene.gene_name, window.selectedTranscript.transcript_id, '', '')
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink)
-			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
+			+ me._tooltipHeaderRow( coord, '', '', '')
 			+ inheritanceModeRow
 			+ leftDiv
 			+ rightDiv
