@@ -2758,6 +2758,9 @@ text.ref-count {
   color: #717171 !important; }
 #bookmark-card .phenotype-symbol {
   stroke: #717171; }
+#bookmark-card .bookmark-call-button {
+  margin: 0px 0px 0px 12px;
+  padding: 0px 8px 0px 8px; }
 #bookmark-card #favorite-badge {
   stroke: #717171; }
 #bookmark-card .favorite-indicator {

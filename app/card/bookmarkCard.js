@@ -578,7 +578,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			});
 
 	me.addPhenotypeGlyphs(container);
-
+	me.addCallVariantsButton(container);
 
 	container.selectAll("div.bookmark-gene")
 	         .each( function(entry, i) {
@@ -614,10 +614,8 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
 								genesCard.selectGene(geneName, function(variantCard) {
-									if (variantCard.getRelationship() == 'proband') {
-										var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-										me._flagBookmark(variantCard, window.gene, variant, key);
-									}
+									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
+									me._flagBookmark(variantCard, window.gene, variant, key);
 								});
 							} else {
 								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
@@ -951,6 +949,89 @@ BookmarkCard.prototype.addPhenotypeGlyphs = function(container) {
 
 	});
 }
+
+BookmarkCard.prototype.addCallVariantsButton = function(container) {
+	var me = this;
+
+	
+	container.selectAll("div.bookmark-gene").each( function(entry, i) {
+		var geneContainer = d3.select(this);
+		var geneName = entry.key;
+		var entryKeys = entry.value;
+
+		entry.transcriptsToCall = {};
+		entryKeys.forEach(function(entryKey) {
+			var bookmarkEntry = me.bookmarkedVariants[entryKey];
+			if (bookmarkEntry.isProxy && bookmarkEntry.freebayesCalled == 'Y') {
+				entry.transcriptsToCall[bookmarkEntry.transcript] = true;
+				addButton = true;
+			}
+		});			
+		if (Object.keys(entry.transcriptsToCall).length > 0) {
+			var callButton = geneContainer.append("button")
+			             .attr("class", "btn btn-raised btn-default bookmark-call-button")
+						 .on("click", function(entry, i) {
+						 	var geneDiv = d3.select(this.parentNode);
+						 	var button  = d3.select(this);
+						 	button.select(".call-variants-loader").classed("hide", false);
+							me.selectedBookmarkKey = entry.key;
+
+							unpinAll();
+							var geneName = entry.key;
+							var bookmarkKeys = entry.value;
+							promiseGetCachedGeneModel(geneName).then(function(geneObject) {
+
+								for(var transcriptId in entry.transcriptsToCall) {
+									var isReady = entry.transcriptsToCall[transcriptId];
+									if (isReady) {
+										var theTranscript = null;
+										geneObject.transcripts.forEach(function(transcript) {
+											if (!theTranscript && transcript.transcript_id == transcriptId) {
+												theTranscript = transcript;
+											}
+										});						
+										if (theTranscript) {
+											window.cacheJointCallVariants(geneObject, theTranscript, function() {
+												cacheHelper.processCachedTrio(geneObject, theTranscript, function() {
+													entry.transcriptsToCall[transcriptId] = false;
+
+													d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+										         	geneDiv.classed("current", true);
+
+													if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
+														genesCard.selectGene(geneName, function() {
+															me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+														});
+													} else {
+														me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+													}
+
+												})						
+											});
+
+										}		
+
+									}
+
+								}
+							})
+
+						 });
+				callButton.append("img")
+				          .attr("class", "call-variants-loader hide")
+				          .style("width", "13px")
+				          .style("height", "13px")
+				          .style("margin-bottom", "1px")
+				          .style("margin-right", "2px")
+				          .style("display", "inline-block")
+				          .attr("src", "assets/images/wheel.gif");
+				callButton.append("span").text("Call variants");
+		}
+
+	});
+
+}
+
 
 
 BookmarkCard.prototype.addPhenotypeList = function(container) {

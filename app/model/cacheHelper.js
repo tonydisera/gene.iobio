@@ -301,6 +301,7 @@ CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 			this.cacheQueue.splice(idx,1);
 		} else {
 			console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
+			callback();
 			return;
 		}
 	}
