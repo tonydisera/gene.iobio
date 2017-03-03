@@ -347,6 +347,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var vepHighestImpactDisplaySimple = "";
 	var vepHighestImpactSimple = "";
 	var vepHighestImpactInfo = "";
+	var vepHighestImpactValue = "";
 	for (impactKey in vepHighestImpacts) {
 
 

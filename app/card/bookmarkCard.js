@@ -89,6 +89,7 @@ BookmarkCard.prototype.init = function() {
 }
 
 BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
+	var importSource = $('input[name="import-source"]:checked').val();
 	var files = fileSelection.files;
 	var me = this;
  	// Check for the various File API support.
@@ -101,10 +102,10 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
 		// Handle errors load
 		reader.onload = function(event) {
 			var data = event.target.result;
-			if (bookmarkFile.name.indexOf(".csv") == (bookmarkFile.name.length - 4)) {
+			if (importSource == "gene") {
 				me.importBookmarksCSV(data)
-			} else {
-				me.importBookmarks(data)
+			} else if (importSource == 'gemini') {
+				me.importBookmarksGemini(data)
 			}
 			$('#dataModal').modal('hide');
 		    fileSelection.value = null;
@@ -131,7 +132,7 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 	var recCount = 0;
 	var fieldNames = [];
 	var exportRecords = [];
-	data.split("\n").forEach( function(rec) {
+	data.split(/[\r\n]+/g).forEach( function(rec) {
 		/*
 		  Validate a CSV string having single, double or un-quoted values.
 			^                                   # Anchor to start of string.
@@ -181,6 +182,8 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 			var key = me.getBookmarkKey(er.gene, er.transcript, er.chrom, er.start, er.ref, er.alt);
 			if (me.bookmarkedVariants[key] == null) {
 				er.isProxy = true;
+				er.importSource = "gene"
+				er.importFormat = "csv";
 				me.bookmarkedVariants[key] = er;
 			}
 	});
@@ -189,12 +192,12 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 
 }
 
-BookmarkCard.prototype.importBookmarks = function(data) {
+BookmarkCard.prototype.importBookmarksGemini = function(data) {
 	var me = this;
 
 	
 	me.bookmarkedVariants = {};
-	var recs = data.split("\n");
+	var recs = data.split(/[\r\n]+/g);
 	recs.forEach( function(rec) {
 		var fields = rec.split(/\s+/);
 
@@ -216,7 +219,7 @@ BookmarkCard.prototype.importBookmarks = function(data) {
 			} else {
 				var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
 				if (me.bookmarkedVariants[key] == null) {
-					me.bookmarkedVariants[key] = {isProxy: true, gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
+					me.bookmarkedVariants[key] = {isProxy: true, importSource: 'gemini', importFormat: "tsv", gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
 				}
 			}
 
@@ -255,8 +258,9 @@ BookmarkCard.prototype.reviseCoord = function(bookmarkEntry, gene) {
 	var me = this;
 	var revisedBookmarkEntry = $().extend({}, bookmarkEntry);
 
-	// TODO:  Figure out coordinate space for GEMINI
-	revisedBookmarkEntry.start++;
+	if (bookmarkEntry.importSource == 'gemini') {
+		revisedBookmarkEntry.start++;
+	}
 
 	// TODO: If gene is reverse strand, change ref alt to compliment
 	if (gene.strand == "-") {
@@ -1014,8 +1018,8 @@ BookmarkCard.prototype.exportBookmarks = function(scope) {
 		rec.isFavorite = me.favorites[key];	
 
 		if (scope == "all" || rec.isFavorite) {
-			rec.start        = entry.start - 1;
-			rec.end          = entry.end - 1;
+			rec.start        = entry.start;
+			rec.end          = entry.end;
 			rec.chrom        = entry.chrom.indexOf("chr") == 0 ? entry.chrom : 'chr' + entry.chrom;
 			rec.ref          = entry.ref;
 			rec.alt          = entry.alt;
@@ -1060,7 +1064,7 @@ BookmarkCard.prototype.exportBookmarks = function(scope) {
 			output += "\n";
 		});
 
-		$('#save-bookmarks-link').addClass("hide");
+		$('#export-bookmarks-link').addClass("hide");
 		$('#export-loader').addClass("hide");
 		$('#export-file-link').removeClass("hide");
 		createDownloadLink("#export-file-link", output, "gene-iobio-bookmarked-variants.csv");

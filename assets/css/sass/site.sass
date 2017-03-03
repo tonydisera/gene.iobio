@@ -238,6 +238,31 @@ h5
     opacity: .5
     font-size: 32px
 
+.form-group
+  .radio
+    label
+      font-size: 14px
+      line-height: 16px 
+      color:  $text-color
+
+  .radio 
+    input[type=radio]:checked 
+      ~ 
+        .check
+          background-color:  $app-color
+        .circle
+          border-color: $app-color
+
+.form-group.is-focused
+  .radio
+    label
+      color:  $text-color
+
+      &:hover
+        color:  $text-color
+
+  
+
 .form-control,
 .form-group .form-control 
   background-image: -webkit-gradient(linear, left top, left bottom, from($current-color), to($current-color)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2))
@@ -873,6 +898,8 @@ a
   &:hover, &:focus
     color: $link-color !important
 
+a.btn
+  color:  $app-color !important
 
 .chosen-container a
   color: $text-color !important

@@ -808,6 +808,16 @@ DataCard.prototype.onShow = function() {
 
 }
 
+DataCard.prototype.onBookmarkImportSource = function(radio) {
+	if (radio.value == 'gene') {
+		$('#gemini-bookmark-selection').addClass("hide");
+		$('#gene-bookmark-selection').removeClass("hide");
+	} else if (radio.value == 'gemini') {
+		$('#gemini-bookmark-selection').removeClass("hide");
+		$('#gene-bookmark-selection').addClass("hide");
+	}
+}
+
 
 DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {	
 	if (!panelSelector) {

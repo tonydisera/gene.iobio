@@ -180,6 +180,20 @@ h5 {
   opacity: 0.5;
   font-size: 32px; }
 
+.form-group .radio label {
+  font-size: 14px;
+  line-height: 16px;
+  color: #717171; }
+.form-group .radio input[type=radio]:checked ~ .check {
+  background-color: #5d809d; }
+.form-group .radio input[type=radio]:checked ~ .circle {
+  border-color: #5d809d; }
+
+.form-group.is-focused .radio label {
+  color: #717171; }
+  .form-group.is-focused .radio label:hover {
+    color: #717171; }
+
 .form-control,
 .form-group .form-control {
   background-image: -webkit-gradient(linear, left top, left bottom, from(#3586c0), to(#3586c0)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
@@ -717,6 +731,9 @@ a {
   color: #2E73AB !important; }
   a:hover, a:focus {
     color: #2E73AB !important; }
+
+a.btn {
+  color: #5d809d !important; }
 
 .chosen-container a {
   color: #717171 !important; }

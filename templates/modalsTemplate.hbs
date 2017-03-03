@@ -327,7 +327,7 @@
                   <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
                   <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
                     <i class="material-icons">cloud_done</i>
-                    Open
+                    Load
                   </button>
                   <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
               </div>
@@ -343,51 +343,114 @@
 
 
 
-                    <div id="import-bookmarks-panel" class="form-group is-empty is-fileinput" >
-                        <label class="control-label col-md-2">
+                    <div id="import-bookmarks-panel" class="panel form-group is-empty is-fileinput" style="margin-bottom:10px;" >
+
+                      <div class="col-md-12">
+                        <label class="control-label">
                           Import
-
-                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
-                            <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
-                            </span>
-                          </a> 
-
                         </label>
 
-                      <div id="bookmarks-format" class="collapse" aria-expanded="false" style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
-                        Each line represents a variant, described by the following columns, separated by tabs or commas:<br>
-                        &nbsp;&nbsp;1. Chromosome<br>
-                        &nbsp;&nbsp;2. Start position (in standard chromosomal<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coordinates, i.e. first base is 0)<br> 
-                        &nbsp;&nbsp;3. End position <br>
-                        &nbsp;&nbsp;4. Reference allele<br>
-                        &nbsp;&nbsp;5. Alternate allele<br>
-                        &nbsp;&nbsp;6. Gene symbol<br>
-                        
-                        <div style="padding-top:3px;">    
-                        Examples:<br>
-                        SNP C->T on chr 21 in gene AIRE:
+                          
+
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="import-source" onclick="dataCard.onBookmarkImportSource(this)" value="gene" checked="">
+                            gene.iobio .csv file
+                          </label>
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gene-bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                              <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
+                              </span>
+                          </a>                            
+
                         </div>
-                        <div  style="font-style:italic">
-                        21&nbsp;&nbsp;&nbsp;&nbsp;45709338&nbsp;&nbsp;&nbsp;&nbsp;45709339&nbsp;&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;T&nbsp;&nbsp;&nbsp;&nbsp;AIRE    
+                        <div class="radio" style="margin-left:30px">
+                          <label>
+                            <input type="radio" onclick="dataCard.onBookmarkImportSource(this)" name="import-source" value="gemini">
+                            Gemini tab delimited file                                                         
+                          </label>
+
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gemini-bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                              <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
+                              </span>
+                          </a>                            
                         </div>
-                        
-                        <div style="padding-top:6px;">    
-                        Deletion of nucleotide C on chr 21, gene AIRE:
+
+
+                        <div id="gene-bookmarks-format" class="collapse" aria-expanded="false" 
+                          style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+
+                          Each line represents a variant, described by the following columns, separated by commas, surrounded by double quotes:<br>
+                          &nbsp;&nbsp;1. Chromosome<br>
+                          &nbsp;&nbsp;2. Start position (1-based)<br>
+                          &nbsp;&nbsp;3. End position (1-based)<br>
+                          &nbsp;&nbsp;4. Reference allele<br>
+                          &nbsp;&nbsp;5. Alternate allele<br>
+                          &nbsp;&nbsp;6. Gene symbol<br>
+                          &nbsp;&nbsp;7. Transcript Id<br>
+                          
+                          <div style="padding-top:3px;">    
+                          Examples:<br>
+                          SNP C->T on chr 21 in gene AIRE:
+                          </div>
+                          <div  style="font-style:italic">
+                          "chr21","45709339","45709339","C","T","AIRE","ENST00000291582.5"  
+                          </div>
+                          
+                          <div style="padding-top:6px;">    
+                          Deletion of nucleotide C on chr 21, gene AIRE:
+                          </div>
+                          <div style="font-style:italic">
+                          "21","45712356","45712357","AC","A","AIRE","ENST00000291582.5"
+                          </div>
+
+                        </div>                        
+
+                        <div id="gemini-bookmarks-format" class="collapse" aria-expanded="false" 
+                          style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+
+                          Each line represents a variant, described by the following columns, separated by tabs:<br>
+                          &nbsp;&nbsp;1. Chromosome<br>
+                          &nbsp;&nbsp;2. Start position (in standard chromosomal<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coordinates, i.e. first base is 0)<br> 
+                          &nbsp;&nbsp;3. End position (1-based)<br>
+                          &nbsp;&nbsp;4. Reference allele<br>
+                          &nbsp;&nbsp;5. Alternate allele<br>
+                          &nbsp;&nbsp;6. Gene symbol<br>
+                          
+                          <div style="padding-top:3px;">    
+                          Examples:<br>
+                          SNP C->T on chr 21 in gene AIRE:
+                          </div>
+                          <div  style="font-style:italic">
+                          21&nbsp;&nbsp;&nbsp;&nbsp;45709338&nbsp;&nbsp;&nbsp;&nbsp;45709339&nbsp;&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;T&nbsp;&nbsp;&nbsp;&nbsp;AIRE    
+                          </div>
+                          
+                          <div style="padding-top:6px;">    
+                          Deletion of nucleotide C on chr 21, gene AIRE:
+                          </div>
+                          <div style="font-style:italic">
+                          21&nbsp;&nbsp;&nbsp;&nbsp;45712356&nbsp;&nbsp;&nbsp;&nbsp;45712357&nbsp;&nbsp;&nbsp;&nbsp;AC&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;AIRE
+                          </div>
+
                         </div>
-                        <div style="font-style:italic">
-                        21&nbsp;&nbsp;&nbsp;&nbsp;45712356&nbsp;&nbsp;&nbsp;&nbsp;45712357&nbsp;&nbsp;&nbsp;&nbsp;AC&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;AIRE</div>
+                    
                       </div>
 
-                        <div class="col-md-10" style="margin-top:5px;">
-                          <input type="text" readonly="" style="padding-bottom:0px" class="form-control" placeholder="Browse...">
-                          <input type="file"  id="bookmark-csv-file-upload" onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".csv,.txt">
+
+                        <div class="col-md-12" id="gene-bookmark-selection" style="margin-top:5px;">
+                          <input type="text" readonly="" style="padding-bottom:0px"  class="form-control" placeholder="choose .csv file..." >
+                          <input type="file"  onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".csv">
                         </div>
+
+                        <div class="col-md-12 hide" id="gemini-bookmark-selection" style="margin-top:5px;">
+                          <input type="text" readonly="" style="padding-bottom:0px"  class="form-control" placeholder="choose txt file..." >
+                          <input type="file"  onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".txt, .tsv">
+                        </div>                        
                     </div>
 
-                    <div id="export-bookmarks-panel" class="form-group" >
+                    <div id="export-bookmarks-panel" class="panel form-group" style="margin-top:20px;margin-bottom:20px;" >
                       <div class="col-md-12">
-                         <a id="save-bookmarks-link" href="javascript:void(0)" 
+                         <a id="export-bookmarks-link" href="javascript:void(0)" 
                          class="btn btn-default btn-raised" onclick="bookmarkCard.exportBookmarks('all')">
                           Export
                          </a>

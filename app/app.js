@@ -872,14 +872,16 @@ function showDataDialog() {
 	if (genomeBuildHelper.getCurrentBuild() == null) {
 		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
 	} 
+
+	$('#import-bookmarks-panel').removeClass("hide");
+
+	$('#export-loader').addClass("hide");
+	$('#export-file-link').addClass("hide");
+	$('#export-bookmarks-link').removeClass("hide");
 	if (bookmarkCard.bookmarkedVariants	&& Object.keys(bookmarkCard.bookmarkedVariants).length > 0) {
 		$('#export-bookmarks-panel').removeClass("hide");
 	} else {
 		$('#export-bookmarks-panel').addClass("hide");
-		$('#export-bookmarks-link').removeClass("hide");
-		$('#export-loader').addClass("hide");
-		$('#export-file-link').addClass("hide");
-
 	}	
 }
 function showDataDialogImportBookmarks() {
