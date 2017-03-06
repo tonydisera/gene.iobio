@@ -835,7 +835,7 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, bypassCaching) {
+VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, format) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -866,15 +866,44 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			       true,
 			       useServerCache
 			    ).then( function(data) {
+
+			    	var rawVcfRecords = data[0];
+			    	var vcfRecord = rawVcfRecords.filter(function(record) {
+			    		if (record.indexOf("#") == 0) {
+			    			return false;
+			    		} else {
+			    			var fields = record.split("\t");
+			    			var chrom = fields[0];
+			    			var start = fields[1];
+			    			var ref   = fields[3];
+			    			var alt   = fields[4];
+			    			if (me.getVcfRefName(theGene.chr) == chrom &&
+			    				start == variant.start &&
+				    		    alt   == variant.alt &&
+				    			ref   == variant.ref) {
+				    			return true;
+				    		} else {
+				    			return false;
+				    		}
+				    		
+			    		}
+			    	});
+
+
 			    	var theVcfData = data[1];	
 
 			    	if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 			    		// Now update the hgvs notation on the variant
 			    		var v = theVcfData.features[0];
 
-			    		if (bypassCaching) {
+			    		if (format && format == 'csv') {			    			
 			    			resolve(v);
-
+			    		} else if (format && format == 'vcf') {
+			    			if (vcfRecord) {
+			    				resolve(vcfRecord);
+			    			} else {
+			    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
+			    			}
 			    		} else {
 				    		var theVariants = me.vcfData.features.filter(function(d) {
 				    			if (d.start == v.start &&

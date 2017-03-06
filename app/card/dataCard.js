@@ -808,6 +808,12 @@ DataCard.prototype.onShow = function() {
 
 }
 
+DataCard.prototype.resetExportPanel = function() {
+	$('#export-loader').addClass("hide");
+	$('#download-bookmarks').addClass("hide");
+	$('#export-bookmarks').removeClass("hide");	
+}
+
 DataCard.prototype.onBookmarkImportSource = function(radio) {
 	if (radio.value == 'gene') {
 		$('#gemini-bookmark-selection').addClass("hide");

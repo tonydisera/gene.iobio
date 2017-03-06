@@ -875,15 +875,14 @@ function showDataDialog() {
 
 	$('#import-bookmarks-panel').removeClass("hide");
 
-	$('#export-loader').addClass("hide");
-	$('#export-file-link').addClass("hide");
-	$('#export-bookmarks-link').removeClass("hide");
+	dataCard.resetExportPanel();
 	if (bookmarkCard.bookmarkedVariants	&& Object.keys(bookmarkCard.bookmarkedVariants).length > 0) {
 		$('#export-bookmarks-panel').removeClass("hide");
 	} else {
 		$('#export-bookmarks-panel').addClass("hide");
 	}	
 }
+
 function showDataDialogImportBookmarks() {
 	$('#dataModal a[href="#bookmarks"]').tab('show');
 	$('#import-bookmarks-panel').removeClass("hide");

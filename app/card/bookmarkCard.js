@@ -1075,32 +1075,46 @@ BookmarkCard.prototype.addPhenotypeList = function(container) {
 
 
 
-BookmarkCard.prototype.exportBookmarks = function(scope) {
+BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 	var me = this;	
+	$('#export-loader span').text("Exporting " + format + " file...")
 	$('#export-loader').removeClass("hide");
-	$('#export-file-link').addClass("hide");
+	$('#export-bookmarks').addClass("hide");
+	$('#download-bookmarks').addClass("hide");
 
 	// Loop through the bookmarked variants, creating a full export record for each one.
 	var promises = [];
 	var records = [];
 	for (key in this.bookmarkedVariants) {
 		var entry = me.bookmarkedVariants[key];	
-		var rec = {};
-		rec.isFavorite = me.favorites[key];	
 
-		if (scope == "all" || rec.isFavorite) {
-			rec.start        = entry.start;
-			rec.end          = entry.end;
-			rec.chrom        = entry.chrom.indexOf("chr") == 0 ? entry.chrom : 'chr' + entry.chrom;
-			rec.ref          = entry.ref;
-			rec.alt          = entry.alt;
-			rec.gene         = me.parseKey(key).gene;
-			rec.transcript   = me.parseKey(key).transcriptId;
-			rec.starred      = me.favorites[key] == true ? "Y" : "";	
+		var geneName      = me.parseKey(key).gene;
+		var transcriptId  = me.parseKey(key).transcriptId;
+		var isFavorite    = me.favorites[key];	
 
-			var promise = me._promiseCreateRecord(entry, rec).then(function(record) {
-				records.push(record);
-			});
+		if (scope == "all" || isFavorite) {
+			var promise = null;
+
+
+			if (format == 'csv') {
+				var rec = {};
+				rec.start        = entry.start;
+				rec.end          = entry.end;
+				rec.chrom        = entry.chrom.indexOf("chr") == 0 ? entry.chrom : 'chr' + entry.chrom;
+				rec.ref          = entry.ref;
+				rec.alt          = entry.alt;
+				rec.gene         = geneName;
+				rec.transcript   = transcriptId;
+				rec.starred      = isFavorite == true ? "Y" : "";	
+				
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec).then(function(record) {
+					records.push(record);
+				});
+			} else if (format == 'vcf') {
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format).then(function(vcfRecord) {
+					records.push(vcfRecord);					
+				});
+			}
 			promises.push(promise);
 		}
 
@@ -1108,48 +1122,80 @@ BookmarkCard.prototype.exportBookmarks = function(scope) {
 
 	// When all of the records have been created, output the csv file
 	Promise.all(promises).then(function() {
+		var formatDownloadButton = function(output, format) {
+			$('#export-bookmarks').addClass("hide");
+			$('#export-loader').addClass("hide");
+			$('#download-bookmarks span').text( "Download " + format + " file");
+			$('#download-bookmarks').removeClass("hide");
+			createDownloadLink("#download-bookmarks", output, "gene-iobio-bookmarked-variants." + format );
+		}
 
-		// Create the column header line
 		var output = "";
-		me.exportFields.forEach(function(fieldName) {
-			if (output.length > 0) {
-				output += ",";
-			}
-			output += "\"" + fieldName + "\"";
-		});
-		output += "\n";	
-
-		// Now create an output (csv) line for each of the bookmark records
-		records.forEach(function(rec) {
-			var isFirstTime = true;
-			me.exportFields.forEach( function(field) {
-				if (isFirstTime) {
-					isFirstTime = false;
-				} else {
-					output += ",";
-				}
-
-				var fieldValue = rec[field] ? rec[field] : "" ;
-				output +=  "\"" + fieldValue + "\"";
+		if (format == 'csv') {
+			output = me._outputCSV(records);
+			formatDownloadButton(output, format);
+		} else if (format == 'vcf') {
+			getProbandVariantCard().model.vcf.getHeader( function(headerStr) {
+				var headerRecords = [];
+				headerStr.split("\n").forEach(function(headerRec) {
+					if (headerRec.indexOf("#CHROM") == 0 || headerRec.indexOf("#chrom") == 0 ) {
+						var fields = headerRec.split("\t");
+						// Include for 8 fields (up to sample columns)
+						var applicableFields = fields.slice(0,9);
+						applicableFields.push(getProbandVariantCard().getSampleName());
+						headerRecords.push(applicableFields.join("\t"));
+					} else {
+						headerRecords.push(headerRec);
+					}
+				});
+				output = headerRecords.join("\n");
+				output += records.join("\n");
+				formatDownloadButton(output, format);
 			});
-			output += "\n";
-		});
+		}
 
-		$('#export-bookmarks-link').addClass("hide");
-		$('#export-loader').addClass("hide");
-		$('#export-file-link').removeClass("hide");
-		createDownloadLink("#export-file-link", output, "gene-iobio-bookmarked-variants.csv");
 	});
 
 }
 
+BookmarkCard.prototype._outputCSV = function(records) {
+	var me = this;
 
-BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, rec) {
+	// Create the column header line
+	var output = "";
+	me.exportFields.forEach(function(fieldName) {
+		if (output.length > 0) {
+			output += ",";
+		}
+		output += "\"" + fieldName + "\"";
+	});
+	output += "\n";	
+
+	// Now create an output (csv) line for each of the bookmark records
+	records.forEach(function(rec) {
+		var isFirstTime = true;
+		me.exportFields.forEach( function(field) {
+			if (isFirstTime) {
+				isFirstTime = false;
+			} else {
+				output += ",";
+			}
+
+			var fieldValue = rec[field] ? rec[field] : "" ;
+			output +=  "\"" + fieldValue + "\"";
+		});
+		output += "\n";
+	});
+	return output;	
+}
+
+
+BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, transcriptId, format, rec) {
 
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
-		promiseGetCachedGeneModel(rec.gene).then(function(theGeneObject) {
+		promiseGetCachedGeneModel(geneName).then(function(theGeneObject) {
 			var theTranscript = null;
 			if (theGeneObject == null || theGeneObject.transcripts == null) {
 				var msg = "Unable to export bookmark.  Invalid gene. " + rec.gene;
@@ -1157,22 +1203,28 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, rec) {
 				reject(msg);
 			}
 			theGeneObject.transcripts.forEach(function(transcript) {
-				if (!theTranscript && transcript.transcript_id == rec.transcript) {
+				if (!theTranscript && transcript.transcript_id == transcriptId) {
 					theTranscript = transcript;
 				}
 			});
 			if (theTranscript) {
 				getProbandVariantCard().model
-				 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, true)
-				 .then(function(theVariant) {
+				 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format)
+				 .then(function(data) {
 
-				 	// Merge the properties of the bookmark entry with the variant with the full annotations
-				 	// Always use the inheritance from the bookmarkEntry
-				 	var revisedVariant = $().extend({}, bookmarkEntry, theVariant);
-				 	revisedVariant.inheritance = bookmarkEntry.inheritance;
+				 	if (format == 'csv') {
+				 		var theVariant = data;
+					 	// Merge the properties of the bookmark entry with the variant with the full annotations
+					 	// Always use the inheritance from the bookmarkEntry
+					 	var revisedVariant = $().extend({}, bookmarkEntry, theVariant);
+					 	revisedVariant.inheritance = bookmarkEntry.inheritance;
 
-					variantTooltip.formatContent(revisedVariant, null, "record", rec);
-					resolve(rec);
+						variantTooltip.formatContent(revisedVariant, null, "record", rec);
+						resolve(rec);				 		
+				 	} else {
+				 		var vcfRecord = data;
+				 		resolve(vcfRecord);
+				 	}
 
 				});
 

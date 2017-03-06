@@ -355,7 +355,7 @@
                         <div class="radio">
                           <label>
                             <input type="radio" name="import-source" onclick="dataCard.onBookmarkImportSource(this)" value="gene" checked="">
-                            gene.iobio .csv file
+                            gene.iobio (comma separated) file
                           </label>
                           <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gene-bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
                               <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
@@ -366,7 +366,7 @@
                         <div class="radio" style="margin-left:30px">
                           <label>
                             <input type="radio" onclick="dataCard.onBookmarkImportSource(this)" name="import-source" value="gemini">
-                            Gemini tab delimited file                                                         
+                            Gemini (tab delimited) file                                                         
                           </label>
 
                           <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gemini-bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
@@ -449,19 +449,40 @@
                     </div>
 
                     <div id="export-bookmarks-panel" class="panel form-group" style="margin-top:20px;margin-bottom:20px;" >
+
                       <div class="col-md-12">
-                         <a id="export-bookmarks-link" href="javascript:void(0)" 
-                         class="btn btn-default btn-raised" onclick="bookmarkCard.exportBookmarks('all')">
+                        <label class="control-label">
+                          Export
+                        </label>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="export-format" onchange="dataCard.resetExportPanel()" value="csv" checked="">
+                            Excel (comma separated) file
+                          </label>
+
+                        </div>
+                        <div class="radio" style="margin-left:30px">
+                          <label>
+                            <input type="radio" name="export-format" onchange="dataCard.resetExportPanel()" value="vcf">
+                            VCF file                                                        
+                          </label>
+
+                        </div>
+                      </div>
+
+                      <div class="col-md-12" style="text-align:center">
+                         <a id="export-bookmarks" href="javascript:void(0)" 
+                         class="btn btn-default btn-raised" onclick="bookmarkCard.exportBookmarks('all', $('input[name=export-format]:checked').val())">
                           Export
                          </a>
-                        <span style="margin-left: 20px;" id="export-loader" class="hide">
+                        <span style="margin-left: 20px;display: inline-block;margin-top: 18px;margin-bottom: 18px;" id="export-loader" class="hide">
                           <img  src="assets/images/wheel.gif" style="display:inline-block;height:16px;width:16px;">
-                          Exporting bookmarks...
+                          <span>Exporting bookmarks...</span>
                         </span>
 
-                        <a id="export-file-link" class="hide btn btn-raised btn-default" download="gene-iobio-variants.csv" href="#">
+                        <a id="download-bookmarks" class="hide btn btn-raised btn-default" download="gene-iobio-variants.csv" href="#">
                           <i class="material-icons" style="font-size:20px">file_download</i>
-                          Download file
+                          <span>Download file</span>
                         </a>                        
                       </div>
 
