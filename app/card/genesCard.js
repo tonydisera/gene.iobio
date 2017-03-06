@@ -1674,7 +1674,7 @@ GenesCard.prototype.setSelectedGene = function(geneName) {
 	}
 }
 
-GenesCard.prototype.selectGene = function(geneName, callback) {
+GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLoaded) {
 	var me = this;
 
 	if (geneName == null || geneName.length == 0) {
@@ -1706,7 +1706,11 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
     	updateUrl('gene', window.gene.gene_name);
 
     	if (!isLevelBasic) {
-			loadTracksForGene();		    		
+			loadTracksForGene(false, function() {
+				if (callbackVariantsLoaded) {
+					callbackVariantsLoaded();
+				}
+			});		    		
     	}
 	    	
 	    me.updateGeneInfoLink(window.gene.gene_name, function() {

@@ -971,7 +971,7 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
 			var callButton = geneContainer.append("button")
 			             .attr("class", "btn btn-raised btn-default bookmark-call-button")
 						 .on("click", function(entry, i) {
-						 	var geneDiv = d3.select(this.parentNode);
+						 	var bookmarkGeneLink = d3.select(this.parentNode).select(".bookmark-gene");
 						 	var button  = d3.select(this);
 						 	button.select(".call-variants-loader").classed("hide", false);
 							me.selectedBookmarkKey = entry.key;
@@ -991,23 +991,13 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
 											}
 										});						
 										if (theTranscript) {
-											window.cacheJointCallVariants(geneObject, theTranscript, function() {
-												cacheHelper.processCachedTrio(geneObject, theTranscript, function() {
-													entry.transcriptsToCall[transcriptId] = false;
+											genesCard.selectGene(geneName, 
+												 function() {
 
-													d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-										         	geneDiv.classed("current", true);
-
-													if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
-														genesCard.selectGene(geneName, function() {
-															me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
-														});
-													} else {
-														me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
-													}
-
-												})						
-											});
+												 }, function() {
+												 	jointCallVariants( function() {
+												 	})
+												 });
 
 										}		
 

@@ -2021,7 +2021,7 @@ function getRidOfDuplicates(genes) {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-function loadTracksForGene(bypassVariantCards) {
+function loadTracksForGene(bypassVariantCards, callback) {
 
 	hideIntro();
 	if (window.gene == null || window.gene == "" && !isLevelBasic) {
@@ -2174,15 +2174,15 @@ function loadTracksForGene(bypassVariantCards) {
 	        function () {	
 	        	// ok		     
 	        	autoCall = true;  
-	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
 	    	},
 			function () {
 				// cancel
 				autoCall = false;
-	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
 			}).set('labels', {ok:'Yes', cancel:'No'}); 		
 	} else {
-		loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+		loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
 	}		
 	
 
@@ -2249,7 +2249,7 @@ function showNavVariantLinks() {
 	$('#variant-links-divider').removeClass("hide");
 }
 
-function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
+function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback) {
 	if (!hasDataSources()) {
 		return;
 	}
@@ -2273,6 +2273,9 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 
 					if (vc.getRelationship() == 'proband') {
                   		showNavVariantLinks();
+                  		if (callback) {
+                  			callback();
+                  		}
                   	}
 
 					var cp = vc.promiseLoadBamDepth()
@@ -2295,12 +2298,12 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 			});
 
 		} else {
-			loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards);
+			loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
 		}
 	});
 }
 
-function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
+function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback) {
 	if (bypassVariantCards == null || !bypassVariantCards) {
 
 
@@ -2376,8 +2379,12 @@ function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards) {
 				promiseDetermineInheritance().then(function() {
 					relevantVariantCards.forEach(function(vc) {
 						vc.showFinalizedVariants();
+						if (vc.getRelationship() == 'proband' && callback) {
+							callback();
+						} 
 					})
 				});
+
 
 				relevantVariantCards.forEach(function(variantCard) {
 					variantCard.showBamDepth(allMaxDepth, function() {
@@ -2651,6 +2658,10 @@ function cacheJointCallVariants(geneObject, transcript, callback) {
 	                .then(function(data) {
 	                	var theFbData = data[1];
 
+	                	theFbData.features.forEach(function(variant) {
+	                		variant.fbCalled = "Y";
+	                	})
+
 						vc.model._determineVariantAfLevels(theFbData, transcript);
 
 			        	// Pileup the variants
@@ -2659,7 +2670,7 @@ function cacheJointCallVariants(geneObject, transcript, callback) {
 						theFbData.featureWidth = pileupObject.featureWidth;				    
 
 						vc.model._cacheData(theFbData, "fbData", geneObject.gene_name, transcript);
-						vc.model._cacheData(theFbData, "vcfData", geneObject.gene_name, transcript);
+						//vc.model._cacheData(theFbData, "vcfData", geneObject.gene_name, transcript);
 						
 						sampleIndex++;
 						parseNextCalledVariants(afterParseCallback);					    				    
