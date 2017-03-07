@@ -355,7 +355,7 @@
 
                         <div class="radio">
                           <label>
-                            <input type="radio" name="import-source" onclick="dataCard.onBookmarkImportSource(this)" value="gene" checked="">
+                            <input type="radio" name="import-source" onclick="$('#gemini-bookmarks-format').removeClass('in');dataCard.onBookmarkImportSource(this)" value="gene" checked="">
                             gene.iobio (comma separated) file
                           </label>
                           <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gene-bookmarks-format" 
@@ -367,7 +367,7 @@
                         </div>
                         <div class="radio" style="margin-left:30px">
                           <label>
-                            <input type="radio" onclick="dataCard.onBookmarkImportSource(this)" name="import-source" value="gemini">
+                            <input type="radio" onclick="$('#gene-bookmarks-format').removeClass('in');dataCard.onBookmarkImportSource(this)" name="import-source" value="gemini">
                             Gemini (tab delimited) file                                                         
                           </label>
 
