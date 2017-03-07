@@ -867,7 +867,11 @@ function showSidebar(sidebar) {
 
 
 
-function showDataDialog() {
+function showDataDialog(activeTab) {
+	if (activeTab && activeTab.length > 0) {
+		var selector = '#dataModal a[href=\"#'+ activeTab + '\"]';
+		$(selector).tab('show');
+	}
 	$('#dataModal').modal('show');
 	if (genomeBuildHelper.getCurrentBuild() == null) {
 		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');

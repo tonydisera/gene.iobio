@@ -2326,12 +2326,17 @@ inputinput:-moz-placeholder {
   color: #717171; }
 #dataModal button {
   font-size: 14px; }
-#dataModal #select-build-box .selectize-dropdown, #dataModal select-species-box .selectize-dropdown {
+#dataModal #select-species-box .selectize-dropdown {
   font-size: 14px; }
-#dataModal #select-build-box .selectize-input, #dataModal select-species-box .selectize-input {
+#dataModal #select-species-box .selectize-input {
   font-size: 14px;
   line-height: 15px; }
-#dataModal #select-build-box #select-build-box .selectize-input input, #dataModal select-species-box #select-build-box .selectize-input input {
+#dataModal #select-build-box .selectize-dropdown {
+  font-size: 14px; }
+#dataModal #select-build-box .selectize-input {
+  font-size: 14px;
+  line-height: 15px; }
+#dataModal #select-build-box .selectize-input input {
   width: 145px !important; }
 
 .tooltip-title {
