@@ -483,7 +483,7 @@ DataCard.prototype.addBuildListener = function() {
 				$('#build-link').text("?");
 				window.disableLoadButton();
 				setTimeout( function() { 
-//					$('#select-build-box .selectize-input').animateIt('tada');
+					$('#select-build-box .selectize-input').animateIt('tada');
 				}, 2000);
 				
 			}
@@ -861,7 +861,7 @@ DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
 		window.enableLoadButton();
 	} else {		
 		if (wiggleWhenEmpty) {
-			//$('#select-build-box .selectize-input').animateIt('tada');			
+			$('#select-build-box .selectize-input').animateIt('tada');			
 		}
 		window.disableLoadButton();
 	}	

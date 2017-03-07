@@ -870,7 +870,7 @@ function showSidebar(sidebar) {
 function showDataDialog() {
 	$('#dataModal').modal('show');
 	if (genomeBuildHelper.getCurrentBuild() == null) {
-//		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
+		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
 	} 
 
 	$('#import-bookmarks-panel').removeClass("hide");
