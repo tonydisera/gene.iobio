@@ -67,7 +67,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 
 
 	// Sort the variants
-	me.probandVcfData.features = me.probandVcfData.features.sort(orderVariantsByPosition);
+	me.probandVcfData.features = me.probandVcfData.features.sort(VariantModel.orderVariantsByPosition);
 
 	// Compare the proband's variants to the mother's variants
 	me.promiseCompareVariants(
@@ -204,7 +204,7 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 	      comparisonAttribute = 'consensus';
 	    }
 
-	    otherVcfData.features = otherVcfData.features.sort(orderVariantsByPosition);
+	    otherVcfData.features = otherVcfData.features.sort(VariantModel.orderVariantsByPosition);
 		if (comparisonAttribute) {
 			otherVcfData.features.forEach( function(feature) {			
 				feature[comparisonAttribute] = '';
@@ -359,7 +359,7 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 	var me = this;
 	me.sibsVcfData = sibsVcfData;
 
-	me.probandVcfData.features = me.probandVcfData.features.sort(orderVariantsByPosition);
+	me.probandVcfData.features = me.probandVcfData.features.sort(VariantModel.orderVariantsByPosition);
 
 	me.sibsTransientVcfData = [];
 	me.sibsVcfData.forEach( function(vcfData) {

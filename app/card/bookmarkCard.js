@@ -1085,6 +1085,8 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 	// Loop through the bookmarked variants, creating a full export record for each one.
 	var promises = [];
 	var records = [];
+	var headerRecords = [];
+	var getHeader  = true;
 	for (key in this.bookmarkedVariants) {
 		var entry = me.bookmarkedVariants[key];	
 
@@ -1111,9 +1113,17 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 					records.push(record);
 				});
 			} else if (format == 'vcf') {
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format).then(function(vcfRecord) {
-					records.push(vcfRecord);					
+
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, null, getHeader).then(function(data) {
+					data.forEach(function(vcfRecord) {
+						if (vcfRecord.indexOf("#") == 0) {
+							headerRecords.push(vcfRecord);
+						} else {
+							records.push(vcfRecord);
+						}
+					});						
 				});
+				getHeader = false;
 			}
 			promises.push(promise);
 		}
@@ -1132,31 +1142,22 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 
 		var output = "";
 		if (format == 'csv') {
-			output = me._outputCSV(records);
+			var sortedRecords = records.sort(VariantModel.orderVariantsByPosition);
+			output = me._outputCSV(sortedRecords);
 			formatDownloadButton(output, format);
 		} else if (format == 'vcf') {
-			getProbandVariantCard().model.vcf.getHeader( function(headerStr) {
-				var headerRecords = [];
-				headerStr.split("\n").forEach(function(headerRec) {
-					if (headerRec.indexOf("#CHROM") == 0 || headerRec.indexOf("#chrom") == 0 ) {
-						var fields = headerRec.split("\t");
-						// Include for 8 fields (up to sample columns)
-						var applicableFields = fields.slice(0,9);
-						applicableFields.push(getProbandVariantCard().getSampleName());
-						headerRecords.push(applicableFields.join("\t"));
-					} else {
-						headerRecords.push(headerRec);
-					}
-				});
-				output = headerRecords.join("\n");
-				output += records.join("\n");
-				formatDownloadButton(output, format);
-			});
+			var sortedRecords = records.sort(VariantModel.orderVcfRecords);
+			output  = headerRecords.join("\n");
+			output += "\n";
+			output += sortedRecords.join("\n");
+			formatDownloadButton(output, format);
 		}
 
 	});
 
 }
+
+
 
 BookmarkCard.prototype._outputCSV = function(records) {
 	var me = this;
@@ -1190,7 +1191,7 @@ BookmarkCard.prototype._outputCSV = function(records) {
 }
 
 
-BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, transcriptId, format, rec) {
+BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, transcriptId, format, rec, getHeader) {
 
 	var me = this;
 
@@ -1209,7 +1210,7 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, 
 			});
 			if (theTranscript) {
 				getProbandVariantCard().model
-				 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format)
+				 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format, getHeader)
 				 .then(function(data) {
 
 				 	if (format == 'csv') {
@@ -1222,8 +1223,7 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, 
 						variantTooltip.formatContent(revisedVariant, null, "record", rec);
 						resolve(rec);				 		
 				 	} else {
-				 		var vcfRecord = data;
-				 		resolve(vcfRecord);
+				 		resolve(data);
 				 	}
 
 				});

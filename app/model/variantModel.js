@@ -835,7 +835,7 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, format) {
+VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, format, getHeader = false) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -847,10 +847,10 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 		fakeGeneObject.end = variant.end;
 
 
-		if (variant.fbCalled == 'Y') {
+		if (variant.fbCalled == 'Y' && format != "vcf") {
 			// We already have the hgvs and rsid if this is a called variant
 			resolve(variant);
-		} else if ( variant.extraAnnot ) {
+		} else if ( variant.extraAnnot && format != "vcf" ) {
 			// We have already retrieved the extra annot for this variant,
 			resolve(variant);
 		} else {	
@@ -868,9 +868,13 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    ).then( function(data) {
 
 			    	var rawVcfRecords = data[0];
-			    	var vcfRecord = rawVcfRecords.filter(function(record) {
+			    	var vcfRecords = rawVcfRecords.filter(function(record) {
 			    		if (record.indexOf("#") == 0) {
-			    			return false;
+			    			if (getHeader) {
+			    				return true;
+			    			} else {
+			    				return false;
+			    			}
 			    		} else {
 			    			var fields = record.split("\t");
 			    			var chrom = fields[0];
@@ -899,8 +903,8 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    		if (format && format == 'csv') {			    			
 			    			resolve(v);
 			    		} else if (format && format == 'vcf') {
-			    			if (vcfRecord) {
-			    				resolve(vcfRecord);
+			    			if (vcfRecords) {
+			    				resolve(vcfRecords);
 			    			} else {
 			    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 			    			}
@@ -1751,7 +1755,7 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 	}
 
 	// Load the clinvar info for the variants loaded from the vcf	
-	var sortedFeatures = theVcfData.features.sort(orderVariantsByPosition);
+	var sortedFeatures = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
 	loadClinvarProperties(sortedFeatures);
 
 }
@@ -1832,7 +1836,7 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 	}
 
 	// Load the clinvar info for the variants loaded from the vcf	
-	var sortedFeatures = theVcfData.features.sort(orderVariantsByPosition);
+	var sortedFeatures = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
 	loadClinvarProperties(sortedFeatures);
 
 }
@@ -2179,8 +2183,8 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function() {
 	var me = this;
 
 	// We have to order the variants in both sets before comparing
-	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);					
-	me.fbData.features  = me.fbData.features.sort(orderVariantsByPosition);
+	me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);					
+	me.fbData.features  = me.fbData.features.sort(VariantModel.orderVariantsByPosition);
 
 	// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 	// unique2 (only in freebayes set), or common (in both sets).	
@@ -2454,7 +2458,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 						var annotatedRecs = data[0];
 				    	me.vcfData = data[1];
 
-					 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
+					 	me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);
 						me.vcfData.features.forEach( function(feature) {
 							feature[compareAttribute] = '';
 						});
@@ -2476,7 +2480,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 			});
 		
 		} else {
-			me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
+			me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);
 			if (compareAttribute) {
 				me.vcfData.features.forEach( function(feature) {			
 					feature[compareAttribute] = '';
@@ -2550,6 +2554,90 @@ VariantModel.getNonCanonicalHighestImpactsVep = function(variant) {
 	}	
 	return vepHighestImpacts;
 }
+
+
+VariantModel.orderVariantsByPosition = function(a, b) {
+	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
+	var refAltB = b.type.toLowerCase() + " " + b.ref + "->" + b.alt;
+
+	var chromA = a.chrom.indexOf("chr") == 0 ? a.chrom.split("chr")[1] : a.chrom;
+	var chromB = b.chrom.indexOf("chr") == 0 ? b.chrom.split("chr")[1] : b.chrom;
+	if (!$.isNumeric(chromA)) {
+		chromA = chromA.charCodeAt(0);
+	};
+	if (!$.isNumeric(chromB)) {
+		chromB = chromB.charCodeAt(0);
+	};
+
+	if (+chromA == +chromB) {
+		if (a.start == b.start) {
+			if (refAltA == refAltB) {
+				return 0;
+			} else if ( refAltA < refAltB ) {
+				return -1;
+			} else {
+				return 1;
+			}
+		} else if (a.start < b.start) {
+			return -1;
+		} else {
+			return 1;
+		}		
+	} else {
+		if (+chromA < +chromB) {
+			return -1;
+		} else if (+chromA > +chromB) {
+			return 1;
+		} 
+	}
+
+
+}
+
+VariantModel.orderVcfRecords = function(rec1, rec2) {
+
+
+	var fields1 = rec1.split("\t");
+	var fields2 = rec2.split("\t");
+
+	var chrom1 = fields1[0].indexOf("chr") == 0 ? fields1[0].split("chr")[1] : fields1[0];
+	var chrom2 = fields2[0].indexOf("chr") == 0 ? fields2[0].split("chr")[1] : fields2[0];
+	if (!$.isNumeric(chrom1)) {
+		chrom1 = chrom1.charCodeAt(0);
+	};
+	if (!$.isNumeric(chrom2)) {
+		chrom2 = chrom2.charCodeAt(0);
+	};
+
+	var start1  = +fields1[1];
+	var start2  = +fields2[1];
+
+	var refalt1 = fields1[3] + fields1[4];
+	var refalt2 = fields2[3] + fields2[4];
+
+
+	if (+chrom1 < +chrom2) {
+		return -1;
+	} else if (+chrom1 > +chrom2) {
+		return 1;
+	} else {
+		if (+start1 < +start2) {
+			return -1;
+		} else if (+start1 > +start2) {
+			return 1;
+		} else {
+			if (refalt1 > refalt2) {
+				return -1;
+			} else if (refalt1 > refalt2) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
+
+}
+
 
 
 

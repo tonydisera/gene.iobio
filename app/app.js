@@ -3024,27 +3024,6 @@ function hideCircleRelatedVariants() {
 
 
 
-
-function orderVariantsByPosition(a, b) {
-	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
-	var refAltB = b.type.toLowerCase() + " " + b.ref + "->" + b.alt;
-
-	if (a.start == b.start) {
-		if (refAltA == refAltB) {
-			return 0;
-		} else if ( refAltA < refAltB ) {
-			return -1;
-		} else {
-			return 1;
-		}
-	} else if (a.start < b.start) {
-		return -1;
-	} else {
-		return 1;
-	}
-}
-
-
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
