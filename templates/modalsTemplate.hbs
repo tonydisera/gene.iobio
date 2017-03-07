@@ -212,22 +212,23 @@
   <div id="data-card" class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header" style="padding-top:12px;text-align:center">
-        <span class="modal-title" style="float:left;display:inline-block;font-size:18px;padding-top:5px">Files</span>
+        
+        <!-- Close button -->
+        <button type="button" class="close" style="font-size:30px" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
 
         <!-- Nav tabs -->
-        <ul class="nav nav-pills" style="display:inline-block;margin-top:15px" role="tablist">
+        <ul class="nav nav-pills" style="display:inline-block;" role="tablist">
           <li role="presentation" class="active">
-            <a  href="#variants" aria-controls="variants" role="tab" data-toggle="tab">Variants and Alignments</a>
+            <a  href="#variants" aria-controls="variants" role="tab" data-toggle="tab">Variant and Alignment files</a>
           </li>
           <li role="presentation">
-            <a  href="#bookmarks" aria-controls="bookmarks" role="tab" data-toggle="tab">Bookmarks</a>
+            <a  href="#bookmarks" aria-controls="bookmarks" role="tab" data-toggle="tab">Bookmark files</a>
           </li>
         </ul>
         
-        <!-- Close button -->
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+
 
       </div>
       <div class="modal-body" style="padding-top:10px;padding-bottom:0px">
@@ -262,12 +263,12 @@
                    <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
                 </button>
                 <div style="float:right;display:inline-block;overflow:visible;margin-bottom:10px;">
-                  <div id="select-build-box" style="width:100px;float:right;margin-left:20px;">
+                  <div id="select-build-box" style="width:160px;float:right;margin-left:20px;">
                     <span id="sample-data-label">Genome Build</span>
                     <select id="select-build" class="selectized" placeholder="select genome build...">
                     </select>
                   </div>
-                  <div id="select-species-box" style="width:100px;float:right;">
+                  <div id="select-species-box" style="width:120px;float:right;">
                     <span id="sample-data-label">Species</span>
                     <select id="select-species" class="selectized" placeholder="select species...">
                     </select>
@@ -357,7 +358,8 @@
                             <input type="radio" name="import-source" onclick="dataCard.onBookmarkImportSource(this)" value="gene" checked="">
                             gene.iobio (comma separated) file
                           </label>
-                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gene-bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gene-bookmarks-format" 
+                          onclick="$('#gemini-bookmarks-format').removeClass('in')" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
                               <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
                               </span>
                           </a>                            
@@ -369,7 +371,8 @@
                             Gemini (tab delimited) file                                                         
                           </label>
 
-                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gemini-bookmarks-format" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gemini-bookmarks-format" 
+                          onclick="$('#gene-bookmarks-format').removeClass('in')" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
                               <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
                               </span>
                           </a>                            

@@ -89,13 +89,13 @@ body {
 
 .nav-pills > li.active > a {
   color: white !important;
-  background-color: #9fa5aa; }
+  background-color: #5d809d; }
 .nav-pills > li.active > a:hover {
   color: white !important;
-  background-color: #9fa5aa; }
+  background-color: #5d809d; }
 .nav-pills > li.active > a:focus {
   color: white !important;
-  background-color: #9fa5aa; }
+  background-color: #5d809d; }
 
 h4 {
   font-size: 13px;
@@ -2276,6 +2276,28 @@ inputinput:-moz-placeholder {
   margin-top: 0px;
   padding-bottom: 0px; }
 
+#dataModal .form-group-sm .form-control {
+  font-size: 13px; }
+#dataModal #vcf-dropdown-button {
+  font-size: 13px;
+  width: 100px;
+  padding-top: 1px;
+  padding-bottom: 0px; }
+#dataModal #bam-dropdown-button {
+  font-size: 12px;
+  width: 100px;
+  padding-top: 1px;
+  padding-bottom: 0px; }
+#dataModal #vcf-sample-box span {
+  font-size: 13px;
+  width: 100px;
+  display: inline-block;
+  color: #717171;
+  vertical-align: top;
+  padding-top: 4px; }
+#dataModal #vcf-sample-select-box {
+  display: inline-block;
+  width: 200px; }
 #dataModal .form-group {
   margin-top: -5px; }
 #dataModal .form-group-header {
@@ -2290,8 +2312,27 @@ inputinput:-moz-placeholder {
   font-size: 14px;
   display: inline-block;
   color: #5d809d; }
+#dataModal .nav-pills li {
+  margin-left: 20px;
+  margin-right: 20px;
+  border: solid thin lightgray;
+  border-radius: 5px; }
+  #dataModal .nav-pills li a {
+    padding-left: 20px;
+    padding-right: 20px; }
+  #dataModal .nav-pills li.active {
+    border: solid thin #3586c0; }
 #dataModal #export-loader {
   color: #717171; }
+#dataModal button {
+  font-size: 14px; }
+#dataModal #select-build-box .selectize-dropdown, #dataModal select-species-box .selectize-dropdown {
+  font-size: 14px; }
+#dataModal #select-build-box .selectize-input, #dataModal select-species-box .selectize-input {
+  font-size: 14px;
+  line-height: 15px; }
+#dataModal #select-build-box #select-build-box .selectize-input input, #dataModal select-species-box #select-build-box .selectize-input input {
+  width: 145px !important; }
 
 .tooltip-title {
   font-size: 12px;
