@@ -31,7 +31,8 @@ body {
     margin-top: -6px;
     padding-top: 15px; }
     .navbar .navbar-brand #home {
-      margin-top: 6px; }
+      margin-top: 6px;
+      cursor: pointer; }
   .navbar .navbar-form {
     margin-top: 10px; }
   .navbar .form-group.is-focused .form-control {

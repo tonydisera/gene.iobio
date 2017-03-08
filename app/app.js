@@ -243,7 +243,7 @@ function init() {
 	cacheHelper = new CacheHelper(loaderDisplay);
 
 	if (!isLevelEdu && !isMygene2) {
-		window.onbeforeunload = function () {
+		window.onbeforeunload = function (event) {
 		    launchTimestampToClear = cacheHelper.launchTimestamp;
 		    return "Are you sure you want to exit gene.iobio?";
 		};
@@ -3401,6 +3401,11 @@ function createDownloadLink(anchorSelector, str, fileName) {
 		$(anchorSelector).attr("href", url);
 	}
 	$(anchorSelector).animateIt('tada', 'animate-twice');
+}
+
+function goToHome() {
+		var homeUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname;
+		window.location.assign(homeUrl);	
 }
 
 
