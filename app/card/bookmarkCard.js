@@ -444,6 +444,8 @@ BookmarkCard.prototype._flagBookmark = function(variantCard, geneObject, variant
 		// bookmark list so that the glyphs show for each resolved bookmark.
 		me.refreshBookmarkList();
 
+	} else {
+
 	}
 }
 
@@ -640,7 +642,11 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
 								genesCard.selectGene(geneName, function(variantCard) {
 									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-									me._flagBookmark(variantCard, window.gene, variant, key);
+									if (variant) {
+										me._flagBookmark(variantCard, window.gene, variant, key);
+									} else {
+										d3.select(this).select("span.not-found").classed("hide", false);
+									}
 								});
 							} else {
 								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
@@ -664,6 +670,10 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 	 container.selectAll(".bookmark")
 	 		 .append("span")
+	         .attr("class", "not-found hide");	         
+
+	 container.selectAll(".bookmark")
+	 		 .append("span")
 	         .attr("class", "favorite-indicator")
 	         .style("float", "right");
 	        
@@ -678,6 +688,9 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				var bm = me.parseKey(key);
 	         	return bm.start + " " + bm.ref + "->" + bm.alt + (rsId ? " " + rsId : "");
 	         });
+
+	container.selectAll(".bookmark span.not-found")
+	         .text("Variant not found");
 
 	container.selectAll(".bookmark .variant-symbols")
          .each( function(entry, i) {

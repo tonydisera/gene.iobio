@@ -2790,6 +2790,10 @@ text.ref-count {
   text-align: left;
   padding-top: 4px;
   margin-left: 0px; }
+  #bookmark-card .bookmark span.not-found {
+    color: #c70001;
+    font-style: italic;
+    padding-left: 6px; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
