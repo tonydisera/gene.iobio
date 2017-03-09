@@ -355,7 +355,6 @@ function geneD3() {
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { 
-            console.log("** enter " + d.feature_type.toLowerCase() + " "  + d.start + " " + d.end);
             return d3.round(x(d.start))
           })
           .attr('width', function(d) { 
