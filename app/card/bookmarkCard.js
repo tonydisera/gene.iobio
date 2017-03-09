@@ -597,24 +597,18 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				// Remove any locked tooltip, hide coordinate frame
 				unpinAll();
 
-				var validateBookmarksFound = function() {
-					bookmarkKeys.forEach( function(key) {		
-						if (me.resolveBookmarkedVariant(key, me.bookmarkedVariants[key], window.gene) == null) {
-							currentBookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
-								return entry.key == key;
-							}).select("span.not-found").classed("hide", false);
-						}
-					});
-				}
+				
 
 				if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
 					genesCard.selectGene(geneName, function() {
+						
+					}, function() {
 						me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
-						validateBookmarksFound();
+						me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene);
 					});
 				} else {
 					me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
-					validateBookmarksFound();
+					me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene);
 				}				
 			});
 
@@ -655,21 +649,17 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
-								genesCard.selectGene(geneName, function(variantCard) {
+								genesCard.selectGene(geneName, function() {
+									
+								}, function() {
 									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-									if (variant) {
-										me._flagBookmark(variantCard, window.gene, variant, key);
-									} else {
-										currentBookmark.select("span.not-found").classed("hide", false);
-									}
+									currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
+									me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
 								});
 							} else {
 								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-								if (variant) {
-									me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
-								} else {
-									currentBookmark.select("span.not-found").classed("hide", false);
-								}					
+								currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
+								me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
 							}
 
 							
@@ -913,6 +903,21 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 }
 
+BookmarkCard.prototype._validateBookmarksFound = function(bookmarkDiv, bookmarkKeys, geneObject) {
+	var me = this;
+	bookmarkKeys.forEach( function(key) {		
+		if (me.resolveBookmarkedVariant(key, me.bookmarkedVariants[key], geneObject) == null) {
+			bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+				return entry.key == key;
+			}).select("span.not-found").classed("hide", false);
+		} else {
+			bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+				return entry.key == key;
+			}).select("span.not-found").classed("hide", true);
+		}
+	});
+}
+
 BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 	var me = this;
 
@@ -1030,6 +1035,7 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
 						 .on("click", function(entry, i) {
 						 	var bookmarkGeneLink = d3.select(this.parentNode).select(".bookmark-gene");
 						 	var button  = d3.select(this);
+						 	var currentBookmarkDiv = d3.select(this.parentNode);
 						 	button.select(".call-variants-loader").classed("hide", false);
 							me.selectedBookmarkKey = entry.key;
 
@@ -1056,6 +1062,7 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
 												 	jointCallVariants( function() {
 												 		button.classed("hide", true);
 												 		button.select(".call-variants-loader").classed("hide", true);
+												 		me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, geneObject);
 												 	})
 												 });
 
