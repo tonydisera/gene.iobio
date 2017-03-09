@@ -462,7 +462,7 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
 			}
 
-		}
+		} 
 	});
 
 	// Now that we have resolved the bookmark entries for a gene, refresh the
@@ -585,7 +585,9 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         })
 	         .on('click', function(entry,i) {
 	         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-	         	d3.select(this).classed("current", true);
+	         	var currentBookmarkGene = d3.select(this);
+	         	var currentBookmarkDiv = d3.select(this.parentNode);
+	         	currentBookmarkGene.classed("current", true);
 
 	         	me.selectedBookmarkKey = entry.key;
 
@@ -595,12 +597,24 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				// Remove any locked tooltip, hide coordinate frame
 				unpinAll();
 
+				var validateBookmarksFound = function() {
+					bookmarkKeys.forEach( function(key) {		
+						if (me.resolveBookmarkedVariant(key, me.bookmarkedVariants[key], window.gene) == null) {
+							currentBookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+								return entry.key == key;
+							}).select("span.not-found").classed("hide", false);
+						}
+					});
+				}
+
 				if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
 					genesCard.selectGene(geneName, function() {
 						me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+						validateBookmarksFound();
 					});
 				} else {
 					me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+					validateBookmarksFound();
 				}				
 			});
 
@@ -627,7 +641,8 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			            .attr("class", "bookmark")
 			            .on('click', function(entry,i) {
 				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-		         			d3.select(this).classed("current", true);
+		         			var currentBookmark = d3.select(this);
+		         			currentBookmark.classed("current", true);
 
 		         			me.selectedBookmarkKey = entry.key;
 
@@ -645,12 +660,16 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 									if (variant) {
 										me._flagBookmark(variantCard, window.gene, variant, key);
 									} else {
-										d3.select(this).select("span.not-found").classed("hide", false);
+										currentBookmark.select("span.not-found").classed("hide", false);
 									}
 								});
 							} else {
-								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
-								me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
+								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
+								if (variant) {
+									me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
+								} else {
+									currentBookmark.select("span.not-found").classed("hide", false);
+								}					
 							}
 
 							
