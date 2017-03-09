@@ -342,16 +342,20 @@ function geneD3() {
            return ft == 'exon';
         };
       }
-      
-      transcript.selectAll('.transcript rect').data(function(d) { 
+
+
+      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
           return filterFeatures(d); 
+        }, function(d) {
+          return d.feature_type + "-" + d.start + "-" + d.end;
         });
       }).enter().append('rect')
           .attr('class', function(d) { return d.feature_type.toLowerCase();})          
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { 
+            console.log("** enter " + d.feature_type.toLowerCase() + " "  + d.start + " " + d.end);
             return d3.round(x(d.start))
           })
           .attr('width', function(d) { 
