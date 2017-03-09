@@ -846,13 +846,19 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 		fakeGeneObject.start = variant.start;
 		fakeGeneObject.end = variant.end;
 
-
-		if (variant.fbCalled == 'Y' && format != "vcf") {
-			// We already have the hgvs and rsid if this is a called variant
-			resolve(variant);
-		} else if ( variant.extraAnnot && format != "vcf" ) {
-			// We have already retrieved the extra annot for this variant,
-			resolve(variant);
+		if ((variant.fbCalled == 'Y' || variant.extraAnnot) && format != "vcf") {
+			// We already have the hgvs and rsid for this variant, so there is 
+			// no need to call the services again.  Just return the
+			// variant.  However, if we are returning raw vcf records, the
+			// services need to be called so that the info field is formatted
+			// with all of the annotations.
+			if (format && format == 'csv') {
+				// Exporting data requires additional data to be returned to link
+				// the extra annotations back to the original bookmarked entries.
+				resolve([variant, variant, ""]);
+			} else {
+				resolve(variant);
+			}
 		} else {	
 			me._promiseVcfRefName(theGene.chr).then( function() {				
 				me.vcf.promiseGetVariants(
@@ -901,10 +907,10 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    		var v = theVcfData.features[0];
 
 			    		if (format && format == 'csv') {			    			
-			    			resolve(v);
+			    			resolve([v, variant, vcfRecords]);
 			    		} else if (format && format == 'vcf') {
 			    			if (vcfRecords) {
-			    				resolve(vcfRecords);
+			    				resolve([v, variant, vcfRecords]);
 			    			} else {
 			    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 			    			}

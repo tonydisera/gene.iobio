@@ -1335,7 +1335,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 
 		}
 	}
-	bookmarkCard.refreshBookmarkList();
+	//bookmarkCard.refreshBookmarkList();
 }
 
 GenesCard.prototype.showGeneBadgeLoading = function(geneName) {

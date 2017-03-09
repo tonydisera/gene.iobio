@@ -51,6 +51,29 @@ function BookmarkCard() {
 
 	];
 
+	this.proxyBookmarkFieldsToExport = [
+		{field: 'inheritance'},
+
+		{field: 'zygosityProband', target: 'zygosity', isProxy: true },
+		{field: 'altCountProband', target: 'genotypeAltCount', isProxy: true },
+		{field: 'refCountProband', target: 'genotypeRefCount', isProxy: true },
+		{field: 'depthProband',    target: 'genotypeDepth', isProxy: true },
+		{field: 'bamDepthProband', target: 'bamDepth', isProxy: true },
+
+		{field: 'zygosityMother', target: 'motherZygosity', isProxy: true },
+		{field: 'altCountMother', target: 'genotypeAltCountMother', isProxy: true },
+		{field: 'refCountMother', target: 'genotypeRefCountMother', isProxy: true },
+		{field: 'depthMother',    target: 'genotypeDepthMother', isProxy: true },
+		{field: 'bamDepthMother', isProxy: true },
+
+		{field: 'zygosityFather', target: 'fatherZygosity', isProxy: true },
+		{field: 'altCountFather', target: 'genotypeAltCountFather', isProxy: true },
+		{field: 'refCountFather', target: 'genotypeRefCountFather', isProxy: true },
+		{field: 'depthFather',    target: 'genotypeDepthFather', isProxy: true },
+		{field: 'bamDepthFather', isProxy: true }
+	]
+	
+
 }
 
 BookmarkCard.prototype.init = function() {
@@ -185,6 +208,9 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 				er.importSource = "gene"
 				er.importFormat = "csv";
 				me.bookmarkedVariants[key] = er;
+				if (er.starred == 'Y') {
+					me.favorites[key] = true;
+				}
 			}
 	});
 	me.showImportedBookmarks();
@@ -386,7 +412,7 @@ BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject)
 				}
 			});
 		}
-		me.refreshBookmarkList();
+		//me.refreshBookmarkList();
 	}
 }
 
@@ -440,7 +466,6 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 	// Now that we have resolved the bookmark entries for a gene, refresh the
 	// bookmark list so that the glyphs show for each resolved bookmark.
 	//me.refreshBookmarkList();
-	me.refreshBookmarkList();
 
 	
 }
@@ -995,7 +1020,10 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
 												 function() {
 
 												 }, function() {
+												 	
 												 	jointCallVariants( function() {
+												 		button.classed("hide", true);
+												 		button.select(".call-variants-loader").classed("hide", true);
 												 	})
 												 });
 
@@ -1097,24 +1125,23 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 		if (scope == "all" || isFavorite) {
 			var promise = null;
 
+			var rec = {};
+			rec.start        = entry.start;
+			rec.end          = entry.end;
+			rec.chrom        = entry.chrom.indexOf("chr") == 0 ? entry.chrom : 'chr' + entry.chrom;
+			rec.ref          = entry.ref;
+			rec.alt          = entry.alt;
+			rec.gene         = geneName;
+			rec.transcript   = transcriptId;
+			rec.starred      = isFavorite == true ? "Y" : "";	
 
 			if (format == 'csv') {
-				var rec = {};
-				rec.start        = entry.start;
-				rec.end          = entry.end;
-				rec.chrom        = entry.chrom.indexOf("chr") == 0 ? entry.chrom : 'chr' + entry.chrom;
-				rec.ref          = entry.ref;
-				rec.alt          = entry.alt;
-				rec.gene         = geneName;
-				rec.transcript   = transcriptId;
-				rec.starred      = isFavorite == true ? "Y" : "";	
-				
 				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec).then(function(record) {
 					records.push(record);
 				});
 			} else if (format == 'vcf') {
 
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, null, getHeader).then(function(data) {
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec, getHeader).then(function(data) {
 					data.forEach(function(vcfRecord) {
 						if (vcfRecord.indexOf("#") == 0) {
 							headerRecords.push(vcfRecord);
@@ -1212,20 +1239,55 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, 
 				getProbandVariantCard().model
 				 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format, getHeader)
 				 .then(function(data) {
+				 	var theVariant = data[0];
+				 	var sourceVariant = data[1];
+				 	var theRawVcfRecords = data[2];
 
-				 	if (format == 'csv') {
-				 		var theVariant = data;
-					 	// Merge the properties of the bookmark entry with the variant with the full annotations
-					 	// Always use the inheritance from the bookmarkEntry
-					 	var revisedVariant = $().extend({}, bookmarkEntry, theVariant);
-					 	revisedVariant.inheritance = bookmarkEntry.inheritance;
+	 				// Merge the properties of the bookmark entry with the variant with the full annotations
+				 	// Always use the inheritance from the bookmarkEntry
+				 	var revisedVariant = $().extend({}, sourceVariant, theVariant);
 
-						variantTooltip.formatContent(revisedVariant, null, "record", rec);
-						resolve(rec);				 		
-				 	} else {
-				 		resolve(data);
-				 	}
+	 				// The bookmarkEntry contains fields that need to be in loaded
+				 	// into the record that will be exported.  These include trio
+				 	// allele counts, inheritance.  If the bookmark variant has
+				 	// been refreshed with live data, bypass loading these fields
+				 	// since they are already updated with latest info
+				 	me.proxyBookmarkFieldsToExport.forEach(function(ftr) {
+				 		var targetField = ftr.hasOwnProperty('target') ? ftr.target : ftr.field;
+				 		if (ftr.hasOwnProperty('isProxy') && ftr.isProxy && sourceVariant.hasOwnProperty('isProxy') && sourceVariant.isProxy) {
+					 		revisedVariant[targetField] = sourceVariant[ftr.field];
+				 		} else if (!ftr.hasOwnProperty('isProxy') || !ftr.isProxy) {
+				 			revisedVariant[targetField] = sourceVariant[ftr.field];
+				 		}
+				 	});
 
+
+				 	// Set the clinvar start, alt, ref for clinvar web access
+					getProbandVariantCard().model.vcf.formatClinvarCoordinates(theVariant, theVariant);
+
+				 	// Get the clinvar data and load into the variant record
+				 	var dummyVcfData  = {features: [revisedVariant]};
+				 	var clinvarLoader = isClinvarOffline ? getProbandVariantCard().model._refreshVariantsWithClinvarVariants.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvar.bind(getProbandVariantCard().model, dummyVcfData);
+					getProbandVariantCard().model
+					   .vcf
+					   .promiseGetClinvarRecordsImpl(dummyVcfData.features, 
+					   								 getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
+					   								 theGeneObject, 
+					   	                             clinvarLoader)	
+					   .then(function() {
+							
+							variantTooltip.formatContent(revisedVariant, null, "record", rec);
+
+							if (format == 'csv') {
+								resolve(rec);				 		
+						 	} else {
+						 		resolve(theRawVcfRecords);
+						 	}
+
+
+					   })                            			 	
+
+				 	
 				});
 
 			} else {

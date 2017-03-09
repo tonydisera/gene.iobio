@@ -1977,25 +1977,9 @@ var effectCategories = [
 
 
             // Get rid of the left most anchor base for insertions and
-            // deletions for accessing clinvar
-            var clinvarStart = +rec.pos;
-            var clinvarRef = rec.ref;
-            var clinvarAlt = alt;
-            if (clinvarAlt == '.') {
-              clinvarAlt = '-';
-            } else if (clinvarRef == '.') {
-              clinvarRef = '-';
-            } else if (clinvarRef.length > clinvarAlt.length) {
-              // deletion
-              clinvarStart++;
-              clinvarAlt = clinvarAlt.length == 1 ? "-" : clinvarAlt.substr(1,clinvarAlt.length-1);
-              clinvarRef = clinvarRef.substr(1,clinvarRef.length-1);
-            } else if (clinvarAlt.length > clinvarRef.length) {
-              // insertion
-              clinvarStart++;
-              clinvarRef = clinvarRef.length == 1 ? "-" : clinvarRef.substr(1,clinvarRef.length-1);
-              clinvarAlt = clinvarAlt.substr(1,clinvarAlt.length-1);
-            }
+            // deletions for accessing clinvar            
+            var clinvarObject = {};
+            me.formatClinvarCoordinates(rec, clinvarObject);
 
             var cullTranscripts = function(transcriptObject, theTranscriptId) {
               // If the current transcript is included in the list,
@@ -2129,9 +2113,9 @@ var effectCategories = [
                 'af1000G': me.parseAf(altIdx, af1000G),
                 'afExAC': me.parseAf(altIdx, afExAC),
                 'rsid' : (rs != null && rs != '' && rs != 0 ? rs : ''),
-                'clinvarStart': clinvarStart,
-                'clinvarRef': clinvarRef,
-                'clinvarAlt': clinvarAlt,
+                'clinvarStart': clinvarObject.clinvarStart,
+                'clinvarRef': clinvarObject.clinvarRef,
+                'clinvarAlt': clinvarObject.clinvarAlt,
                 'vepConsequence': vepConsequence,
                 'vepImpact': vepImpact,
                 'vepExon': vepExon,
@@ -2169,6 +2153,39 @@ var effectCategories = [
 
       return results;
   };
+
+/*
+ *
+ * Get rid of the left most anchor base for insertions and
+ * deletions for accessing clinvar  
+ *
+*/
+  exports.formatClinvarCoordinates = function(rec, target) {
+      if (rec.hasOwnProperty("pos")) {
+        target.clinvarStart = +rec.pos;
+      } else if (rec.hasOwnProperty("start")) {
+        target.clinvarStart = +rec.start;
+      }
+
+      target.clinvarAlt   = rec.alt;
+      target.clinvarRef   = rec.ref;
+
+      if (target.clinvarAlt == '.') {
+        target.clinvarAlt = '-';
+      } else if (target.clinvarRef == '.') {
+        target.clinvarRef = '-';
+      } else if (target.clinvarRef.length > target.clinvarAlt.length) {
+        // deletion
+        target.clinvarStart++;
+        target.clinvarAlt = target.clinvarAlt.length == 1 ? "-" : target.clinvarAlt.substr(1,target.clinvarAlt.length-1);
+        target.clinvarRef = target.clinvarRef.substr(1,target.clinvarRef.length-1);
+      } else if (target.clinvarAlt.length > target.clinvarRef.length) {
+        // insertion
+        target.clinvarStart++;
+        target.clinvarRef = target.clinvarRef.length == 1 ? "-" : target.clinvarRef.substr(1,target.clinvarRef.length-1);
+        target.clinvarAlt = target.clinvarAlt.substr(1,target.clinvarAlt.length-1);
+      }   
+  }
 
   exports.parseMultiAllelic = function(alleleIdx, genotypeValue, delim) {
     if (genotypeValue == null || genotypeValue == "" || genotypeValue.indexOf(delim) < 0) {
