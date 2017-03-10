@@ -941,16 +941,21 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				    		} else {
 				    			if (bypassCaching) {
 				    				resolve(theVariant);
-				    			} else {			    				
-					    			console.log("Cannot find corresponding variant to update HGVS notation");
-					    			reject("Cannot find corresponding variant to update HGVS notation");
+				    			} else {	
+				    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;				
+					    			console.log(msg);
+					    			reject(msg);
 				    			}
 				    		}			    		
 
 			    		}
 			    	} else {
-			    		console.log("Cannot get variant to update HGVS notation");
-			    		reject("Cannot get variant to update HGVS notation");
+			    		var msg = "Empty results returned from VariantModel.promiseGetVariantExtraAnnotations() for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;
+			    		console.log(msg);
+			    		if (format == 'csv' || format == 'vcf') {
+			    			resolve([variant, variant, []]);
+			    		}
+			    		reject(msg);
 			    	}
 
 				});		

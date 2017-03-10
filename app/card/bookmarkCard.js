@@ -4,50 +4,50 @@ function BookmarkCard() {
 	this.selectedBookmarkKey = null;
 	this.favorites = {};
 	this.exportFields = [
-		'chrom', 
-		'start', 
-		'end', 
-		'ref', 
-		'alt', 
-		'gene', 
-		'transcript', 
-	    'starred',
-	    'freebayesCalled',
-	    'type',
-		'impact',
-		'highestImpact', 
-		'highestImpactInfo',
-		'consequence',
-		'afExAC',
-		'af1000G',
-		'inheritance', 
-		'polyphen',
-		'SIFT',
-		'rsId',
-		'clinvarClinSig',
-		'clinvarPhenotype',
-		'HGVSc',
-		'HGVSp',
-		'regulatory',
-		'qual',
-		'filter',
-		'zygosityProband',
-		'altCountProband',
-		'refCountProband',
-		'depthProband',
-		'bamDepthProband',
-	    'zygosityMother',
-		'altCountMother',
-		'refCountMother',
-		'depthMother',
-		'bamDepthMother',
-	    'zygosityFather',
-		'altCountFather',
-		'refCountFather',
-		'depthFather',
-		'bamDepthFather',
-		'dbSnpUrl',
-		'clinvarUrl'
+		{field: 'chrom', 				exportVcf: false}, 
+		{field: 'start', 				exportVcf: false}, 
+		{field: 'end', 					exportVcf: false}, 
+		{field: 'ref', 					exportVcf: false}, 
+		{field: 'alt', 					exportVcf: false}, 
+		{field: 'gene', 				exportVcf: true}, 
+		{field: 'transcript', 			exportVcf: true}, 
+	    {field: 'starred', 				exportVcf: true},
+	    {field: 'freebayesCalled', 		exportVcf: true},
+	    {field: 'type', 				exportVcf: true},
+		{field: 'impact', 				exportVcf: true},
+		{field: 'highestImpact', 		exportVcf: true}, 
+		{field: 'highestImpactInfo', 	exportVcf: true},
+		{field: 'consequence', 			exportVcf: true},
+		{field: 'afExAC', 				exportVcf: true},
+		{field: 'af1000G', 				exportVcf: true},
+		{field: 'inheritance', 			exportVcf: true}, 
+		{field: 'polyphen', 			exportVcf: true},
+		{field: 'SIFT', 				exportVcf: true},
+		{field: 'rsId', 				exportVcf: true},
+		{field: 'clinvarClinSig', 		exportVcf: true},
+		{field: 'clinvarPhenotype', 	exportVcf: true},
+		{field: 'HGVSc', 				exportVcf: true},
+		{field: 'HGVSp', 				exportVcf: true},
+		{field: 'regulatory', 			exportVcf: true},
+		{field: 'qual', 				exportVcf: false},
+		{field: 'filter', 				exportVcf: false},
+		{field: 'zygosityProband', 		exportVcf: true},
+		{field: 'altCountProband', 		exportVcf: true},
+		{field: 'refCountProband', 		exportVcf: true},
+		{field: 'depthProband', 		exportVcf: true},
+		{field: 'bamDepthProband', 		exportVcf: true},
+	    {field: 'zygosityMother', 		exportVcf: true},
+		{field: 'altCountMother', 		exportVcf: true},
+		{field: 'refCountMother', 		exportVcf: true},
+		{field: 'depthMother', 			exportVcf: true},
+		{field: 'bamDepthMother', 		exportVcf: true},
+	    {field: 'zygosityFather', 		exportVcf: true},
+		{field: 'altCountFather', 		exportVcf: true},
+		{field: 'refCountFather', 		exportVcf: true},
+		{field: 'depthFather', 			exportVcf: true},
+		{field: 'bamDepthFather', 		exportVcf: true},
+		{field: 'dbSnpUrl', 			exportVcf: false},
+		{field: 'clinvarUrl',			exportVcf: false}
 
 	];
 
@@ -1175,21 +1175,39 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 			rec.starred      = isFavorite == true ? "Y" : "";	
 
 			if (format == 'csv') {
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec).then(function(record) {
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec).then(function(data) {
+					var record = data[0];
 					records.push(record);
 				});
 			} else if (format == 'vcf') {
 
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec, getHeader).then(function(data) {
-					data.forEach(function(vcfRecord) {
-						if (vcfRecord.indexOf("#") == 0) {
-							headerRecords.push(vcfRecord);
-						} else {
-							records.push(vcfRecord);
-						}
-					});						
-				});
-				getHeader = false;
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec, getHeader)
+				            .then(function(data) {
+				            	var record = data[0];
+				            	var annotatedVcfRecs = data[1];
+
+				            	if (headerRecords.length == 0) {
+					            	annotatedVcfRecs.forEach(function(vcfRecord) {
+										if (vcfRecord.indexOf("#") == 0) {
+											headerRecords.push(vcfRecord);
+											// Insert new INFO field for the gene.iobio annotations
+											if (vcfRecord.indexOf("##INFO=<ID=BGAF_EXAC") == 0) {
+												headerRecords.push("##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
+											}
+											getHeader = false;
+										} 
+									});		
+				            	}
+								annotatedVcfRecs.forEach(function(vcfRecord) {
+									if (vcfRecord.indexOf("#") != 0) {
+										var newRec = me._appendVcfRecordAnnotations(vcfRecord, record);
+										records.push(newRec);
+									}
+								});						
+							}, 
+							function(error) {
+								alert("Cannot produce export record for variant " + geneName + " " + entry.chrom + " " + entry.start + " " + entry.ref + "->" + entry.alt);
+							});
 			}
 			promises.push(promise);
 		}
@@ -1223,6 +1241,27 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 
 }
 
+BookmarkCard.prototype._appendVcfRecordAnnotations = function(vcfRecord, record) {
+	var me = this;
+	var fields = vcfRecord.split("\t");
+	var info = fields[7];
+
+	var buf = "";
+	me.exportFields.forEach(function(exportField) {
+		if (exportField.exportVcf) {
+			if (buf.length > 0) {
+				buf += "|";
+			} 
+			buf += exportField.field + ":" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : " ");			
+		}
+	})
+
+	info += ";IOBIO=" + buf;
+
+	fields[7] = info;
+	return fields.join("\t");
+}
+
 
 
 BookmarkCard.prototype._outputCSV = function(records) {
@@ -1230,25 +1269,25 @@ BookmarkCard.prototype._outputCSV = function(records) {
 
 	// Create the column header line
 	var output = "";
-	me.exportFields.forEach(function(fieldName) {
+	me.exportFields.forEach(function(exportField) {
 		if (output.length > 0) {
 			output += ",";
 		}
-		output += "\"" + fieldName + "\"";
+		output += "\"" + exportField.field + "\"";
 	});
 	output += "\n";	
 
 	// Now create an output (csv) line for each of the bookmark records
 	records.forEach(function(rec) {
 		var isFirstTime = true;
-		me.exportFields.forEach( function(field) {
+		me.exportFields.forEach( function(exportField) {
 			if (isFirstTime) {
 				isFirstTime = false;
 			} else {
 				output += ",";
 			}
 
-			var fieldValue = rec[field] ? rec[field] : "" ;
+			var fieldValue = rec[exportField.field] ? rec[exportField.field] : "" ;
 			output +=  "\"" + fieldValue + "\"";
 		});
 		output += "\n";
@@ -1294,9 +1333,13 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, 
 				 	me.proxyBookmarkFieldsToExport.forEach(function(ftr) {
 				 		var targetField = ftr.hasOwnProperty('target') ? ftr.target : ftr.field;
 				 		if (ftr.hasOwnProperty('isProxy') && ftr.isProxy && sourceVariant.hasOwnProperty('isProxy') && sourceVariant.isProxy) {
-					 		revisedVariant[targetField] = sourceVariant[ftr.field];
+				 			if (sourceVariant.hasOwnProperty(ftr.field)) {
+						 		revisedVariant[targetField] = sourceVariant[ftr.field];
+				 			}
 				 		} else if (!ftr.hasOwnProperty('isProxy') || !ftr.isProxy) {
-				 			revisedVariant[targetField] = sourceVariant[ftr.field];
+				 			if (sourceVariant.hasOwnProperty(ftr.field)) {
+					 			revisedVariant[targetField] = sourceVariant[ftr.field];
+				 			}
 				 		}
 				 	});
 
@@ -1318,9 +1361,9 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, 
 							variantTooltip.formatContent(revisedVariant, null, "record", rec);
 
 							if (format == 'csv') {
-								resolve(rec);				 		
+								resolve([rec]);				 		
 						 	} else {
-						 		resolve(theRawVcfRecords);
+						 		resolve([rec, theRawVcfRecords]);
 						 	}
 
 
