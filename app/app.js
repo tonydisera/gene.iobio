@@ -2635,7 +2635,7 @@ function jointCallVariants(callback) {
 
 }
 
-function cacheJointCallVariants(geneObject, transcript, callback) {
+function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback) {
 
 
 	var bams = [];
@@ -2694,7 +2694,7 @@ function cacheJointCallVariants(geneObject, transcript, callback) {
 
 			parseNextCalledVariants(function() {
 				if (callback) {
-					callback();
+					callback(jointVcfRecs, sourceVariant);
 				}
 			});
 		}

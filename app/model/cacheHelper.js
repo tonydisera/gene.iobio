@@ -146,7 +146,7 @@ CacheHelper.prototype.cacheGene = function(geneName, callback) {
 		    	me.cacheNextGene(geneObject.gene_name, callback);
 		    } else if (shouldJointCall) {
 		    	genesCard._geneBadgeLoading(geneObject.gene_name, true);
-				cacheJointCallVariants(geneObject, transcript, function() {
+				cacheJointCallVariants(geneObject, transcript, null, function() {
 
 					me.processCachedTrio(geneObject, transcript, callback)						
 				});

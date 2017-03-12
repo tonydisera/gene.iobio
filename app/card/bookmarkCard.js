@@ -1256,7 +1256,16 @@ BookmarkCard.prototype._appendVcfRecordAnnotations = function(vcfRecord, record)
 		}
 	})
 
-	info += ";IOBIO=" + buf;
+	// Strip out all of the freebayes INFO fields since the exported VCF may have
+	// records generated from other variant callers
+	if ((record.hasOwnProperty("fbCalled") && record.fbCalled == "Y") ||
+		(record.hasOwnProperty("freebayesCalled") && record.freebayesCalled == "Y")) {
+		info = "IOBIO=" + buf;
+	} else {
+		info += ";IOBIO=" + buf;
+
+	}
+
 
 	fields[7] = info;
 	return fields.join("\t");
@@ -1296,6 +1305,7 @@ BookmarkCard.prototype._outputCSV = function(records) {
 }
 
 
+
 BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, transcriptId, format, rec, getHeader) {
 
 	var me = this;
@@ -1314,68 +1324,135 @@ BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, 
 				}
 			});
 			if (theTranscript) {
-				getProbandVariantCard().model
-				 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format, getHeader)
-				 .then(function(data) {
-				 	var theVariant = data[0];
-				 	var sourceVariant = data[1];
-				 	var theRawVcfRecords = data[2];
-
-	 				// Merge the properties of the bookmark entry with the variant with the full annotations
-				 	// Always use the inheritance from the bookmarkEntry
-				 	var revisedVariant = $().extend({}, sourceVariant, theVariant);
-
-	 				// The bookmarkEntry contains fields that need to be in loaded
-				 	// into the record that will be exported.  These include trio
-				 	// allele counts, inheritance.  If the bookmark variant has
-				 	// been refreshed with live data, bypass loading these fields
-				 	// since they are already updated with latest info
-				 	me.proxyBookmarkFieldsToExport.forEach(function(ftr) {
-				 		var targetField = ftr.hasOwnProperty('target') ? ftr.target : ftr.field;
-				 		if (ftr.hasOwnProperty('isProxy') && ftr.isProxy && sourceVariant.hasOwnProperty('isProxy') && sourceVariant.isProxy) {
-				 			if (sourceVariant.hasOwnProperty(ftr.field)) {
-						 		revisedVariant[targetField] = sourceVariant[ftr.field];
-				 			}
-				 		} else if (!ftr.hasOwnProperty('isProxy') || !ftr.isProxy) {
-				 			if (sourceVariant.hasOwnProperty(ftr.field)) {
-					 			revisedVariant[targetField] = sourceVariant[ftr.field];
-				 			}
-				 		}
-				 	});
 
 
-				 	// Set the clinvar start, alt, ref for clinvar web access
-					getProbandVariantCard().model.vcf.formatClinvarCoordinates(theVariant, theVariant);
+				if ((bookmarkEntry.hasOwnProperty('fbCalled')        && bookmarkEntry.fbCalled == 'Y') ||
+					(bookmarkEntry.hasOwnProperty('freebayesCalled') && bookmarkEntry.freebayesCalled == 'Y')) {
+					// If the variant was called on-demand, issue the service calls to
+					// generate the vcf records.
+					cacheJointCallVariants(theGeneObject, theTranscript, bookmarkEntry, function(jointVcfRecs, sourceVariant) {
+						var theVcfRec = null;
+						var theVcfRecs =[];
+						var theVariant = null;
+						if (format == 'vcf') {
+							jointVcfRecs.forEach(function(vcfRec) {
+								if (getHeader && vcfRec.indexOf("#") == 0) {
+									theVcfRecs.push(vcfRec);
+								} else  {
+									fields = vcfRec.split("\t");
+									var chrom = getProbandVariantCard().model._stripRefName(fields[0]);
+									var start = fields[1];
+									var ref   = fields[3];
+									var alt   = fields[4];
 
-				 	// Get the clinvar data and load into the variant record
-				 	var dummyVcfData  = {features: [revisedVariant]};
-				 	var clinvarLoader = isClinvarOffline ? getProbandVariantCard().model._refreshVariantsWithClinvarVariants.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvar.bind(getProbandVariantCard().model, dummyVcfData);
+									if (theVcfRec == null
+										&& chrom  == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
+										&& start  == sourceVariant.start
+										&& ref    == sourceVariant.ref
+										&& alt    == sourceVariant.alt) {
+										theVcfRec = vcfRec;
+										theVcfRecs.push(vcfRec);
+									}
+								}
+							})							
+						}
+						var fbData = getProbandVariantCard().model._getCachedData('fbData', theGeneObject.gene_name, theTranscript);
+						fbData.features.forEach(function(v) {
+							if (theVariant == null  
+								&& getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
+								&& v.start  == sourceVariant.start
+								&& v.ref    == sourceVariant.ref
+								&& v.alt    == sourceVariant.alt) {
+								theVariant = v;
+							}
+						})
+						me._promiseFormatRecord(theVariant, sourceVariant, theVcfRecs, theGeneObject, format, rec)
+						  .then(function(data) {
+						  	resolve(data);
+						  })
+
+					});
+
+				} else {
+
 					getProbandVariantCard().model
-					   .vcf
-					   .promiseGetClinvarRecordsImpl(dummyVcfData.features, 
-					   								 getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
-					   								 theGeneObject, 
-					   	                             clinvarLoader)	
-					   .then(function() {
-							
-							variantTooltip.formatContent(revisedVariant, null, "record", rec);
+					 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format, getHeader)
+					 .then(function(data) {
+					 	var theVariant = data[0];
+					 	var sourceVariant = data[1];
+					 	var theRawVcfRecords = data[2];
 
-							if (format == 'csv') {
-								resolve([rec]);				 		
-						 	} else {
-						 		resolve([rec, theRawVcfRecords]);
-						 	}
+						me._promiseFormatRecord(theVariant, sourceVariant, theRawVcfRecords, theGeneObject, format, rec)
+						  .then(function(data) {
+						  	resolve(data);
+						  })
+					 	
+					});
+				}
 
-
-					   })                            			 	
-
-				 	
-				});
 
 			} else {
 				reject("Problem during export of bookmarked variants.  Cannot find transcript " + rec.transcript + " in gene " + rec.gene);
 			}
 		});
+	});
+
+
+}
+
+
+BookmarkCard.prototype._promiseFormatRecord = function(theVariant, sourceVariant, theRawVcfRecords, theGeneObject, format, rec) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+
+		// Merge the properties of the bookmark entry with the variant with the full annotations
+	 	// Always use the inheritance from the bookmarkEntry
+	 	var revisedVariant = $().extend({}, sourceVariant, theVariant);
+
+		// The bookmarkEntry contains fields that need to be in loaded
+	 	// into the record that will be exported.  These include trio
+	 	// allele counts, inheritance.  If the bookmark variant has
+	 	// been refreshed with live data, bypass loading these fields
+	 	// since they are already updated with latest info
+	 	me.proxyBookmarkFieldsToExport.forEach(function(ftr) {
+	 		var targetField = ftr.hasOwnProperty('target') ? ftr.target : ftr.field;
+	 		if (ftr.hasOwnProperty('isProxy') && ftr.isProxy && sourceVariant.hasOwnProperty('isProxy') && sourceVariant.isProxy) {
+	 			if (sourceVariant.hasOwnProperty(ftr.field)) {
+			 		revisedVariant[targetField] = sourceVariant[ftr.field];
+	 			}
+	 		} else if (!ftr.hasOwnProperty('isProxy') || !ftr.isProxy) {
+	 			if (sourceVariant.hasOwnProperty(ftr.field)) {
+		 			revisedVariant[targetField] = sourceVariant[ftr.field];
+	 			}
+	 		}
+	 	});
+
+
+	 	// Set the clinvar start, alt, ref for clinvar web access
+		getProbandVariantCard().model.vcf.formatClinvarCoordinates(theVariant, theVariant);
+
+	 	// Get the clinvar data and load into the variant record
+	 	var dummyVcfData  = {features: [revisedVariant]};
+	 	var clinvarLoader = isClinvarOffline ? getProbandVariantCard().model._refreshVariantsWithClinvarVariants.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvar.bind(getProbandVariantCard().model, dummyVcfData);
+		getProbandVariantCard().model
+		   .vcf
+		   .promiseGetClinvarRecordsImpl(dummyVcfData.features, 
+		   								 getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
+		   								 theGeneObject, 
+		   	                             clinvarLoader)	
+		   .then(function() {
+				
+				variantTooltip.formatContent(revisedVariant, null, "record", rec);
+
+				if (format == 'csv') {
+					resolve([rec]);				 		
+			 	} else {
+			 		resolve([rec, theRawVcfRecords]);
+			 	}
+
+
+		   })                            			 	
+
 	});
 
 
