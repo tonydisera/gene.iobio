@@ -1153,7 +1153,8 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 	var promises = [];
 	var records = [];
 	var headerRecords = [];
-	var getHeader  = true;
+	var headerRecordsCalledVariants = [];
+
 	for (key in this.bookmarkedVariants) {
 		var entry = me.bookmarkedVariants[key];	
 
@@ -1174,6 +1175,8 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 			rec.transcript   = transcriptId;
 			rec.starred      = isFavorite == true ? "Y" : "";	
 
+			
+
 			if (format == 'csv') {
 				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec).then(function(data) {
 					var record = data[0];
@@ -1181,20 +1184,24 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 				});
 			} else if (format == 'vcf') {
 
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec, getHeader)
+				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec, true)
 				            .then(function(data) {
 				            	var record = data[0];
 				            	var annotatedVcfRecs = data[1];
 
-				            	if (headerRecords.length == 0) {
+				            	var theHeaderRecords = null;
+								if ((record.hasOwnProperty('fbCalled')        && record.fbCalled == 'Y') ||
+									(record.hasOwnProperty('freebayesCalled') && record.freebayesCalled == 'Y')) {
+									theHeaderRecords = headerRecordsCalledVariants;
+								} else {
+									theHeaderRecords = headerRecords;
+								}
+
+				            	if (theHeaderRecords.length == 0) {
 					            	annotatedVcfRecs.forEach(function(vcfRecord) {
 										if (vcfRecord.indexOf("#") == 0) {
-											headerRecords.push(vcfRecord);
-											// Insert new INFO field for the gene.iobio annotations
-											if (vcfRecord.indexOf("##INFO=<ID=BGAF_EXAC") == 0) {
-												headerRecords.push("##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
-											}
-											getHeader = false;
+											theHeaderRecords.push(vcfRecord);
+											
 										} 
 									});		
 				            	}
@@ -1224,6 +1231,8 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 			createDownloadLink("#download-bookmarks", output, "gene-iobio-bookmarked-variants." + format );
 		}
 
+		me._appendHeaderRecords(headerRecords, headerRecordsCalledVariants);
+
 		var output = "";
 		if (format == 'csv') {
 			var sortedRecords = records.sort(VariantModel.orderVariantsByPosition);
@@ -1238,6 +1247,77 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 		}
 
 	});
+
+}
+
+BookmarkCard.prototype._appendHeaderRecords = function(headerRecords, headerRecordsCalledVariants) {
+	var infoFields = {};
+	var formatFields = {};
+	var newInfoFields = {};
+	var newFormatFields = {};
+	var insertInfoAtIdx = -1;
+	var insertFormatAtIdx = -1;
+	var idx = 0;
+	headerRecords.forEach(function(rec) {
+		if (rec.indexOf('##INFO=<ID=') == 0) {
+			var parts = rec.split("##INFO=<ID=");
+			var key = parts[1].split(",")[0];
+			infoFields[key] = rec;
+			insertInfoAtIdx = idx;
+		} else if (rec.indexOf('##FORMAT=<ID=') == 0) {
+			var parts = rec.split("##FORMAT=<ID=");
+			var key = parts[1].split(",")[0];
+			formatFields[key] = rec;
+			insertFormatAtIdx = idx;
+
+		}
+		idx++;
+	});
+	if (insertInfoAtIdx == -1) {
+		insertInfoAtIdx = headerRecords.length - 1;
+	} else {
+		insertInfoAtIdx++;
+	}
+	if (insertFormatAtIdx == -1) {
+		insertFormatAtIdx = headerRecords.length - 1;
+	} else {
+		insertFormatAtIdx++;
+	}
+	headerRecordsCalledVariants.forEach(function(rec) {
+		if (rec.indexOf('##INFO=<ID=') == 0) {
+			var parts = rec.split("##INFO=<ID=");
+			var key = parts[1].split(",")[0];
+			if (!infoFields.hasOwnProperty(key)) {
+				newInfoFields[key] = rec;
+			}
+		} else if (rec.indexOf('##FORMAT=<ID=') == 0) {
+			var parts = rec.split("##FORMAT=<ID=");
+			var key = parts[1].split(",")[0];
+			if (!formatFields.hasOwnProperty(key)) {
+				newFormatFields[key] = rec;
+			}
+		}
+
+	});
+	
+	// Insert the info field for the iobio annotations
+	headerRecords.splice(insertInfoAtIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
+
+	//  Insert new info fields
+	for (var key in newInfoFields) {
+		var infoRec = newInfoFields[key];
+		headerRecords.splice(insertInfoAtIdx, 0, infoRec);
+		insertInfoAtIdx++;
+	}
+
+	// Insert new format fields
+	for (var key in newFormatFields) {
+		var formatRec = newFormatFields[key];
+		headerRecords.splice(insertFormatAtIdx, 0, formatRec);
+		insertFormatAtIdx++;
+	}
+
+
 
 }
 
@@ -1256,15 +1336,7 @@ BookmarkCard.prototype._appendVcfRecordAnnotations = function(vcfRecord, record)
 		}
 	})
 
-	// Strip out all of the freebayes INFO fields since the exported VCF may have
-	// records generated from other variant callers
-	if ((record.hasOwnProperty("fbCalled") && record.fbCalled == "Y") ||
-		(record.hasOwnProperty("freebayesCalled") && record.freebayesCalled == "Y")) {
-		info = "IOBIO=" + buf;
-	} else {
-		info += ";IOBIO=" + buf;
-
-	}
+	info += ";IOBIO=" + buf;
 
 
 	fields[7] = info;
