@@ -1251,6 +1251,21 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 }
 
 BookmarkCard.prototype._appendHeaderRecords = function(headerRecords, headerRecordsCalledVariants) {
+	if (headerRecords.length == 0 && headerRecordsCalledVariants.length > 0) {
+		var idx = 0;
+		var injectIdx = headerRecordsCalledVariants.length - 2;
+		headerRecordsCalledVariants.forEach(function(rec) {
+			if (rec.indexOf('##INFO=<ID=') == 0) {
+				injectIdx = idx;
+			}
+			headerRecords.push(rec);
+			idx++;
+		});
+		// Insert the info field for the iobio annotations
+		headerRecords.splice(injectIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
+		return;
+	}
+
 	var infoFields = {};
 	var formatFields = {};
 	var newInfoFields = {};
