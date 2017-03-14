@@ -45,7 +45,6 @@ module.exports = {
         },
         inputDefaults: function() {
           this.inputUrl(this.api.globals.variantFileUrl);
-          this.selectGenomeBuild();
           this.selectSample('NA12878');
           this.inputAlignmentsUrl(this.api.globals.NA12878SampleFileUrl);
         }
@@ -57,7 +56,7 @@ module.exports = {
         probandVcfSampleBox: { selector: '#vcf-sample-box' },
         probandVcfSampleSelectBox: { selector: '#vcf-sample-select-box .selectize-input' },
         urlInput: { selector: '#url-input' },
-        bamUrlInput: { selector: '#bam-url-input' }
+        bamUrlInput: { selector: '#bam-url-input' },
       }
     },
     motherData: {

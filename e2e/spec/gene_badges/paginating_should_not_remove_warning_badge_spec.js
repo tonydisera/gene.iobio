@@ -24,6 +24,7 @@ module.exports = {
     nav.searchGene('PLCXD1');
 
     nav.clickData();
+    dataCard.selectGenomeBuild('GRCh37');
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 

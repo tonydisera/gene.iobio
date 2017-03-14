@@ -34,7 +34,7 @@ module.exports = {
       appTitleSection.clickAnalyzeAll();
       appTitleSection.waitForAnalyzeAllDone();
       appTitleSection.assertGeneBadgesLoaded([
-         'CACNA1S', 'TNNT2', 'APOB', 'LDLR', 'SCN5A'
+         'CACNA1S', 'TNNT2', 'APOB', 'LDLR', 'MSH6'
       ]);
       appTitleSection.goToPage(2);
       appTitleSection.assertGeneBadgesLoaded([
