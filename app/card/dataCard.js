@@ -752,6 +752,12 @@ DataCard.prototype.init = function() {
 		filterCard.clearFilters();
 		filterCard.resetStandardFilterCounts();
 
+		 // If we switched from a trio back to a single, clear out the mother and father
+		// data
+		if (me.mode == 'single') {
+			window.clearMotherFatherData();
+		}
+
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father
 		// data is loaded.
@@ -768,7 +774,6 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		
 		
 		if (theGeneName) {
 			setGeneBloodhoundInputElement(theGeneName, false, true);

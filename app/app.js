@@ -1042,6 +1042,15 @@ function toggleSampleTrio(show) {
 		$('#affected-sibs-box').addClass("hide");
 		var motherCard = null;
 		var fatherCard = null;
+	}
+	enableLoadButton();
+
+}
+
+function clearMotherFatherData() {
+	var motherCard = null;
+	var fatherCard = null;
+	if (dataCard.mode == 'single') {
 		variantCards.forEach( function(variantCard) {
 			if (variantCard.getRelationship() == 'mother') {
 				motherCard = variantCard;
@@ -1050,7 +1059,6 @@ function toggleSampleTrio(show) {
 				motherCard.hide();
 				$('#mother-data').find('#vcf-file-info').val('');
 				$('#mother-data').find('#vcf-url-input').val('');
-				//dataCard.displayUrlBox($('#mother-data'));
 				removeUrl("vcf1");
 				removeUrl("bam1");
 			} else if (variantCard.getRelationship() == 'father') {
@@ -1060,16 +1068,11 @@ function toggleSampleTrio(show) {
 				fatherCard.hide();
 				$('#father-data').find('#vcf-file-info').val('');
 				$('#father-data').find('#vcf-url-input').val('');
-				//dataCard.displayUrlBox($('#father-data'));
 				removeUrl("vcf2");
 				removeUrl("bam2");
 			}
-		});
-		
-
-
+		});		
 	}
-	enableLoadButton();
 
 }
 
