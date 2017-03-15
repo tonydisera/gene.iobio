@@ -49,6 +49,10 @@ module.exports = {
     matrixTrack.waitForMatrixLoaded();
     nav.clickData();
     dataCard.selectSingle();
+    dataCard.selectTrio();
+    dataCard.clickLoad();
+
+    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
     indexPage.expect.element('@motherVariantCard').to.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.be.visible;
   },

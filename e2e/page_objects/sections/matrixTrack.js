@@ -328,7 +328,7 @@ module.exports = {
       var self = this;
       this.api.elements('xpath', precedingSiblingsToVariant(variant), function(precedingVariantElements) {
         var variantIndex = precedingVariantElements.value.length + 1;
-        var column = "/*[local-name()='g'][" + variantIndex + "]/*[local-name()='g'][1]/*[local-name()='rect']";
+        var column = "/*[local-name()='g'][" + variantIndex + "]";
         var pathToColumn = "//div[@id='feature-matrix']/*[local-name()='svg']/*[@class='group']" + column;
         self.click('xpath', pathToColumn);
       });

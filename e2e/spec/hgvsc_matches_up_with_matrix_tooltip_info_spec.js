@@ -24,8 +24,8 @@ module.exports = {
     matrixTrack.waitForMatrixLoaded();
     matrixTrack.clickColumn(1);
     client.pause(4000);
-    matrixTooltip.assertTitleContains('C->A');
-    matrixTooltip.assertHGVScContains('C>A');
+    matrixTooltip.assertTitleLine2Equals('SNP G->A rs527236033');
+    matrixTooltip.assertHGVScEquals('NM_030665.3:c.2273G>A');
     client.end();
   },
 }

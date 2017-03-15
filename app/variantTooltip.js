@@ -596,7 +596,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			  qualityWarningRow
 			+ me._tooltipMainHeaderRow(window.gene.gene_name, window.selectedTranscript.transcript_id, '', '')
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '')
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -640,7 +640,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
 			+ me._tooltipMainHeaderRow(window.gene.gene_name, window.selectedTranscript.transcript_id, '', '')
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink)
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
 			+ me._tooltipHeaderRow( coord, '', '', '')
 			+ inheritanceModeRow
 			+ leftDiv
@@ -653,7 +653,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	} else {
 		return (
 			qualityWarningRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink)
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
 			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
 			+ inheritanceModeRow
 
@@ -769,9 +769,13 @@ VariantTooltip.prototype._tooltipHeaderRow = function(value1, value2, value3, va
 	      + '<div class="' + clazzList + '" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
-VariantTooltip.prototype._tooltipMainHeaderRow = function(value1, value2, value3, value4) {
+VariantTooltip.prototype._tooltipMainHeaderRow = function(value1, value2, value3, value4, clazz) {
+	var theClass = "col-md-12 tooltip-title main-header";
+	if (clazz) {
+		theClass += " " + clazz;
+	}
 	return '<div class="row">'
-	      + '<div class="col-md-12 tooltip-title main-header" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
+	      + '<div class="' + theClass + '" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
 	      + '</div>';	
 }
 VariantTooltip.prototype._tooltipLowQualityHeaderRow = function() {
