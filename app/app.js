@@ -112,6 +112,8 @@ var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
+var variantExporter = new VariantExporter();
+
 
 
 // The smaller the region, the wider we can

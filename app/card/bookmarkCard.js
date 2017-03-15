@@ -3,77 +3,6 @@ function BookmarkCard() {
 	this.bookmarkedGenes = {};
 	this.selectedBookmarkKey = null;
 	this.favorites = {};
-	this.exportFields = [
-		{field: 'chrom', 				exportVcf: false}, 
-		{field: 'start', 				exportVcf: false}, 
-		{field: 'end', 					exportVcf: false}, 
-		{field: 'ref', 					exportVcf: false}, 
-		{field: 'alt', 					exportVcf: false}, 
-		{field: 'gene', 				exportVcf: true}, 
-		{field: 'transcript', 			exportVcf: true}, 
-	    {field: 'starred', 				exportVcf: true},
-	    {field: 'freebayesCalled', 		exportVcf: true},
-	    {field: 'type', 				exportVcf: true},
-		{field: 'impact', 				exportVcf: true},
-		{field: 'highestImpact', 		exportVcf: true}, 
-		{field: 'highestImpactInfo', 	exportVcf: true},
-		{field: 'consequence', 			exportVcf: true},
-		{field: 'afExAC', 				exportVcf: true},
-		{field: 'af1000G', 				exportVcf: true},
-		{field: 'inheritance', 			exportVcf: true}, 
-		{field: 'polyphen', 			exportVcf: true},
-		{field: 'SIFT', 				exportVcf: true},
-		{field: 'rsId', 				exportVcf: true},
-		{field: 'clinvarClinSig', 		exportVcf: true},
-		{field: 'clinvarPhenotype', 	exportVcf: true},
-		{field: 'HGVSc', 				exportVcf: true},
-		{field: 'HGVSp', 				exportVcf: true},
-		{field: 'regulatory', 			exportVcf: true},
-		{field: 'qual', 				exportVcf: false},
-		{field: 'filter', 				exportVcf: false},
-		{field: 'zygosityProband', 		exportVcf: true},
-		{field: 'altCountProband', 		exportVcf: true},
-		{field: 'refCountProband', 		exportVcf: true},
-		{field: 'depthProband', 		exportVcf: true},
-		{field: 'bamDepthProband', 		exportVcf: true},
-	    {field: 'zygosityMother', 		exportVcf: true},
-		{field: 'altCountMother', 		exportVcf: true},
-		{field: 'refCountMother', 		exportVcf: true},
-		{field: 'depthMother', 			exportVcf: true},
-		{field: 'bamDepthMother', 		exportVcf: true},
-	    {field: 'zygosityFather', 		exportVcf: true},
-		{field: 'altCountFather', 		exportVcf: true},
-		{field: 'refCountFather', 		exportVcf: true},
-		{field: 'depthFather', 			exportVcf: true},
-		{field: 'bamDepthFather', 		exportVcf: true},
-		{field: 'dbSnpUrl', 			exportVcf: false},
-		{field: 'clinvarUrl',			exportVcf: false}
-
-	];
-
-	this.proxyBookmarkFieldsToExport = [
-		{field: 'inheritance'},
-
-		{field: 'zygosityProband', target: 'zygosity', isProxy: true },
-		{field: 'altCountProband', target: 'genotypeAltCount', isProxy: true },
-		{field: 'refCountProband', target: 'genotypeRefCount', isProxy: true },
-		{field: 'depthProband',    target: 'genotypeDepth', isProxy: true },
-		{field: 'bamDepthProband', target: 'bamDepth', isProxy: true },
-
-		{field: 'zygosityMother', target: 'motherZygosity', isProxy: true },
-		{field: 'altCountMother', target: 'genotypeAltCountMother', isProxy: true },
-		{field: 'refCountMother', target: 'genotypeRefCountMother', isProxy: true },
-		{field: 'depthMother',    target: 'genotypeDepthMother', isProxy: true },
-		{field: 'bamDepthMother', isProxy: true },
-
-		{field: 'zygosityFather', target: 'fatherZygosity', isProxy: true },
-		{field: 'altCountFather', target: 'genotypeAltCountFather', isProxy: true },
-		{field: 'refCountFather', target: 'genotypeRefCountFather', isProxy: true },
-		{field: 'depthFather',    target: 'genotypeDepthFather', isProxy: true },
-		{field: 'bamDepthFather', isProxy: true }
-	]
-	
-
 }
 
 BookmarkCard.prototype.init = function() {
@@ -111,174 +40,6 @@ BookmarkCard.prototype.init = function() {
 
 }
 
-BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
-	var importSource = $('input[name="import-source"]:checked').val();
-	var files = fileSelection.files;
-	var me = this;
- 	// Check for the various File API support.
-      if (window.FileReader) {
-      	var bookmarkFile = files[0];
-		var reader = new FileReader();
-
-		reader.readAsText(bookmarkFile);
-
-		// Handle errors load
-		reader.onload = function(event) {
-			var data = event.target.result;
-			if (importSource == "gene") {
-				me.importBookmarksCSV(data)
-			} else if (importSource == 'gemini') {
-				me.importBookmarksGemini(data)
-			}
-			$('#dataModal').modal('hide');
-		    fileSelection.value = null;
-		}
-		reader.onerror = function(event) {
-			alert("Cannot read file. Error: " + event.target.error.name);
-			console.log(event.toString())
-		}
-
-      } else {
-          alert('FileReader are not supported in this browser.');
-      }
-
-}
-
-BookmarkCard.prototype.initImportBookmarks = function() {
-
-}
-
-BookmarkCard.prototype.importBookmarksCSV = function(data) {
-	var me = this;
-	
-	me.bookmarkedVariants = {};
-	var recCount = 0;
-	var fieldNames = [];
-	var exportRecords = [];
-	data.split(/[\r\n]+/g).forEach( function(rec) {
-		/*
-		  Validate a CSV string having single, double or un-quoted values.
-			^                                   # Anchor to start of string.
-			\s*                                 # Allow whitespace before value.
-			(?:                                 # Group for value alternatives.
-			  '[^'\\]*(?:\\[\S\s][^'\\]*)*'     # Either Single quoted string,
-			| "[^"\\]*(?:\\[\S\s][^"\\]*)*"     # or Double quoted string,
-			| [^,'"\s\\]*(?:\s+[^,'"\s\\]+)*    # or Non-comma, non-quote stuff.
-			)                                   # End group of value alternatives.
-			\s*                                 # Allow whitespace after value.
-			(?:                                 # Zero or more additional values
-			  ,                                 # Values separated by a comma.
-			  \s*                               # Allow whitespace before value.
-			  (?:                               # Group for value alternatives.
-			    '[^'\\]*(?:\\[\S\s][^'\\]*)*'   # Either Single quoted string,
-			  | "[^"\\]*(?:\\[\S\s][^"\\]*)*"   # or Double quoted string,
-			  | [^,'"\s\\]*(?:\s+[^,'"\s\\]+)*  # or Non-comma, non-quote stuff.
-			  )                                 # End group of value alternatives.
-			  \s*                               # Allow whitespace after value.
-			)*                                  # Zero or more additional values
-			$                                   # Anchor to end of string.
-		*/
-		var regexp = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g
-		var match = regexp.exec(rec);
-
-		var exportRec = {};
-		var idx = 0;
-		while (match != null) {
-		  // matched text: match[0]
-		  // match start: match.index
-		  // capturing group n: match[n]
-		  if (recCount == 0) {
-		  	fieldNames.push(match[2]);
-		  } else {
-		  	exportRec[fieldNames[idx]] = match[2];
-		  }
-		  match = regexp.exec(rec);
-		  idx++;
-		}
-		if (recCount > 0 && Object.keys(exportRec).length > 0) {
-			exportRecords.push(exportRec);
-		}
-		recCount++;
-	});
-
-	exportRecords.forEach( function(er) {
-			var key = me.getBookmarkKey(er.gene, er.transcript, er.chrom, er.start, er.ref, er.alt);
-			if (me.bookmarkedVariants[key] == null) {
-				er.isProxy = true;
-				er.importSource = "gene"
-				er.importFormat = "csv";
-				me.bookmarkedVariants[key] = er;
-				if (er.starred == 'Y') {
-					me.favorites[key] = true;
-				}
-			}
-	});
-	me.showImportedBookmarks();
-
-
-}
-
-BookmarkCard.prototype.importBookmarksGemini = function(data) {
-	var me = this;
-
-	
-	me.bookmarkedVariants = {};
-	var recs = data.split(/[\r\n]+/g);
-	recs.forEach( function(rec) {
-		var fields = rec.split(/\s+/);
-
-		if (fields.length >= 5) {
-			var chrom        = fields[0];
-			var start        = +fields[1];
-			var end          = +fields[2];
-			var ref          = fields[3];
-			var alt          = fields[4];
-			var geneName     = fields[5];
-			var transcriptId = null;
-			if (fields.length > 5) {
-				transcriptId = fields[6];
-			}
-
-			// Skip the first line if it contains column names
-			if (chrom == "chrom") {
-
-			} else {
-				var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
-				if (me.bookmarkedVariants[key] == null) {
-					me.bookmarkedVariants[key] = {isProxy: true, importSource: 'gemini', importFormat: "tsv", gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
-				}
-			}
-
-			
-
-		}
-	});
-
-	me.showImportedBookmarks();
-
-}
-
-BookmarkCard.prototype.showImportedBookmarks = function() {
-	var me = this;
-	showSidebar("Bookmarks");
-	
-
-	// Get the phenotypes for each of the bookmarked genes
-	var promises = []
-	for (var geneName in me.bookmarkedGenes) {
-		var promise = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
-			Promise.all(promises).then(function() {
-				me.refreshBookmarkList();
-			});
-		});
-		promises.push(promise);
-	}	
-
-	// Add the bookmarked genes to the gene buttons
-	genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
-
-	$('#import-bookmarks-dropdown .btn-group').removeClass('open');		
-}
 
 BookmarkCard.prototype.reviseCoord = function(bookmarkEntry, gene) {
 	var me = this;
@@ -1144,405 +905,204 @@ BookmarkCard.prototype.addPhenotypeList = function(container) {
 
 BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 	var me = this;	
+
 	$('#export-loader span').text("Exporting " + format + " file...")
 	$('#export-loader').removeClass("hide");
 	$('#export-bookmarks').addClass("hide");
 	$('#download-bookmarks').addClass("hide");
 
-	// Loop through the bookmarked variants, creating a full export record for each one.
-	var promises = [];
-	var records = [];
-	var headerRecords = [];
-	var headerRecordsCalledVariants = [];
-
+	// Prepare bookmark entries for export.
+	var bookmarkEntries = [];
 	for (key in this.bookmarkedVariants) {
 		var entry = me.bookmarkedVariants[key];	
+		if (scope == "all" || me.favorites[key]) {
 
-		var geneName      = me.parseKey(key).gene;
-		var transcriptId  = me.parseKey(key).transcriptId;
-		var isFavorite    = me.favorites[key];	
+			entry.gene         = me.parseKey(key).gene;
+			entry.transcript   = me.parseKey(key).transcriptId;
+			entry.isFavorite   = me.favorites[key];	
 
-		if (scope == "all" || isFavorite) {
-			var promise = null;
-
-			var rec = {};
-			rec.start        = entry.start;
-			rec.end          = entry.end;
-			rec.chrom        = entry.chrom.indexOf("chr") == 0 ? entry.chrom : 'chr' + entry.chrom;
-			rec.ref          = entry.ref;
-			rec.alt          = entry.alt;
-			rec.gene         = geneName;
-			rec.transcript   = transcriptId;
-			rec.starred      = isFavorite == true ? "Y" : "";	
-
-			
-
-			if (format == 'csv') {
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec).then(function(data) {
-					var record = data[0];
-					records.push(record);
-				});
-			} else if (format == 'vcf') {
-
-				promise = me._promiseCreateRecord(entry, geneName, transcriptId, format, rec, true)
-				            .then(function(data) {
-				            	var record = data[0];
-				            	var annotatedVcfRecs = data[1];
-
-				            	var theHeaderRecords = null;
-								if ((record.hasOwnProperty('fbCalled')        && record.fbCalled == 'Y') ||
-									(record.hasOwnProperty('freebayesCalled') && record.freebayesCalled == 'Y')) {
-									theHeaderRecords = headerRecordsCalledVariants;
-								} else {
-									theHeaderRecords = headerRecords;
-								}
-
-				            	if (theHeaderRecords.length == 0) {
-					            	annotatedVcfRecs.forEach(function(vcfRecord) {
-										if (vcfRecord.indexOf("#") == 0) {
-											theHeaderRecords.push(vcfRecord);
-											
-										} 
-									});		
-				            	}
-								annotatedVcfRecs.forEach(function(vcfRecord) {
-									if (vcfRecord.indexOf("#") != 0) {
-										var newRec = me._appendVcfRecordAnnotations(vcfRecord, record);
-										records.push(newRec);
-									}
-								});						
-							}, 
-							function(error) {
-								alert("Cannot produce export record for variant " + geneName + " " + entry.chrom + " " + entry.start + " " + entry.ref + "->" + entry.alt);
-							});
-			}
-			promises.push(promise);
+			bookmarkEntries.push(entry);
 		}
-
 	}
 
-	// When all of the records have been created, output the csv file
-	Promise.all(promises).then(function() {
-		var formatDownloadButton = function(output, format) {
+	// Export the bookmark entries.
+	variantExporter.promiseExportVariants(bookmarkEntries, format)
+	  .then(function(output) {
 			$('#export-bookmarks').addClass("hide");
 			$('#export-loader').addClass("hide");
 			$('#download-bookmarks span').text( "Download " + format + " file");
 			$('#download-bookmarks').removeClass("hide");
 			createDownloadLink("#download-bookmarks", output, "gene-iobio-bookmarked-variants." + format );
-		}
+	  })
+}
 
-		me._appendHeaderRecords(headerRecords, headerRecordsCalledVariants);
 
-		var output = "";
-		if (format == 'csv') {
-			var sortedRecords = records.sort(VariantModel.orderVariantsByPosition);
-			output = me._outputCSV(sortedRecords);
-			formatDownloadButton(output, format);
-		} else if (format == 'vcf') {
-			var sortedRecords = records.sort(VariantModel.orderVcfRecords);
-			output  = headerRecords.join("\n");
-			output += "\n";
-			output += sortedRecords.join("\n");
-			formatDownloadButton(output, format);
-		}
-
-	});
+BookmarkCard.prototype.initImportBookmarks = function() {
 
 }
 
-BookmarkCard.prototype._appendHeaderRecords = function(headerRecords, headerRecordsCalledVariants) {
-	if (headerRecords.length == 0 && headerRecordsCalledVariants.length > 0) {
-		var idx = 0;
-		var injectIdx = headerRecordsCalledVariants.length - 2;
-		headerRecordsCalledVariants.forEach(function(rec) {
-			if (rec.indexOf('##INFO=<ID=') == 0) {
-				injectIdx = idx;
+
+BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
+	var importSource = $('input[name="import-source"]:checked').val();
+	var files = fileSelection.files;
+	var me = this;
+ 	// Check for the various File API support.
+      if (window.FileReader) {
+      	var bookmarkFile = files[0];
+		var reader = new FileReader();
+
+		reader.readAsText(bookmarkFile);
+
+		// Handle errors load
+		reader.onload = function(event) {
+			var data = event.target.result;
+			if (importSource == "gene") {
+				me.importBookmarksCSV(data)
+			} else if (importSource == 'gemini') {
+				me.importBookmarksGemini(data)
 			}
-			headerRecords.push(rec);
-			idx++;
-		});
-		// Insert the info field for the iobio annotations
-		headerRecords.splice(injectIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
-		return;
-	}
-
-	var infoFields = {};
-	var formatFields = {};
-	var newInfoFields = {};
-	var newFormatFields = {};
-	var insertInfoAtIdx = -1;
-	var insertFormatAtIdx = -1;
-	var idx = 0;
-	headerRecords.forEach(function(rec) {
-		if (rec.indexOf('##INFO=<ID=') == 0) {
-			var parts = rec.split("##INFO=<ID=");
-			var key = parts[1].split(",")[0];
-			infoFields[key] = rec;
-			insertInfoAtIdx = idx;
-		} else if (rec.indexOf('##FORMAT=<ID=') == 0) {
-			var parts = rec.split("##FORMAT=<ID=");
-			var key = parts[1].split(",")[0];
-			formatFields[key] = rec;
-			insertFormatAtIdx = idx;
-
+			$('#dataModal').modal('hide');
+		    fileSelection.value = null;
 		}
-		idx++;
-	});
-	if (insertInfoAtIdx == -1) {
-		insertInfoAtIdx = headerRecords.length - 1;
-	} else {
-		insertInfoAtIdx++;
-	}
-	if (insertFormatAtIdx == -1) {
-		insertFormatAtIdx = headerRecords.length - 1;
-	} else {
-		insertFormatAtIdx++;
-	}
-	headerRecordsCalledVariants.forEach(function(rec) {
-		if (rec.indexOf('##INFO=<ID=') == 0) {
-			var parts = rec.split("##INFO=<ID=");
-			var key = parts[1].split(",")[0];
-			if (!infoFields.hasOwnProperty(key)) {
-				newInfoFields[key] = rec;
-			}
-		} else if (rec.indexOf('##FORMAT=<ID=') == 0) {
-			var parts = rec.split("##FORMAT=<ID=");
-			var key = parts[1].split(",")[0];
-			if (!formatFields.hasOwnProperty(key)) {
-				newFormatFields[key] = rec;
-			}
+		reader.onerror = function(event) {
+			alert("Cannot read file. Error: " + event.target.error.name);
+			console.log(event.toString())
 		}
 
-	});
+      } else {
+          alert('FileReader are not supported in this browser.');
+      }
+
+}
+BookmarkCard.prototype.importBookmarksCSV = function(data) {
+	var me = this;
 	
-	// Insert the info field for the iobio annotations
-	headerRecords.splice(insertInfoAtIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
+	me.bookmarkedVariants = {};
+	var recCount = 0;
+	var fieldNames = [];
+	var importRecords = [];
+	data.split(/[\r\n]+/g).forEach( function(rec) {
+		/*
+		  Validate a CSV string having single, double or un-quoted values.
+			^                                   # Anchor to start of string.
+			\s*                                 # Allow whitespace before value.
+			(?:                                 # Group for value alternatives.
+			  '[^'\\]*(?:\\[\S\s][^'\\]*)*'     # Either Single quoted string,
+			| "[^"\\]*(?:\\[\S\s][^"\\]*)*"     # or Double quoted string,
+			| [^,'"\s\\]*(?:\s+[^,'"\s\\]+)*    # or Non-comma, non-quote stuff.
+			)                                   # End group of value alternatives.
+			\s*                                 # Allow whitespace after value.
+			(?:                                 # Zero or more additional values
+			  ,                                 # Values separated by a comma.
+			  \s*                               # Allow whitespace before value.
+			  (?:                               # Group for value alternatives.
+			    '[^'\\]*(?:\\[\S\s][^'\\]*)*'   # Either Single quoted string,
+			  | "[^"\\]*(?:\\[\S\s][^"\\]*)*"   # or Double quoted string,
+			  | [^,'"\s\\]*(?:\s+[^,'"\s\\]+)*  # or Non-comma, non-quote stuff.
+			  )                                 # End group of value alternatives.
+			  \s*                               # Allow whitespace after value.
+			)*                                  # Zero or more additional values
+			$                                   # Anchor to end of string.
+		*/
+		var regexp = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g
+		var match = regexp.exec(rec);
 
-	//  Insert new info fields
-	for (var key in newInfoFields) {
-		var infoRec = newInfoFields[key];
-		headerRecords.splice(insertInfoAtIdx, 0, infoRec);
-		insertInfoAtIdx++;
-	}
-
-	// Insert new format fields
-	for (var key in newFormatFields) {
-		var formatRec = newFormatFields[key];
-		headerRecords.splice(insertFormatAtIdx, 0, formatRec);
-		insertFormatAtIdx++;
-	}
-
-
-
-}
-
-BookmarkCard.prototype._appendVcfRecordAnnotations = function(vcfRecord, record) {
-	var me = this;
-	var fields = vcfRecord.split("\t");
-	var info = fields[7];
-
-	var buf = "";
-	me.exportFields.forEach(function(exportField) {
-		if (exportField.exportVcf) {
-			if (buf.length > 0) {
-				buf += "|";
-			} 
-			buf += exportField.field + ":" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : " ");			
+		var importRec = {};
+		var idx = 0;
+		while (match != null) {
+		  // matched text: match[0]
+		  // match start: match.index
+		  // capturing group n: match[n]
+		  if (recCount == 0) {
+		  	fieldNames.push(match[2]);
+		  } else {
+		  	importRec[fieldNames[idx]] = match[2];
+		  }
+		  match = regexp.exec(rec);
+		  idx++;
 		}
-	})
-
-	info += ";IOBIO=" + buf;
-
-
-	fields[7] = info;
-	return fields.join("\t");
-}
-
-
-
-BookmarkCard.prototype._outputCSV = function(records) {
-	var me = this;
-
-	// Create the column header line
-	var output = "";
-	me.exportFields.forEach(function(exportField) {
-		if (output.length > 0) {
-			output += ",";
+		if (recCount > 0 && Object.keys(importRec).length > 0) {
+			importRecords.push(importRec);
 		}
-		output += "\"" + exportField.field + "\"";
+		recCount++;
 	});
-	output += "\n";	
 
-	// Now create an output (csv) line for each of the bookmark records
-	records.forEach(function(rec) {
-		var isFirstTime = true;
-		me.exportFields.forEach( function(exportField) {
-			if (isFirstTime) {
-				isFirstTime = false;
-			} else {
-				output += ",";
-			}
-
-			var fieldValue = rec[exportField.field] ? rec[exportField.field] : "" ;
-			output +=  "\"" + fieldValue + "\"";
-		});
-		output += "\n";
-	});
-	return output;	
-}
-
-
-
-BookmarkCard.prototype._promiseCreateRecord = function(bookmarkEntry, geneName, transcriptId, format, rec, getHeader) {
-
-	var me = this;
-
-	return new Promise( function(resolve, reject) {
-		promiseGetCachedGeneModel(geneName).then(function(theGeneObject) {
-			var theTranscript = null;
-			if (theGeneObject == null || theGeneObject.transcripts == null) {
-				var msg = "Unable to export bookmark.  Invalid gene. " + rec.gene;
-				console.log(msg);
-				reject(msg);
-			}
-			theGeneObject.transcripts.forEach(function(transcript) {
-				if (!theTranscript && transcript.transcript_id == transcriptId) {
-					theTranscript = transcript;
+	importRecords.forEach( function(ir) {
+			var key = me.getBookmarkKey(ir.gene, ir.transcript, ir.chrom, ir.start, ir.ref, ir.alt);
+			if (me.bookmarkedVariants[key] == null) {
+				ir.isProxy = true;
+				ir.importSource = "gene"
+				ir.importFormat = "csv";
+				me.bookmarkedVariants[key] = ir;
+				if (ir.starred == 'Y') {
+					me.favorites[key] = true;
 				}
+			}
+	});
+	me.showImportedBookmarks();
+
+
+}
+
+BookmarkCard.prototype.importBookmarksGemini = function(data) {
+	var me = this;
+
+	
+	me.bookmarkedVariants = {};
+	var recs = data.split(/[\r\n]+/g);
+	recs.forEach( function(rec) {
+		var fields = rec.split(/\s+/);
+
+		if (fields.length >= 5) {
+			var chrom        = fields[0];
+			var start        = +fields[1];
+			var end          = +fields[2];
+			var ref          = fields[3];
+			var alt          = fields[4];
+			var geneName     = fields[5];
+			var transcriptId = null;
+			if (fields.length > 5) {
+				transcriptId = fields[6];
+			}
+
+			// Skip the first line if it contains column names
+			if (chrom == "chrom") {
+
+			} else {
+				var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
+				if (me.bookmarkedVariants[key] == null) {
+					me.bookmarkedVariants[key] = {isProxy: true, importSource: 'gemini', importFormat: "tsv", gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
+				}
+			}
+
+			
+
+		}
+	});
+
+	me.showImportedBookmarks();
+
+}
+
+BookmarkCard.prototype.showImportedBookmarks = function() {
+	var me = this;
+	showSidebar("Bookmarks");
+	
+
+	// Get the phenotypes for each of the bookmarked genes
+	var promises = []
+	for (var geneName in me.bookmarkedGenes) {
+		var promise = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
+			Promise.all(promises).then(function() {
+				me.refreshBookmarkList();
 			});
-			if (theTranscript) {
-
-
-				if ((bookmarkEntry.hasOwnProperty('fbCalled')        && bookmarkEntry.fbCalled == 'Y') ||
-					(bookmarkEntry.hasOwnProperty('freebayesCalled') && bookmarkEntry.freebayesCalled == 'Y')) {
-					// If the variant was called on-demand, issue the service calls to
-					// generate the vcf records.
-					cacheJointCallVariants(theGeneObject, theTranscript, bookmarkEntry, function(jointVcfRecs, sourceVariant) {
-						var theVcfRec = null;
-						var theVcfRecs =[];
-						var theVariant = null;
-						if (format == 'vcf') {
-							jointVcfRecs.forEach(function(vcfRec) {
-								if (getHeader && vcfRec.indexOf("#") == 0) {
-									theVcfRecs.push(vcfRec);
-								} else  {
-									fields = vcfRec.split("\t");
-									var chrom = getProbandVariantCard().model._stripRefName(fields[0]);
-									var start = fields[1];
-									var ref   = fields[3];
-									var alt   = fields[4];
-
-									if (theVcfRec == null
-										&& chrom  == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
-										&& start  == sourceVariant.start
-										&& ref    == sourceVariant.ref
-										&& alt    == sourceVariant.alt) {
-										theVcfRec = vcfRec;
-										theVcfRecs.push(vcfRec);
-									}
-								}
-							})							
-						}
-						var fbData = getProbandVariantCard().model._getCachedData('fbData', theGeneObject.gene_name, theTranscript);
-						fbData.features.forEach(function(v) {
-							if (theVariant == null  
-								&& getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
-								&& v.start  == sourceVariant.start
-								&& v.ref    == sourceVariant.ref
-								&& v.alt    == sourceVariant.alt) {
-								theVariant = v;
-							}
-						})
-						me._promiseFormatRecord(theVariant, sourceVariant, theVcfRecs, theGeneObject, format, rec)
-						  .then(function(data) {
-						  	resolve(data);
-						  })
-
-					});
-
-				} else {
-
-					getProbandVariantCard().model
-					 .promiseGetVariantExtraAnnotations(theGeneObject, theTranscript, bookmarkEntry, format, getHeader)
-					 .then(function(data) {
-					 	var theVariant = data[0];
-					 	var sourceVariant = data[1];
-					 	var theRawVcfRecords = data[2];
-
-						me._promiseFormatRecord(theVariant, sourceVariant, theRawVcfRecords, theGeneObject, format, rec)
-						  .then(function(data) {
-						  	resolve(data);
-						  })
-					 	
-					});
-				}
-
-
-			} else {
-				reject("Problem during export of bookmarked variants.  Cannot find transcript " + rec.transcript + " in gene " + rec.gene);
-			}
 		});
-	});
+		promises.push(promise);
+	}	
 
+	// Add the bookmarked genes to the gene buttons
+	genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
 
+	$('#import-bookmarks-dropdown .btn-group').removeClass('open');		
 }
-
-
-BookmarkCard.prototype._promiseFormatRecord = function(theVariant, sourceVariant, theRawVcfRecords, theGeneObject, format, rec) {
-	var me = this;
-	return new Promise( function(resolve, reject) {
-
-		// Merge the properties of the bookmark entry with the variant with the full annotations
-	 	// Always use the inheritance from the bookmarkEntry
-	 	var revisedVariant = $().extend({}, sourceVariant, theVariant);
-
-		// The bookmarkEntry contains fields that need to be in loaded
-	 	// into the record that will be exported.  These include trio
-	 	// allele counts, inheritance.  If the bookmark variant has
-	 	// been refreshed with live data, bypass loading these fields
-	 	// since they are already updated with latest info
-	 	me.proxyBookmarkFieldsToExport.forEach(function(ftr) {
-	 		var targetField = ftr.hasOwnProperty('target') ? ftr.target : ftr.field;
-	 		if (ftr.hasOwnProperty('isProxy') && ftr.isProxy && sourceVariant.hasOwnProperty('isProxy') && sourceVariant.isProxy) {
-	 			if (sourceVariant.hasOwnProperty(ftr.field)) {
-			 		revisedVariant[targetField] = sourceVariant[ftr.field];
-	 			}
-	 		} else if (!ftr.hasOwnProperty('isProxy') || !ftr.isProxy) {
-	 			if (sourceVariant.hasOwnProperty(ftr.field)) {
-		 			revisedVariant[targetField] = sourceVariant[ftr.field];
-	 			}
-	 		}
-	 	});
-
-
-	 	// Set the clinvar start, alt, ref for clinvar web access
-		getProbandVariantCard().model.vcf.formatClinvarCoordinates(theVariant, theVariant);
-
-	 	// Get the clinvar data and load into the variant record
-	 	var dummyVcfData  = {features: [revisedVariant]};
-	 	var clinvarLoader = isClinvarOffline ? getProbandVariantCard().model._refreshVariantsWithClinvarVariants.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvar.bind(getProbandVariantCard().model, dummyVcfData);
-		getProbandVariantCard().model
-		   .vcf
-		   .promiseGetClinvarRecordsImpl(dummyVcfData.features, 
-		   								 getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
-		   								 theGeneObject, 
-		   	                             clinvarLoader)	
-		   .then(function() {
-				
-				variantTooltip.formatContent(revisedVariant, null, "record", rec);
-
-				if (format == 'csv') {
-					resolve([rec]);				 		
-			 	} else {
-			 		resolve([rec, theRawVcfRecords]);
-			 	}
-
-
-		   })                            			 	
-
-	});
-
-
-}
-
 
