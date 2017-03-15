@@ -349,8 +349,18 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 										&& start  == sourceVariant.start
 										&& ref    == sourceVariant.ref
 										&& alt    == sourceVariant.alt) {
+
 										theVcfRec = vcfRec;
-										theVcfRecs.push(vcfRec);
+										// Strip off mother and father genotype fields for now since
+										// the loaded variants won't have these when bookmarks are
+										// exported.
+										var fields = theVcfRec.split("\t");
+										if (fields.length > 10) {
+											fields.splice(10, fields.length - 10);
+											theVcfRec = fields.join("\t");	
+										}
+
+										theVcfRecs.push(theVcfRec);
 									}
 								}
 							})							
