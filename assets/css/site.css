@@ -1571,7 +1571,8 @@ header {
 .tt-suggestion {
   padding: 3px 20px;
   font-size: 16px;
-  line-height: 22px; }
+  line-height: 22px;
+  text-align: left; }
   .tt-suggestion.tt-cursor {
     color: #fff;
     background-color: #0097cf; }

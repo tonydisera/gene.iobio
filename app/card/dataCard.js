@@ -810,6 +810,11 @@ DataCard.prototype.initSibs = function() {
 }
 
 DataCard.prototype.onShow = function() {
+	if (window.gene) {
+		$('#bloodhound-data-dialog').addClass("hide");
+	} else {
+		$('#bloodhound-data-dialog').removeClass("hide");
+	}
 
 }
 

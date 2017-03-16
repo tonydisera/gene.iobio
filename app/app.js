@@ -491,7 +491,7 @@ function init() {
 	});	
 
 	// Set up the gene search widget
-	loadGeneWidget( function(success) {
+	loadGeneWidgets( function(success) {
 		if (success) {
 			loadGeneFromUrl();
 		}
@@ -1076,6 +1076,10 @@ function clearMotherFatherData() {
 		});		
 	}
 
+}
+
+function getGeneBloodhoundElementForDataDialog() {
+	return $('#bloodhound-data-dialog .typeahead');
 }
 
 function getGeneBloodhoundElement() {
@@ -1826,7 +1830,7 @@ function promiseGetGeneModel(geneName) {
 
 
 
-function loadGeneWidget(callback) {
+function loadGeneWidgets(callback) {
 	// kicks off the loading/processing of `local` and `prefetch`
 	gene_engine.initialize();
 
@@ -1851,10 +1855,29 @@ function loadGeneWidget(callback) {
 	  // is compatible with the typeahead jQuery plugin
 	  source: gene_engine.ttAdapter()
 	});
-	
-	typeahead.on('typeahead:selected',function(evt,data){	
 
+	var typeaheadDataDialog = getGeneBloodhoundElementForDataDialog().typeahead({
+	  hint: true,
+	  highlight: true,
+	  minLength: 1
+	},
+	{
+	  name: 'name',
+	  displayKey: 'name',
+	  templates: {
+	    empty: [
+	      '<div class="empty-message">',
+	      'no genes match the current query',
+	      '</div>'
+	    ].join('\n'),
+	    suggestion: Handlebars.compile('<p><strong>{{name}}</strong></p>')
+	  },
+	  // `ttAdapter` wraps the suggestion engine in an adapter that
+	  // is compatible with the typeahead jQuery plugin
+	  source: gene_engine.ttAdapter()
+	});
 
+	var onGeneNameEntered = function(evt,data) {
 		// Ignore second event triggered by loading gene widget from url parameter
 		if (data.loadFromUrl && loadedUrl) {
 			return;
@@ -1881,6 +1904,12 @@ function loadGeneWidget(callback) {
 		    	
 	    	    
 	    	window.geneObjects[window.gene.gene_name] = window.gene;
+
+	    	// if the gene name was entered on the data dialog, enable/disable
+	    	// the load button
+	    	if (evt.currentTarget.id == 'enter-gene-name-data-dialog') {
+		    	enableLoadButton();
+	    	}
 
 	    	if (!validateGeneTranscripts()) {
 	    		return;
@@ -1931,7 +1960,12 @@ function loadGeneWidget(callback) {
 				$('#splash').addClass("hide");
 
 				genesCard.setSelectedGene(window.gene.gene_name);
-		    	loadTracksForGene();
+
+				// Only load the variant data if the gene name was NOT entered 
+				// on the data dialog.  
+				if (evt.currentTarget.id != 'enter-gene-name-data-dialog') {
+			    	loadTracksForGene();
+				} 
 
 		    	// add gene to url params
 		    	updateUrl('gene', window.gene.gene_name);
@@ -1949,10 +1983,17 @@ function loadGeneWidget(callback) {
 			alertify.alert(error);
 			genesCard.removeGeneBadgeByName(theGeneName);
 
-		});
-		
-		
+		});		
+	}
+	
+	typeahead.on('typeahead:selected',function(evt,data){	
+		onGeneNameEntered(evt,data);
 	});	
+	typeaheadDataDialog.on('typeahead:selected',function(evt,data){	
+		onGeneNameEntered(evt,data);
+	});	
+
+
 	loadFullGeneSet(callback);
 }
 
@@ -2986,21 +3027,24 @@ function enableLoadButton() {
 		cards[vc.getRelationship()] = vc;
 	});
 
+	if (window.gene) {
+		if (dataCard.mode == 'single') {
+			if (cards['proband'].isReadyToLoad()) {
+				enable = true;
+			}
+		} else if (dataCard.mode == 'trio') {
+			if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
+				enable = true;
+			}
+		}
+		if (enable) {
+			$('#data-card').find('#ok-button').removeClass("disabled");
+		} else {
+			$('#data-card').find('#ok-button').addClass("disabled");
+		}		
+	}
 
-	if (dataCard.mode == 'single') {
-		if (cards['proband'].isReadyToLoad()) {
-			enable = true;
-		}
-	} else if (dataCard.mode == 'trio') {
-		if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
-			enable = true;
-		}
-	}
-	if (enable) {
-		$('#data-card').find('#ok-button').removeClass("disabled");
-	} else {
-		$('#data-card').find('#ok-button').addClass("disabled");
-	}
+
 }
 
 function disableLoadButton() {
