@@ -15,6 +15,7 @@ module.exports = {
     transcriptCard = indexPage.section.transcriptCard;
   },
 
+
   'Loading Platinum Single shows the correct cards (only proband)': function(client) {
     indexPage.load();
     nav.searchGene('BRCA2');
@@ -62,24 +63,9 @@ module.exports = {
     dataCard.selectTrio();
     dataCard.assert.cssClassNotPresent('@loadButton', "disabled");
     client.end();
-  },
-  
-
-  'The gene can be entered on on the Data dialog': function(client) {
-    indexPage.load();
-
-    nav.clickData();
-    dataCard.selectSingle();
-    dataCard.selectGenomeBuild('GRCh37');
-    dataCard.section.probandData.selectPlatinumTrio();
-    dataCard.searchGene('RAI1');
-    dataCard.clickLoad();
-
-
-    transcriptCard.expect.element('@geneName').text.to.equal('RAI1');
-    indexPage.expect.element('@probandVariantCard').to.be.visible;
-    indexPage.expect.element('@motherVariantCard').to.not.be.visible;
-    indexPage.expect.element('@fatherVariantCard').to.not.be.visible;
   }
+
+
+
 };
 
