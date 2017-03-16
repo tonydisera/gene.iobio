@@ -15,6 +15,12 @@ module.exports = {
       build = build || 'GRCh37';
       return this.click('@genomeBuildSelectBox')
                  .click("#select-build-box .selectize-dropdown-content [data-value='" + build + "']");
+    },
+    searchGene: function(gene) {
+      this.clearValue('@enterGeneName');
+      this.setValue('@enterGeneName', [gene, this.api.Keys.ARROW_DOWN, this.api.Keys.ENTER]);
+      this.api.pause(2000);
+      return this;
     }
   }],
   elements: {
@@ -22,6 +28,7 @@ module.exports = {
     singleProbandButton: { selector: '#single-proband-button' },
     trioButton: { selector: '#trio-button' },
     genomeBuildSelectBox: { selector: '#select-build-box .selectize-input' },
+    enterGeneName: { selector: '#enter-gene-name-data-dialog' }
   },
   sections: {
     probandData: {
