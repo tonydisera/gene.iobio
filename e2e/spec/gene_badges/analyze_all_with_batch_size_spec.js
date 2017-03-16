@@ -17,13 +17,13 @@ module.exports = {
 
   'Analyzing all in batch sizes of 10 after refreshing the page should load all badges': function(client) {
     indexPage.load();
+    nav.clickGenes();
+    findGenesPanel.clickACMG56Genes();
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
-    nav.clickGenes();
-    findGenesPanel.clickACMG56Genes();
     matrixTrack.waitForMatrixLoaded();
 
 

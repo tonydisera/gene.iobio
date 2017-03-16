@@ -17,13 +17,13 @@ module.exports = {
 
   'Analyzing all in batch sizes of 1 should load all badges': function(client) {
     indexPage.load();    
+    nav.clickGenes();
+    findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);    
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
-    nav.clickGenes();
-    findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);    
     appTitleSection.clickAnalyzeAll();
     matrixTrack.waitForMatrixLoaded();
     appTitleSection.assertGeneBadgesLoaded(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);
