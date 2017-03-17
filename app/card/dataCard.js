@@ -811,8 +811,10 @@ DataCard.prototype.initSibs = function() {
 
 DataCard.prototype.onShow = function() {
 	if (window.gene) {
+		$('#gene-name-data-dialog-box').addClass("hide");
 		$('#bloodhound-data-dialog').addClass("hide");
 	} else {
+		$('#gene-name-data-dialog-box').removeClass("hide");
 		$('#bloodhound-data-dialog').removeClass("hide");
 	}
 

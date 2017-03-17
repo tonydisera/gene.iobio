@@ -2074,7 +2074,7 @@ function loadTracksForGene(bypassVariantCards, callback) {
 
 	hideIntro();
 	if (window.gene == null || window.gene == "" && !isLevelBasic) {
-		$('.twitter-typeahead').animateIt('tada');
+		$('.bloodhound .twitter-typeahead').animateIt('tada');
 		return;
 	} 
 
