@@ -1,4 +1,4 @@
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
 
 
 var cacheHelper = new CacheHelper();
@@ -14,9 +14,8 @@ var theGene = {gene_name: 'RAI1', chr: 'chr17', start: 17584787, end: 17714767, 
 geneObjects['RAI1'] = theGene;
 
 
-describe('variantExporter', function() {
+describe('iobioVariant', function() {
 
-	var variantExporter = new VariantExporter();
 	
 	var model = new VariantModel();
 	model.init();
@@ -25,15 +24,6 @@ describe('variantExporter', function() {
 	var probandVariantCard = new VariantCard();
 	probandVariantCard.model = model;
 	variantCards.push(probandVariantCard);
-
-
-
-	var bookmarkEntries = [
- 	 {isProxy: true, format: 'csv', chrom: '17',start: 17698535	,end: 17698536	,ref: 'G'	,alt: 'A'	,gene: 'RAI1'	,transcript: 'ENST00000353383.1' ,   freebayesCalled: '',     isFavorite: false },
-	 {isProxy: true, format: 'csv', chrom: '20',start: 30409363	,end: 30409364	,ref: 'A'	,alt: 'G'	,gene: 'MYLK2'	,transcript: 'ENST00000375994.2' ,   freebayesCalled: 'Y',    isFavorite: false},
-	 {isProxy: true, format: 'csv', chrom: '22',start: 39636863	,end: 39636865	,ref: 'GCC'	,alt: 'G'	,gene: 'PDGFB'	,transcript: 'ENST00000331163.6' ,   freebayesCalled: '',     isFavorite: false},	
-	 {isProxy: true, format: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}		
-	];
 
 
 	var speciesData = [
@@ -82,25 +72,19 @@ describe('variantExporter', function() {
 		});
 	});
 
-	describe('#exportBookmarkedVariantsCSV', function() {
+	describe('#getRemoteVariants', function() {
 		beforeEach(function(done) {
-			variantExporter.promiseExportVariants(bookmarkEntries, 'csv').then(function(data) {
-				output = data;
+			getProbandVariantCard().model.promiseGetVariants(theGene, theTranscript, theGene.start, theGene.end).then(function(theVcfData) {
 				done();
 			})
 		});
 
-		it('exports bookmarked variants as csv', function(done) {
+		it('get variants from vcf url', function(done) {
 
 			expect(variantExporter).not.toBeNull();
 			expect(getProbandVariantCard().model).not.toBeNull();
 			expect(getProbandVariantCard().model.sampleName).toEqual('NA12878');
-
-			expect(output).not.toBeNull();
-
-			var records = output.split("\n");
-			expect(records.length).toEqual(5);
-
+			expect(getProbandVariantCard().model.vcfData).not.toBeNull();
 			done();
 		});
 	});

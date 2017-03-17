@@ -284,10 +284,10 @@ VariantExporter.prototype._outputCSV = function(records) {
 		}
 		output += "\"" + exportField.field + "\"";
 	});
-	output += "\n";	
 
 	// Now create an output (csv) line for each of the bookmark records
 	records.forEach(function(rec) {
+		output += "\n";	
 		var isFirstTime = true;
 		me.exportFields.forEach( function(exportField) {
 			if (isFirstTime) {
@@ -299,7 +299,6 @@ VariantExporter.prototype._outputCSV = function(records) {
 			var fieldValue = rec[exportField.field] ? rec[exportField.field] : "" ;
 			output +=  "\"" + fieldValue + "\"";
 		});
-		output += "\n";
 	});
 	return output;	
 }
