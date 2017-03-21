@@ -925,8 +925,18 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
 		}
 	}
 
+	// If this is a trio, the exporter will be getting the genotype info for proband, mother
+	// and father, so pass in a comma separated value of sample names for trio.  Otherwise,
+	// just pass null, which will default to the proband's sample name
+	var sampleNames = null;
+	if (dataCard.mode == 'trio') {
+		sampleNames = variantCards.map(function(vc) {
+			return vc.model.getSampleName();
+		});
+	} 
+
 	// Export the bookmark entries.
-	variantExporter.promiseExportVariants(bookmarkEntries, format)
+	variantExporter.promiseExportVariants(bookmarkEntries, format, sampleNames)
 	  .then(function(output) {
 			$('#export-bookmarks').addClass("hide");
 			$('#export-loader').addClass("hide");
@@ -978,54 +988,7 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 	var me = this;
 	
 	me.bookmarkedVariants = {};
-	var recCount = 0;
-	var fieldNames = [];
-	var importRecords = [];
-	data.split(/[\r\n]+/g).forEach( function(rec) {
-		/*
-		  Validate a CSV string having single, double or un-quoted values.
-			^                                   # Anchor to start of string.
-			\s*                                 # Allow whitespace before value.
-			(?:                                 # Group for value alternatives.
-			  '[^'\\]*(?:\\[\S\s][^'\\]*)*'     # Either Single quoted string,
-			| "[^"\\]*(?:\\[\S\s][^"\\]*)*"     # or Double quoted string,
-			| [^,'"\s\\]*(?:\s+[^,'"\s\\]+)*    # or Non-comma, non-quote stuff.
-			)                                   # End group of value alternatives.
-			\s*                                 # Allow whitespace after value.
-			(?:                                 # Zero or more additional values
-			  ,                                 # Values separated by a comma.
-			  \s*                               # Allow whitespace before value.
-			  (?:                               # Group for value alternatives.
-			    '[^'\\]*(?:\\[\S\s][^'\\]*)*'   # Either Single quoted string,
-			  | "[^"\\]*(?:\\[\S\s][^"\\]*)*"   # or Double quoted string,
-			  | [^,'"\s\\]*(?:\s+[^,'"\s\\]+)*  # or Non-comma, non-quote stuff.
-			  )                                 # End group of value alternatives.
-			  \s*                               # Allow whitespace after value.
-			)*                                  # Zero or more additional values
-			$                                   # Anchor to end of string.
-		*/
-		var regexp = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g
-		var match = regexp.exec(rec);
-
-		var importRec = {};
-		var idx = 0;
-		while (match != null) {
-		  // matched text: match[0]
-		  // match start: match.index
-		  // capturing group n: match[n]
-		  if (recCount == 0) {
-		  	fieldNames.push(match[2]);
-		  } else {
-		  	importRec[fieldNames[idx]] = match[2];
-		  }
-		  match = regexp.exec(rec);
-		  idx++;
-		}
-		if (recCount > 0 && Object.keys(importRec).length > 0) {
-			importRecords.push(importRec);
-		}
-		recCount++;
-	});
+	var importRecords = VariantImporter.parseRecordsCSV(data);
 
 	importRecords.forEach( function(ir) {
 			var key = me.getBookmarkKey(ir.gene, ir.transcript, ir.chrom, ir.start, ir.ref, ir.alt);
@@ -1042,7 +1005,9 @@ BookmarkCard.prototype.importBookmarksCSV = function(data) {
 	me.showImportedBookmarks();
 
 
+
 }
+
 
 BookmarkCard.prototype.importBookmarksGemini = function(data) {
 	var me = this;
@@ -1087,21 +1052,54 @@ BookmarkCard.prototype.importBookmarksGemini = function(data) {
 BookmarkCard.prototype.showImportedBookmarks = function() {
 	var me = this;
 	showSidebar("Bookmarks");
+
+	var genesToRefresh = [];
+	for (var theGeneName in me.bookmarkedGenes) {
+		genesToRefresh.push(theGeneName);
+	}
+
+	var refreshNextGene = function() {
+		var me = this;
+		
+		/*
+		if (genesToRefresh.length == 0) {
+			
+		} else {
+			var geneToRefresh = genesToRefresh.splice(0,1)[0];
+			
+			genesCard.selectGene(geneToRefresh, function(){}, function() {
+				refreshNextGene();
+			});		
+				
+		}
+		*/
+	}
 	
 
 	// Get the phenotypes for each of the bookmarked genes
 	var promises = []
 	for (var geneName in me.bookmarkedGenes) {
 		var promise = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
-			Promise.all(promises).then(function() {
-				me.refreshBookmarkList();
-			});
 		});
 		promises.push(promise);
+		if (promises.length == Object.keys(me.bookmarkedGenes).length) {
+
+			Promise.all(promises).then(function() {
+				// Create the bookmark links 
+				me.refreshBookmarkList();
+
+				// Add the bookmarked genes to the gene buttons
+				genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
+
+				// Sequentially select each gene for bookmarked variants.  When
+				// done, refresh the bookmark list again.
+				refreshNextGene();
+			});
+			
+		}		
 	}	
 
-	// Add the bookmarked genes to the gene buttons
-	genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
+
 
 	$('#import-bookmarks-dropdown .btn-group').removeClass('open');		
 }

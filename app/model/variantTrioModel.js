@@ -126,18 +126,8 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	    // to the father variant set. 
 	    
 		// Fill in the inheritance mode. 
-		// 1. recessive mode if mom and dad are het and proband is hom
-		// 2  denovo proband has variant, but not present in mom and dad 
-		//    (homref parents are also the same as variant not being present)
 		me.probandVcfData.features.forEach(function(variant) {
-			if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
-				&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
-				&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
-				variant.inheritance = 'recessive';
-			} else if ( (variant.compareMother == 'unique1' || (variant.compareMother == 'common' && variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref'))
-				     && (variant.compareFather == 'unique1' || (variant.compareFather == 'common' && variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref'))) {
-				variant.inheritance = 'denovo';
-			} 
+			VariantTrioModel.determineInheritance(variant, 'compareMother', 'compareFather');
 		});
 
 		if (me.probandVcfData) {
@@ -187,6 +177,31 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		console.log("error occured when comparing proband variants to mother?");
 	})	
 
+}
+
+
+/*
+ *  Set the inhertance field on the variant.
+ *  recessive  - if mom and dad are het and proband is hom
+ *	denovo     - proband has variant, but not present in mom and dad 
+ *		         (homref parents are also the same as variant not being present)
+ */
+VariantTrioModel.determineInheritance = function(variant, fieldCompareMother, fieldCompareFather) {
+	if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
+		&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
+		&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
+		variant.inheritance = 'recessive';
+	} else if (fieldCompareMother && fieldCompareFather
+	         && (variant[fieldCompareMother] == 'unique1' || (variant[fieldCompareMother]  == 'common' && variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref'))
+		     && (variant[fieldCompareFather] == 'unique1' || (variant[fieldCompareFather]  == 'common' && variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref'))) {
+		variant.inheritance = 'denovo';
+	} else if (fieldCompareMother == null && fieldCompareFather == null
+	         && (variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref')
+		     && (variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref')) {
+		variant.inheritance = 'denovo';
+	} else {
+		variant.inheritance = 'none';
+	}	
 }
 
 VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfData, compareAttribute, onMatchFunction, onNoMatchFunction ) {

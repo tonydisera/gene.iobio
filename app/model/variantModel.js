@@ -835,7 +835,7 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, format, getHeader = false) {
+VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, format, getHeader = false, sampleNames) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -865,7 +865,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				   me.getVcfRefName(theGene.chr), 
 				   fakeGeneObject,
 			       theTranscript,
-			       me.sampleName,
+			       (sampleNames ? sampleNames.join(",") : me.sampleName),
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
 			       true,
@@ -939,13 +939,9 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 						    	// return the annotated variant
 								resolve(theVariant);
 				    		} else {
-				    			if (bypassCaching) {
-				    				resolve(theVariant);
-				    			} else {	
-				    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;				
-					    			console.log(msg);
-					    			reject(msg);
-				    			}
+			    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;				
+				    			console.log(msg);
+				    			reject(msg);
 				    		}			    		
 
 			    		}

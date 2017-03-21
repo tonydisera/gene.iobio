@@ -1393,9 +1393,15 @@ GenesCard.prototype.setGeneBadgeWarning = function(geneName, select) {
 }
 
 GenesCard.prototype._getGeneBadge = function(geneName) {
-	return $("#gene-badge-container #gene-badge-name"). filter(function() {
-    	return $(this).text().toUpperCase() === geneName.toUpperCase();
-	}).parent().parent();
+	if (geneName) {
+		return $("#gene-badge-container #gene-badge-name"). filter(function() {
+			if (geneName) {
+		    	return $(this).text().toUpperCase() === geneName.toUpperCase();
+			} else {
+				return null;
+			}
+		}).parent().parent();
+	}
 }
 
 GenesCard.prototype.setGeneBadgeError = function(geneName, select) {

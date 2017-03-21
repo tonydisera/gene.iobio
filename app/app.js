@@ -2738,11 +2738,15 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			translatedRefName = trRefName;
 			jointVcfRecs = 	theData.split("\n");		
 
-			parseNextCalledVariants(function() {
-				if (callback) {
-					callback(jointVcfRecs, sourceVariant);
-				}
-			});
+			if (sourceVariant) {
+				callback(jointVcfRecs, translatedRefName, sourceVariant);
+			} else {
+				parseNextCalledVariants(function() {
+					if (callback) {
+						callback(jointVcfRecs);
+					}
+				});				
+			}
 		}
 	);
 

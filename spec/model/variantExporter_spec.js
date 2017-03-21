@@ -1,4 +1,4 @@
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000;
 
 
 var cacheHelper = new CacheHelper();
@@ -6,33 +6,24 @@ cacheHelper.isolateSession();
 
 var genomeBuildHelper = new GenomeBuildHelper();
 
-var variantCards = [];
-
 var geneObjects = {};
 var theTranscript = {transcript_id: 'ENST00000353383.1'};
 var theGene = {gene_name: 'RAI1', chr: 'chr17', start: 17584787, end: 17714767, strand: '+', transcripts: [theTranscript] };
 geneObjects['RAI1'] = theGene;
 
 
+
 describe('variantExporter', function() {
 
 	var variantExporter = new VariantExporter();
 	
-	var model = new VariantModel();
-	model.init();
-	model.relationship = 'proband';
-
-	var probandVariantCard = new VariantCard();
-	probandVariantCard.model = model;
-	variantCards.push(probandVariantCard);
-
 
 
 	var bookmarkEntries = [
- 	 {isProxy: true, format: 'csv', chrom: '17',start: 17698535	,end: 17698536	,ref: 'G'	,alt: 'A'	,gene: 'RAI1'	,transcript: 'ENST00000353383.1' ,   freebayesCalled: '',     isFavorite: false },
-	 {isProxy: true, format: 'csv', chrom: '20',start: 30409363	,end: 30409364	,ref: 'A'	,alt: 'G'	,gene: 'MYLK2'	,transcript: 'ENST00000375994.2' ,   freebayesCalled: 'Y',    isFavorite: false},
-	 {isProxy: true, format: 'csv', chrom: '22',start: 39636863	,end: 39636865	,ref: 'GCC'	,alt: 'G'	,gene: 'PDGFB'	,transcript: 'ENST00000331163.6' ,   freebayesCalled: '',     isFavorite: false},	
-	 {isProxy: true, format: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}		
+ 	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '17',start: 17698535	,end: 17698536	,ref: 'G'	,alt: 'A'	,gene: 'RAI1'	,transcript: 'ENST00000353383.1' ,   freebayesCalled: '',     isFavorite: false },
+	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '20',start: 30409363	,end: 30409364	,ref: 'A'	,alt: 'G'	,gene: 'MYLK2'	,transcript: 'ENST00000375994.2' ,   freebayesCalled: 'Y',    isFavorite: false},
+	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '22',start: 39636863	,end: 39636865	,ref: 'GCC'	,alt: 'G'	,gene: 'PDGFB'	,transcript: 'ENST00000331163.6' ,   freebayesCalled: '',     isFavorite: false},	
+	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}		
 	];
 
 
@@ -64,27 +55,67 @@ describe('variantExporter', function() {
 
 	var output = "";
 
+	var vcfUrl = {
+		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+		father:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz'
+	}
+	var sample = {
+		proband: 'NA12878',
+		mother:  'NA12891',
+		father:  'NA12892'
+	}
+	var bamUrl = {
+		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
+		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
+		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
+	}
+
 
 
 	beforeEach(function(done) {
+
+
+
+		var model = new VariantModel();
+		model.init();
+		model.relationship = 'mother';
+		var vc = new VariantCard();
+		vc.model = model;
+		variantCards.push(vc);
+
+		model = new VariantModel();
+		model.init();
+		model.relationship = 'father';
+		vc = new VariantCard();
+		vc.model = model;
+		variantCards.push(vc);
+
 		genomeBuildHelper = new GenomeBuildHelper();
 		genomeBuildHelper.init(speciesData);
 
 		variantExporter = new VariantExporter();
-	
-		getProbandVariantCard().model.onVcfUrlEntered('https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz', function(success, samples) {
-	
-			getProbandVariantCard().model.setSampleName('NA12878');
-			
-			getProbandVariantCard().model.onBamUrlEntered('https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam', function(success) {
-				done();
+
+		var doneCount = 0;
+
+		variantCards.forEach(function(vc) {
+			vc.model.onVcfUrlEntered(vcfUrl[vc.getRelationship()], function(success, samples) {
+		
+				vc.model.setSampleName(sample[vc.getRelationship()]);
+				
+				vc.model.onBamUrlEntered(bamUrl[vc.getRelationship()], function(success) {
+					doneCount++;
+					if (doneCount == variantCards.length) {
+						done();
+					}
+				});
 			});
 		});
 	});
 
 	describe('#exportBookmarkedVariantsCSV', function() {
 		beforeEach(function(done) {
-			variantExporter.promiseExportVariants(bookmarkEntries, 'csv').then(function(data) {
+			variantExporter.promiseExportVariants(bookmarkEntries, 'csv', Object.values(sample)).then(function(data) {
 				output = data;
 				done();
 			})
@@ -98,8 +129,71 @@ describe('variantExporter', function() {
 
 			expect(output).not.toBeNull();
 
-			var records = output.split("\n");
-			expect(records.length).toEqual(5);
+			var importRecords = VariantImporter.parseRecordsCSV(output);
+			expect(importRecords.length).toEqual(4);
+
+
+			expect(importRecords[0].chrom).toEqual('chr17');
+			expect(importRecords[0].impact).toEqual('HIGH');
+			expect(importRecords[0].consequence).toEqual('stop gained');
+			expect(importRecords[0].afExAC).toEqual('0');
+			expect(importRecords[0].af1000G).toEqual('0');
+			expect(importRecords[0].inheritance).toEqual('recessive');
+			expect(importRecords[0].rsId).toEqual('rs527236033');
+			expect(importRecords[0].clinvarClinSig).toEqual('pathogenic');
+			expect(importRecords[0].clinvarPhenotype).toEqual('smith-magenis syndrome');
+			expect(importRecords[0].HGVSc).toEqual('ENST00000353383.1:c.2273G>A');
+			expect(importRecords[0].HGVSp).toEqual('ENSP00000323074.4:p.Trp758Ter');
+			expect(importRecords[0].qual).toEqual('2880.99');
+			expect(importRecords[0].zygosityProband).toEqual('HOM');
+			expect(importRecords[0].altCountProband).toEqual('38');
+			expect(importRecords[0].refCountProband).toEqual('1');
+			expect(importRecords[0].depthProband).toEqual('39');
+			//expect(importRecords[0].bamDepthProband).toEqual('38');
+			expect(importRecords[0].zygosityMother).toEqual('HET');
+			expect(importRecords[0].altCountMother).toEqual('26');
+			expect(importRecords[0].refCountMother).toEqual('25');
+			expect(importRecords[0].depthMother).toEqual('51');
+			expect(importRecords[0].zygosityFather).toEqual('HET');
+			expect(importRecords[0].altCountFather).toEqual('30');
+			expect(importRecords[0].refCountFather).toEqual('33');
+			expect(importRecords[0].depthFather).toEqual('63');
+
+
+			expect(importRecords[1].chrom == 'chr20');
+			expect(importRecords[1].impact).toEqual('MODERATE');
+			expect(importRecords[1].consequence).toEqual('missense variant');
+			expect(importRecords[1].afExAC).toEqual('3.3e-05');
+			expect(importRecords[1].af1000G).toEqual('0');
+			//expect(importRecords[1].inheritance).toEqual('de novo');
+			expect(importRecords[1].polyphen).toEqual('benign');
+			expect(importRecords[1].SIFT).toEqual('tolerated');
+			expect(importRecords[1].rsId).toEqual('rs193922712');
+			expect(importRecords[1].clinvarClinSig).toEqual('likely pathogenic');
+			expect(importRecords[1].clinvarPhenotype).toEqual('cardiomyopathy');
+			expect(importRecords[1].HGVSc).toEqual('ENST00000375994.2:c.595A>G');
+			expect(importRecords[1].HGVSp).toEqual('ENSP00000365162.2:p.Ile199Val');
+			/*
+			expect(importRecords[1].qual).toEqual('8.46129');
+			expect(importRecords[1].zygosityProband).toEqual('HET');
+			expect(importRecords[1].altCountProband).toEqual('10');
+			expect(importRecords[1].refCountProband).toEqual('29');
+			expect(importRecords[1].depthProband).toEqual('49');
+			expect(importRecords[1].zygosityMother).toEqual('HOMREF');
+			expect(importRecords[1].altCountMother).toEqual('0');
+			expect(importRecords[1].refCountMother).toEqual('55');
+			expect(importRecords[1].depthMother).toEqual('55');
+			expect(importRecords[1].zygosityFather).toEqual('HOMREF');
+			expect(importRecords[1].altCountFather).toEqual('0');
+			expect(importRecords[1].refCountFather).toEqual('0');
+			expect(importRecords[1].depthFather).toEqual('45');
+			*/
+
+
+			expect(importRecords[2].chrom == 'chr22');
+			expect(importRecords[3].chrom == 'chrX');
+
+
 
 			done();
 		});
