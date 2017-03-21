@@ -11,6 +11,9 @@ var theTranscript = {transcript_id: 'ENST00000353383.1'};
 var theGene = {gene_name: 'RAI1', chr: 'chr17', start: 17584787, end: 17714767, strand: '+', transcripts: [theTranscript] };
 geneObjects['RAI1'] = theGene;
 
+dataCard = new DataCard();
+dataCard.mode = 'trio';
+
 
 
 describe('variantExporter', function() {
@@ -165,7 +168,7 @@ describe('variantExporter', function() {
 			expect(importRecords[1].consequence).toEqual('missense variant');
 			expect(importRecords[1].afExAC).toEqual('3.3e-05');
 			expect(importRecords[1].af1000G).toEqual('0');
-			//expect(importRecords[1].inheritance).toEqual('de novo');
+			expect(importRecords[1].inheritance).toEqual('de novo');
 			expect(importRecords[1].polyphen).toEqual('benign');
 			expect(importRecords[1].SIFT).toEqual('tolerated');
 			expect(importRecords[1].rsId).toEqual('rs193922712');
@@ -173,11 +176,10 @@ describe('variantExporter', function() {
 			expect(importRecords[1].clinvarPhenotype).toEqual('cardiomyopathy');
 			expect(importRecords[1].HGVSc).toEqual('ENST00000375994.2:c.595A>G');
 			expect(importRecords[1].HGVSp).toEqual('ENSP00000365162.2:p.Ile199Val');
-			/*
 			expect(importRecords[1].qual).toEqual('8.46129');
 			expect(importRecords[1].zygosityProband).toEqual('HET');
 			expect(importRecords[1].altCountProband).toEqual('10');
-			expect(importRecords[1].refCountProband).toEqual('29');
+			expect(importRecords[1].refCountProband).toEqual('39');
 			expect(importRecords[1].depthProband).toEqual('49');
 			expect(importRecords[1].zygosityMother).toEqual('HOMREF');
 			expect(importRecords[1].altCountMother).toEqual('0');
@@ -185,13 +187,70 @@ describe('variantExporter', function() {
 			expect(importRecords[1].depthMother).toEqual('55');
 			expect(importRecords[1].zygosityFather).toEqual('HOMREF');
 			expect(importRecords[1].altCountFather).toEqual('0');
-			expect(importRecords[1].refCountFather).toEqual('0');
+			expect(importRecords[1].refCountFather).toEqual('45');
 			expect(importRecords[1].depthFather).toEqual('45');
-			*/
-
 
 			expect(importRecords[2].chrom == 'chr22');
+			expect(importRecords[2].type).toEqual('del');
+			expect(importRecords[2].impact).toEqual('MODIFIER');
+			expect(importRecords[2].consequence).toEqual('intron variant');
+			expect(importRecords[2].highestImpact).toEqual('HIGH');
+			expect(importRecords[2].highestImpactInfo).toEqual('high frameshift_variant in ENST00000381551');
+			expect(importRecords[2].afExAC).toEqual('0');
+			expect(importRecords[2].af1000G).toEqual('0');
+			expect(importRecords[2].inheritance).toEqual('de novo');
+			expect(importRecords[2].polyphen).toEqual('');
+			expect(importRecords[2].SIFT).toEqual('');
+			expect(importRecords[2].rsId).toEqual('');
+			expect(importRecords[2].clinvarClinSig).toEqual('');
+			expect(importRecords[2].clinvarPhenotype).toEqual('');
+			expect(importRecords[2].HGVSc).toEqual('ENST00000331163.6:c.63+3041_63+3042delGG');
+			expect(importRecords[2].HGVSp).toEqual('');
+			expect(importRecords[2].qual).toEqual('58.9779');
+			expect(importRecords[2].zygosityProband).toEqual('HET');
+			expect(importRecords[2].altCountProband).toEqual('10');
+			expect(importRecords[2].refCountProband).toEqual('35');
+			expect(importRecords[2].depthProband).toEqual('45');
+			expect(importRecords[2].zygosityMother).toEqual('HOMREF');
+			expect(importRecords[2].altCountMother).toEqual('0');
+			expect(importRecords[2].refCountMother).toEqual('46');
+			expect(importRecords[2].depthMother).toEqual('46');
+			expect(importRecords[2].zygosityFather).toEqual('HOMREF');
+			expect(importRecords[2].altCountFather).toEqual('0');
+			expect(importRecords[2].refCountFather).toEqual('46');
+			expect(importRecords[2].depthFather).toEqual('46');
+
+
 			expect(importRecords[3].chrom == 'chrX');
+			expect(importRecords[3].type).toEqual('snp');
+			expect(importRecords[3].impact).toEqual('MODERATE');
+			expect(importRecords[3].consequence).toEqual('missense variant');
+			expect(importRecords[3].highestImpact).toEqual('');
+			expect(importRecords[3].highestImpactInfo).toEqual('');
+			expect(importRecords[3].afExAC).toEqual('0');
+			expect(importRecords[3].af1000G).toEqual('0');
+			expect(importRecords[3].inheritance).toEqual('de novo');
+			expect(importRecords[3].polyphen).toEqual('probably damaging');
+			expect(importRecords[3].SIFT).toEqual('deleterious');
+			expect(importRecords[3].rsId).toEqual('');
+			expect(importRecords[3].clinvarClinSig).toEqual('');
+			expect(importRecords[3].clinvarPhenotype).toEqual('');
+			expect(importRecords[3].HGVSc).toEqual('ENST00000379806.5:c.478G>T');
+			expect(importRecords[3].HGVSp).toEqual('ENSP00000369134.5:p.Gly160Cys');
+			expect(importRecords[3].qual).toEqual('407.399');
+			expect(importRecords[3].zygosityProband).toEqual('HET');
+			expect(importRecords[3].altCountProband).toEqual('27');
+			expect(importRecords[3].refCountProband).toEqual('76');
+			expect(importRecords[3].depthProband).toEqual('103');
+			expect(importRecords[3].zygosityMother).toEqual('HOMREF');
+			expect(importRecords[3].altCountMother).toEqual('0');
+			expect(importRecords[3].refCountMother).toEqual('13');
+			expect(importRecords[3].depthMother).toEqual('13');
+			expect(importRecords[3].zygosityFather).toEqual('HOMREF');
+			expect(importRecords[3].altCountFather).toEqual('0');
+			expect(importRecords[3].refCountFather).toEqual('42');
+			expect(importRecords[3].depthFather).toEqual('42');
+
 
 
 
