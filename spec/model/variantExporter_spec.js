@@ -11,15 +11,12 @@ var theTranscript = {transcript_id: 'ENST00000353383.1'};
 var theGene = {gene_name: 'RAI1', chr: 'chr17', start: 17584787, end: 17714767, strand: '+', transcripts: [theTranscript] };
 geneObjects['RAI1'] = theGene;
 
-dataCard = new DataCard();
+var dataCard = new DataCard();
 dataCard.mode = 'trio';
 
 
 
 describe('variantExporter', function() {
-
-	var variantExporter = new VariantExporter();
-	
 
 
 	var bookmarkEntries = [
@@ -29,6 +26,135 @@ describe('variantExporter', function() {
 	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}		
 	];
 
+	var validateRecs = [
+		{
+			chrom: 'chr17',
+			gene: 'RAI1',
+			transcript: 'ENST00000353383.1',
+			impact: 'HIGH',
+			highestImpact: '',
+			highestImpactInfo: '',
+			consequence: 'stop gained',
+			afExAC: '0',
+			af1000G: '0',
+			inheritance: 'recessive',
+			rsId: 'rs527236033',
+			clinvarClinSig: 'pathogenic',
+			clinvarPhenotype: 'smith-magenis syndrome',
+			HGVSc: 'ENST00000353383.1:c.2273G>A',
+			HGVSp: 'ENSP00000323074.4:p.Trp758Ter',
+			qual: '2880.99',
+			zygosityProband: 'HOM',
+			altCountProband: '38',
+			refCountProband: '1',
+			depthProband: '39',
+			zygosityMother: 'HET',
+			altCountMother: '26',
+			refCountMother: '25',
+			depthMother: '51',
+			zygosityFather: 'HET',
+			altCountFather: '30',
+			refCountFather: '33',
+			depthFather: '63'
+
+		},
+		{
+			chrom: 'chr20',
+			gene: 'MYLK2',
+			transcript: 'ENST00000375994.2',
+			impact: 'MODERATE',
+			highestImpact: '',
+			highestImpactInfo: '',
+			consequence: 'missense variant',
+			afExAC: '3.3e-05',
+			af1000G: '0',
+			inheritance: 'de novo',
+			rsId: 'rs193922712',
+			clinvarClinSig: 'likely pathogenic',
+			clinvarPhenotype: 'cardiomyopathy',
+			HGVSc: 'ENST00000375994.2:c.595A>G',
+			HGVSp: 'ENSP00000365162.2:p.Ile199Val',
+			qual: '8.46129',
+			zygosityProband: 'HET',
+			altCountProband: '10',
+			refCountProband: '39',
+			depthProband: '49',
+			zygosityMother: 'HOMREF',
+			altCountMother: '0',
+			refCountMother: '55',
+			depthMother: '55',
+			zygosityFather: 'HOMREF',
+			altCountFather: '0',
+			refCountFather: '45',
+			depthFather: '45'
+
+		},
+		{
+			chrom: 'chr22',
+			gene: 'PDGFB',
+			transcript: 'ENST00000331163.6',
+			type: 'del',
+			impact: 'MODIFIER',
+			highestImpact: 'HIGH',
+			highestImpactInfo: 'high frameshift_variant in ENST00000381551',
+			consequence: 'intron variant',
+			afExAC: '0',
+			af1000G: '0',
+			inheritance: 'de novo',
+			rsId: '',
+			clinvarClinSig: '',
+			clinvarPhenotype: '',
+			HGVSc: 'ENST00000331163.6:c.63+3041_63+3042delGG',
+			HGVSp: '',
+			qual: '58.9779',
+			zygosityProband: 'HET',
+			altCountProband: '10',
+			refCountProband: '35',
+			depthProband: '45',
+			zygosityMother: 'HOMREF',
+			altCountMother: '0',
+			refCountMother: '46',
+			depthMother: '46',
+			zygosityFather: 'HOMREF',
+			altCountFather: '0',
+			refCountFather: '46',
+			depthFather: '46'
+
+		},	
+		{
+			chrom: 'chrX',
+			gene: 'PDHA1',
+			transcript: 'ENST00000379806.5',
+			type: 'snp',
+			impact: 'MODERATE',
+			highestImpact: '',
+			highestImpactInfo: '',
+			consequence: 'missense variant',
+			afExAC: '0',
+			af1000G: '0',
+			inheritance: 'de novo',
+			rsId: '',
+			polyphen: 'probably damaging',
+			SIFT: 'deleterious',
+			clinvarClinSig: '',
+			clinvarPhenotype: '',
+			HGVSc: 'ENST00000379806.5:c.478G>T',
+			HGVSp: 'ENSP00000369134.5:p.Gly160Cys',
+			qual: '407.399',
+			zygosityProband: 'HET',
+			altCountProband: '27',
+			refCountProband: '76',
+			depthProband: '103',
+			zygosityMother: 'HOMREF',
+			altCountMother: '0',
+			refCountMother: '13',
+			depthMother: '13',
+			zygosityFather: 'HOMREF',
+			altCountFather: '0',
+			refCountFather: '42',
+			depthFather: '42'
+		}			
+	]
 
 	var speciesData = [
 	{"id":7,"name":"Human","binomialName":"Homo sapiens","latin_name":"homo_sapiens","genomeBuilds":[
@@ -76,29 +202,39 @@ describe('variantExporter', function() {
 
 
 
+
+
+
+
 	beforeEach(function(done) {
-
-
-
-		var model = new VariantModel();
-		model.init();
-		model.relationship = 'mother';
-		var vc = new VariantCard();
-		vc.model = model;
-		variantCards.push(vc);
-
-		model = new VariantModel();
-		model.init();
-		model.relationship = 'father';
-		vc = new VariantCard();
-		vc.model = model;
-		variantCards.push(vc);
-
 		genomeBuildHelper = new GenomeBuildHelper();
 		genomeBuildHelper.init(speciesData);
+		genomeBuildHelper.setCurrentSpecies("Human");
+		genomeBuildHelper.setCurrentBuild("GRCh37");
+
 
 		variantExporter = new VariantExporter();
 
+
+		if (getVariantCard('mother') == null) {
+			var model = new VariantModel();
+			model.init();
+			model.relationship = 'mother';
+			var vc = new VariantCard();
+			vc.model = model;
+			variantCards.push(vc);			
+		}
+
+		if (getVariantCard('father') == null) {
+			model = new VariantModel();
+			model.init();
+			model.relationship = 'father';
+			vc = new VariantCard();
+			vc.model = model;
+			variantCards.push(vc);			
+		}
+
+	
 		var doneCount = 0;
 
 		variantCards.forEach(function(vc) {
@@ -127,132 +263,87 @@ describe('variantExporter', function() {
 		it('exports bookmarked variants as csv', function(done) {
 
 			expect(variantExporter).not.toBeNull();
-			expect(getProbandVariantCard().model).not.toBeNull();
-			expect(getProbandVariantCard().model.sampleName).toEqual('NA12878');
-
 			expect(output).not.toBeNull();
 
 			var importRecords = VariantImporter.parseRecordsCSV(output);
 			expect(importRecords.length).toEqual(4);
 
+			for (var i = 0; i < validateRecs.length; i++) {
+				var importRec   = importRecords[i];
+				var validateRec = validateRecs[i];
+				for(var field in validateRec) {
+					expect(importRec[field]).toEqual(validateRec[field]);
+				}
+			}
 
-			expect(importRecords[0].chrom).toEqual('chr17');
-			expect(importRecords[0].impact).toEqual('HIGH');
-			expect(importRecords[0].consequence).toEqual('stop gained');
-			expect(importRecords[0].afExAC).toEqual('0');
-			expect(importRecords[0].af1000G).toEqual('0');
-			expect(importRecords[0].inheritance).toEqual('recessive');
-			expect(importRecords[0].rsId).toEqual('rs527236033');
-			expect(importRecords[0].clinvarClinSig).toEqual('pathogenic');
-			expect(importRecords[0].clinvarPhenotype).toEqual('smith-magenis syndrome');
-			expect(importRecords[0].HGVSc).toEqual('ENST00000353383.1:c.2273G>A');
-			expect(importRecords[0].HGVSp).toEqual('ENSP00000323074.4:p.Trp758Ter');
-			expect(importRecords[0].qual).toEqual('2880.99');
-			expect(importRecords[0].zygosityProband).toEqual('HOM');
-			expect(importRecords[0].altCountProband).toEqual('38');
-			expect(importRecords[0].refCountProband).toEqual('1');
-			expect(importRecords[0].depthProband).toEqual('39');
-			//expect(importRecords[0].bamDepthProband).toEqual('38');
-			expect(importRecords[0].zygosityMother).toEqual('HET');
-			expect(importRecords[0].altCountMother).toEqual('26');
-			expect(importRecords[0].refCountMother).toEqual('25');
-			expect(importRecords[0].depthMother).toEqual('51');
-			expect(importRecords[0].zygosityFather).toEqual('HET');
-			expect(importRecords[0].altCountFather).toEqual('30');
-			expect(importRecords[0].refCountFather).toEqual('33');
-			expect(importRecords[0].depthFather).toEqual('63');
+			done();
+		});
+	});
 
+	describe('#exportBookmarkedVariantsVCF', function() {
+		beforeEach(function(done) {
+			variantExporter.promiseExportVariants(bookmarkEntries, 'vcf', Object.values(sample)).then(function(data) {
+				output = data;
+				done();
+			})
+		});
 
-			expect(importRecords[1].chrom == 'chr20');
-			expect(importRecords[1].impact).toEqual('MODERATE');
-			expect(importRecords[1].consequence).toEqual('missense variant');
-			expect(importRecords[1].afExAC).toEqual('3.3e-05');
-			expect(importRecords[1].af1000G).toEqual('0');
-			expect(importRecords[1].inheritance).toEqual('de novo');
-			expect(importRecords[1].polyphen).toEqual('benign');
-			expect(importRecords[1].SIFT).toEqual('tolerated');
-			expect(importRecords[1].rsId).toEqual('rs193922712');
-			expect(importRecords[1].clinvarClinSig).toEqual('likely pathogenic');
-			expect(importRecords[1].clinvarPhenotype).toEqual('cardiomyopathy');
-			expect(importRecords[1].HGVSc).toEqual('ENST00000375994.2:c.595A>G');
-			expect(importRecords[1].HGVSp).toEqual('ENSP00000365162.2:p.Ile199Val');
-			expect(importRecords[1].qual).toEqual('8.46129');
-			expect(importRecords[1].zygosityProband).toEqual('HET');
-			expect(importRecords[1].altCountProband).toEqual('10');
-			expect(importRecords[1].refCountProband).toEqual('39');
-			expect(importRecords[1].depthProband).toEqual('49');
-			expect(importRecords[1].zygosityMother).toEqual('HOMREF');
-			expect(importRecords[1].altCountMother).toEqual('0');
-			expect(importRecords[1].refCountMother).toEqual('55');
-			expect(importRecords[1].depthMother).toEqual('55');
-			expect(importRecords[1].zygosityFather).toEqual('HOMREF');
-			expect(importRecords[1].altCountFather).toEqual('0');
-			expect(importRecords[1].refCountFather).toEqual('45');
-			expect(importRecords[1].depthFather).toEqual('45');
+		it('exports bookmarked variants as vcf', function(done) {
 
-			expect(importRecords[2].chrom == 'chr22');
-			expect(importRecords[2].type).toEqual('del');
-			expect(importRecords[2].impact).toEqual('MODIFIER');
-			expect(importRecords[2].consequence).toEqual('intron variant');
-			expect(importRecords[2].highestImpact).toEqual('HIGH');
-			expect(importRecords[2].highestImpactInfo).toEqual('high frameshift_variant in ENST00000381551');
-			expect(importRecords[2].afExAC).toEqual('0');
-			expect(importRecords[2].af1000G).toEqual('0');
-			expect(importRecords[2].inheritance).toEqual('de novo');
-			expect(importRecords[2].polyphen).toEqual('');
-			expect(importRecords[2].SIFT).toEqual('');
-			expect(importRecords[2].rsId).toEqual('');
-			expect(importRecords[2].clinvarClinSig).toEqual('');
-			expect(importRecords[2].clinvarPhenotype).toEqual('');
-			expect(importRecords[2].HGVSc).toEqual('ENST00000331163.6:c.63+3041_63+3042delGG');
-			expect(importRecords[2].HGVSp).toEqual('');
-			expect(importRecords[2].qual).toEqual('58.9779');
-			expect(importRecords[2].zygosityProband).toEqual('HET');
-			expect(importRecords[2].altCountProband).toEqual('10');
-			expect(importRecords[2].refCountProband).toEqual('35');
-			expect(importRecords[2].depthProband).toEqual('45');
-			expect(importRecords[2].zygosityMother).toEqual('HOMREF');
-			expect(importRecords[2].altCountMother).toEqual('0');
-			expect(importRecords[2].refCountMother).toEqual('46');
-			expect(importRecords[2].depthMother).toEqual('46');
-			expect(importRecords[2].zygosityFather).toEqual('HOMREF');
-			expect(importRecords[2].altCountFather).toEqual('0');
-			expect(importRecords[2].refCountFather).toEqual('46');
-			expect(importRecords[2].depthFather).toEqual('46');
+			expect(output).not.toBeNull();
+			var vcfRecs = [];
+			output.split("\n").forEach(function(vcfRec) {
+				if (vcfRec.indexOf("#") == 0) {
 
+				} else {
+					vcfRecs.push(vcfRec);
+				}
+			});
+			expect(vcfRecs.length).toEqual(4);
 
-			expect(importRecords[3].chrom == 'chrX');
-			expect(importRecords[3].type).toEqual('snp');
-			expect(importRecords[3].impact).toEqual('MODERATE');
-			expect(importRecords[3].consequence).toEqual('missense variant');
-			expect(importRecords[3].highestImpact).toEqual('');
-			expect(importRecords[3].highestImpactInfo).toEqual('');
-			expect(importRecords[3].afExAC).toEqual('0');
-			expect(importRecords[3].af1000G).toEqual('0');
-			expect(importRecords[3].inheritance).toEqual('de novo');
-			expect(importRecords[3].polyphen).toEqual('probably damaging');
-			expect(importRecords[3].SIFT).toEqual('deleterious');
-			expect(importRecords[3].rsId).toEqual('');
-			expect(importRecords[3].clinvarClinSig).toEqual('');
-			expect(importRecords[3].clinvarPhenotype).toEqual('');
-			expect(importRecords[3].HGVSc).toEqual('ENST00000379806.5:c.478G>T');
-			expect(importRecords[3].HGVSp).toEqual('ENSP00000369134.5:p.Gly160Cys');
-			expect(importRecords[3].qual).toEqual('407.399');
-			expect(importRecords[3].zygosityProband).toEqual('HET');
-			expect(importRecords[3].altCountProband).toEqual('27');
-			expect(importRecords[3].refCountProband).toEqual('76');
-			expect(importRecords[3].depthProband).toEqual('103');
-			expect(importRecords[3].zygosityMother).toEqual('HOMREF');
-			expect(importRecords[3].altCountMother).toEqual('0');
-			expect(importRecords[3].refCountMother).toEqual('13');
-			expect(importRecords[3].depthMother).toEqual('13');
-			expect(importRecords[3].zygosityFather).toEqual('HOMREF');
-			expect(importRecords[3].altCountFather).toEqual('0');
-			expect(importRecords[3].refCountFather).toEqual('42');
-			expect(importRecords[3].depthFather).toEqual('42');
+			// Make sure that the vcf records imported match the
+			// import records for chrom, start, ref, and alt
+			var recs = [];
+			vcfRecs.forEach(function(vcfRec) {
+				var fields = vcfRec.split("\t");
+				var rec = {};
+				rec.chrom = fields[0];
+				rec.start = fields[1];
+				rec.ref = fields[3];
+				rec.alt = fields[4];
+				recs.push(rec);
+			})
+			for (var i = 0; i < recs.length; i++) {
+				var rec     = recs[i];
+				var importRec = bookmarkEntries[i];
+				expect(rec.chrom).toEqual(importRec.chrom);
+				expect(+rec.start).toEqual(importRec.start);
+				expect(rec.ref).toEqual(importRec.ref);
+				expect(rec.alt).toEqual(importRec.alt);
+			}
 
-
-
+			// Make sure that the IOBIO INFO field matches the expected export values
+			var infoRecs = [];
+			vcfRecs.forEach(function(vcfRec) {
+				var info = {};
+				vcfRec.split("\t")[7].split("IOBIO=")[1].split("|").forEach(function(tagValue) {
+					var tokens = tagValue.split("#");
+					var tag    = tokens[0];
+					var value  = tokens[1];
+					info[tag]  = value;
+				})
+				infoRecs.push(info);
+			})
+			for (var i = 0; i < infoRecs.length; i++) {
+				var infoRec     = infoRecs[i];
+				var validateRec = validateRecs[i];
+				for(var field in infoRec) {
+					infoRec[field] = infoRec[field] == null ? '' : infoRec[field];
+					if (validateRec.hasOwnProperty(field)) {
+						expect(infoRec[field].trim()).toEqual(validateRec[field]);
+					}
+				}
+			}
 
 			done();
 		});

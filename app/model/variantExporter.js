@@ -175,7 +175,7 @@ VariantExporter.prototype._appendHeaderRecords = function(headerRecords, headerR
 			idx++;
 		});
 		// Insert the info field for the iobio annotations
-		headerRecords.splice(injectIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
+		headerRecords.splice(injectIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag#value, fields delimited by |\">");
 		return;
 	}
 
@@ -260,7 +260,7 @@ VariantExporter.prototype._appendVcfRecordAnnotations = function(vcfRecord, reco
 			if (buf.length > 0) {
 				buf += "|";
 			} 
-			buf += exportField.field + ":" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : " ");			
+			buf += exportField.field + "#" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : " ");			
 		}
 	})
 
@@ -333,7 +333,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 						var theVcfRecs = null;
 
 						if (format == 'vcf') {
-							theVcfRecs = me._formatJointVcfRecs(jointVcfRecs);
+							theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
 						}
 
 						getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, sampleNames.join(","))
@@ -384,7 +384,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 
 }
 
-VariantExporter.prototype._formatJointVcfRecs = function(jointVcfRecs, getHeader) {
+VariantExporter.prototype._formatJointVcfRecs = function(jointVcfRecs, sourceVariant, getHeader) {
 	var theVcfRecs = [];
 	var theVcfRec = null;
 
