@@ -2888,35 +2888,60 @@ text.ref-count {
   margin-bottom: 5px;
   margin-top: 5px;
   margin-bottom: 0px; }
-  #genes-panel #analyze-all-progress, #genes-panel #filter-progress {
-    position: relative;
-    background-color: white;
-    color: #717070;
-    border: #878585;
-    border-style: solid;
-    border-width: thin;
-    font-size: 12px;
-    margin-left: 5px;
-    padding: 0px 0px 0px 0px !important;
+  #genes-panel #total-genes-label {
+    float: left;
+    margin-left: 10px;
+    margin-right: 5px;
+    margin-top: 10px; }
+  #genes-panel #analyze-all-panel {
+    overflow: auto;
+    margin-top: 1px;
     display: inline-block;
-    width: 130px;
-    vertical-align: middle;
-    height: 18px;
-    margin-bottom: 2px; }
-    #genes-panel #analyze-all-progress .bar, #genes-panel #filter-progress .bar {
-      background-color: rgba(65, 176, 220, 0.45);
-      height: 17px;
-      position: absolute;
-      left: 0;
-      top: 0%;
-      width: 0%;
-      text-align: center; }
-    #genes-panel #analyze-all-progress .text, #genes-panel #filter-progress .text {
-      position: absolute;
-      left: 0;
-      top: 0%;
-      width: 100%;
-      text-align: center; }
+    float: left; }
+    #genes-panel #analyze-all-panel #analyzed-progress-bar {
+      display: inline-block;
+      margin-top: 10px;
+      margin-bottom: 14px;
+      float: left; }
+      #genes-panel #analyze-all-panel #analyzed-progress-bar .bar {
+        background-color: transparent;
+        height: 17px;
+        float: left;
+        left: 0;
+        top: 0%;
+        width: 0%;
+        text-align: center; }
+      #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress {
+        background-color: transparent;
+        color: #717070;
+        border: #878585;
+        border-style: solid;
+        border-width: thin;
+        font-size: 12px;
+        padding: 0px 0px 0px 0px !important;
+        display: inline-block;
+        width: 260px;
+        vertical-align: middle;
+        height: 18px;
+        margin-left: 5px;
+        margin-bottom: 2px; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar {
+          background-color: rgba(65, 176, 220, 0.45); }
+          #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar #passed-filter-bar {
+            color: white;
+            background-color: #3586c0; }
+          #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar #not-passed-filter-bar {
+            background-color: transparent; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #not-analyzed-bar {
+          background-color: transparent; }
+      #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar {
+        width: 260px;
+        height: 11px;
+        margin-left: 5px;
+        margin-top: -1px; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar .bar {
+          background-color: transparent;
+          line-height: 11px; }
 
 #genes-card {
   height: 100%; }
@@ -3074,19 +3099,21 @@ text.ref-count {
   cursor: pointer; }
 
 #manage-gene-list {
+  float: left;
+  margin-top: 6px;
+  margin-right: 10px;
   display: inline-block;
   padding-top: 0px;
   padding-bottom: 0px;
   padding-left: 8px;
   padding-right: 8px;
-  font-size: 12px;
-  margin-top: 7px; }
+  font-size: 12px; }
 
 #manage-genes-box {
   float: right;
   text-align: right;
   display: inline-block;
-  margin-top: 5px; }
+  margin-top: 6px; }
   #manage-genes-box #manage-genes-dropdown {
     float: right;
     margin-top: -8px; }
@@ -3154,13 +3181,16 @@ text.ref-count {
   margin-right: 10px; }
 
 #order-by-label {
-  margin-left: 20px; }
+  margin-left: 20px;
+  margin-right: 4px;
+  margin-top: 6px;
+  display: inline-block; }
 
 #select-gene-container {
   display: inline-block;
   width: 110px;
   vertical-align: middle;
-  margin-top: 2px; }
+  margin-top: 6px; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
     padding-top: 2px;

@@ -21,39 +21,75 @@
   margin-top: 5px
   margin-bottom: 0px
 
-  #analyze-all-progress, #filter-progress
-    position: relative
-    background-color: white
-    color: #717070
-    border: #878585
-    border-style: solid
-    border-width: thin
-    font-size: 12px
-    margin-left: 5px
-    padding: 0px 0px 0px 0px !important
+  #total-genes-label
+    float: left
+    margin-left: 10px
+    margin-right: 5px
+    margin-top: 10px
+
+  #analyze-all-panel
+    text-align:center
+    overflow: auto
+    margin-top: 1px
     display: inline-block
-    width: 130px
-    vertical-align: middle
-    height: 18px
-    margin-bottom: 2px
+    float: left  
 
-    .bar
-      background-color: rgba(65, 176, 220, 0.45)
-      height: 17px
-      position: absolute
-      left: 0
-      top: 0%
-      width: 0%
-      text-align: center
+    #analyzed-progress-bar
+      display: inline-block
+      margin-top: 10px
+      margin-bottom: 14px
+      float: left  
 
-    .text
-      position: absolute
-      left: 0
-      top: 0%
-      width: 100%
-      text-align: center       
+      .bar
+        background-color: transparent
+        height: 17px
+        float: left
+        left: 0
+        top: 0%
+        width: 0%
+        text-align: center      
 
-    
+      #analyze-all-progress
+        background-color: transparent
+        color: #717070
+        border: #878585
+        border-style: solid
+        border-width: thin
+        font-size: 12px
+        padding: 0px 0px 0px 0px !important
+        display: inline-block
+        width: 260px
+        vertical-align: middle
+        height: 18px
+        margin-left: 5px
+        margin-bottom: 2px      
+
+        #analyzed-bar
+          background-color: rgba(65, 176, 220, 0.45)
+
+          #passed-filter-bar
+            color: white
+            background-color: rgb(53, 134, 192)        
+
+          #not-passed-filter-bar
+            background-color: transparent
+
+        #not-analyzed-bar
+          background-color: transparent
+
+
+      #bottom-label-bar
+        width: 260px
+        height: 11px
+        margin-left: 5px
+        margin-top: -1px
+
+        .bar
+          background-color: transparent
+          line-height: 11px
+
+
+          
 #genes-card
   height: 100%
 
@@ -247,19 +283,22 @@
 
 
 #manage-gene-list
+  float: left
+  margin-top: 6px
+  margin-right: 10px
   display: inline-block
   padding-top: 0px
   padding-bottom: 0px
   padding-left: 8px
   padding-right: 8px
   font-size: 12px
-  margin-top: 7px
+
 
 #manage-genes-box
   float: right
   text-align: right
   display: inline-block
-  margin-top: 5px
+  margin-top: 6px
 
   #manage-genes-dropdown
     float: right
@@ -343,12 +382,15 @@
       
 #order-by-label
   margin-left: 20px
+  margin-right: 4px
+  margin-top: 6px
+  display: inline-block
 
 #select-gene-container
   display: inline-block
   width: 110px
   vertical-align: middle
-  margin-top: 2px
+  margin-top: 6px
 
   .selectize-input
     padding-bottom: 2px

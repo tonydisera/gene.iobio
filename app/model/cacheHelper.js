@@ -14,28 +14,72 @@ CacheHelper.prototype.isolateSession = function() {
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
 	var me = this;
-	me.getAnalyzeAllCounts(function(counts) {
-		$('#analyze-all-progress').removeClass("hide");
-		if (counts.analyzed == 0 && counts.total > 0) {
-			$('#analyze-all-progress').removeClass("done");
-			$('#analyze-all-progress .bar').css("width", "0%");
-			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
-		}
-		else if (counts.analyzed == counts.total) {
-			$('#analyze-all-progress .bar').css("width", "0%");
-			$('#analyze-all-progress').addClass("done");
-			$('#analyze-all-progress .bar').css("width", "100%");
-			$('#analyze-all-progress .text').text(counts.analyzed + ' analyzed');
-		} else {
-			$('#analyze-all-progress').removeClass("done");
-			$('#analyze-all-progress .bar').css("width", percentage(counts.analyzed / counts.total));
-			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
-		}
-		if (filterCard.hasFilters()) {
-			$('#filter-progress .text').text(counts.pass + " passed filter");
-			$('#filter-progress .bar').css("width", percentage(counts.pass / counts.analyzed));
-			$('#filter-progress').removeClass("hide");	
 
+
+	me.getAnalyzeAllCounts(function(counts) {
+
+
+		if (counts.total == 0) {
+			$('#analyzed-progress-bar').addClass("hide");
+			$('#total-genes-label').addClass("hide");
+			return;
+		}
+
+		$('#analyzed-progress-bar').removeClass("hide");
+		$('#analyze-all-progress').removeClass("hide");
+
+		$('#total-genes-label').removeClass("hide");
+		$('#total-genes-label').text(counts.total + " genes");
+
+		var analyzed             = counts.analyzed / counts.total;
+		var notAnalyzed          = 1 - analyzed;
+
+		var analyzedPassed       = filterCard.hasFilters() ? counts.pass / counts.analyzed : 0;
+		var analyzedNotPassed    = filterCard.hasFilters() ? 1 - analyzedPassed : 1;
+
+		$('#analyzed-bar'           ).css("width", percentage(analyzed));
+		$('#analyzed-label'         ).css("width", percentage(analyzed));
+		$('#bottom-analyzed-label'  ).css("width", percentage(analyzed));
+		$('#not-analyzed-bar'       ).css("width", percentage(notAnalyzed));
+		$('#not-analyzed-label'     ).css("width", percentage(notAnalyzed));
+
+		$('#passed-filter-bar'      ).css("width", percentage(analyzedPassed));
+		$('#passed-filter-label'    ).css("width", percentage(analyzedPassed));
+		$('#not-passed-filter-bar'  ).css("width", percentage(analyzedNotPassed));
+		$('#not-passed-filter-label').css("width", percentage(analyzedNotPassed));
+
+
+
+
+		if (counts.total > counts.analyzed ) {
+			$('#not-analyzed-bar'       ).text(counts.total - counts.analyzed);
+			$('#not-analyzed-label'     ).text("not analyzed");
+		} else {
+			$('#not-analyzed-bar'       ).text("");
+			$('#not-analyzed-label'     ).text("");
+		}
+
+		if (counts.analyzed > 0) {
+			if (filterCard.hasFilters()) {
+				$('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
+				$('#passed-filter-label'    ).text(counts.pass > 0 ? "match filter" : "");
+				$('#not-passed-filter-bar'  ).text(counts.analyzed - counts.pass > 0 ? counts.analyzed - counts.pass : "0");
+				$('#not-passed-filter-label').text(counts.analyzed - counts.pass > 0 ? "not match" : "");
+			} else {
+				$('#passed-filter-label'    ).text("");
+				$('#passed-filter-bar'      ).text("");
+				$('#not-passed-filter-bar'  ).text(counts.analyzed);
+				$('#not-passed-filter-label').text("analyzed");
+			}
+		} else {
+				$('#passed-filter-label'    ).text("");
+				$('#not-passed-filter-label').text("");
+		}
+
+
+
+		// Refresh the standard filter count if it applies
+		if (filterCard.hasFilters()) {
 			// If a standard filter has been applied, update its counts
 			if (clearStandardFilterCounts) {
 				$('#standard-filter-panel .standard-filter-btn').parent().find('span.standard-filter-count').text("");
@@ -43,9 +87,8 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
 				$('#standard-filter-panel .standard-filter-btn.current').parent().find('span.standard-filter-count').text(counts.pass + ' of ' + counts.analyzed + ' genes');
 			}			
-		} else {
-			$('#filter-progress').addClass("hide");					
 		}
+
 	});	
 }
 
