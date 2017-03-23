@@ -1896,6 +1896,9 @@ inputinput:-moz-placeholder {
 #filter-track {
   margin-top: 0px;
   margin-bottom: 80px; }
+  #filter-track input {
+    color: #717171;
+    font-size: 12px; }
   #filter-track a.chosen-single {
     font-size: 12px !important; }
   #filter-track h4 {

@@ -47,6 +47,18 @@ FilterCard.prototype.autoSetFilters = function() {
 
 }
 
+/*
+ * If a filter has been clicked after a standard filter has been selected,
+ * unset the standard filter since the criteria has been changed
+ */
+FilterCard.prototype.clearCurrentStandardFilter = function() {
+	if ($('.standard-filter-btn.current').length > 0) {
+		$('.standard-filter-btn.current').parent().find("span.standard-filter-count").text("");
+		$('.standard-filter-btn.current').removeClass("current");		
+	}
+}
+
+
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
 	filterCard.setStandardFilter(button, filterName);
@@ -267,6 +279,7 @@ FilterCard.prototype.init = function() {
 		// We are filtering on range, so clear out the af level filters
 		me.resetAfFilters("af1000glevel");
 		me.resetAfFilters("afexaclevel");
+		me.clearCurrentStandardFilter();
 
 		window.filterVariants();
 	});
@@ -274,6 +287,7 @@ FilterCard.prototype.init = function() {
 		// We are filtering on range, so clear out the af level filters
 		me.resetAfFilters("af1000glevel");
 		me.resetAfFilters("afexaclevel");
+		me.clearCurrentStandardFilter();
 
 		window.filterVariants();
 	});
@@ -285,10 +299,13 @@ FilterCard.prototype.init = function() {
 	});
 	// listen for go button on coverage
 	$('#coverage-go-button').on('click', function() {
+		me.clearCurrentStandardFilter();
+
 		window.filterVariants();
 	});
 	// listen to checkbox for filtering exonic only variants
 	$('#exonic-only-cb').click(function() {	   
+		me.clearCurrentStandardFilter();
 		window.filterVariants();	    
 	});
 
@@ -484,6 +501,9 @@ FilterCard.prototype.initFilterListeners = function() {
 	  	if (!on) {
 		  	d3.select(this).classed("not-equal", false);
 	  	}
+
+	  	me.clearCurrentStandardFilter();
+
 	  	window.filterVariants();
 	  });
 
