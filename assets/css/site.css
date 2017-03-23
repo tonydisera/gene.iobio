@@ -2892,7 +2892,7 @@ text.ref-count {
     float: left;
     margin-left: 10px;
     margin-right: 5px;
-    margin-top: 10px; }
+    margin-top: 8px; }
   #genes-panel #analyze-all-panel {
     overflow: auto;
     margin-top: 1px;
@@ -2900,8 +2900,8 @@ text.ref-count {
     float: left; }
     #genes-panel #analyze-all-panel #analyzed-progress-bar {
       display: inline-block;
-      margin-top: 10px;
-      margin-bottom: 14px;
+      margin-top: 8px;
+      margin-bottom: 6px;
       float: left; }
       #genes-panel #analyze-all-panel #analyzed-progress-bar .bar {
         background-color: transparent;
@@ -2928,10 +2928,11 @@ text.ref-count {
         #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar {
           background-color: rgba(65, 176, 220, 0.45); }
           #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar #passed-filter-bar {
-            color: white;
-            background-color: #3586c0; }
+            background-color: #fadea0;
+            height: 16px; }
           #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar #not-passed-filter-bar {
-            background-color: transparent; }
+            background-color: transparent;
+            height: 16px; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #not-analyzed-bar {
           background-color: transparent; }
       #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar {
@@ -2941,7 +2942,8 @@ text.ref-count {
         margin-top: -1px; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar .bar {
           background-color: transparent;
-          line-height: 11px; }
+          line-height: 11px;
+          font-size: 12px; }
 
 #genes-card {
   height: 100%; }
@@ -3113,10 +3115,10 @@ text.ref-count {
   float: right;
   text-align: right;
   display: inline-block;
-  margin-top: 6px; }
+  margin-top: -2px; }
   #manage-genes-box #manage-genes-dropdown {
     float: right;
-    margin-top: -8px; }
+    margin-top: 0px; }
 
 #gene-badge-container {
   display: flex;
@@ -3183,14 +3185,14 @@ text.ref-count {
 #order-by-label {
   margin-left: 20px;
   margin-right: 4px;
-  margin-top: 6px;
+  margin-top: 8px;
   display: inline-block; }
 
 #select-gene-container {
   display: inline-block;
   width: 110px;
   vertical-align: middle;
-  margin-top: 6px; }
+  margin-top: 4px; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
     padding-top: 2px;

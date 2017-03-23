@@ -28,13 +28,15 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		$('#analyzed-progress-bar').removeClass("hide");
 		$('#analyze-all-progress').removeClass("hide");
 
+
+
 		$('#total-genes-label').removeClass("hide");
 		$('#total-genes-label').text(counts.total + " genes");
 
-		var analyzed             = counts.analyzed / counts.total;
+		var analyzed             = Math.round(counts.analyzed / counts.total * 100) / 100;		
 		var notAnalyzed          = 1 - analyzed;
 
-		var analyzedPassed       = filterCard.hasFilters() ? counts.pass / counts.analyzed : 0;
+		var analyzedPassed       = filterCard.hasFilters() ? Math.round(counts.pass / counts.analyzed * 100) / 100 : 0;
 		var analyzedNotPassed    = filterCard.hasFilters() ? 1 - analyzedPassed : 1;
 
 		$('#analyzed-bar'           ).css("width", percentage(analyzed));
@@ -62,10 +64,17 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		if (counts.analyzed > 0) {
 			if (filterCard.hasFilters()) {
 				$('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
-				$('#passed-filter-label'    ).text(counts.pass > 0 ? "match filter" : "");
+				$('#passed-filter-label'    ).text(counts.pass > 0 ? "passing filter" : "");
+				$('#not-passed-filter-label').text(counts.analyzed - counts.pass > 0 ? "not passing" + ( counts.pass == 0 ? " filter" : "") : "");
 				$('#not-passed-filter-bar'  ).text(counts.analyzed - counts.pass > 0 ? counts.analyzed - counts.pass : "0");
-				$('#not-passed-filter-label').text(counts.analyzed - counts.pass > 0 ? "not match" : "");
+				// If there isn't sufficient width to show the 'passed' and 'not passed' filter, hide the bottom label
+				if ($('#passed-filter-bar').innerWidth() < 65 && (counts.analyzed - counts.pass > 0 && $('#not-passed-filter-bar').innerWidth() < 120) ) {
+					$('#bottom-label-bar').addClass("hide");
+				} else {
+					$('#bottom-label-bar').removeClass("hide");
+				}
 			} else {
+				$('#bottom-label-bar').removeClass("hide");
 				$('#passed-filter-label'    ).text("");
 				$('#passed-filter-bar'      ).text("");
 				$('#not-passed-filter-bar'  ).text(counts.analyzed);
