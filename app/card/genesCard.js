@@ -172,7 +172,6 @@ GenesCard.prototype.init = function() {
 	});
 
 
-
 	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
 	}

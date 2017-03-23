@@ -238,6 +238,7 @@ function determineStyle() {
 function init() {
 	var me = this;
 
+	$("[data-toggle=tooltip]").tooltip();
 
 	detectWindowResize();
 

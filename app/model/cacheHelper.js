@@ -51,8 +51,6 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		$('#not-passed-filter-label').css("width", percentage(analyzedNotPassed));
 
 
-
-
 		if (counts.total > counts.analyzed ) {
 			$('#not-analyzed-bar'       ).text(counts.total - counts.analyzed);
 			$('#not-analyzed-label'     ).text("not analyzed");
@@ -60,6 +58,18 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 			$('#not-analyzed-bar'       ).text("");
 			$('#not-analyzed-label'     ).text("");
 		}
+
+
+		// Show analyze progress counts on hover
+		$('#passed-filter-bar').attr("data-toggle", "tooltip");
+		$('#passed-filter-bar').attr("data-placement", "top");
+
+		$('#not-passed-filter-bar').attr("data-toggle", "tooltip");
+		$('#not-passed-filter-bar').attr("data-placement", "top");
+
+		$('#not-analyzed-bar').attr("data-toggle", "tooltip");
+		$('#not-analyzed-bar').attr("data-placement", "top");
+
 
 		if (counts.analyzed > 0) {
 			if (filterCard.hasFilters()) {
@@ -73,16 +83,30 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 				} else {
 					$('#bottom-label-bar').removeClass("hide");
 				}
+
+				$('#passed-filter-bar'    ).attr("title", counts.pass > 0                    ? counts.pass + " passing filter" : "");
+				$('#not-passed-filter-bar').attr("title", counts.analyzed - counts.pass > 0  ? counts.analyzed - counts.pass + " not passing filter" : "");
+				$('#not-analyzed-bar'     ).attr("title", counts.total - counts.analyzed > 0 ? counts.total - counts.analyzed + " not analyzed" : "");		
+
 			} else {
 				$('#bottom-label-bar').removeClass("hide");
 				$('#passed-filter-label'    ).text("");
 				$('#passed-filter-bar'      ).text("");
 				$('#not-passed-filter-bar'  ).text(counts.analyzed);
 				$('#not-passed-filter-label').text("analyzed");
+
+				$('#passed-filter-bar'    ).attr("title", "");
+				$('#not-passed-filter-bar').attr("title", counts.analyzed + " analyzed");
+				$('#not-analyzed-bar'     ).attr("title", (counts.total - counts.analyzed) + " not analyzed");		
+
 			}
 		} else {
 				$('#passed-filter-label'    ).text("");
 				$('#not-passed-filter-label').text("");
+
+				$('#passed-filter-bar'    ).attr("title", "");
+				$('#not-passed-filter-bar').attr("title", "");
+				$('#not-analyzed-bar'     ).attr("title", (counts.total - counts.analyzed) + " not analyzed");		
 		}
 
 
