@@ -1874,6 +1874,14 @@ inputinput:-moz-placeholder {
   font-size: 13px !important;
   color: #717171 !important; }
 
+#clear-filters-button {
+  font-size: 13px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-left: -30px;
+  margin-bottom: 2px;
+  margin-top: 2px; }
+
 #filter-summary-track {
   margin-top: 4px;
   margin-bottom: 8px;
