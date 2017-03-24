@@ -456,10 +456,15 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 
 	geneNames = [];
 	var unknownGeneNames = {};
+	var duplicateGeneNames = {};
 	geneNameList.forEach( function(geneName) {
 		if (geneName.trim().length > 0) {
 			if (isKnownGene(geneName)) {
-				geneNames.push(geneName.trim().toUpperCase());
+				if (geneNames.indexOf(geneName.trim().toUpperCase()) < 0) {
+					geneNames.push(geneName.trim().toUpperCase());
+				} else {
+					duplicateGeneNames[geneName.trim().toUpperCase()] = true;
+				}
 			} else {
 				unknownGeneNames[geneName.trim().toUpperCase()] = true;
 			}
@@ -468,6 +473,11 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 
 	if (Object.keys(unknownGeneNames).length > 0) {
 		var message = "Bypassing unknown genes: " + Object.keys(unknownGeneNames).join(", ") + ".";
+		alertify.alert(message);
+	}
+
+		if (Object.keys(duplicateGeneNames).length > 0) {
+		var message = "Bypassing duplicate gene name(s): " + Object.keys(duplicateGeneNames).join(", ") + ".";
 		alertify.alert(message);
 	}
 
