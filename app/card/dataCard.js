@@ -178,6 +178,8 @@ DataCard.prototype.loadDemoData = function() {
 
 	window.updateUrl("build", me.demoBuild);
 	genomeBuildHelper.setCurrentBuild(me.demoBuild);
+	$('#select-build-box').removeClass("attention");
+
 
 	window.updateUrl('rel0', "proband");	
 	window.updateUrl('rel', "mother");	
@@ -227,7 +229,8 @@ DataCard.prototype.loadDemoData = function() {
 		me.mode = "single";
 		genomeBuildHelper.setCurrentBuild(me.demoBuild);
 		me.setVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,   me.demoSampleNames.proband, me.demoUrls.proband);
-		
+		$('#select-build-box').removeClass("attention");
+
 		window.loadTracksForGene();
 		window.cacheHelper.clearCache();
 		window.matrixCard.reset();	
@@ -417,6 +420,8 @@ DataCard.prototype.setCurrentBuild = function(buildName) {
 		$('#select-build')[0].selectize.addItem(buildName);
 		genomeBuildHelper.setCurrentBuild(buildName);
 		$('#build-link').text(buildName);
+		$('#select-build-box').removeClass("attention");
+
 	}
 }
 
@@ -469,6 +474,7 @@ DataCard.prototype.addBuildListener = function() {
 				$('#build-link').text(value);
 				me.validateBuildFromData(function(success, message) {
 					if (success) {
+						$('#select-build-box').removeClass("attention");
 						$('#species-build-warning').addClass("hide");
 						window.enableLoadButton();
 					} else {
@@ -483,7 +489,8 @@ DataCard.prototype.addBuildListener = function() {
 				$('#build-link').text("?");
 				window.disableLoadButton();
 				setTimeout( function() { 
-					$('#select-build-box .selectize-input').animateIt('tada');
+					//$('#select-build-box .selectize-input').animateIt('tada');
+					$('#select-build-box').addClass("attention");
 				}, 2000);
 				
 			}
@@ -513,6 +520,9 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 				me.removeBuildListener();
 				genomeBuildHelper.setCurrentSpecies(buildInfo.species.name);
 				genomeBuildHelper.setCurrentBuild(buildInfo.build.name);
+
+				$('#select-build-box').removeClass("attention");
+
 				$('#select-species')[0].selectize.setValue(buildInfo.species.name);
 				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
 				me.addBuildListener();
@@ -873,7 +883,8 @@ DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
 		window.enableLoadButton();
 	} else {		
 		if (wiggleWhenEmpty) {
-			$('#select-build-box .selectize-input').animateIt('tada');			
+			//$('#select-build-box .selectize-input').animateIt('tada');	
+			$('#select-build-box').addClass('attention');		
 		}
 		window.disableLoadButton();
 	}	

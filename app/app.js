@@ -870,14 +870,22 @@ function showSidebar(sidebar) {
 
 
 
-function showDataDialog(activeTab) {
+function showDataDialog(activeTab, geneName) {
+
+	if (geneName) {
+		if (isKnownGene(geneName)) {
+			getGeneBloodhoundInputElementForDataDialog().val(geneName);
+			getGeneBloodhoundInputElementForDataDialog().trigger('typeahead:selected', {"name": geneName, loadFromUrl: true});
+		}		
+	}
+
 	if (activeTab && activeTab.length > 0) {
 		var selector = '#dataModal a[href=\"#'+ activeTab + '\"]';
 		$(selector).tab('show');
 	}
 	$('#dataModal').modal('show');
 	if (genomeBuildHelper.getCurrentBuild() == null) {
-		$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
+		//$('#select-build-box .selectize-input').animateIt('tada', 'animate-twice');
 	} 
 
 	$('#import-bookmarks-panel').removeClass("hide");
@@ -1082,6 +1090,9 @@ function clearMotherFatherData() {
 function getGeneBloodhoundElementForDataDialog() {
 	return $('#bloodhound-data-dialog .typeahead');
 }
+function getGeneBloodhoundInputElementForDataDialog() {
+	return $('#bloodhound-data-dialog .typeahead.tt-input');	
+}
 
 function getGeneBloodhoundElement() {
 	return isLevelBasic ? $('#bloodhound-sidebar .typeahead') : $('#bloodhound .typeahead');	
@@ -1114,9 +1125,9 @@ function loadGeneFromUrl() {
 
 
 	// Get the gene parameter
-	var gene = getUrlParameter('gene');
-	if (gene) {
-		gene = gene.toUpperCase();
+	var geneName = getUrlParameter('gene');
+	if (geneName) {
+		geneName = geneName.toUpperCase();
 	}
 
 	var theGeneSource = getUrlParameter("geneSource");
@@ -1130,7 +1141,7 @@ function loadGeneFromUrl() {
 		DEFAULT_BATCH_SIZE = batchSize;
 	}
 
-	loadGeneNamesFromUrl(gene);
+	loadGeneNamesFromUrl(geneName);
 
 
 
@@ -1147,18 +1158,18 @@ function loadGeneFromUrl() {
 	} else {
 
 		// Load the gene
-	    if (gene != undefined) {
+	    if (geneName != undefined) {
 			// If the species and build have been specified, type in the gene name; this will 
 			// trigger the event to get the gene info and then call loadUrlSources()
 			if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
-				if (isKnownGene(gene)) {
-					setGeneBloodhoundInputElement(gene, true, true);
+				if (isKnownGene(geneName)) {
+					setGeneBloodhoundInputElement(geneName, true, true);
 				}
 			} else {
 				// The build wasn't specified in the URL parameters, so force the user
 				// to select the gemome build from the data dialog.
 				loadUrlSources();
-				showDataDialog();
+				showDataDialog(null, geneName);
 			}
 		} else {
 			// If a gene wasn't provided, go ahead and just set the data sources, etc for
@@ -1280,7 +1291,10 @@ function loadUrlSources() {
 	// Initialize transcript chart and variant cards, but hold off on displaying 
 	// the variant cards.
 	if (!isLevelEdu  && !isLevelBasic) {
-		loadTracksForGene(true);
+		if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
+			loadTracksForGene(true);
+
+		}
 	}
 
 
@@ -1351,7 +1365,9 @@ function loadUrlSources() {
 
 				}
 				
-				loadTracksForGene( false );
+				if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
+					loadTracksForGene( false );
+				}
 
 				if ((isLevelEdu || isLevelBasic) && $('#slider-left').hasClass("hide")) {
 					if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
@@ -2075,7 +2091,7 @@ function loadTracksForGene(bypassVariantCards, callback) {
 
 	hideIntro();
 	if (window.gene == null || window.gene == "" && !isLevelBasic) {
-		$('.bloodhound .twitter-typeahead').animateIt('tada');
+		//$('.bloodhound .twitter-typeahead').animateIt('tada');
 		return;
 	} 
 
@@ -2085,7 +2101,10 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
 	if (!bypassVariantCards && !isDataLoaded()) {
-		$('#add-data-button').animateIt('tada', 'animate-twice');
+		//$('#add-data-button').animateIt('tada', 'animate-twice');
+		$('#add-data-button').addClass("attention");
+	} else {
+		$('#add-data-button').removeClass("attention");		
 	}
 	
 	regionStart = null;
@@ -3032,22 +3051,30 @@ function enableLoadButton() {
 		cards[vc.getRelationship()] = vc;
 	});
 
-	if (window.gene) {
-		if (dataCard.mode == 'single') {
-			if (cards['proband'].isReadyToLoad()) {
+	if (dataCard.mode == 'single') {
+		if (cards['proband'].isReadyToLoad()) {
+			if (window.gene) {
 				enable = true;
-			}
-		} else if (dataCard.mode == 'trio') {
-			if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
-				enable = true;
+				$('#gene-name-data-dialog-box').removeClass("attention");		
+			} else {
+				$('#gene-name-data-dialog-box').addClass("attention");
 			}
 		}
-		if (enable) {
-			$('#data-card').find('#ok-button').removeClass("disabled");
-		} else {
-			$('#data-card').find('#ok-button').addClass("disabled");
-		}		
+	} else if (dataCard.mode == 'trio') {
+		if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
+			if (window.gene) {
+				enable = true;
+				$('#gene-name-data-dialog-box').removeClass("attention");		
+			} else {
+				$('#gene-name-data-dialog-box').addClass("attention");					
+			}
+		}
 	}
+	if (enable) {
+		$('#data-card').find('#ok-button').removeClass("disabled");
+	} else {
+		$('#data-card').find('#ok-button').addClass("disabled");
+	}		
 
 
 }

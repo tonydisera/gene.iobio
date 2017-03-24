@@ -74,8 +74,8 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		if (counts.analyzed > 0) {
 			if (filterCard.hasFilters()) {
 				$('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
-				$('#passed-filter-label'    ).text(counts.pass > 0 ? "passing filter" : "");
-				$('#not-passed-filter-label').text(counts.analyzed - counts.pass > 0 ? "not passing" + ( counts.pass == 0 ? " filter" : "") : "");
+				$('#passed-filter-label'    ).text(counts.pass > 0 ? "pass filter" : "");
+				$('#not-passed-filter-label').text(counts.analyzed - counts.pass > 0 ? "does not pass" + ( counts.pass == 0 ? " filter" : "") : "");
 				$('#not-passed-filter-bar'  ).text(counts.analyzed - counts.pass > 0 ? counts.analyzed - counts.pass : "0");
 				// If there isn't sufficient width to show the 'passed' and 'not passed' filter, hide the bottom label
 				if ($('#passed-filter-bar').innerWidth() < 65 && (counts.analyzed - counts.pass > 0 && $('#not-passed-filter-bar').innerWidth() < 120) ) {
@@ -85,7 +85,7 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 				}
 
 				$('#passed-filter-bar'    ).attr("title", counts.pass > 0                    ? counts.pass + " passing filter" : "");
-				$('#not-passed-filter-bar').attr("title", counts.analyzed - counts.pass > 0  ? counts.analyzed - counts.pass + " not passing filter" : "");
+				$('#not-passed-filter-bar').attr("title", counts.analyzed - counts.pass > 0  ? counts.analyzed - counts.pass + " do not pass filter" : "");
 				$('#not-analyzed-bar'     ).attr("title", counts.total - counts.analyzed > 0 ? counts.total - counts.analyzed + " not analyzed" : "");		
 
 			} else {
