@@ -160,6 +160,11 @@ BookmarkCard.prototype.compressKey = function(bookmarkKey) {
 
 BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject) {
 	var me = this;
+
+	if (geneObject == null) {
+		return;
+	}
+	
 	if (vcfData && vcfData.features) {
 		var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
 		if (bookmarkKeys && bookmarkKeys.length > 0) {
