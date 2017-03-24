@@ -452,19 +452,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 	}
 	// trim newline at very end
 	genesString = genesString.replace(/\s*$/, "");
-	var geneNameList = null;
-	if (genesString.indexOf("\n") > 0) {
-		geneNameList = genesString.split("\n");
-	} else if (genesString.indexOf("\t") > 0 ) {
-		geneNameList = genesString.split("\t");
-	} else if (genesString.indexOf(",") > 0) {
-		geneNameList = genesString.split(" ").join("").split(",");
-	} else if (genesString.indexOf(" ") > 0) {
-		geneNameList = genesString.split(" ");
-	} else {
-		geneNameList = [];
-		geneNameList.push(genesString.trim());
-	}
+	var geneNameList = genesString.split(/(?:\s+|,|^W|\n)/g);
 
 	geneNames = [];
 	var unknownGeneNames = {};
