@@ -452,7 +452,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 	}
 	// trim newline at very end
 	genesString = genesString.replace(/\s*$/, "");
-	var geneNameList = genesString.split(/(?:\s+|,|^W|\n)/g);
+	var geneNameList = genesString.split(/(?:\s+|,\s+|,|^W|\n)/g);
 
 	geneNames = [];
 	var unknownGeneNames = {};
