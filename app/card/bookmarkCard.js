@@ -3,7 +3,6 @@ function BookmarkCard() {
 	this.bookmarkedGenes = {};
 	this.selectedBookmarkKey = null;
 	this.favorites = {};
-
 }
 
 BookmarkCard.prototype.init = function() {
@@ -38,69 +37,17 @@ BookmarkCard.prototype.init = function() {
 	    	
 	    }
 	});
-}
-BookmarkCard.prototype.initImportBookmarks = function() {
 
 }
 
-BookmarkCard.prototype.importBookmarks = function() {
-	var me = this;
-
-	//chrom	start	end	ref	alt	gene
-	var bookmarksString = $('#bookmarks-to-import').val();
-	// trim newline at very end
-	bookmarksString = bookmarksString.replace(/\s*$/, "");
-
-	
-	me.bookmarkedVariants = {};
-	var recs = bookmarksString.split("\n");
-	recs.forEach( function(rec) {
-		var fields = rec.split(/\s+/);
-
-		if (fields.length >= 5) {
-			var chrom    = fields[0];
-			var start    = +fields[1];
-			var end      = +fields[2];
-			var ref      = fields[3];
-			var alt      = fields[4];
-			var geneName = fields[5];
-
-			
-			var key = me.getBookmarkKey(geneName, chrom, start, ref, alt);
-			if (me.bookmarkedVariants[key] == null) {
-				me.bookmarkedVariants[key] = {isProxy: true, gene: gene, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
-			}
-
-		}
-	});
-
-	showSidebar("Bookmarks");
-	
-
-	// Get the phenotypes for each of the bookmarked genes
-	var promises = []
-	for (var geneName in me.bookmarkedGenes) {
-		var promise = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
-			Promise.all(promises).then(function() {
-				me.refreshBookmarkList();
-			});
-		});
-		promises.push(promise);
-	}	
-
-	// Add the bookmarked genes to the gene buttons
-	genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
-
-	$('#import-bookmarks-dropdown .btn-group').removeClass('open');	
-
-}
 
 BookmarkCard.prototype.reviseCoord = function(bookmarkEntry, gene) {
 	var me = this;
 	var revisedBookmarkEntry = $().extend({}, bookmarkEntry);
 
-	// TODO:  Figure out coordinate space for GEMINI
-	revisedBookmarkEntry.start++;
+	if (bookmarkEntry.importSource == 'gemini') {
+		revisedBookmarkEntry.start++;
+	}
 
 	// TODO: If gene is reverse strand, change ref alt to compliment
 	if (gene.strand == "-") {
@@ -135,7 +82,7 @@ BookmarkCard.prototype.reverseBases = function(bases) {
 BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	var me = this;
 	if (variant) {		
-		var key = this.getBookmarkKey(gene.gene_name, gene.chr, variant.start, variant.ref, variant.alt);
+		var key = this.getBookmarkKey(gene.gene_name, selectedTranscript.transcript_id, gene.chr, variant.start, variant.ref, variant.alt);
 		if (this.bookmarkedVariants[key] == null) {
 			this.bookmarkedVariants[key] = variant;
 			//getProbandVariantCard().unpin();
@@ -161,7 +108,7 @@ BookmarkCard.prototype.removeBookmark = function(key, variant) {
 	matrixCard.removeBookmarkFlag(variant);
 
 
-	var geneName = key.split(": ")[0];
+	var geneName = me.parseKey(key).gene;
 	delete this.bookmarkedVariants[key];
 
 	var bookmarkKeys = me.bookmarkedGenes[geneName];
@@ -179,10 +126,28 @@ BookmarkCard.prototype.removeBookmark = function(key, variant) {
 
 }
 
-BookmarkCard.prototype.getBookmarkKey = function(geneName, chrom, start, ref, alt) {
-	return geneName + ": " 
-         + chrom + " " + start  
-         + " " + ref + "->" + alt;         
+BookmarkCard.prototype.getBookmarkKey = function(geneName, transcriptId, chrom, start, ref, alt) {
+	return geneName + " " 
+	     + transcriptId + " : " 
+         + chrom  + " " 
+         + start  + " " 
+         + ref + "->" 
+         + alt;         
+}
+
+BookmarkCard.prototype.parseKey = function(key) {
+	var bm = {};
+
+	var parts = key.split(": ");
+	bm.gene         = parts[0].split(" ")[0];
+	bm.transcriptId = parts[0].split(" ")[1];
+	bm.chr          = parts[1].split(" ")[0];
+	bm.start        = parts[1].split(" ")[1];
+	var refAndAlt   = parts[1].split(" ")[2];	
+	bm.ref          = refAndAlt.split("->")[0];
+	bm.alt          = refAndAlt.split("->")[1];
+
+	return bm;
 }
 
 BookmarkCard.prototype.compressKey = function(bookmarkKey) {
@@ -195,6 +160,11 @@ BookmarkCard.prototype.compressKey = function(bookmarkKey) {
 
 BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject) {
 	var me = this;
+
+	if (geneObject == null) {
+		return;
+	}
+	
 	if (vcfData && vcfData.features) {
 		var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
 		if (bookmarkKeys && bookmarkKeys.length > 0) {
@@ -208,7 +178,7 @@ BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject)
 				}
 			});
 		}
-		me.refreshBookmarkList();
+		//me.refreshBookmarkList();
 	}
 }
 
@@ -240,6 +210,8 @@ BookmarkCard.prototype._flagBookmark = function(variantCard, geneObject, variant
 		// bookmark list so that the glyphs show for each resolved bookmark.
 		me.refreshBookmarkList();
 
+	} else {
+
 	}
 }
 
@@ -256,13 +228,12 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
 			}
 
-		}
+		} 
 	});
 
 	// Now that we have resolved the bookmark entries for a gene, refresh the
 	// bookmark list so that the glyphs show for each resolved bookmark.
 	//me.refreshBookmarkList();
-	me.refreshBookmarkList();
 
 	
 }
@@ -302,8 +273,8 @@ BookmarkCard.prototype.sortBookmarksByGene = function() {
     	var refAltA = a[1].ref + "->" + a[1].alt;
     	var refAltB = b[1].ref + "->" + b[1].alt;
 
-    	var geneA = keyA.split(": ")[0];
-    	var geneB = keyB.split(": ")[0];
+    	var geneA = me.parseKey(keyA).gene;
+    	var geneB = me.parseKey(keyB).gene;
 
     	if (geneA == geneB) {
     		if (startA == startB) {
@@ -322,7 +293,7 @@ BookmarkCard.prototype.sortBookmarksByGene = function() {
     while (length--) {
     	var key   = tuples[length][0];
     	var value = tuples[length][1];
-    	var geneName = key.split(": ")[0];
+    	var geneName = me.parseKey(key).gene;
     	
     	sortedBookmarks[key] = value;
 
@@ -369,17 +340,20 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         .attr("class", "bookmark-gene")
 	         .text(function(entry,i) {
 	         	var geneName = entry.key;
+
 	         	var entryKeys = entry.value;
-	         	var parts = entryKeys[0].split(": ");
-	         	var chr = parts[1].split(" ")[0];
+	         	var chr = me.parseKey(entryKeys[0]).chr;
 	         	if (chr.indexOf("chr") < 0) {
 	         		chr = "chr " + chr;
 	         	}
+
 	         	return  geneName + " " + chr;
 	         })
 	         .on('click', function(entry,i) {
 	         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-	         	d3.select(this).classed("current", true);
+	         	var currentBookmarkGene = d3.select(this);
+	         	var currentBookmarkDiv = d3.select(this.parentNode);
+	         	currentBookmarkGene.classed("current", true);
 
 	         	me.selectedBookmarkKey = entry.key;
 
@@ -389,19 +363,23 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 				// Remove any locked tooltip, hide coordinate frame
 				unpinAll();
 
+				
+
 				if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
-					genesCard.selectGene(geneName, function(variantCard) {
-						if (variantCard.getRelationship() == 'proband') {
-							me._flagBookmarksForGene(variantCard, window.gene, bookmarkKeys, true);
-						}
+					genesCard.selectGene(geneName, function() {
+						
+					}, function() {
+						me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+						me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene);
 					});
 				} else {
 					me._flagBookmarksForGene(getProbandVariantCard(), window.gene, bookmarkKeys, true);
+					me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene);
 				}				
 			});
 
 	me.addPhenotypeGlyphs(container);
-
+	me.addCallVariantsButton(container);
 
 	container.selectAll("div.bookmark-gene")
 	         .each( function(entry, i) {
@@ -423,11 +401,12 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			            .attr("class", "bookmark")
 			            .on('click', function(entry,i) {
 				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-		         			d3.select(this).classed("current", true);
+		         			var currentBookmark = d3.select(this);
+		         			currentBookmark.classed("current", true);
 
 		         			me.selectedBookmarkKey = entry.key;
 
-				         	var geneName = entry.key.split(": ")[0];
+				         	var geneName = me.parseKey(entry.key).gene;
 							var bookmarkEntry = entry.value;
 							var key = entry.key;
 
@@ -436,14 +415,16 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
-								genesCard.selectGene(geneName, function(variantCard) {
-									if (variantCard.getRelationship() == 'proband') {
-										var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
-										me._flagBookmark(variantCard, window.gene, variant, key);
-									}
+								genesCard.selectGene(geneName, function() {
+									
+								}, function() {
+									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
+									currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
+									me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
 								});
 							} else {
-								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);					
+								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene);
+								currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
 								me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
 							}
 
@@ -464,6 +445,10 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 	 container.selectAll(".bookmark")
 	 		 .append("span")
+	         .attr("class", "not-found hide");	         
+
+	 container.selectAll(".bookmark")
+	 		 .append("span")
 	         .attr("class", "favorite-indicator")
 	         .style("float", "right");
 	        
@@ -475,29 +460,89 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	var rsId = getRsId(bookmarkEntry);
 
 				// Strip off gene name and chr
-				var tokens = key.split(": ")[1].split(" ");
-	         	return tokens[1] + " " + tokens[2] + (rsId ? " " + rsId : "");
+				var bm = me.parseKey(key);
+	         	return bm.start + " " + bm.ref + "->" + bm.alt + (rsId ? " " + rsId : "");
 	         });
+
+	container.selectAll(".bookmark span.not-found")
+	         .text("Variant not found");
 
 	container.selectAll(".bookmark .variant-symbols")
          .each( function(entry, i) {
+
+
+
 		    var selection = d3.select(this);
          	var variant = entry.value;	   
-         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_COLOR;      
-         	if (variant[impactField]) {
-	         	for (var impact in variant[impactField]) {		         		
+
+         	// Construct variant impact, clinvar, sift, polyphen objects from imported record fields
+         	var impact = null;
+         	var clinvarClinSig = null;
+         	var polyphen = null;
+         	var sift = null;
+         	var inheritance = null;
+
+
+         	if (variant.isProxy) {
+         		impact = {};
+         		if (variant.highestImpact) {
+	         		variant.highestImpact.split(",").forEach(function(i) {
+	         			impact[i] = "";
+	         		})
+         		} else if (variant.impact) {
+	         		variant.impact.split(",").forEach(function(i) {
+	         			impact[i] = "";
+	         		})         			
+         		}
+         		if (variant.clinvarClinSig) {
+             		clinvarClinSig = {};
+	         		variant.clinvarClinSig.split(",").forEach(function(c) {
+	         			clinvarClinSig[c.split(" ").join("_")] = "";
+	         		})
+         		}
+
+         		if (variant.polyphen) {
+	         		polyphen = {};
+	         		variant.polyphen.split(",").forEach(function(p) {
+	         			polyphen[p.split(" ").join("_")] = "";
+	         		})         			
+         		}
+         		if (variant.SIFT) {
+	         		sift = {};
+	         		variant.SIFT.split(",").forEach(function(s) {
+	         			sift[s.split(" ").join("_")] = "";
+	         		})
+         		}
+         		if (variant.inheritance) {
+	         		inheritance = variant.inheritance.split(" ").join("");
+         		}
+
+         	} else {
+	         	var impactField = filterCard.getAnnotationScheme().toLowerCase() == 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;      
+	         	impact = variant[impactField];
+
+	         	clinvarClinSig = variant.clinVarClinicalSignificance;
+
+	         	polyphen = variant.vepPolyPhen;
+
+	         	sift = variant.vepSIFT;
+
+	         	inheritance = variant.inheritance;
+         	}
+         	if (impact) {
+	         	for (var theImpact in impact) {		         		
          			var svg = selection.append("svg")
 								       .attr("class", "impact-badge")
 								       .attr("height", 12)
 								       .attr("width", 14);
-		         	var impactClazz =  'impact_' + impact.toUpperCase();
+		         	var impactClazz =  'impact_' + theImpact.toUpperCase();
 		         	matrixCard.showImpactBadge(svg, variant, impactClazz);	         		
 	         	}	         		
          	}
-         	if (variant.clinVarClinicalSignificance) {
+         	if (clinvarClinSig) {
          		var lowestValue = 9999;
          		var lowestClazz = null; 
-         		for (var clinvar in variant.clinVarClinicalSignificance) {
+         		for (var clinvar in clinvarClinSig) {
          			if (matrixCard.clinvarMap[clinvar]) {
          				if (matrixCard.clinvarMap[clinvar].value < lowestValue) {
          					lowestValue = matrixCard.clinvarMap[clinvar].value;
@@ -516,11 +561,11 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
      			}
 
          	}
-         	if (variant.vepSIFT) {
-				for (var sift in variant.vepSIFT) {
-					if (matrixCard.siftMap[sift]) {
-		         		var clazz = matrixCard.siftMap[sift].clazz;
-		         		var badge = matrixCard.siftMap[sift].badge;
+         	if (sift) {
+				for (var theSIFT in sift) {
+					if (matrixCard.siftMap[theSIFT]) {
+		         		var clazz = matrixCard.siftMap[theSIFT].clazz;
+		         		var badge = matrixCard.siftMap[theSIFT].badge;
 		         		if (clazz != '') {
 							var options = {width:11, height:11, transform: 'translate(0,1)', clazz: clazz};
 							var svg = selection.append("svg")
@@ -533,11 +578,11 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
          		}
          	}
-         	if (variant.vepPolyPhen) {
-				for (var polyphen in variant.vepPolyPhen) {
-					if (matrixCard.polyphenMap[polyphen]) {
-		         		var clazz = matrixCard.polyphenMap[polyphen].clazz;
-		         		var badge = matrixCard.polyphenMap[polyphen].badge;
+         	if (polyphen) {
+				for (var thePolyphen in polyphen) {
+					if (matrixCard.polyphenMap[thePolyphen]) {
+		         		var clazz = matrixCard.polyphenMap[thePolyphen].clazz;
+		         		var badge = matrixCard.polyphenMap[thePolyphen].badge;
 		         		if (clazz != '') {
 							var options = {width:10, height:10, transform: 'translate(0,2)', clazz: clazz};
 							var svg = selection.append("svg")
@@ -549,15 +594,15 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 					}
          		}
          	}
-         	if (variant.inheritance) {
-         		if (variant.inheritance == 'recessive') {
+         	if (inheritance) {
+         		if (inheritance == 'recessive') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
 								        .attr("height", 14)
 								        .attr("width", 16);
 					var options = {width: 18, height: 16, transform: "translate(-1,1)"};
 					matrixCard.showRecessiveSymbol(svg, options);										        
-         		} else if (variant.inheritance == 'denovo') {
+         		} else if (inheritance == 'denovo') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
 								        .attr("height", 14)
@@ -622,6 +667,21 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 		  .classed("current", true);
 
 
+}
+
+BookmarkCard.prototype._validateBookmarksFound = function(bookmarkDiv, bookmarkKeys, geneObject) {
+	var me = this;
+	bookmarkKeys.forEach( function(key) {		
+		if (me.resolveBookmarkedVariant(key, me.bookmarkedVariants[key], geneObject) == null) {
+			bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+				return entry.key == key;
+			}).select("span.not-found").classed("hide", false);
+		} else {
+			bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+				return entry.key == key;
+			}).select("span.not-found").classed("hide", true);
+		}
+	});
 }
 
 BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
@@ -718,6 +778,84 @@ BookmarkCard.prototype.addPhenotypeGlyphs = function(container) {
 	});
 }
 
+BookmarkCard.prototype.addCallVariantsButton = function(container) {
+	var me = this;
+
+	
+	container.selectAll("div.bookmark-gene").each( function(entry, i) {
+		var geneContainer = d3.select(this);
+		var geneName = entry.key;
+		var entryKeys = entry.value;
+
+		entry.transcriptsToCall = {};
+		entryKeys.forEach(function(entryKey) {
+			var bookmarkEntry = me.bookmarkedVariants[entryKey];
+			if (bookmarkEntry.isProxy && bookmarkEntry.freebayesCalled == 'Y') {
+				entry.transcriptsToCall[bookmarkEntry.transcript] = true;
+				addButton = true;
+			}
+		});			
+		if (Object.keys(entry.transcriptsToCall).length > 0) {
+			var callButton = geneContainer.append("button")
+			             .attr("class", "btn btn-raised btn-default bookmark-call-button")
+						 .on("click", function(entry, i) {
+						 	var bookmarkGeneLink = d3.select(this.parentNode).select(".bookmark-gene");
+						 	var button  = d3.select(this);
+						 	var currentBookmarkDiv = d3.select(this.parentNode);
+						 	button.select(".call-variants-loader").classed("hide", false);
+							me.selectedBookmarkKey = entry.key;
+
+							unpinAll();
+							var geneName = entry.key;
+							var bookmarkKeys = entry.value;
+							promiseGetCachedGeneModel(geneName).then(function(geneObject) {
+
+								for(var transcriptId in entry.transcriptsToCall) {
+									var isReady = entry.transcriptsToCall[transcriptId];
+									if (isReady) {
+										var theTranscript = null;
+										geneObject.transcripts.forEach(function(transcript) {
+											if (!theTranscript && transcript.transcript_id == transcriptId) {
+												theTranscript = transcript;
+											}
+										});						
+										if (theTranscript) {
+											genesCard.selectGene(geneName, 
+												 function() {
+
+												 }, function() {
+												 	
+												 	jointCallVariants( function() {
+												 		button.classed("hide", true);
+												 		button.select(".call-variants-loader").classed("hide", true);
+												 		me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, geneObject);
+												 	})
+												 });
+
+										}		
+
+									}
+
+								}
+							})
+
+						 });
+				callButton.append("img")
+				          .attr("class", "call-variants-loader hide")
+				          .style("width", "13px")
+				          .style("height", "13px")
+				          .style("margin-bottom", "1px")
+				          .style("margin-right", "2px")
+				          .style("display", "inline-block")
+				          .attr("src", "assets/images/wheel.gif");
+				callButton.append("span").text("Call variants");
+		}
+
+	});
+
+}
+
+
 
 BookmarkCard.prototype.addPhenotypeList = function(container) {
 	     var phenotypesContainer = container.selectAll("div.bookmark-gene")
@@ -767,31 +905,207 @@ BookmarkCard.prototype.addPhenotypeList = function(container) {
 	              });	
 }
 
-BookmarkCard.prototype.exportBookmarks = function(scope) {
-	var me = this;
-	var output = "chrom" + "\t" + "start" + "\t" + "end" + "\t" + "ref" + "\t" + "alt" + "\t" + "gene" + "\t" + "impact" + "\t" + "inheritance mode" +"\n";
 
+
+
+BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
+	var me = this;	
+
+	$('#export-loader span').text("Exporting " + format + " file...")
+	$('#export-loader').removeClass("hide");
+	$('#export-bookmarks').addClass("hide");
+	$('#download-bookmarks').addClass("hide");
+
+	// Prepare bookmark entries for export.
+	var bookmarkEntries = [];
 	for (key in this.bookmarkedVariants) {
 		var entry = me.bookmarkedVariants[key];	
-		var isFavorite = me.favorites[key];	
-		var geneName = key.split(": ")[0];
-		var impact = "";
-		if (!entry.hasOwnProperty("isProxy")) {
-			if (Object.keys(entry.effect).length > 0) {
-				impact = Object.keys(entry.effect).join(",");
-			} else if (Object.keys(entry.vepConsequence).length > 0) {				
-				impact = Object.keys(entry.vepConsequence).join(",");
-			}
-		}
-		var inheritance = entry.hasOwnProperty("isProxy") ? "" : entry.inheritance;
-		if (scope == "all" || isFavorite) {
-			var start = entry.start - 1;
-			var end   = entry.end - 1;
-			output += entry.chrom + "\t" + start + "\t" + end + "\t" + entry.ref + "\t" + entry.alt + "\t" + geneName + "\t" + impact + "\t" + inheritance + "\n";
+		if (scope == "all" || me.favorites[key]) {
+
+			entry.gene         = me.parseKey(key).gene;
+			entry.transcript   = me.parseKey(key).transcriptId;
+			entry.isFavorite   = me.favorites[key];	
+
+			bookmarkEntries.push(entry);
 		}
 	}
 
+	// If this is a trio, the exporter will be getting the genotype info for proband, mother
+	// and father, so pass in a comma separated value of sample names for trio.  Otherwise,
+	// just pass null, which will default to the proband's sample name
+	var sampleNames = null;
+	if (dataCard.mode == 'trio') {
+		sampleNames = variantCards.map(function(vc) {
+			return vc.model.getSampleName();
+		});
+	} 
 
-	window.open('about:blank').document.body.innerText += output;
+	// Export the bookmark entries.
+	variantExporter.promiseExportVariants(bookmarkEntries, format, sampleNames)
+	  .then(function(output) {
+			$('#export-bookmarks').addClass("hide");
+			$('#export-loader').addClass("hide");
+			$('#download-bookmarks span').text( "Download " + format + " file");
+			$('#download-bookmarks').removeClass("hide");
+			createDownloadLink("#download-bookmarks", output, "gene-iobio-bookmarked-variants." + format );
+	  })
+}
+
+
+BookmarkCard.prototype.initImportBookmarks = function() {
+
+}
+
+
+BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
+	var importSource = $('input[name="import-source"]:checked').val();
+	var files = fileSelection.files;
+	var me = this;
+ 	// Check for the various File API support.
+      if (window.FileReader) {
+      	var bookmarkFile = files[0];
+		var reader = new FileReader();
+
+		reader.readAsText(bookmarkFile);
+
+		// Handle errors load
+		reader.onload = function(event) {
+			var data = event.target.result;
+			if (importSource == "gene") {
+				me.importBookmarksCSV(data)
+			} else if (importSource == 'gemini') {
+				me.importBookmarksGemini(data)
+			}
+			$('#dataModal').modal('hide');
+		    fileSelection.value = null;
+		}
+		reader.onerror = function(event) {
+			alert("Cannot read file. Error: " + event.target.error.name);
+			console.log(event.toString())
+		}
+
+      } else {
+          alert('FileReader are not supported in this browser.');
+      }
+
+}
+BookmarkCard.prototype.importBookmarksCSV = function(data) {
+	var me = this;
+	
+	me.bookmarkedVariants = {};
+	var importRecords = VariantImporter.parseRecordsCSV(data);
+
+	importRecords.forEach( function(ir) {
+			var key = me.getBookmarkKey(ir.gene, ir.transcript, ir.chrom, ir.start, ir.ref, ir.alt);
+			if (me.bookmarkedVariants[key] == null) {
+				ir.isProxy = true;
+				ir.importSource = "gene"
+				ir.importFormat = "csv";
+				me.bookmarkedVariants[key] = ir;
+				if (ir.starred == 'Y') {
+					me.favorites[key] = true;
+				}
+			}
+	});
+	me.showImportedBookmarks();
+
+
+
+}
+
+
+BookmarkCard.prototype.importBookmarksGemini = function(data) {
+	var me = this;
+
+	
+	me.bookmarkedVariants = {};
+	var recs = data.split(/[\r\n]+/g);
+	recs.forEach( function(rec) {
+		var fields = rec.split(/\s+/);
+
+		if (fields.length >= 5) {
+			var chrom        = fields[0];
+			var start        = +fields[1];
+			var end          = +fields[2];
+			var ref          = fields[3];
+			var alt          = fields[4];
+			var geneName     = fields[5];
+			var transcriptId = null;
+			if (fields.length > 5) {
+				transcriptId = fields[6];
+			}
+
+			// Skip the first line if it contains column names
+			if (chrom == "chrom") {
+
+			} else {
+				var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
+				if (me.bookmarkedVariants[key] == null) {
+					me.bookmarkedVariants[key] = {isProxy: true, importSource: 'gemini', importFormat: "tsv", gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
+				}
+			}
+
+			
+
+		}
+	});
+
+	me.showImportedBookmarks();
+
+}
+
+BookmarkCard.prototype.showImportedBookmarks = function() {
+	var me = this;
+	showSidebar("Bookmarks");
+
+	var genesToRefresh = [];
+	for (var theGeneName in me.bookmarkedGenes) {
+		genesToRefresh.push(theGeneName);
+	}
+
+	var refreshNextGene = function() {
+		var me = this;
+		
+		/*
+		if (genesToRefresh.length == 0) {
+			
+		} else {
+			var geneToRefresh = genesToRefresh.splice(0,1)[0];
+			
+			genesCard.selectGene(geneToRefresh, function(){}, function() {
+				refreshNextGene();
+			});		
+				
+		}
+		*/
+	}
+	
+
+	// Get the phenotypes for each of the bookmarked genes
+	var promises = []
+	for (var geneName in me.bookmarkedGenes) {
+		var promise = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
+		});
+		promises.push(promise);
+		if (promises.length == Object.keys(me.bookmarkedGenes).length) {
+
+			Promise.all(promises).then(function() {
+				// Create the bookmark links 
+				me.refreshBookmarkList();
+
+				// Add the bookmarked genes to the gene buttons
+				genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
+
+				// Sequentially select each gene for bookmarked variants.  When
+				// done, refresh the bookmark list again.
+				refreshNextGene();
+			});
+			
+		}		
+	}	
+
+
+
+	$('#import-bookmarks-dropdown .btn-group').removeClass('open');		
 }
 

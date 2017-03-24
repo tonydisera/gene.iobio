@@ -15,15 +15,17 @@ module.exports = {
     transcriptCard = indexPage.section.transcriptCard;
   },
 
+
   'Loading Platinum Single shows the correct cards (only proband)': function(client) {
     indexPage.load();
+    nav.searchGene('BRCA2');
+
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild('GRCh37');
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
 
-    nav.searchGene('BRCA2');
 
     transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
     indexPage.expect.element('@probandVariantCard').to.be.visible;
@@ -49,6 +51,10 @@ module.exports = {
     matrixTrack.waitForMatrixLoaded();
     nav.clickData();
     dataCard.selectSingle();
+    dataCard.selectTrio();
+    dataCard.clickLoad();
+
+    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
     indexPage.expect.element('@motherVariantCard').to.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.be.visible;
   },
@@ -58,5 +64,8 @@ module.exports = {
     dataCard.assert.cssClassNotPresent('@loadButton', "disabled");
     client.end();
   }
+
+
+
 };
 

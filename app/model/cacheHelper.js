@@ -14,28 +14,120 @@ CacheHelper.prototype.isolateSession = function() {
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
 	var me = this;
+
+
 	me.getAnalyzeAllCounts(function(counts) {
-		$('#analyze-all-progress').removeClass("hide");
-		if (counts.analyzed == 0 && counts.total > 0) {
-			$('#analyze-all-progress').removeClass("done");
-			$('#analyze-all-progress .bar').css("width", "0%");
-			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
+
+
+		if (counts.total == 0) {
+			$('#analyzed-progress-bar').addClass("hide");
+			$('#total-genes-label').addClass("hide");
+			return;
+		} else if (counts.analyzed == 0) {
+
 		}
-		else if (counts.analyzed == counts.total) {
-			$('#analyze-all-progress .bar').css("width", "0%");
+
+		$('#analyzed-progress-bar').removeClass("hide");
+		$('#analyze-all-progress').removeClass("hide");
+
+		if (counts.analyzed == counts.total) {
 			$('#analyze-all-progress').addClass("done");
-			$('#analyze-all-progress .bar').css("width", "100%");
-			$('#analyze-all-progress .text').text(counts.analyzed + ' analyzed');
 		} else {
 			$('#analyze-all-progress').removeClass("done");
-			$('#analyze-all-progress .bar').css("width", percentage(counts.analyzed / counts.total));
-			$('#analyze-all-progress .text').text(counts.analyzed + ' of ' + counts.total + ' analyzed');
 		}
-		if (filterCard.hasFilters()) {
-			$('#filter-progress .text').text(counts.pass + " passed filter");
-			$('#filter-progress .bar').css("width", percentage(counts.pass / counts.analyzed));
-			$('#filter-progress').removeClass("hide");	
 
+
+		$('#total-genes-label').removeClass("hide");
+		$('#total-genes-label').text(counts.total + " genes");
+
+
+		var analyzed             = Math.round(counts.analyzed / counts.total * 100) / 100;		
+		var notAnalyzed          = 1 - analyzed;
+
+		var analyzedPassed       = filterCard.hasFilters() && counts.analyzed > 0 ? Math.round(counts.pass / counts.analyzed * 100) / 100 : 0;
+		var analyzedNotPassed    = filterCard.hasFilters() ? 1 - analyzedPassed : 1;
+
+		$('#analyzed-bar'           ).css("width", percentage(analyzed));
+		$('#analyzed-label'         ).css("width", percentage(analyzed));
+		$('#bottom-analyzed-label'  ).css("width", percentage(analyzed));
+		$('#not-analyzed-bar'       ).css("width", percentage(notAnalyzed));
+		$('#not-analyzed-label'     ).css("width", percentage(notAnalyzed));
+
+		$('#passed-filter-bar'      ).css("width", percentage(analyzedPassed));
+		$('#passed-filter-label'    ).css("width", percentage(analyzedPassed));
+		$('#not-passed-filter-bar'  ).css("width", percentage(analyzedNotPassed));
+		$('#not-passed-filter-label').css("width", percentage(analyzedNotPassed));
+
+		var notAnalyzedCount        = counts.total - counts.analyzed;
+		var analyzedNotPassedCount  = counts.analyzed - counts.pass;
+		var analyedNotPassedVerb    = analyzedNotPassedCount > 1 ? "do" : "does";
+
+
+		if (counts.total > counts.analyzed ) {
+			$('#not-analyzed-bar'       ).text(notAnalyzedCount);
+			$('#not-analyzed-label'     ).text("not analyzed");
+		} else {
+			$('#not-analyzed-bar'       ).text("");
+			$('#not-analyzed-label'     ).text("");
+		}
+
+
+		// Show analyze progress counts on hover
+		$('#passed-filter-bar').attr("data-toggle", "tooltip");
+		$('#passed-filter-bar').attr("data-placement", "top");
+
+		$('#not-passed-filter-bar').attr("data-toggle", "tooltip");
+		$('#not-passed-filter-bar').attr("data-placement", "top");
+
+		$('#not-analyzed-bar').attr("data-toggle", "tooltip");
+		$('#not-analyzed-bar').attr("data-placement", "top");
+
+
+		if (counts.analyzed > 0) {
+			if (filterCard.hasFilters()) {
+				$('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
+				$('#passed-filter-label'    ).text(counts.pass > 0 ? "pass filter" : "");
+				$('#not-passed-filter-label').text(analyzedNotPassedCount > 0 ? analyedNotPassedVerb + " not pass" + ( counts.pass == 0 ? " filter" : "") : "");
+				$('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "0");
+				// If there isn't sufficient width to show the 'passed' and 'not passed' filter, hide the bottom label
+				if ($('#passed-filter-bar').innerWidth() < 65 && (analyzedNotPassedCount > 0 && $('#not-passed-filter-bar').innerWidth() < 120) ) {
+					$('#bottom-label-bar').addClass("hide");
+				} else {
+					$('#bottom-label-bar').removeClass("hide");
+				}
+
+				$('#passed-filter-bar'    ).attr("title", counts.pass > 0             ? counts.pass + " pass filter" : "");
+				$('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount + " " + analyedNotPassedVerb + " not pass filter" : "");
+				$('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");		
+
+			} else {
+				$('#bottom-label-bar').removeClass("hide");
+				$('#passed-filter-label'    ).text("");
+				$('#passed-filter-bar'      ).text("");
+				$('#not-passed-filter-bar'  ).text(counts.analyzed);
+				$('#not-passed-filter-label').text("analyzed");
+
+				$('#passed-filter-bar'    ).attr("title", "");
+				$('#not-passed-filter-bar').attr("title", counts.analyzed  + " analyzed");
+				$('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");		
+
+			}
+		} else {
+				$('#passed-filter-label'    ).text("");
+				$('#passed-filter-bar').text("");
+				$('#passed-filter-bar'    ).attr("title", "");
+
+				$('#not-passed-filter-label').text("");
+				$('#not-passed-filter-bar').text("");
+				$('#not-passed-filter-bar').attr("title", "");
+
+				$('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");		
+		}
+
+
+
+		// Refresh the standard filter count if it applies
+		if (filterCard.hasFilters()) {
 			// If a standard filter has been applied, update its counts
 			if (clearStandardFilterCounts) {
 				$('#standard-filter-panel .standard-filter-btn').parent().find('span.standard-filter-count').text("");
@@ -43,9 +135,8 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
 				$('#standard-filter-panel .standard-filter-btn.current').parent().find('span.standard-filter-count').text(counts.pass + ' of ' + counts.analyzed + ' genes');
 			}			
-		} else {
-			$('#filter-progress').addClass("hide");					
 		}
+
 	});	
 }
 
@@ -146,7 +237,7 @@ CacheHelper.prototype.cacheGene = function(geneName, callback) {
 		    	me.cacheNextGene(geneObject.gene_name, callback);
 		    } else if (shouldJointCall) {
 		    	genesCard._geneBadgeLoading(geneObject.gene_name, true);
-				cacheJointCallVariants(geneObject, transcript, function() {
+				cacheJointCallVariants(geneObject, transcript, null, function() {
 
 					me.processCachedTrio(geneObject, transcript, callback)						
 				});
@@ -301,6 +392,7 @@ CacheHelper.prototype.cacheNextGene = function(geneName, callback) {
 			this.cacheQueue.splice(idx,1);
 		} else {
 			console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
+			callback();
 			return;
 		}
 	}
@@ -437,8 +529,8 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
 		
 				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
-		  	}
-		}
+		  	} 
+		} 
 	}  
 	genesCard.sortGenes();
 	$('#gene-badges-loader').addClass("hide");
@@ -577,6 +669,7 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther,
 			localStorage.removeItem(key);			
 		})
 		window.gene = null;
+		genesCard._hideCurrentGene();
 		me.hideAnalyzeAllProgress();
 		//CacheHelper._logCacheSize();
 		//CacheHelper._logCacheContents();

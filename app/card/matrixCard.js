@@ -17,6 +17,11 @@ function MatrixCard() {
 	this.ROW_LABEL_WIDTH_BASIC     = 25;
 	this.ROW_LABEL_WIDTH_EDU       = 130;
 
+
+	this.fill_green =  "#81A966";
+	this.fill_grey  =  "#8b8b8b";
+	this.fill_red   =  "rgb(173, 73, 74)";
+
 	this.clinvarMap     = {
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
 			  		    'pathogenic/likely_pathogenic' : {value: 2,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
@@ -83,7 +88,7 @@ function MatrixCard() {
                         recessive_all:  {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
                         present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
                         present_all:    {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
-                        present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''},
+                        present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''}
                  };
 	this.affectedMap = {
@@ -91,7 +96,7 @@ function MatrixCard() {
                         recessive_some: {value: 2,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
                         present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
                         present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
-                        present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: ''},
+                        present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'affected',  symbolFunction: ''}
                  };
 	// For af range, value must be > min and <= max
@@ -116,13 +121,13 @@ function MatrixCard() {
 	this.matrixRows = [
 		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:0, index:2, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
-		{name:'Pathogenecity - SIFT'         , id:'sift',           order:2, index:7, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Pathogenicity - SIFT'         , id:'sift',           order:2, index:7, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
 		{name:'Impact (VEP)'                 , id:'impact',         order:3, index:0, match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
 		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:4, index:1, match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
 		{name:'Bookmark'                     , id:'bookmark',       order:5, index:10, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Inheritance Mode'             , id:'inheritance',    order:6, index:3, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Affected Siblings'            , id:'affected-sibs',  order:7, index:8, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Unaffected Siblings'          , id:'unaffected-sibs',order:8, index:9, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
+		{name:'Present in Affected sibs', id:'affected-sibs',  order:7, index:8, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
+		{name:'Absent in Unaffected sibs'          , id:'unaffected-sibs',order:8, index:9, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
 		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:10, index:5, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
 		{name:'Zygosity'                     , id:'zygosity',       order:11, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
@@ -1112,22 +1117,15 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 };
 
 MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
-	options = options || {};
 	selection.append("g")
-	         .attr("transform", options.transform || "translate(0,0)")
+	         .attr("transform", "translate(1,2)")
 	         .append("use")
-	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options.width || "20")
-	         .attr("height", options.height || "20")
+	         .attr("xlink:href", '#thumbs-down-symbol')
+	         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
+	         .attr("height", options && options.cellSize > 18 ? "16" : "14")
+	         .attr("fill",   matrixCard.fill_grey)
 	         .style("pointer-events", "none");
-
-	selection.append("line")
-	         .attr("x1", 2)
-	         .attr("y1", 2)
-	         .attr("x2", 15)
-	         .attr("y2", 15)
-	         .style("stroke-width", "2px")
-	         .style("stroke", "rgb(144, 148, 169)");
+	
 };
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
@@ -1149,36 +1147,63 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	MatrixCard.wrap(text, options.cellSize, 3);
 };
 
-MatrixCard.prototype.showSibRecessiveSymbol = function (selection) {
-	var options = {};
-	if (selection.datum() && selection.datum().value == 'recessive_some') {
-		options.transform = "translate(1,2)";
-		options.width = "17";
-		options.height = "17";
-	} else {
-		options.transform = "translate(0,0)";
-		options.width = "22";
-		options.height = "22";
+MatrixCard.prototype.showSibRecessiveSymbol = function (selection, options) {
+	if (selection.datum().value == 'recessive_all' && selection.datum().clazz == "affected") {
+		selection.append("g")
+			         .attr("transform", options.transform || "translate(1,2)")
+			         .append("use")
+			         .attr("xlink:href", '#thumbs-up-symbol')
+			         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
+			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
+			         .attr("fill",  matrixCard.fill_green)
+			         .style("pointer-events", "none");
+	} else  {
+		selection.append("g")
+			         .attr("transform", "translate(1,2)")
+			         .append("use")
+			         .attr("xlink:href", '#question-mark-symbol')
+			         .attr("width", options && options.cellSize > 18 ? "16" : "14")
+			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
+			         .attr("fill",  matrixCard.fill_grey)
+			         .style("pointer-events", "none");
+	}
+
+};
+
+MatrixCard.prototype.showSibPresentSymbol = function (selection, options) {
+	var symbolLink = null;
+	var fillColor = matrixCard.fill_grey;
+
+	if ( selection.datum().clazz == "affected") {
+		if (selection.datum().value == "present_all") {
+			symbolLink = '#thumbs-up-symbol';
+			fillColor = matrixCard.fill_green;
+		} else if (selection.datum().value == "present_some") {
+			symbolLink = '#question-mark-symbol';
+		} else if (selection.datum().value == "present_none") {
+			symbolLink = '#thumbs-down-symbol';
+		}
+	} else if (selection.datum().clazz == "unaffected") {
+		if (selection.datum().value == "present_all") {
+			symbolLink = '#thumbs-down-symbol';
+		} else if (selection.datum().value == "present_some") {
+			symbolLink = '#question-mark-symbol';
+		} else if (selection.datum().value == "present_none") {
+			symbolLink = '#thumbs-up-symbol';
+			fillColor = matrixCard.fill_green;			
+		}
 	}
 
 	selection.append("g")
-	         .attr("transform", options.transform)
-	         .append("use")
-	         .attr("xlink:href", '#recessive-symbol')
-	         .attr("width", options.width)
-	         .attr("height", options.height)
-	         .style("pointer-events", "none");
-};
+			         .attr("transform",  "translate(1,2)")
+			         .append("use")
+			         .attr("xlink:href", symbolLink)
+			         .attr("width",   options && options.cellSize > 18 ? "16" : "14")
+			         .attr("height",  options && options.cellSize > 18 ? "16" : "14")
+			         .attr("fill",    fillColor)
+			         .style("pointer-events", "none");		
 
-MatrixCard.prototype.showSibPresentSymbol = function (selection) {
-	selection.append("g")
-	         .attr("transform",  selection.datum() && selection.datum().value == 'present_all' ? "translate(1,1)" : "translate(3,3)")
-	         .append("use")
-	         .attr("xlink:href", '#checkmark-symbol')
-	         .attr("width",  selection.datum() && selection.datum().value == 'present_all' ? "15" : "10")
-	         .attr("height", selection.datum() && selection.datum().value == 'present_all' ? "15" : "10")
-	         .attr("fill",   selection.datum() && selection.datum().clazz == 'affected' ? "#81A966": "#ABAFC1")
-	         .style("pointer-events", "none");
+	
 };
 
 MatrixCard.prototype.showNoInheritSymbol = function (selection) {
@@ -1286,10 +1311,10 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 	var transform2 = "translate(5,6)";
 	var clazz = null;
 	if (variant) {
-		type = variant.type;
+		type = variant.type ? variant.type : 'SNP';
 		clazz = impactClazz ? impactClazz : (variant.impact && variant.impact.length > 0 ? "impact_" + variant.impact[0].toUpperCase() : "");
 	} else  {
-		type = selection.datum().type;
+		type = selection.datum().type ? selection.datum().type : 'SNP';
 		transform1 = selection.datum().transform || "translate(1,1)";
 		transform2 = selection.datum().transform || "translate(5,5)";
 		clazz = selection.datum().clazz;

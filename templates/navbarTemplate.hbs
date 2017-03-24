@@ -8,7 +8,7 @@
       </button>
       
           <div class="navbar-brand" >
-                <a id='home'>
+                <a id='home' onclick="goToHome()">
                   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
                 </a>
                 <div id="basic-mode-title" class="level-mygene2 hide">
@@ -21,7 +21,10 @@
                 style="text-align:left;font-size: 14px;color: rgb(132,132,132);font-style: italic;">
                   education edition
                 </div>
+            <!-- Genome build link -->
+            <a href="javascript:void(0)" id="build-link" class="level-edu-tour mygene2 level-basic" onclick="showDataDialog()"></a>
 
+        
           </div>
 
 
@@ -30,64 +33,74 @@
 
       <ul class="nav navbar-nav" >
 
-        <li class="level-basic">
-          <form class="navbar-form navbar-left" >
-            <div id="bloodhound" class="form-group">
-              <input id="enter-gene-name" type="text" class="form-control col-sm-8 typeahead" data-toggle="tooltip" data-placement="bottom"  placeholder="Enter Gene name">
-            </div>           
-          </form>
-        </li>
-
-        <li class="level-basic">
-          <a id="show-select-genes-link" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Phenolyzer')">
-            <svg height="22" width="22">
-              <g transform="translate(0,0)">
-                <use id="search-dna-glyph" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="22" height="22" fill="white"></use>
-              </g>
-            </svg>   
-            <span id="genes-menu-item">
-              <p class="wrapped">Select Genes</p>
-            </span>
-          </a>
-        </li > 
-        <li class="level-basic">
-          <a id="show-filters-link" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')">
-            <span class="material-icons">tune</span> 
-            <p class="wrapped">Filter Variants</p>
-          </a>
-        </li>
-
-
-        <li class="level-basic">
-          <a  id="show-bookmarks-link" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
-            <span class="material-icons">bookmark</span> 
-            <p class="wrapped wide">Bookmark Variants</p>
-          </a>
-        </li> 
-        <li class="level-basic">
-          <a id="call-variants-link" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Recall')">
-            <span class="material-icons">dialpad</span> 
-            <p class="wrapped">Call Variants</p>
-          </a>
-        </li>
-
-        <li class="vertical-divider optional level-basic mygene2"></li>  
 
 
 
         <li>      
-              <!-- Button data modal -->
-              <a href="javascript:void(0)" id="add-data-button"  class="level-edu mygene2 " onclick="$('#dataModal').modal('show')">
-                <span class="material-icons">input</span>    
-                <p class="wrapped">Select Data</p>  
-              </a>
-
+           <a href="javascript:void(0)" id="add-data-button"  class="level-edu mygene2 " onclick="showDataDialog()">
+                  <span class="material-icons">input</span>    
+                  Files
+            </a>
         </li>
-        <li class="optional">
-            <!-- Genome build link -->
-            <a href="javascript:void(0)" id="build-link" class="level-edu-tour mygene2 level-basic" data-toggle="modal" data-target="#dataModal"></a>
 
+
+
+        <li class="vertical-divider level-basic mygene2"></li>  
+
+        <li class="level-basic">
+
+          <form class="navbar-form navbar-left">
+           <div id="search-gene-label">
+              <span class="material-icons ">search</span> 
+              <span class="nav-label">Gene</span>
+           </div>
+
+
+            <div id="bloodhound" class="form-group" style="vertical-align:top">
+              <input id="enter-gene-name" type="text" class="form-control col-sm-8 typeahead" data-toggle="tooltip" style="padding-bottom:1px !important" data-placement="bottom"  placeholder="">
+            </div>           
+          </form>
         </li>
+
+        <li class="or">
+        or
+        </li>
+
+        <li class="level-basic" >
+          <a id="show-select-genes-link" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Phenolyzer')">
+            <span id="genes-menu-item">
+              Genes
+            </span>
+          </a>
+        </li > 
+
+        <li id="variant-links-divider" class="hide vertical-divider level-basic mygene2"></li>  
+
+        <li class="level-basic">
+          <a id="show-filters-link" class="hide" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')">
+            <span class="material-icons large-screen-only">tune</span> 
+            Filter
+          </a>
+        </li>
+
+
+        <li class="level-basic">
+          <a  id="show-bookmarks-link" class="hide" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
+            <span class="material-icons large-screen-only">bookmark</span> 
+            Bookmarks
+          </a>
+        </li> 
+        <li class="level-basic">
+          <a id="call-variants-link" class="hide" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Recall')">
+            <span class="material-icons large-screen-only">dialpad</span> 
+            <p class="wrapped">Call Variants</p>
+          </a>
+        </li>
+
+
+
+
+
          
        
       </ul>
@@ -104,7 +117,39 @@
           <a id="help-link" href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">Help
             <b class="caret"></b></a>
           <ul class="dropdown-menu">
-        
+
+            <!-- 
+                 The following line items w class combined-help-about only show for narrow screens when
+                 help and about menus need to be combined 
+            -->
+            <li class="combined-help-about">
+              <a href="javascript:void(0)" class="level-edu level-basic"  onclick="$('#version-modal').modal('show')">Version&nbsp;<span class="version-number"></span></a>
+            </li>
+            <li class="combined-help-about">
+              <a href="javascript:void(0)" class="level-edu level-basic"  onclick="$('#citation-modal').modal('show')">Software and Resources</a>
+            </li>
+            <li class="combined-help-about">
+              <a href="javascript:void(0)" class="level-edu level-basic"  onclick="$('#disclaimer-modal').modal('show')">Disclaimer</a>
+            </li> 
+            <li class="combined-help-about">
+              <a  id="feedback-link" class="hide level-edu level-edu-tour mygene2" data-toggle="modal" data-target="#feedback-modal">
+                Give us feedback
+              </a>              
+            </li>  
+            <li class="divider combined-help-about"></li>
+            <li class="combined-help-about">
+              <a href="http://iobio.io" target="_new">iobio</a>
+            </li>
+            <li class="combined-help-about">
+              <a  href="http://iobio.io/support.html" target="_new"  onclick="$('#tourWelcome').removeClass('open');">Support the iobio project
+              </a>
+            </li> 
+            <li class="divider combined-help-about"></li>
+
+
+            <!-- 
+                These line items always show regardless of screen dimensions 
+            -->        
             <li>
               <a id="load-demo-data" style="cursor:pointer" onclick="dataCard.loadDemoData()">
                 <span  style="padding-top: 1px;display: inline-block;" >Load Demo data</span>
@@ -135,13 +180,10 @@
               <a  id="show-bookmarks-tour"  href="javascript:void(0)">Tour bookmarks</a>        
             </li>
 
- 
-
-
           </ul>
         </li> 
 
-        <li class="dropdown">
+        <li id="about-link" class="dropdown">
           <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">About
             <b class="caret"></b></a>
           <ul class="dropdown-menu">
@@ -171,7 +213,9 @@
             </li> 
 
           </ul>
-        </li>       
+        </li> 
+
+
       </ul>
     </div>
   </div>

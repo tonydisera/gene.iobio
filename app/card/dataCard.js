@@ -178,6 +178,8 @@ DataCard.prototype.loadDemoData = function() {
 
 	window.updateUrl("build", me.demoBuild);
 	genomeBuildHelper.setCurrentBuild(me.demoBuild);
+	$('#select-build-box').removeClass("attention");
+
 
 	window.updateUrl('rel0', "proband");	
 	window.updateUrl('rel', "mother");	
@@ -227,7 +229,8 @@ DataCard.prototype.loadDemoData = function() {
 		me.mode = "single";
 		genomeBuildHelper.setCurrentBuild(me.demoBuild);
 		me.setVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,   me.demoSampleNames.proband, me.demoUrls.proband);
-		
+		$('#select-build-box').removeClass("attention");
+
 		window.loadTracksForGene();
 		window.cacheHelper.clearCache();
 		window.matrixCard.reset();	
@@ -417,6 +420,8 @@ DataCard.prototype.setCurrentBuild = function(buildName) {
 		$('#select-build')[0].selectize.addItem(buildName);
 		genomeBuildHelper.setCurrentBuild(buildName);
 		$('#build-link').text(buildName);
+		$('#select-build-box').removeClass("attention");
+
 	}
 }
 
@@ -469,6 +474,7 @@ DataCard.prototype.addBuildListener = function() {
 				$('#build-link').text(value);
 				me.validateBuildFromData(function(success, message) {
 					if (success) {
+						$('#select-build-box').removeClass("attention");
 						$('#species-build-warning').addClass("hide");
 						window.enableLoadButton();
 					} else {
@@ -483,7 +489,8 @@ DataCard.prototype.addBuildListener = function() {
 				$('#build-link').text("?");
 				window.disableLoadButton();
 				setTimeout( function() { 
-					$('#select-build-box .selectize-input').animateIt('tada');
+					//$('#select-build-box .selectize-input').animateIt('tada');
+					$('#select-build-box').addClass("attention");
 				}, 2000);
 				
 			}
@@ -513,6 +520,9 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 				me.removeBuildListener();
 				genomeBuildHelper.setCurrentSpecies(buildInfo.species.name);
 				genomeBuildHelper.setCurrentBuild(buildInfo.build.name);
+
+				$('#select-build-box').removeClass("attention");
+
 				$('#select-species')[0].selectize.setValue(buildInfo.species.name);
 				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
 				me.addBuildListener();
@@ -613,6 +623,16 @@ DataCard.prototype.getHeadersFromVcfs = function(callback) {
 
 DataCard.prototype.init = function() {
 	var me = this;
+
+	$('#dataModal').on('hidden.bs.modal', function(e) {
+
+       e.preventDefault();
+
+   	});
+	$('#dataModal').on('shown.bs.modal', function() {
+		me.onShow();
+	})
+
 
 
 	$('#select-species').selectize(
@@ -742,6 +762,12 @@ DataCard.prototype.init = function() {
 		filterCard.clearFilters();
 		filterCard.resetStandardFilterCounts();
 
+		 // If we switched from a trio back to a single, clear out the mother and father
+		// data
+		if (me.mode == 'single') {
+			window.clearMotherFatherData();
+		}
+
 		// Create variant cards for the affected and unaffected sibs.
 		// We will load the data later once the proband, mother, father
 		// data is loaded.
@@ -758,7 +784,6 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		
 		
 		if (theGeneName) {
 			setGeneBloodhoundInputElement(theGeneName, false, true);
@@ -792,6 +817,33 @@ DataCard.prototype.initSibs = function() {
     })
     $('#data-card #unaffected-sibs-select')[0].selectize.setValue(unaffectedSibIds);
 
+}
+
+DataCard.prototype.onShow = function() {
+	if (window.gene) {
+		$('#gene-name-data-dialog-box').addClass("hide");
+		$('#bloodhound-data-dialog').addClass("hide");
+	} else {
+		$('#gene-name-data-dialog-box').removeClass("hide");
+		$('#bloodhound-data-dialog').removeClass("hide");
+	}
+
+}
+
+DataCard.prototype.resetExportPanel = function() {
+	$('#export-loader').addClass("hide");
+	$('#download-bookmarks').addClass("hide");
+	$('#export-bookmarks').removeClass("hide");	
+}
+
+DataCard.prototype.onBookmarkImportSource = function(radio) {
+	if (radio.value == 'gene') {
+		$('#gemini-bookmark-selection').addClass("hide");
+		$('#gene-bookmark-selection').removeClass("hide");
+	} else if (radio.value == 'gemini') {
+		$('#gemini-bookmark-selection').removeClass("hide");
+		$('#gene-bookmark-selection').addClass("hide");
+	}
 }
 
 
@@ -831,7 +883,8 @@ DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
 		window.enableLoadButton();
 	} else {		
 		if (wiggleWhenEmpty) {
-			$('#select-build-box .selectize-input').animateIt('tada');			
+			//$('#select-build-box .selectize-input').animateIt('tada');	
+			$('#select-build-box').addClass('attention');		
 		}
 		window.disableLoadButton();
 	}	

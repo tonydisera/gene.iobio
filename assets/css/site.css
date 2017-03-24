@@ -6,20 +6,47 @@ body {
   background-color: #5d809d !important;
   margin-bottom: 0px !important;
   min-height: 50px; }
+  .navbar .navbar-nav {
+    margin-left: 20px; }
+    .navbar .navbar-nav .dropdown-menu li {
+      overflow: visible; }
+    .navbar .navbar-nav .dropdown-submenu {
+      position: relative; }
+    .navbar .navbar-nav .dropdown-submenu > .dropdown-menu {
+      top: 0;
+      left: 100%;
+      margin-top: -6px;
+      margin-left: -1px; }
+    .navbar .navbar-nav .dropdown-submenu:hover > .dropdown-menu {
+      display: block; }
+    .navbar .navbar-nav .dropdown-submenu:hover > a:after {
+      border-left-color: #fff; }
+    .navbar .navbar-nav .dropdown-submenu.pull-left {
+      float: none; }
+    .navbar .navbar-nav .dropdown-submenu.pull-left > .dropdown-menu {
+      left: -100%;
+      margin-left: 10px; }
   .navbar .navbar-brand {
     height: 50px;
     margin-top: -6px;
     padding-top: 15px; }
     .navbar .navbar-brand #home {
-      margin-top: 6px; }
+      margin-top: 6px;
+      cursor: pointer; }
   .navbar .navbar-form {
     margin-top: 10px; }
   .navbar .form-group.is-focused .form-control {
     background-image: linear-gradient(#53b2ff, #9ef4ff), linear-gradient(#D2D2D2, #D2D2D2); }
   .navbar .vertical-divider {
     height: 34px;
-    margin: 10px 17px;
+    margin: 10px 10px;
     border-left: 1px solid #aba9a9; }
+  .navbar ul.nav .or {
+    padding-top: 15px;
+    margin-right: -5px;
+    margin-left: -5px; }
+  .navbar ul.nav .combined-help-about {
+    display: none; }
   .navbar ul.nav > li #genes-menu-item {
     overflow: visible;
     display: inline-block;
@@ -28,7 +55,9 @@ body {
   .navbar ul.nav > li > a {
     color: white !important;
     padding-top: 15px !important;
-    padding-bottom: 10px !important; }
+    padding-bottom: 10px !important;
+    padding-left: 20px;
+    padding-right: 20px; }
     .navbar ul.nav > li > a:hover {
       color: #9ef4ff !important; }
       .navbar ul.nav > li > a:hover #search-dna-glyph {
@@ -41,13 +70,33 @@ body {
       vertical-align: top;
       margin-bottom: 0px; }
       .navbar ul.nav > li > a p.wrapped.wide {
-        width: 70px; }
+        width: 77px; }
   .navbar ul.nav > li.active {
     color: white !important; }
     .navbar ul.nav > li.active > a {
       color: white !important; }
       .navbar ul.nav > li.active > a #search-dna-glyph {
         fill: white !important; }
+
+.nav-pills > li > a {
+  color: #717171 !important;
+  font-size: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px; }
+.nav-pills > li > a:hover {
+  color: #5d809d !important; }
+.nav-pills > li > a:focus {
+  color: #5d809d !important; }
+
+.nav-pills > li.active > a {
+  color: white !important;
+  background-color: #5d809d; }
+.nav-pills > li.active > a:hover {
+  color: white !important;
+  background-color: #5d809d; }
+.nav-pills > li.active > a:focus {
+  color: white !important;
+  background-color: #5d809d; }
 
 h4 {
   font-size: 13px;
@@ -132,6 +181,20 @@ h5 {
   opacity: 0.5;
   font-size: 32px; }
 
+.form-group .radio label {
+  font-size: 14px;
+  line-height: 16px;
+  color: #717171; }
+.form-group .radio input[type=radio]:checked ~ .check {
+  background-color: #5d809d; }
+.form-group .radio input[type=radio]:checked ~ .circle {
+  border-color: #5d809d; }
+
+.form-group.is-focused .radio label {
+  color: #717171; }
+  .form-group.is-focused .radio label:hover {
+    color: #717171; }
+
 .form-control,
 .form-group .form-control {
   background-image: -webkit-gradient(linear, left top, left bottom, from(#3586c0), to(#3586c0)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2));
@@ -147,6 +210,16 @@ h5 {
 
 .form-group.is-focused .form-control .material-input:after {
   background-color: #3586c0; }
+
+.attention {
+  outline-color: rgba(217, 98, 98, 0.86);
+  outline-style: solid;
+  outline-offset: 4px;
+  outline-width: 2px; }
+
+.navbar-nav .attention {
+  outline-offset: -6px;
+  outline-width: 6px; }
 
 .selectize-dropdown {
   font-size: 12px;
@@ -262,7 +335,7 @@ h5 {
   -ms-justify-content: center; }
 
 .form-group label.control-label {
-  font-size: 16px !important;
+  font-size: 14px !important;
   color: #5d809d !important; }
 
 .shadow-z-2 {
@@ -309,7 +382,7 @@ i.material-icons {
   border: none;
   color: #717171;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   padding: 6px; }
   .alert.alert-info {
     background-color: transparent;
@@ -669,6 +742,9 @@ a {
   color: #2E73AB !important; }
   a:hover, a:focus {
     color: #2E73AB !important; }
+
+a.btn {
+  color: #5d809d !important; }
 
 .chosen-container a {
   color: #717171 !important; }
@@ -1052,7 +1128,9 @@ section {
   color: #9ef4ff !important;
   padding-left: 0px;
   display: inline-block;
-  margin-top: 1px; }
+  margin-top: 3px;
+  margin-left: 8px;
+  font-size: 14px; }
 
 #gene-name {
   font-size: 16px;
@@ -1462,10 +1540,11 @@ header {
   color: #5d809d !important; }
 
 #bloodhound .typeahead {
-  min-width: 140px;
-  max-width: 140px;
-  font-size: 18px;
-  vertical-align: middle !important; }
+  min-width: 100px;
+  max-width: 100px;
+  font-size: 16px !important;
+  vertical-align: middle !important;
+  color: white; }
 
 .results {
   text-align: left;
@@ -1473,8 +1552,8 @@ header {
 
 .tt-input, .tt-hint {
   padding: 5px 8px !important;
-  font-size: 18px !important;
-  line-height: 24px;
+  font-size: 16px !important;
+  line-height: 20px !important;
   outline: none !important;
   border: none !important; }
 
@@ -1501,13 +1580,46 @@ header {
 
 .tt-suggestion {
   padding: 3px 20px;
-  font-size: 18px;
-  line-height: 24px; }
+  font-size: 16px;
+  line-height: 22px;
+  text-align: left; }
   .tt-suggestion.tt-cursor {
     color: #fff;
     background-color: #0097cf; }
   .tt-suggestion p {
     margin: 0; }
+
+#search-gene-label {
+  display: inline-block;
+  padding-right: 3px; }
+  #search-gene-label span {
+    display: inline-block;
+    color: white;
+    vertical-align: top; }
+    #search-gene-label span.nav-label {
+      margin-top: 6px;
+      margin-left: -2px; }
+    #search-gene-label span.material-icons {
+      margin-top: 5px; }
+
+.form-control {
+  font-size: 14px; }
+
+input::-webkit-input-placeholder {
+  font-size: 14px !important; }
+input::-moz-placeholder {
+  font-size: 14px !important; }
+inputinput:-moz-placeholder {
+  font-size: 14px !important; }
+
+#enter-gene-name {
+  color: #9ef4ff !important; }
+  #enter-gene-name::-webkit-input-placeholder {
+    color: white; }
+  #enter-gene-name::-moz-placeholder {
+    color: white; }
+  #enter-gene-nameinput:-moz-placeholder {
+    color: white; }
 
 .checkbox input[type=checkbox]:checked + .checkbox-material .check {
   border-color: #5d809d; }
@@ -1772,6 +1884,14 @@ header {
   font-size: 13px !important;
   color: #717171 !important; }
 
+#clear-filters-button {
+  font-size: 13px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin-left: -30px;
+  margin-bottom: 2px;
+  margin-top: 2px; }
+
 #filter-summary-track {
   margin-top: 4px;
   margin-bottom: 8px;
@@ -1794,6 +1914,9 @@ header {
 #filter-track {
   margin-top: 0px;
   margin-bottom: 80px; }
+  #filter-track input {
+    color: #717171;
+    font-size: 12px; }
   #filter-track a.chosen-single {
     font-size: 12px !important; }
   #filter-track h4 {
@@ -2176,6 +2299,74 @@ header {
   margin-top: 0px;
   padding-bottom: 0px; }
 
+#dataModal .form-group-sm .form-control {
+  font-size: 13px; }
+#dataModal #vcf-dropdown-button {
+  font-size: 13px;
+  width: 100px;
+  padding-top: 1px;
+  padding-bottom: 0px; }
+#dataModal #bam-dropdown-button {
+  font-size: 12px;
+  width: 100px;
+  padding-top: 1px;
+  padding-bottom: 0px; }
+#dataModal #vcf-sample-box span {
+  font-size: 13px;
+  width: 110px;
+  display: inline-block;
+  color: #717171;
+  vertical-align: top;
+  padding-top: 4px; }
+#dataModal #vcf-sample-select-box {
+  display: inline-block;
+  width: 200px; }
+#dataModal .form-group {
+  margin-top: -5px; }
+#dataModal .form-group-header {
+  font-size: 15px;
+  color: #717171;
+  margin-left: 25px;
+  display: inline-block;
+  margin-top: 10px; }
+#dataModal #import-help-icon {
+  color: #5d809d !important; }
+#dataModal #download-bookmarks {
+  font-size: 14px;
+  display: inline-block;
+  color: #5d809d; }
+#dataModal .nav-pills li {
+  margin-left: 20px;
+  margin-right: 20px;
+  border: solid thin lightgray;
+  border-radius: 5px; }
+  #dataModal .nav-pills li a {
+    padding-left: 20px;
+    padding-right: 20px; }
+  #dataModal .nav-pills li.active {
+    border: solid thin #3586c0; }
+#dataModal #export-loader {
+  color: #717171; }
+#dataModal button {
+  font-size: 14px; }
+#dataModal #select-species-box .selectize-dropdown {
+  font-size: 14px; }
+#dataModal #select-species-box .selectize-input {
+  font-size: 14px;
+  line-height: 15px; }
+#dataModal #select-build-box .selectize-dropdown {
+  font-size: 14px; }
+#dataModal #select-build-box .selectize-input {
+  font-size: 14px;
+  line-height: 15px; }
+#dataModal #select-build-box .selectize-input input {
+  width: 145px !important; }
+#dataModal #bloodhound-data-dialog .tt-hint {
+  font-size: 14px !important; }
+#dataModal #bloodhound-data-dialog #enter-gene-name-data-dialog {
+  color: #717171;
+  font-size: 14px !important; }
+
 .tooltip-title {
   font-size: 12px;
   word-break: break-word; }
@@ -2233,6 +2424,13 @@ header {
   float: left;
   width: 180px;
   min-height: 25px; }
+
+.sib-zygosity {
+  width: 140px;
+  float: left; }
+
+.tooltip-row.sib-info {
+  padding-bottom: 2px; }
 
 .tooltip-zygosity {
   float: left;
@@ -2482,6 +2680,8 @@ text.ref-count {
   .tooltip-wide .tooltip-row {
     clear: both;
     padding-bottom: 6px; }
+    .tooltip-wide .tooltip-row.sib-info {
+      padding-bottom: 2px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
     padding-top: 4px !important;
@@ -2617,6 +2817,10 @@ text.ref-count {
   text-align: left;
   padding-top: 4px;
   margin-left: 0px; }
+  #bookmark-card .bookmark span.not-found {
+    color: #c70001;
+    font-style: italic;
+    padding-left: 6px; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
@@ -2632,6 +2836,9 @@ text.ref-count {
   color: #717171 !important; }
 #bookmark-card .phenotype-symbol {
   stroke: #717171; }
+#bookmark-card .bookmark-call-button {
+  margin: 0px 0px 0px 12px;
+  padding: 0px 8px 0px 8px; }
 #bookmark-card #favorite-badge {
   stroke: #717171; }
 #bookmark-card .favorite-indicator {
@@ -2707,35 +2914,62 @@ text.ref-count {
   margin-bottom: 5px;
   margin-top: 5px;
   margin-bottom: 0px; }
-  #genes-panel #analyze-all-progress, #genes-panel #filter-progress {
-    position: relative;
-    background-color: white;
-    color: #717070;
-    border: #878585;
-    border-style: solid;
-    border-width: thin;
-    font-size: 12px;
-    margin-left: 5px;
-    padding: 0px 0px 0px 0px !important;
+  #genes-panel #total-genes-label {
+    float: left;
+    margin-left: 10px;
+    margin-right: 5px;
+    margin-top: 8px; }
+  #genes-panel #analyze-all-panel {
+    overflow: auto;
+    margin-top: 1px;
     display: inline-block;
-    width: 130px;
-    vertical-align: middle;
-    height: 18px;
-    margin-bottom: 2px; }
-    #genes-panel #analyze-all-progress .bar, #genes-panel #filter-progress .bar {
-      background-color: rgba(65, 176, 220, 0.45);
-      height: 17px;
-      position: absolute;
-      left: 0;
-      top: 0%;
-      width: 0%;
-      text-align: center; }
-    #genes-panel #analyze-all-progress .text, #genes-panel #filter-progress .text {
-      position: absolute;
-      left: 0;
-      top: 0%;
-      width: 100%;
-      text-align: center; }
+    float: left; }
+    #genes-panel #analyze-all-panel #analyzed-progress-bar {
+      display: inline-block;
+      margin-top: 8px;
+      margin-bottom: 6px;
+      float: left; }
+      #genes-panel #analyze-all-panel #analyzed-progress-bar .bar {
+        background-color: transparent;
+        height: 17px;
+        float: left;
+        left: 0;
+        top: 0%;
+        width: 0%;
+        text-align: center; }
+      #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress {
+        background-color: transparent;
+        color: #717070;
+        border: #878585;
+        border-style: solid;
+        border-width: thin;
+        font-size: 12px;
+        padding: 0px 0px 0px 0px !important;
+        display: inline-block;
+        width: 260px;
+        vertical-align: middle;
+        height: 18px;
+        margin-left: 5px;
+        margin-bottom: 2px; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar {
+          background-color: rgba(65, 176, 220, 0.45); }
+          #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar #passed-filter-bar {
+            background-color: #fadea0;
+            height: 16px; }
+          #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #analyzed-bar #not-passed-filter-bar {
+            background-color: transparent;
+            height: 16px; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress #not-analyzed-bar {
+          background-color: transparent; }
+      #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar {
+        width: 260px;
+        height: 11px;
+        margin-left: 5px;
+        margin-top: -1px; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar .bar {
+          background-color: transparent;
+          line-height: 11px;
+          font-size: 12px; }
 
 #genes-card {
   height: 100%; }
@@ -2893,22 +3127,24 @@ text.ref-count {
   cursor: pointer; }
 
 #manage-gene-list {
+  float: left;
+  margin-top: 6px;
+  margin-right: 10px;
   display: inline-block;
   padding-top: 0px;
   padding-bottom: 0px;
   padding-left: 8px;
   padding-right: 8px;
-  font-size: 12px;
-  margin-top: 7px; }
+  font-size: 12px; }
 
 #manage-genes-box {
   float: right;
   text-align: right;
   display: inline-block;
-  margin-top: 5px; }
+  margin-top: -2px; }
   #manage-genes-box #manage-genes-dropdown {
     float: right;
-    margin-top: -8px; }
+    margin-top: 0px; }
 
 #gene-badge-container {
   display: flex;
@@ -2973,13 +3209,16 @@ text.ref-count {
   margin-right: 10px; }
 
 #order-by-label {
-  margin-left: 20px; }
+  margin-left: 20px;
+  margin-right: 4px;
+  margin-top: 8px;
+  display: inline-block; }
 
 #select-gene-container {
   display: inline-block;
   width: 110px;
   vertical-align: middle;
-  margin-top: 2px; }
+  margin-top: 4px; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
     padding-top: 2px;
@@ -3302,16 +3541,14 @@ text.ref-count {
   .navbar ul.nav > li > a {
     padding-right: 13px;
     padding-left: 13px; } }
-@media screen and (max-device-width: 1140px), screen and (max-width: 1140px) {
-  .navbar ul.nav > li .navbar-form {
-    margin-right: 25px; }
+@media screen and (max-device-width: 1142px), screen and (max-width: 1142px) {
   .navbar ul.nav > li #genes-menu-item {
     vertical-align: initial;
     padding-top: 0px; }
   .navbar ul.nav > li > a {
     padding-right: 11px;
     padding-left: 11px; }
-    .navbar ul.nav > li > a .material-icons {
+    .navbar ul.nav > li > a .material-icons.large-screen-only {
       display: none; }
     .navbar ul.nav > li > a svg {
       display: none; }
@@ -3325,7 +3562,12 @@ text.ref-count {
 
   #close-slide-left {
     top: 12px; } }
-@media screen and (max-width: 990px) {
+@media screen and (max-width: 1003px) {
+  .navbar .navbar-brand {
+    margin-right: -10px; }
+  .navbar .vertical-divider {
+    margin-left: 1px;
+    margin-right: 1px; }
   .navbar .navbar-brand {
     margin-top: 0px;
     padding-top: 10px;
@@ -3333,17 +3575,21 @@ text.ref-count {
     .navbar .navbar-brand #home {
       margin-right: 10px; }
     .navbar .navbar-brand .iobio {
-      font-size: 28px; }
+      font-size: 23px; }
     .navbar .navbar-brand .iobioapp {
-      font-size: 28px; }
+      font-size: 23px; }
   .navbar #bloodhound .typeahead {
     min-width: 125px;
     max-width: 125px;
-    font-size: 16px !important; }
+    font-size: 14px !important; }
   .navbar .tt-input, .navbar .tt-hint {
     padding: 1px 1px !important;
-    font-size: 16px !important;
-    line-height: 22px; }
+    font-size: 14px !important;
+    line-height: 20px; }
+  .navbar ul.nav .combined-help-about {
+    display: list-item !important; }
+  .navbar ul.nav #about-link {
+    display: none !important; }
   .navbar ul.nav > li.optional {
     display: none; }
   .navbar ul.nav > li .navbar-form {
@@ -3352,19 +3598,50 @@ text.ref-count {
   .navbar ul.nav > li > a {
     padding-right: 11px;
     padding-left: 11px; }
-    .navbar ul.nav > li > a .material-icons {
+    .navbar ul.nav > li > a .material-icons.large-screen-only {
       display: none; }
     .navbar ul.nav > li > a svg {
       display: none; }
   .navbar ul.nav > li .navbar-form {
     padding-right: 5px;
     padding-left: 2px; } }
-@media screen and (max-width: 934px) {
+@media screen and (max-width: 903px) {
+  .navbar .navbar-brand {
+    margin-right: -15px; }
+    .navbar .navbar-brand .iobio {
+      font-size: 22px; }
+    .navbar .navbar-brand .iobioapp {
+      font-size: 22px; }
+    .navbar .navbar-brand #build-link {
+      margin-left: 0px;
+      margin-right: 10px; }
+  .navbar .navbar-nav {
+    margin-left: 0px; }
+  .navbar #bloodhound .typeahead {
+    min-width: 90px;
+    max-width: 90px; }
+  .navbar ul.nav .dropdown-menu > li a {
+    font-size: 13px;
+    padding-top: 6px;
+    padding-bottom: 6px; }
+  .navbar ul.nav .or {
+    font-size: 13px !important;
+    margin-right: 0px; }
+  .navbar ul.nav #search-gene-label span.material-icons {
+    font-size: 18px; }
+  .navbar ul.nav #search-gene-label span.nav-label {
+    font-size: 13px !important; }
+  .navbar ul.nav #enter-gene-name {
+    line-height: 22px !important;
+    font-size: 13px !important; }
   .navbar ul.nav > li > a {
-    font-size: 12px;
-    padding-right: 6px;
-    padding-left: 6px; }
+    font-size: 13px;
+    padding-right: 9px;
+    padding-left: 9px; }
     .navbar ul.nav > li > a p.wrapped.wide {
-      width: 60px; } }
+      width: 67px; } }
+@media screen and (max-width: 767px) {
+  .collapse.in .or {
+    display: none !important; } }
 
 /*# sourceMappingURL=site.css.map */

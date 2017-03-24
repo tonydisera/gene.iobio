@@ -172,7 +172,6 @@ GenesCard.prototype.init = function() {
 	});
 
 
-
 	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
 	}
@@ -453,26 +452,19 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 	}
 	// trim newline at very end
 	genesString = genesString.replace(/\s*$/, "");
-	var geneNameList = null;
-	if (genesString.indexOf("\n") > 0) {
-		geneNameList = genesString.split("\n");
-	} else if (genesString.indexOf("\t") > 0 ) {
-		geneNameList = genesString.split("\t");
-	} else if (genesString.indexOf(",") > 0) {
-		geneNameList = genesString.split(" ").join("").split(",");
-	} else if (genesString.indexOf(" ") > 0) {
-		geneNameList = genesString.split(" ");
-	} else {
-		geneNameList = [];
-		geneNameList.push(genesString.trim());
-	}
+	var geneNameList = genesString.split(/(?:\s+|,\s+|,|^W|\n)/g);
 
 	geneNames = [];
 	var unknownGeneNames = {};
+	var duplicateGeneNames = {};
 	geneNameList.forEach( function(geneName) {
 		if (geneName.trim().length > 0) {
 			if (isKnownGene(geneName)) {
-				geneNames.push(geneName.trim().toUpperCase());
+				if (geneNames.indexOf(geneName.trim().toUpperCase()) < 0) {
+					geneNames.push(geneName.trim().toUpperCase());
+				} else {
+					duplicateGeneNames[geneName.trim().toUpperCase()] = true;
+				}
 			} else {
 				unknownGeneNames[geneName.trim().toUpperCase()] = true;
 			}
@@ -481,6 +473,11 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 
 	if (Object.keys(unknownGeneNames).length > 0) {
 		var message = "Bypassing unknown genes: " + Object.keys(unknownGeneNames).join(", ") + ".";
+		alertify.alert(message);
+	}
+
+		if (Object.keys(duplicateGeneNames).length > 0) {
+		var message = "Bypassing duplicate gene name(s): " + Object.keys(duplicateGeneNames).join(", ") + ".";
 		alertify.alert(message);
 	}
 
@@ -1335,7 +1332,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 
 		}
 	}
-	bookmarkCard.refreshBookmarkList();
+	//bookmarkCard.refreshBookmarkList();
 }
 
 GenesCard.prototype.showGeneBadgeLoading = function(geneName) {
@@ -1393,9 +1390,15 @@ GenesCard.prototype.setGeneBadgeWarning = function(geneName, select) {
 }
 
 GenesCard.prototype._getGeneBadge = function(geneName) {
-	return $("#gene-badge-container #gene-badge-name"). filter(function() {
-    	return $(this).text().toUpperCase() === geneName.toUpperCase();
-	}).parent().parent();
+	if (geneName) {
+		return $("#gene-badge-container #gene-badge-name"). filter(function() {
+			if (geneName) {
+		    	return $(this).text().toUpperCase() === geneName.toUpperCase();
+			} else {
+				return null;
+			}
+		}).parent().parent();
+	}
 }
 
 GenesCard.prototype.setGeneBadgeError = function(geneName, select) {
@@ -1674,7 +1677,7 @@ GenesCard.prototype.setSelectedGene = function(geneName) {
 	}
 }
 
-GenesCard.prototype.selectGene = function(geneName, callback) {
+GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLoaded) {
 	var me = this;
 
 	if (geneName == null || geneName.length == 0) {
@@ -1706,7 +1709,11 @@ GenesCard.prototype.selectGene = function(geneName, callback) {
     	updateUrl('gene', window.gene.gene_name);
 
     	if (!isLevelBasic) {
-			loadTracksForGene();		    		
+			loadTracksForGene(false, function() {
+				if (callbackVariantsLoaded) {
+					callbackVariantsLoaded();
+				}
+			});		    		
     	}
 	    	
 	    me.updateGeneInfoLink(window.gene.gene_name, function() {

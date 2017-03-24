@@ -1,22 +1,19 @@
 module.exports = {
 
   elements: {
-    genes: { selector: '.nav.navbar-nav:first-child li:nth-child(2)' },
-    inspect: { selector: '.nav.navbar-nav:first-child li:nth-child(3)' },
-    filter: { selector: '.nav.navbar-nav:first-child li:nth-child(4)' },
-    bookmarks: { selector: '.nav.navbar-nav:first-child li:nth-child(5)' },
-    callVariants: { selector: '.nav.navbar-nav:first-child li:nth-child(6)' },
+    genes: { selector: '.nav.navbar-nav:first-child li:nth-child(5)' },
+    filter: { selector: '.nav.navbar-nav:first-child li:nth-child(7)' },
+    bookmarks: { selector: '.nav.navbar-nav:first-child li:nth-child(8)' },
+    callVariants: { selector: '.nav.navbar-nav:first-child li:nth-child(9)' },
     enterGeneName: { selector: '#enter-gene-name' },
-    data: { selector: '.nav.navbar-nav:first-child li:nth-child(7)' }
+    data: { selector: '.nav.navbar-nav:first-child li:nth-child(1)' }
   },
 
   commands: [{
     clickFilter: function() {
       return this.click('@filter');
     },
-    clickInspect: function() {
-      return this.click('@inspect');
-    },
+    
     clickGenes: function() {
       return this.click('@genes');
     },

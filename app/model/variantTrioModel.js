@@ -67,7 +67,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 
 
 	// Sort the variants
-	me.probandVcfData.features = me.probandVcfData.features.sort(orderVariantsByPosition);
+	me.probandVcfData.features = me.probandVcfData.features.sort(VariantModel.orderVariantsByPosition);
 
 	// Compare the proband's variants to the mother's variants
 	me.promiseCompareVariants(
@@ -126,18 +126,8 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	    // to the father variant set. 
 	    
 		// Fill in the inheritance mode. 
-		// 1. recessive mode if mom and dad are het and proband is hom
-		// 2  denovo proband has variant, but not present in mom and dad 
-		//    (homref parents are also the same as variant not being present)
 		me.probandVcfData.features.forEach(function(variant) {
-			if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
-				&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
-				&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
-				variant.inheritance = 'recessive';
-			} else if ( (variant.compareMother == 'unique1' || (variant.compareMother == 'common' && variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref'))
-				     && (variant.compareFather == 'unique1' || (variant.compareFather == 'common' && variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref'))) {
-				variant.inheritance = 'denovo';
-			} 
+			VariantTrioModel.determineInheritance(variant, 'compareMother', 'compareFather');
 		});
 
 		if (me.probandVcfData) {
@@ -189,6 +179,31 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 
 }
 
+
+/*
+ *  Set the inhertance field on the variant.
+ *  recessive  - if mom and dad are het and proband is hom
+ *	denovo     - proband has variant, but not present in mom and dad 
+ *		         (homref parents are also the same as variant not being present)
+ */
+VariantTrioModel.determineInheritance = function(variant, fieldCompareMother, fieldCompareFather) {
+	if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
+		&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
+		&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
+		variant.inheritance = 'recessive';
+	} else if (fieldCompareMother && fieldCompareFather
+	         && (variant[fieldCompareMother] == 'unique1' || (variant[fieldCompareMother]  == 'common' && variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref'))
+		     && (variant[fieldCompareFather] == 'unique1' || (variant[fieldCompareFather]  == 'common' && variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref'))) {
+		variant.inheritance = 'denovo';
+	} else if (fieldCompareMother == null && fieldCompareFather == null
+	         && (variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'homref')
+		     && (variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'homref')) {
+		variant.inheritance = 'denovo';
+	} else {
+		variant.inheritance = 'none';
+	}	
+}
+
 VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfData, compareAttribute, onMatchFunction, onNoMatchFunction ) {
 	var me = this;
 
@@ -204,7 +219,7 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 	      comparisonAttribute = 'consensus';
 	    }
 
-	    otherVcfData.features = otherVcfData.features.sort(orderVariantsByPosition);
+	    otherVcfData.features = otherVcfData.features.sort(VariantModel.orderVariantsByPosition);
 		if (comparisonAttribute) {
 			otherVcfData.features.forEach( function(feature) {			
 				feature[comparisonAttribute] = '';
@@ -359,7 +374,7 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 	var me = this;
 	me.sibsVcfData = sibsVcfData;
 
-	me.probandVcfData.features = me.probandVcfData.features.sort(orderVariantsByPosition);
+	me.probandVcfData.features = me.probandVcfData.features.sort(VariantModel.orderVariantsByPosition);
 
 	me.sibsTransientVcfData = [];
 	me.sibsVcfData.forEach( function(vcfData) {
@@ -378,7 +393,7 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 				 Object.keys(variant[sibZygosityAttr]).forEach( function(key) {
 				 	var sibZygosity = variant[sibZygosityAttr][key];
 					if (sibZygosity != null) {
-						if (sibZygosity.toLowerCase() != 'none') {
+						if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'homref') {
 						 	matchesCount++;
 						}
 					 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
@@ -433,11 +448,10 @@ VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, zygosityAt
 	return new Promise( function(resolve, reject) {
 
 		me.probandVcfData.features.forEach(function(variant) {
-			if (variant.uasibsZygosity) {
-				variant[zygosityAttr][unaffectedSibVcfData.name] = "none";		
-			} else {
+			if (variant[zygosityAttr] == null) {
 				variant[zygosityAttr] = {};
 			}
+			variant[zygosityAttr][sibVcfData.name] = "none";		
 		});
 				
 		var idx = 0;

@@ -16,6 +16,7 @@ module.exports = {
 
   'Loading data should work': function(client) {
     indexPage.load();
+    nav.searchGene('BRCA1');
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild('GRCh37');
@@ -23,7 +24,6 @@ module.exports = {
     dataCard.section.probandData.inputDefaults();
     dataCard.clickLoad();
 
-    nav.searchGene('BRCA1');
     matrixTrack.waitForMatrixLoaded();
   },
 

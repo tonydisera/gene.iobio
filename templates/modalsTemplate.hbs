@@ -211,54 +211,74 @@
 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel"  >
   <div id="data-card" class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header" style="padding-top:12px;">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <span class="modal-title">Data</span>
+      <div class="modal-header" style="padding-top:12px;text-align:center">
+        
+        <!-- Close button -->
+        <button type="button" class="close" style="font-size:30px" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
 
-        <div class="fullview" style="text-align:center;width: 100%;margin-top: -32px;">
-          <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-            <i class="mdi-social-person"></i>
-            Single
-          </button>
-          <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <div style="float:left;">
-              <img src="assets/images/family.png" style="height:27px"/>
-            </div>
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-          </button>            
-          <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <div style="float:left;">
-              <img src="assets/images/pedigree.png" style="height:22px"/>
-            </div>
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-          </button>
-          <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-            style="padding-top: 2px;padding-bottom:1px;">
-            <i class="mdi-editor-format-align-justify"></i>                
-             <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-          </button>
-        </div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-pills" style="display:inline-block;" role="tablist">
+          <li role="presentation" class="active">
+            <a  href="#variants" aria-controls="variants" role="tab" data-toggle="tab">Variant and Alignment files</a>
+          </li>
+          <li role="presentation">
+            <a  href="#bookmarks" aria-controls="bookmarks" role="tab" data-toggle="tab">Bookmark files</a>
+          </li>
+        </ul>
+        
+
 
       </div>
-      <div class="modal-body" style="padding-top:0px;padding-bottom:0px">
-          <div  >
+      <div class="modal-body" style="padding-top:10px;padding-bottom:0px">
 
-            <div style="overflow:visible;margin-bottom:10px;">
-              <div id="select-species-box" style="width:170px;float:left;">
-                <span id="sample-data-label">Species</span>
-                <select id="select-species" class="selectized" placeholder="select species...">
-                </select>
+          
+          <div class="tab-content">
+            <!-- Variants and alignments tabs -->
+            <div role="tabpanel" class="tab-pane active" id="variants">
+
+              <div style="text-align:left">
+                <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
+                  <i class="material-icons">person</i>
+                  Single
+                </button>
+                <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  style="padding-top: 2px;padding-bottom:1px;">
+                  <div style="float:left;">
+                    <img src="assets/images/family.png" style="height:27px"/>
+                  </div>
+                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+                </button>            
+                <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  style="padding-top: 2px;padding-bottom:1px;">
+                  <div style="float:left;">
+                    <img src="assets/images/pedigree.png" style="height:22px"/>
+                  </div>
+                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+                </button>
+                <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                  style="padding-top: 2px;padding-bottom:1px;">
+                  <i class="mdi-editor-format-align-justify"></i>                
+                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
+                </button>
+                <div style="float:right;display:inline-block;overflow:visible;margin-bottom:10px;">
+                  <div id="select-build-box" style="width:160px;float:right;margin-left:20px;">
+                    <span id="sample-data-label">Genome Build</span>
+                    <select id="select-build" class="selectized" placeholder="select genome build">
+                    </select>
+                  </div>
+                  <div id="select-species-box" style="width:120px;float:right;">
+                    <span id="sample-data-label">Species</span>
+                    <select id="select-species" class="selectized" placeholder="select species">
+                    </select>
+                  </div>
+                  <div id="species-build-warning" class="alert alert-danger hide" style="float:left;width:100%">                
+                  </div>              
+                </div>
+
               </div>
-              <div id="select-build-box" style="width:170px;float:left;margin-left:20px;">
-                <span id="sample-data-label">Genome Build</span>
-                <select id="select-build" class="selectized" placeholder="select genome build...">
-                </select>
-              </div>
-              <div id="species-build-warning" class="alert alert-danger hide" style="float:left;width:100%">                
-              </div>              
-            </div>
+
 
               <div>
                 <div id="proband-data" style="float:left;min-width:500px;">
@@ -301,22 +321,192 @@
                 </div>
               </div>
 
-          </div>   
 
-          
 
+              <div class="modal-footer" style="clear-both">
+                  <span id="gene-name-data-dialog-box" class="hide" style="float:left">
+                    <span id="sample-data-label">Enter gene name</span>
+                    <span id="bloodhound-data-dialog" style="margin-top:-10px" class="hide form-group" >
+                       <input id="enter-gene-name-data-dialog" type="text" class="form-control col-sm-8 typeahead" data-toggle="tooltip" style="padding-bottom:1px !important" data-placement="bottom"  placeholder="">
+                    </span> 
+                  </span>
+                  <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
+                  <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
+                    <i class="material-icons">cloud_done</i>
+                    Load
+                  </button>
+                  <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>   
+
+
+
+            <!-- Bookmarks tab -->
+            <div role="tabpanel" class="tab-pane" id="bookmarks">
+
+                <form class="form-horizontal">
+                  <fieldset>
+
+
+
+                    <div id="import-bookmarks-panel" class="panel form-group is-empty is-fileinput" style="margin-bottom:10px;" >
+
+                      <div class="col-md-12">
+                        <label class="control-label">
+                          Import
+                        </label>
+
+                          
+
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="import-source" onclick="$('#gemini-bookmarks-format').removeClass('in');dataCard.onBookmarkImportSource(this)" value="gene" checked="">
+                            gene.iobio (comma separated) file
+                          </label>
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gene-bookmarks-format" 
+                          onclick="$('#gemini-bookmarks-format').removeClass('in')" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                              <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
+                              </span>
+                          </a>                            
+
+                        </div>
+                        <div class="radio" style="margin-left:30px">
+                          <label>
+                            <input type="radio" onclick="$('#gene-bookmarks-format').removeClass('in');dataCard.onBookmarkImportSource(this)" name="import-source" value="gemini">
+                            Gemini (tab delimited) file                                                         
+                          </label>
+
+                          <a id="import-help" href="javascript:void(0)"  data-toggle="collapse" data-target="#gemini-bookmarks-format" 
+                          onclick="$('#gene-bookmarks-format').removeClass('in')" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="import format">
+                              <span id="import-help-icon" class="material-icons" style="font-size: 16px;margin-top:-4px;margin-left:4px">help
+                              </span>
+                          </a>                            
+                        </div>
+
+
+                        <div id="gene-bookmarks-format" class="collapse" aria-expanded="false" 
+                          style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+
+                          Each line represents a variant, described by the following columns, separated by commas, surrounded by double quotes:<br>
+                          &nbsp;&nbsp;1. Chromosome<br>
+                          &nbsp;&nbsp;2. Start position (1-based)<br>
+                          &nbsp;&nbsp;3. End position (1-based)<br>
+                          &nbsp;&nbsp;4. Reference allele<br>
+                          &nbsp;&nbsp;5. Alternate allele<br>
+                          &nbsp;&nbsp;6. Gene symbol<br>
+                          &nbsp;&nbsp;7. Transcript Id<br>
+                          
+                          <div style="padding-top:3px;">    
+                          Examples:<br>
+                          SNP C->T on chr 21 in gene AIRE:
+                          </div>
+                          <div  style="font-style:italic">
+                          "chr21","45709339","45709339","C","T","AIRE","ENST00000291582.5"  
+                          </div>
+                          
+                          <div style="padding-top:6px;">    
+                          Deletion of nucleotide C on chr 21, gene AIRE:
+                          </div>
+                          <div style="font-style:italic">
+                          "21","45712356","45712357","AC","A","AIRE","ENST00000291582.5"
+                          </div>
+
+                        </div>                        
+
+                        <div id="gemini-bookmarks-format" class="collapse" aria-expanded="false" 
+                          style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
+
+                          Each line represents a variant, described by the following columns, separated by tabs:<br>
+                          &nbsp;&nbsp;1. Chromosome<br>
+                          &nbsp;&nbsp;2. Start position (in standard chromosomal<br>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coordinates, i.e. first base is 0)<br> 
+                          &nbsp;&nbsp;3. End position (1-based)<br>
+                          &nbsp;&nbsp;4. Reference allele<br>
+                          &nbsp;&nbsp;5. Alternate allele<br>
+                          &nbsp;&nbsp;6. Gene symbol<br>
+                          
+                          <div style="padding-top:3px;">    
+                          Examples:<br>
+                          SNP C->T on chr 21 in gene AIRE:
+                          </div>
+                          <div  style="font-style:italic">
+                          21&nbsp;&nbsp;&nbsp;&nbsp;45709338&nbsp;&nbsp;&nbsp;&nbsp;45709339&nbsp;&nbsp;&nbsp;&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;T&nbsp;&nbsp;&nbsp;&nbsp;AIRE    
+                          </div>
+                          
+                          <div style="padding-top:6px;">    
+                          Deletion of nucleotide C on chr 21, gene AIRE:
+                          </div>
+                          <div style="font-style:italic">
+                          21&nbsp;&nbsp;&nbsp;&nbsp;45712356&nbsp;&nbsp;&nbsp;&nbsp;45712357&nbsp;&nbsp;&nbsp;&nbsp;AC&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;AIRE
+                          </div>
+
+                        </div>
+                    
+                      </div>
+
+
+                        <div class="col-md-12" id="gene-bookmark-selection" style="margin-top:5px;">
+                          <input type="text" readonly="" style="padding-bottom:0px"  class="form-control" placeholder="choose .csv file..." >
+                          <input type="file"  onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".csv">
+                        </div>
+
+                        <div class="col-md-12 hide" id="gemini-bookmark-selection" style="margin-top:5px;">
+                          <input type="text" readonly="" style="padding-bottom:0px"  class="form-control" placeholder="choose txt file..." >
+                          <input type="file"  onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".txt, .tsv">
+                        </div>                        
+                    </div>
+
+                    <div id="export-bookmarks-panel" class="panel form-group" style="margin-top:20px;margin-bottom:20px;" >
+
+                      <div class="col-md-12">
+                        <label class="control-label">
+                          Export
+                        </label>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="export-format" onchange="dataCard.resetExportPanel()" value="csv" checked="">
+                            Excel (comma separated) file
+                          </label>
+
+                        </div>
+                        <div class="radio" style="margin-left:30px">
+                          <label>
+                            <input type="radio" name="export-format" onchange="dataCard.resetExportPanel()" value="vcf">
+                            VCF file                                                        
+                          </label>
+
+                        </div>
+                      </div>
+
+                      <div class="col-md-12" style="text-align:center">
+                         <a id="export-bookmarks" href="javascript:void(0)" 
+                         class="btn btn-default btn-raised" onclick="bookmarkCard.exportBookmarks('all', $('input[name=export-format]:checked').val())">
+                          Export
+                         </a>
+                        <span style="margin-left: 20px;display: inline-block;margin-top: 18px;margin-bottom: 18px;" id="export-loader" class="hide">
+                          <img  src="assets/images/wheel.gif" style="display:inline-block;height:16px;width:16px;">
+                          <span>Exporting bookmarks...</span>
+                        </span>
+
+                        <a id="download-bookmarks" class="hide btn btn-raised btn-default" download="gene-iobio-variants.csv" href="#">
+                          <i class="material-icons" style="font-size:20px">file_download</i>
+                          <span>Download file</span>
+                        </a>                        
+                      </div>
+
+                    </div>
+
+
+                    
+                  </fieldset>
+                </form>
+            </div>
+
+          <div>
 
       </div>
 
-      <div class="modal-footer" style="clear-both">
-         
-          <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
-          <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
-            <i class="material-icons">cloud_done</i>
-            Load
-          </button>
-          <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
-      </div>
+
     </div>
   </div>
 </div>

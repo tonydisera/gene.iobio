@@ -18,6 +18,41 @@ body
   background-color: $app-color !important
   margin-bottom: 0px !important
   min-height: 50px
+
+  .navbar-nav
+    margin-left: 20px
+
+    
+    .dropdown-menu 
+      li
+        overflow: visible  
+
+    .dropdown-submenu 
+      position: relative
+    
+    .dropdown-submenu 
+      >.dropdown-menu 
+        top: 0
+        left: 100%
+        margin-top: -6px
+        margin-left: -1px
+
+    .dropdown-submenu:hover 
+      >.dropdown-menu 
+        display: block
+    
+    .dropdown-submenu:hover 
+      >a:after 
+        border-left-color: #fff
+    
+    .dropdown-submenu.pull-left 
+      float: none
+    
+    .dropdown-submenu.pull-left 
+      >.dropdown-menu 
+        left: -100%
+        margin-left: 10px
+  
   
 
   .navbar-brand
@@ -27,6 +62,7 @@ body
 
     #home
       margin-top: 6px
+      cursor: pointer
 
   .navbar-form
     margin-top: 10px
@@ -37,11 +73,22 @@ body
 
   .vertical-divider    
     height: 34px
-    margin: 10px 17px
+    margin: 10px 10px
     border-left: 1px solid #aba9a9
       
   ul.nav
+
+    .or
+      padding-top: 15px
+      margin-right: -5px
+      margin-left: -5px
+
+
+    .combined-help-about
+      display: none
+
     >li
+
 
       #genes-menu-item
         overflow: visible
@@ -53,6 +100,8 @@ body
         color: white !important
         padding-top: 15px !important
         padding-bottom: 10px !important
+        padding-left: 20px 
+        padding-right: 20px
 
         &:hover
           color: $navbar-hover-color  !important
@@ -69,7 +118,7 @@ body
           margin-bottom: 0px 
 
           &.wide
-            width: 70px       
+            width: 77px       
 
     >li.active
       color: white !important  
@@ -80,8 +129,29 @@ body
         #search-dna-glyph
           fill: white !important
 
+.nav-pills 
+  >li
+    >a 
+      color: $text-color !important
+      font-size: 15px
+      padding-top: 5px
+      padding-bottom: 5px
+    >a:hover 
+      color: $app-color !important
+    >a:focus
+      color: $app-color !important
 
-
+.nav-pills 
+  >li.active 
+    >a 
+      color: white !important
+      background-color: $app-color
+    >a:hover 
+      color: white !important
+      background-color: $app-color
+    >a:focus
+      color: white !important
+      background-color: $app-color
 
 h4
   font-size: 13px
@@ -169,6 +239,31 @@ h5
     opacity: .5
     font-size: 32px
 
+.form-group
+  .radio
+    label
+      font-size: 14px
+      line-height: 16px 
+      color:  $text-color
+
+  .radio 
+    input[type=radio]:checked 
+      ~ 
+        .check
+          background-color:  $app-color
+        .circle
+          border-color: $app-color
+
+.form-group.is-focused
+  .radio
+    label
+      color:  $text-color
+
+      &:hover
+        color:  $text-color
+
+  
+
 .form-control,
 .form-group .form-control 
   background-image: -webkit-gradient(linear, left top, left bottom, from($current-color), to($current-color)), -webkit-gradient(linear, left top, left bottom, from(#D2D2D2), to(#D2D2D2))
@@ -185,6 +280,18 @@ h5
 
 .form-group.is-focused .form-control .material-input:after
   background-color: $current-color
+
+
+.attention
+  outline-color: rgba(217, 98, 98, 0.86)
+  outline-style: solid
+  outline-offset: 4px
+  outline-width: 2px
+
+.navbar-nav
+  .attention
+    outline-offset: -6px
+    outline-width: 6px  
 
 .selectize-dropdown
   font-size: 12px
@@ -321,7 +428,7 @@ h5
 
 .form-group 
   label.control-label 
-    font-size: 16px !important
+    font-size: 14px !important
     color: $app-color !important
 
 
@@ -377,7 +484,7 @@ i.material-icons
   border: none
   color: $text-color
   text-align: center
-  font-size: 12px
+  font-size: 14px
   padding: 6px
 
   &.alert-info
@@ -804,6 +911,8 @@ a
   &:hover, &:focus
     color: $link-color !important
 
+a.btn
+  color:  $app-color !important
 
 .chosen-container a
   color: $text-color !important
@@ -1259,7 +1368,9 @@ section
   color: $navbar-hover-color  !important
   padding-left: 0px
   display: inline-block
-  margin-top: 1px
+  margin-top: 3px
+  margin-left: 8px
+  font-size: 14px
 
 #gene-name
   font-size: 16px 
@@ -1712,10 +1823,11 @@ header
 #button-find-missing-variants
 
 #bloodhound .typeahead
-  min-width: 140px
-  max-width: 140px
-  font-size: 18px
+  min-width: 100px
+  max-width: 100px
+  font-size: 16px !important
   vertical-align: middle !important
+  color: white
 
 
 .results
@@ -1724,8 +1836,8 @@ header
 
 .tt-input, .tt-hint
   padding: 5px 8px !important
-  font-size: 18px !important
-  line-height: 24px
+  font-size: 16px !important
+  line-height: 20px !important
   outline: none !important
   border: none !important
 
@@ -1753,8 +1865,9 @@ header
 
 .tt-suggestion
   padding: 3px 20px
-  font-size: 18px
-  line-height: 24px
+  font-size: 16px
+  line-height: 22px
+  text-align: left
 
   &.tt-cursor
     color: #fff
@@ -1762,6 +1875,48 @@ header
 
   p
     margin: 0
+
+#search-gene-label
+  display: inline-block
+  padding-right: 3px
+
+  span
+    display: inline-block
+    color: white
+    vertical-align: top
+
+    &.nav-label
+      margin-top: 6px
+      margin-left: -2px
+  
+    &.material-icons
+      margin-top: 5px
+
+
+.form-control
+  font-size: 14px
+
+input
+  &::-webkit-input-placeholder
+    font-size: 14px !important
+
+  &::-moz-placeholder 
+    font-size: 14px !important
+
+  &input:-moz-placeholder
+    font-size: 14px !important
+
+#enter-gene-name
+  color: $navbar-hover-color  !important
+
+  &::-webkit-input-placeholder
+    color: white  
+
+  &::-moz-placeholder 
+    color: white
+  
+  &input:-moz-placeholder
+    color: white
 
 // Material design checkboxes
 .checkbox
@@ -1863,15 +2018,13 @@ header
 
 
 
-@media screen and (max-device-width: 1140px), screen and (max-width: 1140px)
+@media screen and (max-device-width: 1142px), screen and (max-width: 1142px)
   .navbar
 
     ul.nav 
 
       > li 
 
-        .navbar-form
-          margin-right: 25px
 
         #genes-menu-item
           vertical-align: initial
@@ -1881,7 +2034,7 @@ header
           padding-right: 11px
           padding-left:  11px
 
-          .material-icons
+          .material-icons.large-screen-only
             display: none
 
           svg
@@ -1903,9 +2056,17 @@ header
   #close-slide-left
     top: 12px
 
-@media screen and (max-width: 990px)
+@media screen and (max-width: 1003px)
 
   .navbar
+
+    .navbar-brand
+      margin-right: -10px
+
+
+    .vertical-divider
+      margin-left: 1px
+      margin-right: 1px
 
     .navbar-brand
       margin-top: 0px
@@ -1916,24 +2077,31 @@ header
         margin-right: 10px
         
       .iobio
-        font-size: 28px
+        font-size: 23px
       .iobioapp
-        font-size: 28px
+        font-size: 23px
 
 
     #bloodhound .typeahead
       min-width: 125px
       max-width: 125px
-      font-size: 16px !important
+      font-size: 14px !important
 
     .tt-input, .tt-hint
       padding: 1px 1px !important
-      font-size: 16px !important
-      line-height: 22px
+      font-size: 14px !important
+      line-height: 20px
 
 
 
     ul.nav 
+
+      .combined-help-about
+        display: list-item !important
+
+      #about-link
+        display: none !important
+
 
       > li 
         &.optional
@@ -1947,8 +2115,9 @@ header
           padding-right: 11px
           padding-left:  11px
 
-          .material-icons
+          .material-icons.large-screen-only
             display: none
+
 
           svg
             display: none
@@ -1959,20 +2128,67 @@ header
 
 
 
-@media screen and (max-width: 934px)
+@media screen and (max-width: 903px)
 
   .navbar
 
+    .navbar-brand
+      margin-right: -15px
+
+      .iobio
+        font-size: 22px
+      .iobioapp
+        font-size: 22px
+
+      #build-link
+        margin-left: 0px
+        margin-right: 10px      
+
+
+    .navbar-nav
+      margin-left: 0px
+
+    #bloodhound .typeahead
+      min-width: 90px
+      max-width: 90px
+
     ul.nav 
+
+      .dropdown-menu
+        >li
+          a
+            font-size: 13px
+            padding-top: 6px
+            padding-bottom: 6px
+
+      .or
+        font-size: 13px !important
+        margin-right: 0px
+
+      #search-gene-label
+        span.material-icons
+          font-size: 18px
+        span.nav-label
+          font-size: 13px !important
+
+      #enter-gene-name
+        line-height:  22px !important
+        font-size: 13px !important
 
       > li
 
+
+
         > a 
-          font-size: 12px
-          padding-right: 6px
-          padding-left:  6px
+          font-size: 13px
+          padding-right: 9px
+          padding-left:  9px
 
           p.wrapped
             &.wide
-              width: 60px
+              width: 67px
 
+@media screen and (max-width: 767px) 
+  .collapse.in
+    .or
+      display: none !important

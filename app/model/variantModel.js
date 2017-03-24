@@ -94,6 +94,11 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
 	var me = this;
 	var data = null;
+
+	if (geneObject == null) {
+		return null;
+	}
+
 	// If only alignments have specified, but not variant files, we will need to use the
 	// getBamRefName function instead of the getVcfRefName function.
 	var theGetRefNameFunction = me.getVcfRefName != null ? me.getVcfRefName : me.getBamRefName;
@@ -128,6 +133,10 @@ VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selected
 VariantModel.prototype.getBamDataForGene = function(geneObject) {
 	var me = this;
 	var data = null;
+
+	if (geneObject == null) {
+		return null;
+	}
 	
 	if (me.bamData != null) {
 		if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
@@ -835,7 +844,7 @@ VariantModel.prototype.promiseAnnotatedAndCoverage = function(theVcfData) {
 
 }
 
-VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant) {
+VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, theTranscript, variant, format, getHeader = false, sampleNames) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -846,61 +855,112 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 		fakeGeneObject.start = variant.start;
 		fakeGeneObject.end = variant.end;
 
-
-		if (variant.fbCalled == 'Y') {
-			// We already have the hgvs and rsid if this is a called variant
-			resolve(variant);
-		} else if ( variant.extraAnnot ) {
-			// We have already retrieved the extra annot for this variant,
-			resolve(variant);
+		if ((variant.fbCalled == 'Y' || variant.extraAnnot) && format != "vcf") {
+			// We already have the hgvs and rsid for this variant, so there is 
+			// no need to call the services again.  Just return the
+			// variant.  However, if we are returning raw vcf records, the
+			// services need to be called so that the info field is formatted
+			// with all of the annotations.
+			if (format && format == 'csv') {
+				// Exporting data requires additional data to be returned to link
+				// the extra annotations back to the original bookmarked entries.
+				resolve([variant, variant, ""]);
+			} else {
+				resolve(variant);
+			}
 		} else {	
 			me._promiseVcfRefName(theGene.chr).then( function() {				
 				me.vcf.promiseGetVariants(
 				   me.getVcfRefName(theGene.chr), 
 				   fakeGeneObject,
 			       theTranscript,
-			       me.sampleName,
+			       (sampleNames ? sampleNames.join(",") : me.sampleName),
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
 			       true,
 			       true,
 			       useServerCache
 			    ).then( function(data) {
+
+			    	var rawVcfRecords = data[0];
+			    	var vcfRecords = rawVcfRecords.filter(function(record) {
+			    		if (record.indexOf("#") == 0) {
+			    			if (getHeader) {
+			    				return true;
+			    			} else {
+			    				return false;
+			    			}
+			    		} else {
+			    			var fields = record.split("\t");
+			    			var chrom = fields[0];
+			    			var start = fields[1];
+			    			var ref   = fields[3];
+			    			var alt   = fields[4];
+			    			if (me.getVcfRefName(theGene.chr) == chrom &&
+			    				start == variant.start &&
+				    		    alt   == variant.alt &&
+				    			ref   == variant.ref) {
+				    			return true;
+				    		} else {
+				    			return false;
+				    		}
+				    		
+			    		}
+			    	});
+
+
 			    	var theVcfData = data[1];	
 
 			    	if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 			    		// Now update the hgvs notation on the variant
 			    		var v = theVcfData.features[0];
-			    		var theVariants = me.vcfData.features.filter(function(d) {
-			    			if (d.start == v.start &&
-			    				d.alt == v.alt &&
-			    				d.ref == v.ref) {
-			    				return true;
+
+			    		if (format && format == 'csv') {			    			
+			    			resolve([v, variant, vcfRecords]);
+			    		} else if (format && format == 'vcf') {
+			    			if (vcfRecords) {
+			    				resolve([v, variant, vcfRecords]);
 			    			} else {
-			    				return false;
+			    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 			    			}
-			    		});
-			    		if (theVariants && theVariants.length > 0) {
-				    		var theVariant = theVariants[0];
-		
-							// set the hgvs and rsid on the existing variant
-				    		theVariant.extraAnnot = true;
-				    		theVariant.vepHGVSc = v.vepHGVSc;
-				    		theVariant.vepHGVSp = v.vepHGVSp;
-				    		theVariant.vepVariationIds = v.vepVariationIds;
-
-					    	// re-cache the data
-					    	me._cacheData(me.vcfData, "vcfData", theGene.gene_name, theTranscript);	
-
-					    	// return the annotated variant
-							resolve(theVariant);
 			    		} else {
-			    			console.log("Cannot find corresponding variant to update HGVS notation");
-			    			reject("Cannot find corresponding variant to update HGVS notation");
-			    		}			    		
+				    		var theVariants = me.vcfData.features.filter(function(d) {
+				    			if (d.start == v.start &&
+				    				d.alt == v.alt &&
+				    				d.ref == v.ref) {
+				    				return true;
+				    			} else {
+				    				return false;
+				    			}
+				    		});
+				    		if (theVariants && theVariants.length > 0) {
+					    		var theVariant = theVariants[0];
+			
+								// set the hgvs and rsid on the existing variant
+					    		theVariant.extraAnnot = true;
+					    		theVariant.vepHGVSc = v.vepHGVSc;
+					    		theVariant.vepHGVSp = v.vepHGVSp;
+					    		theVariant.vepVariationIds = v.vepVariationIds;
+
+						    	// re-cache the data
+						    	me._cacheData(me.vcfData, "vcfData", theGene.gene_name, theTranscript);	
+
+						    	// return the annotated variant
+								resolve(theVariant);
+				    		} else {
+			    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;				
+				    			console.log(msg);
+				    			reject(msg);
+				    		}			    		
+
+			    		}
 			    	} else {
-			    		console.log("Cannot get variant to update HGVS notation");
-			    		reject("Cannot get variant to update HGVS notation");
+			    		var msg = "Empty results returned from VariantModel.promiseGetVariantExtraAnnotations() for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;
+			    		console.log(msg);
+			    		if (format == 'csv' || format == 'vcf') {
+			    			resolve([variant, variant, []]);
+			    		}
+			    		reject(msg);
 			    	}
 
 				});		
@@ -923,12 +983,21 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 	    	
 			resolve(me.vcfData);
 		} else {	
-			me._promiseVcfRefName(theGene.chr).then( function() {				
+			me._promiseVcfRefName(theGene.chr).then( function() {		
+
+				var sampleNames = me.sampleName;
+				if (sampleNames != null && sampleNames != "") {
+					if (me.relationship != 'proband') {
+						sampleNames += "," + getProbandVariantCard().getSampleName();
+					}			
+				}
+
+
 				me.vcf.promiseGetVariants(
 				   me.getVcfRefName(theGene.chr), 
 				   theGene,
 			       theTranscript,
-			       me.sampleName,
+			       sampleNames,
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false
 			    ).then( function(data) {
@@ -1702,7 +1771,7 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 	}
 
 	// Load the clinvar info for the variants loaded from the vcf	
-	var sortedFeatures = theVcfData.features.sort(orderVariantsByPosition);
+	var sortedFeatures = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
 	loadClinvarProperties(sortedFeatures);
 
 }
@@ -1783,7 +1852,7 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 	}
 
 	// Load the clinvar info for the variants loaded from the vcf	
-	var sortedFeatures = theVcfData.features.sort(orderVariantsByPosition);
+	var sortedFeatures = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
 	loadClinvarProperties(sortedFeatures);
 
 }
@@ -2130,8 +2199,8 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function() {
 	var me = this;
 
 	// We have to order the variants in both sets before comparing
-	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);					
-	me.fbData.features  = me.fbData.features.sort(orderVariantsByPosition);
+	me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);					
+	me.fbData.features  = me.fbData.features.sort(VariantModel.orderVariantsByPosition);
 
 	// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 	// unique2 (only in freebayes set), or common (in both sets).	
@@ -2405,7 +2474,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 						var annotatedRecs = data[0];
 				    	me.vcfData = data[1];
 
-					 	me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
+					 	me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);
 						me.vcfData.features.forEach( function(feature) {
 							feature[compareAttribute] = '';
 						});
@@ -2427,7 +2496,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 			});
 		
 		} else {
-			me.vcfData.features = me.vcfData.features.sort(orderVariantsByPosition);
+			me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);
 			if (compareAttribute) {
 				me.vcfData.features.forEach( function(feature) {			
 					feature[compareAttribute] = '';
@@ -2501,6 +2570,90 @@ VariantModel.getNonCanonicalHighestImpactsVep = function(variant) {
 	}	
 	return vepHighestImpacts;
 }
+
+
+VariantModel.orderVariantsByPosition = function(a, b) {
+	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
+	var refAltB = b.type.toLowerCase() + " " + b.ref + "->" + b.alt;
+
+	var chromA = a.chrom.indexOf("chr") == 0 ? a.chrom.split("chr")[1] : a.chrom;
+	var chromB = b.chrom.indexOf("chr") == 0 ? b.chrom.split("chr")[1] : b.chrom;
+	if (!$.isNumeric(chromA)) {
+		chromA = chromA.charCodeAt(0);
+	};
+	if (!$.isNumeric(chromB)) {
+		chromB = chromB.charCodeAt(0);
+	};
+
+	if (+chromA == +chromB) {
+		if (a.start == b.start) {
+			if (refAltA == refAltB) {
+				return 0;
+			} else if ( refAltA < refAltB ) {
+				return -1;
+			} else {
+				return 1;
+			}
+		} else if (a.start < b.start) {
+			return -1;
+		} else {
+			return 1;
+		}		
+	} else {
+		if (+chromA < +chromB) {
+			return -1;
+		} else if (+chromA > +chromB) {
+			return 1;
+		} 
+	}
+
+
+}
+
+VariantModel.orderVcfRecords = function(rec1, rec2) {
+
+
+	var fields1 = rec1.split("\t");
+	var fields2 = rec2.split("\t");
+
+	var chrom1 = fields1[0].indexOf("chr") == 0 ? fields1[0].split("chr")[1] : fields1[0];
+	var chrom2 = fields2[0].indexOf("chr") == 0 ? fields2[0].split("chr")[1] : fields2[0];
+	if (!$.isNumeric(chrom1)) {
+		chrom1 = chrom1.charCodeAt(0);
+	};
+	if (!$.isNumeric(chrom2)) {
+		chrom2 = chrom2.charCodeAt(0);
+	};
+
+	var start1  = +fields1[1];
+	var start2  = +fields2[1];
+
+	var refalt1 = fields1[3] + fields1[4];
+	var refalt2 = fields2[3] + fields2[4];
+
+
+	if (+chrom1 < +chrom2) {
+		return -1;
+	} else if (+chrom1 > +chrom2) {
+		return 1;
+	} else {
+		if (+start1 < +start2) {
+			return -1;
+		} else if (+start1 > +start2) {
+			return 1;
+		} else {
+			if (refalt1 > refalt2) {
+				return -1;
+			} else if (refalt1 > refalt2) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
+
+}
+
 
 
 

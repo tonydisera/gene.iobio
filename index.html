@@ -164,13 +164,13 @@
           <ul class="nav ">
 
             <li id="filter-tab" class="hide">
-             <a href="javascript:void(0)" id="clear-filters-link" 
+             <a href="javascript:void(0)" id="clear-filters-link" class="hide"
                onclick="filterCard.clearFilters();filterVariants()">
                   Clear all
               </a>              
-              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:40px">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;">
                 <span class="material-icons">tune</span> 
-                Filter Variants
+                Filter
               </a>
             </li>
             <li id="examine-tab" class="hide">
@@ -192,7 +192,7 @@
             <li id="bookmarks-tab" class="hide">
               <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
                 <span class="material-icons">bookmark</span> 
-                Bookmark Variants
+                Bookmarks
               </a>
             </li> 
             <li id="recall-tab" class="hide">
@@ -232,10 +232,12 @@
 
 
       <div  class="nav-stretch level-basic" style="margin-top:-13px;">
-          <div class="card-label" style="float:left;padding-top:7px;margin-right:20px;">Selected Genes</div>
+          <div class="card-label" style="float:left;padding-top:8px;margin-right:20px;">Selected Genes</div>
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
-            <div class="level-edu" style="text-align:center">
+
+            <div id="analyze-all-panel" class="level-edu">
+
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
                 <a  id="manage-gene-list" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
@@ -243,14 +245,30 @@
                     Analyze all genes
                 </a>
 
-                <div id="analyze-all-progress" class="hide">
-                  <div class="bar"></div>
-                  <div class="text"></div>
-                </div>
+                <div id="total-genes-label"></div>
 
-                <div id="filter-progress" class="hide">
-                  <div class="bar"></div>
-                  <div class="text"></div>
+                <div id="analyzed-progress-bar" >
+                  
+
+                  <div id="analyze-all-progress">
+                    <div id="analyzed-bar" class="bar" width="0%" >
+                      <div id="passed-filter-bar" class="bar" width="0%"></div>
+                      <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                    </div>
+                  
+                    <div id="not-analyzed-bar"class="bar" width="100%">                      
+                    </div>
+                                    
+                  </div>
+                    
+                    
+                  <div id="bottom-label-bar"  >
+                    <div  id="analyzed-label" class="bar">
+                      <div id="passed-filter-label" class="bar" >passed filter</div>
+                      <div id="not-passed-filter-label" class="bar">not passed</div>
+                    </div>
+                    <div id="not-analyzed-label" class="bar"  >not analyzed</div>
+                  </div>
                 </div>
 
                 
@@ -261,12 +279,12 @@
                 </div>
               </div>
 
-              <div style="display:inline-block">
 
 
-              </div>
 
 
+              
+            </div>
              
               <div id="manage-genes-box">               
                 <div id="manage-genes-dropdown" class="level-edu level-basic" >
@@ -309,10 +327,7 @@
                   </div>
                 </div>
               </div>
-               
 
-              
-            </div>
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
                 
@@ -498,7 +513,7 @@
           <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');pageGuide.open()">
             <span style="">Take an app tour</span>
           </button>
-          <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');showDataDialog()">
+          <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');showDataDialog('variants');">
             <span style="">Start your analysis</span>
           </button>
         </div>
@@ -712,6 +727,8 @@
 <script src="app/model/variantModel.js"></script>  
 <script src="app/model/variantTrioModel.js"></script>  
 <script src="app/model/genomeBuildHelper.js"></script>  
+<script src="app/model/variantExporter.js"></script>  
+<script src="app/model/variantImporter.js"></script>  
 
 <script src="app/legend.js"></script>
 <script src="app/variantTooltip.js"></script>
