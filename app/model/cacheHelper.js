@@ -30,6 +30,11 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		$('#analyzed-progress-bar').removeClass("hide");
 		$('#analyze-all-progress').removeClass("hide");
 
+		if (counts.analyzed == counts.total) {
+			$('#analyze-all-progress').addClass("done");
+		} else {
+			$('#analyze-all-progress').removeClass("done");
+		}
 
 
 		$('#total-genes-label').removeClass("hide");

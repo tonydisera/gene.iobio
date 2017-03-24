@@ -6,7 +6,7 @@ var CLINVAR = {
 };
 
 var SIFT = {
-  LABEL: 'Pathogenecity - SIFT',
+  LABEL: 'Pathogenicity - SIFT',
   SYMBOL: "/*[local-name()='g']",
   TOLERATED: "/*[local-name()='text' and text()='tolerated']",
   DELETERIOUS: "/*[local-name()='text' and text()='deleterious']",
