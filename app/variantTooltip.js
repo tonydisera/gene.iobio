@@ -304,7 +304,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		}
 	}      
 	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
-	var coord = gene.chr + ":" + variant.start;
+	var coord = variant.chrom + ":" + variant.start;
 	var refalt = variant.ref + "->" + variant.alt;
 	if (variant.ref == '' && variant.alt == '') {
 		refalt = '(' + variant.len + ' bp)';
@@ -595,7 +595,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	} else if (type == 'tooltip') {
 		return (
 			  qualityWarningRow
-			+ me._tooltipMainHeaderRow(window.gene.gene_name, window.selectedTranscript.transcript_id, '', '')
+			+ me._tooltipMainHeaderRow(window.gene ? window.gene.gene_name : "", window.selectedTranscript ? window.selectedTranscript.transcript_id : "", '', '')
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
@@ -639,7 +639,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
-			+ me._tooltipMainHeaderRow(window.gene.gene_name, window.selectedTranscript.transcript_id, '', '')
+			+ me._tooltipMainHeaderRow(window.gene ? window.gene.gene_name : "", window.selectedTranscript ? window.selectedTranscript.transcript_id : "", '', '')
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
 			+ me._tooltipHeaderRow( coord, '', '', '')
 			+ inheritanceModeRow
@@ -654,7 +654,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			qualityWarningRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow(window.gene.gene_name, coord, '', '')
+			+ me._tooltipHeaderRow(window.gene ? window.gene.gene_name : "", coord, '', '')
 			+ inheritanceModeRow
 
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  

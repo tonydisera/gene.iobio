@@ -94,6 +94,11 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
 	var me = this;
 	var data = null;
+
+	if (geneObject == null) {
+		return null;
+	}
+
 	// If only alignments have specified, but not variant files, we will need to use the
 	// getBamRefName function instead of the getVcfRefName function.
 	var theGetRefNameFunction = me.getVcfRefName != null ? me.getVcfRefName : me.getBamRefName;
@@ -128,6 +133,10 @@ VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selected
 VariantModel.prototype.getBamDataForGene = function(geneObject) {
 	var me = this;
 	var data = null;
+
+	if (geneObject == null) {
+		return null;
+	}
 	
 	if (me.bamData != null) {
 		if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
