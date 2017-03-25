@@ -28,7 +28,8 @@ var emailServer               = (useSSL ? "wss://" : "ws://") +   iobio_services
 
 // iobio services
 var IOBIO = {};
-IOBIO.tabix                   = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+//IOBIO.tabix                   = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
+IOBIO.tabix                   = (useOnDemand ? "nv-dev-new.iobio.io/" + "od_tabix/" : iobio_services + "tabix/");
 IOBIO.vcfReadDepther          = iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = iobio_services  + "snpeff/";
 IOBIO.vt                      = iobio_services  + "vt/";  
@@ -38,7 +39,8 @@ IOBIO.contigAppender          = iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = iobio_services  + "bcftools/";
 IOBIO.coverage                = iobio_services + "coverage/ ";
 IOBIO.samtools                = iobio_services +  "samtools/";
-IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
+//IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
+IOBIO.samtoolsOnDemand        = (useOnDemand ?  "nv-dev-new.iobio.io/" + "od_samtools/" : iobio_services + "samtools/");
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
 

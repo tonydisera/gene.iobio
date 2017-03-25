@@ -478,7 +478,7 @@ VariantModel.prototype.promiseBamFilesSelected = function(event) {
 
 }
 
-VariantModel.prototype.onBamUrlEntered = function(bamUrl, callback) {
+VariantModel.prototype.onBamUrlEntered = function(bamUrl, baiUrl, callback) {
 	var me = this;
 	this.bamData = null;
 	this.fbData = null;
@@ -490,9 +490,9 @@ VariantModel.prototype.onBamUrlEntered = function(bamUrl, callback) {
 	} else {
 	    
 		this.bamUrlEntered = true;
-		this.bam = new Bam(bamUrl);
+		this.bam = new Bam(bamUrl, baiUrl);
 
-		this.bam.checkBamUrl(bamUrl, function(success, errorMsg) {
+		this.bam.checkBamUrl(bamUrl, baiUrl, function(success, errorMsg) {
 			if (me.lastBamAlertify) {
 				me.lastBamAlertify.dismiss();
 			}
@@ -576,7 +576,7 @@ VariantModel.prototype.clearBam = function(cardIndex) {
 	}
 }
 
-VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
+VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 	var me = this;
 	this.vcfData = null;
 	var success = true;
@@ -591,7 +591,7 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 	    me.vcfFileOpened = false;
 	    me.getVcfRefName = null;	
 
-	    success = this.vcf.openVcfUrl(vcfUrl, function(success, errorMsg) {
+	    success = this.vcf.openVcfUrl(vcfUrl, tbiUrl, function(success, errorMsg) {
 	    	if (me.lastVcfAlertify) {
 		    	me.lastVcfAlertify.dismiss();
 		    }

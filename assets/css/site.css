@@ -2230,10 +2230,20 @@ inputinput:-moz-placeholder {
   font-size: 10px;
   line-height: 2; }
 
+#url-tbi-input {
+  padding: 6px 4px !important;
+  font-size: 10px;
+  line-height: 2; }
+
 #bam-url-input-group {
   visibility: hidden; }
 
 #bam-url-input {
+  padding: 6px 4px !important;
+  font-size: 10px;
+  line-height: 2; }
+
+#bai-url-input {
   padding: 6px 4px !important;
   font-size: 10px;
   line-height: 2; }

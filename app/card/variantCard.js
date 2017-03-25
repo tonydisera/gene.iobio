@@ -370,8 +370,8 @@ VariantCard.prototype.onBamFilesSelected = function(event, callback) {
 	});
 }
 
-VariantCard.prototype.onBamUrlEntered = function(bamUrl, callback) {
-	this.model.onBamUrlEntered(bamUrl, function(success) {
+VariantCard.prototype.onBamUrlEntered = function(bamUrl, baiUrl, callback) {
+	this.model.onBamUrlEntered(bamUrl, baiUrl, function(success) {
 		if (success) {
 			if (bamUrl == null || bamUrl.trim() == "") {
 				this.cardSelector.find("#bam-track").addClass("hide");
@@ -434,7 +434,7 @@ VariantCard.prototype.clearBam = function() {
 }
 
 
-VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
+VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 	var me = this;
 	if (me.isViewable()) {
 		me.cardSelector.find('#vcf-track').removeClass("hide");
@@ -442,7 +442,7 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, callback) {
 		me.cardSelector.find(".vcfloader").addClass("hide");
 	 
 	}
-	this.model.onVcfUrlEntered(vcfUrl, 
+	this.model.onVcfUrlEntered(vcfUrl, tbiUrl,
 		function(success, samples) {
 			callback(success, samples);
 		});

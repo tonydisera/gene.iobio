@@ -187,16 +187,20 @@ DataCard.prototype.loadDemoData = function() {
 
 	window.updateUrl('name0', this.demoNames.proband);	
 	window.updateUrl('vcf0',  this.demoUrls.proband);	
+	window.updateUrl("tbi0", "");
 	if (!window.isLevelEdu) {
 		window.updateUrl('bam0',  this.demoBamUrls.proband);	
+		window.updateUrl('bai0',  "");	
 	}
 	window.updateUrl('sample0',  this.demoSampleNames.proband);	
 
 	if (this.demoCards.mother) {
 		window.updateUrl('name1', this.demoNames.mother);	
 		window.updateUrl('vcf1',  this.demoUrls.mother);	
+		window.updateUrl('tbi1',  "");	
 		if (!window.isLevelEdu) {
 			window.updateUrl('bam1',  this.demoBamUrls.mother);
+			window.updateUrl('bai1',  "");
 		}	
 		window.updateUrl('sample1',  this.demoSampleNames.mother);			
 	} 
@@ -204,8 +208,10 @@ DataCard.prototype.loadDemoData = function() {
 	if (this.demoNames.father) {
 		window.updateUrl('name2', this.demoNames.father);	
 		window.updateUrl('vcf2',  this.demoUrls.father);	
+		window.updateUrl('tbi2',  "");	
 		if (!window.isLevelEdu) {		
 			window.updateUrl('bam2',  this.demoBamUrls.father);
+			window.updateUrl('bai2',  "");
 		}	
 		window.updateUrl('sample2',  this.demoSampleNames.father);			
 	}
@@ -346,6 +352,9 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     panelSelector.find('#bam-url-input').on('change', function() {
     	me.onBamUrlEntered(panelSelector);
     });
+    panelSelector.find('#bai-url-input').on('change', function() {
+    	me.onBamUrlEntered(panelSelector);
+    });
     panelSelector.find('#display-bam-url-item').on('click', function() {
     	me.displayBamUrlBox(panelSelector);
     });
@@ -373,6 +382,9 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     });
 
     panelSelector.find('#url-input').on('change', function() {
+    	me.onVcfUrlEntered(panelSelector);
+    });
+    panelSelector.find('#url-tbi-input').on('change', function() {
     	me.onVcfUrlEntered(panelSelector);
     });
     panelSelector.find('#display-vcf-url-item').on('click', function() {
@@ -677,7 +689,9 @@ DataCard.prototype.init = function() {
 	);
 	this.listenToEvents($('#proband-data'));
 	$('#proband-data').find("#url-input").removeClass('hide');
+	$('#proband-data').find("#url-tbi-input").removeClass('hide');
 	$('#proband-data').find("#bam-url-input").removeClass('hide');
+	$('#proband-data').find("#bai-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 	
@@ -715,7 +729,9 @@ DataCard.prototype.init = function() {
 	);
 	this.listenToEvents($('#mother-data'));
 	$('#mother-data').find("#url-input").removeClass('hide');
+	$('#mother-data').find("#url-tbi-input").removeClass('hide');
 	$('#mother-data').find("#bam-url-input").removeClass('hide');
+	$('#mother-data').find("#bai-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
 
@@ -735,7 +751,9 @@ DataCard.prototype.init = function() {
 
 	addVariantCard();
 	$('#father-data').find("#url-input").removeClass('hide');
+	$('#father-data').find("#url-tbi-input").removeClass('hide');
 	$('#father-data').find("#bam-url-input").removeClass('hide');
+	$('#father-data').find("#bai-url-input").removeClass('hide');
 	me.setDataSourceRelationship($('#father-data'));
 
 	
@@ -855,6 +873,8 @@ DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {
 
 	panelSelector.find('#bam-url-input').addClass('hide');
 	panelSelector.find('#bam-url-input').val('');
+	panelSelector.find('#bai-url-input').addClass('hide');
+	panelSelector.find('#bai-url-input').val('');
 
 	window.disableLoadButton();
 }
@@ -899,7 +919,9 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 	$('#tourWelcome').removeClass("open");
 	
 	var bamUrlInput = panelSelector.find('#bam-url-input');
+	var baiUrlInput = panelSelector.find('#bai-url-input');
 	bamUrlInput.removeClass("hide");
+	baiUrlInput.removeClass("hide");
 
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
@@ -908,17 +930,22 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 	this.setDataSourceRelationship(panelSelector);
 
 	var bamUrl = bamUrlInput.val();
+	var baiUrl = baiUrlInput.val();
 	if (isOffline) {
 		if (bamUrl.indexOf(offlineUrlTag) == 0) {
 			bamUrl = "http://" + serverInstance + serverDataDir + bamUrl.split(offlineUrlTag)[1];
 		}
+		if (baiUrl.indexOf(offlineUrlTag) == 0) {
+			bamiUrl = "http://" + serverInstance + serverDataDir + bamUrl.split(offlineUrlTag)[1];
+		}
 	}
 
-	variantCard.onBamUrlEntered(bamUrl, function(success) {
+	variantCard.onBamUrlEntered(bamUrl, baiUrl, function(success) {
 
 		if (success) {
 			variantCard.setName(variantCard.getName());
 			window.updateUrl('bam' + cardIndex, bamUrl);
+			window.updateUrl('bai' + cardIndex, baiUrl);
 			me.setDefaultBuildFromData();
 			me.enableLoadButtonIfBuildSet(true);		
 		} else {
@@ -941,9 +968,12 @@ DataCard.prototype.displayBamUrlBox = function(panelSelector) {
     panelSelector.find('#bam-file-info').val('');
     panelSelector.find('#bam-url-input').removeClass("hide");
     panelSelector.find("#bam-url-input").focus();
+    panelSelector.find('#bai-url-input').removeClass("hide");
+    panelSelector.find("#bai-url-input").focus();
 
     // Blank out the URL
 	panelSelector.find("#bam-url-input").val("");
+	panelSelector.find("#bai-url-input").val("");
 
     var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
@@ -961,6 +991,8 @@ DataCard.prototype.displayPlatinumBamUrlBox = function(panelSelector) {
     panelSelector.find('#bam-file-info').val('');
     panelSelector.find('#bam-url-input').removeClass("hide");
     panelSelector.find("#bam-url-input").focus();
+	panelSelector.find('#bai-url-input').addClass('hide');
+    panelSelector.find('#bai-url-input').val('');
 
     var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
@@ -985,6 +1017,7 @@ DataCard.prototype.clearBamUrl = function(panelSelector) {
 
 	this.displayBamUrlBox(panelSelector);
 	panelSelector.find("#bam-url-input").val("");
+	panelSelector.find("#bai-url-input").val("");
 	panelSelector.find("#bam-file-info").val("");
 	this.onBamUrlEntered(panelSelector);
 
@@ -1000,9 +1033,11 @@ DataCard.prototype.displayUrlBox = function(panelSelector) {
 
 	// Blank out the URL
 	panelSelector.find("#url-input").val("");
+	panelSelector.find("#url-tbi-input").val("");
 
 	panelSelector.find("#url-input").removeClass('hide');
     panelSelector.find("#url-input").focus();
+	panelSelector.find("#url-tbi-input").removeClass('hide');
     panelSelector.find('#vcf-file-info').addClass('hide');
     panelSelector.find('#vcf-file-info').val('');
     this.onVcfUrlEntered(panelSelector);
@@ -1022,6 +1057,8 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
 	panelSelector.find('#datasource-name').val(this.defaultNames[variantCard.getRelationship()]);
 	panelSelector.find("#url-input").removeClass('hide');
     panelSelector.find("#url-input").focus();
+	panelSelector.find("#url-tbi-input").addClass('hide');
+	panelSelector.find("#url-tbi-input").val('');
     panelSelector.find('#vcf-file-info').addClass('hide');
     panelSelector.find('#vcf-file-info').val('');
 
@@ -1038,6 +1075,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 
 	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
+	panelSelector.find("#url-tbi-input").val("");
 	panelSelector.find("#vcf-file-info").val("");
 	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
 	variantCard.clearVcf();
@@ -1053,6 +1091,8 @@ DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
 
 	panelSelector.find('#url-input').addClass('hide');
 	panelSelector.find('#url-input').val('');
+	panelSelector.find('#url-tbi-input').addClass('hide');
+	panelSelector.find('#url-tbi-input').val('');
 
 	
 	window.disableLoadButton();
@@ -1201,6 +1241,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 
 	var vcfUrl = panelSelector.find('#url-input').val();
+	var tbiUrl = panelSelector.find('#url-tbi-input').val();
 
 	if (isOffline) {
 		if (vcfUrl.indexOf(offlineUrlTag) == 0) {
@@ -1212,8 +1253,9 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 	panelSelector.find('.vcf-sample.loader').removeClass('hide');
 
 	window.updateUrl('vcf'+cardIndex, vcfUrl);
+	window.updateUrl('tbi'+cardIndex, tbiUrl);
 	
-	variantCard.onVcfUrlEntered(vcfUrl, function(success, sampleNames) {
+	variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
 		panelSelector.find('.vcf-sample.loader').addClass('hide');
 
 		if (success) {
@@ -1254,7 +1296,7 @@ DataCard.prototype.setVcfUrl = function(relationship, name, sampleName, vcfUrl) 
 	variantCard.setName(name);
 	variantCard.setVariantCardLabel();
 	variantCard.showDataSources(name);
-	variantCard.onVcfUrlEntered(vcfUrl, function(success, sampleNames) {
+	variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
 		if (sampleName) {
 			variantCard.setSampleName(sampleName);
 		}

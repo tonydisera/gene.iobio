@@ -1280,7 +1280,9 @@ function showWelcomePanel() {
 function loadUrlSources() {
 
 	var bam  = getUrlParameter(/(bam)*/);
+	var bai  = getUrlParameter(/(bai)*/);
 	var vcf  = getUrlParameter(/(vcf)*/);	
+	var tbi  = getUrlParameter(/(tbi)*/);	
 	var rel  = getUrlParameter(/(rel)*/);
 	var dsname = getUrlParameter(/(name)*/);	
 	var sample = getUrlParameter(/(sample)*/);	
@@ -1382,12 +1384,15 @@ function loadUrlSources() {
 	if (vcf != null) {
 		Object.keys(vcf).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
+			var tbiUrl    = tbi["tbi"+cardIndex];
 			var variantCard      = variantCards[+cardIndex];
 			if (variantCard) {
 				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 				var panelSelector    = $(panelSelectorStr);
 				panelSelector.find('#url-input').val(vcf[urlParameter]);
 				panelSelector.find('#url-input').removeClass("hide");
+				panelSelector.find('#url-tbi-input').val(tbiUrl);
+				panelSelector.find('#url-tbi-input').removeClass("hide");
 				dataCard.onVcfUrlEntered(panelSelector, function(success) {
 					if (success) {
 						vcfLoadedCount++;
@@ -1402,12 +1407,15 @@ function loadUrlSources() {
 	if (bam != null) {
 		Object.keys(bam).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
+			var baiUrl    = bai["bai"+cardIndex];
 			var variantCard      = variantCards[+cardIndex];
 			if (variantCard) {
 				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 				var panelSelector    = $(panelSelectorStr);
 				panelSelector.find('#bam-url-input').val(bam[urlParameter]);
 				panelSelector.find('#bam-url-input').removeClass("hide");
+				panelSelector.find('#bai-url-input').val(baiUrl);
+				panelSelector.find('#bai-url-input').removeClass("hide");
 				dataCard.onBamUrlEntered(panelSelector, function(success) {
 					if (success) {
 						bamLoadedCount++;

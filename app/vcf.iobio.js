@@ -23,6 +23,7 @@ vcfiobio = function module() {
 
 
   var vcfURL;
+  var tbiUrl;
   var vcfReader;
   var vcfFile;
   var tabixFile;
@@ -87,6 +88,7 @@ var effectCategories = [
 
   exports.clear = function() {
     vcfURL = null;
+    tbiUrl = null;
     vcfFile = null;
   }
 
@@ -113,10 +115,11 @@ var effectCategories = [
 
 
 
-  exports.openVcfUrl = function(url, callback) {
+  exports.openVcfUrl = function(url, theTbiUrl, callback) {
     var me = this;
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;
+    tbiUrl = theTbiUrl;
 
     var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(vcf\.gz)$/;
     var parts = rexp.exec(url);
@@ -125,7 +128,7 @@ var effectCategories = [
     if (extension == null) {
       callback(false, "Please specify a URL to a compressed, indexed vcf file with the file extension vcf.gz");
     } else {
-      this.checkVcfUrl(url,function(success, message) {
+      this.checkVcfUrl(url, tbiUrl, function(success, message) {
           callback(success, message);
       });
     }
@@ -136,9 +139,14 @@ var effectCategories = [
     if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
 
       var buffer = "";
+      var success = false;
+      var args = ['-H', vcfURL];
+      if (tbiUrl) {
+        args.push(tbiUrl);
+      }
       var cmd = new iobio.cmd(
             IOBIO.tabix,
-            ['-H', vcfURL]
+            args
         );
 
         cmd.on('data', function(data) {
@@ -175,14 +183,19 @@ var effectCategories = [
   }
 
 
-  exports.checkVcfUrl = function(url, callback) {
+  exports.checkVcfUrl = function(url, tbiUrl, callback) {
     var me = this;
     var success = null;
     var buffer = "";
     var recordCount = 0;
+
+    var args = ['-H', url];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-H', url],
+        args,
         {ssl: useSSL}
     );
 
@@ -340,8 +353,9 @@ var effectCategories = [
     return vcfURL;
   }
 
-  exports.setVcfURL = function(url) {
+  exports.setVcfURL = function(url, tbiUrl) {
     vcfURL = url;
+    tbiUrl = tbiUrl;
   }
 
   exports.getSourceType = function() {
@@ -435,9 +449,16 @@ var effectCategories = [
     var buffer = "";
     var refName;
 
+    var args = ['-i'];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    } else {
+      args.push(vcfURL + '.tbi');
+    }
+
     var cmd = new iobio.cmd(
         IOBIO.vcfReadDepther,
-        ['-i', vcfURL + '.tbi'],
+        args,
         {ssl: useSSL}
     );
 
@@ -662,7 +683,11 @@ var effectCategories = [
     var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
-    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm], {ssl: useSSL})
+    var args = ['-h', vcfURL, regionParm];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
       .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
     // filter sample(s)
@@ -838,9 +863,13 @@ var effectCategories = [
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
 
+    var args = ['-h', vcfURL, '1:1-1'];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-h', vcfURL, '1:1-1'],
+        args,
         {ssl: useSSL});
 
 
@@ -886,7 +915,11 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region], {ssl: useSSL});
+    var args = ['-h', vcfURL, region];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
 
     cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
@@ -1108,7 +1141,11 @@ var effectCategories = [
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', clinvarUrl, regionParm], {ssl: useSSL});
+      var args = ['-h', clinvarUrl, regionParm];
+      if (tbiUrl) {
+        args.push(tbiUrl);
+      }
+      var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
 
 
       var clinvarData = "";
