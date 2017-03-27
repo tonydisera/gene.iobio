@@ -215,6 +215,14 @@ describe('variantExporter', function() {
 
 		variantExporter = new VariantExporter();
 
+		if (getVariantCard('proband') == null) {
+			var model = new VariantModel();
+			model.init();
+			model.relationship = 'proband';
+			var vc = new VariantCard();
+			vc.model = model;
+			variantCards.push(vc);			
+		}
 
 		if (getVariantCard('mother') == null) {
 			var model = new VariantModel();
