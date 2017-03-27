@@ -238,7 +238,7 @@ describe('variantExporter', function() {
 		var doneCount = 0;
 
 		variantCards.forEach(function(vc) {
-			vc.model.onVcfUrlEntered(vcfUrl[vc.getRelationship()], function(success, samples) {
+			vc.model.onVcfUrlEntered(vcfUrl[vc.getRelationship()], null, function(success, samples) {
 		
 				vc.model.setSampleName(sample[vc.getRelationship()]);
 				
