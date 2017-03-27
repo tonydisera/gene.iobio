@@ -234,13 +234,22 @@ DataCard.prototype.loadDemoData = function() {
 
 		me.mode = "single";
 		genomeBuildHelper.setCurrentBuild(me.demoBuild);
-		me.setVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,   me.demoSampleNames.proband, me.demoUrls.proband);
-		$('#select-build-box').removeClass("attention");
 
-		window.loadTracksForGene();
-		window.cacheHelper.clearCache();
-		window.matrixCard.reset();	
-		genesCard.selectGene(theGenes[0]);
+		theGenes.forEach(function(geneName) {
+			geneNames.push(geneName);
+			genesCard.addGeneBadge(geneName, true);
+		})
+
+
+		me.promiseSetVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,  
+			me.demoSampleNames.proband, me.demoUrls.proband)
+		  .then(function() {
+			$('#select-build-box').removeClass("attention");
+			window.loadTracksForGene();
+			window.cacheHelper.clearCache();
+			window.matrixCard.reset();	
+			genesCard.selectGene(theGenes[0]);		  	
+		  });
 	
 	} else {
 		loadUrlSources();
@@ -270,10 +279,12 @@ DataCard.prototype.loadMygene2Data = function() {
 
 			// If the genome build was specified, load the endpoint variant file
 			if (genomeBuildHelper.getCurrentBuild()) {
-				me.setVcfUrl("proband", "Variants", null, probandUrl);
-				window.loadTracksForGene();
-				window.cacheHelper.clearCache();
-				window.matrixCard.reset();		
+				me.promiseSetVcfUrl("proband", "Variants", null, probandUrl)
+				  .then(function() {
+					window.loadTracksForGene();
+					window.cacheHelper.clearCache();
+					window.matrixCard.reset();		
+				  })
 			} else {
 				alertify.alert("Cannot load data.  The genome build must be specified.");
 			}
@@ -1288,20 +1299,24 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 
 
-DataCard.prototype.setVcfUrl = function(relationship, name, sampleName, vcfUrl) {
+DataCard.prototype.promiseSetVcfUrl = function(relationship, name, sampleName, vcfUrl) {
 	var me = this;
-	
-	var variantCard = getVariantCard(relationship);
-	variantCard.setRelationship(relationship);		
-	variantCard.setName(name);
-	variantCard.setVariantCardLabel();
-	variantCard.showDataSources(name);
-	variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
-		if (sampleName) {
-			variantCard.setSampleName(sampleName);
-		}
+
+	return new Promise(function(resolve, reject) {
+		var variantCard = getVariantCard(relationship);
+		variantCard.setRelationship(relationship);		
+		variantCard.setName(name);
+		variantCard.setVariantCardLabel();
+		variantCard.showDataSources(name);
+		variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
+			if (sampleName) {
+				variantCard.setSampleName(sampleName);				
+			} 
+			resolve();
+		});
 	});
 }
+
 DataCard.prototype.setDataSourceName = function(panelSelector) {	
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');

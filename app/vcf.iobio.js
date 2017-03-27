@@ -2203,18 +2203,18 @@ var effectCategories = [
 
         gt.eduGenotype = "";
         if (isLevelEdu) {
-          if (alt.indexOf(",") > 0) {
-            alt.split(",").forEach( function(altToken) {
-              if (gt.eduGenotype.length > 0) {
-                gt.eduGenotype += " ";
-              }
-              gt.eduGenotype += altToken;
-            });
-          } else if (gt.zygosity == "HET") {
-            gt.eduGenotype = rec.ref + " " + alt;
+          var alts = alt.split(",");
+          var gtIdx1 = +tokens[0];
+          var gtIdx2 = +tokens[1];
+          if (gt.zygosity == "HET" && gtIdx1 == 0) {
+            gt.eduGenotype = rec.ref + " " + alts[altIdx];
+          } else if (gt.zygosity == "HET" && gtIdx1 > 0) {
+            gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx2-1];
           } else if (gt.zygosity == "HOM") {
-            gt.eduGenotype = alt + " " + alt;
-          }
+            gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx1-1];
+          } else if (gt.zygosity == "HOMREF") {
+            gt.eduGenotype = rec.ref + " " + rec.ref;
+          }  
         }
         gt.eduGenotypeReversed = switchGenotype(gt.eduGenotype);
       }
