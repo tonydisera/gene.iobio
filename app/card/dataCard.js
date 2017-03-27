@@ -1299,7 +1299,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 
 
-DataCard.prototype.promiseSetVcfUrl = function(relationship, name, sampleName, vcfUrl) {
+DataCard.prototype.promiseSetVcfUrl = function(relationship, name, sampleName, vcfUrl, tbiUrl) {
 	var me = this;
 
 	return new Promise(function(resolve, reject) {
