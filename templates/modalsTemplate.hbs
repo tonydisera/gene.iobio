@@ -239,37 +239,37 @@
             <div role="tabpanel" class="tab-pane active" id="variants">
 
               <div style="text-align:left">
-                <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
-                  <i class="material-icons">person</i>
-                  Single
-                </button>
-                <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                  style="padding-top: 2px;padding-bottom:1px;">
-                  <div style="float:left;">
-                    <img src="assets/images/family.png" style="height:27px"/>
-                  </div>
-                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
-                </button>            
-                <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                  style="padding-top: 2px;padding-bottom:1px;">
-                  <div style="float:left;">
-                    <img src="assets/images/pedigree.png" style="height:22px"/>
-                  </div>
-                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
-                </button>
-                <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
-                  style="padding-top: 2px;padding-bottom:1px;">
-                  <i class="mdi-editor-format-align-justify"></i>                
-                   <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
-                </button>
-                <div style="float:right;display:inline-block;overflow:visible;margin-bottom:10px;">
+                <div style="display:inline-block">
+                  <button id="single-proband-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(false)"  >
+                    <i class="material-icons">person</i>
+                    Single
+                  </button>
+                  <button id="trio-button" type="btn btn-raised" class="icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <div style="float:left;">
+                      <img src="assets/images/family.png" style="height:27px"/>
+                    </div>
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Trio</div>
+                  </button>            
+                  <button id="pedigree-button" type="btn btn-raised" class=" todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <div style="float:left;">
+                      <img src="assets/images/pedigree.png" style="height:22px"/>
+                    </div>
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Pedigree</div>
+                  </button>
+                  <button id="other-button" type="btn btn-raised" class="todo hide icon-button-sm btn btn-default btn-raised" onclick="toggleSampleTrio(true)" 
+                    style="padding-top: 2px;padding-bottom:1px;">
+                    <i class="mdi-editor-format-align-justify"></i>                
+                     <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
+                  </button>
+                </div>
+                <div style="float:right;display:inline-block;overflow:visible;margin-top:14px;margin-bottom:18px;">
                   <div id="select-build-box" style="width:160px;float:right;margin-left:20px;">
-                    <span id="sample-data-label">Genome Build</span>
                     <select id="select-build" class="selectized" placeholder="select genome build">
                     </select>
                   </div>
-                  <div id="select-species-box" style="width:120px;float:right;">
-                    <span id="sample-data-label">Species</span>
+                  <div id="select-species-box" style="width:130px;float:right;">
                     <select id="select-species" class="selectized" placeholder="select species">
                     </select>
                   </div>
