@@ -47,8 +47,14 @@ module.exports = {
         inputUrl: function(url) {
           this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
         },
+        inputTbiUrl: function(url) {
+          this.setValue('@tbiUrlInput', [url, this.api.Keys.ENTER]);
+        },
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
+        },
+        inputAlignmentsBaiUrl: function(url) {
+          return this.setValue('@baiUrlInput', [url]);
         },
         inputDefaults: function() {
           this.inputUrl(this.api.globals.variantFileUrl);
@@ -63,7 +69,9 @@ module.exports = {
         probandVcfSampleBox: { selector: '#vcf-sample-box' },
         probandVcfSampleSelectBox: { selector: '#vcf-sample-select-box .selectize-input' },
         urlInput: { selector: '#url-input' },
+        tbiUrlInput: { selector: '#url-tbi-input' },
         bamUrlInput: { selector: '#bam-url-input' },
+        baiUrlInput: { selector: '#bai-url-input' }
       }
     },
     motherData: {
