@@ -107,10 +107,6 @@ VariantCard.prototype.getDangerSummaryForGene = function(geneName) {
 	return this.model.getDangerSummaryForGene(geneName);
 }
 
-VariantCard.prototype.promiseCacheVariants = function(ref, geneObject, transcript) {
-	return this.model.promiseCacheVariants(ref, geneObject, transcript);
-}
-
 VariantCard.prototype.isCached = function(geneName, transcript) {
 	return this.model.isCached(geneName, transcript);
 }

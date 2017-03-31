@@ -1140,9 +1140,11 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 	return data != null;
 }
 
-VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneName, transcript) {
+VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneName, transcript, checkForCalledVariants) {
 	var theVcfData = this._getCachedData("vcfData", geneName, transcript);
-	return theVcfData && theVcfData.loadState != null && theVcfData.loadState['inheritance'];
+	var theFbData  = this._getCachedData("fbData", geneName, transcript);
+	var vcfDataCached = theVcfData && theVcfData.loadState != null && (dataCard.mode == 'single' || theVcfData.loadState['inheritance']);
+	return vcfDataCached && (!checkForCalledVariants || theFbData);
 }
 
 
@@ -2112,12 +2114,64 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) 
 
 }
 
-VariantModel.prototype.loadCalledTrioGenotypes = function() {
+VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, theTranscript, callback) {
 	var me = this;
-	if (this.vcfData == null || this.vcfData.features == null) {
+
+	var theVcfData = me.getVcfDataForGene(geneObject, theTranscript);
+	var theFbData = me.getFbDataForGene(geneObject, theTranscript);
+	
+    theFbData.features.forEach( function(feature) {
+   		feature.fbCalled = 'Y';
+   	});
+
+	// Filter the freebayes variants to only keep the ones
+	// not present in the vcf variant set.
+	me._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
+
+	
+	// Now get the clinvar data		    	
+	me.vcf.promiseGetClinvarRecords(
+	    		theFbData, 
+	    		me._stripRefName(geneObject.chr), geneObject, 
+	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theFbData) : me._refreshVariantsWithClinvar.bind(me, theFbData)
+	    ).then( function() {
+	    	if (callback) {
+
+	    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
+				theFbData.features.forEach(function (fbVariant) {
+					if (fbVariant.source) {
+						fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
+						fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
+						fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
+						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
+						fbVariant.source.clinvar                     = fbVariant.clinvar;
+						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+					}					
+				});	 
+
+
+	    		callback(theFbData, geneObject, theTranscript);
+	    	}
+	    });
+
+
+}
+
+
+VariantModel.prototype.loadCalledTrioGenotypes = function(theVcfData, theFbData, theGeneObject, theTranscript) {
+	var me = this;
+
+	theVcfData = theVcfData ? theVcfData : this.vcfData;
+	if (theVcfData == null || theVcfData.features == null) {
 		return;
 	}
-	var sourceVariants = this.vcfData.features
+	theFbData = theFbData ? theFbData : this.fbData;
+
+	theGeneObject = theGeneObject ? theGeneObject : window.gene;
+	theTranscript = theTranscript ? theTranscript : window.selectedTranscript;
+
+
+	var sourceVariants = theVcfData.features
 							 .filter(function (variant) {
 								return variant.fbCalled == 'Y';
 							 })
@@ -2126,8 +2180,8 @@ VariantModel.prototype.loadCalledTrioGenotypes = function() {
 					  			object[key] = variant; 
 					  			return object;
 					 		 }, {});
-	if (this.fbData) {
-		this.fbData.features.forEach(function (fbVariant) {
+	if (theFbData) {
+		theFbData.features.forEach(function (fbVariant) {
 			var key = fbVariant.type + " " + fbVariant.start + " " + fbVariant.ref + " " + fbVariant.alt;
 			var source = sourceVariants[key];
 			if (source) {
@@ -2155,7 +2209,7 @@ VariantModel.prototype.loadCalledTrioGenotypes = function() {
 		});	
 		// Re-Cache the freebayes variants for proband now that we have mother/father genotype
 		// and allele counts.							
-		me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+		me._cacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript);
 
 
 
@@ -2195,21 +2249,36 @@ VariantModel.prototype._prepareVcfAndFbData = function(data) {
 }
 
 
-VariantModel.prototype._determineUniqueFreebayesVariants = function() {
+VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, theTranscript, theVcfData, theFbData) {
 	var me = this;
 
+	if (geneObject == null) {
+		geneObject = window.gene;
+	}
+	if (theTranscript == null) {
+		theTranscript = window.selectedTranscript;
+	}
+
+	if (theVcfData == null) {
+		theVcfData = me.vcfData;
+	}
+	if (theFbData == null) {
+		theFbData = me.fbData;
+	}
+
+
 	// We have to order the variants in both sets before comparing
-	me.vcfData.features = me.vcfData.features.sort(VariantModel.orderVariantsByPosition);					
-	me.fbData.features  = me.fbData.features.sort(VariantModel.orderVariantsByPosition);
+	theVcfData.features = theVcfData.features.sort(VariantModel.orderVariantsByPosition);					
+	theFbData.features  = theFbData.features.sort(VariantModel.orderVariantsByPosition);
 
 	// Compare the variant sets, marking the variants as unique1 (only in vcf), 
 	// unique2 (only in freebayes set), or common (in both sets).	
 	if (me.isVcfLoaded()) {
 		// Compare fb data to vcf data
-		me.vcf.compareVcfRecords(me.vcfData, me.fbData);
+		me.vcf.compareVcfRecords(theVcfData, theFbData);
 
 		// Add unique freebayes variants to vcfData
-    	me.fbData.features = me.fbData.features.filter(function(d) {
+    	theFbData.features = theFbData.features.filter(function(d) {
     		return d.consensus == 'unique2';
     	});
 	} 
@@ -2217,27 +2286,27 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function() {
 
 	// Add the unique freebayes variants to vcf data to include 
 	// in feature matrix
-	me.fbData.features.forEach( function(v) {
+	theFbData.features.forEach( function(v) {
 		var variantObject = $.extend({}, v);
-   		me.vcfData.features.push(variantObject);
+   		theVcfData.features.push(variantObject);
    		v.source = variantObject;
    	});
 
    	// Figure out max level (lost for some reason)
    	var maxLevel = 1;
-   	me.vcfData.features.forEach(function(feature) {
+   	theVcfData.features.forEach(function(feature) {
    		if (feature.level > maxLevel) {
    			maxLevel = feature.level;
    		}
    	});
-   	me.vcfData.maxLevel = maxLevel;
+   	theVcfData.maxLevel = maxLevel;
 
-    pileupObject = me._pileupVariants(me.fbData.features, gene.start, gene.end);
-	me.fbData.maxLevel = pileupObject.maxLevel + 1;
-	me.fbData.featureWidth = pileupObject.featureWidth;
+    pileupObject = me._pileupVariants(theFbData.features, geneObject.start, geneObject.end);
+	theFbData.maxLevel = pileupObject.maxLevel + 1;
+	theFbData.featureWidth = pileupObject.featureWidth;
 
 	// Re-cache the vcf data now that the called variants have been merged
-	me._cacheData(me.vcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
+	me._cacheData(theVcfData, "vcfData", geneObject.gene_name, theTranscript);
 }
 
 

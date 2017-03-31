@@ -2850,6 +2850,31 @@ function promiseDetermineInheritance(promise) {
 		} else {
 			thePromise = promise;
 		}
+
+		var postInheritanceProcessing = function(probandVariantCard, trioModel) {
+			probandVariantCard.determineMaxAlleleCount();
+			
+			// Enable inheritance filters
+			filterCard.enableInheritanceFilters(getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript));
+
+			genesCard.refreshCurrentGeneBadge();
+
+			$('#filter-and-rank-card').removeClass("hide");
+	 		$('#matrix-track').removeClass("hide");
+
+			$("#matrix-panel .loader").removeClass("hide");
+			$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
+			$("#feature-matrix-note").addClass("hide");
+			determineSibStatus(trioModel, function() {
+				$("#matrix-panel .loader").addClass("hide");
+			    $("#matrix-panel .loader .loader-label").text("Ranking variants");
+				$("#feature-matrix-note").removeClass("hide");
+
+				resolve();
+
+			});			
+		}
+
 		thePromise().then( function(probandVariantCard) {
 			if (!fulfilledTrioPromise) {
 				fulfilledTrioPromise = true;
@@ -2889,34 +2914,18 @@ function promiseDetermineInheritance(promise) {
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
 					var trioModel = new VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData);
-					trioModel.compareVariantsToMotherFather(function() {
-
-						probandVariantCard.determineMaxAlleleCount();
-
-						probandVariantCard.model._cacheData(probandVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
-						
-						// Enable inheritance filters
-						filterCard.enableInheritanceFilters(getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript));
-
-						genesCard.refreshCurrentGeneBadge();
-
-						$('#filter-and-rank-card').removeClass("hide");
-				 		$('#matrix-track').removeClass("hide");
-
-						$("#matrix-panel .loader").removeClass("hide");
-						$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
-						$("#feature-matrix-note").addClass("hide");
-						determineSibStatus(trioModel, function() {
-							$("#matrix-panel .loader").addClass("hide");
-						    $("#matrix-panel .loader .loader-label").text("Ranking variants");
-							$("#feature-matrix-note").removeClass("hide");
-
-							resolve();
-
+					if (probandVcfData.loadState['inheritance']) {
+						// If we have already determined inheritance, don't do it again because
+						// the called variants for mother and father have already been cleared
+						// from the cache, so the allele counts will get blanked out for called variants
+						postInheritanceProcessing(probandVariantCard, trioModel);
+					} else {
+						trioModel.compareVariantsToMotherFather(function() {
+							probandVariantCard.model._cacheData(probandVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
+							postInheritanceProcessing(probandVariantCard, trioModel);
 						});
 
-
-					});
+					}
 				} else {
 					probandVariantCard.determineMaxAlleleCount();
 
