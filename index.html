@@ -236,6 +236,19 @@
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
 
+
+              <div class="btn-group" style="display:inline-block;float:left">
+                <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
+                  Analyze all genes
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">Variants</a></li>
+                  <li><a href="javascript:void(0)" onclick="cacheHelper.analyzeAll(true)">Call variants</a></li>
+                </ul>
+              </div>
+
+
             <div id="analyze-all-panel" class="level-edu">
 
               <!-- Buttons for editting gene list, done editting gene list -->
@@ -244,6 +257,9 @@
                    <i class="material-icons" style="font-size:21px">playlist_play</i>
                     Analyze all genes
                 </a>
+
+
+
 
                 <div id="total-genes-label"></div>
 

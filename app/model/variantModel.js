@@ -1730,6 +1730,9 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, cover
 		}
 
 	}
+	if (!theVcfData.hasOwnProperty('loadState')) {
+		theVcfData.loadState = {};
+	}
 	theVcfData.loadState['coverage'] = true;
 	callback();
 
@@ -2129,27 +2132,27 @@ VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, the
 	me._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
 
 	
-	// Now get the clinvar data		    	
+	// Now get the clinvar data		 
+	// ADD CODE HERE!!! to check to see if the fbData already has the clinvar annotations.  If so,
+	// bypass getting clinvar records and just perform code inside callback   	
 	me.vcf.promiseGetClinvarRecords(
 	    		theFbData, 
 	    		me._stripRefName(geneObject.chr), geneObject, 
 	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theFbData) : me._refreshVariantsWithClinvar.bind(me, theFbData)
 	    ).then( function() {
+
+    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
+			theFbData.features.forEach(function (fbVariant) {
+				if (fbVariant.source) {
+					fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
+					fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
+					fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
+					fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
+					fbVariant.source.clinvar                     = fbVariant.clinvar;
+					fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+				}					
+			});	 
 	    	if (callback) {
-
-	    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
-				theFbData.features.forEach(function (fbVariant) {
-					if (fbVariant.source) {
-						fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
-						fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
-						fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
-						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
-						fbVariant.source.clinvar                     = fbVariant.clinvar;
-						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
-					}					
-				});	 
-
-
 	    		callback(theFbData, geneObject, theTranscript);
 	    	}
 	    });
@@ -2246,6 +2249,58 @@ VariantModel.prototype._prepareVcfAndFbData = function(data) {
 	});	
 
 
+}
+
+VariantModel.prototype.isAlignmentsOnly = function() {
+	return !this.isVcfReadyToLoad() && this.isBamLoaded();
+}
+
+/* 
+ * No variants are loaded, create a dummy vcfData with 0 features
+ */
+VariantModel.prototype.cacheDummyVcfDataAlignmentsOnly = function(theFbData, theGeneObject, theTranscript) {
+	theVcfData = $.extend({}, theFbData);
+	theVcfData.features = [];
+	theVcfData.loadState = {clinvar: true, coverage: true, inheritance: true};
+
+	this._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript);
+}
+
+
+VariantModel.prototype.mergeCalledVariants = function(theVcfData, theFbData) {
+	var me = this;
+
+	// Exit if there are no cached called variants
+	if (theFbData == null || theFbData.features.length == 0) {
+		return;
+	}
+
+
+	// We have to order the variants in both sets before comparing
+	theVcfData.features = theVcfData.features.sort(VariantModel.orderVariantsByPosition);					
+	theFbData.features  = theFbData.features.sort(VariantModel.orderVariantsByPosition);
+
+
+	// Compare the variant sets, marking the variants as unique1 (only in vcf), 
+	// unique2 (only in freebayes set), or common (in both sets).	
+	if (me.isVcfLoaded()) {
+		// Compare fb data to vcf data
+		me.vcf.compareVcfRecords(theVcfData, theFbData);
+
+		// Add unique freebayes variants to vcfData
+    	theFbData.features = theFbData.features.filter(function(d) {
+    		return d.consensus == 'unique2';
+    	});
+	} 
+
+
+	// Add the unique freebayes variants to vcf data to include 
+	// in feature matrix
+	theFbData.features.forEach( function(v) {
+		var variantObject = $.extend({}, v);
+   		theVcfData.features.push(variantObject);
+   		v.source = variantObject;
+   	});	
 }
 
 

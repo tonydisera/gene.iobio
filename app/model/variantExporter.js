@@ -328,34 +328,35 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 					(variantEntry.hasOwnProperty('freebayesCalled') && variantEntry.freebayesCalled == 'Y')) {
 					// If the variant was called on-demand, issue the service calls to
 					// generate the vcf records.
-					cacheJointCallVariants(theGeneObject, theTranscript, variantEntry, function(jointVcfRecs, translatedRefName, sourceVariant) {
-						var theVariant = null;
-						var theVcfRecs = null;
+					cacheJointCallVariants(theGeneObject, theTranscript, variantEntry, 
+						function(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, sourceVariant) {
+							var theVariant = null;
+							var theVcfRecs = null;
 
-						if (format == 'vcf') {
-							theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
-						}
+							if (format == 'vcf') {
+								theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
+							}
 
-						getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, sampleNames.join(","))
-	                	   .then(function(data) {
-	                			var theFbData = data[1];
+							getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, sampleNames.join(","))
+		                	   .then(function(data) {
+		                			var theFbData = data[1];
 
-								theFbData.features.forEach(function(v) {
-									if (theVariant == null  
-										&& getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
-										&& v.start  == sourceVariant.start
-										&& v.ref    == sourceVariant.ref
-										&& v.alt    == sourceVariant.alt) {
-										theVariant = v;
-									}
-								})
-								me._promiseFormatRecord(theVariant, sourceVariant, theVcfRecs, theGeneObject, format, exportRec)
-								  	.then(function(data) {
-								  		resolve(data);
-								 	})
+									theFbData.features.forEach(function(v) {
+										if (theVariant == null  
+											&& getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
+											&& v.start  == sourceVariant.start
+											&& v.ref    == sourceVariant.ref
+											&& v.alt    == sourceVariant.alt) {
+											theVariant = v;
+										}
+									})
+									me._promiseFormatRecord(theVariant, sourceVariant, theVcfRecs, theGeneObject, format, exportRec)
+									  	.then(function(data) {
+									  		resolve(data);
+									 	})
 
-	                	   });
-					});
+		                	   });
+						});
 
 				} else {
 

@@ -593,9 +593,12 @@ var Bam = Class.extend({
    },
 
 
-   freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
+   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, callback) {
     var me = this;
 
+    var refName     = geneObject.chr; 
+    var regionStart = geneObject.start;
+    var regionEnd   = geneObject.end; 
         
     this.transformRefName(refName, function(trRefName){
 
@@ -721,7 +724,7 @@ var Bam = Class.extend({
         });
 
         cmd.on('end', function() {
-          callback(variantData, trRefName);
+          callback(variantData, trRefName, geneObject, transcript);
         });
 
         cmd.on('error', function(error) {

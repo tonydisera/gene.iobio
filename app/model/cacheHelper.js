@@ -147,11 +147,8 @@ CacheHelper.prototype.hideAnalyzeAllProgress = function() {
 }
 
 
-CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants) {
+CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 	var me = this;
-
-	// TESTING CODE  - REMOVE
-	analyzeCalledVariants = true;
 
 	me.showAnalyzeAllProgress();
 
@@ -219,6 +216,12 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
 CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, callback) {
 	var me = this;
 
+	// Don't prompt the user about auto-calling if the user has chosen to analyze all on
+	// called variants
+	if (autoCall == false && analyzeCalledVariants) {
+		autoCall = true;
+	}
+
 	promiseGetGeneModel(geneName).then( function(geneModel) {
 	    var geneObject = geneModel;
     	// Now that we have the gene model,
@@ -232,86 +235,97 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
     	var transcript = getCanonicalTranscript(geneObject);
     	window.geneObjects[geneObject.gene_name] = geneObject;
 
-    	isJointCallOnly( function(shouldJointCall) {
-		    if (me.isCachedForProband(geneObject.gene_name, transcript, analyzeCalledVariants)) {
-		    	// This gene has already been analyzed. Take this gene off of the queue and see
-		    	// if next batch of genes should be analyzed
-		    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
-		    	me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-		    } else if (shouldJointCall) {
-		    	// This gene is ready to be analyzed.  Only alignments were provided, so
-		    	// just joint call variants.
-		    	genesCard._geneBadgeLoading(geneObject.gene_name, true);
-				cacheJointCallVariants(geneObject, transcript, null, function() {
-					me._processCachedTrio(geneObject, transcript, analyzeCalledVariants, callback)						
-				});
-			} else {
 
-				// The gene is ready to be analyzed.  Annotate the variants in the vcf for
-				// this gene and if 'analyze all' includes calling variants, perform
-				// joint calling as well.
-
-				// Show that we are working on this gene
-				genesCard._geneBadgeLoading(geneObject.gene_name, true);
-
-				if (me.isCachedForCards(geneObject.gene_name, transcript)) {
-					// If the 'analyze all' will include calling variants, the gene may already have loaded
-					// variants (user has clicked on the gene).  In this case, we only want to invoke the
-					// code to joint call the variants for the trio once.  
-					cacheJointCallVariants(geneObject, transcript, null, function() {
-						me._diffAndAnnotateCalledVariants(geneObject, transcript, analyzeCalledVariants, function() {
-			    			me._processCachedTrio(geneObject, transcript, analyzeCalledVariants, callback);
-						})
+		// This function will be performed once all loaded variants have been
+		// analyzed and cached.  Joint call the variants for
+		// the cached gene (if alignments provided and 'analyze all' 
+		// included calling variants) and then determine the inheritance 
+		// (if this is a trio)
+    	var analyzeVariantsForGene = function(geneObject, transcript, analyzeCalledVariants, callback) {
+			if (analyzeCalledVariants) {					
+				// If 'analyze all' including calling variants from alignments, perform
+				// joint calling, then add clinvar annotations and determine the
+				// 'delta' (new) variants that are not present in the gene's loaded variants
+				cacheJointCallVariants(geneObject, transcript, null, 
+					function(theGeneObject, theTranscript) {
+						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants, 
+							function(theGeneObject1, theTranscript1) {
+		    					me._processCachedTrio(theGeneObject1, theTranscript1, analyzeCalledVariants, callback);
+							})
 					});
+			} else {
+				// Determine inheritance for the trio
+				me._processCachedTrio(geneObject, transcript, analyzeCalledVariants, callback);
+			}
+    	}
 
-				} else {
-					// This is the time this gene's variants have been cached.
-				    // For each sample, get and annotate the genes and
-				    // cache the variants
-			    	getRelevantVariantCards().forEach(function(variantCard) {
+    	
 
-			    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-				    		variantCard.model.promiseCacheVariants(
-				    			geneObject.chr,
-				    			geneObject, 
-							 	transcript)
-				    		.then( function(vcfData) {
+	    if (me.isCachedForProband(geneObject.gene_name, transcript, analyzeCalledVariants)) {
 
-				    			// Once all analysis of the gene variants for each of
-				    			// the samples is complete, joint call the variants for
-				    			// the cached gene (if alignments provided and 'analyze all' 
-				    			// included calling variants) and then determine the inheritance 
-								// (if this is a trio)
-				    			if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+	    	// This gene has already been analyzed. Take this gene off of the queue and see
+	    	// if next batch of genes should be analyzed
+	    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
+	    	me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+	    
+		
+		} else {
 
-									cacheJointCallVariants(geneObject, transcript, null, function() {
-										me._diffAndAnnotateCalledVariants(geneObject, transcript, analyzeCalledVariants, function() {
-							    			me._processCachedTrio(geneObject, transcript, analyzeCalledVariants, callback);
-										})
-									});
+			// The gene is ready to be analyzed.  Annotate the variants in the vcf for
+			// this gene and if 'analyze all' includes calling variants, perform
+			// joint calling as well.
 
-				    			}
+			// Show that we are working on this gene
+			genesCard._geneBadgeLoading(geneObject.gene_name, true);
 
-				    		}, function(error) {
-				    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-			    				var message = error.hasOwnProperty("message") ? error.message : error;
-				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-				    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+			if (me.isCachedForCards(geneObject.gene_name, transcript) || isAlignmentsOnly()) {
 
-								getVariantCard("proband").summarizeError(geneObject.gene_name, error);
-		    					// take this gene off of the queue and see
-		    					// if next batch of genes should be analyzed
-					    		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);					
-				    		});
+				// If the 'analyze all' will include calling variants, the gene may already have loaded
+				// variants (user has clicked on the gene).  In this case, we only want to invoke the
+				// code to joint call the variants for the trio (and determine inheritance) once.  					
+				analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback);
 
-			    		}
+			} else {
+				// This is the time this gene's variants have been cached.
+			    // For each sample, get and annotate the genes and
+			    // cache the variants
+		    	getRelevantVariantCards().forEach(function(variantCard) {
 
-			    	});						}
-		    	
-		    }
+		    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
+			    		variantCard.model.promiseCacheVariants(
+			    			geneObject.chr,
+			    			geneObject, 
+						 	transcript)
+			    		.then( function(vcfData) {
 
+							if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+								// Once all analysis of the gene variants for each of
+								// the samples is complete, call variants (optional) and
+								// process the trio to determine inheritance
+				    			analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback);
+				    		}
 
-    	});
+			    		}, function(error) {
+
+			    			// An error occurred.  Set the gene badge with an error glyph
+			    			// and move on to analyzing the next gene
+			    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
+		    				var message = error.hasOwnProperty("message") ? error.message : error;
+			    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
+			    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+
+							getVariantCard("proband").summarizeError(geneObject.gene_name, error);
+	    					// take this gene off of the queue and see
+	    					// if next batch of genes should be analyzed
+				    		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);					
+			    		});
+
+		    		}
+
+		    	});		
+		    }				
+		}
+	    	
 
 	},
 	function(error) {
@@ -337,7 +351,7 @@ CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, tran
 				}
 				if (processedCount == getRelevantVariantCards().length) {
 					if (callback) {
-						callback();
+						callback(theGeneObject, theTranscript);
 					}
 				}
 			})
@@ -356,19 +370,30 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 	var trioVcfData = {proband: null, mother: null, father: null};
 	var trioFbData  = {proband: null, mother: null, father: null};
 	getRelevantVariantCards().forEach(function(vc) {
-		trioVcfData[vc.getRelationship()] = vc.model.getVcfDataForGene(geneObject, transcript);
-		if (analyzeCalledVariants) {
-			trioFbData[vc.getRelationship()] = vc.model.getFbDataForGene(geneObject, transcript);
-		}
-	})
+		var theVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
+		var theFbData  = vc.model.getFbDataForGene(geneObject, transcript)
 
-	if (dataCard.mode == 'trio' && (trioVcfData.proband == null ||  trioVcfData.mother == null || trioVcfData.father == null)) {
-		console.log("Unable to determine inheritance during Analyze All for gene " + geneObject.gene_name + " because full trio data not available");
-		genesCard.clearGeneGlyphs(geneObject.gene_name);
-		genesCard.setGeneBadgeError(geneObject.gene_name);		
-		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-		return;
-	} 
+		// Since we assume that the vcf data is the intersection of loaded + called variants, set
+		// the vcf data to the called variants when there are not loaded variants (only alignment files
+		// were provided)
+		if (vc.model.isAlignmentsOnly()) {
+			theVcfData = theFbData;
+		}
+		
+		if (theVcfData == null) {
+			console.log("Unable to processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available");
+			genesCard.clearGeneGlyphs(geneObject.gene_name);
+			genesCard.setGeneBadgeError(geneObject.gene_name);		
+			me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+			return;
+		}
+
+		trioVcfData[vc.getRelationship()] = theVcfData;
+
+		if (analyzeCalledVariants) {
+			trioFbData[vc.getRelationship()] = theFbData;
+		}
+	});
 
 	var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father);
 	trioModel.compareVariantsToMotherFather(function() {
@@ -383,7 +408,9 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 				// If we are calling variants during 'analyze all', then we need to refresh the called variants
 				// with inheritance mode, allele counts and genotypes when inheritance for the trio was performed.
 				// This method will re-cache the called variants.
-				getVariantCard(relationship).model.loadCalledTrioGenotypes(trioVcfData[relationship], trioFbData[relationship], geneObject, transcript);
+				if (trioFbData[relationship]) {
+					getVariantCard(relationship).model.loadCalledTrioGenotypes(trioVcfData[relationship], trioFbData[relationship], geneObject, transcript);
+				}
 			}
 			
 		}
@@ -403,20 +430,25 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 			genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 		}
 
-		// When only bams provided and the variants were auto-called, re-cache the results 
-		// now that inheritance has been determined
-		getRelevantVariantCards().forEach(function(vc) {
-			if (autoCall && !vc.model.isVcfReadyToLoad()) {
-				var data = vc.model.getVcfDataForGene(geneObject, transcript);
-				vc.model._cacheData(data, "fbData", geneObject.gene_name, transcript);
-				vc.model._cacheData(data, "vcfData", geneObject.gene_name, transcript);											
-			} 
-		})
-
 		
-		// Now clear out mother and father from cache.  Don't clear cache for currently selected
-		// gene though as this will result in no inheritance mode being detected.
-		if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
+		// Now clear out mother and father from cache.  
+		if (analyzeCalledVariants) {
+			// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
+			// and father in cache as we need these to show allele counts and genotypes for trio
+			// with determineInheritance() on selected gene is invoked)
+			getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+			getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+
+			// For alignments only analysis, the called variants were cached in as "vcfData" to process
+			// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
+			// for the proband.
+			if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
+				getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
+			}
+
+		} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
+			// Don't clear cache for currently selected
+			// gene though as this will result in no inheritance mode being detected.
 			getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
 			getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
 
