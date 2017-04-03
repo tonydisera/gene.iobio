@@ -150,6 +150,10 @@ CacheHelper.prototype.hideAnalyzeAllProgress = function() {
 CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 	var me = this;
 
+	if (isAlignmentsOnly()) {
+		analyzeCalledVariants = true;
+	}
+
 	me.showAnalyzeAllProgress();
 
 	// Start over with a new queue of genes to be analyzed

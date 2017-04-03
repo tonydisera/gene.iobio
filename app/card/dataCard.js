@@ -784,6 +784,8 @@ DataCard.prototype.init = function() {
 		// Clear out annotations and gene models (and transcripts)
 		genesCard.clearGeneInfos();
 		
+		genesCard.showAnalyzeAllButton();
+
 		// Clear the cache
 		cacheHelper.clearCache();
 
@@ -810,6 +812,7 @@ DataCard.prototype.init = function() {
 		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");			
 
 		window.enableCallVariantsButton();
+
 
 		window.matrixCard.reset();
 

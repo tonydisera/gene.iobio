@@ -237,7 +237,7 @@
           <div id="genes-panel" class="hide nav-center">
 
 
-              <div class="btn-group" style="display:inline-block;float:left">
+              <div id="analyze-all-dropdown" class="hide btn-group" style="display:inline-block;float:left">
                 <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
                   Analyze all genes
                   <span class="caret"></span>
@@ -253,10 +253,9 @@
 
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
-                <a  id="manage-gene-list" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
-                   <i class="material-icons" style="font-size:21px">playlist_play</i>
+                <button  id="manage-gene-list" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
                     Analyze all genes
-                </a>
+                </button>
 
 
 

@@ -1366,6 +1366,8 @@ function loadUrlSources() {
 					});
 
 				}
+
+				genesCard.showAnalyzeAllButton();
 				
 				if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
 					loadTracksForGene( false );

@@ -24,6 +24,7 @@ GenesCard.prototype.init = function() {
 
 	var hpoUrl = hpoServer + "hot/lookup";
 
+
 	if (isLevelBasic) {
 		$("#genes-card #legend-placeholder").html(legendBasicTemplate());	
 		this.legend = new Legend();
@@ -175,6 +176,29 @@ GenesCard.prototype.init = function() {
 	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
 	}
+
+}
+
+GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
+	if (hideAll) {
+		$('#analyze-all-dropdown').addClass("hide");
+		$('#manage-gene-list').addClass("hide");
+	} else {
+
+		if (isAlignmentsOnly()) {
+			$("#analyze-all-dropdown").addClass("hide");
+			$("#manage-gene-list").removeClass("hide");
+		} else {
+			if (getProbandVariantCard().isBamLoaded()) {
+				$("#analyze-all-dropdown").removeClass("hide");		
+				$("#manage-gene-list").addClass("hide");
+			} else {
+				$("#analyze-all-dropdown").addClass("hide");		
+				$("#manage-gene-list").removeClass("hide");
+			}
+		}		
+	}
+
 
 }
 
@@ -507,16 +531,15 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 
 
 	if (geneNames.length > 0) {
-		$('#manage-gene-list').removeClass("hide");
 		$('#clear-gene-list').removeClass("hide");
 		$('#manage-cache-link').removeClass("hide");
 
 	} else {
-		$('#manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
 		$('#clear-gene-list').addClass("hide");
 		$('#manage-cache-link').addClass("hide");
 	}
+	me.showAnalyzeAllButton(geneNames.length == 0);
 
 	this._initPaging(geneNames, true);
 
@@ -588,15 +611,14 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 
 
 	if (geneNames.length > 0) {
-		$('#manage-gene-list').removeClass("hide");
 		$('#clear-gene-list').removeClass("hide");
 		$('#manage-cache-link').removeClass("hide");
 	} else {
-		$('#manage-gene-list').addClass("hide");
 		$('#gene-badge-container #done-manage-gene-list').addClass("hide");
 		$('#clear-gene-list').addClass("hide");
 		$('#manage-cache-link').addClass("hide");
 	}
+	me.showAnalyzeAllButton(geneNames.length == 0);
 
 	// Create a gene badge for each gene name in the comma separated list.
 	for(var i = 0; i < geneNames.length; i++) {
@@ -1189,7 +1211,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 			theGeneBadge.addClass("selected");
 		}
 
-		$('#manage-gene-list').removeClass("hide");
+		me.showAnalyzeAllButton();
 		$('#clear-gene-list').removeClass("hide");
 		$('#manage-cache-link').removeClass("hide");
 
@@ -1764,20 +1786,6 @@ GenesCard.prototype.updateGeneInfoLink = function(geneName, callback) {
 		}
 	}
 
-}
-
-GenesCard.prototype.manageGeneList = function(manage) {
-	var me = this;
-
-	if (manage) {
-		$('#gene-badge-container').addClass('manage');
-		$('#manage-gene-list').addClass('hide');
-		$('#done-manage-gene-list').removeClass('hide');
-	} else {
-		$('#gene-badge-container').removeClass('manage');
-		$('#manage-gene-list').removeClass('hide');
-		$('#done-manage-gene-list').addClass('hide');
-	}
 }
 
 

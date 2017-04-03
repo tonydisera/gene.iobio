@@ -2305,9 +2305,11 @@ inputinput:-moz-placeholder {
   padding-bottom: 20px;
   background: white; }
 
-#data-card .form-group.form-group-sm {
-  margin-top: 0px;
-  padding-bottom: 0px; }
+#data-card {
+  width: 700px; }
+  #data-card .form-group.form-group-sm {
+    margin-top: 0px;
+    padding-bottom: 0px; }
 
 #dataModal .form-group-sm .form-control {
   font-size: 13px; }
@@ -3124,6 +3126,16 @@ text.ref-count {
 #gene-badge.visited.warning #gene-badge-warning {
   display: inline; }
 
+#analyze-all-dropdown {
+  display: inline-block;
+  float: left;
+  margin-top: 3px;
+  margin-bottom: 0px; }
+  #analyze-all-dropdown a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 13px; }
+
 #manage-genes {
   float: left; }
   #manage-genes a {
@@ -3138,14 +3150,15 @@ text.ref-count {
 
 #manage-gene-list {
   float: left;
-  margin-top: 6px;
+  margin-top: 3px;
   margin-right: 10px;
   display: inline-block;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  padding-left: 8px;
-  padding-right: 8px;
-  font-size: 12px; }
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 12px;
+  padding-right: 12px;
+  font-size: 13px;
+  color: #5d809d !important; }
 
 #manage-genes-box {
   float: right;
