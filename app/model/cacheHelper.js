@@ -525,8 +525,6 @@ CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
 CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0, pass: 0};
 	genesCard.getGeneNames().forEach(function(geneName) {
-		//genesToCount.push(geneName);
-		
 		var key = getProbandVariantCard().model._getCacheKey("dangerSummary", geneName);
     	var dangerSummary = CacheHelper.getCachedData(key);
 		if (dangerSummary != null) {
@@ -541,58 +539,6 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 	});
 	callback(countObject);
 
-
-
-/*
-	var genesToCount = [];
-	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0};
-	genesCard.getGeneNames().forEach(function(geneName) {
-		genesToCount.push(geneName);
-	});
-	var countNextGeneTranscript = function(callback) {
-		if (genesToCount.length == 0) {
-			callback();
-		}
-		var geneName = genesToCount.splice(0,1);
-		var url = geneInfoServer + 'api/gene/'  + geneName;
-		$.ajax({
-		    url: url,
-		    jsonp: "callback",
-		    type: "GET",
-		    dataType: "jsonp",
-		    success: function( response ) {
-		    	// Now that we have the gene model,
-		    	// load and annotate the variants for each
-		    	// sample (e.g. each variant card)
-		    	if (response[0].hasOwnProperty('gene_name')) {
-			    	var geneObject = response[0];
-			    	adjustGeneRegion(geneObject);
-			    	var transcript = getCanonicalTranscript(geneObject);
-			    	var key = getProbandVariantCard().model._getCacheKey("dangerSummary", geneObject.gene_name);
-			    	var dangerSummary = CacheHelper.getCachedData(key);
-					if (dangerSummary != null) {
-						countObject.analyzed++;
-					} else {
-						countObject.unanalyzed++;						
-					}
-					countObject.total++;
-					countNextGeneTranscript(callback);
-			    }
-			},
-			error: function( xhr, status, errorThrown ) {
-				countObject.total++;
-				countObject.error++;
-				countNextGeneTranscript(callback);
-			}
-		});
-
-	}
-
-	var countObject = {total: 0, analyzed: 0, unanalyzed: 0, error: 0};
-	countNextGene(function() {
-		callback(countObject);
-	});
-*/
 }
 
 
