@@ -608,13 +608,15 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		theGeneNames[geneName] = true;
 	});
 
+	var dataKind = getProbandVariantCard().model.isAlignmentsOnly() ? "fbData" : "vcfData";
+
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  
 		key = localStorage.key(i);  
 		keyObject = CacheHelper._parseCacheKey(key);
 		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 
-		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
+		  	if (keyObject.dataKind == dataKind && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
 		  		var theVcfData = CacheHelper.getCachedData(key);
 		  		var geneObject = window.geneObjects[keyObject.gene];
 		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
