@@ -7,7 +7,8 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 //
 var DEV_IOBIO                 = "nv-dev.iobio.io/";
 var STAGE_IOBIO               = "nv-purple.iobio.io/";
-var PROD_IOBIO                = "nv-prod.iobio.io/";
+var PROD_IOBIO                = "nv-blue.iobio.io/";
+//var PROD_IOBIO                = "nv-prod.iobio.io/";  !! USE THIS ONCE NV-BLUE POINTS TO NV-PROD WITH OD_ SHELL SCRIPT CHANGE
 
 var CURRENT_IOBIO             = PROD_IOBIO;
 
@@ -28,8 +29,7 @@ var emailServer               = (useSSL ? "wss://" : "ws://") +   iobio_services
 
 // iobio services
 var IOBIO = {};
-//IOBIO.tabix                   = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
-IOBIO.tabix                   = (useOnDemand ? "nv-dev-new.iobio.io/" + "od_tabix/" : iobio_services + "tabix/");
+IOBIO.tabix                   = iobio_services + (useOnDemand ? "od_tabix/" : "tabix/");
 IOBIO.vcfReadDepther          = iobio_services  + "vcfdepther/";
 IOBIO.snpEff                  = iobio_services  + "snpeff/";
 IOBIO.vt                      = iobio_services  + "vt/";  
@@ -39,8 +39,7 @@ IOBIO.contigAppender          = iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = iobio_services  + "bcftools/";
 IOBIO.coverage                = iobio_services + "coverage/ ";
 IOBIO.samtools                = iobio_services +  "samtools/";
-//IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
-IOBIO.samtoolsOnDemand        = (useOnDemand ?  "nv-dev-new.iobio.io/" + "od_samtools/" : iobio_services + "samtools/");
+IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
 
