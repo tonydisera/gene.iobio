@@ -72,7 +72,7 @@ module.exports = {
   elements: {
     selectedGeneBadge: { selector: '#gene-badge.selected' },
     firstGeneBadge: { selector: '#gene-badge:first-child' },
-    analyzeAll: { selector: '#manage-gene-list' },
+    analyzeAll: { selector: '#analyze-all-genes' },
     removeAll: { selector: '#clear-gene-list' },
     analyzeAllDone: { selector: '#analyze-all-progress.done'}
   },

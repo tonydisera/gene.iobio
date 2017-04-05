@@ -236,15 +236,18 @@
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
 
-
-              <div id="analyze-all-dropdown" class="hide btn-group" style="display:inline-block;float:left">
-                <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
+              <button  id="analyze-all-genes" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
                   Analyze all genes
+              </button>
+
+              <div id="call-variants-dropdown" class="hide btn-group" style="display:inline-block;float:left">
+                <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
+                  Call Variants
                   <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">Variants</a></li>
-                  <li><a href="javascript:void(0)" onclick="cacheHelper.analyzeAll(true)">Call variants</a></li>
+                  <li><a href="javascript:void(0)" onclick="jointCallVariants(false)">for selected gene</a></li>
+                  <li><a href="javascript:void(0)" onclick="cacheHelper.analyzeAll(true)">for all genes</a></li>
                 </ul>
               </div>
 
@@ -253,12 +256,6 @@
 
               <!-- Buttons for editting gene list, done editting gene list -->
               <div id="manage-genes" class="manage-gene-links level-edu level-basic">
-                <button  id="manage-gene-list" class="hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
-                    Analyze all genes
-                </button>
-
-
-
 
                 <div id="total-genes-label"></div>
 

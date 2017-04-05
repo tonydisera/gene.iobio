@@ -2264,10 +2264,16 @@ VariantModel.prototype.cacheDummyVcfDataAlignmentsOnly = function(theFbData, the
 	theVcfData.loadState = {clinvar: true, coverage: true, inheritance: true};
 
 	this._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript);
+	return theVcfData;
 }
 
 
-VariantModel.prototype.mergeCalledVariants = function(theVcfData, theFbData) {
+/*
+ *  For trios, mother and father vcf data cache was cleared out, so now
+ *  we need to reconstruct vcf data to equal loaded variants + unique freebayes
+ *  variants
+ */
+VariantModel.prototype.addCalledVariantsToVcfData = function(theVcfData, theFbData) {
 	var me = this;
 
 	// Exit if there are no cached called variants
@@ -2279,6 +2285,12 @@ VariantModel.prototype.mergeCalledVariants = function(theVcfData, theFbData) {
 	// We have to order the variants in both sets before comparing
 	theVcfData.features = theVcfData.features.sort(VariantModel.orderVariantsByPosition);					
 	theFbData.features  = theFbData.features.sort(VariantModel.orderVariantsByPosition);
+
+	// We will call this multiple times, so clear out any called variants from the 
+	// vcf data to start fresh
+	theVcfData.features  = theVcfData.features.filter(function(d,i) {
+		return !d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y';
+	})
 
 
 	// Compare the variant sets, marking the variants as unique1 (only in vcf), 
@@ -2301,6 +2313,8 @@ VariantModel.prototype.mergeCalledVariants = function(theVcfData, theFbData) {
    		theVcfData.features.push(variantObject);
    		v.source = variantObject;
    	});	
+
+   	return theVcfData;
 }
 
 
@@ -2360,8 +2374,9 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
 	theFbData.maxLevel = pileupObject.maxLevel + 1;
 	theFbData.featureWidth = pileupObject.featureWidth;
 
-	// Re-cache the vcf data now that the called variants have been merged
+	// Re-cache the vcf data and fb datanow that the called variants have been merged
 	me._cacheData(theVcfData, "vcfData", geneObject.gene_name, theTranscript);
+	me._cacheData(theFbData, "fbData", geneObject.gene_name, theTranscript);
 }
 
 

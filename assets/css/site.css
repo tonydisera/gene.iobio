@@ -3126,12 +3126,12 @@ text.ref-count {
 #gene-badge.visited.warning #gene-badge-warning {
   display: inline; }
 
-#analyze-all-dropdown {
+#call-variants-dropdown {
   display: inline-block;
   float: left;
   margin-top: 3px;
   margin-bottom: 0px; }
-  #analyze-all-dropdown a {
+  #call-variants-dropdown a {
     padding-top: 5px;
     padding-bottom: 5px;
     font-size: 13px; }
@@ -3148,7 +3148,7 @@ text.ref-count {
   color: #717171 !important;
   cursor: pointer; }
 
-#manage-gene-list {
+#analyze-all-genes {
   float: left;
   margin-top: 3px;
   margin-right: 10px;

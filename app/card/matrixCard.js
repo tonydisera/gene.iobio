@@ -285,7 +285,7 @@ MatrixCard.prototype.init = function() {
 	if (isLevelBasic) {
 		this.matrixRows = this.matrixRowsBasic;
 	} else if (isLevelEdu || isLevelBasic) {
-		this.removeRow('Pathogenecity - SIFT', me.matrixRows);
+		this.removeRow('Pathogenicity - SIFT', me.matrixRows);
 
 		this.removeRow('Zygosity', me.matrixRows);
 		this.removeRow('Bookmark', me.matrixRows);
@@ -299,8 +299,8 @@ MatrixCard.prototype.init = function() {
 			this.removeRow('Inheritance Mode', me.matrixRows);
 		}
 		this.removeRow('Most severe impact (VEP)', me.matrixRows);
-		this.removeRow('Affected Siblings', me.matrixRows);
-		this.removeRow('Unaffected Siblings', me.matrixRows);
+		this.removeRow('Present in Affected sibs', me.matrixRows);
+		this.removeRow('Absent in Unaffected sibs', me.matrixRows);
 		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
 		this.removeRow('Allele Frequency - ExAC', me.matrixRows);
 
@@ -667,10 +667,10 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	if (this.filteredMatrixRows == null) {
 		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);
 		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
-			me.removeRow('Affected Siblings', me.filteredMatrixRows);
+			me.removeRow('Present in Affected sibs', me.filteredMatrixRows);
 		}
 		if (variantCardsSibs['unaffected'] == null || variantCardsSibs['unaffected'].length == 0) {
-			me.removeRow('Unaffected Siblings', me.filteredMatrixRows);
+			me.removeRow('Absent in Unaffected sibs', me.filteredMatrixRows);
 		}
 	}
 

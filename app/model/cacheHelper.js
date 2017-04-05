@@ -375,15 +375,12 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 	var trioFbData  = {proband: null, mother: null, father: null};
 	getRelevantVariantCards().forEach(function(vc) {
 		var theVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
-		var theFbData  = vc.model.getFbDataForGene(geneObject, transcript)
+		var theFbData  = vc.model.getFbDataForGene(geneObject, transcript);
 
-		// Since we assume that the vcf data is the intersection of loaded + called variants, set
-		// the vcf data to the called variants when there are not loaded variants (only alignment files
-		// were provided)
-		if (vc.model.isAlignmentsOnly()) {
-			theVcfData = theFbData;
+		if (theVcfData == null) {
+			theVcfData = {features: []};
 		}
-		
+
 		if (theVcfData == null) {
 			console.log("Unable to processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available");
 			genesCard.clearGeneGlyphs(geneObject.gene_name);
@@ -404,10 +401,6 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 
 		// Re-cache the vcf data and fb for the trio
 		for (var relationship in trioVcfData) {
-			if (!getVariantCard(relationship).model._cacheData(trioVcfData[relationship], "vcfData", geneObject.gene_name, transcript)) {
-				console.log("unable to cache vcf data after inheritance determined for gene " + geneObject.gene_name);
-				return;
-			}
 			if (analyzeCalledVariants) {
 				// If we are calling variants during 'analyze all', then we need to refresh the called variants
 				// with inheritance mode, allele counts and genotypes when inheritance for the trio was performed.
@@ -415,6 +408,11 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 				if (trioFbData[relationship]) {
 					getVariantCard(relationship).model.loadCalledTrioGenotypes(trioVcfData[relationship], trioFbData[relationship], geneObject, transcript);
 				}
+			}
+
+			if (!getVariantCard(relationship).model._cacheData(trioVcfData[relationship], "vcfData", geneObject.gene_name, transcript)) {
+				console.log("unable to cache vcf data after inheritance determined for gene " + geneObject.gene_name);
+				return;
 			}
 			
 		}
@@ -455,9 +453,6 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 			// gene though as this will result in no inheritance mode being detected.
 			getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
 			getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-
-			getVariantCard("mother" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
-			getVariantCard("father" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);								
 		}
 
 

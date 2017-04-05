@@ -2709,14 +2709,16 @@ function jointCallVariants(checkCache, callback) {
 
 		getRelevantVariantCards().forEach(function(vc) {
 			theFbData = vc.model.getFbDataForGene(window.gene, window.selectedTranscript);
+			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+			if (theVcfData == null) {
+				theVcfData = {features: []};
+			}
 
 			// When only alignments provided, only the called variants were cached as "fbData".
 			// So initialize the vcfData to 0 features.
-			if (vc.model.isAlignmentsOnly()) {
-				vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
-			}
-
-			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+			if (theFbData && theFbData.features.length > 0 && theVcfData.features.length == 0) {
+				theVcfData = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
+			} 
 		
 			vc.model.vcfData = theVcfData;
 			vc.model.fbData = theFbData;
@@ -2930,10 +2932,23 @@ function promiseDetermineInheritance(promise) {
 				var trioVcfData = {proband: null, mother: null, father: null};
 				var trioFbData  = {proband: null, mother: null, father: null};
 				getRelevantVariantCards().forEach(function(vc) {
-					trioVcfData[vc.getRelationship()] = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-					trioFbData[vc.getRelationship()]  = vc.model.getFbDataForGene(window.gene, window.selectedTranscript);
-					
-					vc.model.mergeCalledVariants(trioVcfData[vc.getRelationship()], trioFbData[vc.getRelationship()]);
+					var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+					var theFbData = vc.model.getFbDataForGene(window.gene, window.selectedTranscript);
+					if (theVcfData == null) {
+						theVcfData = {features: []};
+					}
+
+
+					if (theFbData && theFbData.features.length > 0) {
+						theVcfData = vc.model.addCalledVariantsToVcfData(theVcfData, theFbData);
+					}
+
+					trioVcfData[vc.getRelationship()] = theVcfData;
+					trioFbData[vc.getRelationship()] = theFbData;
+
+					vc.model.vcfData = theVcfData;
+					vc.model.fbData  = theFbData;
+
 				})
 
 				if (dataCard.mode == 'trio' && (trioVcfData.proband == null || trioVcfData.mother == null || trioVcfData.father == null)) {
@@ -2958,18 +2973,11 @@ function promiseDetermineInheritance(promise) {
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
 					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father);
-					//if (probandVcfData.loadState['inheritance']) {
-						// If we have already determined inheritance, don't do it again because
-						// the called variants for mother and father have already been cleared
-						// from the cache, so the allele counts will get blanked out for called variants
-					//	postInheritanceProcessing(probandVariantCard, trioModel);
-					//} else {
-						trioModel.compareVariantsToMotherFather(function() {
-							probandVariantCard.model._cacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript);
-							postInheritanceProcessing(probandVariantCard, trioModel);
-						});
+					trioModel.compareVariantsToMotherFather(function() {
+						probandVariantCard.model._cacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript);
+						postInheritanceProcessing(probandVariantCard, trioModel);
+					});
 
-					//}
 				} else {
 					probandVariantCard.determineMaxAlleleCount();
 
