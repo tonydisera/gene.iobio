@@ -6,6 +6,7 @@ function CacheHelper(loaderDisplay) {
 	this.cacheQueue = [];
 	this.batchSize = null;
 	this.geneBadgeLoaderDisplay = loaderDisplay;
+	this.showCallAllProgress = false;
 }
 
 CacheHelper.prototype.isolateSession = function() {
@@ -137,6 +138,66 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 			}			
 		}
 
+
+		if (me.showCallAllProgress) {
+			me.getCallAllCounts(function(counts) {
+
+				if (counts.total == 0) {
+					$('#called-progress-bar').addClass("hide");
+					return;
+				} else if (counts.called == 0) {
+					$('#called-progress-bar').addClass("hide");
+					return;
+				}
+
+				$('#call-all-progress').removeClass("hide");
+
+				if (counts.called == counts.total) {
+					$('#call-all-progress').addClass("done");
+					$('#not-called-bar').addClass("hide");
+				} else {
+					$('#call-all-progress').removeClass("done");
+					$('#not-called-bar').removeClass("hide");
+				}
+
+
+				var called             = Math.round(counts.called / counts.total * 100) / 100;		
+				var notCalled          = 1 - called;
+
+				$('#called-bar'           ).css("width", percentage(called));
+				$('#not-called-bar'       ).css("width", percentage(notCalled));
+
+
+				if (counts.total > counts.called ) {
+					//$('#not-called-bar'         ).text(counts.uncalled);
+				} else {
+					$('#not-called-bar'         ).text("");
+				}
+
+				// Show call progress counts on hover
+				$('#not-called-bar').attr("data-toggle", "tooltip");
+				$('#not-called-bar').attr("data-placement", "top");
+
+
+				if (counts.called > 0) {
+					$('#called-bar'         ).text(counts.called + " called");
+					//$('#not-called-bar'     ).text(counts.uncalled);
+					$('#called-bar'         ).attr("title", counts.called   + " called");		
+					$('#not-called-bar'     ).attr("title", counts.uncalled + " not called");		
+				} else {
+					$('#called-bar').text("");
+					//$('#not-called-bar').text(counts.uncalled + " not called");
+					$('#called-bar'     ).attr("title", counts.uncalled + " called");		
+					$('#not-called-bar' ).attr("title", counts.uncalled + " not called");		
+				}
+
+			});	
+		} else {
+			$('#called-progress-bar').addClass("hide");			
+		}
+
+
+
 	});	
 }
 
@@ -152,6 +213,10 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 
 	if (isAlignmentsOnly()) {
 		analyzeCalledVariants = true;
+	}
+
+	if (analyzeCalledVariants) {
+		me.showCallAllProgress = true;
 	}
 
 	me.showAnalyzeAllProgress();
@@ -538,6 +603,32 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 	});
 	callback(countObject);
 
+}
+CacheHelper.prototype.getCallAllCounts = function(callback) {
+	var me = this;
+	var countObject = {total: genesCard.getGeneNames().length, called: 0, uncalled: 0, error: 0, pass: 0};
+	var theGeneNames = {};
+	genesCard.getGeneNames().forEach(function(geneName) {
+		theGeneNames[geneName] = true;
+	});	
+
+	for (var i=0; i<=localStorage.length-1; i++)  
+	{  
+		key = localStorage.key(i);  
+		keyObject = CacheHelper._parseCacheKey(key);
+		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+
+		  	if (keyObject.dataKind == "fbData" && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
+		  		var fbData = CacheHelper.getCachedData(key);
+		  		if (fbData != null) {
+		  			countObject.called++;
+		  		} else {
+		  			countObject.uncalled++;
+		  		}
+		  }
+		}
+	}
+	callback(countObject);
 }
 
 
