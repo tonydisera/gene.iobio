@@ -66,7 +66,12 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 
 		if (counts.total > counts.analyzed ) {
 			$('#not-analyzed-bar'       ).text(notAnalyzedCount);
-			$('#not-analyzed-label'     ).text("not analyzed");
+
+			if ($('#not-analyzed-bar').innerWidth() > 65) {
+				$('#not-analyzed-label'     ).text("not analyzed");
+			} else {
+				$('#not-analyzed-label'     ).text("");
+			}
 		} else {
 			$('#not-analyzed-bar'       ).text("");
 			$('#not-analyzed-label'     ).text("");
@@ -88,7 +93,9 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 			if (filterCard.hasFilters()) {
 				$('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
 				$('#passed-filter-label'    ).text(counts.pass > 0 ? "pass filter" : "");
-				$('#not-passed-filter-label').text(analyzedNotPassedCount > 0 ? analyedNotPassedVerb + " not pass" + ( counts.pass == 0 ? " filter" : "") : "");
+				$('#not-passed-filter-label').text(analyzedNotPassedCount > 0 ? analyedNotPassedVerb + " not pass" + ( counts.pass == 0 ? " filter" : "") : "");					
+			
+				
 				$('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "0");
 				// If there isn't sufficient width to show the 'passed' and 'not passed' filter, hide the bottom label
 				if ($('#passed-filter-bar').innerWidth() < 65 && (analyzedNotPassedCount > 0 && $('#not-passed-filter-bar').innerWidth() < 120) ) {
@@ -99,7 +106,9 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 
 				$('#passed-filter-bar'    ).attr("title", counts.pass > 0             ? counts.pass + " pass filter" : "");
 				$('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount + " " + analyedNotPassedVerb + " not pass filter" : "");
+				
 				$('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");		
+				
 
 			} else {
 				$('#bottom-label-bar').removeClass("hide");
@@ -145,12 +154,9 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 				if (counts.total == 0) {
 					$('#called-progress-bar').addClass("hide");
 					return;
-				} else if (counts.called == 0) {
-					$('#called-progress-bar').addClass("hide");
-					return;
 				}
-
 				$('#call-all-progress').removeClass("hide");
+				$('#called-progress-bar').removeClass("hide");
 
 				if (counts.called == counts.total) {
 					$('#call-all-progress').addClass("done");
@@ -171,22 +177,20 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 				if (counts.total > counts.called ) {
 					//$('#not-called-bar'         ).text(counts.uncalled);
 				} else {
-					$('#not-called-bar'         ).text("");
+					$('#call-all-progress .text'         ).text("");
 				}
 
 				// Show call progress counts on hover
 				$('#not-called-bar').attr("data-toggle", "tooltip");
 				$('#not-called-bar').attr("data-placement", "top");
+				
+				$('#call-all-progress .text' ).text(counts.called + " called");
 
 
 				if (counts.called > 0) {
-					$('#called-bar'         ).text(counts.called + " called");
-					//$('#not-called-bar'     ).text(counts.uncalled);
 					$('#called-bar'         ).attr("title", counts.called   + " called");		
 					$('#not-called-bar'     ).attr("title", counts.uncalled + " not called");		
 				} else {
-					$('#called-bar').text("");
-					//$('#not-called-bar').text(counts.uncalled + " not called");
 					$('#called-bar'     ).attr("title", counts.uncalled + " called");		
 					$('#not-called-bar' ).attr("title", counts.uncalled + " not called");		
 				}
