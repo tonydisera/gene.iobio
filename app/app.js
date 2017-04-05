@@ -2650,7 +2650,9 @@ function addVariantCard() {
 
 function jointCallVariants(checkCache, callback) {
 	fulfilledTrioPromise = false;
-	
+
+	cacheHelper.showCallAllProgress = true;
+
 	var sampleIndex = 0;
 	var jointVcfRecs = null;
 	var translatedRefName = null;
