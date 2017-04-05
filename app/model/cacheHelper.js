@@ -25,16 +25,21 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 			$('#total-genes-label').addClass("hide");
 			return;
 		} else if (counts.analyzed == 0) {
-
+			$("#analyze-all-progress .text").removeClass("hide");
+			$("#analyze-all-progress .text").text("0 analyzed");
+		} else {
+			$("#analyze-all-progress .text").html("&nbsp;");
 		}
+
 
 		$('#analyzed-progress-bar').removeClass("hide");
 		$('#analyze-all-progress').removeClass("hide");
 
 		if (counts.analyzed == counts.total) {
 			$('#analyze-all-progress').addClass("done");
+			$("#analyze-all-progress .text").text(counts.analyzed + " analyzed");
 		} else {
-			$('#analyze-all-progress').removeClass("done");
+			$('#analyze-all-progress').removeClass("done");			
 		}
 
 
@@ -64,7 +69,7 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		var analyedNotPassedVerb    = analyzedNotPassedCount > 1 ? "do" : "does";
 
 
-		if (counts.total > counts.analyzed ) {
+		if (counts.total > counts.analyzed && counts.analyzed > 0) {
 			$('#not-analyzed-bar'       ).text(notAnalyzedCount);
 
 			if ($('#not-analyzed-bar').innerWidth() > 65) {
@@ -108,16 +113,24 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 				$('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount + " " + analyedNotPassedVerb + " not pass filter" : "");
 				
 				$('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");		
+				$("#analyze-all-progress .text").html("&nbsp;");
 				
 
 			} else {
 				$('#bottom-label-bar').removeClass("hide");
 				$('#passed-filter-label'    ).text("");
 				$('#passed-filter-bar'      ).text("");
-				$('#not-passed-filter-bar'  ).text(counts.analyzed);
-				$('#not-passed-filter-label').text("analyzed");
+				if (counts.total > counts.analyzed) {
+					$('#not-passed-filter-bar'  ).text(counts.analyzed);
+					$('#not-passed-filter-label').text("analyzed");					
+				} else {
+					$('#not-passed-filter-bar'  ).text("");
+					$('#not-passed-filter-label').text("");					
+					$("#analyze-all-progress .text").text(counts.analyzed + " genes analyzed");
+				}
 
 				$('#passed-filter-bar'    ).attr("title", "");
+
 				$('#not-passed-filter-bar').attr("title", counts.analyzed  + " analyzed");
 				$('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");		
 
@@ -207,7 +220,6 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 
 CacheHelper.prototype.hideAnalyzeAllProgress = function() {
 	$("#analyze-all-progress").addClass("hide");
-	$("#analyze-all-progress .text").text("");
 	$("#analyze-all-progress .bar").css("width", "0%");	
 }
 
