@@ -2656,6 +2656,7 @@ function jointCallVariants(checkCache, callback) {
 	var translatedRefName = null;
 	var cards = getRelevantVariantCards();
 
+	genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
 	var parseNextCalledVariants = function(afterParseCallback) {
 		if (sampleIndex >= getRelevantVariantCards().length) {
@@ -2699,6 +2700,7 @@ function jointCallVariants(checkCache, callback) {
 				
 
 			});
+
 			if (callback) {
 				callback();
 			}
