@@ -324,6 +324,9 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants, 
 							function(theGeneObject1, theTranscript1) {
 		    					me._processCachedTrio(theGeneObject1, theTranscript1, analyzeCalledVariants, callback);
+		    					if (window.gene && window.gene.gene_name == theGeneObject1.gene_name) {
+		    						genesCard.selectGene(theGeneObject1.gene_name);
+		    					}
 							})
 					});
 			} else {
