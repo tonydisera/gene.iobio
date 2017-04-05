@@ -2,6 +2,19 @@
  
   <div class="card-label">Filter Variants</div>
 
+   <div id="called-and-loaded-checkboxes" style="text-align:center;margin-bottom:15px">
+     <div class="checkbox">
+      <label style="margin-right:5px;">
+        <input id="loaded-variants-cb" checked type="checkbox"> Loaded variants
+      </label>
+    </div>
+     <div class="checkbox">
+      <label style="margin-right:5px;">
+        <input id="called-variants-cb" checked type="checkbox"> Called variants
+      </label>
+    </div>
+  </div>
+
   <div style="text-align:center">
       <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
         Clear all

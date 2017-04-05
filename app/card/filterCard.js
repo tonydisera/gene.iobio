@@ -172,7 +172,9 @@ FilterCard.prototype.getFilterObject = function() {
 		'afMin1000g': afMin1000g,
 		'afMax1000g': afMax1000g,
 		'annotsToInclude': this.annotsToInclude,
-		'exonicOnly': $('#exonic-only-cb').is(":checked")
+		'exonicOnly': $('#exonic-only-cb').is(":checked"),
+		'loadedVariants': $('#loaded-variants-cb').is(":checked"),
+		'calledVariants': $('#called-variants-cb').is(":checked")
   };
 }
 
@@ -305,6 +307,16 @@ FilterCard.prototype.init = function() {
 	});
 	// listen to checkbox for filtering exonic only variants
 	$('#exonic-only-cb').click(function() {	   
+		me.clearCurrentStandardFilter();
+		window.filterVariants();	    
+	});
+	// listen to loaded variants checkbox
+	$('#loaded-variants-cb').click(function() {	   
+		me.clearCurrentStandardFilter();
+		window.filterVariants();	    
+	});
+	// listen to called variants checkbox
+	$('#called-variants-cb').click(function() {	   
 		me.clearCurrentStandardFilter();
 		window.filterVariants();	    
 	});
@@ -942,7 +954,13 @@ FilterCard.prototype._getFilterString = function() {
 		return "<span class=\"filter-flag label label-primary\">" + filterString + "</span>";
 	}
 
+	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
+		filterString += AND(filterString) + filterBox("loaded variants only");
+	}
 
+	if ($('#called-variants-cb').is(":checked") && !$('#loaded-variants-cb').is(":checked")) {
+		filterString += AND(filterString) + filterBox("called variants only");
+	}
 
 	if ($('#exonic-only-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("not intronic");

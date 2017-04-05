@@ -2434,6 +2434,19 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 			meetsAf1000g = (variantAf >= filterObject.afMin1000g && variantAf <= filterObject.afMax1000g);
 		}
 
+		var meetsLoadedVsCalled = false;
+		if (filterObject.loadedVariants && filterObject.calledVariants) {
+			meetsLoadedVsCalled = true;
+		} else if (filterObject.loadedVariants) {
+			if (!d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y') {
+				meetsLoadedVsCalled = true;
+			}
+		} else if (filterObject.calledVariants) {
+			if (d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y') {
+				meetsLoadedVsCalled = true;
+			}
+		} 
+
 		var meetsExonic = false;
 		if (filterObject.exonicOnly) {
 			for (key in d[impactField]) {
@@ -2567,7 +2580,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 
-		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic;
+		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures, start, end);
