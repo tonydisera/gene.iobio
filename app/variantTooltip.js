@@ -396,19 +396,26 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		}
 	}     	
 	var vepHGVScDisplay = "";
-	for (var key in variant.vepHGVSc) {
-		if (vepHGVScDisplay.length > 0) {
-		  	vepHGVScDisplay += ", ";
-		}
-		vepHGVScDisplay += key;
-	}   
 	var vepHGVSpDisplay = "";
-	for (var key in variant.vepHGVSp) {
-		if (vepHGVSpDisplay.length > 0) {
-		  	vepHGVSpDisplay += ", ";
-		}
-		vepHGVSpDisplay += key;
-	}   
+	if (variant.fbCalled == 'Y' || variant.extraAnnot) {
+		for (var key in variant.vepHGVSc) {
+			if (vepHGVScDisplay.length > 0) {
+			  	vepHGVScDisplay += ", ";
+			}
+			vepHGVScDisplay += key;
+		}   		
+		for (var key in variant.vepHGVSp) {
+			if (vepHGVSpDisplay.length > 0) {
+			  	vepHGVSpDisplay += ", ";
+			}
+			vepHGVSpDisplay += key;
+		}   
+	} else {
+		var loading = '<img class="gene-badge-loader glyph" style="width: 12px;height: 12px;" src="assets/images/wheel.gif"><span style="font-style:italic;margin-left:4px">loading</span>';
+		vepHGVScDisplay = loading;
+		vepHGVSpDisplay = loading;
+	}
+
 	var vepSIFTDisplay = "";
 	for (var key in variant.vepSIFT) {
 		if (vepSIFTDisplay.length > 0) {
