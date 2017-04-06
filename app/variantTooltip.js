@@ -44,9 +44,10 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	var x = screenX;
-	var y = screenY -  +$('body #container').css('top').split("px")[0] + 10;
-	if (y - h < 0) {
-		y = h + 5;
+	var yOffset = (+$('body #container').css('top').split("px")[0] - 5);
+	var y = screenY - yOffset;
+	if (lock && y - h < (yOffset * -1)) {
+		y = h - yOffset;
 	}
 
 	x = sidebarAdjustX(x);
