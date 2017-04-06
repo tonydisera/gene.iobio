@@ -586,7 +586,9 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	var me = this;
 
-	geneNames = me.ACMG_GENES.slice(0);;
+	$('#get-acmg-genes .gene-badge-loader').removeClass("hide");
+
+	geneNames = me.ACMG_GENES.slice(0);
 
 	// Remove gene badges not specified in the text area
 	var geneBadgesToRemove = [];
@@ -648,6 +650,9 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');
 	$('#splash').addClass("hide");
+
+	$('#get-acmg-genes .gene-badge-loader').addClass("hide");
+
 
 }
 
