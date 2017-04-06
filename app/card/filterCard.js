@@ -933,6 +933,8 @@ FilterCard.prototype.filterGenes = function() {
 		$('#filter-progress .bar').css("width", percentage(geneCounts.pass / geneCounts.total));
 		$('#filter-progress').removeClass("hide");		
 	}
+	cacheHelper.showAnalyzeAllProgress();
+
 	return geneCounts;
 }
 

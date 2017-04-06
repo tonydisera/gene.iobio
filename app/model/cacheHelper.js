@@ -675,7 +675,6 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  		var theVcfData = CacheHelper.getCachedData(key);
 		  		var geneObject = window.geneObjects[keyObject.gene];
 		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-
 		  		geneCount.total++;
 		  		if (filteredVcfData.features.length > 0) {
 		  			geneCount.pass++;
@@ -689,6 +688,7 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		} 
 	}  
 	genesCard.sortGenes();
+
 	$('#gene-badges-loader').addClass("hide");
 	return geneCount;
 }

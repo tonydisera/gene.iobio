@@ -176,6 +176,8 @@ GenesCard.prototype.init = function() {
 	if (isLevelEdu || isLevelBasic) {
 		eduTourCheckPhenolyzer();
 	}
+	cacheHelper.showAnalyzeAllProgress();
+
 
 }
 
@@ -575,9 +577,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 
 	me._onGeneBadgeUpdate();
 
-	if (refreshStandardFilterCounts) {
-		cacheHelper.showAnalyzeAllProgress(true);
-	}
+	cacheHelper.showAnalyzeAllProgress(refreshStandardFilterCounts);
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');
 }
@@ -643,6 +643,8 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 	}
 
 	me._onGeneBadgeUpdate();
+
+	cacheHelper.showAnalyzeAllProgress();
 
 	$('#get-genes-dropdown .btn-group').removeClass('open');
 	$('#splash').addClass("hide");
@@ -1154,7 +1156,6 @@ GenesCard.prototype.addGene = function(geneName) {
 	
 	me.addGeneBadge(geneName);
 	me.pageToGene(geneName);
-	cacheHelper.showAnalyzeAllProgress(true);
 
 
 
@@ -1217,7 +1218,6 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 	}
 	me._onGeneBadgeUpdate();
-	cacheHelper.showAnalyzeAllProgress();
 
 }
 
@@ -1407,7 +1407,6 @@ GenesCard.prototype.setGeneBadgeWarning = function(geneName, select) {
 		geneBadge.addClass("selected");
 	}
 	geneBadge.find("#gene-badge-warning").removeClass("hide");
-	cacheHelper.showAnalyzeAllProgress();
 }
 
 GenesCard.prototype._getGeneBadge = function(geneName) {
@@ -1654,7 +1653,6 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		}
 	}
 
-	cacheHelper.showAnalyzeAllProgress();
 	readjustCards();
 }
 
@@ -1853,6 +1851,8 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 							  		me._initPaging(window.geneNames);
 							  		me.highlightPhenolyzerGenes();
 							  	}
+							  	cacheHelper.showAnalyzeAllProgress();
+
 							  });
 		d3.select('#phenolyzer-results svg').remove();
 		var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);

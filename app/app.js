@@ -1928,6 +1928,7 @@ function loadGeneWidgets(callback) {
 
 	    	// Add the gene badge
 	    	genesCard.addGene(window.gene.gene_name);	
+	    	cacheHelper.showAnalyzeAllProgress();
 		    	
 	    	    
 	    	window.geneObjects[window.gene.gene_name] = window.gene;
@@ -3244,15 +3245,17 @@ function filterVariants() {
 		if (variantCard.isViewable()) {
 
 			variantCard.unpin();
-			variantCard.filterVariants();
-  			variantCard.filterCalledVariants();
+			if (window.gene) {
+				variantCard.filterVariants();
+  				variantCard.filterCalledVariants();
   			
-  			if (variantCard.getRelationship() == 'proband') {
-		  		variantCard.fillFeatureMatrix(regionStart, regionEnd);
+  				if (variantCard.getRelationship() == 'proband') {
+		  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
+  				}
   			}
 		}
 
-	});
+	});		
 	var geneCounts = filterCard.filterGenes();
 	return geneCounts;
 

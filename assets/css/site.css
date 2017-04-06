@@ -2933,7 +2933,7 @@ text.ref-count {
     margin-right: 5px;
     margin-top: 8px; }
   #genes-panel #analyze-all-panel {
-    overflow: auto;
+    overflow: hidden;
     margin-top: 1px;
     display: inline-block;
     float: left; }
@@ -2979,6 +2979,9 @@ text.ref-count {
         height: 11px;
         margin-left: 5px;
         margin-top: -1px; }
+        #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar.hide {
+          display: block !important;
+          visibility: hidden; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar .bar {
           background-color: transparent;
           line-height: 11px;
@@ -2997,7 +3000,7 @@ text.ref-count {
         height: 18px;
         margin-left: 5px;
         margin-bottom: 2px;
-        margin-top: 5px; }
+        margin-top: -5px; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #called-bar {
           background-color: rgba(65, 176, 220, 0.45); }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #not-called-bar {
