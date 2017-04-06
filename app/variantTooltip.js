@@ -4,6 +4,7 @@ function VariantTooltip() {
 	this.WIDTH_HOVER        = 360;
 	this.WIDTH_SIMPLE       = 280;
 	this.WIDTH_SIMPLE_WIDER = 500;
+	this.VALUE_EMPTY        = "-";
 }
 
 VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html) {
@@ -629,7 +630,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true)
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true)
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
-			+ me._tooltipRow('ClinVar', '<span style="float:left">' + clinvarLink + '</span>', null, true)
+			+ me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
@@ -866,6 +867,9 @@ VariantTooltip.prototype._tooltipRow = function(label, value, paddingTop, always
 		if (valueClazz) {
 			valueClazzes += " " + valueClazz;
 		}
+		if (value == "") {
+			value = this.VALUE_EMPTY;
+		}
 		return '<div class="tooltip-row"' + style + '>'
 		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
 		      + '<div class="' + valueClazzes + '">' + value + '</div>'
@@ -878,6 +882,9 @@ VariantTooltip.prototype._tooltipRow = function(label, value, paddingTop, always
 VariantTooltip.prototype._tooltipRowURL = function(label, value, paddingTop, alwaysShow) {
 	if (alwaysShow || (value && value != '')) {
 		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
+		if (value == "") {
+			value = this.VALUE_EMPTY;
+		}
 		return '<div class="tooltip-row"' + style + '>'
 		      + '<div class="tooltip-header" style="text-align:right">' + label + '</div>'
 		      + '<div class="tooltip-value">' + value + '</div>'
