@@ -1550,6 +1550,13 @@ header {
   text-align: left;
   color: #717171; }
 
+.tt-dropdown-menu {
+  z-index: 1033 !important; }
+  .tt-dropdown-menu .tt-dataset-name {
+    z-index: 1033 !important; }
+    .tt-dropdown-menu .tt-dataset-name .tt-suggestions {
+      z-index: 1033 !important; }
+
 .tt-input, .tt-hint {
   padding: 5px 8px !important;
   font-size: 16px !important;
@@ -1842,8 +1849,7 @@ inputinput:-moz-placeholder {
   -webkit-transform: translate(356px, 0);
   -moz-transform: translate(356px, 0);
   -ms-transform: translate(356px, 0);
-  -o-transform: translate(356px, 0);
-  z-index: 1030; }
+  -o-transform: translate(356px, 0); }
 
 /* make keyframes that tell the start state and the end state of our object */
 @-webkit-keyframes fadeIn {

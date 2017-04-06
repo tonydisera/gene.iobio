@@ -571,6 +571,10 @@ MatrixCard.prototype.hideTooltip = function() {
            .style("z-index", 0)
            .style("pointer-events", "none");
 
+     if ($('#container.slide-left').length > 0) {
+     	$('#container.slide-left').css("z-index", "auto");
+     }
+
 
 }
 
@@ -638,6 +642,9 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
 	var screenX = variant.screenXMatrix;
 	screenX    -= me.featureMatrix.cellSize()/2;
 
+     if ($('#container.slide-left').length > 0) {
+     	$('#container.slide-left').css("z-index", 1032);
+     }
 
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
 	tooltip.select("#unpin").on('click', function() {
