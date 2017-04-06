@@ -2405,6 +2405,8 @@ function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callbac
 function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, trioPromise, callback) {
 	if (bypassVariantCards == null || !bypassVariantCards) {
 
+		window.hideCircleRelatedVariants();
+
 
 		// Load the variants in the variant cards first. After each sample's
 		// variants are shown, load the coverage from the alignment file for
@@ -2684,6 +2686,8 @@ function jointCallVariants(checkCache, callback) {
 
 	var processFbTrio = function(callback) {
 		promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+
+			window.hideCircleRelatedVariants();
 
 			getRelevantVariantCards().forEach( function(vc) {
 

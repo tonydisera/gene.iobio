@@ -617,7 +617,6 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 	// Reset any previous locked variant
 	clickedVariant = null;
 	clickedVariantCard = null;
-	window.hideCircleRelatedVariants();
 	me.unpin();
 
 
@@ -1992,7 +1991,7 @@ VariantCard.prototype.unpin = function(saveClickedVariant) {
 
 	this._hideTooltip();
 	this.hideCoverageCircle();
-	window.hideCircleRelatedVariants();	
+//	window.hideCircleRelatedVariants();	
 	window.hideCoordinateFrame();
 }
 

@@ -42,9 +42,7 @@ body {
     margin: 10px 10px;
     border-left: 1px solid #aba9a9; }
   .navbar ul.nav .or {
-    padding-top: 15px;
-    margin-right: -5px;
-    margin-left: -5px; }
+    padding-top: 15px; }
   .navbar ul.nav .combined-help-about {
     display: none; }
   .navbar ul.nav > li #genes-menu-item {
@@ -3014,6 +3012,8 @@ text.ref-count {
 
 #genes-card {
   height: 100%; }
+  #genes-card #phenolyzer-search-box {
+    margin-top: 20px; }
   #genes-card .phenolyzer-label {
     color: #717171 !important;
     font-size: 13px;
@@ -3021,7 +3021,7 @@ text.ref-count {
   #genes-card #phenolyzer-run-label {
     display: inline-block !important;
     vertical-align: top;
-    margin-top: 4px; }
+    padding-top: 3px; }
   #genes-card #phenolyzer-heading {
     margin-top: 20px; }
     #genes-card #phenolyzer-heading h5 {
