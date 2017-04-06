@@ -3189,7 +3189,7 @@ text.ref-count {
   margin-top: -2px; }
   #manage-genes-box #manage-genes-dropdown {
     float: right;
-    margin-top: 0px; }
+    margin-top: -3px; }
 
 #gene-badge-container {
   display: flex;
@@ -3587,6 +3587,13 @@ text.ref-count {
     padding-right: 13px;
     padding-left: 13px; } }
 @media screen and (max-device-width: 1142px), screen and (max-width: 1142px) {
+  #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress {
+    width: 180px; }
+  #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar {
+    width: 180px; }
+  #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
+    width: 180px; }
+
   .navbar ul.nav > li #genes-menu-item {
     vertical-align: initial;
     padding-top: 0px; }
@@ -3608,6 +3615,13 @@ text.ref-count {
   #close-slide-left {
     top: 12px; } }
 @media screen and (max-width: 1003px) {
+  #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress {
+    width: 120px; }
+  #genes-panel #analyze-all-panel #analyzed-progress-bar #bottom-label-bar {
+    width: 120px; }
+  #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
+    width: 120px; }
+
   .navbar .navbar-brand {
     margin-right: -10px; }
   .navbar .vertical-divider {
