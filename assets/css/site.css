@@ -1917,7 +1917,7 @@ inputinput:-moz-placeholder {
       fill: #717171 !important; }
 
 #checkmark-called {
-  fill: #6ca5d5; }
+  fill: #a6b1b9; }
 
 #recessive-symbol .parent .left {
   stroke: #F49A73;
@@ -3060,7 +3060,7 @@ text.ref-count {
 
 #gene-badge-called {
   font-size: 14px;
-  color: #6ca5d5;
+  color: #a6b1b9;
   float: left;
   display: none; }
 

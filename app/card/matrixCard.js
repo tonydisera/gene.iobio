@@ -10,7 +10,7 @@ function MatrixCard() {
 	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
-	this.COLUMN_LABEL_HEIGHT       = 25;
+	this.COLUMN_LABEL_HEIGHT       = 28;
 	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
 
 	this.ROW_LABEL_WIDTH           = 165;
@@ -904,12 +904,12 @@ MatrixCard.prototype.showColumnHeaderSymbol = function(selection, options) {
 		var colhdr = d3.select(this);
 		if (d.hasOwnProperty("fbCalled") && d.fbCalled == "Y") {
 	        colhdr.append("g")
-	               .attr("transform", "translate(" + (options.cellSize - 15)/2 + ",-22)")
+	               .attr("transform", "translate(" + (options.cellSize - 17)/2 + ",-25)")
 	               .append("use")
 	               .attr("id", "checkmark-called")
 	               .attr("xlink:href", "#circle-checkmark-symbol")
-	               .attr("width",  15)
-	               .attr("height", 15)
+	               .attr("width",  17)
+	               .attr("height", 17)
 	               .style("pointer-events", "none");
 
 		}
