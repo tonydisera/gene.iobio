@@ -1171,6 +1171,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				   	    
 						if (me.getRelationship() == 'proband') {
 							genesCard.refreshCurrentGeneBadge();
+							cacheHelper.showAnalyzeAllProgress();							
 						}
 					} else {
 						if (me.getRelationship() == 'proband') {

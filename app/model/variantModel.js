@@ -329,6 +329,12 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 	dangerCounts.AF = afSummaryObject;
 
 	dangerCounts.featureCount = theVcfData.features.length;
+	dangerCounts.loadedCount  = theVcfData.features.filter(function(d) {
+		return !d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y';
+	}).length;
+	dangerCounts.calledCount  = theVcfData.features.filter(function(d) {
+		return d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y';
+	}).length;
 
 	return dangerCounts;
 }
