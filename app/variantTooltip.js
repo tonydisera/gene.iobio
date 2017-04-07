@@ -90,8 +90,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 		for (impact in impactList) {
 			var theClazz = 'impact_' + impact;	
-			if ($(tooltip[0]).find(".tooltip-title.main-header:eq(1)").length > 0) {
-				$(tooltip[0]).find(".tooltip-title.main-header:eq(1)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
+			if ($(tooltip[0]).find(".tooltip-title.main-header:eq(2)").length > 0) {
+				$(tooltip[0]).find(".tooltip-title.main-header:eq(2)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
 				var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
 				matrixCard.showImpactBadge(selection);					
 			}
@@ -258,6 +258,14 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	if (type == null) {
 		type = 'tooltip';
+	}
+
+	var calledVariantRow = "";
+	if (variant.hasOwnProperty("fbCalled") && variant.fbCalled == "Y") {
+		var calledGlyph = '<i id="gene-badge-called" class="material-icons glyph" style="display: inline-block;font-size: 15px;vertical-align: top;float:initial">check_circle</i>';
+		var marginTop = type == 'tooltip-wide' ? ';margin-top: 1px;' : ';margin-top: 3px;';
+		calledGlyph    += '<span style="display: inline-block;vertical-align: top;margin-left:3px' + marginTop + '">Called variant</span>';
+		calledVariantRow = me._tooltipMainHeaderRow(calledGlyph, '', '', '');
 	}
 
 	var effectDisplay = "";
@@ -490,7 +498,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
 	                          ? ''
-						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '', null, 'padding-top:6px;');
+						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '', null, 'padding-top:0px;');
 
 	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
 	                  ? effectDisplay 
@@ -509,7 +517,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
 	var siftPolyphenRow = '';
 	if (siftLabel || polyphenLabel) {
-		siftPolyphenRow = me._tooltipClassedRow(polyphenLabel + sep, 'polyphen', siftLabel, 'sift', 'padding-top:5px;');
+		siftPolyphenRow = me._tooltipClassedRow(polyphenLabel + sep, 'polyphen', siftLabel, 'sift', 'padding-top:3px;');
 	}
 
 	var clinvarRow = '';
@@ -521,7 +529,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var clinvarRow2 = '';
 	if (clinSigDisplay) {
 		if (isLevelEdu) {
-			clinvarRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '10px');		
+			clinvarRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');		
 		} else {
 			clinvarRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinSigDisplay);		
 		}
@@ -605,13 +613,14 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			  qualityWarningRow
 			+ me._tooltipMainHeaderRow(window.gene ? window.gene.gene_name : "", window.selectedTranscript ? window.selectedTranscript.transcript_id : "", '', '')
+			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
 			+ siftPolyphenRow
-			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '10px')
-			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null, '10px')
+			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '6px')
+			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null, '6px')
 			+ clinvarRow1
 			+ clinvarRow2
 			+ me._tooltipRowAlleleCounts() 
@@ -649,6 +658,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
 			+ me._tooltipMainHeaderRow(window.gene ? window.gene.gene_name : "", window.selectedTranscript ? window.selectedTranscript.transcript_id : "", '', '')
+			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
 			+ me._tooltipHeaderRow( coord, '', '', '')
 			+ inheritanceModeRow
