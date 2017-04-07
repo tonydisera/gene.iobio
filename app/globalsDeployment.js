@@ -50,4 +50,4 @@ var feedbackShowURL             = false;         // show the feedback email show
 
 
 var siteGeneSource        = isMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
-var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'
+var DEFAULT_BATCH_SIZE    = 5;              // how many genes can be analyzed simultaneously for 'Analyze all'
