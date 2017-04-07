@@ -1344,16 +1344,24 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		}
 
+		var theFbData = getProbandVariantCard().model.getFbDataForGene(window.gene, window.selectedTranscript)
+		var options = {};
+		if (theFbData) {
+			options.CALLED = true;
+		}
+
 		if (theVcfData == null ) {
 			me.setGeneBadgeWarning(window.gene.gene_name, true);
 		} else if (theVcfData.features && theVcfData.features.length == 0) {
 			// There are 0 variants.  Summarize danger so that we know we have
 			// analyzed this gene
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData);
+			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 		} else if (theVcfData.features && theVcfData.features.length > 0) {
 			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData);
+
+
+			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
 		}
@@ -1443,6 +1451,7 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	me._setGeneBadgeLoading(geneBadge, false);
 	geneBadge.find('#gene-badge-button #gene-badge-symbols svg').remove();
 	geneBadge.removeClass("visited");
+	geneBadge.removeClass("called");
 	geneBadge.removeClass("selected");
 }
 
@@ -1482,6 +1491,11 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	}
 	if (dangerObject.WARNING) {
 		geneBadge.addClass("warning");
+	}
+
+	geneBadge.removeClass("called");
+	if (dangerObject.CALLED) {
+		geneBadge.addClass("called");
 	}
 
 

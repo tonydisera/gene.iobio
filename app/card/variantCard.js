@@ -91,8 +91,8 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
-VariantCard.prototype.summarizeDanger = function(geneName, data) {
-	var dangerSummary = VariantModel.summarizeDanger(data);
+VariantCard.prototype.summarizeDanger = function(geneName, data, options) {
+	var dangerSummary = VariantModel.summarizeDanger(data, options);
 	this.model.cacheDangerSummary(dangerSummary, geneName);
 	return dangerSummary;
 }

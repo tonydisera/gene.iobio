@@ -507,8 +507,12 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 		// create the gene badges, representing the
 		// most pathogenic variants for this gene
 		var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-		var dangerObject    = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData);
-		
+		var options = {};
+		if (analyzeCalledVariants) {
+			options.CALLED = true;
+		}
+		var dangerObject    = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options);
+
 		genesCard._geneBadgeLoading(geneObject.gene_name, false);
 		if (trioVcfData.proband.features.length == 0) {
 			//genesCard.setGeneBadgeWarning(geneObject.gene_name);
@@ -680,7 +684,13 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  			geneCount.pass++;
 		  		}
 
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData);
+				var theFbData = getVariantCard("proband").model.getFbDataForGene(geneObject, {transcript_id: keyObject.transcript});
+				var options = {};
+				if (theFbData) {
+					options.CALLED = true;
+				}
+
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options);
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
 		
 				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);

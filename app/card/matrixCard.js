@@ -10,7 +10,7 @@ function MatrixCard() {
 	this.CELL_SIZE_EDU             = 23;
 	this.CELL_WIDTH_BASIC          = 160;
 
-	this.COLUMN_LABEL_HEIGHT       = 15;
+	this.COLUMN_LABEL_HEIGHT       = 25;
 	this.COLUMN_LABEL_HEIGHT_BASIC = 30;
 
 	this.ROW_LABEL_WIDTH           = 165;
@@ -273,6 +273,14 @@ MatrixCard.prototype.setTooltipGenerator = function(tooltipFunction) {
 
 }
 
+MatrixCard.prototype.getVariantLabelClass = function(d, i) {
+	var me = this;
+	if (d.hasOwnProperty("fbCalled") && d.fbCalled == "Y") {
+		return "called"
+	} else {
+		return "";
+	}
+}
 
 MatrixCard.prototype.getVariantLabel = function(d, i) {
 	return (i+1).toString();
@@ -321,6 +329,8 @@ MatrixCard.prototype.init = function() {
 				    .columnLabelHeight(isLevelEdu  || isLevelBasic ?  me.COLUMN_LABEL_HEIGHT_BASIC : me.COLUMN_LABEL_HEIGHT)
 				    .rowLabelWidth(isLevelEdu  ? me.ROW_LABEL_WIDTH_EDU : (isLevelBasic ? me.ROW_LABEL_WIDTH_BASIC : me.ROW_LABEL_WIDTH))
 				    .columnLabel( me.getVariantLabel )
+				    .columnLabelClass( me.getVariantLabelClass )
+				    .columnLabelSymbol( me.showColumnHeaderSymbol)
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
 				    		me.unpin();
@@ -884,6 +894,30 @@ MatrixCard.prototype.isDictionary = function(obj) {
 }
 
 
+MatrixCard.prototype.showColumnHeaderSymbol = function(selection, options) {
+	options = options || {};
+	if (!options.cellSize) {
+		options.cellSize = matrixCard.CELL_SIZE;
+	}
+
+	selection.each(function(d) {
+		var colhdr = d3.select(this);
+		if (d.hasOwnProperty("fbCalled") && d.fbCalled == "Y") {
+	        colhdr.append("g")
+	               .attr("transform", "translate(" + (options.cellSize - 15)/2 + ",-22)")
+	               .append("use")
+	               .attr("id", "checkmark-called")
+	               .attr("xlink:href", "#circle-checkmark-symbol")
+	               .attr("width",  15)
+	               .attr("height", 15)
+	               .style("pointer-events", "none");
+
+		}
+
+	})
+
+
+};
 
 MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
 	var width, height, clazz;

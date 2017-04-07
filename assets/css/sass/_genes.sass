@@ -255,6 +255,12 @@
   float: left
   display: none
 
+#gene-badge-called
+  font-size: 14px
+  color: $checkmark-called-color
+  float: left
+  display: none
+
 #gene-badge-warning
   float: left
   font-size: 12px
@@ -277,9 +283,12 @@
   &.visited
     #gene-badge-loaded
       display: inline
-
     #gene-badge-name
       color: $sidebar-text-color !important
+
+  &.called
+    #gene-badge-called
+      display: inline
 
   &:hover #gene-badge-remove
     visibility: visible 
@@ -290,6 +299,9 @@
       display: none
     #gene-badge-error
       display: inline
+  &.called.error
+    #gene-badge-called
+      display: none
 
 #gene-badge
   &.visited.warning
@@ -297,6 +309,9 @@
       display: none
     #gene-badge-warning
       display: inline
+  &.called.warning
+    #gene-badge-called
+      display: none      
 
 
 #call-variants-dropdown
