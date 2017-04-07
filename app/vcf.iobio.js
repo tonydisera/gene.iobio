@@ -1902,7 +1902,7 @@ var effectCategories = [
                 'combinedDepth':            combinedDepth,
                 'genotypes':                gtResult.genotypes,
                 'genotype':                 gtResult.genotypes[0],
-                'genotypeDepth' :           gtResult.genotypes[0].depth,
+                'genotypeDepth' :           gtResult.genotypes[0].genotypeDepth,
                 'genotypeFilteredDepth' :   gtResult.genotypes[0].filteredDepth,
                 'genotypeAltCount' :        gtResult.genotypes[0].altCount,
                 'genotypeRefCount' :        gtResult.genotypes[0].refCount,
@@ -2101,7 +2101,7 @@ var effectCategories = [
             gt.refCount = null;
           }
 
-          gt.depth = totalAllelicDepth;
+          gt.genotypeDepth = totalAllelicDepth;
 
 
         } else {
