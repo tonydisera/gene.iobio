@@ -1494,7 +1494,10 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	}
 
 	geneBadge.removeClass("called");
-	if (dangerObject.CALLED) {
+	geneBadge.removeClass("has-called-variants");
+	if (dangerObject.CALLED && dangerObject.calledCount > 0) {
+		geneBadge.addClass("has-called-variants");
+	} else if (dangerObject.CALLED) {
 		geneBadge.addClass("called");
 	}
 

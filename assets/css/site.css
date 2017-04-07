@@ -1917,7 +1917,7 @@ inputinput:-moz-placeholder {
       fill: #717171 !important; }
 
 #checkmark-called {
-  fill: #a7daee; }
+  fill: #9fbb52; }
 
 #recessive-symbol .parent .left {
   stroke: #F49A73;
@@ -2926,7 +2926,7 @@ text.ref-count {
       #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
         border-top: transparent; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #analyzed-bar #passed-filter-bar {
-          background-color: #a7daee;
+          background-color: #9fbb52;
           height: 17px;
           color: white; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #analyzed-bar #not-passed-filter-bar {
@@ -3047,8 +3047,15 @@ text.ref-count {
   display: none; }
 
 #gene-badge-called {
+  font-size: 15px;
+  font-weight: bold;
+  color: #80a029;
+  float: left;
+  display: none; }
+
+#gene-badge-has-called-variants {
   font-size: 14px;
-  color: #a7daee;
+  color: #9fbb52;
   float: left;
   display: none; }
 
@@ -3076,6 +3083,8 @@ text.ref-count {
   color: #717171 !important; }
 #gene-badge.called #gene-badge-called {
   display: inline; }
+#gene-badge.has-called-variants #gene-badge-has-called-variants {
+  display: inline; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }
 
@@ -3085,12 +3094,16 @@ text.ref-count {
   display: inline; }
 #gene-badge.called.error #gene-badge-called {
   display: none; }
+#gene-badge.has-called-variants.error #gene-badge-has-called-variants {
+  display: none; }
 
 #gene-badge.visited.warning #gene-badge-loaded {
   display: none; }
 #gene-badge.visited.warning #gene-badge-warning {
   display: inline; }
 #gene-badge.called.warning #gene-badge-called {
+  display: none; }
+#gene-badge.has-called-variants.warning #gene-badge-has-called-variants {
   display: none; }
 
 #call-variants-dropdown {

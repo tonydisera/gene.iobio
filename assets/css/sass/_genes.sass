@@ -246,10 +246,17 @@
   display: none
 
 #gene-badge-called
+  font-size: 15px
+  font-weight: bold
+  color: $called-variant-color-darker
+  float: left
+  display: none
+
+#gene-badge-has-called-variants
   font-size: 14px
   color: $called-variant-color
   float: left
-  display: none
+  display: none  
 
 #gene-badge-warning
   float: left
@@ -280,6 +287,10 @@
     #gene-badge-called
       display: inline
 
+  &.has-called-variants
+    #gene-badge-has-called-variants
+      display: inline      
+
   &:hover #gene-badge-remove
     visibility: visible 
 
@@ -292,6 +303,9 @@
   &.called.error
     #gene-badge-called
       display: none
+  &.has-called-variants.error
+    #gene-badge-has-called-variants
+      display: none
 
 #gene-badge
   &.visited.warning
@@ -301,6 +315,9 @@
       display: inline
   &.called.warning
     #gene-badge-called
+      display: none      
+  &.has-called-variants.warning
+    #gene-badge-has-called-variants
       display: none      
 
 
