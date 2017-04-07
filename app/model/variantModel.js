@@ -330,10 +330,18 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 
 	dangerCounts.featureCount = theVcfData.features.length;
 	dangerCounts.loadedCount  = theVcfData.features.filter(function(d) {
-		return !d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y';
+		if (d.hasOwnProperty('zygosity') && d.zygosity != null) {
+			return d.zygosity.toUpperCase() != 'HOMREF' && !d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y';
+		} else {
+			return !d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y';
+		}
 	}).length;
 	dangerCounts.calledCount  = theVcfData.features.filter(function(d) {
-		return d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y';
+		if (d.hasOwnProperty('zygosity') && d.zygosity != null) {
+			return d.zygosity.toUpperCase() != 'HOMREF' && d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y';
+		} else {
+			return d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y';
+		}
 	}).length;
 
 	return dangerCounts;

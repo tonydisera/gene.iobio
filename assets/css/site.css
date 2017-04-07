@@ -2878,7 +2878,9 @@ text.ref-count {
     overflow: hidden;
     margin-top: 1px;
     display: inline-block;
-    float: left; }
+    float: left;
+    margin-left: 10px;
+    margin-right: 10px; }
     #genes-panel #analyze-all-panel #analyzed-progress-bar {
       display: inline-block;
       margin-top: 0px;

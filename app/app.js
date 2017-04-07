@@ -2701,9 +2701,13 @@ function jointCallVariants(checkCache, callback) {
 				vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
 
 				if (!vc.model.isAlignmentsOnly() && vc.getRelationship() == 'proband') {
-
 					vc.fillFeatureMatrix(regionStart, regionEnd);
 				}
+				// Cache the updated the danger summary now that called variants are merged into
+				// variant set
+				cacheHelper._processCachedTrio(window.gene, window.selectedTranscript, true, function() {
+					cacheHelper.showAnalyzeAllProgress();
+				});
 				
 
 			});
