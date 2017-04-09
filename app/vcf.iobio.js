@@ -795,7 +795,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
 
 
       callback(annotatedRecs, results);
@@ -1018,7 +1018,7 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleIndex);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, null, [sampleIndex]);
       resolve([annotatedRecs, results]);
 
     });
@@ -1069,7 +1069,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1405,30 +1405,27 @@ var effectCategories = [
   }
 
 
-  exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleIndices) {
+  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleNames, sampleIndices) {
 
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
 
       // Use the sample index to grab the right genotype column from the vcf record
       // If it isn't provided, assume that the first genotype column is the one
-      // to be evaluated and parsed.  If a comma separated value string is provided,
-      // evaluate the sample indices as ordinals since vt select will return only those
-      // sample (genotype) columns.
+      // to be evaluated and parsed.  If sampleNames (a comma separated value string) is 
+      // provided, evaluate the sample indices as ordinals since vt select will return only those
+      // sample (genotype) columns.     
       if (sampleIndices == null) {
-        sampleIndices = [0];
-      } else if (Array.isArray(sampleIndices)) {
-        // do nothing.  array of sample indices has been passed in
-      } else if ($.isNumeric(sampleIndices)) {
-        sampleIndices = [sampleIndices];
-      } else if (sampleIndices.indexOf(",") > 0) {
-        sampleIndices = sampleIndices.split(",").map(function(sampleName, idx) {
-          return idx;
-        });
-      } else {
-        sampleIndices = [0];
-      }
-      
+        sampleIndices = [];
+        if (sampleNames == null || sampleNames != "") {
+          sampleIndices = sampleNames.split(",").map(function(sampleName,i) {
+            return i;
+          });
+        }
+      } 
+      if (sampleIndices.length == 0) {
+        sampleIndices.push(0);
+      }        
 
 
       // The variant region may span more than the specified region.
