@@ -53,7 +53,8 @@ FilterCard.prototype.autoSetFilters = function() {
  */
 FilterCard.prototype.clearCurrentStandardFilter = function() {
 	if ($('.standard-filter-btn.current').length > 0) {
-		$('.standard-filter-btn.current').parent().find("span.standard-filter-count").text("");
+		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").addClass(hide);
+		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").text("");
 		$('.standard-filter-btn.current').removeClass("current");		
 	}
 }
@@ -63,16 +64,19 @@ FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
 	filterCard.setStandardFilter(button, filterName);
 	var genesCount = filterVariants();
-	me.setStandardFilterCount(button, genesCount)
+	//me.setStandardFilterCount(button, genesCount)
 }
 
-FilterCard.prototype.setStandardFilterCount = function(button, genesCount) {
-	var label = genesCount.pass + " of " + genesCount.total + " genes";
-	$(button.parentNode).find("span.standard-filter-count").text(label);
+FilterCard.prototype.setStandardFilterCount = function(button, genesCount, field) {
+	//var label = genesCount.pass + " of " + genesCount.total + " genes";
+	//$(button.parentNode).find("span.standard-filter-count").text(label);
+	//$(button.parentNode).find("span.standard-filter-count #loaded-variant-count").text(genesCount.pass);
+	//$(button.parentNode).find("span.standard-filter-count #loaded-variant-count").text(genesCount.pass);
 }
 
 FilterCard.prototype.resetStandardFilterCounts = function() {
-	$('#standard-filter-panel span.standard-filter-count').text("");
+	$('#standard-filter-panel span.standard-filter-count #loaded-variant-count').text("");
+	$('#standard-filter-panel span.standard-filter-count #called-variant-count').text("");
 }
 
 FilterCard.prototype.setStandardFilter = function(button, filterName) {

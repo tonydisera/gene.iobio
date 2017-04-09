@@ -32,23 +32,11 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 		$('#total-genes-label').text(counts.geneCount + " genes");
 
 
-
-		// Refresh the standard filter count if it applies
-		if (filterCard.hasFilters()) {
-			// If a standard filter has been applied, update its counts
-			if (clearStandardFilterCounts) {
-				$('#standard-filter-panel .standard-filter-btn').parent().find('span.standard-filter-count').text("");
-			}
-			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
-				$('#standard-filter-panel .standard-filter-btn.current').parent().find('span.standard-filter-count').text(counts.pass + ' of ' + counts.analyzed + ' genes');
-			}			
-		}
-
-		me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded');
+		me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
 
 
 		if (me.showCallAllProgress) {
-			me.fillProgressBar($("#call-all-progress"), counts, 'called');
+			me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
 		} else {
 			$('#called-progress-bar').addClass("hide");			
 		}
@@ -58,7 +46,7 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 	});	
 }
 
-CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field) {
+CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field, clearStandardFilterCounts) {
 	var geneCount = countObject.geneCount;
 	var counts    = countObject[field];
  
@@ -148,6 +136,27 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 			progressBar.find('#not-passed-filter-bar').attr("title", "");
 
 			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");		
+	}
+
+
+
+	// Refresh the standard filter count if it applies
+	if (filterCard.hasFilters()) {
+		var filterCountSelector = 'span.standard-filter-count #' + field + '-variant-count';
+		// If a standard filter has been applied, update its counts
+		if (clearStandardFilterCounts) {
+			$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).text("");
+			$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).addClass('hide');
+		}
+		if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
+			$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).text(counts.pass);
+			$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass('hide');
+			if (counts.pass == 0) {
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).addClass("none");
+			} else {
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass("none");
+			}
+		}			
 	}
 
 

@@ -1907,6 +1907,22 @@ inputinput:-moz-placeholder {
       font-size: 12px;
       color: #717171;
       width: 95px; }
+      #filter-track #standard-filter-panel .standard-filter-count .variant-count {
+        font-size: 13px;
+        vertical-align: middle;
+        text-align: center;
+        display: inline-block;
+        color: white;
+        width: 30px;
+        height: 20px; }
+      #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count {
+        background-color: rgba(18, 127, 170, 0.65); }
+        #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count.none {
+          background-color: #e8e6e6; }
+      #filter-track #standard-filter-panel .standard-filter-count #called-variant-count {
+        background-color: #9fbb52; }
+        #filter-track #standard-filter-panel .standard-filter-count #called-variant-count.none {
+          background-color: #e8e6e6; }
   #filter-track .checkbox label {
     font-size: 12px;
     line-height: 13px; }

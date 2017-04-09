@@ -106,6 +106,28 @@
 			color: $text-color
 			width: 95px
 
+			.variant-count
+				font-size: 13px
+				vertical-align: middle
+				text-align: center
+				display: inline-block
+				color: white
+				width: 30px
+				height: 20px
+
+			#loaded-variant-count
+				background-color: $loaded-variant-progress-color
+
+				&.none
+					background-color:  $not-pass-color
+
+			#called-variant-count
+				background-color: $called-variant-color
+
+				&.none
+					background-color:  $not-pass-color
+
+
 	.checkbox
 		label
 			font-size:    12px
