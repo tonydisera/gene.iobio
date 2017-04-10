@@ -2820,6 +2820,31 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 				    });
 	}
 	
+	var trioFbData = {};
+	var trioModel = null;
+	var parseNextExportVariant = function(theGeneObject, theTranscript, afterParseCallback) {
+		if (sampleIndex >= cards.length) {
+			if (afterParseCallback) {
+				afterParseCallback(theGeneObject, theTranscript, trioFbData);
+			}
+			return;
+		}		
+		var vc = cards[sampleIndex];
+		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, sampleIndex)
+	                .then(function(data) {
+	                	var theFbData = data[1];
+
+	                	theFbData.features.forEach(function(variant) {
+	                		variant.fbCalled = "Y";
+	                	})
+
+	                	var relationship = cards[sampleIndex].getRelationship();
+	                	trioFbData[relationship] = theFbData;
+
+						sampleIndex++;
+						parseNextExportVariant(theGeneObject, theTranscript, afterParseCallback);					    				    
+				    });
+	}
 	getProbandVariantCard().model.bam.freebayesJointCall(
 		geneObject, 
 		transcript,
@@ -2831,7 +2856,26 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			jointVcfRecs = 	theData.split("\n");		
 
 			if (sourceVariant) {
-				callback( theGeneObject, theTranscript, jointVcfRecs, translatedRefName, sourceVariant);
+				parseNextExportVariant(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1, trioFbData) {
+					if (callback) {
+						trioModel = new VariantTrioModel(trioFbData.proband, trioFbData.mother, trioFbData.father);
+						trioModel.compareVariantsToMotherFather(function() {
+							var found = false;
+							trioModel.probandVcfData.features.forEach(function(variant) {
+								if (!found &&
+									variant.chrom == sourceVariant.chrom &&
+									variant.start == sourceVariant.start &&
+									variant.ref == sourceVariant.ref &&
+									variant.alt == variant.alt) {
+									
+									sourceVariant = variant;
+									found = true;
+								}
+							});
+							callback(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, sourceVariant);							
+						});
+					}
+				});				
 			} else {
 				parseNextCalledVariants(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1) {
 					if (callback) {

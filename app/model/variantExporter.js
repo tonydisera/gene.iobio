@@ -335,7 +335,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 
 							if (format == 'vcf') {
 								theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
-							}
+							} 
 
 							getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, 0)
 		                	   .then(function(data) {
@@ -438,12 +438,12 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 			revisedVariant.motherZygosity          = revisedVariant.genotypes[1].zygosity;
 			revisedVariant.genotypeAltCountMother  = revisedVariant.genotypes[1].altCount;
 			revisedVariant.genotypeRefCountMother  = revisedVariant.genotypes[1].refCount;
-			revisedVariant.genotypeDepthMother     = revisedVariant.genotypes[1].depth;
+			revisedVariant.genotypeDepthMother     = revisedVariant.genotypes[1].genotypeDepth;
 
 			revisedVariant.fatherZygosity          = revisedVariant.genotypes[2].zygosity;
 			revisedVariant.genotypeAltCountFather  = revisedVariant.genotypes[2].altCount;
 			revisedVariant.genotypeRefCountFather  = revisedVariant.genotypes[2].refCount;
-			revisedVariant.genotypeDepthFather     = revisedVariant.genotypes[2].depth;
+			revisedVariant.genotypeDepthFather     = revisedVariant.genotypes[2].genotypeDepth;
 	 	}
 	 	VariantTrioModel.determineInheritance(revisedVariant);
 
