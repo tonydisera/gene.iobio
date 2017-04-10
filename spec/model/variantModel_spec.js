@@ -95,7 +95,9 @@ describe('variantModel', function() {
 				},
 				CONSEQUENCE: {},
 				AF: {},
-				featureCount: 5
+				featureCount: 5,
+				loadedCount: 5, 
+				calledCount: 0
 			});
 		});
 
@@ -126,7 +128,9 @@ describe('variantModel', function() {
 					}
 				},
 				AF: {},
-				featureCount: 5
+				featureCount: 5,
+				loadedCount: 5, 
+				calledCount: 0
 			});
 		});
 
@@ -146,7 +150,9 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } },
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0
 			});
 		});
 
@@ -166,7 +172,9 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } },
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0
 			});
 		});
 
@@ -187,7 +195,9 @@ describe('variantModel', function() {
 				IMPACT: {},
 				CONSEQUENCE: {},
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0				
 			});
 		});
 
@@ -206,7 +216,9 @@ describe('variantModel', function() {
 				IMPACT: {},
 				CONSEQUENCE: {},
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0	
 			});
 		});
 
@@ -227,7 +239,9 @@ describe('variantModel', function() {
 					AF: {
 						afexac_rare: { field: 'afExAC', value: 5 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -249,7 +263,9 @@ describe('variantModel', function() {
 					AF: {
 						af1000g_unique: { field: 'af1000G', value: 2 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -271,7 +287,9 @@ describe('variantModel', function() {
 					AF: {
 						afexac_rare: { field: 'afExAC', value: 5 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -293,7 +311,9 @@ describe('variantModel', function() {
 					AF: {
 						af1000g_unique: { field: 'af1000G', value: 2 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});

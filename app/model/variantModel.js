@@ -2451,6 +2451,8 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		var meetsLoadedVsCalled = false;
 		if (filterObject.loadedVariants && filterObject.calledVariants) {
 			meetsLoadedVsCalled = true;
+		} else if (!filterObject.loadedVariants && !filterObject.calledVariants) {
+			meetsLoadedVsCalled = true;
 		} else if (filterObject.loadedVariants) {
 			if (!d.hasOwnProperty("fbCalled") || d.fbCalled != 'Y') {
 				meetsLoadedVsCalled = true;
