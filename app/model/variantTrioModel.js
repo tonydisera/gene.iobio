@@ -163,7 +163,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
     		variantMother.genotypeAltCountFather = variantFather.genotypeAltCount;
 		    variantMother.genotypeRefCountFather = variantFather.genotypeRefCount;
 		    variantMother.genotypeDepthFather    = variantFather.genotypeDepth;
-		    variantMother.bamDepthFahter         = variantFather.bamDepth;
+		    variantMother.bamDepthFather         = variantFather.bamDepth;
 
 	        variantFather.motherZygosity         = variantMother.zygosity != null ? variantMother.zygosity : '';
     		variantFather.genotypeAltCountMother = variantMother.genotypeAltCount;
