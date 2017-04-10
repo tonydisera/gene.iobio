@@ -63,16 +63,9 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
 	filterCard.setStandardFilter(button, filterName);
-	var genesCount = filterVariants();
-	//me.setStandardFilterCount(button, genesCount)
+	filterVariants();
 }
 
-FilterCard.prototype.setStandardFilterCount = function(button, genesCount, field) {
-	//var label = genesCount.pass + " of " + genesCount.total + " genes";
-	//$(button.parentNode).find("span.standard-filter-count").text(label);
-	//$(button.parentNode).find("span.standard-filter-count #loaded-variant-count").text(genesCount.pass);
-	//$(button.parentNode).find("span.standard-filter-count #loaded-variant-count").text(genesCount.pass);
-}
 
 FilterCard.prototype.resetStandardFilterCounts = function() {
 	$('#standard-filter-panel span.standard-filter-count #loaded-variant-count').text("");
