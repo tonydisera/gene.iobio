@@ -2831,7 +2831,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			jointVcfRecs = 	theData.split("\n");		
 
 			if (sourceVariant) {
-				callback(jointVcfRecs, translatedRefName, sourceVariant, theGeneObject, theTranscript);
+				callback( theGeneObject, theTranscript, jointVcfRecs, translatedRefName, sourceVariant);
 			} else {
 				parseNextCalledVariants(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1) {
 					if (callback) {
