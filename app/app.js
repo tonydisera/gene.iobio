@@ -908,6 +908,7 @@ function showDataDialogExportBookmarks() {
 	$('#dataModal a[href="#bookmarks"]').tab('show')
 	$('#import-bookmarks-panel').addClass("hide");
 	$('#export-bookmarks-panel').removeClass("hide");
+	dataCard.resetExportPanel();
 	$('#dataModal').modal('show');
 }
 

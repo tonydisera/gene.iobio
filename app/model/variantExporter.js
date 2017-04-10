@@ -431,6 +431,7 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 		// Merge the properties of the bookmark entry with the variant with the full annotations
 	 	// Always use the inheritance from the bookmarkEntry
 	 	var revisedVariant = $().extend({}, sourceVariant, theVariant);
+	 	revisedVariant.extraAnnot = true;
 
 	 	// If this is a trio, get the genotypes for mother and father
 	 	if (revisedVariant.genotypes.length == 3) {

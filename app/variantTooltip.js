@@ -421,9 +421,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			vepHGVSpDisplay += key;
 		}   
 	} else {
-		var loading = '<img class="gene-badge-loader glyph" style="width: 12px;height: 12px;" src="assets/images/wheel.gif"><span style="font-style:italic;margin-left:4px">loading</span>';
-		vepHGVScDisplay = loading;
-		vepHGVSpDisplay = loading;
+		// Show the loading gif for the hgvs notations (for tooltips only; not export record)
+		if (!rec) {
+			var loading = '<img class="gene-badge-loader glyph" style="width: 12px;height: 12px;" src="assets/images/wheel.gif"><span style="font-style:italic;margin-left:4px">loading</span>';
+			vepHGVScDisplay = loading;
+			vepHGVSpDisplay = loading;
+		}
 	}
 
 	var vepSIFTDisplay = "";
