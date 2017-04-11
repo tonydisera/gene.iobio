@@ -83,7 +83,23 @@ VariantModel.prototype.isInheritanceLoaded = function() {
 
 VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
 	var me = this;
-	return me._getDataForGene("vcfData", geneObject, selectedTranscript);
+	var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
+
+	// If the vcf data is null, see if there are called variants in the cache.  If so,
+	// copy the called variants into the vcf data.
+	if (theVcfData == null) {
+		var theFbData = me.getFbDataForGene(geneObject, selectedTranscript);
+		// If no variants are loaded, create a dummy vcfData with 0 features
+		if (theFbData && theFbData.features) {
+			theVcfData = $.extend({}, theFbData);
+			theVcfData.features = [];
+			me.setLoadState(theVcfData, 'clinvar');
+			me.setLoadState(theVcfData, 'coverage');
+			me.setLoadState(theVcfData, 'inheritance');
+			me.addCalledVariantsToVcfData(theVcfData, theFbData);			
+		}
+	}
+	return theVcfData;
 }
 
 VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscript) {
@@ -1172,10 +1188,6 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 		if (vcfData != null && vcfData != '') {	
 			// Do we already have the variants cached?  If so, just return that data.		
 			resolve(vcfData);
-		}  else if (autoCall && !me.isVcfReadyToLoad()) {	
-			// We should never get to this condition because if no vcf was supplied, then
-			// cacheHelper would have performed joint calling on bams
-			reject();
 		} else {
 			// We don't have the variants for the gene in cache, 
 			// so call the iobio services to retreive the variants for the gene region 

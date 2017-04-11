@@ -774,97 +774,20 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			resolve(null);
 		}
 
-
-		var callVariantsAndLoadCoverage = function() {
-			if (!me.model.isVcfReadyToLoad()) {
-				genesCard.showGeneBadgeLoading(window.gene.gene_name);
-			}
-			
-			// If no vcf supplied, automatically call variants (then get coverage)
-			if (autoCall && !me.model.isVcfReadyToLoad() && !me.model.hasCalledVariants()) {	
-				
-				me.callVariants(regionStart, regionEnd, function() {
-					loadCoverage();
-
-					// For the proband, we need to determine the inheritance and then
-					// fill in the mother/father genotype and allele counts on the
-					// proband's variants.  So we do this first before caching
-					// the called variants and resolving this promise.
-					
-					// Once all variant cards have freebayes variants,
-					// the app will determine in the inheritance mode
-					// for the freebayes variants
-					promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
-	
-						variantCards.forEach(function(variantCard) {
-							// Reflect me new info in the freebayes variants.
-							variantCard.model.loadCalledTrioGenotypes();
-
-							//  Refresh the feature matrix (proband only) and variant cards
-							if (variantCard.getRelationship() == 'proband') {
-								variantCard.fillFeatureMatrix(regionStart, regionEnd);
-							} else {
-								variantCard._showVariants(regionStart, regionEnd, null, false);
-							}
-
-						})
-
-					}, function(error) {
-						console.log("error when determining inheritance for called variants for " + this.getRelationship() + ". " + error);
-					});
-
-				});
-
-			} else {
-				// Otherwise, if a vcf was loaded, just get the coverage
-				//me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
-				loadCoverage();
-			}			
-		}
-
-		var loadCoverage = function() {
-			var coverage = me.model.getBamDataForGene(window.gene);
-			if (coverage != null) {
-				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-				resolve(coverage);
-			} else {
-				// If we have varaitns, get coverage for every variant
-				me.showBamProgress("Calculating coverage");
-				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
-					me.endBamProgress();
-					genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-					resolve(coverageData);
-				});
-			}					
-		};
-
-
-		if (!me.model.isVcfReadyToLoad() && me.model.isBamLoaded()) {
-			if (autoCall == null) {
-				alertify.confirm("Automatically call variants from alignments?",
-			        function () {	
-			        	// ok		     
-			        	autoCall = true;  
-			        	callVariantsAndLoadCoverage();
-			    	},
-					function () {
-						// cancel
-						autoCall = false;
-						callVariantsAndLoadCoverage();
-					}).set('labels', {ok:'Yes', cancel:'No'}); 
-			} else {
-				callVariantsAndLoadCoverage();
-			}
+		var coverage = me.model.getBamDataForGene(window.gene);
+		if (coverage != null) {
+			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+			resolve(coverage);
 		} else {
-			callVariantsAndLoadCoverage();
-		}
-
-		
-
-
+			// If we have varaitns, get coverage for every variant
+			me.showBamProgress("Calculating coverage");
+			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+				me.endBamProgress();
+				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+				resolve(coverageData);
+			});
+		}					
 	});
-
-
 
 }
 
@@ -997,42 +920,6 @@ VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data) {
 VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition, isZoom) {
 	var me = this;
 
-	// If we have alignments but no vcf, we want to load the called variants and return.
-	if (!this.model.isVcfReadyToLoad()) {
-		if (me.model.isBamLoaded()) {
-			this.cardSelector.removeClass("hide");
-		}
-		if (!me.model.hasCalledVariants()) {
-			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-		} else {
-			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
-			if (me.model.isBamLoaded()) {	
-				filterCard.enableVariantFilters(true);
-				me.populateEffectFilters();
-				filterCard.enableClinvarFilters();
-				var filteredFBData = me.filterCalledVariants();			
-				me._fillFreebayesChart(filteredFBData, 
-									   regionStart ? regionStart : window.gene.start, 
-									   regionEnd ? regionEnd : window.gene.end);
-				me.cardSelector.find('#called-variant-count').removeClass("hide");
-				me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());	        	
-
-				if (me.getRelationship() == 'proband') {
-					
-					me.fillFeatureMatrix(regionStart, regionEnd);
-					genesCard.refreshCurrentGeneBadge(null, me.model.getCalledVariants());
-				} 
-			}
-			me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-		}
- 		if (onVariantsDisplayed) {
-			onVariantsDisplayed();
-		}
-		return;
-	}
-
-	//me.cardSelector.find("#zoom-region-chart").css("margin-top", "-30px");
 	if (this.isViewable()) {
 		this.cardSelector.removeClass("hide");
 		this.cardSelector.find('#vcf-track').removeClass("hide");
@@ -1093,7 +980,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 	   	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
    	    }
 
-	} else {
+	} else if (this.model.isVcfReadyToLoad()) {
 
 		if (me.isViewable()) {
 			me.cardSelector.find('.vcfloader').removeClass("hide");
@@ -1225,6 +1112,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				
 
 			});
+	} else {
+		genesCard._geneBadgeLoading(window.gene.gene_name, false);
 	}
 }
 

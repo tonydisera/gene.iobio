@@ -15,9 +15,6 @@ var serverCacheDir        = "local_cache/"; // this is the directory from the se
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
 
-var autoCall              = null;           // if only alignments are provided, should variants automatically be called? 
- 											// set to null if app should prompt first before autocalling
-
 var useSSL                = false;
 var useServerCache        = false;
 

@@ -2233,68 +2233,17 @@ function loadTracksForGene(bypassVariantCards, callback) {
 
 	filterCard.disableFilters();
 
-	var relevantVariantCards = getRelevantVariantCards();
-
-	// Find out if if there are alignments only.  In this case, prompt the user
-	// to determine if alignments should automatically be auto-called with freebayes.
-	var promptForAutocall = null;
-	if (autoCall == null) {
-		relevantVariantCards.forEach( function (variantCard) {
-			if (variantCard.model.isAlignmentsOnly()) {
-				promptForAutocall = true;
-			}
-		});		
-	} else {
-		promptForAutocall = false;
-	}
-
-	// At this point either prompt for autocalling or just continue
-	// on, loading the data.
-	if (promptForAutocall) {
-		alertify.confirm("Automatically call variants from alignments?",
-	        function () {	
-	        	// ok		     
-	        	autoCall = true;  
-	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
-	    	},
-			function () {
-				// cancel
-				autoCall = false;
-	        	loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
-			}).set('labels', {ok:'Yes', cancel:'No'}); 		
-	} else {
-		loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback);
-	}		
 	
-
-
+	// Load the variant cards and feature matrix with the annotated variants and coverage
+	loadTracksForGeneImpl(bypassVariantCards, callback);
+	
 
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 
 	justLaunched = false;
-
-
 	
 }
 
-function promptForAutoCall(callback) {
-	if (autoCall == null) {
-		alertify.confirm("Automatically call variants from alignments?",
-	        function () {	
-	        	// ok		     
-	        	autoCall = true;  
-	        	callback(autoCall);
-	    	},
-			function () {
-				// cancel
-				autoCall = false;
-				callback(autoCall)
-			}).set('labels', {ok:'Yes', cancel:'No'}); 
-	} else {
-		callback(autoCall);
-	}
-
-}
 
 function hasCachedCalledVariants(geneObject, transcript) {
 	var cachedCount =  0;
@@ -2315,26 +2264,6 @@ function isAlignmentsOnly(callback) {
 }
 
 
-function isJointCallOnly(callback) {
-
-	var shouldJointCall = false;
-	var cards = getRelevantVariantCards().filter(function(vc) {
-		return !vc.model.isVcfReadyToLoad() && vc.model.isBamLoaded();
-	});
-	if (cards.length == getRelevantVariantCards().length) {
-		shouldJointCall = true;
-	}			
-		
-	if (shouldJointCall) {
-		promptForAutoCall( function() {
-			callback(autoCall);
-		});			
-	} else {
-		callback(false);
-	}
-}
-
-
 function hasCalledVariants() {
 	var cards = getRelevantVariantCards().filter(function(vc) {
 		return vc.model.hasCalledVariants();
@@ -2349,61 +2278,20 @@ function showNavVariantLinks() {
 	$('#variant-links-divider').removeClass("hide");
 }
 
-function loadTracksForGeneImpl(relevantVariantCards, bypassVariantCards, callback) {
+function loadTracksForGeneImpl(bypassVariantCards, callback) {
+	var me = this;
+
 	if (!hasDataSources()) {
 		return;
 	}
 
 	genesCard.flagUserVisitedGene(window.gene.gene_name);
-
 	$('#welcome-area').addClass("hide");
 
-	relevantVariantCards.forEach(function(vc) {
+	getRelevantVariantCards().forEach(function(vc) {
 		vc.prepareToShowVariants(filterCard.classifyByImpact);
 	});
-	isJointCallOnly(function(shouldJointCallOnly) {
-		if (shouldJointCallOnly) {
-			var coveragePromises = [];
-			var allMaxDepth = 0;
-			relevantVariantCards.forEach(function(vc) {
-				vc.clearBamChart();
-			});
-			jointCallVariants(true, function() {
-				relevantVariantCards.forEach(function(vc) {
 
-					if (vc.getRelationship() == 'proband') {
-                  		showNavVariantLinks();
-                  		if (callback) {
-                  			callback();
-                  		}
-                  	}
-
-					var cp = vc.promiseLoadBamDepth()
-					           .then( function(coverageData) {
-									if (coverageData) {
-										var max = d3.max(coverageData, function(d,i) { return d[1]});
-										if (max > allMaxDepth) {
-											allMaxDepth = max;
-										}						
-									}
-																							
-					           });
-					coveragePromises.push(cp); 
-					Promise.all(coveragePromises).then(function() {
-						relevantVariantCards.forEach(function(vc) {
-							vc.showBamDepth(allMaxDepth);
-						});
-					});
-				});
-			});
-
-		} else {
-			loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, promiseFullTrio, callback);
-		}
-	});
-}
-
-function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, trioPromise, callback) {
 	if (bypassVariantCards == null || !bypassVariantCards) {
 
 		window.hideCircleRelatedVariants();
@@ -2419,52 +2307,59 @@ function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, trio
 		var variantPromises = [];
 		var coveragePromises = [];
 		var allMaxDepth = 0;
-	 	relevantVariantCards.forEach(function(vc) {
+	 	getRelevantVariantCards().forEach(function(vc) {
 	 		
 	 		vc.clearBamChart();
 
 	 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
 				vc.hide();
 			} else {
-				var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
-                  .then( function() {
+				if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
+					// We have variants,either to load from a vcf or called from alignments and
+				 	// optionally alignments.  First annotate the show the variants in the
+				 	// variant cards and calcuate the coverage (if alignments provided).
+					var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
+	                  .then( function() {
 
-                  	if (vc.getRelationship() == 'proband') {
-                  		showNavVariantLinks();
-                  	}
+	                  	if (vc.getRelationship() == 'proband') {
+	                  		showNavVariantLinks();
+	                  	}
 
+						var coveragePromise = vc.promiseLoadBamDepth()
+						                 .then( function(coverageData) {
+												if (coverageData) {
+													var max = d3.max(coverageData, function(d,i) { return d[1]});
+													if (max > allMaxDepth) {
+														allMaxDepth = max;
+													}						
+												}
+																								
+						                 });
+						coveragePromises.push(coveragePromise); 
+
+
+					  });				 
+					  variantPromises.push(variantPromise);		 
+			
+				} else {
+					// In the case where alignments only were provided and we have yet to call variants
+					// we just want to load the bam coverage chart.
 					var coveragePromise = vc.promiseLoadBamDepth()
-					                 .then( function(coverageData) {
-											if (coverageData) {
-												var max = d3.max(coverageData, function(d,i) { return d[1]});
-												if (max > allMaxDepth) {
-													allMaxDepth = max;
-												}						
-											}
-																							
-					                 });
+						                 .then( function(coverageData) {
+												if (coverageData) {
+													var max = d3.max(coverageData, function(d,i) { return d[1]});
+													if (max > allMaxDepth) {
+														allMaxDepth = max;
+													}						
+												}
+																								
+						                 });
 					coveragePromises.push(coveragePromise); 
-
-
-				  });				 
-				  variantPromises.push(variantPromise);		 
+				}
 			}
 		});			
 
 
-
-	 	//
-	 	// TODO:  When variants are called from alignments, the normal full trio promise
-	 	// is never fullfilled, so this case of re-determining inheritance is only
-	 	// working for the standard use case of 'loaded variants'.  The code
-	 	// that determines inheritance needs to be centralized for 4 use cases:
-	 	//  1. the normal one where variants are loaded from a VCF (handled below)
-	 	//  2. the normal one where 'Analyze all' is performed on variants loaded from VCF (also handled below)
-	 	//  3. the case where variants are called for alignments, displaying alongside the loaded variants
-	 	//  4. the case where variants are auto-called when only alignments are provided
-	 	//  5. the case where 'Analyze all' is performed, auto-calling variants when only alignments are provided
-	 	//
-		
 
 	 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
 	 	// (including vep, clinvar, and coverage), compare the proband to mother and father
@@ -2477,8 +2372,10 @@ function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, trio
 			// so determine inheritance (if trio).  Also scale the coverage chart y-axis
 			// based on the max depth of all sample's coverage data
 			Promise.all(coveragePromises).then(function() {
-				promiseDetermineInheritance(trioPromise).then(function() {
-					relevantVariantCards.forEach(function(vc) {
+				promiseDetermineInheritance(promiseFullTrio).then(function() {					
+					getRelevantVariantCards().forEach(function(vc) {
+						// The inheritance has been determined for the trio, so now
+						// show the variants and the feature matrix
 						vc.showFinalizedVariants();
 						if (vc.getRelationship() == 'proband' && callback) {
 							callback();
@@ -2487,7 +2384,8 @@ function loadAllTracksForGeneImpl(relevantVariantCards, bypassVariantCards, trio
 				});
 
 
-				relevantVariantCards.forEach(function(variantCard) {
+				// Show the coverage chart (if alignments provided)
+				getRelevantVariantCards().forEach(function(variantCard) {
 					variantCard.showBamDepth(allMaxDepth, function() {
 					});
 				});
@@ -2701,7 +2599,7 @@ function jointCallVariants(checkCache, callback) {
 
 				vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
 
-				if (!vc.model.isAlignmentsOnly() && vc.getRelationship() == 'proband') {
+				if (vc.getRelationship() == 'proband') {
 					vc.fillFeatureMatrix(regionStart, regionEnd);
 				}
 				// Cache the updated the danger summary now that called variants are merged into
@@ -2867,7 +2765,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 									variant.start == sourceVariant.start &&
 									variant.ref == sourceVariant.ref &&
 									variant.alt == variant.alt) {
-									
+
 									sourceVariant = variant;
 									found = true;
 								}
@@ -3067,7 +2965,8 @@ function promiseFullTrio() {
 	return new Promise( function(resolve, reject) {
 		var loaded = {};
 		variantCards.forEach(function(vc) {
-			if (vc.isLoaded()) {
+			var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+			if (theVcfData) {
 				loaded[vc.getRelationship()] = vc;
 			}
 		});

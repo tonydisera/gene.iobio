@@ -245,12 +245,6 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
 CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, callback) {
 	var me = this;
 
-	// Don't prompt the user about auto-calling if the user has chosen to analyze all on
-	// called variants
-	if (autoCall == false && analyzeCalledVariants) {
-		autoCall = true;
-	}
-
 	promiseGetGeneModel(geneName).then( function(geneModel) {
 	    var geneObject = geneModel;
     	// Now that we have the gene model,
