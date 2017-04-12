@@ -742,7 +742,7 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	this._showBamDepth(regionStart, regionEnd);
 	this._showVariants(regionStart, regionEnd, 
 		function() {
-			me._showFreebayesVariants(regionStart, regionEnd);
+			me.filterAndShowCalledVariants(regionStart, regionEnd);
 			if (callback) {
 				callback();
 			}
@@ -750,21 +750,6 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 		null, true);
 }
 
-
-VariantCard.prototype._showFreebayesVariants = function(regionStart, regionEnd) {
-	if (!this.model.hasCalledVariants()) {
-		return;
-	}
-
-	if (this.isViewable()) {
-		var fbDataFiltered = this.model.getCalledVariants(regionStart, regionEnd);
-		var filteredVcfData = this.filterVariants(fbDataFiltered, this.fbChart);
-		if (regionStart && regionEnd)
-  			this._fillFreebayesChart(filteredVcfData, regionStart, regionEnd);
-  		else
-  			this._fillFreebayesChart(filteredVcfData, window.gene.start, window.gene.end);
-	}
-}
 
 VariantCard.prototype.promiseLoadBamDepth = function() {	
 	var me = this;
@@ -884,17 +869,12 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 VariantCard.prototype.showFinalizedVariants = function() {
 	var me = this;
 	me.endVariantProgress();
-	theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	// For the proband, the fillFeatureMatrix method will both display the variants
-	// in the Ranked Variants card (the feature matrix) as well as the Variant card for
-	// the proband sample.  
+
+	me._showVariants(regionStart, regionEnd, null, false);
+	
 	if (me.model.getRelationship() == 'proband') {
 		me.fillFeatureMatrix(regionStart, regionEnd);
-	} else {
-		// For mother and father, show the variants in their respective
-		// Variant cards.
-		me._showVariants(regionStart, regionEnd, null, false);
-	}
+	} 	
 
 }
 
@@ -927,6 +907,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData) {
+		me.model.vcfData = theVcfData;
 		// The user has selected a region to zoom into or the data has come back for a selected gene that
 		// has now been cached.  Filter the  variants based on the selected region
 		if (this.isViewable()) {
@@ -950,10 +931,13 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
-				var filteredFBData = me.filterCalledVariants();			
-				me._fillFreebayesChart(filteredFBData, 
-									   regionStart ? regionStart : window.gene.start, 
-									   regionEnd ? regionEnd : window.gene.end);
+
+				//  FIXME
+				me.model.fbData = me.model.getCalledVariants();
+				me.model.loadCalledTrioGenotypes();
+
+				me.filterAndShowCalledVariants();			
+				
 			}	
 			me.populateRecFilters(theVcfData);
 			if (!isZoom) {
@@ -963,7 +947,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				me.model.pruneIntronVariants(theVcfData);
 		    }
 		    // Filter variants runs filter and then fills the variant chart.
-			var filteredVcfData = this.filterVariants(theVcfData, showTransition);
+			var filteredVcfData = this.filterAndShowLoadedVariants(theVcfData, showTransition);
 			me.cardSelector.find('#gene-box').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
 
@@ -1204,6 +1188,8 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 
 
 VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
+	var me = this;
+
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (this.getRelationship() == 'proband' && theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
@@ -1219,18 +1205,18 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 		firstTimeShowVariants = false;
 	}
 
-	var filteredVcfData = this.model.isVcfLoaded() ? 
-	       this.filterVariants(null, false) 
-	     : this.filterCalledVariants();
-	
-	window.matrixCard.fillFeatureMatrix(filteredVcfData);
+	// Show called variants
+	this.filterAndShowCalledVariants();
+
+	// Show feature matrix
+	window.matrixCard.fillFeatureMatrix(me._filterVariants());
 }
 
 VariantCard.prototype.sortFeatureMatrix = function() {
 
 	var filteredVcfData = this.model.isVcfLoaded() ? 
-	       this.filterVariants() 
-	     : this.filterCalledVariants();
+	       this.filterAndShowLoadedVariants() 
+	     : this.filterAndShowCalledVariants();
 	
 	window.matrixCard.fillFeatureMatrix(filteredVcfData);
 }
@@ -1408,7 +1394,8 @@ VariantCard.prototype.variantClass = function(clazz) {
 }
 
 
-VariantCard.prototype.filterCalledVariants = function() {
+VariantCard.prototype.filterAndShowCalledVariants = function(regionStart, regionEnd) {
+	var me = this;
 	if (this.model.hasCalledVariants()) {
 		var filteredFBData = this._filterVariants(this.model.getCalledVariants(), this.fbChart);
 
@@ -1426,8 +1413,10 @@ VariantCard.prototype.filterCalledVariants = function() {
 			this.cardSelector.find('#displayed-called-variant-count').addClass("hide");
 			this.cardSelector.find('#displayed-called-variant-count').text("");
 		}
+		me._fillFreebayesChart(filteredFBData, 
+						       regionStart ? regionStart : window.gene.start, 
+							   regionEnd ? regionEnd : window.gene.end);
 
-		this._fillFreebayesChart(filteredFBData, regionStart, regionEnd, true);
 		return filteredFBData;
 	}  else {
 		return null;
@@ -1435,7 +1424,7 @@ VariantCard.prototype.filterCalledVariants = function() {
 }
 
 
-VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
+VariantCard.prototype.filterAndShowLoadedVariants = function(theVcfData, showTransition) {
 	if (this.model.isVcfLoaded()) {
 		var data = theVcfData ? theVcfData : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		var filteredVcfData = this._filterVariants(data, this.vcfChart);
@@ -1469,7 +1458,7 @@ VariantCard.prototype.filterVariants = function(theVcfData, showTransition) {
 }
 
 
-VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
+VariantCard.prototype._filterVariants = function(dataToFilter) {
 	var me = this;
 
 	var data = dataToFilter ? dataToFilter : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
@@ -1480,74 +1469,6 @@ VariantCard.prototype._filterVariants = function(dataToFilter, theChart) {
 	// Filter variants
 	var filterObject = filterCard.getFilterObject();
 	var filteredData = this.model.filterVariants(data, filterObject, window.gene.start, window.gene.end);
-
-/*
-	me.cardSelector.find(".filter-flag").addClass("hide");
-
-	// Filter variants
-	var filterObject = filterCard.getFilterObject();
-	var filteredData = this.model.filterVariants(data, filterObject);
-
-	// Show a badge when the intronic variants have been removed
-	if ($('#exonic-only-cb').is(":checked")) {
-		me.cardSelector.find("#too-many-variants-flag").removeClass("hide");
-		me.cardSelector.find("#excluded-variant-count").text(filteredData.intronsExcludedCount);
-	}
-
-	// Set the filter badges
-	if (filterCard.afScheme == 'exac') {
-		afField = "afExAC";
-	} else {
-		afField = "af1000G";
-	}
-	var afLowerVal = filterObject.afMin;
-	var afUpperVal = filterObject.afMax;
-	if (afLowerVal != null && afUpperVal != null) {
-		if (afLowerVal <= 0 && afUpperVal == 1) {
-			// We are not filtering on af if the range is 0-1
-			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").addClass("hide");
-		} else {
-			// We are filtering on af range.  show the filter flag
-			me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").removeClass("hide");
-		}
-	} else {
-		me.cardSelector.find("#" + afField.toLowerCase() + "range-flag").addClass("hide");
-	}
-
-	if (filterObject.coverageMin && filterObject.coverageMin > 0) {
-		me.cardSelector.find("#coverage-flag").removeClass("hide");
-	}
-
-	// Iterate through the filters to see which badges to turn on in the variant card.
-	// First we need to gather all filters for the same field (for exampe, there might be
-	// a MODERATE and HIGH filter).  If any of the filters for the same
-	// field are turned on, we want to show the filter badge.
-	var annotStates = {};
-	for (key in filterObject.annotsToInclude) {
-		var annot = filterObject.annotsToInclude[key];
-		var states = annotStates[annot.key];
-		if (states == null) {
-			states = {};
-		}
-		states[annot.state] = annot.state;
-		annotStates[annot.key] = states;
-	}
-	for (key in annotStates) {
-		var states = annotStates[key];
-		var filterOn = false;
-		for (state in states) {
-			if (state == "true") {
-				filterOn = true;
-			}
-		}
-		if (filterOn) {
-			me.cardSelector.find("#" + key + "-flag").removeClass("hide");
-		}  else {
-			me.cardSelector.find("#" + key + "-flag").addClass("hide");
-		}
-
-	}
-	*/
 
 	return filteredData;
 

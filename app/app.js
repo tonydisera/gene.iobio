@@ -3198,8 +3198,8 @@ function filterVariants() {
 
 			variantCard.unpin();
 			if (window.gene) {
-				variantCard.filterVariants();
-  				variantCard.filterCalledVariants();
+				variantCard.filterAndShowLoadedVariants();
+  				variantCard.filterAndShowCalledVariants();
   			
   				if (variantCard.getRelationship() == 'proband') {
 		  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
