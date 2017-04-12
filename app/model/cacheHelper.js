@@ -323,12 +323,11 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 			    			geneObject, 
 						 	transcript)
 			    		.then( function(vcfData) {
-
-							if (me.isCachedForCards(geneObject.gene_name, transcript)) {
+							if (me.isCachedForCards(vcfData.gene.gene_name, vcfData.transcript)) {
 								// Once all analysis of the gene variants for each of
 								// the samples is complete, call variants (optional) and
 								// process the trio to determine inheritance
-				    			analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback);
+				    			analyzeVariantsForGene(vcfData.gene, vcfData.transcript, analyzeCalledVariants, callback);
 				    		}
 
 			    		}, function(error) {
@@ -369,12 +368,21 @@ CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, tran
 	var processedCount = 0;
 	if (analyzeCalledVariants) {
 		getRelevantVariantCards().forEach(function(vc) {
-			vc.model.processCachedFreebayesVariants(geneObject, transcript, function(theFbData, theGeneObject, theTranscript) {
-				processedCount++;
+			vc.model.processCachedFreebayesVariants(geneObject, transcript, function(theFbData, theVcfData, theGeneObject, theTranscript) {
+
+				// Cache the called variants now that they are fully annotated
 				if (!vc.model._cacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript)) {
 					console.log("unable to cache fb data for gene " + theGeneObject.gene_name);
 					return;
 				}
+
+				// Re-cache the vcf data now that it has the called (and annotated) variants merged in
+				if (!vc.model._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript)) {
+					console.log("unable to cache vcf data for gene " + theGeneObject.gene_name);
+					return;
+				}
+
+				processedCount++;
 				if (processedCount == getRelevantVariantCards().length) {
 					if (callback) {
 						callback(theGeneObject, theTranscript);
@@ -450,7 +458,6 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 			options.CALLED = true;
 		}
 		var dangerObject    = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options);
-
 		genesCard._geneBadgeLoading(geneObject.gene_name, false);
 		if (trioVcfData.proband.features.length == 0) {
 			//genesCard.setGeneBadgeWarning(geneObject.gene_name);
@@ -631,7 +638,6 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 				if (theFbData) {
 					options.CALLED = true;
 				}
-
 		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options);
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
 		
