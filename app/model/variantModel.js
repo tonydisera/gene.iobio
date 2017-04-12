@@ -68,10 +68,6 @@ VariantModel.prototype.isVcfLoaded = function() {
 	return this.vcf && (this.vcfUrlEntered || this.vcfFileOpened);
 }
 
-VariantModel.prototype.variantsHaveBeenCalled = function() {
-	return this.fbData != null;
-}
-
 
 VariantModel.prototype.isInheritanceLoaded = function() {
 	return (this.vcfData != null && this.vcfData.loadState != null && this.vcfData.loadState['inheritance']);	
@@ -386,6 +382,14 @@ VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 	return this.bam.reducePoints(coverageData, factor, xValue, yValue);
 }
 
+VariantModel.prototype.setLoadedVariants = function(theVcfData) {
+	this.vcfData = theVcfData;
+}
+
+VariantModel.prototype.setCalledVariants = function(theFbData) {
+	this.fbData = theFbData;
+}
+
 
 VariantModel.prototype.getCalledVariantCount = function() {
 	var me = this;
@@ -402,16 +406,17 @@ VariantModel.prototype.getCalledVariantCount = function() {
 	return 0;
 }
 
+
 VariantModel.prototype.hasCalledVariants = function() {
 	var me = this;
-	var theFbData = this.getFbDataForGene(window.gene, window.selectedTranscript);
+	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript);
 	return theFbData != null && theFbData.features != null && theFbData.features.length > 0;
 }
 
 
 VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
 	var me = this;
-	var theFbData = this.getFbDataForGene(window.gene, window.selectedTranscript);
+	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript);
 	
 	if (theRegionStart && theRegionEnd) {
 		// Check the local cache first to see
@@ -424,6 +429,12 @@ VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd
 		return theFbData;
 	}
 }
+
+
+VariantModel.prototype.variantsHaveBeenCalled = function() {
+	return this.getCalledVariants() != null;
+}
+
 
 
 

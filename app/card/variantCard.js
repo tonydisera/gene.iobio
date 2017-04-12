@@ -907,7 +907,17 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData) {
-		me.model.vcfData = theVcfData;
+
+		// Set the current model's loaded and called variants based on the cached data.		
+		me.model.setLoadedVariants(theVcfData);
+		if (me.model.isBamLoaded()) {
+
+			me.model.setCalledVariants(me.model.getCalledVariants());
+			me.model.loadCalledTrioGenotypes();
+			
+		}	
+
+
 		// The user has selected a region to zoom into or the data has come back for a selected gene that
 		// has now been cached.  Filter the  variants based on the selected region
 		if (this.isViewable()) {
@@ -917,28 +927,23 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 			me.clearWarnings();		
 
-	        if (me.model.hasCalledVariants()) {
-		        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-				me.cardSelector.find('#called-variant-count').removeClass("hide");
-				me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());	        	
-	        } else if (me.model.variantsHaveBeenCalled()) {
-	        	// If call variants has occurred but 0 variants returned.
-		        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-				me.cardSelector.find('#called-variant-count').removeClass("hide");
-				me.cardSelector.find('#called-variant-count').text("0");	        		        	
-	        }	
-
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
+		        if (me.model.hasCalledVariants()) {
+			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+					me.cardSelector.find('#called-variant-count').removeClass("hide");
+					me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());	        	
+		        } else if (me.model.variantsHaveBeenCalled()) {
+		        	// If call variants has occurred but 0 variants returned.
+			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+					me.cardSelector.find('#called-variant-count').removeClass("hide");
+					me.cardSelector.find('#called-variant-count').text("0");	        		        	
+		        }	
 
-				//  FIXME
-				me.model.fbData = me.model.getCalledVariants();
-				me.model.loadCalledTrioGenotypes();
-
-				me.filterAndShowCalledVariants();			
-				
+				me.filterAndShowCalledVariants();	
 			}	
+
 			me.populateRecFilters(theVcfData);
 			if (!isZoom) {
 				filterCard.autoSetFilters();
@@ -946,15 +951,15 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 			if (me.getRelationship() == 'proband') {
 				me.model.pruneIntronVariants(theVcfData);
 		    }
+
 		    // Filter variants runs filter and then fills the variant chart.
 			var filteredVcfData = this.filterAndShowLoadedVariants(theVcfData, showTransition);
+			
 			me.cardSelector.find('#gene-box').css("visibility", "visible");
 			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
 
 			// Now enable the filter controls that apply for the variants of this sample
 			filterCard.enableVariantFilters(true);
-
-			
 	
 		}
 		if (onVariantsDisplayed) {
