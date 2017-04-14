@@ -413,7 +413,7 @@ FilterCard.prototype.init = function() {
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
 
-	d3.selectAll(me.annotClasses)
+	d3.select('#filter-track').selectAll(me.annotClasses)
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
