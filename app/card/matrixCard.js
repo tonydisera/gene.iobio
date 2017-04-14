@@ -44,7 +44,8 @@ function MatrixCard() {
 	this.impactMap = {  HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showImpactSymbol},
                         MODERATE: {value: 2, badge: true, clazz: 'impact_MODERATE', symbolFunction: this.showImpactSymbol},
                         MODIFIER: {value: 3, badge: false, clazz: 'impact_MODIFIER', symbolFunction: this.showImpactSymbol},
-                        LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol}
+                        LOW:      {value: 4, badge: false, clazz: 'impact_LOW',      symbolFunction: this.showImpactSymbol},
+                        none:     {value: 5, badge: false, clazz: 'impact_none',      symbolFunction: this.showImpactSymbol}
                      };
 	this.highestImpactMap = {
 		                HIGH:     {value: 1, badge: true, clazz: 'impact_HIGH',     symbolFunction: this.showHighestImpactSymbol},
@@ -765,13 +766,23 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 					if (me.isDictionary(rawValue)) {
 						// Iterate through the objects in the associative array.
 						// Keep the lowest mapped value
-						for (val in rawValue) {
-							var entry = matrixRow.map[val];
+						if (Object.keys(rawValue).length > 0) {
+							for (val in rawValue) {
+								var entry = matrixRow.map[val];
+								if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
+									mappedValue = entry.value;
+									mappedClazz = entry.clazz;
+									symbolFunction = entry.symbolFunction;
+									theValue = val;
+								}
+							}							
+						} else {
+							var entry = matrixRow.map.none;
 							if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
 								mappedValue = entry.value;
 								mappedClazz = entry.clazz;
 								symbolFunction = entry.symbolFunction;
-								theValue = val;
+								theValue = '';
 							}
 						}
 					} else {
