@@ -911,8 +911,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		// Set the current model's loaded and called variants based on the cached data.		
 		me.model.setLoadedVariants(theVcfData);
 		if (me.model.isBamLoaded()) {
-
-			me.model.setCalledVariants(me.model.getCalledVariants());
+			var theFbData = me.model.getFbDataForGene(window.gene, window.selectedTranscript, true);
+			me.model.setCalledVariants(theFbData);
 			me.model.loadCalledTrioGenotypes();
 			
 		}	
@@ -1402,7 +1402,7 @@ VariantCard.prototype.variantClass = function(clazz) {
 VariantCard.prototype.filterAndShowCalledVariants = function(regionStart, regionEnd) {
 	var me = this;
 	if (this.model.hasCalledVariants()) {
-		var filteredFBData = this._filterVariants(this.model.getCalledVariants(), this.fbChart);
+		var filteredFBData = this._filterVariants(this.model.getFbDataForGene(window.gene, window.selectedTranscript), this.fbChart);
 
 
 		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
@@ -1706,7 +1706,7 @@ VariantCard.prototype.hideCoverageCircle = function() {
 VariantCard.prototype.getMaxAlleleCount = function() {
 	var theVcfData = this.model.isVcfLoaded() 
 				      ? this.model.getVcfDataForGene(window.gene, window.selectedTranscript)
-				      : this.model.getCalledVariants();
+				      : this.model.getFbDataForGene(window.gene, window.selectedTranscript)
 	if (theVcfData == null) {
 		return null;
 	}

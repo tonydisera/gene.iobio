@@ -94,9 +94,34 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	return theVcfData;
 }
 
-VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscript) {
+VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscript, reconstiteFromVcfData=false) {
 	var me = this;
-	return me._getDataForGene("fbData", geneObject, selectedTranscript);
+	var theFbData =  me._getDataForGene("fbData", geneObject, selectedTranscript);
+
+	if (reconstiteFromVcfData) {
+		// Reconstitute called variants from vcf data that contains called variants
+		if (theFbData == null || theFbData.features == null) {
+			var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
+			var dangerSummary = me.getDangerSummaryForGene(geneObject.gene_name);
+			if (theVcfData && theVcfData.features && theVcfData.features.length > 0 && dangerSummary && dangerSummary.CALLED) {
+				theFbData = $.extend({}, theVcfData);
+				theFbData.features = [];
+				theFbData.loadState = {clinvar: true, coverage: true, inheritance: true};
+				// Add the unique freebayes variants to vcf data to include 
+				// in feature matrix
+				theVcfData.features.forEach( function(v) {
+					if (v.hasOwnProperty('fbCalled') && v.fbCalled == 'Y') {
+						var variantObject = $.extend({}, v);
+				   		theFbData.features.push(variantObject);
+				   		variantObject.source = v;
+					}
+			   	});					
+			}
+
+		} 
+	}
+	return theFbData;
+
 }
 
 VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
@@ -386,14 +411,16 @@ VariantModel.prototype.setLoadedVariants = function(theVcfData) {
 	this.vcfData = theVcfData;
 }
 
-VariantModel.prototype.setCalledVariants = function(theFbData) {
+VariantModel.prototype.setCalledVariants = function(theFbData, cache=false) {
 	this.fbData = theFbData;
+	if (cache) {
+		this._cacheData(theFbData, 'fbData', window.geneObject.gene_name, window.selectedTranscript);
+	}
 }
-
 
 VariantModel.prototype.getCalledVariantCount = function() {
 	var me = this;
-	var theFbData = me.getCalledVariants();
+	var theFbData = me.getFbDataForGene(window.gene, window.selectedTranscript);
 	if (theFbData.features ) {
 		return theFbData.features.filter(function(d) {
 			// Filter homozygous reference for proband only
@@ -409,30 +436,16 @@ VariantModel.prototype.getCalledVariantCount = function() {
 
 VariantModel.prototype.hasCalledVariants = function() {
 	var me = this;
-	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript);
+	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript, true);
 	return theFbData != null && theFbData.features != null && theFbData.features.length > 0;
 }
 
 
-VariantModel.prototype.getCalledVariants = function(theRegionStart, theRegionEnd) {
-	var me = this;
-	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript);
-	
-	if (theRegionStart && theRegionEnd) {
-		// Check the local cache first to see
-		// if we already have the freebayes variants
-		var variants = theFbData.features.filter(function(d) {
-							return (d.start >= theRegionStart && d.start <= theRegionEnd);
-					   });	
-		return {'features': variants};
-	} else {
-		return theFbData;
-	}
-}
-
 
 VariantModel.prototype.variantsHaveBeenCalled = function() {
-	return this.getCalledVariants() != null;
+	var me = this;
+	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript, true);
+	return theFbData != null;
 }
 
 
@@ -1187,11 +1200,11 @@ VariantModel.prototype.isCached = function(geneName, transcript) {
 	return data != null;
 }
 
-VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneName, transcript, checkForCalledVariants) {
-	var theVcfData = this._getCachedData("vcfData", geneName, transcript);
-	var theFbData  = this._getCachedData("fbData", geneName, transcript);
+VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneObject, transcript, checkForCalledVariants) {
+	var theVcfData = this._getCachedData("vcfData", geneObject.gene_name, transcript);
+	var theFbData  = this.getFbDataForGene(geneObject, transcript, true);
 	var vcfDataCached = theVcfData && theVcfData.loadState != null && (dataCard.mode == 'single' || theVcfData.loadState['inheritance']);
-	return vcfDataCached && (!checkForCalledVariants || theFbData);
+	return vcfDataCached && (!checkForCalledVariants || (theFbData && theFbData.features));
 }
 
 

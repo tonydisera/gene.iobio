@@ -193,6 +193,7 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 		// filters were applied while genes were still in the process of being
 		// analyzed.
 		me.refreshGeneBadges();
+		me.showAnalyzeAllProgress();
 	});
 
 
@@ -287,7 +288,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 
     	
 
-	    if (me.isCachedForProband(geneObject.gene_name, transcript, analyzeCalledVariants)) {
+	    if (me.isCachedForProband(geneObject, transcript, analyzeCalledVariants)) {
 
 	    	// This gene has already been analyzed. Take this gene off of the queue and see
 	    	// if next batch of genes should be analyzed
@@ -477,9 +478,12 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 			// For alignments only analysis, the called variants were cached in as "vcfData" to process
 			// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
 			// for the proband.
-			if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
-				getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
-			}
+			//if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
+			//	getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
+			//}
+
+			getVariantCard("proband" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
+
 
 		} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
 			// Don't clear cache for currently selected
@@ -530,12 +534,12 @@ CacheHelper.prototype.cacheNextGene = function(geneName, analyzeCalledVariants, 
 	this.cacheGenes(analyzeCalledVariants, callback);
 }
 
-CacheHelper.prototype.isCachedForProband = function(geneName, transcript, checkForCalledVariants) {
+CacheHelper.prototype.isCachedForProband = function(geneObject, transcript, checkForCalledVariants) {
 	// If we are analyzing loaded variants, return true if the vcf data is cached (and inheritance loaded)
 	// and we have danger summary for this gene.  If we are also analyzing called variants return true
 	// if the above condition is met plus we have cached the called variants for this gene.
-	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneName, transcript, checkForCalledVariants)
-		|| (!checkForCalledVariants && getProbandVariantCard().model.getDangerSummaryForGene(geneName));
+	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneObject, transcript, checkForCalledVariants)
+		|| (!checkForCalledVariants && getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name));
 }
 
 CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
@@ -633,7 +637,7 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  			geneCount.pass++;
 		  		}
 
-				var theFbData = getVariantCard("proband").model.getFbDataForGene(geneObject, {transcript_id: keyObject.transcript});
+				var theFbData = getVariantCard("proband").model.getFbDataForGene(geneObject, {transcript_id: keyObject.transcript}, true);
 				var options = {};
 				if (theFbData) {
 					options.CALLED = true;
