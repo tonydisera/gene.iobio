@@ -260,7 +260,7 @@ VariantExporter.prototype._appendVcfRecordAnnotations = function(vcfRecord, reco
 			if (buf.length > 0) {
 				buf += "|";
 			} 
-			buf += exportField.field + "#" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : " ");			
+			buf += exportField.field + "#" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : ".");			
 		}
 	})
 
