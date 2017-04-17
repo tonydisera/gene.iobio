@@ -1387,7 +1387,7 @@ function loadUrlSources() {
 	if (vcf != null) {
 		Object.keys(vcf).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
-			var tbiUrl    = tbi["tbi"+cardIndex];
+			var tbiUrl    = tbi && Object.keys(tbi).length > 0 ? tbi["tbi"+cardIndex] : null;
 			var variantCard      = variantCards[+cardIndex];
 			if (variantCard) {
 				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
@@ -1410,7 +1410,7 @@ function loadUrlSources() {
 	if (bam != null) {
 		Object.keys(bam).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
-			var baiUrl    = bai["bai"+cardIndex];
+			var baiUrl    = bai && Object.keys(bai).length > 0 ? bai["bai"+cardIndex] : null;
 			var variantCard      = variantCards[+cardIndex];
 			if (variantCard) {
 				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
