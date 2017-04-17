@@ -400,6 +400,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			    bookmark.append("a")
 			            .attr("class", "bookmark")
 			            .on('click', function(entry,i) {
+			            	me.hideTooltip();
 				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
 		         			var currentBookmark = d3.select(this);
 		         			currentBookmark.classed("current", true);
@@ -429,6 +430,27 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 							}
 
 							
+			            })
+						.on('mouseover', function(entry,i) {
+				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+		         			var currentBookmark = d3.select(this);
+		         			currentBookmark.classed("current", true);
+
+		         			me.selectedBookmarkKey = entry.key;
+
+				         	var geneName     = me.parseKey(entry.key).gene;
+				         	var transcriptId = me.parseKey(entry.key).transcriptId;
+				         	var theTranscript = {transcript_id: transcriptId};
+							var variant = me.resolveBookmarkedVariant(entry.key, entry.value, geneObjects[geneName], theTranscript);
+							
+				            var screenX = window.pageXOffset + currentBookmark.select('.variant-label').node().offsetLeft + currentBookmark.select('.variant-label').node().offsetWidth;
+				            var screenY = window.pageYOffset + currentBookmark.node().offsetTop + $('.navbar-fixed-top').outerHeight();
+				            unpinAll();
+							me._showVariantTooltip(variant, screenX, screenY, geneObjects[geneName], theTranscript);
+
+			            })
+			            .on('mouseout', function(entry,i) {
+			            	me.hideTooltip();
 			            });
 	        });
 			
@@ -666,6 +688,44 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 		  })
 		  .classed("current", true);
 
+
+}
+
+BookmarkCard.prototype._showVariantTooltip = function(variant, screenX, screenY, geneObject, transcriptObject) {
+	var me = this;
+
+	var injectTooltipGlyphs = function(variant) {
+		var tooltip = d3.select('#bookmark-gene-tooltip');
+		variantTooltip.injectVariantGlyphs(tooltip, variant, '.tooltip-wide');
+		var selection = tooltip.select("#coverage-svg");
+		variantTooltip.createAlleleCountSVGTrio(getProbandVariantCard(), selection, variant, 150);		
+	}
+
+	var html = variantTooltip.formatContent(variant, null, 'tooltip-wide');
+	me.showTooltip(html, screenX, screenY, variantTooltip.WIDTH_LOCK);	
+	injectTooltipGlyphs(variant);
+
+
+	getProbandVariantCard().model.promiseGetVariantExtraAnnotations(geneObject, transcriptObject, variant)
+        .then( function(refreshedVariant) {
+    		// Now show tooltip again with the hgvs notations. 
+        	if (variant.start == refreshedVariant.start &&
+        		variant.ref == refreshedVariant.ref &&
+        		variant.alt == refreshedVariant.alt) {
+
+        		variant.vepHGVSc = refreshedVariant.vepHGVSc;
+				variant.vepHGVSp = refreshedVariant.vepHGVSp;
+				variant.vepVariationIds = refreshedVariant.vepVariationIds;
+				variant.extraAnnot = true;
+
+	        	var html = variantTooltip.formatContent(variant, null, 'tooltip-wide');
+				me.showTooltip(html, screenX, screenY, variantTooltip.WIDTH_LOCK);	
+				injectTooltipGlyphs(variant);
+
+			}
+        });
+
+	
 
 }
 
