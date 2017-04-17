@@ -414,14 +414,14 @@ VariantModel.prototype.setLoadedVariants = function(theVcfData) {
 VariantModel.prototype.setCalledVariants = function(theFbData, cache=false) {
 	this.fbData = theFbData;
 	if (cache) {
-		this._cacheData(theFbData, 'fbData', window.geneObject.gene_name, window.selectedTranscript);
+		this._cacheData(theFbData, 'fbData', window.gene.gene_name, window.selectedTranscript);
 	}
 }
 
 VariantModel.prototype.getCalledVariantCount = function() {
 	var me = this;
 	var theFbData = me.getFbDataForGene(window.gene, window.selectedTranscript);
-	if (theFbData.features ) {
+	if (theFbData && theFbData.features ) {
 		return theFbData.features.filter(function(d) {
 			// Filter homozygous reference for proband only
 			if (d.zygosity && d.zygosity.toLowerCase() == 'homref') {

@@ -1,3 +1,6 @@
+var cacheHelper = new CacheHelper();
+cacheHelper.isolateSession();
+
 describe('variantModel', function() {
 	var variantModel;
 
@@ -342,10 +345,13 @@ describe('variantModel', function() {
 
 	describe('#getCalledVariantCount', function() {
 		it('returns the correct count of called variants', function() {
+			window.gene = { chr: 'chr1', gene_name: 'foo' };
+			window.selectedTranscript = 'transcript';
+			variantModel.relationship = 'proband';
 			variantModel.setCalledVariants(
 				{
-					features: [{ zygosity: 'HET' }, { zygosity: 'HOMREF' }, { zygosity: 'HOM'}]
-				}
+					features: [{ ref: 'chr1', zygosity: 'HET' }, { ref: 'chr1', zygosity: 'HOMREF' }, { ref: 'chr1', zygosity: 'HOM'}]
+				}, true
 			);
 			expect(variantModel.getCalledVariantCount()).toEqual(2);
 		});
