@@ -1639,7 +1639,9 @@ VariantModel.prototype._populateEffectFilters  = function(variants) {
 
 VariantModel.prototype._populateRecFilters  = function(variants) {
 	variants.forEach( function(variant) {
-		filterCard.recFilters[variant.recfilter] = variant.recfilter;
+		if (!variant.hasOwnProperty('fbCalled') || variant.fbCalled != 'Y') {
+			filterCard.recFilters[variant.recfilter] = variant.recfilter;
+		}
 	});	
 }
 
