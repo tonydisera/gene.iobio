@@ -656,6 +656,17 @@ DataCard.prototype.init = function() {
 		me.onShow();
 	})
 
+	$('#separate-url-for-index-files-cb').click(function() {	   
+		if ($('#separate-url-for-index-files-cb').is(":checked")) {		
+			$('#url-tbi-input').removeClass("hide");
+			$('#bai-url-input').removeClass("hide");
+			$('#url-tbi-input').val("");
+			$('#bai-url-input').val("");
+		} else {
+			$('#url-tbi-input').addClass("hide");
+			$('#bai-url-input').addClass("hide");
+		}   
+	});
 
 
 	$('#select-species').selectize(
@@ -700,9 +711,11 @@ DataCard.prototype.init = function() {
 	);
 	this.listenToEvents($('#proband-data'));
 	$('#proband-data').find("#url-input").removeClass('hide');
-	$('#proband-data').find("#url-tbi-input").removeClass('hide');
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {
+		$('#proband-data').find("#url-tbi-input").removeClass('hide');
+		$('#proband-data').find("#bai-url-input").removeClass('hide');
+	}
 	$('#proband-data').find("#bam-url-input").removeClass('hide');
-	$('#proband-data').find("#bai-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 	
@@ -740,9 +753,11 @@ DataCard.prototype.init = function() {
 	);
 	this.listenToEvents($('#mother-data'));
 	$('#mother-data').find("#url-input").removeClass('hide');
-	$('#mother-data').find("#url-tbi-input").removeClass('hide');
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {	
+		$('#mother-data').find("#url-tbi-input").removeClass('hide');
+		$('#mother-data').find("#bai-url-input").removeClass('hide');
+	}
 	$('#mother-data').find("#bam-url-input").removeClass('hide');
-	$('#mother-data').find("#bai-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#mother-data'));
 
@@ -762,9 +777,12 @@ DataCard.prototype.init = function() {
 
 	addVariantCard();
 	$('#father-data').find("#url-input").removeClass('hide');
-	$('#father-data').find("#url-tbi-input").removeClass('hide');
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {
+		$('#father-data').find("#url-tbi-input").removeClass('hide');
+		$('#father-data').find("#bai-url-input").removeClass('hide');
+	}
+
 	$('#father-data').find("#bam-url-input").removeClass('hide');
-	$('#father-data').find("#bai-url-input").removeClass('hide');
 	me.setDataSourceRelationship($('#father-data'));
 
 	
@@ -933,9 +951,14 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 	$('#tourWelcome').removeClass("open");
 	
 	var bamUrlInput = panelSelector.find('#bam-url-input');
-	var baiUrlInput = panelSelector.find('#bai-url-input');
 	bamUrlInput.removeClass("hide");
-	baiUrlInput.removeClass("hide");
+
+	var baiUrl = '';
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {		
+		var baiUrlInput = panelSelector.find('#bai-url-input');
+		baiUrlInput.removeClass("hide");
+		baiUrl = baiUrlInput.val();
+	}
 
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
@@ -944,7 +967,6 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 	this.setDataSourceRelationship(panelSelector);
 
 	var bamUrl = bamUrlInput.val();
-	var baiUrl = baiUrlInput.val();
 	if (isOffline) {
 		if (bamUrl.indexOf(offlineUrlTag) == 0) {
 			bamUrl = "http://" + serverInstance + serverDataDir + bamUrl.split(offlineUrlTag)[1];
@@ -982,8 +1004,12 @@ DataCard.prototype.displayBamUrlBox = function(panelSelector) {
     panelSelector.find('#bam-file-info').val('');
     panelSelector.find('#bam-url-input').removeClass("hide");
     panelSelector.find("#bam-url-input").focus();
-    panelSelector.find('#bai-url-input').removeClass("hide");
-    panelSelector.find("#bai-url-input").focus();
+    if ($('#separate-url-for-index-files-cb').is(":checked")) {		
+	    panelSelector.find('#bai-url-input').removeClass("hide");
+	} else {
+	    panelSelector.find('#bai-url-input').addClass("hide");
+
+	}
 
     // Blank out the URL
 	panelSelector.find("#bam-url-input").val("");
@@ -1051,7 +1077,12 @@ DataCard.prototype.displayUrlBox = function(panelSelector) {
 
 	panelSelector.find("#url-input").removeClass('hide');
     panelSelector.find("#url-input").focus();
-	panelSelector.find("#url-tbi-input").removeClass('hide');
+    if ($('#separate-url-for-index-files-cb').is(":checked")) {
+		panelSelector.find("#url-tbi-input").removeClass('hide');
+	} else {
+		panelSelector.find("#url-tbi-input").addClass('hide');
+	}
+
     panelSelector.find('#vcf-file-info').addClass('hide');
     panelSelector.find('#vcf-file-info').val('');
     this.onVcfUrlEntered(panelSelector);
@@ -1255,7 +1286,11 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 
 	var vcfUrl = panelSelector.find('#url-input').val();
-	var tbiUrl = panelSelector.find('#url-tbi-input').val();
+
+	var tbiUrl =  '';
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {
+		tbiUrl = panelSelector.find('#url-tbi-input').val();
+	}
 
 	if (isOffline) {
 		if (vcfUrl.indexOf(offlineUrlTag) == 0) {

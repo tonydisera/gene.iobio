@@ -1394,8 +1394,11 @@ function loadUrlSources() {
 				var panelSelector    = $(panelSelectorStr);
 				panelSelector.find('#url-input').val(vcf[urlParameter]);
 				panelSelector.find('#url-input').removeClass("hide");
-				panelSelector.find('#url-tbi-input').val(tbiUrl);
-				panelSelector.find('#url-tbi-input').removeClass("hide");
+				if (tbiUrl && tbiUrl != "") {
+					panelSelector.find('#url-tbi-input').val(tbiUrl);
+					panelSelector.find('#url-tbi-input').removeClass("hide");					
+					$('#separate-url-for-index-files-cb').prop('checked', true);				
+				}
 				dataCard.onVcfUrlEntered(panelSelector, function(success) {
 					if (success) {
 						vcfLoadedCount++;
@@ -1417,8 +1420,11 @@ function loadUrlSources() {
 				var panelSelector    = $(panelSelectorStr);
 				panelSelector.find('#bam-url-input').val(bam[urlParameter]);
 				panelSelector.find('#bam-url-input').removeClass("hide");
-				panelSelector.find('#bai-url-input').val(baiUrl);
-				panelSelector.find('#bai-url-input').removeClass("hide");
+				if (baiUrl && baiUrl != "") {
+					panelSelector.find('#bai-url-input').val(baiUrl);
+					panelSelector.find('#bai-url-input').removeClass("hide");	
+					$('#separate-url-for-index-files-cb').prop('checked', true);				
+				}
 				dataCard.onBamUrlEntered(panelSelector, function(success) {
 					if (success) {
 						bamLoadedCount++;

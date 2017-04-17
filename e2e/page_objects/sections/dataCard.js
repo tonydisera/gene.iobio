@@ -21,12 +21,16 @@ module.exports = {
       this.setValue('@enterGeneName', [gene, this.api.Keys.ARROW_DOWN, this.api.Keys.ENTER]);
       this.api.pause(2000);
       return this;
+    },
+    checkSeparateUrlForIndex: function() {
+      return this.click('@separateIndexUrlCheckbox');
     }
   }],
-  elements: {
+  elements: {    
     loadButton: { selector: '#ok-button' },
     singleProbandButton: { selector: '#single-proband-button' },
     trioButton: { selector: '#trio-button' },
+    separateIndexUrlCheckbox: { selector: '#separate-url-for-index-files-cb + span' },
     genomeBuildSelectBox: { selector: '#select-build-box .selectize-input' },
     enterGeneName: { selector: '#enter-gene-name-data-dialog' }
   },

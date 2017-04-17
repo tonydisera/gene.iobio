@@ -264,6 +264,16 @@
                      <div style="float: right;margin-top: 2px;margin-left: 2px;padding-bottom: 0px;">Other</div>
                   </button>
                 </div>
+
+                <div style="display: inline-block;margin-left: 20px;">
+                  <div class="checkbox">
+                      <label style="margin-right:5px;">
+                        <input id="separate-url-for-index-files-cb"  type="checkbox"> 
+                        Separate URL for index files
+                      </label>
+                  </div>
+                </div>   
+                             
                 <div style="float:right;display:inline-block;overflow:visible;margin-top:14px;margin-bottom:18px;">
                   <div id="select-build-box" style="width:160px;float:right;margin-left:20px;">
                     <select id="select-build" class="selectized" placeholder="select genome build">
@@ -292,7 +302,7 @@
                   <input id="datasource-relationship" class="hide" value="mother" type="text"/>
                 </div>
 
-                <div id="father-data" class="hide" style="float:left;width:32%;margin-top:20px;min-width:500px;">
+                <div id="father-data" class="hide" style="float:left;margin-top:20px;min-width:500px;">
                   <input id="card-index" class="hide" value="2" type="text">
                   <input id="datasource-relationship" class="hide" value="father" type="text"/>
                 </div>
@@ -300,7 +310,7 @@
 
               </div>
 
-              <div class="fullview" style="clear:both;text-align:left;padding-top:10px;">
+              <div class="fullview" style="overflow:auto;clear:both;text-align:left;padding-top:10px;">
                 <div id="affected-sibs-box" style="float:left;" class="hide">
                     <div id="sample-data-label">
                       AFFECTED SIBLINGS
@@ -323,7 +333,7 @@
 
 
 
-              <div class="modal-footer" style="clear-both">
+              <div class="modal-footer" style="clear-both;padding-top:0px;padding-bottom:12px">
                   <span id="gene-name-data-dialog-box" class="hide" style="float:left">
                     <span id="sample-data-label">Enter gene name</span>
                     <span id="bloodhound-data-dialog" style="margin-top:-10px" class="hide form-group" >
@@ -331,11 +341,11 @@
                     </span> 
                   </span>
                   <span class="hint todo" style="float:left;">Files must correspond to build GRCh37.</span>
-                  <button id="ok-button" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
+                  <button id="ok-button" style="margin-top:10px;" data-dismiss="modal" type="btn btn-raised" class="disabled icon-button-sm btn btn-default btn-raised">
                     <i class="material-icons">cloud_done</i>
                     Load
                   </button>
-                  <button type="button" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
+                  <button type="button" style="margin-top:10px;" class="btn btn-default icon-button-sm btn btn-default btn-raised" data-dismiss="modal">Cancel</button>
               </div>
             </div>   
 

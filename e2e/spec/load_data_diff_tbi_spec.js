@@ -23,7 +23,7 @@ module.exports = {
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild('GRCh37');
-    
+    dataCard.checkSeparateUrlForIndex();
     dataCard.section.probandData.inputUrl("https://s3.amazonaws.com/iobio/app_testing/vcf_files/diff_index_url/snps_only.vcf.gz")
     dataCard.section.probandData.inputTbiUrl("https://s3.amazonaws.com/iobio/app_testing/vcf_files/diff_index_url/index/snps_only.vcf.gz.tbi")
     client.pause(1000);
