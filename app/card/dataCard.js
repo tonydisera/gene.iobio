@@ -656,16 +656,17 @@ DataCard.prototype.init = function() {
 		me.onShow();
 	})
 
-	$('#separate-url-for-index-files-cb').click(function() {	   
-		if ($('#separate-url-for-index-files-cb').is(":checked")) {		
-			$('#url-tbi-input').removeClass("hide");
-			$('#bai-url-input').removeClass("hide");
-			$('#url-tbi-input').val("");
-			$('#bai-url-input').val("");
-		} else {
-			$('#url-tbi-input').addClass("hide");
-			$('#bai-url-input').addClass("hide");
-		}   
+	$('#separate-url-for-index-files-cb').click(function() {	
+		var checked = $('#separate-url-for-index-files-cb').is(":checked");   
+		d3.selectAll('#url-tbi-input').classed("hide", !checked);
+		d3.selectAll('#bai-url-input').classed("hide", !checked);
+		$('.index-input').val("");
+		me.onVcfUrlEntered($('#proband-data'));
+		me.onVcfUrlEntered($('#mother-data'));
+		me.onVcfUrlEntered($('#father-data'));
+		me.onBamUrlEntered($('#proband-data'));
+		me.onBamUrlEntered($('#mother-data'));
+		me.onBamUrlEntered($('#father-data'));
 	});
 
 
@@ -1287,6 +1288,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 	var vcfUrl = panelSelector.find('#url-input').val();
 
+
 	var tbiUrl =  '';
 	if ($('#separate-url-for-index-files-cb').is(":checked")) {
 		tbiUrl = panelSelector.find('#url-tbi-input').val();
@@ -1305,29 +1307,34 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 	window.updateUrl('tbi'+cardIndex, tbiUrl);
 	
 	variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
-		panelSelector.find('.vcf-sample.loader').addClass('hide');
+		if (vcfUrl && vcfUrl != "") {
+			panelSelector.find('.vcf-sample.loader').addClass('hide');
 
-		if (success) {
-			me.setDefaultBuildFromData();
-			
-			// Only show the sample dropdown if there is more than one sample
-			if (sampleNames.length > 1) {
-				me.populateSampleDropdowns(variantCard, panelSelector, sampleNames);
+			if (success) {
+				me.setDefaultBuildFromData();
+				
+				// Only show the sample dropdown if there is more than one sample
+				if (sampleNames.length > 1) {
+					me.populateSampleDropdowns(variantCard, panelSelector, sampleNames);
+
+				} else {
+					variantCard.setSampleName("");
+					variantCard.setDefaultSampleName(null);
+					window.removeUrl('sample'+cardIndex);
+
+
+					me.enableLoadButtonIfBuildSet(true);			
+				}
 
 			} else {
-				variantCard.setSampleName("");
-				variantCard.setDefaultSampleName(null);
-				window.removeUrl('sample'+cardIndex);
-
-
-				me.enableLoadButtonIfBuildSet(true);			
+				window.disableLoadButton();
 			}
 
+			if (callback) {
+				callback(success);
+			}
 		} else {
-			window.disableLoadButton();
-		}
-
-		if (callback) {
+			window.enableLoadButton();
 			callback(success);
 		}
 		

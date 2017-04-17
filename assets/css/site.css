@@ -2292,6 +2292,8 @@ inputinput:-moz-placeholder {
 #dataModal #vcf-sample-select-box {
   display: inline-block;
   width: 200px; }
+  #dataModal #vcf-sample-select-box input {
+    width: 200px !important; }
 #dataModal .form-group {
   margin-top: -5px; }
 #dataModal .form-group-header {
