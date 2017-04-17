@@ -104,7 +104,7 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 			progressBar.find('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
 		
 			
-			progressBar.find('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "0");
+			progressBar.find('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "");
 
 			progressBar.find('#passed-filter-bar'    ).attr("title", counts.pass > 0             ? counts.pass + " pass filter" : "");
 			progressBar.find('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount +  " fail filter" : "");
