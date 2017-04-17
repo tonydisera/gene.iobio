@@ -1923,6 +1923,11 @@ inputinput:-moz-placeholder {
         background-color: #9fbb52; }
         #filter-track #standard-filter-panel .standard-filter-count #called-variant-count.none {
           background-color: #e8e6e6; }
+      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-warning {
+        color: #ababab;
+        font-size: 22px;
+        vertical-align: bottom;
+        cursor: pointer; }
   #filter-track .checkbox label {
     font-size: 12px;
     line-height: 13px; }

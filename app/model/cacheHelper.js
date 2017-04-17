@@ -156,7 +156,14 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 			} else {
 				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass("none");
 			}
+
 		}			
+	}
+
+	if (notAnalyzedCount > 0) {
+		$('#standard-filter-panel .standard-filter-btn').parent().find('#unanalyzed-warning').removeClass("hide");
+	} else {
+		$('#standard-filter-panel .standard-filter-btn.current').parent().find('#unanalyzed-warning').addClass("hide");
 	}
 
 
