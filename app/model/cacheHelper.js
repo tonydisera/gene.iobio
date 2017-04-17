@@ -161,7 +161,16 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 	}
 
 	if (notAnalyzedCount > 0) {
-		$('#standard-filter-panel .standard-filter-btn').parent().find('#unanalyzed-warning').removeClass("hide");
+		var filterCountId = field + '-variant-count';
+		$('#standard-filter-panel .variant-count').each( function(i,val) {
+			if ($(val).attr('id') == filterCountId) {
+				if ($(val).hasClass("hide")) {
+					$(val).parent().find('#unanalyzed-warning').addClass("hide"); 
+				} else {
+					$(val).parent().find('#unanalyzed-warning').removeClass("hide"); 
+				}				
+			}
+		})
 	} else {
 		$('#standard-filter-panel .standard-filter-btn.current').parent().find('#unanalyzed-warning').addClass("hide");
 	}
