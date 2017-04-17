@@ -348,8 +348,8 @@ describe('variantExporter', function() {
 				for(var field in infoRec) {
 					infoRec[field] = infoRec[field] == null ? '' : infoRec[field];
 					// Interpret blank as '.'
-					if (infoRec[field] == '') {
-						infoRec[field] = '.';
+					if (validateRec[field] == '') {
+						validateRec[field] = '.';
 					}
 					if (validateRec.hasOwnProperty(field)) {
 						expect(infoRec[field].trim()).toEqual(validateRec[field]);
