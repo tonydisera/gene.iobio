@@ -660,13 +660,22 @@ DataCard.prototype.init = function() {
 		var checked = $('#separate-url-for-index-files-cb').is(":checked");   
 		d3.selectAll('#url-tbi-input').classed("hide", !checked);
 		d3.selectAll('#bai-url-input').classed("hide", !checked);
-		$('.index-input').val("");
-		me.onVcfUrlEntered($('#proband-data'));
-		me.onVcfUrlEntered($('#mother-data'));
-		me.onVcfUrlEntered($('#father-data'));
-		me.onBamUrlEntered($('#proband-data'));
-		me.onBamUrlEntered($('#mother-data'));
-		me.onBamUrlEntered($('#father-data'));
+
+		// Loop through the .tbi and .bai inputs to see if any need to be blanked out.  Since there are
+		// a pair of index input fields for each sample, the panelSelector array will point us to the
+		// correct sample panel.
+		var panelSelector = ['#proband-data', '#proband-data', '#mother-data','#mother-data', '#father-data','#father-data'];
+		$('.index-input').each(function(i,val) {
+			var currentValue = $(val).val();
+			if (currentValue != "") {
+				$(val).val("");
+				if ($(val).attr("id") == "url-tbi-input") {
+					me.onVcfUrlEntered($(panelSelector[i]));
+				} else if ($(val).attr("id") == "bai-url-input") {
+					me.onBamUrlEntered($(panelSelector[i]));
+				}
+			}
+		})
 	});
 
 
