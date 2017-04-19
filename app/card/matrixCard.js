@@ -871,10 +871,9 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
     this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
 
-    var theVcfData = getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript);
-
+    var unfilteredVcfData = getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (isLevelBasic) {
-		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
+		if (unfilteredVcfData != null && unfilteredVcfData.features != null && unfilteredVcfData.features.length == 0) {
 			$('#matrix-track #no-variants.level-basic').removeClass("hide");
 			$('#matrix-panel').addClass("hide");
 		} else {
@@ -882,7 +881,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			$('#matrix-panel').removeClass("hide");
 		}
 	} else {
-	    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  theVcfData && theVcfData.features.length > 0) {
+	    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
 	    	$('#zero-variants').addClass("zero-filtered-variants");
 	    	$('#zero-variants').text("No variants passed the filter" );
 	    	$('#zero-variants').removeClass("hide");
