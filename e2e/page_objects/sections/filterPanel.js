@@ -1,5 +1,6 @@
 module.exports = {
 	selector: '#slider-left #filter-track',
+
   commands: [{
     clickPASSFilter: function() {
       return this.click('@PASSFilter');
@@ -16,78 +17,107 @@ module.exports = {
     clickEffect: function() {
       return this.click('@effect');
     },
-    clickVepHigh: function() {
-      return this.click('@vepHigh');
+
+    clickClinvarPath: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="clinvar" and @id="clinvar_path"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickVepModerate: function() {
-      return this.click('@vepModerate');
+    clickVepHigh: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="HIGH"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickVepModifier: function() {
-      return this.click('@vepModifier');
+    clickVepModerate: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="MODERATE"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickVepLow: function() {
-      return this.click('@vepLow');
+    clickVepModifier: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="MODIFIER"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    click3PrimeUTR: function() {
-      return this.click('@threePrimeUTRVariant');
+    clickVepLow: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="LOW"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickDownstreamGene: function() {
-      return this.click('@downstreamGeneVariant');
+
+
+    click3PrimeUTR: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="vepConsequence" and @id="3_prime_UTR_variant"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickInframeDeletion: function() {
-      return this.click('@inframeDeletion');
+    clickDownstreamGene: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="vepConsequence" and @id="downstream_gene_variant"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickIntron: function() {
-      return this.click('@intronVariant');
+    clickInframeDeletion: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="vepConsequence" and @id="inframe_deletion"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickStopGained: function() {
-      return this.click('@stopGained');
+    clickIntron: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="vepConsequence" and @id="intron_variant"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickSynonymous: function() {
-      return this.click('@synonymousVariant');
+    clickStopGained: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="vepConsequence" and @id="stop_gained"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    selectAlleleFrequency: function(option) {
-      return this.click('@alleleFrequencySelectBox')
-                 .click("#select-af-scheme + div .selectize-dropdown-content [data-value='" + option + "']");
+    clickSynonymous: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="vepConsequence" and @id="synonymous_variant"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);
     },
-    clickAfexacUnique: function() {
-      return this.click('@afexacUnique');
+
+
+    clickAfexacUnique: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_unique"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAfexacUberrare: function() {
-      return this.click('@afexacUberrare');
+    clickAfexacUberrare: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_uberrare"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAfexacSuperrare: function() {
-      return this.click('@afexacSuperrare');
+    clickAfexacSuperrare: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_superrare"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAfexacRare: function() {
-      return this.click('@afexacRare');
+    clickAfexacRare: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_rare"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAfexacUncommon: function() {
-      return this.click('@afexacUncommon');
+    clickAfexacUncommon: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_uncommon"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAfexacCommon: function() {
-      return this.click('@afexacCommon');
+    clickAfexacCommon: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_common"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAfexacUniqueNc: function() {
-      return this.click('@afexacUniqueNc');
+    clickAfexacUniqueNc: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="afexaclevels" and @id="afexac_unique_nc"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAf1000gUnique: function() {
-      return this.click('@af1000gUnique');
+
+    clickAf1000gUnique: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_unique"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAf1000gUberrare: function() {
-      return this.click('@af1000gUberrare');
+    clickAf1000gUberrare: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_uberrare"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAf1000gSuperrare: function() {
-      return this.click('@af1000gSuperrare');
+    clickAf1000gSuperrare: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_superrare"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAf1000gRare: function() {
-      return this.click('@af1000gRare');
+    clickAf1000gRare: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_rare"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAf1000gUncommon: function() {
-      return this.click('@af1000gUncommon');
+    clickAf1000gUncommon: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_uncommon"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
-    clickAf1000gCommon: function() {
-      return this.click('@af1000gCommon');
+    clickAf1000gCommon: function(client) {
+      var selector = '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_common"]';
+      return client.useXpath().moveToElement(selector, 1,1).click(selector);      
     },
   }],
   elements: {
@@ -95,30 +125,7 @@ module.exports = {
     unassignedFilter: { selector: '#rec-filter-box #unassigned'},
     excludeNonCoding: { selector: '#exonic-only-cb + span' },
     impact: { selector: '#impact-scheme i' },
-    effect: { selector: '#effect-scheme i' },
-    vepHigh: { selector: '.highestImpactVep#HIGH' },
-    vepModerate: { selector: '.highestImpactVep#MODERATE' },
-    vepModifier: { selector: '.highestImpactVep#MODIFIER' },
-    vepLow: { selector: '.highestImpactVep#LOW' },
-    threePrimeUTRVariant: { selector: '#effect-filter-box #3_prime_UTR_variant' },
-    downstreamGeneVariant: { selector: '#effect-filter-box #downstream_gene_variant' },
-    inframeDeletion: { selector: '#effect-filter-box #inframe_deletion' },
-    intronVariant: { selector: '#effect-filter-box #intron_variant' },
-    stopGained: { selector: '#effect-filter-box #stop_gained' },
-    synonymousVariant: { selector: '#effect-filter-box #synonymous_variant' },
-    alleleFrequencySelectBox: { selector: '#select-af-scheme + div' },
-    afexacUnique: { selector: '.afexaclevel-panel #afexac_unique' },
-    afexacUberrare: { selector: '.afexaclevel-panel #afexac_uberrare' },
-    afexacSuperrare: { selector: '.afexaclevel-panel #afexac_superrare' },
-    afexacRare: { selector: '.afexaclevel-panel #afexac_rare' },
-    afexacUncommon: { selector: '.afexaclevel-panel #afexac_uncommon' },
-    afexacCommon: { selector: '.afexaclevel-panel #afexac_common' },
-    afexacUniqueNc: { selector: '.afexaclevel-panel #afexac_unique_nc' },
-    af1000gUnique: { selector: '.af1000glevel-panel #af1000g_unique' },
-    af1000gUberrare: { selector: '.af1000glevel-panel #af1000g_uberrare' },
-    af1000gSuperrare: { selector: '.af1000glevel-panel #af1000g_superrare' },
-    af1000gRare: { selector: '.af1000glevel-panel #af1000g_rare' },
-    af1000gUncommon: { selector: '.af1000glevel-panel #af1000g_uncommon' },
-    af1000gCommon: { selector: '.af1000glevel-panel #af1000g_common' },
+    effect: { selector: '#effect-scheme i' },   
+
   }
 };
