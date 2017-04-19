@@ -1199,11 +1199,7 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (this.getRelationship() == 'proband' && theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
-		$('#filter-and-rank-card').addClass("hide");
-    	//$('#matrix-track').addClass("hide");
-    	return;
-	}
+
 
 
 	$('#filter-and-rank-card').removeClass("hide");
@@ -1469,7 +1465,7 @@ VariantCard.prototype._filterVariants = function(dataToFilter) {
 	var me = this;
 
 	var data = dataToFilter ? dataToFilter : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (data == null || data.features == null || data.features.length == 0) {
+	if (data == null || data.features == null) {
 		return;
 	}
 	

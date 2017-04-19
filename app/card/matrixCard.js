@@ -694,15 +694,6 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 	resizeCardWidths();
 
-	if (isLevelBasic) {
-		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
-			$('#matrix-track #no-variants.level-basic').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else {
-			$('#matrix-track #no-variants.level-basic').addClass("hide");
-			$('#matrix-panel').removeClass("hide");
-		}
-	}
 
 	if (theVcfData != null) {
 		this.featureVcfData = {};
@@ -722,6 +713,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 			return 1;
 		}
 	});
+
 
 
 	// Fill all features used in feature matrix for each variant
@@ -872,15 +864,43 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	this.featureMatrix.matrixRows(this.filteredMatrixRows);
 	var selection = d3.select("#feature-matrix").data([sortedFeatures]);
 
+
+
+
+
     this.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
-    // We have new properties to filter on (for inheritance), so refresh the
-    //proband variant chart.
-	/*variantCards.forEach(function(variantCard) {
-		if (variantCard.getRelationship() == 'proband') {
-			variantCard.showVariants(regionStart, regionEnd);
+
+    var theVcfData = getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript);
+
+	if (isLevelBasic) {
+		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length == 0) {
+			$('#matrix-track #no-variants.level-basic').removeClass("hide");
+			$('#matrix-panel').addClass("hide");
+		} else {
+			$('#matrix-track #no-variants.level-basic').addClass("hide");
+			$('#matrix-panel').removeClass("hide");
 		}
-	});*/
+	} else {
+	    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  theVcfData && theVcfData.features.length > 0) {
+	    	$('#zero-variants').addClass("zero-filtered-variants");
+	    	$('#zero-variants').text("No variants passed the filter" );
+	    	$('#zero-variants').removeClass("hide");
+			$('#matrix-panel').addClass("hide");
+		} else if (sortedFeatures.length == 0 ) {
+	    	$('#zero-variants').removeClass("zero-filtered-variants");
+	    	$('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
+	    	$('#zero-variants').removeClass("hide");
+			$('#matrix-panel').addClass("hide");
+		} else {
+	    	$('#zero-variants').text("");
+	    	$('#zero-variants').addClass("hide");
+			$('#matrix-panel').removeClass("hide");
+		}		
+	}
+
+
+   
 }
 
 MatrixCard.prototype.setFeatureMatrixSource = function(theVcfData) {

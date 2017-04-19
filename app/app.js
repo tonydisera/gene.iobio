@@ -2233,7 +2233,7 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	//mat $("#matrix-panel .loader").removeClass("hide");
 	$("#feature-matrix").addClass("hide");
 	$("#feature-matrix-note").addClass("hide");
-	$('#matrix-track #no-variants').addClass("hide");
+	$('#matrix-track .warning').addClass("hide");
 
 	readjustCards();
 

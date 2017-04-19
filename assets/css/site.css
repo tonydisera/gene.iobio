@@ -3534,6 +3534,21 @@ text.ref-count {
     height: auto;
     margin: 0px; }
 
+#matrix-track #zero-variants {
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
+  background-color: rgba(170, 66, 66, 0.57);
+  border: thin solid #b67272;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto; }
+  #matrix-track #zero-variants.zero-filtered-variants {
+    color: #717171;
+    background-color: #feedc8;
+    border: solid thin #878585; }
+
 #feature-matrix rect.cellbox {
   fill: white;
   stroke: #e6e6e6;
