@@ -1131,7 +1131,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 			// Flag any bookmarked variants
 			if (me.getRelationship() == 'proband') {
-			    bookmarkCard.determineVariantBookmarks(vcfData, theGene);
+			    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
 			}
 
 
@@ -1169,7 +1169,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 			    		// Flag any bookmarked variants
 			    		if (me.getRelationship() == 'proband') {
-					    	bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+					    	bookmarkCard.determineVariantBookmarks(data, theGeneObject, theTranscript);
 					    }
 
 				    	// Cache the data (if there are variants)
@@ -1247,7 +1247,7 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			    	}
 			    	if (theGeneObject) {
 			    		// Flag any bookmarked variants
-					    bookmarkCard.determineVariantBookmarks(data, theGeneObject);
+					    bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
 
 				    	// Cache the data
 					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
@@ -2121,6 +2121,7 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) 
 	// Flag the called variants
    	me.fbData.features.forEach( function(feature) {
    		feature.fbCalled = 'Y';
+   		feature.extraAnnot = true;
    	});
 
 	// We may have called variants that are slightly outside of the region of interest.

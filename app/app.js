@@ -2579,6 +2579,8 @@ function jointCallVariants(checkCache, callback) {
 		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
+
+
 				    
 					    // Get the unique freebayes variants and set up the allele counts
 					    vc.model.processFreebayesVariants(theFbData, function() {
@@ -2605,21 +2607,22 @@ function jointCallVariants(checkCache, callback) {
 
 				vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
 
-				if (vc.getRelationship() == 'proband') {
-					vc.fillFeatureMatrix(regionStart, regionEnd);
-				}
-				// Cache the updated the danger summary now that called variants are merged into
-				// variant set
-				cacheHelper._processCachedTrio(window.gene, window.selectedTranscript, true, function() {
-					cacheHelper.showAnalyzeAllProgress();
-				});
-				
-
 			});
 
-			if (callback) {
-				callback();
-			}
+
+			getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+			
+			// Cache the updated the danger summary now that called variants are merged into
+			// variant set
+			cacheHelper.processCachedTrio(window.gene, window.selectedTranscript, true, false, function() {
+				cacheHelper.showAnalyzeAllProgress();
+				if (callback) {
+					callback();
+				}
+				
+			});
+
+
 		});						
 	}
 	
@@ -2703,6 +2706,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 	                	theFbData.features.forEach(function(variant) {
 	                		variant.fbCalled = "Y";
+	                		variant.extraAnnot = true;
 	                	})
 
 						vc.model._determineVariantAfLevels(theFbData, theTranscript);
@@ -3223,7 +3227,6 @@ function filterVariants() {
 function bookmarkVariant() {
 	if (clickedVariant) {
 		this.bookmarkCard.bookmarkVariant(clickedVariant);
-		this.bookmarkCard.refreshBookmarkList();
 	} 
 }
 

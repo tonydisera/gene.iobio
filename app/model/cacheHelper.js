@@ -290,7 +290,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 					function(theGeneObject, theTranscript) {
 						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants, 
 							function(theGeneObject1, theTranscript1) {
-		    					me._processCachedTrio(theGeneObject1, theTranscript1, analyzeCalledVariants, callback);
+		    					me.processCachedTrio(theGeneObject1, theTranscript1, analyzeCalledVariants, true, callback);
 		    					if (window.gene && window.gene.gene_name == theGeneObject1.gene_name) {
 		    						genesCard.selectGene(theGeneObject1.gene_name);
 		    					}
@@ -298,7 +298,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 					});
 			} else {
 				// Determine inheritance for the trio
-				me._processCachedTrio(geneObject, transcript, analyzeCalledVariants, callback);
+				me.processCachedTrio(geneObject, transcript, analyzeCalledVariants, true, callback);
 			}
     	}
 
@@ -415,7 +415,7 @@ CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, tran
 
 }
 
-CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, analyzeCalledVariants, callback) {
+CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analyzeCalledVariants, cacheNext, callback) {
 	var me = this;
 
 	var trioVcfData = {proband: null, mother: null, father: null};
@@ -431,8 +431,12 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 		if (theVcfData == null) {
 			console.log("Unable to processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available");
 			genesCard.clearGeneGlyphs(geneObject.gene_name);
-			genesCard.setGeneBadgeError(geneObject.gene_name);		
-			me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+			genesCard.setGeneBadgeError(geneObject.gene_name);	
+			if (cacheNext) {
+				me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+			} else {
+				callback();
+			}
 			return;
 		}
 
@@ -511,13 +515,21 @@ CacheHelper.prototype._processCachedTrio = function(geneObject, transcript, anal
 
 		// take this gene off of the queue and see
 		// if next batch of genes should be analyzed
-		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+		if (cacheNext) {
+			me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+		} else {
+			callback();
+		}
 	}, 
 	function(error) {
 		console.log("problem determining inheritance for " + geneObject.gene_name + ". " + error);
 		// take this gene off of the queue and see
 		// if next batch of genes should be analyzed
-		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants,callback);
+		if (cacheNext) {
+			me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants,callback);
+		} else {
+			callback();
+		}
 	});
 }
 

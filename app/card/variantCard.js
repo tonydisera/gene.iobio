@@ -880,8 +880,10 @@ VariantCard.prototype.showFinalizedVariants = function() {
 
 
 
-VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data) {
-	theVcfData = data != null ? data : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data, geneObject, transcriptObject) {
+	geneObject = geneObject ? geneObject : window.gene;
+	transcriptObject = transcriptObject ? transcriptObject: window.selectedTranscript;	
+	theVcfData = data != null ? data : this.model.getVcfDataForGene(geneObject, transcriptObject);
 	if (theVcfData == null) {
 		return null;
 	}
@@ -1175,7 +1177,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	   	}
 	}
 
-	bookmarkCard.flagBookmarks(getProbandVariantCard(), window.gene);
+	bookmarkCard.flagBookmarks(getProbandVariantCard(), window.gene, window.selectedTranscript);
 
 
 

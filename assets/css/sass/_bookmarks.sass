@@ -7,11 +7,12 @@
       font-weight: bold     
       line-height: 12px
       padding-bottom: 2px
-      padding-top: 2px !important
+      padding-top: 6px !important
       margin-top: 1px
       margin-bottom: 1px
       margin-right: 5px
-      border: none !important
+      border: solid thin $current-color
+
 
     #import-help-icon
       color: $sidebar-link-color !important
@@ -31,6 +32,32 @@
       color: #c70001
       font-style: italic
       padding-left: 6px
+      display: inline-block
+      margin-top: -2px
+
+    .variant-symbols
+      display: inline-block
+      width: 60px
+      margin-top: -2px
+
+    .variant-label
+      .coord
+        display: inline-block
+        width: 97px
+        line-height: 12px
+        vertical-align: top        
+      .rsid
+        display: inline-block
+        margin-left: 3px
+        width: 70px
+        line-height: 12px
+        vertical-align: top        
+      .hgvs
+        margin-left: 3px
+        display: inline-block
+        width: 67px
+        line-height: 12px
+        vertical-align: top        
 
 
   div
@@ -57,12 +84,18 @@
     margin: 0px 0px 0px 12px
     padding: 0px 8px 0px 8px
 
+  .called-variant-indicator
+    display: inline-block
+    vertical-align: top
 
   #favorite-badge
     stroke: $sidebar-text-color
 
   .favorite-indicator
     cursor: pointer
+    float: right
+    display: inline-block
+    margin-top: -2px   
 
   .phenotypes-container
     overflow-x: hidden

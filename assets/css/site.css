@@ -1692,7 +1692,7 @@ inputinput:-moz-placeholder {
   background-color: white;
   overflow-y: scroll;
   margin-top: 0px;
-  padding-left: 10px;
+  padding-left: 8px;
   padding-right: 5px;
   padding-bottom: 10px;
   padding-top: 0px; }
@@ -2778,11 +2778,11 @@ text.ref-count {
     font-weight: bold;
     line-height: 12px;
     padding-bottom: 2px;
-    padding-top: 2px !important;
+    padding-top: 6px !important;
     margin-top: 1px;
     margin-bottom: 1px;
     margin-right: 5px;
-    border: none !important; }
+    border: solid thin #3586c0; }
   #bookmark-card a #import-help-icon {
     color: #5d809d !important;
     margin-left: 2px; }
@@ -2798,7 +2798,30 @@ text.ref-count {
   #bookmark-card .bookmark span.not-found {
     color: #c70001;
     font-style: italic;
-    padding-left: 6px; }
+    padding-left: 6px;
+    display: inline-block;
+    margin-top: -2px; }
+  #bookmark-card .bookmark .variant-symbols {
+    display: inline-block;
+    width: 60px;
+    margin-top: -2px; }
+  #bookmark-card .bookmark .variant-label .coord {
+    display: inline-block;
+    width: 97px;
+    line-height: 12px;
+    vertical-align: top; }
+  #bookmark-card .bookmark .variant-label .rsid {
+    display: inline-block;
+    margin-left: 3px;
+    width: 70px;
+    line-height: 12px;
+    vertical-align: top; }
+  #bookmark-card .bookmark .variant-label .hgvs {
+    margin-left: 3px;
+    display: inline-block;
+    width: 67px;
+    line-height: 12px;
+    vertical-align: top; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
@@ -2817,10 +2840,16 @@ text.ref-count {
 #bookmark-card .bookmark-call-button {
   margin: 0px 0px 0px 12px;
   padding: 0px 8px 0px 8px; }
+#bookmark-card .called-variant-indicator {
+  display: inline-block;
+  vertical-align: top; }
 #bookmark-card #favorite-badge {
   stroke: #717171; }
 #bookmark-card .favorite-indicator {
-  cursor: pointer; }
+  cursor: pointer;
+  float: right;
+  display: inline-block;
+  margin-top: -2px; }
 #bookmark-card .phenotypes-container {
   overflow-x: hidden; }
 #bookmark-card .phenotypes {

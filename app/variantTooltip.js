@@ -253,8 +253,11 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 }
 
 
-VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec) {
+VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec, geneObject, theTranscript) {
 	var me = this;
+
+	geneObject = geneObject ? geneObject : window.gene;
+	theTranscript  = theTranscript ? theTranscript : window.selectedTranscript;
 
 	if (type == null) {
 		type = 'tooltip';
@@ -615,7 +618,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	} else if (type == 'tooltip') {
 		return (
 			  qualityWarningRow
-			+ me._tooltipMainHeaderRow(window.gene ? window.gene.gene_name : "", window.selectedTranscript ? window.selectedTranscript.transcript_id : "", '', '')
+			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
@@ -660,7 +663,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
-			+ me._tooltipMainHeaderRow(window.gene ? window.gene.gene_name : "", window.selectedTranscript ? window.selectedTranscript.transcript_id : "", '', '')
+			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
 			+ me._tooltipHeaderRow( coord, '', '', '')
@@ -676,7 +679,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			qualityWarningRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow(window.gene ? window.gene.gene_name : "", coord, '', '')
+			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, '', '')
 			+ inheritanceModeRow
 
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  
@@ -734,7 +737,7 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 	}
 
 
-	var bookmarkLink =  '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this)">bookmark this variant</a>';
+	var bookmarkLink =  '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this);">bookmark this variant</a>';
 	
 	var bookmarkBadge = '<svg class="bookmark-badge" height="14" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="11" style="fill: black;">bookmarked</text></g></svg>';
 	var removeBookmarkLink  =  '<a id="remove-bookmark-link" href="javascript:void(0)" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove bookmark</a>'
