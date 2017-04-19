@@ -82,7 +82,7 @@ VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscri
 	if (theVcfData == null && me.isAlignmentsOnly()) {
 		var theFbData = me.getFbDataForGene(geneObject, selectedTranscript);
 		// If no variants are loaded, create a dummy vcfData with 0 features
-		if (theFbData && theFbData.features && theFbData.features.length > 0) {
+		if (theFbData && theFbData.features) {
 			theVcfData = $.extend({}, theFbData);
 			theVcfData.features = [];
 			me.setLoadState(theVcfData, 'clinvar');
