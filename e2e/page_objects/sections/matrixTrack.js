@@ -324,6 +324,12 @@ module.exports = {
     waitForMatrixLoaded: function() {
       this.waitForElementVisible('@featureMatrix', 60000);
     },
+    waitForZeroVariantsWarning: function() {
+      this.waitForElementVisible('@zeroVariantsWarning', 60000);
+    },
+    waitForZeroFilteredVariantsWarning: function() {
+      this.waitForElementVisible('@zeroFilteredVariantsWarning', 60000);
+    },
     clickColumn: function(variant) {
       var self = this;
       this.api.elements('xpath', precedingSiblingsToVariant(variant), function(precedingVariantElements) {
@@ -336,7 +342,9 @@ module.exports = {
   }],
   elements: {
     featureMatrix: { selector: '#feature-matrix' },
-    featureMatrixNote: { selector: '#feature-matrix-note' }
+    featureMatrixNote: { selector: '#feature-matrix-note' },
+    zeroVariantsWarning: { selector: '#zero-variants' },
+    zeroFilteredVariantsWarning: { selector: '#zero-variants.zero-filtered-variants' }
   }
 };
 

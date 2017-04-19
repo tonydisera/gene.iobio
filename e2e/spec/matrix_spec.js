@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, nav, filterPanel;
 
 module.exports = {
   tags: [],
@@ -12,6 +12,7 @@ module.exports = {
     appTitleSection = indexPage.section.appTitleSection;
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;
+    filterPanel = indexPage.section.filterPanel;
   },
 
   'Loading data should work': function(client) {
@@ -68,6 +69,19 @@ module.exports = {
     matrixTrack.assertAf1000gCommon([1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
     matrixTrack.assertAf1000gUnique([5]);
   },
+
+  'Warning appears when no variants passing filter a gene': function(client) {
+    nav.clickFilter();
+    filterPanel.clickClinvarPath(client);
+    matrixTrack.waitForZeroFilteredVariantsWarning();
+    filterPanel.clickVepHigh(client);
+    matrixTrack.waitForZeroFilteredVariantsWarning();
+  },  
+
+  'Warning appears when no variants found for a gene': function(client) {
+    nav.searchGene('NNMT');
+    matrixTrack.waitForZeroVariantsWarning();
+  },  
 
   'Zygosity row should be accurate': function(client) {
     // matrixTrack.assertZygosityHet([]);
