@@ -72,9 +72,15 @@ module.exports = {
 
   'Warning appears when no variants passing filter a gene': function(client) {
     nav.clickFilter();
-    filterPanel.clickClinvarPath(client);
+    client.pause(1000);    
+    filterPanel.clickClinvarPath();
     matrixTrack.waitForZeroFilteredVariantsWarning();
-    filterPanel.clickVepHigh(client);
+
+    client.pause(1000);
+    // de-select clinvar filter
+    filterPanel.unclickClinvarPath();
+    // now select vep HIGH filter
+    filterPanel.clickVepHigh();
     matrixTrack.waitForZeroFilteredVariantsWarning();
   },  
 

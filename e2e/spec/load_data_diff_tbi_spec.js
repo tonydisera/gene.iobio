@@ -43,8 +43,8 @@ module.exports = {
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertVariantCountEquals('42');
-    probandVariantCard.assertVariantSymbolCountEquals(client, 42);
-    probandVariantCard.assertSNPSymbolCountEquals(client, 42);
+    probandVariantCard.assertVariantSymbolCountEquals(42);
+    probandVariantCard.assertSNPSymbolCountEquals( 42);
     probandVariantCard.waitForBamDepthLoaded();
 
 

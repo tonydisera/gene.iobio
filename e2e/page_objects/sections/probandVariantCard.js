@@ -7,16 +7,16 @@ module.exports = {
     assertVariantCountEquals: function(text) {
   		this.expect.element('@variantCount').text.to.equal(text);
   	},
-    assertVariantSymbolCountEquals: function(client, count) {
-    	var me = this;
+    assertVariantSymbolCountEquals: function(count) {
+    	var self = this;
     	this.api.elements('css selector','#vcf-variants svg g.track .variant', function (result) {
-		    client.assert.equal(result.value.length, count);
+		    self.assert.equal(result.value.length, count);
 		});
   	},
-    assertSNPSymbolCountEquals: function(client, count) {
-    	var me = this;
+    assertSNPSymbolCountEquals: function(count) {
+    	var self = this;
     	this.api.elements('css selector','#vcf-variants svg g.track .variant.snp', function (result) {
-		    client.assert.equal(result.value.length, count);
+		    self.assert.equal(result.value.length, count);
 		});
   	}
   }],
