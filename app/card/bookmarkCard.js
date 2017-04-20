@@ -821,8 +821,8 @@ BookmarkCard.prototype._getVariantLabel = function(bookmarkEntry, key) {
 	var bm = me.parseKey(key);
 
  	return '<span class="coord">' + bm.start + " " + bm.ref + "->" + bm.alt + '</span>' 
- 	     + '<span class="rsid">'  + (rsId ? " " + rsId : "") + '</span>' 
- 	     + '<span class="hgvs">'  + (abbrevHgvsP ? " " + abbrevHgvsP : "") + '</span>';	
+ 	     + '<span class="rsid">'  + (rsId ? rsId : "") + '</span>' 
+ 	     + '<span class="hgvs">'  + (abbrevHgvsP ? abbrevHgvsP : "") + '</span>';	
 }
 
 BookmarkCard.prototype._showVariantTooltip = function(variant, screenX, screenY, geneObject, transcriptObject) {
