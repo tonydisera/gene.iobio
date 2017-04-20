@@ -11,14 +11,20 @@ module.exports = {
     	var self = this;
     	this.api.elements('css selector','#vcf-variants svg g.track .variant', function (result) {
 		    self.assert.equal(result.value.length, count);
-		});
+		  });
   	},
     assertSNPSymbolCountEquals: function(count) {
     	var self = this;
     	this.api.elements('css selector','#vcf-variants svg g.track .variant.snp', function (result) {
 		    self.assert.equal(result.value.length, count);
-		});
-  	}
+		  });
+  	},
+    assertBookmarkIndicatorCountEquals: function(count) {
+      var self = this;
+      this.api.elements('css selector','#vcf-variants svg g.bookmarks .bookmark', function (result) {
+        self.assert.equal(result.value.length, count);
+      });
+    }
   }],
   elements: {
     bamDepth: '#bam-depth',

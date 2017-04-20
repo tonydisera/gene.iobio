@@ -40,7 +40,8 @@ module.exports = {
       return this.click('@removeBookmarkLink');
     },
     waitForTooltip: function() {
-      this.waitForElementVisible('#feature-matrix .tooltip', 4000);
+      this.api.pause(2000);
+      //this.waitForElementVisible('#feature-matrix .tooltip', 4000);
     },
 
 

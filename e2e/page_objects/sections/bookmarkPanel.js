@@ -13,7 +13,16 @@ module.exports = {
   	},
   	clickBookmark: function(client, coord) {
 		client.useXpath().click("//a[@class='bookmark']//span[@class='coord' and contains(text(), '" + coord +"')]");
-  	}
+  	},
+  	clickBookmarkGene: function(client, geneName) {
+		client.useXpath().click("//a[@class='bookmark-gene' and contains(text(), '" + geneName +"')]");
+  	},
+ 	assertBookmarkCountEquals: function(count) {
+    	var self = this;
+    	this.api.elements('css selector','#bookmark-card a.bookmark', function (result) {
+		    self.assert.equal(result.value.length, count);
+		});
+  	}	
   }],
 
   elements: {
