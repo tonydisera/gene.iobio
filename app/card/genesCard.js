@@ -1344,7 +1344,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		}
 
-		var theFbData = getProbandVariantCard().model.getFbDataForGene(window.gene, window.selectedTranscript)
+		var theFbData = getProbandVariantCard().model.getFbDataForGene(window.gene, window.selectedTranscript, true)
 		var options = {};
 		if (theFbData) {
 			options.CALLED = true;
