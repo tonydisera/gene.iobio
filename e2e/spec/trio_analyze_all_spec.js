@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, matrixTooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, matrixTooltip, probandTooltip, probandCalledTooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -14,6 +14,8 @@ module.exports = {
     matrixTooltip = indexPage.section.matrixTooltip;    
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
+    probandTooltip = indexPage.section.probandTooltip;
+    probandCalledTooltip = indexPage.section.probandCalledTooltip;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
   },
@@ -39,11 +41,13 @@ module.exports = {
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
 
   },
+  
   'Known causative filter': function(client) {
     nav.clickFilter();
     client.pause(1000);
 
     filterPanel.clickKnownCausative();
+    client.pause(1000);
     filterPanel.assertKnownCausativeCounts(1,1);
     appTitleSection.assertAnalyzeAllCounts(1,4,1,4);
 
@@ -52,6 +56,7 @@ module.exports = {
   'De novo VUS filter': function(client) {
 
     filterPanel.clickDenovoVus();
+    client.pause(1000);
     filterPanel.assertDenovoVusCounts(2,0);
     appTitleSection.assertAnalyzeAllCounts(2,3,0,5);
 
@@ -59,6 +64,7 @@ module.exports = {
   'Recessive VUS filter': function(client) {
 
     filterPanel.clickRecessiveVus();
+    client.pause(1000);
     filterPanel.assertRecessiveVusCounts(0,0);
     appTitleSection.assertAnalyzeAllCounts(0,5,0,5);
 
@@ -66,6 +72,7 @@ module.exports = {
   'High or Moderate Impact filter': function(client) {
 
     filterPanel.clickHighOrModerateImpact();
+    client.pause(1000);
     filterPanel.assertHighOrModerateImpactCounts(3,0);
     appTitleSection.assertAnalyzeAllCounts(3,2,0,5);
 
@@ -74,6 +81,7 @@ module.exports = {
 
     filterPanel.clickClearAll();
     filterPanel.assertKnownCausativeCounts(1,1);
+    client.pause(1000);
     filterPanel.assertDenovoVusCounts(2,0);
     filterPanel.assertRecessiveVusCounts(0,0);
     filterPanel.assertHighOrModerateImpactCounts(3,0);
@@ -83,11 +91,63 @@ module.exports = {
   'Click denovo inheritance (custom) filter': function(client) {
     filterPanel.clickClearAll();
     filterPanel.clickInheritanceDenovo();
+    client.pause(1000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+  },
+  
+
+  'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
+
+    filterPanel.clickClearAll();
+    nav.searchGene('MYLK2');
+    
+    client.pause(1000);
+    matrixTrack.waitForMatrixLoaded();
+    probandVariantCard.assertLoadedVariantCountEquals(2);
+    probandVariantCard.assertCalledVariantCountEquals(1);
+    probandVariantCard.assertLoadedVariantSymbolCountEquals(2);
+    probandVariantCard.assertCalledVariantSymbolCountEquals(1);
+
+
+    var evaluateTooltip = function(theTooltip) {
+      theTooltip.expectInheritanceEquals('denovo inheritance');
+      theTooltip.expectVepImpact('moderate');
+      theTooltip.expectVepConsequence('missense variant');
+      theTooltip.expectClinvar('likely pathogenic');
+      theTooltip.expectClinvarClinSig('cardiomyopathy');
+      theTooltip.expectPolyphen('benign');
+      theTooltip.expectSIFT('tolerated');
+      theTooltip.expectAFExAC('0.003%');
+      theTooltip.expectAF1000G('0%');
+      theTooltip.expectQual("8.46129");
+      theTooltip.expectFilter("PASS");
+      theTooltip.assertHGVScEquals("ENST00000375994.2:c.595A>G");
+      theTooltip.assertHGVSpEquals("ENSP00000365162.2:p.Ile199Val");
+      theTooltip.expectAlleleCountsEquals('proband', 10, 39, 49, 'Het');
+      theTooltip.expectAlleleCountsEquals('mother',  null, null, 55, 'Homref');
+      theTooltip.expectAlleleCountsEquals('father',  null, null, 45, 'Homref');
+
+    }
+
+
+
+    client.pause(2000);
+    probandVariantCard.clickCalledVariantSymbol(".snp.het.denovo.sift_tolerated.polyphen_benign.clinvar_lpath");
+    client.pause(2000);
+    evaluateTooltip(probandCalledTooltip);
+    probandCalledTooltip.clickUnpin();
+
+
+    client.pause(2000);
+    matrixTrack.clickColumn(1);
+    matrixTooltip.waitForTooltip();
+    evaluateTooltip(matrixTooltip);
+
+    
   },
 
   'end': function(client) {
-    client.end();
+    //client.end();
   }
 
   

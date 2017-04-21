@@ -33,8 +33,8 @@ module.exports = {
     matrixTooltip.expectInheritanceEquals('recessive inheritance');
     matrixTooltip.expectVepImpact('high');
     matrixTooltip.expectVepConsequence('stop gained');
-    matrixTooltip.expectClinvarEquals('pathogenic');
-    matrixTooltip.expectClinvarClinSigEquals('smith-magenis syndrome');
+    matrixTooltip.expectClinvar('pathogenic');
+    matrixTooltip.expectClinvarClinSig('smith-magenis syndrome');
     matrixTooltip.expectAFExAC('0%');
     matrixTooltip.expectAF1000G('0%');
     matrixTooltip.expectQual('2880.99');

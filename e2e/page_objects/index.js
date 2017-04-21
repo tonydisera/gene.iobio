@@ -2,12 +2,17 @@ var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var probandVariantCard = require('./sections/probandVariantCard.js');
 var matrixTrack = require('./sections/matrixTrack.js');
-var matrixTooltip = require('./sections/matrixTooltip.js');
 var filterPanel = require('./sections/filterPanel.js');
 var findGenesPanel = require('./sections/findGenesPanel.js');
 var inspectPanel = require('./sections/inspectPanel.js');
 var recallPanel = require('./sections/recallPanel.js');
 var bookmarkPanel = require('./sections/bookmarkPanel.js');
+
+var matrixTooltip = require('./sections/variantTooltip.js');
+var probandTooltip = require('./sections/variantTooltip.js');
+probandTooltip.selector = '#proband-variant-card #vcf-variants .tooltip';
+var probandCalledTooltip = require('./sections/variantTooltip.js');
+probandTooltip.selector = '#proband-variant-card #fb-variants .tooltip';
 
 module.exports = {
   url: function() {
@@ -25,11 +30,14 @@ module.exports = {
     appTitleSection: '#genes-panel',
     dataCard: '#data-card',
     matrixTrack: '#matrix-track',
-    matrixTooltip: '#feature-matrix .tooltip',
     transcriptCard: '#transcript-card',
     probandVariantCard: '#proband-variant-card',
     motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
-    fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)'
+    fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)',
+    matrixTooltip:        '#feature-matrix .tooltip',
+    probandTooltip:       '#proband-variant-card #vcf-variants .tooltip',
+    probandCalledTooltip: '#proband-variant-card #fb-variants .tooltip'
+
   },
 
   commands: [{
@@ -52,6 +60,9 @@ module.exports = {
     matrixTrack: matrixTrack,
     probandVariantCard: probandVariantCard,
     matrixTooltip: matrixTooltip,
+    probandTooltip: probandTooltip,
+    probandCalledTooltip: probandCalledTooltip,
+
     transcriptCard: {
       selector: '#transcript-card',
       elements: {
@@ -67,5 +78,6 @@ module.exports = {
       selector: '#other-variant-cards .variant-card:nth-child(2)'
     }
 
+ 
   }
 };
