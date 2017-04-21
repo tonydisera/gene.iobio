@@ -1816,6 +1816,13 @@ VariantCard.prototype._hideTooltip = function() {
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
+	tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
+	tooltip.transition()        
+           .duration(500)      
+           .style("opacity", 0)
+           .style("z-index", 0)
+           .style("pointer-events", "none");   
+    matrixCard.unpin();        
 }
 
 
