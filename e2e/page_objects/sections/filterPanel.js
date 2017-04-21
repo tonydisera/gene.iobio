@@ -1,6 +1,9 @@
 var filter = {
   clinvarPath: '//div[@id="filter-track"]//*[local-name()="svg" and @class="clinvar" and @id="clinvar_path"]',
   clinvarPathClicked: '//div[@id="filter-track"]//*[local-name()="svg" and contains(@class,"clinvar") and contains(@class, "current") and @id="clinvar_path"]',
+
+  inheritanceDenovo:    '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="denovo"]',
+  inheritanceRecessive: '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="recessive"]',
   
   vepHigh: '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="HIGH"]',
   vepModerate: '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="MODERATE"]',
@@ -57,6 +60,15 @@ module.exports = {
     unclickClinvarPath: function() {
       return this.api.useXpath().moveToElement(filter.clinvarPathClicked, 1,1).click(filter.clinvarPathClicked);
     },
+
+
+    clickInheritanceDenovo: function() {
+      return this.api.useXpath().moveToElement(filter.inheritanceDenovo, 1,1).click(filter.inheritanceDenovo);
+    },
+    clickInheritanceRecessive: function() {
+      return this.api.useXpath().moveToElement(filter.inheritanceDenovo, 1,1).click(filter.inheritanceDenovo);
+    },
+
     clickVepHigh: function() {
       return this.api.useXpath().moveToElement(filter.vepHigh, 1,1).click(filter.vepHigh);
     },
@@ -126,17 +138,110 @@ module.exports = {
     },
     clickAf1000gUncommon: function() {
       return this.api.useXpath().moveToElement(filter.af1000gUncommon, 1,1).click(filter.af1000gUncommon);      
-    },
+    },    
     clickAf1000gCommon: function() {
       return this.api.useXpath().moveToElement(filter.af1000gCommon, 1,1).click(filter.af1000gCommon);      
     },
+
+    clickClearAll: function() {
+      return this.click('@clearAll');
+    },
+
+    clickKnownCausative: function() {
+      return this.click('@knownCausative');
+    },
+    assertKnownCausativeCounts: function(analyzedCount, calledCount) {
+      var self = this;
+      if (analyzedCount) {
+        this.getText('@knownCausativeAnalyzedCount', function(result) {
+          self.assert.equal(result.value, analyzedCount);
+        })        
+      }
+      if (calledCount) {
+        this.getText('@knownCausativeCalledCount', function(result) {
+          self.assert.equal(result.value, calledCount);
+        })        
+      }
+    },
+
+    clickDenovoVus: function() {
+      return this.click('@denovoVus');
+    },
+    assertDenovoVusCounts: function(analyzedCount, calledCount) {
+      var self = this;
+      if (analyzedCount) {
+        this.getText('@denovoVusAnalyzedCount', function(result) {
+          self.assert.equal(result.value, analyzedCount);
+        })        
+      }
+      if (calledCount) {
+        this.getText('@denovoVusCalledCount', function(result) {
+          self.assert.equal(result.value, calledCount);
+        })        
+      }
+    },
+
+    clickRecessiveVus: function() {
+      return this.click('@recessiveVus');
+    },
+    assertRecessiveVusCounts: function(analyzedCount, calledCount) {
+      var self = this;
+      if (analyzedCount) {
+        this.getText('@recessiveVusAnalyzedCount', function(result) {
+          self.assert.equal(result.value, analyzedCount);
+        })        
+      }
+      if (calledCount) {
+        this.getText('@recessiveVusCalledCount', function(result) {
+          self.assert.equal(result.value, calledCount);
+        })        
+      }
+    },
+
+    clickHighOrModerateImpact: function() {
+      return this.click('@highOrModerateImpact');
+    },
+    assertHighOrModerateImpactCounts: function(analyzedCount, calledCount) {
+      var self = this;
+      if (analyzedCount) {
+        this.getText('@highOrModerateImpactAnalyzedCount', function(result) {
+          self.assert.equal(result.value, analyzedCount);
+        })        
+      }
+      if (calledCount) {
+        this.getText('@highOrModerateImpactCalledCount', function(result) {
+          self.assert.equal(result.value, calledCount);
+        })        
+      }
+    }
+
   }],
+
   elements: {
     PASSFilter: { selector: '#rec-filter-box #PASS'},
     unassignedFilter: { selector: '#rec-filter-box #unassigned'},
     excludeNonCoding: { selector: '#exonic-only-cb + span' },
     impact: { selector: '#impact-scheme i' },
     effect: { selector: '#effect-scheme i' },   
+
+    clearAll: {selector: '#clear-filters-button'},
+
+    knownCausative:              { selector: '//*[@id="button-known-causative"]', locateStrategy: 'xpath' },
+    knownCausativeAnalyzedCount: { selector: '//*[@id="button-known-causative"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
+    knownCausativeCalledCount:   { selector: '//*[@id="button-known-causative"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' },
+
+    denovoVus:              { selector: '//*[@id="button-denovo-vus"]', locateStrategy: 'xpath' },
+    denovoVusAnalyzedCount: { selector: '//*[@id="button-denovo-vus"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
+    denovoVusCalledCount:   { selector: '//*[@id="button-denovo-vus"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' },
+
+    recessiveVus:              { selector: '//*[@id="button-recessive-vus"]', locateStrategy: 'xpath' },
+    recessiveVusAnalyzedCount: { selector: '//*[@id="button-recessive-vus"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
+    recessiveVusCalledCount:   { selector: '//*[@id="button-recessive-vus"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' },
+
+    highOrModerateImpact:              { selector: '//*[@id="button-high-or-moderate-impact"]', locateStrategy: 'xpath' },
+    highOrModerateImpactAnalyzedCount: { selector: '//*[@id="button-high-or-moderate-impact"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
+    highOrModerateImpactCalledCount:   { selector: '//*[@id="button-high-or-moderate-impact"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' },
+
 
   }
 };

@@ -96,7 +96,51 @@ module.exports = {
       })
       this.api.useCss();
       return this;
-    }    
+    },
+
+    assertAnalyzeAllCounts: function(analyzedPassedCount, analyzedFailedCount, calledPassedCount, calledFailedCount) {
+      var self = this;
+
+      if (analyzedPassedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, analyzedPassedCount);
+        })        
+      }
+
+      if (analyzedFailedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, analyzedFailedCount);
+        })        
+      }
+
+      if (calledPassedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, calledPassedCount);
+        })        
+      }
+
+      if (calledFailedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, calledFailedCount);
+        })        
+      }
+
+      this.api.useCss();
+      return this;
+    }
+    
   }],
   elements: {
     selectedGeneBadge: { selector: '#gene-badge.selected' },
