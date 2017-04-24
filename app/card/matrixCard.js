@@ -1290,7 +1290,9 @@ MatrixCard.prototype.showBookmarkSymbol = function(selection, options) {
 	         .append("use")
 	         .attr("xlink:href", '#bookmark-symbol')
 	         .attr("width",  selection.datum().width || optionsSize)
-	         .attr("height", selection.datum().height || optionsSize);
+	         .attr("height", selection.datum().height || optionsSize)
+	         .style("pointer-events", "none")
+	         .style("cursor", "pointer");
 
 	}
 }
