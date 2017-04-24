@@ -1616,9 +1616,12 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 		window.variantCards.forEach(function(variantCard) {
 			if (variantCard.getRelationship() == 'mother' || variantCard.getRelationship() == 'father') {
 				var data = variantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-				data.features.forEach(function(theVariant) {
-					setMaxAlleleCount(theVariant.genotypeDepth);
-				});
+				if (data && data.features) {
+					data.features.forEach(function(theVariant) {
+						setMaxAlleleCount(theVariant.genotypeDepth);
+					});
+					
+				}
 			}
 		});
 		theVcfData.maxAlleleCount = maxAlleleCount;
