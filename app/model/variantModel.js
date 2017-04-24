@@ -103,7 +103,7 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 		if (theFbData == null || theFbData.features == null) {
 			var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
 			var dangerSummary = me.getDangerSummaryForGene(geneObject.gene_name);
-			if (theVcfData && theVcfData.features && theVcfData.features.length > 0 && dangerSummary && dangerSummary.CALLED) {
+			if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
 				theFbData = $.extend({}, theVcfData);
 				theFbData.features = [];
 				theFbData.loadState = {clinvar: true, coverage: true, inheritance: true};
@@ -1620,7 +1620,7 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 					data.features.forEach(function(theVariant) {
 						setMaxAlleleCount(theVariant.genotypeDepth);
 					});
-					
+
 				}
 			}
 		});
