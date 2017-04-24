@@ -4,8 +4,8 @@ module.exports = {
 
   MATRIX_TOOLTIP         : '//div[@id="matrix-panel"]//div[contains(@class, "tooltip-wide")]',
   PROBAND_TOOLTIP        : '//div[@id="proband-variant-card"]//div[@id="vcf-variants"]//div[contains(@class, "tooltip-wide")]',
-  PROBAND_CALLED_TOOLTIP :'//div[@id="proband-variant-card"]//div[@id="fb-variants"]//div[contains(@class, "tooltip-wide")]',
-
+  PROBAND_CALLED_TOOLTIP : '//div[@id="proband-variant-card"]//div[@id="fb-variants"]//div[contains(@class, "tooltip-wide")]',
+  BOOKMARK_TOOLTIP       : '//div[@id="bookmark-gene-tooltip"',
 
   
   commands: [{

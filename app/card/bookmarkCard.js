@@ -3,6 +3,7 @@ function BookmarkCard() {
 	this.bookmarkedGenes = {};
 	this.selectedBookmarkKey = null;
 	this.favorites = {};
+
 }
 
 BookmarkCard.prototype.init = function() {
@@ -460,9 +461,13 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			    bookmark.append("a")
 			            .attr("class", "bookmark")
 			            .on('click', function(entry,i) {
+			         		var currentBookmark = d3.select(this);
+
+			            	me.clickInProgress = true;
+
+
 			            	me.hideTooltip();
 				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-		         			var currentBookmark = d3.select(this);
 		         			currentBookmark.classed("current", true);
 
 		         			me.selectedBookmarkKey = entry.key;
@@ -490,7 +495,6 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 								} 
 							}
 
-
 							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
 								genesCard.selectGene(geneName, function() {
 									
@@ -500,41 +504,47 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 							} else {
 								showBookmarkedVariant(bookmarkEntry, key);
 							}
-							
-			            })
-						.on('mouseover', function(entry,i) {
-				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-		         			var currentBookmark = d3.select(this);
-		         			currentBookmark.classed("current", true);
-
-		         			me.selectedBookmarkKey = entry.key;
-
-				         	var geneName     = me.parseKey(entry.key).gene;
-				         	var transcriptId = me.parseKey(entry.key).transcriptId;
-				         	var theTranscript = {transcript_id: transcriptId};
-							var screenX = window.pageXOffset + currentBookmark.select('.variant-label .coord').node().offsetLeft + currentBookmark.select('.variant-label').node().offsetWidth;
-					        var screenY = window.pageYOffset + currentBookmark.node().offsetTop + $('.navbar-fixed-top').outerHeight();
-					            
-				         	if (entry.value.isProxy && entry.value.freebayesCalled == 'Y') {
-								me.showTooltip("Click 'Call variants' button analyze this bookmarked variant.", screenX, screenY, 100);
-				         	} else {
-								var variant = me.resolveBookmarkedVariant(entry.key, entry.value, geneObjects[geneName], theTranscript);
-					            unpinAll();
-								if (variant) {
-						            me._showVariantTooltip(variant, screenX, screenY, geneObjects[geneName], theTranscript);
-								} else {
-									me.showTooltip("Click on bookmark to analyze variant for this gene.", screenX, screenY, 100);
-								}						
-
-				         	}
-			            })
-			            .on('mouseout', function(entry,i) {
-			            	me.hideTooltip();
-			            	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);	
 			            });
+						
 	        });
 			
 	
+	container.selectAll(".bookmark")
+	         .append("i")
+	         .attr("class", "material-icons bookmark-info-glyph")
+	         .text("info")
+			 .on('mouseover', function(entry,i) {
+     			var currentBookmark = d3.select(this.parentNode);
+
+	         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+     			currentBookmark.classed("current", true);
+
+     			me.selectedBookmarkKey = entry.key;
+
+	         	var geneName     = me.parseKey(entry.key).gene;
+	         	var transcriptId = me.parseKey(entry.key).transcriptId;
+	         	var theTranscript = {transcript_id: transcriptId};
+				var screenX = window.pageXOffset + currentBookmark.select('.variant-label .coord').node().offsetLeft + currentBookmark.select('.variant-label').node().offsetWidth;
+		        var screenY = window.pageYOffset + currentBookmark.node().offsetTop + $('.navbar-fixed-top').outerHeight();
+		            
+	         	if (entry.value.isProxy && entry.value.freebayesCalled == 'Y') {
+					me.showTooltip("Click 'Call variants' button analyze this bookmarked variant.", screenX, screenY, 100);
+	         	} else {
+					var variant = me.resolveBookmarkedVariant(entry.key, entry.value, geneObjects[geneName], theTranscript);
+		            unpinAll();
+					if (variant) {
+			            me._showVariantTooltip(variant, screenX, screenY, geneObjects[geneName], theTranscript);
+					} else {
+						me.showTooltip("Click on bookmark to analyze variant for this gene.", screenX, screenY, 100);
+					}						
+
+	         	}
+					
+            })
+            .on('mouseout', function(entry,i) {
+            	me.hideTooltip();
+            	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);	
+            });	         
 
 
 	container.selectAll(".bookmark")

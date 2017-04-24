@@ -2775,14 +2775,17 @@ text.ref-count {
   margin-right: 5px;
   word-break: break-all; }
   #bookmark-card a.current {
-    font-weight: bold;
     line-height: 12px;
     padding-bottom: 2px;
     padding-top: 6px !important;
     margin-top: 1px;
     margin-bottom: 1px;
     margin-right: 5px;
-    border: solid thin #3586c0; }
+    border: solid thin #3586c0;
+    font-weight: normal;
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-left: 0px; }
   #bookmark-card a #import-help-icon {
     color: #5d809d !important;
     margin-left: 2px; }
@@ -2794,13 +2797,23 @@ text.ref-count {
   width: 100%;
   text-align: left;
   padding-top: 4px;
-  margin-left: 0px; }
+  margin-left: 0px;
+  padding-left: 1px; }
   #bookmark-card .bookmark span.not-found {
     color: #c70001;
     font-style: italic;
     padding-left: 6px;
     display: inline-block;
     margin-top: -2px; }
+  #bookmark-card .bookmark .bookmark-info-glyph {
+    display: inline-block;
+    font-size: 14px;
+    margin-top: -5px;
+    margin-left: -1px;
+    margin-right: 5px;
+    color: #909090;
+    font-size: 15px;
+    cursor: pointer; }
   #bookmark-card .bookmark .variant-symbols {
     display: inline-block;
     width: 60px;
@@ -2822,6 +2835,8 @@ text.ref-count {
     width: 67px;
     line-height: 12px;
     vertical-align: top; }
+  #bookmark-card .bookmark .variant-label:hover {
+    text-decoration: underline !important; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {

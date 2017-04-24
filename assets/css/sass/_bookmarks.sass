@@ -4,7 +4,6 @@
     word-break: break-all
 
     &.current
-      font-weight: bold     
       line-height: 12px
       padding-bottom: 2px
       padding-top: 6px !important
@@ -12,6 +11,10 @@
       margin-bottom: 1px
       margin-right: 5px
       border: solid thin $current-color
+      font-weight: normal
+      padding-right: 0px
+      padding-left: 0px  
+      margin-left: 0px    
 
 
     #import-help-icon
@@ -27,6 +30,7 @@
     text-align: left
     padding-top: 4px
     margin-left: 0px
+    padding-left: 1px
 
     span.not-found
       color: #c70001
@@ -35,10 +39,21 @@
       display: inline-block
       margin-top: -2px
 
+    .bookmark-info-glyph
+      display: inline-block
+      font-size: 14px
+      margin-top: -5px
+      margin-left: -1px
+      margin-right: 5px
+      color: #909090
+      font-size: 15px
+      cursor: pointer
+ 
     .variant-symbols
       display: inline-block
       width: 60px
       margin-top: -2px
+
 
     .variant-label
       .coord
@@ -57,7 +72,10 @@
         display: inline-block
         width: 67px
         line-height: 12px
-        vertical-align: top        
+        vertical-align: top     
+
+      &:hover
+        text-decoration: underline !important         
 
 
   div
