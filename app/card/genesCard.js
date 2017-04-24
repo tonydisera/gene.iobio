@@ -190,12 +190,15 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 		if (isAlignmentsOnly()) {
 			$("#call-variants-dropdown").removeClass("hide");
 			$("#analyze-all-genes").addClass("hide");
+			$("#analyzed-progress-bar").removeClass("no-alignments");
 		} else {
 			$("#analyze-all-genes").removeClass("hide");
 			if (getProbandVariantCard().isBamLoaded()) {
-				$("#call-variants-dropdown").removeClass("hide");		
+				$("#call-variants-dropdown").removeClass("hide");	
+				$("#analyzed-progress-bar").removeClass("no-alignments");	
 			} else {
 				$("#call-variants-dropdown").addClass("hide");		
+				$("#analyzed-progress-bar").addClass("no-alignments");
 			}
 		}		
 	}
