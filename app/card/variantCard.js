@@ -1652,7 +1652,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, x, y, me);
 
 	tooltip.select("#unpin").on('click', function() {
-		me.unpin();
+		me.unpin(null, true);
 	});
 
 
@@ -1797,7 +1797,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 }
 
 
-VariantCard.prototype.unpin = function(saveClickedVariant) {
+VariantCard.prototype.unpin = function(saveClickedVariant, unpinMatrixTooltip) {
 	if (!saveClickedVariant) {
 		clickedVariant = null;
 		clickedVariantCard = null;
@@ -1807,6 +1807,10 @@ VariantCard.prototype.unpin = function(saveClickedVariant) {
 	this.hideCoverageCircle();
 //	window.hideCircleRelatedVariants();	
 	window.hideCoordinateFrame();
+
+	if (unpinMatrixTooltip) {
+		matrixCard.unpin();      		
+	}
 }
 
 VariantCard.prototype._hideTooltip = function() {
@@ -1822,7 +1826,7 @@ VariantCard.prototype._hideTooltip = function() {
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");   
-    matrixCard.unpin();        
+
 }
 
 
