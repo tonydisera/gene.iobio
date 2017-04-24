@@ -42,8 +42,8 @@ module.exports = {
     transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     matrixTrack.waitForMatrixLoaded();
-    probandVariantCard.assertLoadedCountEquals('42');
-    probandVariantCard.assertLoadedSymbolCountEquals(42);
+    probandVariantCard.assertLoadedVariantCountEquals('42');
+    probandVariantCard.assertLoadedVariantSymbolCountEquals(42);
     probandVariantCard.assertLoadedSNPSymbolCountEquals( 42);
     probandVariantCard.waitForBamDepthLoaded();
 
