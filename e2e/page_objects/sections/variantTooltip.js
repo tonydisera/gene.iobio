@@ -1,122 +1,62 @@
-var theClient;
-
 module.exports = {
-  selector: '#feature-matrix .tooltip',
+  selector: '//div[@id="matrix-panel"]//div[contains(@class, "tooltip-wide")]',
+  locateStrategy: 'xpath',
+
+  MATRIX_TOOLTIP         : '//div[@id="matrix-panel"]//div[contains(@class, "tooltip-wide")]',
+  PROBAND_TOOLTIP        : '//div[@id="proband-variant-card"]//div[@id="vcf-variants"]//div[contains(@class, "tooltip-wide")]',
+  PROBAND_CALLED_TOOLTIP :'//div[@id="proband-variant-card"]//div[@id="fb-variants"]//div[contains(@class, "tooltip-wide")]',
+
+
   
   commands: [{
-    assertTitleLine2Equals: function(text) {
+    expectTitleLine2Equals: function(text) {
   		this.expect.element('@title').text.to.equal(text);
   	},
-  	assertHGVScEquals: function(text) {
+  	expectHGVScEquals: function(text) {
   		this.expect.element('@HGVSc').text.to.equal(text);
   	},
-    assertHGVSpEquals: function(text) {
+    expectHGVSpEquals: function(text) {
       this.expect.element('@HGVSp').text.to.equal(text);
     },    
-
-    // For some reason, the bookmark (e2e/bookmark_variants.js) cannot use the 'assertTitleLine2Equals'
-    // method as this returns blank instead of the expected value.
-    expectTitleLine2TextEquals: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class, "tooltip")]//div[contains(@class, "tooltip-title") and contains(@class, "ref-alt")]';
-      return self.api.useXpath().getText('selector', function(result) {
-        self.assert.equal(result.value, text);
-      })
-    },
-    // For some reason, the bookmark (e2e/bookmark_variants.js) cannot use the 'assertHGVSpEquals'
-    // method as this returns blank instead of the expected value.
-    expectHGVSpTextEquals: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class, "tooltip")]//div[@class="tooltip-header" and text()="HGVSp"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
-    },
-
 
     expectInheritanceEquals: function(text) {
       this.expect.element('@inheritance').text.to.equal(text);
     },
     expectVepConsequence: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="VEP Consequence"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@vepConsequence').text.to.equals(text);
     },  
     expectVepImpact: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Impact"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
     },     
     expectHighestVepImpact: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Most severe impact"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@vepHighestImpact').text.to.equals(text);
     }, 
     expectPolyphen: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="PolyPhen"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@polyphen').text.to.equals(text);
     },         
     expectSIFT: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="SIFT"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@sift').text.to.equals(text);
     },         
     expectClinvar: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div/span/a';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@clinvar').text.to.equals(text);
     },
     expectClinvarClinSig: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/parent::node()/following-sibling::div/div[@class="tooltip-value"]';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@clinvarClinSig').text.to.equals(text);
     },  
     expectAFExAC: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq ExAC"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@afExAC').text.to.equals(text);
     },   
     expectAF1000G: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq 1000G"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@af1000G').text.to.equals(text);
     },  
     expectQual: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Qual"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@qual').text.to.equals(text);
     }, 
     expectFilter: function(text) {
-      var self = this;
-      var selector = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Filter"]/following-sibling::div';
-      return self.api.useXpath().getText(selector, function(result) {
-        self.assert.equal(result.value, text);
-      })
+      this.expect.element('@filter').text.to.equals(text);
     },              
-    expectAlleleCountsEquals: function(relationship, altCount, refCount, totalCount, zygosity) {
+    expectAlleleCountsEquals: function(tooltipSelector, relationship, altCount, refCount, totalCount, zygosity) {
       var self = this;
-      var base       = '//div[contains(@class, "tooltip")]//div[@id="coverage-svg"]/div[contains(@class,"' + relationship + '-alt-count") and contains(@class,"tooltip-row")]';
+      var base       = '//div[@id="coverage-svg"]/div[contains(@class,"' + relationship + '-alt-count") and contains(@class,"tooltip-row")]';
       var zygosityPath   = base + '/div[contains(@class,"tooltip-zygosity")]';
       var totalCountPath = base + '/div[contains(@class,"tooltip-allele-count-bar")]/*[local-name()="svg"]/*[local-name()="text"]';
       var altCountPath   = base + '/div[contains(@class,"tooltip-allele-count-bar")]/*[local-name()="svg"]/*[local-name()="g"]/*[local-name()="text" and contains(@class, "alt-count")]';
@@ -163,7 +103,18 @@ module.exports = {
     bookmarkLink:  {selector: '#bookmarkLink', locateStrategy: 'css selector'},
     removeBookmarkLink:  {selector: '#remove-bookmark-link', locateStrategy: 'css selector'},
     unpinLink:  {selector: 'a#unpin', locateStrategy: 'css selector'},
-    inheritance: {selector: '//*[local-name()="svg" and @class="inheritance-badge"]/following-sibling::strong/em', locateStrategy: 'xpath'}
+    inheritance: {selector: '//*[local-name()="svg" and @class="inheritance-badge"]/following-sibling::strong/em', locateStrategy: 'xpath'},
+    vepConsequence: {selector: '//div[@class="tooltip-header" and text()="VEP Consequence"]/following-sibling::div', locateStrategy: 'xpath'},
+    vepImpact: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Impact"]/following-sibling::div', locateStrategy: 'xpath'},
+    vepHighestImpact : {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Most severe impact"]/following-sibling::div', locateStrategy: 'xpath'},
+    polyphen: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="PolyPhen"]/following-sibling::div', locateStrategy: 'xpath'},
+    sift: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="SIFT"]/following-sibling::div', locateStrategy: 'xpath'},
+    clinvar: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div/span/a', locateStrategy: 'xpath'},
+    clinvarClinSig: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/parent::node()/following-sibling::div/div[@class="tooltip-value"]', locateStrategy: 'xpath'},
+    afExAC: {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq ExAC"]/following-sibling::div', locateStrategy: 'xpath'},
+    af1000G: {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq 1000G"]/following-sibling::div', locateStrategy: 'xpath'},
+    qual: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Qual"]/following-sibling::div', locateStrategy: 'xpath'},
+    filter: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Filter"]/following-sibling::div', locateStrategy: 'xpath'}
   }
 
 }

@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, matrixTooltip, bookmarkPanel, probandVariantCard, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, nav;
 
 module.exports = {
   tags: [],
@@ -10,10 +10,12 @@ module.exports = {
     indexPage = client.page.index();
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
-    matrixTrack = indexPage.section.matrixTrack;  
-    matrixTooltip = indexPage.section.matrixTooltip;    
+    matrixTrack = indexPage.section.matrixTrack;      
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
+
+    tooltip = indexPage.section.variantTooltip;    
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
   },
 
 
@@ -27,32 +29,35 @@ module.exports = {
   },
 
   'Bookmark 2 variants for gene RAI1 from matrix tooltip': function(client) {
+    client.pause(2000);
     matrixTrack.clickColumn(1);
-    matrixTooltip.waitForTooltip();
 
-    matrixTooltip.expectInheritanceEquals('recessive inheritance');
-    matrixTooltip.expectVepImpact('high');
-    matrixTooltip.expectVepConsequence('stop gained');
-    matrixTooltip.expectClinvar('pathogenic');
-    matrixTooltip.expectClinvarClinSig('smith-magenis syndrome');
-    matrixTooltip.expectAFExAC('0%');
-    matrixTooltip.expectAF1000G('0%');
-    matrixTooltip.expectQual('2880.99');
-    matrixTooltip.expectFilter('.');
-    matrixTooltip.expectAlleleCountsEquals('proband', 38, 1,  39, 'Hom');
-    matrixTooltip.expectAlleleCountsEquals('mother',  26, 25, 51, 'Het');
-    matrixTooltip.expectAlleleCountsEquals('father',  30, 33, 63, 'Het');
+    tooltip.waitForTooltip();
+    client.pause(2000);
+    tooltip.expectInheritanceEquals('recessive inheritance');
+    tooltip.expectVepImpact('high');
+    tooltip.expectVepConsequence('stop gained');
+    tooltip.expectClinvar('pathogenic');
+    tooltip.expectClinvarClinSig('smith-magenis syndrome');
+    tooltip.expectAFExAC('0%');
+    tooltip.expectAF1000G('0%');
+    tooltip.expectQual('2880.99');
+    tooltip.expectFilter('.');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'proband', 38, 1,  39, 'Hom');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'mother',  26, 25, 51, 'Het');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'father',  30, 33, 63, 'Het');
 
-    matrixTooltip.clickBookmark();
-    client.pause(1000);
+
+    tooltip.clickBookmark();
+    client.pause(3000);
     bookmarkPanel.assertCurrentBookmarkCoordEquals('17698535 G->A');
     bookmarkPanel.assertCurrentBookmarkRsIdEquals('rs527236033');
     bookmarkPanel.assertCurrentBookmarkHgvsEquals('p.Trp758Ter');
     bookmarkPanel.assertBookmarkCountEquals(1);
 
     matrixTrack.clickColumn(2);
-    matrixTooltip.waitForTooltip();
-    matrixTooltip.clickBookmark();
+    tooltip.waitForTooltip();
+    tooltip.clickBookmark();
     bookmarkPanel.assertBookmarkCountEquals(2);
   },
     
@@ -62,20 +67,20 @@ module.exports = {
     client.pause(1000);
     matrixTrack.waitForMatrixLoaded();
     matrixTrack.clickColumn(1);
-    matrixTooltip.waitForTooltip();
+    tooltip.waitForTooltip();
 
 
-    matrixTooltip.expectInheritanceEquals('denovo inheritance');
-    matrixTooltip.expectVepImpact('moderate');
-    matrixTooltip.expectVepConsequence('missense variant');
-    matrixTooltip.expectPolyphen('probably damaging');
-    matrixTooltip.expectSIFT('deleterious');
-    matrixTooltip.expectAlleleCountsEquals('proband', 27, 76, 103, 'Het');
-    matrixTooltip.expectAlleleCountsEquals('mother',  null, null, 13, 'Homref');
-    matrixTooltip.expectAlleleCountsEquals('father',  null, null, 42, 'Homref');
+    tooltip.expectInheritanceEquals('denovo inheritance');
+    tooltip.expectVepImpact('moderate');
+    tooltip.expectVepConsequence('missense variant');
+    tooltip.expectPolyphen('probably damaging');
+    tooltip.expectSIFT('deleterious');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'proband', 27, 76, 103, 'Het');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'mother',  null, null, 13, 'Homref');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'father',  null, null, 42, 'Homref');
 
 
-    matrixTooltip.clickBookmark();
+    tooltip.clickBookmark();
     client.pause(1000);
 
     
@@ -90,11 +95,12 @@ module.exports = {
     client.pause(2000);
     bookmarkPanel.clickBookmark(client, "17698535 G->A");
     matrixTrack.waitForMatrixLoaded();
-    matrixTooltip.waitForTooltip();
-    client.pause(2000);
-    matrixTooltip.expectTitleLine2TextEquals('SNP G->A rs527236033');
-    matrixTooltip.expectHGVSpTextEquals('ENSP00000323074.4:p.Trp758Ter');
-    matrixTooltip.expectAlleleCountsEquals('proband', 38, 1, 39, 'Hom');
+    tooltip.waitForTooltip();
+    client.pause(4000);
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
+    //tooltip.expectTitleLine2Equals('SNP G->A rs527236033');
+    //tooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
+    //tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'proband', 38, 1, 39, 'Hom');
 
   },
 
@@ -108,13 +114,13 @@ module.exports = {
  'Remove bookmark': function(client) {
     nav.searchGene('PDHA1');
     matrixTrack.waitForMatrixLoaded();
-     matrixTrack.clickColumn(1);
-    matrixTooltip.waitForTooltip();
-    matrixTooltip.clickRemoveBookmark();
+    matrixTrack.clickColumn(1);
+    tooltip.waitForTooltip();
+    tooltip.clickRemoveBookmark();
     client.pause(1000);
     bookmarkPanel.assertBookmarkCountEquals(2);
 
-    client.end();
+    //client.end();
   }
 }
 

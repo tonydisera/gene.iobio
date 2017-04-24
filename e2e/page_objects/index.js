@@ -7,12 +7,9 @@ var findGenesPanel = require('./sections/findGenesPanel.js');
 var inspectPanel = require('./sections/inspectPanel.js');
 var recallPanel = require('./sections/recallPanel.js');
 var bookmarkPanel = require('./sections/bookmarkPanel.js');
+var variantTooltip = require('./sections/variantTooltip.js');
 
-var matrixTooltip = require('./sections/variantTooltip.js');
-var probandTooltip = require('./sections/variantTooltip.js');
-probandTooltip.selector = '#proband-variant-card #vcf-variants .tooltip';
-var probandCalledTooltip = require('./sections/variantTooltip.js');
-probandTooltip.selector = '#proband-variant-card #fb-variants .tooltip';
+
 
 module.exports = {
   url: function() {
@@ -34,10 +31,7 @@ module.exports = {
     probandVariantCard: '#proband-variant-card',
     motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
     fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)',
-    matrixTooltip:        '#feature-matrix .tooltip',
-    probandTooltip:       '#proband-variant-card #vcf-variants .tooltip',
-    probandCalledTooltip: '#proband-variant-card #fb-variants .tooltip'
-
+    variantTooltip:        '#feature-matrix .tooltip'
   },
 
   commands: [{
@@ -59,9 +53,7 @@ module.exports = {
     bookmarkPanel: bookmarkPanel,
     matrixTrack: matrixTrack,
     probandVariantCard: probandVariantCard,
-    matrixTooltip: matrixTooltip,
-    probandTooltip: probandTooltip,
-    probandCalledTooltip: probandCalledTooltip,
+    variantTooltip: variantTooltip,
 
     transcriptCard: {
       selector: '#transcript-card',

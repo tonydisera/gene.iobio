@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, matrixTooltip, probandTooltip, probandCalledTooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -11,13 +11,11 @@ module.exports = {
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;  
-    matrixTooltip = indexPage.section.matrixTooltip;    
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
-    probandTooltip = indexPage.section.probandTooltip;
-    probandCalledTooltip = indexPage.section.probandCalledTooltip;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
+    tooltip = indexPage.section.variantTooltip;
   },
 
 
@@ -121,27 +119,29 @@ module.exports = {
       theTooltip.expectAF1000G('0%');
       theTooltip.expectQual("8.46129");
       theTooltip.expectFilter("PASS");
-      theTooltip.assertHGVScEquals("ENST00000375994.2:c.595A>G");
-      theTooltip.assertHGVSpEquals("ENSP00000365162.2:p.Ile199Val");
-      theTooltip.expectAlleleCountsEquals('proband', 10, 39, 49, 'Het');
-      theTooltip.expectAlleleCountsEquals('mother',  null, null, 55, 'Homref');
-      theTooltip.expectAlleleCountsEquals('father',  null, null, 45, 'Homref');
+      theTooltip.expectHGVScEquals("ENST00000375994.2:c.595A>G");
+      theTooltip.expectHGVSpEquals("ENSP00000365162.2:p.Ile199Val");
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'proband', 10, 39, 49, 'Het');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 55, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 45, 'Homref');
 
     }
 
 
 
     client.pause(2000);
+    tooltip.selector = tooltip.PROBAND_TOOLTIP;
     probandVariantCard.clickCalledVariantSymbol(".snp.het.denovo.sift_tolerated.polyphen_benign.clinvar_lpath");
     client.pause(2000);
-    evaluateTooltip(probandCalledTooltip);
-    probandCalledTooltip.clickUnpin();
+    evaluateTooltip(tooltip);
+    tooltip.clickUnpin();
 
 
     client.pause(2000);
     matrixTrack.clickColumn(1);
-    matrixTooltip.waitForTooltip();
-    evaluateTooltip(matrixTooltip);
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
+    tooltip.waitForTooltip();
+    evaluateTooltip(tooltip);
 
     
   },
