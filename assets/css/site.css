@@ -1151,7 +1151,7 @@ section {
   position: relative;
   pointer-events: none;
   top: 0px;
-  height: 18px;
+  height: 23px;
   visibility: visible;
   width: 26px; }
   #top-coordinate-frame.hide {
@@ -1160,7 +1160,7 @@ section {
   #top-coordinate-frame .coordinate-arrow {
     stroke-width: 1px !important;
     stroke: black !important;
-    fill: #61a041; }
+    fill: #3586c0; }
 
 .variant-card {
   min-height: 60px;
@@ -1293,24 +1293,24 @@ header {
     pointer-events: none; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
-  stroke: #61a041;
+  stroke: #3586c0;
   stroke-width: 2;
   fill: none;
   pointer-events: none; }
 
 #vcf-variants .circle.emphasize, #fb-variants .circle.emphasize, #vcf-variants .arrow-line.emphasize, #fb-variants .arrow-line.emphasize {
-  stroke: #61a041;
+  stroke: #3586c0;
   fill: none;
   stroke-width: 3;
   pointer-events: none; }
 
 #vcf-variants .arrow, #fb-variants .arrow, #vcf-variants .arrow.emphasize, #fb-variants .arrow.emphasize {
   stroke-width: 3;
-  stroke: #61a041;
+  stroke: #3586c0;
   pointer-events: none; }
 
 #bam-depth .circle-label {
-  fill: #61a041;
+  fill: #3586c0;
   font-size: 13px;
   font-weight: bold;
   stroke: none;
@@ -2910,7 +2910,7 @@ text.ref-count {
   fill: none;
   stroke: #1574C7;
   stroke-width: 5;
-  opacity: 0.8; }
+  opacity: 0.6; }
 #vcf-track .bookmark line {
   stroke: #1574C7;
   stroke-width: 5;
