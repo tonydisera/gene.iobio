@@ -96,7 +96,6 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
 	if (variant) {		
 		var key = this.getBookmarkKey(gene.gene_name, selectedTranscript.transcript_id, gene.chr, variant.start, variant.ref, variant.alt);
 		if (this.bookmarkedVariants[key] == null) {
-			unpinAll();
 
 			me.bookmarkedVariants[key] = variant;
 			getProbandVariantCard().addBookmarkFlag(variant, me.compressKey(key), false);
