@@ -6,19 +6,19 @@
 
     <div class="col-main">
 
-        <div id="get-genes-dropdown" class="level-edu level-basic" style="margin-top:-5px;width: 125px;">
+        <div id="get-genes-dropdown" class="level-edu level-basic" style="margin-top:0px;width: 125px;">
           <div class="btn-toolbar">
             <div class="btn-group" style="display:inline;">
 
-              <button type="button" style="width:120px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-              <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">content_paste</i>Import Gene set<span style="margin-left:6px" class="caret"></span>
+              <button type="button" style="width:130px;padding-top: 2px;padding-bottom: 1px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">input</i>Import Gene set<span style="margin-left:6px" class="caret"></span>
               </button>
 
               <ul class="dropdown-menu " role="menu">
                 <li id="copy-paste-li">
                   <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
                     <div>Copy/Paste</div>
-                    <textarea style="width:170px;height:150px;" id="genes-to-copy"></textarea>
+                    <textarea style="width:325px;height:450px;" id="genes-to-copy"></textarea>
                     <div style="text-align:right">
                       <button id="get-genes-copy-paste-button" type="submit" onclick="genesCard.copyPasteGenes()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;">
                         Done
@@ -35,8 +35,12 @@
 
       <!-- ACMG genes -->
       
-              <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu level-basic icon-button-sm btn btn-default btn-raised" style="width:120px;margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 10px;">
-                <i class="material-icons" style="font-size:14px;padding-right:0px;padding-top:2px;">format_list_numbered</i>ACMG Genes<span style="margin-left:6px"></span>
+              <button id="get-acmg-genes" type="submit" onclick="genesCard.ACMGGenes()" class="level-edu level-basic icon-button-sm btn btn-default btn-raised" style="width:130px;margin-left:0px;padding-top:0px;padding-bottom:0px;margin-top:10px;margin-bottom: 10px;">
+                <i class="material-icons" style="font-size: 15px;padding-right: 2px;float: initial;margin-top: -2px;">format_list_numbered</i>
+                
+                ACMG Genes
+
+                <img class="gene-badge-loader hide glyph" style="width: 14px; height: 14px;" src="assets/images/wheel.gif">                
               </button>
 
 
@@ -76,15 +80,11 @@
 
             <div style="text-align:center;">
             
-              <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="level-edu level-basic icon-button-sm btn btn-default btn-raised" style="line-height:normal;width:120px;margin-left:3px;padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom: 10px;">
-                <svg height="18" width="19">
-                  <g transform="translate(0,1)">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#search-dna-symbol" width="18" height="18" fill="#5d809d"></use>
-                  </g>
-                </svg>
+              <button id="phenolyzer-go-button" type="submit" onclick="genesCard.getPhenolyzerGenes()" class="level-edu level-basic icon-button-sm btn btn-default btn-raised" style="line-height:normal;width:120px;margin-left:3px;margin-top:5px;margin-bottom: 10px;">
+               
+              <i class="material-icons" style="font-size:18px;padding-right:0px;padding-top:0px;">play_arrow</i>               
 
-
-                <span id="phenolyzer-run-label" class="level-edu level-basic">Run</span>
+                <span id="phenolyzer-run-label" class="level-edu level-basic">Run Phenolyzer</span>
                 <span id="phenolyzer-run-label-long" class="level-edu level-basic hide">Get Genes</span>
 
               </button>

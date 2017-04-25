@@ -44,7 +44,9 @@ describe('filterCard', function() {
 				afMin1000g: 0.2,
 				afMax1000g: 0.65,
 				annotsToInclude: "blah",
-				exonicOnly: false
+				exonicOnly: false,
+				loadedVariants: false, 
+				calledVariants: false 
 			});
 		});
 
@@ -60,7 +62,9 @@ describe('filterCard', function() {
 				afMin1000g: null,
 				afMax1000g: null,
 				annotsToInclude: "blah",
-				exonicOnly: false
+				exonicOnly: false,
+				loadedVariants: false, 
+				calledVariants: false 
 			});
 		});
 
@@ -73,7 +77,9 @@ describe('filterCard', function() {
 				afMin1000g: 0.2,
 				afMax1000g: 0.65,				
 				annotsToInclude: "blah",
-				exonicOnly: true
+				exonicOnly: true,
+				loadedVariants: false, 
+				calledVariants: false 
 			});
 		});
 

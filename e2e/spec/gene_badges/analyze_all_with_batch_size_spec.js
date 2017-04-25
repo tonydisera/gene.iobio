@@ -17,13 +17,13 @@ module.exports = {
 
   'Analyzing all in batch sizes of 10 after refreshing the page should load all badges': function(client) {
     indexPage.load();
+    nav.clickGenes();
+    findGenesPanel.clickACMG56Genes();
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild();
     dataCard.section.probandData.selectPlatinumTrio();
     dataCard.clickLoad();
-    nav.clickGenes();
-    findGenesPanel.clickACMG56Genes();
     matrixTrack.waitForMatrixLoaded();
 
 
@@ -34,7 +34,7 @@ module.exports = {
       appTitleSection.clickAnalyzeAll();
       appTitleSection.waitForAnalyzeAllDone();
       appTitleSection.assertGeneBadgesLoaded([
-         'CACNA1S', 'TNNT2', 'APOB', 'LDLR', 'SCN5A'
+         'CACNA1S', 'TNNT2', 'APOB', 'LDLR', 'MSH6'
       ]);
       appTitleSection.goToPage(2);
       appTitleSection.assertGeneBadgesLoaded([

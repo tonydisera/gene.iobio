@@ -21,41 +21,106 @@
   margin-top: 5px
   margin-bottom: 0px
 
-  #analyze-all-progress, #filter-progress
-    position: relative
-    background-color: white
-    color: #717070
-    border: #878585
-    border-style: solid
-    border-width: thin
-    font-size: 12px
-    margin-left: 5px
-    padding: 0px 0px 0px 0px !important
+  #total-genes-label
+    float: left
+    margin-left: 10px
+    margin-right: 5px
+    margin-top: 8px
+
+  #analyze-all-panel
+    text-align:center
+    overflow: hidden
+    margin-top: 1px
     display: inline-block
-    width: 130px
-    vertical-align: middle
-    height: 18px
-    margin-bottom: 2px
+    float: left  
+    margin-left: 10px
+    margin-right: 10px
 
-    .bar
-      background-color: rgba(65, 176, 220, 0.45)
-      height: 17px
-      position: absolute
-      left: 0
-      top: 0%
-      width: 0%
-      text-align: center
+   
 
-    .text
-      position: absolute
-      left: 0
-      top: 0%
-      width: 100%
-      text-align: center       
+    #analyzed-progress-bar
+      display: inline-block
+      margin-top: 2px
+      margin-bottom: 6px
+      margin-left: 6px
+      float: left  
 
-    
+      &.no-alignments
+        #called-progress-bar-label
+          color:  #cacaca
+
+      .bar
+        background-color: transparent
+        height: 17px
+        float: left
+        left: 0
+        top: 0%
+        width: 0%
+        text-align: center    
+
+
+      .analysis-progress-bar
+        width: 200px
+        background-color: transparent
+        color: #717070
+        border: #d5d5d5
+        border-style: solid
+        border-width: thin
+        font-size: 12px
+        padding: 0px 0px 0px 0px !important
+        vertical-align: middle
+        height: 18px
+        margin-left: 5px
+        margin-bottom: 0px   
+        margin-top: 0px
+        display: inline-block
+
+        .text
+          text-align: center
+          width: 100%
+          color: white  
+
+        #analyzed-bar
+          background-color: transparent
+
+          #passed-filter-bar
+            background-color: $loaded-variant-progress-color    
+            height: 16px  
+            color: white       
+
+          #not-passed-filter-bar
+            background-color: $not-pass-color
+            height: 16px            
+
+        #not-analyzed-bar
+          background-color: transparent
+
+
+      #call-all-progress
+        border-top: transparent   
+
+        #analyzed-bar
+
+          #passed-filter-bar
+            background-color: $called-variant-color
+            height: 17px   
+            color: white      
+
+          #not-passed-filter-bar
+            height: 17px            
+
+
+
+      .progress-bar-label
+        float: left
+        width: 43px
+        font-size: 12px
+          
 #genes-card
   height: 100%
+
+  #phenolyzer-search-box
+    margin-top: 20px
 
   .phenolyzer-label
     color: $sidebar-text-color !important
@@ -65,7 +130,7 @@
   #phenolyzer-run-label
     display: inline-block !important
     vertical-align: top
-    margin-top: 4px  
+    padding-top: 3px
 
   #phenolyzer-heading
     margin-top: 20px
@@ -91,6 +156,8 @@
 #copy-paste-li, #phenolyzer-search-box
   color: $sidebar-text-color !important
   font-size: 12px
+
+
 
 #edit-list-li
   color: $text-color !important
@@ -152,16 +219,16 @@
   height: 21px
 
 #gene-badge.loading
-  border-left: #dad26c solid 12px
+  border-left: #d8d8d8  solid 10px
   height: 22px
 
 
 #gene-badge.loading.selected
-  border-left: #dad26c solid 12px
+  border-left: $app-color solid 12px
 
 
 #gene-badge.selected
-  border-left: #7ea238 solid 12px
+  border-left:  $app-color solid 12px
   height: 22px
   #gene-badge-button
     //box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19)
@@ -186,6 +253,19 @@
   float: left
   display: none
 
+#gene-badge-called
+  font-size: 15px
+  font-weight: bold
+  color: $called-variant-color-darker
+  float: left
+  display: none
+
+#gene-badge-has-called-variants
+  font-size: 14px
+  color: $called-variant-color
+  float: left
+  display: none  
+
 #gene-badge-warning
   float: left
   font-size: 12px
@@ -208,9 +288,16 @@
   &.visited
     #gene-badge-loaded
       display: inline
-
     #gene-badge-name
       color: $sidebar-text-color !important
+
+  &.called
+    #gene-badge-called
+      display: inline
+
+  &.has-called-variants
+    #gene-badge-has-called-variants
+      display: inline      
 
   &:hover #gene-badge-remove
     visibility: visible 
@@ -221,6 +308,12 @@
       display: none
     #gene-badge-error
       display: inline
+  &.called.error
+    #gene-badge-called
+      display: none
+  &.has-called-variants.error
+    #gene-badge-has-called-variants
+      display: none
 
 #gene-badge
   &.visited.warning
@@ -228,7 +321,26 @@
       display: none
     #gene-badge-warning
       display: inline
+  &.called.warning
+    #gene-badge-called
+      display: none      
+  &.has-called-variants.warning
+    #gene-badge-has-called-variants
+      display: none      
 
+
+#call-variants-dropdown
+  display: inline-block
+  float: left
+  margin-top: 3px
+  margin-bottom: 0px
+
+  a
+    padding-top: 5px
+    padding-bottom: 5px
+    font-size: 13px  
+    padding-left: 15px
+    padding-right: 15px    
 
 #manage-genes
   float: left
@@ -246,24 +358,28 @@
 
 
 
-#manage-gene-list
+#analyze-all-genes
+  float: left
+  margin-top: 3px
+  margin-right: 10px
   display: inline-block
-  padding-top: 0px
-  padding-bottom: 0px
-  padding-left: 8px
-  padding-right: 8px
-  font-size: 12px
-  margin-top: 7px
+  padding-top: 3px
+  padding-bottom: 3px
+  padding-left: 12px
+  padding-right: 12px
+  font-size: 13px
+  color:  $app-color !important
+
 
 #manage-genes-box
   float: right
   text-align: right
   display: inline-block
-  margin-top: 5px
+  margin-top: -2px
 
   #manage-genes-dropdown
     float: right
-    margin-top: -8px  
+    margin-top: -3px  
 
 
 #gene-badge-container
@@ -343,12 +459,15 @@
       
 #order-by-label
   margin-left: 20px
+  margin-right: 4px
+  margin-top: 0px
+  display: inline-block
 
 #select-gene-container
   display: inline-block
   width: 110px
   vertical-align: middle
-  margin-top: 2px
+  margin-top: 8px
 
   .selectize-input
     padding-bottom: 2px

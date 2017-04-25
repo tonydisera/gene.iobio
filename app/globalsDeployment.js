@@ -2,7 +2,7 @@
     with for a local deployment.  This entire .js can be replaced or modified to suit the 
     specific iobio deployment environment.
 */
-var version               = "2.2.0";
+var version               = "2.3";
 
 var isOffline             = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
@@ -14,9 +14,6 @@ var serverInstance        = "@hostname@/";  // this will be replace with the nam
 var serverCacheDir        = "local_cache/"; // this is the directory from the server instance where resource files (like clinvar vcf) will be served
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
-
-var autoCall              = null;           // if only alignments are provided, should variants automatically be called? 
- 											// set to null if app should prompt first before autocalling
 
 var useSSL                = false;
 var useServerCache        = false;
@@ -50,4 +47,4 @@ var feedbackShowURL             = false;         // show the feedback email show
 
 
 var siteGeneSource        = isMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
-var DEFAULT_BATCH_SIZE    = 1;              // how many genes can be analyzed simultaneously for 'Analyze all'
+var DEFAULT_BATCH_SIZE    = 5;              // how many genes can be analyzed simultaneously for 'Analyze all'

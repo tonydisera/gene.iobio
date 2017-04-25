@@ -304,6 +304,12 @@ function variantD3() {
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
 
     
+    
+      // Add grouping for bookmarks
+      svg.select("g.bookmarks").remove();
+      svg.append("g")
+         .attr("class", "bookmarks");
+
 
       // Create the X-axis.   
       g.selectAll(".x.axis").remove();    
@@ -532,11 +538,6 @@ function variantD3() {
             .duration(200)
             .call(xAxis);       
       }
-
-      // Add grouping for bookmarks
-      svg.select("g.bookmarks").remove();
-      svg.append("g")
-         .attr("class", "bookmarks");
 
 
 

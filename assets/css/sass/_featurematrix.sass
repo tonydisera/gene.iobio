@@ -1,0 +1,116 @@
+#matrix-track
+  
+  #zero-variants
+    color: white
+    font-size: 14px
+    text-align: center
+    margin-bottom: 10px
+    background-color:  $warning-background-color
+    border: thin solid $warning-border-color
+    width: 300px
+    margin-left: auto
+    margin-right: auto
+
+    &.zero-filtered-variants
+      color: $text-color
+      background-color: $filter-summary-background-color
+      border: solid thin $filter-summary-border-color
+
+#feature-matrix
+  rect.cellbox
+    fill: white
+    stroke: rgb(230, 230, 230)
+    stroke-width: 1px
+
+  .col
+    &.danger
+      rect.cellbox
+        fill: rgba(187, 0, 0, 0.13) 
+
+    &.low-quality
+      rect.cellbox
+        fill: rgba(0, 0, 0, 0.13) 
+
+  .colhdr text
+    font-size: 11px
+    pointer-events: none
+
+    
+  rect.cellbox:hover
+    cursor: pointer
+    font-weight: bold
+
+  .col.active rect.cellbox
+    fill: transparent
+
+  rect.colbox
+    fill: none
+    opacity: 0
+    pointer-events: none
+
+    &.current
+      stroke: $current-frame-color !important
+      stroke-width: 1.5px !important
+      opacity: 1
+      pointer-events: none
+
+  .col.active
+
+    rect.colbox   
+      stroke: $current-frame-color
+      stroke-width: 1px
+      opacity: 1
+
+  text
+    font-size: 12px
+    fill: rgb(120, 120, 120)
+    pointer-events: none
+
+    &.clickable
+      text-decoration: underline
+      fill: $app-color !important
+
+      &:hover
+        fill: $current-color !important
+
+  .axis .tick text.current
+    font-weight: bold !important
+    fill: black !important
+
+  .y.axis .tick
+    .up #arrow-up, .down #arrow-down
+      opacity: 0
+
+#feature-matrix
+  
+  &.shift-rows
+
+    .y.axis .tick
+      .up #arrow-up, .down #arrow-down
+        fill: #E0E0E0
+        stroke: #ABABAB
+        stroke-width: .5px
+        opacity: 1
+
+      text
+        &:hover, &.current, &.active
+          font-weight: bold
+          fill: $current-color
+
+      .up #arrow-up:hover, .down #arrow-down:hover
+        cursor: pointer
+        fill: $current-color
+
+      pointer-events: all
+
+  
+#feature-matrix-note
+  padding-left: 180px
+  font-size: 12px
+  margin-top: -5px
+
+#move-rows
+  float: left
+  font-size: 13px !important
+  color: $text-color !important
+  margin-top: 0px

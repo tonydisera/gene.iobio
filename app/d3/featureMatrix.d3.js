@@ -19,7 +19,10 @@ function featureMatrixD3() {
   var columnLabel = function( d, i) {
     return d.type;
   }
- 
+  var columnLabelClass = function( d, i) {
+    return "";
+  }
+  var columnLabelSymbol = null;
  
   // variables 
   var heightPercent = "100%",
@@ -140,13 +143,20 @@ function featureMatrixD3() {
           .attr("class", "colhdr")
           .attr("transform",  translateColHdrGroup);
 
-        var colhdrs = colhdrGroup.selectAll('.colhdr').data(data);
-        colhdrs.enter().append('g')
-            .attr('class', 'colhdr')
-            .attr('transform', function(d,i) { 
-              return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
-            })
-            .append("text")
+        var colhdrs = colhdrGroup.selectAll('.colhdr')
+                                  .data(data)
+                                  .enter().append('g')
+                                  .attr('class', 'colhdr')
+                                  .attr('transform', function(d,i) { 
+                                    return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
+                                  });
+
+        if (columnLabelSymbol) {
+          columnLabelSymbol(colhdrs, {cellSize: cellSize});
+        }
+
+
+        colhdrs.append("text")
             .style("text-anchor", options.simpleColumnLabels ? "middle" : "start")
             .attr("dx", ".8em")
             .attr("dy", ".15em")
@@ -157,7 +167,8 @@ function featureMatrixD3() {
                 return "rotate(-65)" ;
               }
             })
-            .text( columnLabel );
+            .text( columnLabel )
+            .attr('class', columnLabelClass);
 
       }
 
@@ -500,6 +511,25 @@ function featureMatrixD3() {
       return columnLabel;
     } else {
       columnLabel = _;
+      return chart;
+    }
+  }
+
+  chart.columnLabelClass = function(_) {
+    if (!arguments.length) {
+      return columnLabelClass;
+    } else {
+      columnLabelClass = _;
+      return chart;
+    }
+  }
+
+
+  chart.columnLabelSymbol = function(_) {
+    if (!arguments.length) {
+      return columnLabelSymbol;
+    } else {
+      columnLabelSymbol = _;
       return chart;
     }
   }

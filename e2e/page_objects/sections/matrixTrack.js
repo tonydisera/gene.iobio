@@ -6,7 +6,7 @@ var CLINVAR = {
 };
 
 var SIFT = {
-  LABEL: 'Pathogenecity - SIFT',
+  LABEL: 'Pathogenicity - SIFT',
   SYMBOL: "/*[local-name()='g']",
   TOLERATED: "/*[local-name()='text' and text()='tolerated']",
   DELETERIOUS: "/*[local-name()='text' and text()='deleterious']",
@@ -324,11 +324,17 @@ module.exports = {
     waitForMatrixLoaded: function() {
       this.waitForElementVisible('@featureMatrix', 60000);
     },
+    waitForZeroVariantsWarning: function() {
+      this.waitForElementVisible('@zeroVariantsWarning', 60000);
+    },
+    waitForZeroFilteredVariantsWarning: function() {
+      this.waitForElementVisible('@zeroFilteredVariantsWarning', 60000);
+    },
     clickColumn: function(variant) {
       var self = this;
       this.api.elements('xpath', precedingSiblingsToVariant(variant), function(precedingVariantElements) {
         var variantIndex = precedingVariantElements.value.length + 1;
-        var column = "/*[local-name()='g'][" + variantIndex + "]/*[local-name()='g'][1]/*[local-name()='rect']";
+        var column = "/*[local-name()='g'][" + variantIndex + "]";
         var pathToColumn = "//div[@id='feature-matrix']/*[local-name()='svg']/*[@class='group']" + column;
         self.click('xpath', pathToColumn);
       });
@@ -336,7 +342,9 @@ module.exports = {
   }],
   elements: {
     featureMatrix: { selector: '#feature-matrix' },
-    featureMatrixNote: { selector: '#feature-matrix-note' }
+    featureMatrixNote: { selector: '#feature-matrix-note' },
+    zeroVariantsWarning: { selector: '#zero-variants' },
+    zeroFilteredVariantsWarning: { selector: '#zero-variants.zero-filtered-variants' }
   }
 };
 

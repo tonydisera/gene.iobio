@@ -1,3 +1,6 @@
+var cacheHelper = new CacheHelper();
+cacheHelper.isolateSession();
+
 describe('variantModel', function() {
 	var variantModel;
 
@@ -95,7 +98,9 @@ describe('variantModel', function() {
 				},
 				CONSEQUENCE: {},
 				AF: {},
-				featureCount: 5
+				featureCount: 5,
+				loadedCount: 5, 
+				calledCount: 0
 			});
 		});
 
@@ -126,7 +131,9 @@ describe('variantModel', function() {
 					}
 				},
 				AF: {},
-				featureCount: 5
+				featureCount: 5,
+				loadedCount: 5, 
+				calledCount: 0
 			});
 		});
 
@@ -146,7 +153,9 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } },
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0
 			});
 		});
 
@@ -166,7 +175,9 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } },
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0
 			});
 		});
 
@@ -187,7 +198,9 @@ describe('variantModel', function() {
 				IMPACT: {},
 				CONSEQUENCE: {},
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0				
 			});
 		});
 
@@ -206,7 +219,9 @@ describe('variantModel', function() {
 				IMPACT: {},
 				CONSEQUENCE: {},
 				AF: {},
-				featureCount: 4
+				featureCount: 4,
+				loadedCount: 4, 
+				calledCount: 0	
 			});
 		});
 
@@ -227,7 +242,9 @@ describe('variantModel', function() {
 					AF: {
 						afexac_rare: { field: 'afExAC', value: 5 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -249,7 +266,9 @@ describe('variantModel', function() {
 					AF: {
 						af1000g_unique: { field: 'af1000G', value: 2 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -271,7 +290,9 @@ describe('variantModel', function() {
 					AF: {
 						afexac_rare: { field: 'afExAC', value: 5 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -293,7 +314,9 @@ describe('variantModel', function() {
 					AF: {
 						af1000g_unique: { field: 'af1000G', value: 2 }
 					},
-					featureCount: 2
+					featureCount: 2,
+					loadedCount: 2, 
+					calledCount: 0	
 				});
 			});
 		});
@@ -322,14 +345,19 @@ describe('variantModel', function() {
 
 	describe('#getCalledVariantCount', function() {
 		it('returns the correct count of called variants', function() {
-			variantModel.fbData = {
-				features: [{ zygosity: 'HET' }, { zygosity: 'HOMREF' }, { zygosity: 'HOM'}]
-			};
+			window.gene = { chr: 'chr1', gene_name: 'foo' };
+			window.selectedTranscript = 'transcript';
+			variantModel.relationship = 'proband';
+			variantModel.setCalledVariants(
+				{
+					features: [{ ref: 'chr1', zygosity: 'HET' }, { ref: 'chr1', zygosity: 'HOMREF' }, { ref: 'chr1', zygosity: 'HOM'}]
+				}, true
+			);
 			expect(variantModel.getCalledVariantCount()).toEqual(2);
 		});
 
 		it('returns 0 when there are no called variants', function() {
-			variantModel.fbData = {};
+			variantModel.setCalledVariants({});
 			expect(variantModel.getCalledVariantCount()).toEqual(0);
 		});
 	});

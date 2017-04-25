@@ -615,24 +615,23 @@ describe('MatrixCard', function() {
 		});
 
 		it('appends an svg symbol and line with the correct attributes when there are options', function() {
-			var options = { width: "333", height: "444", transform: "translate(1,12)" };
+			var options = { cellSize: 22 };
 			mc.showSibNotRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,12)');
-			expect(useElem.attr('width')).toEqual('333');
-			expect(useElem.attr('height')).toEqual('444');
-			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
+			expect(useElem.attr('xlink:href')).toEqual('#thumbs-down-symbol');
 			expect(useElem.style('pointer-events')).toEqual('none');
-			expect($('#test > line')).toBeInDOM();
 		});
 
 		it('appends an svg symbol with the default attributes when there are no options', function() {
 			var options = {};
 			mc.showSibNotRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
-			expect(useElem.attr('width')).toEqual('20');
-			expect(useElem.attr('height')).toEqual('20');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('width')).toEqual('14');
+			expect(useElem.attr('height')).toEqual('14');
 		});
 	});
 
@@ -680,21 +679,21 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol with the correct attributes when there are some recessive variants', function() {
 			selection.datum({ value: 'recessive_some' });
-			mc.showSibRecessiveSymbol(selection);
+			mc.showSibRecessiveSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
-			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
-			expect(useElem.attr('width')).toEqual('17');
-			expect(useElem.attr('height')).toEqual('17');
+			expect(useElem.attr('xlink:href')).toEqual('#question-mark-symbol');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
 		});
 
 		it('appends an svg symbol with the correct attributes when there are no recessive variants', function() {
-			selection.datum({ value: 'asdf' });
+			selection.datum({ value: 'asdf', cellSize: 22 });
 			mc.showSibRecessiveSymbol(selection);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
-			expect(useElem.attr('width')).toEqual('22');
-			expect(useElem.attr('height')).toEqual('22');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('width')).toEqual('14');
+			expect(useElem.attr('height')).toEqual('14');
 		});
 	});
 
@@ -712,23 +711,28 @@ describe('MatrixCard', function() {
 				value: 'present_all',
 				clazz: 'affected'
 			});
-			mc.showSibPresentSymbol(selection);
+			mc.showSibPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,1)');
-			expect(useElem.attr('xlink:href')).toEqual('#checkmark-symbol');
-			expect(useElem.attr('width')).toEqual('15');
-			expect(useElem.attr('height')).toEqual('15');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('xlink:href')).toEqual('#thumbs-up-symbol');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
 			expect(useElem.style('pointer-events')).toEqual('none');
 			expect(useElem.attr('fill')).toEqual('#81A966');
 		});
 
 		it('appends an svg symbol with the default attributes when sibling data is not all present', function() {
-			mc.showSibPresentSymbol(selection);
+			selection.datum({
+				value: 'present_some',
+				clazz: 'affected'
+			});			
+			mc.showSibPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(3,3)');
-			expect(useElem.attr('width')).toEqual('10');
-			expect(useElem.attr('height')).toEqual('10');
-			expect(useElem.attr('fill')).toEqual('#ABAFC1');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('xlink:href')).toEqual('#question-mark-symbol');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
+			expect(useElem.attr('fill')).toEqual('#8b8b8b');
 		});
 	});
 

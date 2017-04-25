@@ -47,20 +47,29 @@ FilterCard.prototype.autoSetFilters = function() {
 
 }
 
+/*
+ * If a filter has been clicked after a standard filter has been selected,
+ * unset the standard filter since the criteria has been changed
+ */
+FilterCard.prototype.clearCurrentStandardFilter = function() {
+	if ($('.standard-filter-btn.current').length > 0) {
+		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").addClass(hide);
+		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").text("");
+		$('.standard-filter-btn.current').removeClass("current");		
+	}
+}
+
+
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
 	filterCard.setStandardFilter(button, filterName);
-	var genesCount = filterVariants();
-	me.setStandardFilterCount(button, genesCount)
+	filterVariants();
 }
 
-FilterCard.prototype.setStandardFilterCount = function(button, genesCount) {
-	var label = genesCount.pass + " of " + genesCount.total + " genes";
-	$(button.parentNode).find("span.standard-filter-count").text(label);
-}
 
 FilterCard.prototype.resetStandardFilterCounts = function() {
-	$('#standard-filter-panel span.standard-filter-count').text("");
+	$('#standard-filter-panel span.standard-filter-count #loaded-variant-count').text("");
+	$('#standard-filter-panel span.standard-filter-count #called-variant-count').text("");
 }
 
 FilterCard.prototype.setStandardFilter = function(button, filterName) {
@@ -160,7 +169,9 @@ FilterCard.prototype.getFilterObject = function() {
 		'afMin1000g': afMin1000g,
 		'afMax1000g': afMax1000g,
 		'annotsToInclude': this.annotsToInclude,
-		'exonicOnly': $('#exonic-only-cb').is(":checked")
+		'exonicOnly': $('#exonic-only-cb').is(":checked"),
+		'loadedVariants': $('#loaded-variants-cb').is(":checked"),
+		'calledVariants': $('#called-variants-cb').is(":checked")
   };
 }
 
@@ -267,6 +278,7 @@ FilterCard.prototype.init = function() {
 		// We are filtering on range, so clear out the af level filters
 		me.resetAfFilters("af1000glevel");
 		me.resetAfFilters("afexaclevel");
+		me.clearCurrentStandardFilter();
 
 		window.filterVariants();
 	});
@@ -274,6 +286,7 @@ FilterCard.prototype.init = function() {
 		// We are filtering on range, so clear out the af level filters
 		me.resetAfFilters("af1000glevel");
 		me.resetAfFilters("afexaclevel");
+		me.clearCurrentStandardFilter();
 
 		window.filterVariants();
 	});
@@ -285,10 +298,23 @@ FilterCard.prototype.init = function() {
 	});
 	// listen for go button on coverage
 	$('#coverage-go-button').on('click', function() {
+		me.clearCurrentStandardFilter();
+
 		window.filterVariants();
 	});
 	// listen to checkbox for filtering exonic only variants
 	$('#exonic-only-cb').click(function() {	   
+		me.clearCurrentStandardFilter();
+		window.filterVariants();	    
+	});
+	// listen to loaded variants checkbox
+	$('#loaded-variants-cb').click(function() {	   
+		me.clearCurrentStandardFilter();
+		window.filterVariants();	    
+	});
+	// listen to called variants checkbox
+	$('#called-variants-cb').click(function() {	   
+		me.clearCurrentStandardFilter();
 		window.filterVariants();	    
 	});
 
@@ -387,7 +413,7 @@ FilterCard.prototype.init = function() {
 FilterCard.prototype.initFilterListeners = function() {
 	var me = this;
 
-	d3.selectAll(me.annotClasses)
+	d3.select('#filter-track').selectAll(me.annotClasses)
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -484,6 +510,9 @@ FilterCard.prototype.initFilterListeners = function() {
 	  	if (!on) {
 		  	d3.select(this).classed("not-equal", false);
 	  	}
+
+	  	me.clearCurrentStandardFilter();
+
 	  	window.filterVariants();
 	  });
 
@@ -901,6 +930,8 @@ FilterCard.prototype.filterGenes = function() {
 		$('#filter-progress .bar').css("width", percentage(geneCounts.pass / geneCounts.total));
 		$('#filter-progress').removeClass("hide");		
 	}
+	cacheHelper.showAnalyzeAllProgress();
+
 	return geneCounts;
 }
 
@@ -922,7 +953,13 @@ FilterCard.prototype._getFilterString = function() {
 		return "<span class=\"filter-flag label label-primary\">" + filterString + "</span>";
 	}
 
+	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
+		filterString += AND(filterString) + filterBox("loaded variants only");
+	}
 
+	if ($('#called-variants-cb').is(":checked") && !$('#loaded-variants-cb').is(":checked")) {
+		filterString += AND(filterString) + filterBox("called variants only");
+	}
 
 	if ($('#exonic-only-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("not intronic");
