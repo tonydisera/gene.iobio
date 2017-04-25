@@ -831,47 +831,66 @@ a.btn {
     background-color: white;
     padding-bottom: 15px;
     padding-top: 15px;
-    max-width: 800px;
     padding-left: 10px;
     padding-right: 10px; }
     #welcome-area #welcome-panel #welcome-label {
       color: #5d809d;
       font-size: 17px; }
-    #welcome-area #welcome-panel .description-paragraph {
-      text-align: left;
-      margin-left: 20px;
-      margin-right: 20px;
-      margin-top: 50px;
-      color: #717171;
-      font-size: 15px;
-      width: 40%; }
-      #welcome-area #welcome-panel .description-paragraph li {
-        padding-bottom: 10px; }
-        #welcome-area #welcome-panel .description-paragraph li li {
-          padding-bottom: 4px; }
-    #welcome-area #welcome-panel button {
-      color: #5d809d;
-      font-size: 15px !important;
-      margin-left: 7px;
-      margin-right: 7px; }
-    #welcome-area #welcome-panel #welcome-screencast-panel {
-      width: 60%;
-      height: 200px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      background-color: grey;
-      margin-left: 20px;
-      margin-right: 20px;
-      background-image: url("../../assets/images/screencast-multigene-analysis.png");
-      background-size: cover; }
-      #welcome-area #welcome-panel #welcome-screencast-panel #play-button {
-        margin-top: 50px;
-        margin-bottom: auto;
-        font-size: 100px;
-        cursor: pointer;
-        opacity: 0.6;
-        color: white;
-        font-size: 100px; }
+    #welcome-area #welcome-panel #welcome-panel-content {
+      width: 700px; }
+      #welcome-area #welcome-panel #welcome-panel-content .description-paragraph {
+        text-align: left;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 30px;
+        color: #717171;
+        font-size: 15px;
+        width: 30%; }
+        #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li {
+          padding-bottom: 10px; }
+          #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
+            padding-bottom: 4px; }
+      #welcome-area #welcome-panel #welcome-panel-content button {
+        color: #5d809d;
+        font-size: 15px !important;
+        margin-left: 7px;
+        margin-right: 7px; }
+      #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-multigene-analysis {
+        width: 35%;
+        height: 170px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        background-color: grey;
+        margin-left: 0px;
+        margin-right: 10px;
+        background-image: url("../../assets/images/screencast-multigene-analysis.png");
+        background-size: cover; }
+        #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-multigene-analysis #play-button {
+          margin-top: 40px;
+          margin-bottom: auto;
+          font-size: 100px;
+          cursor: pointer;
+          opacity: 0.6;
+          color: white;
+          font-size: 100px; }
+      #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-saving-analysis {
+        width: 35%;
+        height: 170px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        background-color: grey;
+        margin-left: 0px;
+        margin-right: 10px;
+        background-image: url("../../assets/images/screencast-saving-analysis.png");
+        background-size: cover; }
+        #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-saving-analysis #play-button {
+          margin-top: 40px;
+          margin-bottom: auto;
+          font-size: 100px;
+          cursor: pointer;
+          opacity: 0.6;
+          color: white;
+          font-size: 100px; }
 
 #matrix-track .matrix-note-text {
   margin-top: -7px;

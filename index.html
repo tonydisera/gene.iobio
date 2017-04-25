@@ -499,7 +499,15 @@
    
 
     <div id="screencast-panel" class="hide" style="text-align:center;margin-top:50px;overflow: visible;">
-      <div style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
+      <div id="screencast-saving-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
+          <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-video')[0].stopVideo()">
+            <i class="material-icons" style="text-align: left;">arrow_back</i>
+          </button>
+          <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Saving your analysis with Bookmarks</h4>
+          <iframe id="screencast-video" src="https://www.youtube.com/embed/JlXoBlWvniE?ecver=2&amp;rel=0&amp;vq=hd1080&amp;autoplay=1&amp;loop=1" width="620" height="465" frameborder="0" style="width: 620px;height: 465px;clear: both;" allowfullscreen="">
+          </iframe>
+      </div>
+      <div id="screencast-multi-gene-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
           <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-video')[0].stopVideo()">
             <i class="material-icons" style="text-align: left;">arrow_back</i>
           </button>
@@ -529,8 +537,11 @@
 
           </div>
 
-          <div id="welcome-screencast-panel" >
-            <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide')">play_arrow</i>
+          <div id="welcome-screencast-panel-saving-analysis" >
+            <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');">play_arrow</i>
+          </div>
+          <div id="welcome-screencast-panel-multigene-analysis" >
+            <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide')">play_arrow</i>
           </div>
         </div>    
         <div>  
