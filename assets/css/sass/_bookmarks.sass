@@ -4,14 +4,18 @@
     word-break: break-all
 
     &.current
-      font-weight: bold     
       line-height: 12px
       padding-bottom: 2px
-      padding-top: 2px !important
+      padding-top: 6px !important
       margin-top: 1px
       margin-bottom: 1px
       margin-right: 5px
-      border: none !important
+      border: solid thin $current-color
+      font-weight: normal
+      padding-right: 0px
+      padding-left: 0px  
+      margin-left: 0px    
+
 
     #import-help-icon
       color: $sidebar-link-color !important
@@ -26,6 +30,53 @@
     text-align: left
     padding-top: 4px
     margin-left: 0px
+    padding-left: 1px
+
+    span.not-found
+      color: #c70001
+      font-style: italic
+      padding-left: 6px
+      display: inline-block
+      margin-top: -2px
+
+    .bookmark-info-glyph
+      display: inline-block
+      font-size: 14px
+      margin-top: -5px
+      margin-left: -1px
+      margin-right: 5px
+      color: #909090
+      font-size: 15px
+      cursor: pointer
+ 
+    .variant-symbols
+      display: inline-block
+      width: 60px
+      margin-top: -2px
+
+
+    .variant-label
+      .coord
+        display: inline-block
+        width: 97px
+        line-height: 12px
+        vertical-align: top        
+      .rsid
+        display: inline-block
+        margin-left: 3px
+        width: 70px
+        line-height: 12px
+        vertical-align: top        
+      .hgvs
+        margin-left: 3px
+        display: inline-block
+        width: 67px
+        line-height: 12px
+        vertical-align: top     
+
+      &:hover
+        text-decoration: underline !important         
+
 
   div
     &.bookmark-box
@@ -47,11 +98,22 @@
   .phenotype-symbol
     stroke: $sidebar-text-color
 
+  .bookmark-call-button
+    margin: 0px 0px 0px 12px
+    padding: 0px 8px 0px 8px
+
+  .called-variant-indicator
+    display: inline-block
+    vertical-align: top
+
   #favorite-badge
     stroke: $sidebar-text-color
 
   .favorite-indicator
     cursor: pointer
+    float: right
+    display: inline-block
+    margin-top: -2px   
 
   .phenotypes-container
     overflow-x: hidden
@@ -96,6 +158,8 @@
     color: $text-color !important
     font-size: 12px
 
+
+
 #bookmark-panel
   i#remove-bookmark
     color: #E0292B !important
@@ -114,7 +178,7 @@
     fill: none
     stroke: #1574C7
     stroke-width: 5
-    opacity: .8
+    opacity: .6
 
   line
     stroke: #1574C7

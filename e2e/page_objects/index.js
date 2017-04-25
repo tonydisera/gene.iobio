@@ -2,12 +2,14 @@ var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var probandVariantCard = require('./sections/probandVariantCard.js');
 var matrixTrack = require('./sections/matrixTrack.js');
-var matrixTooltip = require('./sections/matrixTooltip.js');
 var filterPanel = require('./sections/filterPanel.js');
 var findGenesPanel = require('./sections/findGenesPanel.js');
 var inspectPanel = require('./sections/inspectPanel.js');
 var recallPanel = require('./sections/recallPanel.js');
 var bookmarkPanel = require('./sections/bookmarkPanel.js');
+var variantTooltip = require('./sections/variantTooltip.js');
+
+
 
 module.exports = {
   url: function() {
@@ -25,11 +27,11 @@ module.exports = {
     appTitleSection: '#genes-panel',
     dataCard: '#data-card',
     matrixTrack: '#matrix-track',
-    matrixTooltip: '#feature-matrix .tooltip',
     transcriptCard: '#transcript-card',
     probandVariantCard: '#proband-variant-card',
     motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
-    fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)'
+    fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)',
+    variantTooltip:        '#feature-matrix .tooltip'
   },
 
   commands: [{
@@ -51,7 +53,8 @@ module.exports = {
     bookmarkPanel: bookmarkPanel,
     matrixTrack: matrixTrack,
     probandVariantCard: probandVariantCard,
-    matrixTooltip: matrixTooltip,
+    variantTooltip: variantTooltip,
+
     transcriptCard: {
       selector: '#transcript-card',
       elements: {
@@ -67,5 +70,6 @@ module.exports = {
       selector: '#other-variant-cards .variant-card:nth-child(2)'
     }
 
+ 
   }
 };

@@ -7,7 +7,8 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 //
 var DEV_IOBIO                 = "nv-dev.iobio.io/";
 var STAGE_IOBIO               = "nv-purple.iobio.io/";
-var PROD_IOBIO                = "nv-prod.iobio.io/";
+var PROD_IOBIO                = "nv-blue.iobio.io/";
+//var PROD_IOBIO                = "nv-prod.iobio.io/";  !! USE THIS ONCE NV-BLUE POINTS TO NV-PROD WITH OD_ SHELL SCRIPT CHANGE
 
 var CURRENT_IOBIO             = PROD_IOBIO;
 

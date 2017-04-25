@@ -15,13 +15,24 @@ module.exports = {
       build = build || 'GRCh37';
       return this.click('@genomeBuildSelectBox')
                  .click("#select-build-box .selectize-dropdown-content [data-value='" + build + "']");
+    },
+    searchGene: function(gene) {
+      this.clearValue('@enterGeneName');
+      this.setValue('@enterGeneName', [gene, this.api.Keys.ARROW_DOWN, this.api.Keys.ENTER]);
+      this.api.pause(2000);
+      return this;
+    },
+    checkSeparateUrlForIndex: function() {
+      return this.click('@separateIndexUrlCheckbox');
     }
   }],
-  elements: {
+  elements: {    
     loadButton: { selector: '#ok-button' },
     singleProbandButton: { selector: '#single-proband-button' },
     trioButton: { selector: '#trio-button' },
+    separateIndexUrlCheckbox: { selector: '#separate-url-for-index-files-cb + span' },
     genomeBuildSelectBox: { selector: '#select-build-box .selectize-input' },
+    enterGeneName: { selector: '#enter-gene-name-data-dialog' }
   },
   sections: {
     probandData: {
@@ -40,12 +51,17 @@ module.exports = {
         inputUrl: function(url) {
           this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
         },
+        inputTbiUrl: function(url) {
+          this.setValue('@tbiUrlInput', [url, this.api.Keys.ENTER]);
+        },
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
         },
+        inputAlignmentsBaiUrl: function(url) {
+          return this.setValue('@baiUrlInput', [url]);
+        },
         inputDefaults: function() {
           this.inputUrl(this.api.globals.variantFileUrl);
-          this.selectGenomeBuild();
           this.selectSample('NA12878');
           this.inputAlignmentsUrl(this.api.globals.NA12878SampleFileUrl);
         }
@@ -57,7 +73,9 @@ module.exports = {
         probandVcfSampleBox: { selector: '#vcf-sample-box' },
         probandVcfSampleSelectBox: { selector: '#vcf-sample-select-box .selectize-input' },
         urlInput: { selector: '#url-input' },
-        bamUrlInput: { selector: '#bam-url-input' }
+        tbiUrlInput: { selector: '#url-tbi-input' },
+        bamUrlInput: { selector: '#bam-url-input' },
+        baiUrlInput: { selector: '#bai-url-input' }
       }
     },
     motherData: {

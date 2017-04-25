@@ -57,7 +57,14 @@
   float: left
   width: 180px
   min-height: 25px
-  
+
+.sib-zygosity
+  width: 140px 
+  float: left 
+
+.tooltip-row
+  &.sib-info
+    padding-bottom: 2px
 
 .tooltip-zygosity
   float: left
@@ -99,7 +106,7 @@
 .tooltip-footer
   color: $link-color !important
   margin-bottom: -2px
-  margin-top: 35px !important
+  margin-top: 25px !important
   font-size: 12px
 
   .bookmark
@@ -346,9 +353,12 @@ text
     clear: both
     padding-bottom: 6px
 
+    &.sib-info
+      padding-bottom: 2px
+
   .tooltip-footer
     margin-top: 0px !important
-    padding-top: 4px !important
+    padding-top: 0px !important
     padding-bottom: 2px
 
     .bookmark-badge

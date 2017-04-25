@@ -3,8 +3,9 @@
 
 var Bam = Class.extend({
 
-   init: function(bamUri, options) {
+   init: function(bamUri, baiUri, options) {
       this.bamUri = bamUri;
+      this.baiUri = baiUri;
       this.options = options; // *** add options mapper ***
       // test if file or url
       if (typeof(this.bamUri) == "object") {
@@ -52,6 +53,7 @@ var Bam = Class.extend({
     this.bamFile = null;
     this.baiFile = null;
     this.bamUri = null;
+    this.baiUri = null;
     this.header = null;
     this.headerStr =  null;
    },
@@ -73,7 +75,7 @@ var Bam = Class.extend({
      });
    }, 
 
-  checkBamUrl: function(url, callback) {
+  checkBamUrl: function(url, baiUrl, callback) {
     var me = this;
 
     var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(bam)$/;
@@ -84,9 +86,13 @@ var Bam = Class.extend({
       callback(false, "Please specify a URL to a compressed, indexed alignment file with the file extension bam");
     } else {
       var success = null;
+      var args = ['view', '-H', url];
+      if (baiUrl) {
+        args.push(baiUrl);
+      }
       var cmd = new iobio.cmd(
           IOBIO.samtools,
-          ['view', '-H', url],
+          args,
           {ssl: useSSL}
       );
 
@@ -251,7 +257,7 @@ var Bam = Class.extend({
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + "&protocol=http&encoding=binary";
+         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + (this.baiUri ? " " + this.baiUri : "") + "&protocol=http&encoding=binary";
       } else {
 
         var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client");
@@ -360,10 +366,15 @@ var Bam = Class.extend({
         callback(null);
       } else {
 
+        var args = ['view', '-H', me.bamUri];
+        if (me.baiUri) {
+          args.push(me.baiUri);
+        }
+
         var success = null;
         var cmd = new iobio.cmd(
             IOBIO.samtools,
-            ['view', '-H', me.bamUri],
+            args,
             {ssl: useSSL}
         );
         var rawHeader = "";
@@ -482,7 +493,11 @@ var Bam = Class.extend({
         // When bam file is read as a local file, just stream sam records for region to
         // samtools mpileup.
         if (me.sourceType == "url") {
-          cmd = new iobio.cmd(samtools, ['view', '-b', me.bamUri, regionArg],
+          var args = ['view', '-b', me.bamUri, regionArg];
+          if (me.baiUri) {
+            args.push(me.baiUri);
+          }
+          cmd = new iobio.cmd(samtools, args,
             {
               'urlparams': {'encoding':'binary'},
               ssl: useSSL
@@ -578,9 +593,12 @@ var Bam = Class.extend({
    },
 
 
-   freebayesJointCall: function(refName, regionStart, regionEnd, regionStrand, bams, isRefSeq, callback) {
+   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, callback) {
     var me = this;
 
+    var refName     = geneObject.chr; 
+    var regionStart = geneObject.start;
+    var regionEnd   = geneObject.end; 
         
     this.transformRefName(refName, function(trRefName){
 
@@ -600,8 +618,11 @@ var Bam = Class.extend({
             var bam = bams[idx];
 
             if (bam.sourceType == "url") {
-
-              var bamCmd = new iobio.cmd(samtools, ['view', '-b', bam.bamUri, regionArg],
+              var args = ['view', '-b', bam.bamUri, regionArg];
+              if (bam.baiUri) {
+                args.push(bam.baiUri);
+              }
+              var bamCmd = new iobio.cmd(samtools, args,
               {
                 'urlparams': {'encoding':'binary'},
                 ssl: useSSL
@@ -703,7 +724,7 @@ var Bam = Class.extend({
         });
 
         cmd.on('end', function() {
-          callback(variantData, trRefName);
+          callback(variantData, trRefName, geneObject, transcript);
         });
 
         cmd.on('error', function(error) {

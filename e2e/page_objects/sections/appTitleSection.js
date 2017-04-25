@@ -9,8 +9,15 @@ module.exports = {
     clickAnalyzeAll: function() {
       return this.click('@analyzeAll');
     },
+    selectCallAll: function() {
+      return this.click('#call-variants-dropdown')
+                 .click('#call-variants-dropdown li a#call-variants-all-genes');
+    },
     waitForAnalyzeAllDone: function() {
       this.waitForElementPresent('@analyzeAllDone', 60000);
+    },
+    waitForCallAllDone: function() {
+      this.waitForElementPresent('@callAllDone', 60000);
     },
     clickRemoveAll: function() {
       return this.click('@removeAll');
@@ -67,14 +74,81 @@ module.exports = {
       this.waitForElementVisible("//div[@id='gene-badge']//*[@id='gene-badge-name' and text()='" + gene + "']/../*[@id='gene-badge-warning']");
       this.api.useCss();
       return this;
+    },
+    assertAnalyzeAllProgressLabel: function(label) {
+      var self = this;
+      self.api.useXpath().getText(
+        '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]/div[@class="text"]', 
+        function(result) 
+      {
+        self.assert.equal(result.value, label);
+      })
+      this.api.useCss();
+      return this;
+    },
+    assertCallAllProgressLabel: function(label) {
+      var self = this;
+      self.api.useXpath().getText(
+        '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]/div[@class="text"]', 
+        function(result) 
+      {
+        self.assert.equal(result.value, label);
+      })
+      this.api.useCss();
+      return this;
+    },
+
+    assertAnalyzeAllCounts: function(analyzedPassedCount, analyzedFailedCount, calledPassedCount, calledFailedCount) {
+      var self = this;
+
+      if (analyzedPassedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, analyzedPassedCount);
+        })        
+      }
+
+      if (analyzedFailedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, analyzedFailedCount);
+        })        
+      }
+
+      if (calledPassedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, calledPassedCount);
+        })        
+      }
+
+      if (calledFailedCount) {
+        self.api.useXpath().getText(
+          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
+          function(result) 
+        {
+          self.assert.equal(result.value, calledFailedCount);
+        })        
+      }
+
+      this.api.useCss();
+      return this;
     }
+    
   }],
   elements: {
     selectedGeneBadge: { selector: '#gene-badge.selected' },
     firstGeneBadge: { selector: '#gene-badge:first-child' },
-    analyzeAll: { selector: '#manage-gene-list' },
+    analyzeAll: { selector: '#analyze-all-genes' },
     removeAll: { selector: '#clear-gene-list' },
-    analyzeAllDone: { selector: '#analyze-all-progress.done'}
+    analyzeAllDone: { selector: '#analyze-all-progress.done'},
+    callAllDone: { selector: '#call-all-progress.done'}
   },
   sections: {
     selectedGeneBadge: {

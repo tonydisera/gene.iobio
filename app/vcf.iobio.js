@@ -23,6 +23,7 @@ vcfiobio = function module() {
 
 
   var vcfURL;
+  var tbiUrl;
   var vcfReader;
   var vcfFile;
   var tabixFile;
@@ -87,6 +88,7 @@ var effectCategories = [
 
   exports.clear = function() {
     vcfURL = null;
+    tbiUrl = null;
     vcfFile = null;
   }
 
@@ -113,10 +115,11 @@ var effectCategories = [
 
 
 
-  exports.openVcfUrl = function(url, callback) {
+  exports.openVcfUrl = function(url, theTbiUrl, callback) {
     var me = this;
     sourceType = SOURCE_TYPE_URL;
     vcfURL = url;
+    tbiUrl = theTbiUrl;
 
     var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(vcf\.gz)$/;
     var parts = rexp.exec(url);
@@ -125,7 +128,7 @@ var effectCategories = [
     if (extension == null) {
       callback(false, "Please specify a URL to a compressed, indexed vcf file with the file extension vcf.gz");
     } else {
-      this.checkVcfUrl(url,function(success, message) {
+      this.checkVcfUrl(url, tbiUrl, function(success, message) {
           callback(success, message);
       });
     }
@@ -136,9 +139,14 @@ var effectCategories = [
     if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
 
       var buffer = "";
+      var success = false;
+      var args = ['-H', vcfURL];
+      if (tbiUrl) {
+        args.push(tbiUrl);
+      }
       var cmd = new iobio.cmd(
             IOBIO.tabix,
-            ['-H', vcfURL]
+            args
         );
 
         cmd.on('data', function(data) {
@@ -175,14 +183,19 @@ var effectCategories = [
   }
 
 
-  exports.checkVcfUrl = function(url, callback) {
+  exports.checkVcfUrl = function(url, tbiUrl, callback) {
     var me = this;
     var success = null;
     var buffer = "";
     var recordCount = 0;
+
+    var args = ['-H', url];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-H', url],
+        args,
         {ssl: useSSL}
     );
 
@@ -340,8 +353,9 @@ var effectCategories = [
     return vcfURL;
   }
 
-  exports.setVcfURL = function(url) {
+  exports.setVcfURL = function(url, tbiUrl) {
     vcfURL = url;
+    tbiUrl = tbiUrl;
   }
 
   exports.getSourceType = function() {
@@ -435,9 +449,16 @@ var effectCategories = [
     var buffer = "";
     var refName;
 
+    var args = ['-i'];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    } else {
+      args.push(vcfURL + '.tbi');
+    }
+
     var cmd = new iobio.cmd(
         IOBIO.vcfReadDepther,
-        ['-i', vcfURL + '.tbi'],
+        args,
         {ssl: useSSL}
     );
 
@@ -550,14 +571,14 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -568,7 +589,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, data) {
             if (annotatedData && data) {
               resolve([annotatedData, data]);
@@ -583,7 +604,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -607,7 +628,7 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
 
-        me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId)
+        me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -646,7 +667,7 @@ var effectCategories = [
 
 
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
 
     var me = this;
 
@@ -662,13 +683,17 @@ var effectCategories = [
     var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
-    var cmd = new iobio.cmd(IOBIO.tabix,['-h', vcfURL, regionParm], {ssl: useSSL})
+    var args = ['-h', vcfURL, regionParm];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
       .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
     // filter sample(s)
-    if (sampleName != null && sampleName != "") {
+    if (sampleNames != null && sampleNames != "") {
 
-      var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
+      var sampleNameFile = new Blob([sampleNames.split(",").join("\n")])
       cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
     }
 
@@ -711,7 +736,7 @@ var effectCategories = [
     var cacheKey = null;
     var urlParameters = {};
     if (cache) {
-        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleName, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
         console.log(cacheKey);
         urlParameters.cache = cacheKey;
         urlParameters.partialCache = true;
@@ -770,7 +795,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
 
 
       callback(annotatedRecs, results);
@@ -838,9 +863,13 @@ var effectCategories = [
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
 
+    var args = ['-h', vcfURL, '1:1-1'];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
     var cmd = new iobio.cmd(
         IOBIO.tabix,
-        ['-h', vcfURL, '1:1-1'],
+        args,
         {ssl: useSSL});
 
 
@@ -886,7 +915,11 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var cmd = new iobio.cmd(IOBIO.tabix, ['-h', vcfURL, region], {ssl: useSSL});
+    var args = ['-h', vcfURL, region];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
 
     cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
@@ -985,20 +1018,20 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleIndex);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, null, [sampleIndex]);
       resolve([annotatedRecs, results]);
 
     });
   }
 
-  exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the
       // info field.
-      me._annotateVcfRegion(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
+      me._annotateVcfRegion(records, refName, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
@@ -1036,7 +1069,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me.parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1108,7 +1141,11 @@ var effectCategories = [
 
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-      var cmd = new iobio.cmd(IOBIO.tabix, ['-h', clinvarUrl, regionParm], {ssl: useSSL});
+      var args = ['-h', clinvarUrl, regionParm];
+      if (tbiUrl) {
+        args.push(tbiUrl);
+      }
+      var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
 
 
       var clinvarData = "";
@@ -1368,17 +1405,27 @@ var effectCategories = [
   }
 
 
-  exports.parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleIndex) {
+  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleNames, sampleIndices) {
 
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
 
       // Use the sample index to grab the right genotype column from the vcf record
       // If it isn't provided, assume that the first genotype column is the one
-      // to be evaluated and parsed.
-      if (sampleIndex == null) {
-        sampleIndex = 0;
-      }
+      // to be evaluated and parsed.  If sampleNames (a comma separated value string) is 
+      // provided, evaluate the sample indices as ordinals since vt select will return only those
+      // sample (genotype) columns.     
+      if (sampleIndices == null) {
+        sampleIndices = [];
+        if (sampleNames == null || sampleNames != "") {
+          sampleIndices = sampleNames.split(",").map(function(sampleName,i) {
+            return i;
+          });
+        }
+      } 
+      if (sampleIndices.length == 0) {
+        sampleIndices.push(0);
+      }        
 
 
       // The variant region may span more than the specified region.
@@ -1454,16 +1501,7 @@ var effectCategories = [
 
             }
 
-            // Determine the format of the genotype fields
-            var gtTokens = {};
-            var idx = 0;
-            if (rec.format && rec.format != '') {
-              var tokens = rec.format.split(":");
-              tokens.forEach(function(token) {
-                gtTokens[token] = idx;
-                idx++;
-              })
-            }
+
 
 
             // svtype and snpEff annotations from the info field
@@ -1746,256 +1784,13 @@ var effectCategories = [
               impacts["NOIMPACT"] = "NOIMPACT";
             }
 
-            // Parse genotypes
-            var genotypes = [];
-            var genotypeDepths = [];
-            var genotypeFilteredDepths = [];
-            var genotypeAltCounts = [];
-            var genotypeRefCounts = [];
-            var genotypeAltForwardCounts = [];
-            var genotypeAltReverseCounts = [];
-            var genotypeRefForwardCounts = [];
-            var genotypeRefReverseCounts = [];
-            rec.genotypes.forEach(function(genotype) {
-              if (genotype == ".") {
-
-              } else {
-                var tokens = genotype.split(":");
-                gtFieldIndex = gtTokens["GT"];
-                genotypes.push(tokens[gtFieldIndex]);
-
-                gtDepthIndex = gtTokens["DP"];
-                if (gtDepthIndex) {
-                  genotypeFilteredDepths.push(tokens[gtDepthIndex]);
-                } else {
-                  genotypeFilteredDepths.push(null);
-                }
-                var gtAlleleCountIndex = gtTokens["AD"];
-                var gtAltCountIndex = gtTokens["AO"];
-                if (gtAlleleCountIndex) {
-                  //
-                  // GATK allele counts
-                  //
-                  var countTokens = tokens[gtAlleleCountIndex].split(",");
-                  if (countTokens.length >= 2 ) {
-                    var refAlleleCount = countTokens[0];
-                    var altAlleleCounts = countTokens.slice(1).join(",");
-
-                    var totalAllelicDepth = 0;
-                    countTokens.forEach(function(allelicDepth) {
-                      if (allelicDepth) {
-                        totalAllelicDepth += +allelicDepth;
-                      }
-                    })
-
-                    genotypeAltCounts.push(altAlleleCounts);
-                    genotypeRefCounts.push(refAlleleCount);
-                    genotypeDepths.push(totalAllelicDepth);
-                  } else {
-                    genotypeAltCounts.push(null);
-                    genotypeRefCounts.push(null);
-                    genotypeDepths.push(null);
-                  }
-                } else if (gtAltCountIndex) {
-                  //
-                  // Freebayes allele counts
-                  //
-                  var totalAllelicDepth = 0;
-
-                  var altCount = tokens[gtAltCountIndex];
-                  genotypeAltCounts.push(altCount);
-
-                  var altCountTokens = altCount.split(",");
-                  altCountTokens.forEach(function(allelicDepth) {
-                    if (allelicDepth) {
-                        totalAllelicDepth += +allelicDepth;
-                    }
-                  })
-
-                  var refCount = 0;
-                  var gtRefCountIndex = gtTokens["RO"];
-                  if (gtRefCountIndex) {
-                    refCount = tokens[gtRefCountIndex];
-                    genotypeRefCounts.push(refCount);
-                    totalAllelicDepth += +refCount;
-                  } else {
-                    genotypeRefCounts.push(null);
-                  }
-
-                  genotypeDepths.push(totalAllelicDepth);
-
-
-                } else {
-                  genotypeAltCounts.push(null);
-                  genotypeRefCounts.push(null)
-                }
-                var strandAlleleCountIndex = gtTokens["SAC"]; // GATK
-                var strandRefForwardIndex = gtTokens["SRF"]; // Freebayes
-                var strandRefReverseIndex = gtTokens["SRR"]; // Freebayes
-                var strandAltForwardIndex = gtTokens["SAF"]; // Freebayes
-                var strandAltReverseIndex = gtTokens["SAR"]; // Freebayes
-                if (strandAlleleCountIndex) {
-                  //
-                  // GATK Strand allele counts, comma separated
-                  //
-                  var countTokens = tokens[strandAlleleCountIndex].split(",");
-                  if (countTokens.length == 4) {
-                    genotypeRefForwardCounts.push(tokens[0]);
-                    genotypeRefReverseCounts.push(tokens[1]);
-                    genotypeAltForwardCounts.push(tokens[2]);
-                    genotypeAltReverseCounts.push(tokens[3]);
-                  } else {
-                    genotypeRefForwardCounts.push(null);
-                    genotypeRefReverseCounts.push(null);
-                    genotypeAltForwardCounts.push(null);
-                    genotypeAltReverseCounts.push(null);
-                  }
-                } else if (strandRefForwardIndex && strandRefReverseIndex && strandAltForwardIndex && strandAltReverseIndex ) {
-                  //
-                  // Freebayes Strand bias counts (SRF, SRR, SAF, SAR)
-                  //
-                  genotypeRefForwardCounts.push(tokens[strandRefForwardIndex]);
-                  genotypeRefReverseCounts.push(tokens[strandRefReverseIndex]);
-                  genotypeAltForwardCounts.push(tokens[strandAltForwardIndex]);
-                  genotypeAltReverseCounts.push(tokens[strandAltReverseIndex]);
-                } else {
-                  genotypeRefForwardCounts.push(null);
-                  genotypeRefReverseCounts.push(null);
-                  genotypeAltForwardCounts.push(null);
-                  genotypeAltReverseCounts.push(null);
-                }
-              }
-            });
-
-            var gtNumber = altIdx + 1;
-            var genotypeForSample = null;
-            var genotypeDepthForSample = null;
-            var genotypeAltCountForSample = null;
-            var genotypeRefCountForSample = null;
-            var genotypeAltForwardCountForSample = null;
-            var genotypeAltReverseCountForSample = null;
-            var genotypeRefForwardCountForSample = null;
-            var genotypeRefReverseCountForSample = null;
-            var zygosity = null;
-            var phased = null;
-
-
-            // Only keep the alt if we have a genotype that matches.
-            // For example
-            // A->G    0|1 keep
-            // A->G,C  0|1 keep A->G, but bypass A->C
-            // A->G,C  0|2 bypass A->G, keep A->C
-            // A->G,C  1|2 keep A->G, keep A->C
-            var keepAlt = false;
-
-            if (sampleCount == -1) {
-              sampleCount = genotypes.length;
-            }
-
-
-            genotypeForSample = genotypes[sampleIndex];
-
-            if (genotypeForSample == null) {
-              keepAlt = true;
-            } else {
-              var delim = null;
-              if (genotypeForSample.indexOf("|") > 0) {
-                delim = "|";
-                phased = true;
-              } else {
-                delim = "/";
-                phased = false;
-              }
-              var tokens = genotypeForSample.split(delim);
-              if (tokens.length == 2) {
-                if (isLevelEdu && alt.indexOf(",") > 0) {
-                  if ((tokens[0] == 1 ) && (tokens[1] == 2)) {
-                    keepAlt = true;
-                  } if (tokens[0] == tokens[1]) {
-                    keepAlt = true;
-                    theAltIdx = tokens[0] - 1;
-                    alt = alt.split(',')[theAltIdx] + ',' + alt.split(',')[theAltIdx];
-                  } else if (tokens[0] == 0 && tokens[1] != 0) {
-                    var theAltIdx = +tokens[1] - 1;
-                    alt = alt.split(',')[theAltIdx]
-                  } else if (tokens[1] == 0 && tokens[0] != 0) {
-                    var theAltIdx = +tokens[0] - 1;
-                    alt = alt.split(',')[theAltIdx]
-                  }
-                  if (keepAlt) {
-                    if (tokens[0] == tokens[1]) {
-                      zygosity = "HOM";
-                      homCount++;
-                    } else {
-                      zygosity = "HET";
-                      hetCount++;
-                    }
-                  }
-
-                } else if (tokens[0] == gtNumber || tokens[1] == gtNumber) {
-                  keepAlt = true;
-                  if (tokens[0] == tokens[1]) {
-                    zygosity = "HOM";
-                    homCount++;
-                  } else {
-                    zygosity = "HET";
-                    hetCount++;
-                  }
-                } else if (tokens[0] == "0" && tokens[1] == "0" ) {
-                  keepAlt = true;
-                  zygosity = "HOMREF"
-                }
-              }
-            }
-
-            genotypeDepthForSample = genotypeDepths[sampleIndex];
-            genotypeFilteredDepthForSample = genotypeFilteredDepths[sampleIndex];
-            genotypeRefCountForSample = genotypeRefCounts[sampleIndex];
-            genotypeRefForwardCountForSample = genotypeRefForwardCounts[sampleIndex];
-            genotypeRefReverseCountForSample = genotypeRefReverseCounts[sampleIndex];
-
-            genotypeAltCountForSample        = me.parseMultiAllelic(gtNumber-1, genotypeAltCounts[sampleIndex], ",");
-            genotypeAltForwardCountForSample = genotypeAltForwardCounts[sampleIndex];
-            genotypeAltReverseCountForSample = genotypeAltReverseCounts[sampleIndex];
-
-            var eduGenotype = "";
-            if (isLevelEdu) {
-              if (alt.indexOf(",") > 0) {
-                alt.split(",").forEach( function(altToken) {
-                  if (eduGenotype.length > 0) {
-                    eduGenotype += " ";
-                  }
-                  eduGenotype += altToken;
-                });
-              } else if (zygosity == "HET") {
-                eduGenotype = rec.ref + " " + alt;
-              } else if (zygosity == "HOM") {
-                eduGenotype = alt + " " + alt;
-              }
-            }
-            var eduGenotypeReversed = switchGenotype(eduGenotype);
+            var gtResult = me.parseGenotypes(rec, alt, altIdx, sampleIndices);
 
 
             // Get rid of the left most anchor base for insertions and
-            // deletions for accessing clinvar
-            var clinvarStart = +rec.pos;
-            var clinvarRef = rec.ref;
-            var clinvarAlt = alt;
-            if (clinvarAlt == '.') {
-              clinvarAlt = '-';
-            } else if (clinvarRef == '.') {
-              clinvarRef = '-';
-            } else if (clinvarRef.length > clinvarAlt.length) {
-              // deletion
-              clinvarStart++;
-              clinvarAlt = clinvarAlt.length == 1 ? "-" : clinvarAlt.substr(1,clinvarAlt.length-1);
-              clinvarRef = clinvarRef.substr(1,clinvarRef.length-1);
-            } else if (clinvarAlt.length > clinvarRef.length) {
-              // insertion
-              clinvarStart++;
-              clinvarRef = clinvarRef.length == 1 ? "-" : clinvarRef.substr(1,clinvarRef.length-1);
-              clinvarAlt = clinvarAlt.substr(1,clinvarAlt.length-1);
-            }
+            // deletions for accessing clinvar            
+            var clinvarObject = {};
+            me.formatClinvarCoordinates(rec, clinvarObject);
 
             var cullTranscripts = function(transcriptObject, theTranscriptId) {
               // If the current transcript is included in the list,
@@ -2087,7 +1882,7 @@ var effectCategories = [
               return theObject[maxScore];
             }
 
-            if (keepAlt) {
+            if (gtResult.keepAlt) {
 
               var highestImpactSnpeff = getHighestImpact(allSnpeff, cullTranscripts, selectedTranscriptID);
               var highestImpactVep = getHighestImpact(allVep, cullTranscripts, selectedTranscriptID);
@@ -2101,21 +1896,21 @@ var effectCategories = [
                 'id': rec.id, 'ref': rec.ref,
                 'alt': alt, 'qual': rec.qual, 'recfilter': rec.filter,
                 'af': af,
-                'combinedDepth': combinedDepth,
-                'genotypes': genotypes,
-                'genotype': genotypeForSample,
-                'genotypeDepth' : genotypeDepthForSample,
-                'genotypeFilteredDepth' : genotypeFilteredDepthForSample,
-                'genotypeAltCount' : genotypeAltCountForSample,
-                'genotypeRefCount' : genotypeRefCountForSample,
-                'genotypeAltForwardCount' : genotypeAltForwardCountForSample,
-                'genotypeAltReverseCount' : genotypeAltReverseCountForSample,
-                'genotypeRefForwardCount' : genotypeRefForwardCountForSample,
-                'genotypeRefReverseCount' : genotypeRefReverseCountForSample,
-                'eduGenotype' : eduGenotype,
-                'eduGenotypeReversed': eduGenotypeReversed,
-                'zygosity': zygosity ? zygosity : 'gt_unknown',
-                'phased': phased,
+                'combinedDepth':            combinedDepth,
+                'genotypes':                gtResult.genotypes,
+                'genotype':                 gtResult.genotypes[0],
+                'genotypeDepth' :           gtResult.genotypes[0].genotypeDepth,
+                'genotypeFilteredDepth' :   gtResult.genotypes[0].filteredDepth,
+                'genotypeAltCount' :        gtResult.genotypes[0].altCount,
+                'genotypeRefCount' :        gtResult.genotypes[0].refCount,
+                'genotypeAltForwardCount' : gtResult.genotypes[0].altForwardCount,
+                'genotypeAltReverseCount' : gtResult.genotypes[0].altReverseCount,
+                'genotypeRefForwardCount' : gtResult.genotypes[0].refForwardCount,
+                'genotypeRefReverseCount' : gtResult.genotypes[0].refReverseCount,
+                'eduGenotype' :             gtResult.genotypes[0].eduGenotype,
+                'eduGenotypeReversed':      gtResult.genotypes[0].eduGenotypeReversed,
+                'zygosity':                 gtResult.genotypes[0].zygosity ? gtResult.genotypes[0].zygosity : 'gt_unknown',
+                'phased':                   gtResult.genotypes[0].phased,
                 'effect': effects,
                 'impact': impacts,
                 'highestImpactSnpeff': highestImpactSnpeff,
@@ -2129,9 +1924,9 @@ var effectCategories = [
                 'af1000G': me.parseAf(altIdx, af1000G),
                 'afExAC': me.parseAf(altIdx, afExAC),
                 'rsid' : (rs != null && rs != '' && rs != 0 ? rs : ''),
-                'clinvarStart': clinvarStart,
-                'clinvarRef': clinvarRef,
-                'clinvarAlt': clinvarAlt,
+                'clinvarStart': clinvarObject.clinvarStart,
+                'clinvarRef': clinvarObject.clinvarRef,
+                'clinvarAlt': clinvarObject.clinvarAlt,
                 'vepConsequence': vepConsequence,
                 'vepImpact': vepImpact,
                 'vepExon': vepExon,
@@ -2170,12 +1965,307 @@ var effectCategories = [
       return results;
   };
 
+/*
+ *
+ * Parse the genotype field from in the vcf rec
+ * 
+ */
+ exports.parseGenotypes = function(rec, alt, altIdx, sampleIndices) {
+    var me = this;
+
+    // The result returned will be an object representing all
+    // genotypes for the sample indices provided. 
+    //
+    //  all      the alternate for which these genotype(s) apply
+    //  keepAlt  a boolean indicating if any of the sample genotypes
+    //           contains this alternate.  For example, if this is a 
+    //           multiallelic, if non of the samples contains this
+    //           alternate, keepAlt will be set to false.  
+    //  gtNumber Normally, the gtNumber for an alterate will equal
+    //           1.  For multi-allelics, this number ranges from
+    //           1 to the number of alternate alleles.
+    //
+    //
+    var result = {
+      alt:      alt, 
+      keepAlt:  false, 
+      gtNumber: altIdx +1};
+
+    // The results will contain an array of genotype objects for 
+    // each sample index provided.  The first element in the
+    // array is assumed to be the "target" genotype.  For example,
+    // if we are parsing the genotypes for a trio, the first
+    // genotype will be for the proband, followed by 2 more elements
+    // for the mother and father's genotypes.
+    result.genotypes = sampleIndices.map( function(sampleIndex) { 
+      return { sampleIndex: sampleIndex, zygosity: null, phased: null}; 
+    });
+
+    // Determine the format of the genotype fields
+    var gtTokens = {};
+    var idx = 0;
+    if (rec.format && rec.format != '') {
+      var tokens = rec.format.split(":");
+      tokens.forEach(function(token) {
+        gtTokens[token] = idx;
+        idx++;
+      })
+    }
+
+    //
+    // For each applicable genotype (of the sample indices provided), 
+    // parse the genotype field of the vcf record, creating an
+    // object with the following fields:
+    //    sampleIndex         - The applicable genotype column (for a sample)
+    //    gt                  - The genotype field (e.g. 0|1)
+    //    zygosity            - The zygosity (e.g. het, hom, homref)
+    //    depth               - The total observations at this position
+    //    filteredDepth       - The total observations considered at this position
+    //    altCount            - The number of observations where the alternate allele was observed
+    //    refCount            - The number of observations where the reference allele was observed
+    //    altForwardCount,    - The alternate counts for the strands
+    //    altReverseCount 
+    //    refForwardCount,    - The reference counts for the strands
+    //    refReverseCount 
+    //    eduGenotype         - The simplified format for showing genotype (e.g. C->T)
+    //    eduGenotypeReversed - For reverse strand, show the compliment of the simplified genotype (e.g. A->G)
+    //
+    result.genotypes.forEach( function(gt) {
+      var genotype = rec.genotypes.length > gt.sampleIndex ? rec.genotypes[gt.sampleIndex] : null;
+
+      if (genotype == null  || genotype == "" || genotype == '.') {
+        gt.keepAlt = true;
+      } else {
+
+        var tokens = genotype.split(":");
+        gtFieldIndex = gtTokens["GT"];
+        gt.gt = tokens[gtFieldIndex];
+
+        var gtDepthIndex = gtTokens["DP"];
+        if (gtDepthIndex) {
+          gt.filteredDepth = tokens[gtDepthIndex];
+        } else {
+          gt.filteredDepths = null;
+        }
+
+        var gtAlleleCountIndex = gtTokens["AD"];
+        var gtAltCountIndex = gtTokens["AO"];
+        if (gtAlleleCountIndex) {
+          //
+          // GATK allele counts
+          //
+          var countTokens = tokens[gtAlleleCountIndex].split(",");
+          if (countTokens.length >= 2 ) {
+            var refAlleleCount = countTokens[0];
+            var altAlleleCounts = countTokens.slice(1).join(",");
+
+            var totalAllelicDepth = 0;
+            countTokens.forEach(function(allelicDepth) {
+              if (allelicDepth) {
+                totalAllelicDepth += +allelicDepth;
+              }
+            })
+
+            gt.altCount      = altAlleleCounts;
+            gt.refCount      = refAlleleCount;
+            gt.genotypeDepth = totalAllelicDepth;
+          } else {
+            gt.altCount      = null;
+            gt.refCount      = null;
+            gt.genotypeDepth = null;
+          }
+        } else if (gtAltCountIndex) {
+          //
+          // Freebayes allele counts
+          //
+          var totalAllelicDepth = 0;
+
+
+          gt.altCount = tokens[gtAltCountIndex];
+
+          var altCountTokens = gt.altCount.split(",");
+          altCountTokens.forEach(function(allelicDepth) {
+            if (allelicDepth) {
+                totalAllelicDepth += +allelicDepth;
+            }
+          })
+
+          var gtRefCountIndex = gtTokens["RO"];
+          if (gtRefCountIndex) {
+            gt.refCount = tokens[gtRefCountIndex];;
+            totalAllelicDepth += +gt.refCount;
+          } else {
+            gt.refCount = null;
+          }
+
+          gt.genotypeDepth = totalAllelicDepth;
+
+
+        } else {
+          gt.altCount = null;
+          gt.refCount = null;
+        }
+
+        gt.altCount = me.parseMultiAllelic(result.gtNumber-1, gt.altCount, ",");
+
+
+        var strandAlleleCountIndex = gtTokens["SAC"]; // GATK
+        var strandRefForwardIndex  = gtTokens["SRF"]; // Freebayes
+        var strandRefReverseIndex  = gtTokens["SRR"]; // Freebayes
+        var strandAltForwardIndex  = gtTokens["SAF"]; // Freebayes
+        var strandAltReverseIndex  = gtTokens["SAR"]; // Freebayes
+        if (strandAlleleCountIndex) {
+          //
+          // GATK Strand allele counts, comma separated
+          //
+          var countTokens = tokens[strandAlleleCountIndex].split(",");
+          if (countTokens.length == 4) {
+            gt.refForwardCount = tokens[0];
+            gt.refReverseCount = tokens[1];
+            gt.altForwardCount = tokens[2];
+            gt.altReverseCount = tokens[3];
+          } else {
+            gt.refForwardCount = null;
+            gt.refReverseCount = null;
+            gt.altForwardCount = null;
+            gt.altReverseCount = null;
+          }
+        } else if (strandRefForwardIndex && strandRefReverseIndex && strandAltForwardIndex && strandAltReverseIndex ) {
+          //
+          // Freebayes Strand bias counts (SRF, SRR, SAF, SAR)
+          //
+          gt.refForwardCount = tokens[strandRefForwardIndex];
+          gt.refReverseCount = tokens[strandRefReverseIndex];
+          gt.altForwardCount = tokens[strandAltForwardIndex];
+          gt.altReverseCount = tokens[strandAltReverseIndex];
+        } else {
+          gt.refForwardCount = null;
+          gt.refReverseCount = null;
+          gt.altForwardCount = null;
+          gt.altReverseCount = null;
+        }
+      
+
+
+        // Only keep the alt if we have a genotype that matches.
+        // For example
+        // A->G    0|1 keep
+        // A->G,C  0|1 keep A->G, but bypass A->C
+        // A->G,C  0|2 bypass A->G, keep A->C
+        // A->G,C  1|2 keep A->G, keep A->C
+        var delim = null;
+        if (gt.gt.indexOf("|") > 0) {
+          delim = "|";
+          gt.phased = true;
+        } else {
+          delim = "/";
+          gt.phased = false;
+        }
+        var tokens = gt.gt.split(delim);
+        if (tokens.length == 2) {
+          if (isLevelEdu && alt.indexOf(",") > 0) {
+            if ((tokens[0] == 1 ) && (tokens[1] == 2)) {
+              gt.keepAlt = true;
+            } if (tokens[0] == tokens[1]) {
+              gt.keepAlt = true;
+              var theAltIdx = tokens[0] - 1;
+              result.alt = alt.split(',')[theAltIdx] + ',' + alt.split(',')[theAltIdx];
+            } else if (tokens[0] == 0 && tokens[1] != 0) {
+              var theAltIdx = +tokens[1] - 1;
+              result.alt = alt.split(',')[theAltIdx]
+            } else if (tokens[1] == 0 && tokens[0] != 0) {
+              var theAltIdx = +tokens[0] - 1;
+              result.alt = alt.split(',')[theAltIdx]
+            }
+            if (gt.keepAlt) {
+              if (tokens[0] == tokens[1]) {
+                gt.zygosity = "HOM";
+              } else {
+                gt.zygosity = "HET";
+              }
+            }
+
+          } else if (tokens[0] == result.gtNumber || tokens[1] == result.gtNumber) {
+            gt.keepAlt = true;
+            if (tokens[0] == tokens[1]) {
+              gt.zygosity = "HOM";
+            } else {
+              gt.zygosity = "HET";
+            }
+          } else if (tokens[0] == "0" && tokens[1] == "0" ) {
+            gt.keepAlt = true;
+            gt.zygosity = "HOMREF"
+          }
+        }
+
+        gt.eduGenotype = "";
+        if (isLevelEdu) {
+          var alts = alt.split(",");
+          var gtIdx1 = +tokens[0];
+          var gtIdx2 = +tokens[1];
+          if (gt.zygosity == "HET" && gtIdx1 == 0) {
+            gt.eduGenotype = rec.ref + " " + alts[altIdx];
+          } else if (gt.zygosity == "HET" && gtIdx1 > 0) {
+            gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx2-1];
+          } else if (gt.zygosity == "HOM") {
+            gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx1-1];
+          } else if (gt.zygosity == "HOMREF") {
+            gt.eduGenotype = rec.ref + " " + rec.ref;
+          }  
+        }
+        gt.eduGenotypeReversed = switchGenotype(gt.eduGenotype);
+      }
+
+    });
+
+    result.genotypes.forEach(function(gt) {
+      if (gt.keepAlt) {
+        result.keepAlt = true;
+      }
+    })
+
+    return result;
+ }
+
+/*
+ *
+ * Get rid of the left most anchor base for insertions and
+ * deletions for accessing clinvar  
+ *
+*/
+  exports.formatClinvarCoordinates = function(rec, target) {
+      if (rec.hasOwnProperty("pos")) {
+        target.clinvarStart = +rec.pos;
+      } else if (rec.hasOwnProperty("start")) {
+        target.clinvarStart = +rec.start;
+      }
+
+      target.clinvarAlt   = rec.alt;
+      target.clinvarRef   = rec.ref;
+
+      if (target.clinvarAlt == '.') {
+        target.clinvarAlt = '-';
+      } else if (target.clinvarRef == '.') {
+        target.clinvarRef = '-';
+      } else if (target.clinvarRef.length > target.clinvarAlt.length) {
+        // deletion
+        target.clinvarStart++;
+        target.clinvarAlt = target.clinvarAlt.length == 1 ? "-" : target.clinvarAlt.substr(1,target.clinvarAlt.length-1);
+        target.clinvarRef = target.clinvarRef.substr(1,target.clinvarRef.length-1);
+      } else if (target.clinvarAlt.length > target.clinvarRef.length) {
+        // insertion
+        target.clinvarStart++;
+        target.clinvarRef = target.clinvarRef.length == 1 ? "-" : target.clinvarRef.substr(1,target.clinvarRef.length-1);
+        target.clinvarAlt = target.clinvarAlt.substr(1,target.clinvarAlt.length-1);
+      }   
+  }
+
   exports.parseMultiAllelic = function(alleleIdx, genotypeValue, delim) {
     if (genotypeValue == null || genotypeValue == "" || genotypeValue.indexOf(delim) < 0) {
       return genotypeValue;
     } else {
       var tokens = genotypeValue.split(delim);
-      if (tokens.length >= alleleIdx) {
+      if (tokens.length > alleleIdx) {
         return tokens[alleleIdx];
       } else {
         return genotypeValue;
