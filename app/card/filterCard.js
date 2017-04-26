@@ -53,7 +53,7 @@ FilterCard.prototype.autoSetFilters = function() {
  */
 FilterCard.prototype.clearCurrentStandardFilter = function() {
 	if ($('.standard-filter-btn.current').length > 0) {
-		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").addClass(hide);
+		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").addClass("hide");
 		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").text("");
 		$('.standard-filter-btn.current').removeClass("current");		
 	}
