@@ -2975,8 +2975,7 @@ text.ref-count {
         background-color: transparent;
         height: 17px;
         float: left;
-        left: 0;
-        top: 0%;
+        margin-top: 0.5px;
         width: 0%;
         text-align: center; }
       #genes-panel #analyze-all-panel #analyzed-progress-bar .analysis-progress-bar {

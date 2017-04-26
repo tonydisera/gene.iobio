@@ -2150,8 +2150,8 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, callback) 
 	me._determineUniqueFreebayesVariants();
 
 	// Re-cache the vcf data and fb data now that the called variants have been merged
-	me._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
-	me._cacheData(theFbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+	me._cacheData(me.vcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
+	me._cacheData(me.fbData, "fbData", window.gene.gene_name, window.selectedTranscript);
 
 
 	// Show the snpEff effects / vep consequences in the filter card

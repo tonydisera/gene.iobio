@@ -1455,6 +1455,7 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.find('#gene-badge-button #gene-badge-symbols svg').remove();
 	geneBadge.removeClass("visited");
 	geneBadge.removeClass("called");
+	geneBadge.removeClass("has-called-variants");
 	geneBadge.removeClass("selected");
 }
 
@@ -1735,7 +1736,7 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
 	setGeneBloodhoundInputElement(geneName);
 	me.setSelectedGene(geneName);
 
-	promiseGetGeneModel(geneName).then(function(geneModel) {
+	promiseGetCachedGeneModel(geneName).then(function(geneModel) {
 		 
     	// We have successfully return the gene model data.
     	// Load all of the tracks for the gene's region.

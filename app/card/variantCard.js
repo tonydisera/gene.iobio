@@ -372,6 +372,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl, baiUrl, callback) {
 			if (bamUrl == null || bamUrl.trim() == "") {
 				this.cardSelector.find("#bam-track").addClass("hide");
 				this.cardSelector.find(".covloader").addClass("hide");
+				this.cardSelector.find(".fbloader").addClass("hide");
 				this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
 				this.cardSelector.find("#fb-chart-label").addClass("hide");
@@ -393,6 +394,7 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback, callbackErr
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 		this.cardSelector.find('#vcf-variants').css("display", "none");
 		this.cardSelector.find(".vcfloader").addClass("hide");
+		this.cardSelector.find(".fbloader").addClass("hide");
 	}
 	this.model.promiseVcfFilesSelected(event)
 	          .then(function(resolveObject) {
@@ -413,6 +415,7 @@ VariantCard.prototype.clearVcf = function() {
 	this.cardSelector.find('#vcf-track').addClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "none");
 	this.cardSelector.find(".vcfloader").addClass("hide");
+	this.cardSelector.find(".fbloader").addClass("hide");
 	this.cardSelector.find('#vcf-variant-card-label').text("");
 	this.cardSelector.find('#gene-box').text("");
 	this.cardSelector.find('#gene-box').css("visibility", "hidden");
@@ -436,6 +439,7 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 		me.cardSelector.find('#vcf-track').removeClass("hide");
 		me.cardSelector.find('#vcf-variants').css("display", "none");
 		me.cardSelector.find(".vcfloader").addClass("hide");
+		me.cardSelector.find(".fbloader").addClass("hide");
 	 
 	}
 	this.model.onVcfUrlEntered(vcfUrl, tbiUrl,
@@ -737,6 +741,7 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	this.cardSelector.find('#vcf-track').removeClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "block");
 	this.cardSelector.find(".vcfloader").addClass("hide");
+	this.cardSelector.find(".fbloader").addClass("hide");
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 
 	this._showBamDepth(regionStart, regionEnd);
@@ -935,7 +940,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		        if (me.model.hasCalledVariants()) {
 			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
 					me.cardSelector.find('#called-variant-count').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());	        	
+					me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());
+	        	
 		        } else if (me.model.variantsHaveBeenCalled()) {
 		        	// If call variants has occurred but 0 variants returned.
 			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
@@ -1287,8 +1293,8 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 	if (state == 'starting') {
 		if (this.isViewable() && this.isBamLoaded()) {
 			this.cardSelector.find("#vcf-track").removeClass("hide");
-			this.cardSelector.find(".vcfloader").removeClass("hide");
-			this.cardSelector.find('.vcfloader .loader-label').text("Calling Variants with Freebayes");
+			this.cardSelector.find(".fbloader").removeClass("hide");
+			this.cardSelector.find('.fbloader .loader-label').text("Calling Variants with Freebayes");
 
 			$('#recall-card .' + this.getRelationship() + '.covloader').removeClass("hide");
 			$('#recall-card .' + this.getRelationship() + '.call-variants-count').addClass("hide");
@@ -1296,8 +1302,8 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 		}		
 	} else if (state == 'running') {
 		// After variants have been been called from alignments...
-    	me.cardSelector.find('.vcfloader').removeClass("hide");
-		me.cardSelector.find('.vcfloader .loader-label').text();
+    	me.cardSelector.find('.fbloader').removeClass("hide");
+		me.cardSelector.find('.fbloader .loader-label').text();
 
 	} else if (state == 'counting') {
 		// After variants have been called from alignments and annotated from snpEff/VEP...
@@ -1311,9 +1317,9 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 		$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
 	} else if (state == 'done') {
-		me.cardSelector.find('.vcfloader').addClass("hide");			
+		me.cardSelector.find('.fbloader').addClass("hide");			
 	} else if (state == 'error') {
-		me.cardSelector.find('.vcfloader').addClass("hide");
+		me.cardSelector.find('.fbloader').addClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
 		me.cardSelector.find('#freebayes-error').removeClass("hide");
 	}
@@ -1400,6 +1406,8 @@ VariantCard.prototype.variantClass = function(clazz) {
 VariantCard.prototype.filterAndShowCalledVariants = function(regionStart, regionEnd) {
 	var me = this;
 	if (this.model.hasCalledVariants()) {
+
+		me.cardSelector.find('.fbloader').addClass("hide");
 		var filteredFBData = this._filterVariants(this.model.getFbDataForGene(window.gene, window.selectedTranscript), this.fbChart);
 
 

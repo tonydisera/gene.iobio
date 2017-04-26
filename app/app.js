@@ -2555,9 +2555,34 @@ function addVariantCard() {
 
 }
 
-
 function jointCallVariants(checkCache, callback) {
-	fulfilledTrioPromise = false;
+	var me = this;
+
+	var attemptCount = 0;
+	var waitForGene = function() {
+		if (attemptCount > 5) {
+			alertify.alert("Unable to call variants because a gene has not been selected");
+			return;
+		}
+		setTimeout(function() {
+			if (window.gene) {
+				me.jointCallVariantsImpl(checkCache, callback);
+			} else {
+				attemptCount++;
+				waitForGene();
+			}
+		}, 1000);
+
+	}
+	if (window.gene == null) {
+		waitForGene();
+	} else {
+		me.jointCallVariantsImpl(checkCache, callback);
+	}
+}
+
+
+function jointCallVariantsImpl(checkCache, callback) {
 
 	cacheHelper.showCallAllProgress = true;
 
@@ -2567,6 +2592,13 @@ function jointCallVariants(checkCache, callback) {
 	var cards = getRelevantVariantCards();
 
 	genesCard.showGeneBadgeLoading(window.gene.gene_name);
+
+	var showCallingProgress = function() {
+		genesCard.showGeneBadgeLoading(window.gene.gene_name);
+		getRelevantVariantCards().forEach(function(vc) {
+			vc.showCallVariantsProgress('starting');
+		});
+	}
 
 	var parseNextCalledVariants = function(afterParseCallback) {
 		if (sampleIndex >= getRelevantVariantCards().length) {
@@ -2592,6 +2624,7 @@ function jointCallVariants(checkCache, callback) {
 	}
 
 	var processFbTrio = function(callback) {
+		fulfilledTrioPromise = false;
 		promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
 
 			window.hideCircleRelatedVariants();
@@ -2627,7 +2660,7 @@ function jointCallVariants(checkCache, callback) {
 	}
 	
 	if (checkCache && hasCachedCalledVariants(window.gene, window.selectedTranscript)) {
-
+		showCallingProgress();
 		getRelevantVariantCards().forEach(function(vc) {
 			theFbData = vc.model.getFbDataForGene(window.gene, window.selectedTranscript);
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
@@ -2651,10 +2684,10 @@ function jointCallVariants(checkCache, callback) {
 		var bams = [];
 		getRelevantVariantCards().forEach(function(vc) {
 			vc.clearCalledVariants();
-			vc.showCallVariantsProgress('starting');
 			bams.push(vc.model.bam);
 		});
 
+		showCallingProgress();
 
 		getProbandVariantCard().model.bam.freebayesJointCall(
 			window.gene,
@@ -2675,7 +2708,6 @@ function jointCallVariants(checkCache, callback) {
 		);
 
 	}
-
 }
 
 function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback) {
