@@ -835,62 +835,56 @@ a.btn {
     padding-right: 10px; }
     #welcome-area #welcome-panel #welcome-label {
       color: #5d809d;
-      font-size: 17px; }
+      font-size: 20px; }
+    #welcome-area #welcome-panel button {
+      color: #5d809d;
+      font-size: 17px !important;
+      margin-left: 7px;
+      margin-right: 7px; }
     #welcome-area #welcome-panel #welcome-panel-content {
-      width: 700px; }
+      width: 640px; }
       #welcome-area #welcome-panel #welcome-panel-content .description-paragraph {
         text-align: left;
         margin-left: 0px;
-        margin-right: 0px;
+        margin-right: 5px;
         margin-top: 30px;
         color: #717171;
-        font-size: 15px;
-        width: 30%; }
+        font-size: 18px;
+        width: 35%; }
         #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li {
           padding-bottom: 10px; }
           #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
             padding-bottom: 4px; }
-      #welcome-area #welcome-panel #welcome-panel-content button {
-        color: #5d809d;
-        font-size: 15px !important;
-        margin-left: 7px;
-        margin-right: 7px; }
-      #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-multigene-analysis {
-        width: 35%;
-        height: 170px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        background-color: grey;
-        margin-left: 0px;
-        margin-right: 10px;
-        background-image: url("../../assets/images/screencast-multigene-analysis.png");
-        background-size: cover; }
-        #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-multigene-analysis #play-button {
-          margin-top: 40px;
-          margin-bottom: auto;
-          font-size: 100px;
-          cursor: pointer;
-          opacity: 0.6;
-          color: white;
-          font-size: 100px; }
-      #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-saving-analysis {
-        width: 35%;
-        height: 170px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        background-color: grey;
-        margin-left: 0px;
-        margin-right: 10px;
-        background-image: url("../../assets/images/screencast-saving-analysis.png");
-        background-size: cover; }
-        #welcome-area #welcome-panel #welcome-panel-content #welcome-screencast-panel-saving-analysis #play-button {
-          margin-top: 40px;
-          margin-bottom: auto;
-          font-size: 100px;
-          cursor: pointer;
-          opacity: 0.6;
-          color: white;
-          font-size: 100px; }
+      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel {
+        width: 65%;
+        margin-top: 10px; }
+        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-heading {
+          font-size: 18px;
+          color: #717171;
+          margin-top: 10px; }
+        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content {
+          display: flex; }
+          #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint {
+            width: 50%;
+            height: 140px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            background-color: grey;
+            margin-left: 0px;
+            margin-right: 10px;
+            background-size: cover; }
+            #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint #play-button {
+              margin-top: 25px;
+              margin-bottom: auto;
+              font-size: 100px;
+              cursor: pointer;
+              opacity: 0.5;
+              color: white;
+              font-size: 90px; }
+        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-multigene-analysis {
+          background-image: url("../../assets/images/screencast-multigene-analysis.png"); }
+        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-saving-analysis {
+          background-image: url("../../assets/images/screencast-saving-analysis.png"); }
 
 #matrix-track .matrix-note-text {
   margin-top: -7px;
