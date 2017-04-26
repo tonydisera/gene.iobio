@@ -538,12 +538,21 @@
 
           </div>
 
-          <div id="welcome-screencast-panel-saving-analysis" >
-            <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');">play_arrow</i>
+          <div id="video-thumbprint-panel">
+            <div id="video-thumbprint-heading">What's new</div>
+            <div id="video-thumbprint-content">
+
+              <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint" >
+                <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');">play_arrow</i>
+              </div>
+              <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint">
+                <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide')">play_arrow</i>
+              </div>
+                        
+            </div>
           </div>
-          <div id="welcome-screencast-panel-multigene-analysis" >
-            <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide')">play_arrow</i>
-          </div>
+
+
         </div>    
         <div>  
           <button id="load-demo-data" class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');dataCard.loadDemoData()">

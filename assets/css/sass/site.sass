@@ -1014,19 +1014,27 @@ a.btn
 
     #welcome-label
       color: $app-color
-      font-size: 17px
+      font-size: 20px
+
+
+    button
+      color: $app-color
+      font-size: 17px !important
+      margin-left: 7px
+      margin-right: 7px      
 
     #welcome-panel-content
-      width: 700px
+      width: 640px
+
 
       .description-paragraph
         text-align: left
         margin-left: 0px
-        margin-right: 0px
+        margin-right: 5px
         margin-top: 30px
         color: $text-color
-        font-size: 15px
-        width: 30%
+        font-size: 18px
+        width: 35%
 
         li
           padding-bottom: 10px
@@ -1034,51 +1042,44 @@ a.btn
           li
             padding-bottom: 4px
 
-      button
-        color: $app-color
-        font-size: 15px !important
-        margin-left: 7px
-        margin-right: 7px
+      #video-thumbprint-panel
+        width: 65%
+        margin-top: 10px
 
-      #welcome-screencast-panel-multigene-analysis
-        width: 35%
-        height: 170px
-        margin-top: 20px
-        margin-bottom: 20px
-        background-color: grey
-        margin-left: 0px
-        margin-right: 10px
-        background-image: url('../../assets/images/screencast-multigene-analysis.png')
-        background-size: cover
+        #video-thumbprint-heading
+          font-size: 18px
+          color: $text-color
+          margin-top: 10px     
 
-        #play-button
-          margin-top: 40px
-          margin-bottom: auto
-          font-size: 100px
-          cursor: pointer
-          opacity: .6
-          color: white
-          font-size: 100px
+        #video-thumbprint-content
+          display: flex
 
-      #welcome-screencast-panel-saving-analysis
-        width: 35%
-        height: 170px
-        margin-top: 20px
-        margin-bottom: 20px
-        background-color: grey
-        margin-left: 0px
-        margin-right: 10px
-        background-image: url('../../assets/images/screencast-saving-analysis.png')
-        background-size: cover
+          .video-thumbprint
+            width: 50%
+            height: 140px
+            margin-top: 5px
+            margin-bottom: 20px
+            background-color: grey
+            margin-left: 0px
+            margin-right: 10px
+            background-size: cover
 
-        #play-button
-          margin-top: 40px
-          margin-bottom: auto
-          font-size: 100px
-          cursor: pointer
-          opacity: .6
-          color: white
-          font-size: 100px
+            #play-button
+              margin-top: 25px
+              margin-bottom: auto
+              font-size: 100px
+              cursor: pointer
+              opacity: .5
+              color: white
+              font-size: 90px
+
+
+        #welcome-screencast-panel-multigene-analysis
+          background-image: url('../../assets/images/screencast-multigene-analysis.png')
+
+        #welcome-screencast-panel-saving-analysis
+          background-image: url('../../assets/images/screencast-saving-analysis.png')
+
   
 
 #matrix-track
