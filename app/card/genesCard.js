@@ -1736,7 +1736,7 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
 	setGeneBloodhoundInputElement(geneName);
 	me.setSelectedGene(geneName);
 
-	promiseGetCachedGeneModel(geneName).then(function(geneModel) {
+	promiseGetGeneModel(geneName).then(function(geneModel) {
 		 
     	// We have successfully return the gene model data.
     	// Load all of the tracks for the gene's region.
