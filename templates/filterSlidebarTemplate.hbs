@@ -2,7 +2,7 @@
  
   <div class="card-label">Filter Variants</div>
 
-   <div id="called-and-loaded-checkboxes" style="text-align:center;margin-bottom:15px">
+   <div id="called-and-loaded-checkboxes" class="hide" style="text-align:center;margin-bottom:15px">
      <div class="checkbox">
       <label style="margin-right:5px;">
         <input id="loaded-variants-cb" checked type="checkbox"> Loaded variants
@@ -102,7 +102,27 @@
       
     </div>
 
+    <!-- VCF Record Filters -->
+    <div id="rec-filter-panel"  style="clear:both;margin-right:10px;width:150px">
+        <h4>
+            <span style="float:left;">VCF Filter status </span> 
+            <a id="vcf-filter-status-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="What is this field?">
+              <span id="vcf-filter-status-help-icon" class="material-icons">help</span> 
+            </a>         
 
+            <div id="vcf-filter-status-info" class="collapse" aria-expanded="false">
+              The 'Filter status' is a tag set by filtering software to explain the result of
+              filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
+              recommended to display variants marked with 'PASS' if present. Often, if some variants
+              are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
+              For more detailed information, with examples, see the blog post on 'Filter status'.
+            </div>          
+
+        </h4>
+        <div style="clear:both;">
+            <div id="rec-filter-box" style="display:flex;flex-direction:column"></div>
+        </div>
+    </div>
 
 
    <!-- Coverage -->
@@ -113,7 +133,7 @@
       </h4>
 
       <!-- coverage -->  
-      <div id="coverage-filter" style="text-align:left;width:150px;" >
+      <div id="coverage-filter" style="text-align:left;" >
         
         <input type="number" id="coverage-min" value="" style="width:40px;margin-bottom:1px">
         X
@@ -134,7 +154,7 @@
     </h4>
     <div style="display:table;text-align:left;">
 
-      <div style="display:table-cell;width:110px;">
+      <div style="display:table-cell;margin-right:5px;">
       <!-- ClinVar -->
         <div style="display:flex;flex-direction:column;">
         
@@ -153,6 +173,11 @@
           <text class="name" style="fill-opacity: 1;" x="15" y="10">Likely Pathogenic</text>
           </svg>
 
+        </div>
+      </div>
+
+      <div style="display:table-cell;">
+        <div style="display:flex;flex-direction:column;">
           <svg id="clinvar_uc" class="clinvar" width="140" height="17" transform="translate(0,0)">
             <g class="clinvar_uc" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill:rgba(231, 186, 82, 1);"></use>
@@ -160,17 +185,13 @@
             <text class="name" style="fill-opacity: 1;" x="15" y="10">Unknown significance </text>
           </svg>
 
+
           <svg id="clinvar_cd" class="clinvar" width="110" height="17" transform="translate(0,0)">
             <g class="clinvar_cd" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: rgb(111, 182, 180);"></use>
             </g>
             <text class="name" style="fill-opacity: 1;" x="15" y="10">Conflicting data</text>
           </svg>
-        </div>
-      </div>
-
-      <div style="display:table-cell;width:73px;">
-        <div style="display:flex;flex-direction:column;">
 
           <svg id="clinvar_other" class="clinvar" width="73" height="17" transform="translate(0,0)">
             <g class="clinvar_other" transform="translate(1,0)" style="opacity: 1;">
@@ -178,6 +199,12 @@
             </g>
             <text class="name" style="fill-opacity: 1;" x="15" y="10">Other </text>
           </svg>
+   
+        </div>
+      </div>
+
+      <div style="display:table-cell;">
+        <div style="display:flex;flex-direction:column;">
 
           <svg id="clinvar_benign" class="clinvar" width="73" height="17" transform="translate(0,0)">
             <g class="clinvar_benign" transform="translate(1,0)" style="opacity: 1;">
@@ -192,7 +219,6 @@
             </g>
             <text class="name" style="fill-opacity: 1;" x="15" y="10">Likely Benign</text>
           </svg>
-   
         </div>
       </div>
       
@@ -216,9 +242,9 @@
 
 
     <div style="display:table;margin-top:-3px">
-      <div style="width:135px;display:table-cell;">
+      <div style="width:145px;display:table-cell;">
 
-          <h4 style="width:135px;">
+          <h4 style="width:145px;">
             VEP<br>Most severe impact
             <a id="impact-scheme" href="javascript:(0)" class="current">
               <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>            
@@ -248,11 +274,11 @@
        
       <div id="effect-filter-box" style=display:table-cell;text-align:left;width:120px;">
         <h4>
-            VEP<br>Consequence
-        </h4>
+          VEP<br>Consequence
           <a id="effect-scheme" href="javascript:(0)" >
-            <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>            
+            <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>          
           </a>
+        </h4>
 
           <div id="effect-filters" style="display: flex;flex-direction: column;flex-wrap: wrap;">
           </div>     
@@ -543,27 +569,7 @@
   </div>
 
   <div style="display:flex;flex-direction:row;justify-content: space-between;width: 335px;">
-    <!-- VCF Record Filters -->
-    <div id="rec-filter-panel"  style="clear:both">
-        <h4>
-            <span style="float:left;">VCF Filter status </span> 
-            <a id="import-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" style="font-size:10px;float: left;margin-left: 4px;" data-toggle="tooltip" title="What is this field?">
-              <span id="filter-status-help-icon" class="material-icons" style="font-size: 14px;">help</span> 
-            </a>         
 
-            <div id="vcf-filter-status-info" class="collapse" aria-expanded="false" style="clear:both;font-size:10px;padding-top:4px;color:rgb(132,132,132)">
-              The 'Filter status' is a tag set by filtering software to explain the result of
-              filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
-              recommended to display variants marked with 'PASS' if present. Often, if some variants
-              are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
-              For more detailed information, with examples, see the blog post on 'Filter status'.
-            </div>          
-
-        </h4>
-        <div style="clear:both;">
-            <div id="rec-filter-box" style="display:flex;flex-direction:column"></div>
-        </div>
-    </div>
 
     <!-- Exonic and Intronic -->
     <div style="margin-bottom:20px">

@@ -1922,6 +1922,22 @@ inputinput:-moz-placeholder {
     #filter-track svg text {
       font-size: 12px !important;
       fill: #717171 !important; }
+  #filter-track #coverage-filter {
+    color: #717171; }
+  #filter-track #vcf-filter-status-help {
+    float: left;
+    margin-left: 4px; }
+  #filter-track #vcf-filter-status-help-icon {
+    font-size: 16px;
+    margin-top: -4px; }
+  #filter-track #vcf-filter-status-info {
+    clear: both;
+    font-size: 13px;
+    padding-top: 4px;
+    color: #717171; }
+  #filter-track .tooltip-zygosity {
+    cursor: pointer;
+    pointer-events: all; }
 
 #checkmark-called {
   fill: #9fbb52; }
