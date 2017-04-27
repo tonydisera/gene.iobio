@@ -1,4 +1,38 @@
 #matrix-track
+
+  .matrix-note-text
+    margin-top: -7px
+    color: $hint-color
+    font-style: italic
+
+  #low-quality-legend
+    font-size: 12px
+    margin-left: 20px
+    font-style: italic
+    clear:both
+    overflow: visible
+    float: left    
+
+    #low-quality-legend-box
+      display: inline-block
+      width: 15px
+      height: 15px
+      background-color: $low-quality-cell-color
+      border: solid thin $cell-border-color
+      vertical-align: bottom  
+      float: left 
+      margin-top: 5px
+
+
+  #low-quality-legend-text
+    width: 160px
+    float: left
+    margin-left: 5px
+    margin-bottom: 0px  
+    color:  $hint-color
+    font-style: italic
+    line-height: 13px
+
   
   #zero-variants
     color: white
@@ -19,7 +53,7 @@
 #feature-matrix
   rect.cellbox
     fill: white
-    stroke: rgb(230, 230, 230)
+    stroke: $cell-border-color
     stroke-width: 1px
 
   .col
@@ -29,7 +63,7 @@
 
     &.low-quality
       rect.cellbox
-        fill: rgba(0, 0, 0, 0.13) 
+        fill: $low-quality-cell-color
 
   .colhdr text
     font-size: 11px

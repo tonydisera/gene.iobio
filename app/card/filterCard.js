@@ -24,6 +24,17 @@ FilterCard.prototype.shouldWarnForNonPassVariants = function() {
 	return (passStatus && recFilterKeys.length > 1);
 }
 
+FilterCard.prototype.clearDataGeneratedFilters = function() {
+	this.snpEffEffects = new Object();
+	this.vepConsequences = new Object();
+	this.recFilters = new Object();
+}
+
+FilterCard.prototype.displayDataGeneratedFilters = function () {
+	this.displayRecFilters();
+	this.displayEffectFilters();
+}
+
 FilterCard.prototype.autoSetFilters = function() {
 	
 	this.displayRecFilters();
@@ -829,46 +840,33 @@ FilterCard.prototype.displayEffectFilters = function() {
 	var effectKeys = Object.keys(values).sort();
 
 	effectKeys.forEach( function(key) {
-		var count = d3.selectAll('#vcf-track .variant')
-		              .filter( function(d,i) {
-		              	var match = false; 
-		              	for (ef in d[field]) {
-		              		if (ef == key) {
-		              			match = true;
-		              		}
-		              	}
-		              	return match;
-		              })[0].length;
+		var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
+		var svgElem = null;
+		if (effectLabel.length < 20) {
+			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
+                      '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
+    				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+  					  '</svg>';
 
-		if (count > 0) {
-			var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
-			var svgElem = null;
-			if (effectLabel.length < 20) {
-				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
-      					  '</svg>';
-
-			} else {
-				// find first space after 20th character
-				var pos = 0;
-				for (var i = 20; i < effectLabel.length; i++) {
-					if (pos == 0 && effectLabel[i] == " ") {
-						pos = i;
-					}
+		} else {
+			// find first space after 20th character
+			var pos = 0;
+			for (var i = 20; i < effectLabel.length; i++) {
+				if (pos == 0 && effectLabel[i] == " ") {
+					pos = i;
 				}
-				var label1 = effectLabel.substring(0, pos);
-				var label2 = effectLabel.substring(pos+1, effectLabel.length);
-				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="26" transform="translate(0,0)">' +
-                          '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
-                          '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
-        				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
-      					  '</svg>';
-
 			}
+			var label1 = effectLabel.substring(0, pos);
+			var label2 = effectLabel.substring(pos+1, effectLabel.length);
+			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="26" transform="translate(0,0)">' +
+                      '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
+                      '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
+    				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+  					  '</svg>';
 
-      		$('#effect-filters').append(svgElem);
 		}
+
+  		$('#effect-filters').append(svgElem);
 	});	
 }
 

@@ -1417,7 +1417,7 @@ var effectCategories = [
       // sample (genotype) columns.     
       if (sampleIndices == null) {
         sampleIndices = [];
-        if (sampleNames == null || sampleNames != "") {
+        if (sampleNames != null && sampleNames != "") {
           sampleIndices = sampleNames.split(",").map(function(sampleName,i) {
             return i;
           });

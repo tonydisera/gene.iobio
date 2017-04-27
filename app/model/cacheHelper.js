@@ -299,6 +299,9 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 			} else {
 				// Determine inheritance for the trio
 				me.processCachedTrio(geneObject, transcript, analyzeCalledVariants, true, callback);
+				if (window.gene && window.gene.gene_name == geneObject.gene_name) {
+					genesCard.selectGene(geneObject.gene_name);
+				}
 			}
     	}
 

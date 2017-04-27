@@ -886,33 +886,6 @@ a.btn {
         #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-saving-analysis {
           background-image: url("../../assets/images/screencast-saving-analysis.png"); }
 
-#matrix-track .matrix-note-text {
-  margin-top: -7px;
-  color: #969696;
-  font-style: italic; }
-#matrix-track #low-quality-legend {
-  font-size: 12px;
-  margin-left: 20px;
-  font-style: italic;
-  overflow: visible;
-  float: left; }
-  #matrix-track #low-quality-legend #low-quality-legend-box {
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    background-color: #dedede;
-    vertical-align: bottom;
-    float: left;
-    margin-top: 5px; }
-#matrix-track #low-quality-legend-text {
-  width: 160px;
-  float: left;
-  margin-left: 5px;
-  margin-bottom: 0px;
-  color: #969696;
-  font-style: italic;
-  line-height: 13px; }
-
 .icon {
   width: 30px;
   height: 30px;
@@ -3565,6 +3538,33 @@ text.ref-count {
     height: auto;
     margin: 0px; }
 
+#matrix-track .matrix-note-text {
+  margin-top: -7px;
+  color: #969696;
+  font-style: italic; }
+#matrix-track #low-quality-legend {
+  font-size: 12px;
+  margin-left: 20px;
+  font-style: italic;
+  overflow: visible;
+  float: left; }
+  #matrix-track #low-quality-legend #low-quality-legend-box {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-color: rgba(215, 217, 220, 0.31);
+    border: solid thin #dedede;
+    vertical-align: bottom;
+    float: left;
+    margin-top: 5px; }
+#matrix-track #low-quality-legend-text {
+  width: 160px;
+  float: left;
+  margin-left: 5px;
+  margin-bottom: 0px;
+  color: #969696;
+  font-style: italic;
+  line-height: 13px; }
 #matrix-track #zero-variants {
   color: white;
   font-size: 14px;
@@ -3582,12 +3582,12 @@ text.ref-count {
 
 #feature-matrix rect.cellbox {
   fill: white;
-  stroke: #e6e6e6;
+  stroke: #dedede;
   stroke-width: 1px; }
 #feature-matrix .col.danger rect.cellbox {
   fill: rgba(187, 0, 0, 0.13); }
 #feature-matrix .col.low-quality rect.cellbox {
-  fill: rgba(0, 0, 0, 0.13); }
+  fill: rgba(215, 217, 220, 0.31); }
 #feature-matrix .colhdr text {
   font-size: 11px;
   pointer-events: none; }

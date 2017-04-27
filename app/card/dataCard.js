@@ -811,8 +811,8 @@ DataCard.prototype.init = function() {
 		
 		// Clear out annotations and gene models (and transcripts)
 		genesCard.clearGeneInfos();
-		
-		genesCard.showAnalyzeAllButton();
+
+		genesCard.showAnalyzeAllButton();		
 
 		// Clear the cache
 		cacheHelper.clearCache();
@@ -820,6 +820,10 @@ DataCard.prototype.init = function() {
 		// Clear any filters
 		filterCard.clearFilters();
 		filterCard.resetStandardFilterCounts();
+		// Clear out filters for VEP consequences and rec filters as these are
+		// generated from the data
+		filterCard.clearDataGeneratedFilters();
+		
 
 		 // If we switched from a trio back to a single, clear out the mother and father
 		// data

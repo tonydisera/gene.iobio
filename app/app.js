@@ -2129,10 +2129,6 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	regionEnd = null;
 	fulfilledTrioPromise = false;
 
-	filterCard.snpEffEffects = new Object();
-	filterCard.vepConsequences = new Object();
-	filterCard.recFilters = new Object();
-
 	$("#region-flag").addClass("hide");
 
 	$("#coordinate-frame").css("opacity", 0);

@@ -1249,6 +1249,10 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			    		// Flag any bookmarked variants
 					    bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
 
+					    // Refresh the VEP consequence filters and the rec filters that
+					    // show in the Filter panel
+					    filterCard.displayDataGeneratedFilters();
+
 				    	// Cache the data
 					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
 						resolve(data);				    	
