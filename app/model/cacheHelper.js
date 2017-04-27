@@ -481,7 +481,10 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 		if (analyzeCalledVariants) {
 			options.CALLED = true;
 		}
-		var dangerObject    = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options);
+
+  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options);
+		getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
+
 		genesCard._geneBadgeLoading(geneObject.gene_name, false);
 		if (trioVcfData.proband.features.length == 0) {
 			//genesCard.setGeneBadgeWarning(geneObject.gene_name);
@@ -673,9 +676,10 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 				if (theFbData) {
 					options.CALLED = true;
 				}
+		 
 		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options);
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
-		
+				
 				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
 		  	} 
 		} 

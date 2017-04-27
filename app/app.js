@@ -2607,11 +2607,12 @@ function jointCallVariantsImpl(checkCache, callback) {
 		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
+	                	var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
 
 				    
 					    // Get the unique freebayes variants and set up the allele counts
-					    vc.model.processFreebayesVariants(theFbData, function() {
+					    vc.model.processFreebayesVariants(theFbData, theVcfData, function() {
 							sampleIndex++;
 							parseNextCalledVariants(afterParseCallback);					    				    
 					    });
