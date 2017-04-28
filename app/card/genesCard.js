@@ -694,7 +694,8 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 			this._getPhenolyzerGenesBasic(searchTerms)
    		}
    	} else {
-		this._getPhenolyzerGenesAdvanced(phenolyzerServer + '?term=' + searchTerms);
+   		this._getPhenolyzerGenesBasic(searchTerms);
+//		this._getPhenolyzerGenesAdvanced(phenolyzerServer + '?term=' + searchTerms);
    	}
 }
 
