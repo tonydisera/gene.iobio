@@ -44,6 +44,7 @@ var feedbackEmails              = "gene.iobio.feedback@gmail.com";  // what emai
 var feedbackAttachScreenCapture = false;          // should the feedback include a screen capture?
 var feedbackShowURL             = false;         // show the feedback email show the URL that launched gene.iobio?
 
+var autocall              = null       // If only alignments provided, should variants be automatically called when gene is selected?
 
 
 var siteGeneSource        = isMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?

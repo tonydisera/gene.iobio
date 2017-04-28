@@ -160,7 +160,9 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 		}			
 	}
 
-	if (notAnalyzedCount > 0) {
+	// Show a "some genes not analyzed" warning symbol next to standard filters.  Make sure
+	// to exclude loaded variants from the warning when only alignments were provided
+	if (notAnalyzedCount > 0 && (!getProbandVariantCard().model.isAlignmentsOnly() || field == 'called')) {
 		var filterCountId = field + '-variant-count';
 		$('#standard-filter-panel .variant-count').each( function(i,val) {
 			if ($(val).attr('id') == filterCountId) {
@@ -654,7 +656,8 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		theGeneNames[geneName] = true;
 	});
 
-	var dataKind = getProbandVariantCard().model.isAlignmentsOnly() ? "fbData" : "vcfData";
+	//var dataKind = getProbandVariantCard().model.isAlignmentsOnly() ? "fbData" : "vcfData";
+	var dataKind = "vcfData";
 
 	for (var i=0; i<=localStorage.length-1; i++)  
 	{  

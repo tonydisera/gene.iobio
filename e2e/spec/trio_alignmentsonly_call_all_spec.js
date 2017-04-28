@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, findGenesPanel, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -11,28 +11,40 @@ module.exports = {
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
     matrixTrack = indexPage.section.matrixTrack;  
-    bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
     tooltip = indexPage.section.variantTooltip;
+    findGenesPanel = indexPage.section.findGenesPanel;
   },
 
 
-  'Loading Platinum Trio, analyzing all genes': function(client) {
+  'Loading Platinum Trio alignments only, analyzing all genes': function(client) {
     indexPage.load();
+
+    nav.clickGenes();
+    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);   
+    nav.searchGene("RAI1"); 
+
+    nav.clickData();
+    dataCard.selectTrio();
+    dataCard.selectGenomeBuild('GRCh37');
+    dataCard.section.probandData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam");
+    dataCard.section.motherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
+    dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
+    dataCard.section.probandData.inputName("proband");
+
     client.pause(2000);
-    indexPage.clickDemoGene();
+    dataCard.clickLoad();
 
     client.pause(1000);
-    matrixTrack.waitForMatrixLoaded();
-
-    appTitleSection.clickAnalyzeAll();
-    appTitleSection.waitForAnalyzeAllDone();
-    appTitleSection.assertGeneBadgesLoaded(['RAI1', 'PDHA1', 'AIRE', 'MYLK2', 'PDGFB']);
-    appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
-
+    indexPage.waitForAlertify();
+    indexPage.clickAlertifyCancel();
+    client.pause(3000);
+    
   },
+
+
   'Calling all genes': function(client) {
     appTitleSection.selectCallAll();
     appTitleSection.waitForCallAllDone();
@@ -46,8 +58,8 @@ module.exports = {
 
     filterPanel.clickKnownCausative();
     client.pause(1000);
-    filterPanel.assertKnownCausativeCounts(1,1);
-    appTitleSection.assertAnalyzeAllCounts(1,4,1,4);
+    filterPanel.assertKnownCausativeCounts(0,2);
+    appTitleSection.assertAnalyzeAllCounts(0,0,2,3);
 
 
   },
@@ -55,8 +67,8 @@ module.exports = {
 
     filterPanel.clickDenovoVus();
     client.pause(1000);
-    filterPanel.assertDenovoVusCounts(2,0);
-    appTitleSection.assertAnalyzeAllCounts(2,3,0,5);
+    filterPanel.assertDenovoVusCounts(0,2);
+    appTitleSection.assertAnalyzeAllCounts(0,0,2,3);
 
   },
   'Recessive VUS filter': function(client) {
@@ -64,33 +76,32 @@ module.exports = {
     filterPanel.clickRecessiveVus();
     client.pause(1000);
     filterPanel.assertRecessiveVusCounts(0,0);
-    appTitleSection.assertAnalyzeAllCounts(0,5,0,5);
+    appTitleSection.assertAnalyzeAllCounts(0,0,0,5);
 
   },
   'High or Moderate Impact filter': function(client) {
 
     filterPanel.clickHighOrModerateImpact();
     client.pause(1000);
-    filterPanel.assertHighOrModerateImpactCounts(3,0);
-    appTitleSection.assertAnalyzeAllCounts(3,2,0,5);
+    filterPanel.assertHighOrModerateImpactCounts(0,3);
+    appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
 
   },
   'Clear all filter': function(client) {
 
     filterPanel.clickClearAll();
-    filterPanel.assertKnownCausativeCounts(1,1);
+    filterPanel.assertKnownCausativeCounts(0,2);
     client.pause(1000);
-    filterPanel.assertDenovoVusCounts(2,0);
+    filterPanel.assertDenovoVusCounts(0,2);
     filterPanel.assertRecessiveVusCounts(0,0);
-    filterPanel.assertHighOrModerateImpactCounts(3,0);
-    appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
+    filterPanel.assertHighOrModerateImpactCounts(0,3);
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
   },
   'Click denovo inheritance (custom) filter': function(client) {
     filterPanel.clickClearAll();
     filterPanel.clickInheritanceDenovo();
     client.pause(1000);
-    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+    appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
   },
   
 
@@ -101,10 +112,10 @@ module.exports = {
     
     client.pause(1000);
     matrixTrack.waitForMatrixLoaded();
-    probandVariantCard.assertLoadedVariantCountEquals(2);
-    probandVariantCard.assertCalledVariantCountEquals(1);
-    probandVariantCard.assertLoadedVariantSymbolCountEquals(2);
-    probandVariantCard.assertCalledVariantSymbolCountEquals(1);
+    probandVariantCard.assertLoadedVariantCountEquals(0);
+    probandVariantCard.assertCalledVariantCountEquals(3);
+    probandVariantCard.assertLoadedVariantSymbolCountEquals(0);
+    probandVariantCard.assertCalledVariantSymbolCountEquals(3);
 
 
     var evaluateTooltip = function(theTooltip) {
@@ -146,10 +157,10 @@ module.exports = {
     
   },
 
+
   'end': function(client) {
     client.end();
   }
 
   
 }
-

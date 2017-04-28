@@ -1998,8 +1998,6 @@ VariantModel.prototype.clearCalledVariants = function() {
 VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData, callback) {
 	var me = this;
 
-	//me.fbData = theFbData;
-	//me.vcfData = theVcfData;
 
 	// Flag the called variants
     theFbData.features.forEach( function(feature) {
@@ -2029,10 +2027,6 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 	// not present in the vcf variant set.
 	me._determineUniqueFreebayesVariants(window.gene, window.selectedTranscript, theVcfData, theFbData);
 
-	// Re-cache the vcf data and fb data now that the called variants have been merged
-	me._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
-	me._cacheData(theFbData, "fbData", window.gene.gene_name, window.selectedTranscript);
-
 
 	// Show the snpEff effects / vep consequences in the filter card
 	me._populateEffectFilters(theFbData.features);
@@ -2061,6 +2055,12 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
 					}					
 				});	 
+
+				// Re-cache the vcf data and fb data now that the called variants have been merged,
+				// inheritance has been determined, and newly called variants have 
+				// been annotated with clinvar
+				me._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
+				me._cacheData(theFbData, "fbData", window.gene.gene_name, window.selectedTranscript);
 
 
 	    		callback(theFbData);

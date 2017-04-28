@@ -614,7 +614,6 @@ function checkGeneSource(geneName) {
 		//alertify.error(msg, 6); 	
 		$('#non-protein-coding #no-transcripts-badge').removeClass("hide");
 		$('#non-protein-coding #no-transcripts-badge').text(switchMsg);
-
 	} 	
 }
 
@@ -2232,17 +2231,20 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	$('#matrix-track .warning').addClass("hide");
 
 	readjustCards();
-
 	filterCard.disableFilters();
-
-	
-	// Load the variant cards and feature matrix with the annotated variants and coverage
-	loadTracksForGeneImpl(bypassVariantCards, callback);
-	
-
 	transcriptPanelHeight = d3.select("#nav-section").node().offsetHeight;
 
-	justLaunched = false;
+
+	if (isAlignmentsOnly() && autocall == null) {
+		shouldAutocall(function() {
+			// Load the variant cards and feature matrix with the annotated variants and coverage
+			loadTracksForGeneImpl(bypassVariantCards, callback);
+		});
+	} else {
+		// Load the variant cards and feature matrix with the annotated variants and coverage
+		loadTracksForGeneImpl(bypassVariantCards, callback);
+
+	}
 	
 }
 
@@ -2317,7 +2319,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 				vc.hide();
 			} else {
 				if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
-					// We have variants,either to load from a vcf or called from alignments and
+					// We have variants, either to load from a vcf or called from alignments and
 				 	// optionally alignments.  First annotate the show the variants in the
 				 	// variant cards and calcuate the coverage (if alignments provided).
 					var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
@@ -2343,9 +2345,31 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 					  });				 
 					  variantPromises.push(variantPromise);		 
 			
+				} else if (isAlignmentsOnly() && autocall) {
+					// Only alignment files are loaded and user, when prompted, responded
+					// that variants should be autocalled when gene is selected.
+					// First perform joint calling, then load the bam data (for coverage)
+					// for each sample.
+					var callPromise = promiseJointCallVariants(true).then(function() {
+
+						showNavVariantLinks();
+						var coveragePromise = vc.promiseLoadBamDepth()
+							                 .then( function(coverageData) {
+													if (coverageData) {
+														var max = d3.max(coverageData, function(d,i) { return d[1]});
+														if (max > allMaxDepth) {
+															allMaxDepth = max;
+														}						
+													}
+																									
+							                 });
+						coveragePromises.push(coveragePromise); 
+
+					}) 
+					variantPromises.push(callPromise);							
+
 				} else {
-					// In the case where alignments only were provided and we have yet to call variants
-					// we just want to load the bam coverage chart.
+					// Only alignment files are loaded.  Load the bam coverage data.
 					var coveragePromise = vc.promiseLoadBamDepth()
 						                 .then( function(coverageData) {
 												if (coverageData) {
@@ -2551,6 +2575,14 @@ function addVariantCard() {
 
 }
 
+function promiseJointCallVariants(checkCache) {
+	return new Promise(function(resolve, reject) {
+		jointCallVariants(checkCache, function() {
+			resolve();
+		})
+	})
+}
+
 function jointCallVariants(checkCache, callback) {
 	var me = this;
 
@@ -2609,12 +2641,17 @@ function jointCallVariantsImpl(checkCache, callback) {
 	                	var theFbData = data[1];
 	                	var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
+	                	if (vc.model.isAlignmentsOnly() && theVcfData == null) {
+							theVcfData = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
+	                	}
 
 				    
 					    // Get the unique freebayes variants and set up the allele counts
 					    vc.model.processFreebayesVariants(theFbData, theVcfData, function() {
+							vc.model.fbData = theFbData;
+							vc.model.vcfData = theVcfData;			    				    
 							sampleIndex++;
-							parseNextCalledVariants(afterParseCallback);					    				    
+							parseNextCalledVariants(afterParseCallback);		
 					    });
 						
 				    });
@@ -2823,6 +2860,33 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		}
 	);
 
+}
+
+function shouldAutocall(callback) {
+	if (isAlignmentsOnly() && autocall == null) {
+		var message = "Would you like to variants to automatically be called from alignments when gene is selected?";
+		alertify.confirm(message, 
+			            function(){ 
+					    	// OK pressed
+					    	autocall = true;
+					    	if (callback) {
+						    	callback();
+					    	}
+					    }, 
+					    function(){ 
+					    	// Cancel pressed
+					    	autocall = false;
+					    	if (callback) {
+						    	callback();
+					    	}
+					    })
+		        .set('labels', {ok:'OK', cancel:'No, just show the coverage'});   				
+	} else {
+		if (callback) {
+			callback();
+		}
+	}
+	
 }
 
 function enableCallVariantsButton() {

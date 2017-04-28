@@ -11,6 +11,7 @@ var variantTooltip = require('./sections/variantTooltip.js');
 
 
 
+
 module.exports = {
   url: function() {
     return this.api.launchUrl;
@@ -31,7 +32,10 @@ module.exports = {
     probandVariantCard: '#proband-variant-card',
     motherVariantCard: '#other-variant-cards .variant-card:nth-child(1)',
     fatherVariantCard: '#other-variant-cards .variant-card:nth-child(2)',
-    variantTooltip:        '#feature-matrix .tooltip'
+    variantTooltip:        '#feature-matrix .tooltip',
+    alertify:          '.alertify',
+    alertifyOk:        '.alertify .ajs-primary .ajs-button:first-child',
+    alertifyCancel:    '.alertify .ajs-primary .ajs-button:second-child'
   },
 
   commands: [{
@@ -40,7 +44,19 @@ module.exports = {
     },
     clickDemoGene: function() {
       return this.click('@demoGeneButton');
-    }
+    },
+    waitForAlertify: function() {
+      return this.waitForElementPresent('@alertify', 2000);
+    },
+    clickAlertifyOk: function(client) {
+      return this.api.moveTo( '.alertify .ajs-primary .ajs-button:first-child').click('.alertify .ajs-primary .ajs-button:first-child');
+      //return this.click('@alertifyOk');
+    },
+    clickAlertifyCancel: function() {
+      var loc = "(//*[contains(@class, 'ajs-button')])[2]";
+      return this.api.useXpath().moveTo(loc).click(loc).useCss();
+//      return this.click('@alertifyCancel');
+    }    
   }],
 
   sections: {

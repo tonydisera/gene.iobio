@@ -64,6 +64,9 @@ module.exports = {
           this.inputUrl(this.api.globals.variantFileUrl);
           this.selectSample('NA12878');
           this.inputAlignmentsUrl(this.api.globals.NA12878SampleFileUrl);
+        },
+        inputName: function(name) {
+          return this.setValue('@nameInput', [name]);
         }
       }],
       elements: {
@@ -75,7 +78,8 @@ module.exports = {
         urlInput: { selector: '#url-input' },
         tbiUrlInput: { selector: '#url-tbi-input' },
         bamUrlInput: { selector: '#bam-url-input' },
-        baiUrlInput: { selector: '#bai-url-input' }
+        baiUrlInput: { selector: '#bai-url-input' },
+        nameInput: {selector: '#datasource-name'}
       }
     },
     motherData: {
@@ -83,13 +87,17 @@ module.exports = {
       commands: [{
         selectPlatinumTrio: function() {
           return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
-        }
+        },
+        inputAlignmentsUrl: function(url) {
+          return this.setValue('@bamUrlInput', [url]);
+        },        
       }],
       elements: {
         variantsButton: { selector: '#vcf-dropdown-button' },
         alignmentsButton: { selector: '#bam-dropdown-button' },
         platinumTrio: { selector: '#display-platinum-vcf-url-item' },
-        probandVcfSampleBox: { selector: '#vcf-sample-box' }
+        vcfSampleBox: { selector: '#vcf-sample-box' },
+        bamUrlInput: { selector: '#bam-url-input' }
       }
     },
     fatherData: {
@@ -97,13 +105,18 @@ module.exports = {
       commands: [{
         selectPlatinumTrio: function() {
           return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
-        }
+        }, 
+        inputAlignmentsUrl: function(url) {
+          return this.setValue('@bamUrlInput', [url]);
+        }  
       }],
       elements: {
         variantsButton: { selector: '#vcf-dropdown-button' },
         alignmentsButton: { selector: '#bam-dropdown-button' },
         platinumTrio: { selector: '#display-platinum-vcf-url-item' },
-        probandVcfSampleBox: { selector: '#vcf-sample-box' }
+        vcfSampleBox: { selector: '#vcf-sample-box' },
+        bamUrlInput: { selector: '#bam-url-input' }
+
       }
     }
   }

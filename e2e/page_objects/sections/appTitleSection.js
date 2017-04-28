@@ -13,6 +13,10 @@ module.exports = {
       return this.click('#call-variants-dropdown')
                  .click('#call-variants-dropdown li a#call-variants-all-genes');
     },
+    selectCallSelectedGene: function() {
+      return this.click('#call-variants-dropdown')
+                 .click('#call-variants-dropdown li a#call-variants-selected-gene');
+    },
     waitForAnalyzeAllDone: function() {
       this.waitForElementPresent('@analyzeAllDone', 60000);
     },

@@ -322,7 +322,7 @@ module.exports = {
       });
     },
     waitForMatrixLoaded: function() {
-      this.waitForElementVisible('@featureMatrix', 60000);
+      this.waitForElementVisible('@featureMatrix', 90000);
     },
     waitForZeroVariantsWarning: function() {
       this.waitForElementVisible('@zeroVariantsWarning', 60000);

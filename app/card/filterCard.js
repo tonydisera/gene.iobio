@@ -81,6 +81,8 @@ FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 FilterCard.prototype.resetStandardFilterCounts = function() {
 	$('#standard-filter-panel span.standard-filter-count #loaded-variant-count').text("");
 	$('#standard-filter-panel span.standard-filter-count #called-variant-count').text("");
+	$('#standard-filter-panel span.standard-filter-count .variant-count').addClass("hide");
+	$('#standard-filter-panel span.standard-filter-count #unanalyzed-warning').addClass("hide");
 }
 
 FilterCard.prototype.setStandardFilter = function(button, filterName) {
