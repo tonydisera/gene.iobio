@@ -1111,7 +1111,8 @@ GenesCard.prototype.clearGenes = function() {
 		function() {
 			// user clicked cancel.
 		}
-	);
+
+	).set('labels', {ok:'OK', cancel:'Cancel'});   		
 
 }
 

@@ -845,7 +845,8 @@ CacheHelper.prototype.clearAll = function() {
 	    } else {
 	        // user clicked "cancel"
 	    }
-	});
+	})
+	.set('labels', {ok:'OK', cancel:'Cancel'});   		;
 }
 CacheHelper.prototype.clearOther = function() {
 	var me = this;
@@ -859,7 +860,9 @@ CacheHelper.prototype.clearOther = function() {
 	    } else {
 	        // user clicked "cancel"
 	    }
-	});
+	    		
+	})
+	.set('labels', {ok:'OK', cancel:'Cancel'});   
 }
 CacheHelper.prototype.clearOtherApp = function() {
 	var me = this;
@@ -873,7 +876,8 @@ CacheHelper.prototype.clearOtherApp = function() {
 	    } else {
 	        // user clicked "cancel"
 	    }
-	});
+	   
+	}) .set('labels', {ok:'OK', cancel:'Cancel'});   		
 }
 
 CacheHelper.prototype.clearCoverageCache = function() {

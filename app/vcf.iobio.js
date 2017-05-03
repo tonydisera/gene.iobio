@@ -329,6 +329,7 @@ var effectCategories = [
             window.location = 'http://IOBIO.io/2015/09/03/install-run-tabix/';
         }
      });
+     alertify.set('labels', {ok:'OK', cancel:'Cancel'});      
   }
 
   function endsWith(str, suffix) {

@@ -2879,8 +2879,8 @@ function shouldAutocall(callback) {
 					    	if (callback) {
 						    	callback();
 					    	}
-					    })
-		        .set('labels', {ok:'OK', cancel:'No, just show the coverage'});   				
+					    }).set('labels', {ok:'OK', cancel:'No, just show the coverage'});   	
+		alertify.set('labels', {ok:'OK', cancel:'Cancel'});      			
 	} else {
 		if (callback) {
 			callback();
