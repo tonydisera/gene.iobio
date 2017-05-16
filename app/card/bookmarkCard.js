@@ -461,49 +461,65 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			    bookmark.append("a")
 			            .attr("class", "bookmark")
 			            .on('click', function(entry,i) {
+			         		var prevSelectedBookmark = d3.select('#bookmark-card #bookmark-panel a.current');
 			         		var currentBookmark = d3.select(this);
 
-			            	me.clickInProgress = true;
+			         		if (prevSelectedBookmark[0][0] && prevSelectedBookmark.datum() == currentBookmark.datum()) {
+			         			// If the user clicked on the bookmark that is already selected,
+			         			// de-select it
+			         			currentBookmark.classed("current", false);
+			         			me.hideTooltip();
+			         			unpinAll();
+			         			getProbandVariantCard().removeBookmarkFlags();
+
+			         		} else {
+			         			// The user has clicked on a bookmark entry.  Select it and show
+			         			// the matrix tooltip and highlight the variant in the
+			         			// proband variant chart.
+				            	me.clickInProgress = true;
 
 
-			            	me.hideTooltip();
-				         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-		         			currentBookmark.classed("current", true);
+				            	me.hideTooltip();
+					         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+			         			currentBookmark.classed("current", true);
 
-		         			me.selectedBookmarkKey = entry.key;
+			         			me.selectedBookmarkKey = entry.key;
 
-				         	var geneName = me.parseKey(entry.key).gene;
-							var bookmarkEntry = entry.value;
-							var key = entry.key;
+					         	var geneName = me.parseKey(entry.key).gene;
+								var bookmarkEntry = entry.value;
+								var key = entry.key;
 
-							// Remove any locked tooltip, hide coordinate frame
-							unpinAll();
+								// Remove any locked tooltip, hide coordinate frame
+								unpinAll();
 
-							var showBookmarkedVariant = function(bookmarkEntry, key) {
-								var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene, window.selectedTranscript);
-								currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
-								if (variant) {
-									me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
-									if (!variant.extraAnnot) {
-										me.promiseGetExtraAnnotsForVariant(variant, window.gene, window.selectedTranscript)
-										  .then(function(refreshedVariant) {
-										  	me._refreshVariantLabel(refreshedVariant, key);
-										  })									
-									} else {
-										me._refreshVariantLabel(variant, key);
-									}									
-								} 
-							}
+								var showBookmarkedVariant = function(bookmarkEntry, key) {
+									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene, window.selectedTranscript);
+									currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
+									if (variant) {
+										me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
+										if (!variant.extraAnnot) {
+											me.promiseGetExtraAnnotsForVariant(variant, window.gene, window.selectedTranscript)
+											  .then(function(refreshedVariant) {
+											  	me._refreshVariantLabel(refreshedVariant, key);
+											  })									
+										} else {
+											me._refreshVariantLabel(variant, key);
+										}									
+									} 
+								}
 
-							if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
-								genesCard.selectGene(geneName, function() {
-									
-								}, function() {
+								if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
+									genesCard.selectGene(geneName, function() {
+										
+									}, function() {
+										showBookmarkedVariant(bookmarkEntry, key);
+									});
+								} else {
 									showBookmarkedVariant(bookmarkEntry, key);
-								});
-							} else {
-								showBookmarkedVariant(bookmarkEntry, key);
-							}
+								}
+
+			         		}
+
 			            });
 						
 	        });
