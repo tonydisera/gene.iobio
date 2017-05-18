@@ -146,7 +146,8 @@ var effectCategories = [
       }
       var cmd = new iobio.cmd(
             IOBIO.tabix,
-            args
+            args,
+            {ssl: useSSL}
         );
 
         cmd.on('data', function(data) {
@@ -1105,7 +1106,10 @@ var effectCategories = [
 
         } else {
           var promise = me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
-          .then(  function() {
+          .then(  function(data) {
+            if (data == 'clinvarError') {
+              alertify.alert("A problem occurred accessing ClinVar variants in gene " + geneObject.gene_name + ".  Unable to get ClinVar annotations at this time.");
+            }
 
           }, function(error) {
             reject("Unable to get clinvar annotations for variants");
@@ -1268,6 +1272,7 @@ var effectCategories = [
                 requestClinvarSummary(url);
               } else {
                 console.log('clinvar request failed 3 times (' + data.esearchresult.ERROR + '). Aborting ...')
+                resolve("clinvarError");
               }
             } else {
               var webenv = data["esearchresult"]["webenv"];
@@ -1302,13 +1307,15 @@ var effectCategories = [
                 })
                 .fail(function() {
                   console.log('Error: clinvar http request failed to get summary data');
-                  reject('Error: clinvar http request failed to get summary data');
+                  resolve("clinvarError");
+                  //reject('Error: clinvar http request failed to get summary data');
                 })
             }
           })
           .fail(function() {
             console.log('Error: clinvar http request failed to get IDs');
-            reject('Error: clinvar http request failed to get IDs');
+            //reject('Error: clinvar http request failed to get IDs');
+            resolve("clinvarError");
 
           })
         }
