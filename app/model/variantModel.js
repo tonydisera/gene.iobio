@@ -124,6 +124,18 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 
 }
 
+VariantModel.prototype.getGeneCoverageForGene = function(geneObject, selectedTranscript) {
+	var geneCoverage = this._getCachedData("geneCoverage", geneObject.gene_name, selectedTranscript);
+	return geneCoverage;
+}
+
+VariantModel.prototype.setGeneCoverageForGene = function(geneCoverage, geneObject, transcript) {
+	geneObject = geneObject ? geneObject : window.gene;
+	transcript = transcript ? transcript : window.selectedTranscript;
+	this._cacheData(geneCoverage, "geneCoverage", geneObject.gene_name, transcript);
+}
+
+
 VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
 	var me = this;
 	var data = null;
@@ -212,7 +224,7 @@ VariantModel.prototype.getVariantCount = function(data) {
 	return loadedVariantCount;
 }
 
-VariantModel.summarizeDanger = function(theVcfData, options = {}) {
+VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) {
 	var dangerCounts = $().extend({}, options);
 	if (theVcfData == null ) {
 		console.log("unable to summarize danger due to null data");
@@ -376,6 +388,24 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 			return d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y';
 		}
 	}).length;
+
+	if (geneCoverage) {
+		dangerCounts.geneCoverageProblem = false;
+		geneCoverage.forEach(function(gc) {
+			if (!dangerCounts.geneCoverageProblem) {
+				if (   +gc.min    < filterCard.geneCoverageMin 
+					//|| +gc.median < filterCard.geneCoverageMedian
+					|| +gc.mean   < filterCard.geneCoverageMean ) {
+
+					dangerCounts.geneCoverageProblem = true;
+				}
+			}
+		})
+	} else {
+		console.log("no geneCoverage to summarize danger");
+		showStackTrace(new Error());
+		dangerCounts.geneCoverageProblem = false;
+	}
 		
 	return dangerCounts;
 }
@@ -410,6 +440,7 @@ VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 VariantModel.prototype.setLoadedVariants = function(theVcfData) {
 	this.vcfData = theVcfData;
 }
+
 
 VariantModel.prototype.setCalledVariants = function(theFbData, cache=false) {
 	this.fbData = theFbData;

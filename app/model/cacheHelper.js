@@ -7,6 +7,7 @@ function CacheHelper(loaderDisplay) {
 	this.batchSize = null;
 	this.geneBadgeLoaderDisplay = loaderDisplay;
 	this.showCallAllProgress = false;
+	this.KEY_DELIM = "^";
 }
 
 CacheHelper.prototype.isolateSession = function() {
@@ -474,60 +475,72 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 		}
 				
 
-		// Now that inheritance has been determined,
-		// summarize the variants for the proband to
-		// create the gene badges, representing the
-		// most pathogenic variants for this gene
-		var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-		var options = {};
-		if (analyzeCalledVariants) {
-			options.CALLED = true;
-		}
-
-  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options);
-		getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
-
-		genesCard._geneBadgeLoading(geneObject.gene_name, false);
-		if (trioVcfData.proband.features.length == 0) {
-			//genesCard.setGeneBadgeWarning(geneObject.gene_name);
-		} else {
-			genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-		}
-
-		
-		// Now clear out mother and father from cache.  
-		if (analyzeCalledVariants) {
-			// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
-			// and father in cache as we need these to show allele counts and genotypes for trio
-			// with determineInheritance() on selected gene is invoked)
-			getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-			getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-
-			// For alignments only analysis, the called variants were cached in as "vcfData" to process
-			// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
-			// for the proband.
-			//if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
-			//	getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
-			//}
-
-			getVariantCard("proband" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
+		//
+		// Now that inheritance has been determined,  analyze the alignments 
+		// in the gene coding regions to get coverage metrics
+		//
+		cacheGetGeneCoverage(geneObject, transcript, function(geneCoverage) {
 
 
-		} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
-			// Don't clear cache for currently selected
-			// gene though as this will result in no inheritance mode being detected.
-			getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-			getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-		}
+			//
+			// Summarize the variants for the proband to create the gene badges, 
+			// representing the most pathogenic variants for this gene
+			//
+			var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
+			var options = {};
+			if (analyzeCalledVariants) {
+				options.CALLED = true;
+			}
 
 
-		// take this gene off of the queue and see
-		// if next batch of genes should be analyzed
-		if (cacheNext) {
-			me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-		} else {
-			callback();
-		}
+	  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverage);
+			getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
+
+			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+			if (trioVcfData.proband.features.length == 0) {
+				//genesCard.setGeneBadgeWarning(geneObject.gene_name);
+			} else {
+				genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
+			}
+
+			
+			// Now clear out mother and father from cache.  
+			if (analyzeCalledVariants) {
+				// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
+				// and father in cache as we need these to show allele counts and genotypes for trio
+				// with determineInheritance() on selected gene is invoked)
+				getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+				getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+
+				// For alignments only analysis, the called variants were cached in as "vcfData" to process
+				// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
+				// for the proband.
+				//if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
+				//	getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
+				//}
+
+				getVariantCard("proband" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
+
+
+			} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
+				// Don't clear cache for currently selected
+				// gene though as this will result in no inheritance mode being detected.
+				getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+				getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+			}
+
+
+			// We are done analyzing this gene. Take this gene off of the queue and see
+			// if next batch of genes should be analyzed
+			if (cacheNext) {
+				me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+			} else {
+				callback();
+			}
+		});
+
+
+
 	}, 
 	function(error) {
 		console.log("problem determining inheritance for " + geneObject.gene_name + ". " + error);
@@ -679,8 +692,10 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 				if (theFbData) {
 					options.CALLED = true;
 				}
+
+				var geneCoverage = getVariantCard("proband").model.getGeneCoverageForGene(geneObject, {transcript_id: keyObject.transcript});
 		 
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options);
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverage);
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
 				
 				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
@@ -704,14 +719,17 @@ CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 }
 
 CacheHelper.prototype.getCacheKey = function(cacheObject) {
-	return      "gene.iobio"  
-		+ "---" + this.launchTimestamp
-	    + "---" + cacheObject.relationship 
-		+ "---" + cacheObject.sample
-		+ "---" + cacheObject.gene
-		+ "---" + cacheObject.transcript
-	    + "---" + cacheObject.annotationScheme
-		+ "---" + cacheObject.dataKind;
+	var key =  "gene.iobio"  
+		+ cacheHelper.KEY_DELIM + this.launchTimestamp
+	    + cacheHelper.KEY_DELIM + cacheObject.relationship 
+		+ cacheHelper.KEY_DELIM + cacheObject.sample
+		+ cacheHelper.KEY_DELIM + cacheObject.gene
+		+ cacheHelper.KEY_DELIM + cacheObject.transcript
+		+ cacheHelper.KEY_DELIM + cacheObject.dataKind;
+	if (cacheObject.dataKind != 'coverageData') {
+	    key += cacheHelper.KEY_DELIM + cacheObject.annotationScheme;
+	}
+	return key;
 }
 
 
@@ -755,8 +773,8 @@ CacheHelper._logCacheSize = function() {
 	{  
 		var key = localStorage.key(i); 
 		var keyPart = "";
-		if (key.indexOf("---")) {
-			keyPart = key.split("---")[0];
+		if (key.indexOf(cacheHelper.KEY_DELIM)) {
+			keyPart = key.split(cacheHelper.KEY_DELIM)[0];
 		} else {
 			keyPart = key;
 		}
@@ -975,18 +993,22 @@ CacheHelper._sizeMB = function(size) {
 
 
 CacheHelper._parseCacheKey = function(cacheKey) {
-	if (cacheKey.indexOf("---") > 0) {
-		var tokens = cacheKey.split("---");
-		if (tokens.length == 8 && tokens[0] == "gene.iobio") {
-			return { app: tokens[0],
-				     launchTimestamp: tokens[1],
-				     relationship: tokens[2], 
-				     sample: tokens[3], 
-				     gene: tokens[4], 
-				     transcript: tokens[5], 
-				     annotationScheme: tokens[6], 
-				     dataKind: tokens[7]
-				    };
+	if (cacheKey.indexOf(cacheHelper.KEY_DELIM) > 0) {
+		var tokens = cacheKey.split(cacheHelper.KEY_DELIM);
+		if (tokens.length >= 7 && tokens[0] == "gene.iobio") {
+			var keyObject = { 
+			     app: tokens[0],
+			     launchTimestamp: tokens[1],
+			     relationship: tokens[2], 
+			     sample: tokens[3], 
+			     gene: tokens[4], 
+			     transcript: tokens[5], 
+			     dataKind: tokens[6]
+			};
+			if (tokens.length == 8) {
+				keyObject.annotationScheme = tokens[7]; 
+			}
+			return keyObject;
 
 		} else {
 			return null;
@@ -1021,7 +1043,7 @@ CacheHelper.showError = function(key, cacheError) {
 	var cacheObject = CacheHelper._parseCacheKey(key);
 	if (cacheObject) {
 		var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
-		var errorKey = cacheObject.gene + "---" + errorType;
+		var errorKey = cacheObject.gene + cacheHelper.KEY_DELIM + errorType;
 
 		var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
 	    console.log(consoleMessage);

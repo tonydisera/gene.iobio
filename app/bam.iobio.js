@@ -739,6 +739,120 @@ var Bam = Class.extend({
 
    },
 
+   getGeneCoverage: function(geneObject, transcript, bams, callback) {
+    var me = this;
+
+    var refName     = geneObject.chr; 
+    var regionStart = geneObject.start;
+    var regionEnd   = geneObject.end; 
+
+        
+    this.transformRefName(refName, function(trRefName){
+
+      // Create a region text file with the gene name followed by
+      // a record for each coding region
+      var regionStr = "#" + geneObject.gene_name + "\n";
+      transcript.features.forEach(function(feature) {
+          if (feature.feature_type.toUpperCase() == 'CDS' 
+            //|| feature.feature_type.toUpperCase() == 'UTR'
+            ) {
+            regionStr += trRefName + ":" + feature.start + "-" + feature.end + "\n";
+          }
+      })
+      var regionFile = new Blob([regionStr])
+
+      var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+      var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
+
+      var getBamCmds = [];
+      var nextBamCmd = function(bams, idx, callback) {
+
+          if (idx == bams.length) {
+
+            callback(getBamCmds);
+
+          } else {
+
+            var bam = bams[idx];
+
+            if (bam.sourceType == "url") {
+              var args = ['view', '-b', bam.bamUri, regionArg];
+              if (bam.baiUri) {
+                args.push(bam.baiUri);
+              }
+              var bamCmd = new iobio.cmd(samtools, args,
+              {
+                'urlparams': {'encoding':'binary'},
+                ssl: useSSL
+              });
+              getBamCmds.push(bamCmd);
+
+              idx++;
+              nextBamCmd(bams, idx, callback);
+
+            } else {
+
+              bam.convert('sam', trRefName, regionStart, regionEnd, 
+                function(data,e) {
+                  var bamBlob = new Blob([bam.header.toStr + "\n" + data]);  
+                  var bamCmd = new iobio.cmd(samtools, ['view', '-b', bamBlob],
+                  {
+                    'urlparams': {'encoding':'binary'},
+                    ssl: useSSL
+                  });
+                  getBamCmds.push(bamCmd);
+
+                  idx++;
+                  nextBamCmd(bams, idx, callback);
+                }, 
+                {noHeader:true}
+              );
+
+            } 
+
+          }
+
+      }
+
+      var index = 0;
+      nextBamCmd(bams, index, function(getBamCmds) {
+        var geneCoverageArgs = [];
+        getBamCmds.forEach( function(bamCmd) {
+          geneCoverageArgs.push("-b");
+          geneCoverageArgs.push(bamCmd);
+        });
+        geneCoverageArgs.push("-r");
+        geneCoverageArgs.push(regionFile);
+
+        
+        //var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: useSSL});
+        var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: false});
+
+        
+        var geneCoverageData = "";
+        cmd.on('data', function(data) {
+            if (data == undefined) {
+              return;
+            }
+
+            geneCoverageData += data;
+        });
+
+        cmd.on('end', function() {
+          callback(geneCoverageData, trRefName, geneObject, transcript);
+        });
+
+        cmd.on('error', function(error) {
+          console.log(error);
+        });
+
+        cmd.run();
+      });
+
+
+    });
+
+   },
 
 
   reducePoints: function(data, factor, xvalue, yvalue) {

@@ -282,6 +282,12 @@
   padding-left: 1px
   display: none
 
+#gene-badge-coverage-problem
+  font-size: 15px
+  float: left
+  color: #c70001
+  display: none
+
 #gene-badge
   &.visited
     #gene-badge-loaded
@@ -295,7 +301,11 @@
 
   &.has-called-variants
     #gene-badge-has-called-variants
-      display: inline      
+      display: inline   
+
+  &.has-coverage-problem
+    #gene-badge-coverage-problem
+      display: inline-block 
 
   &:hover #gene-badge-remove
     visibility: visible 

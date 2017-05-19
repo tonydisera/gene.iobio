@@ -5,7 +5,7 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 //
 // URLS
 //
-var DEV_IOBIO                 = "nv-dev.iobio.io/";
+var DEV_IOBIO                 = "nv-dev-new.iobio.io/";
 var STAGE_IOBIO               = "nv-purple.iobio.io/";
 var PROD_IOBIO                = "nv-blue.iobio.io/";
 //var PROD_IOBIO                = "nv-prod.iobio.io/";  !! USE THIS ONCE NV-BLUE POINTS TO NV-PROD WITH OD_ SHELL SCRIPT CHANGE
@@ -42,6 +42,8 @@ IOBIO.samtools                = iobio_services +  "samtools/";
 IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
+//IOBIO.geneCoverage            = iobio_services + "genecoverage/";
+IOBIO.geneCoverage            = DEV_IOBIO + "genecoverage/";
 
 
 // URL for Phenolyzer

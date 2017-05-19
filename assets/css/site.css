@@ -3154,6 +3154,12 @@ text.ref-count {
   padding-left: 1px;
   display: none; }
 
+#gene-badge-coverage-problem {
+  font-size: 15px;
+  float: left;
+  color: #c70001;
+  display: none; }
+
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
 #gene-badge.visited #gene-badge-name {
@@ -3162,6 +3168,8 @@ text.ref-count {
   display: inline; }
 #gene-badge.has-called-variants #gene-badge-has-called-variants {
   display: inline; }
+#gene-badge.has-coverage-problem #gene-badge-coverage-problem {
+  display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }
 

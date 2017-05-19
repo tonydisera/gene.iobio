@@ -2862,6 +2862,85 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 }
 
+
+function cacheGetGeneCoverage(geneObject, transcript, callback) {
+
+	var cachedGeneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(geneObject, transcript);
+	if (cachedGeneCoverage) {
+		if (callback) {
+			callback(cachedGeneCoverage);
+		}
+	}
+
+
+	var bams = [];
+	var cards = getRelevantVariantCards();
+	cards.forEach(function(vc) {
+		if (vc.isBamLoaded()) {
+			bams.push(vc.model.bam);
+		}
+	});
+
+	// TEMP code until geneCoverage service supports multiple bams
+	bams = getProbandVariantCard().isBamLoaded() ? [getProbandVariantCard().model.bam] : [];
+
+	if (bams.length > 0) {
+		getProbandVariantCard().model.bam.getGeneCoverage(
+			geneObject, 
+			transcript,
+			bams,	
+			function(theData, trRefName, theGeneObject, theTranscript) {
+				if (theData && theData.length > 0) {
+					var fieldNames = [];
+					var geneCoverageObjects = [];
+					theData.split("\n").forEach(function(rec) {
+						if (rec.indexOf("#") == 0 && fieldNames.length == 0) {
+							rec.split("\t").forEach(function(field) {
+								if (field.indexOf("#") == 0) {
+									field = field.substring(1);
+								}
+								fieldNames.push(field);
+							})
+						} else {
+							var fields = rec.split("\t");
+							if (fields.length == fieldNames.length) {
+								var gc = {};
+								for (var i = 0; i < fieldNames.length; i++) {
+									gc[fieldNames[i]] = fields[i];
+									if (fieldNames[i] == 'region') {
+										if (fields[i] != "NA") {
+											var parts  = fields[i].split(":");
+											gc.chrom   = parts[0];
+											var region = parts[1].split("-");
+											gc.start   = region[0];
+											gc.end     = region[1];											
+										} 
+									}
+								}
+								console.log(theGeneObject.gene_name + " " + gc.id + " " + gc.region + "  min=" + gc.min + " gc.mean=" + gc.mean + " gc.median=" + gc.median);
+								geneCoverageObjects.push(gc);
+							}
+						}
+					})
+				}
+				getProbandVariantCard().model.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
+
+				if (callback) {
+					callback(geneCoverageObjects);
+				}
+			}
+		);
+
+	} else {
+		if (callback) {
+			callback();
+		}
+	}
+	
+
+}
+
+
 function shouldAutocall(callback) {
 	if (isAlignmentsOnly() && autocall == null) {
 		var message = "Would you like to variants to automatically be called from alignments when gene is selected?";

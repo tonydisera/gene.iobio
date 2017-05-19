@@ -14,6 +14,10 @@ function FilterCard() {
 	this.DENOVO                    = "denovo";
 	this.RECESSIVE                 = "recessive";
 	this.FUNCTIONAL_IMPACT         = "functional_impact";
+
+	this.geneCoverageMin           = 10;
+	this.geneCoverageMean          = 30;
+	this.geneCoverageMedian        = 30;
 }
 
 FilterCard.prototype.shouldWarnForNonPassVariants = function() {

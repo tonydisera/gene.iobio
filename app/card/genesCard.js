@@ -1354,18 +1354,20 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 			options.CALLED = true;
 		}
 
+		var geneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(window.gene, window.selectedTranscript);
+
 		if (theVcfData == null ) {
 			me.setGeneBadgeWarning(window.gene.gene_name, true);
 		} else if (theVcfData.features && theVcfData.features.length == 0) {
 			// There are 0 variants.  Summarize danger so that we know we have
 			// analyzed this gene
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options);
+			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverage);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 		} else if (theVcfData.features && theVcfData.features.length > 0) {
 			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 
 
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options);
+			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverage);
 			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
 		}
@@ -1458,6 +1460,7 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("called");
 	geneBadge.removeClass("has-called-variants");
 	geneBadge.removeClass("selected");
+	geneBadge.removeClass("has-coverage-problem");
 }
 
 GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
@@ -1504,6 +1507,11 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		geneBadge.addClass("has-called-variants");
 	} else if (dangerObject.CALLED) {
 		geneBadge.addClass("called");
+	}
+
+	geneBadge.removeClass("has-coverage-problem");
+	if (dangerObject.geneCoverageProblem) {
+		geneBadge.addClass("has-coverage-problem");
 	}
 
 
