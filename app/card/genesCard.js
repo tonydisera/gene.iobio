@@ -1518,6 +1518,22 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	// Indicate if gene has a bookmared variants
 	me._setBookmarkBadge(geneName);
 
+	geneBadge.removeClass("has-harmful-variant");
+
+	if (filterCard.hasFilters()) {
+		me._setGeneBadgeDetailedGlyphs(geneBadge, dangerObject);		
+	} else {
+		if (dangerObject.harmfulVariant) {
+			geneBadge.addClass("has-harmful-variant");
+		}		
+	}
+
+
+	readjustCards();
+}
+
+GenesCard.prototype._setGeneBadgeDetailedGlyphs = function(geneBadge, dangerObject) {
+
 	// Now set danger badges
 	if (dangerObject.CLINVAR) {
 		var dangerClinvar = dangerObject.CLINVAR;
@@ -1688,7 +1704,6 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		}
 	}
 
-	readjustCards();
 }
 
 GenesCard.prototype.selectGeneBadge = function(badgeElement) {

@@ -3067,14 +3067,14 @@ text.ref-count {
 
 #gene-badge-button {
   font-size: 13px;
-  padding: 5px 1px 1px 1px;
+  padding: 3px 1px 1px 1px;
   margin: 0px;
   color: #717171;
   line-height: 15px;
   border: thin solid #e8e6e6; }
   #gene-badge-button.user-visited {
     border: 2px solid #c5c4c4;
-    padding: 4px 1px 0px 1px; }
+    padding: 2px 1px 0px 1px; }
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-left: 3px;
@@ -3119,12 +3119,11 @@ text.ref-count {
   font-size: 14px;
   color: #5d809d;
   font-weight: bold;
-  padding-right: 1px;
   float: left;
   display: none; }
 
 #gene-badge-called {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   color: #80a029;
   float: left;
@@ -3156,6 +3155,17 @@ text.ref-count {
 
 #gene-badge-coverage-problem {
   font-size: 15px;
+  margin-top: 0px;
+  margin-left: 2px;
+  float: left;
+  color: #fb6263;
+  fill: #fb6263;
+  display: none; }
+
+#gene-badge-harmful-variant {
+  font-size: 15px;
+  margin-top: -1px;
+  margin-left: 2px;
   float: left;
   color: #c70001;
   display: none; }
@@ -3169,6 +3179,8 @@ text.ref-count {
 #gene-badge.has-called-variants #gene-badge-has-called-variants {
   display: inline; }
 #gene-badge.has-coverage-problem #gene-badge-coverage-problem {
+  display: inline-block; }
+#gene-badge.has-harmful-variant #gene-badge-harmful-variant {
   display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }

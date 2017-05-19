@@ -52,6 +52,10 @@ function geneD3() {
   var defaults = {};
 
   var brushAllowance = 0;
+
+  var featureClass = function(d,i) {
+    return d.feature_type.toLowerCase();
+  }
       
       
   function chart(selection, options) {
@@ -348,10 +352,12 @@ function geneD3() {
         return d['features'].filter( function(d) {
           return filterFeatures(d); 
         }, function(d) {
-          return d.feature_type + "-" + d.start + "-" + d.end;
+          return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
       }).enter().append('rect')
-          .attr('class', function(d) { return d.feature_type.toLowerCase();})          
+          .attr('class', function(d,i) {
+            return featureClass(d,i);
+          })
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { 
@@ -386,7 +392,17 @@ function geneD3() {
               d3.select(this.parentNode).classed("selected", false);
            });
           
-
+      // Update class
+      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
+        return d['features'].filter( function(d) {
+          return filterFeatures(d); 
+        }, function(d) {
+          return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
+        });
+      })
+      .attr('class', function(d,i) {
+            return featureClass(d,i);
+      });
     
 
       // update 
@@ -474,6 +490,13 @@ function geneD3() {
       d = d / 1000 + "K";
     return d;            
   }
+
+
+  chart.featureClass = function(_) {
+    if (!arguments.length) return featureClass;
+    featureClass = _;
+    return chart;
+  };
 
   chart.margin = function(_) {
     if (!arguments.length) return margin;

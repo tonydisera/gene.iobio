@@ -6,6 +6,7 @@
     stroke: rgb(93, 128, 157);
 }
 
+
 #transcript-menu-item.ibo-gene .transcript.selected .utr,
 #transcript-menu-item.ibo-gene .transcript.selected .exon,
 #transcript-menu-item.ibo-gene .transcript.selected .cds
@@ -44,8 +45,12 @@
   rgb(120,120,120); 
 }
 
-#zoom-region-chart.ibo-gene .cds.danger, #zoom-region-chart.ibo-gene .utr.danger { 
-  fill:  rgba(224, 11, 11, 0.6);
+#zoom-region-chart.ibo-gene .cds.danger, 
+#zoom-region-chart.ibo-gene .utr.danger,  
+#gene-viz.ibo-gene .cds.danger, 
+#gene-viz.ibo-gene .utr.danger  { 
+  fill: rgb(251, 98, 99);
+  stroke: rgb(224, 0, 1);    
 }
 #transcript-menu-item.ibo-gene .transcript.selected .name { 
   font-style: italic;

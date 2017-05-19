@@ -242,9 +242,12 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 	var afClazz = null;
 	var afField = null;
 	var lowestAf = 999;
+	dangerCounts.harmfulVariant = false;
 
 
 	theVcfData.features.forEach( function(variant) {
+
+		var variantDanger = {impact: false, af: false, clinvar: false, sift: false, polyphen: false, inheritance: false};
 
 	    for (key in variant.highestImpactSnpeff) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
@@ -257,6 +260,9 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
 	    		consequenceClasses[key] = consequenceClasses[key] || {};
 	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
+	    		if (key == 'HIGH' || key == 'MODERATE') {
+	    			variantDanger.impact = true;
+	    		}
 	    	}
 	    }
 
@@ -266,6 +272,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 					dangerCounts.SIFT = {};
 					dangerCounts.SIFT[clazz] = {};
 					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
+					variantDanger.sift = true;
 				}
 	    }
 
@@ -275,6 +282,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 					dangerCounts.POLYPHEN = {};
 					dangerCounts.POLYPHEN[clazz] = {};
 					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+					variantDanger.polyphen = true;
 	    	}
 	    }
 
@@ -282,6 +290,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 	    	for (key in variant.clinVarClinicalSignificance) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
 						clinvarClasses[key] = matrixCard.clinvarMap[key];
+						variantDanger.clinvar = true;
 		    	}
 	    	}
 	    }
@@ -289,6 +298,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 	    if (variant.inheritance && variant.inheritance != 'none') {
 	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 	    	inheritanceClasses[clazz] = variant.inheritance;
+	    	variantDanger.inheritance = true;
 	    }
 
 
@@ -300,6 +310,10 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 						lowestAf = rangeEntry.value;
 						afClazz = rangeEntry.clazz;
 						afField = af;
+						afBadge = rangeEntry.badge;
+					}
+					if (rangeEntry.badge) {
+						variantDanger.af = true;
 					}
 				}
 			});
@@ -328,6 +342,11 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 		}
 		if (af && afMap) {
 			evaluateAf(af, afMap);
+		}
+
+		// Turn on flag for harmful variant if one is found
+		if (variantDanger.af && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
+			dangerCounts.harmfulVariant = true;
 		}
 	});
 
@@ -406,6 +425,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 		showStackTrace(new Error());
 		dangerCounts.geneCoverageProblem = false;
 	}
+
+
 		
 	return dangerCounts;
 }

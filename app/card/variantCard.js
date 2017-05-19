@@ -200,6 +200,9 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
 				    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 12)
 		    		.showLabel(false)
+		    		.featureClass( function(d,i) {
+		    			return d.feature_type.toLowerCase() + (d.danger[me.getRelationship()] ? " danger" : "");
+		    		})
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 		    				    			
 		    			

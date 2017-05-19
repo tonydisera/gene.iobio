@@ -368,7 +368,18 @@ function init() {
 	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
 	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 12)
 	    .showLabel(false)
-	    .on("d3brush", function(brush) {
+		.featureClass( function(d,i) {
+			var danger = false;
+			if (d.danger) {
+				for (var key in d.danger) {
+					if (d.danger[key]) {
+						danger = true;
+					}
+				}
+			}
+		    return d.feature_type.toLowerCase() + (danger ? " danger" : "");
+		})	    
+		.on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
 	    	if (!brush.empty()) {
 	    		$('#zoom-hint').text('To zoom out, click outside bounding box.');
@@ -377,7 +388,7 @@ function init() {
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
 					getCodingRegions(selectedTranscript);
-
+			    	markCodingRegions(window.gene, window.selectedTranscript);
 				}
 			} else {
 	    		$('#zoom-hint').text('To zoom into region, drag over gene model.');
@@ -425,11 +436,13 @@ function init() {
 	    .showBrush(false)
 	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
 	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)
-	    .showLabel(true)
+	    .showLabel(true)		   	    
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
+	    	markCodingRegions(window.gene, window.selectedTranscript);
 	    	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 	    	getCodingRegions(window.selectedTranscript);
+
 
 	    	showTranscripts();
 
@@ -1488,6 +1501,7 @@ function onCloseTranscriptMenuEvent() {
 	if (transcriptMenuChart.selectedTranscript() != null ) {
 		if (selectedTranscript == null || selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
 			selectedTranscript = transcriptMenuChart.selectedTranscript();
+		 	markCodingRegions(window.gene, window.selectedTranscript);
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 			d3.selectAll("#gene-viz .transcript").remove();
 		 	getCodingRegions(window.selectedTranscript);
@@ -1660,6 +1674,34 @@ function getCodingRegions(transcript) {
 		return codingRegions;
 	}
 	return [];
+}
+
+function markCodingRegions(geneObject, transcript) {
+	transcript.features.forEach(function(feature) {
+		if (!feature.hasOwnProperty("danger")) {
+			feature.danger = {proband: false, mother: false, father: false};
+		}
+		var geneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(geneObject, transcript);
+		if (geneCoverage) {
+			var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
+				return feature.start == gc.start && feature.end == gc.end;
+			});
+			if (matchingFeatureCoverage.length > 0) {
+				var gc = matchingFeatureCoverage[0];
+				if (   +gc.min    < filterCard.geneCoverageMin 
+					|| +gc.median < filterCard.geneCoverageMedian
+					|| +gc.mean   < filterCard.geneCoverageMean) {
+					feature.danger.proband = true;
+				} else {
+					feature.danger.proband = false;
+				}
+			} else {
+				feature.danger.proband = false;
+			}
+		} else {
+			feature.danger.proband = false;
+		}
+	})
 }
 
 function hasDataSources() {
@@ -2458,6 +2500,7 @@ function selectTranscript(transcriptId) {
 		}
 	})
 	if (found) {
+    	markCodingRegions(window.gene, window.selectedTranscript);
 		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
     	getCodingRegions(window.selectedTranscript);
 
@@ -2497,10 +2540,10 @@ function showTranscripts(regionStart, regionEnd) {
 		// For now, let's just grab the first one in the list.
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
-			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-			getCodingRegions(window.selectedTranscript);
-
 		}
+    	markCodingRegions(window.gene, window.selectedTranscript);
+		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+		getCodingRegions(window.selectedTranscript);
 	}
 
 
