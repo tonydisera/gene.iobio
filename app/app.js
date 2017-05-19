@@ -1688,6 +1688,7 @@ function markCodingRegions(geneObject, transcript) {
 			});
 			if (matchingFeatureCoverage.length > 0) {
 				var gc = matchingFeatureCoverage[0];
+				feature.geneCoverage = gc;
 				if (   +gc.min    < filterCard.geneCoverageMin 
 					|| +gc.median < filterCard.geneCoverageMedian
 					|| +gc.mean   < filterCard.geneCoverageMean) {

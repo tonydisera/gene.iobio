@@ -211,7 +211,17 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    			tooltip.transition()        
 			                   .duration(200)      
 			                   .style("opacity", .9);   
-			            tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))       
+			            var html = feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
+			            if (feature.geneCoverage) {
+			            	html += "<br>gene coverage:" 
+			            	     +  "<br>&nbsp;&nbsp;min:           " + feature.geneCoverage.min
+			            	     +  "<br>&nbsp;&nbsp;max:           " + feature.geneCoverage.max
+			            	     +  "<br>&nbsp;&nbsp;median:        " + feature.geneCoverage.median
+			            	     +  "<br>&nbsp;&nbsp;mean:          " + feature.geneCoverage.mean
+			            	     +  "<br>&nbsp;&nbsp;std deviation: " + feature.geneCoverage.sd;
+
+			            }
+			            tooltip.html(html)       
 							   .style("left", coord.x + "px") 
 				               .style("text-align", 'left')    
 				               .style("top", (coord.y - 4) + "px");    
