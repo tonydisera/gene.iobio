@@ -369,15 +369,7 @@ function init() {
 	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 12)
 	    .showLabel(false)
 		.featureClass( function(d,i) {
-			var danger = false;
-			if (d.danger) {
-				for (var key in d.danger) {
-					if (d.danger[key]) {
-						danger = true;
-					}
-				}
-			}
-		    return d.feature_type.toLowerCase() + (danger ? " danger" : "");
+		    return d.feature_type.toLowerCase();
 		})	    
 		.on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
@@ -2354,48 +2346,73 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 		var variantPromises = [];
 		var coveragePromises = [];
 		var allMaxDepth = 0;
-	 	getRelevantVariantCards().forEach(function(vc) {
-	 		
-	 		vc.clearBamChart();
 
-	 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
-				vc.hide();
-			} else {
-				if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
-					// We have variants, either to load from a vcf or called from alignments and
-				 	// optionally alignments.  First annotate the show the variants in the
-				 	// variant cards and calcuate the coverage (if alignments provided).
-					var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
-	                  .then( function() {
+		promiseGetGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverage) {
 
-	                  	if (vc.getRelationship() == 'proband') {
-	                  		showNavVariantLinks();
-	                  	}
-
-						var coveragePromise = vc.promiseLoadBamDepth()
-						                 .then( function(coverageData) {
-												if (coverageData) {
-													var max = d3.max(coverageData, function(d,i) { return d[1]});
-													if (max > allMaxDepth) {
-														allMaxDepth = max;
-													}						
-												}
-																								
-						                 });
-						coveragePromises.push(coveragePromise); 
+	    	markCodingRegions(window.gene, window.selectedTranscript);
+			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
 
-					  });				 
-					  variantPromises.push(variantPromise);		 
-			
-				} else if (isAlignmentsOnly() && autocall) {
-					// Only alignment files are loaded and user, when prompted, responded
-					// that variants should be autocalled when gene is selected.
-					// First perform joint calling, then load the bam data (for coverage)
-					// for each sample.
-					var callPromise = promiseJointCallVariants(true).then(function() {
+		 	getRelevantVariantCards().forEach(function(vc) {
+		 		
+		 		vc.clearBamChart();
 
-						showNavVariantLinks();
+
+		 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
+					vc.hide();
+				} else {
+					if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
+						// We have variants, either to load from a vcf or called from alignments and
+					 	// optionally alignments.  First annotate the show the variants in the
+					 	// variant cards and calcuate the coverage (if alignments provided).
+						var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
+		                  .then( function() {
+
+		                  	if (vc.getRelationship() == 'proband') {
+		                  		showNavVariantLinks();
+		                  	}
+
+							var coveragePromise = vc.promiseLoadBamDepth()
+							                 .then( function(coverageData) {
+													if (coverageData) {
+														var max = d3.max(coverageData, function(d,i) { return d[1]});
+														if (max > allMaxDepth) {
+															allMaxDepth = max;
+														}						
+													}
+																									
+							                 });
+							coveragePromises.push(coveragePromise); 
+
+
+						  });				 
+						  variantPromises.push(variantPromise);		 
+				
+					} else if (isAlignmentsOnly() && autocall) {
+						// Only alignment files are loaded and user, when prompted, responded
+						// that variants should be autocalled when gene is selected.
+						// First perform joint calling, then load the bam data (for coverage)
+						// for each sample.
+						var callPromise = promiseJointCallVariants(true).then(function() {
+
+							showNavVariantLinks();
+							var coveragePromise = vc.promiseLoadBamDepth()
+								                 .then( function(coverageData) {
+														if (coverageData) {
+															var max = d3.max(coverageData, function(d,i) { return d[1]});
+															if (max > allMaxDepth) {
+																allMaxDepth = max;
+															}						
+														}
+																										
+								                 });
+							coveragePromises.push(coveragePromise); 
+
+						}) 
+						variantPromises.push(callPromise);							
+
+					} else {
+						// Only alignment files are loaded.  Load the bam coverage data.
 						var coveragePromise = vc.promiseLoadBamDepth()
 							                 .then( function(coverageData) {
 													if (coverageData) {
@@ -2407,61 +2424,49 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 																									
 							                 });
 						coveragePromises.push(coveragePromise); 
-
-					}) 
-					variantPromises.push(callPromise);							
-
-				} else {
-					// Only alignment files are loaded.  Load the bam coverage data.
-					var coveragePromise = vc.promiseLoadBamDepth()
-						                 .then( function(coverageData) {
-												if (coverageData) {
-													var max = d3.max(coverageData, function(d,i) { return d[1]});
-													if (max > allMaxDepth) {
-														allMaxDepth = max;
-													}						
-												}
-																								
-						                 });
-					coveragePromises.push(coveragePromise); 
+					}
 				}
-			}
-		});			
+			});			
 
 
 
-	 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
-	 	// (including vep, clinvar, and coverage), compare the proband to mother and father
-	 	// to determine inheritance and obtain the trio's allele counts.
-	 	// Once inheritance is determined, show the feature matrix for the proband
-	 	// and refresh the variants for all samples.
-		Promise.all(variantPromises).then(function() {
+		 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
+		 	// (including vep, clinvar, and coverage), compare the proband to mother and father
+		 	// to determine inheritance and obtain the trio's allele counts.
+		 	// Once inheritance is determined, show the feature matrix for the proband
+		 	// and refresh the variants for all samples.
+			Promise.all(variantPromises).then(function() {
 
-			// When all bam depths have been loaded, the variants are fully annotated
-			// so determine inheritance (if trio).  Also scale the coverage chart y-axis
-			// based on the max depth of all sample's coverage data
-			Promise.all(coveragePromises).then(function() {
-				promiseDetermineInheritance(promiseFullTrio).then(function() {					
-					getRelevantVariantCards().forEach(function(vc) {
-						// The inheritance has been determined for the trio, so now
-						// show the variants and the feature matrix
-						vc.showFinalizedVariants();
-						if (vc.getRelationship() == 'proband' && callback) {
-							callback();
-						} 
-					})
-				});
-
-
-				// Show the coverage chart (if alignments provided)
-				getRelevantVariantCards().forEach(function(variantCard) {
-					variantCard.showBamDepth(allMaxDepth, function() {
+				// When all bam depths have been loaded, the variants are fully annotated
+				// so determine inheritance (if trio).  Also scale the coverage chart y-axis
+				// based on the max depth of all sample's coverage data
+				Promise.all(coveragePromises).then(function() {
+					promiseDetermineInheritance(promiseFullTrio).then(function() {					
+						getRelevantVariantCards().forEach(function(vc) {
+							// The inheritance has been determined for the trio, so now
+							// show the variants and the feature matrix
+							vc.showFinalizedVariants();
+							if (vc.getRelationship() == 'proband' && callback) {
+								callback();
+							} 
+						})
 					});
+
+					// Show the coverage chart (if alignments provided)
+					getRelevantVariantCards().forEach(function(variantCard) {
+						variantCard.showBamDepth(allMaxDepth, function() {
+						});
+					});
+
+
 				});
-			});
 
 
-		});					                 	
+			});		
+
+      	});
+
+			                 	
 
 	}
 
@@ -2906,6 +2911,14 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 }
 
+function promiseGetGeneCoverage(geneObject, transcript) {
+	return new Promise(function(resolve,reject) {
+		cacheGetGeneCoverage(geneObject, transcript, function(geneCoverage) {
+			resolve(geneCoverage);
+		})
+	})
+}
+
 
 function cacheGetGeneCoverage(geneObject, transcript, callback) {
 
@@ -2961,7 +2974,6 @@ function cacheGetGeneCoverage(geneObject, transcript, callback) {
 										} 
 									}
 								}
-								console.log(theGeneObject.gene_name + " " + gc.id + " " + gc.region + "  min=" + gc.min + " gc.mean=" + gc.mean + " gc.median=" + gc.median);
 								geneCoverageObjects.push(gc);
 							}
 						}

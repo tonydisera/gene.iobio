@@ -782,9 +782,9 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 			resolve(coverage);
 		} else {
-			// If we have varaitns, get coverage for every variant
+			// If we have variant, get coverage for every variant
 			me.showBamProgress("Calculating coverage");
-			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
 				me.endBamProgress();
 				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 				resolve(coverageData);
