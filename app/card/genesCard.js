@@ -46,8 +46,9 @@ GenesCard.prototype.init = function() {
 	    searchField: 'value',
 	    create: true
 	});
-	$('#select-gene-sort')[0].selectize.addOption({value:"relevance"});
-	$('#select-gene-sort')[0].selectize.setValue("relevance");
+	$('#select-gene-sort')[0].selectize.addOption({value:"harmful variants"});
+	$('#select-gene-sort')[0].selectize.setValue("harmful variants");
+	$('#select-gene-sort')[0].selectize.addOption({value: "low coverage"});
 	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
 	$('#select-gene-sort')[0].selectize.addOption({value:"(original order)"});
 	$('#select-gene-sort')[0].selectize.on('item_add', function(selectedValue) {
@@ -216,9 +217,10 @@ GenesCard.prototype.sortGenes = function(sortBy) {
 	}
 	if (sortBy.indexOf("gene name") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort();
-	}
-	else if (sortBy.indexOf("relevance") >= 0) {
+	} else if (sortBy.indexOf("harmful variants") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummary);
+	} else if (sortBy.indexOf("low coverage") >= 0) {
+		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummaryByLowCoverage);
 	}
 	this._initPaging(this.sortedGeneNames, true);
 }
@@ -341,6 +343,38 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	return 0;
 }
 
+
+GenesCard.prototype.compareDangerSummaryByLowCoverage = function(geneName1, geneName2) {
+	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
+	var danger2 = getProbandVariantCard().getDangerSummaryForGene(geneName2);
+
+	if (danger1 == null && danger2 == null) {
+		return 0;
+	} else if (danger2 == null) {
+		return -1;
+	} else if (danger1 == null) {
+		return 1;
+	}
+
+	geneCoverageProblem1 = danger1.geneCoverageProblem ? danger1.geneCoverageProblem : false;
+	geneCoverageProblem2 = danger2.geneCoverageProblem ? danger2.geneCoverageProblem : false;
+
+
+	if (geneCoverageProblem1 == geneCoverageProblem2) {
+		if (geneName1 < geneName2) {
+			return -1;
+		} else if (geneName2 < geneName1) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else if (geneCoverageProblem1) {
+		return -1;
+	} else if (geneCoverageProblem2) {
+		return 1;
+	}
+
+}
 
 
 GenesCard.prototype.initCopyPasteGenes = function() {
