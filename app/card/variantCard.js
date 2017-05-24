@@ -203,29 +203,83 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    		.featureClass( function(d,i) {
 		    			return d.feature_type.toLowerCase() + (d.danger[me.getRelationship()] ? " danger" : "");
 		    		})
+		    		.featureGlyphHeight( +10 )
+		    		.featureGlyph( function(d,i,x) {
+		    			var transcript = d3.select(this.parentNode);
+		    			//var x = feature.attr("x");
+		    			if (d.danger[me.getRelationship()]) {
+		    				transcript.append('g')
+	    							  .attr('class',      'feature_glyph')
+	    							  .attr('transform',  'translate(' + x + ',-10)')
+	    							  .data([d])
+	    							  .append('use')
+	    							  .attr('style',      'fill: rgb(7, 218, 222)')
+	    							  .attr('height',     '12')
+	    							  .attr('width',      '12')
+	    							  .attr('href', '#feedback-symbol')
+	    							  .attr('xlink','http://www.w3.org/1999/xlink')
+	    							  .data([d]);
+		    			}
+		    		})
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
-		    				    			
+
 		    			
+			            
+		    			var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
+			            html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
+			            tooltip.html(html);
+
 		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
+    
+						tooltip.style("left", coord.x + "px") 
+				               .style("text-align", 'left')    
+				               .style("top", (coord.y-60) + "px");    
+
+			            tooltip.transition()        
+			                   .duration(200)      
+			                   .style("opacity", .9);   
+
+		    		})
+					.on("d3featureglyphtooltip", function(featureObject, feature, tooltip) {
+
+						var coverageRow = function(fieldName, coverageVal, covFields) {
+							var row = '<div>';
+							row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
+							row += '<span style="width:30px;display:inline-block">' + coverageVal + '</span>';
+							row += '<span class="' + (covFields[fieldName] ? 'danger' : '') + '">' + (covFields[fieldName] ? covFields[fieldName]: '') + '</span>';
+							row += "</div>";
+							return row;
+						}
+
+
+		    			var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
+			            html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
+			            if (feature.geneCoverage) {
+			            	var covFields = filterCard.whichLowCoverage(feature.geneCoverage);
+			            	html += "<div style='margin-top:4px'>" + "Coverage:" 
+			            	     +  coverageRow('min', feature.geneCoverage.min, covFields) 
+			            	     +  coverageRow('median', feature.geneCoverage.median, covFields) 
+			            	     +  coverageRow('mean', feature.geneCoverage.mean, covFields) 
+			            	     +  coverageRow('max', feature.geneCoverage.max, covFields) 
+			            	     +  coverageRow('sd', feature.geneCoverage.mean, covFields) 
+
+			            }
+			            tooltip.html(html);
+
+			            var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
+
+
+			            tooltip.style("left", coord.x + "px") 
+				               .style("text-align", 'left')    
+				               .style("top", (coord.y-60) + "px");        
+							   
 
 		    			tooltip.transition()        
 			                   .duration(200)      
 			                   .style("opacity", .9);   
-			            var html = feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
-			            if (feature.geneCoverage) {
-			            	html += "<br>gene coverage:" 
-			            	     +  "<br>&nbsp;&nbsp;min:           " + feature.geneCoverage.min
-			            	     +  "<br>&nbsp;&nbsp;max:           " + feature.geneCoverage.max
-			            	     +  "<br>&nbsp;&nbsp;median:        " + feature.geneCoverage.median
-			            	     +  "<br>&nbsp;&nbsp;mean:          " + feature.geneCoverage.mean
-			            	     +  "<br>&nbsp;&nbsp;std deviation: " + feature.geneCoverage.sd;
 
-			            }
-			            tooltip.html(html)       
-							   .style("left", coord.x + "px") 
-				               .style("text-align", 'left')    
-				               .style("top", (coord.y - 4) + "px");    
 		    		});
+;
 
 
 		// Create the coverage chart

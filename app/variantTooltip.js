@@ -263,6 +263,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		type = 'tooltip';
 	}
 
+	var exonDisplay = "";
+	if (variant.hasOwnProperty("vepExon")) {
+		exonDisplay += "    Exon ";
+		exonDisplay += Object.keys(variant.vepExon).join(",");
+	}
+
 	var calledVariantRow = "";
 	if (variant.hasOwnProperty("fbCalled") && variant.fbCalled == "Y") {
 		var calledGlyph = '<i id="gene-badge-called" class="material-icons glyph" style="display: inline-block;font-size: 15px;vertical-align: top;float:initial">check_circle</i>';
@@ -275,7 +281,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	for (var key in variant.effect) {
 		if (effectDisplay.length > 0) {
 		  	effectDisplay += ", ";
-		}formatContent
+		}
 		// Strip out "_" from effect
 		var tokens = key.split("_");
 		if (isLevelEdu) {
@@ -620,7 +626,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			  qualityWarningRow
 			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord + exonDisplay, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -666,7 +672,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow( coord, '', '', '')
+			+ me._tooltipHeaderRow( coord, exonDisplay, '', '')
 			+ inheritanceModeRow
 			+ leftDiv
 			+ rightDiv
@@ -679,7 +685,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			qualityWarningRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, '', '')
+			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, exonDisplay, '')
 			+ inheritanceModeRow
 
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  

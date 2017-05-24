@@ -10,7 +10,7 @@ function geneD3() {
   // defaults
 
   // dispatch events
-  var dispatch = d3.dispatch("d3brush", "d3selected", "d3featuretooltip");
+  var dispatch = d3.dispatch("d3brush", "d3selected", "d3featuretooltip", "d3featureglyphtooltip");
 
   var selectedTranscript = null;
 
@@ -35,16 +35,16 @@ function geneD3() {
     .orient("bottom")
     .tickFormat(tickFormatter);
   // variables 
-  var trackHeight = 20,
+  var geneD3_trackHeight = 20,
       borderRadius = 1,
       minFtWidth = 0.5;
-      utrHeight = undefined,
-      cdsHeight = undefined,
-      arrowHeight = undefined,
+  var geneD3_utrHeight = undefined,
+      geneD3_cdsHeight = undefined,
+      geneD3_arrowHeight = undefined,
       geneD3_regionStart = undefined,
       geneD3_regionEnd = undefined,      
-      geneD3_geneD3_widthPercent = null,
-      geneD3_geneD3_heightPercent = null,     
+      geneD3_widthPercent = undefined,
+      geneD3_heightPercent = undefined,     
       showBrushLine = false;
       
 
@@ -56,15 +56,20 @@ function geneD3() {
   var featureClass = function(d,i) {
     return d.feature_type.toLowerCase();
   }
+
+  var featureGlyph = function(d,i) {
+  };
+
+  var featureGlyphHeight = +0;
       
       
   function chart(selection, options) {
     // merge options and defaults
     options = $.extend(defaults,options);
     // set variables if not user set
-    cdsHeight = cdsHeight || trackHeight;
-    utrHeight = utrHeight || cdsHeight / 2;
-    arrowHeight = arrowHeight || trackHeight / 2;
+    geneD3_cdsHeight = geneD3_cdsHeight || geneD3_trackHeight;
+    geneD3_utrHeight = geneD3_utrHeight || geneD3_cdsHeight / 2;
+    geneD3_arrowHeight = geneD3_arrowHeight || geneD3_trackHeight / 2;
 
 
     selection.each(function(data) {
@@ -72,8 +77,8 @@ function geneD3() {
        brushAllowance = geneD3_showBrush ? 20 : 0;
 
        // calculate height
-       var padding = data.length > 1 ? trackHeight/2 : 0;
-       geneD3_height = data.length * (trackHeight + padding);
+       var padding = data.length > 1 ? geneD3_trackHeight/2 : 0;
+       geneD3_height = data.length * (geneD3_trackHeight + padding);
 
        // determine inner height (w/o margins)
        var innerHeight = geneD3_height - margin.top - margin.bottom;
@@ -116,7 +121,7 @@ function geneD3() {
            .filter(function() { 
               return this.parentNode === container.node();
            })
-          .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
+          .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom+featureGlyphHeight))
           .attr("preserveAspectRatio", "none");
       } 
 
@@ -130,7 +135,7 @@ function geneD3() {
 
       var g = svg.select('g');
       // Update the inner dimensions.
-      g.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      g.attr("transform", "translate(" + margin.left + "," + parseInt(margin.top+featureGlyphHeight) + ")");
 
       g.selectAll("line.brush-line").remove();
 
@@ -245,7 +250,7 @@ function geneD3() {
           .attr('x', margin.left * -1)
           .attr('y', 0)
           .attr('width', margin.left + geneD3_width)
-          .attr('height', trackHeight)
+          .attr('height', geneD3_trackHeight)
           .on("mouseover", function(d) {
             d3.selectAll('.transcript.selected').classed("selected", false);
             d3.select(this.parentNode).classed("selected", true);
@@ -269,8 +274,8 @@ function geneD3() {
           .attr('class', 'reference')
           .attr('x1', function(d) { return d3.round(x(d[0]))})
           .attr('x2', function(d) { return d3.round(x(d[1]))})                    
-          .attr('y1', trackHeight/2)
-          .attr('y2', trackHeight/2)
+          .attr('y1', geneD3_trackHeight/2)
+          .attr('y2', geneD3_trackHeight/2)
           .on("mouseover", function(d) {
             d3.selectAll('.transcript.selected').classed("selected", false);
             d3.select(this.parentNode).classed("selected", true);
@@ -366,7 +371,7 @@ function geneD3() {
           .attr('width', function(d) { 
             return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start))) 
           })
-          .attr('y', trackHeight /2)
+          .attr('y', geneD3_trackHeight /2)
           .attr('height', 0)
           .attr("pointer-events", "all")
           .style("cursor", "pointer")
@@ -391,6 +396,37 @@ function geneD3() {
               // de-select the transcript   
               d3.select(this.parentNode).classed("selected", false);
            });
+
+
+      // Add any feature glyphs
+      transcript.selectAll(".feature_glyph").remove();
+      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
+        return d['features'].filter( function(d) {
+          return filterFeatures(d); 
+        }, function(d) {
+          return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
+        });
+      })
+      .each(function(d,i) {
+        var me = this;
+        var featureX = d3.round(x(d.start));
+        featureGlyph.call(me, d, i, featureX);
+      });
+
+      transcript.selectAll(".feature_glyph")
+                .on("mouseover", function(d) {  
+                  // show the tooltip
+                  var tooltip = container.select('.tooltip');              
+                  var featureObject = d3.select(this);
+                  dispatch.d3featureglyphtooltip(featureObject, d, tooltip);
+                })                  
+                .on("mouseout", function(d) {   
+                  // hide the tooltip    
+                  container.select('.tooltip').transition()        
+                     .duration(500)      
+                     .style("opacity", 0);   
+                });
+
           
       // Update class
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
@@ -404,6 +440,7 @@ function geneD3() {
             return featureClass(d,i);
       });
     
+
 
       // update 
       transcript.transition()
@@ -422,7 +459,7 @@ function geneD3() {
       transcript.selectAll('.name').transition()
         .duration(700)
         .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0; })
-        .attr('y', function(d) { return margin.left > 5 ? trackHeight - (trackHeight/2) + 2 : -10; })   
+        .attr('y', function(d) { return margin.left > 5 ? geneD3_trackHeight - (geneD3_trackHeight/2) + 2 : -10; })   
         .text(function(d) { return d[1]; })                
         .style('fill-opacity', 1);
 
@@ -432,11 +469,11 @@ function geneD3() {
           .attr('x', function(d) { return d3.round(x(d.start))})
           .attr('width', function(d) { return Math.max(minFtWidth, d3.round(x(d.end) - x(d.start)))})
           .attr('y', function(d) { 
-            if(d.feature_type.toLowerCase() =='utr') return (trackHeight - utrHeight)/2; 
-            else return (trackHeight - cdsHeight)/2; })
+            if(d.feature_type.toLowerCase() =='utr') return (geneD3_trackHeight - geneD3_utrHeight)/2; 
+            else return (geneD3_trackHeight - geneD3_cdsHeight)/2; })
           .attr('height', function(d) { 
-            if(d.feature_type.toLowerCase() =='utr') return utrHeight; 
-            else return cdsHeight; });          
+            if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight; 
+            else return geneD3_cdsHeight; });          
 
       // Update the x-axis.
       svg.select(".x.axis").transition()
@@ -476,9 +513,9 @@ function geneD3() {
   function centerArrow(d) {
     var arrowHead = parseInt(d.strand + '5');
     var pathStr = "M ";            
-    pathStr += x(d.center) + ' ' + (trackHeight - arrowHeight)/2;
-    pathStr += ' L ' + parseInt(x(d.center)+arrowHead) + ' ' + trackHeight/2;
-    pathStr += ' L ' + x(d.center) + ' ' + parseInt(trackHeight + arrowHeight)/2;
+    pathStr += x(d.center) + ' ' + (geneD3_trackHeight - geneD3_arrowHeight)/2;
+    pathStr += ' L ' + parseInt(x(d.center)+arrowHead) + ' ' + geneD3_trackHeight/2;
+    pathStr += ' L ' + x(d.center) + ' ' + parseInt(geneD3_trackHeight + geneD3_arrowHeight)/2;
     return pathStr;
   }
 
@@ -495,6 +532,18 @@ function geneD3() {
   chart.featureClass = function(_) {
     if (!arguments.length) return featureClass;
     featureClass = _;
+    return chart;
+  };
+
+  chart.featureGlyphHeight = function(_) {
+    if (!arguments.length) return featureGlyphHeight;
+    featureGlyphHeight = _;
+    return chart;
+  };
+
+  chart.featureGlyph = function(_) {
+    if (!arguments.length) return featureGlyph;
+    featureGlyph = _;
     return chart;
   };
 
@@ -552,26 +601,26 @@ function geneD3() {
     return chart; 
   };  
   chart.trackHeight = function(_) {
-    if (!arguments.length) return trackHeight;
-    trackHeight = _;
+    if (!arguments.length) return geneD3_trackHeight;
+    geneD3_trackHeight = _;
     return chart;
   };
 
   chart.utrHeight = function(_) {
-    if (!arguments.length) return utrHeight;
-    utrHeight = _;
+    if (!arguments.length) return geneD3_utrHeight;
+    geneD3_utrHeight = _;
     return chart;
   };
 
   chart.cdsHeight = function(_) {
-    if (!arguments.length) return cdsHeight;
-    cdsHeight = _;
+    if (!arguments.length) return geneD3_cdsHeight;
+    geneD3_cdsHeight = _;
     return chart;
   };
 
   chart.arrowHeight = function(_) {
-    if (!arguments.length) return arrowHeight;
-    arrowHeight = _;
+    if (!arguments.length) return geneD3_arrowHeight;
+    geneD3_arrowHeight = _;
     return chart;
   };
 

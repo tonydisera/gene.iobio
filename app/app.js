@@ -424,7 +424,8 @@ function init() {
     transcriptMenuChart = geneD3()
 	    .width(600)
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
-	    .showXAxis(false)
+		.widthPercent("100%")
+	    .heightPercent("100%")	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
 	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)
@@ -1681,18 +1682,55 @@ function markCodingRegions(geneObject, transcript) {
 			if (matchingFeatureCoverage.length > 0) {
 				var gc = matchingFeatureCoverage[0];
 				feature.geneCoverage = gc;
-				if (   +gc.min    < filterCard.geneCoverageMin 
-					|| +gc.median < filterCard.geneCoverageMedian
-					|| +gc.mean   < filterCard.geneCoverageMean) {
-					feature.danger.proband = true;
-				} else {
-					feature.danger.proband = false;
-				}
+				feature.danger.proband = filterCard.isLowCoverage(gc);
 			} else {
 				feature.danger.proband = false;
 			}
 		} else {
 			feature.danger.proband = false;
+		}
+
+	})
+
+	var exonCount = 0;
+	var exonNumber = 1;
+	var sortedExons = transcript
+		.features.filter(function(feature) {
+			return feature.feature_type.toUpperCase() == 'EXON';
+		})
+		.sort(function(feature1, feature2) {
+
+			var compare = 0;
+			if (feature1.start < feature2.start) {
+				compare = -1;
+			} else if (feature1.start > feature2.start) {
+				compare = 1;
+			} else {
+				compare = 0;
+			}
+
+			var strandMultiplier = transcript.strand == "+" ? 1 : -1;
+
+			return compare * strandMultiplier;
+
+		})
+	sortedExons.forEach(function(exon) {
+		exonCount++
+	})
+
+	sortedExons.forEach(function(exon) {
+		exon.exon_number = exonNumber + "/" + exonCount;
+		exonNumber++;
+	})
+
+	// Now set the exon number on each UTR and CDS within the corresponding exon
+	transcript.features.forEach(function(feature) {
+		if (feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR') {
+			sortedExons.forEach(function(exon) {
+				if (feature.start >= exon.start && feature.end <= exon.end) {
+					feature.exon_number = exon.exon_number;
+				}
+			})
 		}
 	})
 }
@@ -2552,19 +2590,6 @@ function showTranscripts(regionStart, regionEnd) {
 		getCodingRegions(window.selectedTranscript);
 	}
 
-
-	// Show the gene transcripts.
-    // Compress the tracks if we have more than 10 transcripts
-    if (!isLevelEdu && !isLevelBasic) {
-	    if (transcripts.length > 10) {
-	    	transcriptChart.trackHeight(14);
-	    	transcriptChart.cdsHeight(10);
-	    } else {
-	    	transcriptChart.trackHeight(20);
-	    	transcriptChart.cdsHeight(16);
-	    }
-
-    }
 
     if (transcriptViewMode == "single") {
     	transcripts = [selectedTranscript];

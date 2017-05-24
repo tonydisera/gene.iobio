@@ -1,5 +1,5 @@
 function variantD3() {
-   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3click", "d3mouseover", "d3mouseout");
+   var dispatch = d3.dispatch("d3brush", "d3rendered", "d3click", "d3mouseover", "d3mouseout", "d3glyphmouseover", "d3glyphmouseout");
 
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110},

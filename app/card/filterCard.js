@@ -1031,6 +1031,19 @@ FilterCard.prototype.displayFilterSummary = function() {
 	}
 }
 
+FilterCard.prototype.isLowCoverage = function(gc) {
+    return  +gc.min    < this.geneCoverageMin 
+		|| +gc.median < this.geneCoverageMedian
+		|| +gc.mean   < this.geneCoverageMean; 	
+}
+
+FilterCard.prototype.whichLowCoverage = function(gc) {
+	var fields = {};
+	fields.min    = +gc.min    < this.geneCoverageMin    ? '< ' + this.geneCoverageMin : null;
+	fields.median = +gc.median < this.geneCoverageMedian ? '< ' + this.geneCoverageMedian : null;
+	fields.mean   = +gc.mean   < this.geneCoverageMean   ? '< ' + this.geneCoverageMean : null;	
+	return fields;
+}
 
 
 FilterCard.prototype.capitalizeFirstLetter = function(string) {

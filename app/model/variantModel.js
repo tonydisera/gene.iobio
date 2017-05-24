@@ -412,10 +412,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 		dangerCounts.geneCoverageProblem = false;
 		geneCoverage.forEach(function(gc) {
 			if (!dangerCounts.geneCoverageProblem) {
-				if (   +gc.min    < filterCard.geneCoverageMin 
-					//|| +gc.median < filterCard.geneCoverageMedian
-					|| +gc.mean   < filterCard.geneCoverageMean ) {
-
+				if (filterCard.isLowCoverage(gc)) {
 					dangerCounts.geneCoverageProblem = true;
 				}
 			}

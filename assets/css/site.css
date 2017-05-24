@@ -2351,6 +2351,9 @@ inputinput:-moz-placeholder {
   color: #717171;
   font-size: 14px !important; }
 
+#zoom-region-chart .tooltip .danger {
+  color: #07dade; }
+
 .tooltip-title {
   font-size: 12px;
   word-break: break-word; }
@@ -2940,6 +2943,20 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 12px; }
 
+#zoom-region-chart.ibo-gene .cds.danger {
+  fill: #07dade;
+  stroke: #03a1a4; }
+#zoom-region-chart.ibo-gene .utr.danger {
+  fill: #07dade;
+  stroke: #03a1a4; }
+
+#gene-viz.ibo-gene .cds.danger {
+  fill: #07dade;
+  stroke: #03a1a4; }
+#gene-viz.ibo-gene .utr.danger {
+  fill: #07dade;
+  stroke: #03a1a4; }
+
 #genes-panel {
   margin-bottom: 5px;
   margin-top: 5px;
@@ -3158,8 +3175,8 @@ text.ref-count {
   margin-top: 0px;
   margin-left: 2px;
   float: left;
-  color: #fb6263;
-  fill: #fb6263;
+  color: #07dade;
+  fill: #07dade;
   display: none; }
 
 #gene-badge-harmful-variant {
@@ -3214,6 +3231,9 @@ text.ref-count {
     font-size: 13px;
     padding-left: 15px;
     padding-right: 15px; }
+    #call-variants-dropdown a.disabled {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+      box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
 #manage-genes {
   float: left; }
