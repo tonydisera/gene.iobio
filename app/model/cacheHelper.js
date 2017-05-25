@@ -479,7 +479,9 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 		// Now that inheritance has been determined,  analyze the alignments 
 		// in the gene coding regions to get coverage metrics
 		//
-		cacheGetGeneCoverage(geneObject, transcript, function(geneCoverage) {
+		cacheGetGeneCoverage(geneObject, transcript, function() {
+
+			var geneCoverage = getVariantCard("proband").model.getGeneCoverageForGene(geneObject, transcript);
 
 
 			//

@@ -124,6 +124,72 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 
 }
 
+
+
+
+VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+		var cachedGeneCoverage = me.getGeneCoverageForGene(geneObject, transcript);
+		if (cachedGeneCoverage) {
+			resolve(cachedGeneCoverage)
+		} else {
+			me.bam.getGeneCoverage(geneObject, 
+				transcript,
+				[me.bam],	
+				function(theData, trRefName, theGeneObject, theTranscript) {
+					var geneCoverageObjects = me._parseGeneCoverage(theData);
+					if (geneCoverageObjects.length > 0) {
+						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
+						resolve(geneCoverageObjects)
+					} else {
+						reject("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+					}
+				}	
+			);
+		}
+
+	});
+}
+
+VariantModel.prototype._parseGeneCoverage = function(theData) {
+	var geneCoverageObjects = [];
+	if (theData && theData.length > 0) {
+		var fieldNames = [];
+		theData.split("\n").forEach(function(rec) {
+			if (rec.indexOf("#") == 0 && fieldNames.length == 0) {
+				rec.split("\t").forEach(function(field) {
+					if (field.indexOf("#") == 0) {
+						field = field.substring(1);
+					}
+					fieldNames.push(field);
+				})
+			} else {
+				var fields = rec.split("\t");
+				if (fields.length == fieldNames.length) {
+					var gc = {};
+					for (var i = 0; i < fieldNames.length; i++) {
+						gc[fieldNames[i]] = fields[i];
+						if (fieldNames[i] == 'region') {
+							if (fields[i] != "NA") {
+								var parts  = fields[i].split(":");
+								gc.chrom   = parts[0];
+								var region = parts[1].split("-");
+								gc.start   = region[0];
+								gc.end     = region[1];											
+							} 
+						}
+					}
+					geneCoverageObjects.push(gc);
+				}
+			}
+		})		
+	}
+
+	return geneCoverageObjects;
+}
+
 VariantModel.prototype.getGeneCoverageForGene = function(geneObject, selectedTranscript) {
 	var geneCoverage = this._getCachedData("geneCoverage", geneObject.gene_name, selectedTranscript);
 	return geneCoverage;

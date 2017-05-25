@@ -245,7 +245,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						var coverageRow = function(fieldName, coverageVal, covFields) {
 							var row = '<div>';
 							row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
-							row += '<span style="width:30px;display:inline-block">' + coverageVal + '</span>';
+							row += '<span style="width:40px;display:inline-block">' + round(coverageVal, 2) + '</span>';
 							row += '<span class="' + (covFields[fieldName] ? 'danger' : '') + '">' + (covFields[fieldName] ? covFields[fieldName]: '') + '</span>';
 							row += "</div>";
 							return row;
@@ -255,13 +255,13 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    			var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
 			            html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
 			            if (feature.geneCoverage) {
-			            	var covFields = filterCard.whichLowCoverage(feature.geneCoverage);
+			            	var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
 			            	html += "<div style='margin-top:4px'>" + "Coverage:" 
-			            	     +  coverageRow('min', feature.geneCoverage.min, covFields) 
-			            	     +  coverageRow('median', feature.geneCoverage.median, covFields) 
-			            	     +  coverageRow('mean', feature.geneCoverage.mean, covFields) 
-			            	     +  coverageRow('max', feature.geneCoverage.max, covFields) 
-			            	     +  coverageRow('sd', feature.geneCoverage.mean, covFields) 
+			            	     +  coverageRow('min',    feature.geneCoverage[me.getRelationship()].min, covFields) 
+			            	     +  coverageRow('median', feature.geneCoverage[me.getRelationship()].median, covFields) 
+			            	     +  coverageRow('mean',   feature.geneCoverage[me.getRelationship()].mean, covFields) 
+			            	     +  coverageRow('max',    feature.geneCoverage[me.getRelationship()].max, covFields) 
+			            	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields) 
 
 			            }
 			            tooltip.html(html);

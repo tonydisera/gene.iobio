@@ -1674,21 +1674,27 @@ function markCodingRegions(geneObject, transcript) {
 		if (!feature.hasOwnProperty("danger")) {
 			feature.danger = {proband: false, mother: false, father: false};
 		}
-		var geneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(geneObject, transcript);
-		if (geneCoverage) {
-			var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
-				return feature.start == gc.start && feature.end == gc.end;
-			});
-			if (matchingFeatureCoverage.length > 0) {
-				var gc = matchingFeatureCoverage[0];
-				feature.geneCoverage = gc;
-				feature.danger.proband = filterCard.isLowCoverage(gc);
-			} else {
-				feature.danger.proband = false;
-			}
-		} else {
-			feature.danger.proband = false;
+		if (!feature.hasOwnProperty("geneCoverage")) {
+			feature.geneCoverage = {proband: false, mother: false, father: false};
 		}
+		getRelevantVariantCards().forEach(function(vc) {
+			var geneCoverage = vc.model.getGeneCoverageForGene(geneObject, transcript);
+			if (geneCoverage) {
+				var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
+					return feature.start == gc.start && feature.end == gc.end;
+				});
+				if (matchingFeatureCoverage.length > 0) {
+					var gc = matchingFeatureCoverage[0];
+					feature.geneCoverage[vc.getRelationship()] = gc;
+					feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
+				} else {
+					feature.danger[vc.getRelationship()]  = false;
+				}
+			} else {
+				feature.danger[vc.getRelationship()] = false;
+			}
+
+		})
 
 	})
 
@@ -2385,7 +2391,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 		var coveragePromises = [];
 		var allMaxDepth = 0;
 
-		promiseGetGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverage) {
+		promiseGetGeneCoverage(window.gene, window.selectedTranscript).then(function() {
 
 	    	markCodingRegions(window.gene, window.selectedTranscript);
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
@@ -2938,8 +2944,8 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 function promiseGetGeneCoverage(geneObject, transcript) {
 	return new Promise(function(resolve,reject) {
-		cacheGetGeneCoverage(geneObject, transcript, function(geneCoverage) {
-			resolve(geneCoverage);
+		cacheGetGeneCoverage(geneObject, transcript, function() {
+			resolve();
 		})
 	})
 }
@@ -2947,77 +2953,20 @@ function promiseGetGeneCoverage(geneObject, transcript) {
 
 function cacheGetGeneCoverage(geneObject, transcript, callback) {
 
-	var cachedGeneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(geneObject, transcript);
-	if (cachedGeneCoverage) {
-		if (callback) {
-			callback(cachedGeneCoverage);
-		}
-	}
+	var promises = [];
 
-
-	var bams = [];
-	var cards = getRelevantVariantCards();
-	cards.forEach(function(vc) {
+	getRelevantVariantCards().forEach(function(vc) {
 		if (vc.isBamLoaded()) {
-			bams.push(vc.model.bam);
-		}
+			var promise = vc.model.promiseGetGeneCoverage(geneObject, transcript);
+			promises.push(promise);
+		} 
 	});
 
-	// TEMP code until geneCoverage service supports multiple bams
-	bams = getProbandVariantCard().isBamLoaded() ? [getProbandVariantCard().model.bam] : [];
-
-	if (bams.length > 0) {
-		getProbandVariantCard().model.bam.getGeneCoverage(
-			geneObject, 
-			transcript,
-			bams,	
-			function(theData, trRefName, theGeneObject, theTranscript) {
-				if (theData && theData.length > 0) {
-					var fieldNames = [];
-					var geneCoverageObjects = [];
-					theData.split("\n").forEach(function(rec) {
-						if (rec.indexOf("#") == 0 && fieldNames.length == 0) {
-							rec.split("\t").forEach(function(field) {
-								if (field.indexOf("#") == 0) {
-									field = field.substring(1);
-								}
-								fieldNames.push(field);
-							})
-						} else {
-							var fields = rec.split("\t");
-							if (fields.length == fieldNames.length) {
-								var gc = {};
-								for (var i = 0; i < fieldNames.length; i++) {
-									gc[fieldNames[i]] = fields[i];
-									if (fieldNames[i] == 'region') {
-										if (fields[i] != "NA") {
-											var parts  = fields[i].split(":");
-											gc.chrom   = parts[0];
-											var region = parts[1].split("-");
-											gc.start   = region[0];
-											gc.end     = region[1];											
-										} 
-									}
-								}
-								geneCoverageObjects.push(gc);
-							}
-						}
-					})
-				}
-				getProbandVariantCard().model.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
-
-				if (callback) {
-					callback(geneCoverageObjects);
-				}
-			}
-		);
-
-	} else {
+	Promise.all(promises).then(function() {
 		if (callback) {
 			callback();
 		}
-	}
-	
+	})
 
 }
 
