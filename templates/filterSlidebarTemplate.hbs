@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div style="text-align:center">
+  <div style="text-align:center;margin-bottom: 5px">
       <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
         Clear all
       </button>
@@ -69,6 +69,51 @@
           <div id="loaded-variant-count" class="hide variant-count"></div>
           <div id="called-variant-count" class="hide variant-count"></div>
        </span>
+     </div>
+
+     <div style="padding-top:8px">
+
+
+       <button id="button-low-coverage" class="standard-filter-btn btn btn-default btn-raised" 
+        onclick="filterCard.applyStandardFilter(this, 'low_coverage')">
+        <i class="done material-icons glyph">done</i>
+        <span>Low exon coverage</span>
+       </button>
+       <span id="functional_impact_count" class="standard-filter-count">
+          <i id="unanalyzed-warning" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed." class="material-icons hide">warning</i>          
+          <div id="loaded-variant-count" class="hide variant-count"></div>
+          <div id="called-variant-count" class="hide variant-count"></div>
+       </span>
+
+
+      <div id="coverage-thresholds" >
+        <div class="coverage-threshold">
+          <div class="coverage-threshold-label">
+            Min
+          </div>
+          <div>
+            <input type="number" id="gene-coverage-min" value="" style="width:40px">x
+          </div>
+        </div>
+        <div class="coverage-threshold">
+          <div class="coverage-threshold-label">
+            Median
+          </div>
+          <div>
+            <input type="number" id="gene-coverage-median" value="" style="width:40px">x
+          </div>
+        </div>
+        <div class="coverage-threshold">
+          <div  class="coverage-threshold-label">
+            Mean
+          </div>
+          <div>
+            <input type="number" id="gene-coverage-mean" value="" style="width:40px">x
+          </div>
+        </div>
+
+
+      </div>       
      </div>
   </div>
 

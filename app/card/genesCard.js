@@ -48,7 +48,7 @@ GenesCard.prototype.init = function() {
 	});
 	$('#select-gene-sort')[0].selectize.addOption({value:"harmful variants"});
 	$('#select-gene-sort')[0].selectize.setValue("harmful variants");
-	$('#select-gene-sort')[0].selectize.addOption({value: "low coverage"});
+	$('#select-gene-sort')[0].selectize.addOption({value: "low exon coverage"});
 	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
 	$('#select-gene-sort')[0].selectize.addOption({value:"(original order)"});
 	$('#select-gene-sort')[0].selectize.on('item_add', function(selectedValue) {
@@ -210,16 +210,18 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 
 }
 
-GenesCard.prototype.sortGenes = function(sortBy) {
+GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 	this.sortedGeneNames = null;
 	if (sortBy == null) {
 		sortBy = $('#select-gene-sort')[0].selectize.getValue();
+	} else if (setDropdown) {
+		$('#select-gene-sort')[0].selectize.setValue(sortBy);
 	}
 	if (sortBy.indexOf("gene name") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort();
 	} else if (sortBy.indexOf("harmful variants") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummary);
-	} else if (sortBy.indexOf("low coverage") >= 0) {
+	} else if (sortBy.indexOf("low exon coverage") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummaryByLowCoverage);
 	}
 	this._initPaging(this.sortedGeneNames, true);

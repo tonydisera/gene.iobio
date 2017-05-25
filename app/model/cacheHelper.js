@@ -17,34 +17,34 @@ CacheHelper.prototype.isolateSession = function() {
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
 	var me = this;
 
-
 	me.getAnalyzeAllCounts(function(counts) {
-
-
-		if (counts.geneCount == 0) {
-			$('#analyzed-progress-bar').addClass("hide");
-			$('#total-genes-label').addClass("hide");
-			return;
-		} 
-		$('#analyzed-progress-bar').removeClass("hide");
-
-
-		$('#total-genes-label').removeClass("hide");
-		$('#total-genes-label').text(counts.geneCount + " genes");
-
-
-		me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
-
-
-		if (me.showCallAllProgress) {
-			me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
-		} else {
-			$('#called-progress-bar').addClass("hide");			
-		}
-
-
-
+		me.showGeneCounts(counts, clearStandardFilterCounts)
 	});	
+}
+
+CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCounts) {
+	var me = this;
+	if (counts.geneCount == 0) {
+		$('#analyzed-progress-bar').addClass("hide");
+		$('#total-genes-label').addClass("hide");
+		return;
+	} 
+	$('#analyzed-progress-bar').removeClass("hide");
+
+
+	$('#total-genes-label').removeClass("hide");
+	$('#total-genes-label').text(counts.geneCount + " genes");
+
+
+	me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
+
+
+	if (me.showCallAllProgress) {
+		me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
+	} else {
+		$('#called-progress-bar').addClass("hide");			
+	}
+
 }
 
 CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field, clearStandardFilterCounts) {
@@ -704,10 +704,71 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  	} 
 		} 
 	}  
-	genesCard.sortGenes();
+	genesCard.sortGenes('harmful variants', true);
 
 	$('#gene-badges-loader').addClass("hide");
 	return geneCount;
+}
+
+
+CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {  
+	var me = this;
+	
+	var counts = {
+		geneCount: 0,
+		all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
+		loaded: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
+		called: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0}
+	}	
+
+	$('#gene-badges-loader').removeClass("hide");
+
+	var theGeneNames = {};
+	genesCard.getGeneNames().forEach(function(geneName) {
+		theGeneNames[geneName] = true;
+	});
+
+	for (var i=0; i<=localStorage.length-1; i++)  
+	{  
+		key = localStorage.key(i);  
+		keyObject = CacheHelper._parseCacheKey(key);
+		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+
+		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
+		  		counts.geneCount++;
+
+				var geneObject   = window.geneObjects[keyObject.gene];
+				var geneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(geneObject, {transcript_id: keyObject.transcript});
+				var dangerObject = getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name);
+		 		
+			 	if (geneCoverage && dangerObject) {
+			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverage);
+
+			  		counts.all.analyzed++;
+			  		counts.loaded.analyzed++;
+			  		counts.called.analyzed++;
+			 		if (dangerObject.geneCoverageProblem) {
+			  			counts.all.pass++;
+			  			counts.loaded.pass++;
+			  			counts.called.pass++;
+			  		}
+					
+			 		getProbandVariantCard().model.cacheDangerSummary(dangerObject, keyObject.gene);
+					genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
+		 		} else {
+			  		counts.all.unanalyzed++;
+			  		counts.loaded.unanalyzed++;
+			  		counts.called.unanalyzed++;
+
+		 		}
+
+		  	} 
+		} 
+	}  
+	genesCard.sortGenes('low exon coverage', true);
+
+	$('#gene-badges-loader').addClass("hide");
+	return counts;
 }
 
 CacheHelper.prototype.clearCache = function(launchTimestampToClear) {

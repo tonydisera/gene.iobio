@@ -3420,8 +3420,7 @@ function filterVariants() {
 		}
 
 	});		
-	var geneCounts = filterCard.filterGenes();
-	return geneCounts;
+	filterCard.filterGenes();
 
 }
 

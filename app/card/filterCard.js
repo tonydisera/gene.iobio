@@ -8,12 +8,14 @@ function FilterCard() {
 	this.pathogenicityScheme = "clinvar";
 	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter";
 	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Allele Freq ExAC, Allele Freq 1000G, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
-	
+	this.applyLowCoverageFilter = false;
+
 	// standard filters
 	this.KNOWN_CAUSATIVE           = "known_causative";
 	this.DENOVO                    = "denovo";
 	this.RECESSIVE                 = "recessive";
 	this.FUNCTIONAL_IMPACT         = "functional_impact";
+	this.LOW_COVERAGE              = "low_coverage";
 
 	this.geneCoverageMin           = 10;
 	this.geneCoverageMean          = 30;
@@ -77,8 +79,19 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
-	filterCard.setStandardFilter(button, filterName);
-	filterVariants();
+	if (filterName == me.LOW_COVERAGE) {
+		me.clearFilters();
+		$(button).addClass('current');
+
+		me.applyLowCoverageFilter = true;
+		me.displayFilterSummary();
+
+		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
+		cacheHelper.showGeneCounts(geneCounts);	
+	} else {
+		filterCard.setStandardFilter(button, filterName);
+		filterVariants();		
+	}
 }
 
 
@@ -269,6 +282,20 @@ FilterCard.prototype.init = function() {
 
 	// Default annotation scheme to VEP
 	this.setAnnotationScheme("VEP");
+
+	// Se coverage thresholds and listen when thresholds change
+	$('#gene-coverage-min').val(this.geneCoverageMin);
+	$('#gene-coverage-median').val(this.geneCoverageMedian);
+	$('#gene-coverage-mean').val(this.geneCoverageMean);
+	$('#gene-coverage-min').on('change', function() {
+		me.geneCoverageMin = $('#gene-coverage-min').val();
+	})
+	$('#gene-coverage-median').on('change', function() {
+		me.geneCoverageMedian = $('#gene-coverage-median').val();
+	})
+	$('#gene-coverage-mean').on('change', function() {
+		me.geneCoverageMean = $('#gene-coverage-mean').val();
+	})
 
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
@@ -550,6 +577,8 @@ FilterCard.prototype.clearFilters = function() {
 	
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = {};
+
+	this.applyLowCoverageFilter = false;
 
 	$('#filter-progress').addClass("hide");
 	$('#filter-progress .text').text("");
@@ -929,15 +958,10 @@ FilterCard.prototype.filterGenes = function() {
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
 	var geneCounts = cacheHelper.refreshGeneBadges();
-	if (me.hasFilters()) {
-		$('#filter-progress .text').text(geneCounts.pass + " passed filter");
-		$('#filter-progress .bar').css("width", percentage(geneCounts.pass / geneCounts.total));
-		$('#filter-progress').removeClass("hide");		
-	}
 	cacheHelper.showAnalyzeAllProgress();
-
 	return geneCounts;
 }
+
 
 
 FilterCard.prototype._getFilterString = function() {
@@ -956,6 +980,13 @@ FilterCard.prototype._getFilterString = function() {
 	var filterBox = function(filterString) {
 		return "<span class=\"filter-flag label label-primary\">" + filterString + "</span>";
 	}
+
+	// When low coverage filter applied, we only filter on this, not any other criteria.
+	if (this.applyLowCoverageFilter) {
+		filterString += filterBox("Exon coverage min < " + this.geneCoverageMin + " OR median < " + this.geneCoverageMedian + " OR mean < " + this.geneCoverageMean);
+		return filterString;
+	}
+		
 
 	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("loaded variants only");
@@ -1020,8 +1051,8 @@ FilterCard.prototype._getFilterString = function() {
 	return filterString;
 }
 
-FilterCard.prototype.displayFilterSummary = function() {
-	var filterString = this._getFilterString();
+FilterCard.prototype.displayFilterSummary = function(filterString) {
+	filterString = filterString ? filterString : this._getFilterString();
 	if (filterString.length > 0) {
 		$("#filter-summary-track").removeClass("hide")
 		$("#filter-summary-track .card-label").nextAll().remove();
@@ -1032,7 +1063,7 @@ FilterCard.prototype.displayFilterSummary = function() {
 }
 
 FilterCard.prototype.isLowCoverage = function(gc) {
-    return  +gc.min    < this.geneCoverageMin 
+    return  +gc.min   < this.geneCoverageMin 
 		|| +gc.median < this.geneCoverageMedian
 		|| +gc.mean   < this.geneCoverageMean; 	
 }

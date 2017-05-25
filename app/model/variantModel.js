@@ -291,6 +291,7 @@ VariantModel.prototype.getVariantCount = function(data) {
 }
 
 VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) {
+
 	var dangerCounts = $().extend({}, options);
 	if (theVcfData == null ) {
 		console.log("unable to summarize danger due to null data");
@@ -474,26 +475,28 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 		}
 	}).length;
 
+	VariantModel.summarizeDangerForGeneCoverage(dangerCounts, geneCoverage);
+		
+	return dangerCounts;
+}
+
+VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverage) {
 	if (geneCoverage) {
-		dangerCounts.geneCoverageProblem = false;
+		dangerObject.geneCoverageProblem = false;
 		geneCoverage.forEach(function(gc) {
-			if (!dangerCounts.geneCoverageProblem) {
+			if (!dangerObject.geneCoverageProblem) {
 				if (filterCard.isLowCoverage(gc)) {
-					dangerCounts.geneCoverageProblem = true;
+					dangerObject.geneCoverageProblem = true;
 				}
 			}
 		})
 	} else {
 		console.log("no geneCoverage to summarize danger");
 		showStackTrace(new Error());
-		dangerCounts.geneCoverageProblem = false;
+		dangerObject.geneCoverageProblem = false;
 	}
-
-
-		
-	return dangerCounts;
+	return dangerObject;
 }
-
 VariantModel.summarizeError =  function(theError) {
 	var summaryObject = {};
 

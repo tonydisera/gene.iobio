@@ -1834,6 +1834,20 @@ inputinput:-moz-placeholder {
     margin-top: 3px;
     display: inline-block; }
 
+#coverage-thresholds {
+  text-align: center;
+  margin-right: 50px;
+  color: #717171; }
+  #coverage-thresholds .coverage-threshold {
+    margin-left: 8px;
+    display: inline-block;
+    margin-top: 2px; }
+    #coverage-thresholds .coverage-threshold .coverage-threshold-label {
+      font-size: 12px;
+      color: #5d809d; }
+    #coverage-thresholds .coverage-threshold input {
+      margin-right: 2px; }
+
 #recfilter-flag {
   background-color: #5881AD !important; }
 
@@ -3338,7 +3352,7 @@ text.ref-count {
 
 #select-gene-container {
   display: inline-block;
-  width: 110px;
+  width: 150px;
   vertical-align: middle;
   margin-top: 8px; }
   #select-gene-container .selectize-input {
