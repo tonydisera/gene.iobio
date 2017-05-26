@@ -702,7 +702,7 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 		  	} 
 		} 
 	}  
-	genesCard.sortGenes('harmful variants', true);
+	genesCard.sortGenes(genesCard.HARMFUL_VARIANTS_OPTION, true);
 
 	$('#gene-badges-loader').addClass("hide");
 	return geneCount;
@@ -765,7 +765,7 @@ CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {
 		  	} 
 		} 
 	}  
-	genesCard.sortGenes('low exon coverage', true);
+	genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
 
 	$('#gene-badges-loader').addClass("hide");
 	return counts;

@@ -9,6 +9,25 @@
 	this.geneNameLoading = null;
 	this.sortedGeneNames = null;
 	this.legend = null;
+
+	this.LOW_COVERAGE_OPTION    = "low exon coverage";
+	this.HARMFUL_VARIANTS_OPTION = "harmful variants";
+
+	this.geneSortOptions = [
+	    	{value: this.HARMFUL_VARIANTS_OPTION,  disabled: false},
+	    	{value: this.LOW_COVERAGE_OPTION,      disabled: false}, 
+	    	{value: "gene name",                   disabled: false},
+	    	{value: "(original order)",            disabled: false}
+	];
+	this.geneSortIcons = {};
+	this.geneSortIcons[this.HARMFUL_VARIANTS_OPTION] = '<svg id="gene-badge-harmful-variant" width="15" height="14" class="glyph dropdown-item">'
+							 + '<g transform="translate(0,1)">'
+							 + '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="13" height="13" style="pointer-events: none; fill: rgb(173, 73, 74);">'
+							 + '</use>'
+							 + '</g>'
+							 + '</svg>';
+	this.geneSortIcons[this.LOW_COVERAGE_OPTION] = '<i id="gene-badge-coverage-problem" class="dropdown-item material-icons glyph" >announcement</i>';
+
 }
 
 GenesCard.prototype.split = function( val )  {
@@ -40,54 +59,46 @@ GenesCard.prototype.init = function() {
     });
 
 
-	var harmfulVariantIcon = '<svg id="gene-badge-harmful-variant" width="15" height="14" class="glyph dropdown-item">'
-						 + '<g transform="translate(0,1)">'
-						 + '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="13" height="13" style="pointer-events: none; fill: rgb(173, 73, 74);">'
-						 + '</use>'
-						 + '</g>'
-						 + '</svg>';
-    var lowCoverageIcon = '<i id="gene-badge-coverage-problem" class="dropdown-item material-icons glyph" >announcement</i>';
 
 	$('#select-gene-sort').selectize({
 	    valueField: 'value',
 	    labelField: 'value',
 	    searchField: 'value',
+	    disabledField: 'disabled',
 	    create: true,
-	    options: [
-	    	{value: "harmful variants", icon: harmfulVariantIcon },
-	    	{value: "low exon coverage", icon: lowCoverageIcon },
-	    	{value: "gene name"},
-	    	{value: "(original order)"}
-	    ],
+	    options: me.geneSortOptions,
 	    items: [
-	       "harmful variants"
+	       me.HARMFUL_VARIANTS_OPTION
 	    ],
 	    render: {
 			option: function(data, escape) {
-				var option = '<div class="option">'; 
-				if (data.hasOwnProperty("icon")) {
-					option +=  data.icon;
-				}
-				option += '<span>' + escape(data.value) + '</span>' 
-				option += '</div>';
+				var clazz = 'option';
+				var style = "";
+				if (data.hasOwnProperty("disabled") && data.disabled) {
+					clazz += ' disabled';
+					style =  'pointer-events:none;opacity: 0.5;'
+				} 
+				var option = '<div class="' + clazz + '" style="' + style + '">'; 
+				option    += me.geneSortIcons.hasOwnProperty(data.value) ? me.geneSortIcons[data.value] : '';
+				option    += '<span>' + escape(data.value) + '</span>' 
+				option    += '</div>';
 				return option;
 			},
 			item: function(data, escape) {
-				var item = '<div class="item">';
+				var clazz = 'option';
+				var style = "";
+				if (data.hasOwnProperty("disabled") && data.disabled) {
+					clazz += ' disabled';
+					style =  'pointer-events:none;opacity: 0.5;'
+				} 
+				var item = '<div class="' + clazz + '" style="' + style + '">'; 
 				item += '<a href="' + escape(data.value) + '">'; 
-				if (data.hasOwnProperty("icon")) {
-					item +=  data.icon;
-				}
+				item += me.geneSortIcons.hasOwnProperty(data.value) ? me.geneSortIcons[data.value] : '';
 				item += escape(data.value) + '</a></div>';
 				return item;
 			}
 		}
 	});
-//	$('#select-gene-sort')[0].selectize.addOption({value:"harmful variants"});
-//	$('#select-gene-sort')[0].selectize.setValue("harmful variants");
-//	$('#select-gene-sort')[0].selectize.addOption({value: "low exon coverage"});
-//	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
-//	$('#select-gene-sort')[0].selectize.addOption({value:"(original order)"});
 	$('#select-gene-sort')[0].selectize.on('item_add', function(selectedValue) {
 		me.sortGenes(selectedValue);
 	});
@@ -219,6 +230,15 @@ GenesCard.prototype.init = function() {
 
 }
 
+GenesCard.prototype.disableGeneSortOption = function(name, disable) {
+	this.geneSortOptions.forEach(function(option) {
+		if (option.value == name) {
+			option.disabled = disable;
+			$('#select-gene-sort')[0].selectize.updateOption(name, option);
+		}
+	})
+}
+
 GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 	if (hideAll) {
 		$('#call-variants-dropdown').addClass("hide");
@@ -230,16 +250,31 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 			$("#call-variants-dropdown a").removeClass("disabled");
 			$("#analyze-all-genes").addClass("hide");
 			$("#analyzed-progress-bar").removeClass("no-alignments");
+
+			$("#coverage-thresholds").removeClass("hide");
+			$("#button-low-coverage").removeClass("disabled");
+			this.disableGeneSortOption(this.LOW_COVERAGE_OPTION, false);
+
 		} else {
 			$("#analyze-all-genes").removeClass("hide");
 			if (getProbandVariantCard().isBamLoaded()) {
 				$("#call-variants-dropdown").removeClass("hide");
 				$("#call-variants-dropdown a").removeClass("disabled");	
 				$("#analyzed-progress-bar").removeClass("no-alignments");	
+
+				$("#coverage-thresholds").removeClass("hide");
+				$("#button-low-coverage").removeClass("disabled");
+				this.disableGeneSortOption(this.LOW_COVERAGE_OPTION, false);
+
 			} else {
 				$("#call-variants-dropdown").removeClass("hide");
 				$("#call-variants-dropdown a").addClass("disabled");		
 				$("#analyzed-progress-bar").addClass("no-alignments");
+
+				$("#coverage-thresholds").addClass("hide");
+				$("#button-low-coverage").addClass("disabled");
+				this.disableGeneSortOption(this.LOW_COVERAGE_OPTION, true);
+
 			}
 		}		
 	}
@@ -256,9 +291,9 @@ GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 	}
 	if (sortBy.indexOf("gene name") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort();
-	} else if (sortBy.indexOf("harmful variants") >= 0) {
+	} else if (sortBy.indexOf(this.HARMFUL_VARIANTS_OPTION) >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummary);
-	} else if (sortBy.indexOf("low exon coverage") >= 0) {
+	} else if (sortBy.indexOf(this.LOW_COVERAGE_OPTION) >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummaryByLowCoverage);
 	}
 	this._initPaging(this.sortedGeneNames, true);

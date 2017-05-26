@@ -488,13 +488,15 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 		dangerObject.geneCoverageProblem = false;
 		for (relationship in geneCoverageAll) {
 			var geneCoverage = geneCoverageAll[relationship];
-			geneCoverage.forEach(function(gc) {
-				if (!dangerObject.geneCoverageProblem) {
-					if (filterCard.isLowCoverage(gc)) {
-						dangerObject.geneCoverageProblem = true;
+			if (geneCoverage) {
+				geneCoverage.forEach(function(gc) {
+					if (!dangerObject.geneCoverageProblem) {
+						if (filterCard.isLowCoverage(gc)) {
+							dangerObject.geneCoverageProblem = true;
+						}
 					}
-				}
-			})
+				})				
+			}
 		}
 	} else {
 		console.log("no geneCoverage to summarize danger");
