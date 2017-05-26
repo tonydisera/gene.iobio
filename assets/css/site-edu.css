@@ -584,6 +584,10 @@ h5 {
   margin-bottom: 4px;
   margin-top: 10px; }
 
+.btn-raised.disabled {
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12) !important;
+  box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12) !important; }
+
 .alertify-notifier .ajs-message {
   width: 460px; }
 
@@ -2310,6 +2314,20 @@ inputinput:-moz-placeholder {
     margin-top: 3px;
     display: inline-block; }
 
+#coverage-thresholds {
+  text-align: center;
+  margin-right: 50px;
+  color: #717171; }
+  #coverage-thresholds .coverage-threshold {
+    margin-left: 8px;
+    display: inline-block;
+    margin-top: 2px; }
+    #coverage-thresholds .coverage-threshold .coverage-threshold-label {
+      font-size: 12px;
+      color: #5d809d; }
+    #coverage-thresholds .coverage-threshold input {
+      margin-right: 2px; }
+
 #recfilter-flag {
   background-color: #5881AD !important; }
 
@@ -2463,8 +2481,8 @@ inputinput:-moz-placeholder {
   font-weight: bold; }
 
 .impact_MODIFIER {
-  fill: #f4d99b;
-  color: #f4d99b; }
+  fill: #f9e4b5;
+  color: #f9e4b5; }
 
 .impact_LOW {
   fill: rgba(181, 207, 107, 0.65);
@@ -2826,6 +2844,9 @@ inputinput:-moz-placeholder {
 #dataModal #bloodhound-data-dialog #enter-gene-name-data-dialog {
   color: #717171;
   font-size: 14px !important; }
+
+#zoom-region-chart .tooltip .danger {
+  color: deepskyblue; }
 
 .tooltip-title {
   font-size: 12px;
@@ -3416,6 +3437,20 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 12px; }
 
+#zoom-region-chart.ibo-gene .cds.danger {
+  fill: rgba(0, 191, 255, 0.75);
+  stroke: deepskyblue; }
+#zoom-region-chart.ibo-gene .utr.danger {
+  fill: rgba(0, 191, 255, 0.75);
+  stroke: deepskyblue; }
+
+#gene-viz.ibo-gene .cds.danger {
+  fill: rgba(0, 191, 255, 0.75);
+  stroke: deepskyblue; }
+#gene-viz.ibo-gene .utr.danger {
+  fill: rgba(0, 191, 255, 0.75);
+  stroke: deepskyblue; }
+
 #genes-panel {
   margin-bottom: 5px;
   margin-top: 5px;
@@ -3543,14 +3578,14 @@ text.ref-count {
 
 #gene-badge-button {
   font-size: 13px;
-  padding: 5px 1px 1px 1px;
+  padding: 3px 1px 1px 1px;
   margin: 0px;
   color: #717171;
   line-height: 15px;
   border: thin solid #e8e6e6; }
   #gene-badge-button.user-visited {
     border: 2px solid #c5c4c4;
-    padding: 4px 1px 0px 1px; }
+    padding: 2px 1px 0px 1px; }
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-left: 3px;
@@ -3595,12 +3630,11 @@ text.ref-count {
   font-size: 14px;
   color: #5d809d;
   font-weight: bold;
-  padding-right: 1px;
   float: left;
   display: none; }
 
 #gene-badge-called {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   color: #80a029;
   float: left;
@@ -3630,6 +3664,34 @@ text.ref-count {
   padding-left: 1px;
   display: none; }
 
+#gene-badge-coverage-problem {
+  font-size: 15px;
+  margin-top: 0px;
+  margin-left: 2px;
+  float: left;
+  color: deepskyblue;
+  fill: deepskyblue;
+  display: none; }
+  #gene-badge-coverage-problem.dropdown-item {
+    display: inline-block;
+    margin-right: 3px;
+    margin-top: 1px; }
+
+.coverage-problem-glyph {
+  fill: deepskyblue; }
+
+#gene-badge-harmful-variant {
+  font-size: 15px;
+  margin-top: -1px;
+  margin-left: 2px;
+  float: left;
+  color: #c70001;
+  display: none; }
+  #gene-badge-harmful-variant.dropdown-item {
+    display: inline-block;
+    margin-right: 3px;
+    margin-top: 1px; }
+
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
 #gene-badge.visited #gene-badge-name {
@@ -3638,6 +3700,10 @@ text.ref-count {
   display: inline; }
 #gene-badge.has-called-variants #gene-badge-has-called-variants {
   display: inline; }
+#gene-badge.has-coverage-problem #gene-badge-coverage-problem {
+  display: inline-block; }
+#gene-badge.has-harmful-variant #gene-badge-harmful-variant {
+  display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }
 
@@ -3670,6 +3736,9 @@ text.ref-count {
     font-size: 13px;
     padding-left: 15px;
     padding-right: 15px; }
+    #call-variants-dropdown a.disabled {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+      box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
 #manage-genes {
   float: left; }
@@ -3774,7 +3843,7 @@ text.ref-count {
 
 #select-gene-container {
   display: inline-block;
-  width: 110px;
+  width: 150px;
   vertical-align: middle;
   margin-top: 8px; }
   #select-gene-container .selectize-input {
