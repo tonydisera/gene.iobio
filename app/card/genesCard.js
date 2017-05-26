@@ -92,9 +92,9 @@ GenesCard.prototype.init = function() {
 					style =  'pointer-events:none;opacity: 0.5;'
 				} 
 				var item = '<div class="' + clazz + '" style="' + style + '">'; 
-				item += '<a href="' + escape(data.value) + '">'; 
-				item += me.geneSortIcons.hasOwnProperty(data.value) ? me.geneSortIcons[data.value] : '';
-				item += escape(data.value) + '</a></div>';
+				item    += me.geneSortIcons.hasOwnProperty(data.value) ? me.geneSortIcons[data.value] : '';
+				item    += '<span>' + escape(data.value) + '</span>' 
+				item    += '</div>';
 				return item;
 			}
 		}
