@@ -79,19 +79,8 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
-	if (filterName == me.LOW_COVERAGE) {
-		me.clearFilters();
-		$(button).addClass('current');
-
-		me.applyLowCoverageFilter = true;
-		me.displayFilterSummary();
-
-		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
-		cacheHelper.showGeneCounts(geneCounts);	
-	} else {
-		filterCard.setStandardFilter(button, filterName);
-		filterVariants();		
-	}
+    filterCard.setStandardFilter(button, filterName);
+	filterVariants();		
 }
 
 
@@ -107,7 +96,9 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	me.clearFilters();
 	$(button).addClass('current');
 	var annots = null;
-	if (filterName == me.KNOWN_CAUSATIVE) {
+	if (filterName == me.LOW_COVERAGE) {
+		me.applyLowCoverageFilter = true;
+	} else if (filterName == me.KNOWN_CAUSATIVE) {
 		annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
 			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
@@ -957,9 +948,13 @@ FilterCard.prototype.filterGenes = function() {
 	var me = this;
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
-	var geneCounts = cacheHelper.refreshGeneBadges();
-	cacheHelper.showAnalyzeAllProgress();
-	return geneCounts;
+	if (me.applyLowCoverageFilter) {
+		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
+		cacheHelper.showGeneCounts(geneCounts);
+	} else {
+		var geneCounts = cacheHelper.refreshGeneBadges();
+		cacheHelper.showAnalyzeAllProgress();		
+	}
 }
 
 

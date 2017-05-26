@@ -91,8 +91,8 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
-VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverage) {
-	var dangerSummary = VariantModel.summarizeDanger(data, options, geneCoverage);
+VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverageAll) {
+	var dangerSummary = VariantModel.summarizeDanger(data, options, geneCoverageAll);
 	this.model.cacheDangerSummary(dangerSummary, geneName);
 	return dangerSummary;
 }
@@ -208,12 +208,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    			var transcript = d3.select(this.parentNode);
 		    			//var x = feature.attr("x");
 		    			if (d.danger[me.getRelationship()]) {
-		    				transcript.append('g')
-	    							  .attr('class',      'feature_glyph')
+		    				transcript.append('g')     
+	    							  .attr('class',      'feature_glyph coverage-problem-glyph')
 	    							  .attr('transform',  'translate(' + x + ',-10)')
 	    							  .data([d])
 	    							  .append('use')
-	    							  .attr('style',      'fill: rgb(7, 218, 222)')
 	    							  .attr('height',     '12')
 	    							  .attr('width',      '12')
 	    							  .attr('href', '#feedback-symbol')

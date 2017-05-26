@@ -18,18 +18,18 @@
 
 #zoom-region-chart.ibo-gene 
   .cds.danger
-    fill:   $coverage-problem-color
+    fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
   .utr.danger  
-    fill:   $coverage-problem-color
+    fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
 
 #gene-viz.ibo-gene 
   .cds.danger 
-    fill:   $coverage-problem-color
+    fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
   .utr.danger   
-    fill:   $coverage-problem-color
+    fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
 
 
@@ -307,6 +307,14 @@
   fill: $coverage-problem-color
   display: none
 
+  &.dropdown-item
+    display: inline-block
+    margin-right: 3px
+    margin-top: 1px
+
+.coverage-problem-glyph
+  fill: $coverage-problem-color
+
 #gene-badge-harmful-variant
   font-size: 15px
   margin-top: -1px
@@ -314,6 +322,12 @@
   float: left
   color: #c70001
   display: none
+
+  &.dropdown-item
+    display: inline-block
+    margin-right: 3px
+    margin-top: 1px
+
 
 #gene-badge
   &.visited

@@ -290,9 +290,11 @@ VariantModel.prototype.getVariantCount = function(data) {
 	return loadedVariantCount;
 }
 
-VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) {
+VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAll) {
 
 	var dangerCounts = $().extend({}, options);
+	VariantModel.summarizeDangerForGeneCoverage(dangerCounts, geneCoverageAll);
+
 	if (theVcfData == null ) {
 		console.log("unable to summarize danger due to null data");
 		dangerCounts.error = "unable to summarize danger due to null data";
@@ -300,6 +302,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 	} else if (theVcfData.features.length == 0) {		
 		return dangerCounts;		
 	}
+
+
 	var siftClasses = {};
 	var polyphenClasses = {};
 	var clinvarClasses = {};
@@ -475,21 +479,23 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverage) 
 		}
 	}).length;
 
-	VariantModel.summarizeDangerForGeneCoverage(dangerCounts, geneCoverage);
 		
 	return dangerCounts;
 }
 
-VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverage) {
-	if (geneCoverage) {
+VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll) {
+	if (geneCoverageAll && Object.keys(geneCoverageAll).length > 0) {
 		dangerObject.geneCoverageProblem = false;
-		geneCoverage.forEach(function(gc) {
-			if (!dangerObject.geneCoverageProblem) {
-				if (filterCard.isLowCoverage(gc)) {
-					dangerObject.geneCoverageProblem = true;
+		for (relationship in geneCoverageAll) {
+			var geneCoverage = geneCoverageAll[relationship];
+			geneCoverage.forEach(function(gc) {
+				if (!dangerObject.geneCoverageProblem) {
+					if (filterCard.isLowCoverage(gc)) {
+						dangerObject.geneCoverageProblem = true;
+					}
 				}
-			}
-		})
+			})
+		}
 	} else {
 		console.log("no geneCoverage to summarize danger");
 		showStackTrace(new Error());

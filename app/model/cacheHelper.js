@@ -204,15 +204,16 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 	// is all of the genes that need to be analyzed (and cached.)
 	me.genesToCache = [];
 	me.cacheQueue = [];
+
 	genesCard.getGeneNames().forEach(function(geneName) {		
 		me.genesToCache.push(geneName);
 	});
 	me.cacheGenes(analyzeCalledVariants, function() {
+
 		// After all genes have been cached, refresh the gene badges in case
 		// filters were applied while genes were still in the process of being
 		// analyzed.
-		me.refreshGeneBadges();
-		me.showAnalyzeAllProgress();
+		filterCard.filterGenes();
 	});
 
 
@@ -479,10 +480,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 		// Now that inheritance has been determined,  analyze the alignments 
 		// in the gene coding regions to get coverage metrics
 		//
-		cacheGetGeneCoverage(geneObject, transcript, function() {
-
-			var geneCoverage = getVariantCard("proband").model.getGeneCoverageForGene(geneObject, transcript);
-
+		promiseGetGeneCoverage(geneObject, transcript).then(function(geneCoverageAll) {
 
 			//
 			// Summarize the variants for the proband to create the gene badges, 
@@ -495,7 +493,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			}
 
 
-	  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverage);
+	  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverageAll);
 			getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
 
 			genesCard._geneBadgeLoading(geneObject.gene_name, false);
@@ -695,9 +693,9 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 					options.CALLED = true;
 				}
 
-				var geneCoverage = getVariantCard("proband").model.getGeneCoverageForGene(geneObject, {transcript_id: keyObject.transcript});
-		 
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverage);
+				var geneCoverageAll = getCachedGeneCoverage(geneObject,{ transcript_id: keyObject.transcript});
+
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverageAll);
 				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
 				
 				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
@@ -713,7 +711,8 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 
 CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {  
 	var me = this;
-	
+
+
 	var counts = {
 		geneCount: 0,
 		all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
@@ -738,11 +737,11 @@ CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {
 		  		counts.geneCount++;
 
 				var geneObject   = window.geneObjects[keyObject.gene];
-				var geneCoverage = getProbandVariantCard().model.getGeneCoverageForGene(geneObject, {transcript_id: keyObject.transcript});
+				var geneCoverageAll = getCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript});					
 				var dangerObject = getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name);
 		 		
-			 	if (geneCoverage && dangerObject) {
-			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverage);
+			 	if (geneCoverageAll && dangerObject) {
+			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll);
 
 			  		counts.all.analyzed++;
 			  		counts.loaded.analyzed++;
@@ -761,6 +760,7 @@ CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {
 			  		counts.called.unanalyzed++;
 
 		 		}
+
 
 		  	} 
 		} 

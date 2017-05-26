@@ -2944,31 +2944,36 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 function promiseGetGeneCoverage(geneObject, transcript) {
 	return new Promise(function(resolve,reject) {
-		cacheGetGeneCoverage(geneObject, transcript, function() {
-			resolve();
+
+		var promises = [];
+
+		getRelevantVariantCards().forEach(function(vc) {
+			if (vc.isBamLoaded()) {
+				var promise = vc.model.promiseGetGeneCoverage(geneObject, transcript);
+				promises.push(promise);
+			} 
+		});
+
+		Promise.all(promises).then(function() {
+			var geneCoverageAll = getCachedGeneCoverage(geneObject, transcript);
+
+			resolve(geneCoverageAll);
+
 		})
-	})
-}
 
-
-function cacheGetGeneCoverage(geneObject, transcript, callback) {
-
-	var promises = [];
-
-	getRelevantVariantCards().forEach(function(vc) {
-		if (vc.isBamLoaded()) {
-			var promise = vc.model.promiseGetGeneCoverage(geneObject, transcript);
-			promises.push(promise);
-		} 
 	});
-
-	Promise.all(promises).then(function() {
-		if (callback) {
-			callback();
-		}
-	})
-
 }
+
+function getCachedGeneCoverage(geneObject, transcript) {
+	var geneCoverageAll = {};
+	getRelevantVariantCards().forEach(function(vc) {
+		var gc = vc.model.getGeneCoverageForGene(geneObject, transcript);
+		geneCoverageAll[vc.getRelationship()] = gc;
+	})	
+	return geneCoverageAll;
+}
+
+
 
 
 function shouldAutocall(callback) {
