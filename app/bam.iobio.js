@@ -77,7 +77,8 @@ var Bam = Class.extend({
 
   checkBamUrl: function(url, baiUrl, callback) {
     var me = this;
-
+    var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+      
     var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(bam)$/;
     var parts = rexp.exec(url);
     // first element has entire url, second has the bam extension.
@@ -91,7 +92,7 @@ var Bam = Class.extend({
         args.push(baiUrl);
       }
       var cmd = new iobio.cmd(
-          IOBIO.samtools,
+          samtools,
           args,
           {ssl: useSSL}
       );
@@ -253,7 +254,7 @@ var Bam = Class.extend({
    },
 
    _getBamRegionsUrl: function(regions, golocal) {
-      var samtools = this.sourceType == "url" ? IOBIO.samtoolsServiceOnDemand : IOBIO.samtoolsService;
+      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
@@ -268,7 +269,7 @@ var Bam = Class.extend({
    },
 
     _getBamPileupUrl: function(region, golocal) {
-      var samtools = this.sourceType == "url" ? IOBIO.samtoolsServiceOnDemand : IOBIO.samtoolsService;
+      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
       if ( this.sourceType == "url") {
          var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);
          var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
@@ -322,6 +323,8 @@ var Bam = Class.extend({
 
    getHeaderStr: function(callback) {
       var me = this;
+      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+
       if (me.headerStr) {
          callback(me.headerStr);        
       }
@@ -332,7 +335,7 @@ var Bam = Class.extend({
 
         var success = null;
         var cmd = new iobio.cmd(
-            IOBIO.samtools,
+            samtools,
             ['view', '-H', me.bamUri]
         );
         var rawHeader = "";
@@ -358,6 +361,8 @@ var Bam = Class.extend({
 
    getHeader: function(callback) {
       var me = this;
+      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+
       if (me.header) {
          callback(me.header);        
       }
@@ -373,7 +378,7 @@ var Bam = Class.extend({
 
         var success = null;
         var cmd = new iobio.cmd(
-            IOBIO.samtools,
+            samtools,
             args,
             {ssl: useSSL}
         );
