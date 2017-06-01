@@ -1573,6 +1573,7 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("has-called-variants");
 	geneBadge.removeClass("selected");
 	geneBadge.removeClass("has-coverage-problem");
+	geneBadge.removeClass("has-harmful-variant");
 }
 
 GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
