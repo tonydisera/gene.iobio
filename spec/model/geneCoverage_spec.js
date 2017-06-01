@@ -1,19 +1,19 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
-
 var cacheHelper = new CacheHelper();
 cacheHelper.isolateSession();
 
 var genomeBuildHelper = new GenomeBuildHelper();
 
-var geneObjects = {};
 var dataCard = new DataCard();
 dataCard.mode = 'trio';
 
+var geneObjects = {};
+var geneToTranscript = {};
+var geneToGeneCoverage = {};
 
+xdescribe('geneCoverage', function() {
 
-describe('geneCoverage', function() {
-/*
 
 	var speciesData = [
 	{"id":7,"name":"Human","binomialName":"Homo sapiens","latin_name":"homo_sapiens","genomeBuilds":[
@@ -57,7 +57,6 @@ describe('geneCoverage', function() {
 		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
 	}
 
-	var theGeneCoverageAll = null;
 
 
 	var roundIt = function(num) {
@@ -65,6 +64,28 @@ describe('geneCoverage', function() {
 	}
 
 	var pileupSummary = {total: 0, min: 999999, max: 0, mean: 0, count: 0};
+
+	var getGeneCoverageForGene = function(geneName, callback) {
+
+			promiseGetCachedGeneModel(geneName).then(function(theGeneObject) {
+
+				var theTranscript = getCanonicalTranscript(theGeneObject);
+				geneToTranscript[theGeneObject.gene_name] = theTranscript;
+				geneObjects[theGeneObject.gene_name] = theGeneObject;
+
+				promiseGetGeneCoverage(theGeneObject, theTranscript).then(function(geneCoverageAll) {
+					
+					var chrom = geneCoverageAll.proband[0].chrom;
+
+					getPileupCoverageForExons(chrom, geneCoverageAll.proband, 0, function() {
+						geneToGeneCoverage[theGeneObject.gene_name] = geneCoverageAll;
+						if (callback) {
+							callback();
+						}
+					});
+				})
+			});
+	}
 	
 	var getPileupCoverageForExons = function(chrom, geneCoverageExons, idx, callback) {
 
@@ -77,7 +98,7 @@ describe('geneCoverage', function() {
 				}
 				pileupSummary.mean = (pileupSummary.count > 0 ? pileupSummary.total/pileupSummary.count : 0);
 				exon.mpileup = pileupSummary;
-				callback();
+				callback(geneCoverageExons);
 			}
 		} else {
 			getProbandVariantCard().model.bam.getCoverageForRegion(chrom, exon.start, exon.end, [], 5000, false, function(coverageForRegion, coverageForPoints) {						
@@ -130,6 +151,41 @@ describe('geneCoverage', function() {
 		}
 
 
+	}
+
+	var evaluateGeneCoverageForGene = function(geneName) {
+		var theGeneCoverageAll = geneToGeneCoverage[geneName];
+		var theGeneObject = geneObjects[geneName];
+		var theTranscript = geneToTranscript[geneName];
+
+		expect(theGeneCoverageAll).not.toBeNull();
+		var geneCoverage = theGeneCoverageAll.proband;
+
+		expect(geneCoverage).not.toBeNull();
+
+		
+		var codingRegions = theTranscript.features.filter(function(feature) {
+			return feature.feature_type.toUpperCase() == 'CDS';
+		})
+		expect(Object.keys(geneCoverage).length).toEqual(codingRegions.length + 1);
+
+		geneCoverage.forEach(function(gc) {
+			
+			console.log(gc.id + " " 
+				+ (gc.region == 'NA' ? gc.region : (gc.start + "-" + gc.end)) 
+				+ "    sd="        + roundIt(gc.sd) 
+				+ "         mean=" + roundIt(gc.mean) 
+				+ " vs. "          + roundIt(gc.mpileup.mean) 
+				+                    (roundIt(Math.abs(gc.mean - gc.mpileup.mean)) > gc.sd ? "*" : " ")
+				+ "         min="  + roundIt(gc.min) 
+				+ " vs. "          + roundIt(gc.mpileup.min) 
+				+                    (roundIt(Math.abs(gc.min - gc.mpileup.min)) > gc.sd ? "*" : " ")
+				+ "         max="  + roundIt(gc.max) 
+				+ " vs. "          + roundIt(gc.mpileup.max)
+				+                    (roundIt(Math.abs(gc.max - gc.mpileup.max)) > gc.sd ? "*" : " "));
+
+
+		})
 	}
 
 
@@ -192,62 +248,41 @@ describe('geneCoverage', function() {
 		});
 	});
 
-	describe('#verifyGeneCoverage', function() {
+	describe('#verifyGeneCoverageAIRE', function() {
 		beforeEach(function(done) {
-			
 
-			promiseGetCachedGeneModel('AIRE').then(function(theGeneObject) {
-				window.gene = theGeneObject;
-				window.selectedTranscript = getCanonicalTranscript(window.gene);
-				geneObjects[window.gene.gene_name] = window.gene;
+			getGeneCoverageForGene('AIRE', function() {
+				
+				done();
 
-
-				promiseGetGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverageAll) {
-					theGeneCoverageAll = geneCoverageAll;
-					var chrom = theGeneCoverageAll.proband[0].chrom;
-					getPileupCoverageForExons(chrom, theGeneCoverageAll.proband, 0, function() {
-						done();
-					});
-				})
 			});
+
 		});
 
-		it('select a gene with coverage problems', function(done) {
+		it('Evaluate gene coverage for gene AIRE', function(done) {
 
-			expect(theGeneCoverageAll).not.toBeNull();
-			var geneCoverage = theGeneCoverageAll.proband;
-
-			expect(geneCoverage).not.toBeNull();
-
-			
-			var codingRegions = window.selectedTranscript.features.filter(function(feature) {
-				return feature.feature_type.toUpperCase() == 'CDS';
-			})
-			expect(Object.keys(geneCoverage).length).toEqual(codingRegions.length + 1);
-
-			
-
-			geneCoverage.forEach(function(gc) {
-				
-				console.log(gc.id + " " 
-					+ (gc.region == 'NA' ? gc.region : (gc.start + "-" + gc.end)) 
-					+ "    sd="        + roundIt(gc.sd) 
-					+ "         mean=" + roundIt(gc.mean) 
-					+ " vs. "          + roundIt(gc.mpileup.mean) 
-					+                    (roundIt(Math.abs(gc.mean - gc.mpileup.mean)) > gc.sd ? "*" : " ")
-					+ "         min="  + roundIt(gc.min) 
-					+ " vs. "          + roundIt(gc.mpileup.min) 
-					+                    (roundIt(Math.abs(gc.min - gc.mpileup.min)) > gc.sd ? "*" : " ")
-					+ "         max="  + roundIt(gc.max) 
-					+ " vs. "          + roundIt(gc.mpileup.max)
-					+                    (roundIt(Math.abs(gc.max - gc.mpileup.max)) > gc.sd ? "*" : " "));
-
-	
-			})
-
-
+			evaluateGeneCoverageForGene('AIRE');
 			done();
+
 		});
 	});
-*/
+
+
+	describe('#verifyGeneCoveragePDHA1', function() {
+		beforeEach(function(done) {
+
+			getGeneCoverageForGene('PDHA1', function() {
+				done();
+			});
+
+		});
+
+		it('Evaluate gene coverage for gene PDHA1', function(done) {
+
+			evaluateGeneCoverageForGene('PDHA1');
+			done();
+
+		});
+	});	
+
 });
