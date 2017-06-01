@@ -13,7 +13,7 @@ dataCard.mode = 'trio';
 
 
 describe('geneCoverage', function() {
-
+/*
 
 	var speciesData = [
 	{"id":7,"name":"Human","binomialName":"Homo sapiens","latin_name":"homo_sapiens","genomeBuilds":[
@@ -249,4 +249,5 @@ describe('geneCoverage', function() {
 			done();
 		});
 	});
+*/
 });
