@@ -112,7 +112,7 @@ var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
-var variantExporter = new VariantExporter();
+var variantExporter = null;
 
 
 
@@ -237,6 +237,8 @@ function determineStyle() {
 
 function init() {
 	var me = this;
+
+	variantExporter = new VariantExporter();
 
 	$("[data-toggle=tooltip]").tooltip();
 
