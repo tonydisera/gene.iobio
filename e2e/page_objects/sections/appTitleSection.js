@@ -79,6 +79,12 @@ module.exports = {
       this.api.useCss();
       return this;
     },
+    assertGeneBadgeHasLowCoverage: function(gene) {
+      this.api.useXpath();
+      this.waitForElementVisible("//div[@id='gene-badge' and contains(@class,'has-coverage-problem')]//*[@id='gene-badge-name' and text()='" + gene + "']");
+      this.api.useCss();
+      return this;
+    },
     assertAnalyzeAllProgressLabel: function(label) {
       var self = this;
       self.api.useXpath().getText(

@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, motherVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -13,6 +13,7 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;  
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
+    motherVariantCard = indexPage.section.motherVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
     tooltip = indexPage.section.variantTooltip;
@@ -32,6 +33,10 @@ module.exports = {
     appTitleSection.assertGeneBadgesLoaded(['RAI1', 'PDHA1', 'AIRE', 'MYLK2', 'PDGFB']);
     appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
 
+  },
+  'Check for low coverage gene badges': function(client) {
+    appTitleSection.assertGeneBadgeHasLowCoverage('AIRE');
+    appTitleSection.assertGeneBadgeHasLowCoverage('PDHA1');
   },
   'Calling all genes': function(client) {
     appTitleSection.selectCallAll();
@@ -75,6 +80,14 @@ module.exports = {
     appTitleSection.assertAnalyzeAllCounts(3,2,0,5);
 
   },
+  'Low gene coverage filter': function(client) {
+
+    filterPanel.clickLowCoverage();
+    client.pause(1000);
+    filterPanel.assertLowCoverageCounts(2,2);
+    appTitleSection.assertAnalyzeAllCounts(2,3,2,3);
+
+  },
   'Clear all filter': function(client) {
 
     filterPanel.clickClearAll();
@@ -93,6 +106,28 @@ module.exports = {
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
   
+  'Click on AIRE, PDHA1 and look for low coverage exon glyph': function(client) {
+
+    filterPanel.clickClearAll();
+    nav.searchGene('AIRE');
+    
+    client.pause(1000);
+    matrixTrack.waitForMatrixLoaded();
+
+    probandVariantCard.assertDangerExonCountEquals(1);
+    probandVariantCard.assertLowCoverageGlyphCountEquals(1);
+
+    nav.searchGene('PDHA1');
+    
+    client.pause(1000);
+    matrixTrack.waitForMatrixLoaded();
+
+    probandVariantCard.assertDangerExonCountEquals(1);
+    probandVariantCard.assertLowCoverageGlyphCountEquals(1);
+
+    motherVariantCard.assertDangerExonCountEquals(9);
+    motherVariantCard.assertLowCoverageGlyphCountEquals(9);
+  },
 
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
 

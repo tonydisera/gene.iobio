@@ -213,6 +213,23 @@ module.exports = {
           self.assert.equal(result.value, calledCount);
         })        
       }
+    },
+
+    clickLowCoverage: function() {
+      return this.click('@lowCoverage');
+    },
+    assertLowCoverageCounts: function(analyzedCount, calledCount) {
+      var self = this;
+      if (analyzedCount) {
+        this.getText('@lowCoverageAnalyzedCount', function(result) {
+          self.assert.equal(result.value, analyzedCount);
+        })        
+      }
+      if (calledCount) {
+        this.getText('@lowCoverageCalledCount', function(result) {
+          self.assert.equal(result.value, calledCount);
+        })        
+      }
     }
 
   }],
@@ -242,6 +259,9 @@ module.exports = {
     highOrModerateImpactAnalyzedCount: { selector: '//*[@id="button-high-or-moderate-impact"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
     highOrModerateImpactCalledCount:   { selector: '//*[@id="button-high-or-moderate-impact"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' },
 
+    lowCoverage:              { selector: '//*[@id="button-low-coverage"]', locateStrategy: 'xpath' },
+    lowCoverageAnalyzedCount: { selector: '//*[@id="button-low-coverage"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
+    lowCoverageCalledCount:   { selector: '//*[@id="button-low-coverage"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' }
 
   }
 };
