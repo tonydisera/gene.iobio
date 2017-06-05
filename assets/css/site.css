@@ -3770,16 +3770,21 @@ text.ref-count {
   font-size: 18px; }
 
 #legend .legend-element {
-  cursor: pointer;
+  cursor: auto;
   padding: 1px; }
   #legend .legend-element text {
-    cursor: pointer;
+    cursor: auto;
     fill: #717171;
     font-size: 12px; }
+#legend .legend-text {
+  color: #717171;
+  font-size: 12px;
+  cursor: auto; }
 #legend .legend-label {
   font-size: 13px;
   color: #717171;
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  cursor: auto; }
 
 #legend.level-basic .legend-element text {
   font-size: initial; }
