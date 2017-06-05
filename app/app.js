@@ -3406,8 +3406,20 @@ function getRsId(variant) {
 	return rsId;		
 }
 
-
 function filterVariants() {
+	if (filterCard.hasFilters()) {
+		$('#filter-track-loader .loader-label').text("Applying filter")
+	} else {
+		$('#filter-track-loader .loader-label').text("Clearing filter")
+	}
+	$('#filter-track-loader').removeClass("hide");
+	setTimeout(function() {
+        filterVariantsImpl();
+    }, 100);	
+}
+
+function filterVariantsImpl() {
+	
 	clickedVariant = null;
 	matrixCard.unpin();
 
@@ -3428,6 +3440,7 @@ function filterVariants() {
 
 	});		
 	filterCard.filterGenes();
+	$('#filter-track-loader').addClass("hide");
 
 }
 
