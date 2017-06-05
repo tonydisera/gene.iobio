@@ -787,8 +787,12 @@ FilterCard.prototype.enableCoverageFilters = function() {
 FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	if (dataCard.mode == "trio") {
 		d3.selectAll("#filter-track .inheritance").classed("inactive", false);
+		d3.select("#filter-track #button-denovo-vus").classed("disabled", false);
+		d3.select("#filter-track #button-recessive-vus").classed("disabled", false);
 	} else {
 		d3.selectAll("#filter-track .inheritance").classed("inactive", true);
+		d3.select("#filter-track #button-denovo-vus").classed("disabled", true);
+		d3.select("#filter-track #button-recessive-vus").classed("disabled", true);
 		d3.selectAll("#filter-track .inheritance").classed("current", false);
 	}
 	this.displayEffectFilters();
