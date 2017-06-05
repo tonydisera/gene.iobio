@@ -727,16 +727,16 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          		if (inheritance == 'recessive') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
-								        .attr("height", 14)
+								        .attr("height", 15)
 								        .attr("width", 15);
-					var options = {width: 18, height: 16, transform: "translate(-1,1)"};
+					var options = {width: 15, height: 15, transform: "translate(0,3)"};
 					matrixCard.showRecessiveSymbol(svg, options);										        
          		} else if (inheritance == 'denovo') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
-								        .attr("height", 14)
+								        .attr("height", 15)
 								        .attr("width", 15);
-					var options = {width: 18, height: 16, transform: "translate(-1,1)"};
+					var options = {width: 15, height: 15, transform: "translate(0,3)"};
 					matrixCard.showDeNovoSymbol(svg, options);				
          		}
          	}

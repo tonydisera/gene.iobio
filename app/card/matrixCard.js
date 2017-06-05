@@ -1159,10 +1159,10 @@ MatrixCard.prototype.showHomSymbol = function(selection, options) {
 
 MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 	options = options || {};
-	var width = (options.cellSize > 18) ? "24" : (options.width || "20");
+	var width = (options.cellSize > 18) ? "19" : (options.width || "16");
 
 	selection.append("g")
-	         .attr("transform", options.transform || "translate(-1,0)")
+	         .attr("transform", options.transform || "translate(1,2)")
 	         .append("use")
 	         .attr("xlink:href", '#recessive-symbol')
 	         .attr("width", width)
@@ -1173,9 +1173,9 @@ MatrixCard.prototype.showRecessiveSymbol = function (selection, options) {
 MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 	options = options || {};
 
-	var width = (options.cellSize > 18) ? "24" : (options.width || "20");
+	var width = (options.cellSize > 18) ? "19" : (options.width || "16");
 
-	var transform = (options.cellSize > 18) ? "translate(0,0)" : (options.transform || "translate(-1,0)");
+	var transform = (options.cellSize > 18) ? "translate(1,2)" : (options.transform || "translate(1,0)");
 
 	selection.append("g")
 	         .attr("transform", transform)

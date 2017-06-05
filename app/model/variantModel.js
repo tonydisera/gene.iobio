@@ -314,6 +314,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	var afField = null;
 	var lowestAf = 999;
 	dangerCounts.harmfulVariant = false;
+	dangerCounts.harmfulVariantInheritanceMode = {};
 
 
 	theVcfData.features.forEach( function(variant) {
@@ -418,6 +419,9 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		// Turn on flag for harmful variant if one is found
 		if (variantDanger.af && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
 			dangerCounts.harmfulVariant = true;
+			if (variant.inheritance && variant.inheritance != 'none') {
+				dangerCounts.harmfulVariantInheritanceMode[variant.inheritance] = variant.inheritance;
+			}
 		}
 	});
 

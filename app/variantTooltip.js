@@ -203,7 +203,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
 		if ($(selector + " .tooltip-title:contains('inheritance')").length > 0) {
 			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"20\" width=\"20\">");
-			var options = {width:22, height:22, transform: 'translate(0,4)'};
+			var options = {width:18, height:18, transform: 'translate(0,6)'};
 			var selection = d3.select(selector + ' .inheritance-badge').data([{clazz: clazz}]);
 			symbolFunction(selection, options);					
 		}

@@ -2847,25 +2847,27 @@ text.ref-count {
     display: inline-block;
     width: 60px;
     margin-top: -2px; }
-  #bookmark-card .bookmark .variant-label .coord {
-    display: inline-block;
-    width: 97px;
-    line-height: 12px;
-    vertical-align: top; }
-  #bookmark-card .bookmark .variant-label .rsid {
-    display: inline-block;
-    margin-left: 3px;
-    width: 70px;
-    line-height: 12px;
-    vertical-align: top; }
-  #bookmark-card .bookmark .variant-label .hgvs {
-    margin-left: 3px;
-    display: inline-block;
-    width: 67px;
-    line-height: 12px;
-    vertical-align: top; }
-  #bookmark-card .bookmark .variant-label:hover {
-    text-decoration: underline !important; }
+  #bookmark-card .bookmark .variant-label {
+    display: inline-block; }
+    #bookmark-card .bookmark .variant-label .coord {
+      display: inline-block;
+      width: 97px;
+      line-height: 12px;
+      vertical-align: top; }
+    #bookmark-card .bookmark .variant-label .rsid {
+      display: inline-block;
+      margin-left: 3px;
+      width: 70px;
+      line-height: 12px;
+      vertical-align: top; }
+    #bookmark-card .bookmark .variant-label .hgvs {
+      margin-left: 3px;
+      display: inline-block;
+      width: 67px;
+      line-height: 12px;
+      vertical-align: top; }
+    #bookmark-card .bookmark .variant-label:hover {
+      text-decoration: underline !important; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
@@ -3113,7 +3115,7 @@ text.ref-count {
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-left: 3px;
-    padding-top: 1px;
+    padding-top: 0px;
     float: right; }
   #gene-badge-button #gene-badge-phenotype-symbol {
     float: right;

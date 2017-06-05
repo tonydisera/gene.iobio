@@ -1643,8 +1643,32 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	}
 	*/
 	if (dangerObject.harmfulVariant) {
-		geneBadge.addClass("has-harmful-variant");
+		geneBadge.addClass("has-harmful-variant");		
 	}
+
+	if (dangerObject.harmfulVariantInheritanceMode && Object.keys(dangerObject.harmfulVariantInheritanceMode).length > 0) {
+
+		var symbolIndex = 0;
+		for (var key in dangerObject.harmfulVariantInheritanceMode) {
+			var clazz = key;
+			var symbolFunction = matrixCard.inheritanceMap[key].symbolFunction;
+			geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
+			var options = {width:15, height:15, transform: 'translate(0,0)'};
+			var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: clazz}]);
+			symbolFunction(selection, options);
+			symbolIndex++;
+			selection.on("mouseover", function(d,i) {
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
+			})
+			.on("mouseout", function(d,i) {
+					me.hideTooltip();
+			});
+		}
+	}
+
+
 
 
 	readjustCards();
