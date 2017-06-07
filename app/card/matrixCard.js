@@ -1204,7 +1204,7 @@ MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
 		         .attr("xlink:href", '#thumbs-up-symbol')
 		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
 		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .attr("fill",   matrixCard.fill_grey)
+		         .attr("fill",   matrixCard.fill_green)
 		         .style("pointer-events", "none");		
 	}
 	
