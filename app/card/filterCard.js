@@ -955,11 +955,15 @@ FilterCard.prototype.filterGenes = function(callback) {
 	if (me.applyLowCoverageFilter) {
 		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
 		cacheHelper.showGeneCounts(geneCounts);
-		callback();
+		if (callback) {
+			callback();
+		}
 	} else {
 		var geneCounts = cacheHelper.refreshGeneBadges(function() {
-			cacheHelper.showAnalyzeAllProgress();		
-			callback();
+			cacheHelper.showAnalyzeAllProgress();	
+			if (callback) {
+				callback();
+			}	
 		});
 	}
 }

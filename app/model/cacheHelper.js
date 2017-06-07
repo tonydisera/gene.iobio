@@ -786,8 +786,12 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
 	  			geneCount.pass++;
 	  		}
 
+	  		var theFbData = null;
+			var ds = getVariantCard("proband").model.getDangerSummaryForGene(geneObject.gene_name);
+			if (theVcfData && theVcfData.features && ds && ds.CALLED) {
+				theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
+			}
 
-			var theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
 			var options = {};
 			if (theFbData) {
 				options.CALLED = true;
