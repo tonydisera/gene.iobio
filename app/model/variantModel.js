@@ -507,7 +507,7 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 				})				
 			}
 		}
-	} else {
+	} else if (geneCoverageAll) {
 		console.log("no geneCoverage to summarize danger");
 		showStackTrace(new Error());
 		dangerObject.geneCoverageProblem = false;

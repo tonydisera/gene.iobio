@@ -316,10 +316,5 @@ describe('genomeBuildHelper', function() {
 		});
 	});
 
-	describe('#getBuildFromVcfHeader', function() {
-		it('get the build info from the vcf header', function() {
-
-		});
-	});
 
 });

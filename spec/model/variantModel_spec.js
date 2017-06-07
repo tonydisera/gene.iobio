@@ -100,7 +100,9 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 5,
 				loadedCount: 5, 
-				calledCount: 0
+				calledCount: 0,
+				harmfulVariant: false,
+				harmfulVariantInheritanceMode: { }
 			});
 		});
 
@@ -133,7 +135,9 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 5,
 				loadedCount: 5, 
-				calledCount: 0
+				calledCount: 0,				
+				harmfulVariant: false,
+				harmfulVariantInheritanceMode: { }
 			});
 		});
 
@@ -155,7 +159,9 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0
+				calledCount: 0,
+				harmfulVariant: false,
+				harmfulVariantInheritanceMode: { }
 			});
 		});
 
@@ -177,7 +183,9 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0
+				calledCount: 0,
+				harmfulVariant: false,
+				harmfulVariantInheritanceMode: { }
 			});
 		});
 
@@ -200,7 +208,9 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0				
+				calledCount: 0,
+				harmfulVariant: false,
+				harmfulVariantInheritanceMode: { }				
 			});
 		});
 
@@ -221,7 +231,9 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0	
+				calledCount: 0,
+				harmfulVariant: false,
+				harmfulVariantInheritanceMode: { }	
 			});
 		});
 
@@ -244,7 +256,9 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariant: false,
+					harmfulVariantInheritanceMode: { }	
 				});
 			});
 		});
@@ -268,7 +282,9 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariant: false,
+					harmfulVariantInheritanceMode: { }	
 				});
 			});
 		});
@@ -292,7 +308,9 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariant: false,
+					harmfulVariantInheritanceMode: { }	
 				});
 			});
 		});
@@ -316,7 +334,9 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariant: false,
+					harmfulVariantInheritanceMode: { }
 				});
 			});
 		});
