@@ -76,8 +76,8 @@ module.exports = {
 
     filterPanel.clickHighOrModerateImpact();
     client.pause(1000);
-    filterPanel.assertHighOrModerateImpactCounts(3,0);
-    appTitleSection.assertAnalyzeAllCounts(3,2,0,5);
+    filterPanel.assertHighOrModerateImpactCounts(1,0);
+    appTitleSection.assertAnalyzeAllCounts(1,4,0,5);
 
   },
   'Low gene coverage filter': function(client) {
@@ -95,7 +95,7 @@ module.exports = {
     client.pause(1000);
     filterPanel.assertDenovoVusCounts(2,0);
     filterPanel.assertRecessiveVusCounts(0,0);
-    filterPanel.assertHighOrModerateImpactCounts(3,0);
+    filterPanel.assertHighOrModerateImpactCounts(1,0);
     appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
   },
