@@ -393,7 +393,7 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 				 Object.keys(variant[sibZygosityAttr]).forEach( function(key) {
 				 	var sibZygosity = variant[sibZygosityAttr][key];
 					if (sibZygosity != null) {
-						if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'homref') {
+						if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'gt_unknown' && sibZygosity.toLowerCase() != 'homref') {
 						 	matchesCount++;
 						}
 					 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
