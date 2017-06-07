@@ -1827,6 +1827,10 @@ inputinput:-moz-placeholder {
   margin-bottom: 8px;
   color: #717171;
   display: inline-block; }
+  #filter-summary-track .loader {
+    display: inline-block;
+    margin-top: 0px;
+    margin-right: 10px; }
   #filter-summary-track .filter-flag.label-primary {
     background-color: #feedc8;
     color: #717171;
