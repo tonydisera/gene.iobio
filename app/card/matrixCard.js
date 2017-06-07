@@ -1188,14 +1188,25 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 };
 
 MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
-	selection.append("g")
-	         .attr("transform", "translate(1,2)")
-	         .append("use")
-	         .attr("xlink:href", '#thumbs-down-symbol')
-	         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-	         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-	         .attr("fill",   matrixCard.fill_grey)
-	         .style("pointer-events", "none");
+	if (selection.datum().clazz == "affected") {
+		selection.append("g")
+		         .attr("transform", "translate(1,2)")
+		         .append("use")
+		         .attr("xlink:href", '#thumbs-down-symbol')
+		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
+		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
+		         .attr("fill",   matrixCard.fill_grey)
+		         .style("pointer-events", "none");
+	} else {
+		selection.append("g")
+		         .attr("transform", "translate(1,2)")
+		         .append("use")
+		         .attr("xlink:href", '#thumbs-up-symbol')
+		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
+		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
+		         .attr("fill",   matrixCard.fill_grey)
+		         .style("pointer-events", "none");		
+	}
 	
 };
 
