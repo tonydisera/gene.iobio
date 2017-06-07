@@ -104,24 +104,29 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 			var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
 			var dangerSummary = me.getDangerSummaryForGene(geneObject.gene_name);
 			if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
-				theFbData = $.extend({}, theVcfData);
-				theFbData.features = [];
-				theFbData.loadState = {clinvar: true, coverage: true, inheritance: true};
-				// Add the unique freebayes variants to vcf data to include 
-				// in feature matrix
-				theVcfData.features.forEach( function(v) {
-					if (v.hasOwnProperty('fbCalled') && v.fbCalled == 'Y') {
-						var variantObject = $.extend({}, v);
-				   		theFbData.features.push(variantObject);
-				   		variantObject.source = v;
-					}
-			   	});					
+				theFbData = me.reconstituteFbData(theVcfData);
 			}
-
 		} 
 	}
 	return theFbData;
 
+}
+
+VariantModel.prototype.reconstituteFbData = function(theVcfData) {
+	var me = this;
+	var theFbData = $.extend({}, theVcfData);
+	theFbData.features = [];
+	theFbData.loadState = {clinvar: true, coverage: true, inheritance: true};
+	// Add the unique freebayes variants to vcf data to include 
+	// in feature matrix
+	theVcfData.features.forEach( function(v) {
+		if (v.hasOwnProperty('fbCalled') && v.fbCalled == 'Y') {
+			var variantObject = $.extend({}, v);
+	   		theFbData.features.push(variantObject);
+	   		variantObject.source = v;
+		}
+   	});	
+   	return theFbData;				
 }
 
 

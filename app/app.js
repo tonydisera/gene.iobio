@@ -3407,12 +3407,7 @@ function getRsId(variant) {
 }
 
 function filterVariants() {
-	if (filterCard.hasFilters()) {
-		$('#filter-track-loader .loader-label').text("Applying filter")
-	} else {
-		$('#filter-track-loader .loader-label').text("Clearing filter")
-	}
-	$('#filter-track-loader').removeClass("hide");
+	filterCard.startFilterProgress();
 	setTimeout(function() {
         filterVariantsImpl();
     }, 100);	
@@ -3439,8 +3434,9 @@ function filterVariantsImpl() {
 		}
 
 	});		
-	filterCard.filterGenes();
-	$('#filter-track-loader').addClass("hide");
+	filterCard.filterGenes(function() {
+		filterCard.endFilterProgress();
+	});
 
 }
 

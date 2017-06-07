@@ -603,8 +603,6 @@ FilterCard.prototype.clearFilters = function() {
 	$('#af1000g-range-filter #af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
-
-	this.displayFilterSummary();
 	
 }
 
@@ -948,16 +946,19 @@ FilterCard.prototype.hasFilters = function() {
 }
 
 
-FilterCard.prototype.filterGenes = function() {
+FilterCard.prototype.filterGenes = function(callback) {
 	var me = this;
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
 	if (me.applyLowCoverageFilter) {
 		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
 		cacheHelper.showGeneCounts(geneCounts);
+		callback();
 	} else {
-		var geneCounts = cacheHelper.refreshGeneBadges();
-		cacheHelper.showAnalyzeAllProgress();		
+		var geneCounts = cacheHelper.refreshGeneBadges(function() {
+			cacheHelper.showAnalyzeAllProgress();		
+			callback();
+		});
 	}
 }
 
@@ -1051,11 +1052,29 @@ FilterCard.prototype._getFilterString = function() {
 }
 
 FilterCard.prototype.displayFilterSummary = function(filterString) {
+	$("#filter-summary-track .loader").nextAll().remove();
 	filterString = filterString ? filterString : this._getFilterString();
 	if (filterString.length > 0) {
 		$("#filter-summary-track").removeClass("hide")
-		$("#filter-summary-track .card-label").nextAll().remove();
-		$('#filter-summary-track .card-label').after(filterString);		
+		$('#filter-summary-track .loader').after(filterString);		
+	} 
+}
+
+FilterCard.prototype.startFilterProgress = function() {
+	if (this.hasFilters()) {
+		$('#filter-summary-loader .loader-label').text("Applying filter")
+	} else {
+		$('#filter-summary-loader .loader-label').text("Clearing filter")
+	}
+	$('#filter-summary-loader').removeClass("hide");
+}
+
+FilterCard.prototype.endFilterProgress = function() {
+
+	$('#filter-summary-loader').addClass("hide");
+
+	if (this.hasFilters()) {
+		$("#filter-summary-track").removeClass("hide")
 	} else {
 		$("#filter-summary-track").addClass("hide")
 	}

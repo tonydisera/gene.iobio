@@ -658,7 +658,7 @@ CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
 }
 
 
-CacheHelper.prototype.refreshGeneBadges = function() {  
+CacheHelper.prototype.refreshGeneBadges = function(callback) {  
 	var me = this;
 	var geneCount = {total: 0, pass: 0};
 
@@ -672,40 +672,27 @@ CacheHelper.prototype.refreshGeneBadges = function() {
 	//var dataKind = getProbandVariantCard().model.isAlignmentsOnly() ? "fbData" : "vcfData";
 	var dataKind = "vcfData";
 
-	for (var i=0; i<=localStorage.length-1; i++)  
-	{  
-		key = localStorage.key(i);  
+	var keys = [];
+	for (var i=0; i<=localStorage.length-1; i++) {  
+		var key = localStorage.key(i);  
 		keyObject = CacheHelper._parseCacheKey(key);
 		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 
 		  	if (keyObject.dataKind == dataKind && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
-		  		var theVcfData = CacheHelper.getCachedData(key);
-		  		var geneObject = window.geneObjects[keyObject.gene];
-		  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-		  		geneCount.total++;
-		  		if (filteredVcfData.features.length > 0) {
-		  			geneCount.pass++;
-		  		}
+		  		keys.push({'key': key, 'keyObject': keyObject});
+		  	}
+		 }
+	}
 
-				var theFbData = getVariantCard("proband").model.getFbDataForGene(geneObject, {transcript_id: keyObject.transcript}, true);
-				var options = {};
-				if (theFbData) {
-					options.CALLED = true;
-				}
+	me.refreshNextGeneBadge(keys, geneCount, function() {
+		genesCard.sortGenes(genesCard.HARMFUL_VARIANTS_OPTION, true);
 
-				var geneCoverageAll = getCachedGeneCoverage(geneObject,{ transcript_id: keyObject.transcript});
+		$('#gene-badges-loader').addClass("hide");
 
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverageAll);
-				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
-				
-				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
-		  	} 
-		} 
-	}  
-	genesCard.sortGenes(genesCard.HARMFUL_VARIANTS_OPTION, true);
+		callback();
 
-	$('#gene-badges-loader').addClass("hide");
-	return geneCount;
+	});
+
 }
 
 
@@ -778,6 +765,44 @@ CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 	} else {
 		me._clearCache(launchTimestampToClear, false, false);
 		me.genesToCache = [];
+	}
+}
+
+CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback) {
+	var me = this;
+	if (keys.length == 0) {
+		callback();
+	} else {
+		var theKey    = keys.splice(0,1)[0];
+		var key       = theKey.key;
+		var keyObject = theKey.keyObject;
+	  	var geneObject = window.geneObjects[keyObject.gene];
+
+  		CacheHelper.getCachedDataMultithread(key, function(theVcfData) {
+	  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
+	  		
+	  		geneCount.total++;
+	  		if (filteredVcfData.features.length > 0) {
+	  			geneCount.pass++;
+	  		}
+
+
+			var theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
+			var options = {};
+			if (theFbData) {
+				options.CALLED = true;
+			}
+
+			var geneCoverageAll = getCachedGeneCoverage(geneObject,{ transcript_id: keyObject.transcript});
+
+	  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverageAll);
+
+			getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
+			
+			genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
+
+			me.refreshNextGeneBadge(keys, geneCount, callback);	
+  		});
 	}
 }
 
@@ -1083,7 +1108,6 @@ CacheHelper._parseCacheKey = function(cacheKey) {
 
 }
 
-
 CacheHelper.getCachedData = function(key) {
 	var data = null;
 	if (localStorage) {
@@ -1099,6 +1123,32 @@ CacheHelper.getCachedData = function(key) {
       	} 
 	} 
 	return data;	
+}
+
+
+CacheHelper.getCachedDataMultithread = function(key, callback) {
+	if (localStorage) {
+      	var dataCompressed = localStorage.getItem(key);
+      	if (dataCompressed != null) {
+
+			var worker = new Worker('./app/model/cacheHelperWorker.js');	
+			
+			worker.onmessage = function(e) { 
+				callback(e.data);
+			};
+
+			// We will also want to be notified if the worker runs into trouble
+			worker.onerror = function(e) { 
+				console.log('An error occurred while decompressing cached data:', e) 
+				console.log("An error occurred when uncompressing data for key " + key);
+				callback(null);
+			};
+
+			// Start the worker!
+			worker.postMessage( { cmd: 'start', compressedData: dataCompressed });
+		}
+
+	} 
 }
 
 
