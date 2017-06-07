@@ -597,6 +597,7 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .clinvar').classed('current', false);
 	d3.selectAll('#filter-track .clinvar').classed('not-equal', false);
 	d3.selectAll('#filter-track .inheritance').classed('current', false);
+	d3.selectAll('#filter-track .inheritance').classed('not-equal', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
 	$('#afexac-range-filter #af-amount-start').val("");

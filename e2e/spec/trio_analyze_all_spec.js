@@ -34,6 +34,8 @@ module.exports = {
     appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
 
   },
+
+
   'Check for low coverage gene badges': function(client) {
     appTitleSection.assertGeneBadgeHasLowCoverage('AIRE');
     appTitleSection.assertGeneBadgeHasLowCoverage('PDHA1');
@@ -44,6 +46,20 @@ module.exports = {
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
 
   },
+
+
+  'Click denovo inheritance (custom) filter': function(client) {
+    nav.clickFilter();
+    client.pause(1000);   
+
+    filterPanel.clickClearAll();
+    client.pause(1000);
+    
+    filterPanel.clickInheritanceDenovo();
+    client.pause(1000);
+    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+  },
+  
   
   'Known causative filter': function(client) {
     nav.clickFilter();
@@ -80,6 +96,20 @@ module.exports = {
     appTitleSection.assertAnalyzeAllCounts(1,4,0,5);
 
   },
+
+
+  'Clear filter and click denovo inheritance (custom) filter': function(client) {
+    client.pause(1000);
+    filterPanel.clickClearAll();
+    client.pause(1000);
+    
+    filterPanel.clickInheritanceDenovo();
+    client.pause(1000);
+    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+  },
+  
+  
+
   'Low gene coverage filter': function(client) {
 
     filterPanel.clickLowCoverage();
@@ -99,12 +129,8 @@ module.exports = {
     appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
   },
-  'Click denovo inheritance (custom) filter': function(client) {
-    filterPanel.clickClearAll();
-    filterPanel.clickInheritanceDenovo();
-    client.pause(1000);
-    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
-  },
+
+
   
   'Click on AIRE, PDHA1 and look for low coverage exon glyph': function(client) {
 
