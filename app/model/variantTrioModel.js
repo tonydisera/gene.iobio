@@ -383,7 +383,7 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 
 	var sibZygosityAttr = affectedStatus + "_zygosity";
 	var affectedAttr    = affectedStatus + "Sibs";
-	me.nextCompareSib(affectedStatus, sibZygosityAttr, function() {
+	me.nextCompareSib(affectedStatus, function() {
 
 		me.probandVcfData.features.forEach( function(variant) {
 			 variant[affectedAttr] = "none";
@@ -429,12 +429,12 @@ VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedS
 
 }
 
-VariantTrioModel.prototype.nextCompareSib = function(affectedStatus, zygosityAttr, callback) {
+VariantTrioModel.prototype.nextCompareSib = function(affectedStatus, callback) {
 	var me = this;
 	if (me.sibsTransientVcfData.length > 0) {
 		var vcfData = me.sibsTransientVcfData.shift();
-		me.promiseCompareToSib(vcfData, zygosityAttr).then( function() {
-			me.nextCompareSib(affectedStatus, zygosityAttr, callback);
+		me.promiseCompareToSib(vcfData, affectedStatus).then( function() {
+			me.nextCompareSib(affectedStatus, callback);
 		});		
 	} else {
 		callback();
@@ -442,16 +442,32 @@ VariantTrioModel.prototype.nextCompareSib = function(affectedStatus, zygosityAtt
 }
 
 
-VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, zygosityAttr) {
+VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, affectedStatus) {
 	var me = this;
 	
 	return new Promise( function(resolve, reject) {
 
 		me.probandVcfData.features.forEach(function(variant) {
-			if (variant[zygosityAttr] == null) {
-				variant[zygosityAttr] = {};
+			if (variant[affectedStatus + "_zygosity"] == null) {
+				variant[affectedStatus + "_zygosity"] = {};
 			}
-			variant[zygosityAttr][sibVcfData.name] = "none";		
+			if (variant[affectedStatus + "_genotypeAltCount"] == null) {
+				variant[affectedStatus + "_genotypeAltCount"] = {};
+			}			
+			if (variant[affectedStatus + "_genotypeRefCount"] == null) {
+				variant[affectedStatus + "_genotypeRefCount"] = {};
+			}			
+			if (variant[affectedStatus + "_genotypeDepth"] == null) {
+				variant[affectedStatus + "_genotypeDepth"] = {};
+			}			
+			if (variant[affectedStatus + "_bamDepth"] == null) {
+				variant[affectedStatus + "_bamDepth"] = {};
+			}			
+			variant[affectedStatus + "_zygosity"][sibVcfData.name] = "none";		
+        	variant[affectedStatus + "_genotypeAltCount"][sibVcfData.name] = null;
+        	variant[affectedStatus + "_genotypeRefCount"][sibVcfData.name] = null;
+        	variant[affectedStatus + "_genotypeDepth"][sibVcfData.name] = null;
+        	variant[affectedStatus + "_bamDepth"][sibVcfData.name] = null;
 		});
 				
 		var idx = 0;
@@ -465,11 +481,19 @@ VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, zygosityAt
 	    	// in both sets. Here we take the father variant's zygosity and store it in the
 	    	// proband's variant for further sorting/display in the feature matrix.
 	        function(variantA, variantB) {
-	        	variantA[zygosityAttr][sibVcfData.name] = variantB.zygosity;
+	        	variantA[affectedStatus + "_zygosity"][sibVcfData.name]         = variantB.zygosity.toLowerCase() == "gt_unknown" ? "homref" : variantB.zygosity;
+	        	variantA[affectedStatus + "_genotypeAltCount"][sibVcfData.name] = variantB.genotypeAltCount;
+	        	variantA[affectedStatus + "_genotypeRefCount"][sibVcfData.name] = variantB.genotypeRefCount;
+	        	variantA[affectedStatus + "_genotypeDepth"][sibVcfData.name]    = variantB.genotypeDepth;
+	        	variantA[affectedStatus + "_bamDepth"][sibVcfData.name]         = variantB.bamDepth;
 	        },
 	        function(variantA, variantB) {
 	        	if (variantA) {
-	        		variantA[zygosityAttr][sibVcfData.name] = "none";
+	        		variantA[affectedStatus + "_zygosity"][sibVcfData.name]         = "none";
+	        		variantA[affectedStatus + "_genotypeAltCount"][sibVcfData.name] = null;
+	        		variantA[affectedStatus + "_genotypeRefCount"][sibVcfData.name] = null;
+	        		variantA[affectedStatus + "_genotypeDepth"][sibVcfData.name]    = null;
+	        		variantA[affectedStatus + "_bamDepth"][sibVcfData.name]         = null;
 	        	}
 	        }
 	     ).then( function() {

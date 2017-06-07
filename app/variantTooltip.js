@@ -1032,6 +1032,18 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 					row.append("div")
 					   .attr("class",  "tooltip-zygosity label " + zyg.toLowerCase())
 					   .text(capitalizeFirstLetter(zyg.toLowerCase()));
+
+
+					column = row.append("div")
+				                .attr("class", "sib-alt-count tooltip-allele-count-bar")
+					if (zyg && zyg != '') {			            
+						me._appendAlleleCountSVG(column, 
+							variant[affectedStatus + "_genotypeAltCount"][sampleName], 
+							variant[affectedStatus + "_genotypeRefCount"][sampleName], 
+							variant[affectedStatus + "_genotypeDepth"][sampleName], 
+							variant[affectedStatus + "_bamDepth"][sampleName],
+							barWidth);
+					} 
 				}
 			}
 

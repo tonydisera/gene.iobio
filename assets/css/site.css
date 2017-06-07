@@ -2431,7 +2431,7 @@ inputinput:-moz-placeholder {
 .tooltip-header-small {
   overflow-wrap: break-word;
   text-align: left;
-  width: 50px;
+  width: 80px;
   float: left;
   color: #888787;
   fill: #888787; }
@@ -2443,7 +2443,7 @@ inputinput:-moz-placeholder {
   min-height: 25px; }
 
 .sib-zygosity {
-  width: 140px;
+  width: 80px;
   float: left; }
 
 .tooltip-row.sib-info {
@@ -2719,18 +2719,18 @@ text.ref-count {
     padding-top: 10px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-left-column .tooltip-row {
-      width: 360px;
+      width: 330px;
       overflow: auto; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
-        width: 110px; }
+        width: 90px; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
-        width: 240px; }
+        width: 220px; }
   .tooltip-wide .tooltip-right-column {
     float: right;
     padding-top: 10px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-right-column .tooltip-row {
-      width: 270px;
+      width: 300px;
       overflow: auto; }
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-header {
         width: 110px; }
