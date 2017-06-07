@@ -137,6 +137,8 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			afexac_rare:      {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
 			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
 			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			denovo:           {key: 'inheritance',     label: "Inheritance mode",  state: true, not: true, value: 'denovo',           valueDisplay: 'de novo'},
+			recessive:        {key: 'inheritance',     label: "Inheritance mode",  state: true, not: true, value: 'recessive',        valueDisplay: 'recessive'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
 			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
 			clinvar_path:     {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
