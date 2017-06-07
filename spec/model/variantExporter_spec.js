@@ -20,7 +20,7 @@ dataCard.mode = 'trio';
 
 
 
-xdescribe('variantExporter', function() {
+describe('variantExporter', function() {
 
 
 	var bookmarkEntries = [
