@@ -91,6 +91,18 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
+VariantCard.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		me.showBamProgress("Analyzing coverage in coding regions");
+		me.model.promiseGetGeneCoverage(geneObject, transcript).then(function() {
+			me.endBamProgress();
+			resolve();
+		});
+
+	})
+}
+
 VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverageAll) {
 	var dangerSummary = VariantModel.summarizeDanger(data, options, geneCoverageAll);
 	this.model.cacheDangerSummary(dangerSummary, geneName);

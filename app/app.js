@@ -2951,7 +2951,7 @@ function promiseGetGeneCoverage(geneObject, transcript) {
 
 		getRelevantVariantCards().forEach(function(vc) {
 			if (vc.isBamLoaded()) {
-				var promise = vc.model.promiseGetGeneCoverage(geneObject, transcript);
+				var promise = vc.promiseGetGeneCoverage(geneObject, transcript);
 				promises.push(promise);
 			} 
 		});
