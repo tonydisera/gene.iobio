@@ -17,18 +17,18 @@
       font-size: 12px
 
 #zoom-region-chart.ibo-gene 
-  .cds.danger
+  .cds.danger1
     fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
-  .utr.danger  
+  .utr.danger1 
     fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
 
 #gene-viz.ibo-gene 
-  .cds.danger 
+  .cds.danger1 
     fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
-  .utr.danger   
+  .utr.danger1   
     fill:   $coverage-problem-fill-color
     stroke: $coverage-problem-border-color
 
@@ -213,7 +213,7 @@
     height: 14px
     padding-left: 3px
     padding-top: 0px
-    float: right   
+    float: left   
 
   #gene-badge-phenotype-symbol
     float: right
@@ -232,6 +232,9 @@
   margin-bottom: 8px
   margin-right: 10px
   height: 21px
+
+#gene-badge.failed-filter
+  opacity: .65
 
 #gene-badge.loading
   border-left: #d8d8d8  solid 10px
