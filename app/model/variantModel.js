@@ -304,7 +304,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		console.log("unable to summarize danger due to null data");
 		dangerCounts.error = "unable to summarize danger due to null data";
 		return dangerCounts;
-	} else if (theVcfData.features.length == 0) {		
+	} else if (theVcfData.features.length == 0) {	
+		dangerCounts.failedFilter = filterCard.hasFilters();
 		return dangerCounts;		
 	}
 
@@ -488,11 +489,13 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		}
 	}).length;
 
+	// Indicate if the gene pass the filter (if applicable)
+	dangerCounts.failedFilter = filterCard.hasFilters() && dangerCounts.featureCount == 0;
 		
 	return dangerCounts;
 }
 
-VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll) {
+VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, summarizeGeneCoverageOnly=false) {
 	if (geneCoverageAll && Object.keys(geneCoverageAll).length > 0) {
 		dangerObject.geneCoverageProblem = false;
 		for (relationship in geneCoverageAll) {
@@ -512,8 +515,28 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 		showStackTrace(new Error());
 		dangerObject.geneCoverageProblem = false;
 	}
+
+	// When we are just showing gene badges for low coverage and not reporting on status of
+	// filtered variants, clear out the all of the danger summary object related to variants
+	if (summarizeGeneCoverageOnly) {
+		dangerObject.CONSEQUENCE = {};
+		dangerObject.IMPACT = {};
+		dangerObject.CLINVAR = {};
+		dangerObject.INHERITANCE = {};
+		dangerObject.AF = {};
+		dangerObject.featureCount = 0;
+		dangerObject.loadedCount  = 0;
+		dangerObject.calledCount  = 0;
+		dangerObject.harmfulVariant = false;
+		dangerObject.harmfulVariantInheritanceMode = {};
+		// The app is applying the standard filter of 'has exon coverage problems', so
+		// indicate that gene didn't pass filter if there is NOT a coverage problem
+		dangerObject.failedFilter = !dangerObject.geneCoverageProblem;
+	}
+
 	return dangerObject;
 }
+
 VariantModel.summarizeError =  function(theError) {
 	var summaryObject = {};
 

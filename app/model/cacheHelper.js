@@ -728,7 +728,7 @@ CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {
 				var dangerObject = getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name);
 		 		
 			 	if (geneCoverageAll && dangerObject) {
-			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll);
+			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, true);
 
 			  		counts.all.analyzed++;
 			  		counts.loaded.analyzed++;

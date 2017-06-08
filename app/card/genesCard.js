@@ -1574,6 +1574,7 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("selected");
 	geneBadge.removeClass("has-coverage-problem");
 	geneBadge.removeClass("has-harmful-variant");
+	geneBadge.removeClass("failed-filter");
 }
 
 GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
@@ -1612,6 +1613,11 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	}
 	if (dangerObject.WARNING) {
 		geneBadge.addClass("warning");
+	}
+
+	geneBadge.removeClass("failed-filter");
+	if (dangerObject.failedFilter) {
+		geneBadge.addClass("failed-filter");
 	}
 
 	geneBadge.removeClass("called");
