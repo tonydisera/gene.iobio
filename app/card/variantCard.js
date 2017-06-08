@@ -221,64 +221,12 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    			}
 		    		})
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
-
-		    			
-			            
-		    			var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
-			            html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
-			            tooltip.html(html);
-
-		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
-    
-						tooltip.style("left", coord.x + "px") 
-				               .style("text-align", 'left')    
-				               .style("top", (coord.y-60) + "px");    
-
-			            tooltip.transition()        
-			                   .duration(200)      
-			                   .style("opacity", .9);   
-
+						me.showExonTooltip(featureObject, feature, tooltip);
 		    		})
 					.on("d3featureglyphtooltip", function(featureObject, feature, tooltip) {
-
-						var coverageRow = function(fieldName, coverageVal, covFields) {
-							var row = '<div>';
-							row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
-							row += '<span style="width:40px;display:inline-block">' + round(coverageVal, 2) + '</span>';
-							row += '<span class="' + (covFields[fieldName] ? 'danger' : '') + '">' + (covFields[fieldName] ? covFields[fieldName]: '') + '</span>';
-							row += "</div>";
-							return row;
-						}
-
-
-		    			var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
-			            html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
-			            if (feature.geneCoverage) {
-			            	var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
-			            	html += "<div style='margin-top:4px'>" + "Coverage:" 
-			            	     +  coverageRow('min',    feature.geneCoverage[me.getRelationship()].min, covFields) 
-			            	     +  coverageRow('median', feature.geneCoverage[me.getRelationship()].median, covFields) 
-			            	     +  coverageRow('mean',   feature.geneCoverage[me.getRelationship()].mean, covFields) 
-			            	     +  coverageRow('max',    feature.geneCoverage[me.getRelationship()].max, covFields) 
-			            	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields) 
-
-			            }
-			            tooltip.html(html);
-
-			            var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
-
-
-			            tooltip.style("left", coord.x + "px") 
-				               .style("text-align", 'left')    
-				               .style("top", (coord.y-60) + "px");        
-							   
-
-		    			tooltip.transition()        
-			                   .duration(200)      
-			                   .style("opacity", .9);   
-
+						me.showExonTooltip(featureObject, feature, tooltip);
 		    		});
-;
+
 
 
 		// Create the coverage chart
@@ -424,6 +372,40 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 
 };
+
+VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip) {
+	var me = this;
+	var coverageRow = function(fieldName, coverageVal, covFields) {
+		var row = '<div>';
+		row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
+		row += '<span style="width:40px;display:inline-block">' + round(coverageVal, 2) + '</span>';
+		row += '<span class="' + (covFields[fieldName] ? 'danger' : '') + '">' + (covFields[fieldName] ? covFields[fieldName]: '') + '</span>';
+		row += "</div>";
+		return row;
+	}
+
+	var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
+    html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
+    if (feature.geneCoverage && feature.geneCoverage[me.getRelationship()]) {
+    	var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
+    	html += "<div style='margin-top:4px'>" + "Coverage:" 
+    	     +  coverageRow('min',    feature.geneCoverage[me.getRelationship()].min, covFields) 
+    	     +  coverageRow('median', feature.geneCoverage[me.getRelationship()].median, covFields) 
+    	     +  coverageRow('mean',   feature.geneCoverage[me.getRelationship()].mean, covFields) 
+    	     +  coverageRow('max',    feature.geneCoverage[me.getRelationship()].max, covFields) 
+    	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields) 
+
+    }
+    tooltip.html(html);	
+
+    var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
+    tooltip.style("left", coord.x + "px") 
+           .style("text-align", 'left')    
+           .style("top", (coord.y-60) + "px");        
+	tooltip.transition()        
+           .duration(200)      
+           .style("opacity", .9);   
+}
 
 
 VariantCard.prototype.onBamFilesSelected = function(event, callback) {

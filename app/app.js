@@ -719,7 +719,7 @@ function getTooltipCoordinates(node, tooltip, adjustForVerticalScroll) {
 	
 	// If the tooltip will be cropped to the right, adjust its position
 	// so that it is immediately to the left of the node
-	if  ((coord.x + (tooltipWidth/2) + 100) > $('#proband-variant-card').width()) {
+	if  ((coord.x + (tooltipWidth/2) + 150) > $('#proband-variant-card').width()) {
 		coord.x -= tooltipWidth/2;
 		coord.x -= 6;
 		tooltip.classed("black-arrow-left", false);
