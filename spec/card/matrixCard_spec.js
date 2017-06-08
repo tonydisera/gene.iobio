@@ -611,6 +611,7 @@ describe('MatrixCard', function() {
 		beforeEach(function() {
 			setFixtures('<div id="test"></div>');
 			selection = d3.select('#test');
+			selection.datum({ clazz: "affected" });
 			mc = new MatrixCard();
 		});
 
