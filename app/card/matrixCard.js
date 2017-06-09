@@ -332,6 +332,10 @@ MatrixCard.prototype.init = function() {
 				    .columnLabel( me.getVariantLabel )
 				    .columnLabelClass( me.getVariantLabelClass )
 				    .columnLabelSymbol( me.showColumnHeaderSymbol)
+				    .adjustTooltipCoordinates( function(variant) {
+		              variant.screenYMatrix += $('.navbar-fixed-top').outerHeight();
+		              variant.screenXMatrix += $("#slider-left").hasClass("hide") ? 0 : $('#slider-left').outerWidth();
+				    })
 				    .on('d3click', function(variant) {
 				    	if (variant ==  null) {
 				    		me.unpin();
@@ -575,22 +579,18 @@ MatrixCard.prototype.reset = function() {
 
 
 MatrixCard.prototype.hideTooltip = function() {
-	var tooltip = d3.select('#container #matrix-track .tooltip');
+	//var tooltip = d3.select('#container #matrix-track .tooltip');
+	var tooltip = d3.select('#matrix-tooltip');
 	tooltip.transition()
            .duration(500)
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
 
-     if ($('#container.slide-left').length > 0) {
-     	$('#container.slide-left').css("z-index", "auto");
-     }
-
-
 }
 
 MatrixCard.prototype.adjustTooltip = function(variant) {
-	if (d3.select('#matrix-track .tooltip').style('opacity') != 0) {
+	if (d3.select('#matrix-tooltip').style('opacity') != 0) {
 		this.highlightVariant(variant, true);
 	}
 }
@@ -613,6 +613,8 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 			eduTourCheckVariant(variant);
 		}
 	}
+
+
 	
 	if (lock && !isLevelEdu && !isLevelBasic) {
 
@@ -647,15 +649,12 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
 	var me = this;
 
-	var tooltip = d3.select('#container #matrix-track .tooltip');
+	//var tooltip = d3.select('#container #matrix-track .tooltip');
+	var tooltip = d3.select('#matrix-tooltip');
 
 
 	var screenX = variant.screenXMatrix;
 	screenX    -= me.featureMatrix.cellSize()/2;
-
-     if ($('#container.slide-left').length > 0) {
-     	$('#container.slide-left').css("z-index", 1032);
-     }
 
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
 	tooltip.select("#unpin").on('click', function() {

@@ -55,7 +55,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 
 
-	if (x-33 > 0 && (x-33+w) < $('#matrix-panel').outerWidth()) {
+	if (x > 0 && (x+w) < $('#matrix-panel').outerWidth()) {
 		tooltip.classed("arrow-down-left", true);
 		tooltip.classed("arrow-down-right", false);
 		tooltip.classed("arrow-down-center", false);
