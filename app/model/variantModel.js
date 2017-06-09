@@ -760,7 +760,7 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 
 					// Get the sample names from the vcf header
 				    me.vcf.getSampleNames( function(sampleNames) {
-				    	me.isMultiSample = samplesNames && sampleNames.length > 1 ? true : false;
+				    	me.isMultiSample = sampleNames && sampleNames.length > 1 ? true : false;
 				    	resolve({'fileName': me.vcf.getVcfFile().name, 'sampleNames': sampleNames});
 				    });
 				} else {
