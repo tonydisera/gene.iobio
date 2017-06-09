@@ -1203,10 +1203,11 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 			// Only show the sample dropdown if the vcf file has more than one sample
 			if (sampleNames.length > 1) {
-				
 				me.populateSampleDropdowns(variantCard, me.panelSelectorFilesSelected, sampleNames);
 
 			} else {
+				me.panelSelectorFilesSelected.find('#vcf-sample-select-box').removeClass("attention");
+
 				variantCard.setSampleName("");				
 				variantCard.setDefaultSampleName(null);
 				window.removeUrl('sample'+cardIndex);
@@ -1255,12 +1256,16 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 	// If we are loading from URL parameters and the sample name was specified, select this
 	// sample from dropdown
 	if (variantCard.getDefaultSampleName() != null && variantCard.getDefaultSampleName() != "") {
+		panelSelector.find('#vcf-sample-select-box').removeClass("attention");
+
 		panelSelector.find('#vcf-sample-select')[0].selectize.setValue(variantCard.getDefaultSampleName());
 
 		variantCard.setSampleName(variantCard.getDefaultSampleName());
 		variantCard.setDefaultSampleName(null);
 		me.enableLoadButtonIfBuildSet(true);
 	} else {
+		panelSelector.find('#vcf-sample-select-box').addClass("attention");
+
 		window.disableLoadButton();
 	}	
 
@@ -1279,6 +1284,8 @@ DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	panelSelector.find('#datasource-name').val(sampleName);
 	variantCard.setSampleName(sampleName);
 	variantCard.setName(sampleName);
+	panelSelector.find('#vcf-sample-select-box').removeClass("attention");
+
 	
 	window.updateUrl('sample' + cardIndex, sampleName);
 	window.updateUrl('name' + cardIndex, sampleName);
@@ -1335,6 +1342,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 				} else {
 					variantCard.setSampleName("");
 					variantCard.setDefaultSampleName(null);
+					panelSelector.find('#vcf-sample-select-box').removeClass("attention");
 					window.removeUrl('sample'+cardIndex);
 
 

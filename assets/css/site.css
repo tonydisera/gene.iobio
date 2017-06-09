@@ -2321,7 +2321,8 @@ inputinput:-moz-placeholder {
   display: inline-block;
   color: #717171;
   vertical-align: top;
-  padding-top: 4px; }
+  padding-top: 4px;
+  height: 30px; }
 #dataModal #vcf-sample-select-box {
   display: inline-block;
   width: 200px; }

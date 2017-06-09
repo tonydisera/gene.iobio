@@ -75,6 +75,7 @@ module.exports = {
         platinumTrio: { selector: '#display-platinum-vcf-url-item' },
         probandVcfSampleBox: { selector: '#vcf-sample-box' },
         probandVcfSampleSelectBox: { selector: '#vcf-sample-select-box .selectize-input' },
+        probandVcfSampleSelectPanel: { selector: '#vcf-sample-select-box' },
         urlInput: { selector: '#url-input' },
         tbiUrlInput: { selector: '#url-tbi-input' },
         bamUrlInput: { selector: '#bam-url-input' },

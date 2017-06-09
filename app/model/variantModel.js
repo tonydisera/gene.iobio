@@ -11,6 +11,7 @@ function VariantModel() {
 	this.vcfUrlEntered = false;
 	this.vcfFileOpened = false;
 	this.getVcfRefName = null;
+	this.isMultiSample = false;
 
 	this.bamUrlEntered = false;
 	this.bamFileOpened = false;
@@ -48,7 +49,7 @@ VariantModel.prototype.isLoaded = function() {
 
 
 VariantModel.prototype.isReadyToLoad = function() {
-	return this.isVcfReadyToLoad() || this.isBamReadyToLoad();
+	return (this.isVcfReadyToLoad() && this.isSampleSelected()) || this.isBamReadyToLoad();
 }
 
 VariantModel.prototype.isBamReadyToLoad = function() {
@@ -57,6 +58,10 @@ VariantModel.prototype.isBamReadyToLoad = function() {
 
 VariantModel.prototype.isVcfReadyToLoad = function() {
 	return this.vcf != null && (this.vcfUrlEntered || this.vcfFileOpened);
+}
+
+VariantModel.prototype.isSampleSelected = function() {
+	return !this.isMultiSample || (this.sampleName && this.sampleName.length > 0);
 }
 
 
@@ -751,9 +756,11 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 					me.vcfFileOpened = true;
 					me.vcfUrlEntered = false;
 					me.getVcfRefName = null;
+					me.isMultiSample = false;
 
 					// Get the sample names from the vcf header
 				    me.vcf.getSampleNames( function(sampleNames) {
+				    	me.isMultiSample = samplesNames && sampleNames.length > 1 ? true : false;
 				    	resolve({'fileName': me.vcf.getVcfFile().name, 'sampleNames': sampleNames});
 				    });
 				} else {
@@ -807,7 +814,8 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 	} else {
 		me.vcfUrlEntered = true;
 	    me.vcfFileOpened = false;
-	    me.getVcfRefName = null;	
+	    me.getVcfRefName = null;
+	    me.isMultiSample = false;	
 
 	    success = this.vcf.openVcfUrl(vcfUrl, tbiUrl, function(success, errorMsg) {
 	    	if (me.lastVcfAlertify) {
@@ -820,6 +828,7 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 			    me.getVcfRefName = null;	
 			    // Get the sample names from the vcf header
 			    me.vcf.getSampleNames( function(sampleNames) {
+			    	me.isMultiSample = sampleNames && sampleNames.length > 1 ? true : false;
 			    	callback(success, sampleNames);
 			    });	    	
 		    } else {
