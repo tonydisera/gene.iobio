@@ -40,6 +40,8 @@ module.exports = {
     appTitleSection.assertGeneBadgeHasLowCoverage('AIRE');
     appTitleSection.assertGeneBadgeHasLowCoverage('PDHA1');
   },
+
+
   'Calling all genes': function(client) {
     appTitleSection.selectCallAll();
     appTitleSection.waitForCallAllDone();
@@ -130,6 +132,21 @@ module.exports = {
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
   },
 
+
+
+  'Click on AIRE and validate recfilter . (unassigned) counts': function(client) {
+    nav.clickFilter();
+    client.pause(1000);   
+
+    nav.searchGene('AIRE');
+    client.pause(1000);
+    matrixTrack.waitForMatrixLoaded();
+
+    filterPanel.clickRecfilterUnassigned();
+    client.pause(1000);
+    probandVariantCard.assertLoadedVariantSymbolCountEquals('4');
+
+  },
 
   
   'Click on AIRE, PDHA1 and look for low coverage exon glyph': function(client) {

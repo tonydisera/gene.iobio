@@ -2,6 +2,8 @@ var filter = {
   clinvarPath: '//div[@id="filter-track"]//*[local-name()="svg" and @class="clinvar" and @id="clinvar_path"]',
   clinvarPathClicked: '//div[@id="filter-track"]//*[local-name()="svg" and contains(@class,"clinvar") and contains(@class, "current") and @id="clinvar_path"]',
 
+  recfilterUnassigned:    '//div[@id="filter-track"]//*[local-name()="svg" and @class="recfilter" and @id="unassigned"]',
+
   inheritanceDenovo:    '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="denovo"]',
   inheritanceRecessive: '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="recessive"]',
   
@@ -53,6 +55,11 @@ module.exports = {
     clickEffect: function() {
       return this.click('@effect');
     },
+
+    clickRecfilterUnassigned: function() {
+      return this.api.useXpath().moveToElement(filter.recfilterUnassigned, 1,1).click(filter.recfilterUnassigned);
+    },
+
 
     clickClinvarPath: function() {
       return this.api.useXpath().moveToElement(filter.clinvarPath, 1,1).click(filter.clinvarPath);
