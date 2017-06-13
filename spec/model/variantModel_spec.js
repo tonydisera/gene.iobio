@@ -318,7 +318,8 @@ describe('variantModel', function() {
 					loadedCount: 2, 
 					calledCount: 0,
 					harmfulVariant: false,
-					harmfulVariantInheritanceMode: { }	
+					harmfulVariantInheritanceMode: { },
+					failedFilter: false			
 				});
 			});
 		});
@@ -344,7 +345,8 @@ describe('variantModel', function() {
 					loadedCount: 2, 
 					calledCount: 0,
 					harmfulVariant: false,
-					harmfulVariantInheritanceMode: { }
+					harmfulVariantInheritanceMode: { },
+					failedFilter: false		
 				});
 			});
 		});
