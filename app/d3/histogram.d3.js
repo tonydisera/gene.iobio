@@ -10,16 +10,21 @@ function histogramD3() {
       xValue = function(d) { return d[0]; },
       yValue = function(d) { return d[1]; },
       tooltipText = function(d, i) {
-        return d[0] + ", " + d[1]; 
+        return xValue(d) + ", " + yValue(d); 
       },
       x = d3.scale.linear(),
       y = d3.scale.linear();
 
+  var xStart = null;
+  var xEnd   = null;
 
   var formatXTick = null;
 
   var xAxisLabel = null;
   var yAxisLabel = null;
+
+  var showXAxis = true;
+  var showYAxis = true;
 
   var widthPercent = null;
   var heightPercent = null;
@@ -28,8 +33,9 @@ function histogramD3() {
     // merge options and defaults
     options = $.extend(defaults,options);
     var innerHeight = height - margin.top - margin.bottom;    
+    var innerWidth = width - margin.left - margin.right;
+    
 
-   
     selection.each(function(data) {
       // set svg element
       svg = d3.select(this);
@@ -42,39 +48,40 @@ function histogramD3() {
          .attr("preserveAspectRatio", "none");
        
 
-      // Convert data to standard representation greedily;
-      // this is needed for nondeterministic accessors.
-      data = data.map(function(d, i) {return [xValue.call(data, d, i), yValue.call(data, d, i)];});
-      
-      // Remove outliers if wanted.
-      if ( !options.outliers )
-         data = removeOutliers(data);
-         
-      // Calculate average.
-      var avg = [];
-      if (options.averageLine) {
-         var totalValue = 0, numValues = 0;
-         for (var i=0, len = data.length; i < len; i++) { totalValue += data[i][0]*data[i][1]; numValues += data[i][1]; }
-         avg = [totalValue / numValues];
-      }
 
-      // Update the x-scale.
-      x  .domain(d3.extent(data, function(d) { return d[0]; }));
-      x  .range([0, width - margin.left - margin.right]);
-      
-      // Check for single value x axis.
-      if (x.domain()[0] == x.domain()[1]) { var v = x.domain()[0]; x.domain([v-5,v+5]);}
+      if (xStart && xEnd) {
+        x.domain([xStart, xEnd]);
+      } else {
+        x.domain(d3.extent(data, function(d) { return xValue(d); }));
+      }         
+
+      x.range([0, width - margin.left - margin.right]);
+      var xMin = d3.min(data, function(d,i) {
+        return xValue(d);
+      })
+      var xMax = d3.max(data, function(d,i) {
+        return xValue(d);
+      })
+      var barWidth = Math.floor( (x(xMax)-x(xMin)) / data.length);
+
 
       // Update the y-scale.
-      y  .domain([0, d3.max(data, function(d) { return d[1]; })])
-      y  .range([innerHeight , 0]);
+      y.domain([0, d3.max(data, function(d) { return yValue(d); })])
+      y.range([innerHeight , 0]);
+
 
       
-      var xAxis = d3.svg.axis().scale(x).orient("bottom");
+      var xAxis = null;
+      if (showXAxis) {
+        xAxis = d3.svg.axis().scale(x).orient("bottom");
+      }
       var brush = d3.svg.brush().x(x);
-      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(6);
+      var yAxis = null;
+      if (showYAxis) {
+        yAxis = d3.svg.axis().scale(y).orient("left").ticks(6);
+      }
 
-      if (formatXTick) {
+      if (formatXTick && showXAxis) {
         xAxis.tickFormat(formatXTick);
       }
 
@@ -85,15 +92,20 @@ function histogramD3() {
       // Otherwise, create the skeletal chart.
       var gEnter = g.enter().append("g");
       gEnter.selectAll("g.x axis").remove();
-      gEnter.append("g").attr("class", "x axis").attr("transform", "translate(0," + y.range()[0] + ")");
-      gEnter.selectAll("g.y axis").remove();
-      gEnter.append("g").attr("class", "y axis");
-      gEnter.append("g").attr("class", "x brush");
+      if (showXAxis) {
+        gEnter.append("g").attr("class", "x axis").attr("transform", "translate(0," + y.range()[0] + ")");
+        gEnter.append("g").attr("class", "x brush");        
+      }
+
+      if (showYAxis) {
+        gEnter.selectAll("g.y axis").remove();
+        gEnter.append("g").attr("class", "y axis");        
+      }
 
       
       // Add the text label for the x axis
       //gEnter.selectAll("g.xaxis label")
-      if (xAxisLabel) {
+      if (xAxisLabel && showXAxis) {
         gEnter.selectAll("g.x axis label").remove();
         gEnter.append("text")
           .attr("class", "x axis label")
@@ -120,31 +132,16 @@ function histogramD3() {
       // Update the inner dimensions.
       g.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       
-      // Add avg line and text
-      var half = x(x.domain()[0]+1) / 2;
-      var avgLineG = gEnter.selectAll(".avg")
-                .data(avg)
-             .enter().append("g")
-                .attr("class", "avg")
-                .style("z-index", 100)
-                .attr("transform", function(d) { return "translate(" + parseInt(x(d)+half) + "," + 0 + ")"; });
-      
-          avgLineG.append("line")
-             .attr("x1", 0)
-             .attr("x2", 0)
-             .attr("y1", innerHeight)
-             .attr("y2", -8);
-      
-          avgLineG.append("text")
-                .text("avg")
-                .attr("y", "-10");         
+          
       
 
       // Add new bars groups.
       var bar = g.selectAll(".bar").data(data)
       var barEnter = bar.enter().append("g")
             .attr("class", "bar")
-            .attr("transform", function(d) { return "translate(" + x(d[0]) + "," + innerHeight + ")"; });            
+            .attr("transform", function(d,i) { 
+              return "translate(" +  (Math.floor(x(xValue(d))) - Math.floor(barWidth/2)) + "," + innerHeight + ")"; 
+            });            
       
       // Remove any previous selections
       svg.selectAll(".bar rect").attr("class", "");
@@ -153,7 +150,7 @@ function histogramD3() {
       barEnter.append("rect")
          .attr("x", 1)
          .style("z-index", 5)
-         .attr("width", Math.max(x(x.domain()[0]+1),1))
+         .attr("width", barWidth)
          .attr("height", 0)
          .on("mouseover", function(d, i) {  
 
@@ -188,33 +185,32 @@ function histogramD3() {
       // Update bars groups.
       bar.transition()
          .duration(200)
-         .attr("transform", function(d) { 
-            return "translate(" + parseInt(x(d[0])) + "," + Math.floor(y(d[1])) + ")"; 
+         .attr("transform", function(d,i) {
+            return "translate(" + (Math.floor(x(xValue(d))) - Math.floor(barWidth/2))  + "," + Math.floor(y(yValue(d))) + ")"; 
          });
 
       // Update bars.
       bar.select("rect").transition()
          .duration(200)
-         .attr("width", Math.max( Math.ceil( x(x.domain()[0]+1) ), 1))
          .attr("height", function(d) { 
-            return parseInt(d[0]) >= x.domain()[0] ? innerHeight - parseInt(y(d[1])) : 0; 
+            return parseInt(xValue(d)) >= x.domain()[0] ? innerHeight - parseInt(y(yValue(d))) : 0; 
          });
 
       // Update the x-axis.
-      g.select(".x.axis").transition()
-          .duration(200)
-          .call(xAxis);
+      if (showXAxis) {
+        g.select(".x.axis").transition()
+            .duration(200)
+            .call(xAxis);        
+      }
           
       // Update the y-axis.
-      g.select(".y.axis").transition()
-         .duration(200)
-         .call(yAxis);
+      if (showYAxis) {
+        g.select(".y.axis").transition()
+           .duration(200)
+           .call(yAxis);        
+      }
          
-      // Update avg line and text
-      svg.selectAll(".avg").transition()
-         .duration(200)
-         .attr("transform", function(d) { return "translate(" + parseInt(x(d)+half) + "," + 0 + ")"; })
-         .call(moveToFront);
+
             
       // Update brush if event has been set.
       if( brush.on("brushend") || brush.on("brushstart") || brush.on("brush")) {
@@ -236,7 +232,7 @@ function histogramD3() {
       var q1 = quantile(data, 0.25); 
       var q3 = quantile(data, 0.75);
       var iqr = (q3-q1) * 1.5; //
-      return data.filter(function(d) { return (d[0]>=(Math.max(q1-iqr,0)) && d[0]<=(q3+iqr)) });
+      return data.filter(function(d) { return (xValue(d)>=(Math.max(q1-iqr,0)) && xValue(d)<=(q3+iqr)) });
    }
     
    function quantile(arr, p) {
@@ -334,6 +330,35 @@ function histogramD3() {
     return chart;
   }
   
+  chart.showXAxis = function(_) {
+    if (!arguments.length) return showXAxis;
+    showXAxis = _;
+    return chart;
+  };
+
+  chart.showYAxis = function(_) {
+    if (!arguments.length) return showYAxis;
+    showYAxis = _;
+    return chart;
+  };
+
+
+
+  
+  chart.xStart = function(_) {
+    if (!arguments.length) return xStart;
+    xStart = _;
+    return chart;
+  };
+
+  chart.xEnd = function(_) {
+    if (!arguments.length) return xEnd;
+    xEnd = _;
+    return chart;
+  };
+
+
+
   chart.brush = function(_) {
     if (!arguments.length) return brush;
     brush = _;

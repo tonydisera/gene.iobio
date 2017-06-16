@@ -648,6 +648,101 @@ var effectCategories = [
 
   }
 
+  exports.promiseGetKnownVariants = function(refName, geneObject) {
+    var me = this;
+
+
+    return new Promise( function(resolve, reject) {
+
+      if (sourceType == SOURCE_TYPE_URL) {
+        me._getRemoteKnownVariantsImpl(refName, geneObject,
+          function(data) {
+            if (data) {
+              resolve(data);
+            } else {
+              reject();
+            }
+          });
+      } else {
+
+        /*me._getLocalKnownVariantsImpl(refName, geneObject,
+          function(data) {
+            if (data) {
+              resolve(data);
+            } else {
+              reject();
+            }
+          });
+        */
+        resolve();
+      }
+
+    });
+  }
+
+  exports._getRemoteKnownVariantsImpl = function(refName, geneObject, callback) {
+
+    var me = this;
+
+    // Figure out the file location of the reference seq files
+    var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
+
+    // Create an iobio command get get the variants and add any header recs.
+    var args = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
+                       .pipe(IOBIO.knownvariants, ['-r', regionParm, '-'], {ssl: false})
+
+
+    var summaryData = "";
+    // Get the results from the iobio command
+    cmd.on('data', function(data) {
+         if (data == undefined) {
+            return;
+         }
+         summaryData += data;
+    });
+
+    // We have all of the annotated vcf recs.  Now parse them into vcf objects
+    cmd.on('end', function(data) {
+      var results = [];
+      var records = summaryData.split("\n");
+      var fieldsNames = {};
+
+      var idx = 0;
+      records.forEach(function(record) {
+        if (idx == 0) {
+          fieldNames = record.split('\t');
+        } else {
+          var fields = record.split('\t');
+          var resultRec = {};
+
+          var i = 0;
+          fieldNames.forEach(function(fieldName) {
+            // All fields are numeric
+            resultRec[fieldName] = +fields[i];
+            i++;
+          })
+          // Find the mid-point of the interval (binned region)
+          resultRec.point = resultRec.start + ((resultRec.end - resultRec.start) / 2);
+          
+          results.push(resultRec);
+        }
+        idx++;
+      });
+      callback(results);
+    });
+
+    cmd.on('error', function(error) {
+       console.log(error);
+    });
+
+    cmd.run();
+
+  }
+
   exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
     var key =  "backend.gene.iobio"  
       + "-" + cacheHelper.launchTimestamp 

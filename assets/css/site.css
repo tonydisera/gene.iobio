@@ -3816,6 +3816,25 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
+.stacked-bar-chart .axis text {
+  font-size: 12px !important; }
+.stacked-bar-chart .layer.benign .stacked-bar rect {
+  fill: #9cc231;
+  stroke: #717171;
+  stroke-width: 0.5px; }
+.stacked-bar-chart .layer.path .stacked-bar rect {
+  fill: #ad494A;
+  stroke: #717171;
+  stroke-width: 0.5px; }
+.stacked-bar-chart .layer.other .stacked-bar rect {
+  fill: #e7ba52;
+  stroke: #717171;
+  stroke-width: 0.5px; }
+.stacked-bar-chart .layer.unknown .stacked-bar rect {
+  fill: #bdbdbd;
+  stroke: #717171;
+  stroke-width: 0.5px; }
+
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {
     margin-left: 200px !important; } }

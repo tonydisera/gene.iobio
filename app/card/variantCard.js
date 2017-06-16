@@ -4,9 +4,9 @@ function VariantCard() {
 	this.model = null;
 
   	this.vcfChart = null;
-	this.afChart = null;
 	this.zoomRegionChart = null;
 	this.bamDepthChart = null;	 
+	this.knownVariantsChart = null;
 
 	this.cardSelector = null;
 	this.d3CardSelector = null;
@@ -334,28 +334,19 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							matrixCard.clearSelections();
 						}
 					});
-					
 
-	 	// Create allele frequency chart
-	 	// Allele freq chart)
-		// TODO:  Replace this with actual frequency after af grabbed from population (1000G/ExAC)
-	    this.afChart = histogramD3()
-	                       .width(400)
-	                       .height(70)
-						   .margin( {left: 40, right: 0, top: 0, bottom: 20})
-						   .xValue( function(d, i) { return d[0] })
-						   .yValue( function(d, i) { return Math.log(d[1]) })
-						   .yAxisLabel( "log(frequency)" );
-						   
-		this.afChart.formatXTick( function(d,i) {
-			return (d * 2) + '%';
-		});
-		this.afChart.tooltipText( function(d, i) { 
-			var value = vcfAfData[i][1];
-			var lowerVal =  d[0]      * 2;
-			var upperVal = (d[0] + 1) * 2;
-			return  d3.round(value) + ' variants with ' + lowerVal + "-" + upperVal + '%' + ' AF ';
-		});
+					
+		this.knownVariantsChart = stackedBarChartD3()
+									.widthPercent("100%")
+		                    		.heightPercent("100%")
+		                      	    .width($('#container').innerWidth())
+		                    		.height(50)
+		                    		.xValue( function(d, i) { return d.point })
+		                    		.categories(['unknown', 'other', 'benign', 'path'])
+								    .margin( {top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+								    .tooltipText( function(d,i) {
+								    	return me.showKnownVariantsTooltip(d);
+								    })
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
 			me.shrinkCard(true);
@@ -384,6 +375,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 
 };
+
 
 VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip) {
 	var me = this;
@@ -658,7 +650,9 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 			// Load the variant chart.			
 			me._showVariants( regionStart, 
 				regionEnd, 
-				function() {						
+				function() {	
+
+					me.showKnownVariants();
 					readjustCards();
 					resolve();
 				},
@@ -671,6 +665,62 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 	});
 	
 	
+}
+
+VariantCard.prototype.showKnownVariantsTSV = function() {
+	var me = this;					
+	var testGenes = {'BRCA2': true, 'MTHFR': true, 'RAI1': true};
+	if (me.getRelationship() == 'proband' && testGenes[window.gene.gene_name]) {
+		me.cardSelector.find('#known-variants-chart').removeClass("hide");
+        
+		var fileName = 'data/clinvar_summary_' + window.gene.gene_name.toLowerCase() + ".txt";	
+		d3.tsv(fileName, function(error, data) {
+				if (error) throw error;
+				var histData = data.map(function(d) {
+					d.point = +d.start + ((+d.end - +d.start) / 2);
+					d.path = +d.path ;
+					d.benign = +d.benign;
+					d.other = +d.other;
+					d.unknown = +d.unknown;
+					d.total = +d.total;
+					return d;
+				})
+				var selection = me.d3CardSelector.select('#known-variants-chart').datum(histData);
+				me.knownVariantsChart(selection, {transition: {'pushRight': true }} );
+
+			});
+	}					
+}
+
+VariantCard.prototype.showKnownVariants = function() {
+	var me = this;	
+	if (me.getRelationship() == 'proband') {
+	var refName = me.model._stripRefName(window.gene.chr);
+		me.model.vcf.promiseGetKnownVariants(refName, window.gene).then(function(results) {
+
+			me.cardSelector.find('#known-variants-chart').removeClass("hide");
+			var selection = me.d3CardSelector.select('#known-variants-chart').datum(results);
+			me.knownVariantsChart(selection, {transition: {'pushRight': true }} );
+		})					
+	}	
+}
+
+VariantCard.prototype.showKnownVariantsTooltip = function(knownVariants) {
+	var me = this;
+	var tooltipRow = function(valueObject) {
+		var fieldName = Object.keys(valueObject)[0];
+		var row = '<div>';
+		row += '<span style="padding-left:10px;width:70px;display:inline-block">' + fieldName   + '</span>';
+		row += '<span style="width:40px;display:inline-block">' + valueObject[fieldName] + '</span>';
+		row += "</div>";
+		return row;
+	}
+    var html = 'ClinVar variants: ';
+    for (var i = knownVariants.values.length - 1; i >= 0; i--) {
+		html += tooltipRow(knownVariants.values[i])
+    }
+    
+    return html;
 }
 
 VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
@@ -698,6 +748,7 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 
 		if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
 			me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
+			me.cardSelector.find('#known-variants-chart').addClass("hide");
 
 			// Workaround.  For some reason, d3 doesn't clean up previous transcript
 			// as expected.  So we will just force the svg to be removed so that we
