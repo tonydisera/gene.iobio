@@ -648,14 +648,14 @@ var effectCategories = [
 
   }
 
-  exports.promiseGetKnownVariants = function(refName, geneObject) {
+  exports.promiseGetKnownVariants = function(refName, geneObject, binLength) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteKnownVariantsImpl(refName, geneObject,
+        me._getRemoteKnownVariantsImpl(refName, geneObject, binLength,
           function(data) {
             if (data) {
               resolve(data);
@@ -680,12 +680,12 @@ var effectCategories = [
     });
   }
 
-  exports._getRemoteKnownVariantsImpl = function(refName, geneObject, callback) {
+  exports._getRemoteKnownVariantsImpl = function(refName, geneObject, binLength, callback) {
 
     var me = this;
 
     // Figure out the file location of the reference seq files
-    var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
+    var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
 
     // Create an iobio command get get the variants and add any header recs.
     var args = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
@@ -693,7 +693,7 @@ var effectCategories = [
       args.push(tbiUrl);
     }
     var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
-                       .pipe(IOBIO.knownvariants, ['-r', regionParm, '-'], {ssl: false})
+                       .pipe(IOBIO.knownvariants, ['-r', regionParm, '-b', binLength, '-'], {ssl: false})
 
 
     var summaryData = "";
@@ -716,19 +716,21 @@ var effectCategories = [
         if (idx == 0) {
           fieldNames = record.split('\t');
         } else {
-          var fields = record.split('\t');
-          var resultRec = {};
+          if (record.trim().length > 0) {
+            var fields = record.split('\t');
+            var resultRec = {};
 
-          var i = 0;
-          fieldNames.forEach(function(fieldName) {
-            // All fields are numeric
-            resultRec[fieldName] = +fields[i];
-            i++;
-          })
-          // Find the mid-point of the interval (binned region)
-          resultRec.point = resultRec.start + ((resultRec.end - resultRec.start) / 2);
-          
-          results.push(resultRec);
+            var i = 0;
+            fieldNames.forEach(function(fieldName) {
+              // All fields are numeric
+              resultRec[fieldName] = +fields[i];
+              i++;
+            })
+            // Find the mid-point of the interval (binned region)
+            resultRec.point = resultRec.start + ((resultRec.end - resultRec.start) / 2);
+            
+            results.push(resultRec);            
+          }
         }
         idx++;
       });

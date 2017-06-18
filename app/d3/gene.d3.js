@@ -32,7 +32,7 @@ function geneD3() {
   // axis
   var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom")
+    .orient("top")
     .tickFormat(tickFormatter);
   // variables 
   var geneD3_trackHeight = 20,
@@ -199,7 +199,7 @@ function geneD3() {
       if (geneD3_showXAxis) {
         axisEnter.attr("class", "x axis")
                  .attr("transform",   "translate(" + margin.left + "," + "0" + ")");
-        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + "0" + ")");
+        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + parseInt(geneD3_height+margin.top+margin.bottom+featureGlyphHeight) + ")");
       }  
 
 

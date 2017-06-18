@@ -1,31 +1,38 @@
 .stacked-bar-chart
-  .axis
-    text
-      font-size: 12px !important
-  
-  .layer.benign
-    .stacked-bar
-      rect
-        fill: rgba(156, 194, 49, 1)
-        stroke: $text-color
-        stroke-width: .5px
 
-  .layer.path
-    .stacked-bar
-      rect
-        fill: #ad494A
-        stroke: $text-color
-        stroke-width: .5px
+  svg
+    vertical-align: bottom
+    .axis
+      text
+        font-size: 10px !important
 
-  .layer.other
-    .stacked-bar
-      rect
-        fill: rgba(231, 186, 82, 1)
-        stroke: $text-color
-        stroke-width: .5px
-  .layer.unknown
-    .stacked-bar
-      rect
-        fill: rgb(189, 189, 189)
-        stroke: $text-color
-        stroke-width: .5px
+      &.axis--x
+        .tick
+          visibility: hidden
+    
+    .layer.benign
+      .stacked-bar
+        rect
+          fill: rgba(156, 194, 49, 1)
+          stroke: $text-color
+          stroke-width: .5px
+
+    .layer.path
+      .stacked-bar
+        rect
+          fill: #ad494A
+          stroke: $text-color
+          stroke-width: .5px
+
+    .layer.other
+      .stacked-bar
+        rect
+          fill: rgba(231, 186, 82, 1)
+          stroke: $text-color
+          stroke-width: .5px
+    .layer.unknown
+      .stacked-bar
+        rect
+          fill: rgb(189, 189, 189)
+          stroke: $text-color
+          stroke-width: .5px

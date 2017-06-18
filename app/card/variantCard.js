@@ -6,7 +6,6 @@ function VariantCard() {
   	this.vcfChart = null;
 	this.zoomRegionChart = null;
 	this.bamDepthChart = null;	 
-	this.knownVariantsChart = null;
 
 	this.cardSelector = null;
 	this.d3CardSelector = null;
@@ -205,7 +204,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		this.zoomRegionChart = geneD3()
 				    .widthPercent("100%")
 				    .heightPercent("100%")
-				    .width(1000)
+				    .width($('#container').innerWidth())
 				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(false)
 				    .showBrush(false)
@@ -243,7 +242,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
-		                    .width(1000)
+		                    .width($('#container').innerWidth())
 		                    .height( 35 )
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
@@ -261,10 +260,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 		// Create the vcf track
 		this.vcfChart = variantD3()
-				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 17, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .width($('#container').innerWidth())
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(isLevelEdu  || isLevelBasic ? false : true)
-				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 6)
+				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
@@ -300,10 +299,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// The 'missing variants' chart, variants that freebayes found that were not in orginal
 		// variant set from vcf
 		this.fbChart = variantD3()
-				    .width(1000)
+				    .width($('#container').innerWidth())
 				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
-				    .variantHeight(6)
+				    .variantHeight(8)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
@@ -335,18 +334,6 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						}
 					});
 
-					
-		this.knownVariantsChart = stackedBarChartD3()
-									.widthPercent("100%")
-		                    		.heightPercent("100%")
-		                      	    .width($('#container').innerWidth())
-		                    		.height(50)
-		                    		.xValue( function(d, i) { return d.point })
-		                    		.categories(['unknown', 'other', 'benign', 'path'])
-								    .margin( {top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
-								    .tooltipText( function(d,i) {
-								    	return me.showKnownVariantsTooltip(d);
-								    })
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
 			me.shrinkCard(true);
@@ -652,7 +639,6 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 				regionEnd, 
 				function() {	
 
-					me.showKnownVariants();
 					readjustCards();
 					resolve();
 				},
@@ -667,61 +653,6 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 	
 }
 
-VariantCard.prototype.showKnownVariantsTSV = function() {
-	var me = this;					
-	var testGenes = {'BRCA2': true, 'MTHFR': true, 'RAI1': true};
-	if (me.getRelationship() == 'proband' && testGenes[window.gene.gene_name]) {
-		me.cardSelector.find('#known-variants-chart').removeClass("hide");
-        
-		var fileName = 'data/clinvar_summary_' + window.gene.gene_name.toLowerCase() + ".txt";	
-		d3.tsv(fileName, function(error, data) {
-				if (error) throw error;
-				var histData = data.map(function(d) {
-					d.point = +d.start + ((+d.end - +d.start) / 2);
-					d.path = +d.path ;
-					d.benign = +d.benign;
-					d.other = +d.other;
-					d.unknown = +d.unknown;
-					d.total = +d.total;
-					return d;
-				})
-				var selection = me.d3CardSelector.select('#known-variants-chart').datum(histData);
-				me.knownVariantsChart(selection, {transition: {'pushRight': true }} );
-
-			});
-	}					
-}
-
-VariantCard.prototype.showKnownVariants = function() {
-	var me = this;	
-	if (me.getRelationship() == 'proband') {
-	var refName = me.model._stripRefName(window.gene.chr);
-		me.model.vcf.promiseGetKnownVariants(refName, window.gene).then(function(results) {
-
-			me.cardSelector.find('#known-variants-chart').removeClass("hide");
-			var selection = me.d3CardSelector.select('#known-variants-chart').datum(results);
-			me.knownVariantsChart(selection, {transition: {'pushRight': true }} );
-		})					
-	}	
-}
-
-VariantCard.prototype.showKnownVariantsTooltip = function(knownVariants) {
-	var me = this;
-	var tooltipRow = function(valueObject) {
-		var fieldName = Object.keys(valueObject)[0];
-		var row = '<div>';
-		row += '<span style="padding-left:10px;width:70px;display:inline-block">' + fieldName   + '</span>';
-		row += '<span style="width:40px;display:inline-block">' + valueObject[fieldName] + '</span>';
-		row += "</div>";
-		return row;
-	}
-    var html = 'ClinVar variants: ';
-    for (var i = knownVariants.values.length - 1; i >= 0; i--) {
-		html += tooltipRow(knownVariants.values[i])
-    }
-    
-    return html;
-}
 
 VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 	var me = this;
@@ -748,7 +679,6 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 
 		if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
 			me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
-			me.cardSelector.find('#known-variants-chart').addClass("hide");
 
 			// Workaround.  For some reason, d3 doesn't clean up previous transcript
 			// as expected.  So we will just force the svg to be removed so that we

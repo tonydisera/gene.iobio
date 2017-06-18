@@ -60,6 +60,7 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 var geneSource = "gencode";
+var knownVariantsChart = null;
 
 var firstTimeShowVariants = true;
 var readyToHideIntro = false;
@@ -361,14 +362,14 @@ function init() {
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
-	    .width(1000)
+	    .width($('#container').innerWidth())
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
+	    .margin({top:0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
-	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 12)
+	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
+	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
 	    .showLabel(false)
 		.featureClass( function(d,i) {
 		    return d.feature_type.toLowerCase();
@@ -427,7 +428,8 @@ function init() {
 	    .width(600)
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 		.widthPercent("100%")
-	    .heightPercent("100%")	    .showXAxis(false)
+	    .heightPercent("100%")	    
+	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
 	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)
@@ -443,6 +445,23 @@ function init() {
 
 	    	loadTracksForGene();
 	    });
+
+					
+	knownVariantsChart = stackedBarChartD3()
+		.widthPercent("100%")
+		.heightPercent("100%")
+  	    .width($('#container').innerWidth())
+		.height(50)
+		.showXAxis(true)
+		.xTickCount(0)
+		.yTickCount(3)
+		.xValue( function(d, i) { return d.point })
+		.categories(['unknown', 'other', 'benign', 'path'])
+	    .margin( {top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+	    .tooltipText( function(d,i) {
+	    	return showKnownVariantsTooltip(d);
+	    })
+
 
 
 	// Initialize material bootstrap
@@ -2209,6 +2228,8 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	regionEnd = null;
 	fulfilledTrioPromise = false;
 
+	$('#known-variants-chart').addClass("hide");
+
 	$("#region-flag").addClass("hide");
 
 	$("#coordinate-frame").css("opacity", 0);
@@ -2279,6 +2300,9 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	// not rendered.  If the vcf file hasn't been loaded, the vcf variant
 	// chart is not rendered.
 	showTranscripts();
+
+	// Show the chart for known variants
+	showKnownVariants();
 
 	// Show the badge for the transcript type if it is not protein coding and it is different
 	// than the gene type
@@ -3476,6 +3500,42 @@ function toggleIntro() {
 	readjustCards();
 
 }
+
+
+showKnownVariants = function() {
+	if (hasDataSources()) {
+		var refName = getProbandVariantCard().model._stripRefName(window.gene.chr);
+		var BAR_WIDTH = +8;
+		var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * BAR_WIDTH);
+
+		getProbandVariantCard().model.vcf.promiseGetKnownVariants(refName, window.gene, binLength).then(function(results) {
+
+			$('#known-variants-chart').removeClass("hide");
+			var selection = d3.select('#known-variants-chart').datum(results);
+			knownVariantsChart(selection, {transition: {'pushRight': true }} );
+
+		})							
+	}
+
+}
+
+showKnownVariantsTooltip = function(knownVariants) {
+	var tooltipRow = function(valueObject) {
+		var fieldName = Object.keys(valueObject)[0];
+		var row = '<div>';
+		row += '<span style="padding-left:10px;width:70px;display:inline-block">' + fieldName   + '</span>';
+		row += '<span style="width:40px;display:inline-block">' + valueObject[fieldName] + '</span>';
+		row += "</div>";
+		return row;
+	}
+    var html = 'ClinVar variants: ';
+    for (var i = knownVariants.values.length - 1; i >= 0; i--) {
+		html += tooltipRow(knownVariants.values[i])
+    }
+    
+    return html;
+}
+
 
 
 function switchGenotype(gt) {

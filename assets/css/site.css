@@ -1140,7 +1140,8 @@ section {
   border: none;
   position: relative;
   pointer-events: none;
-  top: 0px;
+  top: 10px;
+  margin-top: -10px;
   height: 23px;
   visibility: visible;
   width: 26px; }
@@ -1331,7 +1332,7 @@ header {
   stop-opacity: 0.6; }
 
 .axis text {
-  font-size: 10px;
+  font-size: 13px;
   fill: #787878; }
 
 #zoom-region-chart {
@@ -1404,7 +1405,7 @@ header {
   stroke: #969696;
   fill: none; }
 .ibo-variant .axis {
-  font-size: 10px; }
+  font-size: 13px; }
   .ibo-variant .axis path, .ibo-variant .axis line {
     fill: none;
     stroke: lightgrey;
@@ -3816,24 +3817,28 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
-.stacked-bar-chart .axis text {
-  font-size: 12px !important; }
-.stacked-bar-chart .layer.benign .stacked-bar rect {
-  fill: #9cc231;
-  stroke: #717171;
-  stroke-width: 0.5px; }
-.stacked-bar-chart .layer.path .stacked-bar rect {
-  fill: #ad494A;
-  stroke: #717171;
-  stroke-width: 0.5px; }
-.stacked-bar-chart .layer.other .stacked-bar rect {
-  fill: #e7ba52;
-  stroke: #717171;
-  stroke-width: 0.5px; }
-.stacked-bar-chart .layer.unknown .stacked-bar rect {
-  fill: #bdbdbd;
-  stroke: #717171;
-  stroke-width: 0.5px; }
+.stacked-bar-chart svg {
+  vertical-align: bottom; }
+  .stacked-bar-chart svg .axis text {
+    font-size: 10px !important; }
+  .stacked-bar-chart svg .axis.axis--x .tick {
+    visibility: hidden; }
+  .stacked-bar-chart svg .layer.benign .stacked-bar rect {
+    fill: #9cc231;
+    stroke: #717171;
+    stroke-width: 0.5px; }
+  .stacked-bar-chart svg .layer.path .stacked-bar rect {
+    fill: #ad494A;
+    stroke: #717171;
+    stroke-width: 0.5px; }
+  .stacked-bar-chart svg .layer.other .stacked-bar rect {
+    fill: #e7ba52;
+    stroke: #717171;
+    stroke-width: 0.5px; }
+  .stacked-bar-chart svg .layer.unknown .stacked-bar rect {
+    fill: #bdbdbd;
+    stroke: #717171;
+    stroke-width: 0.5px; }
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {

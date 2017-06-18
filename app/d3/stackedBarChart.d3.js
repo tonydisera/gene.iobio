@@ -21,6 +21,9 @@ function stackedBarChartD3() {
   var showXAxis = true;
   var showYAxis = true;
 
+  var xTickCount = null;
+  var yTickCount = null;
+
   var widthPercent = null;
   var heightPercent = null;
       
@@ -76,12 +79,19 @@ function stackedBarChartD3() {
 
       var xAxis = d3.svg.axis()
           .scale(x)
-          .orient("bottom");
+          .orient("top");
+      if (xTickCount == 0 ) {
+        xAxis.tickValues([]);
+      } else if (xTickCount > 1 ) {
+        xAxis.ticks(xTickCount);
+      } 
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .orient("right")
-          .ticks(5)
+          .orient("right");
+      if (yTickCount) {
+          yAxis.ticks(yTickCount)
+      } 
 
 
 
@@ -135,8 +145,12 @@ function stackedBarChartD3() {
                   })
                   .append("rect")
                   .attr("x", function(d) { return 1; })
-                  .attr("y", function(d) { return y(d.y + d.y0); })
-                  .attr('height', function(d) { return y(d.y0) - y(d.y + d.y0); })
+                  .attr("y", function(d, i) { 
+                    return y(d.y + d.y0);
+                  })
+                  .attr('height', function(d) { 
+                    return y(d.y0) - y(d.y + d.y0); 
+                  })
                   .attr("width", x.rangeBand() - 1 )
                   .attr("pointer-events", "all")
                   .attr("cursor", "pointer");
@@ -195,16 +209,27 @@ function stackedBarChartD3() {
 
 
 
-      g.selectAll(".axis").remove();
-      g.append("g")
-          .attr("class", "axis axis--x")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
+      svg.selectAll(".axis").remove();
+      if (showXAxis) {
+        svg.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(" + margin.left + "," + (innerHeight + margin.top) + ")")
+            .call(xAxis);
 
-      g.append("g")
-          .attr("class", "axis axis--y")
-          .attr("transform", "translate(" + 0 + ",0)")
-          .call(yAxis);
+      }
+
+      if (showYAxis) {
+        svg.append("g")
+            .attr("class", "axis axis--y")
+            .attr("transform", "translate(" + 0 + ",0)")
+            .call(yAxis);     
+
+        d3.selectAll('g.axis--y .tick')
+           .filter(function(d, i) { 
+              return i == 0;
+           })
+           .remove();
+      }
 
 
 
@@ -265,6 +290,18 @@ function stackedBarChartD3() {
     yAxis = _;
     return chart; 
   };  
+
+  chart.xTickCount = function(_) {
+    if (!arguments.length) return xTickCount;
+    xTickCount = _;
+    return chart;
+  }
+
+  chart.yTickCount = function(_) {
+    if (!arguments.length) return yTickCount;
+    yTickCount = _;
+    return chart;
+  }
 
   chart.formatXTick = function(_) {
     if (!arguments.length) return formatXTick;
