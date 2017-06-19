@@ -277,6 +277,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 
     	adjustGeneRegion(geneObject);
     	var transcript = getCanonicalTranscript(geneObject);
+    	markCodingRegions(geneObject, transcript);
     	window.geneObjects[geneObject.gene_name] = geneObject;
 
 

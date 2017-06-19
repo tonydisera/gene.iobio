@@ -151,6 +151,7 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 				function(theData, trRefName, theGeneObject, theTranscript) {
 					var geneCoverageObjects = me._parseGeneCoverage(theData);
 					if (geneCoverageObjects.length > 0) {
+						me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
 						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
 						resolve(geneCoverageObjects)
 					} else {
@@ -158,6 +159,23 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 					}
 				}	
 			);
+		}
+
+	});
+}
+
+VariantModel.prototype._setGeneCoverageExonNumbers = function(transcript, geneCoverageObjects) {
+	var me = this;
+	transcript.features.forEach(function(feature) {
+		var gc = null;
+		var matchingFeatureCoverage = geneCoverageObjects.filter(function(gc) {
+			return feature.start == gc.start && feature.end == gc.end;
+		});
+		if (matchingFeatureCoverage.length > 0) {
+			gc = matchingFeatureCoverage[0];
+		}
+		if (gc) {
+			gc.exon_number = feature.exon_number;
 		}
 
 	});
@@ -324,13 +342,12 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	var afClazz = null;
 	var afField = null;
 	var lowestAf = 999;
-	dangerCounts.harmfulVariant = false;
-	dangerCounts.harmfulVariantInheritanceMode = {};
+	dangerCounts.harmfulVariantsInfo = [];
 
 
 	theVcfData.features.forEach( function(variant) {
 
-		var variantDanger = {impact: false, af: false, clinvar: false, sift: false, polyphen: false, inheritance: false};
+		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
 
 	    for (key in variant.highestImpactSnpeff) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
@@ -344,7 +361,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    		consequenceClasses[key] = consequenceClasses[key] || {};
 	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
 	    		if (key == 'HIGH' || key == 'MODERATE') {
-	    			variantDanger.impact = true;
+	    			variantDanger.impact = key.toLowerCase();
 	    		}
 	    	}
 	    }
@@ -355,7 +372,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 					dangerCounts.SIFT = {};
 					dangerCounts.SIFT[clazz] = {};
 					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-					variantDanger.sift = true;
+					variantDanger.sift = key.split("_").join(" ").toLowerCase();
 				}
 	    }
 
@@ -365,7 +382,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 					dangerCounts.POLYPHEN = {};
 					dangerCounts.POLYPHEN[clazz] = {};
 					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-					variantDanger.polyphen = true;
+					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();;
+;
 	    	}
 	    }
 
@@ -373,7 +391,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    	for (key in variant.clinVarClinicalSignificance) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
 						clinvarClasses[key] = matrixCard.clinvarMap[key];
-						variantDanger.clinvar = true;
+						variantDanger.clinvar = key.split("_").join(" ").toLowerCase();;
 		    	}
 	    	}
 	    }
@@ -396,7 +414,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 						afBadge = rangeEntry.badge;
 					}
 					if (rangeEntry.badge) {
-						variantDanger.af = true;
+						variantDanger.af = +variant[af];
+						variantDanger.meetsAf = true;
 					}
 				}
 			});
@@ -428,11 +447,14 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		}
 
 		// Turn on flag for harmful variant if one is found
-		if (variantDanger.af && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
-			dangerCounts.harmfulVariant = true;
-			if (variant.inheritance && variant.inheritance != 'none') {
-				dangerCounts.harmfulVariantInheritanceMode[variant.inheritance] = variant.inheritance;
-			}
+		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
+			var info = [ {'clinvar'    : variantDanger.clinvar}, 
+			             {'polyphen'   : variantDanger.polyphen},
+			             {'SIFT'       : variantDanger.sift},
+				         {'impact'     : variantDanger.impact}, 
+			             {'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false}
+			           ];
+			dangerCounts.harmfulVariantsInfo.push(info);
 		}
 	});
 
@@ -501,24 +523,42 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 }
 
 VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, summarizeGeneCoverageOnly=false) {
+	dangerObject.geneCoverageInfo = {};
+	dangerObject.geneCoverageProblem = false;
+
 	if (geneCoverageAll && Object.keys(geneCoverageAll).length > 0) {
-		dangerObject.geneCoverageProblem = false;
 		for (relationship in geneCoverageAll) {
 			var geneCoverage = geneCoverageAll[relationship];
 			if (geneCoverage) {
 				geneCoverage.forEach(function(gc) {
-					if (!dangerObject.geneCoverageProblem) {
+					if (gc.region != 'NA') {
 						if (filterCard.isLowCoverage(gc)) {
 							dangerObject.geneCoverageProblem = true;
+
+
+							// build up the geneCoveragerInfo to show exon numbers with low coverage
+							// and for which samples 
+							//   example:  {'Exon 1/10': {'proband'}, 'Exon 9/10': {'proband', 'mother'}}
+							var exon = null;
+							if (gc.exon_number) {
+								exon =  +gc.exon_number.split("\/")[0];
+							} else {
+								exon = +gc.id;
+							}
+							if (dangerObject.geneCoverageInfo[exon] == null) {
+								dangerObject.geneCoverageInfo[exon] = {};
+							}
+							dangerObject.geneCoverageInfo[exon][relationship] = true;
 						}
+
 					}
 				})				
 			}
 		}
+
 	} else if (geneCoverageAll) {
 		console.log("no geneCoverage to summarize danger");
 		showStackTrace(new Error());
-		dangerObject.geneCoverageProblem = false;
 	}
 
 	// When we are just showing gene badges for low coverage and not reporting on status of
@@ -532,8 +572,7 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 		dangerObject.featureCount = 0;
 		dangerObject.loadedCount  = 0;
 		dangerObject.calledCount  = 0;
-		dangerObject.harmfulVariant = false;
-		dangerObject.harmfulVariantInheritanceMode = {};
+		dangerObject.harmfulVariantsInfo = [];
 		// The app is applying the standard filter of 'has exon coverage problems', so
 		// indicate that gene didn't pass filter if there is NOT a coverage problem
 		dangerObject.failedFilter = !dangerObject.geneCoverageProblem;

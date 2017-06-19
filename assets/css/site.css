@@ -3386,7 +3386,7 @@ text.ref-count {
 
 #select-gene-container {
   display: inline-block;
-  width: 150px;
+  width: 200px;
   vertical-align: middle;
   margin-top: 8px; }
   #select-gene-container .selectize-input {

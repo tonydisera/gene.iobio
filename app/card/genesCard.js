@@ -10,7 +10,7 @@
 	this.sortedGeneNames = null;
 	this.legend = null;
 
-	this.LOW_COVERAGE_OPTION    = "low exon coverage";
+	this.LOW_COVERAGE_OPTION    = "insufficient coverage in exons";
 	this.HARMFUL_VARIANTS_OPTION = "harmful variants";
 
 	this.geneSortOptions = [
@@ -1631,6 +1631,25 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	geneBadge.removeClass("has-coverage-problem");
 	if (dangerObject.geneCoverageProblem) {
 		geneBadge.addClass("has-coverage-problem");
+
+		var selection = d3.select(geneBadge.find('#gene-badge-coverage-problem')[0]).data([{ 'geneCoverageInfo': dangerObject.geneCoverageInfo }]);
+		selection.on("mouseover", function(d,i) {
+			if (d && d.hasOwnProperty("geneCoverageInfo") && Object.keys(d.geneCoverageInfo).length > 0) {
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				var message = "";
+				for (exon in d.geneCoverageInfo) {
+					if (message.length > 0) {
+						message += "<br>";
+					} 
+					message +=  'Exon ' + exon + ' has insufficient coverage in ' + Object.keys(d.geneCoverageInfo[exon]).join(",");
+				}
+				me.showTooltip(message, x, y, 330);
+			}
+		})
+		.on("mouseout", function(d,i) {
+			me.hideTooltip();
+		});		
 	}
 
 
@@ -1639,40 +1658,81 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 
 	geneBadge.removeClass("has-harmful-variant");
 
-	/*
-	if (filterCard.hasFilters()) {
-		me._setGeneBadgeDetailedGlyphs(geneBadge, dangerObject);		
-	} else {
-		if (dangerObject.harmfulVariant) {
-			geneBadge.addClass("has-harmful-variant");
-		}		
-	}
-	*/
-	if (dangerObject.harmfulVariant) {
+
+	if (dangerObject.harmfulVariantsInfo && dangerObject.harmfulVariantsInfo.length > 0) {
 		geneBadge.addClass("has-harmful-variant");		
-	}
 
-	if (dangerObject.harmfulVariantInheritanceMode && Object.keys(dangerObject.harmfulVariantInheritanceMode).length > 0) {
 
-		var symbolIndex = 0;
-		for (var key in dangerObject.harmfulVariantInheritanceMode) {
-			var clazz = key;
-			var symbolFunction = matrixCard.inheritanceMap[key].symbolFunction;
-			geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
-			var options = {width:15, height:15, transform: 'translate(0,0)'};
-			var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: clazz}]);
-			symbolFunction(selection, options);
-			symbolIndex++;
-			selection.on("mouseover", function(d,i) {
+		var selection = d3.select(geneBadge.find('#gene-badge-harmful-variant')[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
+		selection.on("mouseover", function(d,i) {
+			if (d && d.hasOwnProperty("harmfulVariantsInfo") && d.harmfulVariantsInfo.length > 0) {
 				var x = d3.event.pageX;
 				var y = d3.event.pageY;
-				me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
-			})
-			.on("mouseout", function(d,i) {
-					me.hideTooltip();
+				var message = "";				
+				d.harmfulVariantsInfo.forEach(function(variantInfo) {
+					if (message.length == 0) {
+						message += 'Gene ' + geneName + "<br>";
+					}
+					message += "<div style='display:table'>"
+					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
+					        +  "<div style='display:table-cell;margin-left:6px'>" + "contains ";
+					var count = 0;
+					variantInfo.forEach(function(info) {
+						for (var key in info) {
+							if (info[key]) {
+								if (count) {
+									message += ", ";
+								}
+								message += info[key] + " " + key;
+								count++;
+							}
+						}
+					});
+					message += " variant.</div></div>"
+				});
+				me.showTooltip(message, x, y, 350);
+			}
+		})
+		.on("mouseout", function(d,i) {
+			me.hideTooltip();
+		});		
+
+		var harmfulVariantInheritance = dangerObject.harmfulVariantsInfo.map(function(variantInfo) {
+			var inheritanceObject = {'inheritance': false}
+			variantInfo.forEach(function(info) {
+				if (info.hasOwnProperty("inheritance") && info.inheritance) {
+					inheritanceObject.inheritance = info.inheritance;
+				}
 			});
-		}
+			return inheritanceObject;
+		}).filter(function(inheritanceObject) {
+			return inheritanceObject.inheritance;
+		})
+		if (harmfulVariantInheritance.length > 0) {
+
+			var symbolIndex = 0;
+			harmfulVariantInheritance.forEach(function(info) {
+				var symbolFunction = matrixCard.inheritanceMap[info.inheritance].symbolFunction;
+				geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
+				var options = {width:15, height:15, transform: 'translate(0,0)'};
+				var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: info.inheritance}]);
+				symbolFunction(selection, options);
+				symbolIndex++;
+				selection.on("mouseover", function(d,i) {
+					var x = d3.event.pageX;
+					var y = d3.event.pageY;
+					me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
+				})
+				.on("mouseout", function(d,i) {
+						me.hideTooltip();
+				});
+
+			})
+		}		
+
 	}
+
+
 
 
 
