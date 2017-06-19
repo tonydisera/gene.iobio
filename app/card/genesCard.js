@@ -1640,13 +1640,11 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 				var message = "";
 				for (exon in d.geneCoverageInfo) {
 					if (message.length > 0) {
-						message += ",<br>in ";
-					} else {
-						message = "Low coverage<br>in ";
-					}
-					message +=  exon + ' for ' + Object.keys(d.geneCoverageInfo[exon]).join(",");
+						message += "<br>";
+					} 
+					message +=  'Exon ' + exon + ' has insufficient coverage in ' + Object.keys(d.geneCoverageInfo[exon]).join(",");
 				}
-				me.showTooltip(message, x, y, 170);
+				me.showTooltip(message, x, y, 330);
 			}
 		})
 		.on("mouseout", function(d,i) {
@@ -1660,17 +1658,45 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 
 	geneBadge.removeClass("has-harmful-variant");
 
-	/*
-	if (filterCard.hasFilters()) {
-		me._setGeneBadgeDetailedGlyphs(geneBadge, dangerObject);		
-	} else {
-		if (dangerObject.harmfulVariant) {
-			geneBadge.addClass("has-harmful-variant");
-		}		
-	}
-	*/
+
 	if (dangerObject.harmfulVariant) {
 		geneBadge.addClass("has-harmful-variant");		
+
+
+		var selection = d3.select(geneBadge.find('#gene-badge-harmful-variant')[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
+		selection.on("mouseover", function(d,i) {
+			if (d && d.hasOwnProperty("harmfulVariantsInfo") && d.harmfulVariantsInfo.length > 0) {
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				var message = "";				
+				d.harmfulVariantsInfo.forEach(function(variantInfo) {
+					if (message.length == 0) {
+						message += 'Gene ' + geneName + "<br>";
+					}
+					message += "<div style='display:table'>"
+					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
+					        +  "<div style='display:table-cell;margin-left:6px'>" + "contains ";
+					var count = 0;
+					variantInfo.forEach(function(info) {
+						for (var key in info) {
+							if (info[key]) {
+								if (count) {
+									message += ", ";
+								}
+								message += info[key] + " " + key;
+								count++;
+							}
+						}
+					});
+					message += " variant.</div></div>"
+				});
+				me.showTooltip(message, x, y, 350);
+			}
+		})
+		.on("mouseout", function(d,i) {
+			me.hideTooltip();
+		});		
+
 	}
 
 	if (dangerObject.harmfulVariantInheritanceMode && Object.keys(dangerObject.harmfulVariantInheritanceMode).length > 0) {

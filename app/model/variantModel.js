@@ -343,12 +343,13 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	var afField = null;
 	var lowestAf = 999;
 	dangerCounts.harmfulVariant = false;
+	dangerCounts.harmfulVariantsInfo = [];
 	dangerCounts.harmfulVariantInheritanceMode = {};
 
 
 	theVcfData.features.forEach( function(variant) {
 
-		var variantDanger = {impact: false, af: false, clinvar: false, sift: false, polyphen: false, inheritance: false};
+		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
 
 	    for (key in variant.highestImpactSnpeff) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
@@ -362,7 +363,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    		consequenceClasses[key] = consequenceClasses[key] || {};
 	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
 	    		if (key == 'HIGH' || key == 'MODERATE') {
-	    			variantDanger.impact = true;
+	    			variantDanger.impact = key.toLowerCase();
 	    		}
 	    	}
 	    }
@@ -373,7 +374,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 					dangerCounts.SIFT = {};
 					dangerCounts.SIFT[clazz] = {};
 					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-					variantDanger.sift = true;
+					variantDanger.sift = key.split("_").join(" ").toLowerCase();
 				}
 	    }
 
@@ -383,7 +384,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 					dangerCounts.POLYPHEN = {};
 					dangerCounts.POLYPHEN[clazz] = {};
 					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-					variantDanger.polyphen = true;
+					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();;
+;
 	    	}
 	    }
 
@@ -391,7 +393,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    	for (key in variant.clinVarClinicalSignificance) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
 						clinvarClasses[key] = matrixCard.clinvarMap[key];
-						variantDanger.clinvar = true;
+						variantDanger.clinvar = key.split("_").join(" ").toLowerCase();;
 		    	}
 	    	}
 	    }
@@ -414,7 +416,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 						afBadge = rangeEntry.badge;
 					}
 					if (rangeEntry.badge) {
-						variantDanger.af = true;
+						variantDanger.af = +variant[af];
+						variantDanger.meetsAf = true;
 					}
 				}
 			});
@@ -446,8 +449,15 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		}
 
 		// Turn on flag for harmful variant if one is found
-		if (variantDanger.af && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
+		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
 			dangerCounts.harmfulVariant = true;
+			var info = [ {'clinvar'    : variantDanger.clinvar}, 
+			             {'polyphen'   : variantDanger.polyphen},
+			             {'SIFT'       : variantDanger.sift},
+				         {'impact'     : variantDanger.impact}, 
+			             {'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false}
+			           ];
+			dangerCounts.harmfulVariantsInfo.push(info);
 			if (variant.inheritance && variant.inheritance != 'none') {
 				dangerCounts.harmfulVariantInheritanceMode[variant.inheritance] = variant.inheritance;
 			}
@@ -535,13 +545,18 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 							// build up the geneCoveragerInfo to show exon numbers with low coverage
 							// and for which samples 
 							//   example:  {'Exon 1/10': {'proband'}, 'Exon 9/10': {'proband', 'mother'}}
-							var exon = 'Exon ' + gc.exon_number.split("\/")[0];
+							var exon = null;
+							if (gc.exon_number) {
+								exon =  +gc.exon_number.split("\/")[0];
+							} else {
+								exon = +gc.id;
+							}
 							if (dangerObject.geneCoverageInfo[exon] == null) {
 								dangerObject.geneCoverageInfo[exon] = {};
 							}
 							dangerObject.geneCoverageInfo[exon][relationship] = true;
 						}
-						
+
 					}
 				})				
 			}
