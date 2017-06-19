@@ -342,9 +342,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	var afClazz = null;
 	var afField = null;
 	var lowestAf = 999;
-	dangerCounts.harmfulVariant = false;
 	dangerCounts.harmfulVariantsInfo = [];
-	dangerCounts.harmfulVariantInheritanceMode = {};
 
 
 	theVcfData.features.forEach( function(variant) {
@@ -450,7 +448,6 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 
 		// Turn on flag for harmful variant if one is found
 		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
-			dangerCounts.harmfulVariant = true;
 			var info = [ {'clinvar'    : variantDanger.clinvar}, 
 			             {'polyphen'   : variantDanger.polyphen},
 			             {'SIFT'       : variantDanger.sift},
@@ -458,9 +455,6 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 			             {'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false}
 			           ];
 			dangerCounts.harmfulVariantsInfo.push(info);
-			if (variant.inheritance && variant.inheritance != 'none') {
-				dangerCounts.harmfulVariantInheritanceMode[variant.inheritance] = variant.inheritance;
-			}
 		}
 	});
 
@@ -578,8 +572,7 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 		dangerObject.featureCount = 0;
 		dangerObject.loadedCount  = 0;
 		dangerObject.calledCount  = 0;
-		dangerObject.harmfulVariant = false;
-		dangerObject.harmfulVariantInheritanceMode = {};
+		dangerObject.harmfulVariantsInfo = [];
 		// The app is applying the standard filter of 'has exon coverage problems', so
 		// indicate that gene didn't pass filter if there is NOT a coverage problem
 		dangerObject.failedFilter = !dangerObject.geneCoverageProblem;
