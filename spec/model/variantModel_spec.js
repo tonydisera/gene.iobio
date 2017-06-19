@@ -103,7 +103,9 @@ describe('variantModel', function() {
 				calledCount: 0,
 				harmfulVariant: false,
 				harmfulVariantInheritanceMode: { },
-				failedFilter: false
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -139,7 +141,9 @@ describe('variantModel', function() {
 				calledCount: 0,				
 				harmfulVariant: false,
 				harmfulVariantInheritanceMode: { },
-				failedFilter: false
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -164,7 +168,9 @@ describe('variantModel', function() {
 				calledCount: 0,
 				harmfulVariant: false,
 				harmfulVariantInheritanceMode: { },
-				failedFilter: false
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -189,7 +195,9 @@ describe('variantModel', function() {
 				calledCount: 0,
 				harmfulVariant: false,
 				harmfulVariantInheritanceMode: { },
-				failedFilter: false
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -215,7 +223,9 @@ describe('variantModel', function() {
 				calledCount: 0,
 				harmfulVariant: false,
 				harmfulVariantInheritanceMode: { },
-				failedFilter: false				
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false				
 			});
 		});
 
@@ -239,7 +249,9 @@ describe('variantModel', function() {
 				calledCount: 0,
 				harmfulVariant: false,
 				harmfulVariantInheritanceMode: { },
-				failedFilter: false	
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false	
 			});
 		});
 
@@ -265,7 +277,9 @@ describe('variantModel', function() {
 					calledCount: 0,
 					harmfulVariant: false,
 					harmfulVariantInheritanceMode: { },
-					failedFilter: false	
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false	
 				});
 			});
 		});
@@ -292,7 +306,9 @@ describe('variantModel', function() {
 					calledCount: 0,
 					harmfulVariant: false,
 					harmfulVariantInheritanceMode: { },
-					failedFilter: false		
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false			
 				});
 			});
 		});
@@ -319,7 +335,9 @@ describe('variantModel', function() {
 					calledCount: 0,
 					harmfulVariant: false,
 					harmfulVariantInheritanceMode: { },
-					failedFilter: false			
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false				
 				});
 			});
 		});
@@ -346,7 +364,9 @@ describe('variantModel', function() {
 					calledCount: 0,
 					harmfulVariant: false,
 					harmfulVariantInheritanceMode: { },
-					failedFilter: false		
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false			
 				});
 			});
 		});
