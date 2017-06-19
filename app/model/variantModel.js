@@ -151,6 +151,7 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 				function(theData, trRefName, theGeneObject, theTranscript) {
 					var geneCoverageObjects = me._parseGeneCoverage(theData);
 					if (geneCoverageObjects.length > 0) {
+						me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
 						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
 						resolve(geneCoverageObjects)
 					} else {
@@ -158,6 +159,23 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 					}
 				}	
 			);
+		}
+
+	});
+}
+
+VariantModel.prototype._setGeneCoverageExonNumbers = function(transcript, geneCoverageObjects) {
+	var me = this;
+	transcript.features.forEach(function(feature) {
+		var gc = null;
+		var matchingFeatureCoverage = geneCoverageObjects.filter(function(gc) {
+			return feature.start == gc.start && feature.end == gc.end;
+		});
+		if (matchingFeatureCoverage.length > 0) {
+			gc = matchingFeatureCoverage[0];
+		}
+		if (gc) {
+			gc.exon_number = feature.exon_number;
 		}
 
 	});
@@ -501,24 +519,37 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 }
 
 VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, summarizeGeneCoverageOnly=false) {
+	dangerObject.geneCoverageInfo = {};
+	dangerObject.geneCoverageProblem = false;
+
 	if (geneCoverageAll && Object.keys(geneCoverageAll).length > 0) {
-		dangerObject.geneCoverageProblem = false;
 		for (relationship in geneCoverageAll) {
 			var geneCoverage = geneCoverageAll[relationship];
 			if (geneCoverage) {
 				geneCoverage.forEach(function(gc) {
-					if (!dangerObject.geneCoverageProblem) {
+					if (gc.region != 'NA') {
 						if (filterCard.isLowCoverage(gc)) {
 							dangerObject.geneCoverageProblem = true;
+
+
+							// build up the geneCoveragerInfo to show exon numbers with low coverage
+							// and for which samples 
+							//   example:  {'Exon 1/10': {'proband'}, 'Exon 9/10': {'proband', 'mother'}}
+							var exon = 'Exon ' + gc.exon_number.split("\/")[0];
+							if (dangerObject.geneCoverageInfo[exon] == null) {
+								dangerObject.geneCoverageInfo[exon] = {};
+							}
+							dangerObject.geneCoverageInfo[exon][relationship] = true;
 						}
+						
 					}
 				})				
 			}
 		}
+
 	} else if (geneCoverageAll) {
 		console.log("no geneCoverage to summarize danger");
 		showStackTrace(new Error());
-		dangerObject.geneCoverageProblem = false;
 	}
 
 	// When we are just showing gene badges for low coverage and not reporting on status of

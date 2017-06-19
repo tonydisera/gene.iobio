@@ -1631,6 +1631,27 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	geneBadge.removeClass("has-coverage-problem");
 	if (dangerObject.geneCoverageProblem) {
 		geneBadge.addClass("has-coverage-problem");
+
+		var selection = d3.select(geneBadge.find('#gene-badge-coverage-problem')[0]).data([{ 'geneCoverageInfo': dangerObject.geneCoverageInfo }]);
+		selection.on("mouseover", function(d,i) {
+			if (d && d.hasOwnProperty("geneCoverageInfo") && Object.keys(d.geneCoverageInfo).length > 0) {
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				var message = "";
+				for (exon in d.geneCoverageInfo) {
+					if (message.length > 0) {
+						message += ",<br>in ";
+					} else {
+						message = "Low coverage<br>in ";
+					}
+					message +=  exon + ' for ' + Object.keys(d.geneCoverageInfo[exon]).join(",");
+				}
+				me.showTooltip(message, x, y, 170);
+			}
+		})
+		.on("mouseout", function(d,i) {
+			me.hideTooltip();
+		});		
 	}
 
 
