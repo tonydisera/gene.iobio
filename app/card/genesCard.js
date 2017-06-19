@@ -10,7 +10,7 @@
 	this.sortedGeneNames = null;
 	this.legend = null;
 
-	this.LOW_COVERAGE_OPTION    = "low exon coverage";
+	this.LOW_COVERAGE_OPTION    = "insufficient coverage in exons";
 	this.HARMFUL_VARIANTS_OPTION = "harmful variants";
 
 	this.geneSortOptions = [
