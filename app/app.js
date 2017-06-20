@@ -61,6 +61,8 @@ var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 var geneSource = "gencode";
 var knownVariantsChart = null;
+var knownVariantsAreaChart = null;
+var knownVariantsBarChart = null;
 
 var firstTimeShowVariants = true;
 var readyToHideIntro = false;
@@ -447,7 +449,7 @@ function init() {
 	    });
 
 					
-	knownVariantsChart = stackedBarChartD3()
+	knownVariantsAreaChart = stackedAreaChartD3()
 		.widthPercent("100%")
 		.heightPercent("100%")
   	    .width($('#container').innerWidth())
@@ -457,10 +459,23 @@ function init() {
 		.yTickCount(3)
 		.xValue( function(d, i) { return d.point })
 		.categories(['unknown', 'other', 'benign', 'path'])
-	    .margin( {top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+	    .margin( {top: 3, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
+	
+	knownVariantsBarChart = stackedBarChartD3()
+		.widthPercent("100%")
+		.heightPercent("100%")
+  	    .width($('#container').innerWidth())
+		.height(50)
+		.showXAxis(true)
+		.xTickCount(0)
+		.yTickCount(3)
+		.xValue( function(d, i) { return d.point })
+		.categories(['unknown', 'other', 'benign', 'path'])
+	    .margin( {top: 3, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 	    .tooltipText( function(d,i) {
 	    	return showKnownVariantsTooltip(d);
-	    })
+	    });
+	 toggleKnownVariantsChart('bar');
 
 
 
@@ -3501,11 +3516,28 @@ function toggleIntro() {
 
 }
 
+toggleKnownVariantsChart = function(chartType, refresh=false, button) {
+	if (chartType == 'bar') {
+		knownVariantsChart = knownVariantsBarChart;
+	} else if (chartType == 'area') {
+		knownVariantsChart = knownVariantsAreaChart;
+	}
+	if (refresh) {
+		d3.select("#known-variants-chart svg").remove();
+		if (button) {
+			$('#known-variants-chart .chart-type.selected').removeClass('selected');
+			$(button).addClass('selected')
+		}
+		var selection = d3.select('#known-variants-chart');
+		knownVariantsChart(selection, {transition: {'pushUp': true }} );
+	}
+}
+
 
 showKnownVariants = function() {
 	if (hasDataSources()) {
 		var refName = getProbandVariantCard().model._stripRefName(window.gene.chr);
-		var BAR_WIDTH = +8;
+		var BAR_WIDTH = +4;
 		var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * BAR_WIDTH);
 
 		getProbandVariantCard().model.vcf.promiseGetKnownVariants(refName, window.gene, binLength).then(function(results) {

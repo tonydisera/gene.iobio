@@ -482,7 +482,17 @@
                 <div id="known-variants-chart" class="stacked-bar-chart track hide" 
                      style="padding: 0px;margin-top:0px;margin-bottom:0px">
                   <div style="text-align:left">
-                      <span class="chart-label">ClinVar variants</span>
+                      <span class="chart-label">
+                        ClinVar variants
+                      </span>
+                      <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)">  
+                        <i class="material-icons">insert_chart</i>
+                      </button>
+                      <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)">
+                        <i class="material-icons">show_chart</i>
+                      </button>
                   </div>  
                 </div>  
                             
@@ -787,6 +797,7 @@
 <script src="app/d3/geneList.d3.js"></script>
 <script src="app/d3/histogram.d3.js"></script>
 <script src="app/d3/stackedBarChart.d3.js"></script>
+<script src="app/d3/stackedAreaChart.d3.js"></script>
 <script src="app/d3/line.d3.js"></script>
 <script src="app/d3/gene.d3.js"></script>
 <script src="app/d3/variant.d3.js"></script>

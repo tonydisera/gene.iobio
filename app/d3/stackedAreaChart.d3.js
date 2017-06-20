@@ -1,5 +1,4 @@
-function stackedBarChartD3() {
-  var dispatch = d3.dispatch("d3click");
+function stackedAreaChartD3() {
 
   var defaults = {};
 
@@ -66,7 +65,7 @@ function stackedBarChartD3() {
           .enter().append('div')
           .attr("class", "tooltip")  
           .style("pointer-events", "none")             
-          .style("opacity", 0);    
+          .style("opacity", 0);  
 
       
       var x = d3.scale.ordinal()
@@ -94,116 +93,75 @@ function stackedBarChartD3() {
       } 
 
 
-      var layers = d3.layout.stack()(categories.map(function(category) {
-        return data.map(function(d) {
-          return {x: xValue(d), y: +d[category], 
-                    values: categories.map(function(cat) { 
-                      var v = {};
-                      v[cat] = d[cat];
-                      return v; 
-                    })
-                  };
-        });
+      var area = d3.svg.area()
+          .x(function(d)  { 
+            return x(d.x); 
+          })
+          .y0(function(d) { 
+            return y(d.y0); 
+          })
+          .y1(function(d) { 
+            return y(d.y0 + d.y); 
+          });
+
+
+      var stack = d3.layout.stack()
+          .values(function(d) { return d.values; });
+
+      var stacks = stack(categories.map(function(category) {
+        return {
+          name: category,
+          values: data.map(function(d) {
+            return {x: xValue(d), y: +d[category]};
+          })
+        };
       }));
+
+      // Determine the max value across all categories
+      var categoryMap = {};
+      categories.forEach(function(cat) {
+        categoryMap[cat] = true;
+      }) 
+      var maxY = d3.max(data, function(d) {
+        var vals = d3.keys(d).map(function(key){ 
+          return categoryMap.hasOwnProperty(key) ? d[key] : 0 
+        });
+        return d3.sum(vals);
+      });
+
 
 
       x.domain(data.map(function(d) { return xValue(d) }));
-      y.domain([0, d3.max(layers[layers.length - 1], function(d) { return d.y0 + d.y; })]);
-      
+      y.domain([0, maxY]);
 
-      
-      if (options.transition && options.transition.pushUp) {
-        g.selectAll(".layer").remove();
-      }
-      var layer = g.selectAll(".layer").data(layers);
+
+   
+      g.selectAll(".layer").remove();
+      var layer = g.selectAll(".layer").data(stacks);
       layer.enter().append("g")
-           .attr("class", function(d, i) { return "layer " + categories[i] })
-           .attr("transform", function(d,i) {
-            if (options.transition && options.transition.pushUp) {
-              return "translate(0," + innerHeight + ")";
-            } else {
-              return "translate(0,0)";
-            }
+                   .attr("class", function(d, i) { return "layer " + categories[i] })
+                   .attr("transform", function(d,i) {
+                      if (options.transition && options.transition.pushUp) {
+                        return "translate(0," + innerHeight + ")";
+                      } else if(options.transition && options.transition.pushRight) {
+                        return "translate(" + (innerWidth * -1) + ",0)";
+                      }else {
+                        return "translate(0,0)";
+                      }
+                    });
 
-          });
-      layer.exit().remove();
-
-      var bar = layer.selectAll("g.stacked-bar")
-                          .data(function(d) { return d; },  function(d) { return d.x });
-
-
-      bar.enter().append("g")
-                  .attr("class", "stacked-bar")
-                  .attr("transform", function(d,i) {
-                    if (options.transition && options.transition.pushRight) {
-                      return 'translate(0,0)';
-                    }
-                    else {
-                      return "translate(" + Math.floor((x(d.x))) + ",0)";
-                    }
-                  })
-                  .append("rect")
-                  .attr("class", "stacked-element")
-                  .attr("x", function(d) { return 1; })
-                  .attr("y", function(d, i) { 
-                    return y(d.y + d.y0);
-                  })
-                  .attr('height', function(d) { 
-                    return y(d.y0) - y(d.y + d.y0); 
-                  })
-                  .attr("width", x.rangeBand() - 1 )
-                  .attr("pointer-events", "all")
-                  .attr("cursor", "pointer");
-      bar.exit().remove();
-      
-      bar.selectAll('.stacked-bar rect.stacked-element')
-                  .on("mouseover", function(d, i) {  
-
-                      var tooltip = container.selectAll(".tooltip");
-                      tooltip.html( tooltipText(d, i) );
+      layer.append("path")
+           .attr("class", function(d, i) { return "stacked-area stacked-element " + categories[i] })
+           .attr("d", function(d) { 
+             return area(d.values); 
+           });
 
 
 
-                      var w = tooltip.node().getBoundingClientRect().width;
-                      var h = tooltip.node().getBoundingClientRect().height;
-                      tooltip.style("left", (d3.event.pageX - w)+ "px") 
-                             .style("text-align", 'left')    
-                            .style("top", (d3.event.pageY - (h + innerHeight)) + "px");    
-
-
-                      tooltip.transition()        
-                         .duration(200)      
-                         .style("opacity", .9);                              
-                   })                  
-                   .on("mouseout", function(d) {       
-                      container.selectAll(".tooltip").transition()        
-                         .duration(500)      
-                         .style("opacity", 0);   
-                   })
-                   .on("click", function(d) {
-                      var on = d3.select(this).attr("class") != "selected";
-
-                      svg.selectAll(".stacked-bar rect.stacked-element").attr("class", "");
-                      d3.select(this).classed("selected", on);
-                      
-                      dispatch.d3click(d, on);
-                   });
-
-
-      if (options.transition && options.transition.pushUp) {
-        g.selectAll(".layer").transition()
+      if (options.transition) {
+        layer.transition()
           .duration(700)
           .attr('transform', 'translate(0,0)');
-      }
-
-      if (options.transition && options.transition.pushRight) {
-        layer.selectAll('g.stacked-bar')           
-             .transition()
-             .duration(700)
-             .attr("transform", function(d,i) {
-                return "translate(" + Math.floor((x(d.x))) + ",0)";
-             })
-
       }
 
 
@@ -351,8 +309,6 @@ function stackedBarChartD3() {
     return chart;
   };
 
-  // This adds the "on" methods to our custom exports
-  d3.rebind(chart, dispatch, "on");
 
   return chart;
 }

@@ -3817,25 +3817,41 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
-.stacked-bar-chart svg {
+#known-variants-chart .chart-label {
+  vertical-align: top;
+  display: inline-block;
+  margin-top: 4px; }
+#known-variants-chart .chart-type {
+  margin: 0;
+  padding: 2px;
+  vertical-align: top;
+  cursor: pointer; }
+  #known-variants-chart .chart-type.selected {
+    font-weight: bold;
+    border: solid 0.5px #3586c0;
+    border-radius: 4px;
+    padding: 1px; }
+  #known-variants-chart .chart-type .material-icons {
+    font-size: 17px; }
+#known-variants-chart svg {
   vertical-align: bottom; }
-  .stacked-bar-chart svg .axis text {
+  #known-variants-chart svg .axis text {
     font-size: 10px !important; }
-  .stacked-bar-chart svg .axis.axis--x .tick {
+  #known-variants-chart svg .axis.axis--x .tick {
     visibility: hidden; }
-  .stacked-bar-chart svg .layer.benign .stacked-bar rect {
+  #known-variants-chart svg .layer.benign .stacked-element {
     fill: #9cc231;
     stroke: #717171;
     stroke-width: 0.5px; }
-  .stacked-bar-chart svg .layer.path .stacked-bar rect {
+  #known-variants-chart svg .layer.path .stacked-element {
     fill: #ad494A;
     stroke: #717171;
     stroke-width: 0.5px; }
-  .stacked-bar-chart svg .layer.other .stacked-bar rect {
+  #known-variants-chart svg .layer.other .stacked-element {
     fill: #e7ba52;
     stroke: #717171;
     stroke-width: 0.5px; }
-  .stacked-bar-chart svg .layer.unknown .stacked-bar rect {
+  #known-variants-chart svg .layer.unknown .stacked-element {
     fill: #bdbdbd;
     stroke: #717171;
     stroke-width: 0.5px; }
