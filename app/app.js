@@ -3518,7 +3518,7 @@ function toggleIntro() {
 
 toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 	if (chartType == 'bar') {
-		knownVariantsChart = knownVariantsBarChart;
+		knownVariantsChart = knownVariantsBarChart;		
 	} else if (chartType == 'area') {
 		knownVariantsChart = knownVariantsAreaChart;
 	}
@@ -3537,8 +3537,8 @@ toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 showKnownVariants = function() {
 	if (hasDataSources()) {
 		var refName = getProbandVariantCard().model._stripRefName(window.gene.chr);
-		var BAR_WIDTH = +4;
-		var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * BAR_WIDTH);
+		var BIN_WIDTH = +6;
+		var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * BIN_WIDTH);
 
 		getProbandVariantCard().model.vcf.promiseGetKnownVariants(refName, window.gene, binLength).then(function(results) {
 

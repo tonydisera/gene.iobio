@@ -94,15 +94,10 @@ function stackedAreaChartD3() {
 
 
       var area = d3.svg.area()
-          .x(function(d)  { 
-            return x(d.x); 
-          })
-          .y0(function(d) { 
-            return y(d.y0); 
-          })
-          .y1(function(d) { 
-            return y(d.y0 + d.y); 
-          });
+          .interpolate("monotone")  
+          .x(function(d)  { return x(d.x); })
+          .y0(function(d) { return y(d.y0); })
+          .y1(function(d) { return y(d.y0 + d.y); });
 
 
       var stack = d3.layout.stack()
