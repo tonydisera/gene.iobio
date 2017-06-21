@@ -135,18 +135,21 @@ VariantModel.prototype.reconstituteFbData = function(theVcfData) {
 }
 
 
-VariantModel.prototype.promiseGetKnownVariants = function(geneObject, binLength, transcript) {
+VariantModel.prototype.promiseGetKnownVariants = function(geneObject, transcript, binLength) {
 	var me = this;
 	return new Promise( function(resolve, reject) {
 		var refName = me._stripRefName(window.gene.chr);
-		me.vcf.promiseGetKnownVariants(refName, window.gene, binLength)
+		me.vcf.promiseGetKnownVariants(refName, window.gene, transcript, binLength)
 		        .then(function(results) {
+		        	resolve(results);
+		        	/*
 		        	if (transcript) {
 						var exonBins = me.binKnownVariantsByExons(geneObject, transcript, binLength, results);
 						resolve(exonBins);	        	
 					} else {
 			        	resolve(results);
 					}
+					*/
 		        },
 		        function(error) {
 		        	reject(error);

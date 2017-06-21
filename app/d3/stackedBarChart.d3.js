@@ -17,6 +17,8 @@ function stackedBarChartD3() {
   var yAxisLabel = null;
 
   var xValue = null;
+  var xValueStart = null;
+  var xValueEnd   = null;   
 
   var showXAxis = true;
   var showYAxis = true;
@@ -27,7 +29,8 @@ function stackedBarChartD3() {
   var xStart = null;
   var xEnd = null;
 
-  var barWidth = 4;
+  var barWidth = 10;
+  var barWithMin = null;
 
   var widthPercent = null;
   var heightPercent = null;
@@ -102,13 +105,20 @@ function stackedBarChartD3() {
 
       var layers = d3.layout.stack()(categories.map(function(category) {
         return data.map(function(d) {
-          return {x: xValue(d), y: +d[category], 
-                    values: categories.map(function(cat) { 
-                      var v = {};
-                      v[cat] = d[cat];
-                      return v; 
-                    })
-                  };
+          var stackRow = { x: xValue(d), 
+                           y: +d[category], 
+                           values: categories.map(function(cat) { 
+                              var v = {};
+                              v[cat] = d[cat];
+                              return v; 
+                           })
+                         };
+          if (xValueStart && xValueEnd) {
+            stackRow.start = xValueStart(d);
+            stackRow.end   = xValueEnd(d);
+          }
+
+          return stackRow;
         });
       }));
 
@@ -119,8 +129,6 @@ function stackedBarChartD3() {
       } else {
         x.domain(d3.extent(data, function(d) { return xValue(d); }));
       }         
-      //x.domain(data.map(function(d) { return xValue(d) }));
-
       y.domain([0, d3.max(layers[layers.length - 1], function(d) { return d.y0 + d.y; })]);
       
 
@@ -152,7 +160,7 @@ function stackedBarChartD3() {
                       return 'translate(0,0)';
                     }
                     else {
-                      return "translate(" + Math.floor( (x(d.x)) - (barWidth/2) ) + ",0)";
+                      return "translate(" + Math.floor( (x(d.x)) - (chart.calcBarWidth(x, d)/2) ) + ",0)";
                     }
                   })
                   .append("rect")
@@ -164,8 +172,9 @@ function stackedBarChartD3() {
                   .attr('height', function(d) { 
                     return y(d.y0) - y(d.y + d.y0); 
                   })
-                  .attr("width", barWidth )
-                  .attr("pointer-events", "all")
+                  .attr("width", function(d) {
+                    return chart.calcBarWidth(x, d); 
+                  }).attr("pointer-events", "all")
                   .attr("cursor", "pointer");
       bar.exit().remove();
       
@@ -214,7 +223,7 @@ function stackedBarChartD3() {
              .transition()
              .duration(700)
              .attr("transform", function(d,i) {
-                return "translate(" + Math.floor( (x(d.x)) - (barWidth/2) ) + ",0)";
+                return "translate(" + Math.floor( (x(d.x)) - (chart.calcBarWidth(x,d)/2) ) + ",0)";
              })
 
       }
@@ -249,6 +258,21 @@ function stackedBarChartD3() {
     });
   };
 
+  chart.calcBarWidth = function(x, d) {
+    var bw = 0;
+    if (d.hasOwnProperty('start') && d.hasOwnProperty('end')) {
+      bw = x(d.end) - x(d.start);
+    } else if (barWidth) {
+      bw = barWidth;
+    } 
+    
+    if (barWidthMin) {
+      return Math.max(+bw, +barWidthMin);
+    } else {
+      return bw;
+    }
+  }
+
   chart.categories = function(_) {
     if (!arguments.length) return categories;
     categories = _;
@@ -277,10 +301,29 @@ function stackedBarChartD3() {
     xValue = _;
     return chart;
   };
+  chart.xValueStart = function(_) {
+    if (!arguments.length) return xValueStart;
+    xValueStart = _;
+    return chart;
+  };
+  chart.xValueEnd = function(_) {
+    if (!arguments.length) return xValueEnd;
+    xValueEnd = _;
+    return chart;
+  };
+
+
 
   chart.barWidth = function(_) {
     if (!arguments.length) return barWidth;
     barWidth = _;
+    return chart;
+  };
+
+
+  chart.barWidthMin = function(_) {
+    if (!arguments.length) return barWidthMin;
+    barWidthMin = _;
     return chart;
   };
   

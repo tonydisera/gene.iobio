@@ -474,6 +474,9 @@ function init() {
 		.xTickCount(0)
 		.yTickCount(3)
 		.xValue( function(d, i) { return d.point })
+		.xValueStart( function(d, i) { return d.start })
+		.xValueEnd( function(d, i) { return d.end })
+		.barWidthMin(4)
 		.categories(['unknown', 'other', 'benign', 'path'])
 	    .margin( {top: 3, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 	    .tooltipText( function(d,i) {
@@ -3573,7 +3576,7 @@ showKnownVariants = function() {
 
 	var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
 	var transcript = knownVariantsChartType == 'exon-bar' ? window.selectedTranscript : null;
-	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, binLength, transcript).then(function(results) {
+	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, transcript, transcript ? null : binLength).then(function(results) {
 
 		$('#known-variants-chart').removeClass("hide");
 		var selection = d3.select('#known-variants-chart').datum(results);

@@ -648,13 +648,13 @@ var effectCategories = [
 
   }
 
-  exports.promiseGetKnownVariants = function(refName, geneObject, binLength) {
+  exports.promiseGetKnownVariants = function(refName, geneObject, transcript, binLength) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
-      me._getKnownVariantsImpl(refName, geneObject, binLength,
+      me._getKnownVariantsImpl(refName, geneObject, transcript, binLength,
         function(data) {
           if (data) {
             resolve(data);
@@ -666,20 +666,56 @@ var effectCategories = [
     });
   }
 
-  exports._getKnownVariantsImpl = function(refName, geneObject, binLength, callback) {
+  exports._getKnownVariantsImpl = function(refName, geneObject, transcript, binLength, callback) {
 
     var me = this;
 
-    // Figure out the file location of the reference seq files
     var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
 
-    // Create an iobio command get get the variants and add any header recs.
-    var args = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
-    if (tbiUrl) {
-      args.push(tbiUrl);
+    // For the knownVariants service, pass in an argument for the gene region, then pass in eith
+    // the length of the bin region or a comma separate string of region parts (e.g. the exons)
+    var knownVariantsArgs = [];
+    knownVariantsArgs.push("-r");
+    knownVariantsArgs.push(regionParm);
+    if (binLength) {
+      knownVariantsArgs.push("-b");
+      knownVariantsArgs.push(binLength);
+    } else if (transcript) {
+      var regionParts = "";
+      transcript.features
+      .filter( function(feature) {
+        return feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR';
+      })
+      .sort( function(exon1, exon2) {
+        if (exon1.start < exon2.start) {
+          return -1;
+        } else if (exon1.start > exon2.start) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+      .forEach( function(exon) {
+        if (regionParts.length > 0) {
+          regionParts += ",";
+        }
+        regionParts += exon.start + "-" + exon.end;
+      })
+      if (regionParts.length > 0) {
+        knownVariantsArgs.push("-p");
+        knownVariantsArgs.push(regionParts);
+      }
     }
-    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
-                       .pipe(IOBIO.knownvariants, ['-r', regionParm, '-b', binLength, '-'], {ssl: false})
+    knownVariantsArgs.push("-");
+
+
+    // Create an iobio command get get the variants and add any header recs.
+    var tabixArgs = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
+    if (tbiUrl) {
+      tabixArgs.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL})
+                       .pipe(IOBIO.knownvariants, knownVariantsArgs, {ssl: false})
 
 
     var summaryData = "";

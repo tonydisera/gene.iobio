@@ -15,7 +15,7 @@ function stackedAreaChartD3() {
   var xAxisLabel = null;
   var yAxisLabel = null;
 
-  var xValue = null;
+  var xValue      = null;
 
   var showXAxis = true;
   var showYAxis = true;

@@ -51,13 +51,13 @@ IOBIO.knownvariants           = DEV_IOBIO + "knownvariants/";
 var KNOWN_VARIANTS_CLINVAR_VCF_URL = "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar_20170530.vcf.gz";
 
 // URL for Phenolyzer
-var OFFLINE_PHENOLYZER_CACHE_URL  = isOffline ?  (serverCacheDir) : ("../" + serverCacheDir);
+var OFFLINE_PHENOLYZER_CACHE_URL   = isOffline ?  (serverCacheDir) : ("../" + serverCacheDir);
 
 // Url for offline Clinvar URL
-var OFFLINE_CLINVAR_VCF_BASE_URL  = isOffline ?  ("http://" + serverInstance + serverCacheDir) : "";
+var OFFLINE_CLINVAR_VCF_BASE_URL   = isOffline ?  ("http://" + serverInstance + serverCacheDir) : "";
 
-var NCBI_GENE_SEARCH_URL          = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json";
-var NCBI_GENE_SUMMARY_URL         = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&usehistory=y&retmode=json"; 
+var NCBI_GENE_SEARCH_URL           = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&usehistory=y&retmode=json";
+var NCBI_GENE_SUMMARY_URL          = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&usehistory=y&retmode=json"; 
 //
 //  EDUCATIONAL / EXHIBIT
 //
