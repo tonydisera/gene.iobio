@@ -654,33 +654,19 @@ var effectCategories = [
 
     return new Promise( function(resolve, reject) {
 
-      if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteKnownVariantsImpl(refName, geneObject, binLength,
-          function(data) {
-            if (data) {
-              resolve(data);
-            } else {
-              reject();
-            }
-          });
-      } else {
-
-        /*me._getLocalKnownVariantsImpl(refName, geneObject,
-          function(data) {
-            if (data) {
-              resolve(data);
-            } else {
-              reject();
-            }
-          });
-        */
-        resolve();
-      }
+      me._getKnownVariantsImpl(refName, geneObject, binLength,
+        function(data) {
+          if (data) {
+            resolve(data);
+          } else {
+            reject();
+          }
+        });
 
     });
   }
 
-  exports._getRemoteKnownVariantsImpl = function(refName, geneObject, binLength, callback) {
+  exports._getKnownVariantsImpl = function(refName, geneObject, binLength, callback) {
 
     var me = this;
 

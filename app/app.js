@@ -60,9 +60,13 @@ var transcriptMenuChart = null;
 var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 var geneSource = "gencode";
+
 var knownVariantsChart = null;
+var knownVariantsChartType = 'bar';
 var knownVariantsAreaChart = null;
 var knownVariantsBarChart = null;
+var KNOWN_VARIANTS_BIN_SPAN  = {'bar': +6, 'exon-bar': +2,  'area': +6};
+var KNOWN_VARIANTS_BAR_WIDTH = {'bar': +6, 'exon-bar': +6,  'area': +6};
 
 var firstTimeShowVariants = true;
 var readyToHideIntro = false;
@@ -2243,8 +2247,6 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	regionEnd = null;
 	fulfilledTrioPromise = false;
 
-	$('#known-variants-chart').addClass("hide");
-
 	$("#region-flag").addClass("hide");
 
 	$("#coordinate-frame").css("opacity", 0);
@@ -3517,37 +3519,75 @@ function toggleIntro() {
 }
 
 toggleKnownVariantsChart = function(chartType, refresh=false, button) {
+
 	if (chartType == 'bar') {
 		knownVariantsChart = knownVariantsBarChart;		
+		knownVariantsChart.xStart(null);
+		knownVariantsChart.xEnd(null);	
+		knownVariantsChart.barWidth(KNOWN_VARIANTS_BAR_WIDTH[chartType]);
+			
+	} else if (chartType == 'exon-bar') {
+		knownVariantsChart = knownVariantsBarChart;		
+		knownVariantsChart.xStart(window.gene.start);
+		knownVariantsChart.xEnd(window.gene.end);				
+		knownVariantsChart.barWidth(KNOWN_VARIANTS_BAR_WIDTH[chartType]);
+
+		// If previous chart has detailed histogram data, just recalculate bins
+		if (knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') {
+			var selection = d3.select('#known-variants-chart');
+			var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
+			var exonBins = getProbandVariantCard().model.binKnownVariantsByExons(window.gene, window.selectedTranscript, binLength, selection.datum());
+			selection.datum(exonBins);		
+		}
+
 	} else if (chartType == 'area') {
 		knownVariantsChart = knownVariantsAreaChart;
-	}
+	} 
+
+
 	if (refresh) {
 		d3.select("#known-variants-chart svg").remove();
 		if (button) {
 			$('#known-variants-chart .chart-type.selected').removeClass('selected');
-			$(button).addClass('selected')
+			$(button).addClass('selected');
 		}
-		var selection = d3.select('#known-variants-chart');
-		knownVariantsChart(selection, {transition: {'pushUp': true }} );
+		// No need to obtain counts for gene since prior data is interchangable between
+		// area and barchart
+		if ((knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') && 
+			(chartType == 'bar' || chartType == 'area')) {			
+			knownVariantsChartType = chartType;
+			var selection = d3.select('#known-variants-chart');
+			knownVariantsChart(selection, {transition: {'pushUp': true }} );
+		} else {
+			knownVariantsChartType = chartType;
+			showKnownVariants();
+		}
 	}
+
 }
 
 
 showKnownVariants = function() {
-	if (hasDataSources()) {
-		var refName = getProbandVariantCard().model._stripRefName(window.gene.chr);
-		var BIN_WIDTH = +6;
-		var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * BIN_WIDTH);
+	$('#known-variants-chart .loader').removeClass('hide');
+	d3.select('#known-variants-chart svg').remove();
 
-		getProbandVariantCard().model.vcf.promiseGetKnownVariants(refName, window.gene, binLength).then(function(results) {
+	var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
+	var transcript = knownVariantsChartType == 'exon-bar' ? window.selectedTranscript : null;
+	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, binLength, transcript).then(function(results) {
 
-			$('#known-variants-chart').removeClass("hide");
-			var selection = d3.select('#known-variants-chart').datum(results);
-			knownVariantsChart(selection, {transition: {'pushRight': true }} );
+		$('#known-variants-chart').removeClass("hide");
+		var selection = d3.select('#known-variants-chart').datum(results);
+		if (knownVariantsChartType == 'exon-bar') {
+			knownVariantsChart.xStart(window.gene.start);
+			knownVariantsChart.xEnd(window.gene.end);		
+		} else if (knownVariantsChartType == 'bar') {
+			knownVariantsChart.xStart(null);
+			knownVariantsChart.xEnd(null);		
+		}
+		knownVariantsChart(selection, {transition: {'pushRight': true }} );
+	    $('#known-variants-chart .loader').addClass('hide');
 
-		})							
-	}
+	})							
 
 }
 

@@ -479,20 +479,31 @@
           <div id="transcript-panel" class="level-edu fullview" >
             <div id="gene-track" class="track hide">  
 
-                <div id="known-variants-chart" class="stacked-bar-chart track hide" 
-                     style="padding: 0px;margin-top:0px;margin-bottom:0px">
-                  <div style="text-align:left">
+                <div id="known-variants-chart" class="stacked-bar-chart track hide">
+                  <div id="known-variants-nav">
                       <span class="chart-label">
                         ClinVar variants
                       </span>
                       <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)">  
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)"
+                      data-toggle="tooltip" data-placement="top" title="histogram">  
                         <i class="material-icons">insert_chart</i>
                       </button>
                       <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)">
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
+                      data-toggle="tooltip" data-placement="top" title="exon bar chart">  
+                        <i class="material-icons">linear_scale</i>
+                      </button>
+                      <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)"
+                      data-toggle="tooltip" data-placement="top" title="area chart">
                         <i class="material-icons">show_chart</i>
                       </button>
+                      <div class="loader hide">
+                          <span class="loader-label">Loading...</span>
+                          <img src="assets/images/wheel.gif"/>
+                      </div>
+
                   </div>  
                 </div>  
                             

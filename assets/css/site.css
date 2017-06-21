@@ -3817,44 +3817,63 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
-#known-variants-chart .chart-label {
-  vertical-align: top;
-  display: inline-block;
-  margin-top: 4px; }
-#known-variants-chart .chart-type {
-  margin: 0;
-  padding: 2px;
-  vertical-align: top;
-  cursor: pointer; }
-  #known-variants-chart .chart-type.selected {
-    font-weight: bold;
-    border: solid 0.5px #3586c0;
-    border-radius: 4px;
-    padding: 1px; }
-  #known-variants-chart .chart-type .material-icons {
-    font-size: 17px; }
-#known-variants-chart svg {
-  vertical-align: bottom; }
-  #known-variants-chart svg .axis text {
-    font-size: 10px !important; }
-  #known-variants-chart svg .axis.axis--x .tick {
-    visibility: hidden; }
-  #known-variants-chart svg .layer.benign .stacked-element {
-    fill: #9cc231;
-    stroke: #717171;
-    stroke-width: 0.5px; }
-  #known-variants-chart svg .layer.path .stacked-element {
-    fill: #ad494A;
-    stroke: #717171;
-    stroke-width: 0.5px; }
-  #known-variants-chart svg .layer.other .stacked-element {
-    fill: #e7ba52;
-    stroke: #717171;
-    stroke-width: 0.5px; }
-  #known-variants-chart svg .layer.unknown .stacked-element {
-    fill: #bdbdbd;
-    stroke: #717171;
-    stroke-width: 0.5px; }
+#known-variants-chart {
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px; }
+  #known-variants-chart #known-variants-nav {
+    text-align: left;
+    margin-bottom: 2px; }
+    #known-variants-chart #known-variants-nav .tooltip {
+      background-color: initial;
+      border: none;
+      box-shadow: none; }
+    #known-variants-chart #known-variants-nav .chart-label {
+      vertical-align: top;
+      display: inline-block;
+      margin-top: 4px;
+      margin-right: 10px; }
+    #known-variants-chart #known-variants-nav .loader {
+      margin-left: 10px;
+      display: inline-block;
+      margin-top: 2px;
+      margin-bottom: 0px; }
+      #known-variants-chart #known-variants-nav .loader .loader-label {
+        font-size: 12px; }
+    #known-variants-chart #known-variants-nav .chart-type {
+      margin: 0;
+      padding: 2px;
+      vertical-align: top;
+      cursor: pointer; }
+      #known-variants-chart #known-variants-nav .chart-type.selected {
+        font-weight: bold;
+        border: solid 0.5px #3586c0;
+        border-radius: 4px;
+        padding: 1px; }
+      #known-variants-chart #known-variants-nav .chart-type .material-icons {
+        font-size: 17px; }
+  #known-variants-chart svg {
+    vertical-align: bottom; }
+    #known-variants-chart svg .axis text {
+      font-size: 12px !important; }
+    #known-variants-chart svg .axis.axis--x .tick {
+      visibility: hidden; }
+    #known-variants-chart svg .layer.benign .stacked-element {
+      fill: #9cc231;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+    #known-variants-chart svg .layer.path .stacked-element {
+      fill: #ad494A;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+    #known-variants-chart svg .layer.other .stacked-element {
+      fill: #e7ba52;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+    #known-variants-chart svg .layer.unknown .stacked-element {
+      fill: #bdbdbd;
+      stroke: #717171;
+      stroke-width: 0.5px; }
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {
