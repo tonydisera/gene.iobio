@@ -213,30 +213,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    		.showLabel(false)
 		    		.featureClass( function(d,i) {
 		    			return d.feature_type.toLowerCase() + (d.danger[me.getRelationship()] ? " danger" : "");
-		    		})
-		    		.featureGlyphHeight( +10 )
-		    		.featureGlyph( function(d,i,x) {
-		    			var transcript = d3.select(this.parentNode);
-		    			//var x = feature.attr("x");
-		    			if (d.danger[me.getRelationship()]) {
-		    				transcript.append('g')     
-	    							  .attr('class',      'feature_glyph coverage-problem-glyph')
-	    							  .attr('transform',  'translate(' + x + ',-10)')
-	    							  .data([d])
-	    							  .append('use')
-	    							  .attr('height',     '12')
-	    							  .attr('width',      '12')
-	    							  .attr('href', '#feedback-symbol')
-	    							  .attr('xlink','http://www.w3.org/1999/xlink')
-	    							  .data([d]);
-		    			}
-		    		})
+		    		})		    		
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
 						me.showExonTooltip(featureObject, feature, tooltip);
 		    		})
-					.on("d3featureglyphtooltip", function(featureObject, feature, tooltip) {
-						me.showExonTooltip(featureObject, feature, tooltip);
-		    		});
+					
 
 
 
@@ -255,8 +236,26 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					   		.depth( function(d) { return d[1] })
 					   		.formatCircleText( function(pos, depth) {
 					   			return depth + 'x' ;
-					   		});
-
+					   		})
+					   		/*
+							.regionGlyph( function(d,i,x) {
+				    			var regions = d3.select(this.parentNode);
+				    			regions.append('g')     
+	    							   .attr('class',      'feature_glyph coverage-problem-glyph')
+	    							   .attr('transform',  'translate(' + x + ',-10)')
+	    							   .data([d])
+	    							   .append('use')
+	    							   .attr('height',     '12')
+	    							   .attr('width',      '12')
+	    							   .attr('href', '#feedback-symbol')
+	    							   .attr('xlink','http://www.w3.org/1999/xlink')
+	    							   .data([d]); 
+				    		})
+*/
+				    		.on("d3regiontooltip", function(featureObject, feature, tooltip) {
+								me.showExonTooltip(featureObject, feature, tooltip);
+				    		})
+							
 
 		// Create the vcf track
 		this.vcfChart = variantD3()
@@ -824,6 +823,24 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 
 VariantCard.prototype.showBamDepth = function(maxDepth, callbackDataLoaded) {
 	this._showBamDepth(regionStart, regionEnd, maxDepth, callbackDataLoaded);
+}
+
+VariantCard.prototype.highlightLowCoverageRegions = function(transcript) {
+	var me = this;
+	if (this.model.isBamLoaded()) {
+		var dangerRegions = [];
+		transcript.features
+				  .filter( function(feature) {
+						return feature.feature_type == 'CDS' || feature.feature_type == 'UTR';
+				  })
+				  .forEach(function(feature) {
+						if (feature.danger[me.getRelationship()]) {
+							dangerRegions.push(feature)
+						}
+				  })
+		this.bamDepthChart.highlightRegions()(dangerRegions);
+		this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
+	}
 }
 
 VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth, callbackDataLoaded) {	

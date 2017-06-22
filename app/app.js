@@ -2545,6 +2545,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 					// Show the coverage chart (if alignments provided)
 					getRelevantVariantCards().forEach(function(variantCard) {
 						variantCard.showBamDepth(allMaxDepth, function() {
+							variantCard.highlightLowCoverageRegions(window.selectedTranscript);
 						});
 					});
 
@@ -3587,7 +3588,7 @@ showKnownVariants = function() {
 			knownVariantsChart.xStart(null);
 			knownVariantsChart.xEnd(null);		
 		}
-		knownVariantsChart(selection, {transition: {'pushRight': true }} );
+		knownVariantsChart(selection, {transition: {'pushUp': true }} );
 	    $('#known-variants-chart .loader').addClass('hide');
 
 	})							
