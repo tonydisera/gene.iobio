@@ -1281,6 +1281,8 @@ header {
     stroke: none;
     fill: #3586c0;
     pointer-events: none; }
+  #bam-depth .region {
+    fill: rgba(198, 175, 77, 0.6); }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
@@ -1900,8 +1902,8 @@ inputinput:-moz-placeholder {
       margin-bottom: 0px;
       margin-top: 10px;
       font-size: 12px;
-      width: 190px;
-      margin-left: 45px;
+      width: 200px;
+      margin-left: 35px;
       vertical-align: bottom; }
       #filter-track #standard-filter-panel .standard-filter-btn span {
         margin-left: -17px; }
@@ -1911,9 +1913,9 @@ inputinput:-moz-placeholder {
         font-weight: bold;
         padding-right: 1px;
         float: left;
-        padding-left: 10px;
         visibility: hidden;
-        display: initial; }
+        display: initial;
+        padding-left: 0px; }
       #filter-track #standard-filter-panel .standard-filter-btn.current i.done {
         visibility: visible; }
     #filter-track #standard-filter-panel .standard-filter-count {
@@ -2381,6 +2383,14 @@ inputinput:-moz-placeholder {
 #dataModal #bloodhound-data-dialog #enter-gene-name-data-dialog {
   color: #717171;
   font-size: 14px !important; }
+
+#bam-depth .tooltip {
+  background: #505050;
+  color: white;
+  font-size: 11px;
+  line-height: normal; }
+  #bam-depth .tooltip .danger {
+    color: #c6af4d; }
 
 #zoom-region-chart .tooltip .danger {
   color: #c6af4d; }
@@ -2977,18 +2987,18 @@ text.ref-count {
   font-size: 12px; }
 
 #zoom-region-chart.ibo-gene .cds.danger1 {
-  fill: #c6af4d;
-  stroke: #c6af4d; }
+  fill: rgba(198, 175, 77, 0.6);
+  stroke: rgba(198, 175, 77, 0.6); }
 #zoom-region-chart.ibo-gene .utr.danger1 {
-  fill: #c6af4d;
-  stroke: #c6af4d; }
+  fill: rgba(198, 175, 77, 0.6);
+  stroke: rgba(198, 175, 77, 0.6); }
 
 #gene-viz.ibo-gene .cds.danger1 {
-  fill: #c6af4d;
-  stroke: #c6af4d; }
+  fill: rgba(198, 175, 77, 0.6);
+  stroke: rgba(198, 175, 77, 0.6); }
 #gene-viz.ibo-gene .utr.danger1 {
-  fill: #c6af4d;
-  stroke: #c6af4d; }
+  fill: rgba(198, 175, 77, 0.6);
+  stroke: rgba(198, 175, 77, 0.6); }
 
 #genes-panel {
   margin-bottom: 5px;

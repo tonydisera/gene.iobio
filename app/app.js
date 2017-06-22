@@ -2501,6 +2501,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 					// Show the coverage chart (if alignments provided)
 					getRelevantVariantCards().forEach(function(variantCard) {
 						variantCard.showBamDepth(allMaxDepth, function() {
+							variantCard.highlightLowCoverageRegions(window.selectedTranscript);
 						});
 					});
 

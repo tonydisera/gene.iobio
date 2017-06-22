@@ -1,6 +1,6 @@
 lineD3 = function module() {
 
-  var dispatch = d3.dispatch("d3brush", "d3rendered");
+  var dispatch = d3.dispatch("d3brush", "d3rendered", "d3regiontooltip");
 
   var debug = false;
 
@@ -21,6 +21,10 @@ lineD3 = function module() {
 
   var pos    = function(d) { return d.pos };
   var depth  = function(d) { return d.depth };
+
+  var regionGlyph = null;
+
+
 
   var getScreenCoords = function(x, y, ctm) {
     var xn = ctm.e + x*ctm.a;
@@ -120,6 +124,54 @@ lineD3 = function module() {
              .duration(500)
              .style("opacity", 0); 
   }
+
+  var highlightRegions = function(regions, options) {
+    if (container == null) {
+      return;
+    }
+    var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
+    var regions =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
+    regions.enter()
+           .append("rect")
+           .attr("class",  "region")
+           .attr("rx", 1)
+           .attr("ry", 1)
+           .attr("x",      function(d,i) { return d3.round(x(d.start)) })
+           .attr("width",  function(d,i) { return Math.max(minRegionWidth, d3.round(x(d.end) - x(d.start))) })
+           .attr("y",      0)
+           .attr("height", height - margin.top - margin.bottom);
+    regions.exit().remove();
+
+
+    regions.each(function(d,i) {
+        var me = this;
+        var featureX = d3.round(x(d.start));
+        if (regionGlyph) {
+          regionGlyph.call(me, d, i, featureX);
+        }
+    });
+
+    regions.on("mouseover", function(d) {  
+              // show the tooltip
+              var tooltip = container.select('.tooltip');   
+              tooltip.classed("region", true);           
+              var featureObject = d3.select(this);
+              dispatch.d3regiontooltip(featureObject, d, tooltip);
+           })                  
+           .on("mouseout", function(d) {   
+              // hide the tooltip    
+              container.select('.tooltip').classed("region", false);           
+              container.select('.tooltip').classed("black-arrow-left", false);           
+              container.select('.tooltip').classed("black-arrow-right", false);           
+              container.select('.tooltip').transition()        
+                 .duration(500)      
+                 .style("opacity", 0);   
+           });
+
+  }
+
+
+
 
 
   var formatXTick = null;
@@ -221,48 +273,53 @@ lineD3 = function module() {
         .attr("class", "group")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+      svgGroup.select("g.regions").remove();
+      svgGroup.append("g")
+              .attr("class", "regions");
+
       // Tooltip     
       svgGroup.on("mouseover", function(d) {
-        var tooltipText = '';
-        mousex = d3.mouse(this)[0];
-        mousey = d3.mouse(this)[1];
-        var invertedx = x.invert(mousex);
-        var invertedy = y.invert(mousey);
+        if (container.select(".tooltip.region").empty()) {
+          var tooltipText = '';
+          mousex = d3.mouse(this)[0];
+          mousey = d3.mouse(this)[1];
+          var invertedx = x.invert(mousex);
+          var invertedy = y.invert(mousey);
 
-        tooltipText += 'position ' + formatter(parseInt(invertedx));
-        tooltipText += '<br>depth ' + parseInt(invertedy);
+          tooltipText += 'position ' + formatter(parseInt(invertedx));
+          tooltipText += '<br>depth ' + parseInt(invertedy);
 
-        var width = 130;
-        var height = 40;
-        var left = sidebarAdjustX(d3.event.pageX - 130);
-        var top = d3.event.pageY - 42;
+          var width = 130;
+          var height = 40;
+          var left = sidebarAdjustX(d3.event.pageX - 130);
+          var top = d3.event.pageY - 42;
 
-        // if the tooltip approaches the left sidebar, flip it to the right side
-        if (left < 50) {
-          left = d3.round(left + width);
+          // if the tooltip approaches the left sidebar, flip it to the right side
+          if (left < 50) {
+            left = d3.round(left + width);
+          }
+
+          var tooltip = container.select('.tooltip');
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9)
+            .style("display", "block");
+          tooltip.html(tooltipText)
+//            .style("width", width + "px")
+//            .style("height", height + "px")
+            .style("left",  left + "px")
+            .style("text-align", 'left')
+            .style("top",  top + "px");
         }
-
-        var tooltip = container.select('.tooltip');
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9)
-          .style("display", "block");
-        tooltip.html(tooltipText)
-          .style("width", width + "px")
-          .style("height", height + "px")
-          .style("left",  left + "px")
-          .style("text-align", 'left')
-          .style("top",  top + "px");
       })
       .on("mouseout", function(d) {
-        var tooltip = container.select('.tooltip');
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-
-        tooltip.transition()
-          .delay(500)
-          .style("display", "none");
+        if (container.select(".tooltip.region").empty()) {
+          var tooltip = container.select('.tooltip');
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        }
+      
       });
 
       var innerWidth = width - margin.left - margin.right;
@@ -439,6 +496,14 @@ lineD3 = function module() {
   exports.hideCircle = function(_) {
     if (!arguments.length) return hideCircle;
     hideCircle = _;
+    return exports;
+  }
+  exports.highlightRegions = function() {
+    return highlightRegions;
+  }
+  exports.regionGlyph = function(_) {
+    if (!arguments.length) return regionGlyph;
+    regionGlyph = _;
     return exports;
   }
  
