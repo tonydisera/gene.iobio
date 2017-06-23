@@ -215,8 +215,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    		.featureClass( function(d,i) {
 		    			return d.feature_type.toLowerCase() + (d.danger[me.getRelationship()] ? " danger" : "");
 		    		})		    		
-		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
-						me.showExonTooltip(featureObject, feature, tooltip);
+		    		.on("d3featuretooltip", function(featureObject, feature, tooltip, lock=false, onClose=null) {
+						me.showExonTooltip(featureObject, feature, tooltip, lock, onClose);
 		    		})
 					
 
@@ -238,23 +238,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 					   		.formatCircleText( function(pos, depth) {
 					   			return depth + 'x' ;
 					   		})
-					   		/*
-							.regionGlyph( function(d,i,x) {
-				    			var regions = d3.select(this.parentNode);
-				    			regions.append('g')     
-	    							   .attr('class',      'feature_glyph coverage-problem-glyph')
-	    							   .attr('transform',  'translate(' + x + ',-10)')
-	    							   .data([d])
-	    							   .append('use')
-	    							   .attr('height',     '12')
-	    							   .attr('width',      '12')
-	    							   .attr('href', '#feedback-symbol')
-	    							   .attr('xlink','http://www.w3.org/1999/xlink')
-	    							   .data([d]); 
-				    		})
-*/
-				    		.on("d3regiontooltip", function(featureObject, feature, tooltip) {
-								me.showExonTooltip(featureObject, feature, tooltip);
+				    		.on("d3regiontooltip", function(featureObject, feature, tooltip, lock, onClose) {
+								me.showExonTooltip(featureObject, feature, tooltip, lock, onClose);
 				    		})
 							
 
@@ -384,8 +369,16 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 };
 
-VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip) {
+VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip, lock, onClose) {
 	var me = this;
+
+
+	if (lock) {
+		tooltip.style("pointer-events", "all");
+	} else {
+		tooltip.style("pointer-events", "none");          
+	}
+
 	var coverageRow = function(fieldName, coverageVal, covFields) {
 		var row = '<div>';
 		row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
@@ -395,8 +388,11 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
 		return row;
 	}
 
-	var html =  (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number + "<br>" : "")
-    html     += feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end);
+	var html = '<div>' 
+	         + '<span id="exon-tooltip-title"' + (lock ? 'style="margin-top:8px">' : '>') + (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number : "") + '</span>'
+	      	 + (lock ? '<a href="javascript:void(0)" id="exon-tooltip-close">X</a>' : '')
+	         + '</div>';
+    html     += '<div style="clear:both">' + feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end) + '</div>';
     if (feature.geneCoverage && feature.geneCoverage[me.getRelationship()]) {
     	var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
     	html += "<div style='margin-top:4px'>" + "Coverage:" 
@@ -407,7 +403,25 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
     	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields) 
 
     }
+    if (lock) {
+    	html += '<div style="text-align:right;margin-top:8px">' 
+    	+ '<a href="javascript:void(0)" id="exon-tooltip-thresholds" class="danger" style="float:left"  >Set thresholds</a>'
+    	+ '</div>'	    	
+    }
     tooltip.html(html);	
+    if (lock) {
+    	tooltip.select("#exon-tooltip-thresholds").on("click", function() {
+    		showSidebar('Filter')
+    		$('#filter-track #coverage-thresholds').addClass('attention');
+    	})
+    	if (onClose) {
+		    tooltip.select("#exon-tooltip-close").on("click", function() {
+		    	if (onClose) {
+			    	onClose();
+		    	}
+		    })    	    		
+    	}
+    }
 
     var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
     tooltip.style("left", coord.x + "px") 

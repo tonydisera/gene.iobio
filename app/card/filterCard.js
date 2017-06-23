@@ -955,6 +955,12 @@ FilterCard.prototype.hasFilters = function() {
 	}
 }
 
+FilterCard.prototype.refreshGeneCoverageBadges = function() {
+	cacheHelper.refreshGeneBadgesGeneCoverage(true);
+	$('#filter-track #coverage-thresholds').removeClass('attention');
+	loadTracksForGene();
+}
+
 
 FilterCard.prototype.filterGenes = function(callback) {
 	var me = this;
@@ -962,7 +968,7 @@ FilterCard.prototype.filterGenes = function(callback) {
 	// refresh all of the gene badges based on the filter
 	if (me.applyLowCoverageFilter) {
 		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
-		cacheHelper.showGeneCounts(geneCounts);
+		cacheHelper.showGeneCounts(geneCounts);	
 		if (callback) {
 			callback();
 		}
