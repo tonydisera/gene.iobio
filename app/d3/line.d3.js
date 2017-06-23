@@ -151,25 +151,39 @@ lineD3 = function module() {
         }
     });
 
+
+    var hideTooltip = function() {
+      container.select('.tooltip').classed("region", false);           
+      container.select('.tooltip').classed("locked", false);           
+      container.select('.tooltip').classed("black-arrow-left", false);           
+      container.select('.tooltip').classed("black-arrow-right", false);           
+      container.select('.tooltip').transition()        
+         .duration(500)      
+         .style("opacity", 0);   
+    }
+
     regions.on("mouseover", function(d) {  
               // show the tooltip
               var tooltip = container.select('.tooltip');   
               tooltip.classed("region", true);           
               var featureObject = d3.select(this);
-              dispatch.d3regiontooltip(featureObject, d, tooltip);
+              dispatch.d3regiontooltip(featureObject, d, tooltip, false);
            })                  
            .on("mouseout", function(d) {   
-              // hide the tooltip    
-              container.select('.tooltip').classed("region", false);           
-              container.select('.tooltip').classed("black-arrow-left", false);           
-              container.select('.tooltip').classed("black-arrow-right", false);           
-              container.select('.tooltip').transition()        
-                 .duration(500)      
-                 .style("opacity", 0);   
-           });
+              if (container.select('.tooltip.region.locked').empty()) {
+                hideTooltip();
+              }
+           })
+           .on("click", function(d) {  
+              // show the tooltip
+              var tooltip = container.select('.tooltip');   
+              tooltip.classed("region", true);           
+              tooltip.classed("locked", true);          
+              var featureObject = d3.select(this);
+              dispatch.d3regiontooltip(featureObject, d, tooltip, true, hideTooltip);
+           }) ;
 
   }
-
 
 
 

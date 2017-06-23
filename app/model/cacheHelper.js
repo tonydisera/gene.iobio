@@ -697,7 +697,7 @@ CacheHelper.prototype.refreshGeneBadges = function(callback) {
 }
 
 
-CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {  
+CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function(refreshOnly=false) {  
 	var me = this;
 
 
@@ -729,7 +729,8 @@ CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {
 				var dangerObject = getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name);
 		 		
 			 	if (geneCoverageAll && dangerObject) {
-			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, true);
+			 		var clearOtherDanger = refreshOnly ? false : true;
+			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
 
 			  		counts.all.analyzed++;
 			  		counts.loaded.analyzed++;
@@ -753,7 +754,9 @@ CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function() {
 		  	} 
 		} 
 	}  
-	genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
+	if (!refreshOnly) {
+		genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
+	}
 
 	$('#gene-badges-loader').addClass("hide");
 	return counts;

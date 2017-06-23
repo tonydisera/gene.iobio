@@ -563,7 +563,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	return dangerCounts;
 }
 
-VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, summarizeGeneCoverageOnly=false) {
+VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, clearOtherDanger=false, refreshOnly=false) {
 	dangerObject.geneCoverageInfo = {};
 	dangerObject.geneCoverageProblem = false;
 
@@ -604,7 +604,7 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 
 	// When we are just showing gene badges for low coverage and not reporting on status of
 	// filtered variants, clear out the all of the danger summary object related to variants
-	if (summarizeGeneCoverageOnly) {
+	if (clearOtherDanger) {
 		dangerObject.CONSEQUENCE = {};
 		dangerObject.IMPACT = {};
 		dangerObject.CLINVAR = {};
@@ -614,9 +614,10 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 		dangerObject.loadedCount  = 0;
 		dangerObject.calledCount  = 0;
 		dangerObject.harmfulVariantsInfo = [];
+		// If a gene filter is being applied (refreshOnly=false)
 		// The app is applying the standard filter of 'has exon coverage problems', so
 		// indicate that gene didn't pass filter if there is NOT a coverage problem
-		dangerObject.failedFilter = !dangerObject.geneCoverageProblem;
+		dangerObject.failedFilter = refreshOnly ? false : !dangerObject.geneCoverageProblem;
 	}
 
 	return dangerObject;

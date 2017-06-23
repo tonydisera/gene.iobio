@@ -12,6 +12,8 @@ function geneD3() {
   // dispatch events
   var dispatch = d3.dispatch("d3brush", "d3selected", "d3featuretooltip", "d3featureglyphtooltip");
 
+  var container = null;
+
   var selectedTranscript = null;
 
   var geneD3_showBrush = false;
@@ -47,6 +49,7 @@ function geneD3() {
       geneD3_heightPercent = undefined,     
       showBrushLine = false;
       
+
 
   //  options
   var defaults = {};
@@ -84,7 +87,7 @@ function geneD3() {
        var innerHeight = geneD3_height - margin.top - margin.bottom;
 
        // set svg element
-       var container = d3.select(this).classed('ibo-gene', true);    
+       container = d3.select(this).classed('ibo-gene', true);    
 
       // Update the x-scale.
       if (geneD3_regionStart && geneD3_regionEnd) {
@@ -401,14 +404,20 @@ function geneD3() {
               selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
            })                  
            .on("mouseout", function(d) {   
-              // hide the tooltip    
-              container.select('.tooltip').transition()        
-                 .duration(500)      
-                 .style("opacity", 0);   
+             if (container.select('.tooltip.locked').empty()) {
+                chart.hideTooltip();
 
-              // de-select the transcript   
-              d3.select(this.parentNode).classed("selected", false);
-           });
+                // de-select the transcript   
+                d3.select(this.parentNode).classed("selected", false);
+              }
+           })
+           .on("click", function(d) {  
+              // show the tooltip
+              var tooltip = container.select('.tooltip');   
+              tooltip.classed("locked", true);          
+              var featureObject = d3.select(this);
+              dispatch.d3featuretooltip(featureObject, d, tooltip, true, chart.hideTooltip);
+           }) 
 
 
       // Add any feature glyphs
@@ -433,12 +442,18 @@ function geneD3() {
                   var featureObject = d3.select(this);
                   dispatch.d3featureglyphtooltip(featureObject, d, tooltip);
                 })                  
-                .on("mouseout", function(d) {   
-                  // hide the tooltip    
-                  container.select('.tooltip').transition()        
-                     .duration(500)      
-                     .style("opacity", 0);   
-                });
+                .on("mouseout", function(d) {  
+                  if (container.select('.tooltip.locked').empty()) { 
+                    chart.hideTooltip();
+                  }
+                })
+                .on("click", function(d) {  
+                  // show the tooltip
+                  var tooltip = container.select('.tooltip');   
+                  tooltip.classed("locked", true);          
+                  var featureObject = d3.select(this);
+                  dispatch.d3featureglyphtooltip(featureObject, d, tooltip, true, chart.hideTooltip);
+               }) 
 
           
       // Update class
@@ -543,6 +558,15 @@ function geneD3() {
       d = d / 1000 + "K";
     return d;            
   }
+
+  chart.hideTooltip = function() {
+      container.select('.tooltip').classed("locked", false);           
+      container.select('.tooltip').classed("black-arrow-left", false);           
+      container.select('.tooltip').classed("black-arrow-right", false);           
+      container.select('.tooltip').transition()        
+         .duration(500)      
+         .style("opacity", 0);   
+  }  
 
 
   chart.featureClass = function(_) {

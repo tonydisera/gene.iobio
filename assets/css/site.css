@@ -1847,8 +1847,11 @@ inputinput:-moz-placeholder {
 
 #coverage-thresholds {
   text-align: center;
-  margin-right: 50px;
+  margin-right: 70px;
   color: #717171; }
+  #coverage-thresholds.attention {
+    outline-color: #c6af4d;
+    outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
     display: inline-block;
@@ -2392,9 +2395,29 @@ inputinput:-moz-placeholder {
   line-height: normal; }
   #bam-depth .tooltip .danger {
     color: #c6af4d; }
+  #bam-depth .tooltip a.danger {
+    color: #c6af4d !important; }
+  #bam-depth .tooltip #exon-tooltip-close {
+    float: right;
+    color: white !important;
+    font-weight: bold;
+    font-size: 14px !important; }
+  #bam-depth .tooltip #exon-tooltip-title {
+    display: inline-block;
+    float: left; }
 
 #zoom-region-chart .tooltip .danger {
   color: #c6af4d; }
+#zoom-region-chart .tooltip a.danger {
+  color: #c6af4d !important; }
+#zoom-region-chart .tooltip #exon-tooltip-close {
+  float: right;
+  color: white !important;
+  font-weight: bold;
+  font-size: 14px !important; }
+#zoom-region-chart .tooltip #exon-tooltip-title {
+  display: inline-block;
+  float: left; }
 
 .tooltip-title {
   font-size: 12px;
