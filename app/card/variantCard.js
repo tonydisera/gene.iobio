@@ -798,6 +798,8 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 
 	this._showBamDepth(regionStart, regionEnd);
+	this.highlightLowCoverageRegions(window.selectedTranscript,regionStart, regionEnd);
+	
 	this._showVariants(regionStart, regionEnd, 
 		function() {
 			me.filterAndShowCalledVariants(regionStart, regionEnd);
@@ -838,20 +840,24 @@ VariantCard.prototype.showBamDepth = function(maxDepth, callbackDataLoaded) {
 	this._showBamDepth(regionStart, regionEnd, maxDepth, callbackDataLoaded);
 }
 
-VariantCard.prototype.highlightLowCoverageRegions = function(transcript) {
+VariantCard.prototype.highlightLowCoverageRegions = function(transcript, regionStart, regionEnd) {
 	var me = this;
 	if (this.model.isBamLoaded()) {
 		var dangerRegions = [];
 		transcript.features
 				  .filter( function(feature) {
-						return feature.feature_type == 'CDS' || feature.feature_type == 'UTR';
+				  		var meetsRegion = true;
+				  		if (regionStart && regionEnd) {
+				  			meetsRegion = feature.start >= regionStart && feature.end <= regionEnd;
+				  		}
+						return meetsRegion && feature.feature_type == 'CDS' || feature.feature_type == 'UTR';
 				  })
 				  .forEach(function(feature) {
 						if (feature.danger[me.getRelationship()]) {
 							dangerRegions.push(feature)
 						}
 				  })
-		this.bamDepthChart.highlightRegions()(dangerRegions);
+		this.bamDepthChart.highlightRegions(dangerRegions, {}, regionStart, regionEnd);
 		this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
 	}
 }
