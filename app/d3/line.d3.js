@@ -499,7 +499,7 @@ lineD3 = function module() {
               tooltip.classed("region", true);           
               tooltip.classed("locked", true);          
               var featureObject = d3.select(this);
-              dispatch.d3regiontooltip(featureObject, d, tooltip, true, hideTooltip);
+              dispatch.d3regiontooltip(featureObject, d, tooltip, true, exports.hideTooltip);
            }) 
 
   }
