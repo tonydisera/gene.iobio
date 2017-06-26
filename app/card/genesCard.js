@@ -1638,11 +1638,24 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 				var x = d3.event.pageX;
 				var y = d3.event.pageY;
 				var message = "";
+				// There are many exons with low coverage.  Just show number of low coverage exons per sample.
+				var counts = {'proband': 0, 'mother': 0, 'father': 0};
 				for (exon in d.geneCoverageInfo) {
-					if (message.length > 0) {
-						message += "<br>";
-					} 
-					message +=  'Exon ' + exon + ' has insufficient coverage in ' + Object.keys(d.geneCoverageInfo[exon]).join(",");
+					for (rel in d.geneCoverageInfo[exon]) {
+						if (rel) {
+							counts[rel]++;
+						}
+					}
+				}
+				for (var rel in counts) {
+					if (counts[rel]) {
+						if (message.length > 0) {
+							message += ", ";
+						} else {
+							message += "Insufficient coverage in "
+						}
+						message += counts[rel] + (counts[rel] == 1 ? " exon" : " exons") + " for " + rel;
+					}
 				}
 				me.showTooltip(message, x, y, 330);
 			}
@@ -1672,23 +1685,37 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 				d.harmfulVariantsInfo.forEach(function(variantInfo) {
 					if (message.length == 0) {
 						message += 'Gene ' + geneName + "<br>";
-					}
+					} 
 					message += "<div style='display:table'>"
 					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
 					        +  "<div style='display:table-cell;margin-left:6px'>" + "contains ";
-					var count = 0;
-					variantInfo.forEach(function(info) {
-						for (var key in info) {
-							if (info[key]) {
-								if (count) {
-									message += ", ";
-								}
-								message += info[key] + " " + key;
-								count++;
-							}
+
+					var desc = "";
+					var inherit = "";
+					if (variantInfo.clinvar) {
+						desc = variantInfo.clinvar + " ClinVar";
+					} else if (variantInfo.sift || variantInfo.polyphen) {
+						if (variantInfo.sift) {
+							desc = variantInfo.sift  + " SIFT";
 						}
-					});
-					message += " variant.</div></div>"
+						if (variantInfo.polyphen) {
+							if (desc.length > 0) {
+								desc += ", ";
+							}
+							desc = variantInfo.polyphen  + " PolyPhen";
+						}
+					} else if (variantInfo.impact) {
+						desc  += variantInfo.impact + " VEP impact";
+					}
+					if (variantInfo.inheritance) {
+						if (variantInfo.inheritance == 'denovo') {
+							variantInfo.inheritance = 'de novo';
+						}
+						inherit += variantInfo.inheritance + " ";
+						
+					}	
+
+					message += inherit + desc + " variant.</div></div>"
 				});
 				me.showTooltip(message, x, y, 350);
 			}
@@ -1697,38 +1724,41 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 			me.hideTooltip();
 		});		
 
-		var harmfulVariantInheritance = dangerObject.harmfulVariantsInfo.map(function(variantInfo) {
-			var inheritanceObject = {'inheritance': false}
-			variantInfo.forEach(function(info) {
-				if (info.hasOwnProperty("inheritance") && info.inheritance) {
-					inheritanceObject.inheritance = info.inheritance;
-				}
-			});
-			return inheritanceObject;
-		}).filter(function(inheritanceObject) {
-			return inheritanceObject.inheritance;
-		})
-		if (harmfulVariantInheritance.length > 0) {
-
-			var symbolIndex = 0;
-			harmfulVariantInheritance.forEach(function(info) {
-				var symbolFunction = matrixCard.inheritanceMap[info.inheritance].symbolFunction;
-				geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
-				var options = {width:15, height:15, transform: 'translate(0,0)'};
-				var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: info.inheritance}]);
-				symbolFunction(selection, options);
-				symbolIndex++;
-				selection.on("mouseover", function(d,i) {
-					var x = d3.event.pageX;
-					var y = d3.event.pageY;
-					me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
-				})
-				.on("mouseout", function(d,i) {
-						me.hideTooltip();
+		if (SHOW_INHERITANCE_GLYPH_FOR_GENE) {
+			var harmfulVariantInheritance = dangerObject.harmfulVariantsInfo.map(function(variantInfo) {
+				var inheritanceObject = {'inheritance': false}
+				variantInfo.forEach(function(info) {
+					if (info.hasOwnProperty("inheritance") && info.inheritance) {
+						inheritanceObject.inheritance = info.inheritance;
+					}
 				});
-
+				return inheritanceObject;
+			}).filter(function(inheritanceObject) {
+				return inheritanceObject.inheritance;
 			})
-		}		
+			if (harmfulVariantInheritance.length > 0) {
+
+				var symbolIndex = 0;
+				harmfulVariantInheritance.forEach(function(info) {
+					var symbolFunction = matrixCard.inheritanceMap[info.inheritance].symbolFunction;
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
+					var options = {width:15, height:15, transform: 'translate(0,0)'};
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: info.inheritance}]);
+					symbolFunction(selection, options);
+					symbolIndex++;
+					selection.on("mouseover", function(d,i) {
+						var x = d3.event.pageX;
+						var y = d3.event.pageY;
+						me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
+					})
+					.on("mouseout", function(d,i) {
+							me.hideTooltip();
+					});
+
+				})
+			}		
+
+		}
 
 	}
 

@@ -448,12 +448,13 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 
 		// Turn on flag for harmful variant if one is found
 		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
-			var info = [ {'clinvar'    : variantDanger.clinvar}, 
-			             {'polyphen'   : variantDanger.polyphen},
-			             {'SIFT'       : variantDanger.sift},
-				         {'impact'     : variantDanger.impact}, 
-			             {'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false}
-			           ];
+			var info = {'type'       : variant.type,
+			            'clinvar'    : variantDanger.clinvar, 
+			            'polyphen'   : variantDanger.polyphen,
+			            'SIFT'       : variantDanger.sift,
+				        'impact'     : variantDanger.impact, 
+			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false
+			           };
 			dangerCounts.harmfulVariantsInfo.push(info);
 		}
 	});

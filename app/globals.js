@@ -95,5 +95,6 @@ var IDLE_RESTART     = 10000; // (in milliseconds) Automatically restart app in 
 var idleTime         = 0;
 var idlePrompting    = false;  // prompt user to continue or just automatically restart session?
 
-
+// Show inheritance glyph in gene button?
+var SHOW_INHERITANCE_GLYPH_FOR_GENE = false;
 
