@@ -789,6 +789,7 @@ function unpinAll() {
 	matrixCard.hideTooltip();
 	variantCards.forEach(function(variantCard) {
 		variantCard.hideVariantCircle();
+		variantCard.hideCoverageCircle();
 	});		
 }
 
