@@ -1367,6 +1367,9 @@ header {
   shape-rendering: crispEdges;
   stroke-width: 1px; }
 
+#bam-depth .y.axis line {
+  stroke-width: 0.5px; }
+
 #gene-viz .axis line, #gene-viz .axis path {
   fill: none;
   stroke: lightgrey;

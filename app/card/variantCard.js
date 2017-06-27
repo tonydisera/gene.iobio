@@ -231,6 +231,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							.margin( {top: 22, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 							.showXAxis(true)
 							.showYAxis(true)
+							.yAxisLine(true)
 							.yTicks(4)
 							.yTickFormat(function(val) {
 								if (val == 0) {

@@ -562,7 +562,8 @@ function geneD3() {
   chart.hideTooltip = function() {
       container.select('.tooltip').classed("locked", false);           
       container.select('.tooltip').classed("black-arrow-left", false);           
-      container.select('.tooltip').classed("black-arrow-right", false);           
+      container.select('.tooltip').classed("black-arrow-right", false);       
+      container.select('.tooltip').style("pointer-events", "none");       
       container.select('.tooltip').transition()        
          .duration(500)      
          .style("opacity", 0);   

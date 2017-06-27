@@ -40,6 +40,7 @@ lineD3 = function module() {
   var showYAxis = true;
   var yTicks = null;
   var yTickFormat = null;
+  var yAxisLine = false;
   var showTransition = true;
   var showGradient = true;
   var brushHeight = null;
@@ -159,7 +160,8 @@ lineD3 = function module() {
       var tooltip = container.selectAll(".tooltip").data([0])
         .enter().append('div')
           .attr("class", "tooltip")               
-          .style("opacity", 0);
+          .style("opacity", 0)
+          .style("pointer-events", "none");
 
 
       var svg = d3.select(this)
@@ -313,7 +315,14 @@ lineD3 = function module() {
       var yAxis = d3.svg.axis()
           .scale(y)
           .ticks(yTicks ? yTicks : 5)
-          .orient("right");
+      if (yAxisLine) {
+          yAxis.innerTickSize(-innerWidth)
+               .outerTickSize(0)  
+               .tickPadding(-22)
+               .orient("left");       
+      } else {
+          yAxis.orient("right");
+      }
 
       if (yTickFormat) {
         yAxis.tickFormat(yTickFormat);
@@ -448,7 +457,8 @@ lineD3 = function module() {
     container.select('.tooltip').classed("region", false);           
     container.select('.tooltip').classed("locked", false);           
     container.select('.tooltip').classed("black-arrow-left", false);           
-    container.select('.tooltip').classed("black-arrow-right", false);           
+    container.select('.tooltip').classed("black-arrow-right", false);   
+    container.select('.tooltip').style("pointer-events", "none");       
     container.select('.tooltip').transition()        
        .duration(500)      
        .style("opacity", 0);   
@@ -607,6 +617,12 @@ lineD3 = function module() {
   exports.showYAxis = function(_) {
     if (!arguments.length) return showYAxis;
     showYAxis = _;
+    return exports; 
+  }
+
+  exports.yAxisLine = function(_) {
+    if (!arguments.length) return yAxisLine;
+    yAxisLine = _;
     return exports; 
   }
 
