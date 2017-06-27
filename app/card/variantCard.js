@@ -266,7 +266,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the vcf track
 		this.vcfChart = variantD3()
 				    .width($('#container').innerWidth())
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 5, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(false)
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
@@ -305,7 +305,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// variant set from vcf
 		this.fbChart = variantD3()
 				    .width($('#container').innerWidth())
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 5, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
 				    .variantHeight(8)
 				    .verticalPadding(2)

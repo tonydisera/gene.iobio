@@ -3244,7 +3244,7 @@ text.ref-count {
 #gene-badge-coverage-problem {
   font-size: 15px;
   margin-top: -1px;
-  margin-left: 2px;
+  margin-left: 0px;
   float: left;
   color: #03aec3;
   fill: #03aec3;
