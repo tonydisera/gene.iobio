@@ -228,7 +228,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
-							.margin( {top: 10, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+							.margin( {top: 22, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 							.showXAxis(true)
 							.showYAxis(true)
 							.yTicks(4)
@@ -243,7 +243,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 								var parent = d3.select(this.parentNode);
 	 		    				parent.append('g')     
 	 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
-	 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-10)')
+	 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-16)')
 	 	    							  .data([d])
 	 	    							  .append('use')
 	 	    							  .attr('height',     '16')
@@ -625,7 +625,7 @@ VariantCard.prototype.endBamProgress = function() {
 	this.cardSelector.find(".covloader .loader-label").text("");
 	this.cardSelector.find("#bam-depth").css("visibility", "visible");
 	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-10px");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-16px");
 
 }
 
@@ -949,8 +949,8 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 
 		// Decide if we should show the x-axis.
 		this.bamDepthChart.showXAxis(!(this.model.isVcfLoaded()));
-		this.bamDepthChart.height(!(this.model.isVcfLoaded()) ? 65 : 45 );
-		this.bamDepthChart.margin(!(this.model.isVcfLoaded()) ? {top: 10, right: 2, bottom: 20, left: 4} : {top: 10, right: 2, bottom: 0, left: 4} );
+		this.bamDepthChart.height(!(this.model.isVcfLoaded()) ? 75 : 55 );
+		this.bamDepthChart.margin(!(this.model.isVcfLoaded()) ? {top: 16, right: 2, bottom: 20, left: 4} : {top: 16, right: 2, bottom: 0, left: 4} );
 	
 		// Detemine the y-scale be setting the maxDepth accross all samples
 		if (maxDepth) {
