@@ -1049,49 +1049,65 @@ a.btn
           li
             padding-bottom: 4px
 
+
+      #video-thumbprint-heading
+        font-size: 18px
+        color: $app-color
+        margin-top: 10px 
+
       #video-thumbprint-panel
         width: 75%
+        margin-top: 15px
+
+
+      #video-thumbprint-content
+        display: flex
+        flex-wrap: wrap
         margin-top: 10px
 
-        #video-thumbprint-heading
-          font-size: 18px
-          color: $text-color
-          margin-top: 10px     
+      .video-thumbprint-well
+        position: relative
+        width: 170px
+        height: 140px
+        text-align: center    
+        margin-left: 15px 
 
-        #video-thumbprint-content
-          display: flex
-          flex-wrap: wrap
 
-          .video-thumbprint
-            width: 190px
-            height: 140px
-            margin-top: 5px
-            margin-bottom: 20px
-            background-color: grey
-            margin-left: 0px
-            margin-right: 5px
-            background-size: cover
-            position: relative
-            background-color: rgba(222, 222, 222, 0.32) !important
+        .video-title
+          margin-top: 10px
+          margin-left: 10px
+          margin-right: 10px
+          color: $app-color
+          font-size: 16px
 
-            #play-button
-              font-size: 100px
-              cursor: pointer
-              opacity: .5
-              color: rgba(165, 165, 165, 0.75)
-              font-size: 90px
-              position: absolute
-              top: 25px
-              left: 50px              
+        .video-thumbprint
+          width: 150px
+          height: 100px
+          margin-top: 5px
+          margin-left: 10px
+          background-color: grey
+          background-size: cover        
 
-            .video-title
-              position: absolute
-              top: 30px
-              color: #eb0000
-              font-size: 24px
-              line-height: 24px
-              font-family: Raleway
-              width: 100%
+          #play-button
+            cursor: pointer
+            opacity: 0.5
+            color: rgba(70, 70, 70, 0.9)
+            font-size: 90px
+            position: absolute
+            top: 15px
+            left: 40px            
+
+
+        #welcome-screencast-panel-multigene-analysis
+          background-image: url('../../assets/images/thumbprint-multigene.png')
+
+        #welcome-screencast-panel-saving-analysis
+          background-image: url('../../assets/images/thumbprint-bookmarks.png')
+
+
+        #welcome-screencast-panel-coverage-analysis
+          background-image: url('../../assets/images/thumbprint-coverage.png')
+
 
 
 .icon
