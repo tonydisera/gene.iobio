@@ -34,7 +34,7 @@ function geneD3() {
   // axis
   var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom")
+    .orient("top")
     .tickFormat(tickFormatter);
   // variables 
   var geneD3_trackHeight = 20,
@@ -202,7 +202,7 @@ function geneD3() {
       if (geneD3_showXAxis) {
         axisEnter.attr("class", "x axis")
                  .attr("transform",   "translate(" + margin.left + "," + "0" + ")");
-        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + "0" + ")");
+        svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + parseInt(geneD3_height+margin.top+margin.bottom+featureGlyphHeight) + ")");
       }  
 
 
@@ -368,6 +368,8 @@ function geneD3() {
           })
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
+
+          /*
           .attr('x', function(d) { 
             return d3.round(x(d.start))
           })
@@ -376,6 +378,17 @@ function geneD3() {
           })
           .attr('y', geneD3_trackHeight /2)
           .attr('height', 0)
+          */
+
+          .attr('x', function(d) { return d3.round(x(d.start))})
+          .attr('width', function(d) { return Math.max(minFtWidth, d3.round(x(d.end) - x(d.start)))})
+          .attr('y', function(d) { 
+            if(d.feature_type.toLowerCase() =='utr') return (geneD3_trackHeight - geneD3_utrHeight)/2; 
+            else return (geneD3_trackHeight - geneD3_cdsHeight)/2; })
+          .attr('height', function(d) { 
+            if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight; 
+            else return geneD3_cdsHeight; })     
+
           .attr("pointer-events", "all")
           .style("cursor", "pointer")
           .on("mouseover", function(d) {  
@@ -461,6 +474,7 @@ function geneD3() {
       transcript.transition()
           .duration(700)
           .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
+      
 
       transcript.selectAll('.reference').transition()
         .duration(700)
@@ -471,12 +485,14 @@ function geneD3() {
         .duration(700)
         .attr('d', centerArrow);
 
+
       transcript.selectAll('.name').transition()
         .duration(700)
         .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0; })
         .attr('y', function(d) { return margin.left > 5 ? geneD3_trackHeight - (geneD3_trackHeight/2) + 2 : -10; })   
         .text(function(d) { return d[1]; })                
         .style('fill-opacity', 1);
+
 
       transcript.selectAll('.utr,.cds,.exon').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
         .transition()        
@@ -488,7 +504,7 @@ function geneD3() {
             else return (geneD3_trackHeight - geneD3_cdsHeight)/2; })
           .attr('height', function(d) { 
             if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight; 
-            else return geneD3_cdsHeight; });          
+            else return geneD3_cdsHeight; });     
 
       // Update the x-axis.
       svg.select(".x.axis").transition()

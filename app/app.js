@@ -361,14 +361,14 @@ function init() {
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
-	    .width(1000)
+	    .width($('#container').innerWidth())
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
+	    .margin({top:0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
-	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 12)
+	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
+	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
 	    .showLabel(false)
 		.featureClass( function(d,i) {
 		    return d.feature_type.toLowerCase();
@@ -427,7 +427,8 @@ function init() {
 	    .width(600)
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
 		.widthPercent("100%")
-	    .heightPercent("100%")	    .showXAxis(false)
+	    .heightPercent("100%")	    
+	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
 	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)

@@ -4,7 +4,6 @@ function VariantCard() {
 	this.model = null;
 
   	this.vcfChart = null;
-	this.afChart = null;
 	this.zoomRegionChart = null;
 	this.bamDepthChart = null;	 
 
@@ -205,7 +204,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		this.zoomRegionChart = geneD3()
 				    .widthPercent("100%")
 				    .heightPercent("100%")
-				    .width(1000)
+				    .width($('#container').innerWidth())
 				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(false)
 				    .showBrush(false)
@@ -224,7 +223,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
-		                    .width(1000)
+		                    .width($('#container').innerWidth())
 		                    .height( 35 )
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
@@ -253,10 +252,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 		// Create the vcf track
 		this.vcfChart = variantD3()
-				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 17, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .width($('#container').innerWidth())
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(isLevelEdu  || isLevelBasic ? false : true)
-				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 6)
+				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
@@ -292,10 +291,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// The 'missing variants' chart, variants that freebayes found that were not in orginal
 		// variant set from vcf
 		this.fbChart = variantD3()
-				    .width(1000)
+				    .width($('#container').innerWidth())
 				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
-				    .variantHeight(6)
+				    .variantHeight(8)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
@@ -326,28 +325,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							matrixCard.clearSelections();
 						}
 					});
-					
 
-	 	// Create allele frequency chart
-	 	// Allele freq chart)
-		// TODO:  Replace this with actual frequency after af grabbed from population (1000G/ExAC)
-	    this.afChart = histogramD3()
-	                       .width(400)
-	                       .height(70)
-						   .margin( {left: 40, right: 0, top: 0, bottom: 20})
-						   .xValue( function(d, i) { return d[0] })
-						   .yValue( function(d, i) { return Math.log(d[1]) })
-						   .yAxisLabel( "log(frequency)" );
-						   
-		this.afChart.formatXTick( function(d,i) {
-			return (d * 2) + '%';
-		});
-		this.afChart.tooltipText( function(d, i) { 
-			var value = vcfAfData[i][1];
-			var lowerVal =  d[0]      * 2;
-			var upperVal = (d[0] + 1) * 2;
-			return  d3.round(value) + ' variants with ' + lowerVal + "-" + upperVal + '%' + ' AF ';
-		});
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
 			me.shrinkCard(true);
@@ -679,7 +657,8 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 			// Load the variant chart.			
 			me._showVariants( regionStart, 
 				regionEnd, 
-				function() {						
+				function() {	
+
 					readjustCards();
 					resolve();
 				},
@@ -693,6 +672,7 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 	
 	
 }
+
 
 VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 	var me = this;
