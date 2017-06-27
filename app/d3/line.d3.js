@@ -462,6 +462,7 @@ lineD3 = function module() {
     if (regionStart && regionEnd) {
         x.domain([regionStart, regionEnd]);
         container.select("svg g.group g.regions").selectAll(".region").remove();
+        container.select("svg g.group g.regions").selectAll(".region-glyph").remove();
     }
 
     var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
@@ -480,32 +481,34 @@ lineD3 = function module() {
 
     regions.each(function(d,i) {
         var me = this;
-        var featureX = d3.round(x(d.start));
+        var regionX     = d3.round(x(d.start));
+        var regionWidth =  Math.max(minRegionWidth, d3.round(x(d.end) - x(d.start)));
         if (regionGlyph) {
-          regionGlyph.call(me, d, i, featureX);
+          regionGlyph.call(me, d, i, regionX + regionWidth/2);
         }
     });
 
-    regions.on("mouseover", function(d) {  
-              // show the tooltip
-              var tooltip = container.select('.tooltip');   
-              tooltip.classed("region", true);           
-              var featureObject = d3.select(this);
-              dispatch.d3regiontooltip(featureObject, d, tooltip, false);
-           })                  
-           .on("mouseout", function(d) {   
-              if (container.select('.tooltip.region.locked').empty()) {
-                exports.hideTooltip();
-              }
-           })
-           .on("click", function(d) {  
-              // show the tooltip
-              var tooltip = container.select('.tooltip');   
-              tooltip.classed("region", true);           
-              tooltip.classed("locked", true);          
-              var featureObject = d3.select(this);
-              dispatch.d3regiontooltip(featureObject, d, tooltip, true, exports.hideTooltip);
-           }) 
+    container.select("svg g.group g.regions").selectAll(".region, .region-glyph")
+             .on("mouseover", function(d) {  
+                // show the tooltip
+                var tooltip = container.select('.tooltip');   
+                tooltip.classed("region", true);           
+                var featureObject = d3.select(this);
+                dispatch.d3regiontooltip(featureObject, d, tooltip, false);
+             })                  
+             .on("mouseout", function(d) {   
+                if (container.select('.tooltip.region.locked').empty()) {
+                  exports.hideTooltip();
+                }
+             })
+             .on("click", function(d) {  
+                // show the tooltip
+                var tooltip = container.select('.tooltip');   
+                tooltip.classed("region", true);           
+                tooltip.classed("locked", true);          
+                var featureObject = d3.select(this);
+                dispatch.d3regiontooltip(featureObject, d, tooltip, true, exports.hideTooltip);
+             }) 
 
   }
 

@@ -26,7 +26,7 @@
 							 + '</use>'
 							 + '</g>'
 							 + '</svg>';
-	this.geneSortIcons[this.LOW_COVERAGE_OPTION] = '<i id="gene-badge-coverage-problem" class="dropdown-item material-icons glyph" >announcement</i>';
+	this.geneSortIcons[this.LOW_COVERAGE_OPTION] = '<i id="gene-badge-coverage-problem" class="dropdown-item material-icons glyph" >error</i>';
 
 }
 

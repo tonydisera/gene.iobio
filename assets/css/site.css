@@ -1082,7 +1082,7 @@ section {
 
 #bam-track {
   margin-bottom: 0px;
-  margin-top: -10px;
+  margin-top: 0px;
   margin-left: 0px;
   margin-right: 0px;
   padding: 0px;
@@ -1140,7 +1140,8 @@ section {
   border: none;
   position: relative;
   pointer-events: none;
-  top: 0px;
+  top: 10px;
+  margin-top: -10px;
   height: 23px;
   visibility: visible;
   width: 26px; }
@@ -1282,7 +1283,9 @@ header {
     fill: #3586c0;
     pointer-events: none; }
   #bam-depth .region {
-    fill: rgba(198, 175, 77, 0.6); }
+    stroke: #a8a9a9;
+    stroke-width: 1px;
+    fill: transparent; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
@@ -1333,7 +1336,7 @@ header {
   stop-opacity: 0.6; }
 
 .axis text {
-  font-size: 10px;
+  font-size: 12px;
   fill: #787878; }
 
 #zoom-region-chart {
@@ -1343,9 +1346,8 @@ header {
   margin-bottom: 0px;
   padding-bottom: 0px; }
   #zoom-region-chart .axis text {
-    font-size: 10px;
-    fill: #787878;
-    font-style: italic; }
+    font-size: 11px;
+    fill: #787878; }
 
 #zoom-region-start {
   float: left;
@@ -1375,7 +1377,7 @@ header {
   fill: none;
   stroke: lightgrey;
   shape-rendering: crispEdges;
-  stroke-width: 3px; }
+  stroke-width: 1px; }
 
 .brush .extent {
   stroke: #000;
@@ -1406,7 +1408,7 @@ header {
   stroke: #969696;
   fill: none; }
 .ibo-variant .axis {
-  font-size: 10px; }
+  font-size: 13px; }
   .ibo-variant .axis path, .ibo-variant .axis line {
     fill: none;
     stroke: lightgrey;
@@ -1849,7 +1851,7 @@ inputinput:-moz-placeholder {
   margin-right: 70px;
   color: #717171; }
   #coverage-thresholds.attention {
-    outline-color: #c6af4d;
+    outline-color: #03aec3;
     outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
@@ -2393,9 +2395,9 @@ inputinput:-moz-placeholder {
   font-size: 11px;
   line-height: normal; }
   #bam-depth .tooltip .danger {
-    color: #c6af4d; }
+    color: #03aec3; }
   #bam-depth .tooltip a.danger {
-    color: #c6af4d !important; }
+    color: #03aec3 !important; }
   #bam-depth .tooltip #exon-tooltip-close {
     float: right;
     color: white !important;
@@ -2406,9 +2408,9 @@ inputinput:-moz-placeholder {
     float: left; }
 
 #zoom-region-chart .tooltip .danger {
-  color: #c6af4d; }
+  color: #03aec3; }
 #zoom-region-chart .tooltip a.danger {
-  color: #c6af4d !important; }
+  color: #03aec3 !important; }
 #zoom-region-chart .tooltip #exon-tooltip-close {
   float: right;
   color: white !important;
@@ -3009,19 +3011,19 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 12px; }
 
-#zoom-region-chart.ibo-gene .cds.danger1 {
-  fill: rgba(198, 175, 77, 0.6);
-  stroke: rgba(198, 175, 77, 0.6); }
-#zoom-region-chart.ibo-gene .utr.danger1 {
-  fill: rgba(198, 175, 77, 0.6);
-  stroke: rgba(198, 175, 77, 0.6); }
+#zoom-region-chart.ibo-gene .cds.danger {
+  fill: rgba(9, 185, 218, 0.6);
+  stroke: #03aec3; }
+#zoom-region-chart.ibo-gene .utr.danger {
+  fill: rgba(9, 185, 218, 0.6);
+  stroke: #03aec3; }
 
-#gene-viz.ibo-gene .cds.danger1 {
-  fill: rgba(198, 175, 77, 0.6);
-  stroke: rgba(198, 175, 77, 0.6); }
+#gene-viz.ibo-gene .cds.danger {
+  fill: rgba(9, 185, 218, 0.6);
+  stroke: #03aec3; }
 #gene-viz.ibo-gene .utr.danger1 {
-  fill: rgba(198, 175, 77, 0.6);
-  stroke: rgba(198, 175, 77, 0.6); }
+  fill: rgba(9, 185, 218, 0.6);
+  stroke: #03aec3; }
 
 #genes-panel {
   margin-bottom: 5px;
@@ -3241,11 +3243,11 @@ text.ref-count {
 
 #gene-badge-coverage-problem {
   font-size: 15px;
-  margin-top: 0px;
+  margin-top: -1px;
   margin-left: 2px;
   float: left;
-  color: #c6af4d;
-  fill: #c6af4d;
+  color: #03aec3;
+  fill: #03aec3;
   display: none; }
   #gene-badge-coverage-problem.dropdown-item {
     display: inline-block;
@@ -3253,7 +3255,7 @@ text.ref-count {
     margin-top: 1px; }
 
 .coverage-problem-glyph {
-  fill: #c6af4d; }
+  fill: #03aec3; }
 
 #gene-badge-harmful-variant {
   font-size: 15px;

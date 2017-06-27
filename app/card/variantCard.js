@@ -205,8 +205,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width($('#container').innerWidth())
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
-				    .showXAxis(false)
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .showXAxis(true)
 				    .showBrush(false)
 				    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
 				    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 12)
@@ -224,7 +224,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
 		                    .width($('#container').innerWidth())
-		                    .height( 35 )
+		                    .height( 50 )
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
@@ -238,6 +238,19 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 								} else {
 									return val + "x";
 								}
+							})
+							.regionGlyph(function(d,i,regionX) {
+								var parent = d3.select(this.parentNode);
+	 		    				parent.append('g')     
+	 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
+	 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-10)')
+	 	    							  .data([d])
+	 	    							  .append('use')
+	 	    							  .attr('height',     '16')
+	 	    							  .attr('width',      '16')
+	 	    							  .attr('href', '#error-symbol')
+	 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
+	 	    							  .data([d]);
 							})
 							.showTooltip(true)
 							.pos( function(d) { return d[0] })
@@ -254,7 +267,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		this.vcfChart = variantD3()
 				    .width($('#container').innerWidth())
 				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
-				    .showXAxis(isLevelEdu  || isLevelBasic ? false : true)
+				    .showXAxis(false)
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
@@ -866,7 +879,7 @@ VariantCard.prototype.highlightLowCoverageRegions = function(transcript, regionS
 						}
 				  })
 		this.bamDepthChart.highlightRegions(dangerRegions, {}, regionStart, regionEnd);
-		this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
+		//this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
 	}
 }
 

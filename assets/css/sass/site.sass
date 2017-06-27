@@ -1299,7 +1299,7 @@ section
 
 #bam-track
   margin-bottom: 0px
-  margin-top: -10px
+  margin-top: 0px
   margin-left: 0px
   margin-right: 0px
   padding: 0px
@@ -1521,7 +1521,9 @@ header
     pointer-events: none
 
   .region
-    fill: $coverage-problem-region-color
+    stroke: #a8a9a9
+    stroke-width: 1px
+    fill: transparent
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
   stroke: $arrow-color
@@ -1574,14 +1576,13 @@ header
   stop-opacity: 0.6
 
 .axis text
-  font-size: 13px
+  font-size: 12px
   fill: rgb(120, 120, 120)
 
 #zoom-region-chart
   .axis text
-    font-size: 10px
+    font-size: 11px
     fill: rgb(120, 120, 120)
-    font-style: italic
 
   padding-left: 0px
   padding-right: 0px
@@ -1622,7 +1623,7 @@ header
     fill: none
     stroke: lightgrey
     shape-rendering: crispEdges
-    stroke-width: 3px
+    stroke-width: 1px
 
 .brush .extent
   stroke: #000
