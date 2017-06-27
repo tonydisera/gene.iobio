@@ -1652,6 +1652,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 						if (message.length > 0) {
 							message += ", ";
 						} else {
+							message += 'Gene ' + geneName + "<br>";
 							message += "Insufficient coverage in "
 						}
 						message += counts[rel] + (counts[rel] == 1 ? " exon" : " exons") + " for " + rel;
@@ -1688,7 +1689,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 					} 
 					message += "<div style='display:table'>"
 					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
-					        +  "<div style='display:table-cell;margin-left:6px'>" + "contains ";
+					        +  "<div style='display:table-cell;margin-left:6px'>" + "Contains ";
 
 					var desc = "";
 					var inherit = "";
