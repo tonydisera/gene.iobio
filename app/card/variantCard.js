@@ -231,7 +231,15 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		                    .kind("area")
 							.margin( {top: 10, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 							.showXAxis(true)
-							.showYAxis(false)
+							.showYAxis(true)
+							.yTicks(4)
+							.yTickFormat(function(val) {
+								if (val == 0) {
+									return "";
+								} else {
+									return val + "x";
+								}
+							})
 							.showTooltip(true)
 							.pos( function(d) { return d[0] })
 					   		.depth( function(d) { return d[1] })
@@ -626,7 +634,7 @@ VariantCard.prototype.endBamProgress = function() {
 	this.cardSelector.find(".covloader .loader-label").text("");
 	this.cardSelector.find("#bam-depth").css("visibility", "visible");
 	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-17px");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-10px");
 
 }
 

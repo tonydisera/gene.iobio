@@ -38,6 +38,8 @@ lineD3 = function module() {
   var showBrush = false;
   var showXAxis = true;
   var showYAxis = true;
+  var yTicks = null;
+  var yTickFormat = null;
   var showTransition = true;
   var showGradient = true;
   var brushHeight = null;
@@ -310,8 +312,12 @@ lineD3 = function module() {
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .ticks(5)
+          .ticks(yTicks ? yTicks : 5)
           .orient("right");
+
+      if (yTickFormat) {
+        yAxis.tickFormat(yTickFormat);
+      }
 
 
       var line = d3.svg.line()
@@ -348,7 +354,6 @@ lineD3 = function module() {
             .attr("class", "y axis")
             .call(yAxis);
       }
-        
 
       // not sure why, but second time through, the svgGroup is a
       // "placeholder", so we will just select the group again
@@ -599,6 +604,18 @@ lineD3 = function module() {
   exports.showYAxis = function(_) {
     if (!arguments.length) return showYAxis;
     showYAxis = _;
+    return exports; 
+  }
+
+  exports.yTicks = function(_) {
+    if (!arguments.length) return yTicks;
+    yTicks = _;
+    return exports; 
+  }
+
+  exports.yTickFormat = function(_) {
+    if (!arguments.length) return yTickFormat;
+    yTickFormat = _;
     return exports; 
   }
   
