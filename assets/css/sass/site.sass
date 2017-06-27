@@ -1521,9 +1521,17 @@ header
     pointer-events: none
 
   .region
-    stroke: #a8a9a9
     stroke-width: 1px
-    fill: transparent
+    stroke: $danger-exon-color
+    fill: $danger-exon-color
+
+  .threshold
+    line
+      stroke-width: 1px
+      stroke: lightgray
+    text
+      font-size: 12px
+      fill: $text-color
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
   stroke: $arrow-color

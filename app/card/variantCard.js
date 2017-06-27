@@ -231,7 +231,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							.margin( {top: 22, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 							.showXAxis(true)
 							.showYAxis(true)
-							.yAxisLine(true)
+							.yAxisLine(false)
 							.yTicks(4)
 							.yTickFormat(function(val) {
 								if (val == 0) {
@@ -820,7 +820,7 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 
 	this._showBamDepth(regionStart, regionEnd);
-	this.highlightLowCoverageRegions(window.selectedTranscript,regionStart, regionEnd);
+	this.highlightLowCoverageRegions(window.selectedTranscript,regionStart, regionEnd, filterCard.geneCoverageMedian);
 	
 	this._showVariants(regionStart, regionEnd, 
 		function() {
@@ -879,7 +879,7 @@ VariantCard.prototype.highlightLowCoverageRegions = function(transcript, regionS
 							dangerRegions.push(feature)
 						}
 				  })
-		this.bamDepthChart.highlightRegions(dangerRegions, {}, regionStart, regionEnd);
+		this.bamDepthChart.highlightRegions(dangerRegions, {}, regionStart, regionEnd, filterCard.geneCoverageMedian);
 		//this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
 	}
 }
@@ -962,6 +962,8 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+
+		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, filterCard.geneCoverageMedian + "x (median threshold)", "threshold" );
 	}
 }
 

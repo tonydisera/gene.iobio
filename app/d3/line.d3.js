@@ -464,7 +464,33 @@ lineD3 = function module() {
        .style("opacity", 0);   
   }
 
-  exports.highlightRegions = function(regions, options, regionStart, regionEnd) {
+  exports.showHorizontalLine = function(yValue, label, clazz) {
+    if (container == null) {
+      return;
+    }
+    if (regionStart && regionEnd) {
+        x.domain([regionStart, regionEnd]);
+    }
+
+    container.select("svg g.group").selectAll("g." + clazz).remove();
+    var lineGroup = container.select("svg g.group")
+                     .append("g")
+                     .attr("transform", "translate(0," + d3.round(y(yValue)) + ")")
+                     .attr("class", clazz);
+    lineGroup.append("line")
+             .attr("x1", d3.round(x(x.domain()[0])))
+             .attr("x2", d3.round(x(x.domain()[1])))
+             .attr("y1", 0)
+             .attr("y2", 0)
+    if (label) {
+      lineGroup.append("text")
+               .attr("x", 40)
+               .attr("y", 3)
+               .text(label);
+    }
+  }
+
+  exports.highlightRegions = function(regions, options, regionStart, regionEnd, regionHeight) {
     if (container == null) {
       return;
     }
@@ -476,7 +502,9 @@ lineD3 = function module() {
     }
 
     var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
-    var regions =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
+    var regions   =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
+    var theY      =  regionHeight ? d3.round(y(regionHeight)) : height - margin.top - margin.bottom;
+    var theHeight =  regionHeight ? theY : 0;     
     regions.enter()
            .append("rect")
            .attr("class",  "region")
@@ -484,8 +512,8 @@ lineD3 = function module() {
            .attr("ry", 1)
            .attr("x",      function(d,i) { return d3.round(x(d.start)) })
            .attr("width",  function(d,i) { return Math.max(minRegionWidth, d3.round(x(d.end) - x(d.start))) })
-           .attr("y",      0)
-           .attr("height", height - margin.top - margin.bottom);
+           .attr("y",      theY)
+           .attr("height", theHeight);
     regions.exit().remove();
 
 
