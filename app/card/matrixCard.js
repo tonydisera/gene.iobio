@@ -167,7 +167,7 @@ MatrixCard.prototype.setCellSize = function(sizeEnum) {
 		toggle = true;
 	} 
 
-	if (toggle) {
+	if (toggle && this.featureMatrix) {
 		this.featureMatrix.cellSize(this.CELL_SIZE);
 		if (getProbandVariantCard().model && getProbandVariantCard().model.vcfData) {
 			this.fillFeatureMatrix(getProbandVariantCard().model.vcfData);
