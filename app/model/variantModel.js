@@ -2335,6 +2335,11 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
 VariantModel.prototype.filterVariants = function(data, filterObject, start, end, bypassRangeFilter) {
 	var me = this;
 
+	if (data == null && data.features == null) {
+		console.log("Empty data/features");
+		return;
+	}
+
 	var afFieldExac  = "afExAC";
 	var afField1000g = "af1000G";
 	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;
