@@ -155,7 +155,8 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
 						resolve(geneCoverageObjects)
 					} else {
-						reject("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+						console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+						resolve([]);
 					}
 				}	
 			);
@@ -2542,6 +2543,11 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
 
 VariantModel.prototype.filterVariants = function(data, filterObject, start, end, bypassRangeFilter) {
 	var me = this;
+
+	if (data == null && data.features == null) {
+		console.log("Empty data/features");
+		return;
+	}
 
 	var afFieldExac  = "afExAC";
 	var afField1000g = "af1000G";
