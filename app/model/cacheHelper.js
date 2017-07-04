@@ -275,7 +275,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 
     	adjustGeneRegion(geneObject);
     	var transcript = getCanonicalTranscript(geneObject);
-    	window.geneObjects[geneObject.gene_name] = geneObject;
+    	window.geneObjects[geneObject.gene_name.toUpperCase()] = geneObject;
 
 
 		// This function will be performed once all loaded variants have been
@@ -560,7 +560,9 @@ CacheHelper.prototype.cacheNextGene = function(geneName, analyzeCalledVariants, 
 			this.cacheQueue.splice(idx,1);
 		} else {
 			console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
-			callback();
+			if (callback) {
+				callback();
+			}
 			return;
 		}
 	}
