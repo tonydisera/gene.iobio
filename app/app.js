@@ -2999,7 +2999,6 @@ function shouldAutocall(callback) {
 						    	callback();
 					    	}
 					    }).set('labels', {ok:'OK', cancel:'No, just show the coverage'});   	
-		alertify.set('labels', {ok:'OK', cancel:'Cancel'});      			
 	} else {
 		if (callback) {
 			callback();
@@ -3206,6 +3205,8 @@ function promiseFullTrio() {
 		    var filterPanelWidth = $('#filter-track').width();
 
 			resolve(loaded.proband);
+		} else if (dataCard.mode == 'single' && isAlignmentsOnly()) {
+			resolve(getProbandVariantCard());
 		} else {
 			reject();
 		}
