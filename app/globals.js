@@ -42,8 +42,7 @@ IOBIO.samtools                = iobio_services +  "samtools/";
 IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" : "samtools/");
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
-//IOBIO.geneCoverage            = iobio_services + "genecoverage/";
-IOBIO.geneCoverage            = DEV_IOBIO + "genecoverage/";
+IOBIO.geneCoverage            = iobio_services + "genecoverage/";
 
 
 // URL for Phenolyzer

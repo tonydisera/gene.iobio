@@ -830,9 +830,8 @@ var Bam = Class.extend({
         geneCoverageArgs.push(regionFile);
 
         
-        //var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: useSSL});
-        var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: false});
-
+        var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: useSSL});
+        
         
         var geneCoverageData = "";
         cmd.on('data', function(data) {
