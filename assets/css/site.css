@@ -1284,8 +1284,8 @@ header {
     pointer-events: none; }
   #bam-depth .region {
     stroke-width: 1px;
-    stroke: rgba(218, 165, 0, 0.78);
-    fill: rgba(218, 165, 0, 0.78); }
+    stroke: rgba(175, 79, 79, 0.32);
+    fill: rgba(175, 79, 79, 0.32); }
   #bam-depth .threshold line {
     stroke-width: 1px;
     stroke: lightgray; }
@@ -1860,7 +1860,7 @@ inputinput:-moz-placeholder {
   margin-right: 70px;
   color: #717171; }
   #coverage-thresholds.attention {
-    outline-color: #daa500;
+    outline-color: #e18c8c;
     outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
@@ -1952,7 +1952,7 @@ inputinput:-moz-placeholder {
         #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count.none {
           background-color: #e8e6e6; }
       #filter-track #standard-filter-panel .standard-filter-count #called-variant-count {
-        background-color: #b4c688; }
+        background-color: #9fbb52; }
         #filter-track #standard-filter-panel .standard-filter-count #called-variant-count.none {
           background-color: #e8e6e6; }
       #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-warning {
@@ -1986,7 +1986,25 @@ inputinput:-moz-placeholder {
     pointer-events: all; }
 
 #checkmark-called {
-  fill: #b4c688; }
+  fill: #9fbb52; }
+
+#recessive-symbol .parent .left {
+  stroke: #F49A73;
+  stroke-width: 2; }
+#recessive-symbol .parent .right {
+  stroke: gray;
+  stroke-width: 2; }
+#recessive-symbol .proband .left, #recessive-symbol .proband .right {
+  stroke: #F49A73;
+  stroke-width: 3; }
+
+#denovo-symbol .parent .left, #denovo-symbol .parent .right {
+  stroke: grey;
+  stroke-width: 2; }
+#denovo-symbol .proband .left, #denovo-symbol .proband .right {
+  stroke: #6A9C2F !important;
+  fill: none;
+  stroke-width: 3; }
 
 #trio-symbol .parent .left {
   stroke: #5d809d;
@@ -1999,15 +2017,6 @@ inputinput:-moz-placeholder {
 #phenotype-symbol {
   fill: #ABA2A2;
   stroke: #ABA2A2; }
-
-#thumbs-green-symbol {
-  fill: #81A966; }
-
-#thumbs-red-symbol {
-  fill: #ad494a; }
-
-#thumbs-grey-symbol {
-  fill: #8b8b8b; }
 
 .variant.homref {
   opacity: 0 !important;
@@ -2132,8 +2141,11 @@ inputinput:-moz-placeholder {
   fill: #D3D5D8;
   stroke: rgba(0, 0, 0, 0.26); }
 
-.impact text, .vepImpact text, .highestImpactVep text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
-  fill: #717171; }
+.impact, .vepImpact, .highestImpactVep, .effect, .vepConsequence, .type, .zygosity, .recfilter {
+  border: solid 2px white;
+  padding: 1px; }
+  .impact text, .vepImpact text, .highestImpactVep text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
+    fill: #717171; }
 
 .impact.nocolor rect, .vepImpact.nocolor rect, .highestImpactVep.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
@@ -2146,33 +2158,37 @@ inputinput:-moz-placeholder {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
-  outline: solid 2px #969696;
-  outline-offset: -2px; }
+  border: solid 1.5px #969696;
+  border-radius: 4px; }
 
 .tooltip-zygosity:hover {
-  outline: solid 2px #969696;
-  outline-offset: -2px; }
+  border-radius: 0px;
+  border: solid 2.5px #969696; }
 
 .impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover, .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
-  outline: solid 2px #3586c0;
-  outline-offset: -2px; }
+  border: solid 2.5px #3586c0;
+  border-radius: 4px;
+  padding: 1px; }
   .impact.current:hover.not-equal, .vepImpact.current:hover.not-equal, .highestImpactVep.current:hover.not-equal, .effect.current:hover.not-equal, .vepConsequence.current:hover.not-equal, .tooltip-zygosity.current:hover.not-equal, .regulatory.current:hover.not-equal, .polyphen.current:hover.not-equal, .sift.current:hover.not-equal, .type.current:hover.not-equal, .afexaclevels.current:hover.not-equal, .af1000glevels.current:hover.not-equal, .inheritance.current:hover.not-equal, .clinvar.current:hover.not-equal, .uasibs.current:hover.not-equal, .recfilter.current:hover.not-equal {
-    outline: none; }
+    border: solid 1.5px #969696; }
+
+.tooltip-zygosity.current:hover {
+  border-radius: 0px; }
 
 .current {
   font-weight: bold;
-  outline: solid 2px #3586c0;
-  outline-offset: -2px; }
+  border: solid 2.5px #3586c0;
+  border-radius: 4px;
+  padding: 1px; }
   .current.not-equal {
     background-image: linear-gradient(transparent 7px, #3586c0 7px, #3586c0 9px, transparent 9px);
-    border: none;
-    outline: none; }
+    border: none; }
 
 .tooltip-zygosity.current {
-  outline: solid 2px #3586c0 !important;
-  outline-offset: -2px; }
+  border-radius: 0px;
+  border: solid 2.5px #3586c0 !important; }
 
 #impact-scheme, #effect-scheme, #regulatory-scheme, #zygosity-scheme {
   padding-top: 2px; }
@@ -2183,8 +2199,7 @@ inputinput:-moz-placeholder {
   font-size: 11px; }
 
 #impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current {
-  color: #3586c0 !important;
-  outline: none; }
+  color: #3586c0 !important; }
   #impact-scheme.current .material-icons, #effect-scheme.current .material-icons, #zygosity-scheme.current .material-icons {
     color: #3586c0 !important; }
 
@@ -2213,7 +2228,10 @@ inputinput:-moz-placeholder {
   font-size: 12px;
   font-style: bold;
   color: #3586c0;
-  fill: #3586c0; }
+  fill: #3586c0;
+  border: solid thin black;
+  border-radius: 4px;
+  padding: 1px; }
 
 #impact-scheme:hover, #effect-scheme:hover, #af1000g-scheme:hover, #afexac-scheme:hover {
   font-weight: bold;
@@ -2386,9 +2404,9 @@ inputinput:-moz-placeholder {
   font-size: 11px;
   line-height: normal; }
   #bam-depth .tooltip .danger {
-    color: #daa500; }
+    color: #e18c8c; }
   #bam-depth .tooltip a.danger {
-    color: #daa500 !important; }
+    color: #e18c8c !important; }
   #bam-depth .tooltip #exon-tooltip-close {
     float: right;
     color: white !important;
@@ -2399,9 +2417,9 @@ inputinput:-moz-placeholder {
     float: left; }
 
 #zoom-region-chart .tooltip .danger {
-  color: #daa500; }
+  color: #e18c8c; }
 #zoom-region-chart .tooltip a.danger {
-  color: #daa500 !important; }
+  color: #e18c8c !important; }
 #zoom-region-chart .tooltip #exon-tooltip-close {
   float: right;
   color: white !important;
@@ -3003,17 +3021,17 @@ text.ref-count {
   font-size: 12px; }
 
 #zoom-region-chart.ibo-gene .cds.danger {
-  fill: rgba(175, 79, 79, 0.81);
+  fill: rgba(175, 79, 79, 0.32);
   stroke: #af4f4f; }
 #zoom-region-chart.ibo-gene .utr.danger {
-  fill: rgba(175, 79, 79, 0.81);
+  fill: rgba(175, 79, 79, 0.32);
   stroke: #af4f4f; }
 
 #gene-viz.ibo-gene .cds.danger {
-  fill: rgba(175, 79, 79, 0.81);
+  fill: rgba(175, 79, 79, 0.32);
   stroke: #af4f4f; }
 #gene-viz.ibo-gene .utr.danger {
-  fill: rgba(175, 79, 79, 0.81);
+  fill: rgba(175, 79, 79, 0.32);
   stroke: #af4f4f; }
 
 #genes-panel {
@@ -3079,7 +3097,7 @@ text.ref-count {
       #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
         border-top: transparent; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #analyzed-bar #passed-filter-bar {
-          background-color: #b4c688;
+          background-color: #9fbb52;
           height: 17px;
           color: white; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #analyzed-bar #not-passed-filter-bar {
@@ -3210,7 +3228,7 @@ text.ref-count {
 
 #gene-badge-has-called-variants {
   font-size: 14px;
-  color: #b4c688;
+  color: #9fbb52;
   float: left;
   display: none; }
 
@@ -3237,8 +3255,8 @@ text.ref-count {
   margin-top: -1px;
   margin-left: 0px;
   float: left;
-  color: #daa500;
-  fill: #daa500;
+  color: #e18c8c;
+  fill: #e18c8c;
   display: none; }
   #gene-badge-coverage-problem.dropdown-item {
     display: inline-block;
@@ -3246,7 +3264,7 @@ text.ref-count {
     margin-top: 1px; }
 
 .coverage-problem-glyph {
-  fill: #daa500; }
+  fill: #e18c8c; }
 
 #gene-badge-harmful-variant {
   font-size: 15px;
