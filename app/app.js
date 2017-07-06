@@ -2359,8 +2359,6 @@ function hasCalledVariants() {
 }
 
 function showNavVariantLinks() {
-	$('#show-filters-link').removeClass("hide");
-	$('#show-bookmarks-link').removeClass("hide");
 	$('#call-variants-link').removeClass("hide");
 	$('#variant-links-divider').removeClass("hide");
 }
