@@ -1832,7 +1832,7 @@ inputinput:-moz-placeholder {
   padding-top: 2px;
   padding-bottom: 2px;
   margin-left: -55px;
-  margin-bottom: 2px;
+  margin-bottom: -22px;
   margin-top: 2px; }
 
 #filter-summary-track {
@@ -1896,6 +1896,13 @@ inputinput:-moz-placeholder {
     color: #5d809d !important;
     margin-top: 12px;
     margin-bottom: 5px; }
+  #filter-track .subheading {
+    font-size: 15px;
+    color: #5d809d !important;
+    margin-bottom: 0px;
+    margin-top: 35px;
+    text-align: center;
+    margin-left: -50px; }
   #filter-track #filter-panel {
     font-size: 12px;
     color: #66585c;
@@ -1903,7 +1910,6 @@ inputinput:-moz-placeholder {
     margin-top: 2px;
     overflow-y: auto; }
   #filter-track #standard-filter-panel {
-    float: left;
     margin-top: 0px;
     margin-bottom: 10px;
     display: flex;
