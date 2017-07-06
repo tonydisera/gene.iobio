@@ -18,10 +18,6 @@ function MatrixCard() {
 	this.ROW_LABEL_WIDTH_EDU       = 130;
 
 
-	this.fill_green =  "#81A966";
-	this.fill_grey  =  "#8b8b8b";
-	this.fill_red   =  "rgb(173, 73, 74)";
-
 	this.clinvarMap     = {
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
 			  		    'pathogenic/likely_pathogenic' : {value: 2,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
@@ -1189,21 +1185,21 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
 	if (selection.datum().clazz == "affected") {
 		selection.append("g")
+		         .attr("id", "thumbs-grey-symbol")
 		         .attr("transform", "translate(1,2)")
 		         .append("use")
 		         .attr("xlink:href", '#thumbs-down-symbol')
 		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
 		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .attr("fill",   matrixCard.fill_grey)
 		         .style("pointer-events", "none");
 	} else {
 		selection.append("g")
+		         .attr("id", "thumbs-green-symbol")
 		         .attr("transform", "translate(1,2)")
 		         .append("use")
 		         .attr("xlink:href", '#thumbs-up-symbol')
 		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
 		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .attr("fill",   matrixCard.fill_green)
 		         .style("pointer-events", "none");		
 	}
 	
@@ -1231,21 +1227,21 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 MatrixCard.prototype.showSibRecessiveSymbol = function (selection, options) {
 	if (selection.datum().value == 'recessive_all' && selection.datum().clazz == "affected") {
 		selection.append("g")
+			         .attr("id", "thumbs-green-symbol")
 			         .attr("transform", options.transform || "translate(1,2)")
 			         .append("use")
 			         .attr("xlink:href", '#thumbs-up-symbol')
 			         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
 			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-			         .attr("fill",  matrixCard.fill_green)
 			         .style("pointer-events", "none");
 	} else  {
 		selection.append("g")
+			         .attr("id", "thumbs-grey-symbol")
 			         .attr("transform", "translate(1,2)")
 			         .append("use")
 			         .attr("xlink:href", '#question-mark-symbol')
 			         .attr("width", options && options.cellSize > 18 ? "16" : "14")
 			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-			         .attr("fill",  matrixCard.fill_grey)
 			         .style("pointer-events", "none");
 	}
 
@@ -1253,12 +1249,12 @@ MatrixCard.prototype.showSibRecessiveSymbol = function (selection, options) {
 
 MatrixCard.prototype.showSibPresentSymbol = function (selection, options) {
 	var symbolLink = null;
-	var fillColor = matrixCard.fill_grey;
+	var id = "thumbs-grey-symbol";
 
 	if ( selection.datum().clazz == "affected") {
 		if (selection.datum().value == "present_all") {
 			symbolLink = '#thumbs-up-symbol';
-			fillColor = matrixCard.fill_green;
+			id = "thumbs-green-symbol";
 		} else if (selection.datum().value == "present_some") {
 			symbolLink = '#question-mark-symbol';
 		} else if (selection.datum().value == "present_none") {
@@ -1271,17 +1267,17 @@ MatrixCard.prototype.showSibPresentSymbol = function (selection, options) {
 			symbolLink = '#question-mark-symbol';
 		} else if (selection.datum().value == "present_none") {
 			symbolLink = '#thumbs-up-symbol';
-			fillColor = matrixCard.fill_green;			
+			id = "thumbs-green-symbol";
 		}
 	}
 
 	selection.append("g")
+	                 .attr("id", id)
 			         .attr("transform",  "translate(1,2)")
 			         .append("use")
 			         .attr("xlink:href", symbolLink)
 			         .attr("width",   options && options.cellSize > 18 ? "16" : "14")
 			         .attr("height",  options && options.cellSize > 18 ? "16" : "14")
-			         .attr("fill",    fillColor)
 			         .style("pointer-events", "none");		
 
 	
