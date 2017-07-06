@@ -232,7 +232,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							.showXAxis(true)
 							.showYAxis(true)
 							.yAxisLine(false)
-							.yTicks(4)
+							.yTicks(3)
 							.yTickFormat(function(val) {
 								if (val == 0) {
 									return "";
@@ -268,7 +268,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		this.vcfChart = variantD3()
 				    .width($('#container').innerWidth())
 				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 5, left: isLevelBasic || isLevelEdu ? 9 : 4})
-				    .showXAxis(false)
+				    .showXAxis(true)
+				    .xTickFormat(function(val) {
+				    	return "";
+				    })
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)

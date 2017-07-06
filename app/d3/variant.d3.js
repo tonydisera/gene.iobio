@@ -11,7 +11,7 @@ function variantD3() {
   // axis
   var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom")
+    .orient("top")
     .tickFormat(tickFormatter);
   // variables 
   var borderRadius = 1,
@@ -19,6 +19,7 @@ function variantD3() {
       regionStart = undefined,
       regionEnd = undefined,
       showXAxis = false,
+      xTickFormat = null,
       heightPercent = "100%",
       widthPercent = "100%",
       showBrush = false,
@@ -534,6 +535,9 @@ function variantD3() {
 
       // Generate the x axis
       if (showXAxis) {
+        if (xTickFormat) {
+          xAxis.tickFormat(xTickFormat);
+        }
         svg.select(".x.axis").transition()
             .duration(200)
             .call(xAxis);       
@@ -770,6 +774,12 @@ function variantD3() {
     showXAxis = _;
     return chart; 
   };
+
+  chart.xTickFormat = function(_) {
+    if (!arguments.length) return xTickFormat;
+    xTickFormat = _;
+    return chart; 
+  }
 
    chart.showBrush = function(_) {
     if (!arguments.length) return showBrush;
