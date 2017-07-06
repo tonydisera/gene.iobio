@@ -136,17 +136,17 @@
       <div style="display:flex;flex-direction:column">
 
 
-               <svg id="denovo" class="inheritance" width="90" height="19" transform="translate(0,0)">
-                <g class="denovo" transform="translate(0,-1)" style="opacity: 1;">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="18" height="18"></use>
+               <svg id="denovo" class="inheritance" width="80" height="16" transform="translate(0,0)">
+                <g class="denovo" transform="translate(0,1)" style="opacity: 1;">
+                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="16" height="16"></use>
+                  <text class="name" style="fill-opacity: 1;" x="16" y="11">De novo</text>
                 </g>
-                <text class="name" style="fill-opacity: 1;" x="20" y="11">De novo</text>
               </svg>
-              <svg id="recessive" class="inheritance" width="90" height="19" transform="translate(0,0)">
-                <g class=" recessive" style="opacity: 1;" transform="translate(0,-1)">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="18" height="18"></use>
+              <svg id="recessive" class="inheritance" width="80" height="16" transform="translate(0,0)">
+                <g class=" recessive" style="opacity: 1;" transform="translate(0,1)">
+                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="16" height="16"></use>
+                  <text class="name" style="fill-opacity: 1;" x="16" y="11">Recessive</text>
                 </g>
-                <text class="name" style="fill-opacity: 1;" x="20" y="11">Recessive</text>
               </svg>
       </div>
       
@@ -303,20 +303,29 @@
 
           <div style="text-align:left;display:flex;flex-direction:column">
             <svg id="HIGH" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;">High</text>
-              <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+              <g transform="translate(0,2)">
+                <text class="name" x="9" y="9" style="fill-opacity: 1;">High</text>
+                <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;">
+                </rect>
+              </g>            
             </svg>
             <svg id="MODERATE" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;">Moderate</text>
-              <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+              <g transform="translate(0,2)">              
+                <text class="name" x="9" y="9" style="fill-opacity: 1;">Moderate</text>
+                <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+              </g>
             </svg>
             <svg id="MODIFIER" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;">Modifier</text>
-              <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+              <g transform="translate(0,2)">              
+                <text class="name" x="9" y="9" style="fill-opacity: 1;">Modifier</text>
+                <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+                </g>
             </svg>
             <svg id="LOW" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-              <text class="name" x="9" y="9" style="fill-opacity: 1;">Low</text>
-              <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+              <g transform="translate(0,2)">              
+                <text class="name" x="9" y="9" style="fill-opacity: 1;">Low</text>
+                <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
+              </g>
             </svg>
           </div>
 
@@ -563,21 +572,27 @@
 
         <!-- type -->
           <svg id="snp" class="type" width="70" height="15" transform="translate(0,0)">
-            <text class="name" x="10" y="9" style="fill-opacity: 1;">SNP</text>
-            <rect class="filter-symbol snp" rx="2" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+            <g transform="translate(1,2)">
+              <text class="name" x="10" y="9" style="fill-opacity: 1;">SNP</text>
+              <rect class="filter-symbol snp" rx="2" ry="1" x="1" width="6" y="2" height="6" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px;"></rect>
+            </g>
           </svg>
           <svg id="ins" class="type" width="70" height="15" transform="translate(0,0)">
-            <text class="name" x="11" y="9" style="fill-opacity: 1;"> Insertion</text>
-            <circle class="filter-symbol ins" cx="4.5" cy="5" r="4.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+            <g transform="translate(1,2)">
+              <text class="name" x="11" y="9" style="fill-opacity: 1;"> Insertion</text>
+              <circle class="filter-symbol ins" cx="4.5" cy="5" r="4.5" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></circle>
+            </g>
           </svg>
 
           <svg id="del" class="type" width="70" height="15" transform="translate(0,0)">
-            <text class="name" x="11" y="9" style="fill-opacity: 1;">Deletion</text>       
-            <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+            <g transform="translate(1,2)">
+              <text class="name" x="11" y="9" style="fill-opacity: 1;">Deletion</text>       
+              <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
+            </g>
           </svg>
 
           <svg id="complex" class="type" width="70" height="15" transform="translate(0,0)">
-            <g transform="translate(1,0)">
+            <g transform="translate(2,2)">
               <text class="name" x="9" y="9" style="fill-opacity: 1;">Complex</text>       
               <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
               </path>
@@ -594,7 +609,7 @@
       </h4>
       <div style="text-align:left;display:flex;flex-direction:column">
 
-          <svg id="reg_the_promoter" class="regulatory nocolor" width="110" height="15" transform="translate(0,0)">
+          <svg id="reg_the_promoter" class="regulatory nocolor" width="55" height="15" transform="translate(0,0)">
             <text class="name" x="2" y="11" style="fill-opacity: 1;">Promoter</text>
           </svg>
 
