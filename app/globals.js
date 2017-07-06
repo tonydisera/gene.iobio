@@ -95,5 +95,5 @@ var idleTime         = 0;
 var idlePrompting    = false;  // prompt user to continue or just automatically restart session?
 
 // Show inheritance glyph in gene button?
-var SHOW_INHERITANCE_GLYPH_FOR_GENE = false;
+var SHOW_INHERITANCE_GLYPH_FOR_GENE = true;
 
