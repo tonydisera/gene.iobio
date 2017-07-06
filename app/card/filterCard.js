@@ -111,7 +111,9 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	} else if (filterName == me.DENOVO) {
 		annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
 			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
@@ -122,7 +124,9 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	} else if (filterName == me.RECESSIVE) {
 		annots = 	{
 			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
 			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
@@ -882,8 +886,10 @@ FilterCard.prototype.displayEffectFilters = function() {
 		var svgElem = null;
 		if (effectLabel.length < 20) {
 			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
+                      '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
     				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+  					  '</g>' +
   					  '</svg>';
 
 		} else {
@@ -897,9 +903,11 @@ FilterCard.prototype.displayEffectFilters = function() {
 			var label1 = effectLabel.substring(0, pos);
 			var label2 = effectLabel.substring(pos+1, effectLabel.length);
 			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="26" transform="translate(0,0)">' +
+			          '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
                       '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
     				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+  					  '</g>' +
   					  '</svg>';
 
 		}
@@ -934,8 +942,10 @@ FilterCard.prototype.displayRecFilters = function() {
 		var label = key === "." ? ". (unassigned)" : key;
 		var elmId = key === "." ? "unassigned" : key;
 		var svgElem = '<svg id="' + elmId + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
+			          '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
-  					  '</svg>';
+  					  '</g>' +
+					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
 	});
 	/*
