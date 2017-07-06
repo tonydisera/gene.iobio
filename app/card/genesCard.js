@@ -1726,25 +1726,20 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		});		
 
 		if (SHOW_INHERITANCE_GLYPH_FOR_GENE) {
-			var harmfulVariantInheritance = dangerObject.harmfulVariantsInfo.map(function(variantInfo) {
-				var inheritanceObject = {'inheritance': false}
-				variantInfo.forEach(function(info) {
-					if (info.hasOwnProperty("inheritance") && info.inheritance) {
-						inheritanceObject.inheritance = info.inheritance;
-					}
-				});
-				return inheritanceObject;
-			}).filter(function(inheritanceObject) {
-				return inheritanceObject.inheritance;
+			var harmfulVariantInheritance = {};
+			dangerObject.harmfulVariantsInfo.forEach(function(variantInfo) {
+				if (variantInfo.hasOwnProperty("inheritance") && variantInfo.inheritance) {
+					harmfulVariantInheritance[variantInfo.inheritance] = true;
+				}
 			})
-			if (harmfulVariantInheritance.length > 0) {
+			if (Object.keys(harmfulVariantInheritance).length > 0) {
 
 				var symbolIndex = 0;
-				harmfulVariantInheritance.forEach(function(info) {
-					var symbolFunction = matrixCard.inheritanceMap[info.inheritance].symbolFunction;
+				for (var inheritance in harmfulVariantInheritance) {
+					var symbolFunction = matrixCard.inheritanceMap[inheritance].symbolFunction;
 					geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
 					var options = {width:15, height:15, transform: 'translate(0,0)'};
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: info.inheritance}]);
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: inheritance}]);
 					symbolFunction(selection, options);
 					symbolIndex++;
 					selection.on("mouseover", function(d,i) {
@@ -1756,7 +1751,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 							me.hideTooltip();
 					});
 
-				})
+				}
 			}		
 
 		}
