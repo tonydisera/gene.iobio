@@ -973,9 +973,13 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		row.append("div")
 		   .attr("class", "mother-alt-count tooltip-header-small")
 		   .html("<span class='tooltip-subtitle " + selectedClazz + "'>Mother</span>");
+		var zyg = trioFields.MOTHER.zygosity != null ? trioFields.MOTHER.zygosity.toLowerCase() : "";
+	    if (zyg == "gt_unknown") {
+	    	zyg = "unknown";
+	    }
 		row.append("div")
-		   .attr("class", "tooltip-zygosity label " + (trioFields.MOTHER.zygosity != null ? trioFields.MOTHER.zygosity.toLowerCase() : ""))
-		   .text(trioFields.MOTHER.zygosity ? capitalizeFirstLetter(trioFields.MOTHER.zygosity.toLowerCase()) : "");
+		   .attr("class", "tooltip-zygosity label " + zyg)
+		   .text(capitalizeFirstLetter(zyg));
 		column = row.append("div")
 		            .attr("class", "mother-alt-count tooltip-allele-count-bar");
 		if (trioFields.MOTHER.zygosity && trioFields.MOTHER.zygosity != '') {			            
@@ -997,9 +1001,14 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		row.append("div")
 	       .attr("class", "father-alt-count tooltip-header-small")
 	       .html("<span class='tooltip-subtitle " + selectedClazz + "'>Father</span>");
+
+	    var zyg = trioFields.FATHER.zygosity != null ? trioFields.FATHER.zygosity.toLowerCase() : "";
+	    if (zyg == "gt_unknown") {
+	    	zyg = "unknown";
+	    }
 		row.append("div")
-		   .attr("class",  "tooltip-zygosity label " + (trioFields.FATHER.zygosity != null ? trioFields.FATHER.zygosity.toLowerCase() : ""))
-		   .text(trioFields.FATHER.zygosity ? capitalizeFirstLetter(trioFields.FATHER.zygosity.toLowerCase()) : "");
+		   .attr("class",  "tooltip-zygosity label " + zyg)
+		   .text(capitalizeFirstLetter(zyg));
 		column = row.append("div")
 	                .attr("class", "father-alt-count tooltip-allele-count-bar")
 		if (trioFields.FATHER.zygosity && trioFields.FATHER.zygosity != '') {			            
@@ -1025,13 +1034,16 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		            if (sibRowCount.affected > 0 && sibRowCount.unaffected == 1) {
 		            	row.style("padding-top", "6px");		            	
 		            }
-					var zyg = variant[sibZygField][sampleName] ? variant[sibZygField][sampleName] : "";
+					var zyg = variant[sibZygField][sampleName] ? variant[sibZygField][sampleName].toLowerCase() : "";
+					if (zyg == "gt_unknown") {
+						zyg = "unknown";
+					}
 					row.append("div")
 				       .attr("class", "sib-zygosity tooltip-header-small")
 				       .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(affectedStatus) + " Sib " + sampleName + "</span>");
 					row.append("div")
-					   .attr("class",  "tooltip-zygosity label " + zyg.toLowerCase())
-					   .text(capitalizeFirstLetter(zyg.toLowerCase()));
+					   .attr("class",  "tooltip-zygosity label " + zyg)
+					   .text(capitalizeFirstLetter(zyg));
 
 
 					column = row.append("div")
