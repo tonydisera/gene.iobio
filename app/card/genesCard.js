@@ -10,7 +10,7 @@
 	this.sortedGeneNames = null;
 	this.legend = null;
 
-	this.LOW_COVERAGE_OPTION    = "insufficient coverage in exons";
+	this.LOW_COVERAGE_OPTION    = "insufficient coverage";
 	this.HARMFUL_VARIANTS_OPTION = "harmful variants";
 
 	this.geneSortOptions = [
@@ -1238,12 +1238,19 @@ GenesCard.prototype._clearGenesImpl = function() {
 
 		me._removeGeneHousekeeping(theGeneName, false, false);
 	};
+	window.gene = null;
+	window.selectedTranscript = null;
+	me._hideCurrentGene();
+
 	me._onGeneBadgeUpdate();
 	me._initPaging(geneNames);
-	readjustCards();
-	cacheHelper.showAnalyzeAllProgress(true);
+//	readjustCards();
 
-	me._hideCurrentGene();
+	filterCard.clearFilters();
+	filterVariants();
+	filterCard.resetStandardFilterCounts();
+
+	cacheHelper.hideAnalyzeAllProgress();
 }
 
 

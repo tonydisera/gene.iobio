@@ -942,6 +942,11 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther,
 		})
 		window.gene = null;
 		genesCard._hideCurrentGene();
+
+		filterCard.clearFilters();
+		filterVariants();
+		filterCard.resetStandardFilterCounts();
+
 		me.hideAnalyzeAllProgress();
 		//CacheHelper._logCacheSize();
 		//CacheHelper._logCacheContents();
