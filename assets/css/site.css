@@ -1451,6 +1451,28 @@ header {
   font-size: 12px;
   color: #717171 !important; }
 
+.icon-button-standard {
+  font-size: 13px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  color: #717171 !important; }
+  .icon-button-standard i {
+    font-size: 17px;
+    margin-top: -3px; }
+
+.icon-button-large {
+  font-size: 14px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  color: #5d809d !important; }
+  .icon-button-large i {
+    font-size: 17px;
+    margin-top: -3px; }
+
 .icon-button-sm {
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2351,6 +2373,14 @@ inputinput:-moz-placeholder {
   margin-top: 10px; }
 #dataModal #import-help-icon {
   color: #5d809d !important; }
+#dataModal #export-bookmarks {
+  font-size: 14px;
+  display: inline-block;
+  color: #5d809d; }
+  #dataModal #export-bookmarks i {
+    font-size: 18px;
+    margin-top: -3px;
+    margin-right: 2px; }
 #dataModal #download-bookmarks {
   font-size: 14px;
   display: inline-block;

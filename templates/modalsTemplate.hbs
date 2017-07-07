@@ -363,7 +363,7 @@
 
                       <div class="col-md-12">
                         <label class="control-label">
-                          Import
+                          Open
                         </label>
 
                           
@@ -470,7 +470,7 @@
 
                       <div class="col-md-12">
                         <label class="control-label">
-                          Export
+                          Save
                         </label>
                         <div class="radio">
                           <label>
@@ -491,11 +491,12 @@
                       <div class="col-md-12" style="text-align:center">
                          <a id="export-bookmarks" href="javascript:void(0)" 
                          class="btn btn-default btn-raised" onclick="bookmarkCard.exportBookmarks('all', $('input[name=export-format]:checked').val())">
-                          Export
+                            <i class="material-icons" style="font-size:20px">save</i>
+                            Save
                          </a>
                         <span style="margin-left: 20px;display: inline-block;margin-top: 18px;margin-bottom: 18px;" id="export-loader" class="hide">
                           <img  src="assets/images/wheel.gif" style="display:inline-block;height:16px;width:16px;">
-                          <span>Exporting bookmarks...</span>
+                          <span>Saving bookmarks...</span>
                         </span>
 
                         <a id="download-bookmarks" class="hide btn btn-raised btn-default" download="gene-iobio-variants.csv" href="#">
