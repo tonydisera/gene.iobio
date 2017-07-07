@@ -1487,6 +1487,7 @@ header {
   color: #717171; }
 
 .tt-dropdown-menu {
+  cursor: pointer;
   z-index: 1033 !important; }
   .tt-dropdown-menu .tt-dataset-name {
     z-index: 1033 !important; }
@@ -3345,7 +3346,8 @@ text.ref-count {
   margin-top: -2px; }
   #manage-genes-box #manage-genes-dropdown {
     float: right;
-    margin-top: -3px; }
+    margin-top: 0px;
+    margin-left: 20px; }
 
 #gene-badge-container {
   display: flex;
@@ -3412,18 +3414,20 @@ text.ref-count {
 #order-by-label {
   margin-left: 5px;
   margin-right: 4px;
-  margin-top: 0px;
-  display: inline-block; }
+  margin-top: 10px;
+  display: inline-block;
+  float: right; }
 
 #select-gene-container {
   display: inline-block;
-  width: 200px;
+  width: 150px;
   vertical-align: middle;
-  margin-top: 8px; }
+  margin-top: 8px;
+  float: right; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
     padding-top: 2px;
-    line-height: 17px; }
+    line-height: 20px; }
 
 #manage-cache-modal .modal-dialog {
   width: 500px; }
