@@ -812,6 +812,34 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
    	} else {
 		this._getPhenolyzerGenesAdvanced(phenolyzerServer + '?term=' + searchTerms);
    	}
+
+
+}
+
+GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
+	var me = this;
+
+	if (window.geneNames.length > 0) {
+		alertify.confirm("",
+			"There are " + window.geneNames.length  + " genes already listed.  Do you want to keep these genes?",
+			function (e) {
+				// user clicked "keep genes"
+		        me._getPhenolyzerGenesAdvancedImpl(url);
+				alertify.defaults.glossary.ok = 'OK';
+				alertify.defaults.glossary.cancel = 'Cancel';
+			},
+			function() {
+				// user clicked 'remove genes'.
+		        me._clearGenesImpl();
+		        me._getPhenolyzerGenesAdvancedImpl(url);
+				alertify.defaults.glossary.ok = 'OK';
+				alertify.defaults.glossary.cancel = 'Cancel';
+			}
+
+		).set('labels', {ok:'Keep genes', cancel:'Remove genes'});   				
+	}
+
+
 }
 
 
@@ -820,7 +848,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 *  for Phenolyzer, built on Amazon's distributed hash tables (Dynamo)
 *  and Message queuing service.
 */
-GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
+GenesCard.prototype._getPhenolyzerGenesAdvancedImpl = function(url) {
 	var me = this;
 
 	$.ajax({
@@ -828,7 +856,6 @@ GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
 		    type: "GET",
 		    dataType: "json",
 		    success: function( data ) {
-
 			 	if (data == "") {
 					me.showGenesSlideLeft();
 					$('.phenolyzer.loader').addClass("hide");
@@ -1144,7 +1171,7 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
 
 }
 
-GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
+GenesCard.prototype.removeGeneBadgeByName = function(theGeneName, performPaging=true, updateAnalyzedCounts=true) {
 	var me = this;
 
 
@@ -1156,7 +1183,7 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 		me._onGeneBadgeUpdate();
 	}
 
-	me._removeGeneHousekeeping(theGeneName);
+	me._removeGeneHousekeeping(theGeneName, performPaging, updateAnalyzedCounts);
 
 }
 
@@ -1213,7 +1240,7 @@ GenesCard.prototype._hideCurrentGene = function() {
 }
 
 
-GenesCard.prototype.clearGenes = function() {
+GenesCard.prototype.clearGenes = function(callbackOk, callbackCancel) {
 	var me = this;
 	// confirm dialog
 	alertify.defaults.glossary.ok = 'OK';
@@ -1223,9 +1250,15 @@ GenesCard.prototype.clearGenes = function() {
 		function (e) {
 			// user clicked "ok"
 	        me._clearGenesImpl();
+	        if (callbackOk) {
+	        	callbackOk();
+	        }
 		},
 		function() {
 			// user clicked cancel.
+	        if (callbackCancel) {
+	        	callbackCancel();
+	        }
 		}
 
 	).set('labels', {ok:'OK', cancel:'Cancel'});   		
@@ -2157,7 +2190,8 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 
 }
 
-GenesCard.prototype.selectPhenolyzerGeneRange = function() {
+
+GenesCard.prototype.selectPhenolyzerGeneRange = function(addGenes=true) {
 	var start = 0;
 	var end   = +$('#phenolyzer-select-range-end').val();
 
@@ -2182,19 +2216,24 @@ GenesCard.prototype.selectPhenolyzerGeneRange = function() {
 	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 	this.geneBarChart(selection, {shadowOnHover:false});
 
-	this.refreshSelectedPhenolyzerGenes();
+	if (addGenes) {
+		this.refreshSelectedPhenolyzerGenes();
+	}
 }
 
 GenesCard.prototype.deselectPhenolyzerGenes = function() {
 	var me = this;
 	for (var i = 0; i < phenolyzerGenes.length; i++) {
 		if (phenolyzerGenes[i].selected) {
-			me.removeGeneBadgeByName(phenolyzerGenes[i].geneName);
+			me.removeGeneBadgeByName(phenolyzerGenes[i].geneName, false, false);
 		}
 		phenolyzerGenes[i].selected = false;
 	}
 	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 	this.geneBarChart(selection, {shadowOnHover:false});
+
+	me.sortGenes();
+	
 
 }
 
