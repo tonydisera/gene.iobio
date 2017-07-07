@@ -993,14 +993,14 @@ FilterCard.prototype._getFilterString = function() {
 
 	var AND = function(filterString) {
 		if (filterString.length > 0) {
-			return   " <span>and</span> ";
+			return   " <span class='filter-element'>and</span> ";
 		} else {
 			return "";
 		}
 	}
 
 	var filterBox = function(filterString) {
-		return "<span class=\"filter-flag label label-primary\">" + filterString + "</span>";
+		return "<span class=\"filter-flag filter-element label label-primary\">" + filterString + "</span>";
 	}
 
 	// When low coverage filter applied, we only filter on this, not any other criteria.
@@ -1074,7 +1074,7 @@ FilterCard.prototype._getFilterString = function() {
 }
 
 FilterCard.prototype.displayFilterSummary = function(filterString) {
-	$("#filter-summary-track .loader").nextAll().remove();
+	$("#filter-summary-track span.filter-element").remove();
 	filterString = filterString ? filterString : this._getFilterString();
 	if (filterString.length > 0) {
 		$("#filter-summary-track").removeClass("hide")

@@ -218,11 +218,15 @@
     </div>
 
     <div id="filter-summary-track" class="hide shadow-z-2 track">
-      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
+      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filter</span>
+      <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
+        Clear filter
+      </button>
       <div id="filter-summary-loader" class="loader hide level-edu level-basic">
         <span class="loader-label"></span>
         <img src="assets/images/wheel.gif">
       </div> 
+
            
     </div>
 

@@ -97,7 +97,7 @@ body {
   background-color: #5d809d; }
 
 h4 {
-  font-size: 13px;
+  font-size: 14px;
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
@@ -214,10 +214,10 @@ h5 {
   background-color: #3586c0; }
 
 .attention {
-  outline-color: rgba(217, 98, 98, 0.86);
-  outline-style: solid;
-  outline-offset: 4px;
-  outline-width: 2px; }
+  outline-color: rgba(217, 98, 98, 0.86) !important;
+  outline-style: solid !important;
+  outline-offset: 4px !important;
+  outline-width: 2px !important; }
 
 .navbar-nav .attention {
   outline-offset: -6px;
@@ -1626,6 +1626,12 @@ inputinput:-moz-placeholder {
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {
   color: #5d809d !important; }
+#slider-left #slider-left-content .subheading {
+  font-size: 15px;
+  color: #5d809d !important;
+  margin-bottom: 0px;
+  margin-top: 35px;
+  text-align: center; }
 #slider-left .navbar {
   background-color: #636161 !important;
   min-height: 30px !important; }
@@ -1863,6 +1869,17 @@ inputinput:-moz-placeholder {
   margin-bottom: 8px;
   color: #717171;
   display: inline-block; }
+  #filter-summary-track #clear-filters-button {
+    font-size: 13px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    margin-left: 0px;
+    margin-right: 10px;
+    color: #5d809d;
+    padding-left: 10px;
+    padding-right: 10px; }
   #filter-summary-track .loader {
     display: inline-block;
     margin-top: 0px;
@@ -1901,6 +1918,8 @@ inputinput:-moz-placeholder {
 #filter-track {
   margin-top: 0px;
   margin-bottom: 80px; }
+  #filter-track .subheading {
+    margin-left: -50px; }
   #filter-track .loader {
     display: inline-block;
     margin-right: 40px;
@@ -3130,16 +3149,19 @@ text.ref-count {
   height: 100%; }
   #genes-card #phenolyzer-search-box {
     margin-top: 20px; }
+    #genes-card #phenolyzer-search-box .selectize-input {
+      font-size: 14px; }
+    #genes-card #phenolyzer-search-box .selectize-dropdown {
+      font-size: 13px; }
   #genes-card .phenolyzer-label {
     color: #717171 !important;
     font-size: 13px;
     float: left; }
   #genes-card #phenolyzer-run-label {
     display: inline-block !important;
-    vertical-align: top;
-    padding-top: 3px; }
+    vertical-align: top; }
   #genes-card #phenolyzer-heading {
-    margin-top: 20px; }
+    margin-top: 10px; }
     #genes-card #phenolyzer-heading h5 {
       display: inline-block;
       font-size: 13px; }
@@ -3150,6 +3172,14 @@ text.ref-count {
   #genes-card #phenolyzer-disclaimer {
     color: #717171 !important;
     font-style: italic !important; }
+  #genes-card #phenolyzer-refresh-genes-button {
+    float: left;
+    margin-right: 30px;
+    margin-top: -2px;
+    margin-bottom: 0px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-left: 5px; }
 
 #get-genes-copy-paste-button.btn.btn-raised, #phenolyzer-go-button.btn.btn-raised {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12) !important;
@@ -3175,7 +3205,7 @@ text.ref-count {
     margin-top: 0px;
     margin-bottom: 1px; }
 
-#get-genes-copy-paste-button, #phenolyzer-go-button {
+#get-genes-copy-paste-button {
   font-size: 12px; }
 
 #gene-badge-button {
