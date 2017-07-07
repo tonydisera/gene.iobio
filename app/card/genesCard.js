@@ -286,6 +286,11 @@ GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 	this.sortedGeneNames = null;
 	if (sortBy == null) {
 		sortBy = $('#select-gene-sort')[0].selectize.getValue();
+		if (sortBy == "") {
+			// If the dropdown is empty, set to 'harmful variants'
+			$('#select-gene-sort')[0].selectize.setValue(this.HARMFUL_VARIANTS_OPTION);
+			sortBy = this.HARMFUL_VARIANTS_OPTION;
+		}
 	} else if (setDropdown) {
 		$('#select-gene-sort')[0].selectize.setValue(sortBy);
 	}
