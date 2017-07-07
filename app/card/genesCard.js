@@ -1191,7 +1191,7 @@ GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPagin
 	me.clearGeneInfo(theGeneName);
 
 	if (performPaging) {
-		me._initPaging(geneNames);
+		me.sortGenes();
 	}
 	
 	if (updateAnalyzedCounts) {

@@ -688,7 +688,7 @@ CacheHelper.prototype.refreshGeneBadges = function(callback) {
 	}
 
 	me.refreshNextGeneBadge(keys, geneCount, function() {
-		genesCard.sortGenes(genesCard.HARMFUL_VARIANTS_OPTION, true);
+		genesCard.sortGenes();
 
 		$('#gene-badges-loader').addClass("hide");
 
