@@ -93,10 +93,8 @@ VariantCard.prototype.getRelationship = function() {
 VariantCard.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
 	var me = this;
 	return new Promise(function(resolve, reject) {
-		me.showBamProgress("Analyzing coverage in coding regions");
 		me.model.promiseGetGeneCoverage(geneObject, transcript).then(function() {
-			me.endBamProgress();
-			resolve();
+			resolve(me);
 		});
 
 	})
@@ -627,9 +625,6 @@ VariantCard.prototype.endBamProgress = function() {
 	this.cardSelector.find("#bam-track").removeClass("hide");
 	this.cardSelector.find(".covloader").addClass("hide");
 	this.cardSelector.find(".covloader .loader-label").text("");
-	this.cardSelector.find("#bam-depth").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-16px");
 
 }
 
@@ -903,6 +898,10 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		return;
 	}
 
+	this.cardSelector.find("#bam-depth").css("visibility", "visible");
+	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-16px");
+
 
 	if (this.isViewable()) {
 		this.cardSelector.removeClass("hide");
@@ -918,6 +917,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		} else {
 			me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
 		}
+		
 		if (callbackDataLoaded) {
 	   	    callbackDataLoaded();
    	    }
