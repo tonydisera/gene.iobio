@@ -202,7 +202,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
 		if ($(selector + " .tooltip-title:contains('inheritance')").length > 0) {
-			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"20\" width=\"20\">");
+			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"22\" width=\"20\">");
 			var options = {width:18, height:18, transform: 'translate(0,6)'};
 			var selection = d3.select(selector + ' .inheritance-badge').data([{clazz: clazz}]);
 			symbolFunction(selection, options);					
@@ -510,7 +510,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
 	                          ? ''
-						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '', null, 'padding-top:0px;');
+						      : me._tooltipHeaderRow('<span class="tooltip-inheritance-mode-label">' + variant.inheritance + ' inheritance</span>', '', '', '', null, 'padding-top:0px;');
 
 	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
 	                  ? effectDisplay 

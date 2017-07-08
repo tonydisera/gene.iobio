@@ -1284,8 +1284,8 @@ header {
     pointer-events: none; }
   #bam-depth .region {
     stroke-width: 1px;
-    stroke: rgba(218, 165, 0, 0.78);
-    fill: rgba(218, 165, 0, 0.78); }
+    stroke: rgba(218, 165, 0, 0.5);
+    fill: rgba(218, 165, 0, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
     stroke: lightgray; }
@@ -2773,6 +2773,11 @@ text.ref-count {
   -webkit-transform: rotate(152deg);
   transform: rotate(152deg);
   content: ""; }
+
+.tooltip-inheritance-mode-label {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 8px; }
 
 .tooltip.tooltip-wide {
   width: 650px !important; }
