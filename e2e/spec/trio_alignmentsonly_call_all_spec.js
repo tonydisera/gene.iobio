@@ -139,7 +139,7 @@ module.exports = {
 
 
     var evaluateTooltip = function(theTooltip) {
-      theTooltip.expectInheritanceEquals('denovo inheritance');
+      theTooltip.expectInheritanceEquals('de novo inheritance');
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');

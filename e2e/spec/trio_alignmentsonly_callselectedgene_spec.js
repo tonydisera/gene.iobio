@@ -51,13 +51,15 @@ module.exports = {
     appTitleSection.selectCallSelectedGene();
     client.pause(1000);
 
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
+
     matrixTrack.waitForMatrixLoaded();
     matrixTrack.clickColumn(1);
 
     tooltip.waitForTooltip();
-    client.pause(2000);
-    tooltip.expectInheritanceEquals('recessive inheritance');
+    client.pause(1000);
     tooltip.expectVepImpact('high');
+    tooltip.expectInheritanceEquals('recessive inheritance');
     tooltip.expectVepConsequence('stop gained');
     tooltip.expectClinvar('pathogenic');
     tooltip.expectClinvarClinSig('smith-magenis syndrome');
@@ -73,7 +75,7 @@ module.exports = {
   },
 
   'end': function(client) {
-    client.end();
+    //client.end();
   }
 
   

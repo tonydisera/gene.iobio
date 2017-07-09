@@ -2,7 +2,7 @@ module.exports = {
   selector: '#proband-variant-card',
   commands: [{
     waitForBamDepthLoaded: function() {
-      this.waitForElementVisible('@bamDepth');
+      this.waitForElementVisible('@bamDepthChart', 90000);
     },
     assertLoadedVariantCountEquals: function(text) {
   		this.expect.element('@variantCount').text.to.equal(text);
@@ -70,9 +70,6 @@ module.exports = {
       var self = this;
       var cssSelector = '#proband-variant-card #fb-variants svg g.track .variant' + variantSelector;
       this.api.useCss().moveToElement(cssSelector, 1,1).click(cssSelector);
-    },
-    waitForBamDepthLoaded: function() {
-      this.waitForElementVisible('@bamDepthChart', 90000);
     },
   }],
   elements: {
