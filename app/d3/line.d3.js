@@ -503,8 +503,8 @@ lineD3 = function module() {
 
     var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
     var regions   =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
-    var theY      =  regionHeight ? d3.round(y(regionHeight)) : height - margin.top - margin.bottom;
-    var theHeight =  regionHeight ? theY : 0;     
+    var theY      =  regionHeight ? (d3.round(y(regionHeight))) : (height - margin.top - margin.bottom);
+    var theHeight =  regionHeight ? ((height - margin.top - margin.bottom) - theY) : 0;     
     var regionsEnter = regions.enter();
     regions.enter()
            .append("rect")
