@@ -986,7 +986,10 @@ VariantCard.prototype.showFinalizedVariants = function() {
 	me._showVariants(regionStart, regionEnd, null, false);
 	
 	if (me.model.getRelationship() == 'proband') {
-		me.fillFeatureMatrix(regionStart, regionEnd);
+		if (me.model.isVcfReadyToLoad() || me.model.isLoaded()) {
+			me.fillFeatureMatrix(regionStart, regionEnd);
+		}
+
 	} 	
 
 }
@@ -1314,6 +1317,15 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
+	// If only alignments provided, only show feature matrix if variants have been called.
+	if (isAlignmentsOnly() && theVcfData.features.length == 0) {
+		if (!theVcfData.loadState || !theVcfData.loadState['called']) {
+			$('#matrix-track').addClass("hide");
+			me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+ 	  		me.cardSelector.find("#vcf-variant-count").text("");
+			return;
+		}
+	}
 
 
 	$('#filter-and-rank-card').removeClass("hide");

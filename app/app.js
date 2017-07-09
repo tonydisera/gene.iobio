@@ -2712,6 +2712,12 @@ function jointCallVariantsImpl(checkCache, callback) {
 
 	                	if (vc.model.isAlignmentsOnly() && theVcfData == null) {
 							theVcfData = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
+	                	} else {
+	                		if (theVcfData.loadState == null) {
+	                			theVcfData.loadState = {};
+	                		}
+	                		theVcfData.loadState['called'] = true;
+	                		theVcfData.loadState['clinvar'] = true;
 	                	}
 
 				    
@@ -2838,6 +2844,12 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
+
+	                	if (theFbData.loadState == null) {
+	                		theFbData.loadState = {};
+	                	}
+	                	theFbData.loadState['called'] = true;
+	                	theFbData.loadState['clinvar'] = true;
 
 	                	theFbData.features.forEach(function(variant) {
 	                		variant.fbCalled = "Y";
