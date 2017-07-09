@@ -240,16 +240,20 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							})
 							.regionGlyph(function(d,i,regionX) {
 								var parent = d3.select(this.parentNode);
-	 		    				parent.append('g')     
-	 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
-	 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-16)')
-	 	    							  .data([d])
-	 	    							  .append('use')
-	 	    							  .attr('height',     '16')
-	 	    							  .attr('width',      '16')
-	 	    							  .attr('href', '#error-symbol')
-	 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
-	 	    							  .data([d]);
+								var exonId = 'exon' + d.exon_number.replace("/", "-");
+								if (parent.select("g#" + exonId).empty()) {
+		 		    				parent.append('g')     
+		 		    						  .attr("id", exonId)
+		 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
+		 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-16)')
+		 	    							  .data([d])
+		 	    							  .append('use')
+		 	    							  .attr('height',     '16')
+		 	    							  .attr('width',      '16')
+		 	    							  .attr('href', '#error-symbol')
+		 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
+		 	    							  .data([d]);									
+								}
 							})
 							.showTooltip(true)
 							.pos( function(d) { return d[0] })

@@ -157,6 +157,7 @@ module.exports = {
     client.pause(1000);
     matrixTrack.waitForMatrixLoaded();
 
+    probandVariantCard.waitForBamDepthLoaded();
     probandVariantCard.assertDangerExonCountEquals(1);
     probandVariantCard.assertLowCoverageGlyphCountEquals(1);
 
@@ -165,9 +166,11 @@ module.exports = {
     client.pause(1000);
     matrixTrack.waitForMatrixLoaded();
 
+    probandVariantCard.waitForBamDepthLoaded();
     probandVariantCard.assertDangerExonCountEquals(1);
     probandVariantCard.assertLowCoverageGlyphCountEquals(1);
 
+    motherVariantCard.waitForBamDepthLoaded();
     motherVariantCard.assertDangerExonCountEquals(9);
     motherVariantCard.assertLowCoverageGlyphCountEquals(9);
   },
@@ -186,7 +189,7 @@ module.exports = {
 
 
     var evaluateTooltip = function(theTooltip) {
-      theTooltip.expectInheritanceEquals('denovo inheritance');
+      theTooltip.expectInheritanceEquals('de novo inheritance');
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');
@@ -225,7 +228,6 @@ module.exports = {
   },
 
   'end': function(client) {
-    client.end();
   }
 
   

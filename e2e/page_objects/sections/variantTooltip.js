@@ -103,7 +103,7 @@ module.exports = {
     bookmarkLink:  {selector: '#bookmarkLink', locateStrategy: 'css selector'},
     removeBookmarkLink:  {selector: '#remove-bookmark-link', locateStrategy: 'css selector'},
     unpinLink:  {selector: 'a#unpin', locateStrategy: 'css selector'},
-    inheritance: {selector: '//*[local-name()="svg" and @class="inheritance-badge"]/following-sibling::strong/em', locateStrategy: 'xpath'},
+    inheritance: {selector: '//*[local-name()="svg" and @class="inheritance-badge"]/following-sibling::span', locateStrategy: 'xpath'},
     vepConsequence: {selector: '//div[@class="tooltip-header" and text()="VEP Consequence"]/following-sibling::div', locateStrategy: 'xpath'},
     vepImpact: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Impact"]/following-sibling::div', locateStrategy: 'xpath'},
     vepHighestImpact : {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Most severe impact"]/following-sibling::div', locateStrategy: 'xpath'},

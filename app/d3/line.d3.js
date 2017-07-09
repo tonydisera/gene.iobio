@@ -498,13 +498,14 @@ lineD3 = function module() {
     if (regionStart && regionEnd) {
         x.domain([regionStart, regionEnd]);
         container.select("svg g.group g.regions").selectAll(".region").remove();
-        container.select("svg g.group g.regions").selectAll(".region-glyph").remove();
+        container.select("svg g.group").selectAll(".region-glyph").remove();
     }
 
     var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
     var regions   =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
     var theY      =  regionHeight ? d3.round(y(regionHeight)) : height - margin.top - margin.bottom;
     var theHeight =  regionHeight ? theY : 0;     
+    var regionsEnter = regions.enter();
     regions.enter()
            .append("rect")
            .attr("class",  "region")
@@ -517,7 +518,7 @@ lineD3 = function module() {
     regions.exit().remove();
 
 
-    regions.each(function(d,i) {
+    container.select("svg g.group g.regions").selectAll(".region").each(function(d,i) {
         var me = this;
         var regionX     = d3.round(x(d.start));
         var regionWidth =  Math.max(minRegionWidth, d3.round(x(d.end) - x(d.start)));

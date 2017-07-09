@@ -53,9 +53,13 @@ module.exports = {
     },
     assertLowCoverageGlyphCountEquals: function(count) {
       var self = this;
-      this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(1) #zoom-region-chart svg g.feature_glyph.coverage-problem-glyph', function (result) {
+      this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(1) #bam-depth svg .region-glyph', function (result) {
         self.assert.equal(result.value.length, count);
       });
+      this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(1) #bam-depth svg rect.region', function (result) {
+        self.assert.equal(result.value.length, count);
+      });
+
     },
 
     clickLoadedVariantSymbol: function(variantSelector) {

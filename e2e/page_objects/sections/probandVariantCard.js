@@ -53,7 +53,10 @@ module.exports = {
     },
     assertLowCoverageGlyphCountEquals: function(count) {
       var self = this;
-      this.api.elements('css selector','#proband-variant-card #zoom-region-chart svg g.feature_glyph.coverage-problem-glyph', function (result) {
+      this.api.elements('css selector','#proband-variant-card #bam-depth svg .region-glyph', function (result) {
+        self.assert.equal(result.value.length, count);
+      });
+      this.api.elements('css selector','#proband-variant-card #bam-depth svg rect.region', function (result) {
         self.assert.equal(result.value.length, count);
       });
     },
@@ -68,9 +71,13 @@ module.exports = {
       var cssSelector = '#proband-variant-card #fb-variants svg g.track .variant' + variantSelector;
       this.api.useCss().moveToElement(cssSelector, 1,1).click(cssSelector);
     },
+    waitForBamDepthLoaded: function() {
+      this.waitForElementVisible('@bamDepthChart', 90000);
+    },
   }],
   elements: {
     bamDepth: '#bam-depth',
+    bamDepthChart: '#bam-depth svg',
     variantCount: '#vcf-variant-count',
     calledVariantCount: '#called-variant-count'
   }
