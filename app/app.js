@@ -112,7 +112,7 @@ var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
-var variantExporter = new VariantExporter();
+var variantExporter = null;
 
 
 
@@ -238,6 +238,8 @@ function determineStyle() {
 function init() {
 	var me = this;
 
+	variantExporter = new VariantExporter();
+
 	$("[data-toggle=tooltip]").tooltip();
 
 	detectWindowResize();
@@ -359,16 +361,19 @@ function init() {
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
-	    .width(1000)
+	    .width($('#container').innerWidth())
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
+	    .margin({top:0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
-	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
-	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 12)
+	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
+	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
 	    .showLabel(false)
-	    .on("d3brush", function(brush) {
+		.featureClass( function(d,i) {
+		    return d.feature_type.toLowerCase();
+		})	    
+		.on("d3brush", function(brush) {
 	    	hideCoordinateFrame();
 	    	if (!brush.empty()) {
 	    		$('#zoom-hint').text('To zoom out, click outside bounding box.');
@@ -377,7 +382,7 @@ function init() {
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
 					getCodingRegions(selectedTranscript);
-
+			    	markCodingRegions(window.gene, window.selectedTranscript);
 				}
 			} else {
 	    		$('#zoom-hint').text('To zoom into region, drag over gene model.');
@@ -421,15 +426,19 @@ function init() {
     transcriptMenuChart = geneD3()
 	    .width(600)
 	    .margin({top: 5, right: 5, bottom: 5, left: 200})
+		.widthPercent("100%")
+	    .heightPercent("100%")	    
 	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
 	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)
-	    .showLabel(true)
+	    .showLabel(true)		   	    
 	    .on("d3selected", function(d) {
 	    	window.selectedTranscript = d;
+	    	markCodingRegions(window.gene, window.selectedTranscript);
 	    	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 	    	getCodingRegions(window.selectedTranscript);
+
 
 	    	showTranscripts();
 
@@ -711,7 +720,7 @@ function getTooltipCoordinates(node, tooltip, adjustForVerticalScroll) {
 	
 	// If the tooltip will be cropped to the right, adjust its position
 	// so that it is immediately to the left of the node
-	if  ((coord.x + (tooltipWidth/2) + 100) > $('#proband-variant-card').width()) {
+	if  ((coord.x + (tooltipWidth/2) + 150) > $('#proband-variant-card').width()) {
 		coord.x -= tooltipWidth/2;
 		coord.x -= 6;
 		tooltip.classed("black-arrow-left", false);
@@ -780,6 +789,7 @@ function unpinAll() {
 	matrixCard.hideTooltip();
 	variantCards.forEach(function(variantCard) {
 		variantCard.hideVariantCircle();
+		variantCard.hideCoverageCircle();
 	});		
 }
 
@@ -1488,6 +1498,7 @@ function onCloseTranscriptMenuEvent() {
 	if (transcriptMenuChart.selectedTranscript() != null ) {
 		if (selectedTranscript == null || selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
 			selectedTranscript = transcriptMenuChart.selectedTranscript();
+		 	markCodingRegions(window.gene, window.selectedTranscript);
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 			d3.selectAll("#gene-viz .transcript").remove();
 		 	getCodingRegions(window.selectedTranscript);
@@ -1660,6 +1671,78 @@ function getCodingRegions(transcript) {
 		return codingRegions;
 	}
 	return [];
+}
+
+function markCodingRegions(geneObject, transcript) {
+	transcript.features.forEach(function(feature) {
+		if (!feature.hasOwnProperty("danger")) {
+			feature.danger = {proband: false, mother: false, father: false};
+		}
+		if (!feature.hasOwnProperty("geneCoverage")) {
+			feature.geneCoverage = {proband: false, mother: false, father: false};
+		}
+		getRelevantVariantCards().forEach(function(vc) {
+			var geneCoverage = vc.model.getGeneCoverageForGene(geneObject, transcript);
+			if (geneCoverage) {
+				var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
+					return feature.start == gc.start && feature.end == gc.end;
+				});
+				if (matchingFeatureCoverage.length > 0) {
+					var gc = matchingFeatureCoverage[0];
+					feature.geneCoverage[vc.getRelationship()] = gc;
+					feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
+				} else {
+					feature.danger[vc.getRelationship()]  = false;
+				}
+			} else {
+				feature.danger[vc.getRelationship()] = false;
+			}
+
+		})
+
+	})
+
+	var exonCount = 0;
+	var exonNumber = 1;
+	var sortedExons = transcript
+		.features.filter(function(feature) {
+			return feature.feature_type.toUpperCase() == 'EXON';
+		})
+		.sort(function(feature1, feature2) {
+
+			var compare = 0;
+			if (feature1.start < feature2.start) {
+				compare = -1;
+			} else if (feature1.start > feature2.start) {
+				compare = 1;
+			} else {
+				compare = 0;
+			}
+
+			var strandMultiplier = transcript.strand == "+" ? 1 : -1;
+
+			return compare * strandMultiplier;
+
+		})
+	sortedExons.forEach(function(exon) {
+		exonCount++
+	})
+
+	sortedExons.forEach(function(exon) {
+		exon.exon_number = exonNumber + "/" + exonCount;
+		exonNumber++;
+	})
+
+	// Now set the exon number on each UTR and CDS within the corresponding exon
+	transcript.features.forEach(function(feature) {
+		if (feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR') {
+			sortedExons.forEach(function(exon) {
+				if (feature.start >= exon.start && feature.end <= exon.end) {
+					feature.exon_number = exon.exon_number;
+				}
+			})
+		}
+	})
 }
 
 function hasDataSources() {
@@ -2276,8 +2359,6 @@ function hasCalledVariants() {
 }
 
 function showNavVariantLinks() {
-	$('#show-filters-link').removeClass("hide");
-	$('#show-bookmarks-link').removeClass("hide");
 	$('#call-variants-link').removeClass("hide");
 	$('#variant-links-divider').removeClass("hide");
 }
@@ -2294,6 +2375,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 
 	getRelevantVariantCards().forEach(function(vc) {
 		vc.prepareToShowVariants(filterCard.classifyByImpact);
+		vc.clearBamChart();
 	});
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
@@ -2309,95 +2391,67 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 		// the coverage so that the max depth for all variant cards is determined 
 		// so that the coverage scales across all samples.
 		var variantPromises = [];
-		var coveragePromises = [];
-		var allMaxDepth = 0;
-	 	getRelevantVariantCards().forEach(function(vc) {
-	 		
-	 		vc.clearBamChart();
-
-	 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
-				vc.hide();
-			} else {
-				if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
-					// We have variants, either to load from a vcf or called from alignments and
-				 	// optionally alignments.  First annotate the show the variants in the
-				 	// variant cards and calcuate the coverage (if alignments provided).
-					var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
-	                  .then( function() {
-
-	                  	if (vc.getRelationship() == 'proband') {
-	                  		showNavVariantLinks();
-	                  	}
-
-						var coveragePromise = vc.promiseLoadBamDepth()
-						                 .then( function(coverageData) {
-												if (coverageData) {
-													var max = d3.max(coverageData, function(d,i) { return d[1]});
-													if (max > allMaxDepth) {
-														allMaxDepth = max;
-													}						
-												}
-																								
-						                 });
-						coveragePromises.push(coveragePromise); 
 
 
-					  });				 
-					  variantPromises.push(variantPromise);		 
-			
-				} else if (isAlignmentsOnly() && autocall) {
-					// Only alignment files are loaded and user, when prompted, responded
-					// that variants should be autocalled when gene is selected.
-					// First perform joint calling, then load the bam data (for coverage)
-					// for each sample.
-					var callPromise = promiseJointCallVariants(true).then(function() {
 
-						showNavVariantLinks();
-						var coveragePromise = vc.promiseLoadBamDepth()
-							                 .then( function(coverageData) {
-													if (coverageData) {
-														var max = d3.max(coverageData, function(d,i) { return d[1]});
-														if (max > allMaxDepth) {
-															allMaxDepth = max;
-														}						
-													}
-																									
-							                 });
-						coveragePromises.push(coveragePromise); 
+		promiseGetGeneCoverage(window.gene, window.selectedTranscript, true).then(function() {
 
-					}) 
-					variantPromises.push(callPromise);							
+	    	markCodingRegions(window.gene, window.selectedTranscript);
+			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
+
+		 	getRelevantVariantCards().forEach(function(vc) {
+		 		
+
+		 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
+					vc.hide();
 				} else {
-					// Only alignment files are loaded.  Load the bam coverage data.
-					var coveragePromise = vc.promiseLoadBamDepth()
-						                 .then( function(coverageData) {
-												if (coverageData) {
-													var max = d3.max(coverageData, function(d,i) { return d[1]});
-													if (max > allMaxDepth) {
-														allMaxDepth = max;
-													}						
-												}
-																								
-						                 });
-					coveragePromises.push(coveragePromise); 
+					if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
+						// We have variants, either to load from a vcf or called from alignments and
+					 	// optionally alignments.  First annotate the show the variants in the
+					 	// variant cards and calcuate the coverage (if alignments provided).
+						var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
+		                  .then( function() {
+
+		                  	if (vc.getRelationship() == 'proband') {
+		                  		showNavVariantLinks();
+		                  	}
+
+						  });				 
+						  variantPromises.push(variantPromise);		 
+				
+					} else if (isAlignmentsOnly() && autocall) {
+						// Only alignment files are loaded and user, when prompted, responded
+						// that variants should be autocalled when gene is selected.
+						// First perform joint calling, then load the bam data (for coverage)
+						// for each sample.
+						var callPromise = promiseJointCallVariants(true).then(function() {
+
+							showNavVariantLinks();
+						}) 
+						variantPromises.push(callPromise);							
+
+					} 
 				}
-			}
-		});			
+			});			
 
 
 
-	 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
-	 	// (including vep, clinvar, and coverage), compare the proband to mother and father
-	 	// to determine inheritance and obtain the trio's allele counts.
-	 	// Once inheritance is determined, show the feature matrix for the proband
-	 	// and refresh the variants for all samples.
-		Promise.all(variantPromises).then(function() {
+		 	// For a trio, when all of the variants for the trio have been displayed and fully annotated
+		 	// (including vep, clinvar, and coverage), compare the proband to mother and father
+		 	// to determine inheritance and obtain the trio's allele counts.
+		 	// Once inheritance is determined, show the feature matrix for the proband
+		 	// and refresh the variants for all samples.  Now that all variants have been displayed,
+		 	// get the bam depth and display it.  We do this last since we want to show the variants
+		 	// in the ranked table as soon as possible.
+			Promise.all(variantPromises).then(function() {
 
-			// When all bam depths have been loaded, the variants are fully annotated
-			// so determine inheritance (if trio).  Also scale the coverage chart y-axis
-			// based on the max depth of all sample's coverage data
-			Promise.all(coveragePromises).then(function() {
+				var coveragePromises = [];
+				var allMaxDepth = 0;
+
+				// the variants are fully annotated so determine inheritance (if trio).  
+				// Also scale the coverage chart y-axis
+				// based on the max depth of all sample's coverage data
 				promiseDetermineInheritance(promiseFullTrio).then(function() {					
 					getRelevantVariantCards().forEach(function(vc) {
 						// The inheritance has been determined for the trio, so now
@@ -2409,16 +2463,43 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 					})
 				});
 
+				// Get the bam depth for each sample.  Calculate the max depth
+				// so that all coverage charts use the same y-Axis
+				getRelevantVariantCards().forEach(function(vc) {
+						var coveragePromise = vc.promiseLoadBamDepth()
+						                 .then( function(coverageData) {
+												if (coverageData) {
+													var max = d3.max(coverageData, function(d,i) { return d[1]});
+													if (max > allMaxDepth) {
+														allMaxDepth = max;
+													}						
+												}
+																								
+						                 });
+						coveragePromises.push(coveragePromise); 
+				});
 
-				// Show the coverage chart (if alignments provided)
-				getRelevantVariantCards().forEach(function(variantCard) {
-					variantCard.showBamDepth(allMaxDepth, function() {
+				// When we have figured out the max bam depth, show the bam depth
+				// for each sample
+				Promise.all(coveragePromises).then(function() {
+					// Show the coverage chart (if alignments provided)
+					getRelevantVariantCards().forEach(function(variantCard) {
+						variantCard.showBamDepth(allMaxDepth, function(theVariantCard) {
+							theVariantCard.highlightLowCoverageRegions(window.selectedTranscript);
+						});
 					});
 				});
-			});
+
+			});		
 
 
-		});					                 	
+
+
+
+
+      	});
+
+			                 	
 
 	}
 
@@ -2458,6 +2539,7 @@ function selectTranscript(transcriptId) {
 		}
 	})
 	if (found) {
+    	markCodingRegions(window.gene, window.selectedTranscript);
 		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
     	getCodingRegions(window.selectedTranscript);
 
@@ -2497,25 +2579,12 @@ function showTranscripts(regionStart, regionEnd) {
 		// For now, let's just grab the first one in the list.
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
-			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-			getCodingRegions(window.selectedTranscript);
-
 		}
+    	markCodingRegions(window.gene, window.selectedTranscript);
+		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+		getCodingRegions(window.selectedTranscript);
 	}
 
-
-	// Show the gene transcripts.
-    // Compress the tracks if we have more than 10 transcripts
-    if (!isLevelEdu && !isLevelBasic) {
-	    if (transcripts.length > 10) {
-	    	transcriptChart.trackHeight(14);
-	    	transcriptChart.cdsHeight(10);
-	    } else {
-	    	transcriptChart.trackHeight(20);
-	    	transcriptChart.cdsHeight(16);
-	    }
-
-    }
 
     if (transcriptViewMode == "single") {
     	transcripts = [selectedTranscript];
@@ -2643,6 +2712,12 @@ function jointCallVariantsImpl(checkCache, callback) {
 
 	                	if (vc.model.isAlignmentsOnly() && theVcfData == null) {
 							theVcfData = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
+	                	} else {
+	                		if (theVcfData.loadState == null) {
+	                			theVcfData.loadState = {};
+	                		}
+	                		theVcfData.loadState['called'] = true;
+	                		theVcfData.loadState['clinvar'] = true;
 	                	}
 
 				    
@@ -2770,6 +2845,12 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 
+	                	if (theFbData.loadState == null) {
+	                		theFbData.loadState = {};
+	                	}
+	                	theFbData.loadState['called'] = true;
+	                	theFbData.loadState['clinvar'] = true;
+
 	                	theFbData.features.forEach(function(variant) {
 	                		variant.fbCalled = "Y";
 	                		variant.extraAnnot = true;
@@ -2861,6 +2942,47 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 	);
 
 }
+
+function promiseGetGeneCoverage(geneObject, transcript, showProgress=false) {
+	return new Promise(function(resolve,reject) {
+
+		var promises = [];
+
+		getRelevantVariantCards().forEach(function(vc) {
+			if (vc.isBamLoaded()) {
+				if (showProgress) {
+					vc.showBamProgress("Analyzing coverage in coding regions");
+				}
+				var promise = vc.promiseGetGeneCoverage(geneObject, transcript).then(function(theVariantCard) {
+					if (showProgress) {
+						theVariantCard.endBamProgress();
+					}
+				})
+				promises.push(promise);
+			} 
+		});
+
+		Promise.all(promises).then(function() {
+			var geneCoverageAll = getCachedGeneCoverage(geneObject, transcript);
+
+			resolve(geneCoverageAll);
+
+		})
+
+	});
+}
+
+function getCachedGeneCoverage(geneObject, transcript) {
+	var geneCoverageAll = {};
+	getRelevantVariantCards().forEach(function(vc) {
+		var gc = vc.model.getGeneCoverageForGene(geneObject, transcript);
+		geneCoverageAll[vc.getRelationship()] = gc;
+	})	
+	return geneCoverageAll;
+}
+
+
+
 
 function shouldAutocall(callback) {
 	if (isAlignmentsOnly() && autocall == null) {
@@ -3086,7 +3208,7 @@ function promiseFullTrio() {
 		    var filterPanelWidth = $('#filter-track').width();
 
 			resolve(loaded.proband);
-		} else if (dataCard.mode == 'single' && isAlignmentsOnly()) {
+		} else if (isAlignmentsOnly()) {
 			resolve(getProbandVariantCard());
 		} else {
 			reject();
@@ -3291,8 +3413,15 @@ function getRsId(variant) {
 	return rsId;		
 }
 
-
 function filterVariants() {
+	filterCard.startFilterProgress();
+	setTimeout(function() {
+        filterVariantsImpl();
+    }, 100);	
+}
+
+function filterVariantsImpl() {
+	
 	clickedVariant = null;
 	matrixCard.unpin();
 
@@ -3312,8 +3441,9 @@ function filterVariants() {
 		}
 
 	});		
-	var geneCounts = filterCard.filterGenes();
-	return geneCounts;
+	filterCard.filterGenes(function() {
+		filterCard.endFilterProgress();
+	});
 
 }
 
@@ -3321,6 +3451,7 @@ function filterVariants() {
 function bookmarkVariant() {
 	if (clickedVariant) {
 		this.bookmarkCard.bookmarkVariant(clickedVariant);
+		unpinAll();
 	} 
 }
 

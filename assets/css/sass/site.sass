@@ -4,7 +4,7 @@
 // These  are styles for the gene.iobio education edition, with
 // a simplified interface and logic.  Remember to set the isLevelEdu flag
 // in app/globalsDeployment.js
-@import levelEdu
+//@import levelEdu
 
  
 
@@ -152,7 +152,7 @@ body
       background-color: $app-color
 
 h4
-  font-size: 13px
+  font-size: 14px
   color: $app-color
   margin-bottom: 4px
   margin-top: 10px
@@ -163,6 +163,13 @@ h5
   color: $app-color
   margin-bottom: 4px
   margin-top: 10px
+
+
+.btn-raised
+  &.disabled
+    -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12) !important
+    box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12) !important
+
 
 .alertify-notifier .ajs-message 
   width: 460px 
@@ -281,10 +288,10 @@ h5
 
 
 .attention
-  outline-color: rgba(217, 98, 98, 0.86)
-  outline-style: solid
-  outline-offset: 4px
-  outline-width: 2px
+  outline-color: rgba(217, 98, 98, 0.86) !important
+  outline-style: solid !important
+  outline-offset: 4px !important
+  outline-width: 2px !important
 
 .navbar-nav
   .attention
@@ -574,7 +581,7 @@ i.material-icons
 .label-warning
   padding-bottom: 2px !important
   background-color: transparent !important
-  color: $danger-font-color !important
+  color: $danger-color !important
   font-weight: normal !important
   font-size: 12px !important
 
@@ -1024,17 +1031,17 @@ a.btn
       margin-right: 7px      
 
     #welcome-panel-content
-      width: 640px
+      width: 820px
 
 
       .description-paragraph
         text-align: left
         margin-left: 0px
-        margin-right: 5px
-        margin-top: 30px
+        margin-right: 30px
+        margin-top: 20px
         color: $text-color
         font-size: 18px
-        width: 35%
+        width: 25%
 
         li
           padding-bottom: 10px
@@ -1043,7 +1050,7 @@ a.btn
             padding-bottom: 4px
 
       #video-thumbprint-panel
-        width: 65%
+        width: 75%
         margin-top: 10px
 
         #video-thumbprint-heading
@@ -1053,15 +1060,16 @@ a.btn
 
         #video-thumbprint-content
           display: flex
+          flex-wrap: wrap
 
           .video-thumbprint
-            width: 50%
+            width: 190px
             height: 140px
             margin-top: 5px
             margin-bottom: 20px
             background-color: grey
             margin-left: 0px
-            margin-right: 10px
+            margin-right: 5px
             background-size: cover
 
             #play-button
@@ -1080,7 +1088,10 @@ a.btn
         #welcome-screencast-panel-saving-analysis
           background-image: url('../../assets/images/screencast-saving-analysis.png')
 
-  
+
+        #welcome-screencast-panel-coverage-analysis
+          background-image: url('../../assets/images/screencast-coverage-analysis.png')
+
 
 .icon
   width: 30px
@@ -1292,7 +1303,7 @@ section
 
 #bam-track
   margin-bottom: 0px
-  margin-top: -10px
+  margin-top: -5px
   margin-left: 0px
   margin-right: 0px
   padding: 0px
@@ -1355,7 +1366,8 @@ section
   border: none 
   position: relative
   pointer-events: none
-  top: 0px
+  top: 10px
+  margin-top: -10px
   height: 23px
   visibility: visible
   width:  26px
@@ -1512,6 +1524,19 @@ header
     fill: $current-color
     pointer-events: none
 
+  .region
+    stroke-width: 1px
+    stroke: $coverage-problem-region-color
+    fill: $coverage-problem-region-color
+
+  .threshold
+    line
+      stroke-width: 1px
+      stroke: lightgray
+    text
+      font-size: 12px
+      fill: $text-color
+
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line
   stroke: $arrow-color
   stroke-width: 2
@@ -1563,14 +1588,13 @@ header
   stop-opacity: 0.6
 
 .axis text
-  font-size: 10px
+  font-size: 12px
   fill: rgb(120, 120, 120)
 
 #zoom-region-chart
   .axis text
-    font-size: 10px
+    font-size: 11px
     fill: rgb(120, 120, 120)
-    font-style: italic
 
   padding-left: 0px
   padding-right: 0px
@@ -1599,6 +1623,11 @@ header
     shape-rendering: crispEdges
     stroke-width: 1px
 
+#bam-depth
+  .y.axis
+    line
+      stroke-width: .5px
+
 #gene-viz .axis
   line, path
     fill: none
@@ -1611,7 +1640,7 @@ header
     fill: none
     stroke: lightgrey
     shape-rendering: crispEdges
-    stroke-width: 3px
+    stroke-width: 1px
 
 .brush .extent
   stroke: #000
@@ -1653,7 +1682,7 @@ header
       stroke: lightgrey
       shape-rendering: crispEdges
 
-    font-size: 10px
+    font-size: 13px
 
 .brush-line, .dashed
   stroke: rgb(150, 150, 150)
@@ -1678,6 +1707,7 @@ header
   &:hover
     border-bottom: 1px solid #009587
 
+
 .icon-button
   padding-right: 10px
   padding-left: 10px
@@ -1686,6 +1716,31 @@ header
   line-height: 22px
   font-size: 12px
   color: $text-color !important
+
+.icon-button-standard
+  font-size: 13px
+  padding-left: 12px
+  padding-right: 12px
+  padding-top: 3px
+  padding-bottom: 3px
+  color: $text-color !important
+
+  i
+    font-size:  17px  
+    margin-top: -3px
+
+.icon-button-large
+  font-size: 14px
+  padding-left: 12px
+  padding-right: 12px
+  padding-top: 4px
+  padding-bottom: 4px
+  color: $app-color !important
+
+  i
+    font-size:  17px  
+    margin-top: -3px    
+
 
 .icon-button-sm
   padding-top: 4px
@@ -1726,6 +1781,7 @@ header
   color: $text-color
 
 .tt-dropdown-menu
+  cursor: pointer
   z-index: 1033 !important
   .tt-dataset-name
     z-index: 1033 !important

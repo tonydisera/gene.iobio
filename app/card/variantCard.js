@@ -4,7 +4,6 @@ function VariantCard() {
 	this.model = null;
 
   	this.vcfChart = null;
-	this.afChart = null;
 	this.zoomRegionChart = null;
 	this.bamDepthChart = null;	 
 
@@ -91,8 +90,18 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
-VariantCard.prototype.summarizeDanger = function(geneName, data, options) {
-	var dangerSummary = VariantModel.summarizeDanger(data, options);
+VariantCard.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		me.model.promiseGetGeneCoverage(geneObject, transcript).then(function() {
+			resolve(me);
+		});
+
+	})
+}
+
+VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverageAll) {
+	var dangerSummary = VariantModel.summarizeDanger(data, options, geneCoverageAll);
 	this.model.cacheDangerSummary(dangerSummary, geneName);
 	return dangerSummary;
 }
@@ -193,52 +202,79 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		this.zoomRegionChart = geneD3()
 				    .widthPercent("100%")
 				    .heightPercent("100%")
-				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4})
-				    .showXAxis(false)
+				    .width($('#container').innerWidth())
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .showXAxis(true)
 				    .showBrush(false)
 				    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
 				    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 12)
 		    		.showLabel(false)
-		    		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
-		    				    			
-		    			
-		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
+		    		.featureClass( function(d,i) {
+		    			return d.feature_type.toLowerCase() + (d.danger[me.getRelationship()] ? " danger" : "");
+		    		})		    		
+		    		.on("d3featuretooltip", function(featureObject, feature, tooltip, lock=false, onClose=null) {
+						me.showExonTooltip(featureObject, feature, tooltip, lock, onClose);
+		    		})
+					
 
-		    			tooltip.transition()        
-			                   .duration(200)      
-			                   .style("opacity", .9);   
-			            tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))       
-							   .style("left", coord.x + "px") 
-				               .style("text-align", 'left')    
-				               .style("top", (coord.y - 4) + "px");    
-		    		});
 
 
 		// Create the coverage chart
 		this.bamDepthChart = lineD3()
-		                    .width(1000)
-		                    .height( 35 )
+		                    .width($('#container').innerWidth())
+		                    .height( 50 )
 		                    .widthPercent("100%")
 		                    .heightPercent("100%")
 		                    .kind("area")
-							.margin( {top: 10, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+							.margin( {top: 22, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 							.showXAxis(true)
-							.showYAxis(false)
+							.showYAxis(true)
+							.yAxisLine(false)
+							.yTicks(3)
+							.yTickFormat(function(val) {
+								if (val == 0) {
+									return "";
+								} else {
+									return val + "x";
+								}
+							})
+							.regionGlyph(function(d,i,regionX) {
+								var parent = d3.select(this.parentNode);
+								var exonId = 'exon' + d.exon_number.replace("/", "-");
+								if (parent.select("g#" + exonId).empty()) {
+		 		    				parent.append('g')     
+		 		    						  .attr("id", exonId)
+		 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
+		 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-16)')
+		 	    							  .data([d])
+		 	    							  .append('use')
+		 	    							  .attr('height',     '16')
+		 	    							  .attr('width',      '16')
+		 	    							  .attr('href', '#error-symbol')
+		 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
+		 	    							  .data([d]);									
+								}
+							})
 							.showTooltip(true)
 							.pos( function(d) { return d[0] })
 					   		.depth( function(d) { return d[1] })
 					   		.formatCircleText( function(pos, depth) {
 					   			return depth + 'x' ;
-					   		});
-
+					   		})
+				    		.on("d3regiontooltip", function(featureObject, feature, tooltip, lock, onClose) {
+								me.showExonTooltip(featureObject, feature, tooltip, lock, onClose);
+				    		})
+							
 
 		// Create the vcf track
 		this.vcfChart = variantD3()
-				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: isLevelEdu  || isLevelBasic ? 12 : 17, left: isLevelBasic || isLevelEdu ? 9 : 4})
-				    .showXAxis(isLevelEdu  || isLevelBasic ? false : true)
-				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 6)
+				    .width($('#container').innerWidth())
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 5, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .showXAxis(true)
+				    .xTickFormat(function(val) {
+				    	return "";
+				    })
+				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
@@ -274,10 +310,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		// The 'missing variants' chart, variants that freebayes found that were not in orginal
 		// variant set from vcf
 		this.fbChart = variantD3()
-				    .width(1000)
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 10, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
+				    .width($('#container').innerWidth())
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 5, left: isLevelBasic || isLevelEdu ? 9 : 4}) // bottom margin for missing variant x when no vcf variants loaded
 				    .showXAxis(false)
-				    .variantHeight(6)
+				    .variantHeight(8)
 				    .verticalPadding(2)
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
@@ -308,28 +344,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							matrixCard.clearSelections();
 						}
 					});
-					
 
-	 	// Create allele frequency chart
-	 	// Allele freq chart)
-		// TODO:  Replace this with actual frequency after af grabbed from population (1000G/ExAC)
-	    this.afChart = histogramD3()
-	                       .width(400)
-	                       .height(70)
-						   .margin( {left: 40, right: 0, top: 0, bottom: 20})
-						   .xValue( function(d, i) { return d[0] })
-						   .yValue( function(d, i) { return Math.log(d[1]) })
-						   .yAxisLabel( "log(frequency)" );
-						   
-		this.afChart.formatXTick( function(d,i) {
-			return (d * 2) + '%';
-		});
-		this.afChart.tooltipText( function(d, i) { 
-			var value = vcfAfData[i][1];
-			var lowerVal =  d[0]      * 2;
-			var upperVal = (d[0] + 1) * 2;
-			return  d3.round(value) + ' variants with ' + lowerVal + "-" + upperVal + '%' + ' AF ';
-		});
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
 			me.shrinkCard(true);
@@ -358,6 +373,69 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 
 };
+
+VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip, lock, onClose) {
+	var me = this;
+
+
+	if (lock) {
+		tooltip.style("pointer-events", "all");
+	} else {
+		tooltip.style("pointer-events", "none");          
+	}
+
+	var coverageRow = function(fieldName, coverageVal, covFields) {
+		var row = '<div>';
+		row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
+		row += '<span style="width:40px;display:inline-block">' + round(coverageVal, 2) + '</span>';
+		row += '<span class="' + (covFields[fieldName] ? 'danger' : '') + '">' + (covFields[fieldName] ? covFields[fieldName]: '') + '</span>';
+		row += "</div>";
+		return row;
+	}
+
+	var html = '<div>' 
+	         + '<span id="exon-tooltip-title"' + (lock ? 'style="margin-top:8px">' : '>') + (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number : "") + '</span>'
+	      	 + (lock ? '<a href="javascript:void(0)" id="exon-tooltip-close">X</a>' : '')
+	         + '</div>';
+    html     += '<div style="clear:both">' + feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end) + '</div>';
+    if (feature.geneCoverage && feature.geneCoverage[me.getRelationship()]) {
+    	var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
+    	html += "<div style='margin-top:4px'>" + "Coverage:" 
+    	     +  coverageRow('min',    feature.geneCoverage[me.getRelationship()].min, covFields) 
+    	     +  coverageRow('median', feature.geneCoverage[me.getRelationship()].median, covFields) 
+    	     +  coverageRow('mean',   feature.geneCoverage[me.getRelationship()].mean, covFields) 
+    	     +  coverageRow('max',    feature.geneCoverage[me.getRelationship()].max, covFields) 
+    	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields) 
+
+    }
+    if (lock) {
+    	html += '<div style="text-align:right;margin-top:8px">' 
+    	+ '<a href="javascript:void(0)" id="exon-tooltip-thresholds" class="danger" style="float:left"  >Set thresholds</a>'
+    	+ '</div>'	    	
+    }
+    tooltip.html(html);	
+    if (lock) {
+    	tooltip.select("#exon-tooltip-thresholds").on("click", function() {
+    		showSidebar('Filter')
+    		$('#filter-track #coverage-thresholds').addClass('attention');
+    	})
+    	if (onClose) {
+		    tooltip.select("#exon-tooltip-close").on("click", function() {
+		    	if (onClose) {
+			    	onClose();
+		    	}
+		    })    	    		
+    	}
+    }
+
+    var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
+    tooltip.style("left", coord.x + "px") 
+           .style("text-align", 'left')    
+           .style("top", (coord.y-60) + "px");        
+	tooltip.transition()        
+           .duration(200)      
+           .style("opacity", .9);   
+}
 
 
 VariantCard.prototype.onBamFilesSelected = function(event, callback) {
@@ -551,9 +629,6 @@ VariantCard.prototype.endBamProgress = function() {
 	this.cardSelector.find("#bam-track").removeClass("hide");
 	this.cardSelector.find(".covloader").addClass("hide");
 	this.cardSelector.find(".covloader .loader-label").text("");
-	this.cardSelector.find("#bam-depth").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-17px");
 
 }
 
@@ -598,7 +673,8 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 			// Load the variant chart.			
 			me._showVariants( regionStart, 
 				regionEnd, 
-				function() {						
+				function() {	
+
 					readjustCards();
 					resolve();
 				},
@@ -612,6 +688,7 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 	
 	
 }
+
 
 VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 	var me = this;
@@ -745,6 +822,8 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	this.cardSelector.find('#vcf-name').removeClass("hide");		
 
 	this._showBamDepth(regionStart, regionEnd);
+	this.highlightLowCoverageRegions(window.selectedTranscript,regionStart, regionEnd, filterCard.geneCoverageMedian);
+	
 	this._showVariants(regionStart, regionEnd, 
 		function() {
 			me.filterAndShowCalledVariants(regionStart, regionEnd);
@@ -769,9 +848,9 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 			resolve(coverage);
 		} else {
-			// If we have varaitns, get coverage for every variant
+			// If we have variant, get coverage for every variant
 			me.showBamProgress("Calculating coverage");
-			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
 				me.endBamProgress();
 				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 				resolve(coverageData);
@@ -785,6 +864,28 @@ VariantCard.prototype.showBamDepth = function(maxDepth, callbackDataLoaded) {
 	this._showBamDepth(regionStart, regionEnd, maxDepth, callbackDataLoaded);
 }
 
+VariantCard.prototype.highlightLowCoverageRegions = function(transcript, regionStart, regionEnd) {
+	var me = this;
+	if (this.model.isBamLoaded()) {
+		var dangerRegions = [];
+		transcript.features
+				  .filter( function(feature) {
+				  		var meetsRegion = true;
+				  		if (regionStart && regionEnd) {
+				  			meetsRegion = feature.start >= regionStart && feature.end <= regionEnd;
+				  		}
+						return meetsRegion && feature.feature_type == 'CDS' || feature.feature_type == 'UTR';
+				  })
+				  .forEach(function(feature) {
+						if (feature.danger[me.getRelationship()]) {
+							dangerRegions.push(feature)
+						}
+				  })
+		this.bamDepthChart.highlightRegions(dangerRegions, {}, regionStart, regionEnd, filterCard.geneCoverageMedian);
+		//this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
+	}
+}
+
 VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth, callbackDataLoaded) {	
 	var me = this;
 
@@ -796,10 +897,14 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		this.cardSelector.find("#bam-track").addClass("hide");
 		filterCard.enableCoverageFilters();
 		if (callbackDataLoaded) {
-			callbackDataLoaded();
+			callbackDataLoaded(me);
 		}
 		return;
 	}
+
+	this.cardSelector.find("#bam-depth").css("visibility", "visible");
+	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-16px");
 
 
 	if (this.isViewable()) {
@@ -816,8 +921,9 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		} else {
 			me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
 		}
+		
 		if (callbackDataLoaded) {
-	   	    callbackDataLoaded();
+	   	    callbackDataLoaded(me);
    	    }
 	} else {
 
@@ -830,7 +936,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 			me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
 
 			if (callbackDataLoaded) {
-		   	    callbackDataLoaded();
+		   	    callbackDataLoaded(me);
 	   	    }
 
 		});
@@ -851,8 +957,8 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 
 		// Decide if we should show the x-axis.
 		this.bamDepthChart.showXAxis(!(this.model.isVcfLoaded()));
-		this.bamDepthChart.height(!(this.model.isVcfLoaded()) ? 65 : 45 );
-		this.bamDepthChart.margin(!(this.model.isVcfLoaded()) ? {top: 10, right: 2, bottom: 20, left: 4} : {top: 10, right: 2, bottom: 0, left: 4} );
+		this.bamDepthChart.height(!(this.model.isVcfLoaded()) ? 75 : 55 );
+		this.bamDepthChart.margin(!(this.model.isVcfLoaded()) ? {top: 16, right: 2, bottom: 20, left: 4} : {top: 16, right: 2, bottom: 0, left: 4} );
 	
 		// Detemine the y-scale be setting the maxDepth accross all samples
 		if (maxDepth) {
@@ -863,6 +969,8 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+
+		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, filterCard.geneCoverageMedian + "x (median threshold)", "threshold" );
 	}
 }
 
@@ -878,7 +986,10 @@ VariantCard.prototype.showFinalizedVariants = function() {
 	me._showVariants(regionStart, regionEnd, null, false);
 	
 	if (me.model.getRelationship() == 'proband') {
-		me.fillFeatureMatrix(regionStart, regionEnd);
+		if (me.model.isVcfReadyToLoad() || me.model.isLoaded()) {
+			me.fillFeatureMatrix(regionStart, regionEnd);
+		}
+
 	} 	
 
 }
@@ -1206,6 +1317,15 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
+	// If only alignments provided, only show feature matrix if variants have been called.
+	if (isAlignmentsOnly() && theVcfData.features.length == 0) {
+		if (!theVcfData.loadState || !theVcfData.loadState['called']) {
+			$('#matrix-track').addClass("hide");
+			me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+ 	  		me.cardSelector.find("#vcf-variant-count").text("");
+			return;
+		}
+	}
 
 
 	$('#filter-and-rank-card').removeClass("hide");
@@ -1803,6 +1923,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);
 	}
 }
+
 
 
 VariantCard.prototype.unpin = function(saveClickedVariant, unpinMatrixTooltip) {

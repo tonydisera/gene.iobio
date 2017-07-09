@@ -8,12 +8,18 @@ function FilterCard() {
 	this.pathogenicityScheme = "clinvar";
 	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter";
 	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Allele Freq ExAC, Allele Freq 1000G, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
-	
+	this.applyLowCoverageFilter = false;
+
 	// standard filters
 	this.KNOWN_CAUSATIVE           = "known_causative";
 	this.DENOVO                    = "denovo";
 	this.RECESSIVE                 = "recessive";
 	this.FUNCTIONAL_IMPACT         = "functional_impact";
+	this.LOW_COVERAGE              = "low_coverage";
+
+	this.geneCoverageMin           = 10;
+	this.geneCoverageMean          = 30;
+	this.geneCoverageMedian        = 30;
 }
 
 FilterCard.prototype.shouldWarnForNonPassVariants = function() {
@@ -73,8 +79,8 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
-	filterCard.setStandardFilter(button, filterName);
-	filterVariants();
+    filterCard.setStandardFilter(button, filterName);
+	filterVariants();		
 }
 
 
@@ -90,20 +96,20 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	me.clearFilters();
 	$(button).addClass('current');
 	var annots = null;
-	if (filterName == me.KNOWN_CAUSATIVE) {
+	if (filterName == me.LOW_COVERAGE) {
+		me.applyLowCoverageFilter = true;
+	} else if (filterName == me.KNOWN_CAUSATIVE) {
 		annots = 	{
-			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
-			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
-			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
-			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			clinvar_path:     {key: 'clinvar',       label: "ClinVar",           state: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
 			clinvar_lpath:    {key: 'clinvar',       label: "ClinVar",           state: true, value: 'clinvar_lpath',    valueDisplay: 'likely pathogenic'}
 		}
 	} else if (filterName == me.DENOVO) {
 		annots = 	{
-			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
-			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
@@ -113,8 +119,8 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 		}
 	} else if (filterName == me.RECESSIVE) {
 		annots = 	{
-			af1000g_rare:     {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
-			afexac_rare:      {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
 			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
@@ -124,11 +130,11 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 		}
 	} else if (filterName == me.FUNCTIONAL_IMPACT) {
 		annots = 	{
-			af1000g_rare:     {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_rare',     valueDisplay: '< 1%'},
-			af1000g_uncommon: {key: 'af1000glevels',   label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '1 - 5%'},
-			afexac_rare:      {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_rare',      valueDisplay: '< 1%'},
-			afexac_uncommon:  {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '1 - 5 %'},
+			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
+			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
 			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
+			denovo:           {key: 'inheritance',     label: "Inheritance mode",  state: true, not: true, value: 'denovo',           valueDisplay: 'de novo'},
+			recessive:        {key: 'inheritance',     label: "Inheritance mode",  state: true, not: true, value: 'recessive',        valueDisplay: 'recessive'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
 			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
 			clinvar_path:     {key: 'clinvar',         label: "ClinVar",           state: true, not: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
@@ -174,6 +180,8 @@ FilterCard.prototype.getFilterObject = function() {
 
 	var afMin1000g = $('#af1000g-range-filter #af-amount-start').val() != '' ? +$('#af1000g-range-filter #af-amount-start').val() / 100 : null;
 	var afMax1000g = $('#af1000g-range-filter #af-amount-end').val()   != '' ? +$('#af1000g-range-filter #af-amount-end').val()   / 100 : null;
+
+
 
 	return {
 		'coverageMin': +$('#coverage-min').val(),
@@ -265,6 +273,20 @@ FilterCard.prototype.init = function() {
 
 	// Default annotation scheme to VEP
 	this.setAnnotationScheme("VEP");
+
+	// Se coverage thresholds and listen when thresholds change
+	$('#gene-coverage-min').val(this.geneCoverageMin);
+	$('#gene-coverage-median').val(this.geneCoverageMedian);
+	$('#gene-coverage-mean').val(this.geneCoverageMean);
+	$('#gene-coverage-min').on('change', function() {
+		me.geneCoverageMin = $('#gene-coverage-min').val();
+	})
+	$('#gene-coverage-median').on('change', function() {
+		me.geneCoverageMedian = $('#gene-coverage-median').val();
+	})
+	$('#gene-coverage-mean').on('change', function() {
+		me.geneCoverageMean = $('#gene-coverage-mean').val();
+	})
 
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
@@ -513,9 +535,14 @@ FilterCard.prototype.initFilterListeners = function() {
 	  	} else {
 	  		valueDisplay = d3.select(this).attr("id");
 	  	}
+
+	  	var theValue = d3.select(this).attr("id");
+	  	if (schemeClass == "recfilter" && d3.select(this).attr("id") == 'unassigned') {
+	  		theValue = ".";
+	  	}
 	  	me.annotsToInclude[d3.select(this).attr("id")] = {'key':   schemeClass , 
 	  													  'label': schemeLabel,
-	  													  'value': d3.select(this).attr("id"),
+	  													  'value': theValue,
 	  													  'valueDisplay': valueDisplay,   
 	  													  'state': on};
 
@@ -547,6 +574,8 @@ FilterCard.prototype.clearFilters = function() {
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = {};
 
+	this.applyLowCoverageFilter = false;
+
 	$('#filter-progress').addClass("hide");
 	$('#filter-progress .text').text("");
 	$('#filter-progress .bar').css("width", "0%");
@@ -571,6 +600,7 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .clinvar').classed('current', false);
 	d3.selectAll('#filter-track .clinvar').classed('not-equal', false);
 	d3.selectAll('#filter-track .inheritance').classed('current', false);
+	d3.selectAll('#filter-track .inheritance').classed('not-equal', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
 	$('#afexac-range-filter #af-amount-start').val("");
@@ -579,8 +609,6 @@ FilterCard.prototype.clearFilters = function() {
 	$('#af1000g-range-filter #af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
-
-	this.displayFilterSummary();
 	
 }
 
@@ -763,8 +791,12 @@ FilterCard.prototype.enableCoverageFilters = function() {
 FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	if (dataCard.mode == "trio") {
 		d3.selectAll("#filter-track .inheritance").classed("inactive", false);
+		d3.select("#filter-track #button-denovo-vus").classed("disabled", false);
+		d3.select("#filter-track #button-recessive-vus").classed("disabled", false);
 	} else {
 		d3.selectAll("#filter-track .inheritance").classed("inactive", true);
+		d3.select("#filter-track #button-denovo-vus").classed("disabled", true);
+		d3.select("#filter-track #button-recessive-vus").classed("disabled", true);
 		d3.selectAll("#filter-track .inheritance").classed("current", false);
 	}
 	this.displayEffectFilters();
@@ -846,8 +878,10 @@ FilterCard.prototype.displayEffectFilters = function() {
 		var svgElem = null;
 		if (effectLabel.length < 20) {
 			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
+                      '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
     				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+  					  '</g>' +
   					  '</svg>';
 
 		} else {
@@ -861,9 +895,11 @@ FilterCard.prototype.displayEffectFilters = function() {
 			var label1 = effectLabel.substring(0, pos);
 			var label2 = effectLabel.substring(pos+1, effectLabel.length);
 			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="26" transform="translate(0,0)">' +
+			          '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
                       '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
     				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+  					  '</g>' +
   					  '</svg>';
 
 		}
@@ -898,8 +934,10 @@ FilterCard.prototype.displayRecFilters = function() {
 		var label = key === "." ? ". (unassigned)" : key;
 		var elmId = key === "." ? "unassigned" : key;
 		var svgElem = '<svg id="' + elmId + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
+			          '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
-  					  '</svg>';
+  					  '</g>' +
+					  '</svg>';
   		$('#rec-filter-box').append(svgElem);
 	});
 	/*
@@ -919,21 +957,33 @@ FilterCard.prototype.hasFilters = function() {
 	}
 }
 
+FilterCard.prototype.refreshGeneCoverageBadges = function() {
+	cacheHelper.refreshGeneBadgesGeneCoverage(true);
+	$('#filter-track #coverage-thresholds').removeClass('attention');
+	loadTracksForGene();
+}
 
-FilterCard.prototype.filterGenes = function() {
+
+FilterCard.prototype.filterGenes = function(callback) {
 	var me = this;
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
-	var geneCounts = cacheHelper.refreshGeneBadges();
-	if (me.hasFilters()) {
-		$('#filter-progress .text').text(geneCounts.pass + " passed filter");
-		$('#filter-progress .bar').css("width", percentage(geneCounts.pass / geneCounts.total));
-		$('#filter-progress').removeClass("hide");		
+	if (me.applyLowCoverageFilter) {
+		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
+		cacheHelper.showGeneCounts(geneCounts);	
+		if (callback) {
+			callback();
+		}
+	} else {
+		var geneCounts = cacheHelper.refreshGeneBadges(function() {
+			cacheHelper.showAnalyzeAllProgress();	
+			if (callback) {
+				callback();
+			}	
+		});
 	}
-	cacheHelper.showAnalyzeAllProgress();
-
-	return geneCounts;
 }
+
 
 
 FilterCard.prototype._getFilterString = function() {
@@ -943,15 +993,22 @@ FilterCard.prototype._getFilterString = function() {
 
 	var AND = function(filterString) {
 		if (filterString.length > 0) {
-			return   " <span>and</span> ";
+			return   " <span class='filter-element'>and</span> ";
 		} else {
 			return "";
 		}
 	}
 
 	var filterBox = function(filterString) {
-		return "<span class=\"filter-flag label label-primary\">" + filterString + "</span>";
+		return "<span class=\"filter-flag filter-element label label-primary\">" + filterString + "</span>";
 	}
+
+	// When low coverage filter applied, we only filter on this, not any other criteria.
+	if (this.applyLowCoverageFilter) {
+		filterString += filterBox("Exon coverage min < " + this.geneCoverageMin + " OR median < " + this.geneCoverageMedian + " OR mean < " + this.geneCoverageMean);
+		return filterString;
+	}
+		
 
 	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("loaded variants only");
@@ -1016,17 +1073,48 @@ FilterCard.prototype._getFilterString = function() {
 	return filterString;
 }
 
-FilterCard.prototype.displayFilterSummary = function() {
-	var filterString = this._getFilterString();
+FilterCard.prototype.displayFilterSummary = function(filterString) {
+	$("#filter-summary-track span.filter-element").remove();
+	filterString = filterString ? filterString : this._getFilterString();
 	if (filterString.length > 0) {
 		$("#filter-summary-track").removeClass("hide")
-		$("#filter-summary-track .card-label").nextAll().remove();
-		$('#filter-summary-track .card-label').after(filterString);		
+		$('#filter-summary-track .loader').after(filterString);		
+	} 
+}
+
+FilterCard.prototype.startFilterProgress = function() {
+	if (this.hasFilters()) {
+		$('#filter-summary-loader .loader-label').text("Applying filter")
+	} else {
+		$('#filter-summary-loader .loader-label').text("Clearing filter")
+	}
+	$('#filter-summary-loader').removeClass("hide");
+}
+
+FilterCard.prototype.endFilterProgress = function() {
+
+	$('#filter-summary-loader').addClass("hide");
+
+	if (this.hasFilters()) {
+		$("#filter-summary-track").removeClass("hide")
 	} else {
 		$("#filter-summary-track").addClass("hide")
 	}
 }
 
+FilterCard.prototype.isLowCoverage = function(gc) {
+    return  +gc.min   < this.geneCoverageMin 
+		|| +gc.median < this.geneCoverageMedian
+		|| +gc.mean   < this.geneCoverageMean; 	
+}
+
+FilterCard.prototype.whichLowCoverage = function(gc) {
+	var fields = {};
+	fields.min    = +gc.min    < this.geneCoverageMin    ? '< ' + this.geneCoverageMin : null;
+	fields.median = +gc.median < this.geneCoverageMedian ? '< ' + this.geneCoverageMedian : null;
+	fields.mean   = +gc.mean   < this.geneCoverageMean   ? '< ' + this.geneCoverageMean : null;	
+	return fields;
+}
 
 
 FilterCard.prototype.capitalizeFirstLetter = function(string) {
@@ -1080,7 +1168,11 @@ FilterCard.prototype.classifyByImpact = function(d) {
     var af1000g = Object.keys(d.af1000glevels).join(" ");
     var afexac = Object.keys(d.afexaclevels).join(" ");
 	
-	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory + ' recfilter_' + d.recfilter + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + (d.inheritance ? d.inheritance.toLowerCase() : "") + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory +  ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+}
+
+FilterCard.getRecFilterClazz = function(variant) {
+	return ' recfilter_' + (variant.recfilter == "." ? "unassigned" : variant.recfilter);	
 }
 
 FilterCard.prototype.classifyByEffect = function(d) { 
@@ -1129,7 +1221,7 @@ FilterCard.prototype.classifyByEffect = function(d) {
     var afexac = Object.keys(d.afexaclevels).join(" ");
 
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + ' recfilter_' + d.recfilter + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 
@@ -1173,7 +1265,7 @@ FilterCard.prototype.classifyByZygosity = function(d) {
     var afexac = Object.keys(d.afexaclevels).join(" ");
 
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + ' recfilter_' + d.recfilter +  ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
 

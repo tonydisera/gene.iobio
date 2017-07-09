@@ -1,3 +1,38 @@
+#bam-depth
+  .tooltip
+    background: rgb(80,80,80)
+    color: white
+    font-size: 11px
+    line-height: normal
+    .danger
+      color: $coverage-problem-color
+    a.danger
+      color: $coverage-problem-color !important
+    #exon-tooltip-close
+      float: right
+      color: white !important
+      font-weight: bold
+      font-size: 14px !important
+    #exon-tooltip-title
+      display: inline-block
+      float: left
+  
+
+#zoom-region-chart
+  .tooltip
+    .danger
+      color: $coverage-problem-color
+    a.danger
+      color: $coverage-problem-color !important
+    #exon-tooltip-close
+      float: right
+      color: white !important
+      font-weight: bold
+      font-size: 14px !important
+    #exon-tooltip-title
+      display: inline-block
+      float: left
+
 .tooltip-title
   font-size: 12px
   word-break: break-word
@@ -6,7 +41,7 @@
     text-align: center
     font-size: 12px
     font-weight: bold
-    color: $danger-font-color
+    color: $danger-color
 
 .tooltip-header
   overflow-wrap: break-all
@@ -47,7 +82,7 @@
 .tooltip-header-small
   overflow-wrap: break-word
   text-align: left
-  width: 50px
+  width: 75px
   float: left
   color: $tooltip-label-color
   fill:  $tooltip-label-color
@@ -59,7 +94,7 @@
   min-height: 25px
 
 .sib-zygosity
-  width: 140px 
+  width: 75px 
   float: left 
 
 .tooltip-row
@@ -75,9 +110,9 @@
   padding-right: 0px !important
   padding-left: 0px !important
   background-color: #D3D5D8 !important
-  margin-right: 3px
+  margin-right: 2px
   margin-top: 0px !important
-  width: 33px !important
+  width: 39px !important
   color: black
   border: solid thin rgba(0, 0, 0, 0.22)
   cursor: none
@@ -92,6 +127,9 @@
   &.homref
     background-color: #5D809D !important
     color: rgba(255,255,255,1)
+
+  &.unknown
+    background-color: #b9edf3 !important
 
 .tooltip-subtitle
   font-size: 12px
@@ -152,6 +190,7 @@
 .tooltip
   font-family: $app-font, sans-serif !important
   
+
 
 rect
   &.alt-count
@@ -342,18 +381,25 @@ text
     transform: rotate(152deg)
     content: ""
 
+.tooltip-inheritance-mode-label
+  display: inline-block
+  vertical-align: top
+  padding-top: 0px
+
 .tooltip.tooltip-wide
   width: 650px !important
 
 .tooltip-wide
   font-size: 13px 
 
+  
+
   .tooltip-title
     font-size: 14px
 
   .tooltip-row
     clear: both
-    padding-bottom: 6px
+    padding-bottom: 3px
 
     &.sib-info
       padding-bottom: 2px
@@ -377,23 +423,23 @@ text
 
   .tooltip-left-column
     float: left
-    padding-top: 10px
+    padding-top: 5px
     padding-bottom: 0px
     .tooltip-row
-      width: 360px
+      width: 330px
       overflow: auto
       .tooltip-header
-        width: 110px
+        width: 90px
       .tooltip-value
-        width: 240px
+        width: 220px
 
     
   .tooltip-right-column
     float: right
-    padding-top: 10px
+    padding-top: 5px
     padding-bottom: 0px
     .tooltip-row
-      width: 270px    
+      width: 300px    
       overflow: auto
       .tooltip-header
         width: 110px
@@ -424,7 +470,7 @@ text
         font-size: 14px !important
 
   .row
-    line-height: 14px !important
+    line-height: 13px !important
 
 
     

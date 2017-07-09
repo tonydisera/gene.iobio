@@ -1,6 +1,7 @@
 var appTitleSection = require('./sections/appTitleSection.js');
 var dataCard = require('./sections/dataCard.js');
 var probandVariantCard = require('./sections/probandVariantCard.js');
+var motherVariantCard = require('./sections/motherVariantCard.js');
 var matrixTrack = require('./sections/matrixTrack.js');
 var filterPanel = require('./sections/filterPanel.js');
 var findGenesPanel = require('./sections/findGenesPanel.js');
@@ -69,6 +70,7 @@ module.exports = {
     bookmarkPanel: bookmarkPanel,
     matrixTrack: matrixTrack,
     probandVariantCard: probandVariantCard,
+    motherVariantCard: motherVariantCard,
     variantTooltip: variantTooltip,
 
     transcriptCard: {
@@ -76,10 +78,6 @@ module.exports = {
       elements: {
         geneName: { selector: '#gene-name' }
       }
-    },
-
-    motherVariantCard: {
-      selector: '#other-variant-cards .variant-card:nth-child(1)'
     },
 
     fatherVariantCard: {

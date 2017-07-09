@@ -16,6 +16,10 @@ function featureMatrixD3() {
     return "tootip at row " + rowIndex;
   }
 
+  var _adjustTooltipCoordinates = function(variant) {
+    return;
+  }
+
   var columnLabel = function( d, i) {
     return d.type;
   }
@@ -317,13 +321,6 @@ function featureMatrixD3() {
         })
       }
 
-      // add tooltip div
-      var tooltip = container.selectAll(".tooltip").data([0])
-        .enter().append('div')
-          .attr("class", "tooltip")               
-          .style("opacity", 0);
-
-
       // Generate the cols
       var cols = g.selectAll('.col').data(data);
       cols.enter().append('g')
@@ -445,6 +442,10 @@ function featureMatrixD3() {
               //colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
               colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
+              // If tooltip sits outside of the of the feature matrix, so make necessary adjustments
+              chart.adjustTooltipCoordinates()(colObject);
+
+
               dispatch.d3mouseover(colObject); 
 
 
@@ -563,6 +564,12 @@ function featureMatrixD3() {
     heightPercent = _;
     return chart;
   };
+
+  chart.adjustTooltipCoordinates = function(_) {
+    if (!arguments.length) return _adjustTooltipCoordinates;
+    _adjustTooltipCoordinates = _;
+    return chart;
+  }
   
   chart.x = function(_) {
     if (!arguments.length) return x;

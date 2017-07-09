@@ -1,164 +1,19 @@
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
-
-
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 var cacheHelper = new CacheHelper();
 cacheHelper.isolateSession();
 
 var genomeBuildHelper = new GenomeBuildHelper();
 
-var variantExporter = null;
-
-var geneObjects = {};
-var theTranscript = {transcript_id: 'ENST00000353383.1'};
-var theGene = {gene_name: 'RAI1', chr: 'chr17', start: 17584787, end: 17714767, strand: '+', transcripts: [theTranscript] };
-geneObjects['RAI1'] = theGene;
-
 var dataCard = new DataCard();
 dataCard.mode = 'trio';
 
+var geneObjects = {};
+var geneToTranscript = {};
+var geneToGeneCoverage = {};
 
+xdescribe('geneCoverage', function() {
 
-xdescribe('variantExporter', function() {
-
-
-	var bookmarkEntries = [
- 	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '17',start: 17698535	,end: 17698536	,ref: 'G'	,alt: 'A'	,gene: 'RAI1'	,transcript: 'ENST00000353383.1' ,   freebayesCalled: '',     isFavorite: false },
-	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '20',start: 30409363	,end: 30409364	,ref: 'A'	,alt: 'G'	,gene: 'MYLK2'	,transcript: 'ENST00000375994.2' ,   freebayesCalled: 'Y',    isFavorite: false},
-	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '22',start: 39636863	,end: 39636865	,ref: 'GCC'	,alt: 'G'	,gene: 'PDGFB'	,transcript: 'ENST00000331163.6' ,   freebayesCalled: '',     isFavorite: false},	
-	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}		
-	];
-
-	var validateRecs = [
-		{
-			chrom: 'chr17',
-			gene: 'RAI1',
-			transcript: 'ENST00000353383.1',
-			impact: 'HIGH',
-			highestImpact: '',
-			highestImpactInfo: '',
-			consequence: 'stop gained',
-			afExAC: '0',
-			af1000G: '0',
-			inheritance: 'recessive',
-			rsId: 'rs527236033',
-			clinvarClinSig: 'pathogenic',
-			clinvarPhenotype: 'smith-magenis syndrome',
-			HGVSc: 'ENST00000353383.1:c.2273G>A',
-			HGVSp: 'ENSP00000323074.4:p.Trp758Ter',
-			qual: '2880.99',
-			zygosityProband: 'HOM',
-			altCountProband: '38',
-			refCountProband: '1',
-			depthProband: '39',
-			zygosityMother: 'HET',
-			altCountMother: '26',
-			refCountMother: '25',
-			depthMother: '51',
-			zygosityFather: 'HET',
-			altCountFather: '30',
-			refCountFather: '33',
-			depthFather: '63'
-
-		},
-		{
-			chrom: 'chr20',
-			gene: 'MYLK2',
-			transcript: 'ENST00000375994.2',
-			impact: 'MODERATE',
-			highestImpact: '',
-			highestImpactInfo: '',
-			consequence: 'missense variant',
-			afExAC: '3.3e-05',
-			af1000G: '0',
-			inheritance: 'de novo',
-			rsId: 'rs193922712',
-			clinvarClinSig: 'likely pathogenic',
-			clinvarPhenotype: 'cardiomyopathy',
-			HGVSc: 'ENST00000375994.2:c.595A>G',
-			HGVSp: 'ENSP00000365162.2:p.Ile199Val',
-			qual: '8.46129',
-			zygosityProband: 'HET',
-			altCountProband: '10',
-			refCountProband: '39',
-			depthProband: '49',
-			zygosityMother: 'HOMREF',
-			altCountMother: '0',
-			refCountMother: '55',
-			depthMother: '55',
-			zygosityFather: 'HOMREF',
-			altCountFather: '0',
-			refCountFather: '45',
-			depthFather: '45'
-
-		},
-		{
-			chrom: 'chr22',
-			gene: 'PDGFB',
-			transcript: 'ENST00000331163.6',
-			type: 'del',
-			impact: 'MODIFIER',
-			highestImpact: 'HIGH',
-			highestImpactInfo: 'high frameshift_variant in ENST00000381551',
-			consequence: 'intron variant',
-			afExAC: '0',
-			af1000G: '0',
-			inheritance: 'de novo',
-			rsId: '',
-			clinvarClinSig: '',
-			clinvarPhenotype: '',
-			HGVSc: 'ENST00000331163.6:c.63+3041_63+3042delGG',
-			HGVSp: '',
-			qual: '58.9779',
-			zygosityProband: 'HET',
-			altCountProband: '10',
-			refCountProband: '35',
-			depthProband: '45',
-			zygosityMother: 'HOMREF',
-			altCountMother: '0',
-			refCountMother: '46',
-			depthMother: '46',
-			zygosityFather: 'HOMREF',
-			altCountFather: '0',
-			refCountFather: '46',
-			depthFather: '46'
-
-		},	
-		{
-			chrom: 'chrX',
-			gene: 'PDHA1',
-			transcript: 'ENST00000379806.5',
-			type: 'snp',
-			impact: 'MODERATE',
-			highestImpact: '',
-			highestImpactInfo: '',
-			consequence: 'missense variant',
-			afExAC: '0',
-			af1000G: '0',
-			inheritance: 'de novo',
-			rsId: '',
-			polyphen: 'probably damaging',
-			SIFT: 'deleterious',
-			clinvarClinSig: '',
-			clinvarPhenotype: '',
-			HGVSc: 'ENST00000379806.5:c.478G>T',
-			HGVSp: 'ENSP00000369134.5:p.Gly160Cys',
-			qual: '407.399',
-			zygosityProband: 'HET',
-			altCountProband: '27',
-			refCountProband: '76',
-			depthProband: '103',
-			zygosityMother: 'HOMREF',
-			altCountMother: '0',
-			refCountMother: '13',
-			depthMother: '13',
-			zygosityFather: 'HOMREF',
-			altCountFather: '0',
-			refCountFather: '42',
-			depthFather: '42'
-		}			
-	]
 
 	var speciesData = [
 	{"id":7,"name":"Human","binomialName":"Homo sapiens","latin_name":"homo_sapiens","genomeBuilds":[
@@ -186,8 +41,6 @@ xdescribe('variantExporter', function() {
 
 	];
 
-	var output = "";
-
 	var vcfUrl = {
 		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
@@ -206,18 +59,149 @@ xdescribe('variantExporter', function() {
 
 
 
+	var roundIt = function(num) {
+		return Math.round(num);
+	}
 
+	var pileupSummary = {total: 0, min: 999999, max: 0, mean: 0, count: 0};
+
+	var getGeneCoverageForGene = function(geneName, callback) {
+
+			promiseGetCachedGeneModel(geneName).then(function(theGeneObject) {
+
+				var theTranscript = getCanonicalTranscript(theGeneObject);
+				geneToTranscript[theGeneObject.gene_name] = theTranscript;
+				geneObjects[theGeneObject.gene_name] = theGeneObject;
+
+				promiseGetGeneCoverage(theGeneObject, theTranscript).then(function(geneCoverageAll) {
+					
+					var chrom = geneCoverageAll.proband[0].chrom;
+
+					getPileupCoverageForExons(chrom, geneCoverageAll.proband, 0, function() {
+						geneToGeneCoverage[theGeneObject.gene_name] = geneCoverageAll;
+						if (callback) {
+							callback();
+						}
+					});
+				})
+			});
+	}
+	
+	var getPileupCoverageForExons = function(chrom, geneCoverageExons, idx, callback) {
+
+		var exon = geneCoverageExons[idx];
+
+		if (exon.region == 'NA') {
+			if (callback) {
+				if (pileupSummary.min == 999999) {
+					pileupSummary.min = 0;
+				}
+				pileupSummary.mean = (pileupSummary.count > 0 ? pileupSummary.total/pileupSummary.count : 0);
+				exon.mpileup = pileupSummary;
+				callback(geneCoverageExons);
+			}
+		} else {
+			getProbandVariantCard().model.bam.getCoverageForRegion(chrom, exon.start, exon.end, [], 5000, false, function(coverageForRegion, coverageForPoints) {						
+				var total = 0;
+				var count = 0;
+				var min   = 999999;
+				var max   = 0;
+
+				// Zero fill if coverage is empty
+				if (coverageForRegion == null || coverageForRegion.length == 0) {
+					coverageForRegion = [];
+					for (var i = 0; i < exon.end-exon.start; i++) {
+						coverageForRegion.push([exon.start+i, 0])
+					}
+				}
+				coverageForRegion.forEach(function(cov) {
+					if (cov[0] >= exon.start && cov[0] <= exon.end) {
+						total += cov[1];
+						pileupSummary.total += cov[1];
+
+						// Keep track of lowest coverage (min)
+						if (cov[1] < min) {
+							min = cov[1];
+						}
+						if (cov[1] < pileupSummary.min) {
+							pileupSummary.min = cov[1];
+						}
+
+
+						// Keep track of highest coverage (max)
+						if (cov[1] > max) {
+							max = cov[1];
+						}
+						if (cov[1] > pileupSummary.max) {
+							pileupSummary.max = cov[1];
+						}
+
+						count++;
+						pileupSummary.count++;
+
+					}
+				})					
+				exon.mpileup = {min: (min == 999999 ? 0 : min), max: max, mean: (count > 0 ? total/count : 0)};
+				
+
+
+				idx++;
+				getPileupCoverageForExons(chrom, geneCoverageExons, idx, callback);
+			});
+		}
+
+
+	}
+
+	var evaluateGeneCoverageForGene = function(geneName) {
+		var theGeneCoverageAll = geneToGeneCoverage[geneName];
+		var theGeneObject = geneObjects[geneName];
+		var theTranscript = geneToTranscript[geneName];
+
+		expect(theGeneCoverageAll).not.toBeNull();
+		var geneCoverage = theGeneCoverageAll.proband;
+
+		expect(geneCoverage).not.toBeNull();
+
+		
+		var codingRegions = theTranscript.features.filter(function(feature) {
+			return feature.feature_type.toUpperCase() == 'CDS';
+		})
+		expect(Object.keys(geneCoverage).length).toEqual(codingRegions.length + 1);
+
+		geneCoverage.forEach(function(gc) {
+			
+			console.log(gc.id + " " 
+				+ (gc.region == 'NA' ? gc.region : (gc.start + "-" + gc.end)) 
+				+ "    sd="        + roundIt(gc.sd) 
+				+ "         mean=" + roundIt(gc.mean) 
+				+ " vs. "          + roundIt(gc.mpileup.mean) 
+				+                    (roundIt(Math.abs(gc.mean - gc.mpileup.mean)) > gc.sd ? "*" : " ")
+				+ "         min="  + roundIt(gc.min) 
+				+ " vs. "          + roundIt(gc.mpileup.min) 
+				+                    (roundIt(Math.abs(gc.min - gc.mpileup.min)) > gc.sd ? "*" : " ")
+				+ "         max="  + roundIt(gc.max) 
+				+ " vs. "          + roundIt(gc.mpileup.max)
+				+                    (roundIt(Math.abs(gc.max - gc.mpileup.max)) > gc.sd ? "*" : " "));
+
+
+		})
+	}
 
 
 
 	beforeEach(function(done) {
+
+		useSSL = false;
+
+		IOBIO.samtools                = DEV_IOBIO + "samtools/";
+		IOBIO.samtoolsOnDemand        = DEV_IOBIO + "od_samtools/";
+
 		genomeBuildHelper = new GenomeBuildHelper();
 		genomeBuildHelper.init(speciesData);
 		genomeBuildHelper.setCurrentSpecies("Human");
 		genomeBuildHelper.setCurrentBuild("GRCh37");
 
-
-		variantExporter = new VariantExporter();
 
 		if (getVariantCard('proband') == null) {
 			var model = new VariantModel();
@@ -264,104 +248,41 @@ xdescribe('variantExporter', function() {
 		});
 	});
 
-	describe('#exportBookmarkedVariantsCSV', function() {
+	describe('#verifyGeneCoverageAIRE', function() {
 		beforeEach(function(done) {
-			variantExporter.promiseExportVariants(bookmarkEntries, 'csv', Object.values(sample)).then(function(data) {
-				output = data;
+
+			getGeneCoverageForGene('AIRE', function() {
+				
 				done();
-			})
-		});
 
-		it('exports bookmarked variants as csv', function(done) {
-
-			expect(variantExporter).not.toBeNull();
-			expect(output).not.toBeNull();
-
-			var importRecords = VariantImporter.parseRecordsCSV(output);
-			expect(importRecords.length).toEqual(4);
-
-			for (var i = 0; i < validateRecs.length; i++) {
-				var importRec   = importRecords[i];
-				var validateRec = validateRecs[i];
-				for(var field in validateRec) {
-					expect(importRec[field]).toEqual(validateRec[field]);
-				}
-			}
-
-			done();
-		});
-	});
-
-	describe('#exportBookmarkedVariantsVCF', function() {
-		beforeEach(function(done) {
-			variantExporter.promiseExportVariants(bookmarkEntries, 'vcf', Object.values(sample)).then(function(data) {
-				output = data;
-				done();
-			})
-		});
-
-		it('exports bookmarked variants as vcf', function(done) {
-
-			expect(output).not.toBeNull();
-			var vcfRecs = [];
-			output.split("\n").forEach(function(vcfRec) {
-				if (vcfRec.indexOf("#") == 0) {
-
-				} else {
-					vcfRecs.push(vcfRec);
-				}
 			});
-			expect(vcfRecs.length).toEqual(4);
 
-			// Make sure that the vcf records imported match the
-			// import records for chrom, start, ref, and alt
-			var recs = [];
-			vcfRecs.forEach(function(vcfRec) {
-				var fields = vcfRec.split("\t");
-				var rec = {};
-				rec.chrom = fields[0];
-				rec.start = fields[1];
-				rec.ref = fields[3];
-				rec.alt = fields[4];
-				recs.push(rec);
-			})
-			for (var i = 0; i < recs.length; i++) {
-				var rec     = recs[i];
-				var importRec = bookmarkEntries[i];
-				expect(rec.chrom).toEqual(importRec.chrom);
-				expect(+rec.start).toEqual(importRec.start);
-				expect(rec.ref).toEqual(importRec.ref);
-				expect(rec.alt).toEqual(importRec.alt);
-			}
+		});
 
-			// Make sure that the IOBIO INFO field matches the expected export values
-			var infoRecs = [];
-			vcfRecs.forEach(function(vcfRec) {
-				var info = {};
-				vcfRec.split("\t")[7].split("IOBIO=")[1].split("|").forEach(function(tagValue) {
-					var tokens = tagValue.split("#");
-					var tag    = tokens[0];
-					var value  = tokens[1];
-					info[tag]  = value;
-				})
-				infoRecs.push(info);
-			})
-			for (var i = 0; i < infoRecs.length; i++) {
-				var infoRec     = infoRecs[i];
-				var validateRec = validateRecs[i];
-				for(var field in infoRec) {
-					infoRec[field] = infoRec[field] == null ? '' : infoRec[field];
-					// Interpret blank as '.'
-					if (validateRec[field] == '') {
-						validateRec[field] = '.';
-					}
-					if (validateRec.hasOwnProperty(field)) {
-						expect(infoRec[field].trim()).toEqual(validateRec[field]);
-					}
-				}
-			}
+		it('Evaluate gene coverage for gene AIRE', function(done) {
 
+			evaluateGeneCoverageForGene('AIRE');
 			done();
+
 		});
 	});
+
+
+	describe('#verifyGeneCoveragePDHA1', function() {
+		beforeEach(function(done) {
+
+			getGeneCoverageForGene('PDHA1', function() {
+				done();
+			});
+
+		});
+
+		it('Evaluate gene coverage for gene PDHA1', function(done) {
+
+			evaluateGeneCoverageForGene('PDHA1');
+			done();
+
+		});
+	});	
+
 });

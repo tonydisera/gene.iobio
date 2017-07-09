@@ -151,7 +151,7 @@
           </div>
           <div >
             <div id="vcf-chart-label" class="level-edu level-basic chart-label hide" 
-             style="margin-top: 4px;margin-bottom: -30px;">
+             style="margin-top: 4px;margin-bottom: -10px;">
               Variants loaded
             </div>
             <div id="vcf-variants">
@@ -160,25 +160,37 @@
       </div>
     </div>
 
-
-    <div id="zoom-region-chart"  class="track" style="clear:both;"></div>
-
-    <div id="gene-box" class="level-edu hide" >
-    </div>
-
     <div id="bam-track" class="track hide level-edu level-basic">
       <div class="track-chart">
 
       
           <div >
-            <div id="bam-chart-label" class="chart-label" style="visibility:hidden;margin-bottom:-20px;margin-left:15px;">Coverage
+
+            <div id="bam-chart-label" class="chart-label" style="visibility: visible; margin-bottom: -16px;">
+              
+              <span style="display: inline-block;vertical-align: top;">Coverage</span>
+              <i id="gene-badge-coverage-problem" class="hide material-icons glyph level-edu" 
+              style="display: inline-block;float: none;font-size: 17px;">
+                announcement
+              </i>
+              
             </div>
+
+
             <div id="bam-depth"  style="visibility:hidden">
             </div>
           </div>
 
       </div>
     </div>
+
+
+
+    <div id="zoom-region-chart"  class="track" style="clear:both;"></div>
+
+    <div id="gene-box" class="level-edu hide" >
+    </div>
+    
 
 
   

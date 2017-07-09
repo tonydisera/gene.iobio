@@ -100,7 +100,11 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 5,
 				loadedCount: 5, 
-				calledCount: 0
+				calledCount: 0,
+				harmfulVariantsInfo: [],
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -133,7 +137,11 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 5,
 				loadedCount: 5, 
-				calledCount: 0
+				calledCount: 0,				
+				harmfulVariantsInfo: [],
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -155,7 +163,11 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0
+				calledCount: 0,
+				harmfulVariantsInfo: [],
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -177,7 +189,11 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0
+				calledCount: 0,
+				harmfulVariantsInfo: [],
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false
 			});
 		});
 
@@ -200,7 +216,11 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0				
+				calledCount: 0,
+				harmfulVariantsInfo: [],
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false				
 			});
 		});
 
@@ -221,7 +241,11 @@ describe('variantModel', function() {
 				AF: {},
 				featureCount: 4,
 				loadedCount: 4, 
-				calledCount: 0	
+				calledCount: 0,
+				harmfulVariantsInfo: [],
+				failedFilter: false,
+				geneCoverageInfo: {},
+				geneCoverageProblem: false	
 			});
 		});
 
@@ -244,7 +268,11 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariantsInfo: [],
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false	
 				});
 			});
 		});
@@ -268,7 +296,11 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariantsInfo: [],
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false			
 				});
 			});
 		});
@@ -292,7 +324,11 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariantsInfo: [],
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false				
 				});
 			});
 		});
@@ -316,7 +352,11 @@ describe('variantModel', function() {
 					},
 					featureCount: 2,
 					loadedCount: 2, 
-					calledCount: 0	
+					calledCount: 0,
+					harmfulVariantsInfo: [],
+					failedFilter: false,
+					geneCoverageInfo: {},
+					geneCoverageProblem: false			
 				});
 			});
 		});
@@ -810,8 +850,8 @@ describe('variantModel', function() {
 			var variant_3 = { afExAC: -100 };
 			var vcfData = { features: [variant_1, variant_2, variant_3] };
 			variantModel._determineVariantAfLevels(vcfData, transcript);
-			expect(variant_1.afexaclevel).toEqual('afexac_rare');
-			expect(variant_1.afexaclevels).toEqual({ 'afexac_superrare': 'afexac_superrare', 'afexac_rare': 'afexac_rare'});
+			expect(variant_1.afexaclevel).toEqual('afexac_uncommon');
+			expect(variant_1.afexaclevels).toEqual({ 'afexac_superrare': 'afexac_superrare', 'afexac_rare': 'afexac_rare', 'afexac_uncommon': 'afexac_uncommon'});
 			expect(variant_2.afexaclevel).toEqual('afexac_uncommon');
 			expect(variant_2.afexaclevels).toEqual({ 'afexac_uncommon': 'afexac_uncommon' });
 			expect(variant_3.afexaclevel).toEqual('afexac_unique_nc');
@@ -825,16 +865,17 @@ describe('variantModel', function() {
 			var variant_3 = { af1000G: 0 };
 			var vcfData = { features: [variant_1, variant_2, variant_3] };
 			variantModel._determineVariantAfLevels(vcfData, transcript);
-			expect(variant_1.af1000glevel).toEqual('af1000g_rare');
-			expect(variant_1.af1000glevels).toEqual({ 'af1000g_superrare': 'af1000g_superrare', 'af1000g_rare': 'af1000g_rare'});
+			expect(variant_1.af1000glevel).toEqual('af1000g_uncommon');
+			expect(variant_1.af1000glevels).toEqual({ 'af1000g_superrare': 'af1000g_superrare', 'af1000g_rare': 'af1000g_rare', 'af1000g_uncommon': 'af1000g_uncommon'});
 			expect(variant_2.af1000glevel).toEqual('af1000g_uncommon');
 			expect(variant_2.af1000glevels).toEqual({ 'af1000g_uncommon': 'af1000g_uncommon' });
-			expect(variant_3.af1000glevel).toEqual('af1000g_rare');
+			expect(variant_3.af1000glevel).toEqual('af1000g_uncommon');
 			expect(variant_3.af1000glevels).toEqual({
 				'af1000g_unique': 'af1000g_unique',
 				'af1000g_uberrare': 'af1000g_uberrare',
 				'af1000g_superrare': 'af1000g_superrare',
-				'af1000g_rare': 'af1000g_rare'
+				'af1000g_rare': 'af1000g_rare',
+				'af1000g_uncommon': 'af1000g_uncommon',
 			});
 		});
 	});

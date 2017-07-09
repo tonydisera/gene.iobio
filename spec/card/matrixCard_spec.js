@@ -540,10 +540,10 @@ describe('MatrixCard', function() {
 			var options = { cellSize: 22};
 			mc.showRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect(useElem.attr('xlink:href')).toEqual('#recessive-symbol');
-			expect(useElem.attr('width')).toEqual('24');
-			expect(useElem.attr('height')).toEqual('24');
+			expect(useElem.attr('width')).toEqual('19');
+			expect(useElem.attr('height')).toEqual('19');
 			expect(useElem.style('pointer-events')).toEqual('none');
 		});
 
@@ -560,9 +560,9 @@ describe('MatrixCard', function() {
 			var options = {};
 			mc.showRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
-			expect(useElem.attr('width')).toEqual('20');
-			expect(useElem.attr('height')).toEqual('20');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
 		});
 	});
 
@@ -579,10 +579,10 @@ describe('MatrixCard', function() {
 			var options = { cellSize: 22 };
 			mc.showDeNovoSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(0,0)');
+			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect(useElem.attr('xlink:href')).toEqual('#denovo-symbol');
-			expect(useElem.attr('width')).toEqual('24');
-			expect(useElem.attr('height')).toEqual('24');
+			expect(useElem.attr('width')).toEqual('19');
+			expect(useElem.attr('height')).toEqual('19');
 			expect(useElem.style('pointer-events')).toEqual('none');
 		});
 
@@ -599,9 +599,9 @@ describe('MatrixCard', function() {
 			var options = {};
 			mc.showDeNovoSymbol(selection, options);
 			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(-1,0)');
-			expect(useElem.attr('width')).toEqual('20');
-			expect(useElem.attr('height')).toEqual('20');
+			expect($('#test g').attr('transform')).toEqual('translate(1,0)');
+			expect(useElem.attr('width')).toEqual('16');
+			expect(useElem.attr('height')).toEqual('16');
 		});
 	});
 
@@ -611,6 +611,7 @@ describe('MatrixCard', function() {
 		beforeEach(function() {
 			setFixtures('<div id="test"></div>');
 			selection = d3.select('#test');
+			selection.datum({ clazz: "affected" });
 			mc = new MatrixCard();
 		});
 
@@ -714,11 +715,11 @@ describe('MatrixCard', function() {
 			mc.showSibPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect($('#test g').attr('id')).toEqual('thumbs-green-symbol');
 			expect(useElem.attr('xlink:href')).toEqual('#thumbs-up-symbol');
 			expect(useElem.attr('width')).toEqual('16');
 			expect(useElem.attr('height')).toEqual('16');
 			expect(useElem.style('pointer-events')).toEqual('none');
-			expect(useElem.attr('fill')).toEqual('#81A966');
 		});
 
 		it('appends an svg symbol with the default attributes when sibling data is not all present', function() {
@@ -729,10 +730,10 @@ describe('MatrixCard', function() {
 			mc.showSibPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
+			expect($('#test g').attr('id')).toEqual('thumbs-grey-symbol');
 			expect(useElem.attr('xlink:href')).toEqual('#question-mark-symbol');
 			expect(useElem.attr('width')).toEqual('16');
 			expect(useElem.attr('height')).toEqual('16');
-			expect(useElem.attr('fill')).toEqual('#8b8b8b');
 		});
 	});
 

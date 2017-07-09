@@ -2,6 +2,8 @@ var filter = {
   clinvarPath: '//div[@id="filter-track"]//*[local-name()="svg" and @class="clinvar" and @id="clinvar_path"]',
   clinvarPathClicked: '//div[@id="filter-track"]//*[local-name()="svg" and contains(@class,"clinvar") and contains(@class, "current") and @id="clinvar_path"]',
 
+  recfilterUnassigned:    '//div[@id="filter-track"]//*[local-name()="svg" and @class="recfilter" and @id="unassigned"]',
+
   inheritanceDenovo:    '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="denovo"]',
   inheritanceRecessive: '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="recessive"]',
   
@@ -53,6 +55,11 @@ module.exports = {
     clickEffect: function() {
       return this.click('@effect');
     },
+
+    clickRecfilterUnassigned: function() {
+      return this.api.useXpath().moveToElement(filter.recfilterUnassigned, 1,1).click(filter.recfilterUnassigned);
+    },
+
 
     clickClinvarPath: function() {
       return this.api.useXpath().moveToElement(filter.clinvarPath, 1,1).click(filter.clinvarPath);
@@ -213,6 +220,23 @@ module.exports = {
           self.assert.equal(result.value, calledCount);
         })        
       }
+    },
+
+    clickLowCoverage: function() {
+      return this.click('@lowCoverage');
+    },
+    assertLowCoverageCounts: function(analyzedCount, calledCount) {
+      var self = this;
+      if (analyzedCount) {
+        this.getText('@lowCoverageAnalyzedCount', function(result) {
+          self.assert.equal(result.value, analyzedCount);
+        })        
+      }
+      if (calledCount) {
+        this.getText('@lowCoverageCalledCount', function(result) {
+          self.assert.equal(result.value, calledCount);
+        })        
+      }
     }
 
   }],
@@ -242,6 +266,9 @@ module.exports = {
     highOrModerateImpactAnalyzedCount: { selector: '//*[@id="button-high-or-moderate-impact"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
     highOrModerateImpactCalledCount:   { selector: '//*[@id="button-high-or-moderate-impact"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' },
 
+    lowCoverage:              { selector: '//*[@id="button-low-coverage"]', locateStrategy: 'xpath' },
+    lowCoverageAnalyzedCount: { selector: '//*[@id="button-low-coverage"]/following-sibling::span/div[@id="loaded-variant-count"]', locateStrategy: 'xpath' },
+    lowCoverageCalledCount:   { selector: '//*[@id="button-low-coverage"]/following-sibling::span/div[@id="called-variant-count"]', locateStrategy: 'xpath' }
 
   }
 };

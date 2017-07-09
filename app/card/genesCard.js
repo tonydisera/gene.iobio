@@ -9,6 +9,25 @@
 	this.geneNameLoading = null;
 	this.sortedGeneNames = null;
 	this.legend = null;
+
+	this.LOW_COVERAGE_OPTION    = "insufficient coverage";
+	this.HARMFUL_VARIANTS_OPTION = "harmful variants";
+
+	this.geneSortOptions = [
+	    	{value: this.HARMFUL_VARIANTS_OPTION,  disabled: false},
+	    	{value: this.LOW_COVERAGE_OPTION,      disabled: false}, 
+	    	{value: "gene name",                   disabled: false},
+	    	{value: "(original order)",            disabled: false}
+	];
+	this.geneSortIcons = {};
+	this.geneSortIcons[this.HARMFUL_VARIANTS_OPTION] = '<svg id="gene-badge-harmful-variant" width="15" height="14" class="glyph dropdown-item">'
+							 + '<g transform="translate(0,1)">'
+							 + '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="13" height="13" style="pointer-events: none; fill: rgb(173, 73, 74);">'
+							 + '</use>'
+							 + '</g>'
+							 + '</svg>';
+	this.geneSortIcons[this.LOW_COVERAGE_OPTION] = '<i id="gene-badge-coverage-problem" class="dropdown-item material-icons glyph" >error</i>';
+
 }
 
 GenesCard.prototype.split = function( val )  {
@@ -39,17 +58,47 @@ GenesCard.prototype.init = function() {
          me._goToPage(pageNumber, me.getGeneNames());
     });
 
-    
+
+
 	$('#select-gene-sort').selectize({
 	    valueField: 'value',
 	    labelField: 'value',
 	    searchField: 'value',
-	    create: true
+	    disabledField: 'disabled',
+	    create: true,
+	    options: me.geneSortOptions,
+	    items: [
+	       me.HARMFUL_VARIANTS_OPTION
+	    ],
+	    render: {
+			option: function(data, escape) {
+				var clazz = 'option';
+				var style = "";
+				if (data.hasOwnProperty("disabled") && data.disabled) {
+					clazz += ' disabled';
+					style =  'pointer-events:none;opacity: 0.5;'
+				} 
+				var option = '<div class="' + clazz + '" style="' + style + '">'; 
+				option    += me.geneSortIcons.hasOwnProperty(data.value) ? me.geneSortIcons[data.value] : '';
+				option    += '<span>' + escape(data.value) + '</span>' 
+				option    += '</div>';
+				return option;
+			},
+			item: function(data, escape) {
+				var clazz = 'option';
+				var style = "";
+				if (data.hasOwnProperty("disabled") && data.disabled) {
+					clazz += ' disabled';
+					style =  'pointer-events:none;opacity: 0.5;'
+				} 
+				var item = '<div class="' + clazz + '" style="' + style + '">'; 
+				item    += me.geneSortIcons.hasOwnProperty(data.value) ? me.geneSortIcons[data.value] : '';
+				item    += '<span>' + escape(data.value) + '</span>' 
+				item    += '</div>';
+				return item;
+			}
+		}
 	});
-	$('#select-gene-sort')[0].selectize.addOption({value:"relevance"});
-	$('#select-gene-sort')[0].selectize.setValue("relevance");
-	$('#select-gene-sort')[0].selectize.addOption({value: "gene name"});
-	$('#select-gene-sort')[0].selectize.addOption({value:"(original order)"});
 	$('#select-gene-sort')[0].selectize.on('item_add', function(selectedValue) {
 		me.sortGenes(selectedValue);
 	});
@@ -181,6 +230,15 @@ GenesCard.prototype.init = function() {
 
 }
 
+GenesCard.prototype.disableGeneSortOption = function(name, disable) {
+	this.geneSortOptions.forEach(function(option) {
+		if (option.value == name) {
+			option.disabled = disable;
+			$('#select-gene-sort')[0].selectize.updateOption(name, option);
+		}
+	})
+}
+
 GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 	if (hideAll) {
 		$('#call-variants-dropdown').addClass("hide");
@@ -189,16 +247,34 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 
 		if (isAlignmentsOnly()) {
 			$("#call-variants-dropdown").removeClass("hide");
+			$("#call-variants-dropdown a").removeClass("disabled");
 			$("#analyze-all-genes").addClass("hide");
 			$("#analyzed-progress-bar").removeClass("no-alignments");
+
+			$("#coverage-thresholds").removeClass("hide");
+			$("#button-low-coverage").removeClass("disabled");
+			this.disableGeneSortOption(this.LOW_COVERAGE_OPTION, false);
+
 		} else {
 			$("#analyze-all-genes").removeClass("hide");
 			if (getProbandVariantCard().isBamLoaded()) {
-				$("#call-variants-dropdown").removeClass("hide");	
+				$("#call-variants-dropdown").removeClass("hide");
+				$("#call-variants-dropdown a").removeClass("disabled");	
 				$("#analyzed-progress-bar").removeClass("no-alignments");	
+
+				$("#coverage-thresholds").removeClass("hide");
+				$("#button-low-coverage").removeClass("disabled");
+				this.disableGeneSortOption(this.LOW_COVERAGE_OPTION, false);
+
 			} else {
-				$("#call-variants-dropdown").addClass("hide");		
+				$("#call-variants-dropdown").removeClass("hide");
+				$("#call-variants-dropdown a").addClass("disabled");		
 				$("#analyzed-progress-bar").addClass("no-alignments");
+
+				$("#coverage-thresholds").addClass("hide");
+				$("#button-low-coverage").addClass("disabled");
+				this.disableGeneSortOption(this.LOW_COVERAGE_OPTION, true);
+
 			}
 		}		
 	}
@@ -206,16 +282,24 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 
 }
 
-GenesCard.prototype.sortGenes = function(sortBy) {
+GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 	this.sortedGeneNames = null;
 	if (sortBy == null) {
 		sortBy = $('#select-gene-sort')[0].selectize.getValue();
+		if (sortBy == "") {
+			// If the dropdown is empty, set to 'harmful variants'
+			$('#select-gene-sort')[0].selectize.setValue(this.HARMFUL_VARIANTS_OPTION);
+			sortBy = this.HARMFUL_VARIANTS_OPTION;
+		}
+	} else if (setDropdown) {
+		$('#select-gene-sort')[0].selectize.setValue(sortBy);
 	}
 	if (sortBy.indexOf("gene name") >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort();
-	}
-	else if (sortBy.indexOf("relevance") >= 0) {
+	} else if (sortBy.indexOf(this.HARMFUL_VARIANTS_OPTION) >= 0) {
 		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummary);
+	} else if (sortBy.indexOf(this.LOW_COVERAGE_OPTION) >= 0) {
+		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummaryByLowCoverage);
 	}
 	this._initPaging(this.sortedGeneNames, true);
 }
@@ -338,6 +422,38 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	return 0;
 }
 
+
+GenesCard.prototype.compareDangerSummaryByLowCoverage = function(geneName1, geneName2) {
+	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
+	var danger2 = getProbandVariantCard().getDangerSummaryForGene(geneName2);
+
+	if (danger1 == null && danger2 == null) {
+		return 0;
+	} else if (danger2 == null) {
+		return -1;
+	} else if (danger1 == null) {
+		return 1;
+	}
+
+	geneCoverageProblem1 = danger1.geneCoverageProblem ? danger1.geneCoverageProblem : false;
+	geneCoverageProblem2 = danger2.geneCoverageProblem ? danger2.geneCoverageProblem : false;
+
+
+	if (geneCoverageProblem1 == geneCoverageProblem2) {
+		if (geneName1 < geneName2) {
+			return -1;
+		} else if (geneName2 < geneName1) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else if (geneCoverageProblem1) {
+		return -1;
+	} else if (geneCoverageProblem2) {
+		return 1;
+	}
+
+}
 
 
 GenesCard.prototype.initCopyPasteGenes = function() {
@@ -696,6 +812,36 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
    	} else {
 		this._getPhenolyzerGenesAdvanced(phenolyzerServer + '?term=' + searchTerms);
    	}
+
+
+}
+
+GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
+	var me = this;
+
+	if (!isLevelEdu && !isLevelBasic && window.geneNames.length > 0) {
+		alertify.confirm("",
+			"There are " + window.geneNames.length  + " genes already listed.  Do you want to keep these genes?",
+			function (e) {
+				// user clicked "keep genes"
+		        me._getPhenolyzerGenesAdvancedImpl(url);
+				alertify.defaults.glossary.ok = 'OK';
+				alertify.defaults.glossary.cancel = 'Cancel';
+			},
+			function() {
+				// user clicked 'remove genes'.
+		        me._clearGenesImpl();
+		        me._getPhenolyzerGenesAdvancedImpl(url);
+				alertify.defaults.glossary.ok = 'OK';
+				alertify.defaults.glossary.cancel = 'Cancel';
+			}
+
+		).set('labels', {ok:'Keep genes', cancel:'Remove genes'});   				
+	} else {
+		me._getPhenolyzerGenesAdvancedImpl(url);
+	}
+
+
 }
 
 
@@ -704,7 +850,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 *  for Phenolyzer, built on Amazon's distributed hash tables (Dynamo)
 *  and Message queuing service.
 */
-GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
+GenesCard.prototype._getPhenolyzerGenesAdvancedImpl = function(url) {
 	var me = this;
 
 	$.ajax({
@@ -712,7 +858,6 @@ GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
 		    type: "GET",
 		    dataType: "json",
 		    success: function( data ) {
-
 			 	if (data == "") {
 					me.showGenesSlideLeft();
 					$('.phenolyzer.loader').addClass("hide");
@@ -1028,7 +1173,7 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
 
 }
 
-GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
+GenesCard.prototype.removeGeneBadgeByName = function(theGeneName, performPaging=true, updateAnalyzedCounts=true) {
 	var me = this;
 
 
@@ -1040,7 +1185,7 @@ GenesCard.prototype.removeGeneBadgeByName = function(theGeneName) {
 		me._onGeneBadgeUpdate();
 	}
 
-	me._removeGeneHousekeeping(theGeneName);
+	me._removeGeneHousekeeping(theGeneName, performPaging, updateAnalyzedCounts);
 
 }
 
@@ -1080,7 +1225,7 @@ GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPagin
 	me.clearGeneInfo(theGeneName);
 
 	if (performPaging) {
-		me._initPaging(geneNames);
+		me.sortGenes();
 	}
 	
 	if (updateAnalyzedCounts) {
@@ -1097,7 +1242,7 @@ GenesCard.prototype._hideCurrentGene = function() {
 }
 
 
-GenesCard.prototype.clearGenes = function() {
+GenesCard.prototype.clearGenes = function(callbackOk, callbackCancel) {
 	var me = this;
 	// confirm dialog
 	alertify.defaults.glossary.ok = 'OK';
@@ -1107,9 +1252,15 @@ GenesCard.prototype.clearGenes = function() {
 		function (e) {
 			// user clicked "ok"
 	        me._clearGenesImpl();
+	        if (callbackOk) {
+	        	callbackOk();
+	        }
 		},
 		function() {
 			// user clicked cancel.
+	        if (callbackCancel) {
+	        	callbackCancel();
+	        }
 		}
 
 	).set('labels', {ok:'OK', cancel:'Cancel'});   		
@@ -1127,12 +1278,19 @@ GenesCard.prototype._clearGenesImpl = function() {
 
 		me._removeGeneHousekeeping(theGeneName, false, false);
 	};
+	window.gene = null;
+	window.selectedTranscript = null;
+	me._hideCurrentGene();
+
 	me._onGeneBadgeUpdate();
 	me._initPaging(geneNames);
-	readjustCards();
-	cacheHelper.showAnalyzeAllProgress(true);
+//	readjustCards();
 
-	me._hideCurrentGene();
+	filterCard.clearFilters();
+	filterVariants();
+	filterCard.resetStandardFilterCounts();
+
+	cacheHelper.hideAnalyzeAllProgress();
 }
 
 
@@ -1354,23 +1512,26 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 			options.CALLED = true;
 		}
 
-		if (theVcfData == null ) {
-			me.setGeneBadgeWarning(window.gene.gene_name, true);
-		} else if (theVcfData.features && theVcfData.features.length == 0) {
-			// There are 0 variants.  Summarize danger so that we know we have
-			// analyzed this gene
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options);
-			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
-		} else if (theVcfData.features && theVcfData.features.length > 0) {
-			var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
+		promiseGetGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverageAll) {
+
+			if (theVcfData == null ) {
+				me.setGeneBadgeWarning(window.gene.gene_name, true);
+			} else if (theVcfData.features && theVcfData.features.length == 0) {
+				// There are 0 variants.  Summarize danger so that we know we have
+				// analyzed this gene
+				var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll);
+				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+			} else if (theVcfData.features && theVcfData.features.length > 0) {
+				var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 
 
-			var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options);
-			me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+				var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll);
+				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 
-		}
+			}
+		});	
+
 	}
-	//bookmarkCard.refreshBookmarkList();
 }
 
 GenesCard.prototype.showGeneBadgeLoading = function(geneName) {
@@ -1458,6 +1619,9 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("called");
 	geneBadge.removeClass("has-called-variants");
 	geneBadge.removeClass("selected");
+	geneBadge.removeClass("has-coverage-problem");
+	geneBadge.removeClass("has-harmful-variant");
+	geneBadge.removeClass("failed-filter");
 }
 
 GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select) {
@@ -1498,6 +1662,11 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		geneBadge.addClass("warning");
 	}
 
+	geneBadge.removeClass("failed-filter");
+	if (dangerObject.failedFilter) {
+		geneBadge.addClass("failed-filter");
+	}
+
 	geneBadge.removeClass("called");
 	geneBadge.removeClass("has-called-variants");
 	if (dangerObject.CALLED && dangerObject.calledCount > 0) {
@@ -1506,9 +1675,146 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		geneBadge.addClass("called");
 	}
 
+	geneBadge.removeClass("has-coverage-problem");
+	if (dangerObject.geneCoverageProblem) {
+		geneBadge.addClass("has-coverage-problem");
+
+		var selection = d3.select(geneBadge.find('#gene-badge-coverage-problem')[0]).data([{ 'geneCoverageInfo': dangerObject.geneCoverageInfo }]);
+		selection.on("mouseover", function(d,i) {
+			if (d && d.hasOwnProperty("geneCoverageInfo") && Object.keys(d.geneCoverageInfo).length > 0) {
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				var message = "";
+				// There are many exons with low coverage.  Just show number of low coverage exons per sample.
+				var counts = {'proband': 0, 'mother': 0, 'father': 0};
+				for (exon in d.geneCoverageInfo) {
+					for (rel in d.geneCoverageInfo[exon]) {
+						if (rel) {
+							counts[rel]++;
+						}
+					}
+				}
+				for (var rel in counts) {
+					if (counts[rel]) {
+						if (message.length > 0) {
+							message += ", ";
+						} else {
+							message += 'Gene ' + geneName + "<br>";
+							message += "Insufficient coverage in "
+						}
+						message += counts[rel] + (counts[rel] == 1 ? " exon" : " exons") + " for " + rel;
+					}
+				}
+				me.showTooltip(message, x, y, 330);
+			}
+		})
+		.on("mouseout", function(d,i) {
+			me.hideTooltip();
+		});		
+	}
+
 
 	// Indicate if gene has a bookmared variants
 	me._setBookmarkBadge(geneName);
+
+	geneBadge.removeClass("has-harmful-variant");
+
+
+	if (dangerObject.harmfulVariantsInfo && dangerObject.harmfulVariantsInfo.length > 0) {
+		geneBadge.addClass("has-harmful-variant");		
+
+
+		var selection = d3.select(geneBadge.find('#gene-badge-harmful-variant')[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
+		selection.on("mouseover", function(d,i) {
+			if (d && d.hasOwnProperty("harmfulVariantsInfo") && d.harmfulVariantsInfo.length > 0) {
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				var message = "";				
+				d.harmfulVariantsInfo.forEach(function(variantInfo) {
+					if (message.length == 0) {
+						message += 'Gene ' + geneName + "<br>";
+					} 
+					message += "<div style='display:table'>"
+					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
+					        +  "<div style='display:table-cell;margin-left:6px'>" + "Contains ";
+
+					var desc = "";
+					var inherit = "";
+					if (variantInfo.clinvar) {
+						desc = variantInfo.clinvar + " ClinVar";
+					} else if (variantInfo.sift || variantInfo.polyphen) {
+						if (variantInfo.sift) {
+							desc = variantInfo.sift  + " SIFT";
+						}
+						if (variantInfo.polyphen) {
+							if (desc.length > 0) {
+								desc += ", ";
+							}
+							desc = variantInfo.polyphen  + " PolyPhen";
+						}
+					} else if (variantInfo.impact) {
+						desc  += variantInfo.impact + " VEP impact";
+					}
+					if (variantInfo.inheritance) {
+						if (variantInfo.inheritance == 'denovo') {
+							variantInfo.inheritance = 'de novo';
+						}
+						inherit += matrixCard.getInheritanceLabel(inheritance) + " ";
+						
+					}	
+
+					message += inherit + desc + " variant.</div></div>"
+				});
+				me.showTooltip(message, x, y, 350);
+			}
+		})
+		.on("mouseout", function(d,i) {
+			me.hideTooltip();
+		});		
+
+		if (SHOW_INHERITANCE_GLYPH_FOR_GENE) {
+			var harmfulVariantInheritance = {};
+			dangerObject.harmfulVariantsInfo.forEach(function(variantInfo) {
+				if (variantInfo.hasOwnProperty("inheritance") && variantInfo.inheritance) {
+					harmfulVariantInheritance[variantInfo.inheritance] = true;
+				}
+			})
+			if (Object.keys(harmfulVariantInheritance).length > 0) {
+
+				var symbolIndex = 0;
+				for (var inheritance in harmfulVariantInheritance) {
+					var symbolFunction = matrixCard.inheritanceMap[inheritance].symbolFunction;
+					var inheritanceDisplay = matrixCard.getInheritanceLabel(inheritance)
+					geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
+					var options = {width:15, height:15, transform: 'translate(0,0)'};
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: inheritance, display: inheritanceDisplay}]);
+					symbolFunction(selection, options);
+					symbolIndex++;
+					selection.on("mouseover", function(d,i) {
+						var x = d3.event.pageX;
+						var y = d3.event.pageY;
+						me.showTooltip(d.display + " inheritance mode", x, y, 170);
+					})
+					.on("mouseout", function(d,i) {
+							me.hideTooltip();
+					});
+
+				}
+			}		
+
+		}
+
+	}
+
+
+
+
+
+
+	readjustCards();
+}
+
+GenesCard.prototype._setGeneBadgeDetailedGlyphs = function(geneBadge, dangerObject) {
 
 	// Now set danger badges
 	if (dangerObject.CLINVAR) {
@@ -1680,7 +1986,6 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 		}
 	}
 
-	readjustCards();
 }
 
 GenesCard.prototype.selectGeneBadge = function(badgeElement) {
@@ -1888,7 +2193,8 @@ GenesCard.prototype.showGenesSlideLeft = function() {
 
 }
 
-GenesCard.prototype.selectPhenolyzerGeneRange = function() {
+
+GenesCard.prototype.selectPhenolyzerGeneRange = function(addGenes=true) {
 	var start = 0;
 	var end   = +$('#phenolyzer-select-range-end').val();
 
@@ -1913,19 +2219,24 @@ GenesCard.prototype.selectPhenolyzerGeneRange = function() {
 	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 	this.geneBarChart(selection, {shadowOnHover:false});
 
-	this.refreshSelectedPhenolyzerGenes();
+	if (addGenes) {
+		this.refreshSelectedPhenolyzerGenes();
+	}
 }
 
 GenesCard.prototype.deselectPhenolyzerGenes = function() {
 	var me = this;
 	for (var i = 0; i < phenolyzerGenes.length; i++) {
 		if (phenolyzerGenes[i].selected) {
-			me.removeGeneBadgeByName(phenolyzerGenes[i].geneName);
+			me.removeGeneBadgeByName(phenolyzerGenes[i].geneName, false, false);
 		}
 		phenolyzerGenes[i].selected = false;
 	}
 	var selection = d3.select('#phenolyzer-results').data([phenolyzerGenes]);
 	this.geneBarChart(selection, {shadowOnHover:false});
+
+	me.sortGenes();
+	
 
 }
 

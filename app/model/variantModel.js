@@ -11,6 +11,7 @@ function VariantModel() {
 	this.vcfUrlEntered = false;
 	this.vcfFileOpened = false;
 	this.getVcfRefName = null;
+	this.isMultiSample = false;
 
 	this.bamUrlEntered = false;
 	this.bamFileOpened = false;
@@ -48,7 +49,7 @@ VariantModel.prototype.isLoaded = function() {
 
 
 VariantModel.prototype.isReadyToLoad = function() {
-	return this.isVcfReadyToLoad() || this.isBamReadyToLoad();
+	return (this.isVcfReadyToLoad() && this.isSampleSelected()) || this.isBamReadyToLoad();
 }
 
 VariantModel.prototype.isBamReadyToLoad = function() {
@@ -57,6 +58,10 @@ VariantModel.prototype.isBamReadyToLoad = function() {
 
 VariantModel.prototype.isVcfReadyToLoad = function() {
 	return this.vcf != null && (this.vcfUrlEntered || this.vcfFileOpened);
+}
+
+VariantModel.prototype.isSampleSelected = function() {
+	return !this.isMultiSample || (this.sampleName && this.sampleName.length > 0);
 }
 
 
@@ -104,25 +109,127 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 			var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
 			var dangerSummary = me.getDangerSummaryForGene(geneObject.gene_name);
 			if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
-				theFbData = $.extend({}, theVcfData);
-				theFbData.features = [];
-				theFbData.loadState = {clinvar: true, coverage: true, inheritance: true};
-				// Add the unique freebayes variants to vcf data to include 
-				// in feature matrix
-				theVcfData.features.forEach( function(v) {
-					if (v.hasOwnProperty('fbCalled') && v.fbCalled == 'Y') {
-						var variantObject = $.extend({}, v);
-				   		theFbData.features.push(variantObject);
-				   		variantObject.source = v;
-					}
-			   	});					
+				theFbData = me.reconstituteFbData(theVcfData);
 			}
-
 		} 
 	}
 	return theFbData;
 
 }
+
+VariantModel.prototype.reconstituteFbData = function(theVcfData) {
+	var me = this;
+	var theFbData = $.extend({}, theVcfData);
+	theFbData.features = [];
+	theFbData.loadState = {clinvar: true, coverage: true, inheritance: true};
+	// Add the unique freebayes variants to vcf data to include 
+	// in feature matrix
+	theVcfData.features.forEach( function(v) {
+		if (v.hasOwnProperty('fbCalled') && v.fbCalled == 'Y') {
+			var variantObject = $.extend({}, v);
+	   		theFbData.features.push(variantObject);
+	   		variantObject.source = v;
+		}
+   	});	
+   	return theFbData;				
+}
+
+
+
+
+VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+		var cachedGeneCoverage = me.getGeneCoverageForGene(geneObject, transcript);
+		if (cachedGeneCoverage) {
+			resolve(cachedGeneCoverage)
+		} else {
+			me.bam.getGeneCoverage(geneObject, 
+				transcript,
+				[me.bam],	
+				function(theData, trRefName, theGeneObject, theTranscript) {
+					var geneCoverageObjects = me._parseGeneCoverage(theData);
+					if (geneCoverageObjects.length > 0) {
+						me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
+						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
+						resolve(geneCoverageObjects)
+					} else {
+						console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+						resolve([]);
+					}
+				}	
+			);
+		}
+
+	});
+}
+
+VariantModel.prototype._setGeneCoverageExonNumbers = function(transcript, geneCoverageObjects) {
+	var me = this;
+	transcript.features.forEach(function(feature) {
+		var gc = null;
+		var matchingFeatureCoverage = geneCoverageObjects.filter(function(gc) {
+			return feature.start == gc.start && feature.end == gc.end;
+		});
+		if (matchingFeatureCoverage.length > 0) {
+			gc = matchingFeatureCoverage[0];
+		}
+		if (gc) {
+			gc.exon_number = feature.exon_number;
+		}
+
+	});
+}
+
+VariantModel.prototype._parseGeneCoverage = function(theData) {
+	var geneCoverageObjects = [];
+	if (theData && theData.length > 0) {
+		var fieldNames = [];
+		theData.split("\n").forEach(function(rec) {
+			if (rec.indexOf("#") == 0 && fieldNames.length == 0) {
+				rec.split("\t").forEach(function(field) {
+					if (field.indexOf("#") == 0) {
+						field = field.substring(1);
+					}
+					fieldNames.push(field);
+				})
+			} else {
+				var fields = rec.split("\t");
+				if (fields.length == fieldNames.length) {
+					var gc = {};
+					for (var i = 0; i < fieldNames.length; i++) {
+						gc[fieldNames[i]] = fields[i];
+						if (fieldNames[i] == 'region') {
+							if (fields[i] != "NA") {
+								var parts  = fields[i].split(":");
+								gc.chrom   = parts[0];
+								var region = parts[1].split("-");
+								gc.start   = region[0];
+								gc.end     = region[1];											
+							} 
+						}
+					}
+					geneCoverageObjects.push(gc);
+				}
+			}
+		})		
+	}
+
+	return geneCoverageObjects;
+}
+
+VariantModel.prototype.getGeneCoverageForGene = function(geneObject, selectedTranscript) {
+	var geneCoverage = this._getCachedData("geneCoverage", geneObject.gene_name, selectedTranscript);
+	return geneCoverage;
+}
+
+VariantModel.prototype.setGeneCoverageForGene = function(geneCoverage, geneObject, transcript) {
+	geneObject = geneObject ? geneObject : window.gene;
+	transcript = transcript ? transcript : window.selectedTranscript;
+	this._cacheData(geneCoverage, "geneCoverage", geneObject.gene_name, transcript);
+}
+
 
 VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
 	var me = this;
@@ -212,15 +319,21 @@ VariantModel.prototype.getVariantCount = function(data) {
 	return loadedVariantCount;
 }
 
-VariantModel.summarizeDanger = function(theVcfData, options = {}) {
+VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAll) {
+
 	var dangerCounts = $().extend({}, options);
+	VariantModel.summarizeDangerForGeneCoverage(dangerCounts, geneCoverageAll);
+
 	if (theVcfData == null ) {
 		console.log("unable to summarize danger due to null data");
 		dangerCounts.error = "unable to summarize danger due to null data";
 		return dangerCounts;
-	} else if (theVcfData.features.length == 0) {		
+	} else if (theVcfData.features.length == 0) {	
+		dangerCounts.failedFilter = filterCard.hasFilters();
 		return dangerCounts;		
 	}
+
+
 	var siftClasses = {};
 	var polyphenClasses = {};
 	var clinvarClasses = {};
@@ -230,9 +343,12 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 	var afClazz = null;
 	var afField = null;
 	var lowestAf = 999;
+	dangerCounts.harmfulVariantsInfo = [];
 
 
 	theVcfData.features.forEach( function(variant) {
+
+		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
 
 	    for (key in variant.highestImpactSnpeff) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
@@ -245,6 +361,9 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
 	    		consequenceClasses[key] = consequenceClasses[key] || {};
 	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
+	    		if (key == 'HIGH' || key == 'MODERATE') {
+	    			variantDanger.impact = key.toLowerCase();
+	    		}
 	    	}
 	    }
 
@@ -254,6 +373,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 					dangerCounts.SIFT = {};
 					dangerCounts.SIFT[clazz] = {};
 					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
+					variantDanger.sift = key.split("_").join(" ").toLowerCase();
 				}
 	    }
 
@@ -263,6 +383,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 					dangerCounts.POLYPHEN = {};
 					dangerCounts.POLYPHEN[clazz] = {};
 					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();;
+;
 	    	}
 	    }
 
@@ -270,6 +392,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 	    	for (key in variant.clinVarClinicalSignificance) {
 		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
 						clinvarClasses[key] = matrixCard.clinvarMap[key];
+						variantDanger.clinvar = key.split("_").join(" ").toLowerCase();;
 		    	}
 	    	}
 	    }
@@ -277,6 +400,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 	    if (variant.inheritance && variant.inheritance != 'none') {
 	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 	    	inheritanceClasses[clazz] = variant.inheritance;
+	    	variantDanger.inheritance = true;
 	    }
 
 
@@ -288,6 +412,11 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 						lowestAf = rangeEntry.value;
 						afClazz = rangeEntry.clazz;
 						afField = af;
+						afBadge = rangeEntry.badge;
+					}
+					if (rangeEntry.badge) {
+						variantDanger.af = +variant[af];
+						variantDanger.meetsAf = true;
 					}
 				}
 			});
@@ -316,6 +445,18 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 		}
 		if (af && afMap) {
 			evaluateAf(af, afMap);
+		}
+
+		// Turn on flag for harmful variant if one is found
+		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
+			var info = {'type'       : variant.type,
+			            'clinvar'    : variantDanger.clinvar, 
+			            'polyphen'   : variantDanger.polyphen,
+			            'SIFT'       : variantDanger.sift,
+				        'impact'     : variantDanger.impact, 
+			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false
+			           };
+			dangerCounts.harmfulVariantsInfo.push(info);
 		}
 	});
 
@@ -376,8 +517,71 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}) {
 			return d.hasOwnProperty("fbCalled") && d.fbCalled == 'Y';
 		}
 	}).length;
+
+	// Indicate if the gene pass the filter (if applicable)
+	dangerCounts.failedFilter = filterCard.hasFilters() && dangerCounts.featureCount == 0;
 		
 	return dangerCounts;
+}
+
+VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, clearOtherDanger=false, refreshOnly=false) {
+	dangerObject.geneCoverageInfo = {};
+	dangerObject.geneCoverageProblem = false;
+
+	if (geneCoverageAll && Object.keys(geneCoverageAll).length > 0) {
+		for (relationship in geneCoverageAll) {
+			var geneCoverage = geneCoverageAll[relationship];
+			if (geneCoverage) {
+				geneCoverage.forEach(function(gc) {
+					if (gc.region != 'NA') {
+						if (filterCard.isLowCoverage(gc)) {
+							dangerObject.geneCoverageProblem = true;
+
+
+							// build up the geneCoveragerInfo to show exon numbers with low coverage
+							// and for which samples 
+							//   example:  {'Exon 1/10': {'proband'}, 'Exon 9/10': {'proband', 'mother'}}
+							var exon = null;
+							if (gc.exon_number) {
+								exon =  +gc.exon_number.split("\/")[0];
+							} else {
+								exon = +gc.id;
+							}
+							if (dangerObject.geneCoverageInfo[exon] == null) {
+								dangerObject.geneCoverageInfo[exon] = {};
+							}
+							dangerObject.geneCoverageInfo[exon][relationship] = true;
+						}
+
+					}
+				})				
+			}
+		}
+
+	} else if (geneCoverageAll) {
+		console.log("no geneCoverage to summarize danger");
+		showStackTrace(new Error());
+	}
+
+	// When we are just showing gene badges for low coverage and not reporting on status of
+	// filtered variants, clear out the all of the danger summary object related to variants
+	if (clearOtherDanger) {
+		dangerObject.CONSEQUENCE = {};
+		dangerObject.IMPACT = {};
+		dangerObject.CLINVAR = {};
+		dangerObject.INHERITANCE = {};
+		dangerObject.AF = {};
+		dangerObject.featureCount = 0;
+		dangerObject.loadedCount  = 0;
+		dangerObject.calledCount  = 0;
+		dangerObject.harmfulVariantsInfo = [];
+		// If a gene filter is being applied (refreshOnly=false)
+		// The app is applying the standard filter of 'has exon coverage problems', so
+		// indicate that gene didn't pass filter if there is NOT a coverage problem
+		dangerObject.failedFilter = refreshOnly ? false : !dangerObject.geneCoverageProblem;
+	}
+
+	return dangerObject;
 }
 
 VariantModel.summarizeError =  function(theError) {
@@ -410,6 +614,7 @@ VariantModel.prototype.reduceBamData = function(coverageData, numberOfPoints) {
 VariantModel.prototype.setLoadedVariants = function(theVcfData) {
 	this.vcfData = theVcfData;
 }
+
 
 VariantModel.prototype.setCalledVariants = function(theFbData, cache=false) {
 	this.fbData = theFbData;
@@ -593,9 +798,11 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 					me.vcfFileOpened = true;
 					me.vcfUrlEntered = false;
 					me.getVcfRefName = null;
+					me.isMultiSample = false;
 
 					// Get the sample names from the vcf header
 				    me.vcf.getSampleNames( function(sampleNames) {
+				    	me.isMultiSample = sampleNames && sampleNames.length > 1 ? true : false;
 				    	resolve({'fileName': me.vcf.getVcfFile().name, 'sampleNames': sampleNames});
 				    });
 				} else {
@@ -649,7 +856,8 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 	} else {
 		me.vcfUrlEntered = true;
 	    me.vcfFileOpened = false;
-	    me.getVcfRefName = null;	
+	    me.getVcfRefName = null;
+	    me.isMultiSample = false;	
 
 	    success = this.vcf.openVcfUrl(vcfUrl, tbiUrl, function(success, errorMsg) {
 	    	if (me.lastVcfAlertify) {
@@ -662,6 +870,7 @@ VariantModel.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 			    me.getVcfRefName = null;	
 			    // Get the sample names from the vcf header
 			    me.vcf.getSampleNames( function(sampleNames) {
+			    	me.isMultiSample = sampleNames && sampleNames.length > 1 ? true : false;
 			    	callback(success, sampleNames);
 			    });	    	
 		    } else {

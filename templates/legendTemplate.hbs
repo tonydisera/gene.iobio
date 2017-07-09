@@ -1,17 +1,37 @@
 <div id="legend" >
 
   <div  style="display:flex;flex-wrap:wrap;justify-content:flex-start">
-    <div style="text-align:left;width:100px;margin-right:10px">
+
+
+
+      <div style="text-align:left;width:130px;margin-right:10px">
+          <div class="legend-label" style="width:100px">Gene summary</div>
+          <svg id="gene-badge-harmful-variant" width="120" height="18" style="margin-left:0px;display:inline-block" class="legend-element level-edu glyph">
+            <g transform="translate(0,0)">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="13" height="13" style="pointer-events: none; fill: rgb(173, 73, 74);">
+                </use>
+                <text class="name" x="16" y="11">Harmful variant</text>
+            </g>
+          </svg>
+
+          <div>
+           <i id="gene-badge-coverage-problem" style="display:inline-block;padding-top: 3px;padding-right: 3px;" class="material-icons glyph level-edu">error</i>
+           <span class="legend-text">Insufficient coverage</span>
+          </div>
+
+     </div>
+
+    <div style="text-align:left;width:80px;margin-right:10px">
       <div class="legend-label" style="width:130px">Inheritance</div>
-       <svg id="denovo" class="legend-element" width="100" height="14" transform="translate(0,0)">
-        <g class="denovo" transform="translate(0,-2)" style="opacity: 1;">
-          <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="20" height="20"></use>
+       <svg id="denovo" class="legend-element" width="100" height="16" transform="translate(0,0)">
+        <g class="denovo" transform="translate(0,0)" style="opacity: 1;">
+          <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#denovo-symbol" width="16" height="16"></use>
         </g>
         <text class="name" style="fill-opacity: 1;" x="20" y="11">Denovo</text></svg>
       </svg>
-      <svg id="recessive" class="legend-element" width="100" height="14" transform="translate(0,0)">
-        <g class=" recessive" style="opacity: 1;" transform="translate(0,-2)">
-          <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="20" height="20"></use>
+      <svg id="recessive" class="legend-element" width="100" height="16" transform="translate(0,0)">
+        <g class=" recessive" style="opacity: 1;" transform="translate(0,0)">
+          <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#recessive-symbol" width="16" height="16"></use>
         </g>
         <text class="name" style="fill-opacity: 1;" x="20" y="11">Recessive</text></svg>
       </svg>
@@ -65,7 +85,7 @@
       </div>
 
       <div style="width:140px;margin-right:10px">
-            <div class="legend-label">Clinvar</div>
+          <div class="legend-label">Clinvar</div>
             <svg id="clinvar_path" class="legend-element" width="110" height="14" transform="translate(0,0)">
             <g class="clinvar_path" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: #ad494A;"></use>

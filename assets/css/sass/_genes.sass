@@ -16,6 +16,23 @@
       fill: $sidebar-text-color !important
       font-size: 12px
 
+#zoom-region-chart.ibo-gene 
+  .cds.danger
+    fill:   $danger-exon-color
+    stroke: $danger-exon-border-color
+  .utr.danger 
+    fill:   $danger-exon-color
+    stroke: $danger-exon-border-color
+
+#gene-viz.ibo-gene 
+  .cds.danger 
+    fill:   $danger-exon-color
+    stroke: $danger-exon-border-color
+  .utr.danger  
+    fill:   $danger-exon-color
+    stroke: $danger-exon-border-color
+
+
 #genes-panel
   margin-bottom: 5px 
   margin-top: 5px
@@ -120,6 +137,12 @@
   #phenolyzer-search-box
     margin-top: 20px
 
+    .selectize-input
+      font-size: 14px
+
+    .selectize-dropdown
+      font-size: 13px
+
   .phenolyzer-label
     color: $sidebar-text-color !important
     font-size: 13px
@@ -128,10 +151,9 @@
   #phenolyzer-run-label
     display: inline-block !important
     vertical-align: top
-    padding-top: 3px
 
   #phenolyzer-heading
-    margin-top: 20px
+    margin-top: 10px
     
     h5
       display: inline-block
@@ -145,6 +167,15 @@
   #phenolyzer-disclaimer
     color: $text-color !important
     font-style: italic  !important
+
+  #phenolyzer-refresh-genes-button
+    float: left
+    margin-right: 30px
+    margin-top: -2px
+    margin-bottom: 0px
+    padding-top: 2px
+    padding-bottom: 2px
+    margin-left: 5px
 
 
 #get-genes-copy-paste-button.btn.btn-raised, #phenolyzer-go-button.btn.btn-raised
@@ -176,13 +207,13 @@
     margin-bottom: 1px  
 
 
-#get-genes-copy-paste-button, #phenolyzer-go-button
+#get-genes-copy-paste-button
   font-size: 12px
 
 
 #gene-badge-button
   font-size: 13px
-  padding: 5px 1px 1px 1px
+  padding: 3px 1px 1px 1px
   margin: 0px
   color: $text-color
   line-height: 15px
@@ -190,13 +221,13 @@
 
   &.user-visited
     border: 2px solid #c5c4c4
-    padding: 4px 1px 0px 1px
+    padding: 2px 1px 0px 1px
   
   #gene-badge-symbols
     height: 14px
     padding-left: 3px
-    padding-top: 1px
-    float: right   
+    padding-top: 0px
+    float: left   
 
   #gene-badge-phenotype-symbol
     float: right
@@ -215,6 +246,9 @@
   margin-bottom: 8px
   margin-right: 10px
   height: 21px
+
+#gene-badge.failed-filter
+  opacity: .65
 
 #gene-badge.loading
   border-left: #d8d8d8  solid 10px
@@ -247,12 +281,11 @@
   font-size: 14px
   color: $heading-color
   font-weight: bold
-  padding-right: 1px
   float: left
   display: none
 
 #gene-badge-called
-  font-size: 15px
+  font-size: 14px
   font-weight: bold
   color: $called-variant-color-darker
   float: left
@@ -282,6 +315,37 @@
   padding-left: 1px
   display: none
 
+#gene-badge-coverage-problem
+  font-size: 15px
+  margin-top: -1px
+  margin-left: 0px
+  float: left
+  color: $coverage-problem-color
+  fill: $coverage-problem-color
+  display: none
+
+  &.dropdown-item
+    display: inline-block
+    margin-right: 3px
+    margin-top: 1px
+
+.coverage-problem-glyph
+  fill: $coverage-problem-color
+
+#gene-badge-harmful-variant
+  font-size: 15px
+  margin-top: -1px
+  margin-left: 2px
+  float: left
+  color: #c70001
+  display: none
+
+  &.dropdown-item
+    display: inline-block
+    margin-right: 3px
+    margin-top: 1px
+
+
 #gene-badge
   &.visited
     #gene-badge-loaded
@@ -295,7 +359,16 @@
 
   &.has-called-variants
     #gene-badge-has-called-variants
-      display: inline      
+      display: inline   
+
+  &.has-coverage-problem
+    #gene-badge-coverage-problem
+      display: inline-block 
+
+  &.has-harmful-variant
+    #gene-badge-harmful-variant
+      display: inline-block 
+
 
   &:hover #gene-badge-remove
     visibility: visible 
@@ -338,7 +411,11 @@
     padding-bottom: 5px
     font-size: 13px  
     padding-left: 15px
-    padding-right: 15px    
+    padding-right: 15px  
+
+    &.disabled
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
+      box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
 
 #manage-genes
   float: left
@@ -377,7 +454,8 @@
 
   #manage-genes-dropdown
     float: right
-    margin-top: -3px  
+    margin-top: 0px  
+    margin-left: 20px
 
 
 #gene-badge-container
@@ -458,19 +536,21 @@
 #order-by-label
   margin-left: 5px
   margin-right: 4px
-  margin-top: 0px
+  margin-top: 10px
   display: inline-block
+  float: left
 
 #select-gene-container
   display: inline-block
-  width: 110px
+  width: 150px
   vertical-align: middle
   margin-top: 8px
+  float: left
 
   .selectize-input
     padding-bottom: 2px
     padding-top: 2px
-    line-height: 17px
+    line-height: 20px
 
 #manage-cache-modal
 

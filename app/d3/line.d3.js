@@ -1,6 +1,6 @@
 lineD3 = function module() {
 
-  var dispatch = d3.dispatch("d3brush", "d3rendered");
+  var dispatch = d3.dispatch("d3brush", "d3rendered", "d3regiontooltip");
 
   var debug = false;
 
@@ -21,6 +21,33 @@ lineD3 = function module() {
 
   var pos    = function(d) { return d.pos };
   var depth  = function(d) { return d.depth };
+
+  var regionGlyph = null;
+
+
+  var formatXTick = null;
+
+  var margin = {left: 50, right: 20, top: 10, bottom: 30};
+
+  var width = 600 - margin.left - margin.right;
+  var height = 220 - margin.top - margin.bottom;
+  var widthPercent  = "95%";
+  var heightPercent = "95%";
+
+  var showTooltip = true;
+  var showBrush = false;
+  var showXAxis = true;
+  var showYAxis = true;
+  var yTicks = null;
+  var yTickFormat = null;
+  var yAxisLine = false;
+  var showTransition = true;
+  var showGradient = true;
+  var brushHeight = null;
+  var xStart = null;
+  var xEnd = null;
+
+
 
   var getScreenCoords = function(x, y, ctm) {
     var xn = ctm.e + x*ctm.a;
@@ -121,30 +148,6 @@ lineD3 = function module() {
              .style("opacity", 0); 
   }
 
-
-  var formatXTick = null;
-
-
-  var margin = {left: 50, right: 20, top: 10, bottom: 30};
-
-  var width = 600 - margin.left - margin.right;
-  var height = 220 - margin.top - margin.bottom;
-  var widthPercent  = "95%";
-  var heightPercent = "95%";
-
-  var showTooltip = true;
-  var showBrush = false;
-  var showXAxis = true;
-  var showYAxis = true;
-  var showTransition = true;
-  var showGradient = true;
-  var brushHeight = null;
-  var xStart = null;
-  var xEnd = null;
-
-
-
-      
   function exports(selection, cb) {
 
    
@@ -157,7 +160,8 @@ lineD3 = function module() {
       var tooltip = container.selectAll(".tooltip").data([0])
         .enter().append('div')
           .attr("class", "tooltip")               
-          .style("opacity", 0);
+          .style("opacity", 0)
+          .style("pointer-events", "none");
 
 
       var svg = d3.select(this)
@@ -221,48 +225,53 @@ lineD3 = function module() {
         .attr("class", "group")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+      svgGroup.select("g.regions").remove();
+      svgGroup.append("g")
+              .attr("class", "regions");
+
       // Tooltip     
       svgGroup.on("mouseover", function(d) {
-        var tooltipText = '';
-        mousex = d3.mouse(this)[0];
-        mousey = d3.mouse(this)[1];
-        var invertedx = x.invert(mousex);
-        var invertedy = y.invert(mousey);
+        if (container.select(".tooltip.region").empty()) {
+          var tooltipText = '';
+          mousex = d3.mouse(this)[0];
+          mousey = d3.mouse(this)[1];
+          var invertedx = x.invert(mousex);
+          var invertedy = y.invert(mousey);
 
-        tooltipText += 'position ' + formatter(parseInt(invertedx));
-        tooltipText += '<br>depth ' + parseInt(invertedy);
+          tooltipText += 'position ' + formatter(parseInt(invertedx));
+          tooltipText += '<br>depth ' + parseInt(invertedy);
 
-        var width = 130;
-        var height = 40;
-        var left = sidebarAdjustX(d3.event.pageX - 130);
-        var top = d3.event.pageY - 42;
+          var width = 130;
+          var height = 40;
+          var left = sidebarAdjustX(d3.event.pageX - 130);
+          var top = d3.event.pageY - 42;
 
-        // if the tooltip approaches the left sidebar, flip it to the right side
-        if (left < 50) {
-          left = d3.round(left + width);
+          // if the tooltip approaches the left sidebar, flip it to the right side
+          if (left < 50) {
+            left = d3.round(left + width);
+          }
+
+          var tooltip = container.select('.tooltip');
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9)
+            .style("display", "block");
+          tooltip.html(tooltipText)
+//            .style("width", width + "px")
+//            .style("height", height + "px")
+            .style("left",  left + "px")
+            .style("text-align", 'left')
+            .style("top",  top + "px");
         }
-
-        var tooltip = container.select('.tooltip');
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9)
-          .style("display", "block");
-        tooltip.html(tooltipText)
-          .style("width", width + "px")
-          .style("height", height + "px")
-          .style("left",  left + "px")
-          .style("text-align", 'left')
-          .style("top",  top + "px");
       })
       .on("mouseout", function(d) {
-        var tooltip = container.select('.tooltip');
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-
-        tooltip.transition()
-          .delay(500)
-          .style("display", "none");
+        if (container.select(".tooltip.region").empty()) {
+          var tooltip = container.select('.tooltip');
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        }
+      
       });
 
       var innerWidth = width - margin.left - margin.right;
@@ -305,8 +314,19 @@ lineD3 = function module() {
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .ticks(5)
-          .orient("right");
+          .ticks(yTicks ? yTicks : 5)
+      if (yAxisLine) {
+          yAxis.innerTickSize(-innerWidth)
+               .outerTickSize(0)  
+               .tickPadding(-22)
+               .orient("left");       
+      } else {
+          yAxis.orient("right");
+      }
+
+      if (yTickFormat) {
+        yAxis.tickFormat(yTickFormat);
+      }
 
 
       var line = d3.svg.line()
@@ -343,7 +363,6 @@ lineD3 = function module() {
             .attr("class", "y axis")
             .call(yAxis);
       }
-        
 
       // not sure why, but second time through, the svgGroup is a
       // "placeholder", so we will just select the group again
@@ -431,6 +450,108 @@ lineD3 = function module() {
 
   });
 }
+
+
+
+  exports.hideTooltip = function() {
+    container.select('.tooltip').classed("region", false);           
+    container.select('.tooltip').classed("locked", false);           
+    container.select('.tooltip').classed("black-arrow-left", false);           
+    container.select('.tooltip').classed("black-arrow-right", false);   
+    container.select('.tooltip').style("pointer-events", "none");       
+    container.select('.tooltip').transition()        
+       .duration(500)      
+       .style("opacity", 0);   
+  }
+
+  exports.showHorizontalLine = function(yValue, label, clazz) {
+    if (container == null) {
+      return;
+    }
+    if (regionStart && regionEnd) {
+        x.domain([regionStart, regionEnd]);
+    }
+
+    container.select("svg g.group").selectAll("g." + clazz).remove();
+    var lineGroup = container.select("svg g.group")
+                     .append("g")
+                     .attr("transform", "translate(0," + d3.round(y(yValue)) + ")")
+                     .attr("class", clazz);
+    lineGroup.append("line")
+             .attr("x1", d3.round(x(x.domain()[0])))
+             .attr("x2", d3.round(x(x.domain()[1])))
+             .attr("y1", 0)
+             .attr("y2", 0)
+    if (label) {
+      lineGroup.append("text")
+               .attr("x", 40)
+               .attr("y", 3)
+               .text(label);
+    }
+  }
+
+  exports.highlightRegions = function(regions, options, regionStart, regionEnd, regionHeight) {
+    if (container == null) {
+      return;
+    }
+
+    if (regionStart && regionEnd) {
+        x.domain([regionStart, regionEnd]);
+        container.select("svg g.group g.regions").selectAll(".region").remove();
+        container.select("svg g.group").selectAll(".region-glyph").remove();
+    }
+
+    var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
+    var regions   =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
+    var theY      =  regionHeight ? (d3.round(y(regionHeight))) : (height - margin.top - margin.bottom);
+    var theHeight =  regionHeight ? ((height - margin.top - margin.bottom) - theY) : 0;     
+    var regionsEnter = regions.enter();
+    regions.enter()
+           .append("rect")
+           .attr("class",  "region")
+           .attr("rx", 1)
+           .attr("ry", 1)
+           .attr("x",      function(d,i) { return d3.round(x(d.start)) })
+           .attr("width",  function(d,i) { return Math.max(minRegionWidth, d3.round(x(d.end) - x(d.start))) })
+           .attr("y",      theY)
+           .attr("height", theHeight);
+    regions.exit().remove();
+
+
+    container.select("svg g.group g.regions").selectAll(".region").each(function(d,i) {
+        var me = this;
+        var regionX     = d3.round(x(d.start));
+        var regionWidth =  Math.max(minRegionWidth, d3.round(x(d.end) - x(d.start)));
+        if (regionGlyph) {
+          regionGlyph.call(me, d, i, regionX + regionWidth/2);
+        }
+    });
+
+    container.select("svg g.group g.regions").selectAll(".region, .region-glyph")
+             .on("mouseover", function(d) {  
+                // show the tooltip
+                var tooltip = container.select('.tooltip');   
+                tooltip.classed("region", true);           
+                var featureObject = d3.select(this);
+                dispatch.d3regiontooltip(featureObject, d, tooltip, false);
+             })                  
+             .on("mouseout", function(d) {   
+                if (container.select('.tooltip.region.locked').empty()) {
+                  exports.hideTooltip();
+                }
+             })
+             .on("click", function(d) {  
+                // show the tooltip
+                var tooltip = container.select('.tooltip');   
+                tooltip.classed("region", true);           
+                tooltip.classed("locked", true);          
+                var featureObject = d3.select(this);
+                dispatch.d3regiontooltip(featureObject, d, tooltip, true, exports.hideTooltip);
+             }) 
+
+  }
+
+
   exports.showCircle = function(_) {
     if (!arguments.length) return showCircle;
     showCircle = _;
@@ -439,6 +560,12 @@ lineD3 = function module() {
   exports.hideCircle = function(_) {
     if (!arguments.length) return hideCircle;
     hideCircle = _;
+    return exports;
+  }
+
+  exports.regionGlyph = function(_) {
+    if (!arguments.length) return regionGlyph;
+    regionGlyph = _;
     return exports;
   }
  
@@ -519,6 +646,24 @@ lineD3 = function module() {
   exports.showYAxis = function(_) {
     if (!arguments.length) return showYAxis;
     showYAxis = _;
+    return exports; 
+  }
+
+  exports.yAxisLine = function(_) {
+    if (!arguments.length) return yAxisLine;
+    yAxisLine = _;
+    return exports; 
+  }
+
+  exports.yTicks = function(_) {
+    if (!arguments.length) return yTicks;
+    yTicks = _;
+    return exports; 
+  }
+
+  exports.yTickFormat = function(_) {
+    if (!arguments.length) return yTickFormat;
+    yTickFormat = _;
     return exports; 
   }
   

@@ -12,7 +12,7 @@
 	padding-top: 2px
 	padding-bottom: 2px
 	margin-left: -55px
-	margin-bottom: 2px
+	margin-bottom: -22px
 	margin-top: 2px
 
 #filter-summary-track
@@ -20,6 +20,23 @@
 	margin-bottom: 8px
 	color: $text-color
 	display: inline-block
+
+	#clear-filters-button
+		font-size: 13px
+		padding-top: 2px
+		padding-bottom: 2px
+		margin-top: 1px
+		margin-bottom: 1px
+		margin-left: 0px
+		margin-right: 10px
+		color:  $app-color
+		padding-left: 10px
+		padding-right: 10px
+
+	.loader
+		display: inline-block
+		margin-top: 0px
+		margin-right: 10px
 
 	.filter-flag.label-primary
 		background-color: $filter-summary-background-color
@@ -32,11 +49,45 @@
 		margin-top: 3px 
 		display: inline-block
 
+#coverage-thresholds
+	text-align: center
+	margin-right: 70px
+	color: $text-color
+
+	&.attention
+		outline-color: $coverage-problem-color
+		outline-offset: 0px
+
+	.coverage-threshold
+		margin-left: 8px
+		display: inline-block
+		margin-top: 2px
+
+		.coverage-threshold-label
+			font-size: 12px
+			color: $app-color
+
+		input
+			margin-right: 2px		
 
 #recfilter-flag
 	background-color: #5881AD !important
 
 #filter-track
+
+	.subheading
+		margin-left: -50px
+
+
+	.loader
+		display: inline-block
+		margin-right: 40px
+		margin-bottom: 3px
+		margin-top: 0px
+
+		&.hide
+			visibility: hidden
+			display: inline-block !important
 
 	input
 		color:  $text-color
@@ -54,6 +105,14 @@
 		margin-top: 12px
 		margin-bottom: 5px
 
+	.subheading
+		font-size: 15px 
+		color: $app-color !important
+		margin-bottom: 0px
+		margin-top: 35px
+		text-align: center
+		margin-left: -50px
+
 
 	#filter-panel
 		font-size: 12px
@@ -63,7 +122,6 @@
 		overflow-y: auto
 
 	#standard-filter-panel
-		float: left
 		margin-top: 0px
 		margin-bottom: 10px
 		display: flex
@@ -77,8 +135,8 @@
 			margin-bottom: 0px
 			margin-top: 10px
 			font-size: 12px
-			width: 190px
-			margin-left: 45px
+			width: 200px
+			margin-left: 35px
 			vertical-align: bottom
 
 			span
@@ -90,9 +148,9 @@
 				font-weight: bold
 				padding-right: 1px
 				float: left
-				padding-left: 10px
 				visibility: hidden
 				display: initial
+				padding-left: 0px
 
 			&.current
 				i.done

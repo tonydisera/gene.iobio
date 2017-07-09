@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, motherVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -13,6 +13,7 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;  
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
+    motherVariantCard = indexPage.section.motherVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
     tooltip = indexPage.section.variantTooltip;
@@ -33,12 +34,34 @@ module.exports = {
     appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
 
   },
+
+
+  'Check for low coverage gene badges': function(client) {
+    appTitleSection.assertGeneBadgeHasLowCoverage('AIRE');
+    appTitleSection.assertGeneBadgeHasLowCoverage('PDHA1');
+  },
+
+
   'Calling all genes': function(client) {
     appTitleSection.selectCallAll();
     appTitleSection.waitForCallAllDone();
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
 
   },
+
+
+  'Click denovo inheritance (custom) filter': function(client) {
+    nav.clickFilter();
+    client.pause(1000);   
+
+    filterPanel.clickClearAll();
+    client.pause(1000);
+    
+    filterPanel.clickInheritanceDenovo();
+    client.pause(1000);
+    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+  },
+  
   
   'Known causative filter': function(client) {
     nav.clickFilter();
@@ -71,8 +94,30 @@ module.exports = {
 
     filterPanel.clickHighOrModerateImpact();
     client.pause(1000);
-    filterPanel.assertHighOrModerateImpactCounts(3,0);
-    appTitleSection.assertAnalyzeAllCounts(3,2,0,5);
+    filterPanel.assertHighOrModerateImpactCounts(1,0);
+    appTitleSection.assertAnalyzeAllCounts(1,4,0,5);
+
+  },
+
+
+  'Clear filter and click denovo inheritance (custom) filter': function(client) {
+    client.pause(1000);
+    filterPanel.clickClearAll();
+    client.pause(1000);
+    
+    filterPanel.clickInheritanceDenovo();
+    client.pause(1000);
+    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+  },
+  
+  
+
+  'Low gene coverage filter': function(client) {
+
+    filterPanel.clickLowCoverage();
+    client.pause(1000);
+    filterPanel.assertLowCoverageCounts(2,2);
+    appTitleSection.assertAnalyzeAllCounts(2,3,2,3);
 
   },
   'Clear all filter': function(client) {
@@ -82,17 +127,53 @@ module.exports = {
     client.pause(1000);
     filterPanel.assertDenovoVusCounts(2,0);
     filterPanel.assertRecessiveVusCounts(0,0);
-    filterPanel.assertHighOrModerateImpactCounts(3,0);
+    filterPanel.assertHighOrModerateImpactCounts(1,0);
     appTitleSection.assertAnalyzeAllProgressLabel("5 analyzed");
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
   },
-  'Click denovo inheritance (custom) filter': function(client) {
-    filterPanel.clickClearAll();
-    filterPanel.clickInheritanceDenovo();
+
+
+
+  'Click on AIRE and validate recfilter . (unassigned) counts': function(client) {
+    nav.clickFilter();
+    client.pause(1000);   
+
+    nav.searchGene('AIRE');
     client.pause(1000);
-    appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
+    matrixTrack.waitForMatrixLoaded();
+
+    filterPanel.clickRecfilterUnassigned();
+    client.pause(1000);
+    probandVariantCard.assertLoadedVariantSymbolCountEquals('4');
+
   },
+
   
+  'Click on AIRE, PDHA1 and look for low coverage exon glyph': function(client) {
+
+    filterPanel.clickClearAll();
+    nav.searchGene('AIRE');
+    
+    client.pause(1000);
+    matrixTrack.waitForMatrixLoaded();
+
+    probandVariantCard.waitForBamDepthLoaded();
+    probandVariantCard.assertDangerExonCountEquals(1);
+    probandVariantCard.assertLowCoverageGlyphCountEquals(1);
+
+    nav.searchGene('PDHA1');
+    
+    client.pause(1000);
+    matrixTrack.waitForMatrixLoaded();
+
+    probandVariantCard.waitForBamDepthLoaded();
+    probandVariantCard.assertDangerExonCountEquals(1);
+    probandVariantCard.assertLowCoverageGlyphCountEquals(1);
+
+    motherVariantCard.waitForBamDepthLoaded();
+    motherVariantCard.assertDangerExonCountEquals(9);
+    motherVariantCard.assertLowCoverageGlyphCountEquals(9);
+  },
 
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
 
@@ -108,7 +189,7 @@ module.exports = {
 
 
     var evaluateTooltip = function(theTooltip) {
-      theTooltip.expectInheritanceEquals('denovo inheritance');
+      theTooltip.expectInheritanceEquals('de novo inheritance');
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');
@@ -147,7 +228,6 @@ module.exports = {
   },
 
   'end': function(client) {
-    client.end();
   }
 
   

@@ -7,7 +7,7 @@ function VariantTooltip() {
 	this.VALUE_EMPTY        = "-";
 }
 
-VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html) {
+VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html, adjustPosition=true) {
 	var me = this;
 	tooltip.style("z-index", 1032);
 	tooltip.transition()        
@@ -45,17 +45,20 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	var x = screenX;
-	var yOffset = (+$('body #container').css('top').split("px")[0] - 5);
-	var y = screenY - yOffset;
-	if (lock && y - h < (yOffset * -1)) {
-		y = h - yOffset;
+	var y = screenY;
+	var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
+	if (adjustPosition) {
+		y -= navbarHeight;
+		if (lock && y - h < (navbarHeight * -1)) {
+			y = h - navbarHeight;
+		}
+		x = sidebarAdjustX(x);
 	}
 
-	x = sidebarAdjustX(x);
 
 
 
-	if (x-33 > 0 && (x-33+w) < $('#matrix-panel').outerWidth()) {
+	if (x > 0 && (x+w) < $('#matrix-panel').outerWidth()) {
 		tooltip.classed("arrow-down-left", true);
 		tooltip.classed("arrow-down-right", false);
 		tooltip.classed("arrow-down-center", false);
@@ -202,8 +205,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
 		if ($(selector + " .tooltip-title:contains('inheritance')").length > 0) {
-			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"20\" width=\"20\">");
-			var options = {width:22, height:22, transform: 'translate(0,4)'};
+			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"15\" width=\"16\">");
+			var options = {width:15, height:15, transform: 'translate(0,0)'};
 			var selection = d3.select(selector + ' .inheritance-badge').data([{clazz: clazz}]);
 			symbolFunction(selection, options);					
 		}
@@ -263,6 +266,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		type = 'tooltip';
 	}
 
+	var exonDisplay = "";
+	if (variant.hasOwnProperty("vepExon")) {
+		exonDisplay += "    Exon ";
+		exonDisplay += Object.keys(variant.vepExon).join(",");
+	}
+
 	var calledVariantRow = "";
 	if (variant.hasOwnProperty("fbCalled") && variant.fbCalled == "Y") {
 		var calledGlyph = '<i id="gene-badge-called" class="material-icons glyph" style="display: inline-block;font-size: 15px;vertical-align: top;float:initial">check_circle</i>';
@@ -275,7 +284,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	for (var key in variant.effect) {
 		if (effectDisplay.length > 0) {
 		  	effectDisplay += ", ";
-		}formatContent
+		}
 		// Strip out "_" from effect
 		var tokens = key.split("_");
 		if (isLevelEdu) {
@@ -504,7 +513,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
 	                          ? ''
-						      : me._tooltipHeaderRow('<strong><em>' + variant.inheritance + ' inheritance</em></strong>', '', '', '', null, 'padding-top:0px;');
+						      : me._tooltipHeaderRow('<span class="tooltip-inheritance-mode-label">' + matrixCard.getInheritanceLabel(variant.inheritance) + ' inheritance</span>', '', '', '', null, 'padding-top:0px;');
 
 	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
 	                  ? effectDisplay 
@@ -565,7 +574,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	}
 
 	if (rec) {
-		rec.inheritance      = variant.inheritance ? (variant.inheritance == 'denovo' ? 'de novo' : variant.inheritance) : "";
+		rec.inheritance      = variant.inheritance ? matrixCard.getInheritanceLabel(variant.inheritance) : "";
 		rec.impact           = vepImpactDisplay;
 		rec.highestImpact    = vepHighestImpactValue;
  		rec.highestImpactInfo = vepHighestImpactInfo;
@@ -620,7 +629,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			  qualityWarningRow
 			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord + exonDisplay, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -663,10 +672,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
-			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
+			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", exonDisplay, '')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow( coord, '', '', '')
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, dbSnpLink, coord, 'ref-alt')
 			+ inheritanceModeRow
 			+ leftDiv
 			+ rightDiv
@@ -679,7 +687,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			qualityWarningRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, '', '')
+			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, exonDisplay, '')
 			+ inheritanceModeRow
 
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  
@@ -709,6 +717,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	        
 
 }
+
 
 
 VariantTooltip.prototype.variantTooltipMinimalHTML = function(variant) {
@@ -967,9 +976,13 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		row.append("div")
 		   .attr("class", "mother-alt-count tooltip-header-small")
 		   .html("<span class='tooltip-subtitle " + selectedClazz + "'>Mother</span>");
+		var zyg = trioFields.MOTHER.zygosity != null ? trioFields.MOTHER.zygosity.toLowerCase() : "";
+	    if (zyg == "gt_unknown") {
+	    	zyg = "unknown";
+	    }
 		row.append("div")
-		   .attr("class", "tooltip-zygosity label " + (trioFields.MOTHER.zygosity != null ? trioFields.MOTHER.zygosity.toLowerCase() : ""))
-		   .text(trioFields.MOTHER.zygosity ? capitalizeFirstLetter(trioFields.MOTHER.zygosity.toLowerCase()) : "");
+		   .attr("class", "tooltip-zygosity label " + zyg)
+		   .text(capitalizeFirstLetter(zyg));
 		column = row.append("div")
 		            .attr("class", "mother-alt-count tooltip-allele-count-bar");
 		if (trioFields.MOTHER.zygosity && trioFields.MOTHER.zygosity != '') {			            
@@ -991,9 +1004,14 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		row.append("div")
 	       .attr("class", "father-alt-count tooltip-header-small")
 	       .html("<span class='tooltip-subtitle " + selectedClazz + "'>Father</span>");
+
+	    var zyg = trioFields.FATHER.zygosity != null ? trioFields.FATHER.zygosity.toLowerCase() : "";
+	    if (zyg == "gt_unknown") {
+	    	zyg = "unknown";
+	    }
 		row.append("div")
-		   .attr("class",  "tooltip-zygosity label " + (trioFields.FATHER.zygosity != null ? trioFields.FATHER.zygosity.toLowerCase() : ""))
-		   .text(trioFields.FATHER.zygosity ? capitalizeFirstLetter(trioFields.FATHER.zygosity.toLowerCase()) : "");
+		   .attr("class",  "tooltip-zygosity label " + zyg)
+		   .text(capitalizeFirstLetter(zyg));
 		column = row.append("div")
 	                .attr("class", "father-alt-count tooltip-allele-count-bar")
 		if (trioFields.FATHER.zygosity && trioFields.FATHER.zygosity != '') {			            
@@ -1019,13 +1037,28 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		            if (sibRowCount.affected > 0 && sibRowCount.unaffected == 1) {
 		            	row.style("padding-top", "6px");		            	
 		            }
-					var zyg = variant[sibZygField][sampleName] ? variant[sibZygField][sampleName] : "";
+					var zyg = variant[sibZygField][sampleName] ? variant[sibZygField][sampleName].toLowerCase() : "";
+					if (zyg == "gt_unknown") {
+						zyg = "unknown";
+					}
 					row.append("div")
 				       .attr("class", "sib-zygosity tooltip-header-small")
 				       .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(affectedStatus) + " Sib " + sampleName + "</span>");
 					row.append("div")
-					   .attr("class",  "tooltip-zygosity label " + zyg.toLowerCase())
-					   .text(capitalizeFirstLetter(zyg.toLowerCase()));
+					   .attr("class",  "tooltip-zygosity label " + zyg)
+					   .text(capitalizeFirstLetter(zyg));
+
+
+					column = row.append("div")
+				                .attr("class", "sib-alt-count tooltip-allele-count-bar")
+					if (zyg && zyg != '') {			            
+						me._appendAlleleCountSVG(column, 
+							variant[affectedStatus + "_genotypeAltCount"][sampleName], 
+							variant[affectedStatus + "_genotypeRefCount"][sampleName], 
+							variant[affectedStatus + "_genotypeDepth"][sampleName], 
+							variant[affectedStatus + "_bamDepth"][sampleName],
+							barWidth);
+					} 
 				}
 			}
 

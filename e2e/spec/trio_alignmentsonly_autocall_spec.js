@@ -46,6 +46,7 @@ module.exports = {
   
 
   'Call variants for selected gene': function(client) {
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
 
     matrixTrack.waitForMatrixLoaded();
     matrixTrack.clickColumn(1);

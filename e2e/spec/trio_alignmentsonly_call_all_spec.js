@@ -52,6 +52,19 @@ module.exports = {
 
   },
   
+
+  'Click denovo inheritance (custom) filter': function(client) {
+    nav.clickFilter();
+    client.pause(1000);
+
+    filterPanel.clickClearAll();
+    client.pause(1000);
+    filterPanel.clickInheritanceDenovo();
+    client.pause(1000);
+    appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
+  },
+  
+
   'Known causative filter': function(client) {
     nav.clickFilter();
     client.pause(1000);
@@ -63,14 +76,7 @@ module.exports = {
 
 
   },
-  'De novo VUS filter': function(client) {
 
-    filterPanel.clickDenovoVus();
-    client.pause(1000);
-    filterPanel.assertDenovoVusCounts(0,2);
-    appTitleSection.assertAnalyzeAllCounts(0,0,2,3);
-
-  },
   'Recessive VUS filter': function(client) {
 
     filterPanel.clickRecessiveVus();
@@ -83,22 +89,36 @@ module.exports = {
 
     filterPanel.clickHighOrModerateImpact();
     client.pause(1000);
-    filterPanel.assertHighOrModerateImpactCounts(0,3);
-    appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
+    filterPanel.assertHighOrModerateImpactCounts(0,0);
+    appTitleSection.assertAnalyzeAllCounts(0,0,0,0);
+
+  },
+  'De novo VUS filter': function(client) {
+
+    filterPanel.clickDenovoVus();
+    client.pause(1000);
+    filterPanel.assertDenovoVusCounts(0,2);
+    appTitleSection.assertAnalyzeAllCounts(0,0,2,3);
 
   },
   'Clear all filter': function(client) {
 
     filterPanel.clickClearAll();
+    client.pause(1000);
     filterPanel.assertKnownCausativeCounts(0,2);
     client.pause(1000);
     filterPanel.assertDenovoVusCounts(0,2);
     filterPanel.assertRecessiveVusCounts(0,0);
-    filterPanel.assertHighOrModerateImpactCounts(0,3);
+    filterPanel.assertHighOrModerateImpactCounts(0,1);
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
   },
-  'Click denovo inheritance (custom) filter': function(client) {
+
+  'Click denovo inheritance (custom) filter after all standard filters': function(client) {
+    nav.clickFilter();
+    client.pause(1000);
+
     filterPanel.clickClearAll();
+    client.pause(1000);
     filterPanel.clickInheritanceDenovo();
     client.pause(1000);
     appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
@@ -119,7 +139,7 @@ module.exports = {
 
 
     var evaluateTooltip = function(theTooltip) {
-      theTooltip.expectInheritanceEquals('denovo inheritance');
+      theTooltip.expectInheritanceEquals('de novo inheritance');
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');

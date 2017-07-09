@@ -26,12 +26,13 @@ module.exports = {
     matrixTrack.waitForMatrixLoaded();
     
     matrixTrack.clickColumn(1);
+    variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     variantTooltip.waitForTooltip();   
     client.pause(4000); 
     
     variantTooltip.expectVepConsequence('stop gained');
     variantTooltip.expectInheritanceEquals('recessive inheritance');
-    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033');
+    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033 17:17698535');
     variantTooltip.expectHGVScEquals('NM_030665.3:c.2273G>A');
     
     client.end();

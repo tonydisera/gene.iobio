@@ -1,32 +1,6 @@
 #checkmark-called
   fill: $called-variant-color
 
-#recessive-symbol
-  .parent
-    .left
-      stroke: #F49A73
-      stroke-width: 2
-
-    .right
-      stroke: gray
-      stroke-width: 2
-
-  .proband
-    .left, .right
-      stroke: #F49A73
-      stroke-width: 3
-
-#denovo-symbol
-  .parent
-    .left, .right
-      stroke: grey
-      stroke-width: 2
-
-  .proband
-    .left, .right
-      stroke: #6A9C2F !important
-      fill: none
-      stroke-width: 3
 
 #trio-symbol
   .parent
@@ -44,6 +18,15 @@
 #phenotype-symbol
   fill: #ABA2A2
   stroke: #ABA2A2
+
+#thumbs-green-symbol
+  fill: #81A966
+
+#thumbs-red-symbol
+  fill: rgb(173, 73, 74)
+
+#thumbs-grey-symbol
+  fill: #8b8b8b
 
 
 .variant
@@ -63,8 +46,8 @@
   font-weight: bold
 
 .impact_MODIFIER
-  fill: rgba(244, 217, 155, 1)
-  color: rgba(244, 217, 155, 1)
+  fill: #f9e4b5
+  color: #f9e4b5
 
 .impact_LOW
   fill: rgba(181, 207, 107, 0.65)
@@ -177,9 +160,7 @@
   fill: #D3D5D8
   stroke: rgba(0, 0, 0, 0.26)
 
-.impact, .vepImpact, .highestImpactVep, .effect, .vepConsequence, .type, .zygosity, .recfilter
-  border: solid 2px $sidebar-body-color
-  padding: 1px
+.impact, .vepImpact, .highestImpactVep, .effect, .vepConsequence, .type, .zygosity, .recfilter  
 
   text
     fill: $sidebar-text-color
@@ -195,41 +176,40 @@
   cursor: pointer
   font-weight: bold
   fill: $current-color
-  border: solid 1.5px $current-frame-color 
-  border-radius: 4px
+  outline: solid 2px $current-frame-color 
+  outline-offset: -2px
 
 .tooltip-zygosity:hover
-  border-radius: 0px  
-  border: solid 2.5px $current-frame-color 
+  outline: solid 2px $current-frame-color 
+  outline-offset: -2px
 
 .impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover,  .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover
   font-weight: bold
   cursor: pointer
-  border: solid 2.5px $current-color 
-  border-radius: 4px
-  padding: 1px
+  outline: solid 2px $current-color 
+  outline-offset: -2px
 
   &.not-equal
-    border: solid 1.5px $current-frame-color 
+    outline: none
 
 
 .tooltip-zygosity.current:hover
-  border-radius: 0px
 
 .current
   font-weight: bold
-  border: solid 2.5px $current-color
-  border-radius: 4px
-  padding: 1px
+  outline: solid 2px $current-color
+  outline-offset: -2px
 
   &.not-equal
     background-image: linear-gradient(transparent 7px,$current-color 7px,$current-color 9px,transparent 9px)
     border: none  
+    outline: none
 
 
 .tooltip-zygosity.current
-  border-radius: 0px
-  border: solid 2.5px $current-color !important
+  outline: solid 2px $current-color !important
+  outline-offset: -2px
+
 
 #impact-scheme, #effect-scheme, #regulatory-scheme, #zygosity-scheme
   padding-top: 2px
@@ -241,6 +221,7 @@
 
 #impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current
   color: $current-color !important
+  outline: none
 
   .material-icons
     color: $current-color !important
@@ -271,9 +252,7 @@
   font-style: bold
   color: $current-color
   fill: $current-color
-  border: solid thin black
-  border-radius: 4px
-  padding: 1px
+
 
 #impact-scheme:hover, #effect-scheme:hover, #af1000g-scheme:hover, #afexac-scheme:hover
   font-weight: bold

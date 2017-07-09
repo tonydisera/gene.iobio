@@ -97,7 +97,7 @@ body {
   background-color: #5d809d; }
 
 h4 {
-  font-size: 13px;
+  font-size: 14px;
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
@@ -107,6 +107,10 @@ h5 {
   color: #5d809d;
   margin-bottom: 4px;
   margin-top: 10px; }
+
+.btn-raised.disabled {
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12) !important;
+  box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12) !important; }
 
 .alertify-notifier .ajs-message {
   width: 460px; }
@@ -210,10 +214,10 @@ h5 {
   background-color: #3586c0; }
 
 .attention {
-  outline-color: rgba(217, 98, 98, 0.86);
-  outline-style: solid;
-  outline-offset: 4px;
-  outline-width: 2px; }
+  outline-color: rgba(217, 98, 98, 0.86) !important;
+  outline-style: solid !important;
+  outline-offset: 4px !important;
+  outline-width: 2px !important; }
 
 .navbar-nav .attention {
   outline-offset: -6px;
@@ -842,36 +846,37 @@ a.btn {
       margin-left: 7px;
       margin-right: 7px; }
     #welcome-area #welcome-panel #welcome-panel-content {
-      width: 640px; }
+      width: 820px; }
       #welcome-area #welcome-panel #welcome-panel-content .description-paragraph {
         text-align: left;
         margin-left: 0px;
-        margin-right: 5px;
-        margin-top: 30px;
+        margin-right: 30px;
+        margin-top: 20px;
         color: #717171;
         font-size: 18px;
-        width: 35%; }
+        width: 25%; }
         #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li {
           padding-bottom: 10px; }
           #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
             padding-bottom: 4px; }
       #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel {
-        width: 65%;
+        width: 75%;
         margin-top: 10px; }
         #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-heading {
           font-size: 18px;
           color: #717171;
           margin-top: 10px; }
         #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content {
-          display: flex; }
+          display: flex;
+          flex-wrap: wrap; }
           #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint {
-            width: 50%;
+            width: 190px;
             height: 140px;
             margin-top: 5px;
             margin-bottom: 20px;
             background-color: grey;
             margin-left: 0px;
-            margin-right: 10px;
+            margin-right: 5px;
             background-size: cover; }
             #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint #play-button {
               margin-top: 25px;
@@ -885,6 +890,8 @@ a.btn {
           background-image: url("../../assets/images/screencast-multigene-analysis.png"); }
         #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-saving-analysis {
           background-image: url("../../assets/images/screencast-saving-analysis.png"); }
+        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-coverage-analysis {
+          background-image: url("../../assets/images/screencast-coverage-analysis.png"); }
 
 .icon {
   width: 30px;
@@ -1078,7 +1085,7 @@ section {
 
 #bam-track {
   margin-bottom: 0px;
-  margin-top: -10px;
+  margin-top: -5px;
   margin-left: 0px;
   margin-right: 0px;
   padding: 0px;
@@ -1136,7 +1143,8 @@ section {
   border: none;
   position: relative;
   pointer-events: none;
-  top: 0px;
+  top: 10px;
+  margin-top: -10px;
   height: 23px;
   visibility: visible;
   width: 26px; }
@@ -1277,6 +1285,16 @@ header {
     stroke: none;
     fill: #3586c0;
     pointer-events: none; }
+  #bam-depth .region {
+    stroke-width: 1px;
+    stroke: rgba(218, 165, 0, 0.5);
+    fill: rgba(218, 165, 0, 0.5); }
+  #bam-depth .threshold line {
+    stroke-width: 1px;
+    stroke: lightgray; }
+  #bam-depth .threshold text {
+    font-size: 12px;
+    fill: #717171; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
@@ -1327,7 +1345,7 @@ header {
   stop-opacity: 0.6; }
 
 .axis text {
-  font-size: 10px;
+  font-size: 12px;
   fill: #787878; }
 
 #zoom-region-chart {
@@ -1337,9 +1355,8 @@ header {
   margin-bottom: 0px;
   padding-bottom: 0px; }
   #zoom-region-chart .axis text {
-    font-size: 10px;
-    fill: #787878;
-    font-style: italic; }
+    font-size: 11px;
+    fill: #787878; }
 
 #zoom-region-start {
   float: left;
@@ -1359,6 +1376,9 @@ header {
   shape-rendering: crispEdges;
   stroke-width: 1px; }
 
+#bam-depth .y.axis line {
+  stroke-width: 0.5px; }
+
 #gene-viz .axis line, #gene-viz .axis path {
   fill: none;
   stroke: lightgrey;
@@ -1369,7 +1389,7 @@ header {
   fill: none;
   stroke: lightgrey;
   shape-rendering: crispEdges;
-  stroke-width: 3px; }
+  stroke-width: 1px; }
 
 .brush .extent {
   stroke: #000;
@@ -1400,7 +1420,7 @@ header {
   stroke: #969696;
   fill: none; }
 .ibo-variant .axis {
-  font-size: 10px; }
+  font-size: 13px; }
   .ibo-variant .axis path, .ibo-variant .axis line {
     fill: none;
     stroke: lightgrey;
@@ -1433,6 +1453,28 @@ header {
   line-height: 22px;
   font-size: 12px;
   color: #717171 !important; }
+
+.icon-button-standard {
+  font-size: 13px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  color: #717171 !important; }
+  .icon-button-standard i {
+    font-size: 17px;
+    margin-top: -3px; }
+
+.icon-button-large {
+  font-size: 14px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  color: #5d809d !important; }
+  .icon-button-large i {
+    font-size: 17px;
+    margin-top: -3px; }
 
 .icon-button-sm {
   padding-top: 4px;
@@ -1470,6 +1512,7 @@ header {
   color: #717171; }
 
 .tt-dropdown-menu {
+  cursor: pointer;
   z-index: 1033 !important; }
   .tt-dropdown-menu .tt-dataset-name {
     z-index: 1033 !important; }
@@ -1586,6 +1629,12 @@ inputinput:-moz-placeholder {
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {
   color: #5d809d !important; }
+#slider-left #slider-left-content .subheading {
+  font-size: 15px;
+  color: #5d809d !important;
+  margin-bottom: 0px;
+  margin-top: 35px;
+  text-align: center; }
 #slider-left .navbar {
   background-color: #636161 !important;
   min-height: 30px !important; }
@@ -1815,7 +1864,7 @@ inputinput:-moz-placeholder {
   padding-top: 2px;
   padding-bottom: 2px;
   margin-left: -55px;
-  margin-bottom: 2px;
+  margin-bottom: -22px;
   margin-top: 2px; }
 
 #filter-summary-track {
@@ -1823,6 +1872,21 @@ inputinput:-moz-placeholder {
   margin-bottom: 8px;
   color: #717171;
   display: inline-block; }
+  #filter-summary-track #clear-filters-button {
+    font-size: 13px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    margin-left: 0px;
+    margin-right: 10px;
+    color: #5d809d;
+    padding-left: 10px;
+    padding-right: 10px; }
+  #filter-summary-track .loader {
+    display: inline-block;
+    margin-top: 0px;
+    margin-right: 10px; }
   #filter-summary-track .filter-flag.label-primary {
     background-color: #feedc8;
     color: #717171;
@@ -1834,12 +1898,39 @@ inputinput:-moz-placeholder {
     margin-top: 3px;
     display: inline-block; }
 
+#coverage-thresholds {
+  text-align: center;
+  margin-right: 70px;
+  color: #717171; }
+  #coverage-thresholds.attention {
+    outline-color: #daa500;
+    outline-offset: 0px; }
+  #coverage-thresholds .coverage-threshold {
+    margin-left: 8px;
+    display: inline-block;
+    margin-top: 2px; }
+    #coverage-thresholds .coverage-threshold .coverage-threshold-label {
+      font-size: 12px;
+      color: #5d809d; }
+    #coverage-thresholds .coverage-threshold input {
+      margin-right: 2px; }
+
 #recfilter-flag {
   background-color: #5881AD !important; }
 
 #filter-track {
   margin-top: 0px;
   margin-bottom: 80px; }
+  #filter-track .subheading {
+    margin-left: -50px; }
+  #filter-track .loader {
+    display: inline-block;
+    margin-right: 40px;
+    margin-bottom: 3px;
+    margin-top: 0px; }
+    #filter-track .loader.hide {
+      visibility: hidden;
+      display: inline-block !important; }
   #filter-track input {
     color: #717171;
     font-size: 12px; }
@@ -1850,6 +1941,13 @@ inputinput:-moz-placeholder {
     color: #5d809d !important;
     margin-top: 12px;
     margin-bottom: 5px; }
+  #filter-track .subheading {
+    font-size: 15px;
+    color: #5d809d !important;
+    margin-bottom: 0px;
+    margin-top: 35px;
+    text-align: center;
+    margin-left: -50px; }
   #filter-track #filter-panel {
     font-size: 12px;
     color: #66585c;
@@ -1857,7 +1955,6 @@ inputinput:-moz-placeholder {
     margin-top: 2px;
     overflow-y: auto; }
   #filter-track #standard-filter-panel {
-    float: left;
     margin-top: 0px;
     margin-bottom: 10px;
     display: flex;
@@ -1870,8 +1967,8 @@ inputinput:-moz-placeholder {
       margin-bottom: 0px;
       margin-top: 10px;
       font-size: 12px;
-      width: 190px;
-      margin-left: 45px;
+      width: 200px;
+      margin-left: 35px;
       vertical-align: bottom; }
       #filter-track #standard-filter-panel .standard-filter-btn span {
         margin-left: -17px; }
@@ -1881,9 +1978,9 @@ inputinput:-moz-placeholder {
         font-weight: bold;
         padding-right: 1px;
         float: left;
-        padding-left: 10px;
         visibility: hidden;
-        display: initial; }
+        display: initial;
+        padding-left: 0px; }
       #filter-track #standard-filter-panel .standard-filter-btn.current i.done {
         visibility: visible; }
     #filter-track #standard-filter-panel .standard-filter-count {
@@ -1906,7 +2003,7 @@ inputinput:-moz-placeholder {
         #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count.none {
           background-color: #e8e6e6; }
       #filter-track #standard-filter-panel .standard-filter-count #called-variant-count {
-        background-color: #9fbb52; }
+        background-color: #b4c688; }
         #filter-track #standard-filter-panel .standard-filter-count #called-variant-count.none {
           background-color: #e8e6e6; }
       #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-warning {
@@ -1940,25 +2037,7 @@ inputinput:-moz-placeholder {
     pointer-events: all; }
 
 #checkmark-called {
-  fill: #9fbb52; }
-
-#recessive-symbol .parent .left {
-  stroke: #F49A73;
-  stroke-width: 2; }
-#recessive-symbol .parent .right {
-  stroke: gray;
-  stroke-width: 2; }
-#recessive-symbol .proband .left, #recessive-symbol .proband .right {
-  stroke: #F49A73;
-  stroke-width: 3; }
-
-#denovo-symbol .parent .left, #denovo-symbol .parent .right {
-  stroke: grey;
-  stroke-width: 2; }
-#denovo-symbol .proband .left, #denovo-symbol .proband .right {
-  stroke: #6A9C2F !important;
-  fill: none;
-  stroke-width: 3; }
+  fill: #b4c688; }
 
 #trio-symbol .parent .left {
   stroke: #5d809d;
@@ -1971,6 +2050,15 @@ inputinput:-moz-placeholder {
 #phenotype-symbol {
   fill: #ABA2A2;
   stroke: #ABA2A2; }
+
+#thumbs-green-symbol {
+  fill: #81A966; }
+
+#thumbs-red-symbol {
+  fill: #ad494a; }
+
+#thumbs-grey-symbol {
+  fill: #8b8b8b; }
 
 .variant.homref {
   opacity: 0 !important;
@@ -1987,8 +2075,8 @@ inputinput:-moz-placeholder {
   font-weight: bold; }
 
 .impact_MODIFIER {
-  fill: #f4d99b;
-  color: #f4d99b; }
+  fill: #f9e4b5;
+  color: #f9e4b5; }
 
 .impact_LOW {
   fill: rgba(181, 207, 107, 0.65);
@@ -2095,11 +2183,8 @@ inputinput:-moz-placeholder {
   fill: #D3D5D8;
   stroke: rgba(0, 0, 0, 0.26); }
 
-.impact, .vepImpact, .highestImpactVep, .effect, .vepConsequence, .type, .zygosity, .recfilter {
-  border: solid 2px white;
-  padding: 1px; }
-  .impact text, .vepImpact text, .highestImpactVep text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
-    fill: #717171; }
+.impact text, .vepImpact text, .highestImpactVep text, .effect text, .vepConsequence text, .type text, .zygosity text, .recfilter text {
+  fill: #717171; }
 
 .impact.nocolor rect, .vepImpact.nocolor rect, .highestImpactVep.nocolor rect, .effect.nocolor rect, .vepConsequence.nocolor rect, .zygosity.nocolor rect, .regulatory.nocolor rect, .polyphen.nocolor rect, .sift.nocolor rect {
   fill: lightgrey !important;
@@ -2112,37 +2197,33 @@ inputinput:-moz-placeholder {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
-  border: solid 1.5px #969696;
-  border-radius: 4px; }
+  outline: solid 2px #969696;
+  outline-offset: -2px; }
 
 .tooltip-zygosity:hover {
-  border-radius: 0px;
-  border: solid 2.5px #969696; }
+  outline: solid 2px #969696;
+  outline-offset: -2px; }
 
 .impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover, .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
-  border: solid 2.5px #3586c0;
-  border-radius: 4px;
-  padding: 1px; }
+  outline: solid 2px #3586c0;
+  outline-offset: -2px; }
   .impact.current:hover.not-equal, .vepImpact.current:hover.not-equal, .highestImpactVep.current:hover.not-equal, .effect.current:hover.not-equal, .vepConsequence.current:hover.not-equal, .tooltip-zygosity.current:hover.not-equal, .regulatory.current:hover.not-equal, .polyphen.current:hover.not-equal, .sift.current:hover.not-equal, .type.current:hover.not-equal, .afexaclevels.current:hover.not-equal, .af1000glevels.current:hover.not-equal, .inheritance.current:hover.not-equal, .clinvar.current:hover.not-equal, .uasibs.current:hover.not-equal, .recfilter.current:hover.not-equal {
-    border: solid 1.5px #969696; }
-
-.tooltip-zygosity.current:hover {
-  border-radius: 0px; }
+    outline: none; }
 
 .current {
   font-weight: bold;
-  border: solid 2.5px #3586c0;
-  border-radius: 4px;
-  padding: 1px; }
+  outline: solid 2px #3586c0;
+  outline-offset: -2px; }
   .current.not-equal {
     background-image: linear-gradient(transparent 7px, #3586c0 7px, #3586c0 9px, transparent 9px);
-    border: none; }
+    border: none;
+    outline: none; }
 
 .tooltip-zygosity.current {
-  border-radius: 0px;
-  border: solid 2.5px #3586c0 !important; }
+  outline: solid 2px #3586c0 !important;
+  outline-offset: -2px; }
 
 #impact-scheme, #effect-scheme, #regulatory-scheme, #zygosity-scheme {
   padding-top: 2px; }
@@ -2153,7 +2234,8 @@ inputinput:-moz-placeholder {
   font-size: 11px; }
 
 #impact-scheme.current, #effect-scheme.current, #zygosity-scheme.current {
-  color: #3586c0 !important; }
+  color: #3586c0 !important;
+  outline: none; }
   #impact-scheme.current .material-icons, #effect-scheme.current .material-icons, #zygosity-scheme.current .material-icons {
     color: #3586c0 !important; }
 
@@ -2182,10 +2264,7 @@ inputinput:-moz-placeholder {
   font-size: 12px;
   font-style: bold;
   color: #3586c0;
-  fill: #3586c0;
-  border: solid thin black;
-  border-radius: 4px;
-  padding: 1px; }
+  fill: #3586c0; }
 
 #impact-scheme:hover, #effect-scheme:hover, #af1000g-scheme:hover, #afexac-scheme:hover {
   font-weight: bold;
@@ -2291,7 +2370,8 @@ inputinput:-moz-placeholder {
   display: inline-block;
   color: #717171;
   vertical-align: top;
-  padding-top: 4px; }
+  padding-top: 4px;
+  height: 30px; }
 #dataModal #vcf-sample-select-box {
   display: inline-block;
   width: 200px; }
@@ -2315,6 +2395,14 @@ inputinput:-moz-placeholder {
   margin-top: 10px; }
 #dataModal #import-help-icon {
   color: #5d809d !important; }
+#dataModal #export-bookmarks {
+  font-size: 14px;
+  display: inline-block;
+  color: #5d809d; }
+  #dataModal #export-bookmarks i {
+    font-size: 18px;
+    margin-top: -3px;
+    margin-right: 2px; }
 #dataModal #download-bookmarks {
   font-size: 14px;
   display: inline-block;
@@ -2350,6 +2438,37 @@ inputinput:-moz-placeholder {
 #dataModal #bloodhound-data-dialog #enter-gene-name-data-dialog {
   color: #717171;
   font-size: 14px !important; }
+
+#bam-depth .tooltip {
+  background: #505050;
+  color: white;
+  font-size: 11px;
+  line-height: normal; }
+  #bam-depth .tooltip .danger {
+    color: #daa500; }
+  #bam-depth .tooltip a.danger {
+    color: #daa500 !important; }
+  #bam-depth .tooltip #exon-tooltip-close {
+    float: right;
+    color: white !important;
+    font-weight: bold;
+    font-size: 14px !important; }
+  #bam-depth .tooltip #exon-tooltip-title {
+    display: inline-block;
+    float: left; }
+
+#zoom-region-chart .tooltip .danger {
+  color: #daa500; }
+#zoom-region-chart .tooltip a.danger {
+  color: #daa500 !important; }
+#zoom-region-chart .tooltip #exon-tooltip-close {
+  float: right;
+  color: white !important;
+  font-weight: bold;
+  font-size: 14px !important; }
+#zoom-region-chart .tooltip #exon-tooltip-title {
+  display: inline-block;
+  float: left; }
 
 .tooltip-title {
   font-size: 12px;
@@ -2398,7 +2517,7 @@ inputinput:-moz-placeholder {
 .tooltip-header-small {
   overflow-wrap: break-word;
   text-align: left;
-  width: 50px;
+  width: 75px;
   float: left;
   color: #888787;
   fill: #888787; }
@@ -2410,7 +2529,7 @@ inputinput:-moz-placeholder {
   min-height: 25px; }
 
 .sib-zygosity {
-  width: 140px;
+  width: 75px;
   float: left; }
 
 .tooltip-row.sib-info {
@@ -2425,9 +2544,9 @@ inputinput:-moz-placeholder {
   padding-right: 0px !important;
   padding-left: 0px !important;
   background-color: #D3D5D8 !important;
-  margin-right: 3px;
+  margin-right: 2px;
   margin-top: 0px !important;
-  width: 33px !important;
+  width: 39px !important;
   color: black;
   border: solid thin rgba(0, 0, 0, 0.22);
   cursor: none;
@@ -2439,6 +2558,8 @@ inputinput:-moz-placeholder {
 .tooltip-zygosity.homref {
   background-color: #5D809D !important;
   color: white; }
+.tooltip-zygosity.unknown {
+  background-color: #b9edf3 !important; }
 
 .tooltip-subtitle {
   font-size: 12px;
@@ -2656,6 +2777,11 @@ text.ref-count {
   transform: rotate(152deg);
   content: ""; }
 
+.tooltip-inheritance-mode-label {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 0px; }
+
 .tooltip.tooltip-wide {
   width: 650px !important; }
 
@@ -2665,7 +2791,7 @@ text.ref-count {
     font-size: 14px; }
   .tooltip-wide .tooltip-row {
     clear: both;
-    padding-bottom: 6px; }
+    padding-bottom: 3px; }
     .tooltip-wide .tooltip-row.sib-info {
       padding-bottom: 2px; }
   .tooltip-wide .tooltip-footer {
@@ -2683,21 +2809,21 @@ text.ref-count {
       display: inline-block; }
   .tooltip-wide .tooltip-left-column {
     float: left;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-left-column .tooltip-row {
-      width: 360px;
+      width: 330px;
       overflow: auto; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
-        width: 110px; }
+        width: 90px; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
-        width: 240px; }
+        width: 220px; }
   .tooltip-wide .tooltip-right-column {
     float: right;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-right-column .tooltip-row {
-      width: 270px;
+      width: 300px;
       overflow: auto; }
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-header {
         width: 110px; }
@@ -2718,7 +2844,7 @@ text.ref-count {
     .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
       font-size: 14px !important; }
   .tooltip-wide .row {
-    line-height: 14px !important; }
+    line-height: 13px !important; }
 
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
@@ -2826,25 +2952,27 @@ text.ref-count {
     display: inline-block;
     width: 60px;
     margin-top: -2px; }
-  #bookmark-card .bookmark .variant-label .coord {
-    display: inline-block;
-    width: 97px;
-    line-height: 12px;
-    vertical-align: top; }
-  #bookmark-card .bookmark .variant-label .rsid {
-    display: inline-block;
-    margin-left: 3px;
-    width: 70px;
-    line-height: 12px;
-    vertical-align: top; }
-  #bookmark-card .bookmark .variant-label .hgvs {
-    margin-left: 3px;
-    display: inline-block;
-    width: 67px;
-    line-height: 12px;
-    vertical-align: top; }
-  #bookmark-card .bookmark .variant-label:hover {
-    text-decoration: underline !important; }
+  #bookmark-card .bookmark .variant-label {
+    display: inline-block; }
+    #bookmark-card .bookmark .variant-label .coord {
+      display: inline-block;
+      width: 97px;
+      line-height: 12px;
+      vertical-align: top; }
+    #bookmark-card .bookmark .variant-label .rsid {
+      display: inline-block;
+      margin-left: 3px;
+      width: 70px;
+      line-height: 12px;
+      vertical-align: top; }
+    #bookmark-card .bookmark .variant-label .hgvs {
+      margin-left: 3px;
+      display: inline-block;
+      width: 67px;
+      line-height: 12px;
+      vertical-align: top; }
+    #bookmark-card .bookmark .variant-label:hover {
+      text-decoration: underline !important; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
@@ -2940,6 +3068,20 @@ text.ref-count {
   fill: #717171 !important;
   font-size: 12px; }
 
+#zoom-region-chart.ibo-gene .cds.danger {
+  fill: rgba(175, 79, 79, 0.81);
+  stroke: #af4f4f; }
+#zoom-region-chart.ibo-gene .utr.danger {
+  fill: rgba(175, 79, 79, 0.81);
+  stroke: #af4f4f; }
+
+#gene-viz.ibo-gene .cds.danger {
+  fill: rgba(175, 79, 79, 0.81);
+  stroke: #af4f4f; }
+#gene-viz.ibo-gene .utr.danger {
+  fill: rgba(175, 79, 79, 0.81);
+  stroke: #af4f4f; }
+
 #genes-panel {
   margin-bottom: 5px;
   margin-top: 5px;
@@ -3003,7 +3145,7 @@ text.ref-count {
       #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
         border-top: transparent; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #analyzed-bar #passed-filter-bar {
-          background-color: #9fbb52;
+          background-color: #b4c688;
           height: 17px;
           color: white; }
         #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress #analyzed-bar #not-passed-filter-bar {
@@ -3017,16 +3159,19 @@ text.ref-count {
   height: 100%; }
   #genes-card #phenolyzer-search-box {
     margin-top: 20px; }
+    #genes-card #phenolyzer-search-box .selectize-input {
+      font-size: 14px; }
+    #genes-card #phenolyzer-search-box .selectize-dropdown {
+      font-size: 13px; }
   #genes-card .phenolyzer-label {
     color: #717171 !important;
     font-size: 13px;
     float: left; }
   #genes-card #phenolyzer-run-label {
     display: inline-block !important;
-    vertical-align: top;
-    padding-top: 3px; }
+    vertical-align: top; }
   #genes-card #phenolyzer-heading {
-    margin-top: 20px; }
+    margin-top: 10px; }
     #genes-card #phenolyzer-heading h5 {
       display: inline-block;
       font-size: 13px; }
@@ -3037,6 +3182,14 @@ text.ref-count {
   #genes-card #phenolyzer-disclaimer {
     color: #717171 !important;
     font-style: italic !important; }
+  #genes-card #phenolyzer-refresh-genes-button {
+    float: left;
+    margin-right: 30px;
+    margin-top: -2px;
+    margin-bottom: 0px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-left: 5px; }
 
 #get-genes-copy-paste-button.btn.btn-raised, #phenolyzer-go-button.btn.btn-raised {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12) !important;
@@ -3062,24 +3215,24 @@ text.ref-count {
     margin-top: 0px;
     margin-bottom: 1px; }
 
-#get-genes-copy-paste-button, #phenolyzer-go-button {
+#get-genes-copy-paste-button {
   font-size: 12px; }
 
 #gene-badge-button {
   font-size: 13px;
-  padding: 5px 1px 1px 1px;
+  padding: 3px 1px 1px 1px;
   margin: 0px;
   color: #717171;
   line-height: 15px;
   border: thin solid #e8e6e6; }
   #gene-badge-button.user-visited {
     border: 2px solid #c5c4c4;
-    padding: 4px 1px 0px 1px; }
+    padding: 2px 1px 0px 1px; }
   #gene-badge-button #gene-badge-symbols {
     height: 14px;
     padding-left: 3px;
-    padding-top: 1px;
-    float: right; }
+    padding-top: 0px;
+    float: left; }
   #gene-badge-button #gene-badge-phenotype-symbol {
     float: right;
     height: 14px;
@@ -3095,6 +3248,9 @@ text.ref-count {
   margin-bottom: 8px;
   margin-right: 10px;
   height: 21px; }
+
+#gene-badge.failed-filter {
+  opacity: 0.65; }
 
 #gene-badge.loading {
   border-left: #d8d8d8 solid 10px;
@@ -3119,12 +3275,11 @@ text.ref-count {
   font-size: 14px;
   color: #5d809d;
   font-weight: bold;
-  padding-right: 1px;
   float: left;
   display: none; }
 
 #gene-badge-called {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   color: #80a029;
   float: left;
@@ -3132,7 +3287,7 @@ text.ref-count {
 
 #gene-badge-has-called-variants {
   font-size: 14px;
-  color: #9fbb52;
+  color: #b4c688;
   float: left;
   display: none; }
 
@@ -3154,6 +3309,34 @@ text.ref-count {
   padding-left: 1px;
   display: none; }
 
+#gene-badge-coverage-problem {
+  font-size: 15px;
+  margin-top: -1px;
+  margin-left: 0px;
+  float: left;
+  color: #daa500;
+  fill: #daa500;
+  display: none; }
+  #gene-badge-coverage-problem.dropdown-item {
+    display: inline-block;
+    margin-right: 3px;
+    margin-top: 1px; }
+
+.coverage-problem-glyph {
+  fill: #daa500; }
+
+#gene-badge-harmful-variant {
+  font-size: 15px;
+  margin-top: -1px;
+  margin-left: 2px;
+  float: left;
+  color: #c70001;
+  display: none; }
+  #gene-badge-harmful-variant.dropdown-item {
+    display: inline-block;
+    margin-right: 3px;
+    margin-top: 1px; }
+
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
 #gene-badge.visited #gene-badge-name {
@@ -3162,6 +3345,10 @@ text.ref-count {
   display: inline; }
 #gene-badge.has-called-variants #gene-badge-has-called-variants {
   display: inline; }
+#gene-badge.has-coverage-problem #gene-badge-coverage-problem {
+  display: inline-block; }
+#gene-badge.has-harmful-variant #gene-badge-harmful-variant {
+  display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }
 
@@ -3194,6 +3381,9 @@ text.ref-count {
     font-size: 13px;
     padding-left: 15px;
     padding-right: 15px; }
+    #call-variants-dropdown a.disabled {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+      box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
 
 #manage-genes {
   float: left; }
@@ -3226,7 +3416,8 @@ text.ref-count {
   margin-top: -2px; }
   #manage-genes-box #manage-genes-dropdown {
     float: right;
-    margin-top: -3px; }
+    margin-top: 0px;
+    margin-left: 20px; }
 
 #gene-badge-container {
   display: flex;
@@ -3293,18 +3484,20 @@ text.ref-count {
 #order-by-label {
   margin-left: 5px;
   margin-right: 4px;
-  margin-top: 0px;
-  display: inline-block; }
+  margin-top: 10px;
+  display: inline-block;
+  float: left; }
 
 #select-gene-container {
   display: inline-block;
-  width: 110px;
+  width: 150px;
   vertical-align: middle;
-  margin-top: 8px; }
+  margin-top: 8px;
+  float: left; }
   #select-gene-container .selectize-input {
     padding-bottom: 2px;
     padding-top: 2px;
-    line-height: 17px; }
+    line-height: 20px; }
 
 #manage-cache-modal .modal-dialog {
   width: 500px; }
@@ -3701,16 +3894,21 @@ text.ref-count {
   font-size: 18px; }
 
 #legend .legend-element {
-  cursor: pointer;
+  cursor: auto;
   padding: 1px; }
   #legend .legend-element text {
-    cursor: pointer;
+    cursor: auto;
     fill: #717171;
     font-size: 12px; }
+#legend .legend-text {
+  color: #717171;
+  font-size: 12px;
+  cursor: auto; }
 #legend .legend-label {
   font-size: 13px;
   color: #717171;
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  cursor: auto; }
 
 #legend.level-basic .legend-element text {
   font-size: initial; }
