@@ -46,11 +46,11 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 	var x = screenX;
 	var y = screenY;
-	var yOffset = (+$('body #container').css('top').split("px")[0] - 5);
+	var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
 	if (adjustPosition) {
-		y -= yOffset;
-		if (lock && y - h < (yOffset * -1)) {
-			y = h - yOffset;
+		y -= navbarHeight;
+		if (lock && y - h < (navbarHeight * -1)) {
+			y = h - navbarHeight;
 		}
 		x = sidebarAdjustX(x);
 	}

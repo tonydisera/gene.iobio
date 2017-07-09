@@ -4331,7 +4331,7 @@ button {
     display: block !important; }
   .variant-card #zoom-region-chart {
     display: block;
-    margin-top: -20px !important;
+    margin-top: 0px !important;
     padding-top: 0px !important; }
   .variant-card #vcf-variants .circle, .variant-card #fb-variants .circle, .variant-card #vcf-variants .arrow-line, .variant-card #fb-variants .arrow-line {
     stroke: #3586c0;

@@ -652,7 +652,12 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 	var screenX = variant.screenXMatrix;
 	screenX    -= me.featureMatrix.cellSize()/2;
 
-	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix, null, null, adjustPosition);
+	var screenY = variant.screenYMatrix;
+	if (isLevelEdu) {
+		screenY += $('#nav-edu-tour').outerHeight();
+	} 
+
+	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, null, null, adjustPosition);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});
