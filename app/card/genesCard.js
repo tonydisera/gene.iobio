@@ -819,7 +819,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
 	var me = this;
 
-	if (window.geneNames.length > 0) {
+	if (!isLevelEdu && !isLevelBasic && window.geneNames.length > 0) {
 		alertify.confirm("",
 			"There are " + window.geneNames.length  + " genes already listed.  Do you want to keep these genes?",
 			function (e) {
@@ -837,6 +837,8 @@ GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
 			}
 
 		).set('labels', {ok:'Keep genes', cancel:'Remove genes'});   				
+	} else {
+		me._getPhenolyzerGenesAdvancedImpl(url);
 	}
 
 
