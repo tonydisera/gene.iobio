@@ -1757,7 +1757,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 						if (variantInfo.inheritance == 'denovo') {
 							variantInfo.inheritance = 'de novo';
 						}
-						inherit += variantInfo.inheritance + " ";
+						inherit += matrixCard.getInheritanceLabel(inheritance) + " ";
 						
 					}	
 
@@ -1782,15 +1782,16 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 				var symbolIndex = 0;
 				for (var inheritance in harmfulVariantInheritance) {
 					var symbolFunction = matrixCard.inheritanceMap[inheritance].symbolFunction;
+					var inheritanceDisplay = matrixCard.getInheritanceLabel(inheritance)
 					geneBadge.find('#gene-badge-symbols').append("<svg class=\"inheritance-badge\" height=\"15\" width=\"15\">");
 					var options = {width:15, height:15, transform: 'translate(0,0)'};
-					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: inheritance}]);
+					var selection = d3.select(geneBadge.find('#gene-badge-symbols .inheritance-badge')[symbolIndex]).data([{clazz: inheritance, display: inheritanceDisplay}]);
 					symbolFunction(selection, options);
 					symbolIndex++;
 					selection.on("mouseover", function(d,i) {
 						var x = d3.event.pageX;
 						var y = d3.event.pageY;
-						me.showTooltip(d.clazz + " inheritance mode", x, y, 170);
+						me.showTooltip(d.display + " inheritance mode", x, y, 170);
 					})
 					.on("mouseout", function(d,i) {
 							me.hideTooltip();

@@ -510,7 +510,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
 	                          ? ''
-						      : me._tooltipHeaderRow('<span class="tooltip-inheritance-mode-label">' + variant.inheritance + ' inheritance</span>', '', '', '', null, 'padding-top:0px;');
+						      : me._tooltipHeaderRow('<span class="tooltip-inheritance-mode-label">' + matrixCard.getInheritanceLabel(variant.inheritance) + ' inheritance</span>', '', '', '', null, 'padding-top:0px;');
 
 	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
 	                  ? effectDisplay 
@@ -571,7 +571,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	}
 
 	if (rec) {
-		rec.inheritance      = variant.inheritance ? (variant.inheritance == 'denovo' ? 'de novo' : variant.inheritance) : "";
+		rec.inheritance      = variant.inheritance ? matrixCard.getInheritanceLabel(variant.inheritance) : "";
 		rec.impact           = vepImpactDisplay;
 		rec.highestImpact    = vepHighestImpactValue;
  		rec.highestImpactInfo = vepHighestImpactInfo;
@@ -715,6 +715,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	        
 
 }
+
 
 
 VariantTooltip.prototype.variantTooltipMinimalHTML = function(variant) {

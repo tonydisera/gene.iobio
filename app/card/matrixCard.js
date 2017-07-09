@@ -65,9 +65,9 @@ function MatrixCard() {
                         none:                 {value: 104, badge: false, clazz: ''}
                      };
 	this.inheritanceMap = {
-		                denovo:    {value: 1, badge: true, clazz: 'denovo',    symbolFunction: this.showDeNovoSymbol},
-                        recessive: {value: 2, badge: true, clazz: 'recessive', symbolFunction: this.showRecessiveSymbol},
-                        none:      {value: 3, badge: false, clazz: 'noinherit', symbolFunction: this.showNoInheritSymbol}
+		                denovo:    {value: 1, badge: true, clazz: 'denovo',    display: 'de novo', symbolFunction: this.showDeNovoSymbol},
+                        recessive: {value: 2, badge: true, clazz: 'recessive', display: 'recessive', symbolFunction: this.showRecessiveSymbol},
+                        none:      {value: 3, badge: false, clazz: 'noinherit', display: '', symbolFunction: this.showNoInheritSymbol}
                      };
 	this.zygosityMap = {
 		                HOM:        {value: 1, badge: true,  clazz: 'zyg_hom',        symbolFunction: this.showHomSymbol},
@@ -1548,13 +1548,12 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 }
 
 MatrixCard.prototype.formatInheritance = function(variant, value) {
-	if (value == null || value == 'none') {
-		return '';
-	} else if (value == 'denovo') {
-		return 'de novo';
-	} else {
-		return value;
-	}
+	return this.getInheritanceLabel(value);
+}
+
+MatrixCard.prototype.getInheritanceLabel = function(inheritance) {
+	var matrixRow = this.inheritanceMap[inheritance];
+	return matrixRow ? matrixRow.display : inheritance;
 }
 
 MatrixCard.wrap = function(text, width, maxLines) {
