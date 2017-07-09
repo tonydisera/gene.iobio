@@ -2788,7 +2788,7 @@ text.ref-count {
     font-size: 14px; }
   .tooltip-wide .tooltip-row {
     clear: both;
-    padding-bottom: 6px; }
+    padding-bottom: 3px; }
     .tooltip-wide .tooltip-row.sib-info {
       padding-bottom: 2px; }
   .tooltip-wide .tooltip-footer {
