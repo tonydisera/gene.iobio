@@ -29,11 +29,12 @@ module.exports = {
   },
 
   'Bookmark 2 variants for gene RAI1 from matrix variantTooltip': function(client) {
+    variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     client.pause(2000);
     matrixTrack.clickColumn(1);
 
     variantTooltip.waitForTooltip();
-    client.pause(2000);
+    client.pause(3000);
     variantTooltip.expectInheritanceEquals('recessive inheritance');
     variantTooltip.expectVepImpact('high');
     variantTooltip.expectVepConsequence('stop gained');
@@ -46,6 +47,8 @@ module.exports = {
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'proband', 38, 1,  39, 'Hom');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'mother',  26, 25, 51, 'Het');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'father',  30, 33, 63, 'Het');
+    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033 17:17698535');
+    variantTooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
 
 
     variantTooltip.clickBookmark();
@@ -55,14 +58,6 @@ module.exports = {
     bookmarkPanel.assertCurrentBookmarkHgvsEquals('p.Trp758Ter');
     bookmarkPanel.assertBookmarkCountEquals(1);
 
-
-    client.pause(2000);
-    matrixTrack.waitForMatrixLoaded();
-    variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
-    variantTooltip.waitForTooltip();
-    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033');
-    variantTooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
-    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_variantTooltip, 'proband', 38, 1, 39, 'Hom');
     
 
     matrixTrack.clickColumn(2);
@@ -73,14 +68,15 @@ module.exports = {
     
     
   'Click on another gene and bookmark a third variant from variantTooltip': function(client) {
+    variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
+    client.pause(2000);
     nav.searchGene('PDHA1');
     client.pause(1000);
     matrixTrack.waitForMatrixLoaded();
     matrixTrack.clickColumn(1);
     variantTooltip.waitForTooltip();
 
-    console.log('variantTooltip after matrix column click = ' + variantTooltip.selector);
-    variantTooltip.expectInheritanceEquals('denovo inheritance');
+    variantTooltip.expectInheritanceEquals('de novo inheritance');
     variantTooltip.expectVepImpact('moderate');
     variantTooltip.expectVepConsequence('missense variant');
     variantTooltip.expectPolyphen('probably damaging');
@@ -101,15 +97,17 @@ module.exports = {
   },
 
 
-  'Click on a bookmark link in the bookmark panel and show matrix variantTooltip': function(client) {
-    client.pause(2000);
-    bookmarkPanel.clickBookmark(client, "17698535 G->A");
 
-    client.pause(2000);
-    matrixTrack.waitForMatrixLoaded();
+  'Click on a bookmark link in the bookmark panel and show matrix variantTooltip': function(client) {
+    client.pause(3000);
+    bookmarkPanel.clickBookmark(client, "17698535 G->A");
+    
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
+    matrixTrack.waitForMatrixLoaded();
+    
     variantTooltip.waitForTooltip();
-    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033');
+    client.pause(1000);
+    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033 17:17698535');
     variantTooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_variantTooltip, 'proband', 38, 1, 39, 'Hom');
 
@@ -119,6 +117,7 @@ module.exports = {
   'Click on a gene link in the bookmark panel and make sure rectangles shown for bookmarked variants in proband variant': function(client) {
     bookmarkPanel.clickBookmarkGene(client, "RAI1");
     matrixTrack.waitForMatrixLoaded();
+    client.pause(3000)
     probandVariantCard.assertBookmarkIndicatorCountEquals(2);
 
   },

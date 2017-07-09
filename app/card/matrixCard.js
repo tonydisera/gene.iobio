@@ -499,7 +499,7 @@ MatrixCard.prototype.removeBookmarkFlag = function(theVariant) {
 	}
 
 }
-MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
+MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip, adjustPosition=true) {
 	var me  = this;
 	var index = -1;
 	var i = 0;
@@ -549,7 +549,7 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
 	      	colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
 
 	      	clickedVariant = colObject;
-	      	me.showTooltip(colObject, true);
+	      	me.showTooltip(colObject, true, adjustPosition);
 
       	}
 
@@ -591,7 +591,7 @@ MatrixCard.prototype.adjustTooltip = function(variant) {
 	}
 }
 
-MatrixCard.prototype.showTooltip = function(variant, lock) {
+MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) {
 	var me = this;
 
 	// Don't show the tooltip for mygene2 beginner mode
@@ -630,19 +630,19 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
 
 		        	refreshedVariant.screenXMatrix = xMatrix;
 		        	refreshedVariant.screenYMatrix = yMatrix;
-					me._showTooltipImpl(refreshedVariant, true);
+					me._showTooltipImpl(refreshedVariant, true, adjustPosition);
 				}
 
 
 	        });
 	} else {
-		me._showTooltipImpl(variant, lock);
+		me._showTooltipImpl(variant, lock, adjustPosition);
 	}
 }
 
 
 
-MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
+MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=true) {
 	var me = this;
 
 	//var tooltip = d3.select('#container #matrix-track .tooltip');
@@ -652,7 +652,7 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
 	var screenX = variant.screenXMatrix;
 	screenX    -= me.featureMatrix.cellSize()/2;
 
-	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix);
+	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, variant.screenYMatrix, null, null, adjustPosition);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});

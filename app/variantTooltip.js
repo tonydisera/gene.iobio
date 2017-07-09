@@ -7,7 +7,7 @@ function VariantTooltip() {
 	this.VALUE_EMPTY        = "-";
 }
 
-VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html) {
+VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html, adjustPosition=true) {
 	var me = this;
 	tooltip.style("z-index", 1032);
 	tooltip.transition()        
@@ -45,13 +45,16 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	var x = screenX;
+	var y = screenY;
 	var yOffset = (+$('body #container').css('top').split("px")[0] - 5);
-	var y = screenY - yOffset;
-	if (lock && y - h < (yOffset * -1)) {
-		y = h - yOffset;
+	if (adjustPosition) {
+		y -= yOffset;
+		if (lock && y - h < (yOffset * -1)) {
+			y = h - yOffset;
+		}
+		x = sidebarAdjustX(x);
 	}
 
-	x = sidebarAdjustX(x);
 
 
 
@@ -202,8 +205,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 		var symbolFunction = matrixCard.inheritanceMap[variant.inheritance].symbolFunction;
 		if ($(selector + " .tooltip-title:contains('inheritance')").length > 0) {
-			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"22\" width=\"20\">");
-			var options = {width:18, height:18, transform: 'translate(0,6)'};
+			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"15\" width=\"16\">");
+			var options = {width:15, height:15, transform: 'translate(0,0)'};
 			var selection = d3.select(selector + ' .inheritance-badge').data([{clazz: clazz}]);
 			symbolFunction(selection, options);					
 		}
@@ -669,10 +672,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
-			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
+			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", exonDisplay, '')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
-			+ me._tooltipHeaderRow( coord, exonDisplay, '', '')
+			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, dbSnpLink, coord, 'ref-alt')
 			+ inheritanceModeRow
 			+ leftDiv
 			+ rightDiv

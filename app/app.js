@@ -3439,6 +3439,7 @@ function filterVariantsImpl() {
 function bookmarkVariant() {
 	if (clickedVariant) {
 		this.bookmarkCard.bookmarkVariant(clickedVariant);
+		unpinAll();
 	} 
 }
 

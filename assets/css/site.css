@@ -2777,7 +2777,7 @@ text.ref-count {
 .tooltip-inheritance-mode-label {
   display: inline-block;
   vertical-align: top;
-  padding-top: 8px; }
+  padding-top: 0px; }
 
 .tooltip.tooltip-wide {
   width: 650px !important; }
@@ -2806,7 +2806,7 @@ text.ref-count {
       display: inline-block; }
   .tooltip-wide .tooltip-left-column {
     float: left;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-left-column .tooltip-row {
       width: 330px;
@@ -2817,7 +2817,7 @@ text.ref-count {
         width: 220px; }
   .tooltip-wide .tooltip-right-column {
     float: right;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-right-column .tooltip-row {
       width: 300px;
@@ -2841,7 +2841,7 @@ text.ref-count {
     .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
       font-size: 14px !important; }
   .tooltip-wide .row {
-    line-height: 14px !important; }
+    line-height: 13px !important; }
 
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
