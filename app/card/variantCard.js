@@ -897,7 +897,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		this.cardSelector.find("#bam-track").addClass("hide");
 		filterCard.enableCoverageFilters();
 		if (callbackDataLoaded) {
-			callbackDataLoaded();
+			callbackDataLoaded(me);
 		}
 		return;
 	}
@@ -923,7 +923,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		}
 		
 		if (callbackDataLoaded) {
-	   	    callbackDataLoaded();
+	   	    callbackDataLoaded(me);
    	    }
 	} else {
 
@@ -936,7 +936,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 			me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
 
 			if (callbackDataLoaded) {
-		   	    callbackDataLoaded();
+		   	    callbackDataLoaded(me);
 	   	    }
 
 		});
@@ -1911,6 +1911,7 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);
 	}
 }
+
 
 
 VariantCard.prototype.unpin = function(saveClickedVariant, unpinMatrixTooltip) {

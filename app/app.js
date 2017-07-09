@@ -2484,8 +2484,8 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 				Promise.all(coveragePromises).then(function() {
 					// Show the coverage chart (if alignments provided)
 					getRelevantVariantCards().forEach(function(variantCard) {
-						variantCard.showBamDepth(allMaxDepth, function() {
-							variantCard.highlightLowCoverageRegions(window.selectedTranscript);
+						variantCard.showBamDepth(allMaxDepth, function(theVariantCard) {
+							theVariantCard.highlightLowCoverageRegions(window.selectedTranscript);
 						});
 					});
 				});
