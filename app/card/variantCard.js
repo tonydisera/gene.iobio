@@ -203,7 +203,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .widthPercent("100%")
 				    .heightPercent("100%")
 				    .width($('#container').innerWidth())
-				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 20, left: isLevelBasic || isLevelEdu ? 9 : 4})
+				    .margin({top: 0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
 				    .showXAxis(true)
 				    .showBrush(false)
 				    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 16)
@@ -908,7 +908,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 
 	this.cardSelector.find("#bam-depth").css("visibility", "visible");
 	this.cardSelector.find("#bam-chart-label").css("visibility", "visible");
-	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-16px");
+	this.cardSelector.find("#bam-chart-label").css("margin-bottom", "-12px");
 
 
 	if (this.isViewable()) {

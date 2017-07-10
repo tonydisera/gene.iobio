@@ -307,6 +307,7 @@ lineD3 = function module() {
              return d;            
           })
           .orient("bottom");
+
       if (formatXTick) {
         xAxis.tickFormat(formatXTick);
       }
@@ -314,7 +315,6 @@ lineD3 = function module() {
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .ticks(yTicks ? yTicks : 5)
       if (yAxisLine) {
           yAxis.innerTickSize(-innerWidth)
                .outerTickSize(0)  
@@ -324,6 +324,15 @@ lineD3 = function module() {
           yAxis.orient("right");
       }
 
+      if (yTicks && yTicks == 3) {
+        var newTickValues = [];
+        newTickValues.push(0);
+        newTickValues.push(d3.round(y.domain()[1]/2));
+        newTickValues.push(y.domain()[1])
+        yAxis.tickValues(newTickValues);          
+      } else if (yTicks) {
+        xAxis.ticks(yTicks);
+      }
       if (yTickFormat) {
         yAxis.tickFormat(yTickFormat);
       }

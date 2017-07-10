@@ -1301,6 +1301,17 @@ section
   padding-bottom: 0px
   clear: both
 
+  .axis.x
+    .tick
+      line 
+        transform: translateY(-14px)
+        stroke-width: 1px
+      text 
+        transform: translateY(6px)
+    path   
+      transform: translateY(-20px)
+      display: none  
+
 #bam-track
   margin-bottom: 0px
   margin-top: -5px
@@ -1557,12 +1568,25 @@ header
   stroke: $arrow-color
   pointer-events: none
 
+#vcf-variants
+  .axis.x
+    .tick
+      line
+        display: none
+        stroke: rgba(211, 211, 211, 0.84)
+
 #bam-depth .circle-label
   fill: $arrow-color
   font-size: 13px
   font-weight: bold
   stroke: none
   pointer-events: none
+
+#bam-depth
+  .y.axis
+    .tick
+      text
+        font-size: 11px
 
 .bar
   stroke: black
@@ -1576,10 +1600,9 @@ header
     opacity: 0
 
 #bam-depth path.line
-  stroke: black
+  stroke: rgba(128,128,128,.81)
   stroke-width: 1
   fill: none
-  opacity: .5
 
 .area-chart-gradient-top
   stop-color: grey
@@ -1597,6 +1620,17 @@ header
   .axis text
     font-size: 11px
     fill: rgb(120, 120, 120)
+
+  .axis.x
+    .tick
+      line 
+        transform: translateY(-14px)
+      text 
+        transform: translateY(6px)
+    path   
+      transform: translateY(-20px)
+      display: none
+
 
   padding-left: 0px
   padding-right: 0px

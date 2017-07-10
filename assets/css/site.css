@@ -1082,6 +1082,14 @@ section {
   margin-bottom: 0px;
   padding-bottom: 0px;
   clear: both; }
+  #gene-track .axis.x .tick line {
+    transform: translateY(-14px);
+    stroke-width: 1px; }
+  #gene-track .axis.x .tick text {
+    transform: translateY(6px); }
+  #gene-track .axis.x path {
+    transform: translateY(-20px);
+    display: none; }
 
 #bam-track {
   margin-bottom: 0px;
@@ -1315,12 +1323,19 @@ header {
   stroke: #3586c0;
   pointer-events: none; }
 
+#vcf-variants .axis.x .tick line {
+  display: none;
+  stroke: rgba(211, 211, 211, 0.84); }
+
 #bam-depth .circle-label {
   fill: #3586c0;
   font-size: 13px;
   font-weight: bold;
   stroke: none;
   pointer-events: none; }
+
+#bam-depth .y.axis .tick text {
+  font-size: 11px; }
 
 .bar {
   stroke: black;
@@ -1333,10 +1348,9 @@ header {
     opacity: 0; }
 
 #bam-depth path.line {
-  stroke: black;
+  stroke: rgba(128, 128, 128, 0.81);
   stroke-width: 1;
-  fill: none;
-  opacity: 0.5; }
+  fill: none; }
 
 .area-chart-gradient-top {
   stop-color: grey;
@@ -1359,6 +1373,13 @@ header {
   #zoom-region-chart .axis text {
     font-size: 11px;
     fill: #787878; }
+  #zoom-region-chart .axis.x .tick line {
+    transform: translateY(-14px); }
+  #zoom-region-chart .axis.x .tick text {
+    transform: translateY(6px); }
+  #zoom-region-chart .axis.x path {
+    transform: translateY(-20px);
+    display: none; }
 
 #zoom-region-start {
   float: left;
