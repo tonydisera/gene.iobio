@@ -2986,7 +2986,7 @@ function getCachedGeneCoverage(geneObject, transcript) {
 
 function shouldAutocall(callback) {
 	if (isAlignmentsOnly() && autocall == null) {
-		var message = "Would you like to variants to automatically be called from alignments when gene is selected?";
+		var message = "Would you like to auto-call variants from alignments when gene is selected?";
 		alertify.confirm(message, 
 			            function(){ 
 					    	// OK pressed
