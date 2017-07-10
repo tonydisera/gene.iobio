@@ -1,6 +1,6 @@
 lineD3 = function module() {
 
-  var dispatch = d3.dispatch("d3brush", "d3rendered", "d3regiontooltip");
+  var dispatch = d3.dispatch("d3brush", "d3rendered", "d3regiontooltip", "d3horizontallineclick");
 
   var debug = false;
 
@@ -484,9 +484,16 @@ lineD3 = function module() {
              .attr("y2", 0)
     if (label) {
       lineGroup.append("text")
-               .attr("x", 40)
+               .attr("x", d3.round(x(x.domain()[1])))
                .attr("y", 3)
-               .text(label);
+               .attr("text-anchor", "end")
+               .text(label)
+               .on("click", function(d,i) {
+                  var label = d3.select(this).text();
+                  dispatch.d3horizontallineclick(label);
+               })
+               
+
     }
   }
 

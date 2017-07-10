@@ -264,6 +264,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    		.on("d3regiontooltip", function(featureObject, feature, tooltip, lock, onClose) {
 								me.showExonTooltip(featureObject, feature, tooltip, lock, onClose);
 				    		})
+				    		.on("d3horizontallineclick", function(label) {
+								showSidebar('Filter')
+    							$('#filter-track #coverage-thresholds').addClass('attention');
+				    		})
 							
 
 		// Create the vcf track
@@ -410,7 +414,7 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
     }
     if (lock) {
     	html += '<div style="text-align:right;margin-top:8px">' 
-    	+ '<a href="javascript:void(0)" id="exon-tooltip-thresholds" class="danger" style="float:left"  >Set thresholds</a>'
+    	+ '<a href="javascript:void(0)" id="exon-tooltip-thresholds" class="danger" style="float:left"  >Set cutoffs</a>'
     	+ '</div>'	    	
     }
     tooltip.html(html);	
@@ -970,7 +974,7 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 
 		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
-		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, filterCard.geneCoverageMedian + "x (median threshold)", "threshold" );
+		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, "cutoff", "threshold" );
 	}
 }
 
