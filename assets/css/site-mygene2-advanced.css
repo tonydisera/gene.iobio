@@ -1291,7 +1291,8 @@ header {
     fill: rgba(218, 165, 0, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
-    stroke: lightgray; }
+    stroke: lightgray;
+    stroke-dasharray: 5, 5; }
   #bam-depth .threshold text {
     font-size: 12px;
     fill: #717171; }

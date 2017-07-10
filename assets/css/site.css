@@ -1291,10 +1291,12 @@ header {
     fill: rgba(218, 165, 0, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
-    stroke: lightgray; }
+    stroke: lightgray;
+    stroke-dasharray: 5, 5; }
   #bam-depth .threshold text {
     font-size: 12px;
-    fill: #717171; }
+    fill: #717171;
+    cursor: pointer; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
