@@ -881,7 +881,8 @@ a.btn {
           margin-left: 10px;
           margin-right: 10px;
           color: #5d809d;
-          font-size: 16px; }
+          font-size: 16px;
+          line-height: 17px; }
         #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint {
           width: 150px;
           height: 100px;
