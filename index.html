@@ -538,6 +538,18 @@
 
 
     <div id="screencast-panel" class="hide" style="text-align:center;margin-top:50px;overflow: visible;">
+      
+      <div id="screencast-coverage-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
+          <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-coverage-analysis #screencast-video').stop()">
+            <i class="material-icons" style="text-align: left;">arrow_back</i>
+          </button>
+          <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Assessing insufficient coverage</h4>
+
+              <div style="position:relative;height:0;padding-bottom:75.0%"><iframe src="https://www.youtube.com/embed/4VG1au5txn0?rel=0&ecver=2" width="480" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen=""></iframe></div>
+
+
+        </div>
+
       <div id="screencast-saving-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
           <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-saving-analysi #screencast-video').stop()">
             <i class="material-icons" style="text-align: left;">arrow_back</i>
@@ -545,7 +557,7 @@
           <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Saving your analysis with Bookmarks</h4>
 
 
-          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/JlXoBlWvniE" frameborder="0" allowfullscreen></iframe>
+          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/JlXoBlWvniE?rel=0" frameborder="0" allowfullscreen></iframe>
 
 
       </div>
@@ -555,9 +567,11 @@
           </button>
           <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Multi-gene analysis</h4>
 
-          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/QiJ7wuN8LYQ" frameborder="0" allowfullscreen></iframe>
+          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/QiJ7wuN8LYQ?rel=0" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>    
+
+   
 
 
 
@@ -585,18 +599,31 @@
             <div id="video-thumbprint-heading">What's new</div>
             <div id="video-thumbprint-content">
 
-              <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint" >
-                <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');">play_arrow</i>
+              <div class="video-thumbprint-well ">
+                <div id="welcome-screencast-panel-coverage-analysis" class="video-thumbprint shadow-z-2" >
+                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-coverage-analysis').removeClass('hide');$('#screencast-multigene-analysis').addClass('hide');$('#screencast-saving-analysis').addClass('hide');">play_arrow</i>
+                </div>
+                <div class="video-title">Detecting insufficient coverage</div>
               </div>
-              <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint">
-                <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide')">play_arrow</i>
+              <div class="video-thumbprint-well ">
+                <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint shadow-z-2" >
+                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');$('#screencast-coverage-analysis').addClass('hide');">play_arrow</i>
+                </div>
+                <div class="video-title">Saving your analysis</div>                
               </div>
-                        
+              <div class="video-thumbprint-well ">
+                <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint shadow-z-2">
+                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide');$('#screencast-coverage-analysis').addClass('hide');">play_arrow</i>
+                </div>
+                <div class="video-title">Multi-gene analysis</div>     
+              </div>                           
             </div>
           </div>
 
 
         </div>    
+
+   
 
 
         <div>  
