@@ -648,6 +648,127 @@ var effectCategories = [
 
   }
 
+
+  
+  exports.promiseGetKnownVariants = function(refName, geneObject, transcript, binLength) {
+    var me = this;
+
+
+    return new Promise( function(resolve, reject) {
+
+      me._getKnownVariantsImpl(refName, geneObject, transcript, binLength,
+        function(data) {
+          if (data) {
+            resolve(data);
+          } else {
+            reject();
+          }
+        });
+
+    });
+  }
+
+  exports._getKnownVariantsImpl = function(refName, geneObject, transcript, binLength, callback) {
+
+    var me = this;
+
+    var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
+
+    // For the knownVariants service, pass in an argument for the gene region, then pass in eith
+    // the length of the bin region or a comma separate string of region parts (e.g. the exons)
+    var knownVariantsArgs = [];
+    knownVariantsArgs.push("-r");
+    knownVariantsArgs.push(regionParm);
+    if (binLength) {
+      knownVariantsArgs.push("-b");
+      knownVariantsArgs.push(binLength);
+    } else if (transcript) {
+      var regionParts = "";
+      transcript.features
+      .filter( function(feature) {
+        return feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR';
+      })
+      .sort( function(exon1, exon2) {
+        if (exon1.start < exon2.start) {
+          return -1;
+        } else if (exon1.start > exon2.start) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+      .forEach( function(exon) {
+        if (regionParts.length > 0) {
+          regionParts += ",";
+        }
+        regionParts += exon.start + "-" + exon.end;
+      })
+      if (regionParts.length > 0) {
+        knownVariantsArgs.push("-p");
+        knownVariantsArgs.push(regionParts);
+      }
+    }
+    knownVariantsArgs.push("-");
+
+
+    // Create an iobio command get get the variants and add any header recs.
+    var tabixArgs = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
+    if (tbiUrl) {
+      tabixArgs.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL})
+                       .pipe(IOBIO.knownvariants, knownVariantsArgs, {ssl: false})
+
+
+    var summaryData = "";
+    // Get the results from the iobio command
+    cmd.on('data', function(data) {
+         if (data == undefined) {
+            return;
+         }
+         summaryData += data;
+    });
+
+    // We have all of the annotated vcf recs.  Now parse them into vcf objects
+    cmd.on('end', function(data) {
+      var results = [];
+      var records = summaryData.split("\n");
+      var fieldsNames = {};
+
+      var idx = 0;
+      records.forEach(function(record) {
+        if (idx == 0) {
+          fieldNames = record.split('\t');
+        } else {
+          if (record.trim().length > 0) {
+            var fields = record.split('\t');
+            var resultRec = {};
+
+            var i = 0;
+            fieldNames.forEach(function(fieldName) {
+              // All fields are numeric
+              resultRec[fieldName] = +fields[i];
+              i++;
+            })
+            // Find the mid-point of the interval (binned region)
+            resultRec.point = resultRec.start + ((resultRec.end - resultRec.start) / 2);
+            
+            results.push(resultRec);            
+          }
+        }
+        idx++;
+      });
+      callback(results);
+    });
+
+    cmd.on('error', function(error) {
+       console.log(error);
+    });
+
+    cmd.run();
+
+  }
+
   exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
     var key =  "backend.gene.iobio"  
       + "-" + cacheHelper.launchTimestamp 

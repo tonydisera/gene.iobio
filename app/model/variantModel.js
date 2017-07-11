@@ -134,6 +134,48 @@ VariantModel.prototype.reconstituteFbData = function(theVcfData) {
    	return theFbData;				
 }
 
+VariantModel.prototype.promiseGetKnownVariants = function(geneObject, transcript, binLength) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+		var refName = me._stripRefName(geneObject.chr);
+		me.vcf.promiseGetKnownVariants(refName, geneObject, transcript, binLength)
+		        .then(function(results) {
+		        	resolve(results);
+		        	/*
+		        	if (transcript) {
+						var exonBins = me.binKnownVariantsByExons(geneObject, transcript, binLength, results);
+						resolve(exonBins);	        	
+					} else {
+			        	resolve(results);
+					}
+					*/
+		        },
+		        function(error) {
+		        	reject(error);
+		        });
+	})
+}
+
+VariantModel.prototype.binKnownVariantsByExons = function(geneObject, transcript, binLength, results) {
+	var exonBins = [];
+	transcript.features.filter(function(feature) {
+		return feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'CDS';
+	}).forEach(function(exon) {
+		var exonBin = {point: (+exon.start + ((+exon.end - +exon.start)/2)), start: exon.start, end: exon.end, total: +0, path: +0, benign: +0, unknown: +0, other: +0};
+		results.forEach(function(rec) {
+			if (+rec.start >= +exon.start && +rec.end <= +exon.end) {
+				exonBin.total    += +rec.total;
+				exonBin.path     += +rec.path;
+				exonBin.benign   += +rec.benign;
+				exonBin.other    += +rec.other;
+				exonBin.unknown  += +rec.unknown;
+			}
+		})
+		exonBins.push(exonBin);
+	})	
+	return exonBins;
+}
+
 
 
 

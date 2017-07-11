@@ -43,7 +43,10 @@ IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" :
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
 IOBIO.geneCoverage            = iobio_services + "genecoverage/";
+IOBIO.knownvariants           = DEV_IOBIO + "knownvariants/";
 
+
+var KNOWN_VARIANTS_CLINVAR_VCF_URL = "https://s3.amazonaws.com/iobio/gene/clinvar/clinvar_20170530.vcf.gz";
 
 // URL for Phenolyzer
 var OFFLINE_PHENOLYZER_CACHE_URL  = isOffline ?  (serverCacheDir) : ("../" + serverCacheDir);

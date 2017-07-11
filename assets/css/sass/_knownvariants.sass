@@ -1,0 +1,77 @@
+#known-variants-chart
+  padding: 0px
+  margin-top: 0px
+  margin-bottom: 0px
+
+  #known-variants-nav
+    text-align: left
+    margin-bottom: 2px
+
+    .tooltip
+      background-color: initial
+      border: none
+      box-shadow: none
+
+    .chart-label
+      vertical-align: top
+      display: inline-block
+      margin-top: 4px
+      margin-right: 10px
+
+    .loader
+      margin-left: 10px
+      display: inline-block
+      margin-top: 2px
+      margin-bottom: 0px
+
+      .loader-label
+        font-size: 12px
+
+    .chart-type
+      margin: 0
+      padding: 2px
+      vertical-align: top
+      cursor: pointer
+
+      &.selected
+        font-weight: bold
+        border: solid .5px $current-color
+        border-radius: 4px
+        padding: 1px
+
+      .material-icons
+        font-size: 17px
+
+  svg
+    vertical-align: bottom
+    .axis
+      text
+        font-size: 12px !important
+
+      &.axis--x
+        .tick
+          visibility: hidden
+    
+    .layer.benign
+      .stacked-element
+        fill: rgba(156, 194, 49, 1)
+        stroke: $text-color
+        stroke-width: .5px
+
+    .layer.path
+      .stacked-element
+        fill: #ad494A
+        stroke: $text-color
+        stroke-width: .5px
+
+    .layer.other
+      .stacked-element
+        fill: rgba(231, 186, 82, 1)
+        stroke: $text-color
+        stroke-width: .5px
+
+    .layer.unknown
+      .stacked-element
+        fill: rgb(189, 189, 189)
+        stroke: $text-color
+        stroke-width: .5px

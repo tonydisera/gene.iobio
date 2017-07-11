@@ -170,7 +170,7 @@
                onclick="filterCard.clearFilters();filterVariants()">
                   Clear all
               </a>              
-              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:-50px">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;">
                 <span class="material-icons">tune</span> 
                 Filter
               </a>
@@ -217,175 +217,102 @@
     <div id="intro" class="hide level-basic shadow-z-2">
     </div>
 
-    <div id="filter-summary-track" class="hide shadow-z-2 track level-edu level-basic">
-      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filter</span>
-      <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
-        Clear filter
-      </button>
+
+    <div id="analysis-track" class="hide shadow-z-2 track">
+    </div>
+
+    <div id="filter-summary-track" class="hide shadow-z-2 track">
+      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
       <div id="filter-summary-loader" class="loader hide level-edu level-basic">
         <span class="loader-label"></span>
         <img src="assets/images/wheel.gif">
       </div> 
-
            
     </div>
 
-
     <div id="genes-control-track" class="hide level-basic shadow-z-2">
-      
-      <button id="refresh-badges-button" class="hide btn btn-default icon-button-sm btn-raised" onclick="cacheHelper.refreshGeneBadges()">
-        Refresh all
-      </button>
-
 
       <div  class="nav-stretch level-basic" style="margin-top:-13px;">
           <div class="card-label level-edu" style="float:left;padding-top:8px;margin-right:10px;">Selected Genes</div>
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
 
-              <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
-                  Analyze all genes
-              </button>
-
-              <div id="call-variants-dropdown" class="hide btn-group level-edu level-mygene2" style="display:inline-block;float:left">
-                <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
-                  Call Variants
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a href="javascript:void(0)" id="call-variants-selected-gene" onclick="jointCallVariants(false)">for selected gene</a></li>
-                  <li><a href="javascript:void(0)" id="call-variants-all-genes" onclick="cacheHelper.analyzeAll(true)">for all genes</a></li>
-                </ul>
-              </div>
-
-
-            <div id="analyze-all-panel" class="level-edu">
-
-              <!-- Buttons for editting gene list, done editting gene list -->
-              <div id="manage-genes" class="manage-gene-links level-edu level-basic">
-
-                <div id="total-genes-label"></div>
-
-                <div id="analyzed-progress-bar" >
-                  
-
-                  <div >
-                    <span class='progress-bar-label'>Loaded</span>
-
-                    <div id="analyze-all-progress" class="analysis-progress-bar">
-                      <div class="text">0 analyzed</div>   
-                      <div style="float:left;margin-top:-17px;width:100%">                 
-                        <div id="analyzed-bar" class="bar" width="0%" >
-                          <div id="passed-filter-bar" class="bar" width="0%"></div>
-                          <div id="not-passed-filter-bar" class="bar" width="0%"></div>
-                        </div>
-                    
-                        <div id="not-analyzed-bar" class="bar" width="100%">                      
-                        </div>
-                      </div>
-
-                     </div>
-                  </div>
-
-
-                  <div style='margin-top:-1px;float:left'>
-                    <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
-
-                    <div id="call-all-progress" class="analysis-progress-bar">
-                      <div class="text" >0 analyzed</div>   
-                      <div style="float:left;margin-top:-17px;width:100%">                 
-                        <div id="analyzed-bar" class="bar" width="0%" >
-                          <div id="passed-filter-bar" class="bar" width="0%"></div>
-                          <div id="not-passed-filter-bar" class="bar" width="0%"></div>
-                        </div>
-                    
-                        <div id="not-analyzed-bar"class="bar" width="100%">                      
-                        </div>
-                      </div>
-
-                     </div>
-
-                  </div>
-
-                </div>
-
-               
-              </div>
-
-              
+            <div id="analysis-track-deprecated" class="" style="vertical-align:top;display:inline-block;padding-top:0px">
             </div>
+
+            <div id="analyze-genes-progress-placeholder-deprecated" style="display:inline-block"></div>
+
            
-              <div id="manage-genes-box">               
-                <div id="manage-genes-dropdown" class="level-edu level-basic" >
-                  <div class="btn-toolbar">
-                    <div class="btn-group" style="display:inline;">
+            <div id="manage-genes-box">               
+              <div id="manage-genes-dropdown" class="level-edu level-basic" >
+                <div class="btn-toolbar">
+                  <div class="btn-group" style="display:inline;margin-bottom:0px">
 
-                      <button type="button" style="padding-top: 2px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          Manage genes
-                          <span style="margin-left:6px" class="caret"></span>
-                      </button>
-                       
-                      <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
-                        <li style="margin-bottom: 10px">
-                            <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
-                              Manage cache of analyzed genes...
-                          </a>
-                        </li>
+                    <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Manage genes
+                        <span style="margin-left:6px" class="caret"></span>
+                    </button>
+                     
+                    <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
+                      <li style="margin-bottom: 10px">
+                          <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
+                            Manage cache of analyzed genes...
+                        </a>
+                      </li>
 
-                         <li  style="margin-bottom: 10px">
-                            <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
-                              href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                                Remove all genes
-                           </a>
-                        </li>
-                       
-                        <li id="edit-list-li">
-                           <div >Edit gene list</div>
-                           <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
-                              <textarea  id="genes-to-edit"></textarea>
-                              <div style="text-align:right">
-                                <button id="edit-genes-button" type="submit" onclick="genesCard.editGenes()" class="icon-button-sm btn btn-default btn-raised">
-                                  Done
-                                </button>
-                              </div>
-                          </div>
-                        </li>
-                        
-                      </ul>
-                    </div>
+                       <li  style="margin-bottom: 10px">
+                          <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
+                            href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                              Remove all genes
+                         </a>
+                      </li>
+                     
+                      <li id="edit-list-li">
+                         <div >Edit gene list</div>
+                         <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
+                            <textarea  id="genes-to-edit"></textarea>
+                            <div style="text-align:right">
+                              <button id="edit-genes-button" type="submit" onclick="genesCard.editGenes()" class="icon-button-sm btn btn-default btn-raised">
+                                Done
+                              </button>
+                            </div>
+                        </div>
+                      </li>
+                      
+                    </ul>
                   </div>
                 </div>
               </div>
-
-            <div style="float:right">
-              <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
-              <div id="select-gene-container">
-                  <select id="select-gene-sort" class="level-edu">
-                  </select>
-              </div>
             </div>
+
+            <div id="select-gene-container">
+                <select id="select-gene-sort" class="level-edu">
+                </select>
+            </div>
+
+            <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
 
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
+              <div id="gene-page-control" class="hide level-edu level-basic">
+                <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
                 
-            </div>
-          </div>
-          <div id="gene-page-control" class="hide level-edu level-basic">
-            <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
-            
-            <div id="gene-page-selection" class="level-basic"></div>
+                <div id="gene-page-selection" class="level-basic"></div>
 
-            <div id="gene-paging-links" class="hide">
-              <a href="javascript:void(0)" id="view-50-genes" 
-                 class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
-                    View 40
-              </a>
-              <a href="javascript:void(0)" id="view-all-genes" 
-                 class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
-                | all
-              </a>
+                <div id="gene-paging-links" class="hide">
+                  <a href="javascript:void(0)" id="view-50-genes" 
+                     class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
+                        View 40
+                  </a>
+                  <a href="javascript:void(0)" id="view-all-genes" 
+                     class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
+                    | all
+                  </a>
+                </div>
+              </div>                
             </div>
           </div>
+
       </div>          
     </div>
     
@@ -407,8 +334,6 @@
 
           <div id="region-track" class="level-edu level-basic" style="clear:both;">
               <div class="card-label" style="float:left;">Selected Gene</div>
-
-
               <div id="select-gene-box"  class="level-basic hide">
                 <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
                 </select>
@@ -485,6 +410,36 @@
 
           <div id="transcript-panel" class="level-edu fullview" >
             <div id="gene-track" class="track hide">  
+
+                <div id="known-variants-chart" class="stacked-bar-chart track hide">
+                  <div id="known-variants-nav">
+                      <span class="chart-label">
+                        ClinVar variants
+                      </span>
+                      <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)"
+                      data-toggle="tooltip" data-placement="top" title="histogram">  
+                        <i class="material-icons">insert_chart</i>
+                      </button>
+                      <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
+                      data-toggle="tooltip" data-placement="top" title="exon bar chart">  
+                        <i class="material-icons">linear_scale</i>
+                      </button>
+                      <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)"
+                      data-toggle="tooltip" data-placement="top" title="area chart">
+                        <i class="material-icons">show_chart</i>
+                      </button>
+                      <div class="loader hide">
+                          <span class="loader-label">Loading...</span>
+                          <img src="assets/images/wheel.gif"/>
+                      </div>
+
+                  </div>  
+                </div>  
+
+
                 <div id="top-coordinate-frame" class="hide">
                   <svg height="23" width="28">
                       <g  transform="translate(0,0)">
@@ -514,18 +469,6 @@
 
 
     <div id="screencast-panel" class="hide" style="text-align:center;margin-top:50px;overflow: visible;">
-      
-      <div id="screencast-coverage-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
-          <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-coverage-analysis #screencast-video').stop()">
-            <i class="material-icons" style="text-align: left;">arrow_back</i>
-          </button>
-          <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Assessing insufficient coverage</h4>
-
-              <div style="position:relative;height:0;padding-bottom:75.0%"><iframe src="https://www.youtube.com/embed/4VG1au5txn0?rel=0&ecver=2" width="480" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen=""></iframe></div>
-
-
-        </div>
-
       <div id="screencast-saving-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
           <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-saving-analysi #screencast-video').stop()">
             <i class="material-icons" style="text-align: left;">arrow_back</i>
@@ -533,7 +476,7 @@
           <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Saving your analysis with Bookmarks</h4>
 
 
-          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/JlXoBlWvniE?rel=0" frameborder="0" allowfullscreen></iframe>
+          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/JlXoBlWvniE" frameborder="0" allowfullscreen></iframe>
 
 
       </div>
@@ -543,11 +486,9 @@
           </button>
           <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Multi-gene analysis</h4>
 
-          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/QiJ7wuN8LYQ?rel=0" frameborder="0" allowfullscreen></iframe>
+          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/QiJ7wuN8LYQ" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>    
-
-   
 
 
 
@@ -575,24 +516,13 @@
             <div id="video-thumbprint-heading">What's new</div>
             <div id="video-thumbprint-content">
 
-              <div class="video-thumbprint-well ">
-                <div id="welcome-screencast-panel-coverage-analysis" class="video-thumbprint shadow-z-2" >
-                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-coverage-analysis').removeClass('hide');$('#screencast-multigene-analysis').addClass('hide');$('#screencast-saving-analysis').addClass('hide');">play_arrow</i>
-                </div>
-                <div class="video-title">Detecting insufficient coverage</div>
+              <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint" >
+                <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');">play_arrow</i>
               </div>
-              <div class="video-thumbprint-well ">
-                <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint shadow-z-2" >
-                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');$('#screencast-coverage-analysis').addClass('hide');">play_arrow</i>
-                </div>
-                <div class="video-title">Saving your analysis</div>                
+              <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint">
+                <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide')">play_arrow</i>
               </div>
-              <div class="video-thumbprint-well ">
-                <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint shadow-z-2">
-                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide');$('#screencast-coverage-analysis').addClass('hide');">play_arrow</i>
-                </div>
-                <div class="video-title">Multi-gene analysis</div>     
-              </div>                           
+                        
             </div>
           </div>
 
@@ -810,6 +740,8 @@
 
 <script src="app/d3/geneList.d3.js"></script>
 <script src="app/d3/histogram.d3.js"></script>
+<script src="app/d3/stackedBarChart.d3.js"></script>
+<script src="app/d3/stackedAreaChart.d3.js"></script>
 <script src="app/d3/line.d3.js"></script>
 <script src="app/d3/gene.d3.js"></script>
 <script src="app/d3/variant.d3.js"></script>

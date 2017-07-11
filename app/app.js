@@ -61,6 +61,15 @@ var transcriptPanelHeight = null;
 var transcriptCollapse = true;
 var geneSource = "gencode";
 
+
+var knownVariantsChart = null;
+var knownVariantsChartType = 'bar';
+var knownVariantsAreaChart = null;
+var knownVariantsBarChart = null;
+var KNOWN_VARIANTS_BIN_SPAN  = {'bar': +6, 'exon-bar': +2,  'area': +6};
+var KNOWN_VARIANTS_BAR_WIDTH = {'bar': +6, 'exon-bar': +6,  'area': +6};
+
+
 var firstTimeShowVariants = true;
 var readyToHideIntro = false;
 var keepShowingIntro = false;
@@ -445,6 +454,37 @@ function init() {
 	    	loadTracksForGene();
 	    });
 
+
+	knownVariantsAreaChart = stackedAreaChartD3()
+		.widthPercent("100%")
+		.heightPercent("100%")
+  	    .width($('#container').innerWidth())
+		.height(50)
+		.showXAxis(true)
+		.xTickCount(0)
+		.yTickCount(3)
+		.xValue( function(d, i) { return d.point })
+		.categories(['unknown', 'other', 'benign', 'path'])
+	    .margin( {top: 3, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
+	
+	knownVariantsBarChart = stackedBarChartD3()
+		.widthPercent("100%")
+		.heightPercent("100%")
+  	    .width($('#container').innerWidth())
+		.height(50)
+		.showXAxis(true)
+		.xTickCount(0)
+		.yTickCount(3)
+		.xValue( function(d, i) { return d.point })
+		.xValueStart( function(d, i) { return d.start })
+		.xValueEnd( function(d, i) { return d.end })
+		.barWidthMin(4)
+		.categories(['unknown', 'other', 'benign', 'path'])
+	    .margin( {top: 3, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+	    .tooltipText( function(d,i) {
+	    	return showKnownVariantsTooltip(d);
+	    });
+	toggleKnownVariantsChart('bar');
 
 	// Initialize material bootstrap
     $.material.init();
@@ -2282,6 +2322,9 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	// chart is not rendered.
 	showTranscripts();
 
+	// Show the chart for known variants
+	showKnownVariants();
+
 	// Show the badge for the transcript type if it is not protein coding and it is different
 	// than the gene type
 	if (window.selectedTranscript == null || window.selectedTranscript.transcript_type == 'protein_coding'
@@ -3484,6 +3527,97 @@ function toggleIntro() {
 	readjustCards();
 
 }
+
+toggleKnownVariantsChart = function(chartType, refresh=false, button) {
+
+	if (chartType == 'bar') {
+		knownVariantsChart = knownVariantsBarChart;		
+		knownVariantsChart.xStart(null);
+		knownVariantsChart.xEnd(null);	
+		knownVariantsChart.barWidth(KNOWN_VARIANTS_BAR_WIDTH[chartType]);
+			
+	} else if (chartType == 'exon-bar') {
+		knownVariantsChart = knownVariantsBarChart;		
+		knownVariantsChart.xStart(window.gene.start);
+		knownVariantsChart.xEnd(window.gene.end);				
+		knownVariantsChart.barWidth(KNOWN_VARIANTS_BAR_WIDTH[chartType]);
+
+		// If previous chart has detailed histogram data, just recalculate bins
+		if (knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') {
+			var selection = d3.select('#known-variants-chart');
+			var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
+			var exonBins = getProbandVariantCard().model.binKnownVariantsByExons(window.gene, window.selectedTranscript, binLength, selection.datum());
+			selection.datum(exonBins);		
+		}
+
+	} else if (chartType == 'area') {
+		knownVariantsChart = knownVariantsAreaChart;
+	} 
+
+
+	if (refresh) {
+		d3.select("#known-variants-chart svg").remove();
+		if (button) {
+			$('#known-variants-chart .chart-type.selected').removeClass('selected');
+			$(button).addClass('selected');
+		}
+		// No need to obtain counts for gene since prior data is interchangable between
+		// area and barchart
+		if ((knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') && 
+			(chartType == 'bar' || chartType == 'area')) {			
+			knownVariantsChartType = chartType;
+			var selection = d3.select('#known-variants-chart');
+			knownVariantsChart(selection, {transition: {'pushUp': true }} );
+		} else {
+			knownVariantsChartType = chartType;
+			showKnownVariants();
+		}
+	}
+
+}
+
+
+showKnownVariants = function() {
+	$('#known-variants-chart .loader').removeClass('hide');
+	d3.select('#known-variants-chart svg').remove();
+
+	var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
+	var transcript = knownVariantsChartType == 'exon-bar' ? window.selectedTranscript : null;
+	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, transcript, transcript ? null : binLength).then(function(results) {
+
+		$('#known-variants-chart').removeClass("hide");
+		var selection = d3.select('#known-variants-chart').datum(results);
+		if (knownVariantsChartType == 'exon-bar') {
+			knownVariantsChart.xStart(window.gene.start);
+			knownVariantsChart.xEnd(window.gene.end);		
+		} else if (knownVariantsChartType == 'bar') {
+			knownVariantsChart.xStart(null);
+			knownVariantsChart.xEnd(null);		
+		}
+		knownVariantsChart(selection, {transition: {'pushUp': true }} );
+	    $('#known-variants-chart .loader').addClass('hide');
+
+	})							
+
+}
+
+showKnownVariantsTooltip = function(knownVariants) {
+	var tooltipRow = function(valueObject) {
+		var fieldName = Object.keys(valueObject)[0];
+		var row = '<div>';
+		row += '<span style="padding-left:10px;width:70px;display:inline-block">' + fieldName   + '</span>';
+		row += '<span style="width:40px;display:inline-block">' + valueObject[fieldName] + '</span>';
+		row += "</div>";
+		return row;
+	}
+    var html = 'ClinVar variants: ';
+    for (var i = knownVariants.values.length - 1; i >= 0; i--) {
+		html += tooltipRow(knownVariants.values[i])
+    }
+    
+    return html;
+}
+
 
 
 function switchGenotype(gt) {
