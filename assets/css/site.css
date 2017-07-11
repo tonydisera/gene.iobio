@@ -800,6 +800,9 @@ a.btn {
   color: #717171;
   font-size: 13px; }
 
+.checkbox .checkbox-material .check {
+  border: 1px solid rgba(0, 0, 0, 0.54); }
+
 .material-dropdown .form-control {
   background: white; }
 .material-dropdown li.disabled {
@@ -813,7 +816,7 @@ a.btn {
 #genes-control-track {
   background: white;
   padding-right: 10px;
-  padding-top: 10px;
+  padding-top: 15px;
   padding-bottom: 0px;
   margin-bottom: 5px;
   margin-top: 0px;
@@ -3957,6 +3960,13 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
+#show-known-variants-cb-area {
+  display: inline-block;
+  float: left;
+  margin-left: 20px;
+  margin-top: -4px;
+  margin-bottom: 0px; }
+
 #known-variants-chart {
   padding: 0px;
   margin-top: 0px;
@@ -4014,6 +4024,112 @@ text.ref-count {
       fill: #bdbdbd;
       stroke: #717171;
       stroke-width: 0.5px; }
+
+#analyze-all-genes {
+  vertical-align: top;
+  margin-top: 3px;
+  margin-right: 10px;
+  display: inline-block;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 12px;
+  padding-right: 12px;
+  font-size: 13px;
+  color: #717171 !important;
+  margin-bottom: 15px; }
+
+#call-variants-dropdown {
+  vertical-align: top;
+  display: inline-block;
+  margin-top: 3px;
+  margin-right: 3px;
+  margin-bottom: 15px; }
+  #call-variants-dropdown a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 13px;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: #717171 !important; }
+    #call-variants-dropdown a.disabled {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+      box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
+
+#analyze-genes-progress {
+  overflow: hidden;
+  margin-top: 1px;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-top: -3px; }
+  #analyze-genes-progress #total-genes-label {
+    float: left;
+    margin-right: 5px;
+    font-size: 12px;
+    color: #717171;
+    margin-left: 5px;
+    margin-top: 10px;
+    display: block; }
+  #analyze-genes-progress #analyzed-progress-bar {
+    float: left;
+    display: inline-block;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    margin-left: 6px;
+    margin-bottom: 0px; }
+    #analyze-genes-progress #analyzed-progress-bar.no-alignments #called-progress-bar-label {
+      color: #cacaca; }
+    #analyze-genes-progress #analyzed-progress-bar .bar {
+      background-color: transparent;
+      height: 16px;
+      float: left;
+      width: 0%;
+      text-align: center; }
+    #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar {
+      width: 150px;
+      background-color: transparent;
+      color: #717070;
+      border: #d5d5d5;
+      border-style: solid;
+      border-width: thin;
+      font-size: 12px;
+      padding: 0px 0px 0px 0px !important;
+      vertical-align: middle;
+      height: 17px;
+      margin-left: 5px;
+      margin-bottom: 0px;
+      margin-top: 0px;
+      display: inline-block; }
+      #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar .text {
+        text-align: center;
+        width: 100%;
+        color: white; }
+      #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #analyzed-bar {
+        background-color: transparent; }
+        #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #analyzed-bar #passed-filter-bar {
+          background-color: rgba(18, 127, 170, 0.65);
+          height: 15px;
+          color: white; }
+        #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #analyzed-bar #not-passed-filter-bar {
+          background-color: #e8e6e6;
+          height: 15px; }
+      #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #not-analyzed-bar {
+        background-color: transparent; }
+    #analyze-genes-progress #analyzed-progress-bar #call-all-progress {
+      border-top: transparent; }
+      #analyze-genes-progress #analyzed-progress-bar #call-all-progress #analyzed-bar #passed-filter-bar {
+        background-color: #b4c688;
+        height: 16px;
+        color: white; }
+      #analyze-genes-progress #analyzed-progress-bar #call-all-progress #analyzed-bar #not-passed-filter-bar {
+        height: 16px; }
+    #analyze-genes-progress #analyzed-progress-bar .progress-bar-label {
+      float: left;
+      width: 43px;
+      font-size: 12px;
+      padding-top: 1px;
+      color: #717171; }
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {

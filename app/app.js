@@ -62,6 +62,7 @@ var transcriptCollapse = true;
 var geneSource = "gencode";
 
 
+var hideKnownVariants = true;
 var knownVariantsChart = null;
 var knownVariantsChartType = 'bar';
 var knownVariantsAreaChart = null;
@@ -365,8 +366,17 @@ function init() {
 	dataCard = new DataCard();
 	dataCard.init();	
 
-
-
+	// Show known variants histogram
+	$('#show-known-variants-cb').click(function() {
+		if ($('#show-known-variants-cb').is(":checked")) {
+			hideKnownVariants = false;
+			$('#known-variants-chart').removeClass("hide");
+		} else {
+			hideKnownVariants = true;
+			$('#known-variants-chart').addClass("hide");
+		}
+		showKnownVariants();
+	})
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
@@ -3578,6 +3588,11 @@ toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 
 
 showKnownVariants = function() {
+
+	d3.select('#known-variants-chart svg').remove();
+	if (hideKnownVariants) {
+		return;
+	}
 	$('#known-variants-chart .loader').removeClass('hide');
 	d3.select('#known-variants-chart svg').remove();
 

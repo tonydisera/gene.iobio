@@ -217,10 +217,6 @@
     <div id="intro" class="hide level-basic shadow-z-2">
     </div>
 
-
-    <div id="analysis-track" class="hide shadow-z-2 track">
-    </div>
-
     <div id="filter-summary-track" class="hide shadow-z-2 track">
       <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
       <div id="filter-summary-loader" class="loader hide level-edu level-basic">
@@ -237,12 +233,76 @@
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
 
-            <div id="analysis-track-deprecated" class="" style="vertical-align:top;display:inline-block;padding-top:0px">
+
+            <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
+              Analyze all genes
+            </button>
+
+            <div id="call-variants-dropdown" class="hide btn-group level-edu level-mygene2">
+              <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
+                Call Variants
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="javascript:void(0)" id="call-variants-selected-gene" onclick="jointCallVariants(false)">for selected gene</a></li>
+                <li><a href="javascript:void(0)" id="call-variants-all-genes" onclick="cacheHelper.analyzeAll(true)">for all genes</a></li>
+              </ul>
             </div>
 
-            <div id="analyze-genes-progress-placeholder-deprecated" style="display:inline-block"></div>
 
-           
+            <div id="analyze-genes-progress" class="level-edu level-basic">
+
+
+
+                <div id="analyzed-progress-bar" >
+                  
+
+                  <div >
+                    <span class='progress-bar-label'>Loaded</span>
+
+                    <div id="analyze-all-progress" class="analysis-progress-bar">
+                      <div class="text">0 analyzed</div>   
+                      <div style="float:left;margin-top:-17px;width:100%">                 
+                        <div id="analyzed-bar" class="bar" width="0%" >
+                          <div id="passed-filter-bar" class="bar" width="0%"></div>
+                          <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                        </div>
+                    
+                        <div id="not-analyzed-bar" class="bar" width="100%">                      
+                        </div>
+                      </div>
+
+                     </div>
+                  </div>
+
+
+                  <div style='margin-top:-1px;float:left'>
+                    <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
+
+                    <div id="call-all-progress" class="analysis-progress-bar">
+                      <div class="text" >0 analyzed</div>   
+                      <div style="float:left;margin-top:-17px;width:100%">                 
+                        <div id="analyzed-bar" class="bar" width="0%" >
+                          <div id="passed-filter-bar" class="bar" width="0%"></div>
+                          <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                        </div>
+                    
+                        <div id="not-analyzed-bar"class="bar" width="100%">                      
+                        </div>
+                      </div>
+
+                     </div>
+
+                  </div>
+
+                </div>
+
+
+                <div id="total-genes-label"></div>                
+
+              
+            </div>
+
             <div id="manage-genes-box">               
               <div id="manage-genes-dropdown" class="level-edu level-basic" >
                 <div class="btn-toolbar">
@@ -285,12 +345,13 @@
               </div>
             </div>
 
-            <div id="select-gene-container">
-                <select id="select-gene-sort" class="level-edu">
-                </select>
+            <div style="float:right">
+              <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
+              <div id="select-gene-container">
+                  <select id="select-gene-sort" class="level-edu">
+                  </select>
+              </div>
             </div>
-
-            <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
 
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
@@ -334,6 +395,14 @@
 
           <div id="region-track" class="level-edu level-basic" style="clear:both;">
               <div class="card-label" style="float:left;">Selected Gene</div>
+
+              <div id="show-known-variants-cb-area" class="checkbox">
+                  <label style="margin-right:5px;">
+                    <input id="show-known-variants-cb"  type="checkbox"> 
+                    Known ClinVar variants
+                  </label>
+              </div>
+
               <div id="select-gene-box"  class="level-basic hide">
                 <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
                 </select>
