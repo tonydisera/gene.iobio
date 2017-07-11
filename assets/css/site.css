@@ -877,21 +877,26 @@ a.btn {
             background-color: grey;
             margin-left: 0px;
             margin-right: 5px;
-            background-size: cover; }
+            background-size: cover;
+            position: relative;
+            background-color: rgba(222, 222, 222, 0.32) !important; }
             #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint #play-button {
-              margin-top: 25px;
-              margin-bottom: auto;
               font-size: 100px;
               cursor: pointer;
               opacity: 0.5;
-              color: white;
-              font-size: 90px; }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-multigene-analysis {
-          background-image: url("../../assets/images/screencast-multigene-analysis.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-saving-analysis {
-          background-image: url("../../assets/images/screencast-saving-analysis.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-coverage-analysis {
-          background-image: url("../../assets/images/screencast-coverage-analysis.png"); }
+              color: rgba(165, 165, 165, 0.75);
+              font-size: 90px;
+              position: absolute;
+              top: 25px;
+              left: 50px; }
+            #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint .video-title {
+              position: absolute;
+              top: 30px;
+              color: #eb0000;
+              font-size: 24px;
+              line-height: 24px;
+              font-family: Raleway;
+              width: 100%; }
 
 .icon {
   width: 30px;
