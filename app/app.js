@@ -475,7 +475,7 @@ function init() {
 		.yTickCount(3)
 		.xValue( function(d, i) { return d.point })
 		.categories(['unknown', 'other', 'benign', 'path'])
-	    .margin( {top: 3, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
+	    .margin( {top: 6, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
 	
 	knownVariantsBarChart = stackedBarChartD3()
 		.widthPercent("100%")
