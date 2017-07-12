@@ -205,7 +205,7 @@ function stackedBarChartD3() {
                    .on("click", function(d) {
                       var on = d3.select(this).attr("class") != "selected";
 
-                      svg.selectAll(".stacked-bar rect.stacked-element").attr("class", "");
+                      svg.selectAll(".stacked-bar rect.stacked-element").classed("selected", false);
                       d3.select(this).classed("selected", on);
                       
                       dispatch.d3click(d, on);
