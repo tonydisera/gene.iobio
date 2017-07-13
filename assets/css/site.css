@@ -1978,7 +1978,8 @@ inputinput:-moz-placeholder {
     font-size: 13px;
     color: #5d809d !important;
     margin-top: 12px;
-    margin-bottom: 5px; }
+    margin-bottom: 5px;
+    display: inline-block; }
   #filter-track .subheading {
     font-size: 15px;
     color: #5d809d !important;
@@ -2090,13 +2091,16 @@ inputinput:-moz-placeholder {
   stroke: #ABA2A2; }
 
 #thumbs-green-symbol {
-  fill: #81A966; }
+  fill: #81A966;
+  color: #81A966; }
 
 #thumbs-red-symbol {
-  fill: #ad494a; }
+  fill: #ad494a;
+  color: #ad494a; }
 
 #thumbs-grey-symbol {
-  fill: #8b8b8b; }
+  fill: #8b8b8b;
+  color: #8b8b8b; }
 
 .variant.homref {
   opacity: 0 !important;

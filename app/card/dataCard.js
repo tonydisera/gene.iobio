@@ -362,6 +362,11 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     	me.setDataSourceName(panelSelector); 
     });
     
+    // listen to checkbox for filtering exonic only variants
+	panelSelector.find('#affected-cb').click(function() {	   
+		me.setAffected(panelSelector);
+	});
+
     panelSelector.find('#bam-url-input').on('change', function() {
     	me.onBamUrlEntered(panelSelector);
     });
@@ -825,6 +830,8 @@ DataCard.prototype.init = function() {
 		// Clear out filters for VEP consequences and rec filters as these are
 		// generated from the data
 		filterCard.clearDataGeneratedFilters();
+		filterCard.displayAffectedFilters();
+
 		
 
 		 // If we switched from a trio back to a single, clear out the mother and father
@@ -1399,6 +1406,20 @@ DataCard.prototype.setDataSourceName = function(panelSelector) {
 	//	$('#variant-card-button-' + cardIndex ).text(dsName);
 	window.updateUrl('name' + cardIndex, dsName);
 
+}
+
+
+DataCard.prototype.setAffected = function(panelSelector) {	
+	if (!panelSelector) {
+		panelSelector = $('#datasource-dialog');
+	}
+	var cardIndex = panelSelector.find('#card-index').val();
+	var variantCard = variantCards[+cardIndex];
+
+	var isAffected = panelSelector.find('#affected-cb').is(":checked");
+	variantCard.setAffectedStatus(isAffected ? "affected" : "unaffected");
+	
+	window.updateUrl('affectedStatus' + cardIndex, isAffected);
 }
 
 DataCard.prototype.setDataSourceRelationship = function(panelSelector) {		

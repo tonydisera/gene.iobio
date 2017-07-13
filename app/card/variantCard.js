@@ -22,6 +22,10 @@ VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
 
+VariantCard.prototype.isAffected = function() {
+	return this.model.isAffected();
+}
+
 VariantCard.prototype.setName = function(theName) {
 	this.model.setName(theName);
 }

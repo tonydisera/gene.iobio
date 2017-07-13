@@ -25,7 +25,7 @@ var introTemplate = null;
 var legendTemplate = null;
 var navbarTemplate = null;
 var modalsTemplate = null;
-
+var filterAffectedTemplate = null;
 
 // The selected (sub-) region of the gene.  Null
 // when there is not an active selection.
@@ -197,6 +197,9 @@ $(document).ready(function(){
 	}));
 	promises.push(promiseLoadTemplate('templates/modalsTemplate.hbs').then(function(compiledTemplate) {
 		modalsTemplate = compiledTemplate;
+	}));
+	promises.push(promiseLoadTemplate('templates/filterAffectedTemplate.hbs').then(function(compiledTemplate) {
+		filterAffectedTemplate = compiledTemplate;
 	}));
 
 	Promise.all(promises).then(function() {
@@ -1339,13 +1342,14 @@ function showWelcomePanel() {
 
 function loadUrlSources() {
 
-	var bam  = getUrlParameter(/(bam)*/);
-	var bai  = getUrlParameter(/(bai)*/);
-	var vcf  = getUrlParameter(/(vcf)*/);	
-	var tbi  = getUrlParameter(/(tbi)*/);	
-	var rel  = getUrlParameter(/(rel)*/);
-	var dsname = getUrlParameter(/(name)*/);	
-	var sample = getUrlParameter(/(sample)*/);	
+	var bam      = getUrlParameter(/(bam)*/);
+	var bai      = getUrlParameter(/(bai)*/);
+	var vcf      = getUrlParameter(/(vcf)*/);	
+	var tbi      = getUrlParameter(/(tbi)*/);	
+	var rel      = getUrlParameter(/(rel)*/);
+	var affected = getUrlParameter(/(affectedStatus)*/);
+	var dsname   = getUrlParameter(/(name)*/);	
+	var sample   = getUrlParameter(/(sample)*/);	
 	var affectedSibsString = getUrlParameter("affectedSibs");
 	var unaffectedSibsString = getUrlParameter("unaffectedSibs");
 
@@ -1398,6 +1402,17 @@ function loadUrlSources() {
 			variantCard.setDefaultSampleName(sampleName);
 		});
 	}
+	if (affected != null) {
+		Object.keys(affected).forEach(function(urlParameter) {
+			var cardIndex = urlParameter.substring(14);
+			var variantCard      = variantCards[+cardIndex];
+			var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
+			var panelSelector    = $(panelSelectorStr);
+			var status = affected[urlParameter];
+			panelSelector.find('#affected-cb').prop('checked', status == "true" ? true : false);
+			dataCard.setAffected(panelSelector);
+		});
+	}	
 
 	var bamLoadedCount = 0;
 	var vcfLoadedCount = 0;
@@ -1428,6 +1443,8 @@ function loadUrlSources() {
 				}
 
 				genesCard.showAnalyzeAllButton();
+				filterCard.displayAffectedFilters();
+
 				
 				if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
 					loadTracksForGene( false );
@@ -2565,6 +2582,30 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 */
 function getRelevantVariantCards() {
 	return dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
+}
+
+function getAffectedInfo () {
+	var affectedInfo = [];
+	getRelevantVariantCards().forEach(function(vc) {
+		var info = {};
+		info.variantCard = vc;
+		info.status = vc.isAffected() ? 'affected' : 'unaffected';
+		info.label = vc.getRelationship();
+		info.id = info.status + "-" + vc.getRelationship() + "-" + vc.getSampleName();
+		affectedInfo.push(info);
+	})
+	for (var status in variantCardsSibs) {
+		var sibs = variantCardsSibs[status];
+		sibs.forEach(function(sibVariantCard) {
+			var info = {};
+			info.status = status;
+			info.variantCard = sibVariantCard;
+			info.label = sibVariantCard.getRelationship() + " " + sibVariantCard.getSampleName();
+			info.id = info.status + "-" + sibVariantCard.getRelationship() + "-" + sibVariantCard.getSampleName();
+			affectedInfo.push(info);
+		})
+	}
+	return affectedInfo;
 }
 
 function addCommas(nStr)

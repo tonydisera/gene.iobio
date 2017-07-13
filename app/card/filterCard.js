@@ -64,6 +64,63 @@ FilterCard.prototype.autoSetFilters = function() {
 
 }
 
+FilterCard.prototype.displayAffectedFilters = function() {
+    $('#present-in-affected').find(".checkbox").remove();
+    $('#absent-in-unaffected').find(".checkbox").remove();
+
+    var affectedInfo = getAffectedInfo();
+    affectedInfo.filter(function(info) {
+    	return info.variantCard.isAffected();
+    })
+    .forEach(function(info) {
+    	$('#present-in-affected').removeClass("hide");
+    	$('#present-in-affected-heading').removeClass("hide");
+    	$('#present-in-affected').append(filterAffectedTemplate());
+    	var cb = $('#present-in-affected').find('.checkbox').last();
+    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
+    	cb.attr("id", info.id)
+    	cb.click(function() {	
+    		//window.filterVariants();   
+    	})
+    })
+    affectedInfo.filter(function(info) {
+    	return !info.variantCard.isAffected();
+    })
+    .forEach(function(info) {
+    	$('#absent-in-unaffected').removeClass("hide");
+    	$('#absent-in-unaffected-heading').removeClass("hide");
+    	$('#absent-in-unaffected').append(filterAffectedTemplate());
+    	var cb = $('#absent-in-unaffected').find('.checkbox').last();
+    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
+    	cb.attr("id", info.id);
+		cb.click(function() {	
+    		//window.filterVariants();   
+    	})    	
+    })
+    $.material.init();
+}
+
+FilterCard.prototype.getAffectedFilterInfo = function() {
+	var affectedInfo = getAffectedInfo();
+	
+	affectedInfo.filter(function(info) {
+    	return info.variantCard.isAffected();
+    })
+    .forEach(function(info) {
+    	var cb = $('#present-in-affected').find("#" + info.id + " input");
+    	info.filter = (cb.is(":checked"));
+    });
+
+	affectedInfo.filter(function(info) {
+    	return !info.variantCard.isAffected();
+    })
+    .forEach(function(info) {
+    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
+    	info.filter = (cb.is(":checked"));
+    });    
+    return affectedInfo;
+}
+
 /*
  * If a filter has been clicked after a standard filter has been selected,
  * unset the standard filter since the criteria has been changed

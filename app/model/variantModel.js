@@ -712,6 +712,12 @@ VariantModel.prototype.setRelationship = function(theRelationship) {
 	this.relationship = theRelationship;	
 }
 
+
+VariantModel.prototype.isAffected = function() {
+	return this.affectedStatus && this.affectedStatus == 'affected' ? true : false;
+}
+
+
 VariantModel.prototype.setAffectedStatus = function(theAffectedStatus) {
 	this.affectedStatus = theAffectedStatus;
 }
