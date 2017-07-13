@@ -2589,19 +2589,23 @@ function getAffectedInfo () {
 	getRelevantVariantCards().forEach(function(vc) {
 		var info = {};
 		info.variantCard = vc;
-		info.status = vc.isAffected() ? 'affected' : 'unaffected';
-		info.label = vc.getRelationship();
-		info.id = info.status + "-" + vc.getRelationship() + "-" + vc.getSampleName();
-		affectedInfo.push(info);
+		if (vc) {
+			info.relatioship = vc.getRelationship();
+			info.status = vc.isAffected() ? 'affected' : 'unaffected';
+			info.label = vc.getRelationship();
+			info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
+			affectedInfo.push(info);			
+		}
 	})
 	for (var status in variantCardsSibs) {
 		var sibs = variantCardsSibs[status];
 		sibs.forEach(function(sibVariantCard) {
 			var info = {};
+			info.relationship = vc.getRelationship();
 			info.status = status;
 			info.variantCard = sibVariantCard;
 			info.label = sibVariantCard.getRelationship() + " " + sibVariantCard.getSampleName();
-			info.id = info.status + "-" + sibVariantCard.getRelationship() + "-" + sibVariantCard.getSampleName();
+			info.id = info.status + "-_-" + sibVariantCard.getRelationship() + "-_-" + sibVariantCard.getSampleName();
 			affectedInfo.push(info);
 		})
 	}

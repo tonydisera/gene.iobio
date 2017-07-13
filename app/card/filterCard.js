@@ -20,6 +20,8 @@ function FilterCard() {
 	this.geneCoverageMin           = 10;
 	this.geneCoverageMean          = 30;
 	this.geneCoverageMedian        = 30;
+
+	this.affectedInfo              = null;
 }
 
 FilterCard.prototype.shouldWarnForNonPassVariants = function() {
@@ -65,6 +67,12 @@ FilterCard.prototype.autoSetFilters = function() {
 }
 
 FilterCard.prototype.displayAffectedFilters = function() {
+	var me = this;
+	$('#present-in-affected').addClass("hide");
+	$('#present-in-affected-heading').addClass("hide");
+	$('#absent-in-unaffected').addClass("hide");
+	$('#absent-in-unaffected-heading').addClass("hide");
+
     $('#present-in-affected').find(".checkbox").remove();
     $('#absent-in-unaffected').find(".checkbox").remove();
 
@@ -73,52 +81,72 @@ FilterCard.prototype.displayAffectedFilters = function() {
     	return info.variantCard.isAffected();
     })
     .forEach(function(info) {
-    	$('#present-in-affected').removeClass("hide");
-    	$('#present-in-affected-heading').removeClass("hide");
-    	$('#present-in-affected').append(filterAffectedTemplate());
-    	var cb = $('#present-in-affected').find('.checkbox').last();
-    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
-    	cb.attr("id", info.id)
-    	cb.click(function() {	
-    		//window.filterVariants();   
-    	})
+    	if (info.variantCard.getRelationship() == 'proband') {
+    		info.filter = true;
+    	} else {
+	    	$('#present-in-affected').removeClass("hide");
+	    	$('#present-in-affected-heading').removeClass("hide");
+	
+	    	$('#present-in-affected').append(filterAffectedTemplate());
+	    	var cb = $('#present-in-affected').find('.checkbox').last();
+	    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
+	    	cb.attr("id", info.id)
+	    	cb.click(function() {	
+	    		me.getAffectedFilterInfo(true);
+	    		window.filterVariants();   
+	    	})    		
+    	}
     })
     affectedInfo.filter(function(info) {
     	return !info.variantCard.isAffected();
     })
     .forEach(function(info) {
-    	$('#absent-in-unaffected').removeClass("hide");
-    	$('#absent-in-unaffected-heading').removeClass("hide");
-    	$('#absent-in-unaffected').append(filterAffectedTemplate());
-    	var cb = $('#absent-in-unaffected').find('.checkbox').last();
-    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
-    	cb.attr("id", info.id);
-		cb.click(function() {	
-    		//window.filterVariants();   
-    	})    	
+    	if (info.variantCard.getRelationship() == 'proband') {
+    		info.filter = false;
+    	} else {
+	    	$('#absent-in-unaffected').removeClass("hide");
+	    	$('#absent-in-unaffected-heading').removeClass("hide");
+	    	$('#absent-in-unaffected').append(filterAffectedTemplate());
+	    	var cb = $('#absent-in-unaffected').find('.checkbox').last();
+	    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
+	    	cb.attr("id", info.id);
+			cb.click(function() {	
+	    		me.getAffectedFilterInfo(true);
+	    		window.filterVariants();   
+	    	})    	
+    	}
     })
+    me.getAffectedFilterInfo(true);
     $.material.init();
 }
 
-FilterCard.prototype.getAffectedFilterInfo = function() {
-	var affectedInfo = getAffectedInfo();
-	
-	affectedInfo.filter(function(info) {
-    	return info.variantCard.isAffected();
-    })
-    .forEach(function(info) {
-    	var cb = $('#present-in-affected').find("#" + info.id + " input");
-    	info.filter = (cb.is(":checked"));
-    });
+FilterCard.prototype.getAffectedFilterInfo = function(forceRefresh=false) {
+	var me = this;
 
-	affectedInfo.filter(function(info) {
-    	return !info.variantCard.isAffected();
-    })
-    .forEach(function(info) {
-    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
-    	info.filter = (cb.is(":checked"));
-    });    
-    return affectedInfo;
+	if (this.affectedInfo == null || forceRefresh) {
+		this.affectedInfo = getAffectedInfo();
+		forceRefresh = true;
+	} 
+
+	if (forceRefresh) {
+		this.affectedInfo.filter(function(info) {
+	    	return info.variantCard.isAffected();
+	    })
+	    .forEach(function(info) {
+	    	var cb = $('#present-in-affected').find("#" + info.id + " input");
+	    	info.filter = (cb.is(":checked"));
+	    });
+
+		this.affectedInfo.filter(function(info) {
+	    	return !info.variantCard.isAffected();
+	    })
+	    .forEach(function(info) {
+	    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
+	    	info.filter = (cb.is(":checked"));
+	    });    
+
+	}
+    return this.affectedInfo;
 }
 
 /*
@@ -211,6 +239,7 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 }
 
 FilterCard.prototype.getFilterObject = function() {
+	var me = this;
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
 	if (isLevelBasic) {
 		var annots = 	{
@@ -249,7 +278,8 @@ FilterCard.prototype.getFilterObject = function() {
 		'annotsToInclude': this.annotsToInclude,
 		'exonicOnly': $('#exonic-only-cb').is(":checked"),
 		'loadedVariants': $('#loaded-variants-cb').is(":checked"),
-		'calledVariants': $('#called-variants-cb').is(":checked")
+		'calledVariants': $('#called-variants-cb').is(":checked"),
+		'affectedInfo': me.getAffectedFilterInfo(true)
   };
 }
 
@@ -1060,12 +1090,41 @@ FilterCard.prototype._getFilterString = function() {
 		return "<span class=\"filter-flag filter-element label label-primary\">" + filterString + "</span>";
 	}
 
+
+
 	// When low coverage filter applied, we only filter on this, not any other criteria.
 	if (this.applyLowCoverageFilter) {
 		filterString += filterBox("Exon coverage min < " + this.geneCoverageMin + " OR median < " + this.geneCoverageMedian + " OR mean < " + this.geneCoverageMean);
 		return filterString;
 	}
-		
+
+	var affectedFilters = filterObject.affectedInfo.filter(function(info) {
+		return info.filter && info.status == 'affected';
+	});
+	if (affectedFilters.length > 0) {
+		var buf = "";
+		affectedFilters.forEach(function(info) {
+			if (buf.length > 0) {
+				buf += ", ";
+			}
+			buf += info.label;
+		})
+		filterString +=  AND(filterString) + filterBox("Present in affected: " + buf);
+	}
+
+	var unaffectedFilters = filterObject.affectedInfo.filter(function(info) {
+		return info.filter  && info.status == 'unaffected';
+	});
+	if (unaffectedFilters.length > 0) {
+		var buf = "";
+		unaffectedFilters.forEach(function(info) {
+			if (buf.length > 0) {
+				buf += ", ";
+			}
+			buf += info.label;
+		})
+		filterString +=  AND(filterString) +  filterBox("Absent in unaffected: " + buf);
+	}		
 
 	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("loaded variants only");

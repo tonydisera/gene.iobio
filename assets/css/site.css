@@ -2427,6 +2427,8 @@ inputinput:-moz-placeholder {
   width: inherit !important; }
 #dataModal #affected-sibs-box .selectize-input.has-items input {
   width: initial !important; }
+#dataModal #proband-data #affected-box {
+  display: none !important; }
 #dataModal .form-group {
   margin-top: -5px; }
 #dataModal .form-group-header {
@@ -3476,9 +3478,9 @@ text.ref-count {
   #gene-badge-container.hide {
     display: flex !important;
     visibility: hidden; }
-  #gene-badge-container a {
+  #gene-badge-container #gene-badge a {
     color: #717171 !important; }
-    #gene-badge-container a:hover {
+    #gene-badge-container #gene-badge a:hover {
       text-decoration: underline !important; }
   #gene-badge-container #gene-badge-remove {
     visibility: hidden; }

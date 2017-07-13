@@ -2606,8 +2606,41 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 	var	coverageMin = filterObject.coverageMin;
 	var intronsExcludedCount = 0;
 
+	var affectedFilters = filterObject.affectedInfo.filter(function(info) {
+		return info.filter;
+	});
+
 
 	var filteredFeatures = data.features.filter(function(d) {
+
+		var passAffectedStatus = true;
+		if (me.getRelationship() == 'proband' && affectedFilters.length > 0) {
+			affectedFilters.forEach(function(info) {
+				var zygosity = null;
+				if (info.variantCard.getRelationship() == "sibling") {
+					if (d[info.status + "_zygosity"] && d[info.status + "_zygosity"][info.variantCard.getSampleName()]) {
+						zygosity = d[info.status + "_zygosity"][info.variantCard.getSampleName()];
+					}
+				} else {
+					if (info.variantCard.getRelationship() == 'proband') {
+						zygosity = d.zygosity;
+					} else if (d[info.variantCard.getRelationship() + "Zygosity"]) {
+						zygosity = d[info.variantCard.getRelationship() + "Zygosity"];
+					}
+				}
+				if (zygosity) {
+					if (info.status == 'affected') {
+						if (zygosity.toUpperCase() != 'HET' && zygosity.toUpperCase() != 'HOM') {
+							passAffectedStatus = false;
+						}
+					} else if (info.status == 'unaffected') {
+						if (zygosity.toUpperCase() == 'HET' || zygosity.toUpperCase() == 'HOM') {
+							passAffectedStatus = false;
+						}
+					}					
+				}
+			})
+		}
 
 		if (filterCard.shouldWarnForNonPassVariants()) {
 			if (d.recfilter != 'PASS') {
@@ -2795,7 +2828,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 
-		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled;
+		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled && passAffectedStatus;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures, start, end);

@@ -830,7 +830,6 @@ DataCard.prototype.init = function() {
 		// Clear out filters for VEP consequences and rec filters as these are
 		// generated from the data
 		filterCard.clearDataGeneratedFilters();
-		filterCard.displayAffectedFilters();
 
 		
 
@@ -852,6 +851,7 @@ DataCard.prototype.init = function() {
 		window.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
 		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");			
 
+		filterCard.displayAffectedFilters();
 		window.enableCallVariantsButton();
 
 
