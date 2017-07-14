@@ -434,16 +434,31 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 	 	revisedVariant.extraAnnot = true;
 
 	 	// If this is a trio, get the genotypes for mother and father
-	 	if (revisedVariant.genotypes.length == 3) {
-			revisedVariant.motherZygosity          = revisedVariant.genotypes[1].zygosity;
-			revisedVariant.genotypeAltCountMother  = revisedVariant.genotypes[1].altCount;
-			revisedVariant.genotypeRefCountMother  = revisedVariant.genotypes[1].refCount;
-			revisedVariant.genotypeDepthMother     = revisedVariant.genotypes[1].genotypeDepth;
+	 	if (Object.keys(revisedVariant.genotypes).length == 3) {
+	 		var motherGenotype = null;
+	 		var fatherGenotype = null;
+	 		for (var key in revisedVariant.genotypes) {
+	 			var gt = revisedVariant.genotypes[key];
+	 			if (gt.sampleIndex == 1) {
+	 				motherGenotype = gt;
+	 			} else if (gt.sampleIndex == 2) {
+	 				fatherGenotype = gt;
+	 			}
+	 		}
+	 		if (motherGenotype) {
+				revisedVariant.motherZygosity          = motherGenotype.zygosity;
+				revisedVariant.genotypeAltCountMother  = motherGenotype.altCount;
+				revisedVariant.genotypeRefCountMother  = motherGenotype.refCount;
+				revisedVariant.genotypeDepthMother     = motherGenotype.genotypeDepth;
 
-			revisedVariant.fatherZygosity          = revisedVariant.genotypes[2].zygosity;
-			revisedVariant.genotypeAltCountFather  = revisedVariant.genotypes[2].altCount;
-			revisedVariant.genotypeRefCountFather  = revisedVariant.genotypes[2].refCount;
-			revisedVariant.genotypeDepthFather     = revisedVariant.genotypes[2].genotypeDepth;
+	 		}
+	 		if (fatherGenotype) { 			
+				revisedVariant.fatherZygosity          = fatherGenotype.zygosity;
+				revisedVariant.genotypeAltCountFather  = fatherGenotype.altCount;
+				revisedVariant.genotypeRefCountFather  = fatherGenotype.refCount;
+				revisedVariant.genotypeDepthFather     = fatherGenotype.genotypeDepth;
+	 		}
+
 	 	}
 	 	VariantTrioModel.determineInheritance(revisedVariant);
 

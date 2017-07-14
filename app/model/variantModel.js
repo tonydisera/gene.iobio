@@ -1459,6 +1459,86 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 }
 
+VariantModel.prototype.determineSibStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
+	var me = this;
+	var theVcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
+
+	var affectedSibs = affectedInfo.filter(function(info) {
+		return info.status == 'affected' && info.relationship == 'sibling';
+	})
+	me._determineSibStatusByGenotypes(theVcfData, 'affected', affectedSibs)
+
+	var unaffectedSibs = affectedInfo.filter(function(info) {
+		return info.status == 'unaffected' && info.relationship == 'sibling';
+	})
+	me._determineSibStatusByGenotypes(theVcfData, 'unaffected', unaffectedSibs)
+
+	me._cacheData(theVcfData, "vcfData", theGene.gene_name, theTranscript);	
+	// For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
+	// at this point
+	me.vcfData = null;
+
+	onUpdate(theVcfData);
+}
+
+VariantModel.prototype._determineSibStatusByGenotypes = function(theVcfData, affectedStatus, affectedSibs) {
+	var me = this;
+	var sibsCount       = affectedSibs.length;
+	var sibZygosityAttr = affectedStatus + "_zygosity";
+	var affectedAttr    = affectedStatus + "Sibs";
+
+	theVcfData.features.forEach( function(variant) {
+
+		variant[affectedAttr] = "none";
+		variant[sibZygosityAttr] = {};
+	 	variant[affectedStatus + "_genotypeAltCount"] = {};
+		variant[affectedStatus + "_genotypeRefCount"] = {};
+		variant[affectedStatus + "_genotypeDepth"]    = {};
+		variant[affectedStatus + "_bamDepth"]         = {};
+
+		var matchesCount = 0;
+		var matchesHomCount = 0;
+
+		affectedSibs.forEach(function(info) {
+		 	var sampleName = info.variantCard.getSampleName();
+		 	var genotype = variant.genotypes[sampleName];
+		 	var sibZygosity = genotype.zygosity ? genotype.zygosity : "none";
+		 	
+			if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'gt_unknown' && sibZygosity.toLowerCase() != 'homref') {
+			 	matchesCount++;
+			}
+		 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
+			 	matchesHomCount++;
+		 	}
+		 	variant[sibZygosityAttr][sampleName] = sibZygosity;
+		 	variant[affectedStatus + "_genotypeAltCount"][sampleName] = genotype.altCount;
+			variant[affectedStatus + "_genotypeRefCount"][sampleName] = genotype.refCount;
+			variant[affectedStatus + "_genotypeDepth"][sampleName]    = genotype.genotypeDepth;
+			variant[affectedStatus + "_bamDepth"][sampleName]         = 0;
+
+		})
+		if (variant.inheritance.toLowerCase() == 'recessive'
+			&& matchesHomCount > 0 
+			&& matchesHomCount == sibsCount) { 
+			variant[affectedAttr] = "recessive_all";
+		} else if (variant.inheritance.toLowerCase() == 'recessive'
+			      && matchesHomCount > 0 )  {
+			variant[affectedAttr] = "recessive_some";
+		} else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
+			variant[affectedAttr] = "recessive_none";
+		} else if (matchesCount > 0 && matchesCount == sibsCount) {
+			variant[affectedAttr] = "present_all";
+		}  else if (matchesCount > 0) {
+			variant[affectedAttr] = "present_some"
+		}  else {
+			variant[affectedAttr] = "present_none";
+		}  	 	 
+
+	});
+
+}
+
+
 VariantModel.prototype.isCached = function(geneName, transcript) {
 	var key = this._getCacheKey("vcfData", geneName.toUpperCase(), transcript);
 	var data = localStorage.getItem(key);
@@ -1749,6 +1829,13 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		if (sampleNames != null && sampleNames != "") {
 			if (me.relationship != 'proband') {
 				sampleNames += "," + getProbandVariantCard().getSampleName();
+			} else {
+				getAffectedInfo().forEach(function(info) {
+					if (info.variantCard.getRelationship() != 'proband') {
+						sampleNames += ",";
+						sampleNames += info.variantCard.getSampleName();
+					}
+				})
 			}			
 		}
 

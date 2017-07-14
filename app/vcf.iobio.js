@@ -932,6 +932,7 @@ var effectCategories = [
 
   }
 
+
   exports.parseHeaderFieldForVep = function(record) {
     var vepFields = {};
     var tokens = record.split("Format: ");
@@ -1544,10 +1545,12 @@ var effectCategories = [
       // to be evaluated and parsed.  If sampleNames (a comma separated value string) is 
       // provided, evaluate the sample indices as ordinals since vt select will return only those
       // sample (genotype) columns.     
+      var theSampleNames = null;
       if (sampleIndices == null) {
         sampleIndices = [];
         if (sampleNames != null && sampleNames != "") {
-          sampleIndices = sampleNames.split(",").map(function(sampleName,i) {
+          theSampleNames = sampleNames.split(",");
+          sampleIndices = theSampleNames.map(function(sampleName,i) {
             return i;
           });
         }
@@ -1913,7 +1916,7 @@ var effectCategories = [
               impacts["NOIMPACT"] = "NOIMPACT";
             }
 
-            var gtResult = me.parseGenotypes(rec, alt, altIdx, sampleIndices);
+            var gtResult = me.parseGenotypes(rec, alt, altIdx, sampleIndices, theSampleNames ? theSampleNames : sampleIndices);
 
 
             // Get rid of the left most anchor base for insertions and
@@ -2026,7 +2029,7 @@ var effectCategories = [
                 'alt': alt, 'qual': rec.qual, 'recfilter': rec.filter,
                 'af': af,
                 'combinedDepth':            combinedDepth,
-                'genotypes':                gtResult.genotypes,
+                'genotypes':                gtResult.genotypeMap,
                 'genotype':                 gtResult.genotypes[0],
                 'genotypeDepth' :           gtResult.genotypes[0].genotypeDepth,
                 'genotypeFilteredDepth' :   gtResult.genotypes[0].filteredDepth,
@@ -2099,7 +2102,7 @@ var effectCategories = [
  * Parse the genotype field from in the vcf rec
  * 
  */
- exports.parseGenotypes = function(rec, alt, altIdx, sampleIndices) {
+ exports.parseGenotypes = function(rec, alt, altIdx, sampleIndices, sampleNames) {
     var me = this;
 
     // The result returned will be an object representing all
@@ -2118,7 +2121,8 @@ var effectCategories = [
     var result = {
       alt:      alt, 
       keepAlt:  false, 
-      gtNumber: altIdx +1};
+      gtNumber: altIdx +1,
+      genotypeMap: {} };
 
     // The results will contain an array of genotype objects for 
     // each sample index provided.  The first element in the
@@ -2129,6 +2133,11 @@ var effectCategories = [
     result.genotypes = sampleIndices.map( function(sampleIndex) { 
       return { sampleIndex: sampleIndex, zygosity: null, phased: null}; 
     });
+
+    result.genotypes.forEach(function(gt) {
+      var sampleName = sampleNames[gt.sampleIndex];
+      result.genotypeMap[sampleName] = gt;
+    })
 
     // Determine the format of the genotype fields
     var gtTokens = {};

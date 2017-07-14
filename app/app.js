@@ -2599,13 +2599,13 @@ function getAffectedInfo () {
 	})
 	for (var status in variantCardsSibs) {
 		var sibs = variantCardsSibs[status];
-		sibs.forEach(function(sibVariantCard) {
+		sibs.forEach(function(vc) {
 			var info = {};
 			info.relationship = vc.getRelationship();
 			info.status = status;
-			info.variantCard = sibVariantCard;
-			info.label = sibVariantCard.getRelationship() + " " + sibVariantCard.getSampleName();
-			info.id = info.status + "-_-" + sibVariantCard.getRelationship() + "-_-" + sibVariantCard.getSampleName();
+			info.variantCard = vc;
+			info.label = vc.getRelationship() + " " + vc.getSampleName();
+			info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
 			affectedInfo.push(info);
 		})
 	}
@@ -3193,7 +3193,9 @@ function promiseDetermineInheritance(promise) {
 			$("#matrix-panel .loader").removeClass("hide");
 			$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
 			$("#feature-matrix-note").addClass("hide");
-			determineSibStatus(trioModel, function() {
+			getProbandVariantCard().determineSibStatus( window.gene, window.selectedTranscript, getAffectedInfo(), function(probandVcfData) {
+			//determineSibStatus(trioModel, function() {
+
 				$("#matrix-panel .loader").addClass("hide");
 			    $("#matrix-panel .loader .loader-label").text("Ranking variants");
 				$("#feature-matrix-note").removeClass("hide");
@@ -3336,7 +3338,8 @@ function promiseFullTrioCalledVariants() {
 
 }
 
-function determineSibStatus(trioModel, onStatusUpdated) {
+
+function determineSibStatusSingle(trioModel, onStatusUpdated) {
 	var me = this;
 	// Now compare the unaffected sibs to the variant to flag variants
 	// common to unaffected sibs + proband

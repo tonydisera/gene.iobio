@@ -369,8 +369,9 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 
 
+
 // TODO:  Need to load unaffected sibs vcf data (variantModel.loadVariantDataOnly) beforehand
-VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedStatus, sibsCount, onUpdate) {
+VariantTrioModel.prototype.determineSibsStatusSingle = function(sibsVcfData, affectedStatus, sibsCount, onUpdate) {
 	var me = this;
 	me.sibsVcfData = sibsVcfData;
 

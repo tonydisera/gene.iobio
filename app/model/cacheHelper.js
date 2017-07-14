@@ -476,69 +476,79 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			
 		}
 				
+		// Use the genotypes in the proband variant data to determine sib status
+		getProbandVariantCard().determineSibStatus(geneObject, transcript, getAffectedInfo(), function(probandVcfData) {
 
-		//
-		// Now that inheritance has been determined,  analyze the alignments 
-		// in the gene coding regions to get coverage metrics
-		//
-		promiseGetGeneCoverage(geneObject, transcript).then(function(geneCoverageAll) {
+			// Need to set the trio model vcf data to the refreshed proband vcf data after
+			// determining sib status
+			trioVcfData.proband = probandVcfData;
 
 			//
-			// Summarize the variants for the proband to create the gene badges, 
-			// representing the most pathogenic variants for this gene
+			// Now that inheritance has been determined,  analyze the alignments 
+			// in the gene coding regions to get coverage metrics
 			//
-			var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-			var options = {};
-			if (analyzeCalledVariants) {
-				options.CALLED = true;
-			}
+			promiseGetGeneCoverage(geneObject, transcript).then(function(geneCoverageAll) {
+
+				//
+				// Summarize the variants for the proband to create the gene badges, 
+				// representing the most pathogenic variants for this gene
+				//
+				var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
+				var options = {};
+				if (analyzeCalledVariants) {
+					options.CALLED = true;
+				}
 
 
-	  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverageAll);
-			getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
+		  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverageAll);
+				getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
 
-			genesCard._geneBadgeLoading(geneObject.gene_name, false);
-			if (trioVcfData.proband.features.length == 0) {
-				//genesCard.setGeneBadgeWarning(geneObject.gene_name);
-			} else {
-				genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-			}
+				genesCard._geneBadgeLoading(geneObject.gene_name, false);
+				if (trioVcfData.proband.features.length == 0) {
+					//genesCard.setGeneBadgeWarning(geneObject.gene_name);
+				} else {
+					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
+				}
 
-			
-			// Now clear out mother and father from cache.  
-			if (analyzeCalledVariants) {
-				// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
-				// and father in cache as we need these to show allele counts and genotypes for trio
-				// with determineInheritance() on selected gene is invoked)
-				getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-				getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+				
+				// Now clear out mother and father from cache.  
+				if (analyzeCalledVariants) {
+					// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
+					// and father in cache as we need these to show allele counts and genotypes for trio
+					// with determineInheritance() on selected gene is invoked)
+					getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+					getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
 
-				// For alignments only analysis, the called variants were cached in as "vcfData" to process
-				// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
-				// for the proband.
-				//if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
-				//	getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
-				//}
+					// For alignments only analysis, the called variants were cached in as "vcfData" to process
+					// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
+					// for the proband.
+					//if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
+					//	getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
+					//}
 
-				getVariantCard("proband" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
-
-
-			} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
-				// Don't clear cache for currently selected
-				// gene though as this will result in no inheritance mode being detected.
-				getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-				getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-			}
+					getVariantCard("proband" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
 
 
-			// We are done analyzing this gene. Take this gene off of the queue and see
-			// if next batch of genes should be analyzed
-			if (cacheNext) {
-				me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-			} else {
-				callback();
-			}
+				} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
+					// Don't clear cache for currently selected
+					// gene though as this will result in no inheritance mode being detected.
+					getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+					getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
+				}
+
+
+				// We are done analyzing this gene. Take this gene off of the queue and see
+				// if next batch of genes should be analyzed
+				if (cacheNext) {
+					me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
+				} else {
+					callback();
+				}
+			});
+
 		});
+
+
 
 
 
