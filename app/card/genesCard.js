@@ -1492,7 +1492,7 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 		});
 }
 
-GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
+GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback) {
 	var me = this;
 
 	if (error && error.length > 0) {
@@ -1516,17 +1516,26 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 
 			if (theVcfData == null ) {
 				me.setGeneBadgeWarning(window.gene.gene_name, true);
+				if (callback) {
+					callback();
+				}
 			} else if (theVcfData.features && theVcfData.features.length == 0) {
 				// There are 0 variants.  Summarize danger so that we know we have
 				// analyzed this gene
 				var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll);
 				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+				if (callback) {
+					callback();
+				}
 			} else if (theVcfData.features && theVcfData.features.length > 0) {
 				var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 
 
 				var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll);
 				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+				if (callback) {
+					callback();
+				}
 
 			}
 		});	
