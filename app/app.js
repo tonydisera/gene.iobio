@@ -2421,6 +2421,19 @@ function isAlignmentsOnly(callback) {
 }
 
 
+function samplesInSingleVcf() {
+	var theVcfs = {};
+	var cards = getRelevantVariantCards().forEach(function(vc) {
+		if (vc.model.vcfUrlEntered) {
+			theVcfs[vc.model.vcf.getVcfURL()] = true;
+		} else {
+			theVcfs[vc.model.vcf.getVcfFile().name] = true;
+		}
+	});
+	return Object.keys(theVcfs).length == 1;
+}
+
+
 function hasCalledVariants() {
 	var cards = getRelevantVariantCards().filter(function(vc) {
 		return vc.model.hasCalledVariants();
@@ -2446,6 +2459,9 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 	getRelevantVariantCards().forEach(function(vc) {
 		vc.prepareToShowVariants(filterCard.classifyByImpact);
 		vc.clearBamChart();
+		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
+			vc.hide();
+		}
 	});
 
 	if (bypassVariantCards == null || !bypassVariantCards) {
@@ -2470,12 +2486,21 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
 
-		 	getRelevantVariantCards().forEach(function(vc) {
-		 		
+			/*if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
 
-		 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
-					vc.hide();
-				} else {
+			} else*/ if (isAlignmentsOnly() && autocall) {
+				// Only alignment files are loaded and user, when prompted, responded
+				// that variants should be autocalled when gene is selected.
+				// First perform joint calling, then load the bam data (for coverage)
+				// for each sample.
+				var callPromise = promiseJointCallVariants(true).then(function() {
+					showNavVariantLinks();
+				}) 
+				variantPromises.push(callPromise);							
+
+			} else {
+			 	getRelevantVariantCards().forEach(function(vc) {
+
 					if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
 						// We have variants, either to load from a vcf or called from alignments and
 					 	// optionally alignments.  First annotate the show the variants in the
@@ -2490,20 +2515,12 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 						  });				 
 						  variantPromises.push(variantPromise);		 
 				
-					} else if (isAlignmentsOnly() && autocall) {
-						// Only alignment files are loaded and user, when prompted, responded
-						// that variants should be autocalled when gene is selected.
-						// First perform joint calling, then load the bam data (for coverage)
-						// for each sample.
-						var callPromise = promiseJointCallVariants(true).then(function() {
-
-							showNavVariantLinks();
-						}) 
-						variantPromises.push(callPromise);							
-
 					} 
-				}
-			});			
+
+				});			
+
+			}
+
 
 
 
@@ -2801,7 +2818,8 @@ function jointCallVariantsImpl(checkCache, callback) {
 			return;
 		}		
 		var vc = getRelevantVariantCards()[sampleIndex];
-		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, sampleIndex)
+		var sampleNames = vc.getSampleNamesToGenotype();
+		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, (sampleNames ? sampleNames.join(",") : null), sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 	                	var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
@@ -2937,7 +2955,8 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			return;
 		}		
 		var vc = cards[sampleIndex];
-		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, sampleIndex)
+		var sampleNames = vc.getSampleNamesToGenotype();
+		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, (sampleNames ? sampleNames.join(",") : null), sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 
@@ -2981,7 +3000,8 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			return;
 		}		
 		var vc = cards[sampleIndex];
-		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, sampleIndex)
+		var sampleNames = vc.getSampleNamesToGenotype();
+		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, (sampleNames ? sampleNames.join(",") : null), sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 

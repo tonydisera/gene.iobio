@@ -12,7 +12,24 @@ function VariantCard() {
 	this.cardIndex = null;
 }
 
+VariantCard.prototype.getSampleNamesToGenotype = function() {
+	var sampleNames = null;
+	var idx = 0;
+	if (this.getRelationship() == 'proband') {
+		sampleNames = [];
+		getRelevantVariantCards().forEach(function(vc) {
+			// Make sure every varient card has a sample name.  We will use this to access
+			// the genotypes for the trio and sibs
+			if (vc.getSampleName() == null ||  vc.getSampleName() == '') {
+				vc.setSampleName('sample' + idx);					
+			}
+			sampleNames.push(vc.getSampleName());
+			idx++;
 
+		})
+	}	
+	return sampleNames;
+}
 
 VariantCard.prototype.getName = function() {
 	return this.model.getName();

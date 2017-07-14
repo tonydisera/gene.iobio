@@ -1097,7 +1097,7 @@ var effectCategories = [
 
   }
 
-  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript, sampleIndex) {
+  exports.promiseParseVcfRecords = function(annotatedRecs, refName, geneObject, selectedTranscript, sampleNames, sampleIndex) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1142,7 +1142,7 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, null, [sampleIndex]);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames, sampleNames ? null : [sampleIndex]);
       resolve([annotatedRecs, results]);
 
     });

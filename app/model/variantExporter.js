@@ -337,7 +337,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 								theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
 							} 
 
-							getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, 0)
+							getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, null, 0)
 		                	   .then(function(data) {
 		                			var theFbData = data[1];
 
