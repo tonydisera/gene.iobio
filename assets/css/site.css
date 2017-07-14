@@ -2427,8 +2427,6 @@ inputinput:-moz-placeholder {
   width: inherit !important; }
 #dataModal #affected-sibs-box .selectize-input.has-items input {
   width: initial !important; }
-#dataModal #proband-data #affected-box {
-  display: none !important; }
 #dataModal .form-group {
   margin-top: -5px; }
 #dataModal .form-group-header {
@@ -2571,6 +2569,11 @@ inputinput:-moz-placeholder {
   float: left;
   width: 180px;
   min-height: 25px; }
+
+.tooltip-affected-symbol {
+  font-size: 17px;
+  color: #b32f2f !important;
+  float: left; }
 
 .sib-zygosity {
   width: 75px;
@@ -2837,7 +2840,7 @@ text.ref-count {
     clear: both;
     padding-bottom: 3px; }
     .tooltip-wide .tooltip-row.sib-info {
-      padding-bottom: 2px; }
+      padding-bottom: 6px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
     padding-top: 0px !important;

@@ -735,6 +735,7 @@ DataCard.prototype.init = function() {
 	$('#proband-data').find("#bam-url-input").removeClass('hide');
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
+	me.setAffected($('#proband-data'))
 	
 	
 	$('#unaffected-sibs-select').selectize(
@@ -1416,10 +1417,20 @@ DataCard.prototype.setAffected = function(panelSelector) {
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	var isAffected = panelSelector.find('#affected-cb').is(":checked");
-	variantCard.setAffectedStatus(isAffected ? "affected" : "unaffected");
+
+
+	if (cardIndex == 0) {
+		variantCard.setAffectedStatus(true);
+		panelSelector.find('#affected-cb').attr("checked", true)
+		panelSelector.find('#affected-cb').attr("disabled", "disabled");
+
+	} else {
+		var isAffected = panelSelector.find('#affected-cb').is(":checked");
+		variantCard.setAffectedStatus(isAffected ? "affected" : "unaffected");
+		window.updateUrl('affectedStatus' + cardIndex, isAffected);
+
+	}
 	
-	window.updateUrl('affectedStatus' + cardIndex, isAffected);
 }
 
 DataCard.prototype.setDataSourceRelationship = function(panelSelector) {		

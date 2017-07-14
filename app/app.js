@@ -2738,8 +2738,6 @@ function addVariantCard() {
 
 	variantCard.init($(cardSelectorString), d3CardSelector, cardIndex);
 	variantCard.setName(defaultName);
-
-
 }
 
 function promiseJointCallVariants(checkCache) {
@@ -3747,6 +3745,10 @@ function stripTranscriptPrefix(transcriptId) {
 	}
 	var nameTokens = transcriptId.split('.');
 	return nameTokens.length > 0 ? nameTokens[0] : transcriptId;
+}
+
+function uniq(theArray) {
+   return Array.from(new Set(theArray));
 }
 
 function showFeedback() {

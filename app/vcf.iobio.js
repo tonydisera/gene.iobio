@@ -1549,7 +1549,7 @@ var effectCategories = [
       if (sampleIndices == null) {
         sampleIndices = [];
         if (sampleNames != null && sampleNames != "") {
-          theSampleNames = sampleNames.split(",");
+          theSampleNames = uniq(sampleNames.split(","));
           sampleIndices = theSampleNames.map(function(sampleName,i) {
             return i;
           });

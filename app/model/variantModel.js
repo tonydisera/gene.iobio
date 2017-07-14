@@ -1495,7 +1495,6 @@ VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedS
 		variant[affectedStatus + "_genotypeRefCount"] = {};
 		variant[affectedStatus + "_genotypeDepth"]    = {};
 		variant[affectedStatus + "_bamDepth"]         = {};
-		variant[affectedStatus + "_rel"]              = {};
 
 		var matchesCount = 0;
 		var matchesHomCount = 0;
@@ -1512,7 +1511,6 @@ VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedS
 			 	matchesHomCount++;
 		 	}
 		 	variant[zygField][sampleName] = zyg;
-		 	variant[affectedStatus + "_rel"][sampleName] = info.relationship;
 		 	variant[affectedStatus + "_genotypeAltCount"][sampleName] = genotype.altCount;
 			variant[affectedStatus + "_genotypeRefCount"][sampleName] = genotype.refCount;
 			variant[affectedStatus + "_genotypeDepth"][sampleName]    = genotype.genotypeDepth;
