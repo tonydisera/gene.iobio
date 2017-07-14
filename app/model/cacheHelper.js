@@ -476,11 +476,11 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			
 		}
 				
-		// Use the genotypes in the proband variant data to determine sib status
-		getProbandVariantCard().determineSibStatus(geneObject, transcript, getAffectedInfo(), function(probandVcfData) {
+		// Use the genotypes in the proband variant data to determine affected/unaffected status
+		getProbandVariantCard().determineAffectedStatus(geneObject, transcript, getAffectedInfo(), function(probandVcfData) {
 
 			// Need to set the trio model vcf data to the refreshed proband vcf data after
-			// determining sib status
+			// determining affected/unaffected status
 			trioVcfData.proband = probandVcfData;
 
 			//

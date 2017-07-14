@@ -80,20 +80,20 @@ function MatrixCard() {
                         N: {value: 2, badge: false, clazz: '',          symbolFunction: this.showBookmarkSymbol}
                      };
 	this.unaffectedMap = {
-		                recessive_none: {value: 1,   badge: true,  clazz: 'unaffected', symbolFunction: this.showSibNotRecessiveSymbol},
-                        recessive_some: {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
-                        recessive_all:  {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
-                        present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
-                        present_all:    {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
-                        present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
+		                recessive_none: {value: 1,   badge: true,  clazz: 'unaffected', symbolFunction: this.showAffectedNotRecessiveSymbol},
+                        recessive_some: {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedRecessiveSymbol},
+                        recessive_all:  {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedRecessiveSymbol},
+                        present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
+                        present_all:    {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
+                        present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''}
                  };
 	this.affectedMap = {
-		                recessive_all:  {value: 1,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
-                        recessive_some: {value: 2,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
-                        present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
-                        present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
-                        present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
+		                recessive_all:  {value: 1,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedRecessiveSymbol},
+                        recessive_some: {value: 2,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedRecessiveSymbol},
+                        present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
+                        present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
+                        present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'affected',  symbolFunction: ''}
                  };
 	// For af range, value must be > min and <= max
@@ -123,8 +123,8 @@ function MatrixCard() {
 		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:4, index:1, match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
 		{name:'Bookmark'                     , id:'bookmark',       order:5, index:10, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
 		{name:'Inheritance Mode'             , id:'inheritance',    order:6, index:3, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Present in Affected sibs', id:'affected-sibs',  order:7, index:8, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Absent in Unaffected sibs'          , id:'unaffected-sibs',order:8, index:9, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
+		{name:'Present in Affected'          , id:'affected',       order:7, index:8, match: 'exact', attribute: 'affected_summary',  map: this.affectedMap},
+		{name:'Absent in Unaffected'         , id:'unaffected',     order:8, index:9, match: 'exact', attribute: 'unaffected_summary',  map: this.unaffectedMap},
 		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
 		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:10, index:5, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
 		{name:'Zygosity'                     , id:'zygosity',       order:11, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
@@ -304,8 +304,8 @@ MatrixCard.prototype.init = function() {
 			this.removeRow('Inheritance Mode', me.matrixRows);
 		}
 		this.removeRow('Most severe impact (VEP)', me.matrixRows);
-		this.removeRow('Present in Affected sibs', me.matrixRows);
-		this.removeRow('Absent in Unaffected sibs', me.matrixRows);
+		this.removeRow('Present in Affected', me.matrixRows);
+		this.removeRow('Absent in Unaffected', me.matrixRows);
 		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
 		this.removeRow('Allele Frequency - ExAC', me.matrixRows);
 
@@ -684,11 +684,18 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	// Figure out if we should show the unaffected sibs row
 	if (this.filteredMatrixRows == null) {
 		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);
-		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
-			me.removeRow('Present in Affected sibs', me.filteredMatrixRows);
+		var affectedInfo = getAffectedInfo();
+		var affected = affectedInfo.filter(function(info) {
+			return info.status == 'affected' && info.relationship != 'proband';
+		})
+		var unaffected = affectedInfo.filter(function(info) {
+			return info.status == 'unaffected' && info.relationship != 'proband';
+		})
+		if (affected.length == 0) {
+			me.removeRow('Present in Affected', me.filteredMatrixRows);
 		}
-		if (variantCardsSibs['unaffected'] == null || variantCardsSibs['unaffected'].length == 0) {
-			me.removeRow('Absent in Unaffected sibs', me.filteredMatrixRows);
+		if (unaffected.length == 0) {
+			me.removeRow('Absent in Unaffected', me.filteredMatrixRows);
 		}
 	}
 
@@ -1187,7 +1194,7 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 
 };
 
-MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
+MatrixCard.prototype.showAffectedNotRecessiveSymbol = function(selection, options) {
 	if (selection.datum().clazz == "affected") {
 		selection.append("g")
 		         .attr("id", "thumbs-grey-symbol")
@@ -1229,7 +1236,7 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	MatrixCard.wrap(text, options.cellSize, 3);
 };
 
-MatrixCard.prototype.showSibRecessiveSymbol = function (selection, options) {
+MatrixCard.prototype.showAffectedRecessiveSymbol = function (selection, options) {
 	if (selection.datum().value == 'recessive_all' && selection.datum().clazz == "affected") {
 		selection.append("g")
 			         .attr("id", "thumbs-green-symbol")
@@ -1252,7 +1259,7 @@ MatrixCard.prototype.showSibRecessiveSymbol = function (selection, options) {
 
 };
 
-MatrixCard.prototype.showSibPresentSymbol = function (selection, options) {
+MatrixCard.prototype.showAffectedPresentSymbol = function (selection, options) {
 	var symbolLink = null;
 	var id = "thumbs-grey-symbol";
 

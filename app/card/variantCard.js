@@ -45,8 +45,8 @@ VariantCard.prototype.setSampleName = function(sampleName) {
 	}
 }
 
-VariantCard.prototype.determineSibStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
-	this.model.determineSibStatus(theGene, theTranscript, affectedInfo, onUpdate);
+VariantCard.prototype.determineAffectedStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
+	this.model.determineAffectedStatus(theGene, theTranscript, affectedInfo, onUpdate);
 }
 
 VariantCard.prototype.getSampleName = function() {

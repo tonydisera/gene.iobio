@@ -1028,37 +1028,44 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		container.select("div.sib-zygosity").remove();
 		var sibRowCount = {affected: 0, unaffected: 0};
 		["affected", "unaffected"].forEach(function (affectedStatus) {
-			var sibZygField = affectedStatus + "_zygosity";
-			if (variant[sibZygField] && Object.keys(variant[sibZygField]).length > 0) {
-				for (sampleName in variant[sibZygField]) {
-					row = container.append("div")
-		                           .attr("class", "tooltip-row sib-info");	
-					sibRowCount[affectedStatus]++;
-		            if (sibRowCount.affected > 0 && sibRowCount.unaffected == 1) {
-		            	row.style("padding-top", "6px");		            	
-		            }
-					var zyg = variant[sibZygField][sampleName] ? variant[sibZygField][sampleName].toLowerCase() : "";
-					if (zyg == "gt_unknown") {
-						zyg = "unknown";
+			
+			var zygField = affectedStatus + "_zygosity";
+
+			if (variant[zygField] && Object.keys(variant[zygField]).length > 0) {				
+				for (sampleName in variant[zygField]) {
+
+					var rel = variant[affectedStatus + "_rel"][sampleName];
+					if (rel == 'sibling') {
+						row = container.append("div")
+			                           .attr("class", "tooltip-row sib-info");	
+						sibRowCount[affectedStatus]++;
+			            if (sibRowCount.affected > 0 && sibRowCount.unaffected == 1) {
+			            	row.style("padding-top", "6px");		            	
+			            }
+						var zyg = variant[zygField][sampleName] ? variant[zygField][sampleName].toLowerCase() : "";
+						if (zyg == "gt_unknown") {
+							zyg = "unknown";
+						}
+						row.append("div")
+					       .attr("class", "sib-zygosity tooltip-header-small")
+					       .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(affectedStatus) + " Sib " + sampleName + "</span>");
+						row.append("div")
+						   .attr("class",  "tooltip-zygosity label " + zyg)
+						   .text(capitalizeFirstLetter(zyg));
+
+
+						column = row.append("div")
+					                .attr("class", "sib-alt-count tooltip-allele-count-bar")
+						if (zyg && zyg != '') {			            
+							me._appendAlleleCountSVG(column, 
+								variant[affectedStatus + "_genotypeAltCount"][sampleName], 
+								variant[affectedStatus + "_genotypeRefCount"][sampleName], 
+								variant[affectedStatus + "_genotypeDepth"][sampleName], 
+								variant[affectedStatus + "_bamDepth"][sampleName],
+								barWidth);
+						} 
+
 					}
-					row.append("div")
-				       .attr("class", "sib-zygosity tooltip-header-small")
-				       .html("<span class='tooltip-subtitle'>" + capitalizeFirstLetter(affectedStatus) + " Sib " + sampleName + "</span>");
-					row.append("div")
-					   .attr("class",  "tooltip-zygosity label " + zyg)
-					   .text(capitalizeFirstLetter(zyg));
-
-
-					column = row.append("div")
-				                .attr("class", "sib-alt-count tooltip-allele-count-bar")
-					if (zyg && zyg != '') {			            
-						me._appendAlleleCountSVG(column, 
-							variant[affectedStatus + "_genotypeAltCount"][sampleName], 
-							variant[affectedStatus + "_genotypeRefCount"][sampleName], 
-							variant[affectedStatus + "_genotypeDepth"][sampleName], 
-							variant[affectedStatus + "_bamDepth"][sampleName],
-							barWidth);
-					} 
 				}
 			}
 

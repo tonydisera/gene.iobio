@@ -2590,7 +2590,7 @@ function getAffectedInfo () {
 		var info = {};
 		info.variantCard = vc;
 		if (vc) {
-			info.relatioship = vc.getRelationship();
+			info.relationship = vc.getRelationship();
 			info.status = vc.isAffected() ? 'affected' : 'unaffected';
 			info.label = vc.getRelationship();
 			info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
@@ -3193,7 +3193,7 @@ function promiseDetermineInheritance(promise) {
 			$("#matrix-panel .loader").removeClass("hide");
 			$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
 			$("#feature-matrix-note").addClass("hide");
-			getProbandVariantCard().determineSibStatus( window.gene, window.selectedTranscript, getAffectedInfo(), function(probandVcfData) {
+			getProbandVariantCard().determineAffectedStatus( window.gene, window.selectedTranscript, getAffectedInfo(), function(probandVcfData) {
 			//determineSibStatus(trioModel, function() {
 
 				$("#matrix-panel .loader").addClass("hide");

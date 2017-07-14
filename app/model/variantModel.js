@@ -1459,19 +1459,19 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 }
 
-VariantModel.prototype.determineSibStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
+VariantModel.prototype.determineAffectedStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
 	var me = this;
 	var theVcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
 
 	var affectedSibs = affectedInfo.filter(function(info) {
-		return info.status == 'affected' && info.relationship == 'sibling';
+		return info.status == 'affected' && info.relationship != 'proband';
 	})
-	me._determineSibStatusByGenotypes(theVcfData, 'affected', affectedSibs)
+	me._determineAffectedStatus(theVcfData, 'affected', affectedSibs)
 
 	var unaffectedSibs = affectedInfo.filter(function(info) {
-		return info.status == 'unaffected' && info.relationship == 'sibling';
+		return info.status == 'unaffected' && info.relationship != 'proband';
 	})
-	me._determineSibStatusByGenotypes(theVcfData, 'unaffected', unaffectedSibs)
+	me._determineAffectedStatus(theVcfData, 'unaffected', unaffectedSibs)
 
 	me._cacheData(theVcfData, "vcfData", theGene.gene_name, theTranscript);	
 	// For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
@@ -1481,36 +1481,38 @@ VariantModel.prototype.determineSibStatus = function(theGene, theTranscript, aff
 	onUpdate(theVcfData);
 }
 
-VariantModel.prototype._determineSibStatusByGenotypes = function(theVcfData, affectedStatus, affectedSibs) {
+VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedStatus, affectedInfo) {
 	var me = this;
-	var sibsCount       = affectedSibs.length;
-	var sibZygosityAttr = affectedStatus + "_zygosity";
-	var affectedAttr    = affectedStatus + "Sibs";
+	var affectedCount       = affectedInfo.length;
+	var zygField        = affectedStatus + "_zygosity";
+	var summaryField    = affectedStatus + "_summary";
 
 	theVcfData.features.forEach( function(variant) {
 
-		variant[affectedAttr] = "none";
-		variant[sibZygosityAttr] = {};
+		variant[summaryField]                         = "none";
+		variant[zygField]                             = {};
 	 	variant[affectedStatus + "_genotypeAltCount"] = {};
 		variant[affectedStatus + "_genotypeRefCount"] = {};
 		variant[affectedStatus + "_genotypeDepth"]    = {};
 		variant[affectedStatus + "_bamDepth"]         = {};
+		variant[affectedStatus + "_rel"]              = {};
 
 		var matchesCount = 0;
 		var matchesHomCount = 0;
 
-		affectedSibs.forEach(function(info) {
-		 	var sampleName = info.variantCard.getSampleName();
-		 	var genotype = variant.genotypes[sampleName];
-		 	var sibZygosity = genotype.zygosity ? genotype.zygosity : "none";
+		affectedInfo.forEach(function(info) {
+		 	var sampleName  = info.variantCard.getSampleName();
+		 	var genotype    = variant.genotypes[sampleName];
+		 	var zyg         = genotype.zygosity ? genotype.zygosity : "none";
 		 	
-			if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'gt_unknown' && sibZygosity.toLowerCase() != 'homref') {
+			if (zyg.toLowerCase() != 'none' && zyg.toLowerCase() != 'gt_unknown' && zyg.toLowerCase() != 'homref') {
 			 	matchesCount++;
 			}
-		 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
+		 	if (zyg.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
 			 	matchesHomCount++;
 		 	}
-		 	variant[sibZygosityAttr][sampleName] = sibZygosity;
+		 	variant[zygField][sampleName] = zyg;
+		 	variant[affectedStatus + "_rel"][sampleName] = info.relationship;
 		 	variant[affectedStatus + "_genotypeAltCount"][sampleName] = genotype.altCount;
 			variant[affectedStatus + "_genotypeRefCount"][sampleName] = genotype.refCount;
 			variant[affectedStatus + "_genotypeDepth"][sampleName]    = genotype.genotypeDepth;
@@ -1519,19 +1521,19 @@ VariantModel.prototype._determineSibStatusByGenotypes = function(theVcfData, aff
 		})
 		if (variant.inheritance.toLowerCase() == 'recessive'
 			&& matchesHomCount > 0 
-			&& matchesHomCount == sibsCount) { 
-			variant[affectedAttr] = "recessive_all";
+			&& matchesHomCount == affectedCount) { 
+			variant[summaryField] = "recessive_all";
 		} else if (variant.inheritance.toLowerCase() == 'recessive'
 			      && matchesHomCount > 0 )  {
-			variant[affectedAttr] = "recessive_some";
+			variant[summaryField] = "recessive_some";
 		} else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
-			variant[affectedAttr] = "recessive_none";
-		} else if (matchesCount > 0 && matchesCount == sibsCount) {
-			variant[affectedAttr] = "present_all";
+			variant[summaryField] = "recessive_none";
+		} else if (matchesCount > 0 && matchesCount == affectedCount) {
+			variant[summaryField] = "present_all";
 		}  else if (matchesCount > 0) {
-			variant[affectedAttr] = "present_some"
+			variant[summaryField] = "present_some"
 		}  else {
-			variant[affectedAttr] = "present_none";
+			variant[summaryField] = "present_none";
 		}  	 	 
 
 	});
