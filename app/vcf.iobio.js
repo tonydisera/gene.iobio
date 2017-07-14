@@ -2291,67 +2291,75 @@ var effectCategories = [
         // A->G,C  0|1 keep A->G, but bypass A->C
         // A->G,C  0|2 bypass A->G, keep A->C
         // A->G,C  1|2 keep A->G, keep A->C
+        // unknown .   bypass
         var delim = null;
+
         if (gt.gt.indexOf("|") > 0) {
           delim = "|";
           gt.phased = true;
-        } else {
+        } else if (gt.gt.indexOf("/") > 0){
           delim = "/";
           gt.phased = false;
+        } else {
+          gt.keepAlt = false;
+          gt.zygosity = "gt_unknown";          
         }
-        var tokens = gt.gt.split(delim);
-        if (tokens.length == 2) {
-          if (isLevelEdu && alt.indexOf(",") > 0) {
-            if ((tokens[0] == 1 ) && (tokens[1] == 2)) {
+        if (delim) {
+          var tokens = gt.gt.split(delim);
+          if (tokens.length == 2) {
+            if (isLevelEdu && alt.indexOf(",") > 0) {
+              if ((tokens[0] == 1 ) && (tokens[1] == 2)) {
+                gt.keepAlt = true;
+              } if (tokens[0] == tokens[1]) {
+                gt.keepAlt = true;
+                var theAltIdx = tokens[0] - 1;
+                result.alt = alt.split(',')[theAltIdx] + ',' + alt.split(',')[theAltIdx];
+              } else if (tokens[0] == 0 && tokens[1] != 0) {
+                var theAltIdx = +tokens[1] - 1;
+                result.alt = alt.split(',')[theAltIdx]
+              } else if (tokens[1] == 0 && tokens[0] != 0) {
+                var theAltIdx = +tokens[0] - 1;
+                result.alt = alt.split(',')[theAltIdx]
+              }
+              if (gt.keepAlt) {
+                if (tokens[0] == tokens[1]) {
+                  gt.zygosity = "HOM";
+                } else {
+                  gt.zygosity = "HET";
+                }
+              }
+
+            } else if (tokens[0] == result.gtNumber || tokens[1] == result.gtNumber) {
               gt.keepAlt = true;
-            } if (tokens[0] == tokens[1]) {
-              gt.keepAlt = true;
-              var theAltIdx = tokens[0] - 1;
-              result.alt = alt.split(',')[theAltIdx] + ',' + alt.split(',')[theAltIdx];
-            } else if (tokens[0] == 0 && tokens[1] != 0) {
-              var theAltIdx = +tokens[1] - 1;
-              result.alt = alt.split(',')[theAltIdx]
-            } else if (tokens[1] == 0 && tokens[0] != 0) {
-              var theAltIdx = +tokens[0] - 1;
-              result.alt = alt.split(',')[theAltIdx]
-            }
-            if (gt.keepAlt) {
               if (tokens[0] == tokens[1]) {
                 gt.zygosity = "HOM";
               } else {
                 gt.zygosity = "HET";
               }
+            } else if (tokens[0] == "0" && tokens[1] == "0" ) {
+              gt.keepAlt = true;
+              gt.zygosity = "HOMREF"
             }
-
-          } else if (tokens[0] == result.gtNumber || tokens[1] == result.gtNumber) {
-            gt.keepAlt = true;
-            if (tokens[0] == tokens[1]) {
-              gt.zygosity = "HOM";
-            } else {
-              gt.zygosity = "HET";
-            }
-          } else if (tokens[0] == "0" && tokens[1] == "0" ) {
-            gt.keepAlt = true;
-            gt.zygosity = "HOMREF"
           }
-        }
 
-        gt.eduGenotype = "";
-        if (isLevelEdu) {
-          var alts = alt.split(",");
-          var gtIdx1 = +tokens[0];
-          var gtIdx2 = +tokens[1];
-          if (gt.zygosity == "HET" && gtIdx1 == 0) {
-            gt.eduGenotype = rec.ref + " " + alts[altIdx];
-          } else if (gt.zygosity == "HET" && gtIdx1 > 0) {
-            gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx2-1];
-          } else if (gt.zygosity == "HOM") {
-            gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx1-1];
-          } else if (gt.zygosity == "HOMREF") {
-            gt.eduGenotype = rec.ref + " " + rec.ref;
-          }  
+          gt.eduGenotype = "";
+          if (isLevelEdu) {
+            var alts = alt.split(",");
+            var gtIdx1 = +tokens[0];
+            var gtIdx2 = +tokens[1];
+            if (gt.zygosity == "HET" && gtIdx1 == 0) {
+              gt.eduGenotype = rec.ref + " " + alts[altIdx];
+            } else if (gt.zygosity == "HET" && gtIdx1 > 0) {
+              gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx2-1];
+            } else if (gt.zygosity == "HOM") {
+              gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx1-1];
+            } else if (gt.zygosity == "HOMREF") {
+              gt.eduGenotype = rec.ref + " " + rec.ref;
+            }  
+          }
+          gt.eduGenotypeReversed = switchGenotype(gt.eduGenotype);
+
         }
-        gt.eduGenotypeReversed = switchGenotype(gt.eduGenotype);
       }
 
     });
@@ -2361,6 +2369,7 @@ var effectCategories = [
         result.keepAlt = true;
       }
     })
+
 
     return result;
  }
