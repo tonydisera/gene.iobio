@@ -942,32 +942,44 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 	container.select("div.proband-alt-count").remove();	
 	me._appendReadCountHeading(container);
 
+	var selectedRel = null;
+	for (var rel in trioFields) {
+		if (trioFields[rel].selected) {
+			selectedRel = rel;
+		}
+	}
+	if (selectedRel == null) {
+		return;
+	}
 	
-	// Show the Proband's allele counts
-	var selectedClazz = dataCard.mode == 'trio' && trioFields.PROBAND.selected ? 'selected' : '';
+	// Show the allele counts for the sample 
+	var selectedClazz = dataCard.mode == 'trio' && trioFields[selectedRel].selected ? 'selected' : '';
 	var row = container.append("div")
 	                   .attr("class", "proband-alt-count tooltip-row");
 	row.append("div")
 	   .attr("class", "proband-alt-count tooltip-header-small")
-	   .html("<span class='tooltip-subtitle " + selectedClazz + "'>" + me.AFFECTED_GLYPH + 'Proband' + "</span>");
+	   .html("<span class='tooltip-subtitle " 
+	   	+ selectedClazz + "'>" 
+	   	+ (variantCard.isAffected() ? me.AFFECTED_GLYPH : '') 
+	   	+ capitalizeFirstLetter(variantCard.getRelationship()) + "</span>");
 	row.append("div")
-		   .attr("class", "tooltip-zygosity label " + ( trioFields.PROBAND.zygosity ? trioFields.PROBAND.zygosity.toLowerCase() : ""))
-		   .text(trioFields.PROBAND.zygosity ? capitalizeFirstLetter(trioFields.PROBAND.zygosity.toLowerCase()) : "");
+		   .attr("class", "tooltip-zygosity label " + ( trioFields[selectedRel].zygosity ? trioFields[selectedRel].zygosity.toLowerCase() : ""))
+		   .text(trioFields[selectedRel].zygosity ? capitalizeFirstLetter(trioFields[selectedRel].zygosity.toLowerCase()) : "");
 	var column = row.append("div")
 	                .attr("class", "proband-alt-count tooltip-allele-count-bar");
-	if (trioFields.PROBAND.zygosity && trioFields.PROBAND.zygosity != '') {
+	if (trioFields[selectedRel].zygosity && trioFields[selectedRel].zygosity != '') {
 		me._appendAlleleCountSVG(column, 
-			trioFields.PROBAND.genotypeAltCount, 
-			trioFields.PROBAND.genotypeRefCount, 
-			trioFields.PROBAND.genotypeDepth, 
-			trioFields.PROBAND.bamDepth, 
+			trioFields[selectedRel].genotypeAltCount, 
+			trioFields[selectedRel].genotypeRefCount, 
+			trioFields[selectedRel].genotypeDepth, 
+			trioFields[selectedRel].bamDepth, 
 			barWidth);	
-	}  else if (!trioFields.PROBAND.done) {
+	}  else if (!trioFields[selectedRel].done) {
 		column.append("span").attr("class", "processing").text("analyzing..");
 	}             
 
 	
-	if (dataCard.mode == 'trio') {
+	if (dataCard.mode == 'trio' && selectedRel == 'PROBAND') {
 
 		container.select("div.sib-zygosity").remove();
 		var sibRowCount = {affected: 0, unaffected: 0};
