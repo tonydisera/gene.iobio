@@ -182,7 +182,7 @@ DataCard.prototype.loadDemoData = function() {
 
 
 	window.updateUrl('rel0', "proband");	
-	window.updateUrl('rel', "mother");	
+	window.updateUrl('rel1', "mother");	
 	window.updateUrl('rel2', "father");	
 
 	window.updateUrl('name0', this.demoNames.proband);	
@@ -1420,7 +1420,7 @@ DataCard.prototype.setAffected = function(panelSelector) {
 
 
 	if (cardIndex == 0) {
-		variantCard.setAffectedStatus(true);
+		variantCard.setAffectedStatus('affected');
 		panelSelector.find('#affected-cb').attr("checked", true)
 		panelSelector.find('#affected-cb').attr("disabled", "disabled");
 
