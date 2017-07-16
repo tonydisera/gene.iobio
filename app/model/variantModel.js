@@ -2497,6 +2497,14 @@ VariantModel.prototype.loadCalledTrioGenotypes = function(theVcfData, theFbData,
 				fbVariant.fatherZygosity              = source.fatherZygosity;
 				fbVariant.motherZygosity              = source.motherZygosity;
 				fbVariant.uasibsZygosity              = source.uasibsZygosity;
+				['affected', 'unaffected']
+				.forEach(function(affectedStatus) {
+					['summary', 'zygosity', 'genotypeAltCount', 'genotypeRefCount', 'genotypeDepth', 'bamDepth']
+					.forEach(function(field) {
+						var attr = affectedStatus + "_" + field;
+						fbVariant[attr]  = source[attr];
+					})
+				})				
 				if (me.relationship != 'proband') {
 					fbVariant.genotypeRefCountProband      = source.genotypeRefCountProband;
 					fbVariant.genotypeAltCountProband      = source.genotypeAltCountProband;
