@@ -2757,6 +2757,7 @@ function addVariantCard() {
 	variantCard.setName(defaultName);
 }
 
+
 function promiseJointCallVariants(checkCache) {
 	return new Promise(function(resolve, reject) {
 		jointCallVariants(checkCache, function() {
@@ -2818,8 +2819,8 @@ function jointCallVariantsImpl(checkCache, callback) {
 			return;
 		}		
 		var vc = getRelevantVariantCards()[sampleIndex];
-		var sampleNames = vc.getSampleNamesToGenotype();
-		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, (sampleNames ? sampleNames.join(",") : null), sampleIndex)
+		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
+		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 	                	var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
@@ -2955,8 +2956,8 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			return;
 		}		
 		var vc = cards[sampleIndex];
-		var sampleNames = vc.getSampleNamesToGenotype();
-		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, (sampleNames ? sampleNames.join(",") : null), sampleIndex)
+		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
+		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 
@@ -3000,8 +3001,8 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 			return;
 		}		
 		var vc = cards[sampleIndex];
-		var sampleNames = vc.getSampleNamesToGenotype();
-		vc.model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, (sampleNames ? sampleNames.join(",") : null), sampleIndex)
+		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
+		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 
