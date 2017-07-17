@@ -573,17 +573,17 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
-          function(annotatedData, data) {
-            if (annotatedData && data) {
-              resolve([annotatedData, data]);
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+          function(annotatedData, results) {
+            if (annotatedData && results) {
+              resolve([annotatedData, results]);
             } else {
               reject();
             }
@@ -591,10 +591,10 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
-          function(annotatedData, data) {
-            if (annotatedData && data) {
-              resolve([annotatedData, data]);
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+          function(annotatedData, results) {
+            if (annotatedData && results) {
+              resolve([annotatedData, results]);
             } else {
               reject();
             }
@@ -606,7 +606,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -647,6 +647,149 @@ var effectCategories = [
 
 
   }
+
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+
+    var me = this;
+
+    // Figure out the file location of the reference seq files
+    var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
+    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+
+
+    var contigStr = "";
+    getHumanRefNames(refName).split(" ").forEach(function(ref) {
+        contigStr += "##contig=<ID=" + ref + ">\n";
+    })
+    var contigNameFile = new Blob([contigStr])
+
+    // Create an iobio command get get the variants and add any header recs.
+    var args = ['-h', vcfURL, regionParm];
+    if (tbiUrl) {
+      args.push(tbiUrl);
+    }
+    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
+      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
+
+    // filter sample(s)
+    if (sampleNames != null && sampleNames != "") {
+
+      var sampleNameFile = new Blob([sampleNames.split(",").join("\n")])
+      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
+    }
+
+    // normalize variants
+    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
+
+    // get allele frequencies from 1000G and ExAC
+    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
+
+    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
+    if (isRefSeq || annotationEngine == 'vep') {
+    } else {
+      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
+    }
+
+    // VEP
+    var vepArgs = [];
+    vepArgs.push(" --assembly");
+    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+    vepArgs.push(" --format vcf");
+    if (isRefSeq) {
+      vepArgs.push("--refseq");
+    }
+    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+    // since we won't have the original vcf records as input
+    if (hgvsNotation) {
+      vepArgs.push("--hgvs");
+    }
+    if (getRsId) {
+      vepArgs.push("--check_existing");
+    }
+    if (hgvsNotation || getRsId) {
+      vepArgs.push("--fasta");
+      vepArgs.push(refFastaFile);
+    }
+
+    //
+    //  SERVER SIDE CACHING
+    //
+    var cacheKey = null;
+    var urlParameters = {};
+    if (cache) {
+        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        console.log(cacheKey);
+        urlParameters.cache = cacheKey;
+        urlParameters.partialCache = true;
+        cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
+    } else {
+        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
+    }
+
+
+
+
+    var annotatedData = "";
+    // Get the results from the iobio command
+    cmd.on('data', function(data) {
+         if (data == undefined) {
+            return;
+         }
+         annotatedData += data;
+    });
+
+    // We have all of the annotated vcf recs.  Now parse them into vcf objects
+    cmd.on('end', function(data) {
+      var annotatedRecs = annotatedData.split("\n");
+      var vcfObjects = [];
+      var contigHdrRecFound = false;
+      var vepFields = {};
+
+      annotatedRecs.forEach(function(record) {
+        if (record.charAt(0) == "#") {
+          // Figure out how the vep fields positions
+          if (record.indexOf("INFO=<ID=CSQ") > 0) {
+            vepFields = me.parseHeaderFieldForVep(record);
+          }
+        } else {
+
+          // Parse the vcf record into its fields
+          var fields = record.split('\t');
+          var pos    = fields[1];
+          var id     = fields[2];
+          var ref    = fields[3];
+          var alt    = fields[4];
+          var qual   = fields[5];
+          var filter = fields[6];
+          var info   = fields[7];
+          var format = fields[8];
+          var genotypes = [];
+          for (var i = 9; i < fields.length; i++) {
+            genotypes.push(fields[i]);
+          }
+
+          // Turn vcf record into a JSON object and add it to an array
+          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
+                           'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+          vcfObjects.push(vcfObject);
+        }
+      });
+
+      // Parse the vcf object into a variant object that is visualized by the client.
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames, null, isMultiSample);
+
+
+      callback(annotatedRecs, results);
+    });
+
+    cmd.on('error', function(error) {
+       console.log(error);
+    });
+
+    cmd.run();
+
+  }
+
 
 
   
@@ -788,149 +931,6 @@ var effectCategories = [
     return key;
   }
 
-
-
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
-
-    var me = this;
-
-    // Figure out the file location of the reference seq files
-    var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
-    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
-
-
-    var contigStr = "";
-    getHumanRefNames(refName).split(" ").forEach(function(ref) {
-        contigStr += "##contig=<ID=" + ref + ">\n";
-    })
-    var contigNameFile = new Blob([contigStr])
-
-    // Create an iobio command get get the variants and add any header recs.
-    var args = ['-h', vcfURL, regionParm];
-    if (tbiUrl) {
-      args.push(tbiUrl);
-    }
-    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
-      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
-
-    // filter sample(s)
-    if (sampleNames != null && sampleNames != "") {
-
-      var sampleNameFile = new Blob([sampleNames.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
-    }
-
-    // normalize variants
-    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
-
-    // get allele frequencies from 1000G and ExAC
-    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
-
-    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
-    if (isRefSeq || annotationEngine == 'vep') {
-    } else {
-      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
-    }
-
-    // VEP
-    var vepArgs = [];
-    vepArgs.push(" --assembly");
-    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
-    vepArgs.push(" --format vcf");
-    if (isRefSeq) {
-      vepArgs.push("--refseq");
-    }
-    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
-    // since we won't have the original vcf records as input
-    if (hgvsNotation) {
-      vepArgs.push("--hgvs");
-    }
-    if (getRsId) {
-      vepArgs.push("--check_existing");
-    }
-    if (hgvsNotation || getRsId) {
-      vepArgs.push("--fasta");
-      vepArgs.push(refFastaFile);
-    }
-
-    //
-    //  SERVER SIDE CACHING
-    //
-    var cacheKey = null;
-    var urlParameters = {};
-    if (cache) {
-        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
-        console.log(cacheKey);
-        urlParameters.cache = cacheKey;
-        urlParameters.partialCache = true;
-        cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
-    } else {
-        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
-    }
-
-
-
-
-    var annotatedData = "";
-    // Get the results from the iobio command
-    cmd.on('data', function(data) {
-         if (data == undefined) {
-            return;
-         }
-         annotatedData += data;
-    });
-
-    // We have all of the annotated vcf recs.  Now parse them into vcf objects
-    cmd.on('end', function(data) {
-      var annotatedRecs = annotatedData.split("\n");
-      var vcfObjects = [];
-      var contigHdrRecFound = false;
-      var vepFields = {};
-
-      annotatedRecs.forEach(function(record) {
-        if (record.charAt(0) == "#") {
-          // Figure out how the vep fields positions
-          if (record.indexOf("INFO=<ID=CSQ") > 0) {
-            vepFields = me.parseHeaderFieldForVep(record);
-          }
-        } else {
-
-          // Parse the vcf record into its fields
-          var fields = record.split('\t');
-          var pos    = fields[1];
-          var id     = fields[2];
-          var ref    = fields[3];
-          var alt    = fields[4];
-          var qual   = fields[5];
-          var filter = fields[6];
-          var info   = fields[7];
-          var format = fields[8];
-          var genotypes = [];
-          for (var i = 9; i < fields.length; i++) {
-            genotypes.push(fields[i]);
-          }
-
-          // Turn vcf record into a JSON object and add it to an array
-          var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
-                           'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
-          vcfObjects.push(vcfObject);
-        }
-      });
-
-      // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
-
-
-      callback(annotatedRecs, results);
-    });
-
-    cmd.on('error', function(error) {
-       console.log(error);
-    });
-
-    cmd.run();
-
-  }
 
 
   exports.parseHeaderFieldForVep = function(record) {
@@ -1548,7 +1548,6 @@ var effectCategories = [
       var gtSampleIndices = [];
       var gtSampleNames = null;
 
-
       if (sampleNames != null && sampleNames != "") {
         gtSampleNames   = uniq(sampleNames.split(","))
         gtSampleIndices = gtSampleNames.map(function(sampleName,i) {
@@ -1565,7 +1564,14 @@ var effectCategories = [
           return elem.toString();
         })
       }       
-
+      var allVariants = null;
+      if (parseMultiSample) {
+        allVariants = gtSampleIndices.map(function(element) {
+          return [];
+        })        
+      } else {
+        allVariants = [ [] ];
+      }
 
 
       // The variant region may span more than the specified region.
@@ -1573,10 +1579,9 @@ var effectCategories = [
       // of the region start, so to prevent a negative index, we will
       // keep track of the region start based on the variants.
       var variantRegionStart = geneObject.start;
-      var variants = [];
-      variants.length = 0;
 
-
+      // Interate through the vcf records.  For each record, if multiple
+      // alternates are provided, iterate through each alternate
       vcfRecs.forEach(function(rec) {
         if (rec.pos && rec.id) {
           var alts = [];
@@ -1640,91 +1645,101 @@ var effectCategories = [
               var highestSIFT         = me._getLowestScore(  annot.vep.allSIFT,      me._cullTranscripts, selectedTranscriptID);
               var highestPolyphen     = me._getHighestScore( annot.vep.allPolyphen,  me._cullTranscripts, selectedTranscriptID);
 
-              variants.push( 
-                {
-                  'start':                    +rec.pos, 
-                  'end':                      +end, 
-                  'len':                      +len, 
-                  'level':                    +0,
-                  'strand':                   geneObject.strand,
-                  'chrom':                    refName,
-                  'type':                     annot.typeAnnotated && annot.typeAnnotated != '' ? annot.typeAnnotated : type,
-                  'id':                       rec.id, 
-                  'ref':                      rec.ref,
-                  'alt':                      alt, 
-                  'qual':                     rec.qual, 
-                  'recfilter':                rec.filter,
+              for (var i = 0; i < allVariants.length; i++) {
+                var genotype = gtResult.genotypes[i];
 
-                  // genotype fields
-                  'genotypes':                gtResult.genotypeMap,
-                  'genotype':                 gtResult.genotype,
-                  'genotypeDepth' :           gtResult.genotype.genotypeDepth,
-                  'genotypeFilteredDepth' :   gtResult.genotype.filteredDepth,
-                  'genotypeAltCount' :        gtResult.genotype.altCount,
-                  'genotypeRefCount' :        gtResult.genotype.refCount,
-                  'genotypeAltForwardCount' : gtResult.genotype.altForwardCount,
-                  'genotypeAltReverseCount' : gtResult.genotype.altReverseCount,
-                  'genotypeRefForwardCount' : gtResult.genotype.refForwardCount,
-                  'genotypeRefReverseCount' : gtResult.genotype.refReverseCount,
-                  'eduGenotype' :             gtResult.genotype.eduGenotype,
-                  'eduGenotypeReversed':      gtResult.genotype.eduGenotypeReversed,
-                  'zygosity':                 gtResult.genotype.zygosity ? gtResult.genotype.zygosity : 'gt_unknown',
-                  'phased':                   gtResult.genotype.phased,
+                // Keep the variant if we are just parsing a single sample (parseMultiSample=false)
+                // or we are parsing multiple samples and this sample's genotype is het or hom
+                if (!parseMultiSample || genotype.keep) {
+                  var variant = {
+                    'start':                    +rec.pos, 
+                    'end':                      +end, 
+                    'len':                      +len, 
+                    'level':                    +0,
+                    'strand':                   geneObject.strand,
+                    'chrom':                    refName,
+                    'type':                     annot.typeAnnotated && annot.typeAnnotated != '' ? annot.typeAnnotated : type,
+                    'id':                       rec.id, 
+                    'ref':                      rec.ref,
+                    'alt':                      alt, 
+                    'qual':                     rec.qual, 
+                    'recfilter':                rec.filter,
 
-                  // fields to init to 'empty'
-                  'consensus':                rec.consensus,
-                  'inheritance':              '',
-                  'af1000glevel':             '',
-                  'afexaclevel:':             '',
+                    // genotype fields
+                    'genotypes':                gtResult.genotypeMap,
+                    'genotype':                 genotype,
+                    'genotypeDepth' :           genotype.genotypeDepth,
+                    'genotypeFilteredDepth' :   genotype.filteredDepth,
+                    'genotypeAltCount' :        genotype.altCount,
+                    'genotypeRefCount' :        genotype.refCount,
+                    'genotypeAltForwardCount' : genotype.altForwardCount,
+                    'genotypeAltReverseCount' : genotype.altReverseCount,
+                    'genotypeRefForwardCount' : genotype.refForwardCount,
+                    'genotypeRefReverseCount' : genotype.refReverseCount,
+                    'eduGenotype' :             genotype.eduGenotype,
+                    'eduGenotypeReversed':      genotype.eduGenotypeReversed,
+                    'zygosity':                 genotype.zygosity ? genotype.zygosity : 'gt_unknown',
+                    'phased':                   genotype.phased,
 
-                  // clinvar coords
-                  'clinvarStart':            clinvarObject.clinvarStart,
-                  'clinvarRef':              clinvarObject.clinvarRef,
-                  'clinvarAlt':              clinvarObject.clinvarAlt,
+                    // fields to init to 'empty'
+                    'consensus':                rec.consensus,
+                    'inheritance':              '',
+                    'af1000glevel':             '',
+                    'afexaclevel:':             '',
 
-                  //
-                  // annot fields
-                  //
-                  'af':                       annot.af,
-                  'af1000G':                  me._parseAf(altIdx, annot.af1000G),
-                  'afExAC':                   me._parseAf(altIdx, annot.afExAC),
-                  'rsid' :                    annot.rs,
-                  'combinedDepth':            annot.combinedDepth,
+                    // clinvar coords
+                    'clinvarStart':            clinvarObject.clinvarStart,
+                    'clinvarRef':              clinvarObject.clinvarRef,
+                    'clinvarAlt':              clinvarObject.clinvarAlt,
 
-                  // snpeff
-                  'effect':                   annot.snpEff.effects,
-                  'impact':                   annot.snpEff.impacts,
+                    //
+                    // annot fields
+                    //
+                    'af':                       annot.af,
+                    'af1000G':                  me._parseAf(altIdx, annot.af1000G),
+                    'afExAC':                   me._parseAf(altIdx, annot.afExAC),
+                    'rsid' :                    annot.rs,
+                    'combinedDepth':            annot.combinedDepth,
 
-                  // vep
-                  'vepConsequence':          annot.vep.vepConsequence,
-                  'vepImpact':               annot.vep.vepImpact,
-                  'vepExon':                 annot.vep.vepExon,
-                  'vepHGVSc':                annot.vep.vepHGVSc,
-                  'vepHGVSp':                annot.vep.vepHGVSp,
-                  'vepAminoAcids':           annot.vep.vepAminoAcids,
-                  'vepVariationIds' :        annot.vep.vepVariationIds,
-                  'vepSIFT':                 annot.vep.vepSIFT,
-                  'sift' :                   annot.vep.sift,
-                  'vepPolyPhen':             annot.vep.vepPolyPhen,
-                  'polyphen' :               annot.vep.polyphen,
-                  'vepRegs':                 annot.vep.vepRegs,
-                  'regulatory' :             annot.vep.regulatory,
+                    // snpeff
+                    'effect':                   annot.snpEff.effects,
+                    'impact':                   annot.snpEff.impacts,
 
-                  //  when multiple impacts, pick the highest one (by variant type and transcript)                  
-                  'highestImpactSnpeff':      highestImpactSnpeff,
-                  'highestImpactVep':         highestImpactVep,
-                  'highestSIFT':              highestSIFT,
-                  'highestPolyphen':          highestPolyphen
+                    // vep
+                    'vepConsequence':          annot.vep.vepConsequence,
+                    'vepImpact':               annot.vep.vepImpact,
+                    'vepExon':                 annot.vep.vepExon,
+                    'vepHGVSc':                annot.vep.vepHGVSc,
+                    'vepHGVSp':                annot.vep.vepHGVSp,
+                    'vepAminoAcids':           annot.vep.vepAminoAcids,
+                    'vepVariationIds' :        annot.vep.vepVariationIds,
+                    'vepSIFT':                 annot.vep.vepSIFT,
+                    'sift' :                   annot.vep.sift,
+                    'vepPolyPhen':             annot.vep.vepPolyPhen,
+                    'polyphen' :               annot.vep.polyphen,
+                    'vepRegs':                 annot.vep.vepRegs,
+                    'regulatory' :             annot.vep.regulatory,
+
+                    //  when multiple impacts, pick the highest one (by variant type and transcript)                  
+                    'highestImpactSnpeff':     highestImpactSnpeff,
+                    'highestImpactVep':        highestImpactVep,
+                    'highestSIFT':             highestSIFT,
+                    'highestPolyphen':         highestPolyphen
+                  }
+
+                  allVariants[i].push(variant);                  
                 }
-              );
 
-              if (rec.pos < geneObject.start ) {
+              }
+
+              if (rec.pos < variantRegionStart) {
                 variantRegionStart = rec.pos;
               }
 
             }
 
             altIdx++;
+
           });
         }
 
@@ -1732,20 +1747,24 @@ var effectCategories = [
 
       // Here is the result set.  An object representing the entire region with a field called
       // 'features' that contains an array of variants for this region of interest.
-      var results = {
-        'name':              'vcf track',
-        'ref':                refName, 
-        'gene':               geneObject.gene_name, 
-        'start':              +geneObject.start, 
-        'end':                +geneObject.end, 
-        'strand':             geneObject.strand, 
-        'transcript':         selectedTranscript,
-        'variantRegionStart': variantRegionStart, 
-        'features':           variants
-      };
+      var results = [];
+      for (var i = 0; i < allVariants.length; i++) {
+        var data = {
+          'name':              'vcf track',
+          'ref':                refName, 
+          'gene':               geneObject.gene_name, 
+          'start':              +geneObject.start, 
+          'end':                +geneObject.end, 
+          'strand':             geneObject.strand, 
+          'transcript':         selectedTranscript,
+          'variantRegionStart': variantRegionStart, 
+          'features':           allVariants[i]
+        };
+        results.push(data);
+      }
 
 
-      return results;
+      return  parseMultiSample ? results :  results[0];
   };
 
 exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, vepFields) {
@@ -2118,7 +2137,8 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
       var genotype = rec.genotypes.length > gt.sampleIndex ? rec.genotypes[gt.sampleIndex] : null;
 
       if (genotype == null  || genotype == "" || genotype == '.') {
-        gt.keep = true;
+        gt.keep = false;
+        gt.zygosity = 'gt_unknown';
       } else {
 
         var tokens = genotype.split(":");
@@ -2283,7 +2303,7 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
                 gt.zygosity = "HET";
               }
             } else if (tokens[0] == "0" && tokens[1] == "0" ) {
-              gt.keep = true;
+              gt.keep = false;
               gt.zygosity = "HOMREF"
             }
           }

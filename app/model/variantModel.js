@@ -1191,6 +1191,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				   me.getVcfRefName(theGene.chr), 
 				   fakeGeneObject,
 			       theTranscript,
+			       false,
 			       (sampleNames ? sampleNames.join(",") : me.sampleName),
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
@@ -1322,6 +1323,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				   me.getVcfRefName(theGene.chr), 
 				   theGene,
 			       theTranscript,
+			       false,
 			       sampleNames,
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false
@@ -1407,6 +1409,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					me.getVcfRefName(theGene.chr),
 					theGene,
 			        theTranscript,
+			        false,   // parseMultipleSamples
 			        onVcfData)
 				.then( function(data) {
 			    	
@@ -1443,6 +1446,131 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 			    		console.log(error);
 			    		reject(error);
 			    	}
+
+			    }, function(error) {
+			    	reject(error);
+			    });
+			}, function(error) {
+				reject("missing reference")
+			});
+
+		}
+
+
+
+	});
+
+}
+
+VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, theTranscript, variantCards) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+
+		// First the gene vcf data has been cached, just return
+		// it.  (No need to retrieve the variants from the iobio service.)
+		resultMap = {};
+		variantCards.forEach(function(vc) {
+			var vcfData = vc.model._getCachedData("vcfData", theGene.gene_name, theTranscript);
+			if (vcfData != null && vcfData != '') {
+				resultMap[vc.getRelationship()] = vcfData;
+
+				vc.model.vcfData = vcfData;
+				me._populateEffectFilters(me.vcfData.features);
+				me._populateRecFilters(me.vcfData.features);
+				if (me.getRelationship() == 'proband') {
+				    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
+				}
+			}
+		})
+		if (Object.keys(resultMap).length == variantCards.length) {
+			resolve(resultMap);
+		} else {
+			// We don't have the variants for the gene in cache, 
+			// so call the iobio services to retreive the variants for the gene region 
+			// and annotate them.
+			me._promiseVcfRefName(theGene.chr).then( function() {
+				var refName = me.getVcfRefName(theGene.chr);
+				me._promiseGetAndAnnotateVariants(
+					refName,
+					theGene,
+			        theTranscript,
+			        true, // parseMultipleSamples
+			        )
+				.then( function(results) {
+
+					if (results && results.length > 0) {
+						var data = results[0];
+				    	
+				    	// Associate the correct gene with the data
+				    	var theGeneObject = null;
+				    	for( var key in window.geneObjects) {
+				    		var geneObject = geneObjects[key];
+				    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+				    			geneObject.start == data.start &&
+				    			geneObject.end == data.end &&
+				    			geneObject.strand == data.strand) {
+				    			theGeneObject = geneObject;
+				    		}
+				    	}
+				    	if (theGeneObject) {
+
+				    		var resultMap = {};
+				    		var idx = 0;
+				    		var variantCards = getRelevantVariantCards();
+
+				    		var postProcessNextVariantCard = function(idx, callback) {
+
+				    			if (idx == variantCards.length) {
+				    				if (callback) {
+				    					callback();
+				    				}
+				    				return;
+				    			} else {
+					    			var vc          = variantCards[idx];
+					    			var theVcfData  = results[idx];
+					    			theVcfData.gene = theGeneObject;
+					    			resultMap[vc.getRelationship()] = theVcfData;
+
+					    			// Perform post-annotation processing for each variant card's model
+								    vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData)
+								      .then(function() {
+							    		// Flag any bookmarked variants
+							    		if (vc.getRelationship() == 'proband') {
+									    	bookmarkCard.determineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
+									    }
+
+								    	// Cache the data (if there are variants)
+								    	if (theVcfData && theVcfData.features) {
+									    	if (!vc.model._cacheData(theVcfData, "vcfData", theVcfData.gene.gene_name, theVcfData.transcript)) {
+									    		reject("Unable to cache annotated variants for gene " + theVcfData.gene.gene_name);
+									    	};	
+								    	}
+
+								    	//  Store the data and process next variant card
+								    	vc.model.vcfData = theVcfData;		
+								    	idx++;
+								    	postProcessNextVariantCard(idx, callback);
+								      })
+				    			}
+				    		}
+
+				    		postProcessNextVariantCard(idx, function() {
+				    			resolve(resultMap);
+				    		});
+
+
+				    	} else {
+				    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+				    		console.log(error);
+				    		reject(error);
+				    	}						
+					} else {
+			    		var error = "ERROR - empty vcf results for " + theGene.gene_name;;
+			    		console.log(error);
+			    		reject(error);
+					}
+
 
 			    }, function(error) {
 			    	reject(error);
@@ -1811,7 +1939,7 @@ VariantModel.prototype.pruneIntronVariants = function(data) {
 }
 
 
-VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, onVcfData) {
+VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, parseMultipleSamples=false, onVcfData=null) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -1845,6 +1973,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		   me.getVcfRefName(ref), 
 		   geneObject,
 		   transcript,
+		   parseMultipleSamples,
 	       sampleNames,
 	       filterCard.annotationScheme.toLowerCase(),
 	       window.geneSource == 'refseq' ? true : false,
@@ -1853,58 +1982,24 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];
-	    	var theVcfData = data[1];
-
-		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-
-
-		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
-			    // can be filtered by range.
-			    me._determineVariantAfLevels(theVcfData, transcript );
-
-
-			    // Show the snpEff effects / vep consequences in the filter card
-			    me._populateEffectFilters(theVcfData.features);
-
-			    // Determine the unique values in the VCF filter field 
-			    me._populateRecFilters(theVcfData.features);
-
-			    // Invoke callback now that we have annotated variants
-			    me.vcfData = theVcfData;
-		    	if (onVcfData) {
-		    		onVcfData(theVcfData);
-		    	}
+	    	var results = data[1];
 		
-		    	// Get the clinvar records (for proband, mom, data)
-		    	// 
-		    	if (me.getRelationship() != 'sibling') {
-			    	return me.vcf.promiseGetClinvarRecords(
+			if (parseMultipleSamples) {
 
-			    		theVcfData, 
-			    		me._stripRefName(ref), geneObject, 
-			    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+		    	resolve(results);
 
-		    	} else {
-		    		
-		    		resolve(theVcfData);
-		    	}	
-
-
-	    	} else if (theVcfData.features.length == 0) {
-
-			    // Invoke callback now that we have annotated variants
-			    me.vcfData = theVcfData;
-		    	if (onVcfData) {
-		    		onVcfData(theVcfData);
-		    	}
-		    	resolve(theVcfData);
+			} else {
+				var theVcfData = results;
+				if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
+					return me._promisePostAnnotateProcessing(ref, geneObject, transcript, theVcfData, onVcfData);
+				} else if (theVcfData.features.length == 0) {
+			    	resolve(theVcfData);		
+				} else {
+					reject("_promiseGetAndAnnotateVariants() No variants");
+				}
+			}
 
 
-	    	} else {
-	    		reject("_promiseGetAndAnnotateVariants() No variants");
-	    	}
-
-		
 	    }, 
 	    function(error) {
 	    	// If error when annotating clinvar records	    	
@@ -1927,6 +2022,61 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 
 
 	});
+
+
+}
+
+VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject, transcript, theVcfData, onVcfData) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
+
+			// We have the AFs from 1000G and ExAC.  Now set the level so that variants
+		    // can be filtered by range.
+		    me._determineVariantAfLevels(theVcfData, transcript );
+
+
+		    // Show the snpEff effects / vep consequences in the filter card
+		    me._populateEffectFilters(theVcfData.features);
+
+		    // Determine the unique values in the VCF filter field 
+		    me._populateRecFilters(theVcfData.features);
+
+		    // Invoke callback now that we have annotated variants
+		    me.vcfData = theVcfData;
+			if (onVcfData) {
+				onVcfData(theVcfData);
+			}
+
+			//
+			// Get the clinvar records (for proband, mom, data)
+			// 
+			if (me.getRelationship() != 'sibling') {
+		    	me.vcf.promiseGetClinvarRecords(
+		    		theVcfData, 
+		    		me._stripRefName(ref), geneObject, 
+		    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData))
+		    	.then(function() {
+		    		resolve();
+		    	}, function(error) {
+		    		reject(error);
+		    	});
+
+			} else {
+				resolve();
+			}
+
+		} else if (theVcfData.features.length == 0) {
+
+		    // Invoke callback now that we have annotated variants
+		    me.vcfData = theVcfData;
+		    if (onVcfData) {
+		    	onVcfData(theVcfData);
+		    }
+		    resolve();
+
+		} 		
+	})
 
 
 }
@@ -2956,10 +3106,9 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 
 				me.vcf.promiseGetVariants(
 					 me.getVcfRefName(window.gene.chr), 
-					 window.gene.start, 
-					 window.gene.end, 
-					 window.gene.strand, 
+					 window.gene, 
 					 window.selectedTranscript,
+					 false,
 					 me.sampleName,
 					 filterCard.annotationScheme.toLowerCase(),
 					 window.geneSource == 'refseq' ? true : false)

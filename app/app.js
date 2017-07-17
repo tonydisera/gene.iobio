@@ -2486,9 +2486,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
 
-			/*if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
-
-			} else*/ if (isAlignmentsOnly() && autocall) {
+			if (isAlignmentsOnly() && autocall) {
 				// Only alignment files are loaded and user, when prompted, responded
 				// that variants should be autocalled when gene is selected.
 				// First perform joint calling, then load the bam data (for coverage)
@@ -2498,6 +2496,32 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 				}) 
 				variantPromises.push(callPromise);							
 
+			} else if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
+				// We have a multi-sample vcf, so we only need to retrieve the vcf records once for
+				// the proband and then obtain the genotypes for the mother/father and affected/unaffected
+				// sibs.
+				var variantPromise = getProbandVariantCard().model.promiseGetVariantsMultipleSamples(window.gene, window.selectedTranscript, getRelevantVariantCards())
+	                  .then( function() {
+
+					 	getRelevantVariantCards().forEach(function(vc) {
+
+							// We have variants, either to load from a vcf or called from alignments and
+						 	// optionally alignments.  First annotate the show the variants in the
+						 	// variant cards and calcuate the coverage (if alignments provided).
+							vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
+			                  .then( function() {
+
+			                  	if (vc.getRelationship() == 'proband') {
+			                  		showNavVariantLinks();
+			                  	}
+
+							  });				 
+							 
+						});		                  	
+				 });		
+				 variantPromises.push(variantPromise);		 
+		 
+			
 			} else {
 			 	getRelevantVariantCards().forEach(function(vc) {
 
@@ -2853,6 +2877,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 
 			window.hideCircleRelatedVariants();
 
+
 			getRelevantVariantCards().forEach( function(vc) {
 
 				// Reflect me new info in the freebayes variants.
@@ -2864,20 +2889,23 @@ function jointCallVariantsImpl(checkCache, callback) {
 
 				vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
 
-			});
-
+			});		
 
 			getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
-			
+
 			// Cache the updated the danger summary now that called variants are merged into
 			// variant set
 			cacheHelper.processCachedTrio(window.gene, window.selectedTranscript, true, false, function() {
 				cacheHelper.showAnalyzeAllProgress();
+	
 				if (callback) {
 					callback();
 				}
 				
 			});
+
+
+			
 
 
 		});						
