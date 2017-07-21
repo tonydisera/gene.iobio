@@ -630,7 +630,7 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
 
-        me.promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId)
+        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -776,7 +776,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames, null, isMultiSample);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, vepFields, sampleNames, null);
 
 
       callback(annotatedRecs, results);
@@ -1142,13 +1142,13 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNamesToGenotype, sampleIndex);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, false, vepFields, sampleNamesToGenotype, sampleIndex);
       resolve([annotatedRecs, results]);
 
     });
   }
 
-  exports.promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1193,7 +1193,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, vepFields, sampleNames);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, vepFields, sampleNames, null);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1535,7 +1535,7 @@ var effectCategories = [
   }
 
 
-  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, vepFields, sampleNames, sampleIndex, parseMultiSample=false) {
+  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, parseMultiSample, vepFields, sampleNames, sampleIndex) {
 
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);

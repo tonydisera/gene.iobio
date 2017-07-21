@@ -1486,6 +1486,15 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 		if (Object.keys(resultMap).length == variantCards.length) {
 			resolve(resultMap);
 		} else {
+
+
+			// Place any called variants back in the cache (for proband).  This is necessary, because 
+			// the mother and father vcf data will not be cached?
+			var theFbData = getProbandVariantCard().model.getFbDataForGene(theGene, theTranscript, true);
+			if (theFbData && theFbData.features) {
+				getProbandVariantCard().model._cacheData(theFbData, "fbData", theGene.gene_name, theTranscript);
+			}
+
 			// We don't have the variants for the gene in cache, 
 			// so call the iobio services to retreive the variants for the gene region 
 			// and annotate them.
@@ -1743,95 +1752,6 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 
 }
 
-VariantModel.prototype._promiseCacheCalledVariants = function(ref, geneObject, transcript) {
-	var me = this;
-	return new Promise( function(resolve, reject) {
-		var fbData = me._getCachedData("fbData", geneObject.gene_name, transcript);
-		if (fbData) {
-			resolve(fbData);
-		} else {
-
-			// Call Freebayes variants
-			me.bam.getFreebayesVariants(ref, 
-				geneObject.start, 
-				geneObject.end, 
-				geneObject.strand, 
-				window.geneSource == 'refseq' ? true : false,
-				function(data) {
-
-				if (data == null || data.length == 0) {
-					reject("A problem occurred while calling variants.");
-				}
-
-				// Parse string into records
-				var fbRecs = [];
-				var recs = data.split("\n");
-				recs.forEach( function(rec) {
-					fbRecs.push(rec);
-				});
-				
-
-				// Annotate the fb variants
-				me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(ref), geneObject, 
-					                             transcript, null, 
-					                             filterCard.annotationScheme.toLowerCase(),
-					                             window.geneSource == 'refseq' ? true : false)
-			    .then( function(data) {
-
-			    	var theData = data[1];
-
-			    	// Flag the called variants
-				   	theData.features.forEach( function(feature) {
-				   		feature.fbCalled = 'Y';
-				   	});
-		    		return me.vcf.promiseGetClinvarRecords(
-					    		theData, 
-					    		me._stripRefName(ref), geneObject, 
-					    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theData) : me._refreshVariantsWithClinvar.bind(me, theData));
-
-
-
-
-			    }, function(error) {
-			    	var message = "Problem when annotating called variants in Analyze All. " + error;
-					console.log(message);
-					reject({isValid: false, message: message});
-			    })
-			    .then (function(data) {
-
-
-					// We are done getting the clinvar data for called variants.
-			    	// Now merge called data with variant set and display.
-					// Prepare vcf and fb data for comparisons
-					//me._prepareVcfAndFbData(data);
-
-		        	// Filter the freebayes variants to only keep the ones
-		        	// not present in the vcf variant set.
-					me._determineVariantAfLevels(data, transcript);
-
-		        	// Pileup the variants
-		        	var pileupObject = me._pileupVariants(data.features, geneObject.start, geneObject.end);
-					data.maxLevel = pileupObject.maxLevel + 1;
-					data.featureWidth = pileupObject.featureWidth;		
-
-					// Cache the freebayes variants.
-					me._cacheData(data, "fbData", geneObject.gene_name, transcript);
-					me._cacheData(data, "vcfData", geneObject.gene_name, transcript);
-					resolve(data);
-			
-			    	
-			    }, function(error) {
-			    	var message = "Problem when calling variants in Analyze All. " + error;
-					console.log(message);
-					reject({isValid: false, message: message});
-			    });
-			
-			});	
-
-		}		
-	});
-	
-}
 
 VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 	return cacheHelper.getCacheKey(
