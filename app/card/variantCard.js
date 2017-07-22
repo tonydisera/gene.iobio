@@ -1712,7 +1712,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 		}
 		
 	}
-	if (this.vcfChart != null) {
+	if (this.vcfChart != null  && !matchingVariant) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
 		var lock = clickedVariant != null && this == sourceVariantCard;
 
