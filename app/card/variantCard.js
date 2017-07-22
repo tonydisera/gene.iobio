@@ -17,15 +17,14 @@ VariantCard.prototype.getSampleNamesToGenotype = function() {
 	var idx = 0;
 	if (this.getRelationship() == 'proband') {
 		sampleNames = [];
-		getRelevantVariantCards().forEach(function(vc) {
+		getAffectedInfo().forEach(function(info) {
 			// Make sure every varient card has a sample name.  We will use this to access
 			// the genotypes for the trio and sibs
-			if (vc.getSampleName() == null ||  vc.getSampleName() == '') {
-				vc.setSampleName('sample' + idx);					
+			if (info.variantCard.getSampleName() == null ||  info.variantCard.getSampleName() == '') {
+				info.variantCard.setInternalSampleName(idx.toString());	
 			}
-			sampleNames.push(vc.getSampleName());
+			sampleNames.push(info.variantCard.getSampleName());
 			idx++;
-
 		})
 	}	
 	return sampleNames;
@@ -61,6 +60,11 @@ VariantCard.prototype.setSampleName = function(sampleName) {
 		this.setVariantCardLabel();
 	}
 }
+
+VariantCard.prototype.setInternalSampleName = function(sampleName) {
+	this.model.setInternalSampleName(sampleName);
+}
+
 
 VariantCard.prototype.determineAffectedStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
 	this.model.determineAffectedStatus(theGene, theTranscript, affectedInfo, onUpdate);
@@ -582,10 +586,16 @@ VariantCard.prototype.setVariantCardLabel = function() {
 	} else if (isLevelBasic) {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName());
 	} else {
-		this.cardSelector.find('#variant-card-label').text(
-   			this.model.getName() == this.model.getSampleName()  ? 
-   		  	this.model.getName() : 
-   		  	this.model.getSampleName() + " " + this.model.getName());
+		var label = "";
+		if (this.model.isInternalSampleName) {
+			label = this.model.getName();
+		} else {
+			label = 
+   				this.model.getName() == this.model.getSampleName()  ? 
+   		  		this.model.getName() : 
+   		  		this.model.getSampleName() + " " + this.model.getName()
+		}
+		this.cardSelector.find('#variant-card-label').text(label);
 	}
 
 }

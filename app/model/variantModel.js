@@ -20,6 +20,7 @@ function VariantModel() {
 	this.name = "";
 	this.vcfRefNamesMap = {};
 	this.sampleName = "";
+	this.isInternalSampleName = false;
 	this.defaultSampleName = null;
 	this.relationship = null;
 	this.affectedStatus = null;
@@ -731,6 +732,12 @@ VariantModel.prototype.getRelationship = function() {
 VariantModel.prototype.setSampleName = function(sampleName) {
 	this.sampleName = sampleName;
 }
+
+VariantModel.prototype.setInternalSampleName = function(sampleName) {
+	this.sampleName = sampleName;
+	this.isInternalSampleName = true;
+}
+
 
 
 VariantModel.prototype.getSampleName = function() {
