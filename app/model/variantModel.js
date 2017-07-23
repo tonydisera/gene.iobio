@@ -1918,7 +1918,13 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			} else {
 				var theVcfData = results;
 				if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-					return me._promisePostAnnotateProcessing(ref, geneObject, transcript, theVcfData, onVcfData);
+					me._promisePostAnnotateProcessing(ref, geneObject, transcript, theVcfData, onVcfData).then(function() {
+						me.setLoadState(theVcfData, 'clinvar');
+						resolve(theVcfData);
+					}, function(error) {
+						console.log("An error occurred when performing postAnnotateProcessing");
+						reject("_promiseGetAndAnnotateVariants(): " + error);
+					})
 				} else if (theVcfData.features.length == 0) {
 			    	resolve(theVcfData);		
 				} else {
@@ -1933,20 +1939,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	    	console.log("an error occurred when annotating vcf records " + error);
 	    	reject(error);
 
-	    }).then( function(data) {
-	    	// We are done getting clinvar records.
-	    	me.setLoadState(data, 'clinvar');
-	    	resolve(data);
-	    }, 
-	    function(error) {
-	    	console.log("an error occurred after vcf data returned (post processing) " + error);
-	    	reject(error);
-	    });
-
-	
-		
-
-
+	    })
 
 	});
 
@@ -1984,13 +1977,13 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 		    		me._stripRefName(ref), geneObject, 
 		    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData))
 		    	.then(function() {
-		    		resolve();
+		    		resolve(theVcfData);
 		    	}, function(error) {
 		    		reject(error);
 		    	});
 
 			} else {
-				resolve();
+				resolve(theVcfData);
 			}
 
 		} else if (theVcfData.features.length == 0) {
@@ -2000,7 +1993,7 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 		    if (onVcfData) {
 		    	onVcfData(theVcfData);
 		    }
-		    resolve();
+		    resolve(theVcfData);
 
 		} 		
 	})
