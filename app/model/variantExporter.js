@@ -337,7 +337,8 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 								theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
 							} 
 
-							getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, null, 0)
+							var sampleNamesToGenotype = getProbandVariantCard().getSampleNamesToGenotype();
+							getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0)
 		                	   .then(function(data) {
 		                			var theFbData = data[1];
 
@@ -481,7 +482,7 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 	 	});
 
 	 	// Set the clinvar start, alt, ref for clinvar web access
-		getProbandVariantCard().model.vcf.formatClinvarCoordinates(theVariant, theVariant);
+		getProbandVariantCard().model.vcf._formatClinvarCoordinates(theVariant, theVariant);
 
 	 	// Get the clinvar data and load into the variant record
 	 	var dummyVcfData  = {features: [revisedVariant]};
