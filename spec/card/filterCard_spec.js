@@ -46,7 +46,8 @@ describe('filterCard', function() {
 				annotsToInclude: "blah",
 				exonicOnly: false,
 				loadedVariants: false, 
-				calledVariants: false 
+				calledVariants: false,
+				affectedInfo: [] 
 			});
 		});
 
@@ -64,7 +65,8 @@ describe('filterCard', function() {
 				annotsToInclude: "blah",
 				exonicOnly: false,
 				loadedVariants: false, 
-				calledVariants: false 
+				calledVariants: false,
+				affectedInfo: []  
 			});
 		});
 
@@ -79,7 +81,8 @@ describe('filterCard', function() {
 				annotsToInclude: "blah",
 				exonicOnly: true,
 				loadedVariants: false, 
-				calledVariants: false 
+				calledVariants: false,
+				affectedInfo: [] 
 			});
 		});
 

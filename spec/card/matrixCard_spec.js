@@ -605,7 +605,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	describe('#showSibNotRecessiveSymbol', function() {
+	describe('#showAffectedNotRecessiveSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -617,7 +617,7 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol and line with the correct attributes when there are options', function() {
 			var options = { cellSize: 22 };
-			mc.showSibNotRecessiveSymbol(selection, options);
+			mc.showAffectedNotRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect(useElem.attr('width')).toEqual('16');
@@ -628,7 +628,7 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol with the default attributes when there are no options', function() {
 			var options = {};
-			mc.showSibNotRecessiveSymbol(selection, options);
+			mc.showAffectedNotRecessiveSymbol(selection, options);
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect(useElem.attr('width')).toEqual('14');
@@ -669,7 +669,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	describe('#showSibRecessiveSymbol', function() {
+	describe('#showAffectedRecessiveSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -680,7 +680,7 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol with the correct attributes when there are some recessive variants', function() {
 			selection.datum({ value: 'recessive_some' });
-			mc.showSibRecessiveSymbol(selection, {cellSize: 22});
+			mc.showAffectedRecessiveSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect(useElem.attr('xlink:href')).toEqual('#question-mark-symbol');
@@ -690,7 +690,7 @@ describe('MatrixCard', function() {
 
 		it('appends an svg symbol with the correct attributes when there are no recessive variants', function() {
 			selection.datum({ value: 'asdf', cellSize: 22 });
-			mc.showSibRecessiveSymbol(selection);
+			mc.showAffectedRecessiveSymbol(selection);
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect(useElem.attr('width')).toEqual('14');
@@ -698,7 +698,7 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	describe('#showSibPresentSymbol', function() {
+	describe('#showAffectedPresentSymbol', function() {
 		var selection, mc;
 
 		beforeEach(function() {
@@ -712,7 +712,7 @@ describe('MatrixCard', function() {
 				value: 'present_all',
 				clazz: 'affected'
 			});
-			mc.showSibPresentSymbol(selection, {cellSize: 22});
+			mc.showAffectedPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect($('#test g').attr('id')).toEqual('thumbs-green-symbol');
@@ -727,7 +727,7 @@ describe('MatrixCard', function() {
 				value: 'present_some',
 				clazz: 'affected'
 			});			
-			mc.showSibPresentSymbol(selection, {cellSize: 22});
+			mc.showAffectedPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
 			expect($('#test g').attr('id')).toEqual('thumbs-grey-symbol');

@@ -2771,9 +2771,14 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 	var	coverageMin = filterObject.coverageMin;
 	var intronsExcludedCount = 0;
 
-	var affectedFilters = filterObject.affectedInfo.filter(function(info) {
-		return info.filter;
-	});
+	var affectedFilters = null;
+	if (filterObject.affectedInfo) {
+		affectedFilters = filterObject.affectedInfo.filter(function(info) {
+			return info.filter;
+		});
+	} else {
+		affectedFilters = {};
+	}
 
 
 	var filteredFeatures = data.features.filter(function(d) {
