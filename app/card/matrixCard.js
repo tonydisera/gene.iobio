@@ -80,17 +80,12 @@ function MatrixCard() {
                         N: {value: 2, badge: false, clazz: '',          symbolFunction: this.showBookmarkSymbol}
                      };
 	this.unaffectedMap = {
-		                recessive_none: {value: 1,   badge: true,  clazz: 'unaffected', symbolFunction: this.showAffectedNotRecessiveSymbol},
-                        recessive_some: {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedRecessiveSymbol},
-                        recessive_all:  {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedRecessiveSymbol},
                         present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
                         present_all:    {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
                         present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''}
                  };
 	this.affectedMap = {
-		                recessive_all:  {value: 1,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedRecessiveSymbol},
-                        recessive_some: {value: 2,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedRecessiveSymbol},
                         present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
                         present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
                         present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
@@ -1194,28 +1189,6 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 
 };
 
-MatrixCard.prototype.showAffectedNotRecessiveSymbol = function(selection, options) {
-	if (selection.datum().clazz == "affected") {
-		selection.append("g")
-		         .attr("id", "thumbs-grey-symbol")
-		         .attr("transform", "translate(1,2)")
-		         .append("use")
-		         .attr("xlink:href", '#thumbs-down-symbol')
-		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .style("pointer-events", "none");
-	} else {
-		selection.append("g")
-		         .attr("id", "thumbs-green-symbol")
-		         .attr("transform", "translate(1,2)")
-		         .append("use")
-		         .attr("xlink:href", '#thumbs-up-symbol')
-		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .style("pointer-events", "none");		
-	}
-	
-};
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)";
@@ -1236,28 +1209,6 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	MatrixCard.wrap(text, options.cellSize, 3);
 };
 
-MatrixCard.prototype.showAffectedRecessiveSymbol = function (selection, options) {
-	if (selection.datum().value == 'recessive_all' && selection.datum().clazz == "affected") {
-		selection.append("g")
-			         .attr("id", "thumbs-green-symbol")
-			         .attr("transform", options.transform || "translate(1,2)")
-			         .append("use")
-			         .attr("xlink:href", '#thumbs-up-symbol')
-			         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-			         .style("pointer-events", "none");
-	} else  {
-		selection.append("g")
-			         .attr("id", "thumbs-grey-symbol")
-			         .attr("transform", "translate(1,2)")
-			         .append("use")
-			         .attr("xlink:href", '#question-mark-symbol')
-			         .attr("width", options && options.cellSize > 18 ? "16" : "14")
-			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-			         .style("pointer-events", "none");
-	}
-
-};
 
 MatrixCard.prototype.showAffectedPresentSymbol = function (selection, options) {
 	var symbolLink = null;

@@ -958,11 +958,12 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
         }
 		row.append("div")
 	       .attr("class", rel + "-alt-count tooltip-header-small")
-	       .html("<span class='tooltip-subtitle " 
+	       .html("<span class='tooltip-ped-label " 
 	       	+ selectedClazz + "'>" 
-	       	+ (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ' ') 
 	       	+ " " + (rel == 'sibling' ? 'Sib' : capitalizeFirstLetter(rel)) 
-	       	+ " " + (rel == 'sibling' ? sampleName : '') + "</span>");
+	       	+ " " + (rel == 'sibling' ? sampleName : '') 
+	       	+ "</span>"
+	        + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
 
         var zyg = genotype ? (genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
 		row.append("div")

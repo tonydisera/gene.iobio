@@ -1643,7 +1643,6 @@ VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedS
 VariantModel._determineAffectedStatusForVariant = function(variant, affectedStatus, affectedInfo) {
 	
 	var matchesCount = 0;
-	var matchesHomCount = 0;	
 	var summaryField    = affectedStatus + "_summary";
 
 	variant[summaryField]                         = "none";
@@ -1653,28 +1652,15 @@ VariantModel._determineAffectedStatusForVariant = function(variant, affectedStat
 	 	var genotype    = variant.genotypes[sampleName];
 
 	 	if (genotype) {
-	 		//VariantModel.determineAffectedStatusFromGenotype(variant, affectedStatus, genotype, sampleName);
 
 		 	var zyg  = genotype.zygosity ? genotype.zygosity : "none";
 			if (zyg.toLowerCase() != 'none' && zyg.toLowerCase() != 'gt_unknown' && zyg.toLowerCase() != 'homref') {
 			 	matchesCount++;
 			}
-		 	if (zyg.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
-			 	matchesHomCount++;
-		 	}	 		
 	 	} 
 	})	
 
-	if (variant.inheritance.toLowerCase() == 'recessive'
-		&& matchesHomCount > 0 
-		&& matchesHomCount == affectedInfo.length) { 
-		variant[summaryField] = "recessive_all";
-	} else if (variant.inheritance.toLowerCase() == 'recessive'
-		      && matchesHomCount > 0 )  {
-		variant[summaryField] = "recessive_some";
-	} else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
-		variant[summaryField] = "recessive_none";
-	} else if (matchesCount > 0 && matchesCount == affectedInfo.length) {
+	if (matchesCount > 0 && matchesCount == affectedInfo.length) {
 		variant[summaryField] = "present_all";
 	}  else if (matchesCount > 0) {
 		variant[summaryField] = "present_some"

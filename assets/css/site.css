@@ -2572,9 +2572,19 @@ inputinput:-moz-placeholder {
   min-height: 25px; }
 
 .tooltip-affected-symbol {
-  font-size: 17px;
+  font-size: 14px;
   color: #b32f2f !important;
-  float: left; }
+  float: right;
+  padding-right: 2px; }
+
+.tooltip-ped-label {
+  padding-top: 0px;
+  vertical-align: top;
+  text-align: left;
+  width: 49px;
+  float: left;
+  font-size: 12px;
+  color: #717171; }
 
 .ped-zygosity {
   width: 75px;
