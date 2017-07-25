@@ -3318,7 +3318,10 @@ function promiseDetermineInheritance(promise) {
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
-					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, samplesInSingleVcf() ? null : getAffectedInfo());
+					// We only pass in the affected info if we need to sync up genotypes because samples
+					// where in separate vcf files
+					var affectedInfo = isAlignmentsOnly() || samplesInSingleVcf() ? null : getAffectedInfo();
+					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfo);
 					trioModel.compareVariantsToMotherFather(function() {
 
 
