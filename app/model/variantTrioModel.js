@@ -75,14 +75,6 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		variant.genotypeDepthFather     = null;
 		variant.bamDepthFather          = null;
 
-		if (me.motherAffectedInfo) {
-			variant[me.motherAffectedInfo.status + "_summary"]          = "none";
-			variant[me.motherAffectedInfo.status + "_zygosity"]         = {};
-		 	variant[me.motherAffectedInfo.status + "_genotypeAltCount"] = {};
-			variant[me.motherAffectedInfo.status + "_genotypeRefCount"] = {};
-			variant[me.motherAffectedInfo.status + "_genotypeDepth"]    = {};
-			variant[me.motherAffectedInfo.status + "_bamDepth"]         = {};
-		}
 
 	});
 	me.fatherVcfData.features.forEach(function(variant) {
@@ -98,14 +90,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		variant.genotypeDepthMother     = null;
 		variant.bamDepthMother          = null;
 		
-		if (me.fatherAffectedInfo) {
-			variant[me.fatherAffectedInfo.status + "_summary"]          = "none";
-			variant[me.fatherAffectedInfo.status + "_zygosity"]         = {};
-		 	variant[me.fatherAffectedInfo.status + "_genotypeAltCount"] = {};
-			variant[me.fatherAffectedInfo.status + "_genotypeRefCount"] = {};
-			variant[me.fatherAffectedInfo.status + "_genotypeDepth"]    = {};
-			variant[me.fatherAffectedInfo.status + "_bamDepth"]         = {};
-		}		
+	
 	});
 
 
