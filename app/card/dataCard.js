@@ -245,6 +245,7 @@ DataCard.prototype.loadDemoData = function() {
 			me.demoSampleNames.proband, me.demoUrls.proband)
 		  .then(function() {
 			$('#select-build-box').removeClass("attention");
+			window.setGeneratedSampleNames();
 			window.loadTracksForGene();
 			window.cacheHelper.clearCache();
 			window.matrixCard.reset();	
@@ -281,6 +282,7 @@ DataCard.prototype.loadMygene2Data = function() {
 			if (genomeBuildHelper.getCurrentBuild()) {
 				me.promiseSetVcfUrl("proband", "Variants", null, probandUrl)
 				  .then(function() {
+					window.setGeneratedSampleNames();
 					window.loadTracksForGene();
 					window.cacheHelper.clearCache();
 					window.matrixCard.reset();		
@@ -855,6 +857,7 @@ DataCard.prototype.init = function() {
 		filterCard.displayAffectedFilters();
 		window.enableCallVariantsButton();
 
+		window.setGeneratedSampleNames();
 
 		window.matrixCard.reset();
 
@@ -1231,35 +1234,44 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector, sampleNames) {
 	var me = this;
 
+
     // When the sample name dropdown is selected
     panelSelector.find('#vcf-sample-select')[0].selectize.off('change');
 
 	// Populate the sample names in the dropdown
 	panelSelector.find('#vcf-sample-box').removeClass('hide');
-	if (me.mode == 'trio') {
+	if (me.mode == 'trio' && variantCard.getRelationship() == 'proband') {
 		$('#unaffected-sibs-box').removeClass('hide');
 		$('#affected-sibs-box').removeClass('hide');
 	}
 	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
-	$('#unaffected-sibs-select')[0].selectize.clearOptions();
-	$('#affected-sibs-select')[0].selectize.clearOptions();
-
+	if (variantCard.getRelationship() == 'proband') {
+		$('#unaffected-sibs-select')[0].selectize.clearOptions();
+		$('#affected-sibs-select')[0].selectize.clearOptions();
+	}
 	// Add a blank option if there is more than one sample in the vcf file
 	if (sampleNames.length > 1) {
 		panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:""});
-		$('#unaffected-sibs-select')[0].selectize.addOption({value:""});			                             
-		$('#affected-sibs-select')[0].selectize.addOption({value:""});			                             
+		if (variantCard.getRelationship() == 'proband') {
+			$('#unaffected-sibs-select')[0].selectize.addOption({value:""});			                             
+			$('#affected-sibs-select')[0].selectize.addOption({value:""});			                             
+		}
 	}							         
 
 	// Populate the sample name in the dropdown
 	sampleNames.forEach( function(sampleName) {
 		panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
-		$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
-		$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
+		if (variantCard.getRelationship() == 'proband') {
+			$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
+			$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
+		}
 	});
 
 	
-	me.initSibs();
+
+	if (variantCard.getRelationship() == 'proband') {
+		me.initSibs();
+	}
 
 	// If we are loading from URL parameters and the sample name was specified, select this
 	// sample from dropdown

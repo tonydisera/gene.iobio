@@ -1373,15 +1373,7 @@ function loadUrlSources() {
 
 
 
-	// Now create variant cards for the affected and unaffected sibs
-	if (affectedSibsString) {
-		var affectedSibs = affectedSibsString.split(",");	
-		window.loadSibs(affectedSibs, 'affected');	
-	}
-	if (unaffectedSibsString) {
-		var unaffectedSibs = unaffectedSibsString.split(",");	
-		window.loadSibs(unaffectedSibs, 'unaffected');	
-	}
+
 
 	if (dsname != null) {
 		Object.keys(dsname).forEach(function(urlParameter) {
@@ -1426,6 +1418,18 @@ function loadUrlSources() {
 			// Only load tracks for genes if all bam and vcf urls loaded without error
 			if (vcfCount == vcfLoadedCount && bamCount == bamLoadedCount) {
 
+				window.setGeneratedSampleNames();
+
+				// Now create variant cards for the affected and unaffected sibs
+				if (affectedSibsString) {
+					var affectedSibs = affectedSibsString.split(",");	
+					window.loadSibs(affectedSibs, 'affected');	
+				}
+				if (unaffectedSibsString) {
+					var unaffectedSibs = unaffectedSibsString.split(",");	
+					window.loadSibs(unaffectedSibs, 'unaffected');	
+				}				
+
 				if (sample != null) {
 					Object.keys(sample).forEach(function(urlParameter) {
 						var cardIndex = urlParameter.substring(6);
@@ -1441,6 +1445,7 @@ function loadUrlSources() {
 					});
 
 				}
+
 
 				genesCard.showAnalyzeAllButton();
 				filterCard.displayAffectedFilters();
@@ -2276,7 +2281,6 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	
 	regionStart = null;
 	regionEnd = null;
-	fulfilledTrioPromise = false;
 
 	$("#region-flag").addClass("hide");
 
@@ -2559,6 +2563,8 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 
 				var coveragePromises = [];
 				var allMaxDepth = 0;
+				fulfilledTrioPromise = false;
+
 
 				// the variants are fully annotated so determine inheritance (if trio).  
 				// Also scale the coverage chart y-axis
@@ -2625,30 +2631,46 @@ function getRelevantVariantCards() {
 	return dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
 }
 
-function getAffectedInfo () {
-	var affectedInfo = [];
+function setGeneratedSampleNames() {
+	// Make sure each variant card has a sample name; otherwise, we can't address
+	// the genotypes map later on.
 	getRelevantVariantCards().forEach(function(vc) {
-		var info = {};
-		info.variantCard = vc;
-		if (vc) {
-			info.relationship = vc.getRelationship();
-			info.status = vc.isAffected() ? 'affected' : 'unaffected';
-			info.label = vc.getRelationship();
-			info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
-			affectedInfo.push(info);			
+		if (vc.getSampleName() == null ||  vc.getSampleName() == '') {
+			vc.setGeneratedSampleName(vc.getRelationship());	
 		}
 	})
-	for (var status in variantCardsSibs) {
-		var sibs = variantCardsSibs[status];
-		sibs.forEach(function(vc) {
+}
+
+function getAffectedInfo () {
+	var affectedInfo = [];
+	if (getRelevantVariantCards() && getRelevantVariantCards().length > 0) {
+		getRelevantVariantCards().forEach(function(vc) {
 			var info = {};
-			info.relationship = vc.getRelationship();
-			info.status = status;
 			info.variantCard = vc;
-			info.label = vc.getRelationship() + " " + vc.getSampleName();
-			info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
-			affectedInfo.push(info);
+			if (vc) {
+				info.relationship = vc.getRelationship();
+				info.status = vc.isAffected() ? 'affected' : 'unaffected';
+				info.label = vc.getRelationship();
+
+				info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
+
+				affectedInfo.push(info);			
+			}
 		})
+		var sibIdx = 0;
+		for (var status in variantCardsSibs) {
+			var sibs = variantCardsSibs[status];
+			sibs.forEach(function(vc) {
+				var info = {};
+				info.relationship = vc.getRelationship();
+				info.status = status;
+				info.variantCard = vc;
+				info.label = vc.getRelationship() + " " + vc.getSampleName();
+				info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
+
+				affectedInfo.push(info);
+			})
+		}		
 	}
 	return affectedInfo;
 }
@@ -3179,7 +3201,7 @@ function loadSibs(sibs, affectedStatus) {
 		sibs.forEach( function(sibName) {
 			var variantCard = new VariantCard();	
 
-			variantCard.model          = new VariantModel();	
+			variantCard.model                = new VariantModel();	
 
 
 			variantCard.model.vcf            = getProbandVariantCard().model.vcf;
@@ -3284,9 +3306,6 @@ function promiseDetermineInheritance(promise) {
 					reject("Unable to determine inheritance for gene " + window.gene.gene_name + " because full trio data for gene is not available");
 				} else if (dataCard.mode == 'trio') {					
 
-					probandVariantCard.determineMaxAlleleCount();
-
-					probandVariantCard.populateEffectFilters();
 
 
 					$('#filter-and-rank-card').removeClass("hide");
@@ -3299,8 +3318,14 @@ function promiseDetermineInheritance(promise) {
 					// we need to compare the proband variants to mother and father variants to determine
 					// the inheritance mode.  After this completes, we are ready to show the
 					// feature matrix.
-					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father);
+					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, samplesInSingleVcf() ? null : getAffectedInfo());
 					trioModel.compareVariantsToMotherFather(function() {
+
+
+						probandVariantCard.determineMaxAlleleCount();
+
+						probandVariantCard.populateEffectFilters();
+
 						probandVariantCard.model._cacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript);
 						postInheritanceProcessing(probandVariantCard, trioModel);
 					});

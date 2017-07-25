@@ -20,7 +20,7 @@ function VariantModel() {
 	this.name = "";
 	this.vcfRefNamesMap = {};
 	this.sampleName = "";
-	this.isInternalSampleName = false;
+	this.isGeneratedSampleName = false;
 	this.defaultSampleName = null;
 	this.relationship = null;
 	this.affectedStatus = null;
@@ -34,6 +34,9 @@ function VariantModel() {
 	this.debugMe = false;
 }
 
+VariantModel.prototype.getSampleIdentifier = function(theSampleName) {
+	var id = this.relationship + "&&" + this.sampleName + "&&" + theSampleName;
+}
 
 VariantModel.prototype.setLoadState = function(theVcfData, taskName) {
 	if (theVcfData != null) {
@@ -733,15 +736,20 @@ VariantModel.prototype.setSampleName = function(sampleName) {
 	this.sampleName = sampleName;
 }
 
-VariantModel.prototype.setInternalSampleName = function(sampleName) {
+VariantModel.prototype.setGeneratedSampleName = function(sampleName) {
 	this.sampleName = sampleName;
-	this.isInternalSampleName = true;
+	this.isGeneratedSampleName = true;
 }
 
 
 
 VariantModel.prototype.getSampleName = function() {
 	return this.sampleName;
+}
+
+VariantModel.prototype.getVcfSampleName = function() {
+	// Returns a sample name if provided in the vcf header; otherwise returns null.
+	return !this.isGeneratedSampleName ? (this.sampleName == "" ? null : this.sampleName) : null;
 }
 
 
@@ -1199,7 +1207,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				   fakeGeneObject,
 			       theTranscript,
 			       false,
-			       (sampleNames ? sampleNames.join(",") : me.sampleName),
+			       me._getSamplesToRetrieve(),
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false,
 			       true,
@@ -1331,7 +1339,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				   theGene,
 			       theTranscript,
 			       false,
-			       sampleNames,
+			       me._getSamplesToRetrieve(),
 			       filterCard.annotationScheme.toLowerCase(),
 			       window.geneSource == 'refseq' ? true : false
 			    ).then( function(data) {
@@ -1511,7 +1519,7 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 					refName,
 					theGene,
 			        theTranscript,
-			        true, // parseMultipleSamples
+			        true // parseMultipleSamples
 			        )
 				.then( function(results) {
 
@@ -1627,60 +1635,72 @@ VariantModel.prototype.determineAffectedStatus = function(theGene, theTranscript
 
 VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedStatus, affectedInfo) {
 	var me = this;
-	var affectedCount       = affectedInfo.length;
-	var zygField        = affectedStatus + "_zygosity";
+	theVcfData.features.forEach( function(variant) {
+		VariantModel._determineAffectedStatusForVariant(variant, affectedStatus, affectedInfo);
+	});
+}
+
+VariantModel._determineAffectedStatusForVariant = function(variant, affectedStatus, affectedInfo) {
+	
+	var matchesCount = 0;
+	var matchesHomCount = 0;	
 	var summaryField    = affectedStatus + "_summary";
 
-	theVcfData.features.forEach( function(variant) {
+	variant[summaryField]                         = "none";
+	//variant[affectedStatus + "_zygosity"]         = {};
+ 	//variant[affectedStatus + "_genotypeAltCount"] = {};
+	//variant[affectedStatus + "_genotypeRefCount"] = {};
+	//variant[affectedStatus + "_genotypeDepth"]    = {};
+	//variant[affectedStatus + "_bamDepth"]         = {};
 
-		variant[summaryField]                         = "none";
-		variant[zygField]                             = {};
-	 	variant[affectedStatus + "_genotypeAltCount"] = {};
-		variant[affectedStatus + "_genotypeRefCount"] = {};
-		variant[affectedStatus + "_genotypeDepth"]    = {};
-		variant[affectedStatus + "_bamDepth"]         = {};
 
-		var matchesCount = 0;
-		var matchesHomCount = 0;
+	affectedInfo.forEach(function(info) {
+	 	var sampleName  = info.variantCard.getSampleName();
+	 	var genotype    = variant.genotypes[sampleName];
 
-		affectedInfo.forEach(function(info) {
-		 	var sampleName  = info.variantCard.getSampleName();
-		 	var genotype    = variant.genotypes[sampleName];
-		 	var zyg         = genotype.zygosity ? genotype.zygosity : "none";
-		 	
+	 	if (genotype) {
+	 		//VariantModel.determineAffectedStatusFromGenotype(variant, affectedStatus, genotype, sampleName);
+
+		 	var zyg  = genotype.zygosity ? genotype.zygosity : "none";
 			if (zyg.toLowerCase() != 'none' && zyg.toLowerCase() != 'gt_unknown' && zyg.toLowerCase() != 'homref') {
 			 	matchesCount++;
 			}
 		 	if (zyg.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
 			 	matchesHomCount++;
-		 	}
-		 	variant[zygField][sampleName] = zyg;
-		 	variant[affectedStatus + "_genotypeAltCount"][sampleName] = genotype.altCount;
-			variant[affectedStatus + "_genotypeRefCount"][sampleName] = genotype.refCount;
-			variant[affectedStatus + "_genotypeDepth"][sampleName]    = genotype.genotypeDepth;
-			variant[affectedStatus + "_bamDepth"][sampleName]         = 0;
+		 	}	 		
+	 	} 
+	})	
 
-		})
-		if (variant.inheritance.toLowerCase() == 'recessive'
-			&& matchesHomCount > 0 
-			&& matchesHomCount == affectedCount) { 
-			variant[summaryField] = "recessive_all";
-		} else if (variant.inheritance.toLowerCase() == 'recessive'
-			      && matchesHomCount > 0 )  {
-			variant[summaryField] = "recessive_some";
-		} else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
-			variant[summaryField] = "recessive_none";
-		} else if (matchesCount > 0 && matchesCount == affectedCount) {
-			variant[summaryField] = "present_all";
-		}  else if (matchesCount > 0) {
-			variant[summaryField] = "present_some"
-		}  else {
-			variant[summaryField] = "present_none";
-		}  	 	 
+	if (variant.inheritance.toLowerCase() == 'recessive'
+		&& matchesHomCount > 0 
+		&& matchesHomCount == affectedInfo.length) { 
+		variant[summaryField] = "recessive_all";
+	} else if (variant.inheritance.toLowerCase() == 'recessive'
+		      && matchesHomCount > 0 )  {
+		variant[summaryField] = "recessive_some";
+	} else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
+		variant[summaryField] = "recessive_none";
+	} else if (matchesCount > 0 && matchesCount == affectedInfo.length) {
+		variant[summaryField] = "present_all";
+	}  else if (matchesCount > 0) {
+		variant[summaryField] = "present_some"
+	}  else {
+		variant[summaryField] = "present_none";
+	}  	 	 	
+}
 
-	});
+/*
+VariantModel.determineAffectedStatusFromGenotype = function(variant, affectedStatus, genotype, sampleName) {
+
+ 	variant[affectedStatus + "_zygosity"][sampleName]         = genotype.zygosity ? genotype.zygosity : "none";
+ 	variant[affectedStatus + "_genotypeAltCount"][sampleName] = genotype.altCount;
+	variant[affectedStatus + "_genotypeRefCount"][sampleName] = genotype.refCount;
+	variant[affectedStatus + "_genotypeDepth"][sampleName]    = genotype.genotypeDepth;
+	variant[affectedStatus + "_bamDepth"][sampleName]         = 0;
 
 }
+*/
+
 
 
 VariantModel.prototype.isCached = function(geneName, transcript) {
@@ -1865,6 +1885,59 @@ VariantModel.prototype.pruneIntronVariants = function(data) {
 	}	
 }
 
+VariantModel.prototype._getSamplesToRetrieve = function() {
+	var me = this;
+	var samplesToRetrieve = [];
+	
+	if (me.getVcfSampleName()) {
+		samplesToRetrieve.push( {vcfSampleName: me.getVcfSampleName(), 
+			                     sampleName:    me.getSampleName() } );
+		
+		// Include all of the sample names for the proband
+		getAffectedInfo().forEach(function(info) {
+			if (info.variantCard.model == me) {
+				// ignore the affected info for this sample.  We already added it 
+				// to the list of samples to retrieve
+
+			} else if (info.variantCard.model.getVcfSampleName() && me._otherSampleInThisVcf(info.variantCard.model) ) {
+				// If the 'other' sample exists in the sample multi-sample vcf as this sample,
+				// add it to the list of samples to retrieve.  For example, an affected sib could be in the
+				// mother's vcf file.   In this case, we will retreive both the mother and affected sib at 
+				// the same time so we can obtain the genotype for the affected sib and sync up to the
+				// proband later (when inheritance is determined)
+				samplesToRetrieve.push( {vcfSampleName: info.variantCard.model.getVcfSampleName(), 
+					                     sampleName:    info.variantCard.model.getSampleName() } );
+			}
+		})
+			
+	} else {
+		samplesToRetrieve.push( {vcfSampleName: "", 
+			                     sampleName:    me.getSampleName() } );
+	}
+
+	return samplesToRetrieve;
+
+}
+
+VariantModel.prototype._otherSampleInThisVcf = function(otherModel) {
+	var me = this;
+	var theVcfs = {};
+
+	var pushVcfFile = function(model) {
+		if (model.vcfUrlEntered) {
+			theVcfs[model.vcf.getVcfURL()] = true;
+		} else {
+			theVcfs[model.vcf.getVcfFile().name] = true;
+		}			
+	}
+
+	pushVcfFile(me);
+	pushVcfFile(otherModel);
+		
+	return Object.keys(theVcfs).length == 1;
+}
+
+
 
 VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, parseMultipleSamples=false, onVcfData=null) {
 	var me = this;
@@ -1880,28 +1953,12 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		}
 
 
-		var sampleNames = me.sampleName;
-		if (sampleNames != null && sampleNames != "") {
-			if (me.relationship != 'proband') {
-				sampleNames += "," + getProbandVariantCard().getSampleName();
-			} else {
-				getAffectedInfo().forEach(function(info) {
-					if (info.variantCard.getRelationship() != 'proband') {
-						sampleNames += ",";
-						sampleNames += info.variantCard.getSampleName();
-					}
-				})
-			}			
-		}
-
-
-
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(ref), 
 		   geneObject,
 		   transcript,
 		   parseMultipleSamples,
-	       sampleNames,
+	       me._getSamplesToRetrieve(),
 	       filterCard.annotationScheme.toLowerCase(),
 	       window.geneSource == 'refseq' ? true : false,
 	       window.isLevelBasic ? true : me.GET_HGVS,
@@ -2786,29 +2843,18 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		var passAffectedStatus = true;
 		if (me.getRelationship() == 'proband' && affectedFilters.length > 0) {
 			affectedFilters.forEach(function(info) {
-				var zygosity = null;
-				if (info.variantCard.getRelationship() == "sibling") {
-					if (d[info.status + "_zygosity"] && d[info.status + "_zygosity"][info.variantCard.getSampleName()]) {
-						zygosity = d[info.status + "_zygosity"][info.variantCard.getSampleName()];
+				var genotype = d.genotypes[info.variantCard.getSampleName()];
+				var zygosity = genotype && genotype.zygosity ? genotype.zygosity : "gt_unknown";
+
+				if (info.status == 'affected') {
+					if (zygosity.toUpperCase() != 'HET' && zygosity.toUpperCase() != 'HOM') {
+						passAffectedStatus = false;
 					}
-				} else {
-					if (info.variantCard.getRelationship() == 'proband') {
-						zygosity = d.zygosity;
-					} else if (d[info.variantCard.getRelationship() + "Zygosity"]) {
-						zygosity = d[info.variantCard.getRelationship() + "Zygosity"];
+				} else if (info.status == 'unaffected') {
+					if (zygosity.toUpperCase() == 'HET' || zygosity.toUpperCase() == 'HOM') {
+						passAffectedStatus = false;
 					}
-				}
-				if (zygosity) {
-					if (info.status == 'affected') {
-						if (zygosity.toUpperCase() != 'HET' && zygosity.toUpperCase() != 'HOM') {
-							passAffectedStatus = false;
-						}
-					} else if (info.status == 'unaffected') {
-						if (zygosity.toUpperCase() == 'HET' || zygosity.toUpperCase() == 'HOM') {
-							passAffectedStatus = false;
-						}
-					}					
-				}
+				}					
 			})
 		}
 
@@ -3034,7 +3080,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 					 window.gene, 
 					 window.selectedTranscript,
 					 false,
-					 me.sampleName,
+					 me._getSamplesToRetrieve(),
 					 filterCard.annotationScheme.toLowerCase(),
 					 window.geneSource == 'refseq' ? true : false)
 				.then( function(data) {

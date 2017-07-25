@@ -2576,12 +2576,12 @@ inputinput:-moz-placeholder {
   color: #b32f2f !important;
   float: left; }
 
-.sib-zygosity {
+.ped-zygosity {
   width: 75px;
   float: left; }
 
-.tooltip-row.sib-info {
-  padding-bottom: 2px; }
+.tooltip-row.ped-info {
+  padding-bottom: 5px; }
 
 .tooltip-zygosity {
   float: left;
@@ -2608,6 +2608,9 @@ inputinput:-moz-placeholder {
   color: white; }
 .tooltip-zygosity.unknown {
   background-color: #b9edf3 !important; }
+.tooltip-zygosity.none {
+  background-color: transparent !important;
+  border: solid thin #5D809D !important; }
 
 .tooltip-subtitle {
   font-size: 12px;
@@ -2840,7 +2843,7 @@ text.ref-count {
   .tooltip-wide .tooltip-row {
     clear: both;
     padding-bottom: 3px; }
-    .tooltip-wide .tooltip-row.sib-info {
+    .tooltip-wide .tooltip-row.ped-info {
       padding-bottom: 6px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;

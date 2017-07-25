@@ -573,14 +573,31 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, isMultiSample, samplesToRetrieve, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
     return new Promise( function(resolve, reject) {
 
+
+      // This comma separated string of samples to perform vcf subset on
+      var vcfSampleNames = samplesToRetrieve.filter(function(sample) {
+        return (sample.vcfSampleName != "" && sample.vcfSampleName != null);
+      })
+      .map(function(sample) {
+        return sample.vcfSampleName;
+      })
+      .join(",");
+
+      // This comma separated string of samples to be contained in the maps of genotypes
+      var sampleNamesToGenotype = samplesToRetrieve.map(function(sample) {
+        return sample.sampleName;
+      })
+      .join(",");
+
+
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -591,7 +608,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -606,7 +623,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -630,7 +647,7 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
 
-        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId)
+        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -648,7 +665,7 @@ var effectCategories = [
 
   }
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
 
     var me = this;
 
@@ -671,10 +688,9 @@ var effectCategories = [
     var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
       .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
-    // filter sample(s)
-    if (sampleNames != null && sampleNames != "") {
 
-      var sampleNameFile = new Blob([sampleNames.split(",").join("\n")])
+    if (vcfSampleNames && vcfSampleNames.length > 0) {
+      var sampleNameFile = new Blob([vcfSampleNames.split(",").join("\n")])
       cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
     }
 
@@ -717,7 +733,7 @@ var effectCategories = [
     var cacheKey = null;
     var urlParameters = {};
     if (cache) {
-        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, sampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, vcfSampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
         console.log(cacheKey);
         urlParameters.cache = cacheKey;
         urlParameters.partialCache = true;
@@ -776,7 +792,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, vepFields, sampleNames, null);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, vepFields, sampleNamesToGenotype, null);
 
 
       callback(annotatedRecs, results);
@@ -1148,14 +1164,14 @@ var effectCategories = [
     });
   }
 
-  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, isMultiSample, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the
       // info field.
-      me._annotateVcfRegion(records, refName, sampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
+      me._annotateVcfRegion(records, refName, vcfSampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
@@ -1193,7 +1209,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, vepFields, sampleNames, null);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, vepFields, sampleNamesToGenotype, null);
         resolve([annotatedRecs, results]);
       });
     });

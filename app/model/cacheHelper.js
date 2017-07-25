@@ -980,7 +980,9 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther,
 		genesCard._hideCurrentGene();
 
 		filterCard.clearFilters();
-		filterVariants();
+		if (window.variantCards && window.variantCards.length > 0) {
+			filterVariants();
+		}
 		filterCard.resetStandardFilterCounts();
 
 		me.hideAnalyzeAllProgress();

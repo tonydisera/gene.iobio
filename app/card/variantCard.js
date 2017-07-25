@@ -14,20 +14,17 @@ function VariantCard() {
 
 VariantCard.prototype.getSampleNamesToGenotype = function() {
 	var sampleNames = null;
-	var idx = 0;
 	if (this.getRelationship() == 'proband') {
 		sampleNames = [];
 		getAffectedInfo().forEach(function(info) {
-			// Make sure every varient card has a sample name.  We will use this to access
-			// the genotypes for the trio and sibs
-			if (info.variantCard.getSampleName() == null ||  info.variantCard.getSampleName() == '') {
-				info.variantCard.setInternalSampleName(idx.toString());	
-			}
 			sampleNames.push(info.variantCard.getSampleName());
-			idx++;
 		})
 	}	
 	return sampleNames;
+}
+
+VariantCard.prototype.getSampleIdentifier = function(sampleName) {
+	return this.model.getSampleIdentifier(sampleName);
 }
 
 VariantCard.prototype.getName = function() {
@@ -61,8 +58,8 @@ VariantCard.prototype.setSampleName = function(sampleName) {
 	}
 }
 
-VariantCard.prototype.setInternalSampleName = function(sampleName) {
-	this.model.setInternalSampleName(sampleName);
+VariantCard.prototype.setGeneratedSampleName = function(sampleName) {
+	this.model.setGeneratedSampleName(sampleName);
 }
 
 
@@ -587,7 +584,7 @@ VariantCard.prototype.setVariantCardLabel = function() {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName());
 	} else {
 		var label = "";
-		if (this.model.isInternalSampleName) {
+		if (this.model.isGeneratedSampleName) {
 			label = this.model.getName();
 		} else {
 			label = 

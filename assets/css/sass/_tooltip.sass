@@ -98,13 +98,13 @@
   color: $danger-color !important
   float: left
 
-.sib-zygosity
+.ped-zygosity
   width: 75px 
   float: left 
 
 .tooltip-row
-  &.sib-info
-    padding-bottom: 2px
+  &.ped-info
+    padding-bottom: 5px
 
 .tooltip-zygosity
   float: left
@@ -135,6 +135,10 @@
 
   &.unknown
     background-color: #b9edf3 !important
+
+  &.none
+    background-color: transparent !important  
+    border: solid thin #5D809D !important
 
 .tooltip-subtitle
   font-size: 12px
@@ -406,7 +410,7 @@ text
     clear: both
     padding-bottom: 3px
 
-    &.sib-info
+    &.ped-info
       padding-bottom: 6px
 
   .tooltip-footer

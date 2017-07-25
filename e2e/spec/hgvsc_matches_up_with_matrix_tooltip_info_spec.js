@@ -24,10 +24,12 @@ module.exports = {
     client.pause(1000);
     appTitleSection.selectRefSeqTranscript();
     matrixTrack.waitForMatrixLoaded();
+    client.pause(2000);
     
-    matrixTrack.clickColumn(1);
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
+    matrixTrack.clickColumn(1);
     variantTooltip.waitForTooltip();   
+    
     client.pause(4000); 
     
     variantTooltip.expectVepConsequence('stop gained');
