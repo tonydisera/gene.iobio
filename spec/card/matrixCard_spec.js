@@ -605,36 +605,6 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	describe('#showAffectedNotRecessiveSymbol', function() {
-		var selection, mc;
-
-		beforeEach(function() {
-			setFixtures('<div id="test"></div>');
-			selection = d3.select('#test');
-			selection.datum({ clazz: "affected" });
-			mc = new MatrixCard();
-		});
-
-		it('appends an svg symbol and line with the correct attributes when there are options', function() {
-			var options = { cellSize: 22 };
-			mc.showAffectedNotRecessiveSymbol(selection, options);
-			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
-			expect(useElem.attr('width')).toEqual('16');
-			expect(useElem.attr('height')).toEqual('16');
-			expect(useElem.attr('xlink:href')).toEqual('#thumbs-down-symbol');
-			expect(useElem.style('pointer-events')).toEqual('none');
-		});
-
-		it('appends an svg symbol with the default attributes when there are no options', function() {
-			var options = {};
-			mc.showAffectedNotRecessiveSymbol(selection, options);
-			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
-			expect(useElem.attr('width')).toEqual('14');
-			expect(useElem.attr('height')).toEqual('14');
-		});
-	});
 
 	describe('#showTextSymbol', function() {
 		var selection, mc;
@@ -669,34 +639,6 @@ describe('MatrixCard', function() {
 		});
 	});
 
-	describe('#showAffectedRecessiveSymbol', function() {
-		var selection, mc;
-
-		beforeEach(function() {
-			setFixtures('<div id="test"></div>');
-			selection = d3.select('#test');
-			mc = new MatrixCard();
-		});
-
-		it('appends an svg symbol with the correct attributes when there are some recessive variants', function() {
-			selection.datum({ value: 'recessive_some' });
-			mc.showAffectedRecessiveSymbol(selection, {cellSize: 22});
-			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
-			expect(useElem.attr('xlink:href')).toEqual('#question-mark-symbol');
-			expect(useElem.attr('width')).toEqual('16');
-			expect(useElem.attr('height')).toEqual('16');
-		});
-
-		it('appends an svg symbol with the correct attributes when there are no recessive variants', function() {
-			selection.datum({ value: 'asdf', cellSize: 22 });
-			mc.showAffectedRecessiveSymbol(selection);
-			var useElem = d3.select('#test use');
-			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
-			expect(useElem.attr('width')).toEqual('14');
-			expect(useElem.attr('height')).toEqual('14');
-		});
-	});
 
 	describe('#showAffectedPresentSymbol', function() {
 		var selection, mc;
