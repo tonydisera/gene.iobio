@@ -1647,12 +1647,6 @@ VariantModel._determineAffectedStatusForVariant = function(variant, affectedStat
 	var summaryField    = affectedStatus + "_summary";
 
 	variant[summaryField]                         = "none";
-	//variant[affectedStatus + "_zygosity"]         = {};
- 	//variant[affectedStatus + "_genotypeAltCount"] = {};
-	//variant[affectedStatus + "_genotypeRefCount"] = {};
-	//variant[affectedStatus + "_genotypeDepth"]    = {};
-	//variant[affectedStatus + "_bamDepth"]         = {};
-
 
 	affectedInfo.forEach(function(info) {
 	 	var sampleName  = info.variantCard.getSampleName();
@@ -1688,19 +1682,6 @@ VariantModel._determineAffectedStatusForVariant = function(variant, affectedStat
 		variant[summaryField] = "present_none";
 	}  	 	 	
 }
-
-/*
-VariantModel.determineAffectedStatusFromGenotype = function(variant, affectedStatus, genotype, sampleName) {
-
- 	variant[affectedStatus + "_zygosity"][sampleName]         = genotype.zygosity ? genotype.zygosity : "none";
- 	variant[affectedStatus + "_genotypeAltCount"][sampleName] = genotype.altCount;
-	variant[affectedStatus + "_genotypeRefCount"][sampleName] = genotype.refCount;
-	variant[affectedStatus + "_genotypeDepth"][sampleName]    = genotype.genotypeDepth;
-	variant[affectedStatus + "_bamDepth"][sampleName]         = 0;
-
-}
-*/
-
 
 
 VariantModel.prototype.isCached = function(geneName, transcript) {
