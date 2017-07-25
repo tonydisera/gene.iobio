@@ -2428,10 +2428,13 @@ function isAlignmentsOnly(callback) {
 function samplesInSingleVcf() {
 	var theVcfs = {};
 	var cards = getRelevantVariantCards().forEach(function(vc) {
-		if (vc.model.vcfUrlEntered) {
-			theVcfs[vc.model.vcf.getVcfURL()] = true;
-		} else {
-			theVcfs[vc.model.vcf.getVcfFile().name] = true;
+		if (!vc.model.isAlignmentsOnly()) {
+			if (vc.model.vcfUrlEntered) {
+				theVcfs[vc.model.vcf.getVcfURL()] = true;
+			} else {
+				theVcfs[vc.model.vcf.getVcfFile().name] = true;
+			}
+
 		}
 	});
 	return Object.keys(theVcfs).length == 1;
