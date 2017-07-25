@@ -1088,6 +1088,8 @@ DataCard.prototype.clearBamUrl = function(panelSelector) {
 	panelSelector.find("#bam-file-info").val("");
 	this.onBamUrlEntered(panelSelector);
 
+	window.enableLoadButton();
+
 }
 
 DataCard.prototype.displayUrlBox = function(panelSelector) {
@@ -1148,13 +1150,21 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
 	panelSelector.find("#url-tbi-input").val("");
-	panelSelector.find("#vcf-file-info").val("");
+	panelSelector.find("#vcf-file-info").val("");	
 	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
+	panelSelector.find('#vcf-sample-select-box').removeClass("attention");
+	panelSelector.find('#vcf-sample-box').addClass('hide');
+
+	if (me.mode == 'trio' && variantCard.getRelationship() == 'proband') {
+		$('#unaffected-sibs-box').removeClass('hide');
+		$('#affected-sibs-box').removeClass('hide');
+		$('#unaffected-sibs-select')[0].selectize.clearOptions();
+		$('#affected-sibs-select')[0].selectize.clearOptions();
+	}
 	variantCard.clearVcf();
-	me.enableLoadButtonIfBuildSet();
-
-
+	window.enableLoadButton();
 }
+
 DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {	
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
