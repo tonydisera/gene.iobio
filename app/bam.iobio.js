@@ -598,7 +598,7 @@ var Bam = Class.extend({
    },
 
 
-   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, callback) {
+   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, useSuggestedVariants, callback) {
     var me = this;
 
     var refName     = geneObject.chr; 
@@ -670,6 +670,11 @@ var Bam = Class.extend({
         });
         freebayesArgs.push("-f");
         freebayesArgs.push(refFastaFile);
+        if (useSuggestedVariants) {
+          freebayesArgs.push("-@");
+          freebayesArgs.push(me.getSuggestedVariantsCmd(trRefName, geneObject));
+          freebayesArgs.push("-l");
+        }
 
         
         var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs, {ssl: useSSL});
@@ -743,6 +748,17 @@ var Bam = Class.extend({
     });
 
    },
+
+
+  getSuggestedVariantsCmd: function(refName, geneObject) {
+    // Create an iobio command get get the variants from clinvar for the region of the gene
+    var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
+
+    var tabixArgs = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
+    var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL});
+    
+    return cmd;
+  },
 
    getGeneCoverage: function(geneObject, transcript, bams, callback) {
     var me = this;

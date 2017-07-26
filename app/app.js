@@ -124,6 +124,15 @@ var fulfilledTrioPromise = false;
 
 var variantExporter = null;
 
+// freebayes settings
+var fbSettings = {
+	'visited': false,
+	'useSuggestedVariants': false,
+	'minMappingQual': 0,
+	'minCoverage': 0,
+	'maxCoverage': ''
+}
+
 
 
 // The smaller the region, the wider we can
@@ -973,7 +982,29 @@ function showDataDialogExportBookmarks() {
 	dataCard.resetExportPanel();
 	$('#dataModal').modal('show');
 }
+function showFreebayesSettingsDialog(onClose) {
+	fbSettings.onClose = onClose;
+	fbSettings.visited = true;
+	$('#fb-suggested-variants-cb').prop('checked', fbSettings.useSuggestedVariants);
+	$('#fb-min-mapping-qual').val(fbSettings.minMappingQual);
+	$('#fb-min-coverage').val(fbSettings.minCoverage);
+	$('#fb-max-coverage').val(fbSettings.maxCoverage);
 
+	$('#freebayes-settings-modal').modal("show");
+}
+
+function saveFreebayesSettings() {
+	fbSettings.useSuggestedVariants = $('#fb-suggested-variants-cb').is(":checked");
+	fbSettings.minMappingQual       = $('#fb-min-mapping-qual').val();
+	fbSettings.minCoverage          = $('#fb-min-coverage').val();
+	fbSettings.maxCoverage          = $('#fb-max-coverage').val();
+
+	if (fbSettings.onClose) {
+		fbSettings.onClose();
+	}
+
+	$('#freebayes-settings-modal').modal("hide");
+}
 
 function detectWindowResize() {
 	$(window).resize(function() {
@@ -2807,7 +2838,7 @@ function addVariantCard() {
 }
 
 
-function promiseJointCallVariants(checkCache) {
+function promiseJointCallVariants(checkCache=false) {
 	return new Promise(function(resolve, reject) {
 		jointCallVariants(checkCache, function() {
 			resolve();
@@ -2815,8 +2846,19 @@ function promiseJointCallVariants(checkCache) {
 	})
 }
 
-function jointCallVariants(checkCache, callback) {
+function jointCallVariants(checkCache=false, callback=null) {
 	var me = this;
+
+	var runIt = function(checkCache, callback) {
+		if (fbSettings.visited) {
+			me.jointCallVariantsImpl(checkCache, callback);
+		} else {
+			showFreebayesSettingsDialog(function() {
+				me.jointCallVariantsImpl(checkCache, callback);
+			})
+		}
+
+	}
 
 	var attemptCount = 0;
 	var waitForGene = function() {
@@ -2826,7 +2868,7 @@ function jointCallVariants(checkCache, callback) {
 		}
 		setTimeout(function() {
 			if (window.gene) {
-				me.jointCallVariantsImpl(checkCache, callback);
+				runIt(checkCache, callback);
 			} else {
 				attemptCount++;
 				waitForGene();
@@ -2837,7 +2879,7 @@ function jointCallVariants(checkCache, callback) {
 	if (window.gene == null) {
 		waitForGene();
 	} else {
-		me.jointCallVariantsImpl(checkCache, callback);
+		runIt(checkCache, callback);
 	}
 }
 
@@ -2971,6 +3013,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 			window.selectedTranscript, 
 			bams, 
 			window.geneSource == 'refseq' ? true : false, 
+			fbSettings.useSuggestedVariants,
 			function(theData, trRefName) {
 
 				translatedRefName = trRefName;
@@ -3075,6 +3118,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		transcript,
 		bams, 
 		window.geneSource == 'refseq' ? true : false, 
+		fbSettings.useSuggestedVariants,
 		function(theData, trRefName, theGeneObject, theTranscript) {
 
 			translatedRefName = trRefName;

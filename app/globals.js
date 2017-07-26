@@ -43,6 +43,7 @@ IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" :
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
 IOBIO.geneCoverage            = iobio_services + "genecoverage/";
+//IOBIO.knownvariants           = iobio_services + "knownvariants/";
 IOBIO.knownvariants           = DEV_IOBIO + "knownvariants/";
 
 

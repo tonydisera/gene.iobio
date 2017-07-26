@@ -291,7 +291,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 				// If 'analyze all' including calling variants from alignments, perform
 				// joint calling, then add clinvar annotations and determine the
 				// 'delta' (new) variants that are not present in the gene's loaded variants
-				cacheJointCallVariants(geneObject, transcript, null, 
+				cacheJointCallVariants(geneObject, transcript, false, null, 
 					function(theGeneObject, theTranscript) {
 						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants, 
 							function(theGeneObject1, theTranscript1) {

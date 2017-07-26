@@ -1665,6 +1665,12 @@ inputinput:-moz-placeholder {
   flex-grow: 0;
   align-self: flex-end; }
 
+#freebayes-settings-modal .fb-setting {
+  padding-top: 10px; }
+#freebayes-settings-modal .fb-setting-label {
+  width: 200px;
+  display: inline-block; }
+
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {
   color: #5d809d !important; }

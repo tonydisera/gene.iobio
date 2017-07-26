@@ -808,6 +808,7 @@ var effectCategories = [
 
 
 
+
   
   exports.promiseGetKnownVariants = function(refName, geneObject, transcript, binLength) {
     var me = this;
@@ -927,6 +928,7 @@ var effectCategories = [
     cmd.run();
 
   }
+
 
   exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
     var key =  "backend.gene.iobio"  

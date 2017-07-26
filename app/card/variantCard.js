@@ -1355,8 +1355,8 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
 	// If only alignments provided, only show feature matrix if variants have been called.
-	if (isAlignmentsOnly() && theVcfData.features.length == 0) {
-		if (!theVcfData.loadState || !theVcfData.loadState['called']) {
+	if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
+		if (!theVcfData || !theVcfData.loadState || !theVcfData.loadState['called']) {
 			$('#matrix-track').addClass("hide");
 			me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
  	  		me.cardSelector.find("#vcf-variant-count").text("");
