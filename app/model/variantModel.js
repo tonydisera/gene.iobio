@@ -2428,7 +2428,22 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 }
 
 VariantModel.prototype.clearCalledVariants = function() {
+	var me = this;
 	this._cacheData(null, "fbData", window.gene.gene_name, window.selectedTranscript);
+
+	if (this.relationship == 'proband') {
+		var theVcfData = this._getCachedData("vcfData",  window.gene.gene_name, window.selectedTranscript);
+		if (theVcfData && theVcfData.features && theVcfData.features.length > 0) {
+			var loadedVariantsOnly = theVcfData.features.filter(function(variant) {
+				return !variant.fbCalled || variant.fbCalled != 'Y';
+			})
+			if (loadedVariantsOnly.length < theVcfData.features.length ) {
+				theVcfData.features = loadedVariantsOnly;
+				this._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
+				me.vcfData = theVcfData;
+			}			
+		}
+	}
 }
 
 

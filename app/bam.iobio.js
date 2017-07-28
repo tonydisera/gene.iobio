@@ -598,7 +598,7 @@ var Bam = Class.extend({
    },
 
 
-   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, useSuggestedVariants, callback) {
+   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, fbArgs, callback) {
     var me = this;
 
     var refName     = geneObject.chr; 
@@ -670,10 +670,29 @@ var Bam = Class.extend({
         });
         freebayesArgs.push("-f");
         freebayesArgs.push(refFastaFile);
-        if (useSuggestedVariants) {
+        if (fbArgs && fbArgs.useSuggestedVariants.value == true) {
           freebayesArgs.push("-@");
           freebayesArgs.push(me.getSuggestedVariantsCmd(trRefName, geneObject));
           freebayesArgs.push("-l");
+        }
+        if (fbArgs) {
+          for (var key in fbArgs) {
+            var theArg = fbArgs[key];
+            if (theArg.hasOwnProperty('argName')) {
+              if (theArg.hasOwnProperty('isFlag') && theArg.isFlag == true) {
+                if (theArg.value && theArg.value == true) {
+                    freebayesArgs.push(theArg.argName);
+                }
+              } else {
+                if (theArg.value && theArg.value != '') {
+                  freebayesArgs.push(theArg.argName);
+                  freebayesArgs.push(theArg.value);
+                }
+              }
+              
+            }
+          }
+
         }
 
         

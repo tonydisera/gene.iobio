@@ -127,10 +127,12 @@ var variantExporter = null;
 // freebayes settings
 var fbSettings = {
 	'visited': false,
-	'useSuggestedVariants': false,
-	'minMappingQual': 0,
-	'minCoverage': 0,
-	'maxCoverage': ''
+	'arguments': {
+		'useSuggestedVariants':  {value: false, defaultValue: false},
+		'minMappingQual':        {value: 0,     defaultValue: 0,     argName: '--min-mapping-quality'},
+		'minCoverage':           {value: 0,     defaultValue: 0,     argName: '--min-coverage'},
+		'useDupReads':           {value: false, defaultValue: false, argName: '--use-duplicate-reads', isFlag: true}		
+	}
 }
 
 
@@ -985,19 +987,19 @@ function showDataDialogExportBookmarks() {
 function showFreebayesSettingsDialog(onClose) {
 	fbSettings.onClose = onClose;
 	fbSettings.visited = true;
-	$('#fb-suggested-variants-cb').prop('checked', fbSettings.useSuggestedVariants);
-	$('#fb-min-mapping-qual').val(fbSettings.minMappingQual);
-	$('#fb-min-coverage').val(fbSettings.minCoverage);
-	$('#fb-max-coverage').val(fbSettings.maxCoverage);
+	$('#fb-suggested-variants-cb').prop('checked', fbSettings.arguments.useSuggestedVariants.value);
+	$('#fb-min-mapping-qual'     ).val(fbSettings.arguments.minMappingQual.value);
+	$('#fb-min-coverage'         ).val(fbSettings.arguments.minCoverage.value);
+	$('#fb-use-dup-reads-cb'     ).prop('checked', fbSettings.arguments.useDupReads.value);
 
 	$('#freebayes-settings-modal').modal("show");
 }
 
 function saveFreebayesSettings() {
-	fbSettings.useSuggestedVariants = $('#fb-suggested-variants-cb').is(":checked");
-	fbSettings.minMappingQual       = $('#fb-min-mapping-qual').val();
-	fbSettings.minCoverage          = $('#fb-min-coverage').val();
-	fbSettings.maxCoverage          = $('#fb-max-coverage').val();
+	fbSettings.arguments.useSuggestedVariants.value = $('#fb-suggested-variants-cb').is(":checked");
+	fbSettings.arguments.minMappingQual.value       = $('#fb-min-mapping-qual').val();
+	fbSettings.arguments.minCoverage.value          = $('#fb-min-coverage').val();
+	fbSettings.arguments.useDupReads.value          = $('#fb-use-dup-reads-cb').is(":checked");
 
 	if (fbSettings.onClose) {
 		fbSettings.onClose();
@@ -3013,7 +3015,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 			window.selectedTranscript, 
 			bams, 
 			window.geneSource == 'refseq' ? true : false, 
-			fbSettings.useSuggestedVariants,
+			fbSettings.arguments,
 			function(theData, trRefName) {
 
 				translatedRefName = trRefName;
@@ -3118,7 +3120,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		transcript,
 		bams, 
 		window.geneSource == 'refseq' ? true : false, 
-		fbSettings.useSuggestedVariants,
+		fbSettings.arguments,
 		function(theData, trRefName, theGeneObject, theTranscript) {
 
 			translatedRefName = trRefName;
