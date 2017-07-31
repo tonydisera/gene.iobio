@@ -3314,27 +3314,25 @@ text.ref-count {
   margin-top: 0px;
   margin-bottom: 8px;
   margin-right: 10px;
-  height: 21px; }
+  height: 21px;
+  display: inline-block; }
 
 #gene-badge.failed-filter {
   opacity: 0.65; }
 
 #gene-badge.loading {
-  border-left: #d8d8d8 solid 10px;
-  height: 22px; }
+  border-left: #d8d8d8 solid 10px; }
 
 #gene-badge.loading.selected {
   border-left: #5d809d solid 12px; }
 
 #gene-badge.selected {
-  border-left: #5d809d solid 12px;
-  height: 22px; }
+  border-left: #5d809d solid 12px; }
   #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
     font-weight: bold; }
 
 #gene-badge.phenolyzer #gene-badge-button {
-  border: solid 1px #9FC2D0;
-  height: 21px; }
+  border: solid 1px #9FC2D0; }
   #gene-badge.phenolyzer #gene-badge-button.user-visited {
     border: solid 2px #9FC2D0; }
 
@@ -3487,20 +3485,19 @@ text.ref-count {
     margin-left: 20px; }
 
 #gene-badge-container {
-  display: flex;
-  display: -webkit-flex;
-  flex-flow: row wrap;
-  -webkit-flex-flow: row wrap;
-  justify-content: center;
-  -webkit-justify-content: center;
-  max-height: 150px;
-  overflow-y: auto;
   padding-bottom: 0px;
   padding-top: 0px;
-  visibility: visible; }
+  visibility: visible;
+  overflow: auto;
+  text-align: center; }
   #gene-badge-container.hide {
-    display: flex !important;
+    display: block !important;
     visibility: hidden; }
+  #gene-badge-container.view-all {
+    max-height: 150px;
+    overflow-y: auto; }
+  #gene-badge-container.page-control {
+    text-align: left; }
   #gene-badge-container #gene-badge a {
     color: #717171 !important; }
     #gene-badge-container #gene-badge a:hover {
@@ -3530,10 +3527,13 @@ text.ref-count {
 #gene-page-control {
   margin-top: 0px;
   margin-bottom: 5px;
-  text-align: center; }
+  text-align: right;
+  float: right;
+  display: inline-block; }
   #gene-page-control #gene-paging-links {
     display: inline-block;
-    width: 160px; }
+    margin-right: 20px;
+    margin-left: 30px; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
     font-size: 12px;
