@@ -3032,7 +3032,21 @@ function jointCallVariantsImpl(checkCache, callback) {
 	}
 }
 
+
 function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback) {
+	var me = this;
+
+	if (fbSettings.visited) {
+		me.cacheJointCallVariantsImpl(geneObject, transcript, sourceVariant, callback);
+	} else {
+		showFreebayesSettingsDialog(function() {
+			me.cacheJointCallVariantsImpl(geneObject, transcript, sourceVariant, callback);
+		})
+	}
+
+}
+
+function cacheJointCallVariantsImpl(geneObject, transcript, sourceVariant, callback) {
 
 
 	var bams = [];
