@@ -246,13 +246,14 @@
   margin-bottom: 8px
   margin-right: 10px
   height: 21px
+  display: inline-block
 
 #gene-badge.failed-filter
   opacity: .65
 
 #gene-badge.loading
   border-left: #d8d8d8  solid 10px
-  height: 22px
+  //height: 22px
 
 
 #gene-badge.loading.selected
@@ -261,7 +262,7 @@
 
 #gene-badge.selected
   border-left:  $app-color solid 12px
-  height: 22px
+  //height: 22px
   #gene-badge-button
     //box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19)
 
@@ -271,7 +272,7 @@
 #gene-badge.phenolyzer
   #gene-badge-button
     border: solid 1px #9FC2D0
-    height: 21px
+    //height: 21px
 
     &.user-visited
       border: solid 2px #9FC2D0
@@ -459,21 +460,22 @@
 
 
 #gene-badge-container
-  display: flex
-  display: -webkit-flex
-  flex-flow: row wrap
-  -webkit-flex-flow: row wrap
-  justify-content: center
-  -webkit-justify-content: center
-  max-height: 150px
-  overflow-y: auto
   padding-bottom: 0px
   padding-top: 0px
   visibility: visible
+  overflow: auto
+  text-align: center
 
   &.hide
-    display: flex !important
+    display:  block !important
     visibility: hidden
+
+  &.view-all
+    max-height: 150px  
+    overflow-y: auto
+
+  &.page-control
+    text-align: left
 
   #gene-badge
     a
@@ -512,11 +514,14 @@
 #gene-page-control
   margin-top: 0px
   margin-bottom: 5px
-  text-align: center
+  text-align: right
+  float: right
+  display: inline-block
 
   #gene-paging-links
     display: inline-block
-    width: 160px
+    margin-right: 20px
+    margin-left: 30px    
 
   a.gene-paging-link
     color:  $sidebar-text-color !important
