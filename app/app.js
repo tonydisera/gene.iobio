@@ -1988,7 +1988,7 @@ function getUrlParameter(sParam) {
 }
 
 
-function promiseGetCachedGeneModel(geneName) {
+function promiseGetCachedGeneModel(geneName, resolveOnError=false) {
 	return new Promise( function(resolve, reject) {
 		var theGeneObject = window.geneObjects[geneName];
 		if (theGeneObject) {
@@ -1998,7 +1998,11 @@ function promiseGetCachedGeneModel(geneName) {
 				resolve(geneObject);
 			},
 			function(error) {
-				reject(error);
+				if (resolveOnError) {
+					resolve(null);
+				} else {
+					reject(error);
+				}
 			});
 		}
 

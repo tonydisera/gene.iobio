@@ -915,11 +915,11 @@ DataCard.prototype.resetExportPanel = function() {
 
 DataCard.prototype.onBookmarkImportSource = function(radio) {
 	if (radio.value == 'gene') {
-		$('#gemini-bookmark-selection').addClass("hide");
-		$('#gene-bookmark-selection').removeClass("hide");
-	} else if (radio.value == 'gemini') {
-		$('#gemini-bookmark-selection').removeClass("hide");
-		$('#gene-bookmark-selection').addClass("hide");
+		$('#tsv-bookmark-selection').addClass("hide");
+		$('#csv-bookmark-selection').removeClass("hide");
+	} else if (radio.value == 'gemini' || radio.value == 'tsv') {
+		$('#tsv-bookmark-selection').removeClass("hide");
+		$('#csv-bookmark-selection').addClass("hide");
 	}
 }
 

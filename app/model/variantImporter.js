@@ -1,5 +1,38 @@
 function VariantImporter() {
 
+
+
+}
+
+VariantImporter.geminiFields = ['chrom', 'start', 'end', 'ref', 'alt', 'gene', 'transcript'];
+
+VariantImporter.fields = {
+	'chrom':      {required: true},
+	'start':      {required: true},
+	'end':        {required: false},
+	'ref':        {required: true},
+	'alt':        {required: true},
+	'gene':       {required: true},
+	'transcript': {required: false}
+
+}
+
+VariantImporter.fieldMap = {
+	'chromosome':      'chrom',
+	'final_positions': 'start',
+	'ref_allele':      'ref',
+	'alt_allele':      'alt',
+	'gene_name':       'gene'
+}
+
+VariantImporter.parseRecords = function(importSource, data) {
+	if (importSource == 'gene') {
+		return VariantImporter.parseRecordsCSV(data);
+	} else if (importSource == 'gemini') {
+		return VariantImporter.parseRecordsGemini(data);
+	} else if (importSource == 'tsv') {
+		return VariantImporter.parseRecordsTSV(data);
+	}
 }
 
 VariantImporter.parseRecordsCSV = function(data) {
@@ -47,9 +80,93 @@ VariantImporter.parseRecordsCSV = function(data) {
 		  idx++;
 		}
 		if (recCount > 0 && Object.keys(importRec).length > 0) {
+			importRec.importSource = "gene"
+			importRec.importFormat = "csv";
 			importRecords.push(importRec);
 		}
 		recCount++;
 	});
 	return importRecords;	
+}
+
+VariantImporter.parseRecordsGemini = function(data) {
+	var fieldNames = VariantImporter.geminiFields;
+	var importRecords = [];
+
+	var recs = data.split(/[\r\n]+/g);
+	recs.forEach( function(rec) {
+		var fields = rec.split(/\s+/);
+		if (fields.length == 0 || fields[0] == "chrom" || fields[0] == '') { 
+			// Ignore the header line or a blank link
+		} else {
+			// Parse the tab separate record into fields
+			var importRec = {};
+			for (var i = 0; i < fields.length; i++) {
+				importRec[fieldNames[i]] = fields[i];
+			}
+			importRec.importSource = "gemini"
+			importRec.importFormat = "tsv";			
+			importRecords.push(importRec);
+		}
+	});
+	return importRecords;
+}
+
+VariantImporter.parseRecordsTSV = function(data) {
+	var idxMap = {};
+	var properFieldNames = {};
+	var importRecords = [];
+
+	var recs = data.split(/[\r\n]+/g);
+
+	if (recs.length > 0) {
+		var fieldNames = recs[0].split(/\s+/);
+		var idx = 0;
+		fieldNames.forEach(function(fieldName) {
+			var properFieldName = null;
+			if (VariantImporter.fields[fieldName]) {
+				properFieldName = fieldName;
+			} else if (VariantImporter.fieldMap[fieldName]) {
+				properFieldName = VariantImporter.fieldMap[fieldName];
+			}
+
+			if (properFieldName) {
+				idxMap[idx] = properFieldName;
+				properFieldNames[properFieldName] = true;
+			}
+
+			idx++;
+		})
+	}
+
+	var isParsable = true;
+	for (var key in VariantImporter.fields) {
+		var fieldInfo = VariantImporter.fields[key];
+		if (fieldInfo.required && !properFieldNames[key]) {
+			isParsable = false;
+		}
+	}
+
+	if (isParsable) {
+		// Now parse the data records based on the field names provided in
+		// the first record
+		for (var i = 1; i < recs.length; i++) {
+			var rec = recs[i];
+
+			var fields = rec.split(/\s+/);
+
+			// Parse the tab separate record into fields
+			var importRec = {};
+			for (var x = 0; x < fields.length; x++) {
+				var properFieldName = idxMap[x];
+				if (properFieldName) {
+					importRec[properFieldName] = fields[x];
+				}
+			}
+			importRecords.push(importRec);
+
+		};
+
+	}
+	return importRecords;
 }

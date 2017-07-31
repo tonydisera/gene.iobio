@@ -393,6 +393,13 @@
                           </a>                            
                         </div>
 
+                        <div class="radio" style="margin-left:30px">
+                          <label>
+                            <input type="radio" onclick="dataCard.onBookmarkImportSource(this)" name="import-source" value="tsv">
+                            Tab delimited file                                                         
+                          </label>
+              
+                        </div>
 
                         <div id="gene-bookmarks-format" class="collapse" aria-expanded="false" 
                           style="margin-left:40px;clear:both;padding-top:4px;padding-bottom:10px;color:rgb(132,132,132)">
@@ -455,12 +462,12 @@
                       </div>
 
 
-                        <div class="col-md-12" id="gene-bookmark-selection" style="margin-top:5px;">
+                        <div class="col-md-12" id="csv-bookmark-selection" style="margin-top:5px;">
                           <input type="text" readonly="" style="padding-bottom:0px"  class="form-control" placeholder="choose .csv file..." >
                           <input type="file"  onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".csv">
                         </div>
 
-                        <div class="col-md-12 hide" id="gemini-bookmark-selection" style="margin-top:5px;">
+                        <div class="col-md-12 hide" id="tsv-bookmark-selection" style="margin-top:5px;">
                           <input type="text" readonly="" style="padding-bottom:0px"  class="form-control" placeholder="choose txt file..." >
                           <input type="file"  onchange="bookmarkCard.onBookmarkFileSelected(this)"  accept=".txt, .tsv">
                         </div>                        

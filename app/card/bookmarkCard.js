@@ -4,6 +4,7 @@ function BookmarkCard() {
 	this.selectedBookmarkKey = null;
 	this.favorites = {};
 
+
 }
 
 BookmarkCard.prototype.init = function() {
@@ -273,7 +274,7 @@ BookmarkCard.prototype.resolveBookmarkedVariant = function(key, bookmarkEntry, g
 		variant = getProbandVariantCard().getBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject), null, geneObject, theTranscript);
 		if (variant) {
 			variant.isBookmark = "Y";
-			variant.isProxy = false;
+			variant.isProxy = false;			
 			variant.chrom = bookmarkEntry.chrom;
 			me.bookmarkedVariants[key] = variant;
 			bookmarkEntry = variant;									
@@ -1196,11 +1197,9 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
 		// Handle errors load
 		reader.onload = function(event) {
 			var data = event.target.result;
-			if (importSource == "gene") {
-				me.importBookmarksCSV(data)
-			} else if (importSource == 'gemini') {
-				me.importBookmarksGemini(data)
-			}
+
+			me.importBookmarks(importSource, data);
+
 			$('#dataModal').modal('hide');
 		    fileSelection.value = null;
 		}
@@ -1214,68 +1213,70 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
       }
 
 }
-BookmarkCard.prototype.importBookmarksCSV = function(data) {
-	var me = this;
-	
-	me.bookmarkedVariants = {};
-	var importRecords = VariantImporter.parseRecordsCSV(data);
 
+
+
+BookmarkCard.prototype.importBookmarks = function(importSource, data) {
+	var me = this;
+
+	var importRecords = VariantImporter.parseRecords(importSource, data);
+
+	// If we have over 50 bookmarks, just grab first 50
+	// and warn user
+	/*
+	if (importRecords.length > 0) {
+		importRecords = importRecords.slice(0,50);
+		alertify.alert("Only first 50 bookmarks will be imported.");
+	}
+	*/
+
+	// We need to make sure each imported record has a transcript.  
+	// So first, cache all of the gene objects for the imported bookmarks
+	var promises = []
 	importRecords.forEach( function(ir) {
+		if (!ir.transcript || ir.transcript == '') {
+			var promise = promiseGetCachedGeneModel(ir.gene, true).then( function(theGeneObject) {
+				if (theGeneObject) {
+					window.geneObjects[theGeneObject.gene_name] = theGeneObject;
+				} else {
+					//  If a gene isn't found, just ignore and keep importing
+				}
+			});
+			promises.push(promise);
+		}
+	})
+
+	// Now that all of the gene objects have been cached, we can fill in the
+	// transcript if necessary and then find load the imported bookmarks
+	Promise.all(promises).then(function() {
+		importRecords.forEach( function(ir) {
+			if (!ir.transcript || ir.transcript == '') {
+				var geneObject = window.geneObjects[ir.gene];
+				var tx = geneObject ? getCanonicalTranscript(geneObject) : null;
+				if (tx) {
+					ir.transcript = tx.transcript_id;
+				}
+			}
+			// Add the bookmark entry
 			var key = me.getBookmarkKey(ir.gene, ir.transcript, ir.chrom, ir.start, ir.ref, ir.alt);
 			if (me.bookmarkedVariants[key] == null) {
 				ir.isProxy = true;
-				ir.importSource = "gene"
-				ir.importFormat = "csv";
 				me.bookmarkedVariants[key] = ir;
-				if (ir.starred == 'Y') {
-					me.favorites[key] = true;
-				}
-			}
-	});
-	me.showImportedBookmarks();
+			}		
 
+			// Add the bookmarked gene
+			var keys = me.bookmarkedGenes[ir.gene];
+	    	if (keys == null) {
+	    		keys = [];
+	    	}
+	    	keys.push(key);
+	    	me.bookmarkedGenes[ir.gene] = keys;				
+		});
 
+		// Show the imported bookmarks
+		me.showImportedBookmarks();
 
-}
-
-
-BookmarkCard.prototype.importBookmarksGemini = function(data) {
-	var me = this;
-
-	
-	me.bookmarkedVariants = {};
-	var recs = data.split(/[\r\n]+/g);
-	recs.forEach( function(rec) {
-		var fields = rec.split(/\s+/);
-
-		if (fields.length >= 5) {
-			var chrom        = fields[0];
-			var start        = +fields[1];
-			var end          = +fields[2];
-			var ref          = fields[3];
-			var alt          = fields[4];
-			var geneName     = fields[5];
-			var transcriptId = null;
-			if (fields.length > 5) {
-				transcriptId = fields[6];
-			}
-
-			// Skip the first line if it contains column names
-			if (chrom == "chrom") {
-
-			} else {
-				var key = me.getBookmarkKey(geneName, transcriptId, chrom, start, ref, alt);
-				if (me.bookmarkedVariants[key] == null) {
-					me.bookmarkedVariants[key] = {isProxy: true, importSource: 'gemini', importFormat: "tsv", gene: geneName, transcriptId: transcriptId, chrom: chrom, start: +start, end: +end, ref: ref, alt: alt};
-				}
-			}
-
-			
-
-		}
-	});
-
-	me.showImportedBookmarks();
+	})
 
 }
 
@@ -1292,23 +1293,23 @@ BookmarkCard.prototype.showImportedBookmarks = function() {
 		});
 		promises.push(promisePheno);
 
-		var promiseModel = promiseGetCachedGeneModel(geneName).then(function(geneModel) {
-			window.geneObjects[geneModel.gene_name] = geneModel;
+		var promiseModel = promiseGetCachedGeneModel(geneName, true).then(function(geneModel) {
+			if (geneModel) {
+				window.geneObjects[geneModel.gene_name] = geneModel;
+			}
 		});
-		promises.push(promiseModel);
+		promises.push(promiseModel);		
 		
-		if (promises.length == Object.keys(me.bookmarkedGenes).length*2) {
-
-			Promise.all(promises).then(function() {
-				// Create the bookmark links 
-				me.refreshBookmarkList();
-
-				// Add the bookmarked genes to the gene buttons
-				genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
-			});
-			
-		}		
 	}	
+
+
+	Promise.all(promises).then(function() {
+		// Create the bookmark links 
+		me.refreshBookmarkList();
+
+		// Add the bookmarked genes to the gene buttons
+		genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
+	});
 
 
 
