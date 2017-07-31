@@ -493,6 +493,7 @@ GenesCard.prototype.pageToGene = function(geneName) {
 GenesCard.prototype.viewDefaultsGenesPerPage = function() {
 	var me = this;
 	me.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
+	$('#gene-badge-container').removeClass("view-all");
 	me._initPaging(me.getGeneNames(), true);
 }
 
@@ -500,6 +501,7 @@ GenesCard.prototype.viewAllGenes = function() {
 	var me = this;
 	me.GENES_PER_PAGE = 1000000;
 	me._initPaging(me.getGeneNames(), true);
+	$('#gene-badge-container').addClass("view-all");
 }
 
 GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
@@ -552,6 +554,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		this.currentPageNumber = startOver ? 1 : Math.min(me.currentPageNumber, pageCount);
 		$('#gene-page-control').removeClass("hide");
 		$('#gene-paging-links').removeClass("hide");
+		$('#gene-badge-container').addClass("page-control")
 		$('#gene-page-selection').bootpag({
 			page: me.currentPageNumber,
 	        total: pageCount,
@@ -562,9 +565,11 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		if (this.GENES_PER_PAGE > this.GENES_PER_PAGE_DEFAULT) {
 			$('#gene-page-control').removeClass("hide");
 			$('#gene-paging-links').removeClass("hide");
+			$('#gene-badge-container').addClass("page-control")
 		} else {
 			$('#gene-page-control').addClass("hide");
 			$('#gene-paging-links').addClass("hide");
+			$('#gene-badge-container').removeClass("page-control")
 		}
 		$('#gene-page-selection').html("");
 		this.currentPageNumber = 1;
@@ -573,6 +578,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 	} else {
 		$('#gene-page-control').addClass("hide");
 		$('#gene-paging-links').addClass("hide");
+		$('#gene-badge-container').removeClass("page-control")
 		$('#gene-page-selection').html("");
 	}
 
