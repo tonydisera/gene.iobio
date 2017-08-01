@@ -1198,6 +1198,7 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
 		reader.onload = function(event) {
 			var data = event.target.result;
 
+
 			me.importBookmarks(importSource, data);
 
 			$('#dataModal').modal('hide');
@@ -1218,6 +1219,10 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
 
 BookmarkCard.prototype.importBookmarks = function(importSource, data) {
 	var me = this;
+
+	$('#bookmark-card .loader').removeClass("hide");
+	$('#bookmark-card .loader-label').text("Loading bookmarks");
+
 
 	var importRecords = VariantImporter.parseRecords(importSource, data);
 
@@ -1273,14 +1278,17 @@ BookmarkCard.prototype.importBookmarks = function(importSource, data) {
 	    	me.bookmarkedGenes[ir.gene] = keys;				
 		});
 
+	
 		// Show the imported bookmarks
-		me.showImportedBookmarks();
+		me.showImportedBookmarks(function() {
+			$('#bookmark-card .loader').addClass("hide");
+		});
 
 	})
 
 }
 
-BookmarkCard.prototype.showImportedBookmarks = function() {
+BookmarkCard.prototype.showImportedBookmarks = function(callback) {
 	var me = this;
 	showSidebar("Bookmarks");
 
@@ -1309,6 +1317,10 @@ BookmarkCard.prototype.showImportedBookmarks = function() {
 
 		// Add the bookmarked genes to the gene buttons
 		genesCard.refreshBookmarkedGenes(me.bookmarkedGenes);
+
+		if (callback) {
+			callback();
+		}
 	});
 
 
