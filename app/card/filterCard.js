@@ -93,6 +93,7 @@ FilterCard.prototype.displayAffectedFilters = function() {
 	    	cb.attr("id", info.id)
 	    	cb.click(function() {	
 	    		me.getAffectedFilterInfo(true);
+	    		me.clearCurrentStandardFilter();
 	    		window.filterVariants();   
 	    	})    		
     	}
@@ -112,6 +113,7 @@ FilterCard.prototype.displayAffectedFilters = function() {
 	    	cb.attr("id", info.id);
 			cb.click(function() {	
 	    		me.getAffectedFilterInfo(true);
+	    		me.clearCurrentStandardFilter();
 	    		window.filterVariants();   
 	    	})    	
     	}
@@ -146,6 +148,34 @@ FilterCard.prototype.getAffectedFilterInfo = function(forceRefresh=false) {
 	    });    
 
 	}
+    return this.affectedInfo;
+}
+
+
+FilterCard.prototype.clearAffectedFilters = function() {
+	var me = this;
+
+	this.affectedInfo.filter(function(info) {
+    	return info.variantCard.isAffected() && info.relationship != 'proband';
+    })
+    .forEach(function(info) {
+    	var cb = $('#present-in-affected').find("#" + info.id + " input");
+    	cb.prop('checked', false);
+    	info.filter = false;
+    });
+
+	this.affectedInfo.filter(function(info) {
+    	return !info.variantCard.isAffected();
+    })
+    .forEach(function(info) {
+    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
+    	cb.prop('checked', false);
+    	info.filter = false;
+    });    
+
+
+	this.affectedInfo = getAffectedInfo();
+
     return this.affectedInfo;
 }
 
@@ -696,6 +726,8 @@ FilterCard.prototype.clearFilters = function() {
 	$('#af1000g-range-filter #af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
+
+	this.clearAffectedFilters();
 	
 }
 
