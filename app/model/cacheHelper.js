@@ -1,4 +1,5 @@
 var recordedCacheErrors = {};
+var cacheErrorTypes = {};
 
 function CacheHelper(loaderDisplay) {
 
@@ -1208,6 +1209,14 @@ CacheHelper.getCachedDataMultithread = function(key, callback) {
 CacheHelper.showError = function(key, cacheError) {
 	var cacheObject = CacheHelper._parseCacheKey(key);
 	if (cacheObject) {
+
+		var errorCount = cacheErrorTypes[cacheError.name];
+		if (errorCount == null) {
+			errorCount = 0;
+		}
+		errorCount++;
+		cacheErrorTypes[cacheError.name] = errorCount;
+
 		var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
 		var errorKey = cacheObject.gene + cacheHelper.KEY_DELIM + errorType;
 
@@ -1216,12 +1225,21 @@ CacheHelper.showError = function(key, cacheError) {
 	    console.log(cacheError.toString());
 	    
 	    // Only show the error once
-	    if (!recordedCacheErrors[errorKey]) {
+	    if (!recordedCacheErrors[errorKey] ) {
 	    	recordedCacheErrors[errorKey] = message;
-		    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes."
-			alertify.alert(message, function() {
+		    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes.  Click on 'Clear cache...' link to clear cache.";
+		    // If we have shown this kind of cache error 2 times already, just show in right hand corner instead
+		    // of showning dialog with ok/cancel.
+			if (errorCount < 3) {
+				alertify.alert(message, function() {
+					recordedCacheErrors[errorKey] = null;			
+				});					
+			} else if (errorCount < 8) { 
+		    	var msg = "<span style='font-size:12px'>" + message + "</span>";
+		    	alertify.set('notifier','position', 'top-right');
+		    	alertify.error(msg,  5);				
 				recordedCacheErrors[errorKey] = null;			
-			});	
+			}
 	    }		
 	}
 
