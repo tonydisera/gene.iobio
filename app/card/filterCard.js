@@ -155,26 +155,28 @@ FilterCard.prototype.getAffectedFilterInfo = function(forceRefresh=false) {
 FilterCard.prototype.clearAffectedFilters = function() {
 	var me = this;
 
-	this.affectedInfo.filter(function(info) {
-    	return info.variantCard.isAffected() && info.relationship != 'proband';
-    })
-    .forEach(function(info) {
-    	var cb = $('#present-in-affected').find("#" + info.id + " input");
-    	cb.prop('checked', false);
-    	info.filter = false;
-    });
+	if (this.affectedInfo) {
+		this.affectedInfo.filter(function(info) {
+	    	return info.variantCard.isAffected() && info.relationship != 'proband';
+	    })
+	    .forEach(function(info) {
+	    	var cb = $('#present-in-affected').find("#" + info.id + " input");
+	    	cb.prop('checked', false);
+	    	info.filter = false;
+	    });
 
-	this.affectedInfo.filter(function(info) {
-    	return !info.variantCard.isAffected();
-    })
-    .forEach(function(info) {
-    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
-    	cb.prop('checked', false);
-    	info.filter = false;
-    });    
+		this.affectedInfo.filter(function(info) {
+	    	return !info.variantCard.isAffected();
+	    })
+	    .forEach(function(info) {
+	    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
+	    	cb.prop('checked', false);
+	    	info.filter = false;
+	    });    
 
 
-	this.affectedInfo = getAffectedInfo();
+		this.affectedInfo = getAffectedInfo();
+	}
 
     return this.affectedInfo;
 }
@@ -995,8 +997,8 @@ FilterCard.prototype.displayEffectFilters = function() {
 	effectKeys.forEach( function(key) {
 		var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
 		var svgElem = null;
-		if (effectLabel.length < 20) {
-			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="100" height="15" transform="translate(0,0)">' +
+		if (effectLabel.length < 50) {
+			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="200" height="15" transform="translate(0,0)">' +
                       '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
     				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
@@ -1005,15 +1007,18 @@ FilterCard.prototype.displayEffectFilters = function() {
 
 		} else {
 			// find first space after 20th character
-			var pos = 0;
-			for (var i = 20; i < effectLabel.length; i++) {
-				if (pos == 0 && effectLabel[i] == " ") {
+			var pos = -1;
+			for (var i = 50; i < effectLabel.length; i++) {
+				if (pos == -1 && effectLabel[i] == " ") {
 					pos = i;
 				}
 			}
+			if (pos <= 0) {
+				pos = Math.round(effectLabel.length / 2);
+			}
 			var label1 = effectLabel.substring(0, pos);
 			var label2 = effectLabel.substring(pos+1, effectLabel.length);
-			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="80" height="26" transform="translate(0,0)">' +
+			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="200" height="26" transform="translate(0,0)">' +
 			          '<g transform="translate(1,2)">' +
                       '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
                       '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
@@ -1130,33 +1135,39 @@ FilterCard.prototype._getFilterString = function() {
 		return filterString;
 	}
 
-	var affectedFilters = filterObject.affectedInfo.filter(function(info) {
-		return info.filter && info.status == 'affected';
-	});
-	if (affectedFilters.length > 0) {
-		var buf = "";
-		affectedFilters.forEach(function(info) {
-			if (buf.length > 0) {
-				buf += ", ";
-			}
-			buf += info.label;
-		})
-		filterString +=  AND(filterString) + filterBox("Present in affected: " + buf);
+	var affectedFilters = [];
+	if (filterObject.affectedInfo) {
+		affectedFilters = filterObject.affectedInfo.filter(function(info) {
+			return info.filter && info.status == 'affected';
+		});
+		if (affectedFilters.length > 0) {
+			var buf = "";
+			affectedFilters.forEach(function(info) {
+				if (buf.length > 0) {
+					buf += ", ";
+				}
+				buf += info.label;
+			})
+			filterString +=  AND(filterString) + filterBox("Present in affected: " + buf);
+		}		
 	}
 
-	var unaffectedFilters = filterObject.affectedInfo.filter(function(info) {
-		return info.filter  && info.status == 'unaffected';
-	});
-	if (unaffectedFilters.length > 0) {
-		var buf = "";
-		unaffectedFilters.forEach(function(info) {
-			if (buf.length > 0) {
-				buf += ", ";
-			}
-			buf += info.label;
-		})
-		filterString +=  AND(filterString) +  filterBox("Absent in unaffected: " + buf);
-	}		
+	var unaffectedFilters = [];
+	if (filterObject.affectedInfo) {
+		unaffectedFilters = filterObject.affectedInfo.filter(function(info) {
+			return info.filter  && info.status == 'unaffected';
+		});
+		if (unaffectedFilters.length > 0) {
+			var buf = "";
+			unaffectedFilters.forEach(function(info) {
+				if (buf.length > 0) {
+					buf += ", ";
+				}
+				buf += info.label;
+			})
+			filterString +=  AND(filterString) +  filterBox("Absent in unaffected: " + buf);
+		}	
+	}	
 
 	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("loaded variants only");
