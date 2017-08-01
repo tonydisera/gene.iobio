@@ -1215,9 +1215,51 @@ BookmarkCard.prototype.onBookmarkFileSelected = function(fileSelection) {
 
 }
 
-
-
 BookmarkCard.prototype.importBookmarks = function(importSource, data) {
+	var me = this;
+
+	// Prompt user to keep or remove existing bookmarks (if any exist)
+	if (Object.keys(me.bookmarkedVariants).length > 0) {
+		alertify.confirm("",
+			"There are " + Object.keys(me.bookmarkedVariants).length + " bookmarked variants already loaded.  Do you want to keep these?",
+			function (e) {
+				// user clicked "keep bookmarks"
+				me.importBookmarksImpl(importSource, data);
+
+				alertify.defaults.glossary.ok = 'OK';
+				alertify.defaults.glossary.cancel = 'Cancel';
+			},
+			function() {
+				// user clicked 'remove bookmarks'.
+
+				// First, get rid of the genes for the existing bookmarks
+				for (var geneName in me.bookmarkedGenes) {
+					genesCard.removeGeneBadgeByName(geneName.toUpperCase(), false, false);
+				}
+
+				// Now clear out the bookmarks
+				me.bookmarkedVariants = {};
+				me.bookmarkedGenes = {};
+				me.refreshBookmarkList();
+
+				// Now import the new bookmarks
+				me.importBookmarksImpl(importSource, data);
+
+				alertify.defaults.glossary.ok = 'OK';
+				alertify.defaults.glossary.cancel = 'Cancel';
+			}
+
+		).set('labels', {ok:'Keep bookmarks', cancel:'Clear out existing bookmarks'});   						
+	} else {
+		me.importBookmarksImpl(importSource, data);
+
+	}
+
+}
+
+
+
+BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
 	var me = this;
 
 	$('#bookmark-card .loader').removeClass("hide");
