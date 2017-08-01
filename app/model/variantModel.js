@@ -1553,6 +1553,13 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 				    			} else {
 					    			var vc          = variantCards[idx];
 					    			var theVcfData  = results[idx];
+					    			if (theVcfData == null) {
+					    				if (callback) {
+					    					callback();
+					    				}
+					    				return;
+					    			}
+					    			
 					    			theVcfData.gene = theGeneObject;
 					    			resultMap[vc.getRelationship()] = theVcfData;
 
@@ -1848,8 +1855,9 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 VariantModel.prototype.pruneIntronVariants = function(data) {
 	if (data.features.length > 500) {
 		filterCard.setExonicOnlyFilter();
-
-	}	
+	} else {
+		filterCard.setExonicOnlyFilter(false);
+	}
 }
 
 VariantModel.prototype._getSamplesToRetrieve = function() {
