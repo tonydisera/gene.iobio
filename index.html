@@ -217,7 +217,7 @@
     <div id="intro" class="hide level-basic shadow-z-2">
     </div>
 
-    <div id="filter-summary-track" class="hide shadow-z-2 track">
+    <div id="filter-summary-track" class="hide level-edu level-basic shadow-z-2 track">
       <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
       <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
          Clear filter
@@ -406,7 +406,7 @@
           <div id="region-track" class="level-edu level-basic" style="clear:both;">
               <div class="card-label" style="float:left;">Selected Gene</div>
 
-              <div id="show-known-variants-cb-area" class="checkbox">
+              <div id="show-known-variants-cb-area" class="level-edu level-basic checkbox">
                   <label style="margin-right:5px;">
                     <input id="show-known-variants-cb"  type="checkbox"> 
                     Known ClinVar variants
@@ -674,11 +674,7 @@
 
             <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
-            <div id="zero-variants" class="warning level-edu level-basic hide">              
-            </div>
-
-            <div id="no-variants" class="warning level-basic hide">
-              No clinvar variants under 1% population frequency found
+            <div id="zero-variants" class="warning level-edu hide">              
             </div>
     
             <div id="matrix-panel"  style="clear:both;min-height:30px"
