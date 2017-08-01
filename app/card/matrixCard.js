@@ -874,31 +874,23 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 
     var unfilteredVcfData = getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (isLevelBasic) {
-		if (unfilteredVcfData != null && unfilteredVcfData.features != null && unfilteredVcfData.features.length == 0) {
-			$('#matrix-track #no-variants.level-basic').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else {
-			$('#matrix-track #no-variants.level-basic').addClass("hide");
-			$('#matrix-panel').removeClass("hide");
-		}
+
+    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
+    	$('#zero-variants').addClass("zero-filtered-variants");
+    	$('#zero-variants').text("No variants passed the filter" );
+    	$('#zero-variants').removeClass("hide");
+		$('#matrix-panel').addClass("hide");
+	} else if (sortedFeatures.length == 0 ) {
+    	$('#zero-variants').removeClass("zero-filtered-variants");
+    	$('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
+    	$('#zero-variants').removeClass("hide");
+		$('#matrix-panel').addClass("hide");
 	} else {
-	    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
-	    	$('#zero-variants').addClass("zero-filtered-variants");
-	    	$('#zero-variants').text("No variants passed the filter" );
-	    	$('#zero-variants').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else if (sortedFeatures.length == 0 ) {
-	    	$('#zero-variants').removeClass("zero-filtered-variants");
-	    	$('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
-	    	$('#zero-variants').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else {
-	    	$('#zero-variants').text("");
-	    	$('#zero-variants').addClass("hide");
-			$('#matrix-panel').removeClass("hide");
-		}		
-	}
+    	$('#zero-variants').text("");
+    	$('#zero-variants').addClass("hide");
+		$('#matrix-panel').removeClass("hide");
+	}		
+
 
 
    
