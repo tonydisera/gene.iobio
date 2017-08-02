@@ -2863,6 +2863,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		// We don't want to display homozygous reference variants in the variant chart
 		// or feature matrix (but we want to keep it to show trio allele counts).
 		var isHomRef = (d.zygosity != null && (d.zygosity.toLowerCase() == 'gt_unknown' || d.zygosity.toLowerCase() == 'homref')) ? true : false;
+		var isGenotypeAbsent = d.genotype.absent ? d.genotype.absent : false;
 
 		var meetsRegion = true;
 		if (!bypassRangeFilter) {
@@ -3034,7 +3035,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 
-		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled && passAffectedStatus;
+		return (!isHomRef || isGenotypeAbsent) && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled && passAffectedStatus;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures, start, end);

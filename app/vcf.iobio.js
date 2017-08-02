@@ -2155,8 +2155,9 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
       var genotype = rec.genotypes.length > gt.sampleIndex ? rec.genotypes[gt.sampleIndex] : null;
 
       if (genotype == null  || genotype == "" || genotype == '.') {
-        gt.keep = false;
         gt.zygosity = 'gt_unknown';
+        gt.keep      = rec.genotypes.length == 0 ? true : false;
+        gt.absent   =  rec.genotypes.length == 0 ? true : false;
       } else {
 
         var tokens = genotype.split(":");
