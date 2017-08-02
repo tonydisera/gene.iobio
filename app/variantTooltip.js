@@ -1,6 +1,7 @@
 function VariantTooltip() {
 	this.examinedVariant = null;
 	this.WIDTH_LOCK         = 650;
+	this.WIDTH_EXTRA_WIDE   = 840;
 	this.WIDTH_HOVER        = 360;
 	this.WIDTH_SIMPLE       = 280;
 	this.WIDTH_SIMPLE_WIDER = 500;
@@ -22,6 +23,9 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	} 
 
 	tooltip.classed("tooltip-wide", lock && !isLevelEdu);
+
+	var extraWide = lock && !isLevelEdu && variant.otherAnnots && Object.keys(variant.otherAnnots).length > 0;
+	tooltip.classed("tooltip-extra-wide", extraWide);
 	
 	if (html == null) {
 		if (lock) {
@@ -43,7 +47,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 
 	var hasLongText = $(tooltip[0]).find('.col-sm-8').length > 0  || $(tooltip[0]).find('.col-sm-9').length > 0;
- 	var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? me.WIDTH_LOCK : me.WIDTH_HOVER);
+ 	var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? (extraWide ? me.WIDTH_EXTRA_WIDE : me.WIDTH_LOCK) : me.WIDTH_HOVER);
 	var h = d3.round(tooltip[0][0].offsetHeight);
 
 	var x = screenX;
@@ -671,6 +675,25 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRowAlleleCounts() 
 			+ "</div>";
 
+		var otherAnnotsClazz = '';
+		var otherDiv = '';
+		if (variant.otherAnnots && Object.keys(variant.otherAnnots).length > 0) {
+			otherAnnotsClazz = "tooltip-info-column";
+			var otherDiv = '<div class="tooltip-info-column">';
+			for (var annotLabel in variant.otherAnnots) {
+				otherDiv += '<div class="tooltip-row" style="text-align:center">' + annotLabel + '</div>';
+				for (var fieldName in variant.otherAnnots[annotLabel]) {
+					var annotValue = variant.otherAnnots[annotLabel][fieldName];
+					var label = capitalizeFirstLetter(fieldName.split("_").join(" ").toLowerCase());
+
+					// TODO:  Loop through value map to create tag/value subfields
+
+					
+					otherDiv += me._tooltipRow(label, annotValue, null, true);
+				}
+			}
+		}
+
 		var div =
 		    '<div class="tooltip-wide">'
 	        + qualityWarningRow
@@ -678,8 +701,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, dbSnpLink, coord, 'ref-alt')
 			+ inheritanceModeRow
-			+ leftDiv
-			+ rightDiv
+			+ '<div class="row">' 
+				+ leftDiv
+				+ rightDiv
+				+ otherDiv
+			+ '</div>'
 			+ me._linksRow(variant)	
 			+ "</div>";
 
@@ -946,40 +972,47 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		var affectedStatus = info.status;
 		var sampleName     = info.variantCard.getSampleName();
 		var genotype       = variant.genotypes[sampleName];
-		var selectedClazz  = dataCard.mode == 'trio' && info.variantCard == variantCard ? 'selected' : '';
 
-		var rel      = info.relationship;
-		row = container.append("div")
-                       .attr("class", rel + "-alt-count tooltip-row ped-info");	
+		if (genotype.absent && dataCard.mode == 'single') {
+			// If vcf doesn't have any genotypes, skip showing this
 
-        if (firstTime) {
-        	row.style("padding-top", "6px");
-        	firstTime = false;
-        }
-		row.append("div")
-	       .attr("class", rel + "-alt-count tooltip-header-small")
-	       .html("<span class='tooltip-ped-label " 
-	       	+ selectedClazz + "'>" 
-	       	+ " " + (rel == 'sibling' ? 'Sib' : capitalizeFirstLetter(rel)) 
-	       	+ " " + (rel == 'sibling' ? sampleName : '') 
-	       	+ "</span>"
-	        + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
+		} else {
 
-        var zyg = genotype ? (genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
-		row.append("div")
-		   .attr("class",  "tooltip-zygosity label " + zyg)
-		   .text(capitalizeFirstLetter(zyg));
+			var selectedClazz  = dataCard.mode == 'trio' && info.variantCard == variantCard ? 'selected' : '';
+
+			var rel      = info.relationship;
+			row = container.append("div")
+	                       .attr("class", rel + "-alt-count tooltip-row ped-info");	
+
+	        if (firstTime) {
+	        	row.style("padding-top", "6px");
+	        	firstTime = false;
+	        }
+			row.append("div")
+		       .attr("class", rel + "-alt-count tooltip-header-small")
+		       .html("<span class='tooltip-ped-label " 
+		       	+ selectedClazz + "'>" 
+		       	+ " " + (rel == 'sibling' ? 'Sib' : capitalizeFirstLetter(rel)) 
+		       	+ " " + (rel == 'sibling' ? sampleName : '') 
+		       	+ "</span>"
+		        + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
+
+	        var zyg = genotype ? (genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
+			row.append("div")
+			   .attr("class",  "tooltip-zygosity label " + zyg)
+			   .text(capitalizeFirstLetter(zyg));
 
 
-		var barContainer = row.append("div")
-	                          .attr("class", rel + "-alt-count tooltip-allele-count-bar")
-		if (genotype) {
-			me._appendAlleleCountSVG(barContainer, 
-				genotype.altCount, 
-				genotype.refCount, 
-				genotype.genotypeDepth, 
-				null,
-				barWidth);
+			var barContainer = row.append("div")
+		                          .attr("class", rel + "-alt-count tooltip-allele-count-bar")
+			if (genotype) {
+				me._appendAlleleCountSVG(barContainer, 
+					genotype.altCount, 
+					genotype.refCount, 
+					genotype.genotypeDepth, 
+					null,
+					barWidth);
+			}
 		}
 
 

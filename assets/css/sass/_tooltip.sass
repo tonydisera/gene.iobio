@@ -373,6 +373,15 @@ text
     bottom: -8px
     content: ""
     right: 330px
+
+.tooltip-extra-wide.arrow-down-center
+  &:before 
+    right: 418px
+
+  &:after
+    right: 420px
+
+
  
 .tooltip.black-arrow-left
   &:after
@@ -407,6 +416,9 @@ text
 
 .tooltip.tooltip-wide
   width: 650px !important
+
+  &.tooltip-extra-wide
+    width: 840px !important
 
 .tooltip-wide
   font-size: 13px 
@@ -454,7 +466,7 @@ text
 
     
   .tooltip-right-column
-    float: right
+    float: left
     padding-top: 5px
     padding-bottom: 0px
     .tooltip-row
@@ -463,7 +475,23 @@ text
       .tooltip-header
         width: 110px
       .tooltip-value
-        width: 150px      
+        width: 150px 
+
+  .tooltip-info-column
+    float: left
+    padding-top: 5px
+    padding-bottom: 0px
+    max-height: 200px
+    overflow-y: auto
+    width: 200px
+    .tooltip-row
+      width: 200px    
+      overflow: auto
+      .tooltip-header
+        width: 80px
+        word-wrap: break-word
+      .tooltip-value
+        width: 100px         
 
   a
     font-size: 13px !important
@@ -490,6 +518,11 @@ text
 
   .row
     line-height: 13px !important
+
+.tooltip-extra-wide
+  .row
+    margin-left: -5px
+    margin-right: -5px
 
 
     

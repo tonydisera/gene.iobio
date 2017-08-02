@@ -2820,6 +2820,11 @@ text.ref-count {
   content: "";
   right: 330px; }
 
+.tooltip-extra-wide.arrow-down-center:before {
+  right: 418px; }
+.tooltip-extra-wide.arrow-down-center:after {
+  right: 420px; }
+
 .tooltip.black-arrow-left:after {
   position: absolute;
   display: inline-block;
@@ -2851,6 +2856,8 @@ text.ref-count {
 
 .tooltip.tooltip-wide {
   width: 650px !important; }
+  .tooltip.tooltip-wide.tooltip-extra-wide {
+    width: 840px !important; }
 
 .tooltip-wide {
   font-size: 13px; }
@@ -2886,7 +2893,7 @@ text.ref-count {
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
         width: 220px; }
   .tooltip-wide .tooltip-right-column {
-    float: right;
+    float: left;
     padding-top: 5px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-right-column .tooltip-row {
@@ -2896,6 +2903,21 @@ text.ref-count {
         width: 110px; }
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-value {
         width: 150px; }
+  .tooltip-wide .tooltip-info-column {
+    float: left;
+    padding-top: 5px;
+    padding-bottom: 0px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 200px; }
+    .tooltip-wide .tooltip-info-column .tooltip-row {
+      width: 200px;
+      overflow: auto; }
+      .tooltip-wide .tooltip-info-column .tooltip-row .tooltip-header {
+        width: 80px;
+        word-wrap: break-word; }
+      .tooltip-wide .tooltip-info-column .tooltip-row .tooltip-value {
+        width: 100px; }
   .tooltip-wide a {
     font-size: 13px !important; }
     .tooltip-wide a:hover, .tooltip-wide a:focus {
@@ -2912,6 +2934,10 @@ text.ref-count {
       font-size: 14px !important; }
   .tooltip-wide .row {
     line-height: 13px !important; }
+
+.tooltip-extra-wide .row {
+  margin-left: -5px;
+  margin-right: -5px; }
 
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
