@@ -3041,10 +3041,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 	var pileupObject = this._pileupVariants(filteredFeatures, start, end);
 
 	var vcfDataFiltered = {
-		count: data.count,
-		countMatch: data.countMatch,
-		countUnique: data.countUnique,
-		sampleCount : data.sampleCount,
 		intronsExcludedCount: intronsExcludedCount,
 		end: end,
 		features: filteredFeatures,
@@ -3053,7 +3049,8 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		name: data.name,
 		start: start,
 		strand: data.strand,
-		variantRegionStart: start
+		variantRegionStart: start,
+		genericAnnotators: data.genericAnnotators
 	};
 	return vcfDataFiltered;
 }

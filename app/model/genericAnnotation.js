@@ -54,12 +54,12 @@ function GenericAnnotation() {
 				type:       'number',
 				filter:     'range',
 				valueMap: [ 
-                   {min:    0,   max: +0,     value: +2,  badge: false,  clazz:  'afgnomad_unique',     symbolFunction: matrixCard.showAfSymbol},
-                   {min:    0,   max: +.0001, value: +3,  badge: false,  clazz:  'afgnomad_uberrare',   symbolFunction: matrixCard.showAfSymbol},
-                   {min:    0,   max: +.001,  value: +4,  badge: false,  clazz:  'afgnomad_superrare',  symbolFunction: matrixCard.showAfSymbol},
-                   {min:    0,   max: +.01,   value: +5,  badge: false,  clazz:  'afgnomad_rare',       symbolFunction: matrixCard.showAfSymbol},
-                   {min:    0,   max: +.05,   value: +6,  badge: false,  clazz:  'afgnomad_uncommon',   symbolFunction: matrixCard.showAfSymbol},
-                   {min: +.05,   max: +1,     value: +7,  badge: false,  clazz:  'afgnomad_common',     symbolFunction: matrixCard.showAfSymbol}
+                   {min:    0,   max: +0,     value: +2,  badge: false,  clazz:  'af_unique',     symbolFunction: matrixCard.showAfSymbol},
+                   {min:    0,   max: +.0001, value: +3,  badge: false,  clazz:  'af_uberrare',   symbolFunction: matrixCard.showAfSymbol},
+                   {min:    0,   max: +.001,  value: +4,  badge: false,  clazz:  'af_superrare',  symbolFunction: matrixCard.showAfSymbol},
+                   {min:    0,   max: +.01,   value: +5,  badge: false,  clazz:  'af_rare',       symbolFunction: matrixCard.showAfSymbol},
+                   {min:    0,   max: +.05,   value: +6,  badge: false,  clazz:  'af_uncommon',   symbolFunction: matrixCard.showAfSymbol},
+                   {min: +.05,   max: +1,     value: +7,  badge: false,  clazz:  'af_common',     symbolFunction: matrixCard.showAfSymbol}
                 ]
 			},
 			'GNOMAD_EXOME.gnomAD_exome_AFR': { label: 'Allele Freq AFR'},
@@ -77,11 +77,11 @@ function GenericAnnotation() {
 				type:       'category',
 				filter:     'category',
 				valueMap:   {
-                        'disease causing automatic': {value: 1,    badge: false, clazz: 'mt_disease_causing_auto', symbolFunction: this.showMTSymbol},
-                        'disease causing':           {value: 2,    badge: false, clazz: 'mt_disease_causing',      symbolFunction: this.showMTSymbol},
-		                'polymorphism automatic':    {value: 3,    badge: false, clazz: 'mt_polymorphism_auto',    symbolFunction: this.showMTSymbol},
-		                'polymorphism':              {value: 102,  badge: false, clazz: 'mt_polymorphism',         symbolFunction: this.showMTSymbol},
-                        none:                        {value: 103,  badge: false, clazz: ''}
+                        'Disease Causing Automatic': {value: 1,    badge: false, clazz: 'mt_disease_causing_auto', symbolFunction: matrixCard.showMutationTasterSymbol},
+                        'Disease Causing':           {value: 2,    badge: false, clazz: 'mt_disease_causing',      symbolFunction: matrixCard.showMutationTasterSymbol},
+		                'Polymorphism':              {value: 103,  badge: false, clazz: 'mt_polymorphism',         symbolFunction: matrixCard.showMutationTasterSymbol},
+		                'Polymorphism Automatic':    {value: 104,  badge: false, clazz: 'mt_polymorphism_auto',    symbolFunction: matrixCard.showMutationTasterSymbol},
+                        none:                        {value: 105,  badge: false, clazz: ''}
                      }            
 			},
 			'MT:VALUE':  {
@@ -96,35 +96,52 @@ function GenericAnnotation() {
 	{ 
 		name:      'Allele Frequency - gnomAD', 
 	    id:        'af-gnomad',        
-	    order:     13,
-	    index:     13, 
 	    match:     'range', 
-	    attribute: 'otherAnnots.AVI3.GNOMAD_EXOME.gnomAD_exome_ALL',      
+	    attribute: ['genericAnnots','AVIA3', 'GNOMAD_EXOME','gnomAD_exome_ALL'],      
 	    map:       me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].valueMap
 	}
+	
 	me.descriptor.AVIA3['MT:KEY'].matrixRow = 
 	{ 
 		name:      'Mutation taster', 
 	    id:        'mt',        
-	    order:     14,
-	    index:     14, 
 	    match:     'exact', 
-	    attribute: 'otherAnnots.AVI3.MT',      
+	    attribute: ['genericAnnots','AVIA3','MT','OBJECT.KEY'],      
 	    map:       me.descriptor.AVIA3['MT:KEY'].valueMap
-	}         	
+	} 
+    	
+}
+
+GenericAnnotation.prototype.getMatrixRows = function(annotators) {
+	var me = this;
+	var matrixRows = [];
+	if (annotators && annotators.length > 0) {
+		annotators.forEach(function(annotator) {
+			var theDescriptor = me.descriptor[annotator];
+			if (theDescriptor) {
+				for (var annotName in theDescriptor) {
+					var annot = theDescriptor[annotName];
+					if (annot.matrixRow) {
+						matrixRows.push(annot.matrixRow);
+					}
+				}
+			}
+		})		
+	}
+	return matrixRows;
 }
 
 GenericAnnotation.prototype.formatContent = function(variant, clazzMap, EMPTY_VALUE) {
 	var me = this;
 	var annotDiv = "";
-	if (variant.otherAnnots && Object.keys(variant.otherAnnots).length > 0) {
+	if (variant.genericAnnots && Object.keys(variant.genericAnnots).length > 0) {
 		annotDiv = '<div class="' + clazzMap.container + '">';
-		for (var annotator in variant.otherAnnots) {
+		for (var annotator in variant.genericAnnots) {
 			annotDiv += '<div class="' + clazzMap.row + '" style="text-align:center">' + annotator + '</div>';
-			for (var fieldName in variant.otherAnnots[annotator]) {
+			for (var fieldName in variant.genericAnnots[annotator]) {
 
 				if (me.shouldShow(annotator, [fieldName])) {
-					var annotValue = variant.otherAnnots[annotator][fieldName];
+					var annotValue = variant.genericAnnots[annotator][fieldName];
 					var label = me.getLabel(annotator, [fieldName]);
 
 					// Loop through value map to create tag/value subfields
@@ -195,4 +212,23 @@ GenericAnnotation.prototype.getLabel = function(annotator, fieldPath) {
 	} 
 
 	return label ? label : fieldPath[fieldPath.length-1];
+}
+
+GenericAnnotation.prototype.getValue = function(variant, fieldPath) {
+	var me = this;
+	var node = variant;
+	fieldPath.forEach(function(fieldName) {
+		if (node) {
+			if (fieldName == 'OBJECT.KEY' && Object.keys(node).length > 0) {
+				node = Object.keys(node).join(",");
+			} else if (fieldName == 'OBJECT.VALUE' && Object.values(node).length > 0) {
+				node = Object.values(node).join(",");
+			} else if (node[fieldName]) {			
+				node = node[fieldName];
+			} else {
+				node = null;
+			}
+		}
+	})
+	return node;
 }

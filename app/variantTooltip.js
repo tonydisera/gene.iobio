@@ -24,7 +24,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 	tooltip.classed("tooltip-wide", lock && !isLevelEdu);
 
-	var extraWide = lock && !isLevelEdu && variant.otherAnnots && Object.keys(variant.otherAnnots).length > 0;
+	var extraWide = lock && !isLevelEdu && variant.genericAnnots && Object.keys(variant.genericAnnots).length > 0;
 	tooltip.classed("tooltip-extra-wide", extraWide);
 	
 	if (html == null) {

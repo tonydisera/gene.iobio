@@ -692,7 +692,19 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 		if (unaffected.length == 0) {
 			me.removeRow('Absent in Unaffected', me.filteredMatrixRows);
 		}
+
+		// Figure out if we should show any rows for generic annotations
+		var genericMatrixRows = genericAnnotation.getMatrixRows(theVcfData.genericAnnotators);
+
+		genericMatrixRows.forEach(function(matrixRow) {
+			matrixRow.index = me.filteredMatrixRows.length;
+			matrixRow.order = me.filteredMatrixRows.length;
+			me.filteredMatrixRows.push(matrixRow);
+		})
 	}
+
+
+
 
 	resizeCardWidths();
 
@@ -726,7 +738,12 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 		}
 
 		me.filteredMatrixRows.forEach( function(matrixRow) {
-			var rawValue = variant[matrixRow.attribute];
+			var rawValue = null;
+			if (matrixRow.attribute instanceof Array) {
+				rawValue = genericAnnotation.getValue(variant, matrixRow.attribute);
+			} else {
+				rawValue = variant[matrixRow.attribute];
+			}
 			var theValue    = null;
 			var mappedValue = null;
 			var mappedClazz = null;
@@ -1059,6 +1076,42 @@ MatrixCard.prototype.showSiftSymbol = function(selection, options) {
 	         .style("fill", colors[attrs.clazz]);
 };
 
+MatrixCard.prototype.showMutationTasterSymbol = function(selection, options) {
+	options = options || {};
+	var attrs = {
+		transform: "translate(2,2)",
+		width: "14",
+		height: "14",
+		clazz: ""
+	};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.width = "17",
+		cellSizeAttrs.height = "17",
+		cellSizeAttrs.transform = "translate(2,2)"		
+	}
+
+	var datumAttrs = selection.datum() || {};
+
+	$.extend(attrs, datumAttrs, options, cellSizeAttrs);
+
+	var colors = {
+		mt_disease_causing_auto: "#ad494A",
+		mt_disease_causing:      "#FB7737",
+		mt_polymorphism:         "rgba(231,186,82,1)",
+		mt_polymorphism_auto:    "rgba(181, 207, 107,1)"
+	};
+
+	selection.append("g")
+	         .attr("transform", attrs.transform)
+	         .append("use")
+	         .attr("xlink:href", "#danger-symbol")
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
+	         .style("pointer-events", "none")
+	         .style("fill", colors[attrs.clazz]);
+};
 MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
 	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
 	var symbolDimNc = { transform: "translate(2,2)",    size: "11" };
@@ -1109,6 +1162,37 @@ MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
 		af1000g_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
 		af1000g_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
 		af1000g_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size},
+	}
+	// For the gene badge, we will display in a smaller size
+	if (options && options.hasOwnProperty('transform')) {
+		symbolAttrs[selection.datum().clazz].transform = options.transform;
+	}
+	if (options && options.hasOwnProperty('height')) {
+		symbolAttrs[selection.datum().clazz].size = options.height;
+	}
+	selection.append("g")
+		.attr("class", function(d, i)    { return d.clazz; })
+		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
+		.append("use")
+		.attr("xlink:href", "#af-symbol")
+		.style("pointer-events", "none")
+		.style("fill", function(d,i)  { return symbolAttrs[d.clazz].fill; })
+		.attr("width", function(d,i)  { return symbolAttrs[d.clazz].size; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].size; });
+};
+
+MatrixCard.prototype.showAfSymbol = function(selection, options) {
+	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
+	if (options.cellSize > 18) {
+		symbolDim   = { transform: "translate(2,2)",    size: "17" };
+	}
+	var symbolAttrs = {
+		af_unique:    { fill: "rgb(199, 0, 1)",          transform: symbolDim.transform,   size: symbolDim.size},
+		af_uberrare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size},
+		af_superrare: { fill: "rgba(255, 44, 0, 0.76)",  transform: symbolDim.transform,   size: symbolDim.size},
+		af_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
+		af_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
+		af_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size},
 	}
 	// For the gene badge, we will display in a smaller size
 	if (options && options.hasOwnProperty('transform')) {

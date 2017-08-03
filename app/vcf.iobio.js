@@ -952,10 +952,10 @@ var effectCategories = [
     var me = this;
     if (record.indexOf("INFO=<ID=CSQ") > 0) {
       var fieldMap = me._parseInfoHeaderRecord(record);
-      infoFields.vepFields = fieldMap;
+      infoFields.VEP = fieldMap;
     } else if (record.indexOf("INFO=<ID=AVIA3") > 0) {
       var fieldMap = me._parseInfoHeaderRecord(record);
-      infoFields.avia3Fields = fieldMap;
+      infoFields.AVIA3 = fieldMap;
     }    
   }
 
@@ -1743,8 +1743,8 @@ var effectCategories = [
                     'vepRegs':                 annot.vep.vepRegs,
                     'regulatory' :             annot.vep.regulatory,
 
-                    // other annots
-                    'otherAnnots':             annot.otherAnnots,
+                    // generic annots
+                    'genericAnnots':          annot.genericAnnots,
 
                     //  when multiple impacts, pick the highest one (by variant type and transcript)                  
                     'highestImpactSnpeff':     highestImpactSnpeff,
@@ -1784,7 +1784,8 @@ var effectCategories = [
           'strand':             geneObject.strand, 
           'transcript':         selectedTranscript,
           'variantRegionStart': variantRegionStart, 
-          'features':           allVariants[i]
+          'features':           allVariants[i],
+          'genericAnnotators':  Object.keys(infoFields)
         };
         results.push(data);
       }
@@ -1828,7 +1829,7 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
       regulatory: {}, // need a special field for filtering purposes
       vepRegs: []      
     },
-    otherAnnots:  {}
+    genericAnnots:  {}
   };
 
   var annotTokens = rec.info.split(";");
@@ -1866,10 +1867,10 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
     
     } else if (annotToken.indexOf("CSQ") == 0) {
 
-      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, infoFields.vepFields)
+      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, infoFields.VEP)
 
     } else if (annotToken.indexOf("AVIA3") == 0) {
-      me._parseOtherAnnot("AVIA3", annotToken, annot, infoFields.avia3Fields);
+      me._parseGenericAnnot("AVIA3", annotToken, annot, infoFields.AVIA3);
 
     }
 
@@ -2014,7 +2015,7 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
 
 }
 
-exports._parseOtherAnnot = function(annotLabel, annotToken, annot, fieldMap) {
+exports._parseGenericAnnot = function(annotLabel, annotToken, annot, fieldMap) {
   var me = this;
   var annotObject = {};
 
@@ -2040,7 +2041,7 @@ exports._parseOtherAnnot = function(annotLabel, annotToken, annot, fieldMap) {
 
     annotObject[fieldName] = valueObject;
   }
-  annot.otherAnnots[annotLabel] = annotObject;
+  annot.genericAnnots[annotLabel] = annotObject;
 }
 
 /* Split the EFF annotation into its parts.  Each
