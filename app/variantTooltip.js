@@ -687,9 +687,18 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					var label = capitalizeFirstLetter(fieldName.split("_").join(" ").toLowerCase());
 
 					// TODO:  Loop through value map to create tag/value subfields
-
+					var tagValues = null;
+					if (annotValue instanceof Object) {
+						tagValues = "";
+						for (var tag in annotValue) {
+							if (tagValues.length > 0) {
+								tagValues += "<br>"
+							}
+							tagValues += tag + ": " + annotValue[tag];
+						}
+					}
 					
-					otherDiv += me._tooltipRow(label, annotValue, null, true);
+					otherDiv += me._tooltipRow(label, tagValues ? tagValues : annotValue, null, true);
 				}
 			}
 		}

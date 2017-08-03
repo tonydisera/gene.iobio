@@ -2821,9 +2821,9 @@ text.ref-count {
   right: 330px; }
 
 .tooltip-extra-wide.arrow-down-center:before {
-  right: 418px; }
+  right: 448px; }
 .tooltip-extra-wide.arrow-down-center:after {
-  right: 420px; }
+  right: 450px; }
 
 .tooltip.black-arrow-left:after {
   position: absolute;
@@ -2857,7 +2857,7 @@ text.ref-count {
 .tooltip.tooltip-wide {
   width: 650px !important; }
   .tooltip.tooltip-wide.tooltip-extra-wide {
-    width: 840px !important; }
+    width: 940px !important; }
 
 .tooltip-wide {
   font-size: 13px; }
@@ -2909,15 +2909,15 @@ text.ref-count {
     padding-bottom: 0px;
     max-height: 200px;
     overflow-y: auto;
-    width: 200px; }
+    width: 299px; }
     .tooltip-wide .tooltip-info-column .tooltip-row {
-      width: 200px;
+      width: 299px;
       overflow: auto; }
       .tooltip-wide .tooltip-info-column .tooltip-row .tooltip-header {
         width: 80px;
         word-wrap: break-word; }
       .tooltip-wide .tooltip-info-column .tooltip-row .tooltip-value {
-        width: 100px; }
+        width: 200px; }
   .tooltip-wide a {
     font-size: 13px !important; }
     .tooltip-wide a:hover, .tooltip-wide a:focus {
