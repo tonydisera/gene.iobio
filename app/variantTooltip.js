@@ -185,8 +185,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 	for (key in variant.vepSIFT) {
 		if (matrixCard.siftMap[key]) {
 			var clazz = matrixCard.siftMap[key].clazz;
-			if (clazz && $(selector + " .tooltip-header:contains('SIFT')").length > 0) {
-				$(selector + " .tooltip-header:contains('SIFT')").next().prepend("<svg class=\"sift-badge\" style=\"float:left\"  height=\"12\" width=\"13\">");
+			if (clazz && $(selector + " .tooltip-value.sift-glyph").length > 0) {
+				$(selector + " .tooltip-value.sift-glyph").prepend("<svg class=\"sift-badge\" style=\"float:left\"  height=\"12\" width=\"13\">");
 				var selection = d3.select(selector + ' .sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
 				matrixCard.showSiftSymbol(selection);				
 			}			
@@ -197,8 +197,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 	for (key in variant.vepPolyPhen) {
 		if (matrixCard.polyphenMap[key]) {
 			var clazz = matrixCard.polyphenMap[key].clazz;
-			if (clazz && $(selector + " .tooltip-header:contains('PolyPhen')").length > 0) {
-				$(selector + " .tooltip-header:contains('PolyPhen')").next().prepend("<svg class=\"polyphen-badge\" style=\"float:left\"   height=\"12\" width=\"12\">");
+			if (clazz &&$(selector + " .tooltip-value.polyphen-glyph").length > 0) {
+				$(selector + " .tooltip-value.polyphen-glyph").prepend("<svg class=\"polyphen-badge\" style=\"float:left\"   height=\"12\" width=\"12\">");
 				var selection = d3.select(selector + ' .polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
 				matrixCard.showPolyPhenSymbol(selection);				
 			}
@@ -657,8 +657,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
 					        ' ' + (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
 			+ vepHighestImpactExamineRow			
-			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true)
-			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true)
+			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
+			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
@@ -675,33 +675,10 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRowAlleleCounts() 
 			+ "</div>";
 
-		var otherAnnotsClazz = '';
-		var otherDiv = '';
-		if (variant.otherAnnots && Object.keys(variant.otherAnnots).length > 0) {
-			otherAnnotsClazz = "tooltip-info-column";
-			var otherDiv = '<div class="tooltip-info-column">';
-			for (var annotLabel in variant.otherAnnots) {
-				otherDiv += '<div class="tooltip-row" style="text-align:center">' + annotLabel + '</div>';
-				for (var fieldName in variant.otherAnnots[annotLabel]) {
-					var annotValue = variant.otherAnnots[annotLabel][fieldName];
-					var label = capitalizeFirstLetter(fieldName.split("_").join(" ").toLowerCase());
 
-					// TODO:  Loop through value map to create tag/value subfields
-					var tagValues = null;
-					if (annotValue instanceof Object) {
-						tagValues = "";
-						for (var tag in annotValue) {
-							if (tagValues.length > 0) {
-								tagValues += "<br>"
-							}
-							tagValues += tag + ": " + annotValue[tag];
-						}
-					}
-					
-					otherDiv += me._tooltipRow(label, tagValues ? tagValues : annotValue, null, true);
-				}
-			}
-		}
+		var clazzMap = {container: 'tooltip-info-column', row: 'tooltip-row', label: 'tooltip-header', value: 'tooltip-value'};
+		var otherDiv = genericAnnotation.formatContent(variant, clazzMap, this.VALUE_EMPTY);
+
 
 		var div =
 		    '<div class="tooltip-wide">'
@@ -733,8 +710,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
 					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
 			+ vepHighestImpactExamineRow			
-			+ me._tooltipRow('SIFT', vepSIFTDisplay)
-			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay)
+			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, false, 'sift-glyph')
+			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, false, 'polyphen-glyph')
 			+ me._tooltipRow('ClinVar', clinvarLink)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 			+ me._tooltipRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)))

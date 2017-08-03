@@ -101,6 +101,9 @@ var launchTimestampToClear = null;
 // genomeBuild helper
 var genomeBuildHelper = null;
 
+// generic annotation
+var genericAnnotation = new GenericAnnotation();
+
 // legend
 var legend = new Legend();
 
