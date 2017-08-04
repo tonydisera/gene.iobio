@@ -31,6 +31,7 @@ vcfiobio = function module() {
   var refData = [];
   var refDensity = [];
   var refName = "";
+  var infoFields =  null;
 
   var regions = [];
   var regionIndex = 0;
@@ -90,8 +91,12 @@ var effectCategories = [
     vcfURL = null;
     tbiUrl = null;
     vcfFile = null;
+    annotators = [];
   }
 
+  exports.getAnnotators = function() {
+    return this.infoFields ? Object.keys(this.infoFields) : [];
+  }
 
   var errorMessageMap =  {
     "tabix Could not load .tbi": {
@@ -212,6 +217,11 @@ var effectCategories = [
         success = true;
       }
       if (success && buffer.length > 0) {
+        buffer.split("\n").forEach( function(rec) {
+          if (rec.indexOf("#") == 0) {
+            me._parseHeaderForInfoFields(rec);
+          }
+        })
         callback(success);
       }
     });
@@ -759,11 +769,10 @@ var effectCategories = [
       var annotatedRecs = annotatedData.split("\n");
       var vcfObjects = [];
       var contigHdrRecFound = false;
-      var infoFields = {};
 
       annotatedRecs.forEach(function(record) {
         if (record.charAt(0) == "#") {
-          me._parseHeaderForInfoFields(record, infoFields);
+          me._parseHeaderForInfoFields(record);
           
         } else {
 
@@ -790,7 +799,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, infoFields, sampleNamesToGenotype, null);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, sampleNamesToGenotype, null);
 
 
       callback(annotatedRecs, results);
@@ -948,14 +957,17 @@ var effectCategories = [
   }
 
 
-  exports._parseHeaderForInfoFields = function(record, infoFields) {
+  exports._parseHeaderForInfoFields = function(record) {
     var me = this;
-    if (record.indexOf("INFO=<ID=CSQ") > 0) {
+    if (me.infoFields == null) {
+      me.infoFields = {};
+    }
+    if (record.indexOf("INFO=<ID=CSQ") > 0 && !me.infoFields.VEP) {
       var fieldMap = me._parseInfoHeaderRecord(record);
-      infoFields.VEP = fieldMap;
-    } else if (record.indexOf("INFO=<ID=AVIA3") > 0) {
+      me.infoFields.VEP = fieldMap;
+    } else if (record.indexOf("INFO=<ID=AVIA3") > 0 && !me.infoFields.AVIA3) {
       var fieldMap = me._parseInfoHeaderRecord(record);
-      infoFields.AVIA3 = fieldMap;
+      me.infoFields.AVIA3 = fieldMap;
     }    
   }
 
@@ -1134,13 +1146,12 @@ var effectCategories = [
       // Each vcf record returned will have an EFF field in the
       // info field.
       var vcfObjects = [];
-      var infoFields = {};
 
       annotatedRecs.forEach(function(record) {
         if (record == null || record == "") {
 
         } else if (record.charAt(0) == "#") {
-          me._parseHeaderForInfoFields(record, infoFields);
+          me._parseHeaderForInfoFields(record);
         } else {
 
           // Parse the vcf record into its fields
@@ -1168,7 +1179,7 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, false, infoFields, sampleNamesToGenotype, sampleIndex);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, false, sampleNamesToGenotype, sampleIndex);
       resolve([annotatedRecs, results]);
 
     });
@@ -1185,11 +1196,10 @@ var effectCategories = [
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
-        var infoFields = {};
 
         annotatedRecs.forEach(function(record) {
           if (record.charAt(0) == "#") {
-              me._parseHeaderForInfoFields(record, infoFields);
+              me._parseHeaderForInfoFields(record);
           } else {
 
             // Parse the vcf record into its fields
@@ -1216,7 +1226,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, infoFields, sampleNamesToGenotype, null);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, sampleNamesToGenotype, null);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1558,7 +1568,7 @@ var effectCategories = [
   }
 
 
-  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, parseMultiSample, infoFields, sampleNames, sampleIndex) {
+  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, parseMultiSample, sampleNames, sampleIndex) {
 
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
@@ -1655,7 +1665,7 @@ var effectCategories = [
             }
 
 
-            var annot = me._parseAnnot(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, infoFields);
+            var annot = me._parseAnnot(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID);
 
             var gtResult = me._parseGenotypes(rec, alt, altIdx, gtSampleIndices, gtSampleNames);
             
@@ -1753,6 +1763,8 @@ var effectCategories = [
                     'highestPolyphen':         highestPolyphen
                   }
 
+                  genericAnnotation.setSimpleFields(variant);
+
                   allVariants[i].push(variant);                  
                 }
 
@@ -1785,7 +1797,7 @@ var effectCategories = [
           'transcript':         selectedTranscript,
           'variantRegionStart': variantRegionStart, 
           'features':           allVariants[i],
-          'genericAnnotators':  Object.keys(infoFields)
+          'genericAnnotators':  Object.keys(me.infoFields)
         };
         results.push(data);
       }
@@ -1794,7 +1806,7 @@ var effectCategories = [
       return  parseMultiSample ? results :  results[0];
   };
 
-exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, infoFields) {
+exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID) {
   var me = this;
 
   var annot = {
@@ -1867,10 +1879,10 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
     
     } else if (annotToken.indexOf("CSQ") == 0) {
 
-      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, infoFields.VEP)
+      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID)
 
     } else if (annotToken.indexOf("AVIA3") == 0) {
-      me._parseGenericAnnot("AVIA3", annotToken, annot, infoFields.AVIA3);
+      me._parseGenericAnnot("AVIA3", annotToken, annot);
 
     }
 
@@ -1891,8 +1903,10 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
   |CLIN_SIG|SOMATIC|PHENO|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
 
 */
-exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepFields) {
+exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID) {
   var me = this;
+
+  var vepFields = me.infoFields.VEP;
 
   var tokenValue = annotToken.substring(4, annotToken.length);
   var transcriptTokens = tokenValue.split(",");
@@ -2015,11 +2029,12 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
 
 }
 
-exports._parseGenericAnnot = function(annotLabel, annotToken, annot, fieldMap) {
+exports._parseGenericAnnot = function(annotator, annotToken, annot) {
   var me = this;
   var annotObject = {};
+  var fieldMap = me.infoFields[annotator];
 
-  var infoValues  = annotToken.substring(annotLabel.length + 1, annotToken.length);
+  var infoValues  = annotToken.substring(annotator.length + 1, annotToken.length);
   var tokens      = infoValues.split("|");
   for (var fieldName in fieldMap) {
     var idx = fieldMap[fieldName];
@@ -2041,7 +2056,7 @@ exports._parseGenericAnnot = function(annotLabel, annotToken, annot, fieldMap) {
 
     annotObject[fieldName] = valueObject;
   }
-  annot.genericAnnots[annotLabel] = annotObject;
+  annot.genericAnnots[annotator] = annotObject;
 }
 
 /* Split the EFF annotation into its parts.  Each

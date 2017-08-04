@@ -47,6 +47,10 @@ VariantModel.prototype.setLoadState = function(theVcfData, taskName) {
 	}
 }
 
+VariantModel.prototype.getAnnotators = function() {
+	return this.vcf ? this.vcf.getAnnotators() : [];
+}
+
 VariantModel.prototype.isLoaded = function() {
 	return this.vcf != null && this.vcfData != null;
 }

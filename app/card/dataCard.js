@@ -855,6 +855,9 @@ DataCard.prototype.init = function() {
 		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");			
 
 		filterCard.displayAffectedFilters();
+		genericAnnotation.appendGenericFilters(getProbandVariantCard().model.getAnnotators());
+
+
 		window.enableCallVariantsButton();
 
 		window.setGeneratedSampleNames();

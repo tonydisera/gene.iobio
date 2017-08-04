@@ -564,10 +564,13 @@ FilterCard.prototype.init = function() {
 	  
 }
 
-FilterCard.prototype.initFilterListeners = function() {
+FilterCard.prototype.initFilterListeners = function(filterSelector, theAnnotClassMap) {
 	var me = this;
 
-	d3.select('#filter-track').selectAll(me.annotClasses)
+	filterSelector = filterSelector ? filterSelector : me.annotClasses;
+	theAnnotClassMap = theAnnotClassMap ? theAnnotClassMap : me.annotClassMap;
+
+	d3.select('#filter-track').selectAll(filterSelector)
 	  .on("mouseover", function(d) {  	  	
 		var id = d3.select(this).attr("id");
 
@@ -600,40 +603,12 @@ FilterCard.prototype.initFilterListeners = function() {
 	  	var schemeClass = null;
 	  	var schemeLabel = "";
 	  	clazzes.split(" ").forEach(function(classToken) {
-	  		if (me.annotClassMap[classToken]) {
+	  		if (theAnnotClassMap[classToken]) {
 	  			schemeClass = classToken;
-	  			schemeLabel = me.annotClassMap[classToken];
+	  			schemeLabel = theAnnotClassMap[classToken];
 	  		}
 	  	});
-	  	/*
-	  	// strip out extraneous 'no color' and 'current' class
-	  	// so that we are left with the attribute name of the
-	  	// annotation we will be filtering on.
-	  	if (schemeClass.indexOf('nocolor') >= 0) {
-	  		var tokens = schemeClass.split(' ');
-	  		tokens.forEach(function(clazz) {
-	  			if (clazz != 'nocolor') {
-	  				schemeClass = clazz;
-	  			}
-	  		})
-	  	}
-	  	if (schemeClass.indexOf('current') >= 0) {
-	  		var tokens = schemeClass.split(' ');
-	  		tokens.forEach(function(clazz) {
-	  			if (clazz != 'current') {
-	  				schemeClass = clazz;
-	  			}
-	  		})
-	  	}
-	  	if (schemeClass.indexOf('inactive') >= 0) {
-	  		var tokens = schemeClass.split(' ');
-	  		tokens.forEach(function(clazz) {
-	  			if (clazz != 'inactive') {
-	  				schemeClass = clazz;
-	  			}
-	  		})
-	  	}
-	  	*/
+
 
 	  	// If af level clicked on, reset af range filter
 	  	if (d3.select(this).attr("class").indexOf("af1000glevel") || 

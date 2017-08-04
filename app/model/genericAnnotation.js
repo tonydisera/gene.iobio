@@ -51,6 +51,8 @@ function GenericAnnotation() {
 			'GNOMAD_EXOME':                  { label: 'gnomAD Exome'},
 			'GNOMAD_EXOME.gnomAD_exome_ALL': {
 				label: 		'AF All', 
+				fieldPath:  ['genericAnnots','AVIA3','GNOMAD_EXOME', 'gnomAD_exome_ALL'],   
+				fieldName:  'avia3_gnomad_af_all',   
 				type:       'number',
 				filter:     'range',
 				valueMap: [ 
@@ -74,6 +76,8 @@ function GenericAnnotation() {
 			'MT':                            { label: 'Mutation taster'},
 			'MT:KEY': {
 				label: 		'Mutation taster', 
+				fieldPath:  ['genericAnnots','AVIA3','MT','OBJECT.KEY'],  
+				fieldName:  'avia3_mt',     
 				type:       'category',
 				filter:     'category',
 				valueMap:   {
@@ -86,6 +90,8 @@ function GenericAnnotation() {
 			},
 			'MT:VALUE':  {
 				label: 		'Mutation taster score', 
+				fieldPath:  ['genericAnnots','AVIA3','MT','OBJECT.VALUE'],   
+				fieldName:  'avia3_mt_score', 
 				type:       'number',
 				filter:     'range'
 			}
@@ -97,7 +103,7 @@ function GenericAnnotation() {
 		name:      'Allele Frequency - gnomAD', 
 	    id:        'af-gnomad',        
 	    match:     'range', 
-	    attribute: ['genericAnnots','AVIA3', 'GNOMAD_EXOME','gnomAD_exome_ALL'],      
+	    attribute: me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].fieldPath,      
 	    map:       me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].valueMap
 	}
 	
@@ -106,7 +112,7 @@ function GenericAnnotation() {
 		name:      'Mutation taster', 
 	    id:        'mt',        
 	    match:     'exact', 
-	    attribute: ['genericAnnots','AVIA3','MT','OBJECT.KEY'],      
+	    attribute: me.descriptor.AVIA3['MT:KEY'].fieldPath, 
 	    map:       me.descriptor.AVIA3['MT:KEY'].valueMap
 	} 
     	
@@ -129,6 +135,69 @@ GenericAnnotation.prototype.getMatrixRows = function(annotators) {
 		})		
 	}
 	return matrixRows;
+}
+
+GenericAnnotation.prototype.appendGenericFilters = function(annotators) {
+	var me = this;
+	var html = "";
+	var container = d3.select("#filter-track #generic-annotation-filters");
+	container.html("");
+	if (annotators && annotators.length > 0) {
+		annotators.forEach(function(annotator) {
+			var theDescriptor = me.descriptor[annotator];
+			if (theDescriptor) {
+				for (var annotName in theDescriptor) {
+					var annot = theDescriptor[annotName];
+					if (annot.filter  && annot.filter == 'category' && annot.valueMap) {
+						container.append("h4")
+						         .text(annot.label);
+						var column = container.append("div")
+						                      .style("display", "flex")
+						                      .style("flex-direction", "column");
+
+
+						var filterSelector = "";
+						var classToLabel = {};
+						for (var key in annot.valueMap) {
+
+							if (annot.valueMap[key].clazz && annot.valueMap[key].clazz.length > 0 && annot.valueMap[key].symbolFunction) {
+								var svg =
+								 container.append("svg")
+								          .datum(annot.valueMap[key])
+									      .attr("id", annot.valueMap[key].clazz)
+									      .attr("class", annot.fieldName)
+									      .style("cursor", "pointer")
+									      .attr("width", 200);
+
+								annot.valueMap[key].symbolFunction(svg, {transform: 'translate(0,0)', width: 12, height: 12});
+
+								svg.append("text")
+								   .attr("class", "name")
+								   .style("fill-opacity", 1)
+								   .attr("x", 15)
+								   .attr("y", 10)
+								   .text(key);
+
+
+								 if (filterSelector.length > 0) {
+								 	filterSelector += ", ";
+								 }
+
+							}
+						}
+
+						filterSelector += "." + annot.fieldName;
+						classToLabel[annot.fieldName] = annot.label;
+						filterCard.initFilterListeners(filterSelector, classToLabel)
+
+							  
+					}
+				}
+			}
+		})		
+	}
+	return html;
+
 }
 
 GenericAnnotation.prototype.formatContent = function(variant, clazzMap, EMPTY_VALUE) {
@@ -232,3 +301,25 @@ GenericAnnotation.prototype.getValue = function(variant, fieldPath) {
 	})
 	return node;
 }
+
+GenericAnnotation.prototype.setSimpleFields = function(variant) {
+	var me = this;
+	for (var annotator in me.descriptor) {
+		var theDescriptor = me.descriptor[annotator];
+		var annots        = variant.genericAnnots[annotator];
+
+		for (var key in theDescriptor) {
+			var annotInfo = theDescriptor[key];
+			if (annotInfo.fieldName) {
+				var theValue = me.getValue(variant, annotInfo.fieldPath);
+				if (annotInfo.filter == 'category' && annotInfo.valueMap && annotInfo.valueMap[theValue]) {
+					theValue = annotInfo.valueMap[theValue].clazz;
+				} 
+				variant[annotInfo.fieldName] = theValue;
+			}
+
+		}
+	}
+}
+
+

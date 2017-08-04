@@ -1485,6 +1485,7 @@ function loadUrlSources() {
 
 				genesCard.showAnalyzeAllButton();
 				filterCard.displayAffectedFilters();
+				genericAnnotation.appendGenericFilters(getProbandVariantCard().model.getAnnotators());
 
 				
 				if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
