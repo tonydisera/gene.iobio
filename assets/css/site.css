@@ -2555,6 +2555,9 @@ inputinput:-moz-placeholder {
   width: 220px;
   margin-right: 5px; }
 
+.tooltip-clinvar-link {
+  padding-top: 1px; }
+
 .tooltip-header {
   overflow-wrap: break-all;
   text-align: right;
@@ -2934,6 +2937,8 @@ text.ref-count {
       font-size: 14px !important; }
   .tooltip-wide .row {
     line-height: 13px !important; }
+  .tooltip-wide .tooltip-clinvar-link {
+    padding-top: 0px; }
 
 .tooltip-extra-wide .row {
   margin-left: -5px;

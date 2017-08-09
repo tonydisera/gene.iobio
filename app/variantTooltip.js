@@ -169,18 +169,40 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 
 	}
 
+	var injectClinvarBadge = function(clinsig, key) {
+		clinsig.split(",").forEach( function(clinsigToken) {
+			if (matrixCard.clinvarMap.hasOwnProperty(clinsigToken)) {
+			    var clazz = matrixCard.clinvarMap[clinsigToken].clazz;
+			    var badge = matrixCard.clinvarMap[clinsigToken].examineBadge;
 
-    for (key in variant.clinVarClinicalSignificance) {
-    	if (matrixCard.clinvarMap.hasOwnProperty(key)) {
-		    var clazz = matrixCard.clinvarMap[key].clazz;
-		    var badge = matrixCard.clinvarMap[key].examineBadge;
-		    if (badge && $(selector + " .tooltip-header:contains('ClinVar')").length > 0) {
-				$(selector + " .tooltip-header:contains('ClinVar')").next().prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
-				var selection = d3.select(selector + ' .clinvar-badge').data([{width:10, height:10, transform: 'translate(0,1)', clazz: clazz}]);
-				matrixCard.showClinVarSymbol(selection);						    			    	
-		    }
+			    var linkSelector = selector + " .tooltip-clinsig-link" + key;
+			    if (badge && $(linkSelector).length > 0) {
+			    	var div = $(linkSelector);
+					$(div).before("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
+					var svg = d3.select($(div).prev("svg.clinvar-badge")[0]);
+					var selection = svg.data([{width:10, height:10, transform: 'translate(0,1)', clazz: clazz}]);
+					matrixCard.showClinVarSymbol(selection);						    			    	
+			    }			
+
+			}
+
+		})
+	}
+
+	if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
+		for (var key in variant.clinvarSubmissions) {
+			var submission = variant.clinvarSubmissions[key];
+			injectClinvarBadge(submission.clinsig, key);
+		}
+	} else if (variant.clinVarClinicalSignificance) {
+	    for (clinsig in variant.clinVarClinicalSignificance) {
+	    	var key = variant.clinVarClinicalSignificance[clinsig];
+	    	injectClinvarBadge(clinsig, key);
 		}
 	}
+
+
+
 
 	for (key in variant.vepSIFT) {
 		if (matrixCard.siftMap[key]) {
@@ -330,7 +352,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			}
 			phenotypeDisplay += key.split("_").join(" ");
 		}
-	}      
+	} 
+
 	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
 	var coord = variant.chrom + ":" + variant.start;
 	var refalt = variant.ref + "->" + variant.alt;
@@ -340,10 +363,40 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var clinvarUrl = "";
 	var clinvarLink = "";
+	var clinvarSimpleRow1 = '';
+	var clinvarSimpleRow2 = '';
+	if (isLevelEdu) {
+		if (clinSigDisplay != null && clinSigDisplay != "") {
+			clinvarSimpleRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');	
+			if (phenotypeDisplay) {
+				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay);			
+			}
+		}
+	}
+
 	if (clinSigDisplay != null && clinSigDisplay != "") {
 		if (variant.clinVarUid != null && variant.clinVarUid != '') {
 			clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
-			clinvarLink = '<a href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+			clinvarLink = '<a class="tooltip-clinsig-link0" href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+			
+			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '<span>', null, );		
+			if (phenotypeDisplay) {
+				clinvarSimpleRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
+			}
+
+		} else if (variant.clinvarSubmissions != null && Object.keys(variant.clinvarSubmissions).length > 0) {
+			for (var key in variant.clinvarSubmissions) {
+				var submission = variant.clinvarSubmissions[key];
+				
+				clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + submission.accession;
+				if (clinvarLink.length > 0) {
+					clinvarLink += '<div style="padding-top:3px">&nbsp;</div>';
+				}
+				clinvarLink += '<a class="tooltip-clinvar-link tooltip-clinsig-link' + key + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + submission.clinsig.split("_").join(" ") + '</a>';
+				clinvarLink += '<span style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
+			}
+			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinvarLink );	
+			phenotypeDisplay = "";	
 		} else {
 			clinvarLink = clinSigDisplay;
 		}		
@@ -541,27 +594,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		siftPolyphenRow = me._tooltipClassedRow(polyphenLabel + sep, 'polyphen', siftLabel, 'sift', 'padding-top:3px;');
 	}
 
-	var clinvarRow = '';
-	if (clinvarLink != '') {
-		clinvarRow = me._tooltipLongTextRow('ClinVar', clinvarLink);
-	}
-
-	var clinvarRow1 = '';
-	var clinvarRow2 = '';
-	if (clinSigDisplay) {
-		if (isLevelEdu) {
-			clinvarRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');		
-		} else {
-			clinvarRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinSigDisplay);		
-		}
-		if (phenotypeDisplay) {
-			if (isLevelEdu) {
-				clinvarRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay);		
-			} else {
-				clinvarRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
-			}
-		}
-	}
 
 	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Predicted effect', vepPolyPhenDisplay + ' to protein', '3px') : "";
 
@@ -628,8 +660,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
 			+ inheritanceModeRow
 			+ polyphenRowSimple
-			+ clinvarRow1
-			+ clinvarRow2 );
+			+ clinvarSimpleRow1
+			+ clinvarSimpleRow2 );
 	} else if (type == 'tooltip') {
 		return (
 			  qualityWarningRow
@@ -642,8 +674,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ siftPolyphenRow
 			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '6px')
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null, '6px')
-			+ clinvarRow1
-			+ clinvarRow2
+			+ clinvarSimpleRow1
+			+ clinvarSimpleRow2
 			+ me._tooltipRowAlleleCounts() 
 			+ me._linksRow(variant, pinMessage)
 		);                  
@@ -870,11 +902,11 @@ VariantTooltip.prototype._tooltipWideHeadingRow = function(value1, value2, paddi
 	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
-VariantTooltip.prototype._tooltipWideHeadingSecondRow = function(value1, value2, paddingTop) {
+VariantTooltip.prototype._tooltipWideHeadingSecondRow = function(value1, value2, paddingTop, valueClazz) {
 	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
 	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
 	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
-	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '<div class="col-sm-8 tooltip-title' + (valueClazz ? ' ' + valueClazz : '') + '" style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 

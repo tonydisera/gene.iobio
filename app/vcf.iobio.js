@@ -879,7 +879,8 @@ var effectCategories = [
 
 
     // Create an iobio command get get the variants and add any header recs.
-    var tabixArgs = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
+    var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+    var tabixArgs = ['-h', clinvarUrl, regionParm];
     if (tbiUrl) {
       tabixArgs.push(tbiUrl);
     }
@@ -1250,8 +1251,8 @@ var effectCategories = [
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
         //var isLastBatch = (i == numberOfBatches - 1 ? true : false);
 
-        if (isClinvarOffline) {
-          var promise = me.promiseGetClinvarRecordsOffline(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
+        if (isClinvarOffline || clinvarSource == 'vcf') {
+          var promise = me.promiseGetClinvarVCFImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
           .then(  function() {
 
           }, function(error) {
@@ -1260,7 +1261,7 @@ var effectCategories = [
           clinvarPromises.push(promise);
 
         } else {
-          var promise = me.promiseGetClinvarRecordsImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
+          var promise = me.promiseGetClinvarEutilsImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
           .then(  function(data) {
             if (data == 'clinvarError') {
               alertify.alert("A problem occurred accessing ClinVar variants in gene " + geneObject.gene_name + ".  Unable to get ClinVar annotations at this time.");
@@ -1283,8 +1284,10 @@ var effectCategories = [
     });
   }
 
-  // When there is no internet, read the clinvar vcf to obtain clinvar annotations
-  exports.promiseGetClinvarRecordsOffline= function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
+  // This method will obtain clinvar annotations from a clinvar vcf.
+  // When there is no internet (isOffline == true), read the clinvar vcf from a locally served
+  // file; otherwise, serve clinvar vcf from standard ftp site.
+  exports.promiseGetClinvarVCFImpl= function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1299,6 +1302,9 @@ var effectCategories = [
         clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
       }
 
+      // Figure out the reference sequence file path
+      var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+
 
       var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
       var args = ['-h', clinvarUrl, regionParm];
@@ -1306,6 +1312,9 @@ var effectCategories = [
         args.push(tbiUrl);
       }
       var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
+
+      // normalize variants
+      cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
 
 
       var clinvarData = "";
@@ -1322,7 +1331,7 @@ var effectCategories = [
         var vcfObjects = [];
 
         clinvarRecs.forEach(function(record) {
-          if (record.charAt(0) == "#") {
+          if (record.charAt(0) == "#" || record == "") {
 
           } else {
 
@@ -1331,7 +1340,7 @@ var effectCategories = [
             var pos    = fields[1];
             var id     = fields[2];
             var ref    = fields[3];
-            var alt    = fields[4];
+            var altBuf = fields[4];
             var qual   = fields[5];
             var filter = fields[6];
             var info   = fields[7];
@@ -1341,10 +1350,13 @@ var effectCategories = [
               genotypes.push(fields[i]);
             }
 
-            // Turn vcf record into a JSON object and add it to an array
-            var vcfObject = {'pos': pos, 'id': 'id', 'ref': ref, 'alt': alt,
-                             'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
-            vcfObjects.push(vcfObject);
+            altBuf.split(",").forEach(function(alt) {
+              // Turn vcf record into a JSON object and add it to an array
+              var vcfObject = {'pos': pos, 'start':  +pos,  'id': 'id', 'ref': ref, 'alt': alt, 'chrom': refName,
+                               'qual': qual, 'filter': filter, 'info': info, 'format':format, 'genotypes': genotypes};
+              vcfObjects.push(vcfObject);
+            })
+
           }
         });
 
@@ -1365,7 +1377,7 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetClinvarRecordsImpl = function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarEutilsImpl = function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1669,7 +1681,7 @@ var effectCategories = [
 
             var gtResult = me._parseGenotypes(rec, alt, altIdx, gtSampleIndices, gtSampleNames);
             
-            var clinvarObject = me._formatClinvarCoordinates(rec);
+            var clinvarObject = me._formatClinvarCoordinates(rec, alt);
 
             if (gtResult.keep) {
 
@@ -2536,7 +2548,7 @@ exports._getHighestScore = function(theObject, cullFunction, theTranscriptId) {
  * deletions for accessing clinvar  
  *
 */
-  exports._formatClinvarCoordinates = function(rec) {
+  exports._formatClinvarCoordinates = function(rec, alt) {
       var target = {};
       if (rec.hasOwnProperty("pos")) {
         target.clinvarStart = +rec.pos;
@@ -2544,7 +2556,7 @@ exports._getHighestScore = function(theObject, cullFunction, theTranscriptId) {
         target.clinvarStart = +rec.start;
       }
 
-      target.clinvarAlt   = rec.alt;
+      target.clinvarAlt   = alt;
       target.clinvarRef   = rec.ref;
 
       if (target.clinvarAlt == '.') {

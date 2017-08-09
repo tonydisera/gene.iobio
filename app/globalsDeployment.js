@@ -23,6 +23,10 @@ var mygene2Endpoint       = "";
 var mygene2XAuthToken     = "";
 
 
+// Get clinvar annotations from 'eutils' or 'vcf'
+var clinvarSource        = "vcf";
+
+
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  
