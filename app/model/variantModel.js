@@ -2025,7 +2025,7 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 		    	me.vcf.promiseGetClinvarRecords(
 		    		theVcfData, 
 		    		me._stripRefName(ref), geneObject, 
-		    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData))
+		    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theVcfData) : me._refreshVariantsWithClinvarEutils.bind(me, theVcfData))
 		    	.then(function() {
 		    		resolve(theVcfData);
 		    	}, function(error) {
@@ -2277,7 +2277,7 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, cover
 
 }
 
-VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVars) {	
+VariantModel.prototype._refreshVariantsWithClinvarEutils = function(theVcfData, clinVars) {	
 	var me = this;
 	var clinVarIds = clinVars.uids;
 	if (theVcfData == null) {
@@ -2301,9 +2301,15 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 					vcfIter++;
 					clinvarIter++;
 				} else {
-					// Only advance the clinvar iterator if clinvar entry didn't match the variant
-					// because there can be multiple clinvar entries for the same position.
-					clinvarIter++;
+					// If clinvar entry didn't match the variant, figure out if the vcf
+					// iter (multiple vcf recs with same position as 1 clinvar rec) or 
+					// the clinvar iter needs to be advanced (multiple clinvar recs with same
+					// position as 1 vcf rec)
+					if (vcfIter+1 < recs.length && recs[vcfIter+1].clinvarStart == clinVarStart) {
+						vcfIter++;
+					} else {
+						clinvarIter++;
+					}
 				}
 			} else if (recs[vcfIter].start < clinVarStart) {						
 				vcfIter++;
@@ -2320,10 +2326,19 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 }
 
 
-VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData, clinvarVariants) {	
+VariantModel.prototype._refreshVariantsWithClinvarVCFRecs= function(theVcfData, clinvarVariants) {	
 	var me = this;
 	if (theVcfData == null) {
 		return;
+	}
+
+	var getClinvarSubmission = function(submissions, idx) {
+		var entry = submissions[idx.toString()];
+		if (entry == null) {
+			entry = { clinsig: "", phenotype: "", accession: "" };
+			submissions[idx.toString()] = entry;
+		}
+		return entry;
 	}
 
 	var parseClinvarInfo = function(variant, clinvarVariant) {		
@@ -2338,42 +2353,80 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 			'7':   'other',
 			'255': 'other'
 		};
+		clinvarSubmissions = {};
 		clinvarVariant.info.split(";").forEach( function (annotToken) {
+			// TODO - Need to store one array of the entries
+			// [
+			//    {clinsig: 'unknown',            pheno': 'unknown',         accessionId: 'RSV123456.2'},
+			//    {clinsig: 'pathogenic',         pheno': 'type I diabetes', accessionId: 'RSV789901.2'},
+			//    {clinsig: 'likely pathogengic', pheno': 'type I diabetes', accessionId: 'RSV555553.1'}
+			// ]
 			if (annotToken.indexOf("CLNSIG=") == 0) {
             	var clinvarCode = annotToken.substring(7, annotToken.length);  
             	variant.clinVarClinicalSignificance = {};
-            	clinvarCode.split("|").forEach(function(code) {
-	            	clinvarToken = clinvarCodes[code];
-	            	var mapEntry = matrixCard.clinvarMap[clinvarToken];
-					if (mapEntry != null) {
-						if (variant.clinvarRank == null || 
-							mapEntry.value < variant.clinvarRank) {
-							variant.clinvarRank = mapEntry.value;
-							variant.clinvar = mapEntry.clazz;
-						}
-						variant.clinVarClinicalSignificance[clinvarToken] = "Y";
-					}	
 
+            	var idx = 0;
+            	clinvarCode.split("|").forEach(function(codePart) {
+            		var submission = getClinvarSubmission(clinvarSubmissions, idx);
+
+	            	codePart.split(",").forEach(function(code) {
+
+		            	clinvarToken = clinvarCodes[code];
+		            	var mapEntry = matrixCard.clinvarMap[clinvarToken];
+						if (mapEntry != null) {
+							if (variant.clinvarRank == null || 
+								mapEntry.value < variant.clinvarRank) {
+								variant.clinvarRank = mapEntry.value;
+								variant.clinvar = mapEntry.clazz;
+							}
+							submission.clinsig += submission.clinsig.length > 0 ? "," : "";
+							submission.clinsig += clinvarToken;
+							variant.clinVarClinicalSignificance[clinvarToken] = idx.toString();
+						}	
+
+	            	})
+
+	            	idx++;
             	})
             } else if (annotToken.indexOf("CLNDBN=") == 0) {
             	phenotypes = annotToken.substring(7, annotToken.length);  
             	variant.clinVarPhenotype = {};
+            	var idx = 0;
             	phenotypes.split("|").forEach(function(phenotype) {
             		
-            		variant.clinVarPhenotype[phenotype] = "Y";
+            		var submission = getClinvarSubmission(clinvarSubmissions, idx);
+            		submission.phenotype = phenotype;
+
+            		variant.clinVarPhenotype[phenotype] = idx.toString();
+            		idx++;
             	})
-            }       
+            } else if (annotToken.indexOf("CLNACC=") == 0) {
+            	variant.clinVarAccession = {};
+            	var accessionIds = annotToken.substring(7, annotToken.length);
+            	var idx = 0;
+            	accessionIds.split("|").forEach(function(accessionId) {
+
+            		var submission = getClinvarSubmission(clinvarSubmissions, idx);
+            		submission.accession = accessionId;
+
+	            	variant.clinVarAccession[accessionId] = idx.toString();
+	            	idx++;
+            	})
+            }    
 		})
+		variant.clinvarSubmissions = clinvarSubmissions;
 	}
 
 
-	var loadClinvarProperties = function(recs) {
-		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarVariants.length; null) {
+	var loadClinvarProperties = function(recs, clinvarRecs) {
+		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarRecs.length; null) {
 
-			var clinvarVariant = clinvarVariants[clinvarIter];
+			var clinvarVariant = clinvarRecs[clinvarIter];
 			
 			// compare curr variant and curr clinVar record
-			if (recs[vcfIter].start == +clinvarVariant.pos) {			
+			if (recs[vcfIter].start == +clinvarVariant.pos) {	
+
+
 				// add clinVar info to variant if it matches
 				if (recs[vcfIter].alt == clinvarVariant.alt &&
 					recs[vcfIter].ref == clinvarVariant.ref) {
@@ -2381,9 +2434,15 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 					vcfIter++;
 					clinvarIter++;
 				} else {
-					// Only advance the clinvar iterator if clinvar entry didn't match the variant
-					// because there can be multiple clinvar entries for the same position.
-					clinvarIter++;
+					// If clinvar entry didn't match the variant, figure out if the vcf
+					// iter (multiple vcf recs with same position as 1 clinvar rec) or 
+					// the clinvar iter needs to be advanced (multiple clinvar recs with same
+					// position as 1 vcf rec)
+					if (vcfIter+1 < recs.length && recs[vcfIter+1].start == +clinvarVariant.pos) {
+						vcfIter++;
+					} else {
+						clinvarIter++;
+					}
 				}
 				
 			} else if (recs[vcfIter].start < +clinvarVariant.pos) {						
@@ -2396,7 +2455,8 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 
 	// Load the clinvar info for the variants loaded from the vcf	
 	var sortedFeatures = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
-	loadClinvarProperties(sortedFeatures);
+	var sortedClinvarVariants = clinvarVariants.sort(VariantModel.orderVariantsByPosition)
+	loadClinvarProperties(sortedFeatures, sortedClinvarVariants);
 
 }
 
@@ -2410,19 +2470,21 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 
 	var clinSigObject = variant.clinVarClinicalSignificance;
 	if (clinSigObject == null) {
-		variant.clinVarClinicalSignificance = {"none": "Y"};
+		variant.clinVarClinicalSignificance = {"none": "0"};
 	}
 
 	var clinSigString = clinvar.clinical_significance.description;
 	var clinSigTokens = clinSigString.split(", ");
+	var idx = 0;
 	clinSigTokens.forEach( function(clinSigToken) {
 		if (clinSigToken != "") {		
 			// Replace space with underlink
 			clinSigToken = clinSigToken.split(" ").join("_").toLowerCase();
-			variant.clinVarClinicalSignificance[clinSigToken] = 'Y';
+			variant.clinVarClinicalSignificance[clinSigToken] = idx.toString();
+			idx++;
 
 			// Get the clinvar "classification" for the highest ranked clinvar 
-			// designation. (e.g. "pathologic" trumps "benign");
+			// designation. (e.g. "pathogenic" trumps "benign");
 			var mapEntry = matrixCard.clinvarMap[clinSigToken];
 			if (mapEntry != null) {
 				if (variant.clinvarRank == null || 
@@ -2445,10 +2507,12 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 	var phTokens = clinvar.trait_set.map(function(d) { return d.trait_name; }).join ('; ')
 	if (phTokens != "") {
 		var tokens = phTokens.split("; ");
+		var idx = 0;
 		tokens.forEach(function(phToken) {
 			// Replace space with underlink
 			phToken = phToken.split(" ").join("_");
-			variant.clinVarPhenotype[phToken.toLowerCase()] = 'Y';
+			variant.clinVarPhenotype[phToken.toLowerCase()] = idx.toString();
+			idx++;
 		});
 	}
 }
@@ -2519,7 +2583,7 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 	me.vcf.promiseGetClinvarRecords(
 	    		theFbData, 
 	    		me._stripRefName(window.gene.chr), window.gene, 
-	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theFbData) : me._refreshVariantsWithClinvar.bind(me, theFbData)
+	    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theFbData) : me._refreshVariantsWithClinvarEutils.bind(me, theFbData)
 	    ).then( function() {
 	    	if (callback) {
 
@@ -2570,7 +2634,7 @@ VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, the
 	me.vcf.promiseGetClinvarRecords(
 	    		theFbData, 
 	    		me._stripRefName(geneObject.chr), geneObject, 
-	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theFbData) : me._refreshVariantsWithClinvar.bind(me, theFbData)
+	    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theFbData) : me._refreshVariantsWithClinvarEutils.bind(me, theFbData)
 	    ).then( function() {
 
     		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
@@ -3194,8 +3258,8 @@ VariantModel.getNonCanonicalHighestImpactsVep = function(variant) {
 
 
 VariantModel.orderVariantsByPosition = function(a, b) {
-	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
-	var refAltB = b.type.toLowerCase() + " " + b.ref + "->" + b.alt;
+	var refAltA = a.ref + "->" + a.alt;
+	var refAltB = b.ref + "->" + b.alt;
 
 	var chromA = a.chrom.indexOf("chr") == 0 ? a.chrom.split("chr")[1] : a.chrom;
 	var chromB = b.chrom.indexOf("chr") == 0 ? b.chrom.split("chr")[1] : b.chrom;
