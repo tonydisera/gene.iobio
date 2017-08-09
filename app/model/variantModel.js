@@ -1227,21 +1227,24 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    			} else {
 			    				return false;
 			    			}
-			    		} else {
+			    		} else if (record != "") {
 			    			var fields = record.split("\t");
 			    			var chrom = fields[0];
 			    			var start = fields[1];
 			    			var ref   = fields[3];
 			    			var alt   = fields[4];
-			    			if (me.getVcfRefName(theGene.chr) == chrom &&
-			    				start == variant.start &&
-				    		    alt   == variant.alt &&
-				    			ref   == variant.ref) {
-				    			return true;
-				    		} else {
-				    			return false;
-				    		}
-				    		
+			    			var found = false;
+			    			alt.split(",").forEach(function(theAlt) {
+				    			if (!found && 
+				    				me.getVcfRefName(theGene.chr) == chrom &&
+				    				start    == variant.start &&
+					    		    theAlt   == variant.alt &&
+					    			ref      == variant.ref) {
+				    				found = true;
+				    			}
+
+			    			})
+			    			return found;
 			    		}
 			    	});
 
@@ -1250,55 +1253,66 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 			    	if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 			    		// Now update the hgvs notation on the variant
-			    		var v = theVcfData.features[0];
+			    		var matchingVariants = theVcfData.features.filter(function(aVariant) {
+			    			return variant.chrom == aVariant.chrom &&
+				    			   variant.start == aVariant.start &&
+					    		   variant.alt   == aVariant.alt &&
+					    		   variant.ref   == aVariant.ref
+			    		});
+			    		if (matchingVariants.length > 0) {
+			    			var v = matchingVariants[0];
+				    		if (format && format == 'csv') {			    			
+				    			resolve([v, variant, vcfRecords]);
+				    		} else if (format && format == 'vcf') {
+				    			if (vcfRecords) {
+				    				resolve([v, variant, vcfRecords]);
+				    			} else {
+				    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
+				    			}
+				    		} else {
+				    			var cachedVcfData = me.getVcfDataForGene(theGene, theTranscript);
+				    			if (cachedVcfData) {
+						    		var theVariants = cachedVcfData.features.filter(function(d) {
+						    			if (d.start == v.start &&
+						    				d.alt == v.alt &&
+						    				d.ref == v.ref) {
+						    				return true;
+						    			} else {
+						    				return false;
+						    			}
+						    		});
+						    		if (theVariants && theVariants.length > 0) {
+							    		var theVariant = theVariants[0];
+					
+										// set the hgvs and rsid on the existing variant
+							    		theVariant.extraAnnot = true;
+							    		theVariant.vepHGVSc = v.vepHGVSc;
+							    		theVariant.vepHGVSp = v.vepHGVSp;
+							    		theVariant.vepVariationIds = v.vepVariationIds;
 
-			    		if (format && format == 'csv') {			    			
-			    			resolve([v, variant, vcfRecords]);
-			    		} else if (format && format == 'vcf') {
-			    			if (vcfRecords) {
-			    				resolve([v, variant, vcfRecords]);
-			    			} else {
-			    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
-			    			}
-			    		} else {
-			    			var cachedVcfData = me.getVcfDataForGene(theGene, theTranscript);
-			    			if (cachedVcfData) {
-					    		var theVariants = cachedVcfData.features.filter(function(d) {
-					    			if (d.start == v.start &&
-					    				d.alt == v.alt &&
-					    				d.ref == v.ref) {
-					    				return true;
-					    			} else {
-					    				return false;
-					    			}
-					    		});
-					    		if (theVariants && theVariants.length > 0) {
-						    		var theVariant = theVariants[0];
-				
-									// set the hgvs and rsid on the existing variant
-						    		theVariant.extraAnnot = true;
-						    		theVariant.vepHGVSc = v.vepHGVSc;
-						    		theVariant.vepHGVSp = v.vepHGVSp;
-						    		theVariant.vepVariationIds = v.vepVariationIds;
+								    	// re-cache the data
+									    me._cacheData(cachedVcfData, "vcfData", theGene.gene_name, theTranscript);	
 
-							    	// re-cache the data
-								    me._cacheData(cachedVcfData, "vcfData", theGene.gene_name, theTranscript);	
-
-							    	// return the annotated variant
-									resolve(theVariant);
-					    		} else {
-				    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v .alt;				
+								    	// return the annotated variant
+										resolve(theVariant);
+						    		} else {
+					    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v .alt;				
+						    			console.log(msg);
+						    			reject(msg);
+						    		}			    		
+				    			} else {
+				    				var msg = "Unable to update gene vcfData cache with updated HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v.alt;				
 					    			console.log(msg);
 					    			reject(msg);
-					    		}			    		
-			    			} else {
-			    				var msg = "Unable to update gene vcfData cache with updated HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v.alt;				
-				    			console.log(msg);
-				    			reject(msg);
 
-			    			}
+				    			}
 
+				    		}			    			
+			    		} else {
+			    			reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 			    		}
+
+
 			    	} else {
 			    		var msg = "Empty results returned from VariantModel.promiseGetVariantExtraAnnotations() for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;
 			    		console.log(msg);
