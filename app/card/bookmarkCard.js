@@ -1268,14 +1268,14 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
 
 	var importRecords = VariantImporter.parseRecords(importSource, data);
 
-	// If we have over 50 bookmarks, just grab first 50
+	// If we have over 100 bookmarks, just grab first 100
 	// and warn user
-	/*
-	if (importRecords.length > 0) {
-		importRecords = importRecords.slice(0,50);
-		alertify.alert("Only first 50 bookmarks will be imported.");
+	if (importRecords.length > 100) {
+		var bypassedCount = importRecords.length - 100;
+		importRecords = importRecords.slice(0,100);
+		alertify.alert("Only first 100 bookmarks will be imported. " + bypassedCount.toString() + " were bypassed.");
 	}
-	*/
+	
 
 	// We need to make sure each imported record has a transcript.  
 	// So first, cache all of the gene objects for the imported bookmarks
