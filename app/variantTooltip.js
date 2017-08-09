@@ -387,12 +387,20 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		} else if (variant.clinvarSubmissions != null && Object.keys(variant.clinvarSubmissions).length > 0) {
 			for (var key in variant.clinvarSubmissions) {
 				var submission = variant.clinvarSubmissions[key];
-				
-				clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + submission.accession;
-				if (clinvarLink.length > 0) {
-					clinvarLink += '<div style="padding-top:3px">&nbsp;</div>';
+
+				var accessions = submission.accession.split(",");
+				var clinsigs   = submission.clinsig.split(",");
+				for (var i = 0; i < accessions.length; i++) {
+					var accessionSingle = accessions[i];
+					var clinsigSingle   = clinsigs.length > i ? clinsigs[i] : "?";
+
+					clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
+					if (clinvarLink.length > 0) {
+						clinvarLink += '<div style="padding-top:3px">&nbsp;</div>';
+					}
+					clinvarLink += '<a class="tooltip-clinvar-link tooltip-clinsig-link' + key + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
 				}
-				clinvarLink += '<a class="tooltip-clinvar-link tooltip-clinsig-link' + key + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + submission.clinsig.split("_").join(" ") + '</a>';
+				
 				clinvarLink += '<span style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
 			}
 			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinvarLink );	
