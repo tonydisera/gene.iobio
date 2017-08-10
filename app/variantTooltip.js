@@ -178,8 +178,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			    var linkSelector = selector + " .tooltip-clinsig-link" + key;
 			    if (badge && $(linkSelector).length > 0) {
 			    	var div = $(linkSelector);
-					$(div).before("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
-					var svg = d3.select($(div).prev("svg.clinvar-badge")[0]);
+					$(div).prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
+					var svg = d3.select($(div).find("svg.clinvar-badge")[0]);
 					var selection = svg.data([{width:10, height:10, transform: 'translate(0,1)', clazz: clazz}]);
 					matrixCard.showClinVarSymbol(selection);						    			    	
 			    }			
@@ -377,16 +377,21 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	if (clinSigDisplay != null && clinSigDisplay != "") {
 		if (variant.clinVarUid != null && variant.clinVarUid != '') {
 			clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
-			clinvarLink = '<a class="tooltip-clinsig-link0" href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+
+			clinvarLink  = '<div class="tooltip-clinsig-link0" style="clear:both">';			
+			clinvarLink += '<a  href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
+			clinvarLink += '</div>';
 			
 			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '<span>', null, );		
 			if (phenotypeDisplay) {
-				clinvarSimpleRow2 = me._tooltipLongTextRow('', phenotypeDisplay);		
+				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay);		
 			}
 
 		} else if (variant.clinvarSubmissions != null && Object.keys(variant.clinvarSubmissions).length > 0) {
 			for (var key in variant.clinvarSubmissions) {
 				var submission = variant.clinvarSubmissions[key];
+
+				clinvarLink += "<div style='clear:both' class='tooltip-clinsig-link" + key + "'>";
 
 				var accessions = submission.accession.split(",");
 				var clinsigs   = submission.clinsig.split(",");
@@ -395,13 +400,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					var clinsigSingle   = clinsigs.length > i ? clinsigs[i] : "?";
 
 					clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
-					if (clinvarLink.length > 0) {
-						clinvarLink += '<div style="padding-top:3px">&nbsp;</div>';
-					}
-					clinvarLink += '<a class="tooltip-clinvar-link tooltip-clinsig-link' + key + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
-				}
-				
+					clinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
+				}				
 				clinvarLink += '<span style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
+
+				clinvarLink += "</div>"
 			}
 			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinvarLink );	
 			phenotypeDisplay = "";	
