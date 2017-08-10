@@ -727,7 +727,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, dbSnpLink, coord, 'ref-alt')
 			+ inheritanceModeRow
-			+ '<div class="row">' 
+			+ '<div class="row" style="max-height:241px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
