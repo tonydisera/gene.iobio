@@ -131,10 +131,11 @@ var variantExporter = null;
 var fbSettings = {
 	'visited': false,
 	'arguments': {
-		'useSuggestedVariants':  {value: false, defaultValue: false},
-		'minMappingQual':        {value: 0,     defaultValue: 0,     argName: '--min-mapping-quality'},
-		'minCoverage':           {value: 0,     defaultValue: 0,     argName: '--min-coverage'},
-		'useDupReads':           {value: false, defaultValue: false, argName: '--use-duplicate-reads', isFlag: true}		
+		'useSuggestedVariants':     {value: true,  defaultValue: true},
+		'limitToSuggestedVariants': {value: true, defaultValue: true, argName: '-l',                    isFlag: true},
+		'minMappingQual':           {value: 0,     defaultValue: 0,     argName: '--min-mapping-quality'},
+		'minCoverage':              {value: 0,     defaultValue: 0,     argName: '--min-coverage'},
+		'useDupReads':              {value: false, defaultValue: false, argName: '--use-duplicate-reads', isFlag: true}		
 	}
 }
 
@@ -286,6 +287,10 @@ function init() {
 
 
 	cacheHelper.isolateSession();
+
+	if (allowFreebayesSettings) {
+		$('#show-fb-settings').removeClass("hide");
+	}
 
 	
 	// If we are using the gene.iobio education tour edition, automatically load 
@@ -987,22 +992,31 @@ function showDataDialogExportBookmarks() {
 	dataCard.resetExportPanel();
 	$('#dataModal').modal('show');
 }
-function showFreebayesSettingsDialog(onClose) {
-	fbSettings.onClose = onClose;
-	fbSettings.visited = true;
-	$('#fb-suggested-variants-cb').prop('checked', fbSettings.arguments.useSuggestedVariants.value);
-	$('#fb-min-mapping-qual'     ).val(fbSettings.arguments.minMappingQual.value);
-	$('#fb-min-coverage'         ).val(fbSettings.arguments.minCoverage.value);
-	$('#fb-use-dup-reads-cb'     ).prop('checked', fbSettings.arguments.useDupReads.value);
 
-	$('#freebayes-settings-modal').modal("show");
+function showFreebayesSettingsDialog(onClose) {
+	if (allowFreebayesSettings) {
+		fbSettings.onClose = onClose;
+		fbSettings.visited = true;
+		$('#fb-use-suggested-variants-cb').prop('checked', fbSettings.arguments.useSuggestedVariants.value);
+		$('#fb-limit-to-suggested-variants-cb').prop('checked', fbSettings.arguments.limitToSuggestedVariants.value);
+		$('#fb-min-mapping-qual'     ).val(fbSettings.arguments.minMappingQual.value);
+		$('#fb-min-coverage'         ).val(fbSettings.arguments.minCoverage.value);
+		$('#fb-use-dup-reads-cb'     ).prop('checked', fbSettings.arguments.useDupReads.value);
+
+		$('#freebayes-settings-modal').modal("show");		
+	} else  {
+		if (onClose) {
+			onClose();
+		}
+	}
 }
 
 function saveFreebayesSettings() {
-	fbSettings.arguments.useSuggestedVariants.value = $('#fb-suggested-variants-cb').is(":checked");
-	fbSettings.arguments.minMappingQual.value       = $('#fb-min-mapping-qual').val();
-	fbSettings.arguments.minCoverage.value          = $('#fb-min-coverage').val();
-	fbSettings.arguments.useDupReads.value          = $('#fb-use-dup-reads-cb').is(":checked");
+	fbSettings.arguments.useSuggestedVariants.value     = $('#fb-use-suggested-variants-cb').is(":checked");
+	fbSettings.arguments.limitToSuggestedVariants.value = $('#fb-limit-to-suggested-variants-cb').is(":checked");
+	fbSettings.arguments.minMappingQual.value           = $('#fb-min-mapping-qual').val();
+	fbSettings.arguments.minCoverage.value              = $('#fb-min-coverage').val();
+	fbSettings.arguments.useDupReads.value              = $('#fb-use-dup-reads-cb').is(":checked");
 
 	if (fbSettings.onClose) {
 		fbSettings.onClose();
@@ -3039,20 +3053,8 @@ function jointCallVariantsImpl(checkCache, callback) {
 }
 
 
+
 function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback) {
-	var me = this;
-
-	if (fbSettings.visited) {
-		me.cacheJointCallVariantsImpl(geneObject, transcript, sourceVariant, callback);
-	} else {
-		showFreebayesSettingsDialog(function() {
-			me.cacheJointCallVariantsImpl(geneObject, transcript, sourceVariant, callback);
-		})
-	}
-
-}
-
-function cacheJointCallVariantsImpl(geneObject, transcript, sourceVariant, callback) {
 
 
 	var bams = [];

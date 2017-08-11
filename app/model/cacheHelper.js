@@ -195,6 +195,22 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 		analyzeCalledVariants = true;
 	}
 
+	// Show the freebayes runtime args dialog first if dialog has not
+	// yet been visited.   Note:  showFreebayesSettingsDialog() is a
+	// pass-through if global settings allowFreebayesSettings is set
+	// to false.
+	if (analyzeCalledVariants && !fbSettings.visited) {
+		showFreebayesSettingsDialog(function() {
+			me._analyzeAllImpl(analyzeCalledVariants)
+		})
+	} else {
+		me._analyzeAllImpl(analyzeCalledVariants)
+	}
+}
+
+CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
+	var me = this;
+	
 	if (analyzeCalledVariants) {
 		me.showCallAllProgress = true;
 	}
@@ -216,7 +232,6 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 		// analyzed.
 		filterCard.filterGenes();
 	});
-
 
 }
 

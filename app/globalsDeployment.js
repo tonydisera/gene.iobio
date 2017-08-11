@@ -26,6 +26,8 @@ var mygene2XAuthToken     = "";
 // Get clinvar annotations from 'eutils' or 'vcf'
 var clinvarSource        = "vcf";
 
+// Allow freebayes runtime args to be set by user
+var allowFreebayesSettings  = false;
 
 /*
 * This variable controls special behavior for running gene.iobio education edition, with

@@ -672,8 +672,7 @@ var Bam = Class.extend({
         freebayesArgs.push(refFastaFile);
         if (fbArgs && fbArgs.useSuggestedVariants.value == true) {
           freebayesArgs.push("-@");
-          freebayesArgs.push(me.getSuggestedVariantsCmd(trRefName, geneObject));
-          freebayesArgs.push("-l");
+          freebayesArgs.push(me.getSuggestedVariantsCmd(trRefName, geneObject));          
         }
         if (fbArgs) {
           for (var key in fbArgs) {
