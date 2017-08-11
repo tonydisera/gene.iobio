@@ -895,66 +895,6 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 	}
 	this.displayEffectFilters();
 	this.initFilterListeners();
-
-	/*
-	var me = this;
-
-	d3.selectAll(".impact").each( function(d,i) {
-		var impact = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".highestImpactVep").each( function(d,i) {
-		var impact = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".vepImpact").each( function(d,i) {
-		var impact = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + impact)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".type").each( function(d,i) {
-		var type = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + type)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".zygosity").each( function(d,i) {
-		var zygosity = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + zygosity)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".sift").each( function(d,i) {
-		var sift = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + sift)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".polyphen").each( function(d,i) {
-		var polyphen = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + polyphen)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".regulatory").each( function(d,i) {
-		var reg = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + reg)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-
-	this.displayEffectFilters();
-	this.initFilterListeners();
-	d3.selectAll(".afexaclevels").each( function(d,i) {
-		var afexaclevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + afexaclevel)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	d3.selectAll(".af1000glevels").each( function(d,i) {
-		var af1000glevel = d3.select(this).attr("id");
-		var count = d3.selectAll('#vcf-track .variant.' + af1000glevel)[0].length;
-		d3.select(this).classed("inactive", count == 0);
-	});
-	$("#af-range-filter").removeClass("hide");
-	*/
-
 }
 
 FilterCard.prototype.displayEffectFilters = function() {
