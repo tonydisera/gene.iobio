@@ -1587,6 +1587,10 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 							    		// Flag any bookmarked variants
 							    		if (vc.getRelationship() == 'proband') {
 									    	bookmarkCard.determineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
+
+											me._populateEffectFilters(theVcfData.features);
+											me._populateRecFilters(theVcfData.features);
+										    filterCard.displayDataGeneratedFilters();
 									    }
 
 								    	// Cache the data (if there are variants)
@@ -1739,6 +1743,9 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			    		}
 			    	}
 			    	if (theGeneObject) {
+			    		me._populateEffectFilters(data.features);
+						me._populateRecFilters(data.features);
+
 			    		// Flag any bookmarked variants
 					    bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
 
