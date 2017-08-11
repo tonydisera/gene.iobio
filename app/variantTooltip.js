@@ -654,14 +654,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
-	var qualityWarningRow = "";
-	if (filterCard.shouldWarnForNonPassVariants()) {
-		if (variant.recfilter != 'PASS') {
-			if (!variant.hasOwnProperty('fbCalled') || variant.fbCalled != 'Y') {
-				qualityWarningRow = me._tooltipLowQualityHeaderRow();
-			}
-		}
-	}
 
 	if (rec) {
 		rec.inheritance      = variant.inheritance ? matrixCard.getInheritanceLabel(variant.inheritance) : "";
@@ -716,8 +708,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ clinvarSimpleRow2 );
 	} else if (type == 'tooltip') {
 		return (
-			  qualityWarningRow
-			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
+			  me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord + exonDisplay, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
@@ -766,12 +757,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		var div =
 		    '<div class="tooltip-wide">'
-	        + qualityWarningRow
 			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", exonDisplay, '')
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, dbSnpLink, coord, 'ref-alt')
 			+ inheritanceModeRow
-			+ '<div class="row" style="max-height:241px;overflow-y:scroll">' 
+			+ '<div class="row" style="max-height:235px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
@@ -783,8 +773,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	} else {
 		return (
-			qualityWarningRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
+			 me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, '   ', dbSnpLink, 'ref-alt')
 			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, exonDisplay, '')
 			+ inheritanceModeRow
 

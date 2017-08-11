@@ -2937,17 +2937,6 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 			})
 		}
 
-		if (filterCard.shouldWarnForNonPassVariants()) {
-			if (d.recfilter != 'PASS') {
-				if (!d.hasOwnProperty('fbCalled') || d.fbCalled != 'Y') {
-					d.featureClass = 'low-quality';
-				} else {
-					d.featureClass = '';
-				}
-			} else {
-				d.featureClass = '';
-			}
-		}
 
 		// We don't want to display homozygous reference variants in the variant chart
 		// or feature matrix (but we want to keep it to show trio allele counts).

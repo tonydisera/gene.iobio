@@ -2340,8 +2340,6 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	$('#recall-card .call-variants-count').text("");
 	$('#recall-card .covloader').addClass("hide");
 
-	$('#low-quality-legend').addClass("hide");		
-
 
 	d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
 
