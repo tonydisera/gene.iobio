@@ -24,18 +24,16 @@ function FilterCard() {
 	this.affectedInfo              = null;
 }
 
-FilterCard.prototype.shouldWarnForNonPassVariants = function() {
-	var recFilterKeys = Object.keys(this.recFilters);
-	var passStatus = recFilterKeys.some(function(key) {
-		return key === 'PASS';
-	});
-	return (passStatus && recFilterKeys.length > 1);
-}
 
 FilterCard.prototype.clearDataGeneratedFilters = function() {
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
+	$('#effect-filter-box .effect').remove();
+	$('#effect-filter-box .vepConsequence').remove();
+
+	
 	this.recFilters = new Object();
+	$('#rec-filter-box .recfilter').remove();
 }
 
 FilterCard.prototype.displayDataGeneratedFilters = function () {
@@ -961,55 +959,58 @@ FilterCard.prototype.enableVariantFilters = function(fullRefresh) {
 
 FilterCard.prototype.displayEffectFilters = function() {
 	var me = this;
-	$('#effect-filter-box .effect').remove();
-	$('#effect-filter-box .vepConsequence').remove();
-	var nocolor = $('#effect-filter-box #effect-scheme').hasClass("current") ? "" : "nocolor";
-	var values = this.annotationScheme.toLowerCase() == 'snpeff' ? this.snpEffEffects : this.vepConsequences;
-	var field  = this.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
+
+	var nocolor    = $('#effect-filter-box #effect-scheme').hasClass("current") ? "" : "nocolor";
+	var values     = this.annotationScheme.toLowerCase() == 'snpeff' ? this.snpEffEffects : this.vepConsequences;
+	var field      = this.annotationScheme.toLowerCase() == 'snpeff' ? 'effect' : 'vepConsequence';
+	var fieldLabel = this.annotationScheme.toLowerCase() == 'snpeff' ? 'Effect' : 'VEP Consequence';
 
 	var effectKeys = Object.keys(values).sort();
 
 	effectKeys.forEach( function(key) {
-		var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
-		var svgElem = null;
-		if (effectLabel.length < 50) {
-			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="200" height="15" transform="translate(0,0)">' +
-                      '<g transform="translate(1,2)">' +
-                      '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
-    				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
-  					  '</g>' +
-  					  '</svg>';
+		if ($('#filter-track svg#' +key).length == 0) {
+			var effectLabel = me.capitalizeFirstLetter(key.split("_gene_variant").join("").split("_variant").join("").split("_").join(" "));
+			var svgElem = null;
+			if (effectLabel.length < 50) {
+				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="180" height="15" transform="translate(0,0)">' +
+	                      '<g transform="translate(1,2)">' +
+	                      '<text class="name" x="9" y="9" style="fill-opacity: 1;font-size: 9px;">' + effectLabel + '</text>' +
+	    				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+	  					  '</g>' +
+	  					  '</svg>';
 
-		} else {
-			// find first space after 20th character
-			var pos = -1;
-			for (var i = 50; i < effectLabel.length; i++) {
-				if (pos == -1 && effectLabel[i] == " ") {
-					pos = i;
+			} else {
+				// find first space after 20th character
+				var pos = -1;
+				for (var i = 50; i < effectLabel.length; i++) {
+					if (pos == -1 && effectLabel[i] == " ") {
+						pos = i;
+					}
 				}
+				if (pos <= 0) {
+					pos = Math.round(effectLabel.length / 2);
+				}
+				var label1 = effectLabel.substring(0, pos);
+				var label2 = effectLabel.substring(pos+1, effectLabel.length);
+				svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="180" height="26" transform="translate(0,0)">' +
+				          '<g transform="translate(1,2)">' +
+	                      '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
+	                      '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
+	    				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
+	  					  '</g>' +
+	  					  '</svg>';
+
 			}
-			if (pos <= 0) {
-				pos = Math.round(effectLabel.length / 2);
-			}
-			var label1 = effectLabel.substring(0, pos);
-			var label2 = effectLabel.substring(pos+1, effectLabel.length);
-			svgElem = '<svg id="' + key + '" class="' + field + ' ' + nocolor + '" width="200" height="26" transform="translate(0,0)">' +
-			          '<g transform="translate(1,2)">' +
-                      '<text class="name" x="9" y="7" style="fill-opacity: 1;font-size: 9px;">' + label1 + '</text>' +
-                      '<text class="name" x="9" y="17" style="fill-opacity: 1;font-size: 9px;">' + label2 + '</text>' +
-    				  '<rect class="filter-symbol  effect_' + key + '" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>' +
-  					  '</g>' +
-  					  '</svg>';
+
+	  		$('#effect-filters').append(svgElem);
 
 		}
-
-  		$('#effect-filters').append(svgElem);
 	});	
+	me.initFilterListeners("." + field, {field: fieldLabel} )
 }
 
 FilterCard.prototype.displayRecFilters = function() {
 	var me = this;
-	$('#rec-filter-box .recfilter').remove();
 
 	var recFilterCount = 0;
 	var recFilterKeys = Object.keys(this.recFilters).sort(function(a,b) {
@@ -1029,23 +1030,19 @@ FilterCard.prototype.displayRecFilters = function() {
 	});
 	
 	recFilterKeys.forEach(function(key) {
-		recFilterCount++;
-		var label = key === "." ? ". (unassigned)" : key;
 		var elmId = key === "." ? "unassigned" : key;
-		var svgElem = '<svg id="' + elmId + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
-			          '<g transform="translate(1,2)">' +
-                      '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
-  					  '</g>' +
-					  '</svg>';
-  		$('#rec-filter-box').append(svgElem);
+		if ($('#filter-track #' + elmId).length == 0) {
+			var label = key === "." ? ". unassigned" : key;
+			recFilterCount++;
+			var svgElem = '<svg id="' + elmId + '" class="recfilter" width="90" height="15" transform="translate(0,0)">' +
+				          '<g transform="translate(1,2)">' +
+	                      '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label) + '</text>' +
+	  					  '</g>' +
+						  '</svg>';
+	  		$('#rec-filter-box').append(svgElem);			
+		}
 	});
-	/*
-	if (recFilterCount > 0) {
-		$('#rec-filter-panel').removeClass("hide");
-	} else {
-		$('#rec-filter-panel').addClass("hide");		
-	}
-	*/	
+	me.initFilterListeners('.recfilter', {recfilter: 'VCF Filter Status'})
 }
 
 FilterCard.prototype.hasFilters = function() {
