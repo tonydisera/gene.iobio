@@ -716,7 +716,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ inheritanceModeRow
 			+ siftPolyphenRow
 			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '6px')
-			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null, '6px')
+			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
+			+ me._tooltipLabeledRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, '6px') 
 			+ clinvarSimpleRow1
 			+ clinvarSimpleRow2
 			+ me._tooltipRowAlleleCounts() 
@@ -746,7 +747,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'))
 			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
 			+ me._tooltipRow('Qual', variant.qual, null, true) 
-			+ me._tooltipRow('Filter', variant.recfilter, null, true) 
+			+ me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
 			+ me._tooltipRowAlleleCounts() 
 			+ "</div>";
 
