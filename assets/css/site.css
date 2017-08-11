@@ -2246,25 +2246,21 @@ inputinput:-moz-placeholder {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
-  outline: solid 2px #969696;
-  outline-offset: -2px; }
+  outline: solid 2px #969696; }
 
 .tooltip-zygosity:hover {
-  outline: solid 2px #969696;
-  outline-offset: -2px; }
+  outline: solid 2px #969696; }
 
 .impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover, .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
-  outline: solid 2px #3586c0;
-  outline-offset: -2px; }
+  outline: solid 2px #3586c0; }
   .impact.current:hover.not-equal, .vepImpact.current:hover.not-equal, .highestImpactVep.current:hover.not-equal, .effect.current:hover.not-equal, .vepConsequence.current:hover.not-equal, .tooltip-zygosity.current:hover.not-equal, .regulatory.current:hover.not-equal, .polyphen.current:hover.not-equal, .sift.current:hover.not-equal, .type.current:hover.not-equal, .afexaclevels.current:hover.not-equal, .af1000glevels.current:hover.not-equal, .inheritance.current:hover.not-equal, .clinvar.current:hover.not-equal, .uasibs.current:hover.not-equal, .recfilter.current:hover.not-equal {
     outline: none; }
 
 .current {
   font-weight: bold;
-  outline: solid 2px #3586c0;
-  outline-offset: -2px; }
+  outline: solid 2px #3586c0; }
   .current.not-equal {
     background-image: linear-gradient(transparent 7px, #3586c0 7px, #3586c0 9px, transparent 9px);
     border: none;
