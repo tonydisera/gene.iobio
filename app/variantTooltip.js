@@ -95,6 +95,27 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 
 VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, selector) {
+
+	var injectClinvarBadge = function(clinsig, key, translate) {
+		clinsig.split(",").forEach( function(clinsigToken) {
+			if (matrixCard.clinvarMap.hasOwnProperty(clinsigToken)) {
+			    var clazz = matrixCard.clinvarMap[clinsigToken].clazz;
+			    var badge = matrixCard.clinvarMap[clinsigToken].examineBadge;
+
+			    var linkSelector = selector + " .tooltip-clinsig-link" + key;
+			    if (badge && $(linkSelector).length > 0) {
+			    	var div = $(linkSelector);
+					$(div).prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
+					var svg = d3.select($(div).find("svg.clinvar-badge")[0]);
+					var selection = svg.data([{width:10, height:10, transform: (translate ? translate : 'translate(0,1)'), clazz: clazz}]);
+					matrixCard.showClinVarSymbol(selection);						    			    	
+			    }			
+
+			}
+
+		})
+	}
+
 	if (selector == ".tooltip") {
 		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 		for (impact in impactList) {
@@ -141,7 +162,26 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 					}
 				}
 			}
+		}	
+
+		if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
+			var clinsigUniq = {};
+			for (var key in variant.clinvarSubmissions) {
+				var submission = variant.clinvarSubmissions[key];
+				submission.clinsig.split(",").forEach(function(clinsig) {
+					clinsigUniq[clinsig] = "";
+				})
+			}
+			for (var clinsig in clinsigUniq) {
+				injectClinvarBadge(clinsig, clinsig, 'translate(0,0)');
+			}
+		} else if (variant.clinVarClinicalSignificance) {
+		    for (clinsig in variant.clinVarClinicalSignificance) {
+		    	var key = variant.clinVarClinicalSignificance[clinsig];
+		    	injectClinvarBadge(clinsig, key);
+			}
 		}		
+
 	} else {
 		var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(0,2)' : 'translate(5,6)';
 		
@@ -167,39 +207,22 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			}
 		}
 
-	}
 
-	var injectClinvarBadge = function(clinsig, key) {
-		clinsig.split(",").forEach( function(clinsigToken) {
-			if (matrixCard.clinvarMap.hasOwnProperty(clinsigToken)) {
-			    var clazz = matrixCard.clinvarMap[clinsigToken].clazz;
-			    var badge = matrixCard.clinvarMap[clinsigToken].examineBadge;
-
-			    var linkSelector = selector + " .tooltip-clinsig-link" + key;
-			    if (badge && $(linkSelector).length > 0) {
-			    	var div = $(linkSelector);
-					$(div).prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
-					var svg = d3.select($(div).find("svg.clinvar-badge")[0]);
-					var selection = svg.data([{width:10, height:10, transform: 'translate(0,1)', clazz: clazz}]);
-					matrixCard.showClinVarSymbol(selection);						    			    	
-			    }			
-
+		if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
+			for (var key in variant.clinvarSubmissions) {
+				var submission = variant.clinvarSubmissions[key];
+				injectClinvarBadge(submission.clinsig, key);
 			}
+		} else if (variant.clinVarClinicalSignificance) {
+		    for (clinsig in variant.clinVarClinicalSignificance) {
+		    	var key = variant.clinVarClinicalSignificance[clinsig];
+		    	injectClinvarBadge(clinsig, key);
+			}
+		}
 
-		})
 	}
 
-	if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
-		for (var key in variant.clinvarSubmissions) {
-			var submission = variant.clinvarSubmissions[key];
-			injectClinvarBadge(submission.clinsig, key);
-		}
-	} else if (variant.clinVarClinicalSignificance) {
-	    for (clinsig in variant.clinVarClinicalSignificance) {
-	    	var key = variant.clinVarClinicalSignificance[clinsig];
-	    	injectClinvarBadge(clinsig, key);
-		}
-	}
+
 
 
 
@@ -401,12 +424,30 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 					clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
 					clinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
-				}				
+				}	
 				clinvarLink += '<span style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
 
 				clinvarLink += "</div>"
 			}
-			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinvarLink );	
+
+			var clinsigSummary = "";
+			var clinsigUniq = {};
+			for (var key in variant.clinvarSubmissions) {
+				var submission = variant.clinvarSubmissions[key];
+				submission.clinsig.split(",").forEach(function(clinsig) {
+					clinsigUniq[clinsig] = "";					
+				})
+			}	
+			for (var clinsig in clinsigUniq) {
+				var style = 'display:inline-block;'
+				if (clinsigSummary.length > 0) {
+					style += 'padding-left:5px';
+				}
+				clinsigSummary += "<span style='" + style +"' class='tooltip-clinsig-link" + clinsig + "'>";
+				clinsigSummary += "<span style='float:left'>" + clinsig.split("_").join(" ") + "</span>";
+				clinsigSummary += "</span>";
+			}	
+			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinsigSummary );	
 			phenotypeDisplay = "";	
 		} else {
 			clinvarLink = clinSigDisplay;
