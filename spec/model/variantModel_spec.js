@@ -509,27 +509,7 @@ describe('variantModel', function() {
 			expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 		});
 
-		describe('when there is a PASS filter applied to the vcf records', function() {
-			it('assigns a feature class of low-quality for each variant that does not have a PASS filter record', function() {
-				spyOn(filterCard, 'shouldWarnForNonPassVariants').and.returnValue(true);
-				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.features[0].featureClass).toEqual('');
-				expect(filteredData.features[1].featureClass).toEqual('');
-				expect(filteredData.features[2].featureClass).toEqual('low-quality');
-				expect(filteredData.features[3].featureClass).toEqual('low-quality');
-			});
-		});
 
-		describe('when there is not a PASS filter applied to the vcf records', function() {
-			it('assigns a feature class of low-quality for each variant that does not have a PASS filter record', function() {			
-				spyOn(filterCard, 'shouldWarnForNonPassVariants').and.returnValue(false);
-				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.features[0].featureClass).toBeUndefined();
-				expect(filteredData.features[1].featureClass).toBeUndefined();
-				expect(filteredData.features[2].featureClass).toBeUndefined();
-				expect(filteredData.features[3].featureClass).toBeUndefined();
-			});
-		});
 
 		it('filters out variants that do not start within the specified region', function() {
 			start = 5;
