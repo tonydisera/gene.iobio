@@ -2684,7 +2684,19 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 *  analysis, return all variant cards.
 */
 function getRelevantVariantCards() {
-	return dataCard.mode == 'single' ? [getProbandVariantCard()] : variantCards;
+	var rels = {'proband': true};
+	if (dataCard.mode == 'trio') {
+		rels.mother = true;
+		rels.father = true;
+	}
+
+	// TODO - Need to get rid of existing known-variants card if hideKnownVariants is true
+	if (!hideKnownVariants) {
+		rels['known-variants'] = true;
+	}
+	return variantCards.filter(function(vc) {
+		return rels[vc.getRelationship()];
+	})
 }
 
 function setGeneratedSampleNames() {
@@ -2701,16 +2713,18 @@ function getAffectedInfo () {
 	var affectedInfo = [];
 	if (getRelevantVariantCards() && getRelevantVariantCards().length > 0) {
 		getRelevantVariantCards().forEach(function(vc) {
-			var info = {};
-			info.variantCard = vc;
-			if (vc) {
-				info.relationship = vc.getRelationship();
-				info.status = vc.isAffected() ? 'affected' : 'unaffected';
-				info.label = vc.getRelationship();
+			if (vc && vc.getRelationship() != 'known-variants') {
+				var info = {};
+				info.variantCard = vc;
+				if (vc) {
+					info.relationship = vc.getRelationship();
+					info.status = vc.isAffected() ? 'affected' : 'unaffected';
+					info.label = vc.getRelationship();
 
-				info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
+					info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
 
-				affectedInfo.push(info);			
+					affectedInfo.push(info);			
+				}
 			}
 		})
 		var sibIdx = 0;
@@ -2857,6 +2871,36 @@ function addVariantCard() {
 
 	variantCard.init($(cardSelectorString), d3CardSelector, cardIndex);
 	variantCard.setName(defaultName);
+}
+
+
+function addKnownVariantsCard(refresh) {
+	if (getVariantCard('known-variants') == null) {
+		var variantCard = new VariantCard();	
+
+		variantCard.model                = new VariantModel();	
+
+		
+		$('#known-variants-cards').append(variantCardTemplate());  
+		var cardSelectorString = "#known-variants-cards .variant-card";
+		var d3CardSelector = d3.selectAll(cardSelectorString);
+
+		variantCard.init($(cardSelectorString), d3CardSelector, 0);
+
+
+		variantCard.setRelationship("known-variants");
+		variantCard.setAffectedStatus('unaffected');
+		variantCard.setName('Known variants');
+
+		var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+		variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
+			if (refresh) {
+				loadTracksForGene();
+			}
+		});
+		variantCard.setVariantCardLabel();
+		variantCards.push(variantCard);		
+	}
 }
 
 
@@ -3787,6 +3831,9 @@ showKnownVariants = function() {
 	if (hideKnownVariants) {
 		return;
 	}
+
+	addKnownVariantsCard(true);
+
 	$('#known-variants-chart .loader').removeClass('hide');
 	d3.select('#known-variants-chart svg').remove();
 

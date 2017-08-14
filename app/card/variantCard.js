@@ -584,7 +584,10 @@ VariantCard.prototype.setVariantCardLabel = function() {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName());
 	} else {
 		var label = "";
-		if (this.model.isGeneratedSampleName) {
+		if (this.getRelationship() == 'known-variants') {
+			label = "KNOWN VARIANTS"
+			this.cardSelector.find('#card-relationship-label').text("");
+		} else if (this.model.isGeneratedSampleName) {
 			label = this.model.getName();
 		} else {
 			label = 
@@ -592,6 +595,7 @@ VariantCard.prototype.setVariantCardLabel = function() {
    		  		this.model.getName() : 
    		  		this.model.getSampleName() + " " + this.model.getName()
 		}
+
 		this.cardSelector.find('#variant-card-label').text(label);
 	}
 
