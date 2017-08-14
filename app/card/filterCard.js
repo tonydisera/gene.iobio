@@ -284,10 +284,8 @@ FilterCard.prototype.getFilterObject = function() {
 			clinvar_lbenign:  {key: 'clinvar',       state: true, value: 'clinvar_lbenign'},
 			clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}
 		}
-		if (this.shouldWarnForNonPassVariants()) {
-			annots.PASS = {key: 'recfilter', state: true, value: 'PASS'};
-		}
-
+		annots.PASS = {key: 'recfilter', state: true, value: 'PASS'};
+		
 		return { annotsToInclude: annots };
 	}
 
