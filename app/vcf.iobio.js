@@ -38,6 +38,19 @@ vcfiobio = function module() {
   var stream = null;
 
 
+  var CLINVAR_CODES = {
+    '0':   'not_provided',
+    '1':   'not_provided',
+    '2':   'benign',
+    '3':   'likely_benign',
+    '4':   'likely_pathogenic',
+    '5':   'pathogenic',
+    '6':   'drug_response',
+    '7':   'other',
+    '255': 'other'
+  }
+
+
 var effectCategories = [
 ['coding_sequence_variant', 'coding'],
 ['chromosome' ,'chromosome'],
@@ -583,7 +596,7 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, isMultiSample, samplesToRetrieve, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, isMultiSample, samplesToRetrieve, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
@@ -607,7 +620,7 @@ var effectCategories = [
 
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -618,7 +631,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -633,7 +646,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -657,7 +670,7 @@ var effectCategories = [
         var allRecs = headerRecords.concat(records);
 
 
-        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId)
+        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, clinvarMap, isRefSeq && hgvsNotation, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -675,7 +688,7 @@ var effectCategories = [
 
   }
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
 
     var me = this;
 
@@ -799,7 +812,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, sampleNamesToGenotype, null);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, (hgvsNotation && getRsId), isMultiSample, sampleNamesToGenotype, null);
 
 
       callback(annotatedRecs, results);
@@ -1139,7 +1152,7 @@ var effectCategories = [
 
   }
 
-  exports.promiseParseVcfRecordsForASample = function(annotatedRecs, refName, geneObject, selectedTranscript, sampleNamesToGenotype, sampleIndex) {
+  exports.promiseParseVcfRecordsForASample = function(annotatedRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, sampleNamesToGenotype, sampleIndex) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1180,13 +1193,13 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, false, sampleNamesToGenotype, sampleIndex);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, false, sampleNamesToGenotype, sampleIndex);
       resolve([annotatedRecs, results]);
 
     });
   }
 
-  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1227,7 +1240,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, isMultiSample, sampleNamesToGenotype, null);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, sampleNamesToGenotype, null);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1580,7 +1593,7 @@ var effectCategories = [
   }
 
 
-  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, parseMultiSample, sampleNames, sampleIndex) {
+  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, parseMultiSample, sampleNames, sampleIndex) {
 
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
@@ -1679,6 +1692,8 @@ var effectCategories = [
 
             var annot = me._parseAnnot(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID);
 
+            var clinvarResult = me.parseClinvarInfo(rec.info, clinvarMap);
+
             var gtResult = me._parseGenotypes(rec, alt, altIdx, gtSampleIndices, gtSampleNames);
             
             var clinvarObject = me._formatClinvarCoordinates(rec, alt);
@@ -1709,6 +1724,8 @@ var effectCategories = [
                     'alt':                      alt, 
                     'qual':                     rec.qual, 
                     'recfilter':                rec.filter,
+
+                    'extraAnnot':               hasExtraAnnot,
 
                     // genotype fields
                     'genotypes':                gtResult.genotypeMap,
@@ -1775,7 +1792,13 @@ var effectCategories = [
                     'highestPolyphen':         highestPolyphen
                   }
 
-                  genericAnnotation.setSimpleFields(variant);
+                  for (var key in clinvarResult) {
+                    variant[key] = clinvarResult[key]; 
+                  }                  
+
+                  if (window.genericAnnotation !== undefined) {
+                    genericAnnotation.setSimpleFields(variant);
+                  }
 
                   allVariants[i].push(variant);                  
                 }
@@ -2139,6 +2162,86 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
   if ($.isEmptyObject(annot.snpEff.impacts)) {
     annot.snpEff.impacts["NOIMPACT"] = "NOIMPACT";
   }  
+}
+
+exports.parseClinvarInfo = function(info, clinvarMap) {    
+  var me = this;
+
+  var result = {
+    clinvarSubmissions: {},
+    clinVarClinicalSignificance: {},
+    clinVarPhenotype:  {},
+    clinVarAccession: {},
+    clinvarRank: null,
+    clinvar: null
+  }
+
+
+  var getClinvarSubmission = function(clinvarSubmissions, idx) {
+    var entry = clinvarSubmissions[idx.toString()];
+    if (entry == null) {
+      entry = { clinsig: "", phenotype: "", accession: "" };
+      clinvarSubmissions[idx.toString()] = entry;
+    }
+    return entry;
+  }
+
+
+  info.split(";").forEach( function (annotToken) {
+    
+    if (annotToken.indexOf("CLNSIG=") == 0) {
+      var clinvarCode = annotToken.substring(7, annotToken.length);  
+
+      var idx = 0;
+      clinvarCode.split("|").forEach(function(codePart) {
+        var submission = getClinvarSubmission(result.clinvarSubmissions, idx);
+
+        codePart.split(",").forEach(function(code) {
+
+            clinvarToken = CLINVAR_CODES[code];
+            var mapEntry = clinvarMap[clinvarToken];
+            if (mapEntry != null) {
+              if (result.clinvarRank == null || mapEntry.value < result.clinvarRank) {
+              
+                result.clinvarRank = mapEntry.value;
+                result.clinvar = mapEntry.clazz;
+            
+              }
+              submission.clinsig += submission.clinsig.length > 0 ? "," : "";
+              submission.clinsig += clinvarToken;
+              result.clinVarClinicalSignificance[clinvarToken] = idx.toString();
+            } 
+
+        })
+
+        idx++;
+      })
+    } else if (annotToken.indexOf("CLNDBN=") == 0) {
+      var phenotypesStr = annotToken.substring(7, annotToken.length);  
+      var idx = 0;
+      phenotypesStr.split("|").forEach(function(pheno) {
+        
+        var submission = getClinvarSubmission(result.clinvarSubmissions, idx);
+        submission.phenotype = pheno;
+
+        result.clinVarPhenotype[pheno] = idx.toString();
+        idx++;
+      })
+    } else if (annotToken.indexOf("CLNACC=") == 0) {
+      var accessionIds = annotToken.substring(7, annotToken.length);
+      var idx = 0;
+      accessionIds.split("|").forEach(function(accessionId) {
+
+        var submission = getClinvarSubmission(result.clinvarSubmissions, idx);
+        submission.accession = accessionId;
+
+          result.clinVarAccession[accessionId] = idx.toString();
+          idx++;
+      })
+    }  
+
+  })
+  return result;
 }
 
 

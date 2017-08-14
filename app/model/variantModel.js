@@ -25,14 +25,12 @@ function VariantModel() {
 	this.relationship = null;
 	this.affectedStatus = null;
 
-	this.GET_RSID = false;
-	this.GET_HGVS = false;
-
 	this.lastVcfAlertify = null;
 	this.lastBamAlertify = null;
 
 	this.debugMe = false;
 }
+
 
 VariantModel.prototype.getSampleIdentifier = function(theSampleName) {
 	var id = this.relationship + "&&" + this.sampleName + "&&" + theSampleName;
@@ -1213,9 +1211,10 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			       false,
 			       me._getSamplesToRetrieve(),
 			       filterCard.annotationScheme.toLowerCase(),
+			       matrixCard.clinvarMap,
 			       window.geneSource == 'refseq' ? true : false,
-			       true,
-			       true,
+			       true,  // hgvs notation
+			       true,  // rsid
 			       useServerCache
 			    ).then( function(data) {
 
@@ -1359,6 +1358,7 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 			       false,
 			       me._getSamplesToRetrieve(),
 			       filterCard.annotationScheme.toLowerCase(),
+			       matrixCard.clinvarMap,
 			       window.geneSource == 'refseq' ? true : false
 			    ).then( function(data) {
 			    	var annotatedRecs = data[0];
@@ -1442,6 +1442,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					me.getVcfRefName(theGene.chr),
 					theGene,
 			        theTranscript,
+			        global_getVariantIdsForGene,
 			        false,   // parseMultipleSamples
 			        onVcfData)
 				.then( function(data) {
@@ -1537,6 +1538,7 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 					refName,
 					theGene,
 			        theTranscript,
+			        global_getVariantIdsForGene,
 			        true // parseMultipleSamples
 			        )
 				.then( function(results) {
@@ -1728,7 +1730,7 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			// so call the iobio services to retreive the variants for the gene region 
 			// and annotate them.
 			me._promiseVcfRefName(ref).then( function() {
-				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
+				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript, false)
 				.then( function(data) {
 					// Associate the correct gene with the data
 			    	var theGeneObject = null;
@@ -1939,7 +1941,7 @@ VariantModel.prototype._otherSampleInThisVcf = function(otherModel) {
 
 
 
-VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, parseMultipleSamples=false, onVcfData=null) {
+VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, getVariantIds=false, parseMultipleSamples=false, onVcfData=null) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -1960,9 +1962,10 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		   parseMultipleSamples,
 	       me._getSamplesToRetrieve(),
 	       filterCard.annotationScheme.toLowerCase(),
+	       matrixCard.clinvarMap,
 	       window.geneSource == 'refseq' ? true : false,
-	       window.isLevelBasic ? true : me.GET_HGVS,
-	       me.GET_RSID
+	       window.isLevelBasic || getVariantIds,  // hgvs notation
+	       getVariantIds  // rsid
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];
@@ -2028,7 +2031,11 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 			//
 			// Get the clinvar records (for proband, mom, data)
 			// 
-			if (me.getRelationship() != 'sibling') {
+			if (me.getRelationship() == 'sibling') {
+				resolve(theVcfData);
+			} else if (me.getRelationship() == 'known-variants') {
+				resolve(theVcfData);
+			} else {
 		    	me.vcf.promiseGetClinvarRecords(
 		    		theVcfData, 
 		    		me._stripRefName(ref), geneObject, 
@@ -2038,9 +2045,6 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 		    	}, function(error) {
 		    		reject(error);
 		    	});
-
-			} else {
-				resolve(theVcfData);
 			}
 
 		} else if (theVcfData.features.length == 0) {
@@ -2339,105 +2343,26 @@ VariantModel.prototype._refreshVariantsWithClinvarVCFRecs= function(theVcfData, 
 		return;
 	}
 
-	var getClinvarSubmission = function(submissions, idx) {
-		var entry = submissions[idx.toString()];
-		if (entry == null) {
-			entry = { clinsig: "", phenotype: "", accession: "" };
-			submissions[idx.toString()] = entry;
-		}
-		return entry;
-	}
-
-	var parseClinvarInfo = function(variant, clinvarVariant) {		
-		clinvarCodes = {
-			'0':   'not_provided',
-			'1':   'not_provided',
-			'2':   'benign',
-			'3':   'likely_benign',
-			'4':   'likely_pathogenic',
-			'5':   'pathogenic',
-			'6':   'drug_response',
-			'7':   'other',
-			'255': 'other'
-		};
-		clinvarSubmissions = {};
-		clinvarVariant.info.split(";").forEach( function (annotToken) {
-			// TODO - Need to store one array of the entries
-			// [
-			//    {clinsig: 'unknown',            pheno': 'unknown',         accessionId: 'RSV123456.2'},
-			//    {clinsig: 'pathogenic',         pheno': 'type I diabetes', accessionId: 'RSV789901.2'},
-			//    {clinsig: 'likely pathogengic', pheno': 'type I diabetes', accessionId: 'RSV555553.1'}
-			// ]
-			if (annotToken.indexOf("CLNSIG=") == 0) {
-            	var clinvarCode = annotToken.substring(7, annotToken.length);  
-            	variant.clinVarClinicalSignificance = {};
-
-            	var idx = 0;
-            	clinvarCode.split("|").forEach(function(codePart) {
-            		var submission = getClinvarSubmission(clinvarSubmissions, idx);
-
-	            	codePart.split(",").forEach(function(code) {
-
-		            	clinvarToken = clinvarCodes[code];
-		            	var mapEntry = matrixCard.clinvarMap[clinvarToken];
-						if (mapEntry != null) {
-							if (variant.clinvarRank == null || 
-								mapEntry.value < variant.clinvarRank) {
-								variant.clinvarRank = mapEntry.value;
-								variant.clinvar = mapEntry.clazz;
-							}
-							submission.clinsig += submission.clinsig.length > 0 ? "," : "";
-							submission.clinsig += clinvarToken;
-							variant.clinVarClinicalSignificance[clinvarToken] = idx.toString();
-						}	
-
-	            	})
-
-	            	idx++;
-            	})
-            } else if (annotToken.indexOf("CLNDBN=") == 0) {
-            	phenotypes = annotToken.substring(7, annotToken.length);  
-            	variant.clinVarPhenotype = {};
-            	var idx = 0;
-            	phenotypes.split("|").forEach(function(phenotype) {
-            		
-            		var submission = getClinvarSubmission(clinvarSubmissions, idx);
-            		submission.phenotype = phenotype;
-
-            		variant.clinVarPhenotype[phenotype] = idx.toString();
-            		idx++;
-            	})
-            } else if (annotToken.indexOf("CLNACC=") == 0) {
-            	variant.clinVarAccession = {};
-            	var accessionIds = annotToken.substring(7, annotToken.length);
-            	var idx = 0;
-            	accessionIds.split("|").forEach(function(accessionId) {
-
-            		var submission = getClinvarSubmission(clinvarSubmissions, idx);
-            		submission.accession = accessionId;
-
-	            	variant.clinVarAccession[accessionId] = idx.toString();
-	            	idx++;
-            	})
-            }    
-		})
-		variant.clinvarSubmissions = clinvarSubmissions;
-	}
-
 
 	var loadClinvarProperties = function(recs, clinvarRecs) {
 		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarRecs.length; null) {
 
-			var clinvarVariant = clinvarRecs[clinvarIter];
+			var clinvarRec = clinvarRecs[clinvarIter];
 			
 			// compare curr variant and curr clinVar record
-			if (recs[vcfIter].start == +clinvarVariant.pos) {	
+			if (recs[vcfIter].start == +clinvarRec.pos) {	
 
 
 				// add clinVar info to variant if it matches
-				if (recs[vcfIter].alt == clinvarVariant.alt &&
-					recs[vcfIter].ref == clinvarVariant.ref) {
-					parseClinvarInfo(recs[vcfIter], clinvarVariant);
+				if (recs[vcfIter].alt == clinvarRec.alt &&
+					recs[vcfIter].ref == clinvarRec.ref) {
+					var variant = recs[vcfIter];
+
+					var result = me.vcf.parseClinvarInfo(clinvarRec.info, matrixCard.clinvarMap);
+					for (var key in result) {
+						variant[key] = result[key]; 
+					}
+
 					vcfIter++;
 					clinvarIter++;
 				} else {
@@ -2445,14 +2370,14 @@ VariantModel.prototype._refreshVariantsWithClinvarVCFRecs= function(theVcfData, 
 					// iter (multiple vcf recs with same position as 1 clinvar rec) or 
 					// the clinvar iter needs to be advanced (multiple clinvar recs with same
 					// position as 1 vcf rec)
-					if (vcfIter+1 < recs.length && recs[vcfIter+1].start == +clinvarVariant.pos) {
+					if (vcfIter+1 < recs.length && recs[vcfIter+1].start == +clinvarRec.pos) {
 						vcfIter++;
 					} else {
 						clinvarIter++;
 					}
 				}
 				
-			} else if (recs[vcfIter].start < +clinvarVariant.pos) {						
+			} else if (recs[vcfIter].start < +clinvarRec.pos) {						
 				vcfIter++;
 			} else {
 				clinvarIter++;
@@ -3145,9 +3070,10 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 					 me.getVcfRefName(window.gene.chr), 
 					 window.gene, 
 					 window.selectedTranscript,
-					 false,
+					 false,  
 					 me._getSamplesToRetrieve(),
 					 filterCard.annotationScheme.toLowerCase(),
+					 matrixCard.clinvarMap,
 					 window.geneSource == 'refseq' ? true : false)
 				.then( function(data) {
 

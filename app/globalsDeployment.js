@@ -29,6 +29,9 @@ var clinvarSource        = "vcf";
 // Allow freebayes runtime args to be set by user
 var allowFreebayesSettings  = false;
 
+// get hgvs, rsid annotation for all variants
+var global_getVariantIdsForGene = true;
+
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  
