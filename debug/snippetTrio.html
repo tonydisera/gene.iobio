@@ -62,7 +62,7 @@
 
             var genomeBuildHelper = null;
             var cacheHelper = null;
-            var useCache = true;
+            var useCache = false;
 
             $(document).ready(function(){
                 //$('#data-source').text(new_iobio_services);
@@ -81,21 +81,23 @@
 
                 // To time server-side caching, double the entries in gene names in the array
                 var duplicatedGeneNames = [];
-                geneNames.forEach(function(geneName) {
-                    duplicatedGeneNames.push(geneName);
-                    duplicatedGeneNames.push(geneName);
-                })
-                geneNames = duplicatedGeneNames;
+                if (useCache) {
+                    geneNames.forEach(function(geneName) {
+                        duplicatedGeneNames.push(geneName);
+                        duplicatedGeneNames.push(geneName);
+                    })
+                    geneNames = duplicatedGeneNames;                    
+                }
 
 
                 vcfWorkers.proband = vcfiobio();         
-                vcfWorkers.proband.openVcfUrl(vcfUrl, function() {
+                vcfWorkers.proband.openVcfUrl(vcfUrl, null, function() {
 
                     vcfWorkers.mother = vcfiobio();         
-                    vcfWorkers.mother.openVcfUrl(vcfUrl, function() {
+                    vcfWorkers.mother.openVcfUrl(vcfUrl, null, function() {
 
                         vcfWorkers.father = vcfiobio();         
-                        vcfWorkers.father.openVcfUrl(vcfUrl, function() {
+                        vcfWorkers.father.openVcfUrl(vcfUrl, null, function() {
                             runCount++;
 
                             if (runCount == 1) {
@@ -151,7 +153,7 @@
 
                 var thePromise =  
                     vcfWorkers.proband.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  sampleNames.proband, annotationEngine, isRefSeq, 
+                                                  false, [sampleNames.proband], annotationEngine, {}, isRefSeq, 
                                                   hgvsNotation, getRsId, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
@@ -162,7 +164,7 @@
 
                 thePromise =  
                     vcfWorkers.mother.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  sampleNames.mother, annotationEngine, isRefSeq, 
+                                                  false, [sampleNames.mother], annotationEngine, {}, isRefSeq, 
                                                   hgvsNotation, getRsId, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
@@ -173,7 +175,7 @@
 
                 thePromise =  
                     vcfWorkers.father.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  sampleNames.father, annotationEngine, isRefSeq, 
+                                                  false, [sampleNames.father], annotationEngine, {}, isRefSeq, 
                                                   hgvsNotation, getRsId, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
