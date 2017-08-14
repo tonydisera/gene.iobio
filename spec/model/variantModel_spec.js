@@ -503,7 +503,8 @@ describe('variantModel', function() {
 				name: "vcf track",
 				start: 100,
 				strand: "+",
-				variantRegionStart: 100
+				variantRegionStart: 100,
+				genericAnnotators: undefined
 			})
 		});
 
