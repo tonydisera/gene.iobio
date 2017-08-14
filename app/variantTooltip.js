@@ -102,9 +102,10 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			    var clazz = matrixCard.clinvarMap[clinsigToken].clazz;
 			    var badge = matrixCard.clinvarMap[clinsigToken].examineBadge;
 
-			    var linkSelector = selector + " .tooltip-clinsig-link" + key;
-			    if (badge && $(linkSelector).length > 0) {
-			    	var div = $(linkSelector);
+			    var linkSelector =  ".tooltip-clinsig-link" + key;
+			    var tooltipNode = $(tooltip.node());
+			    if (badge && tooltipNode.find(linkSelector).length > 0) {
+			    	var div = tooltipNode.find(linkSelector);
 					$(div).prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
 					var svg = d3.select($(div).find("svg.clinvar-badge")[0]);
 					var selection = svg.data([{width:10, height:10, transform: (translate ? translate : 'translate(0,1)'), clazz: clazz}]);
