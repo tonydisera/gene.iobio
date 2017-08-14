@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Snippet Test WGS Platinum Trio</title>
+        <style>
+            body {
+                font-family: Helvetica;
+            }
+        </style>
+    </head>
+    <body>
+
+        <h1>Snippet - Loading genes for Platinum WGS spike-in trio.</h1>
+        <h2 id="data-source"></h2>
+        <div id="main">
+
+        </div>
+
+        <script src="../assets/js/iobio.min.js"></script>
+        <script src="../assets/js/d3.min.js"></script> 
+        <script src="../assets/js/jquery.1.11.1.min.js"></script> 
+
+        <script src="../app/globalsDeployment.js"></script>
+        <script src="../app/globals.js"></script>
+        <script src="../app/model/cacheHelper.js"></script>
+        <script src="../app/model/genomeBuildHelper.js"></script>
+        <script src="../app/vcf.iobio.js"></script>
+
+        
+        <script>
+
+            var GENE_REGION_BUFFER = 1000;
+            var annotationEngine = 'vep';
+            var geneSource = 'gencode';
+            var isRefSeq = false;
+            var hgvsNotation = false;
+            var getRsId = false;
+            var geneCount = 1;
+            var start = 0;
+            var end = 0;
+            var runCount = 0;
+
+            function uniq(theArray) {
+               return Array.from(new Set(theArray));
+            }
+
+
+            var sampleNames = {
+                proband: 'NA12878',
+                mother:  'NA12892',
+                father:  'NA12891'
+            };                
+            var vcfUrl = "https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz";
+            var vcfWorkers = {
+
+            };
+
+/*
+            var geneNames = ["BRCA1", "BRCA2", "TP53", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "APC", "MUTYH", "VHL", "MEN1", "RET", "PTEN", "RB1", "SDHD", "SDHAF2", "SDHC", "SDHB", "TSC1", "TSC2", "WT1", "NF2", "COL3A1", "FBN1", "TGFBR1", "TGFBR2", "SMAD3", "ACTA2", "MYLK", "MYH11", "MYBPC3", "MYH7", "TNNT2", "TNNI3", "TPM1", "MYL3", "ACTC1", "PRKAG2", "GLA", "MYL2", "LMNA", "RYR2", "PKP2", "DSP", "DSC2", "TMEM43", "DSG2", "KCNQ1", "KCNH2", "SCN5A", "LDLR", "APOB", "PCSK9", "RYR1", "CACNA1S"];
+*/
+
+            var geneNames = [
+              "BCS1L", "COX10", "NDUFS4", "SLC37A4", "PDHA1", "FH", "CACNA1S", "NDUFS3", "SLC25A19", "NDUFV1", "NDUFS1", "NDUFS7", "SDHA", "PC", "G6PC", "DLD", "PDHB", "NDUFV2", "DLAT", "TAZ", "SURF1", "NDUFA2", "NDUFS8", "PDP1", "NDUFA10", "NDUFS2", "NDUFS6", "NDUFB3", "NDUFA1", "COQ2", "NDUFA11", "COX15", "RYR1", "NDUFAF2", "SDHD", "CYC1", "HSD17B10", "YARS2", "PDHX", "COX6B1", "SCO1", "HADHA", "ACAD9", "NDUFAF4", "SLC19A3", "PCCB", "PCCA", "HADHB", "NDUFA7", "TACO1", "NDUFA9", "NDUFB6", "NDUFA12", "NDUFB5", "NDUFA8", "NDUFA5", "NDUFB8", "NDUFA4", "NDUFS5", "NDUFB7", "NDUFV3", "NDUFC2", "NDUFB10", "NDUFB4", "NDUFB2", "NDUFC1", "NDUFAB1", "NDUFA3", "NDUFB1", "NDUFB11", "NDUFA13", "ND6", "ND4", "ND5", "ND3", "ND4L", "ND2", "ND1", "MPC1", "PHKG2", "NDUFAF3", "NDUFAF1", "NUBPL", "SDHAF1", "SLC25A3", "SLC25A4", "SCO2", "PDSS2", "COX20", "RRM2B", "NDUFAF6", "COA5", "MLYCD", "ETS1", "SLC3A1", "SLC25A5", "COX17", "SDHB", "SDHC", "SLC2A4", "TUFM", "SFXN4", "MRPS16", "ADCK3", "LRPPRC", "TSFM", "ELAC2", "UCP1", "SLC2A1", "OGDH", "SLC2A2", "COX11", "GAPDH", "UCP2", "EARS2", "UCP3", "PIK3R5", "CACNA1D", "AKT1", "EP300", "SLC2A5", "PIK3R1", "PIK3CG", "PIK3CB", "PIK3R3", "PIK3R2", "PIK3CD", "PIK3CA", "SLC25A6", "PRKACA", "PKLR", "SLC2A3", "ATP5B", "CREBBP", "ATP5A1", "ATP5G1", "SLC25A13", "SLC25A12", "CACNA1C", "FARS2", "AARS2", "SLC9A1", "UQCRFS1", "NDUFB9", "CALM1", "MPV17", "MDH2", "SLC16A1", "SLC16A8", "SLC16A3", "INS", "PRKACB", "SLC6A11", "UQCRC1", "UQCRB", "UQCRC2", "UQCRH", "UQCRQ", "UQCR11", "UQCR10", "PLCB2", "SLC5A1", "COX6C", "COX5B", "COX5A", "COX6A1", "COX4I1", "COX3", "COX7B", "COX1", "COX2", "COX7C", "COX8A", "SLC18A2", "SLC18A1", "SLC5A6", "PRKACG", "CALM3", "CALM2", "SLC25A10", "SLC25A31", "SP1", "ATP5C1", "LIAS", "NDUFA6", "ATP5F1", "ATP5O", "SLC44A2", "SLC44A3", "SLC44A5", "SLC44A4", "ATP5H", "ATP5D", "PRKAG2", "PRKAB2", "PRKAA2", "ATP8", "ATP5G2", "ATP6", "COX7A2L"            
+            ];
+            
+
+            var genomeBuildHelper = null;
+            var cacheHelper = null;
+            var useCache = false;
+
+            $(document).ready(function(){
+                //$('#data-source').text(new_iobio_services);
+                
+                genomeBuildHelper = new GenomeBuildHelper();
+                genomeBuildHelper.promiseInit().then(function() {
+                    cacheHelper = new CacheHelper();
+                    cacheHelper.isolateSession();
+
+                    run();
+                });
+            });
+
+            function run() {
+                geneCount = 0;
+
+                // To time server-side caching, double the entries in gene names in the array
+                var duplicatedGeneNames = [];
+                if (useCache) {
+                    geneNames.forEach(function(geneName) {
+                        duplicatedGeneNames.push(geneName);
+                        duplicatedGeneNames.push(geneName);
+                    })
+                    geneNames = duplicatedGeneNames;                    
+                }
+
+
+                vcfWorkers.proband = vcfiobio();         
+                vcfWorkers.proband.openVcfUrl(vcfUrl, null, function() {
+
+                    vcfWorkers.mother = vcfiobio();         
+                    vcfWorkers.mother.openVcfUrl(vcfUrl, null, function() {
+
+                        vcfWorkers.father = vcfiobio();         
+                        vcfWorkers.father.openVcfUrl(vcfUrl, null, function() {
+                            runCount++;
+
+                            if (runCount == 1) {
+                                geneCount = 1;
+                                start = Date.now();
+
+                                var table = '<table id="result-table" style="width:600px"><tr>';
+                                table += 
+                                      '<td>'  +             '</td>'
+                                    + '<td>'  + 'gene'    + '</td>'
+                                    + '<td>'  + 'proband' + '</td>'
+                                    + '<td>'  + 'mother'  + '</td>'
+                                    + '<td>'  + 'father'  + '</td>'
+                                    + '<td>'  + 'sec'     + '</td>'                               
+                                    + '<td>'  + 'variant/sec' + '</td>';                                
+                                table += '</tr></table>';    
+                                $('#main').append(table);
+
+
+
+                                runNextGene();
+
+                            }
+                        });
+
+                    });
+                });
+            }
+
+            function runNextGene() {
+                if (geneNames.length == 0) {
+                    return;
+                }
+                
+                var geneName = geneNames[0];
+                geneNames.splice(0,1);
+
+                promiseGetGeneObject(geneName).then(function(geneObject) {
+                    var transcript = getCanonicalTranscript(geneObject);
+                    annotateVariantsForGene(geneObject, transcript);
+                }, function(error) {
+                    console.log("SKIPPING GENE " + geneName);
+
+                    runNextGene();
+                });
+            }
+
+
+            function annotateVariantsForGene(geneObject, selectedTranscript) {
+
+                console.log("PROCESSING GENE " + geneObject.gene_name);
+                var promises = [];
+
+                var theSamples = [
+                  {sampleName: sampleNames.proband, vcfSampleName: sampleNames.proband },
+                  {sampleName: sampleNames.mother,  vcfSampleName: sampleNames.mother },
+                  {sampleName: sampleNames.father,  vcfSampleName: sampleNames.father }
+                ]
+
+                var thePromise =  
+                    vcfWorkers.proband.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
+                                                  true,  
+                                                  theSamples,
+                                                  annotationEngine, {}, isRefSeq, 
+                                                  true, true, useCache)
+                              .then( function(data) {
+                                    var annotatedRecs = data[0];
+                                    var results = data[1];
+                                    geneObject.probandCount =  results[0].features.length;
+                                    geneObject.motherCount  =  results[1].features.length;
+                                    geneObject.fatherCount  =  results[2].features.length;
+                              });
+
+
+
+                thePromise.then(function(data) {
+                    end = Date.now();
+                    var sec = round((end - start) / 1000, 2);
+                    var variantPerSec = round((geneObject.probandCount+geneObject.motherCount+geneObject.fatherCount)/sec, 2);
+                    var row = '<tr>';
+                    row += 
+                          '<td>'  + geneCount               + '</td>'
+                        + '<td>'  + geneObject.gene_name    + '</td>'
+                        + '<td>'  + geneObject.probandCount + '</td>'
+                        + '<td>'  + geneObject.motherCount  + '</td>'
+                        + '<td>'  + geneObject.fatherCount  + '</td>'
+                        + '<td>'    + sec                   + '</td>'
+                        + '<td>'    + variantPerSec         + '</td>';
+                    row += '</tr>';    
+                    console.log("***** " + geneCount + ". " + "FINISHED WITH TRIO FOR GENE "  + ' *******');
+
+                    
+                    $("#main #result-table").append(row);
+
+                    geneCount++;
+
+                    start = Date.now();
+                    runNextGene();
+                });          
+            }
+
+
+            function promiseGetGeneObject(geneName) {
+
+                return new Promise( function(resolve, reject) {
+
+                    var searchType = 'gene';
+                    var url = geneInfoServer + 'api/' + searchType + '/' + geneName + "?source=" + geneSource;
+                    url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
+                    url += "&build="   + genomeBuildHelper.getCurrentBuildName();
+
+                    $.ajax({
+                        url: url,
+                        jsonp: "callback",
+                        type: "GET",
+                        dataType: "jsonp",
+                        success: function( response ) {
+
+                            var geneObject = response[0];  
+                            if (geneObject.hasOwnProperty("gene_name") 
+                                && geneObject.hasOwnProperty("chr")
+                                && geneObject.hasOwnProperty("transcripts")
+                                && geneObject.transcripts.length > 0) {
+
+                                if (geneObject.chr.indexOf('chr') == 0) {
+                                    geneObject.ref = geneObject.chr.split("chr")[1];
+                                } else {
+                                    geneObject.ref = geneObject.chr;
+                                }
+                                adjustGeneRegion(geneObject);  
+                                resolve(geneObject);
+                            } else {
+                                reject("error - incomplete gene info for gene " + geneName);
+                            }
+
+                        },
+                        error: function( xhr, status, errorThrown ) {
+                            
+                            console.log( "Error: " + errorThrown );
+                            console.log( "Status: " + status );
+                            console.log( xhr );
+                            console.log("Gene " + geneName + " not found");
+                            reject("Gene " + geneName + " not found");
+
+                        },
+                        complete: function( xhr, status ) {
+                        }
+                    });
+                });
+            }
+
+
+
+            function getCanonicalTranscript(theGeneObject) {
+                var geneObject = theGeneObject != null ? theGeneObject : window.gene;
+                var canonical;  
+
+                if (geneObject.transcripts == null || geneObject.transcripts.length == 0) {     
+                    return null;
+                }
+                var order = 0;
+                geneObject.transcripts.forEach(function(transcript) {
+                    transcript.isCanonical = false;
+                    var cdsLength = 0;
+                    if (transcript.features != null) {
+                        transcript.features.forEach(function(feature) {
+                            if (feature.feature_type == 'CDS') {
+                                cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
+                            }
+                        })          
+                        transcript.cdsLength = cdsLength;           
+                    } else {
+                        transcript.cdsLength = +0;
+                    }
+                    transcript.order = order++;
+
+                });
+                var sortedTranscripts = geneObject.transcripts.slice().sort(function(a, b) {
+                    var aType = +2;
+                    var bType = +2;
+                    if (a.hasOwnProperty("transcript_type") && a.transcript_type == 'protein_coding') {
+                        aType = +0;
+                    } else if (a.hasOwnProperty("gene_type") && a.gene_type == "gene")  {
+                        aType = +0;
+                    } else {
+                        aType = +1;
+                    }
+                    if (b.hasOwnProperty("transcript_type") && b.transcript_type == 'protein_coding') {
+                        bType = +0;
+                    } else if (b.hasOwnProperty("gene_type") && b.gene_type == "gene")  {
+                        bType = +0;
+                    } else {
+                        bType = +1;
+                    }
+
+
+                    var aLevel = +2;
+                    var bLevel = +2;
+                    if (geneSource.toLowerCase() == 'refseq') {
+                        if (a.transcript_id.indexOf("NM_") == 0 ) {
+                            aLevel = +0;
+                        } 
+                        if (b.transcript_id.indexOf("NM_") == 0 ) {
+                            bLevel = +0;
+                        } 
+                    } else {
+                        // Don't consider level for gencode as this seems to point to shorter transcripts many
+                        // of the times.
+                        //aLevel = +a.level;
+                        //bLevel = +b.level;
+                    }
+
+
+                    var aSource = +2;
+                    var bSource = +2;
+                    if (geneSource.toLowerCase() =='refseq') {
+                        if (a.annotation_source == 'BestRefSeq' ) {
+                            aSource = +0;
+                        }
+                        if (b.annotation_source == 'BestRefSeq' ) {
+                            bSource = +0;
+                        }
+                    }
+
+                    a.sort = aType + ' ' + aLevel + ' ' + aSource + ' ' + a.cdsLength + ' ' + a.order;
+                    b.sort = bType + ' ' + bLevel + ' ' + bSource + ' ' + b.cdsLength + ' ' + b.order;
+
+                    if (aType == bType) {
+                        if (aLevel == bLevel) {
+                            if (aSource == bSource) {
+                                if (+a.cdsLength == +b.cdsLength) {
+                                    // If all other sort criteria is the same,
+                                    // we will grab the first transcript listed
+                                    // for the gene.
+                                    if (a.order == b.order) {
+                                        return 0;
+                                    } else if (a.order < b.order) {
+                                        return -1;
+                                    } else {
+                                        return 1;
+                                    }
+                                    return 0;
+                                } else if (+a.cdsLength > +b.cdsLength) {
+                                    return -1;
+                                } else {
+                                    return 1;
+                                }
+                            } else if ( aSource < bSource ) {
+                                return -1;
+                            } else {
+                                return 1;
+                            }
+                        } else if (aLevel < bLevel) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    } else if (aType < bType) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                });
+                canonical = sortedTranscripts[0];
+                canonical.isCanonical = true;
+                return canonical;
+            }
+
+
+            function getHumanRefNames(refName) {
+                if (refName.indexOf("chr") == 0) {
+                  return "chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr20 chr21 chr22 chrX chrY";
+                } else {
+                  return "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y";
+                }
+            }
+            function switchGenotype(gt) {
+                if (gt != null && gt.length == 3) {
+                    return gt[2] +  gt[0];
+                } else {
+                    return gt;
+                }
+
+            }
+
+
+            function adjustGeneRegion(geneObject) {
+                if (geneObject.startOrig == null) {
+                    geneObject.startOrig = geneObject.start;
+                }
+                if (geneObject.endOrig == null) {
+                    geneObject.endOrig = geneObject.end;
+                }
+                // Open up gene region to include upstream and downstream region;
+                geneObject.start = geneObject.startOrig < GENE_REGION_BUFFER ? 0 : geneObject.startOrig - GENE_REGION_BUFFER;
+                // TODO: Don't go past length of reference
+                geneObject.end   = geneObject.endOrig + GENE_REGION_BUFFER;
+
+            }
+
+            function round(value, places) {
+              return +(Math.round(value + "e+" + places)  + "e-" + places);
+            }
+
+            function stripTranscriptPrefix(transcriptId) {
+                if (transcriptId == null) {
+                    console.log("null transcript id")
+                    return "";
+                }
+                var nameTokens = transcriptId.split('.');
+                return nameTokens.length > 0 ? nameTokens[0] : transcriptId;
+            }
+
+        </script>
+    </body>
+</html>
