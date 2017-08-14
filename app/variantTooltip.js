@@ -709,9 +709,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ clinvarSimpleRow2 );
 	} else if (type == 'tooltip') {
 		return (
-			  me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", '', '')
+			me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, coord + exonDisplay, dbSnpId ? '    (' + dbSnpId  + ')' : '', 'ref-alt')
+			+ me._tooltipMainHeaderRow(theTranscript ? 'Transcript ' + theTranscript.transcript_id : "", exonDisplay, '', '')
 			+ me._tooltipHeaderRow(effectLabel, '', '', '')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -759,9 +759,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		var div =
 		    '<div class="tooltip-wide">'
-			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", theTranscript ? theTranscript.transcript_id : "", exonDisplay, '')
+			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(variant.type ? variant.type.toUpperCase() : "", refalt, dbSnpLink, coord, 'ref-alt')
+			+ me._tooltipMainHeaderRow(theTranscript ? 'Transcript ' + theTranscript.transcript_id : "", exonDisplay, '', '')
 			+ inheritanceModeRow
 			+ '<div class="row" style="max-height:235px;overflow-y:scroll">' 
 				+ leftDiv
@@ -1034,7 +1034,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		var sampleName     = info.variantCard.getSampleName();
 		var genotype       = variant.genotypes[sampleName];
 
-		if (genotype.absent && dataCard.mode == 'single') {
+		if (genotype == null || genotype.absent && dataCard.mode == 'single') {
 			// If vcf doesn't have any genotypes, skip showing this
 
 		} else {
