@@ -491,15 +491,11 @@ describe('variantModel', function() {
 			data.features = [];
 			var vcfDataFiltered = variantModel.filterVariants(data, filterObject, 100, 200);
 			expect(vcfDataFiltered).toEqual({
-				count: 33,
-				countMatch: 10,
-				countUnique: 2,
-				sampleCount: 2,
 				intronsExcludedCount: 0,
 				end: 200,
 				features: [],
 				maxLevel: 11,
-				featureWidth: 100,
+				featureWidth: 100, 
 				name: "vcf track",
 				start: 100,
 				strand: "+",
