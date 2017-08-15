@@ -57,7 +57,7 @@ module.exports = {
     tooltip.expectVepImpact('high');
     tooltip.expectVepConsequence('stop gained');
     tooltip.expectClinvar('pathogenic');
-    tooltip.expectClinvarClinSig('smith-magenis syndrome');
+    tooltip.expectClinvarClinSig('smith-magenis syndrome', 'Smith-Magenis_syndrome');
     tooltip.expectAFExAC('0%');
     tooltip.expectAF1000G('0%');
     tooltip.expectQual('2266.59');
