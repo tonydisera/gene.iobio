@@ -393,7 +393,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		if (clinSigDisplay != null && clinSigDisplay != "") {
 			clinvarSimpleRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');	
 			if (phenotypeDisplay) {
-				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay);			
+				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay, null, 'tooltip-clinvar-pheno');			
 			}
 		}
 	}
@@ -406,9 +406,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			clinvarLink += '<a  href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
 			clinvarLink += '</div>';
 			
-			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '<span>', null, );		
+			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '<span>', null);		
 			if (phenotypeDisplay) {
-				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay);		
+				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay, null, 'tooltip-clinvar-pheno');		
 			}
 
 		} else if (variant.clinvarSubmissions != null && Object.keys(variant.clinvarSubmissions).length > 0) {
@@ -426,7 +426,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
 					clinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
 				}	
-				clinvarLink += '<span style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
+				clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
 
 				clinvarLink += "</div>"
 			}
@@ -738,7 +738,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
-			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
+			+ me._tooltipRow('&nbsp;', phenotypeDisplay, null, false, 'tooltip-clinvar-pheno')
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
 			+ "</div>";
@@ -787,7 +787,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ vepHighestImpactExamineRow			
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, false, 'sift-glyph')
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, false, 'polyphen-glyph')
-			+ me._tooltipRow('ClinVar', clinvarLink)
+			+ me._tooltipRow('ClinVar', clinvarLink, null, false, 'tooltip-clinvar-pheno')
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
 			+ me._tooltipRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)))
 			+ me._tooltipRow('Allele Freq 1000G', percentage(variant.af1000G))
