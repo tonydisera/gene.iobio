@@ -15,7 +15,7 @@ var serverCacheDir        = "local_cache/"; // this is the directory from the se
 var serverDataDir         = "local_cache/"; // this is the directory from the server instance where data files will be served
 var offlineUrlTag         = "site:"         // this is the first part if the vcf/bam URL that indicates that a special URL should be constructed to get to files served from the local isntance
 
-var useSSL                = true;
+var useSSL                = false;
 var useServerCache        = false;
 
 // MyGene2 deployment variables;
