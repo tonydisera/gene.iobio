@@ -77,7 +77,14 @@ module.exports = {
     },
 
     clickVepHigh: function() {
-      return this.api.useXpath().moveToElement(filter.vepHigh, 1,1).click(filter.vepHigh);
+      var self = this;
+      this.api.execute(function(data) {
+        var element = document.querySelector("#filter-track svg#HIGH")
+        element.scrollIntoView(true);
+         return true;
+      }, [], function(result) {
+        return self.api.useXpath().getLocationInView(filter.vepHigh).moveToElement(filter.vepHigh, 0,0).click(filter.vepHigh);
+      });
     },
     clickVepModerate: function() {
       return this.api.useXpath().moveToElement(filter.vepModerate, 1,1).click(filter.vepModerate);

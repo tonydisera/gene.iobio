@@ -34,7 +34,7 @@ module.exports = {
     
     variantTooltip.expectVepConsequence('stop gained');
     variantTooltip.expectInheritanceEquals('recessive inheritance');
-    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033 ');
+    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033');
     variantTooltip.expectHGVScEquals('NM_030665.3:c.2273G>A');
     
     client.end();

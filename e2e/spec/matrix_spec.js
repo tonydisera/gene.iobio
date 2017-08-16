@@ -29,7 +29,11 @@ module.exports = {
   },
 
   'ClinVar Pathogenicity row should be accurate': function(client) {
-    matrixTrack.assertClinVarBenign([1, 2, 3, 4, 6]);
+    // Use this test if using clinvar eutils
+    //matrixTrack.assertClinVarBenign([1, 2, 3, 4, 6]);
+
+    // Use this test if using clinvar vcf
+    matrixTrack.assertClinVarBenign([6, 7, 8, 10, 11, 12]);
     matrixTrack.assertClinVarNull([5]);
   },
 
@@ -75,10 +79,9 @@ module.exports = {
     client.pause(1000);    
     filterPanel.clickClinvarPath();
     matrixTrack.waitForZeroFilteredVariantsWarning();
-
     client.pause(1000);
-    // de-select clinvar filter
     filterPanel.unclickClinvarPath();
+
     // now select vep HIGH filter
     filterPanel.clickVepHigh();
     matrixTrack.waitForZeroFilteredVariantsWarning();

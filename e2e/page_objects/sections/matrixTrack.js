@@ -2,7 +2,8 @@ var CLINVAR = {
   LABEL: 'Pathogenicity - ClinVar',
   SYMBOL: "/*[local-name()='g']", // used to assert that a symbol is not present in the DOM
   BENIGN: "/*[local-name()='text' and text()='benign']",
-  PATHOGENIC: "/*[local-name()='text' and text()='pathogenic']"
+  PATHOGENIC: "/*[local-name()='text' and text()='pathogenic']",
+  OTHER: "/*[local-name()='text' and text()='other']"
 };
 
 var SIFT = {
@@ -85,6 +86,9 @@ module.exports = {
     // CLINVAR
     assertClinVarBenign: function(variants) {
       this.assertSymbolsPresent(CLINVAR.LABEL, variants, CLINVAR.BENIGN);
+    },
+    assertClinVarOther: function(variants) {
+      this.assertSymbolsPresent(CLINVAR.LABEL, variants, CLINVAR.OTHER);
     },
     assertClinVarPathogenic: function(variants) {
       this.assertSymbolsPresent(CLINVAR.LABEL, variants, CLINVAR.PATHOGENIC);
