@@ -245,6 +245,7 @@ DataCard.prototype.loadDemoData = function() {
 			me.demoSampleNames.proband, me.demoUrls.proband)
 		  .then(function() {
 			$('#select-build-box').removeClass("attention");
+			window.getAffectedInfo(true);
 			window.setGeneratedSampleNames();
 			window.loadTracksForGene();
 			window.cacheHelper.clearCache();
@@ -282,6 +283,7 @@ DataCard.prototype.loadMygene2Data = function() {
 			if (genomeBuildHelper.getCurrentBuild()) {
 				me.promiseSetVcfUrl("proband", "Variants", null, probandUrl)
 				  .then(function() {
+				  	window.getAffectedInfo(true);
 					window.setGeneratedSampleNames();
 					window.loadTracksForGene();
 					window.cacheHelper.clearCache();
@@ -854,6 +856,7 @@ DataCard.prototype.init = function() {
 		window.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
 		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");			
 
+		window.getAffectedInfo(true);
 		filterCard.displayAffectedFilters();
 		genericAnnotation.appendGenericFilters(getProbandVariantCard().model.getAnnotators());
 

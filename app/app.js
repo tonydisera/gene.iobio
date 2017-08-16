@@ -75,6 +75,8 @@ var firstTimeShowVariants = true;
 var readyToHideIntro = false;
 var keepShowingIntro = false;
 
+var affectedInfo = null;
+
 
 // bookmark card
 var bookmarkCard = new BookmarkCard();
@@ -1498,6 +1500,7 @@ function loadUrlSources() {
 
 
 				genesCard.showAnalyzeAllButton();
+				getAffectedInfo(true);
 				filterCard.displayAffectedFilters();
 				genericAnnotation.appendGenericFilters(getProbandVariantCard().model.getAnnotators());
 
@@ -2709,40 +2712,43 @@ function setGeneratedSampleNames() {
 	})
 }
 
-function getAffectedInfo () {
-	var affectedInfo = [];
-	if (getRelevantVariantCards() && getRelevantVariantCards().length > 0) {
-		getRelevantVariantCards().forEach(function(vc) {
-			if (vc && vc.getRelationship() != 'known-variants') {
-				var info = {};
-				info.variantCard = vc;
-				if (vc) {
-					info.relationship = vc.getRelationship();
-					info.status = vc.isAffected() ? 'affected' : 'unaffected';
-					info.label = vc.getRelationship();
+function getAffectedInfo (forceRefresh) {
+	if (window.affectedInfo == null || forceRefresh) {
+		window.affectedInfo = [];
+		if (getRelevantVariantCards() && getRelevantVariantCards().length > 0) {
+			getRelevantVariantCards().forEach(function(vc) {
+				if (vc && vc.getRelationship() != 'known-variants') {
+					var info = {};
+					info.variantCard = vc;
+					if (vc) {
+						info.relationship = vc.getRelationship();
+						info.status = vc.isAffected() ? 'affected' : 'unaffected';
+						info.label = vc.getRelationship();
 
+						info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
+
+						window.affectedInfo.push(info);			
+					}
+				}
+			})
+			var sibIdx = 0;
+			for (var status in variantCardsSibs) {
+				var sibs = variantCardsSibs[status];
+				sibs.forEach(function(vc) {
+					var info = {};
+					info.relationship = vc.getRelationship();
+					info.status = status;
+					info.variantCard = vc;
+					info.label = vc.getRelationship() + " " + vc.getSampleName();
 					info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
 
-					affectedInfo.push(info);			
-				}
-			}
-		})
-		var sibIdx = 0;
-		for (var status in variantCardsSibs) {
-			var sibs = variantCardsSibs[status];
-			sibs.forEach(function(vc) {
-				var info = {};
-				info.relationship = vc.getRelationship();
-				info.status = status;
-				info.variantCard = vc;
-				info.label = vc.getRelationship() + " " + vc.getSampleName();
-				info.id = info.status + "-_-" + vc.getRelationship() + "-_-" + vc.getSampleName();
+					window.affectedInfo.push(info);
+				})
+			}		
+		}
 
-				affectedInfo.push(info);
-			})
-		}		
 	}
-	return affectedInfo;
+	return window.affectedInfo;
 }
 
 function addCommas(nStr)
