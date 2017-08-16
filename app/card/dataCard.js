@@ -36,8 +36,8 @@ function DataCard() {
 
 	this.demoNames = {
 		proband: 'NA12878',
-		mother:  'NA12891',
-		father:  'NA12892' 
+		mother:  'NA12892',
+		father:  'NA12891' 
 	};
 	this.demoUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
@@ -46,13 +46,13 @@ function DataCard() {
 	};
 	this.demoBamUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
-		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
-		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
+		mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam',
+		father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam'
 	};
 	this.demoSampleNames = {
 		proband: 'NA12878',
-		mother:  'NA12891',
-		father:  'NA12892' 
+		mother:  'NA12892',
+		father:  'NA12891' 
 	};
 
 	this.eduTourModes = [
