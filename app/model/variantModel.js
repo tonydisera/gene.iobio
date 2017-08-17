@@ -3003,7 +3003,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		// We don't want to display homozygous reference variants in the variant chart
 		// or feature matrix (but we want to keep it to show trio allele counts).
 		var isHomRef = (d.zygosity != null && (d.zygosity.toLowerCase() == 'gt_unknown' || d.zygosity.toLowerCase() == 'homref')) ? true : false;
-		var isGenotypeAbsent = d.genetoype && d.genotype.absent ? d.genotype.absent : false;
+		var isGenotypeAbsent = d.genotype == null ? true :(d.genotype.absent ? d.genotype.absent : false);
 
 		var meetsRegion = true;
 		if (!bypassRangeFilter) {
