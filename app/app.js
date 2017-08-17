@@ -134,7 +134,7 @@ var fbSettings = {
 	'visited': false,
 	'arguments': {
 		'useSuggestedVariants':     {value: true,  defaultValue: true},
-		'limitToSuggestedVariants': {value: true, defaultValue: true, argName: '-l',                    isFlag: true},
+		'limitToSuggestedVariants': {value: false, defaultValue: false, argName: '-l',                    isFlag: true},
 		'minMappingQual':           {value: 0,     defaultValue: 0,     argName: '--min-mapping-quality'},
 		'minCoverage':              {value: 0,     defaultValue: 0,     argName: '--min-coverage'},
 		'useDupReads':              {value: false, defaultValue: false, argName: '--use-duplicate-reads', isFlag: true}		
