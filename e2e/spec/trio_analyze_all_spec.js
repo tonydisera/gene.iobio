@@ -203,8 +203,8 @@ module.exports = {
       theTooltip.expectHGVScEquals("ENST00000375994.2:c.595A>G");
       theTooltip.expectHGVSpEquals("ENSP00000365162.2:p.Ile199Val");
       theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'proband', 10, 39, 49, 'Het');
-      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 55, 'Homref');
-      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 45, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 55, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 45, 'Homref');
 
     }
 

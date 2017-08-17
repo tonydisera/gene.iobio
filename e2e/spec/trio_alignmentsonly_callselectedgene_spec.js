@@ -68,8 +68,8 @@ module.exports = {
     tooltip.expectQual('2266.59');
     tooltip.expectFilter('PASS');
     tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'proband', 38, 1,  39, 'Hom');
-    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'mother',  26, 25, 51, 'Het');
-    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'father',  30, 33, 63, 'Het');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'father',  26, 25, 51, 'Het');
+    tooltip.expectAlleleCountsEquals(tooltip.MATRIX_TOOLTIP, 'mother',  30, 33, 63, 'Het');
 
 
   },
