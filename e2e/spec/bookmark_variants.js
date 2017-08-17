@@ -45,8 +45,8 @@ module.exports = {
     variantTooltip.expectQual('2880.99');
     variantTooltip.expectFilter('. (unassigned)');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'proband', 38, 1,  39, 'Hom');
-    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'mother',  26, 25, 51, 'Het');
-    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'father',  30, 33, 63, 'Het');
+    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'father',  26, 25, 51, 'Het');
+    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'mother',  30, 33, 63, 'Het');
     variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033' );
     variantTooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
 
@@ -82,8 +82,8 @@ module.exports = {
     variantTooltip.expectPolyphen('probably damaging');
     variantTooltip.expectSIFT('deleterious');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'proband', 27, 76, 103, 'Het');
-    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'mother',  null, null, 13, 'Homref');
-    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'father',  null, null, 42, 'Homref');
+    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'father',  null, null, 13, 'Homref');
+    variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'mother',  null, null, 42, 'Homref');
 
 
     variantTooltip.clickBookmark();
