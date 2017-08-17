@@ -37,7 +37,10 @@ module.exports = {
       this.expect.element('@sift').text.to.equals(text);
     },         
     expectClinvar: function(text) {
-      this.expect.element('@clinvar').text.to.equals(text);
+      this.expect.element('@clinvarLink').text.to.equals(text);
+    },
+    expectClinvarSpan: function(text) {
+      this.expect.element('@clinvarSpan').text.to.equals(text);
     },
     expectClinvarClinSig: function(text1, text2) {
       var clinsigXPath = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//*[contains(@class, "tooltip-clinvar-pheno")]';
@@ -117,7 +120,8 @@ module.exports = {
     polyphen: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="PolyPhen"]/following-sibling::div', locateStrategy: 'xpath'},
     sift:     {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="SIFT"]/following-sibling::div', locateStrategy: 'xpath'},
    
-    clinvar:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div//a', locateStrategy: 'xpath'},
+    clinvarLink:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div//a', locateStrategy: 'xpath'},
+    clinvarSpan:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div/span', locateStrategy: 'xpath'},
    
     afExAC:  {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq ExAC"]/following-sibling::div', locateStrategy: 'xpath'},
     af1000G: {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq 1000G"]/following-sibling::div', locateStrategy: 'xpath'},
