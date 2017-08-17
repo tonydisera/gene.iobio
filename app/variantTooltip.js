@@ -729,6 +729,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		var leftDiv =  
 		    '<div class="tooltip-left-column">' 
+			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
+			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
 		    + me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  
 					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? effectDisplay : vepConsequenceDisplay))
 			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
@@ -736,11 +738,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ vepHighestImpactExamineRow			
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
-			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay, null, false, 'tooltip-clinvar-pheno')
-			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
-			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
+			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ "</div>";
 
 		var rightDiv = 

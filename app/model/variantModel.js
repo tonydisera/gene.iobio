@@ -1270,7 +1270,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 				    			}
 				    		} else {
-				    			var cachedVcfData = me.getVcfDataForGene(theGene, theTranscript);
+				    			var cachedVcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
 				    			if (cachedVcfData) {
 						    		var theVariants = cachedVcfData.features.filter(function(d) {
 						    			if (d.start == v.start &&
