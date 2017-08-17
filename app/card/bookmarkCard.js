@@ -728,14 +728,14 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          		if (inheritance == 'recessive') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
-								        .attr("height", 15)
+								        .attr("height", 16)
 								        .attr("width", 15);
 					var options = {width: 15, height: 15, transform: "translate(0,3)"};
 					matrixCard.showRecessiveSymbol(svg, options);										        
          		} else if (inheritance == 'denovo') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
-								        .attr("height", 15)
+								        .attr("height", 16)
 								        .attr("width", 15);
 					var options = {width: 15, height: 15, transform: "translate(0,3)"};
 					matrixCard.showDeNovoSymbol(svg, options);				

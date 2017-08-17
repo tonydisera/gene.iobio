@@ -328,7 +328,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 					(variantEntry.hasOwnProperty('freebayesCalled') && variantEntry.freebayesCalled == 'Y')) {
 					// If the variant was called on-demand, issue the service calls to
 					// generate the vcf records.
-					cacheJointCallVariants(theGeneObject, theTranscript, false, variantEntry, 
+					cacheJointCallVariants(theGeneObject, theTranscript, variantEntry, 
 						function(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, sourceVariant) {
 							var theVariant = null;
 							var theVcfRecs = null;
@@ -486,13 +486,13 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 
 	 	// Get the clinvar data and load into the variant record
 	 	var dummyVcfData  = {features: [revisedVariant]};
-	 	var clinvarLoader = isClinvarOffline ? getProbandVariantCard().model._refreshVariantsWithClinvarVariants.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvar.bind(getProbandVariantCard().model, dummyVcfData);
+	 	var clinvarLoader = isClinvarOffline || clinvarSource == "vcf" ? getProbandVariantCard().model._refreshVariantsWithClinvarVCFRecs.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvarEutils.bind(getProbandVariantCard().model, dummyVcfData);
 		getProbandVariantCard().model
 		   .vcf
-		   .promiseGetClinvarRecordsImpl(dummyVcfData.features, 
-		   								 getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
-		   								 theGeneObject, 
-		   	                             clinvarLoader)	
+		   .promiseGetClinvarRecords(dummyVcfData, 
+		   						     getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
+		   						     theGeneObject, 
+		   	                         clinvarLoader)	
 		   .then(function() {
 				
 				variantTooltip.formatContent(revisedVariant, null, "record", rec);
