@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, motherVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, fatherVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -13,7 +13,7 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;  
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
-    motherVariantCard = indexPage.section.motherVariantCard;
+    fatherVariantCard = indexPage.section.fatherVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
     tooltip = indexPage.section.variantTooltip;
@@ -170,9 +170,9 @@ module.exports = {
     probandVariantCard.assertDangerExonCountEquals(1);
     probandVariantCard.assertLowCoverageGlyphCountEquals(1);
 
-    motherVariantCard.waitForBamDepthLoaded();
-    motherVariantCard.assertDangerExonCountEquals(9);
-    motherVariantCard.assertLowCoverageGlyphCountEquals(9);
+    fatherVariantCard.waitForBamDepthLoaded();
+    fatherVariantCard.assertDangerExonCountEquals(9);
+    fatherVariantCard.assertLowCoverageGlyphCountEquals(9);
   },
 
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
