@@ -596,7 +596,7 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, isMultiSample, samplesToRetrieve, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, regions, isMultiSample, samplesToRetrieve, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache) {
     var me = this;
 
 
@@ -620,7 +620,7 @@ var effectCategories = [
 
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -631,7 +631,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -646,7 +646,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -664,11 +664,33 @@ var effectCategories = [
 
     });
 
-    // Get the vcf records for this region
-    vcfReader.getRecords(refName, geneObject.start, geneObject.end, function(records) {
+    var getRecordsForRegion = function(theRegions, theRecords, callback) {
+      if (theRegions.length > 0) {
+        var region = theRegions.splice(0,1)[0];
+        vcfReader.getRecords(region.name, region.start, region.end, function(recs) {
+          theRecords = theRecords.concat(recs);
+          getRecordsForRegion(theRegions, theRecords, callback);
+        });
+      } else {
+        if (callback) {
+          callback(theRecords);
+        }
+      } 
+    }
 
-        var allRecs = headerRecords.concat(records);
 
+    var theRegions = null;
+    if (regions && regions.length > 0) {
+      theRegions = regions.slice();
+    } else {
+      theRegions = [{name: refName, start: geneObject.start, end: geneObject.end}];
+    }
+
+    // Get the vcf records for every region
+    var records = [];
+    getRecordsForRegion(theRegions, records, function(recordsForRegions) {
+
+        var allRecs = headerRecords.concat(recordsForRegions);
 
         me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, clinvarMap, isRefSeq && hgvsNotation, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId)
         .then( function(data) {
@@ -688,12 +710,22 @@ var effectCategories = [
 
   }
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
 
     var me = this;
 
     // Figure out the file location of the reference seq files
-    var regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
+    var regionParm = null;
+    if (regions && regions.length > 0) {
+      regionParm = "";
+      regions.forEach(function(region) {
+        regionParm += " ";
+        regionParm += region.name + ":" + region.start + "-" + region.end;
+      })
+    } else {
+      regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
+
+    }
     var refFastaFile = genomeBuildHelper.getFastaPath(refName);
 
 

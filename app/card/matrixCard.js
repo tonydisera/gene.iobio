@@ -613,23 +613,46 @@ MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) 
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(variant, true)
 
-		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-	        .then( function(refreshedVariant) {
 
-        		// Now show tooltip again with the hgvs notations.  Only show
-	        	// if we haven't clicked on another variant
-	        	if (clickedVariant &&
-	        		clickedVariant.start == refreshedVariant.start &&
-	        		clickedVariant.ref == refreshedVariant.ref &&
-	        		clickedVariant.alt == refreshedVariant.alt) {
 
-		        	refreshedVariant.screenXMatrix = xMatrix;
-		        	refreshedVariant.screenYMatrix = yMatrix;
-					me._showTooltipImpl(refreshedVariant, true, adjustPosition);
+		var showTooltipExtraAnnot = function(annotatedVariants, callbackNotFound) {
+			var targetVariants = annotatedVariants.filter(function(v) {
+				return clickedVariant &&
+	        		   clickedVariant.start == v.start &&
+	        		   clickedVariant.ref   == v.ref &&
+	        		   clickedVariant.alt   == v.alt;
+			});
+			if (targetVariants.length > 0) {
+				var annotatedVariant = targetVariants[0];
+				annotatedVariant.screenXMatrix = xMatrix;
+	        	annotatedVariant.screenYMatrix = yMatrix;
+				me._showTooltipImpl(annotatedVariant, true, adjustPosition);
+			} else {
+				if (callbackNotFound) {
+					callbackNotFound();
 				}
+			}
 
+		}
 
-	        });
+		getProbandVariantCard()
+		    .model
+		    .promiseGetImpactfulVariantIds(window.gene, window.selectedTranscript)
+			.then( function(annotatedVariants) {
+				// If the clicked variant is in the list of annotated variants, show the
+				// tooltip; otherwise, the callback will get the extra annots for this
+				// specific variant
+				showTooltipExtraAnnot(annotatedVariants, function() {
+					// The clicked variant wasn't annotated in the batch of variants.  Get the
+					// extra annots for this specific variant.
+					getProbandVariantCard()
+					    .model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+				        .then( function(refreshedVariant) {
+				        	showTooltipExtraAnnot([refreshedVariant]);
+				        })
+				})
+			});
+
 	} else {
 		me._showTooltipImpl(variant, lock, adjustPosition);
 	}
