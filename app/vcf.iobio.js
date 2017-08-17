@@ -1356,7 +1356,15 @@ var effectCategories = [
       if (tbiUrl) {
         args.push(tbiUrl);
       }
-      var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
+
+      var contigStr = "";
+      getHumanRefNames(refName).split(" ").forEach(function(ref) {
+          contigStr += "##contig=<ID=" + ref + ">\n";
+      })
+      var contigNameFile = new Blob([contigStr])
+
+      var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
+        .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
 
       // normalize variants
       cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
