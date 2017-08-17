@@ -2857,7 +2857,7 @@ text.ref-count {
 .tooltip.tooltip-wide {
   width: 680px !important; }
   .tooltip.tooltip-wide.tooltip-extra-wide {
-    width: 970px !important; }
+    width: 1000px !important; }
 
 .tooltip-wide {
   font-size: 13px; }
