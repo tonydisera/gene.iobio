@@ -2665,6 +2665,7 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
 						fbVariant.source.clinvar                     = fbVariant.clinvar;
 						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+						fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
 					}					
 				});	 
 
@@ -2715,6 +2716,7 @@ VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, the
 					fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
 					fbVariant.source.clinvar                     = fbVariant.clinvar;
 					fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+					fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
 				}					
 			});	 
 	    	if (callback) {
