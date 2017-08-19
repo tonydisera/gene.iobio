@@ -22,6 +22,18 @@ function FilterCard() {
 	this.geneCoverageMedian        = 30;
 
 	this.affectedInfo              = null;
+
+	this.cardSpecificFilters = {
+		'known-variants': {
+			clinvar_path:    {'key': 'clinvar', 'value': true,  clazz: 'clinvar_path' },
+			clinvar_lpath:   {'key': 'clinvar', 'value': true,  clazz: 'clinvar_lpath' },
+			clinvar_uc:      {'key': 'clinvar', 'value': true,  clazz: 'clinvar_uc' },
+			clinvar_cd:      {'key': 'clinvar', 'value': true,  clazz: 'clinvar_cd' },
+			clinvar_unknown: {'key': 'clinvar', 'value': false, clazz: 'clinvar_unknown' },
+			clinvar_benign:  {'key': 'clinvar', 'value': false, clazz: 'clinvar_benign' },
+			clinvar_lbenign: {'key': 'clinvar', 'value': false, clazz: 'clinvar_lbenign' }
+		}
+	}
 }
 
 
@@ -990,6 +1002,46 @@ FilterCard.prototype.hasFilters = function() {
 		return false;
 	}
 }
+
+
+FilterCard.prototype.getCardSpecificFilters = function(relationship) {
+	var me = this;
+	var specificFilters = [];
+
+	var theFilterMap = me.cardSpecificFilters[relationship];
+	
+	if (theFilterMap) {
+		for (var key in theFilterMap) {
+			var theFilter = theFilterMap[key];			
+			specificFilters.push(theFilter);
+		}			
+	} 
+	
+	return specificFilters;
+}
+
+FilterCard.prototype.hasCardSpecificFilters = function(relationship) {
+	return this.getCardSpecificFilters(relationship).filter(function(theFilter) {
+		return theFilter.value == true;
+	}).length > 0;
+}
+
+FilterCard.prototype.getCardSpecificFilter = function(relationship, id) {
+	var theFilter = null;
+	if (this.cardSpecificFilters[relationship]) {
+		theFilter = this.cardSpecificFilters[relationship][id];
+	} 
+	return theFilter;
+}
+
+FilterCard.prototype.setCardSpecificFilter = function(relationship, id, value) {
+	var theFilter = this.getCardSpecificFilter(relationship, id, value);
+	if (theFilter) {
+		theFilter.value = value;
+	}	
+}
+
+
 
 FilterCard.prototype.refreshGeneCoverageBadges = function() {
 	cacheHelper.refreshGeneBadgesGeneCoverage(true);

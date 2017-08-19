@@ -4019,6 +4019,34 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
+#show-known-variants-card-cb-area {
+  float: left;
+  margin-right: 20px; }
+
+#proband-variant-card #show-known-variants-card-cb-area {
+  display: inline-block !important; }
+
+#known-variants-cards #vcf-chart-label {
+  display: none !important; }
+#known-variants-cards #known-variants-filters {
+  display: inline-block;
+  padding-top: 6px; }
+  #known-variants-cards #known-variants-filters text {
+    color: #717171;
+    fill: #717171;
+    font-size: 12px; }
+  #known-variants-cards #known-variants-filters svg.known-variants-clinvar {
+    margin-right: 10px; }
+  #known-variants-cards #known-variants-filters svg.known-variants-clinvar:hover {
+    cursor: pointer;
+    font-weight: bold;
+    fill: #3586c0;
+    outline: solid 2px #969696; }
+  #known-variants-cards #known-variants-filters svg.known-variants-clinvar.current:hover {
+    font-weight: bold;
+    cursor: pointer;
+    outline: solid 2px #3586c0; }
+
 #show-known-variants-cb-area {
   display: inline-block;
   float: left;

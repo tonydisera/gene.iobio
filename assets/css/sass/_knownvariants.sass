@@ -1,9 +1,54 @@
+#show-known-variants-card-cb-area    
+  float: left
+  margin-right: 20px
+
+
+#proband-variant-card
+  #show-known-variants-card-cb-area    
+    display:  inline-block !important 
+
+
+//
+//  Known Variants Card
+//
+#known-variants-cards
+  #vcf-chart-label
+    display: none !important
+
+  #known-variants-filters
+    display: inline-block
+    padding-top: 6px
+
+    text
+      color: $text-color
+      fill:  $text-color
+      font-size: 12px
+
+    svg.known-variants-clinvar
+      margin-right:  10px
+
+    svg.known-variants-clinvar:hover
+      cursor: pointer
+      font-weight: bold
+      fill: $current-color
+      outline: solid 2px $current-frame-color 
+    
+    svg.known-variants-clinvar.current:hover
+      font-weight: bold
+      cursor: pointer
+      outline: solid 2px $current-color 
+
+
+//
+// Known Variants Histogram
+//
 #show-known-variants-cb-area
   display: inline-block
   float: left
   margin-left: 20px
   margin-top: -4px
   margin-bottom: 0px
+      
 
 #known-variants-chart
   padding: 0px

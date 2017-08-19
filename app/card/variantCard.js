@@ -399,10 +399,128 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 			}
 		});
 
+
+		// Clinvar variants checkbox
+		$('#show-known-variants-card-cb').click(function() {
+			if (me.getRelationship() == 'proband') {
+				if ($('#show-known-variants-card-cb').is(":checked")) {
+					addKnownVariantsCard();
+				} else {					
+					clearKnownVariantsCard();
+				}				
+			}
+
+		})
+
+
 	}
 
 
 };
+
+VariantCard.prototype.initKnownVariantsCard = function() {
+	var me = this;
+
+	me.cardSelector.find("#known-variants-filters").append(knownVariantsFilterTemplateHTML);
+
+	// Clinvar variant filters 
+	me.d3CardSelector.selectAll('svg.known-variants-clinvar')
+	  .on("mouseover", function(d) {  	  	
+		var id = d3.select(this).attr("id");
+
+		d3.selectAll("#known-variants-cards .variant")
+		   .style("opacity", .1);
+
+	    d3.selectAll("#known-variants-cards .variant")
+	      .filter( function(d,i) {
+	      	var theClasses = d3.select(this).attr("class");
+	    	if (theClasses.indexOf(id) >= 0) {
+	    		return true;
+	    	} else {
+	    		return false;
+	    	}
+	      })
+	      .style("opacity", 1);
+	  })
+	  .on("mouseout", function(d) {
+	  	d3.selectAll("#known-variants-cards .variant")
+		   .style("opacity", 1);
+	  })
+	  .on("click", function(d) {
+	  	var on = null;
+	  	if (d3.select(this).attr("class").indexOf("current") >= 0) {
+	  		on = false;
+	  	} else {
+	  		on = true;
+	  	}
+
+	  	filterCard.setCardSpecificFilter('known-variants', d3.select(this).attr("id"), on);
+
+	  	d3.select(this).classed("current", on);
+
+		me.filterAndShowLoadedVariants();
+//	  	var theVcfData = me.model.filterKnownVariants(me.model.vcfData, regionStart, regionEnd);
+//	  	me._fillVariantChart(theVcfData, regionStart, regionEnd, null, true);	
+
+	  });	
+
+	filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
+		me.d3CardSelector.select("svg#" + theFilter.clazz).classed('current', theFilter.value);
+	})
+
+}
+
+VariantCard.prototype.filterAndShowKnownVariants = function() {
+	/*
+	var me = this;
+
+	var hasFilter = false;
+	for (var clinvarClazz in filterCard.knownVariantsFilters) {
+		var filter = filterCard.knownVariantsFilters[clinvarClazz];
+		if (filter.value == true) {
+			hasFilter = true;
+		}
+	}
+	
+	var filteredVariants = null;
+	if (hasFilter) {
+		filteredVariants = me.model.vcfData.features.filter(function (variant) {
+			var keep = false;
+			for (var clinvarClazz in filterCard.knownVariantsFilters) {
+				var filter = filterCard.knownVariantsFilters[clinvarClazz];
+				if (filter.value == true) {
+					if (variant[filter.key] == clinvarClazz) {
+						keep = true;
+					}
+				}
+			}
+			return keep;
+		})
+	} else {
+		filteredVariants = me.model.vcfData.features;
+	}
+
+	if (hasFilter) {
+		me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+		me.cardSelector.find('#displayed-variant-count').removeClass("hide");
+		me.cardSelector.find('#displayed-variant-count').text(filteredVariants.length);
+		me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
+	} else {
+		me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
+		me.cardSelector.find('#displayed-variant-count').addClass("hide");
+		me.cardSelector.find('#displayed-variant-count').text("");
+		me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");	
+		me.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
+	}
+
+	var pileupObject = me.model._pileupVariants(filteredVariants, regionStart, regionEnd);
+	var theVcfData = { maxLevel: pileupObject.maxLevel + 1,
+					   featureWidth: pileupObject.featureWidth,
+					   features: filteredVariants };
+	me._fillVariantChart(theVcfData, regionStart, regionEnd, null, true);	
+	*/
+
+}
 
 VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip, lock, onClose) {
 	var me = this;
@@ -585,7 +703,7 @@ VariantCard.prototype.setVariantCardLabel = function() {
 	} else {
 		var label = "";
 		if (this.getRelationship() == 'known-variants') {
-			label = "KNOWN VARIANTS"
+			label = "CLINVAR VARIANTS"
 			this.cardSelector.find('#card-relationship-label').text("");
 		} else if (this.model.isGeneratedSampleName) {
 			label = this.model.getName();
@@ -1603,7 +1721,7 @@ VariantCard.prototype.filterAndShowLoadedVariants = function(theVcfData, showTra
 
 		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
 		// this by checking if the number filter flags exceed those that are hidden
-		if (filterCard.hasFilters()) {
+		if (filterCard.hasFilters() || filterCard.hasCardSpecificFilters(this.getRelationship()) ) {
 			this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(filteredVcfData));

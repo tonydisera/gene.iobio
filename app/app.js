@@ -14,6 +14,7 @@ var gene_engine = new Bloodhound({
 // Handlebar templates
 var dataCardEntryTemplate = null;
 var variantCardTemplate = null;
+var knownVariantsFilterTemplateHTML = null;
 var filterCardTemplateHTML = null;
 var genesCardTemplateHTML = null;
 var bookmarkTemplateHTML = null;
@@ -63,6 +64,7 @@ var geneSource = "gencode";
 
 
 var hideKnownVariants = true;
+var hideKnownVariantsCard = true;
 var knownVariantsChart = null;
 var knownVariantsChartType = 'bar';
 var knownVariantsAreaChart = null;
@@ -95,6 +97,9 @@ var variantTooltip = new VariantTooltip();
 
 // matrix card
 var matrixCard = new MatrixCard();
+
+
+
 
 // cache helper
 var cacheHelper = null;
@@ -184,6 +189,9 @@ $(document).ready(function(){
 	}));
 	promises.push(promiseLoadTemplate('templates/bookmarkCardTemplate.hbs').then(function(compiledTemplate) {
 		bookmarkTemplateHTML = compiledTemplate();
+	}));
+	promises.push(promiseLoadTemplate('templates/knownVariantsFilterTemplate.hbs').then(function(compiledTemplate) {
+		knownVariantsFilterTemplateHTML = compiledTemplate();
 	}));
 	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
 		recallTemplateHTML = compiledTemplate;
@@ -544,6 +552,7 @@ function init() {
 	// Initialize the bookmark card
 	bookmarkCard = new BookmarkCard();
 	bookmarkCard.init();
+
 
 	// Initialize the legend content
 	$('#legend-track #legend-placeholder').html(legendTemplate());
@@ -912,18 +921,6 @@ function showSidebar(sidebar) {
 	$('#slider-left-content #recall-card').toggleClass("hide", sidebar !== 'Recall');
 	$('#slider-left-content #help-card').toggleClass("hide", sidebar !== 'Help');
 
-	if (sidebar == "Filter") {
-		$('#button-show-filters').toggleClass('selected', true);
-	} else if (sidebar == "Phenolyzer") {
-		$('#button-show-phenolyzer').toggleClass('selected', true);
-	} else if (sidebar == "Bookmarks") {
-		$('#button-show-bookmarks').toggleClass('selected', true);
-		window.bookmarkCard.refreshBookmarkList();
-	} else if (sidebar == "Recall") {
-		$('#button-find-missing-variants').toggleClass('selected', true);
-	} else if (sidebar == "Help") {
-		$('#button-show-help').toggleClass('selected', true);
-	}
 
 	if ($('#slider-left').hasClass("hide")) {
 		$('#slider-left').removeClass("hide");
@@ -2693,8 +2690,7 @@ function getRelevantVariantCards() {
 		rels.father = true;
 	}
 
-	// TODO - Need to get rid of existing known-variants card if hideKnownVariants is true
-	if (!hideKnownVariants) {
+	if (!hideKnownVariantsCard) {
 		rels['known-variants'] = true;
 	}
 	return variantCards.filter(function(vc) {
@@ -2880,33 +2876,38 @@ function addVariantCard() {
 }
 
 
-function addKnownVariantsCard(refresh) {
-	if (getVariantCard('known-variants') == null) {
+function addKnownVariantsCard() {
+	$('#known-variants-cards').removeClass("hide");
+	var vc = getVariantCard('known-variants');
+	if (vc == null) {
 		var variantCard = new VariantCard();	
-
 		variantCard.model                = new VariantModel();	
 
-		
 		$('#known-variants-cards').append(variantCardTemplate());  
 		var cardSelectorString = "#known-variants-cards .variant-card";
 		var d3CardSelector = d3.selectAll(cardSelectorString);
 
 		variantCard.init($(cardSelectorString), d3CardSelector, 0);
 
-
 		variantCard.setRelationship("known-variants");
 		variantCard.setAffectedStatus('unaffected');
-		variantCard.setName('Known variants');
+		variantCard.setName('Clinvar variants');
+
+		variantCard.initKnownVariantsCard();
 
 		var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
 		variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
-			if (refresh) {
-				loadTracksForGene();
-			}
+			loadTracksForGene();
 		});
 		variantCard.setVariantCardLabel();
 		variantCards.push(variantCard);		
 	}
+	hideKnownVariantsCard = false;
+}
+
+function clearKnownVariantsCard() {
+	$('#known-variants-cards').addClass("hide");
+	hideKnownVariantsCard = true;
 }
 
 
@@ -3839,8 +3840,6 @@ showKnownVariants = function() {
 	if (hideKnownVariants) {
 		return;
 	}
-
-	addKnownVariantsCard(true);
 
 	$('#known-variants-chart .loader').removeClass('hide');
 	d3.select('#known-variants-chart svg').remove();

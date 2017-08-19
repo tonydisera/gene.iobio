@@ -8,7 +8,15 @@
       </span>
                   
       <span id="variant-card-label" class="card-label keep-case" style="float:left;margin-left:3px;margin-right:10px;"></span>
-    </span>
+      </span>
+
+      <div id="show-known-variants-card-cb-area" class="hide level-edu level-basic checkbox">
+          <label style="margin-right:5px;">
+            <input id="show-known-variants-card-cb"  type="checkbox"> 
+            Show ClinVar variants
+          </label>
+      </div>     
+
     
     <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
       <li class="level-edu level-basic">                       
@@ -63,6 +71,9 @@
 
     </ul>
 
+    <div  id="known-variants-filters" class="level-edu level-basic">
+    </div>               
+
 
     <a href="javascript:void(0)" class="level-edu level-basic" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">remove</i>
@@ -79,10 +90,10 @@
 
 
   </div>
-  
- 
 
-  <div style="margin-top:25px;width: 100%;text-align: center;clear: both;">
+
+
+  <div style="text-align: center;clear: both;">
     <div class="loader vcfloader hide"  style="display: inline;">
       <span class="loader-label"></span>
       <img src="assets/images/wheel.gif">
@@ -151,8 +162,8 @@
           </div>
           <div >
             <div id="vcf-chart-label" class="level-edu level-basic chart-label hide" 
-             style="margin-top: 4px;margin-bottom: -10px;">
-              Variants loaded
+             style="display:inline-block;margin-top: 0px;margin-bottom: -10px;">
+              Variants loaded>
             </div>
             <div id="vcf-variants">
             </div>
