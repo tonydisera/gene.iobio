@@ -408,12 +408,8 @@
           <div id="region-track" class="level-edu level-basic" style="clear:both;">
               <div class="card-label" style="float:left;">Selected Gene</div>
 
-              <div id="show-known-variants-cb-area" class="level-edu level-basic checkbox">
-                  <label style="margin-right:5px;">
-                    <input id="show-known-variants-cb"  type="checkbox"> 
-                    ClinVar variants
-                  </label>
-              </div>
+
+
 
               <div id="select-gene-box"  class="level-basic hide">
                 <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
@@ -471,6 +467,23 @@
 
           </div>
 
+          <div style="margin-bottom: 5px;">
+
+              <div id="show-known-variants-cb-area" class="level-edu level-basic checkbox">
+                  <label style="margin-right:5px;">
+                    <input id="show-known-variants-cb"  type="checkbox"> 
+                    ClinVar counts
+                  </label>
+              </div>
+              
+              <div id="show-known-variants-card-cb-area" class=" level-edu level-basic checkbox">
+                  <label style="margin-right:5px;">
+                    <input id="show-known-variants-card-cb"  type="checkbox"> 
+                    ClinVar variants
+                  </label>
+              </div>     
+          </div>
+
 
 
           <!-- Non protein-coding gene badges -->
@@ -494,9 +507,6 @@
 
                 <div id="known-variants-chart" class="stacked-bar-chart track hide">
                   <div id="known-variants-nav">
-                      <span class="chart-label">
-                        ClinVar variants
-                      </span>
                       <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
                       href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)"
                       data-toggle="tooltip" data-placement="top" title="histogram">  
@@ -520,6 +530,9 @@
                   </div>  
                 </div>  
 
+
+                <div id="known-variants-cards">
+                </div>
 
                 <div id="top-coordinate-frame" class="hide">
                   <svg height="23" width="28">
@@ -738,8 +751,10 @@
     <div id="proband-variant-card"  >
     </div>
 
+    <!--
     <div id="known-variants-cards">
     </div>
+    -->
 
     <div id="other-variant-cards">
     </div>

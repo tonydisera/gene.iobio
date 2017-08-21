@@ -1,7 +1,38 @@
-#show-known-variants-card-cb-area    
+#show-known-variants-cb-area
+  display: inline-block
   float: left
-  margin-right: 20px
+  margin-left: 20px
+  margin-top: -4px
+  margin-bottom: 0px
+      
 
+#transcript-card
+
+  #show-known-variants-cb-area 
+    margin-left: 10px !important
+    float: none !important
+
+  #show-known-variants-card-cb-area
+    float: none !important
+    margin-left: 20px !important
+    display: inline-block !important
+
+  #known-variants-cards
+    margin-left: -10px
+    margin-right: -10px
+    .variant-card
+      box-shadow:  none
+      margin-bottom: -25px
+
+      #variant-heading
+        display: none !important
+
+      #zoom-region-chart
+        display: none !important
+      #bam-track
+        display: none !important
+
+      
 
 #proband-variant-card
   #show-known-variants-card-cb-area    
@@ -42,13 +73,7 @@
 //
 // Known Variants Histogram
 //
-#show-known-variants-cb-area
-  display: inline-block
-  float: left
-  margin-left: 20px
-  margin-top: -4px
-  margin-bottom: 0px
-      
+
 
 #known-variants-chart
   padding: 0px
@@ -58,6 +83,7 @@
   #known-variants-nav
     text-align: left
     margin-bottom: 2px
+    margin-left: 10px
 
     .tooltip
       background-color: initial

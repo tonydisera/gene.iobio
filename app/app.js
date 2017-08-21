@@ -409,6 +409,15 @@ function init() {
 		}
 		showKnownVariants();
 	})
+
+	// Show known variants chart
+	$('#show-known-variants-card-cb').click(function() {
+			if ($('#show-known-variants-card-cb').is(":checked")) {
+				addKnownVariantsCard();
+			} else {					
+				clearKnownVariantsCard();
+			}				
+	})
 	
 	// Create transcript chart
 	transcriptChart = geneD3()

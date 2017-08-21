@@ -4019,9 +4019,32 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
-#show-known-variants-card-cb-area {
+#show-known-variants-cb-area {
+  display: inline-block;
   float: left;
-  margin-right: 20px; }
+  margin-left: 20px;
+  margin-top: -4px;
+  margin-bottom: 0px; }
+
+#transcript-card #show-known-variants-cb-area {
+  margin-left: 10px !important;
+  float: none !important; }
+#transcript-card #show-known-variants-card-cb-area {
+  float: none !important;
+  margin-left: 20px !important;
+  display: inline-block !important; }
+#transcript-card #known-variants-cards {
+  margin-left: -10px;
+  margin-right: -10px; }
+  #transcript-card #known-variants-cards .variant-card {
+    box-shadow: none;
+    margin-bottom: -25px; }
+    #transcript-card #known-variants-cards .variant-card #variant-heading {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #zoom-region-chart {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #bam-track {
+      display: none !important; }
 
 #proband-variant-card #show-known-variants-card-cb-area {
   display: inline-block !important; }
@@ -4047,20 +4070,14 @@ text.ref-count {
     cursor: pointer;
     outline: solid 2px #3586c0; }
 
-#show-known-variants-cb-area {
-  display: inline-block;
-  float: left;
-  margin-left: 20px;
-  margin-top: -4px;
-  margin-bottom: 0px; }
-
 #known-variants-chart {
   padding: 0px;
   margin-top: 0px;
   margin-bottom: 0px; }
   #known-variants-chart #known-variants-nav {
     text-align: left;
-    margin-bottom: 2px; }
+    margin-bottom: 2px;
+    margin-left: 10px; }
     #known-variants-chart #known-variants-nav .tooltip {
       background-color: initial;
       border: none;
