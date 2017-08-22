@@ -3618,8 +3618,13 @@ function enableLoadButton() {
 	if (dataCard.mode == 'single') {
 		if (cards['proband'].isReadyToLoad()) {
 			if (window.gene) {
-				enable = true;
-				$('#gene-name-data-dialog-box').removeClass("attention");		
+				$('#gene-name-data-dialog-box').removeClass("attention");	
+				if (genomeBuildHelper.getCurrentBuild()) {
+					$('#select-build-box').removeClass("attention");	
+					enable = true;
+				} else {
+					$('#select-build-box').addClass("attention");						
+				}
 			} else {
 				$('#gene-name-data-dialog-box').addClass("attention");
 			}
@@ -3627,8 +3632,13 @@ function enableLoadButton() {
 	} else if (dataCard.mode == 'trio') {
 		if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
 			if (window.gene) {
-				enable = true;
 				$('#gene-name-data-dialog-box').removeClass("attention");		
+				if (genomeBuildHelper.getCurrentBuild()) {
+					$('#select-build-box').removeClass("attention");	
+					enable = true;
+				} else {
+					$('#select-build-box').addClass("attention");
+				}
 			} else {
 				$('#gene-name-data-dialog-box').addClass("attention");					
 			}
