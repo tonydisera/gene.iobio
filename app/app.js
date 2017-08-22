@@ -930,6 +930,10 @@ function showSidebar(sidebar) {
 	$('#slider-left-content #recall-card').toggleClass("hide", sidebar !== 'Recall');
 	$('#slider-left-content #help-card').toggleClass("hide", sidebar !== 'Help');
 
+	if (sidebar == 'Bookmarks') {
+		window.bookmarkCard.refreshBookmarkList();
+	}
+
 
 	if ($('#slider-left').hasClass("hide")) {
 		$('#slider-left').removeClass("hide");
