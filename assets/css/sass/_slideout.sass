@@ -124,7 +124,9 @@
 
 
 #slider-left-content
-  height: 100%
+  // this height will allow sidebar content to extend to height of window size
+  // we subtract out the height of the main app navbar and the side panel navbar
+  height: calc(100% - (37px + 55px))   
   width: 352px
   background-color: $sidebar-body-color
   overflow-y: scroll
