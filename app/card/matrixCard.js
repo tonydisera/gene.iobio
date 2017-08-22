@@ -1461,7 +1461,7 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 
     var symbolSize = symbolScale(6);
 
-	if (type.toUpperCase() == 'SNP') {
+	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
 		          .attr("transform", transform1)
 		         .append("rect")
