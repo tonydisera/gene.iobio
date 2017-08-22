@@ -927,21 +927,19 @@ BookmarkCard.prototype.showTooltip = function(html, screenX, screenY, width) {
 	var y = screenY;
 
 	if (window.outerHeight < y + h + 30) {
-		tooltip.style("width", w + "px")
-			       .style("left", x + "px") 
-			       .style("text-align", 'left')    
-			       .style("top", (y - h) + "px")
-			       .style("z-index", 1032)
-			       .style("overflow-y", "hidden");
-			       
+		tooltip.style("left", x + "px") 
+			   .style("text-align", 'left')    
+		       .style("top", (y - h) + "px")
+		       .style("z-index", 1032)
+		       .style("overflow-y", "hidden");
+		       
 
 	} else {
-		tooltip.style("width", w + "px")
-			       .style("left", x + "px") 
-			       .style("text-align", 'left')    
-			       .style("top", (y) + "px")
-			       .style("z-index", 1032)
-			       .style("overflow-y", "hidden");
+		tooltip.style("left", x + "px") 
+		       .style("text-align", 'left')    
+		       .style("top", (y) + "px")
+		       .style("z-index", 1032)
+		       .style("overflow-y", "hidden");
 
 	}
 
