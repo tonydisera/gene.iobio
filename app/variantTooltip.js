@@ -95,6 +95,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 
 VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, selector) {
+	var tooltipNode = $(tooltip.node());
 
 	var injectClinvarBadge = function(clinsig, key, translate) {
 		clinsig.split(",").forEach( function(clinsigToken) {
@@ -103,7 +104,6 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			    var badge = matrixCard.clinvarMap[clinsigToken].examineBadge;
 
 			    var linkSelector =  ".tooltip-clinsig-link" + key;
-			    var tooltipNode = $(tooltip.node());
 			    if (badge && tooltipNode.find(linkSelector).length > 0) {
 			    	var div = tooltipNode.find(linkSelector);
 					$(div).prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
@@ -117,27 +117,36 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		})
 	}
 
-	if (selector == ".tooltip") {
-		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
-		for (impact in impactList) {
+
+	var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(0,2)' : 'translate(5,6)';
+	
+	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
+	var impactDivSelector = selector == '.tooltip-wide' ? '.tooltip-value' : '.tooltip-title';
+	var impactStyle       = selector == '.tooltip-wide' ? " style='float:left' "             : " style='padding-top:2px;float:none' ";
+	for (impact in impactList) {
+		var theClazz = 'impact_' + impact;	
+		if (tooltipNode.find(impactDivSelector  + '.impact-badge').length > 0) {			
+			tooltipNode.find(impactDivSelector  + '.impact-badge').prepend("<svg class=\"impact-badge\" height=\"12\" width=\"14\" " + impactStyle + ">" );
+			var selection = tooltip.select(impactDivSelector + '.impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: translate, type: variant.type}]);
+			matrixCard.showImpactBadge(selection);	
+		}
+	}		
+
+	if ($(selector + ' ' + impactDivSelector + '.highest-impact-badge').length > 0) {
+		var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
+		for (impact in highestImpactList) {
 			var theClazz = 'impact_' + impact;	
-			if ($(tooltip[0]).find(".tooltip-title.main-header:eq(2)").length > 0) {
-				$(tooltip[0]).find(".tooltip-title.main-header:eq(2)").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
-				var selection = tooltip.select('.impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
-				matrixCard.showImpactBadge(selection);					
-			}
-
-		}
-
-		if ($(tooltip[0]).find(".tooltip-title.highest-impact-badge").length > 0) {
-			var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
-			for (impact in highestImpactList) {
-				var theClazz = 'impact_' + impact;	
-				$(tooltip[0]).find(".tooltip-title.highest-impact-badge").prepend("<svg class=\"impact-badge\" height=\"11\" width=\"14\">");
-				var selection = tooltip.select('.highest-impact-badge .impact-badge').data([{width:10, height:10,clazz: theClazz,  type: variant.type}]);
+			if (tooltipNode.find(impactDivSelector  + '.highest-impact-badge').length > 0) {				
+				tooltipNode.find(impactDivSelector  + '.highest-impact-badge').prepend("<svg class=\"impact-badge\" height=\"12\" width=\"14\" " + impactStyle + ">");
+				var selection = tooltip.select(impactDivSelector + '.highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: translate, type: variant.type}]);
 				matrixCard.showImpactBadge(selection);	
-			}		
+			}
 		}
+	}
+
+
+	if (selector == ".tooltip") {
+
 		for (key in variant.vepSIFT) {
 			if (matrixCard.siftMap[key]) {
 				var clazz = matrixCard.siftMap[key].clazz;
@@ -184,29 +193,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		}		
 
 	} else {
-		var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(0,2)' : 'translate(5,6)';
-		
-		var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
-		for (impact in impactList) {
-			var theClazz = 'impact_' + impact;	
-			if ($(selector + " .tooltip-value.impact-badge").length > 0) {			
-				$(selector + " .tooltip-value.impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
-				var selection = d3.select(selector + ' .impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: translate, type: variant.type}]);
-				matrixCard.showImpactBadge(selection);	
-			}
-		}		
 
-		if ($(selector + " .tooltip-value.highest-impact-badge").length > 0) {
-			var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
-			for (impact in highestImpactList) {
-				var theClazz = 'impact_' + impact;	
-				if ($(selector + " .tooltip-value.highest-impact-badge").length > 0) {				
-					$(selector + " .tooltip-value.highest-impact-badge").prepend("<svg class=\"impact-badge\" style=\"float:left\" height=\"12\" width=\"14\">");
-					var selection = d3.select(selector + ' .highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: translate, type: variant.type}]);
-					matrixCard.showImpactBadge(selection);	
-				}
-			}
-		}
 
 
 		if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
@@ -231,9 +218,9 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 	for (key in variant.vepSIFT) {
 		if (matrixCard.siftMap[key]) {
 			var clazz = matrixCard.siftMap[key].clazz;
-			if (clazz && $(selector + " .tooltip-value.sift-glyph").length > 0) {
-				$(selector + " .tooltip-value.sift-glyph").prepend("<svg class=\"sift-badge\" style=\"float:left\"  height=\"12\" width=\"13\">");
-				var selection = d3.select(selector + ' .sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
+			if (clazz && tooltipNode.find(".tooltip-value.sift-glyph").length > 0) {
+				tooltipNode.find(".tooltip-value.sift-glyph").prepend("<svg class=\"sift-badge\" style=\"float:left\"  height=\"12\" width=\"13\">");
+				var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
 				matrixCard.showSiftSymbol(selection);				
 			}			
 		}
@@ -243,9 +230,9 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 	for (key in variant.vepPolyPhen) {
 		if (matrixCard.polyphenMap[key]) {
 			var clazz = matrixCard.polyphenMap[key].clazz;
-			if (clazz &&$(selector + " .tooltip-value.polyphen-glyph").length > 0) {
-				$(selector + " .tooltip-value.polyphen-glyph").prepend("<svg class=\"polyphen-badge\" style=\"float:left\"   height=\"12\" width=\"12\">");
-				var selection = d3.select(selector + ' .polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
+			if (clazz && tooltipNode.find(".tooltip-value.polyphen-glyph").length > 0) {
+				tooltipNode.find(".tooltip-value.polyphen-glyph").prepend("<svg class=\"polyphen-badge\" style=\"float:left\"   height=\"12\" width=\"12\">");
+				var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
 				matrixCard.showPolyPhenSymbol(selection);				
 			}
 		}
@@ -278,13 +265,15 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 				}
 			}
 		});
-		if (afClazz && $(selector + " .tooltip-header:contains('Allele Freq ExAC')").length > 0) {
-			$(selector + " .tooltip-header:contains('Allele Freq ExAC')").next().prepend("<svg class=\"afexac-badge\" style=\"float:left\" height=\"14\" width=\"15\">");
-			var selection = d3.select(selector + ' .afexac-badge').data([{clazz: afClazz}]);
+		var afLabel = tooltip.selectAll('.tooltip-header').filter( function(d) { 
+			return d3.select(this).text() == 'Allele Freq ExAC'; 
+		});
+		if (afClazz && !afLabel.empty()) {
+			$(afLabel.node()).next().prepend("<svg class=\"afexac-badge\" style=\"float:left\" height=\"14\" width=\"15\">");
+			var selection = d3.select(afLabel[0].parentNode).select('.afexac-badge').data([{clazz: afClazz}]);
 			afSymbolFunction(selection, {transform: 'translate(2,0)'});		
-		}		
+		}
 	}
-	
 	if (matrixCard.isNumeric(variant.af1000G)) {
 		var rawValue = variant.af1000G;
 		var afClazz = null;
@@ -299,12 +288,16 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 				}
 			}
 		});
-		if (afClazz && $(selector + " .tooltip-header:contains('Allele Freq 1000G')").length > 0) {
-			$(selector + " .tooltip-header:contains('Allele Freq 1000G')").next().prepend("<svg class=\"af1000g-badge\" style=\"float:left\" height=\"14\" width=\"15\">");
-			var selection = d3.select(selector + ' .af1000g-badge').data([{clazz: afClazz}]);
+		var afLabel = tooltip.selectAll('.tooltip-header').filter( function(d) { 
+			return d3.select(this).text() == 'Allele Freq 1000G'; 
+		});
+		if (afClazz && !afLabel.empty()) {
+			$(afLabel.node()).next().prepend("<svg class=\"af1000g-badge\" style=\"float:left\" height=\"14\" width=\"15\">");
+			var selection = d3.select(afLabel[0].parentNode).select('.af1000g-badge').data([{clazz: afClazz}]);
 			afSymbolFunction(selection, {transform: 'translate(2,0)'});		
 		}		
-	}	
+	}
+	
 }
 
 
@@ -470,10 +463,10 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		if (isLevelEdu) {
 			vepImpactDisplay = levelEduImpact[key];
 		} else {
-			vepImpactDisplay += key;
+			vepImpactDisplay += key.toLowerCase();
 		}
 	} 
-
+	
 	// If the highest impact occurs in a non-canonical transcript, show the impact followed by
 	// the consequence and corresponding transcripts
 	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
@@ -524,9 +517,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		  	vepConsequenceDisplay += ", ";
 		}
 		if (isLevelEdu) {
-			vepConsequenceDisplay = key.split("_").join(" ");
+			vepConsequenceDisplay = key.split("_").join(" ").toLowerCase();
 		} else {
-			vepConsequenceDisplay += key.split("_").join(" ");
+			vepConsequenceDisplay += key.split("_").join(" ").toLowerCase();
 		}
 	}     	
 	var vepHGVScDisplay = "";
@@ -627,13 +620,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	                          ? ''
 						      : me._tooltipHeaderRow('<span class="tooltip-inheritance-mode-label">' + matrixCard.getInheritanceLabel(variant.inheritance) + ' inheritance</span>', '', '', '', null, 'padding-top:0px;');
 
-	var effectLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
-	                  ? effectDisplay 
-					  : vepConsequenceDisplay;
-
-	var impactLabel = filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' 
-	                  ? impactDisplay 
-					  : vepImpactDisplay;					  
 
 	var siftLabel = vepSIFTDisplay != ''  && vepSIFTDisplay != 'unknown' 
 	                ? 'SIFT ' + vepSIFTDisplay
@@ -701,8 +687,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	} else if (isLevelEdu) {
 		return (
 			genotypeRow
-			+ me._tooltipMainHeaderRow('Severity - ' + impactLabel , '', '', '')
-			//+ me._tooltipHeaderRow((variant.type ? variant.type.toUpperCase() : ''), effectLabel, '', '')
+			+ me._tooltipMainHeaderRow('Severity - ' + vepImpactDisplay , '', '', '')
 			+ inheritanceModeRow
 			+ polyphenRowSimple
 			+ clinvarSimpleRow1
@@ -712,7 +697,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(theTranscript ? 'Transcript ' + theTranscript.transcript_id : "", exonDisplay, '', '')
-			+ me._tooltipHeaderRow(effectLabel, '', '', '')
+			+ me._tooltipMainHeaderRow(vepImpactDisplay, vepConsequenceDisplay, '', '', 'impact-badge')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
 			+ siftPolyphenRow
@@ -731,10 +716,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		    '<div class="tooltip-left-column">' 
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
-		    + me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  
-					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? effectDisplay : vepConsequenceDisplay))
-			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
-					        ' ' + (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
+		    + me._tooltipRow('VEP Consequence', vepConsequenceDisplay)
+			+ me._tooltipRow('VEP Impact', ' '  + vepImpactDisplay, null, true, 'impact-badge')
 			+ vepHighestImpactExamineRow			
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
@@ -779,11 +762,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipHeaderRow(geneObject ? geneObject.gene_name : "", coord, exonDisplay, '')
 			+ inheritanceModeRow
 
-			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'SnpEff Effect' : 'VEP Consequence'),  
-					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? effectDisplay : vepConsequenceDisplay),
-					        "10px")
-			+ me._tooltipRow((filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? 'Impact' : 'Impact'),  
-					        (filterCard.getAnnotationScheme() == null || filterCard.getAnnotationScheme() == 'snpEff' ? impactDisplay.toLowerCase() : vepImpactDisplay.toLowerCase()), null, true, 'impact-badge')
+			+ me._tooltipRow('VEP Consequence', vepConsequenceDisplay, "10px")
+			+ me._tooltipRow('VEP Impact', vepImpactDisplay.toLowerCase(), null, true, 'impact-badge')
 			+ vepHighestImpactExamineRow			
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, false, 'sift-glyph')
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, false, 'polyphen-glyph')
