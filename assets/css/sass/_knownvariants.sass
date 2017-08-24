@@ -11,12 +11,32 @@
 #select-known-variants-display-box
   width: 130px 
   display: inline-block
+  vertical-align: top
+
 
 #select-known-variants-filter-box
   min-width: 200px
-  max-width: 700px
+  max-width: 500px
   display: inline-block
   margin-left: 10px
+
+  .selectize-input
+    input
+      width: 120px !important
+
+
+      &::-webkit-input-placeholder
+        font-size: 12px !important
+
+      &::-moz-placeholder 
+        font-size: 12px !important
+
+      &input:-moz-placeholder
+        font-size: 12px !important
+
+    &.has-items
+      input
+        width: 4px !important
 
   .selectize-control.multi 
     .selectize-input.has-items 

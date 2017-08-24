@@ -4030,13 +4030,24 @@ text.ref-count {
 
 #select-known-variants-display-box {
   width: 130px;
-  display: inline-block; }
+  display: inline-block;
+  vertical-align: top; }
 
 #select-known-variants-filter-box {
   min-width: 200px;
-  max-width: 700px;
+  max-width: 500px;
   display: inline-block;
   margin-left: 10px; }
+  #select-known-variants-filter-box .selectize-input input {
+    width: 120px !important; }
+    #select-known-variants-filter-box .selectize-input input::-webkit-input-placeholder {
+      font-size: 12px !important; }
+    #select-known-variants-filter-box .selectize-input input::-moz-placeholder {
+      font-size: 12px !important; }
+    #select-known-variants-filter-box .selectize-input inputinput:-moz-placeholder {
+      font-size: 12px !important; }
+  #select-known-variants-filter-box .selectize-input.has-items input {
+    width: 4px !important; }
   #select-known-variants-filter-box .selectize-control.multi .selectize-input.has-items {
     padding: 3px 8px 0px; }
 
