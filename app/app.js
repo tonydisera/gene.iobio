@@ -63,10 +63,10 @@ var transcriptCollapse = true;
 var geneSource = "gencode";
 
 
-var hideKnownVariants = true;
+var hideKnownVariants = false;
 var hideKnownVariantsCard = true;
 var knownVariantsChart = null;
-var knownVariantsChartType = 'bar';
+var knownVariantsChartType = 'exon-bar';
 var knownVariantsAreaChart = null;
 var knownVariantsBarChart = null;
 var KNOWN_VARIANTS_BIN_SPAN  = {'bar': +6, 'exon-bar': +2,  'area': +6};
@@ -398,6 +398,7 @@ function init() {
 	dataCard = new DataCard();
 	dataCard.init();	
 
+/*
 	// Show known variants histogram
 	$('#show-known-variants-cb').click(function() {
 		if ($('#show-known-variants-cb').is(":checked")) {
@@ -407,7 +408,7 @@ function init() {
 			hideKnownVariants = true;
 			$('#known-variants-chart').addClass("hide");
 		}
-		showKnownVariants();
+		showKnownVariantsCounts();
 	})
 
 	// Show known variants chart
@@ -418,6 +419,50 @@ function init() {
 				clearKnownVariantsCard();
 			}				
 	})
+
+*/
+
+
+	$('#select-known-variants-display').selectize({});
+	$('#select-known-variants-display')[0].selectize.on('change', function(value) { 	
+		if (value == 'counts') {
+			showKnownVariantsHistoChart(true);
+			showKnownVariantsCounts();
+			clearKnownVariantsCard();
+		} else if (value == 'variants') {
+			showKnownVariantsHistoChart(false);
+			addKnownVariantsCard();
+		} else if (value == 'none') {
+			showKnownVariantsHistoChart(false);
+			clearKnownVariantsCard();
+		}
+	});	
+
+	$('#select-known-variants-filter').selectize(
+		{ 
+			create: false,
+		    maxItems: null,
+		    valueField: 'value',
+		    labelField: 'display'
+    	}
+	);
+	             
+
+	filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
+		$('#select-known-variants-filter')[0].selectize.addOption({value: theFilter.clazz, display: theFilter.display})
+	})   
+	$('#select-known-variants-filter')[0].selectize.setValue(['clinvar_path', 'clinvar_lpath']);
+	$('#select-known-variants-filter')[0].selectize.on('change', function(values) { 	
+		filterCard.clearCardSpecificFilters('known-variants');
+		if (values) {
+			values.forEach(function(filterName) {
+				filterCard.setCardSpecificFilter('known-variants', filterName, true);
+			})			
+		}
+		getVariantCard('known-variants').filterAndShowLoadedVariants();
+	})
+
+
 	
 	// Create transcript chart
 	transcriptChart = geneD3()
@@ -511,7 +556,7 @@ function init() {
 		.heightPercent("100%")
   	    .width($('#container').innerWidth())
 		.height(50)
-		.showXAxis(true)
+		.showXAxis(false)
 		.xTickCount(0)
 		.yTickCount(3)
 		.xValue( function(d, i) { return d.point })
@@ -523,7 +568,7 @@ function init() {
 		.heightPercent("100%")
   	    .width($('#container').innerWidth())
 		.height(50)
-		.showXAxis(true)
+		.showXAxis(false)
 		.xTickCount(0)
 		.yTickCount(3)
 		.xValue( function(d, i) { return d.point })
@@ -591,6 +636,7 @@ function init() {
 			genesCard.selectGene(window.gene.gene_name);
 		}
 	});	
+
 
 	// Set up the gene search widget
 	loadGeneWidgets( function(success) {
@@ -2420,7 +2466,9 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	showTranscripts();
 
 	// Show the chart for known variants
-	showKnownVariants();
+	if (!bypassVariantCards) {
+		showKnownVariantsCounts();
+	}
 
 	// Show the badge for the transcript type if it is not protein coding and it is different
 	// than the gene type
@@ -2891,6 +2939,8 @@ function addVariantCard() {
 
 function addKnownVariantsCard() {
 	$('#known-variants-cards').removeClass("hide");
+	$('#select-known-variants-filter-box').removeClass("hide");
+	
 	var vc = getVariantCard('known-variants');
 	if (vc == null) {
 		var variantCard = new VariantCard();	
@@ -2905,8 +2955,10 @@ function addKnownVariantsCard() {
 		variantCard.setRelationship("known-variants");
 		variantCard.setAffectedStatus('unaffected');
 		variantCard.setName('Clinvar variants');
+		variantCard.cardSelector.find('#vcf-variant-count-label').text("Clinvar variants")
 
 		variantCard.initKnownVariantsCard();
+
 
 		var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
 		variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
@@ -2920,6 +2972,8 @@ function addKnownVariantsCard() {
 
 function clearKnownVariantsCard() {
 	$('#known-variants-cards').addClass("hide");
+	$('#select-known-variants-filter-box').addClass("hide");
+
 	hideKnownVariantsCard = true;
 }
 
@@ -3849,15 +3903,27 @@ toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 			knownVariantsChart(selection, {transition: {'pushUp': true }} );
 		} else {
 			knownVariantsChartType = chartType;
-			showKnownVariants();
+			showKnownVariantsCounts();
 		}
 
 	}
 
 }
 
+showKnownVariantsHistoChart = function(show=true) {
+	if (show) {
+		hideKnownVariants = false;
+		$('#known-variants-chart').removeClass("hide");
+		$('#known-variants-nav').removeClass("hide");	
+	} else {
+		hideKnownVariants = true;
+		$('#known-variants-chart').addClass("hide");
+		$('#known-variants-nav').addClass("hide");			
+	}
+}
 
-showKnownVariants = function() {
+
+showKnownVariantsCounts = function(show=true) {
 
 	d3.select('#known-variants-chart svg').remove();
 	if (hideKnownVariants) {
@@ -3885,7 +3951,9 @@ showKnownVariants = function() {
 
 	})							
 
+
 }
+
 
 showKnownVariantsTooltip = function(knownVariants) {
 	var tooltipRow = function(valueObject) {

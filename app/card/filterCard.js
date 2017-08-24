@@ -25,13 +25,13 @@ function FilterCard() {
 
 	this.cardSpecificFilters = {
 		'known-variants': {
-			clinvar_path:    {'key': 'clinvar', 'value': true,  clazz: 'clinvar_path' },
-			clinvar_lpath:   {'key': 'clinvar', 'value': true,  clazz: 'clinvar_lpath' },
-			clinvar_uc:      {'key': 'clinvar', 'value': true,  clazz: 'clinvar_uc' },
-			clinvar_cd:      {'key': 'clinvar', 'value': true,  clazz: 'clinvar_cd' },
-			clinvar_unknown: {'key': 'clinvar', 'value': false, clazz: 'clinvar_unknown' },
-			clinvar_benign:  {'key': 'clinvar', 'value': false, clazz: 'clinvar_benign' },
-			clinvar_lbenign: {'key': 'clinvar', 'value': false, clazz: 'clinvar_lbenign' }
+			clinvar_path:    {'key': 'clinvar', 'value': true,  clazz: 'clinvar_path',   display: 'Pathogenic' },
+			clinvar_lpath:   {'key': 'clinvar', 'value': true,  clazz: 'clinvar_lpath',  display: 'Likely pathogenic' },
+			clinvar_uc:      {'key': 'clinvar', 'value': true,  clazz: 'clinvar_uc',     display: 'Uncertain significance' },
+			clinvar_cd:      {'key': 'clinvar', 'value': true,  clazz: 'clinvar_cd',     display: 'Conflicting data'},
+			clinvar_unknown: {'key': 'clinvar', 'value': false, clazz: 'clinvar_other',  display: 'Other' },
+			clinvar_benign:  {'key': 'clinvar', 'value': false, clazz: 'clinvar_benign', display: 'Benign'},
+			clinvar_lbenign: {'key': 'clinvar', 'value': false, clazz: 'clinvar_lbenign',display: 'Likely benign' }
 		}
 	}
 }
@@ -1039,6 +1039,11 @@ FilterCard.prototype.setCardSpecificFilter = function(relationship, id, value) {
 	if (theFilter) {
 		theFilter.value = value;
 	}	
+}
+FilterCard.prototype.clearCardSpecificFilters = function(relationship) {
+	return this.getCardSpecificFilters(relationship).forEach(function(theFilter) {
+		theFilter.value = false;
+	})
 }
 
 

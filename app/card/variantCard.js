@@ -206,7 +206,6 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 	this.cardIndex = cardIndex;
 
-
 	if (this.isViewable()) {
 		this.cardSelector = cardSelector;
 		this.d3CardSelector = d3CardSelector;
@@ -420,6 +419,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 VariantCard.prototype.initKnownVariantsCard = function() {
 	var me = this;
+	/*
 
 	me.cardSelector.find("#known-variants-filters").append(knownVariantsFilterTemplateHTML);
 
@@ -459,14 +459,13 @@ VariantCard.prototype.initKnownVariantsCard = function() {
 	  	d3.select(this).classed("current", on);
 
 		me.filterAndShowLoadedVariants();
-//	  	var theVcfData = me.model.filterKnownVariants(me.model.vcfData, regionStart, regionEnd);
-//	  	me._fillVariantChart(theVcfData, regionStart, regionEnd, null, true);	
 
 	  });	
 
 	filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
 		me.d3CardSelector.select("svg#" + theFilter.clazz).classed('current', theFilter.value);
 	})
+*/
 
 }
 

@@ -1767,7 +1767,7 @@ inputinput:-moz-placeholder {
   background-color: #636161; }
 
 #slider-left-content {
-  height: 100%;
+  height: calc(100% - (37px + 55px));
   width: 352px;
   background-color: white;
   overflow-y: scroll;
@@ -4019,6 +4019,27 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
+#known-variants-display-label {
+  font-size: 13px;
+  color: #717171;
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 4px;
+  margin-left: 10px;
+  margin-right: 4px; }
+
+#select-known-variants-display-box {
+  width: 130px;
+  display: inline-block; }
+
+#select-known-variants-filter-box {
+  min-width: 200px;
+  max-width: 700px;
+  display: inline-block;
+  margin-left: 10px; }
+  #select-known-variants-filter-box .selectize-control.multi .selectize-input.has-items {
+    padding: 3px 8px 0px; }
+
 #show-known-variants-cb-area {
   display: inline-block;
   float: left;
@@ -4026,7 +4047,12 @@ text.ref-count {
   margin-top: -4px;
   margin-bottom: 0px; }
 
-#transcript-card #known-variants-chart #known-variants-nav {
+#transcript-card #known-variants-nav {
+  margin-left: 10px;
+  text-align: left;
+  display: inline-block;
+  vertical-align: top; }
+#transcript-card #known-variants-chart {
   margin-left: 0px; }
 
 #known-variants-all-card .track {
@@ -4061,9 +4087,17 @@ text.ref-count {
   float: none !important;
   margin-left: 20px !important;
   display: inline-block !important; }
+#transcript-card #known-variants-chart {
+  margin-bottom: -20px !important; }
 #transcript-card #known-variants-cards {
   margin-left: -10px;
-  margin-right: -10px; }
+  margin-right: -10px;
+  margin-top: -30px; }
+  #transcript-card #known-variants-cards .badge-label {
+    font-size: 12px; }
+  #transcript-card #known-variants-cards #variant-badges {
+    float: right !important;
+    margin-top: -6px !important; }
   #transcript-card #known-variants-cards .variant-card {
     box-shadow: none;
     margin-bottom: -25px; }
@@ -4072,6 +4106,12 @@ text.ref-count {
     #transcript-card #known-variants-cards .variant-card #zoom-region-chart {
       display: none !important; }
     #transcript-card #known-variants-cards .variant-card #bam-track {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #minimize-button {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #expand-button {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #shrink-button {
       display: none !important; }
 
 #proband-variant-card #show-known-variants-card-cb-area {
@@ -4100,42 +4140,43 @@ text.ref-count {
     cursor: pointer;
     outline: solid 2px #3586c0; }
 
+#known-variants-nav {
+  text-align: left;
+  margin-bottom: 2px;
+  margin-left: 10px; }
+  #known-variants-nav .tooltip {
+    background-color: initial;
+    border: none;
+    box-shadow: none; }
+  #known-variants-nav .chart-label {
+    vertical-align: top;
+    display: inline-block;
+    margin-top: 4px;
+    margin-right: 10px; }
+  #known-variants-nav .loader {
+    margin-left: 10px;
+    display: inline-block;
+    margin-top: 2px;
+    margin-bottom: 0px; }
+    #known-variants-nav .loader .loader-label {
+      font-size: 12px; }
+  #known-variants-nav .chart-type {
+    margin: 0;
+    padding: 2px;
+    vertical-align: top;
+    cursor: pointer; }
+    #known-variants-nav .chart-type.selected {
+      font-weight: bold;
+      border: solid 0.5px #3586c0;
+      border-radius: 4px;
+      padding: 1px; }
+    #known-variants-nav .chart-type .material-icons {
+      font-size: 17px; }
+
 #known-variants-chart {
   padding: 0px;
   margin-top: 0px;
   margin-bottom: 0px; }
-  #known-variants-chart #known-variants-nav {
-    text-align: left;
-    margin-bottom: 2px;
-    margin-left: 10px; }
-    #known-variants-chart #known-variants-nav .tooltip {
-      background-color: initial;
-      border: none;
-      box-shadow: none; }
-    #known-variants-chart #known-variants-nav .chart-label {
-      vertical-align: top;
-      display: inline-block;
-      margin-top: 4px;
-      margin-right: 10px; }
-    #known-variants-chart #known-variants-nav .loader {
-      margin-left: 10px;
-      display: inline-block;
-      margin-top: 2px;
-      margin-bottom: 0px; }
-      #known-variants-chart #known-variants-nav .loader .loader-label {
-        font-size: 12px; }
-    #known-variants-chart #known-variants-nav .chart-type {
-      margin: 0;
-      padding: 2px;
-      vertical-align: top;
-      cursor: pointer; }
-      #known-variants-chart #known-variants-nav .chart-type.selected {
-        font-weight: bold;
-        border: solid 0.5px #3586c0;
-        border-radius: 4px;
-        padding: 1px; }
-      #known-variants-chart #known-variants-nav .chart-type .material-icons {
-        font-size: 17px; }
   #known-variants-chart svg {
     vertical-align: bottom; }
     #known-variants-chart svg .axis text {

@@ -468,7 +468,7 @@
           </div>
 
           <div style="margin-bottom: 5px;">
-
+<!--
               <div id="show-known-variants-cb-area" class="level-edu level-basic checkbox">
                   <label style="margin-right:5px;">
                     <input id="show-known-variants-cb"  type="checkbox"> 
@@ -481,7 +481,48 @@
                     <input id="show-known-variants-card-cb"  type="checkbox"> 
                     ClinVar variants
                   </label>
-              </div>     
+              </div>   
+--> 
+              <span id="known-variants-display-label">ClinVar track</span>
+
+              <div id="select-known-variants-display-box" class="level-edu level-basic">
+                  <select id="select-known-variants-display" class="fullview" data-placeholder="">
+                        <option value="counts" >Show counts</option>
+                        <option value="variants">Show variants</option>                   
+                        <option value="none">Hide</option>
+                  </select>        
+              </div>  
+
+              <div id="known-variants-nav" class="">
+                  <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                  href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
+                  data-toggle="tooltip" data-placement="top" title="exon bar chart">  
+                    <i class="material-icons">linear_scale</i>
+                  </button>
+                  <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                  href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)"
+                  data-toggle="tooltip" data-placement="top" title="histogram">  
+                    <i class="material-icons">insert_chart</i>
+                  </button>
+                  <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
+                  href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)"
+                  data-toggle="tooltip" data-placement="top" title="area chart">
+                    <i class="material-icons">show_chart</i>
+                  </button>
+                  <div class="loader hide">
+                      <span class="loader-label">Loading...</span>
+                      <img src="assets/images/wheel.gif"/>
+                  </div>
+
+              </div>  
+
+
+              <div id="select-known-variants-filter-box" class="hide level-edu level-basic">
+                  <select id="select-known-variants-filter" class="fullview" data-placeholder="">                 
+                  </select>        
+              </div>  
+
+
           </div>
 
 
@@ -506,28 +547,7 @@
             <div id="gene-track" class="track hide">  
 
                 <div id="known-variants-chart" class="stacked-bar-chart track hide">
-                  <div id="known-variants-nav">
-                      <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)"
-                      data-toggle="tooltip" data-placement="top" title="histogram">  
-                        <i class="material-icons">insert_chart</i>
-                      </button>
-                      <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
-                      data-toggle="tooltip" data-placement="top" title="exon bar chart">  
-                        <i class="material-icons">linear_scale</i>
-                      </button>
-                      <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                      href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)"
-                      data-toggle="tooltip" data-placement="top" title="area chart">
-                        <i class="material-icons">show_chart</i>
-                      </button>
-                      <div class="loader hide">
-                          <span class="loader-label">Loading...</span>
-                          <img src="assets/images/wheel.gif"/>
-                      </div>
 
-                  </div>  
                 </div>  
 
 

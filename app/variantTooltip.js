@@ -405,6 +405,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			}
 
 		} else if (variant.clinvarSubmissions != null && Object.keys(variant.clinvarSubmissions).length > 0) {
+			phenotypeDisplay = "";
 			for (var key in variant.clinvarSubmissions) {
 				var submission = variant.clinvarSubmissions[key];
 
@@ -420,6 +421,13 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					clinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
 				}	
 				clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
+
+				if (submission.phenotype != 'not_provided') {
+					if (phenotypeDisplay.length > 0) {
+						phenotypeDisplay += ", ";
+					}
+					phenotypeDisplay += submission.phenotype;					
+				}
 
 				clinvarLink += "</div>"
 			}
@@ -441,8 +449,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				clinsigSummary += "<span style='float:left'>" + clinsig.split("_").join(" ") + "</span>";
 				clinsigSummary += "</span>";
 			}	
-			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', clinsigSummary );	
-			phenotypeDisplay = "";	
+			clinvarSimpleRow1 = me._tooltipSimpleClinvarSigRow('ClinVar', clinsigSummary );	
+			clinvarSimpleRow2 = me._tooltipHeaderRow(phenotypeDisplay, '', '', '', '', null, 'style=padding-top:0px');	
 		} else {
 			clinvarLink = clinSigDisplay;
 		}		
@@ -703,7 +711,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ siftPolyphenRow
 			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '6px')
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
-			+ me._tooltipLabeledRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, '6px') 
 			+ clinvarSimpleRow1
 			+ clinvarSimpleRow2
 			+ me._tooltipRowAlleleCounts() 
@@ -930,6 +937,12 @@ VariantTooltip.prototype._tooltipWideHeadingSecondRow = function(value1, value2,
 	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
 	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title' + (valueClazz ? ' ' + valueClazz : '') + '" style="text-align:left;word-break:normal">' + value2 + '</div>'
+	      + '</div>';	
+}
+VariantTooltip.prototype._tooltipSimpleClinvarSigRow = function(value1, value2) {
+	return '<div class="row" style="padding-bottom:0px;padding-top: 5px">'
+	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
+	      + '<div class="col-sm-8 tooltip-title style="text-align:left;word-break:normal">' + value2 + '</div>'
 	      + '</div>';	
 }
 
