@@ -422,7 +422,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				}	
 				clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
 
-				if (submission.phenotype != 'not_provided') {
+				if (submission.phenotype != 'not_provided' || submission.phenotype != "not_specified") {
 					if (phenotypeDisplay.length > 0) {
 						phenotypeDisplay += ", ";
 					}
