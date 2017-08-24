@@ -398,70 +398,9 @@ function init() {
 	dataCard = new DataCard();
 	dataCard.init();	
 
-/*
-	// Show known variants histogram
-	$('#show-known-variants-cb').click(function() {
-		if ($('#show-known-variants-cb').is(":checked")) {
-			hideKnownVariants = false;
-			$('#known-variants-chart').removeClass("hide");
-		} else {
-			hideKnownVariants = true;
-			$('#known-variants-chart').addClass("hide");
-		}
-		showKnownVariantsCounts();
-	})
 
-	// Show known variants chart
-	$('#show-known-variants-card-cb').click(function() {
-			if ($('#show-known-variants-card-cb').is(":checked")) {
-				addKnownVariantsCard();
-			} else {					
-				clearKnownVariantsCard();
-			}				
-	})
-
-*/
-
-
-	$('#select-known-variants-display').selectize({});
-	$('#select-known-variants-display')[0].selectize.on('change', function(value) { 	
-		if (value == 'counts') {
-			showKnownVariantsHistoChart(true);
-			showKnownVariantsCounts();
-			clearKnownVariantsCard();
-		} else if (value == 'variants') {
-			showKnownVariantsHistoChart(false);
-			addKnownVariantsCard();
-		} else if (value == 'none') {
-			showKnownVariantsHistoChart(false);
-			clearKnownVariantsCard();
-		}
-	});	
-
-	$('#select-known-variants-filter').selectize(
-		{ 
-			create: false,
-		    maxItems: null,
-		    valueField: 'value',
-		    labelField: 'display'
-    	}
-	);
-	             
-
-	filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
-		$('#select-known-variants-filter')[0].selectize.addOption({value: theFilter.clazz, display: theFilter.display})
-	})   
-	$('#select-known-variants-filter')[0].selectize.setValue(['clinvar_path', 'clinvar_lpath']);
-	$('#select-known-variants-filter')[0].selectize.on('change', function(values) { 	
-		filterCard.clearCardSpecificFilters('known-variants');
-		if (values) {
-			values.forEach(function(filterName) {
-				filterCard.setCardSpecificFilter('known-variants', filterName, true);
-			})			
-		}
-		getVariantCard('known-variants').filterAndShowLoadedVariants();
-	})
-
+	// Init known variants chart
+	initKnownVariants();
 
 	
 	// Create transcript chart
@@ -682,6 +621,83 @@ function showGeneSummary(theGeneName) {
 	if (isLevelBasic && $('#gene-summary').text() != summary ) {
 		$('#gene-summary').html(summary);
 	}	
+}
+
+function initKnownVariants() {
+
+	$('#select-known-variants-display').selectize({});
+	$('#select-known-variants-display')[0].selectize.on('change', function(value) { 	
+		if (value == 'counts') {
+			showKnownVariantsHistoChart(true);
+			showKnownVariantsCounts();
+			clearKnownVariantsCard();
+		} else if (value == 'variants') {
+			showKnownVariantsHistoChart(false);
+			addKnownVariantsCard();
+		} else if (value == 'none') {
+			showKnownVariantsHistoChart(false);
+			clearKnownVariantsCard();
+		}
+	});	
+
+	$('#select-known-variants-filter').selectize(
+		{ 
+			placeholder: 'Filter...',
+		    maxItems: null,
+		    valueField: 'value',
+		    labelField: 'display',
+			plugins: ['remove_button'],
+		    persist: true,
+		    create: function(input) {
+		        return {
+		            value: input,
+		            text: input
+		        }
+		    }	
+		}
+	);
+	             
+
+	filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
+		$('#select-known-variants-filter')[0].selectize.addOption({value: theFilter.clazz, display: theFilter.display})
+	})   
+	$('#select-known-variants-filter')[0].selectize.setValue(['clinvar_path', 'clinvar_lpath']);
+	$('#select-known-variants-filter')[0].selectize.on('change', function(values) { 	
+		filterCard.clearCardSpecificFilters('known-variants');
+		if (values) {
+			values.forEach(function(filterName) {
+				filterCard.setCardSpecificFilter('known-variants', filterName, true);
+			})			
+		}
+		getVariantCard('known-variants').filterAndShowLoadedVariants();
+	})
+
+
+/*
+	// Show known variants histogram
+	$('#show-known-variants-cb').click(function() {
+		if ($('#show-known-variants-cb').is(":checked")) {
+			hideKnownVariants = false;
+			$('#known-variants-chart').removeClass("hide");
+		} else {
+			hideKnownVariants = true;
+			$('#known-variants-chart').addClass("hide");
+		}
+		showKnownVariantsCounts();
+	})
+
+	// Show known variants chart
+	$('#show-known-variants-card-cb').click(function() {
+			if ($('#show-known-variants-card-cb').is(":checked")) {
+				addKnownVariantsCard();
+			} else {					
+				clearKnownVariantsCard();
+			}				
+	})
+
+*/
+	
+
 }
 
 function selectGeneInDropdown(theGeneName, select) {
