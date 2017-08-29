@@ -1,17 +1,35 @@
 
-#known-variants-display-label
-  font-size: 13px
-  color: $text-color
+#known-variants-nav-area
   display: inline-block
-  vertical-align: top
-  padding-top: 4px
-  margin-left: 10px
-  margin-right: 4px
+  padding-top: 0px
+  float: left
+
+  text
+    color: $text-color
+    fill:  $text-color
+    font-size: 12px
+
+  svg.known-variants-clinvar
+    margin-right:  10px
+
+  svg.known-variants-clinvar:hover
+    cursor: pointer
+    font-weight: bold
+    fill: $current-color
+    outline: solid 2px $current-frame-color 
+  
+  svg.known-variants-clinvar.current:hover
+    font-weight: bold
+    cursor: pointer
+    outline: solid 2px $current-color 
+
+
 
 #select-known-variants-display-box
   width: 130px 
   display: inline-block
   vertical-align: top
+  float: left
 
 
 #select-known-variants-filter-box
@@ -19,6 +37,7 @@
   max-width: 500px
   display: inline-block
   margin-left: 10px
+  float: left
 
   .selectize-input
     input
@@ -62,7 +81,29 @@
     margin-left: 0px
 
 
+  #known-variants-display-label
+    font-size: 13px
+    color: $text-color
+    display: inline-block
+    vertical-align: top
+    padding-top: 4px
+    margin-left: 10px
+    margin-right: 4px
+
+
+
 #known-variants-all-card
+  min-height: 35px
+
+  #known-variants-nav-area
+    display: inline-block
+    padding-top: 0px
+
+    #known-variants-nav  
+      margin-left: 10px
+      margin-top: 0px
+      float: left
+
   .track
     background-color: transparent !important
 
@@ -72,6 +113,7 @@
   .card-label
     //color:  #06a7bc !important
 
+
   #show-known-variants-cb-area
     margin-top: 0px    
     margin-left: 10px
@@ -79,26 +121,37 @@
   #show-known-variants-card-cb-area
     margin-right: 10px
 
+  #known-variants-chart
+    margin-bottom: -13px
+
   #known-variants-cards
     margin-left: -10px
     margin-right: -10px
+    margin-bottom: 5px
 
     .badge-label
       font-size: 12px
+
+    #variant-badges
+      float: right !important
 
     .variant-card
       margin-top: -3px
       box-shadow:  none
       margin-bottom: -10px
+      min-height: initial
 
       #variant-heading
         display: none !important
 
-  #known-variants-chart 
-    #known-variants-nav  
-      clear: both       
-      margin-left: 0px
-      margin-top: 7px
+      #minimize-button
+        display: none !important
+      #expand-button
+        display: none !important
+      #shrink-button
+        display: none !important
+      #bam-track
+        display: none !important
 
 
 #transcript-card
@@ -111,6 +164,10 @@
     float: none !important
     margin-left: 20px !important
     display: inline-block !important
+
+  #known-variants-nav-area
+    display: inline-block
+    padding-top: 6px
 
   #known-variants-chart
     margin-bottom: -20px !important
@@ -156,35 +213,13 @@
 
 
 
-//
-//  Known Variants Card
-//
 #known-variants-cards
   #vcf-chart-label
     display: none !important
 
-  #known-variants-filters
-    display: inline-block
-    padding-top: 6px
-
-    text
-      color: $text-color
-      fill:  $text-color
-      font-size: 12px
-
-    svg.known-variants-clinvar
-      margin-right:  10px
-
-    svg.known-variants-clinvar:hover
-      cursor: pointer
-      font-weight: bold
-      fill: $current-color
-      outline: solid 2px $current-frame-color 
-    
-    svg.known-variants-clinvar.current:hover
-      font-weight: bold
-      cursor: pointer
-      outline: solid 2px $current-color 
+  #variant-heading
+    min-width: initial
+    max-width: initial
 
 
 //
@@ -195,6 +230,7 @@
   text-align: left
   margin-bottom: 2px
   margin-left: 10px
+  float: left
 
   .tooltip
     background-color: initial

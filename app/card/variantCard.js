@@ -399,127 +399,12 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		});
 
 
-		// Clinvar variants checkbox
-		$('#show-known-variants-card-cb').click(function() {
-			if (me.getRelationship() == 'proband') {
-				if ($('#show-known-variants-card-cb').is(":checked")) {
-					addKnownVariantsCard();
-				} else {					
-					clearKnownVariantsCard();
-				}				
-			}
-
-		})
-
-
 	}
 
 
 };
 
-VariantCard.prototype.initKnownVariantsCard = function() {
-	var me = this;
-	/*
 
-	me.cardSelector.find("#known-variants-filters").append(knownVariantsFilterTemplateHTML);
-
-	// Clinvar variant filters 
-	me.d3CardSelector.selectAll('svg.known-variants-clinvar')
-	  .on("mouseover", function(d) {  	  	
-		var id = d3.select(this).attr("id");
-
-		d3.selectAll("#known-variants-cards .variant")
-		   .style("opacity", .1);
-
-	    d3.selectAll("#known-variants-cards .variant")
-	      .filter( function(d,i) {
-	      	var theClasses = d3.select(this).attr("class");
-	    	if (theClasses.indexOf(id) >= 0) {
-	    		return true;
-	    	} else {
-	    		return false;
-	    	}
-	      })
-	      .style("opacity", 1);
-	  })
-	  .on("mouseout", function(d) {
-	  	d3.selectAll("#known-variants-cards .variant")
-		   .style("opacity", 1);
-	  })
-	  .on("click", function(d) {
-	  	var on = null;
-	  	if (d3.select(this).attr("class").indexOf("current") >= 0) {
-	  		on = false;
-	  	} else {
-	  		on = true;
-	  	}
-
-	  	filterCard.setCardSpecificFilter('known-variants', d3.select(this).attr("id"), on);
-
-	  	d3.select(this).classed("current", on);
-
-		me.filterAndShowLoadedVariants();
-
-	  });	
-
-	filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
-		me.d3CardSelector.select("svg#" + theFilter.clazz).classed('current', theFilter.value);
-	})
-*/
-
-}
-
-VariantCard.prototype.filterAndShowKnownVariants = function() {
-	/*
-	var me = this;
-
-	var hasFilter = false;
-	for (var clinvarClazz in filterCard.knownVariantsFilters) {
-		var filter = filterCard.knownVariantsFilters[clinvarClazz];
-		if (filter.value == true) {
-			hasFilter = true;
-		}
-	}
-	
-	var filteredVariants = null;
-	if (hasFilter) {
-		filteredVariants = me.model.vcfData.features.filter(function (variant) {
-			var keep = false;
-			for (var clinvarClazz in filterCard.knownVariantsFilters) {
-				var filter = filterCard.knownVariantsFilters[clinvarClazz];
-				if (filter.value == true) {
-					if (variant[filter.key] == clinvarClazz) {
-						keep = true;
-					}
-				}
-			}
-			return keep;
-		})
-	} else {
-		filteredVariants = me.model.vcfData.features;
-	}
-
-	if (hasFilter) {
-		me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
-		me.cardSelector.find('#displayed-variant-count').removeClass("hide");
-		me.cardSelector.find('#displayed-variant-count').text(filteredVariants.length);
-		me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
-	} else {
-		me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
-		me.cardSelector.find('#displayed-variant-count').addClass("hide");
-		me.cardSelector.find('#displayed-variant-count').text("");
-		me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");	
-		me.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
-	}
-
-	var pileupObject = me.model._pileupVariants(filteredVariants, regionStart, regionEnd);
-	var theVcfData = { maxLevel: pileupObject.maxLevel + 1,
-					   featureWidth: pileupObject.featureWidth,
-					   features: filteredVariants };
-	me._fillVariantChart(theVcfData, regionStart, regionEnd, null, true);	
-	*/
-
-}
 
 VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip, lock, onClose) {
 	var me = this;
@@ -598,7 +483,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl, baiUrl, callback) {
 				this.cardSelector.find("#bam-track").addClass("hide");
 				this.cardSelector.find(".covloader").addClass("hide");
 				this.cardSelector.find(".fbloader").addClass("hide");
-				this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+				this.cardSelector.find('#zoom-region-chart').addClass("hide");
 
 				this.cardSelector.find("#fb-chart-label").addClass("hide");
 				this.cardSelector.find("#fb-separator").addClass("hide");
@@ -724,10 +609,7 @@ VariantCard.prototype.loadBamDataSource = function(dataSourceName, callback) {
 	this.model.loadBamDataSource(dataSourceName, function() {
 		me.showDataSources(dataSourceName);
 
-		selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-		me.zoomRegionChart.regionStart(+window.gene.start);
-		me.zoomRegionChart.regionEnd(+window.gene.end);
-		me.zoomRegionChart(selection);
+		me.fillZoomRegionChart();
 
 		callback();
 	});
@@ -870,21 +752,7 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 		me.vcfChart.clazz(classifyClazz);
 		me.fbChart.clazz(classifyClazz);
 
-		if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
-			me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
-
-			// Workaround.  For some reason, d3 doesn't clean up previous transcript
-			// as expected.  So we will just force the svg to be removed so that we
-			// start with a clean slate to avoid the bug where switching between transcripts
-			// resulted in last transcripts features not clearing out.
-			me.d3CardSelector.select('#zoom-region-chart svg').remove();
-
-			selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-			me.zoomRegionChart.regionStart(+window.gene.start);
-			me.zoomRegionChart.regionEnd(+window.gene.end);
-			me.zoomRegionChart(selection);
-
-		}
+		me.fillZoomRegionChart();
 
 
     	me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
@@ -964,13 +832,9 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 
 	});
 
-    var selection = this.d3CardSelector.select("#zoom-region-chart").datum([filteredTranscript]);
-	this.zoomRegionChart.regionStart(!brush.empty() ? regionStart : window.gene.start);
-	this.zoomRegionChart.regionEnd(!brush.empty() ? regionEnd : window.gene.end);
-	this.zoomRegionChart(selection);
-	this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
-	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+	this.fillZoomRegionChart(filteredTranscript, !brush.empty() ? regionStart : window.gene.start, !brush.empty() ? regionEnd : window.gene.end);
+
 
 	this.cardSelector.find('#vcf-track').removeClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "block");
@@ -1103,6 +967,36 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 
 }
 
+VariantCard.prototype.fillZoomRegionChart = function(filteredTranscript, start, end) {
+	var me = this;
+
+	var theTranscript = filteredTranscript ? filteredTranscript : window.selectedTranscript;
+	var start = start ? start : window.gene.start;
+	var end   = end   ? end   : window.gene.end;
+
+
+	if (me.getRelationship() == 'known-variants' || me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
+
+		// Workaround.  For some reason, d3 doesn't clean up previous transcript
+		// as expected.  So we will just force the svg to be removed so that we
+		// start with a clean slate to avoid the bug where switching between transcripts
+		// resulted in last transcripts features not clearing out.
+		me.d3CardSelector.select('#zoom-region-chart svg').remove();
+		me.cardSelector.select("#zoom-region-chart").removeClass("hide");
+
+		selection = me.d3CardSelector.select("#zoom-region-chart").datum([theTranscript]);
+		me.zoomRegionChart.regionStart(+start);
+		me.zoomRegionChart.regionEnd(+end);
+		me.zoomRegionChart(selection);
+
+	}	
+
+    if (filteredTranscript) {
+		this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
+	}
+
+}
+
 
 VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, maxDepth) {
 	if (this.isViewable()) {
@@ -1124,8 +1018,6 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
-
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
 		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, "cutoff", "threshold" );
 	}
@@ -1429,10 +1321,8 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
     if (isLevelEdu && eduTourNumber == "2") {
 		this.cardSelector.find('#zoom-region-chart').addClass("hide");
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
     } else {
 		this.cardSelector.find('#zoom-region-chart').removeClass("hide");
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
     }
 
 	resizeCardWidths();
@@ -1515,14 +1405,11 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 	
 	if (data) {
 		this.cardSelector.find('#fb-chart-label').removeClass("hide");
-		me.cardSelector.find('#zoom-region-chart').css("visibility", "visible");	
 		if (me.model.isVcfReadyToLoad()) {
 			this.cardSelector.find('#fb-separator').removeClass("hide");
-			//me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
 
 		} else {
 			this.cardSelector.find('#fb-separator').addClass("hide");
-			//me.cardSelector.find('#zoom-region-chart').css("margin-top", "-25px");	
 		}
 
 		this.cardSelector.find('#fb-variants').removeClass("hide");

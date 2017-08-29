@@ -14,7 +14,7 @@ var gene_engine = new Bloodhound({
 // Handlebar templates
 var dataCardEntryTemplate = null;
 var variantCardTemplate = null;
-var knownVariantsFilterTemplateHTML = null;
+var knownVariantsNavTemplateHTML = null;
 var filterCardTemplateHTML = null;
 var genesCardTemplateHTML = null;
 var bookmarkTemplateHTML = null;
@@ -190,8 +190,8 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/bookmarkCardTemplate.hbs').then(function(compiledTemplate) {
 		bookmarkTemplateHTML = compiledTemplate();
 	}));
-	promises.push(promiseLoadTemplate('templates/knownVariantsFilterTemplate.hbs').then(function(compiledTemplate) {
-		knownVariantsFilterTemplateHTML = compiledTemplate();
+	promises.push(promiseLoadTemplate('templates/knownVariantsNavTemplate.hbs').then(function(compiledTemplate) {
+		knownVariantsNavTemplateHTML = compiledTemplate();
 	}));
 	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
 		recallTemplateHTML = compiledTemplate;
@@ -399,8 +399,8 @@ function init() {
 	dataCard.init();	
 
 
-	// Init known variants chart
-	initKnownVariants();
+	// Init known variants nav
+	initKnownVariantsNav();
 
 	
 	// Create transcript chart
@@ -435,13 +435,16 @@ function init() {
 			}
 
 
-			var variantCount = 0;
-			variantCards.forEach(function(variantCard) {
+			var cardCount = 0;
+		    showKnownVariantsCounts();
+			
+			getRelevantVariantCards().forEach(function(variantCard) {
 		    	variantCard.onBrush(brush, function() {
-					variantCount++;
+
+					cardCount++;
 					// Wait until all variant cards have finished with onBrush,
 					// then fill feature matrix and circle variants.
-					if (variantCount == variantCards.length) {
+					if (cardCount == getRelevantVariantCards().length) {
 						getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
 			    		if (clickedVariant && clickedVariantCard) {
 							clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
@@ -623,7 +626,11 @@ function showGeneSummary(theGeneName) {
 	}	
 }
 
-function initKnownVariants() {
+function initKnownVariantsNav() {
+
+	$('#known-variants-all-card').removeClass("hide");
+	$('#known-variants-all-card').find("#known-variants-nav-area").append(knownVariantsNavTemplateHTML);
+
 
 	$('#select-known-variants-display').selectize({});
 	$('#select-known-variants-display')[0].selectize.on('change', function(value) { 	
@@ -637,6 +644,8 @@ function initKnownVariants() {
 		} else if (value == 'none') {
 			showKnownVariantsHistoChart(false);
 			clearKnownVariantsCard();
+			$('#known-variants-cards #vcf-track').addClass("hide");
+			$('#known-variants-cards #variant-badges').addClass("hide");
 		}
 	});	
 
@@ -672,31 +681,27 @@ function initKnownVariants() {
 		getVariantCard('known-variants').filterAndShowLoadedVariants();
 	})
 
+	var variantCard = getVariantCard('known-variants');
+	if (variantCard == null) {
+		variantCard = new VariantCard();	
+		variantCard.model                = new VariantModel();	
 
-/*
-	// Show known variants histogram
-	$('#show-known-variants-cb').click(function() {
-		if ($('#show-known-variants-cb').is(":checked")) {
-			hideKnownVariants = false;
-			$('#known-variants-chart').removeClass("hide");
-		} else {
-			hideKnownVariants = true;
-			$('#known-variants-chart').addClass("hide");
-		}
-		showKnownVariantsCounts();
-	})
+		$('#known-variants-cards').append(variantCardTemplate());  
+		var cardSelectorString = "#known-variants-cards .variant-card";
+		var d3CardSelector = d3.selectAll(cardSelectorString);
 
-	// Show known variants chart
-	$('#show-known-variants-card-cb').click(function() {
-			if ($('#show-known-variants-card-cb').is(":checked")) {
-				addKnownVariantsCard();
-			} else {					
-				clearKnownVariantsCard();
-			}				
-	})
+		variantCard.init($(cardSelectorString), d3CardSelector, 0);
 
-*/
-	
+		variantCard.setRelationship("known-variants");
+		variantCard.setAffectedStatus('unaffected');
+		variantCard.setName('Clinvar variants');
+		variantCard.cardSelector.find('#vcf-variant-count-label').text("Clinvar variants")
+
+		
+		variantCard.setVariantCardLabel();
+		variantCards.push(variantCard);				
+	} 
+
 
 }
 
@@ -2952,42 +2957,27 @@ function addVariantCard() {
 	variantCard.setName(defaultName);
 }
 
+function addKnownVariantsCard()  {
 
-function addKnownVariantsCard() {
-	$('#known-variants-cards').removeClass("hide");
+	$('#known-variants-cards #vcf-track').removeClass("hide");
+	$('#known-variants-cards #variant-badges').removeClass("hide");
 	$('#select-known-variants-filter-box').removeClass("hide");
+
 	
-	var vc = getVariantCard('known-variants');
-	if (vc == null) {
-		var variantCard = new VariantCard();	
-		variantCard.model                = new VariantModel();	
-
-		$('#known-variants-cards').append(variantCardTemplate());  
-		var cardSelectorString = "#known-variants-cards .variant-card";
-		var d3CardSelector = d3.selectAll(cardSelectorString);
-
-		variantCard.init($(cardSelectorString), d3CardSelector, 0);
-
-		variantCard.setRelationship("known-variants");
-		variantCard.setAffectedStatus('unaffected');
-		variantCard.setName('Clinvar variants');
-		variantCard.cardSelector.find('#vcf-variant-count-label').text("Clinvar variants")
-
-		variantCard.initKnownVariantsCard();
-
-
-		var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
-		variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
-			loadTracksForGene();
-		});
-		variantCard.setVariantCardLabel();
-		variantCards.push(variantCard);		
-	}
+	var variantCard = getVariantCard('known-variants');
+	var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+	variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
+		loadTracksForGene();
+	});
+	
 	hideKnownVariantsCard = false;
+
 }
 
+
 function clearKnownVariantsCard() {
-	$('#known-variants-cards').addClass("hide");
+	$('#known-variants-cards #vcf-track').addClass("hide");
+	$('#known-variants-cards #variant-badges').addClass("hide");
 	$('#select-known-variants-filter-box').addClass("hide");
 
 	hideKnownVariantsCard = true;
@@ -3907,9 +3897,10 @@ toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 	if (refresh) {
 		d3.select("#known-variants-chart svg").remove();
 		if (button) {
-			$('#known-variants-chart .chart-type.selected').removeClass('selected');
+			$('#known-variants-nav .chart-type.selected').removeClass('selected');
 			$(button).addClass('selected');
 		}
+
 		// No need to obtain counts for gene since prior data is interchangable between
 		// area and barchart
 		if ((knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') && 
@@ -3918,6 +3909,7 @@ toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 			var selection = d3.select('#known-variants-chart');
 			knownVariantsChart(selection, {transition: {'pushUp': true }} );
 		} else {
+			
 			knownVariantsChartType = chartType;
 			showKnownVariantsCounts();
 		}
@@ -3931,45 +3923,70 @@ showKnownVariantsHistoChart = function(show=true) {
 		hideKnownVariants = false;
 		$('#known-variants-chart').removeClass("hide");
 		$('#known-variants-nav').removeClass("hide");	
+		$('#known-variants-cards #vcf-track').addClass("hide");
+		$('#known-variants-cards #variant-badges').addClass("hide");
 	} else {
 		hideKnownVariants = true;
 		$('#known-variants-chart').addClass("hide");
 		$('#known-variants-nav').addClass("hide");			
+		$('#known-variants-cards #vcf-track').removeClass("hide");
+		$('#known-variants-cards #variant-badges').removeClass("hide");
 	}
 }
 
 
-showKnownVariantsCounts = function(show=true) {
+showKnownVariantsCounts = function() {
+
+	var vc = getVariantCard('known-variants');
 
 	d3.select('#known-variants-chart svg').remove();
 	if (hideKnownVariants) {
 		return;
 	}
+	var featureBarWidth = false;
+
+	var theTranscript = null;
+	var binLength = null;
+
+	theTranscript =  $.extend({}, window.selectedTranscript);
+	theTranscript.features = window.selectedTranscript.features.filter(function(d) {
+		  var inRegion = (d.start >= regionStart && d.start <= regionEnd)
+                         || (d.end >= regionStart && d.end <= regionEnd) ;
+          return inRegion;
+
+	});		
+	vc.fillZoomRegionChart(theTranscript, regionStart, regionEnd);
+
+	if (knownVariantsChartType != 'exon-bar') {
+		theTranscript = null;
+		binLength = Math.floor( ((+regionEnd - +regionStart) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
+	}
+
+	if (knownVariantsChartType == 'exon-bar' || knownVariantsChartType == 'bar') {
+		knownVariantsChart.xStart(regionStart);
+		knownVariantsChart.xEnd(regionEnd);		
+	}
+	
 
 	$('#known-variants-chart .loader').removeClass('hide');
 	d3.select('#known-variants-chart svg').remove();
+	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, theTranscript, binLength).then(function(results) {
 
-	var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
-	var transcript = knownVariantsChartType == 'exon-bar' ? window.selectedTranscript : null;
-	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, transcript, transcript ? null : binLength).then(function(results) {
+		results = results.filter(function(binObject) {
+			return binObject.start >= regionStart && binObject.end <= regionEnd;
+		})
 
 		$('#known-variants-chart').removeClass("hide");
 		var selection = d3.select('#known-variants-chart').datum(results);
-		if (knownVariantsChartType == 'exon-bar') {
-			knownVariantsChart.xStart(window.gene.start);
-			knownVariantsChart.xEnd(window.gene.end);		
-		} else if (knownVariantsChartType == 'bar') {
-			knownVariantsChart.xStart(null);
-			knownVariantsChart.xEnd(null);		
-		}
-		knownVariantsChart(selection, {transition: {'pushUp': true }} );
+		
+		
+		knownVariantsChart(selection, {transition: {'pushUp': true, 'featureBarWidth' : featureBarWidth }} );
 	    $('#known-variants-chart .loader').addClass('hide');
 
 	})							
 
 
 }
-
 
 showKnownVariantsTooltip = function(knownVariants) {
 	var tooltipRow = function(valueObject) {

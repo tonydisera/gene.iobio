@@ -34,10 +34,13 @@ function stackedBarChartD3() {
 
   var widthPercent = null;
   var heightPercent = null;
-      
-  function chart(selection, options) {
 
-    options = $.extend(defaults,options);
+  var options = null;
+
+
+  function chart(selection, theOptions) {
+
+    options = $.extend( defaults, theOptions);
     var innerHeight = height - margin.top - margin.bottom;    
     var innerWidth = width - margin.left - margin.right;
     
@@ -260,7 +263,7 @@ function stackedBarChartD3() {
 
   chart.calcBarWidth = function(x, d) {
     var bw = 0;
-    if (d.hasOwnProperty('start') && d.hasOwnProperty('end')) {
+    if (options.hasOwnProperty('featureBarWidth') && options.featureBarWidth == true) {
       bw = x(d.end) - x(d.start);
     } else if (barWidth) {
       bw = barWidth;

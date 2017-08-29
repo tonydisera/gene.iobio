@@ -483,46 +483,13 @@
                   </label>
               </div>   
 --> 
-              <span id="known-variants-display-label">ClinVar track</span>
 
-              <div id="select-known-variants-display-box" class="level-edu level-basic">
-                  <select id="select-known-variants-display" class="fullview" data-placeholder="">
-                        <option value="counts" >Show counts</option>
-                        <option value="variants">Show variants</option>                   
-                        <option value="none">Hide</option>
-                  </select>        
-              </div>  
+<!--          
+            <span id="known-variants-display-label">ClinVar track</span>
 
-              <div id="known-variants-nav" class="">
-                  <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                  href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
-                  data-toggle="tooltip" data-placement="top" title="exon bar chart">  
-                    <i class="material-icons">linear_scale</i>
-                  </button>
-                  <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                  href="javascript:void(0)" onclick="toggleKnownVariantsChart('bar', true, this)"
-                  data-toggle="tooltip" data-placement="top" title="histogram">  
-                    <i class="material-icons">insert_chart</i>
-                  </button>
-                  <button class="chart-type level-edu btn btn-default icon-button-sm btn-raised" 
-                  href="javascript:void(0)" onclick="toggleKnownVariantsChart('area', true, this)"
-                  data-toggle="tooltip" data-placement="top" title="area chart">
-                    <i class="material-icons">show_chart</i>
-                  </button>
-                  <div class="loader hide">
-                      <span class="loader-label">Loading...</span>
-                      <img src="assets/images/wheel.gif"/>
-                  </div>
-
-              </div>  
-
-
-              <div id="select-known-variants-filter-box" class="hide level-edu level-basic">
-                  <select id="select-known-variants-filter" class="fullview" data-placeholder="">                 
-                  </select>        
-              </div>  
-
-
+              <div id="known-variants-nav-area">
+              </div>
+-->              
           </div>
 
 
@@ -546,6 +513,7 @@
           <div id="transcript-panel" class="level-edu fullview" >
             <div id="gene-track" class="track hide">  
 
+<!--
                 <div id="known-variants-chart" class="stacked-bar-chart track hide">
 
                 </div>  
@@ -553,6 +521,7 @@
 
                 <div id="known-variants-cards">
                 </div>
+-->
 
                 <div id="top-coordinate-frame" class="hide">
                   <svg height="23" width="28">
@@ -768,13 +737,22 @@
     <div id="coordinate-frame" class="">
     </div>
 
+    <div id="known-variants-all-card" class="hide track shadow-z-2">
+      <span class="card-label" style="float:left;margin-right:10px;padding-top:3px">CLINVAR VARIANTS</span>
+      <div id="known-variants-nav-area">
+      </div>
+      <div id="known-variants-chart" class="stacked-bar-chart track hide">
+      </div>        
+      <div id="known-variants-cards">
+      </div>
+    </div>
+    
+    
     <div id="proband-variant-card"  >
     </div>
 
-    <!--
-    <div id="known-variants-cards">
-    </div>
-    -->
+
+    
 
     <div id="other-variant-cards">
     </div>

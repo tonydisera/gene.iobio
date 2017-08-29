@@ -4019,25 +4019,38 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
-#known-variants-display-label {
-  font-size: 13px;
-  color: #717171;
+#known-variants-nav-area {
   display: inline-block;
-  vertical-align: top;
-  padding-top: 4px;
-  margin-left: 10px;
-  margin-right: 4px; }
+  padding-top: 0px;
+  float: left; }
+  #known-variants-nav-area text {
+    color: #717171;
+    fill: #717171;
+    font-size: 12px; }
+  #known-variants-nav-area svg.known-variants-clinvar {
+    margin-right: 10px; }
+  #known-variants-nav-area svg.known-variants-clinvar:hover {
+    cursor: pointer;
+    font-weight: bold;
+    fill: #3586c0;
+    outline: solid 2px #969696; }
+  #known-variants-nav-area svg.known-variants-clinvar.current:hover {
+    font-weight: bold;
+    cursor: pointer;
+    outline: solid 2px #3586c0; }
 
 #select-known-variants-display-box {
   width: 130px;
   display: inline-block;
-  vertical-align: top; }
+  vertical-align: top;
+  float: left; }
 
 #select-known-variants-filter-box {
   min-width: 200px;
   max-width: 500px;
   display: inline-block;
-  margin-left: 10px; }
+  margin-left: 10px;
+  float: left; }
   #select-known-variants-filter-box .selectize-input input {
     width: 120px !important; }
     #select-known-variants-filter-box .selectize-input input::-webkit-input-placeholder {
@@ -4065,31 +4078,58 @@ text.ref-count {
   vertical-align: top; }
 #transcript-card #known-variants-chart {
   margin-left: 0px; }
+#transcript-card #known-variants-display-label {
+  font-size: 13px;
+  color: #717171;
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 4px;
+  margin-left: 10px;
+  margin-right: 4px; }
 
-#known-variants-all-card .track {
-  background-color: transparent !important; }
-#known-variants-all-card .track-expand {
-  background-color: transparent !important; }
-#known-variants-all-card #show-known-variants-cb-area {
-  margin-top: 0px;
-  margin-left: 10px; }
-#known-variants-all-card #show-known-variants-card-cb-area {
-  margin-right: 10px; }
-#known-variants-all-card #known-variants-cards {
-  margin-left: -10px;
-  margin-right: -10px; }
-  #known-variants-all-card #known-variants-cards .badge-label {
-    font-size: 12px; }
-  #known-variants-all-card #known-variants-cards .variant-card {
-    margin-top: -3px;
-    box-shadow: none;
-    margin-bottom: -10px; }
-    #known-variants-all-card #known-variants-cards .variant-card #variant-heading {
-      display: none !important; }
-#known-variants-all-card #known-variants-chart #known-variants-nav {
-  clear: both;
-  margin-left: 0px;
-  margin-top: 7px; }
+#known-variants-all-card {
+  min-height: 35px; }
+  #known-variants-all-card #known-variants-nav-area {
+    display: inline-block;
+    padding-top: 0px; }
+    #known-variants-all-card #known-variants-nav-area #known-variants-nav {
+      margin-left: 10px;
+      margin-top: 0px;
+      float: left; }
+  #known-variants-all-card .track {
+    background-color: transparent !important; }
+  #known-variants-all-card .track-expand {
+    background-color: transparent !important; }
+  #known-variants-all-card #show-known-variants-cb-area {
+    margin-top: 0px;
+    margin-left: 10px; }
+  #known-variants-all-card #show-known-variants-card-cb-area {
+    margin-right: 10px; }
+  #known-variants-all-card #known-variants-chart {
+    margin-bottom: -13px; }
+  #known-variants-all-card #known-variants-cards {
+    margin-left: -10px;
+    margin-right: -10px;
+    margin-bottom: 5px; }
+    #known-variants-all-card #known-variants-cards .badge-label {
+      font-size: 12px; }
+    #known-variants-all-card #known-variants-cards #variant-badges {
+      float: right !important; }
+    #known-variants-all-card #known-variants-cards .variant-card {
+      margin-top: -3px;
+      box-shadow: none;
+      margin-bottom: -10px;
+      min-height: initial; }
+      #known-variants-all-card #known-variants-cards .variant-card #variant-heading {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #minimize-button {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #expand-button {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #shrink-button {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #bam-track {
+        display: none !important; }
 
 #transcript-card #show-known-variants-cb-area {
   margin-left: 10px !important;
@@ -4098,6 +4138,9 @@ text.ref-count {
   float: none !important;
   margin-left: 20px !important;
   display: inline-block !important; }
+#transcript-card #known-variants-nav-area {
+  display: inline-block;
+  padding-top: 6px; }
 #transcript-card #known-variants-chart {
   margin-bottom: -20px !important; }
 #transcript-card #known-variants-cards {
@@ -4132,29 +4175,15 @@ text.ref-count {
 
 #known-variants-cards #vcf-chart-label {
   display: none !important; }
-#known-variants-cards #known-variants-filters {
-  display: inline-block;
-  padding-top: 6px; }
-  #known-variants-cards #known-variants-filters text {
-    color: #717171;
-    fill: #717171;
-    font-size: 12px; }
-  #known-variants-cards #known-variants-filters svg.known-variants-clinvar {
-    margin-right: 10px; }
-  #known-variants-cards #known-variants-filters svg.known-variants-clinvar:hover {
-    cursor: pointer;
-    font-weight: bold;
-    fill: #3586c0;
-    outline: solid 2px #969696; }
-  #known-variants-cards #known-variants-filters svg.known-variants-clinvar.current:hover {
-    font-weight: bold;
-    cursor: pointer;
-    outline: solid 2px #3586c0; }
+#known-variants-cards #variant-heading {
+  min-width: initial;
+  max-width: initial; }
 
 #known-variants-nav {
   text-align: left;
   margin-bottom: 2px;
-  margin-left: 10px; }
+  margin-left: 10px;
+  float: left; }
   #known-variants-nav .tooltip {
     background-color: initial;
     border: none;
