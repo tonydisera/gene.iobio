@@ -3,11 +3,12 @@
     <select id="select-known-variants-display" class="fullview" data-placeholder="">
           <option value="counts" >Show counts</option>
           <option value="variants">Show variants</option>                   
-          <option value="none">Hide</option>
+          <option value="hide">Hide</option>
+          <option value="none"></option>
     </select>        
 </div>  
 
-<div id="known-variants-nav" class="">
+<div id="known-variants-nav" class="hide">
     <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
     href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
     data-toggle="tooltip" data-placement="top" title="exon bar chart">  

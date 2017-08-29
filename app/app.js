@@ -63,7 +63,7 @@ var transcriptCollapse = true;
 var geneSource = "gencode";
 
 
-var hideKnownVariants = false;
+var hideKnownVariants = true;
 var hideKnownVariantsCard = true;
 var knownVariantsChart = null;
 var knownVariantsChartType = 'exon-bar';
@@ -628,11 +628,11 @@ function showGeneSummary(theGeneName) {
 
 function initKnownVariantsNav() {
 
-	$('#known-variants-all-card').removeClass("hide");
 	$('#known-variants-all-card').find("#known-variants-nav-area").append(knownVariantsNavTemplateHTML);
 
 
 	$('#select-known-variants-display').selectize({});
+	$('#select-known-variants-display')[0].selectize.setValue("none")
 	$('#select-known-variants-display')[0].selectize.on('change', function(value) { 	
 		if (value == 'counts') {
 			showKnownVariantsHistoChart(true);
@@ -641,11 +641,12 @@ function initKnownVariantsNav() {
 		} else if (value == 'variants') {
 			showKnownVariantsHistoChart(false);
 			addKnownVariantsCard();
-		} else if (value == 'none') {
+		} else if (value == 'none' || value == 'hide') {
 			showKnownVariantsHistoChart(false);
 			clearKnownVariantsCard();
 			$('#known-variants-cards #vcf-track').addClass("hide");
 			$('#known-variants-cards #variant-badges').addClass("hide");
+			$('#known-variants-cards #zoom-region-track').addClass("hide");
 		}
 	});	
 
@@ -2488,6 +2489,7 @@ function loadTracksForGene(bypassVariantCards, callback) {
 
 	// Show the chart for known variants
 	if (!bypassVariantCards) {
+		$('#known-variants-all-card').removeClass("hide");
 		showKnownVariantsCounts();
 	}
 
