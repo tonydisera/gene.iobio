@@ -630,26 +630,6 @@ function initKnownVariantsNav() {
 
 	$('#known-variants-all-card').find("#known-variants-nav-area").append(knownVariantsNavTemplateHTML);
 
-
-	$('#select-known-variants-display').selectize({});
-	$('#select-known-variants-display')[0].selectize.setValue("none")
-	$('#select-known-variants-display')[0].selectize.on('change', function(value) { 	
-		if (value == 'counts') {
-			showKnownVariantsHistoChart(true);
-			showKnownVariantsCounts();
-			clearKnownVariantsCard();
-		} else if (value == 'variants') {
-			showKnownVariantsHistoChart(false);
-			addKnownVariantsCard();
-		} else if (value == 'none' || value == 'hide') {
-			showKnownVariantsHistoChart(false);
-			clearKnownVariantsCard();
-			$('#known-variants-cards #vcf-track').addClass("hide");
-			$('#known-variants-cards #variant-badges').addClass("hide");
-			$('#known-variants-cards #zoom-region-track').addClass("hide");
-		}
-	});	
-
 	$('#select-known-variants-filter').selectize(
 		{ 
 			placeholder: 'Filter...',
@@ -703,7 +683,23 @@ function initKnownVariantsNav() {
 		variantCards.push(variantCard);				
 	} 
 
+}
 
+function onKnownVariantsNav(value) {
+	if (value == 'counts') {
+		showKnownVariantsHistoChart(true);
+		showKnownVariantsCounts();
+		clearKnownVariantsCard();
+	} else if (value == 'variants') {
+		showKnownVariantsHistoChart(false);
+		addKnownVariantsCard();
+	} else if (value == 'none' || value == 'hide') {
+		showKnownVariantsHistoChart(false);
+		clearKnownVariantsCard();
+		$('#known-variants-cards #vcf-track').addClass("hide");
+		$('#known-variants-cards #variant-badges').addClass("hide");
+		$('#known-variants-cards #zoom-region-chart').addClass("hide");
+	}	
 }
 
 function selectGeneInDropdown(theGeneName, select) {
@@ -3899,7 +3895,7 @@ toggleKnownVariantsChart = function(chartType, refresh=false, button) {
 	if (refresh) {
 		d3.select("#known-variants-chart svg").remove();
 		if (button) {
-			$('#known-variants-nav .chart-type.selected').removeClass('selected');
+			$('#known-variants-nav-chart-type .chart-type.selected').removeClass('selected');
 			$(button).addClass('selected');
 		}
 
@@ -3924,13 +3920,13 @@ showKnownVariantsHistoChart = function(show=true) {
 	if (show) {
 		hideKnownVariants = false;
 		$('#known-variants-chart').removeClass("hide");
-		$('#known-variants-nav').removeClass("hide");	
+		$('#known-variants-nav-chart-type').removeClass("hide");	
 		$('#known-variants-cards #vcf-track').addClass("hide");
 		$('#known-variants-cards #variant-badges').addClass("hide");
 	} else {
 		hideKnownVariants = true;
 		$('#known-variants-chart').addClass("hide");
-		$('#known-variants-nav').addClass("hide");			
+		$('#known-variants-nav-chart-type').addClass("hide");			
 		$('#known-variants-cards #vcf-track').removeClass("hide");
 		$('#known-variants-cards #variant-badges').removeClass("hide");
 	}
@@ -3970,7 +3966,7 @@ showKnownVariantsCounts = function() {
 	}
 	
 
-	$('#known-variants-chart .loader').removeClass('hide');
+	$('#known-variants-nav-chart-type .loader').removeClass('hide');
 	d3.select('#known-variants-chart svg').remove();
 	getProbandVariantCard().model.promiseGetKnownVariants(window.gene, theTranscript, binLength).then(function(results) {
 
@@ -3983,7 +3979,7 @@ showKnownVariantsCounts = function() {
 		
 		
 		knownVariantsChart(selection, {transition: {'pushUp': true, 'featureBarWidth' : featureBarWidth }} );
-	    $('#known-variants-chart .loader').addClass('hide');
+	    $('#known-variants-nav-chart-type .loader').addClass('hide');
 
 	})							
 

@@ -1,14 +1,29 @@
 
-<div id="select-known-variants-display-box" class="level-edu level-basic">
-    <select id="select-known-variants-display" class="fullview" data-placeholder="">
-          <option value="counts" >Show counts</option>
-          <option value="variants">Show variants</option>                   
-          <option value="hide">Hide</option>
-          <option value="none"></option>
-    </select>        
-</div>  
+<div id="known-variants-nav-radio-buttons" class="form-group level-edu level-basic">
+  <div class="radio">
+    <label>
+      <input type="radio" name="known-variants-display-radio" onclick="onKnownVariantsNav(this.value)" value="counts" >
+      Counts
+    </label>
+  </div>
+  <div class="radio" style="margin-left:10px">
+    <label>
+      <input type="radio" name="known-variants-display-radio" onclick="onKnownVariantsNav(this.value)" value="variants">
+      Variants                                                        
+    </label>
+  </div>
 
-<div id="known-variants-nav" class="hide">
+  <div class="radio" style="margin-left:10px">
+    <label>
+      <input type="radio" checked="true" name="known-variants-display-radio" onclick="onKnownVariantsNav(this.value)" value="none">
+      None                                                    
+    </label>
+
+  </div>
+</div>
+
+
+<div id="known-variants-nav-chart-type" class="hide">
     <button class="selected chart-type level-edu btn btn-default icon-button-sm btn-raised" 
     href="javascript:void(0)" onclick="toggleKnownVariantsChart('exon-bar', true, this)"
     data-toggle="tooltip" data-placement="top" title="exon bar chart">  
@@ -24,11 +39,11 @@
     data-toggle="tooltip" data-placement="top" title="area chart">
       <i class="material-icons">show_chart</i>
     </button>
+
     <div class="loader hide">
-        <span class="loader-label">Loading...</span>
+        <span class="loader-label">Loading variant counts...</span>
         <img src="assets/images/wheel.gif"/>
     </div>
-
 </div>  
 
 

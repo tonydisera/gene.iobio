@@ -1,13 +1,67 @@
-
 #known-variants-nav-area
   display: inline-block
   padding-top: 0px
   float: left
 
+  #known-variants-nav-radio-buttons
+    display: inline-block
+    margin-top: 2px
+    padding-top: 0px
+    float: left
+    margin-right: 15px
+
+    .radio 
+      label 
+        font-size: 13px
+        color: $text-color 
+        padding-top: 1px
+
+
+  #known-variants-nav-chart-type  
+    margin-left: 10px
+    margin-top: 0px
+    float: left
+
+    .tooltip
+      background-color: initial
+      border: none
+      box-shadow: none
+
+    .chart-label
+      vertical-align: top
+      display: inline-block
+      margin-top: 4px
+      margin-right: 10px
+
+    .loader
+      margin-left: 10px
+      display: inline-block
+      margin-top: 2px
+      margin-bottom: 0px
+
+      .loader-label
+        font-size: 12px
+
+    .chart-type
+      margin: 0
+      padding: 2px
+      vertical-align: top
+      cursor: pointer
+
+      &.selected
+        font-weight: bold
+        border: solid .5px $current-color
+        border-radius: 4px
+        padding: 1px
+
+      .material-icons
+        font-size: 17px    
+
+
   text
     color: $text-color
     fill:  $text-color
-    font-size: 12px
+    font-size: 12px    
 
   svg.known-variants-clinvar
     margin-right:  10px
@@ -99,11 +153,6 @@
     display: inline-block
     padding-top: 0px
 
-    #known-variants-nav  
-      margin-left: 10px
-      margin-top: 0px
-      float: left
-
   .track
     background-color: transparent !important
 
@@ -140,7 +189,7 @@
       box-shadow:  none
       margin-bottom: -10px
       min-height: initial
-
+      
       #variant-heading
         display: none !important
 
@@ -205,13 +254,6 @@
 
       
 
-#proband-variant-card
-  #show-known-variants-card-cb-area    
-    display:  inline-block !important 
-    float: left
-    margin-right: 20px  
-
-
 
 #known-variants-cards
   #vcf-chart-label
@@ -225,49 +267,6 @@
 //
 // Known Variants Histogram
 //
-
-#known-variants-nav
-  text-align: left
-  margin-bottom: 2px
-  margin-left: 10px
-  float: left
-
-  .tooltip
-    background-color: initial
-    border: none
-    box-shadow: none
-
-  .chart-label
-    vertical-align: top
-    display: inline-block
-    margin-top: 4px
-    margin-right: 10px
-
-  .loader
-    margin-left: 10px
-    display: inline-block
-    margin-top: 2px
-    margin-bottom: 0px
-
-    .loader-label
-      font-size: 12px
-
-  .chart-type
-    margin: 0
-    padding: 2px
-    vertical-align: top
-    cursor: pointer
-
-    &.selected
-      font-weight: bold
-      border: solid .5px $current-color
-      border-radius: 4px
-      padding: 1px
-
-    .material-icons
-      font-size: 17px
-
-
 #known-variants-chart
   padding: 0px
   margin-top: 0px
