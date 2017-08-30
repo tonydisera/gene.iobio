@@ -2493,9 +2493,9 @@ inputinput:-moz-placeholder {
   font-size: 11px;
   line-height: normal; }
   #bam-depth .tooltip .danger {
-    color: #6974d8; }
+    color: #aab2ff; }
   #bam-depth .tooltip a.danger {
-    color: #6974d8 !important; }
+    color: #aab2ff !important; }
   #bam-depth .tooltip #exon-tooltip-close {
     float: right;
     color: white !important;
@@ -2506,9 +2506,9 @@ inputinput:-moz-placeholder {
     float: left; }
 
 #zoom-region-chart .tooltip .danger {
-  color: #6974d8; }
+  color: #aab2ff; }
 #zoom-region-chart .tooltip a.danger {
-  color: #6974d8 !important; }
+  color: #aab2ff !important; }
 #zoom-region-chart .tooltip #exon-tooltip-close {
   float: right;
   color: white !important;
