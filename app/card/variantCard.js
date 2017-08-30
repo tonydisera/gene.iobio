@@ -982,7 +982,7 @@ VariantCard.prototype.fillZoomRegionChart = function(filteredTranscript, start, 
 		// start with a clean slate to avoid the bug where switching between transcripts
 		// resulted in last transcripts features not clearing out.
 		me.d3CardSelector.select('#zoom-region-chart svg').remove();
-		me.cardSelector.select("#zoom-region-chart").removeClass("hide");
+		me.cardSelector.find("#zoom-region-chart").removeClass("hide");
 
 		selection = me.d3CardSelector.select("#zoom-region-chart").datum([theTranscript]);
 		me.zoomRegionChart.regionStart(+start);
