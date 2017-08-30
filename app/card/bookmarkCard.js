@@ -526,6 +526,17 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	        });
 			
 	
+       
+
+
+	container.selectAll(".bookmark")
+	 		 .append("span")
+	         .attr("class", "bookmark-number")
+	         .text(function(d,i) {
+	         	return i + ".";
+	         })
+
+
 	container.selectAll(".bookmark")
 	         .append("i")
 	         .attr("class", "material-icons bookmark-info-glyph")
@@ -533,8 +544,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			 .on('mouseover', function(entry,i) {
      			var currentBookmark = d3.select(this.parentNode);
 
-	         	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-     			currentBookmark.classed("current", true);
+	         	currentBookmark.classed("current", true);
 
      			me.selectedBookmarkKey = entry.key;
 
@@ -561,8 +571,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
             .on('mouseout', function(entry,i) {
             	me.hideTooltip();
             	d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);	
-            });	         
-
+            });	
 
 	container.selectAll(".bookmark")
 	 		 .append("span")
@@ -572,20 +581,20 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	 		 .append("span")
 	         .attr("class", "called-variant-indicator");
 
-	 container.selectAll(".bookmark")
+	container.selectAll(".bookmark")
 	 		 .append("span")
 	         .attr("class", "variant-label");
 
-	 container.selectAll(".bookmark")
+	container.selectAll(".bookmark")
 	 		 .append("span")
 	         .attr("class", "not-found hide");	         
 
-
-	 container.selectAll(".bookmark")
+	container.selectAll(".bookmark")
 	 		 .append("span")
 	         .attr("class", "favorite-indicator")
 	         .style("float", "right");
-	        
+ 
+
 	container.selectAll(".bookmark span.variant-label")
 	         .html(function(entry,i) {	
 	         	var key = entry.key;
@@ -728,16 +737,16 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
          		if (inheritance == 'recessive') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
-								        .attr("height", 16)
-								        .attr("width", 15);
-					var options = {width: 15, height: 15, transform: "translate(0,3)"};
+								        .attr("height", 13)
+								        .attr("width", 13);
+					var options = {width: 15, height: 15, transform: "translate(0,0)"};
 					matrixCard.showRecessiveSymbol(svg, options);										        
          		} else if (inheritance == 'denovo') {
 					var svg = selection.append("svg")
 								        .attr("class", "inheritance-badge")
-								        .attr("height", 16)
-								        .attr("width", 15);
-					var options = {width: 15, height: 15, transform: "translate(0,3)"};
+								        .attr("height", 13)
+								        .attr("width", 13);
+					var options = {width: 15, height: 15, transform: "translate(0,0)"};
 					matrixCard.showDeNovoSymbol(svg, options);				
          		}
          	}
@@ -788,7 +797,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 			   		me.favorites[entry.key] = !selected;
 			   });
 			var group = svg.append("g")
-			   .attr("transform", "translate(0,1)");
+			   .attr("transform", "translate(0,0)");
 			group.append("use")
 			   .attr("xlink:href", "#star-symbol")
 			   .attr("id", "favorite-badge")
@@ -842,13 +851,24 @@ BookmarkCard.prototype._getVariantLabel = function(bookmarkEntry, key) {
 
 	var rsId = getRsId(bookmarkEntry);
  	var abbrevHgvsP = bookmarkEntry.extraAnnot ? matrixCard.formatHgvsP(bookmarkEntry, bookmarkEntry.vepHGVSp) : "";
+ 	var vepConsequence = bookmarkEntry.vepConsequence ? Object.keys(bookmarkEntry.vepConsequence).join(" ") : "";
 
 	// Strip off gene name and chr
 	var bm = me.parseKey(key);
 
- 	return '<span class="coord">' + bm.start + " " + bm.ref + "->" + bm.alt + '</span>' 
- 	     + '<span class="rsid">'  + (rsId ? rsId : "") + '</span>' 
- 	     + '<span class="hgvs">'  + (abbrevHgvsP ? abbrevHgvsP : "") + '</span>';	
+	var buf = "";
+	buf +=  "<div style='display:inline-block'";
+	buf +=  "    <div>";
+	buf +=  '       <span class="coord">' + bm.start + " " + bm.ref + "->" + bm.alt + '</span>' ;
+	buf +=  '       <span class="hgvs">'  + (abbrevHgvsP ? abbrevHgvsP : "") + '</span>'
+	buf +=  "    </div>";
+	buf +=  "    <div>";
+	buf +=  '       <span class="vep-consequence">'  + vepConsequence.split("_").join(" ") + '</span>';
+	buf +=  '       <span class="rsid">'  + (rsId ? rsId : "") + '</span>' 
+	buf +=  "    </div>";
+	buf +=  "</div>";
+
+	return buf;
 }
 
 BookmarkCard.prototype._showVariantTooltip = function(variant, screenX, screenY, geneObject, transcriptObject) {

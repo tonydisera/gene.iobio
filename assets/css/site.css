@@ -2812,7 +2812,7 @@ text.ref-count {
   border-top-color: rgba(0, 0, 0, 0.2);
   bottom: -10px;
   content: "";
-  right: 328px; }
+  right: 343px; }
 .tooltip-wide.arrow-down-center:after {
   position: absolute;
   display: inline-block;
@@ -2821,7 +2821,7 @@ text.ref-count {
   border-right: 9px solid transparent;
   bottom: -8px;
   content: "";
-  right: 330px; }
+  right: 345px; }
 
 .tooltip-extra-wide.arrow-down-center:before {
   right: 448px; }
@@ -3008,17 +3008,10 @@ text.ref-count {
   margin-right: 5px;
   word-break: break-all; }
   #bookmark-card a.current {
-    line-height: 12px;
-    padding-bottom: 2px;
-    padding-top: 6px !important;
-    margin-top: 1px;
-    margin-bottom: 1px;
-    margin-right: 5px;
-    border: solid thin #3586c0;
-    font-weight: normal;
-    padding-right: 0px;
-    padding-left: 0px;
-    margin-left: 0px; }
+    outline-style: solid;
+    outline-color: #3586c0;
+    outline-width: 1px;
+    font-weight: normal; }
   #bookmark-card a #import-help-icon {
     color: #5d809d !important;
     margin-left: 2px; }
@@ -3037,19 +3030,28 @@ text.ref-count {
     font-style: italic;
     padding-left: 6px;
     display: inline-block;
-    margin-top: -2px; }
+    vertical-align: top; }
   #bookmark-card .bookmark .bookmark-info-glyph {
     display: inline-block;
     font-size: 14px;
-    margin-top: -5px;
-    margin-left: -1px;
-    margin-right: 5px;
-    color: #909090;
-    font-size: 15px;
-    cursor: pointer; }
+    margin-left: 0px;
+    margin-right: 9px;
+    color: #ababab;
+    font-size: 14px;
+    cursor: pointer;
+    vertical-align: top;
+    margin-top: -2px; }
+  #bookmark-card .bookmark .bookmark-number {
+    margin-right: 7px;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 1px; }
   #bookmark-card .bookmark .variant-symbols {
     display: inline-block;
-    width: 60px;
+    width: 70px;
+    vertical-align: top;
     margin-top: -2px; }
   #bookmark-card .bookmark .variant-label {
     display: inline-block; }
@@ -3058,20 +3060,31 @@ text.ref-count {
       width: 97px;
       line-height: 12px;
       vertical-align: top; }
+      #bookmark-card .bookmark .variant-label .coord:hover {
+        text-decoration: underline !important; }
+    #bookmark-card .bookmark .variant-label .hgvs {
+      margin-left: 3px;
+      display: inline-block;
+      width: 70px;
+      line-height: 12px;
+      vertical-align: top; }
+      #bookmark-card .bookmark .variant-label .hgvs:hover {
+        text-decoration: underline !important; }
+    #bookmark-card .bookmark .variant-label .vep-consequence {
+      display: inline-block;
+      width: 97px;
+      line-height: 12px;
+      vertical-align: top; }
+      #bookmark-card .bookmark .variant-label .vep-consequence:hover {
+        text-decoration: underline !important; }
     #bookmark-card .bookmark .variant-label .rsid {
       display: inline-block;
       margin-left: 3px;
       width: 70px;
       line-height: 12px;
       vertical-align: top; }
-    #bookmark-card .bookmark .variant-label .hgvs {
-      margin-left: 3px;
-      display: inline-block;
-      width: 67px;
-      line-height: 12px;
-      vertical-align: top; }
-    #bookmark-card .bookmark .variant-label:hover {
-      text-decoration: underline !important; }
+      #bookmark-card .bookmark .variant-label .rsid:hover {
+        text-decoration: underline !important; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
@@ -3099,7 +3112,10 @@ text.ref-count {
   cursor: pointer;
   float: right;
   display: inline-block;
-  margin-top: -2px; }
+  vertical-align: top;
+  margin-top: -2px;
+  margin-left: 5px;
+  margin-right: 5px; }
 #bookmark-card .phenotypes-container {
   overflow-x: hidden; }
 #bookmark-card .phenotypes {
@@ -4141,11 +4157,6 @@ text.ref-count {
     background-color: transparent !important; }
   #known-variants-all-card .track-expand {
     background-color: transparent !important; }
-  #known-variants-all-card #show-known-variants-cb-area {
-    margin-top: 0px;
-    margin-left: 10px; }
-  #known-variants-all-card #show-known-variants-card-cb-area {
-    margin-right: 10px; }
   #known-variants-all-card #known-variants-chart {
     margin-bottom: -13px; }
   #known-variants-all-card #known-variants-cards {

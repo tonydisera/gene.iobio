@@ -1,6 +1,6 @@
 function VariantTooltip() {
 	this.examinedVariant = null;
-	this.WIDTH_LOCK         = 650;
+	this.WIDTH_LOCK         = 680;
 	this.WIDTH_EXTRA_WIDE   = 840;
 	this.WIDTH_HOVER        = 360;
 	this.WIDTH_SIMPLE       = 280;
