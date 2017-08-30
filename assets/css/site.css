@@ -4155,7 +4155,7 @@ text.ref-count {
     #known-variants-all-card #known-variants-cards .badge-label {
       font-size: 12px; }
     #known-variants-all-card #known-variants-cards #variant-badges {
-      float: right !important; }
+      margin-left: 20px !important; }
     #known-variants-all-card #known-variants-cards .variant-card {
       margin-top: -3px;
       box-shadow: none;

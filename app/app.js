@@ -3963,7 +3963,7 @@ showKnownVariantsCounts = function() {
 		results = results.filter(function(binObject) {
 			return binObject.start >= regionStart && binObject.end <= regionEnd;
 		})
-
+		vc.cardSelector.removeClass("hide");
 		$('#known-variants-chart').removeClass("hide");
 		var selection = d3.select('#known-variants-chart').datum(results);
 		
