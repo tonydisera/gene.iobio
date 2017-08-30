@@ -1311,8 +1311,8 @@ header {
     pointer-events: none; }
   #bam-depth .region {
     stroke-width: 1px;
-    stroke: rgba(218, 165, 0, 0.5);
-    fill: rgba(218, 165, 0, 0.5); }
+    stroke: rgba(105, 116, 216, 0.5);
+    fill: rgba(105, 116, 216, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
     stroke: lightgray;
@@ -1951,7 +1951,7 @@ inputinput:-moz-placeholder {
   margin-right: 70px;
   color: #717171; }
   #coverage-thresholds.attention {
-    outline-color: #daa500;
+    outline-color: #6974d8;
     outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
@@ -2493,9 +2493,9 @@ inputinput:-moz-placeholder {
   font-size: 11px;
   line-height: normal; }
   #bam-depth .tooltip .danger {
-    color: #daa500; }
+    color: #6974d8; }
   #bam-depth .tooltip a.danger {
-    color: #daa500 !important; }
+    color: #6974d8 !important; }
   #bam-depth .tooltip #exon-tooltip-close {
     float: right;
     color: white !important;
@@ -2506,9 +2506,9 @@ inputinput:-moz-placeholder {
     float: left; }
 
 #zoom-region-chart .tooltip .danger {
-  color: #daa500; }
+  color: #6974d8; }
 #zoom-region-chart .tooltip a.danger {
-  color: #daa500 !important; }
+  color: #6974d8 !important; }
 #zoom-region-chart .tooltip #exon-tooltip-close {
   float: right;
   color: white !important;
@@ -3168,18 +3168,18 @@ text.ref-count {
   font-size: 12px; }
 
 #zoom-region-chart.ibo-gene .cds.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(105, 116, 216, 0.81);
+  stroke: #555da5; }
 #zoom-region-chart.ibo-gene .utr.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(105, 116, 216, 0.81);
+  stroke: #555da5; }
 
 #gene-viz.ibo-gene .cds.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(105, 116, 216, 0.81);
+  stroke: #555da5; }
 #gene-viz.ibo-gene .utr.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(105, 116, 216, 0.81);
+  stroke: #555da5; }
 
 #genes-panel {
   margin-bottom: 5px;
@@ -3411,8 +3411,8 @@ text.ref-count {
   margin-top: -1px;
   margin-left: 0px;
   float: left;
-  color: #daa500;
-  fill: #daa500;
+  color: #6974d8;
+  fill: #6974d8;
   display: none; }
   #gene-badge-coverage-problem.dropdown-item {
     display: inline-block;
@@ -3420,7 +3420,7 @@ text.ref-count {
     margin-top: 1px; }
 
 .coverage-problem-glyph {
-  fill: #daa500; }
+  fill: #6974d8; }
 
 #gene-badge-harmful-variant {
   font-size: 15px;
