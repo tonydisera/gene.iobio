@@ -478,19 +478,9 @@ function init() {
 	    .showXAxis(false)
 	    .showBrush(false)
 	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
-	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 18)
-	    .showLabel(true)		   	    
-	    .on("d3selected", function(d) {
-	    	window.selectedTranscript = d;
-	    	markCodingRegions(window.gene, window.selectedTranscript);
-	    	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-	    	getCodingRegions(window.selectedTranscript);
-
-
-	    	showTranscripts();
-
-	    	loadTracksForGene();
-	    });
+	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 10)
+	    .showLabel(true);		   	    
+	    
 
 
 	knownVariantsAreaChart = stackedAreaChartD3()
