@@ -46,8 +46,7 @@ function geneD3() {
       geneD3_regionStart = undefined,
       geneD3_regionEnd = undefined,      
       geneD3_widthPercent = undefined,
-      geneD3_heightPercent = undefined,     
-      showBrushLine = false;
+      geneD3_heightPercent = undefined;
       
 
 
@@ -77,7 +76,7 @@ function geneD3() {
 
     selection.each(function(data) {
 
-       brushAllowance = geneD3_showBrush ? 20 : 0;
+       brushAllowance = geneD3_showBrush ? 0 : 0;
 
        // calculate height
        var padding = data.length > 1 ? geneD3_trackHeight/2 : 0;
@@ -147,7 +146,6 @@ function geneD3() {
       // Update the inner dimensions.
       g.attr("transform", "translate(" + margin.left + "," + parseInt(margin.top+featureGlyphHeight) + ")");
 
-      g.selectAll("line.brush-line").remove();
 
       // Brush
       var brush = d3.svg.brush()
@@ -156,48 +154,8 @@ function geneD3() {
             var extentRect = d3.select("g.x.brush rect.extent");
             
             var xExtent = +extentRect.attr("x") + (+extentRect.attr("width") / 2);
-            var heightExtent = +extentRect.attr("height") - 10;
+            var heightExtent = +extentRect.attr("height");
 
-            g.selectAll("line.brush-line").remove();
-
-            if (showBrushLine) {
-              if (!brush.empty()) {
-                g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', xExtent)
-                  .attr('x2', xExtent)          
-                  .attr('y1', heightExtent -20)
-                  .attr('y2', heightExtent );
-
-                 g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', 40 )
-                  .attr('x2',  geneD3_width - margin.left - margin.right - 40)          
-                  .attr('y1', heightExtent)
-                  .attr('y2', heightExtent);
-
-                if (geneD3_widthPercent && geneD3_heightPercent) {
-                  svg.attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom+brushAllowance))
-                     .attr("preserveAspectRatio", "xMaxYMid meet");
-                } 
-
-                svg.attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
-                   .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom+brushAllowance);
-
-
-              } else {
-                 if (geneD3_widthPercent && geneD3_heightPercent) {
-                    svg.attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
-                       .attr("preserveAspectRatio", "xMaxYMid meet");
-                  } 
-
-                  svg.attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
-                     .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
-               
-              }
-
-
-            }
             dispatch.d3brush(brush);
 
 
@@ -214,8 +172,8 @@ function geneD3() {
 
 
       if (geneD3_showBrush) {
-        var brushHeight = geneD3_height + 20;
-        var brushY = -20;
+        var brushHeight = geneD3_height + margin.top;
+        var brushY = margin.top * -1;
         g.selectAll("g.x.brush").remove();
         var theBrush = g.selectAll("g.x.brush").data([0]);
         theBrush.enter().append("g")
@@ -224,9 +182,6 @@ function geneD3() {
             .selectAll("rect")
             .attr("y", brushY)
             .attr("height", brushHeight);
-        theBrush.exit().remove();
-
-           
       }    
 
       // add tooltip div
@@ -703,11 +658,7 @@ function geneD3() {
     return chart;
   }
 
-  chart.showBrushLine = function(_) {
-    if (!arguments.length) return showBrushLine;
-    showBrushLine = _;
-    return chart;
-  }
+
   // This adds the "on" methods to our custom exports
   d3.rebind(chart, dispatch, "on");
 
