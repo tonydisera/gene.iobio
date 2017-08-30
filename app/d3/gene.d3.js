@@ -53,8 +53,6 @@ function geneD3() {
   //  options
   var defaults = {};
 
-  var brushAllowance = 0;
-
   var featureClass = function(d,i) {
     return d.feature_type.toLowerCase();
   }
@@ -75,8 +73,6 @@ function geneD3() {
 
 
     selection.each(function(data) {
-
-       brushAllowance = geneD3_showBrush ? 0 : 0;
 
        // calculate height
        var padding = data.length > 1 ? geneD3_trackHeight/2 : 0;
@@ -152,9 +148,9 @@ function geneD3() {
         .x(x)
         .on("brushend", function() {
             var extentRect = d3.select("g.x.brush rect.extent");
-            
-            var xExtent = +extentRect.attr("x") + (+extentRect.attr("width") / 2);
-            var heightExtent = +extentRect.attr("height");
+            var xExtent = +extentRect.attr("x");
+
+            extentRect.attr("x", xExtent - 1);
 
             dispatch.d3brush(brush);
 
@@ -173,7 +169,7 @@ function geneD3() {
 
       if (geneD3_showBrush) {
         var brushHeight = geneD3_height + margin.top;
-        var brushY = margin.top * -1;
+        var brushY = (margin.top-1) * -1;
         g.selectAll("g.x.brush").remove();
         var theBrush = g.selectAll("g.x.brush").data([0]);
         theBrush.enter().append("g")

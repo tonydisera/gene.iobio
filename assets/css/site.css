@@ -1418,6 +1418,9 @@ header {
 #bam-depth .y.axis line {
   stroke-width: 0.5px; }
 
+#gene-viz {
+  margin-top: -25px; }
+
 #gene-viz .axis line, #gene-viz .axis path {
   fill: none;
   stroke: lightgrey;

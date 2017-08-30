@@ -408,7 +408,7 @@ function init() {
 	    .width($('#container').innerWidth())
 	    .widthPercent("100%")
 	    .heightPercent("100%")
-	    .margin({top:0, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
+	    .margin({top: isLevelBasic || isLevelEdu ? 0 : 20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
 	    .showXAxis(true)
 	    .showBrush(true)
 	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
