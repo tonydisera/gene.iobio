@@ -109,6 +109,13 @@ function geneD3() {
       y  .range([innerHeight , 0]);
 
 
+      data.forEach(function(transcript) {
+        transcript.features.forEach(function(feature) {
+          feature.transcript_type = transcript.transcript_type;
+        })
+      })
+
+
       // Select the svg element, if it exists.
       var svg = container.selectAll("svg").data([0]);
 
@@ -339,26 +346,22 @@ function geneD3() {
           .attr('class', 'arrow')
           .attr('d', centerArrow);      
 
-      var filterFeatures = null;
-      if ( transcript.datum().transcript_type == 'protein_coding' 
-        || transcript.datum().transcript_type == 'mRNA' 
-        || transcript.datum().transcript_type == 'transcript'
-        || transcript.datum().transcript_type == 'primary_transcript') {
-        filterFeatures = function(d) {
-           var ft = d.feature_type.toLowerCase(); 
-           return  (ft == 'utr' || ft == 'cds');
-        };
-      } else {
-        filterFeatures = function(d) {
-           var ft = d.feature_type.toLowerCase(); 
-           return ft == 'exon';
-        };
+
+      var filterFeature = function(feature) {
+          if ( feature.transcript_type == 'protein_coding' 
+              || feature.transcript_type == 'mRNA' 
+              || feature.transcript_type == 'transcript'
+              || feature.transcript_type == 'primary_transcript') {
+            return feature.feature_type.toLowerCase() == 'utr' || feature.feature_type.toLowerCase() == 'cds';
+          } else {
+            return feature.feature_type.toLowerCase() == 'exon';
+          }
       }
 
 
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
-          return filterFeatures(d); 
+          return filterFeature(d);
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -424,7 +427,7 @@ function geneD3() {
       transcript.selectAll(".feature_glyph").remove();
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
-          return filterFeatures(d); 
+          return filterFeature(d); 
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -459,7 +462,7 @@ function geneD3() {
       // Update class
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
-          return filterFeatures(d); 
+          return filterFeature(d); 
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
