@@ -1697,19 +1697,41 @@ function initTranscriptControls() {
 }
 
 
+function selectTranscript(transcriptId) {
+	var found = false;
+	hideCoordinateFrame();
+	window.gene.transcripts.forEach(function(transcript) {
+		if (transcript.transcript_id == transcriptId) {
+			window.selectedTranscript = transcript;
+			found = true;
+		} else if (transcript.transcript_id.indexOf(transcriptId.toUpperCase()) == 0) {
+			window.selectedTranscript = transcript;
+			found = true;
+		}
+	})
+	if (found) {
+		selectCurrentTranscript();
+	}
+}
+
 
 function onCloseTranscriptMenuEvent() {
 	if (transcriptMenuChart.selectedTranscript() != null ) {
 		if (selectedTranscript == null || selectedTranscript.transcript_id != transcriptMenuChart.selectedTranscript().transcript_id) {
 			selectedTranscript = transcriptMenuChart.selectedTranscript();
-		 	markCodingRegions(window.gene, window.selectedTranscript);
-			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-			d3.selectAll("#gene-viz .transcript").remove();
-		 	getCodingRegions(window.selectedTranscript);
-		 	loadTracksForGene();
-		 }		
+		 	selectCurrentTranscript();
+		 }
+
 	}
 
+}
+
+function selectCurrentTranscript() {
+	markCodingRegions(window.gene, window.selectedTranscript);
+	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+	d3.selectAll("#gene-viz .transcript rect").remove();
+ 	getCodingRegions(window.selectedTranscript);
+ 	loadTracksForGene();	
 }
 
 function getCanonicalTranscript(theGeneObject) {
@@ -2842,28 +2864,6 @@ function addCommas(nStr)
 		x1 = x1.replace(rgx, '$1' + ',' + '$2');
 	}
 	return x1 + x2;
-}
-
-function selectTranscript(transcriptId) {
-	var found = false;
-	window.gene.transcripts.forEach(function(transcript) {
-		if (transcript.transcript_id == transcriptId) {
-			window.selectedTranscript = transcript;
-			found = true;
-		} else if (transcript.transcript_id.indexOf(transcriptId.toUpperCase()) == 0) {
-			window.selectedTranscript = transcript;
-			found = true;
-		}
-	})
-	if (found) {
-    	markCodingRegions(window.gene, window.selectedTranscript);
-		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-    	getCodingRegions(window.selectedTranscript);
-
-    	showTranscripts();
-
-    	loadTracksForGene();
-	}
 }
 
 
