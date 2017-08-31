@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   margin-top: -5px; }
@@ -238,6 +239,23 @@ h5 {
   border-radius: 0 !important;
   border: none !important;
   color: #717171; }
+
+.selectize-control.multi .selectize-input:after {
+  content: "";
+  font-family: "Glyphicons Halflings";
+  line-height: 2;
+  display: block;
+  position: absolute;
+  top: 20%;
+  right: 4px;
+  background-color: white;
+  font-size: 9px;
+  cursor: pointer; }
+
+.selectize-control.multi .selectize-input.dropdown-active:after {
+  content: "";
+  font-family: "Glyphicons Halflings";
+  background-color: white; }
 
 #gene-source-box .selectize-input {
   padding-top: 5px;
