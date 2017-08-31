@@ -1072,6 +1072,11 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 	}
 
+	if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+		me.cardSelector.find('.vcfloader').addClass("hide");
+		return;
+	}
+
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData) {
 
