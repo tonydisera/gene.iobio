@@ -3931,7 +3931,8 @@ showKnownVariantsCounts = function() {
 	if (hideKnownVariants) {
 		return;
 	}
-	var featureBarWidth = false;
+	// This determines if the exon bar will span the width of the exon.
+	var featureBarWidth = true;
 
 	var theTranscript = null;
 	var binLength = null;
@@ -3968,7 +3969,7 @@ showKnownVariantsCounts = function() {
 		var selection = d3.select('#known-variants-chart').datum(results);
 		
 		
-		knownVariantsChart(selection, {transition: {'pushUp': true, 'featureBarWidth' : featureBarWidth }} );
+		knownVariantsChart(selection, {transition: {'pushUp': true}, 'featureBarWidth' : featureBarWidth} );
 	    $('#known-variants-nav-chart-type .loader').addClass('hide');
 
 	})							
