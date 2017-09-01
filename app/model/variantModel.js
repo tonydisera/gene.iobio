@@ -1548,7 +1548,9 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 				    	me.vcfData = data;		
 
 				    	// Get the HGVS, rsID for high, moderate impact variants
-						me.promiseGetImpactfulVariantIds(data.gene, data.transcript);
+				    	if (me.getRelationship() != 'known-variants') {
+							me.promiseGetImpactfulVariantIds(data.gene, data.transcript);
+				    	}
 
 
 						resolve(me.vcfData);

@@ -2949,7 +2949,6 @@ function addVariantCard() {
 
 function addKnownVariantsCard()  {
 
-	$('#known-variants-cards #vcf-track').removeClass("hide");
 	$('#known-variants-cards #variant-badges').removeClass("hide");
 	$('#select-known-variants-filter-box').removeClass("hide");
 
@@ -2957,7 +2956,7 @@ function addKnownVariantsCard()  {
 	var variantCard = getVariantCard('known-variants');
 	var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
 	variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
-		loadTracksForGene();
+		variantCard.promiseLoadAndShowVariants(true);
 	});
 	
 	hideKnownVariantsCard = false;
@@ -3913,13 +3912,11 @@ showKnownVariantsHistoChart = function(show=true) {
 		hideKnownVariants = false;
 		$('#known-variants-chart').removeClass("hide");
 		$('#known-variants-nav-chart-type').removeClass("hide");	
-		$('#known-variants-cards #vcf-track').addClass("hide");
 		$('#known-variants-cards #variant-badges').addClass("hide");
 	} else {
 		hideKnownVariants = true;
 		$('#known-variants-chart').addClass("hide");
 		$('#known-variants-nav-chart-type').addClass("hide");			
-		$('#known-variants-cards #vcf-track').removeClass("hide");
 		$('#known-variants-cards #variant-badges').removeClass("hide");
 	}
 }
