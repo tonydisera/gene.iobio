@@ -31,6 +31,7 @@ function stackedBarChartD3() {
 
   var barWidth = 10;
   var barWidthMin = null;
+  var barHeightMin = null;
 
   var widthPercent = null;
   var heightPercent = null;
@@ -105,11 +106,20 @@ function stackedBarChartD3() {
           yAxis.ticks(yTickCount)
       } 
 
+      if (xStart && xEnd) {
+        x.domain([xStart, xEnd]);
+      } else {
+        x.domain(d3.extent(data, function(d) { return xValue(d); }));
+      }         
+      var yMax = d3.max(data, function(d) { return d.total; })
+      y.domain([0, yMax]);    
 
-      var layers = d3.layout.stack()(categories.map(function(category) {
+      // What is the min y value that will equal a min height (the height of the chart is 0, so subtract min from height)
+      var minY = barHeightMin ? y.invert(y.range()[0] - barHeightMin) : 0;  
+      var stackedData = categories.map(function(category) {
         return data.map(function(d) {
           var stackRow = { x: xValue(d), 
-                           y: +d[category], 
+                           y: +d[category] > 0 ? Math.max(+d[category], minY) : 0, 
                            values: categories.map(function(cat) { 
                               var v = {};
                               v[cat] = d[cat];
@@ -123,16 +133,25 @@ function stackedBarChartD3() {
 
           return stackRow;
         });
-      }));
+      });        
 
 
+      var layers = d3.layout.stack()(stackedData);
 
-      if (xStart && xEnd) {
-        x.domain([xStart, xEnd]);
-      } else {
-        x.domain(d3.extent(data, function(d) { return xValue(d); }));
-      }         
-      y.domain([0, d3.max(layers[layers.length - 1], function(d) { return d.y0 + d.y; })]);
+
+/*
+      var revisedLayers = layers.map(function(layer) {
+        layer.scaledY       = y(layer.y);
+        layer.scaledYStart  = y(layer.y0);
+        layer.scaledYEnd    = y(layer.y + layer.y0);
+
+        layer.height        = layer.scaledYStart - layer.scaledYEnd;
+        layer.yPos          = layer.scaledYEnd;
+      })
+
+*/
+
+
       
 
       
@@ -327,6 +346,12 @@ function stackedBarChartD3() {
   chart.barWidthMin = function(_) {
     if (!arguments.length) return barWidthMin;
     barWidthMin = _;
+    return chart;
+  };
+
+  chart.barHeightMin = function(_) {
+    if (!arguments.length) return barHeightMin;
+    barHeightMin = _;
     return chart;
   };
   

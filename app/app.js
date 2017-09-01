@@ -507,6 +507,7 @@ function init() {
 		.xValueStart( function(d, i) { return d.start })
 		.xValueEnd( function(d, i) { return d.end })
 		.barWidthMin(4)
+		.barHeightMin(3)
 		.categories(['unknown', 'other', 'benign', 'path'])
 	    .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
 	    .tooltipText( function(d,i) {
