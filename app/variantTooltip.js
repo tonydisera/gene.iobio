@@ -31,7 +31,8 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		if (lock) {
 			html = variantTooltip.formatContent(variant, null, 'tooltip-wide');
 		} else {	
-			html = variantTooltip.formatContent(variant, variantCard ? "click on variant to pin tooltip" : "click on column to pin tooltip");
+			var pinMessage = variantCard ? "click on variant to pin tooltip" : "click on column to pin tooltip";
+			html = variantTooltip.formatContent(variant, pinMessage, null, null, null, null, variantCard);
 		}		
 	}
 	tooltip.html(html);

@@ -1787,6 +1787,11 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		}
 	}
 
+	if (me.getRelationship() == 'known-variants') {
+		lock = false;
+	}
+
+
 	if (lock  && !isLevelEdu && !isLevelBasic)  {
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);

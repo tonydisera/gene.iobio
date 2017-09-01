@@ -2156,6 +2156,34 @@ inputinput:-moz-placeholder {
   fill: #FAF5BE;
   stroke: #807D7D; }
 
+.colorby_clinvar_path {
+  fill: #ad494A;
+  color: #ad494A; }
+
+.colorby_clinvar_lpath {
+  fill: #FB7737;
+  color: #FB7737; }
+
+.colorby_clinvar_uc {
+  fill: #e7ba52;
+  color: #e7ba52; }
+
+.colorby_clinvar_cd {
+  fill: #6fb6b4;
+  color: #6fb6b4; }
+
+.colorby_clinvar_other {
+  fill: #bdbdbd;
+  color: #bdbdbd; }
+
+.colorby_clinvar_benign {
+  fill: #9cc231;
+  color: #9cc231; }
+
+.colorby_clinvar_lbenign {
+  fill: #b5cf6b;
+  color: #b5cf6b; }
+
 #feature-matrix .impact_HIGH {
   pointer-events: none; }
 #feature-matrix .impact_MODERATE {
@@ -4118,12 +4146,6 @@ text.ref-count {
     cursor: pointer;
     outline: solid 2px #3586c0; }
 
-#select-known-variants-display-box {
-  width: 130px;
-  display: inline-block;
-  vertical-align: top;
-  float: left; }
-
 #select-known-variants-filter-box {
   min-width: 200px;
   max-width: 500px;
@@ -4142,13 +4164,6 @@ text.ref-count {
     width: 4px !important; }
   #select-known-variants-filter-box .selectize-control.multi .selectize-input.has-items {
     padding: 3px 8px 0px; }
-
-#show-known-variants-cb-area {
-  display: inline-block;
-  float: left;
-  margin-left: 20px;
-  margin-top: -4px;
-  margin-bottom: 0px; }
 
 #transcript-card #known-variants-nav {
   margin-left: 10px;
@@ -4199,6 +4214,8 @@ text.ref-count {
       #known-variants-all-card #known-variants-cards .variant-card #shrink-button {
         display: none !important; }
       #known-variants-all-card #known-variants-cards .variant-card #bam-track {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card .tooltip #bookmarkLink {
         display: none !important; }
 
 #transcript-card #show-known-variants-cb-area {
