@@ -1286,12 +1286,12 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
 
 	var importRecords = VariantImporter.parseRecords(importSource, data);
 
-	// If we have over 100 bookmarks, just grab first 100
-	// and warn user
-	if (importRecords.length > 100) {
-		var bypassedCount = importRecords.length - 100;
-		importRecords = importRecords.slice(0,100);
-		alertify.alert("Only first 100 bookmarks will be imported. " + bypassedCount.toString() + " were bypassed.");
+	// If the number of bookmarks exceeds the max gene limit, truncate the
+	// bookmarked variants to this max.
+	if (global_maxGeneCount && importRecords.length > global_maxGeneCount) {
+		var bypassedCount = importRecords.length - global_maxGeneCount;
+		importRecords = importRecords.slice(0, global_maxGeneCount);
+		alertify.alert("Only first " + global_maxGeneCount + " bookmarks will be imported. " + bypassedCount.toString() + " were bypassed.");
 	}
 	
 

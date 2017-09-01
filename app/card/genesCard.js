@@ -626,9 +626,20 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 		alertify.alert(message);
 	}
 
-		if (Object.keys(duplicateGeneNames).length > 0) {
+	if (Object.keys(duplicateGeneNames).length > 0) {
 		var message = "Bypassing duplicate gene name(s): " + Object.keys(duplicateGeneNames).join(", ") + ".";
 		alertify.alert(message);
+	}
+
+	if (global_maxGeneCount && geneNames.length > global_maxGeneCount) {
+		var bypassedCount = geneNames.length - global_maxGeneCount;
+		geneNames = geneNames.slice(0, global_maxGeneCount);
+		alertify.alert("Due to browser cache limitations, only the first " + global_maxGeneCount 
+			+ " genes were added. " 
+			+ bypassedCount.toString() 
+			+ " " 
+			+ (bypassedCount == 1 ? "gene" : "genes") 
+			+  " bypassed.");
 	}
 
 	// Remove gene badges not specified in the text area
@@ -1320,6 +1331,11 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 GenesCard.prototype.addGene = function(geneName) {
 	var me = this;
+
+	if (global_maxGeneCount && geneNames.length >= global_maxGeneCount) {
+		alertify.alert("Cannot add gene " + geneName + ".  Only " + global_maxGeneCount + " can be added due to browse cache limitations.");
+		return;
+	}
 
 	geneName = geneName.toUpperCase();
 

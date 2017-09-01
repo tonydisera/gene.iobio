@@ -32,6 +32,9 @@ var allowFreebayesSettings  = false;
 // get hgvs, rsid annotation for all variants
 var global_getVariantIdsForGene = false;
 
+// How many genes can be analyzed in one session.  Set to null if no limitation.
+var global_maxGeneCount         = 100;
+
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  
