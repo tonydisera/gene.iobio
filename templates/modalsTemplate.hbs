@@ -168,7 +168,10 @@
         <span class="modal-title">Manage cache of analyzed genes</span>
       </div>
       <div class="modal-body" style="padding-top:0px;padding-bottom:0px;font-size:12px;color:rgb(132,132,132)">
-     
+              <div id="cache-alert" class="hide alert alert-danger" style="margin-top: -20px;">
+                In order to analyze genes, you need to clear out the cache highlighted below.
+              </div>     
+              
                <div >
                  <span class="cache-label" >Coverage data for this session</span>
                  <span class="cache-size" id="coverage-size"></span>
@@ -179,21 +182,21 @@
                 <span class="cache-size" id="cache-size"></span>
                  <button id="clear-coverage-cache" onclick="cacheHelper.clearAll();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                </div>
-               <div style="margin-top:30px">
-                 <a  style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-cache-panel" aria-expanded="false" aria-controls="other-cache-panel">
+               <div id="other-cache-panel" style="margin-top:30px">
+                 <a  style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-cache-panel" aria-expanded="true" aria-controls="other-cache-panel">
                   Other gene.iobio sessions...
                  </a>
-                 <div id="other-cache-panel" class="collapse">
+                 <div id="other-cache-panel" class="collapse in" aria-expanded="true">
                   <span class="cache-label" >All data from other sessions</span>
                   <span class="cache-size" id="other-cache-size"></span>
                    <button id="clear-other-cache" onclick="cacheHelper.clearOther();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                  </div>
               </div>
-              <div style="margin-top:30px">
-                 <a  style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-app-cache-panel" aria-expanded="false" aria-controls="other-app-cache-panel">
+              <div id="other-app-cache-panel" style="margin-top:30px">
+                 <a  style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-app-cache-panel" aria-expanded="true" aria-controls="other-app-cache-panel">
                   Other browser apps ...
                  </a>
-                 <div id="other-app-cache-panel" class="collapse">
+                 <div id="other-app-cache-panel" class="collapse in" aria-expanded="true">
                   <span class="cache-label" >Data from other web apps</span>
                   <span class="cache-size" id="other-app-cache-size"></span>
                    <button id="clear-other-app-cache" onclick="cacheHelper.clearOtherApp();" class="icon-button-sm btn btn-default btn-raised">Clear</button>

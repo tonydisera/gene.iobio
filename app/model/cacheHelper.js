@@ -15,6 +15,30 @@ CacheHelper.prototype.isolateSession = function() {
 	this.launchTimestamp = Date.now().valueOf();	
 }
 
+CacheHelper.prototype.checkCacheSize = function() {
+	var counts = this.getCacheSize(false);
+	if (counts.other > 0 || counts.otherApp > 0) {
+		cacheHelper.openDialog();
+		$('#cache-alert').removeClass("hide");
+
+		if (counts.other > 0) {
+			$("#other-cache-panel").addClass("attention");
+		} else {
+			$("#other-cache-panel").removeClass("attention");
+		}
+
+		if (counts.otherApp > 0) {
+			$("#other-app-cache-panel").addClass("attention");
+		} else {
+			$("#other-app-cache-panel").removeClass("attention");
+		}
+	} else {
+		$('#cache-alert').addClass("hide");	
+		$("#other-cache-panel").removeClass("attention");
+		$("#other-app-cache-panel").removeClass("attention");	
+	}
+}
+
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
 	var me = this;
 
@@ -883,7 +907,7 @@ CacheHelper.prototype.getCacheKey = function(cacheObject) {
 }
 
 
-CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes of the data currently stored
+CacheHelper.prototype.getCacheSize = function(format=true) {  // provide the size in bytes of the data currently stored
 	var me = this;
 	var size = 0;
 	var otherSize = 0;
@@ -910,11 +934,21 @@ CacheHelper.prototype.getCacheSize = function() {  // provide the size in bytes 
 			otherAppSize += localStorage.getItem(key).length;
 		}
 	}  
-	return {total:     (CacheHelper._sizeMB(size) + " MB"), 
-	        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
-	        other:     (CacheHelper._sizeMB(otherSize) + " MB"),
-	        otherApp:  (CacheHelper._sizeMB(otherAppSize) + " MB")
-	    };
+	if (format) {
+		return {total:     (CacheHelper._sizeMB(size) + " MB"), 
+		        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
+		        other:     (CacheHelper._sizeMB(otherSize) + " MB"),
+		        otherApp:  (CacheHelper._sizeMB(otherAppSize) + " MB")
+		    };
+	} else {
+		return {total:     (CacheHelper._sizeMB(size)), 
+		        coverage:  (CacheHelper._sizeMB(coverageSize)),
+		        other:     (CacheHelper._sizeMB(otherSize)),
+		        otherApp:  (CacheHelper._sizeMB(otherAppSize))
+		    };
+
+	}
+
 }
 
 CacheHelper._logCacheSize = function() {
@@ -1026,7 +1060,7 @@ CacheHelper.prototype.clearAll = function() {
 CacheHelper.prototype.clearOther = function() {
 	var me = this;
 	// confirm dialog
-	alertify.confirm("Clear all cached data for other gene.iobio sessions?", function (e) {
+	alertify.confirm("Clear all cached data for other gene.iobio sessions?  IMPORTANT: Save any gene.iobio analysis in other browser tabs before clearing the cache.", function (e) {
 	    if (e) {
 			// user clicked "ok"
 			me._clearCache(null, true, false);

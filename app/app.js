@@ -604,6 +604,8 @@ function init() {
 	    $('#report-feedback-button').on('click', emailFeedback);
 	}
 
+	cacheHelper.checkCacheSize();
+
 }
 
 function showGeneSummary(theGeneName) {
