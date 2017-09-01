@@ -2611,7 +2611,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 	$('#welcome-area').addClass("hide");
 
 	getRelevantVariantCards().forEach(function(vc) {
-		vc.prepareToShowVariants(filterCard.classifyByImpact);
+		vc.prepareToShowVariants();
 		vc.clearBamChart();
 		if (dataCard.mode == 'single' && vc.getRelationship() != 'proband') {
 			vc.hide();
@@ -2662,7 +2662,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 							// We have variants, either to load from a vcf or called from alignments and
 						 	// optionally alignments.  First annotate the show the variants in the
 						 	// variant cards and calcuate the coverage (if alignments provided).
-							vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
+							vc.promiseLoadAndShowVariants(true)
 			                  .then( function() {
 
 			                  	if (vc.getRelationship() == 'proband') {
@@ -2683,7 +2683,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 						// We have variants, either to load from a vcf or called from alignments and
 					 	// optionally alignments.  First annotate the show the variants in the
 					 	// variant cards and calcuate the coverage (if alignments provided).
-						var variantPromise = vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, true)
+						var variantPromise = vc.promiseLoadAndShowVariants(true)
 		                  .then( function() {
 
 		                  	if (vc.getRelationship() == 'proband') {
@@ -3090,7 +3090,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 				vc.showCallVariantsProgress('counting');
 				vc.showCallVariantsProgress('done');
 
-				vc.promiseLoadAndShowVariants(filterCard.classifyByImpact, false); 
+				vc.promiseLoadAndShowVariants(false); 
 
 			});		
 
