@@ -2044,7 +2044,7 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		   null,   // regions
 		   parseMultipleSamples, // is multi-sample
 	       me._getSamplesToRetrieve(), 
-	       filterCard.annotationScheme.toLowerCase(),
+	       me.getRelationship() == 'known-variants' ? 'none' : filterCard.annotationScheme.toLowerCase(),
 	       matrixCard.clinvarMap,
 	       window.geneSource == 'refseq' ? true : false,
 	       window.isLevelBasic || getVariantIds,  // hgvs notation
