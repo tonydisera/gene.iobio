@@ -495,7 +495,7 @@ FilterCard.prototype.init = function() {
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
-				variantCard.variantClass(me.classifyByImpact);
+				variantCard.setVariantColorClass(me.classifyByImpact);
 			});
 		    window.filterVariants();
 
@@ -514,7 +514,7 @@ FilterCard.prototype.init = function() {
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
-		    	variantCard.variantClass(me.classifyByEffect);		    	
+		    	variantCard.setVariantColorClass(me.classifyByEffect);		    	
 		  	});
 			window.filterVariants();
 		
@@ -533,7 +533,7 @@ FilterCard.prototype.init = function() {
 	    	d3.selectAll(".zygosity").classed("nocolor", false);
 
 			window.variantCards.forEach(function(variantCard) {
-		    	variantCard.variantClass(me.classifyByZygosity);
+		    	variantCard.setVariantColorClass(me.classifyByZygosity);
 			});
 		    window.filterVariants();
 
@@ -1391,9 +1391,17 @@ FilterCard.prototype.classifyByZygosity = function(d) {
     var afexac = Object.keys(d.afexaclevels).join(" ");
 
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+ d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
+
+FilterCard.prototype.classifyByClinvar = function(d) {
+	
+    var af1000g = Object.keys(d.af1000glevels).join(" ");
+    var afexac = Object.keys(d.afexaclevels).join(" ");
+	
+	return  'variant ' + d.type.toLowerCase()  +  ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' colorby_' + d.clinvar; 
+}
 
 
 

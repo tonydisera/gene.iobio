@@ -29,7 +29,8 @@ function variantD3() {
       showTransition = true,
       lowestWidth = 3,
       dividerLevel = null,
-      container = null;
+      container = null,
+      clazz = null;
 
   //  options
   var defaults = {};
@@ -40,9 +41,6 @@ function variantD3() {
           + (variant.end > variant.start+1 ?  ' - ' + variant.end : ""));
   }
 
-  var clazz = function (d) { 
-    return variant;
-  };
 
   function getSymbol(d,i) {
      if (d.type.toUpperCase() == 'DEL') {
@@ -383,7 +381,7 @@ function variantD3() {
       track.selectAll('.variant').data(function(d) { 
         return d['features'].filter( function(d) { return d.type.toUpperCase() == 'SNP' || d.type.toUpperCase() == 'MNP'; }) ;
       }).enter().append('rect')
-          .attr('class', function(d) { return clazz(d); })          
+          .attr('class', function(d) { return chart.clazz()(d); })          
           .attr('rx', borderRadius)
           .attr('ry', borderRadius)
           .attr('x', function(d) { 
@@ -414,7 +412,7 @@ function variantD3() {
                      .type( getSymbol(d,i) )
                      .size(symbolSize)();
           })
-          .attr('class', function(d) { return clazz(d); })    
+          .attr('class', function(d) { return chart.clazz()(d); })    
           .attr("transform", function(d) { 
             var xCoord = x(d.start) + 2;
             var yCoord = showTransition ? 0 : height - ((d.level + 1) * (variantHeight + verticalPadding)) + 3;
@@ -812,7 +810,7 @@ function variantD3() {
     return chart;
   }
 
-   chart.clazz = function(_) {
+  chart.clazz = function(_) {
     if (!arguments.length) return clazz;
     clazz = _;
     return chart;

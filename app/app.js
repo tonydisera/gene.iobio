@@ -661,11 +661,13 @@ function initKnownVariantsNav() {
 		var cardSelectorString = "#known-variants-cards .variant-card";
 		var d3CardSelector = d3.selectAll(cardSelectorString);
 
-		variantCard.init($(cardSelectorString), d3CardSelector, 0);
-
 		variantCard.setRelationship("known-variants");
 		variantCard.setAffectedStatus('unaffected');
 		variantCard.setName('Clinvar variants');
+
+		variantCard.init($(cardSelectorString), d3CardSelector, 0);
+
+
 		variantCard.cardSelector.find('#vcf-variant-count-label').text("Clinvar variants")
 
 		

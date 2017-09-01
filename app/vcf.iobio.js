@@ -756,47 +756,51 @@ var effectCategories = [
     cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
 
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
-    if (isRefSeq || annotationEngine == 'vep') {
-    } else {
-      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
-    }
+    if (annotationEngine == 'none') {
+      // skip annotation if annotationEngine set to  'none'
 
-    // VEP
-    var vepArgs = [];
-    vepArgs.push(" --assembly");
-    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
-    vepArgs.push(" --format vcf");
-    if (isRefSeq) {
-      vepArgs.push("--refseq");
-    }
-    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
-    // since we won't have the original vcf records as input
-    if (hgvsNotation) {
-      vepArgs.push("--hgvs");
-    }
-    if (getRsId) {
-      vepArgs.push("--check_existing");
-    }
-    if (hgvsNotation || getRsId) {
-      vepArgs.push("--fasta");
-      vepArgs.push(refFastaFile);
-    }
+      
+    } else if (isRefSeq || annotationEngine == 'vep') {
+      // VEP
+      var vepArgs = [];
+      vepArgs.push(" --assembly");
+      vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+      vepArgs.push(" --format vcf");
+      if (isRefSeq) {
+        vepArgs.push("--refseq");
+      }
+      // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+      // since we won't have the original vcf records as input
+      if (hgvsNotation) {
+        vepArgs.push("--hgvs");
+      }
+      if (getRsId) {
+        vepArgs.push("--check_existing");
+      }
+      if (hgvsNotation || getRsId) {
+        vepArgs.push("--fasta");
+        vepArgs.push(refFastaFile);
+      }
 
-    //
-    //  SERVER SIDE CACHING
-    //
-    var cacheKey = null;
-    var urlParameters = {};
-    if (cache) {
-        cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, vcfSampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
-        console.log(cacheKey);
-        urlParameters.cache = cacheKey;
-        urlParameters.partialCache = true;
-        cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
-    } else {
-        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
-    }
-
+      //
+      //  SERVER SIDE CACHING
+      //
+      var cacheKey = null;
+      var urlParameters = {};
+      if (cache) {
+          cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, vcfSampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
+          console.log(cacheKey);
+          urlParameters.cache = cacheKey;
+          urlParameters.partialCache = true;
+          cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
+      } else {
+          cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
+      }        
+    
+    } else if (annotationEngine == 'snpeff') {
+        cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
+    }    
+    
 
 
 
@@ -1584,33 +1588,35 @@ var effectCategories = [
     // Get Allele Frequencies from 1000G and ExAC
     cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL})
 
-    // Bypass snpEff if the transcript set is RefSeq or the annotation engine is VEP
-    if (annotationEngine == 'vep' || isRefSeq) {
+
+    if (annotationEngine == 'none') {
+      // skip annotation with vep or snpeff if annotationEngine is not set
+    } else if (annotationEngine == 'vep' || isRefSeq) {
+      // VEP
+      var vepArgs = [];
+      vepArgs.push(" --assembly");
+      vepArgs.push(genomeBuildHelper.getCurrentBuildName());
+      vepArgs.push(" --format vcf");
+      if (isRefSeq) {
+        vepArgs.push("--refseq");
+      }
+      // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
+      // since we won't have the original vcf records as input
+      if (hgvsNotation) {
+        vepArgs.push("--hgvs");
+      }
+      if (getRsId) {
+        vepArgs.push("--check_existing");
+      }
+      if (hgvsNotation || getRsId) {
+        vepArgs.push("--fasta");
+        vepArgs.push(refFastaFile);
+      }
+      cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
     } else {
       cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
     }
 
-    // VEP
-    var vepArgs = [];
-    vepArgs.push(" --assembly");
-    vepArgs.push(genomeBuildHelper.getCurrentBuildName());
-    vepArgs.push(" --format vcf");
-    if (isRefSeq) {
-      vepArgs.push("--refseq");
-    }
-    // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
-    // since we won't have the original vcf records as input
-    if (hgvsNotation) {
-      vepArgs.push("--hgvs");
-    }
-    if (getRsId) {
-      vepArgs.push("--check_existing");
-    }
-    if (hgvsNotation || getRsId) {
-      vepArgs.push("--fasta");
-      vepArgs.push(refFastaFile);
-    }
-    cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
 
 
     var buffer = "";

@@ -201,8 +201,10 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 	var me = this;	
 
 	// init model
-	this.model = new VariantModel();
-	this.model.init();
+	if (this.model == null) {
+		this.model = new VariantModel();
+	}
+	this.model.init();		
 
 	this.cardIndex = cardIndex;
 
@@ -306,7 +308,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
-				    .tooltipHTML(variantTooltip.formatContent)
+				    .tooltipHTML(variantTooltip.formatContent)				    
 				    .on("d3rendered", function() {
 				    	
 				    })
@@ -335,6 +337,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						}
 
 					});
+		this.vcfChart.clazz(this.getDefaultVariantColorClass());
 
 		// The 'missing variants' chart, variants that freebayes found that were not in orginal
 		// variant set from vcf
@@ -373,6 +376,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							matrixCard.clearSelections();
 						}
 					});
+		this.fbChart.clazz(this.getDefaultVariantColorClass());
 
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
@@ -697,12 +701,12 @@ VariantCard.prototype.clearWarnings = function() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, fullRefresh) {
+VariantCard.prototype.promiseLoadAndShowVariants = function (fullRefresh) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
 		if (fullRefresh) {
-			me.prepareToShowVariants(classifyClazz);
+			me.prepareToShowVariants();
 		}
 		
 		// Clear out previous variant data and set up variant card
@@ -729,7 +733,7 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 }
 
 
-VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
+VariantCard.prototype.prepareToShowVariants = function() {
 	var me = this;
 
 	me.cardSelector.removeClass("hide");
@@ -748,9 +752,6 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 
 	if (me.isViewable()) {
 		//filterCard.clearFilters();
-
-		me.vcfChart.clazz(classifyClazz);
-		me.fbChart.clazz(classifyClazz);
 
 		me.fillZoomRegionChart();
 
@@ -1566,10 +1567,18 @@ VariantCard.prototype.updateCalledVariantsWithInheritance = function() {
 }
 
 
+VariantCard.prototype.getDefaultVariantColorClass = function() {
+	if (this.getRelationship() == 'known-variants') {
+		return filterCard.classifyByClinvar;
+	} else {
+		return filterCard.classifyByImpact;
+	}
+}
 
-VariantCard.prototype.variantClass = function(clazz) {
-	this.vcfChart.clazz(clazz);
-	this.fbChart.clazz(clazz);
+VariantCard.prototype.setVariantColorClass = function(clazz) {
+	var me = this;
+	this.vcfChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);
+	this.fbChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);		
 }
 
 
@@ -1756,6 +1765,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 
 VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
 	var me = this;
+
 
 	// Only show the tooltip for the chart user mouses over / click
     if (this != sourceVariantCard) {
