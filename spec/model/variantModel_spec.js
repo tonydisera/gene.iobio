@@ -443,27 +443,32 @@ describe('variantModel', function() {
 		beforeEach(function() {
 			variant_1 = {
 				zygosity: 'HOM',
-				recfilter: 'PASS'
+				recfilter: 'PASS',
+				genotype: {zygosity: 'HOM', absent: false}
 			};
 
 			variant_2 = {
 				zygosity: 'HET',
-				recfilter: 'PASS'
+				recfilter: 'PASS',
+				genotype: {zygosity: 'HET', absent: false}
 			};
 
 			variant_3 = {
 				zygosity: 'HET',
-				recfilter: '.'
+				recfilter: '.',
+				genotype: {zygosity: 'HET', absent: false}
 			};
 
 			variant_4 = {
 				zygosity: 'HOM',
-				recfilter: '.'
+				recfilter: '.',
+				genotype: {zygosity: 'HOM', absent: false}
 			};
 
 			variant_5 = {
 				zygosity: 'HOMREF',
-				recfilter: 'PASS'
+				recfilter: 'PASS',
+				genotype: {zygosity: 'HOMREF', absent: false}
 			}
 
 			data = {
