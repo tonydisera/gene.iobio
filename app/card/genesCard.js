@@ -1255,7 +1255,8 @@ GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPagin
 GenesCard.prototype._hideCurrentGene = function() {
 	$('#nav-section').addClass("hide");
 	$('#matrix-track').addClass("hide");
-	$('.variant-card').addClass("hide");	
+	$('.variant-card').addClass("hide");
+	$('#known-variants-all-card').addClass("hide");	
 }
 
 
