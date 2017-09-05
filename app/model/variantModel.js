@@ -431,8 +431,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 					dangerCounts.POLYPHEN = {};
 					dangerCounts.POLYPHEN[clazz] = {};
 					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();;
-;
+					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();
 	    	}
 	    }
 
