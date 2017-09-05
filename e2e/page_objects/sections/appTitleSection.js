@@ -18,10 +18,10 @@ module.exports = {
                  .click('#call-variants-dropdown li a#call-variants-selected-gene');
     },
     waitForAnalyzeAllDone: function() {
-      this.waitForElementPresent('@analyzeAllDone', 60000);
+      this.waitForElementPresent('@analyzeAllDone', 120000);
     },
     waitForCallAllDone: function() {
-      this.waitForElementPresent('@callAllDone', 60000);
+      this.waitForElementPresent('@callAllDone', 120000);
     },
     clickRemoveAll: function() {
       return this.click('@removeAll');

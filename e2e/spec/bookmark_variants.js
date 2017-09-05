@@ -34,6 +34,7 @@ module.exports = {
     matrixTrack.clickColumn(1);
 
     variantTooltip.waitForTooltip();
+    variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     client.pause(3000);
     variantTooltip.expectInheritanceEquals('recessive inheritance');
     variantTooltip.expectVepImpact('high');
