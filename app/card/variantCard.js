@@ -1294,6 +1294,9 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 		return;
 	}
 
+	if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+		return;
+	}
 
 	$('#vcf-legend').css("display", "block");		
 	this.cardSelector.find('#vcf-chart-label').removeClass("hide");		
