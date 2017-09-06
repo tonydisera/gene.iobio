@@ -2500,6 +2500,14 @@ function loadTracksForGene(bypassVariantCards, callback) {
 	// chart is not rendered.
 	showTranscripts();
 
+	// If the 'variants' radio button was selected for Known Variants card, reset to
+	// counts because getting the variants is costly for large genes
+	if (!hideKnownVariantsCard) {
+		clearKnownVariantsCard();
+		$('#known-variants-nav-radio-buttons input:radio[name="known-variants-display-radio"]').filter('[value="counts"]').prop("checked", true);
+		hideKnownVariants = false;
+	}
+
 	// Show the chart for known variants
 	if (!bypassVariantCards) {
 		$('#known-variants-all-card').removeClass("hide");
