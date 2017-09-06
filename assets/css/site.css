@@ -1969,7 +1969,7 @@ inputinput:-moz-placeholder {
   margin-right: 70px;
   color: #717171; }
   #coverage-thresholds.attention {
-    outline-color: #6974d8;
+    outline-color: #8b9bc0;
     outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
@@ -3230,17 +3230,17 @@ text.ref-count {
   font-size: 12px; }
 
 #zoom-region-chart.ibo-gene .cds.danger {
-  fill: rgba(105, 116, 216, 0.81);
+  fill: rgba(116, 123, 182, 0.85);
   stroke: #555da5; }
 #zoom-region-chart.ibo-gene .utr.danger {
-  fill: rgba(105, 116, 216, 0.81);
+  fill: rgba(116, 123, 182, 0.85);
   stroke: #555da5; }
 
 #gene-viz.ibo-gene .cds.danger {
-  fill: rgba(105, 116, 216, 0.81);
+  fill: rgba(116, 123, 182, 0.85);
   stroke: #555da5; }
 #gene-viz.ibo-gene .utr.danger {
-  fill: rgba(105, 116, 216, 0.81);
+  fill: rgba(116, 123, 182, 0.85);
   stroke: #555da5; }
 
 #genes-panel {
@@ -3473,8 +3473,8 @@ text.ref-count {
   margin-top: -1px;
   margin-left: 0px;
   float: left;
-  color: #6974d8;
-  fill: #6974d8;
+  color: #8b9bc0;
+  fill: #8b9bc0;
   display: none; }
   #gene-badge-coverage-problem.dropdown-item {
     display: inline-block;
@@ -3482,7 +3482,7 @@ text.ref-count {
     margin-top: 1px; }
 
 .coverage-problem-glyph {
-  fill: #6974d8; }
+  fill: #8b9bc0; }
 
 #gene-badge-harmful-variant {
   font-size: 15px;
@@ -3496,6 +3496,20 @@ text.ref-count {
     margin-right: 3px;
     margin-top: 1px; }
 
+.gene-badge-harmful-variant {
+  font-size: 15px;
+  margin-top: -1px;
+  margin-left: 2px;
+  float: left; }
+
+#gene-badge-harmful1-variant {
+  display: none;
+  fill: #9d2024; }
+
+#gene-badge-harmful2-variant {
+  display: none;
+  fill: #d6635c; }
+
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
 #gene-badge.visited #gene-badge-name {
@@ -3507,6 +3521,10 @@ text.ref-count {
 #gene-badge.has-coverage-problem #gene-badge-coverage-problem {
   display: inline-block; }
 #gene-badge.has-harmful-variant #gene-badge-harmful-variant {
+  display: inline-block; }
+#gene-badge.has-harmful1-variant #gene-badge-harmful1-variant {
+  display: inline-block; }
+#gene-badge.has-harmful2-variant #gene-badge-harmful2-variant {
   display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }

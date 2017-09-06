@@ -336,6 +336,18 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 
 	var dangers = [danger1, danger2];
 
+
+	// lowests (non-zero) harmful variant level  = highest relevance
+	var harmfulVariantValues = [9999, 9999]; 
+	dangers.forEach(function(danger, index) {
+		if (danger.harmfulVariantsLevel) {
+			harmfulVariantValues[index] = danger.harmfulVariantsLevel;
+		}
+	});
+	if (harmfulVariantValues[0] !== harmfulVariantValues[1]) {
+		return harmfulVariantValues[0] - harmfulVariantValues[1];
+	}	
+
 	// lowest clinvar value = highest relevance
 	var clinvarValues = [9999, 9999];
 	dangers.forEach(function(danger, index) {
@@ -1652,7 +1664,8 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("has-called-variants");
 	geneBadge.removeClass("selected");
 	geneBadge.removeClass("has-coverage-problem");
-	geneBadge.removeClass("has-harmful-variant");
+	geneBadge.removeClass("has-harmful1-variant");
+	geneBadge.removeClass("has-harmful2-variant");
 	geneBadge.removeClass("failed-filter");
 }
 
@@ -1749,14 +1762,17 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	// Indicate if gene has a bookmared variants
 	me._setBookmarkBadge(geneName);
 
-	geneBadge.removeClass("has-harmful-variant");
-
+	geneBadge.removeClass("has-harmful1-variant");
+	geneBadge.removeClass("has-harmful2-variant");
 
 	if (dangerObject.harmfulVariantsInfo && dangerObject.harmfulVariantsInfo.length > 0) {
-		geneBadge.addClass("has-harmful-variant");		
+
+		var harmfulVariantClazz = "has-harmful"        + dangerObject.harmfulVariantsLevel + "-variant";
+		var harmfulVariantBadge = "gene-badge-harmful" + dangerObject.harmfulVariantsLevel + "-variant";
+		geneBadge.addClass(harmfulVariantClazz);		
 
 
-		var selection = d3.select(geneBadge.find('#gene-badge-harmful-variant')[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
+		var selection = d3.select(geneBadge.find('#' + harmfulVariantBadge)[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
 		selection.on("mouseover", function(d,i) {
 			if (d && d.hasOwnProperty("harmfulVariantsInfo") && d.harmfulVariantsInfo.length > 0) {
 				var x = d3.event.pageX;
@@ -1768,7 +1784,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 					} 
 					message += "<div style='display:table'>"
 					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
-					        +  "<div style='display:table-cell;margin-left:6px'>" + "Contains ";
+					        +  "<div style='display:table-cell;margin-left:6px'>" + "Contains rare ";
 
 					var desc = "";
 					var inherit = "";

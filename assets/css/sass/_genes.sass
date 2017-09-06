@@ -347,6 +347,22 @@
     margin-top: 1px
 
 
+.gene-badge-harmful-variant
+  font-size: 15px
+  margin-top: -1px
+  margin-left: 2px
+  float: left  
+
+#gene-badge-harmful1-variant
+  display: none 
+  fill: #9d2024
+
+#gene-badge-harmful2-variant
+  display: none 
+  fill: #d6635c
+
+
+
 #gene-badge
   &.visited
     #gene-badge-loaded
@@ -369,7 +385,12 @@
   &.has-harmful-variant
     #gene-badge-harmful-variant
       display: inline-block 
-
+  &.has-harmful1-variant
+    #gene-badge-harmful1-variant
+      display: inline-block 
+  &.has-harmful2-variant
+    #gene-badge-harmful2-variant
+      display: inline-block 
 
   &:hover #gene-badge-remove
     visibility: visible 

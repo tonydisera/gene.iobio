@@ -416,31 +416,40 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    }
 
 	    for (key in variant.highestSIFT) {
-				if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
-					var clazz = matrixCard.siftMap[key].clazz;
-					dangerCounts.SIFT = {};
-					dangerCounts.SIFT[clazz] = {};
-					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-					variantDanger.sift = key.split("_").join(" ").toLowerCase();
-				}
+			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
+				var clazz = matrixCard.siftMap[key].clazz;
+				dangerCounts.SIFT = {};
+				dangerCounts.SIFT[clazz] = {};
+				dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
+				variantDanger.sift = key.split("_").join(" ").toLowerCase();
+			}
 	    }
 
 	    for (key in variant.highestPolyphen) {
 	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
-					var clazz = matrixCard.polyphenMap[key].clazz;
-					dangerCounts.POLYPHEN = {};
-					dangerCounts.POLYPHEN[clazz] = {};
-					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();
+				var clazz = matrixCard.polyphenMap[key].clazz;
+				dangerCounts.POLYPHEN = {};
+				dangerCounts.POLYPHEN[clazz] = {};
+				dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+				variantDanger.polyphen = key.split("_").join(" ").toLowerCase();
 	    	}
 	    }
 
-	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
-	    	for (key in variant.clinVarClinicalSignificance) {
-		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
-						clinvarClasses[key] = matrixCard.clinvarMap[key];
-						variantDanger.clinvar = key.split("_").join(" ").toLowerCase();;
-		    	}
+	    if (variant.hasOwnProperty('clinvar')) {
+	    	var clinvarEntry = null;
+	    	var clinvarDisplay = null;
+	    	var clinvarKey = null;
+	    	for (var key in matrixCard.clinvarMap) {
+	    		var me = matrixCard.clinvarMap[key];
+	    		if (me.clazz == variant.clinvar) {
+	    			clinvarEntry = me;
+	    			clinvarDisplay = key;
+	    			clinvarKey = key;
+	    		}
+	    	}
+	    	if (clinvarEntry && clinvarEntry.badge) {
+				clinvarClasses[clinvarKey] = clinvarEntry;
+				variantDanger.clinvar = clinvarDisplay;
 	    	}
 	    }
 
@@ -501,7 +510,8 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 			            'polyphen'   : variantDanger.polyphen,
 			            'SIFT'       : variantDanger.sift,
 				        'impact'     : variantDanger.impact, 
-			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false
+			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false,
+			            'level'      : variantDanger.clinvar || variantDanger.impact == 'high' ? 1 : 2
 			           };
 			dangerCounts.harmfulVariantsInfo.push(info);
 		}
@@ -537,6 +547,11 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		}
 		return {};
 	}
+
+	var hvLevel = dangerCounts.harmfulVariantsInfo
+							  .map( d => d.level )
+							  .reduce( (min, cur) => Math.min( min, cur ), Infinity );
+	dangerCounts.harmfulVariantsLevel = hvLevel == Infinity ? null : hvLevel;
 
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
 	dangerCounts.IMPACT = filterCard.getAnnotationScheme().toLowerCase() == 'vep' ? dangerCounts.CONSEQUENCE : getLowestImpact(impactClasses);
