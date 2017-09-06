@@ -49,7 +49,6 @@ module.exports = {
 
   },
 
-
   'Click denovo inheritance (custom) filter': function(client) {
     nav.clickFilter();
     client.pause(1000);   
@@ -193,7 +192,7 @@ module.exports = {
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');
-      theTooltip.expectClinvarClinSig('cardiomyopathy');
+      theTooltip.expectClinvarClinSigExact('Cardiomyopathy');
       theTooltip.expectPolyphen('benign');
       theTooltip.expectSIFT('tolerated');
       theTooltip.expectAFExAC('0.003%');
@@ -222,12 +221,14 @@ module.exports = {
     matrixTrack.clickColumn(1);
     tooltip.selector = tooltip.MATRIX_TOOLTIP;
     tooltip.waitForTooltip();
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
     evaluateTooltip(tooltip);
 
     
   },
 
   'end': function(client) {
+    client.end();
   }
 
   

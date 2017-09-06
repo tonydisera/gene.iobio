@@ -42,6 +42,13 @@ module.exports = {
     expectClinvarSpan: function(text) {
       this.expect.element('@clinvarSpan').text.to.equals(text);
     },
+    expectClinvarClinSigExact: function(text1) {
+      var clinsigXPath = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//*[contains(@class, "tooltip-clinvar-pheno")]';
+      var self = this;
+      self.api.useXpath().getText(clinsigXPath, function(result) {
+          self.assert.ok(result.value == text1, 'check if the clinvar phenotype is equal to value1');            
+      })   
+    },    
     expectClinvarClinSig: function(text1, text2) {
       var clinsigXPath = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//*[contains(@class, "tooltip-clinvar-pheno")]';
       var self = this;
@@ -121,7 +128,7 @@ module.exports = {
     sift:     {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="SIFT"]/following-sibling::div', locateStrategy: 'xpath'},
    
     clinvarLink:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div//a', locateStrategy: 'xpath'},
-    clinvarSpan:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div/span', locateStrategy: 'xpath'},
+    clinvarSpan:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div//div/span', locateStrategy: 'xpath'},
    
     afExAC:  {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq ExAC"]/following-sibling::div', locateStrategy: 'xpath'},
     af1000G: {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq 1000G"]/following-sibling::div', locateStrategy: 'xpath'},

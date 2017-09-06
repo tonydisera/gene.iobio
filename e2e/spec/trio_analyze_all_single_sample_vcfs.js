@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, genesPanel, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, motherVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, genesPanel, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, fatherVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -13,7 +13,7 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;  
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
-    motherVariantCard = indexPage.section.motherVariantCard;
+    fatherVariantCard = indexPage.section.fatherVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
     tooltip = indexPage.section.variantTooltip;
@@ -67,7 +67,7 @@ module.exports = {
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
 
   },
-
+/*
 
   'Click denovo inheritance (custom) filter': function(client) {
     nav.clickFilter();
@@ -189,11 +189,12 @@ module.exports = {
     probandVariantCard.assertDangerExonCountEquals(1);
     probandVariantCard.assertLowCoverageGlyphCountEquals(1);
 
-    motherVariantCard.waitForBamDepthLoaded();
-    motherVariantCard.assertDangerExonCountEquals(9);
-    motherVariantCard.assertLowCoverageGlyphCountEquals(9);
+    fatherVariantCard.waitForBamDepthLoaded();
+    fatherVariantCard.assertDangerExonCountEquals(9);
+    fatherVariantCard.assertLowCoverageGlyphCountEquals(9);
   },
 
+*/
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
 
     filterPanel.clickClearAll();
@@ -212,7 +213,7 @@ module.exports = {
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');
-      theTooltip.expectClinvarClinSig('cardiomyopathy');
+      theTooltip.expectClinvarClinSigExact('Cardiomyopathy');
       theTooltip.expectPolyphen('benign');
       theTooltip.expectSIFT('tolerated');
       theTooltip.expectAFExAC('0.003%');
@@ -241,12 +242,14 @@ module.exports = {
     matrixTrack.clickColumn(1);
     tooltip.selector = tooltip.MATRIX_TOOLTIP;
     tooltip.waitForTooltip();
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
     evaluateTooltip(tooltip);
 
     
   },
 
   'end': function(client) {
+    client.end();
   }
 
   
