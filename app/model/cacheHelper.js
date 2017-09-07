@@ -541,13 +541,8 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			}
 			
 		}
-				
-		// Use the genotypes in the proband variant data to determine affected/unaffected status
-		getProbandVariantCard().determineAffectedStatus(geneObject, transcript, getAffectedInfo(), function(probandVcfData) {
 
-			// Need to set the trio model vcf data to the refreshed proband vcf data after
-			// determining affected/unaffected status
-			trioVcfData.proband = probandVcfData;
+		getProbandVariantCard().model.postInheritanceParsing(trioVcfData.proband, geneObject, transcript, getAffectedInfo(), function() {
 
 			//
 			// Now that inheritance has been determined,  analyze the alignments 

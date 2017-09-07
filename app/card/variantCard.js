@@ -63,10 +63,6 @@ VariantCard.prototype.setGeneratedSampleName = function(sampleName) {
 }
 
 
-VariantCard.prototype.determineAffectedStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
-	this.model.determineAffectedStatus(theGene, theTranscript, affectedInfo, onUpdate);
-}
-
 VariantCard.prototype.getSampleName = function() {
 	return this.model.getSampleName();
 }

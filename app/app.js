@@ -3444,13 +3444,15 @@ function promiseDetermineInheritance(promise) {
 			thePromise = promise;
 		}
 
-		var postInheritanceProcessing = function(probandVariantCard, trioModel) {
+		var postInheritanceProcessing = function(theVcfData, probandVariantCard) {
+
+			probandVariantCard.populateEffectFilters();
+
 			probandVariantCard.determineMaxAlleleCount();
 			
 			// Enable inheritance filters
-			filterCard.enableInheritanceFilters(getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript));
+			filterCard.enableInheritanceFilters(theVcfData);
 
-			genesCard.refreshCurrentGeneBadge();
 
 			$('#filter-and-rank-card').removeClass("hide");
 	 		$('#matrix-track').removeClass("hide");
@@ -3458,16 +3460,18 @@ function promiseDetermineInheritance(promise) {
 			$("#matrix-panel .loader").removeClass("hide");
 			$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
 			$("#feature-matrix-note").addClass("hide");
-			getProbandVariantCard().determineAffectedStatus( window.gene, window.selectedTranscript, getAffectedInfo(), function(probandVcfData) {
-			//determineSibStatus(trioModel, function() {
 
+			getProbandVariantCard().model.postInheritanceParsing(theVcfData, window.gene, window.selectedTranscript, getAffectedInfo(), function() {
 				$("#matrix-panel .loader").addClass("hide");
 			    $("#matrix-panel .loader .loader-label").text("Ranking variants");
 				$("#feature-matrix-note").removeClass("hide");
+	
+				genesCard.refreshCurrentGeneBadge();
 
 				resolve();
 
-			});			
+			});
+
 		}
 
 		thePromise().then( function(probandVariantCard) {
@@ -3519,17 +3523,12 @@ function promiseDetermineInheritance(promise) {
 					var affectedInfo = isAlignmentsOnly() || samplesInSingleVcf() ? null : getAffectedInfo();
 					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfo);
 					trioModel.compareVariantsToMotherFather(function() {
-
-
-						probandVariantCard.determineMaxAlleleCount();
-
-						probandVariantCard.populateEffectFilters();
-
-						probandVariantCard.model._cacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript);
-						postInheritanceProcessing(probandVariantCard, trioModel);
+						postInheritanceProcessing(trioVcfData.proband, probandVariantCard);
 					});
 
 				} else {
+					probandVariantCard.model.performAdditionalParsing(trioVcfData.proband);
+
 					probandVariantCard.determineMaxAlleleCount();
 
 					probandVariantCard.populateEffectFilters();					

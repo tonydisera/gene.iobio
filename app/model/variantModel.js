@@ -396,7 +396,6 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 
 	theVcfData.features.forEach( function(variant) {
 
-		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
 
 	    for (key in variant.highestImpactSnpeff) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
@@ -409,9 +408,6 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
 	    		consequenceClasses[key] = consequenceClasses[key] || {};
 	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
-	    		if (key == 'HIGH' || key == 'MODERATE') {
-	    			variantDanger.impact = key.toLowerCase();
-	    		}
 	    	}
 	    }
 
@@ -421,7 +417,6 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 				dangerCounts.SIFT = {};
 				dangerCounts.SIFT[clazz] = {};
 				dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-				variantDanger.sift = key.split("_").join(" ").toLowerCase();
 			}
 	    }
 
@@ -431,8 +426,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 				dangerCounts.POLYPHEN = {};
 				dangerCounts.POLYPHEN[clazz] = {};
 				dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-				variantDanger.polyphen = key.split("_").join(" ").toLowerCase();
-	    	}
+			}
 	    }
 
 	    if (variant.hasOwnProperty('clinvar')) {
@@ -449,71 +443,32 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    	}
 	    	if (clinvarEntry && clinvarEntry.badge) {
 				clinvarClasses[clinvarKey] = clinvarEntry;
-				variantDanger.clinvar = clinvarDisplay;
 	    	}
 	    }
 
 	    if (variant.inheritance && variant.inheritance != 'none') {
 	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 	    	inheritanceClasses[clazz] = variant.inheritance;
-	    	variantDanger.inheritance = true;
 	    }
 
 
 
-	    var evaluateAf = function(af, afMap) {
-			afMap.forEach( function(rangeEntry) {
-				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
+	    if (variant.afFieldHighest) {
+	    	var afMapName = matrixCard.afFieldToMap[variant.afFieldHighest];
+			matrixCard[afMapName].forEach( function(rangeEntry) {
+				if (+variant[variant.afFieldHighest] > rangeEntry.min && +variant[variant.afFieldHighest] <= rangeEntry.max) {
 					if (rangeEntry.value < lowestAf) {
 						lowestAf = rangeEntry.value;
 						afClazz = rangeEntry.clazz;
-						afField = af;
 						afBadge = rangeEntry.badge;
-					}
-					if (rangeEntry.badge) {
-						variantDanger.af = +variant[af];
-						variantDanger.meetsAf = true;
 					}
 				}
 			});
 		}
 
-		// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
-		// as 'lowest' af for all variants in gene
-		var af = null;
-		var afMap = null;
-		if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
-			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
-			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
-				af = 'afExAC';
-				afMap = matrixCard.afExacMap;
-			} else {
-				af = 'af1000G';
-				afMap = matrixCard.af1000gMap;
-			}
-		} else if ($.isNumeric(variant.afExAC)) {
-			af = 'afExAC';
-			afMap = matrixCard.afExacMap;
-
-		} else if ($.isNumeric(variant.af1000G)) {
-			af = 'af1000G';
-			afMap = matrixCard.af1000gMap;
-		}
-		if (af && afMap) {
-			evaluateAf(af, afMap);
-		}
-
 		// Turn on flag for harmful variant if one is found
-		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
-			var info = {'type'       : variant.type,
-			            'clinvar'    : variantDanger.clinvar, 
-			            'polyphen'   : variantDanger.polyphen,
-			            'SIFT'       : variantDanger.sift,
-				        'impact'     : variantDanger.impact, 
-			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false,
-			            'level'      : variantDanger.clinvar || variantDanger.impact == 'high' ? 1 : 2
-			           };
-			dangerCounts.harmfulVariantsInfo.push(info);
+		if (variant.harmfulVariant) {
+			dangerCounts.harmfulVariantsInfo.push(variant.harmfulVariant);
 		}
 	});
 
@@ -1561,12 +1516,6 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 				    	}
 				    	me.vcfData = data;		
 
-				    	// Get the HGVS, rsID for high, moderate impact variants
-				    	if (me.getRelationship() != 'known-variants') {
-							me.promiseGetImpactfulVariantIds(data.gene, data.transcript);
-				    	}
-
-
 						resolve(me.vcfData);
 
 			    	} else {
@@ -1706,9 +1655,6 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 
 				    		postProcessNextVariantCard(idx, function() {
 
-						    	// Get the HGVS, rsID for high, moderate impact variants
-								me.promiseGetImpactfulVariantIds(theGene, theTranscript);
-
 				    			resolve(resultMap);
 				    		});
 
@@ -1740,29 +1686,148 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 
 }
 
-VariantModel.prototype.determineAffectedStatus = function(theGene, theTranscript, affectedInfo, onUpdate) {
+
+VariantModel.prototype.postInheritanceParsing = function(theVcfData, theGene, theTranscript, affectedInfo, callback) {
 	var me = this;
-	var theVcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
+	var theVcfData = theVcfData ? theVcfData : me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
 
-	var affectedSibs = affectedInfo.filter(function(info) {
-		return info.status == 'affected' && info.relationship != 'proband';
-	})
-	me._determineAffectedStatus(theVcfData, 'affected', affectedSibs)
-
-	var unaffectedSibs = affectedInfo.filter(function(info) {
-		return info.status == 'unaffected' && info.relationship != 'proband';
-	})
-	me._determineAffectedStatus(theVcfData, 'unaffected', unaffectedSibs)
+	me._determineAffectedStatus(theVcfData, affectedInfo);
+	me.performAdditionalParsing(theVcfData);
 
 	me._cacheData(theVcfData, "vcfData", theGene.gene_name, theTranscript);	
+
 	// For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
 	// at this point
 	me.vcfData = null;
 
-	onUpdate(theVcfData);
+	if (callback) {
+		callback(theVcfData);		
+	}
 }
 
-VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedStatus, affectedInfo) {
+
+VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
+	var me = this;
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
+
+	theVcfData.features.forEach(function(variant) {
+
+		variant.harmfulVariant = null;
+		variant.afFieldHighest = null;
+
+		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
+
+
+	    for (key in variant.highestImpactVep) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		if (key == 'HIGH' || key == 'MODERATE') {
+	    			variantDanger.impact = key.toLowerCase();
+	    		}
+	    	}
+	    }
+
+	    for (key in variant.highestSIFT) {
+			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
+				variantDanger.sift = key.split("_").join(" ").toLowerCase();
+			}
+	    }
+
+	    for (key in variant.highestPolyphen) {
+	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
+				variantDanger.polyphen = key.split("_").join(" ").toLowerCase();
+	    	}
+	    }
+
+	    if (variant.hasOwnProperty('clinvar')) {
+	    	var clinvarEntry = null;
+	    	var clinvarDisplay = null;
+	    	var clinvarKey = null;
+	    	for (var key in matrixCard.clinvarMap) {
+	    		var me = matrixCard.clinvarMap[key];
+	    		if (me.clazz == variant.clinvar) {
+	    			clinvarEntry = me;
+	    			clinvarDisplay = key;
+	    			clinvarKey = key;
+	    		}
+	    	}
+	    	if (clinvarEntry && clinvarEntry.badge) {
+				variantDanger.clinvar = clinvarDisplay;
+	    	}
+	    }
+
+	    if (variant.inheritance && variant.inheritance != 'none') {
+	    	variantDanger.inheritance = true;
+	    }
+
+
+
+
+		var evaluateAf = function(af) {
+			var afMapName = matrixCard.afFieldToMap[af];
+			matrixCard[afMapName].forEach( function(rangeEntry) {
+				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
+					if (rangeEntry.badge) {
+						variantDanger.af = +variant[af];
+						variantDanger.meetsAf = true;
+					}
+				}
+			});
+		}
+
+
+		// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
+		// as 'lowest' af for all variants in gene
+		if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
+			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
+			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
+				variant.afFieldHighest = 'afExAC';
+			} else {
+				variant.afFieldHighest = 'af1000G';
+			}
+		} else if ($.isNumeric(variant.afExAC)) {
+			variant.afFieldHighest = 'afExAC';
+
+		} else if ($.isNumeric(variant.af1000G)) {
+			variant.afFieldHighest = 'af1000G';
+		}
+		if (variant.afFieldHighest) {
+			evaluateAf(variant.afFieldHighest);
+		}
+
+		// Turn on flag for harmful variant if one is found
+		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
+			variant.harmfulVariant = {
+				        'type'       : variant.type,
+			            'clinvar'    : variantDanger.clinvar, 
+			            'polyphen'   : variantDanger.polyphen,
+			            'SIFT'       : variantDanger.sift,
+				        'impact'     : variantDanger.impact, 
+			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false,
+			            'level'      : variantDanger.clinvar || variantDanger.impact == 'high' ? 1 : 2			            
+			};
+			console.log("harmful variant = " + JSON.stringify(variant.harmfulVariant));
+		}
+	});
+
+}
+
+VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedInfo) {
+	var me = this;
+
+	var affectedSibs = affectedInfo.filter(function(info) {
+		return info.status == 'affected' && info.relationship != 'proband';
+	})
+	me._determineAffectedStatusImpl(theVcfData, 'affected', affectedSibs)
+
+	var unaffectedSibs = affectedInfo.filter(function(info) {
+		return info.status == 'unaffected' && info.relationship != 'proband';
+	})
+	me._determineAffectedStatusImpl(theVcfData, 'unaffected', unaffectedSibs)
+}
+
+VariantModel.prototype._determineAffectedStatusImpl = function(theVcfData, affectedStatus, affectedInfo) {
 	var me = this;
 	theVcfData.features.forEach( function(variant) {
 		VariantModel._determineAffectedStatusForVariant(variant, affectedStatus, affectedInfo);
@@ -2160,6 +2225,7 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 
 
 }
+
 
 VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 	var theVcfData = null;

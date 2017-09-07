@@ -149,6 +149,12 @@ function MatrixCard() {
 
 	this.featureUnknown = 199;
 
+	this.afFieldToMap = {
+		'afExAC': 'afExacMap',
+		'af1000G': 'af1000gMap'
+	}
+
+
 }
 
 MatrixCard.prototype.setCellSize = function(sizeEnum) {
