@@ -4058,6 +4058,14 @@ text.ref-count {
   margin-top: 40px;
   margin-bottom: 40px; }
 
+.legend-help-link {
+  font-size: 12px;
+  display: inline-block;
+  vertical-align: top; }
+
+.legend-help {
+  font-size: 11px; }
+
 .legend-symbol {
   stroke: #000 !important;
   stroke-width: 1.5px !important;
