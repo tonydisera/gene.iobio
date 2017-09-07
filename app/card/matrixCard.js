@@ -94,6 +94,11 @@ function MatrixCard() {
                         present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'affected',  symbolFunction: ''}
                  };
+    this.harmfulVariantMap = {
+                        1:    {value: 1,   badge: true,  clazz: 'harmful1-variant',  symbolFunction: this.showHarmfulVariantSymbol},
+                        2:    {value: 2,   badge: true,  clazz: 'harmful2-variant',  symbolFunction: this.showHarmfulVariantSymbol},
+                        none: {value: 101, badge: false, clazz: '',                  symbolFunction: ''}
+                 };
 	// For af range, value must be > min and <= max
 	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, badge: true, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},
                        {min: -1.1,   max: +0,     value: +2,  badge: true, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},
@@ -114,19 +119,20 @@ function MatrixCard() {
 
 
 	this.matrixRows = [
-		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:0, index:2, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
-		{name:'Pathogenicity - SIFT'         , id:'sift',           order:2, index:7, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Impact (VEP)'                 , id:'impact',         order:3, index:0, match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
-		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:4, index:1, match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
-		{name:'Bookmark'                     , id:'bookmark',       order:5, index:10, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Inheritance Mode'             , id:'inheritance',    order:6, index:3, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Present in Affected'          , id:'affected',       order:7, index:8, match: 'exact', attribute: 'affected_summary',  map: this.affectedMap},
-		{name:'Absent in Unaffected'         , id:'unaffected',     order:8, index:9, match: 'exact', attribute: 'unaffected_summary',  map: this.unaffectedMap},
-		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:10, index:5, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Zygosity'                     , id:'zygosity',       order:11, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
-		{name:'Genotype'                     , id:'genotype',       order:12, index:12, match: 'field', attribute: 'eduGenotypeReversed' }
+		{name:'Harmful variant'              , id:'harmfulVariant', order:0, index:13,  match: 'exact', attribute: 'harmfulVariantLevel',     map: this.harmfulVariantMap },
+		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:1, index:2,   match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:2, index:6,   match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenicity - SIFT'         , id:'sift',           order:3, index:7,   match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Impact (VEP)'                 , id:'impact',         order:4, index:0,   match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
+		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:5, index:1,   match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
+		{name:'Bookmark'                     , id:'bookmark',       order:6, index:10,  match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
+		{name:'Inheritance Mode'             , id:'inheritance',    order:7, index:3,   match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Present in Affected'          , id:'affected',       order:8, index:8,   match: 'exact', attribute: 'affected_summary',  map: this.affectedMap},
+		{name:'Absent in Unaffected'         , id:'unaffected',     order:9, index:9,   match: 'exact', attribute: 'unaffected_summary',  map: this.unaffectedMap},
+		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:10, index:4,  match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:11, index:5,  match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Zygosity'                     , id:'zygosity',       order:12, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Genotype'                     , id:'genotype',       order:13, index:12, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
 	this.matrixRowsBasic = [
@@ -455,6 +461,7 @@ MatrixCard.prototype._isolateVariants = function() {
 	});
 
 }
+
 
 MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
 	var me = this;
@@ -985,6 +992,38 @@ MatrixCard.prototype.showColumnHeaderSymbol = function(selection, options) {
 	})
 
 
+};
+
+MatrixCard.prototype.showHarmfulVariantSymbol = function(selection, options) {
+	var width, height, clazz;
+	options = options || {};
+
+	var attrs = {
+		width: "13",
+		height: "13",
+		transform: "translate(2,2)",
+		clazz: ""
+	};
+
+	var datumAttrs = selection.datum() || {};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.width = "16",
+		cellSizeAttrs.height = "16",
+		cellSizeAttrs.transform = "translate(2,2)"
+	}
+
+	$.extend(attrs, datumAttrs, cellSizeAttrs, options);
+
+	selection.append("g")
+	         .attr("transform", attrs.transform)
+	         .append("use")
+	         .attr("xlink:href", "#lightning-symbol")
+	         .attr("class", attrs.clazz)
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
+	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showClinVarSymbol = function(selection, options) {

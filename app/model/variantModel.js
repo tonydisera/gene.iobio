@@ -1714,6 +1714,7 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 
 	theVcfData.features.forEach(function(variant) {
 
+		variant.harmfulVariantLevel = 'none';
 		variant.harmfulVariant = null;
 		variant.afFieldHighest = null;
 
@@ -1805,9 +1806,9 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 			            'SIFT'       : variantDanger.sift,
 				        'impact'     : variantDanger.impact, 
 			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false,
-			            'level'      : variantDanger.clinvar || variantDanger.impact == 'high' ? 1 : 2			            
+			            'level'      : variantDanger.clinvar || variantDanger.impact == 'high' ? 1 : 2			            			          
 			};
-			console.log("harmful variant = " + JSON.stringify(variant.harmfulVariant));
+			variant.harmfulVariantLevel = variant.harmfulVariant.level;
 		}
 	});
 

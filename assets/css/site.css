@@ -3502,6 +3502,12 @@ text.ref-count {
   margin-left: 2px;
   float: left; }
 
+.harmful1-variant {
+  fill: #9d2024; }
+
+.harmful2-variant {
+  fill: #d6635c; }
+
 #gene-badge-harmful1-variant {
   display: none;
   fill: #9d2024; }
