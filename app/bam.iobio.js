@@ -772,7 +772,9 @@ var Bam = Class.extend({
     // Create an iobio command get get the variants from clinvar for the region of the gene
     var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
 
-    var tabixArgs = ['-h', KNOWN_VARIANTS_CLINVAR_VCF_URL, regionParm];
+    var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+    
+    var tabixArgs = ['-h', clinvarUrl, regionParm];
     var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL});
     
     return cmd;
