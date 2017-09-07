@@ -1276,9 +1276,15 @@ header {
   margin-bottom: 20px;
   font-size: 18px; }
 
-#matrix-track g.bookmark, #examine-card g.bookmark, #gene-badge-button g.bookmark, .tooltip g.bookmark {
+#matrix-track g.bookmark, #examine-card g.bookmark, .tooltip g.bookmark {
   fill: #3773A7;
   opacity: 0.7; }
+
+#gene-badge-button g.bookmark {
+  fill: transparent;
+  stroke: #3773A7;
+  stroke-width: 3px;
+  opacity: 1; }
 
 .arrow_box {
   position: relative;
@@ -2127,8 +2133,8 @@ inputinput:-moz-placeholder {
   color: #ad494a; }
 
 #thumbs-grey-symbol {
-  fill: #8b8b8b;
-  color: #8b8b8b; }
+  fill: #b6b6b6;
+  color: #b6b6b6; }
 
 .variant.homref {
   opacity: 0 !important;
