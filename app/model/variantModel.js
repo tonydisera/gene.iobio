@@ -1345,7 +1345,7 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
 					    me._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript);
 					    me.theVcfData = theVcfData;	
 
-					    resolve(annotVcfData.features);
+					    resolve(theVcfData.features);
 			    	} else {
 			    		var msg = "Empty results returned from VariantModel.promiseGetImpactfulVariantIds() for gene " + theGeneObject.gene_name;
 			    		console.log(msg);
