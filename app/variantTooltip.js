@@ -777,7 +777,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ calledVariantRow
 			+ me._tooltipMainHeaderRow(theTranscript ? 'Transcript ' + theTranscript.transcript_id : "", exonDisplay, '', '')
 			+ inheritanceModeRow
-			+ '<div class="row" style="max-height:235px;overflow-y:scroll">' 
+			+ '<div class="row" style="max-height:225px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
