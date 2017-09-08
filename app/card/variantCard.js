@@ -1216,9 +1216,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						}	 				
 				   	    
 						if (me.getRelationship() == 'proband') {
-							genesCard.refreshCurrentGeneBadge(null, null, function() {
-								cacheHelper.showAnalyzeAllProgress();							
-							});
+							//genesCard.refreshCurrentGeneBadge(null, null, function() {
+							//	cacheHelper.showAnalyzeAllProgress();							
+							//});
 						}
 					} else {
 						if (me.getRelationship() == 'proband') {

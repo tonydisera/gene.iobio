@@ -257,7 +257,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var afClazz = null;
 		var afSymbolFunction = null;
 		var lowestValue = 999;
-		matrixCard.afExacMap.forEach( function(rangeEntry) {
+		matrixCard.afHighestMap.forEach( function(rangeEntry) {
 			if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
 				if (rangeEntry.value < lowestValue) {
 					lowestValue = rangeEntry.value;
@@ -280,7 +280,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		var afClazz = null;
 		var afSymbolFunction = null;
 		var lowestValue = 999;
-		matrixCard.afExacMap.forEach( function(rangeEntry) {
+		matrixCard.afHighestMap.forEach( function(rangeEntry) {
 			if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
 				if (rangeEntry.value < lowestValue) {
 					lowestValue = rangeEntry.value;
@@ -650,6 +650,27 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
+	var gnomADAfRow = "";
+	var gnomADAfRowWide = "";
+	if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37") {
+		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "n/a" : percentage(variant.vepAf.gnomAD.AF)), '6px')
+		var af   =  variant.vepAf.gnomAD.AF == "." ? "n/a" : percentage(variant.vepAf.gnomAD.AF);
+		var link =  "<a target='_gnomad' href='http://gnomad.broadinstitute.org/variant/" + variant.chrom + "-" + variant.start + "-" + variant.ref + "-" + variant.alt + "'>" + af + "</a>";
+		gnomADAfRowWide = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (af == "." ? af : link) + '</span>');
+		if (variant.vepAf.gnomAD.AF != ".") {
+			var buf = "";
+			for (var key in variant.vepAf.gnomAD) {
+				if (key != "AF") {
+					var label = key.split("_")[0];
+					if (buf.length > 0) {
+						buf += ", ";
+					}
+					buf += label + " " + (variant.vepAf.gnomAD[key] == "." ? "." : percentage(variant.vepAf.gnomAD[key]));					
+				}
+			}
+			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + buf + '</span>');
+		}
+	}
 
 	if (rec) {
 		rec.inheritance      = variant.inheritance ? matrixCard.getInheritanceLabel(variant.inheritance) : "";
@@ -710,7 +731,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
 			+ siftPolyphenRow
-			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), '6px')
+			+ gnomADAfRow
+			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), gnomADAfRow.length > 0 ? '0px' : '6px')
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
 			+ clinvarSimpleRow1
 			+ clinvarSimpleRow2
@@ -735,7 +757,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ "</div>";
 
 		var rightDiv = 
-			'<div class="tooltip-right-column">' 
+			'<div class="tooltip-right-column">'
+			+ gnomADAfRowWide
 			+ me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'))
 			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
 			+ me._tooltipRow('Qual', variant.qual, null, true) 
@@ -1052,7 +1075,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		       	+ "</span>"
 		        + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
 
-	        var zyg = genotype ? (genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
+	        var zyg = genotype ? (!genotype.hasOwnProperty('zygosity') || genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
 			row.append("div")
 			   .attr("class",  "tooltip-zygosity label " + zyg)
 			   .text(capitalizeFirstLetter(zyg));

@@ -115,11 +115,19 @@ function MatrixCard() {
                        {min: -1.1,   max: +.05,   value: +6,  badge: true, clazz: 'af1000g_uncommon',   symbolFunction: this.showAf1000gSymbol},
                        {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'af1000g_common',     symbolFunction: this.showAf1000gSymbol},
                       ];
+	this.afHighestMap = [ {min: -100.1, max: -100,   value: +99, badge: false, clazz: '',    symbolFunction: ''},
+                       {min: -1.1,   max: +0,        value: +2,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.0001,    value: +3,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.001,     value: +4,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.01,      value: +5,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.05,      value: +6,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: +.05,   max: +1,        value: +7,  badge: false,clazz: '',    symbolFunction: ''},
+                      ];
 
 
 
 	this.matrixRows = [
-		{name:'Harmful variant'              , id:'harmfulVariant', order:0, index:13,  match: 'exact', attribute: 'harmfulVariantLevel',     map: this.harmfulVariantMap },
+		{name:'Harmful variant'              , id:'harmfulVariant', order:0, index:12,  match: 'exact', attribute: 'harmfulVariantLevel',     map: this.harmfulVariantMap },
 		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:1, index:2,   match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
 		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:2, index:6,   match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
 		{name:'Pathogenicity - SIFT'         , id:'sift',           order:3, index:7,   match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
@@ -129,10 +137,11 @@ function MatrixCard() {
 		{name:'Inheritance Mode'             , id:'inheritance',    order:7, index:3,   match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
 		{name:'Present in Affected'          , id:'affected',       order:8, index:8,   match: 'exact', attribute: 'affected_summary',  map: this.affectedMap},
 		{name:'Absent in Unaffected'         , id:'unaffected',     order:9, index:9,   match: 'exact', attribute: 'unaffected_summary',  map: this.unaffectedMap},
-		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:10, index:4,  match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:11, index:5,  match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Zygosity'                     , id:'zygosity',       order:12, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
-		{name:'Genotype'                     , id:'genotype',       order:13, index:12, match: 'field', attribute: 'eduGenotypeReversed' }
+		{name:'Allele Frequency <5%'         , id:'af-highest',     order:10, index:11, match: 'range', attribute: 'afHighest',      map: this.afHighestMap},
+		//{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:11, index:4,  match: 'range', attribute: 'afExAC',      map: this.afExacMap},
+		//{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:12, index:5,  match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
+		{name:'Zygosity'                     , id:'zygosity',       order:11, index:4, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Genotype'                     , id:'genotype',       order:12, index:5, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
 	this.matrixRowsBasic = [
@@ -157,7 +166,8 @@ function MatrixCard() {
 
 	this.afFieldToMap = {
 		'afExAC': 'afExacMap',
-		'af1000G': 'af1000gMap'
+		'af1000G': 'af1000gMap',
+		'vepAf.gnomAD.AF': 'afHighestMap'
 	}
 
 
@@ -800,7 +810,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 					} else {
 						mappedValue = theValue;
 					}
-					symbolFunction = me.showTextSymbol;
+					symbolFunction = matrixRow.symbolFunction ? matrixRow.symbolFunction : me.showTextSymbol;
 
 				} else if (matrixRow.match == 'exact') {
 					// We are going to get the mapped value through exact match,
@@ -1258,7 +1268,33 @@ MatrixCard.prototype.showAfSymbol = function(selection, options) {
 		af_superrare: { fill: "rgba(255, 44, 0, 0.76)",  transform: symbolDim.transform,   size: symbolDim.size},
 		af_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
 		af_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
-		af_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size},
+		af_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size}
+	}
+	// For the gene badge, we will display in a smaller size
+	if (options && options.hasOwnProperty('transform')) {
+		symbolAttrs[selection.datum().clazz].transform = options.transform;
+	}
+	if (options && options.hasOwnProperty('height')) {
+		symbolAttrs[selection.datum().clazz].size = options.height;
+	}
+	selection.append("g")
+		.attr("class", function(d, i)    { return d.clazz; })
+		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
+		.append("use")
+		.attr("xlink:href", "#af-symbol")
+		.style("pointer-events", "none")
+		.style("fill", function(d,i)  { return symbolAttrs[d.clazz].fill; })
+		.attr("width", function(d,i)  { return symbolAttrs[d.clazz].size; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].size; });
+};
+
+MatrixCard.prototype.showAfRareSymbol = function(selection, options) {
+	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
+	if (options.cellSize > 18) {
+		symbolDim   = { transform: "translate(2,2)",    size: "17" };
+	}
+	var symbolAttrs = {
+		afhighest_rare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size}
 	}
 	// For the gene badge, we will display in a smaller size
 	if (options && options.hasOwnProperty('transform')) {
@@ -1349,6 +1385,25 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 				         .attr("dy", "0em")
 				         .text(selection.datum().value);
 	MatrixCard.wrap(text, options.cellSize, 3);
+};
+
+MatrixCard.prototype.showNumericSymbol = function (selection, options) {
+	var translate = options.cellSize > 18 ? "translate(0,4)" : "translate(0,0)";
+	var text =  selection.append("g")
+				         .attr("transform", translate)
+				         .append("text")
+				         .attr("class", function(d,i) {
+				         	if (selection.datum().clickFunction) {
+				         		return "clickable";
+				         	} else {
+				         		return "";
+				         	}
+				     	 })
+				         .attr("x", 0)
+				         .attr("y", isLevelBasic ? 14 : 11)
+				         .attr("dy", "0em")
+				         .text(selection.datum().value);
+	MatrixCard.wrap(text, options.cellSize, 3, options.cellSize - 1);
 };
 
 
@@ -1652,6 +1707,10 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 
 }
 
+MatrixCard.prototype.formatAfHighest = function(variant, afField) {
+	return afField && afField.length > 0 && +variant[afField] < .1 ? percentage(variant[afField], false) : "";
+}
+
 MatrixCard.prototype.formatInheritance = function(variant, value) {
 	return this.getInheritanceLabel(value);
 }
@@ -1661,10 +1720,13 @@ MatrixCard.prototype.getInheritanceLabel = function(inheritance) {
 	return matrixRow ? matrixRow.display : inheritance;
 }
 
-MatrixCard.wrap = function(text, width, maxLines) {
+MatrixCard.wrap = function(text, width, maxLines, x) {
   if (maxLines == null) {
   	maxLines = 10;
   }
+  var theX       = x ? x : 0;
+  var textAnchor = x ? "end" : "start";
+
   text.each(function() {
     var text = d3.select(this),
         words = text.text()
@@ -1680,7 +1742,12 @@ MatrixCard.wrap = function(text, width, maxLines) {
         lineHeight = 1.1, // ems
         y = text.attr("y"),
         dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        tspan = text.text(null)
+                    .append("tspan")
+                    .style("text-anchor", textAnchor)
+                    .attr("x", theX)
+                    .attr("y", y)
+                    .attr("dy", dy + "em");
     while (word = words.pop()) {
       line.push(word);
       if (lineNumber < maxLines) {
@@ -1692,7 +1759,10 @@ MatrixCard.wrap = function(text, width, maxLines) {
 	        line.pop();
 	        tspan.text(line.join(" "));
 	        line = [word];
-	        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+	        tspan = text.append("tspan").attr("x", theX).attr("y", y)
+	                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+	                    .style("text-anchor", textAnchor)
+	                    .text(word);
 	      }
       }
     }

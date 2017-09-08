@@ -37,6 +37,11 @@ vcfiobio = function module() {
   var regionIndex = 0;
   var stream = null;
 
+  var VEP_FIELDS_AF_1000G  = "AFR_AF|AMR_AF|EAS_AF|EUR_AF|SAS_AF".split("|");
+  var VEP_FIELDS_AF_ESP    = "AA_AF|EA_AF".split("|");
+  var VEP_FIELDS_AF_GNOMAD = "gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF".split("|");
+  var VEP_FIELDS_AF_MAX    = "MAX_AF|MAX_AF_POPS".split("|");
+
 
   var CLINVAR_CODES = {
     '0':   'not_provided',
@@ -596,7 +601,7 @@ var effectCategories = [
   }
 
 
-  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, regions, isMultiSample, samplesToRetrieve, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache) {
+  exports.promiseGetVariants = function(refName, geneObject, selectedTranscript, regions, isMultiSample, samplesToRetrieve, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, cache) {
     var me = this;
 
 
@@ -620,7 +625,7 @@ var effectCategories = [
 
 
       if (sourceType == SOURCE_TYPE_URL) {
-        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getRemoteVariantsImpl(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -631,7 +636,7 @@ var effectCategories = [
       } else {
         //me._getLocalStats(refName, geneObject.start, geneObject.end, sampleName);
 
-        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache,
+        me._getLocalVariantsImpl(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, cache,
           function(annotatedData, results) {
             if (annotatedData && results) {
               resolve([annotatedData, results]);
@@ -646,7 +651,7 @@ var effectCategories = [
   }
 
 
-  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getLocalVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, cache, callback, errorCallback) {
     var me = this;
 
     // The variant region may span more than the specified region.
@@ -710,7 +715,7 @@ var effectCategories = [
 
   }
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, cache, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, cache, callback, errorCallback) {
 
     var me = this;
 
@@ -766,6 +771,12 @@ var effectCategories = [
       vepArgs.push(" --assembly");
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
+      if (vepAF) {
+        vepArgs.push("--af_gnomad");
+        vepArgs.push("--af_esp");
+        vepArgs.push("--af_1kg");
+        vepArgs.push("--max_af");
+      }
       if (isRefSeq) {
         vepArgs.push("--refseq");
       }
@@ -1827,6 +1838,7 @@ var effectCategories = [
                     'polyphen' :               annot.vep.polyphen,
                     'vepRegs':                 annot.vep.vepRegs,
                     'regulatory' :             annot.vep.regulatory,
+                    'vepAf':                   annot.vep.af,
 
                     // generic annots
                     'genericAnnots':          annot.genericAnnots,
@@ -1895,7 +1907,7 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
     typeAnnotated: null,
     combinedDepth: null,
     af1000G: '.',
-    afExAC: '.',
+    afExAC: '.',    
     rs: '',
     snpEff: { 
       effects: {},
@@ -1920,7 +1932,8 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
       sift: {},       // need a special field for filtering purposes
       polyphen: {},   // need a special field for filtering purposes
       regulatory: {}, // need a special field for filtering purposes
-      vepRegs: []      
+      vepRegs: [],
+      af: {'1000G': {}, 'ESP': {}, 'gnomAD': {}, 'MAX': {}}     
     },
     genericAnnots:  {}
   };
@@ -1978,10 +1991,15 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
   Here is the field mapping for each transcript
   which is separated by a comma
    
-  Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|GVSp
-  |cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation
-  |DISTANCE|STRAND|SYMBOL_SOURCE|HGNC_ID|REFSEQ_MATCH|SIFT|PolyPhen|HGVS_OFFSET
-  |CLIN_SIG|SOMATIC|PHENO|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
+   Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp
+   |cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation
+   |DISTANCE|STRAND|FLAGS|SYMBOL_SOURCE|HGNC_ID|GENE_PHENO|SIFT|PolyPhen|HGVS_OFFSET
+   |AFR_AF|AMR_AF|EAS_AF|EUR_AF|SAS_AF
+   |AA_AF|EA_AF
+   |gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF
+   |MAX_AF|MAX_AF_POPS
+   |CLIN_SIG|SOMATIC|PHENO|MOTIF_NAME|MOTIF_POS|HIGH_INF_POS|MOTIF_SCORE_CHANGE
+
 
 */
 exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID) {
@@ -2074,8 +2092,6 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
           var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
           var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : -99;
 
-
-
           var consequencesObject = annot.vep.allVep[theImpact];
           if (consequencesObject == null) {
             consequencesObject = {};
@@ -2097,6 +2113,13 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
           me._appendTranscript(polyphenObject, polyphenDisplay, theTranscriptId);
           annot.vep.allPolyphen[polyphenScore] = polyphenObject;
 
+          if (global_vepAF) {
+            me._parseVepAfAnnot(VEP_FIELDS_AF_GNOMAD, vepFields, vepTokens, "gnomAD", "gnomAD", annot);
+            me._parseVepAfAnnot(VEP_FIELDS_AF_1000G,  vepFields, vepTokens, "1000G",  null,     annot);
+            me._parseVepAfAnnot(VEP_FIELDS_AF_ESP,    vepFields, vepTokens, "ESP",    null,     annot);
+            me._parseVepAfAnnot(VEP_FIELDS_AF_MAX,    vepFields, vepTokens, "MAX",    "MAX",    annot);            
+          }
+
         } else {
           var consequence = vepTokens[vepFields.Consequence];
           //console.log(geneObject.gene_name + " " + consequence + ": throwing out invalid transcript " + theTranscriptId);
@@ -2108,6 +2131,18 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
   });  
 
 
+}
+
+exports._parseVepAfAnnot = function(fieldNames, vepFields, vepTokens, afSource, omitPrefix, annot) {
+  fieldNames.forEach(function(fieldName) {
+    var targetFieldName = omitPrefix ? fieldName.split(omitPrefix + "_")[1] : fieldName;
+    var tokenIdx        = vepFields[fieldName];
+    if (tokenIdx && vepTokens[tokenIdx] && vepTokens[tokenIdx].length > 0) {
+      annot.vep.af[afSource][targetFieldName] = vepTokens[tokenIdx];
+    } else {
+      annot.vep.af[afSource][targetFieldName] = ".";
+    }
+  })  
 }
 
 exports._parseGenericAnnot = function(annotator, annotToken, annot) {

@@ -456,7 +456,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    if (variant.afFieldHighest) {
 	    	var afMapName = matrixCard.afFieldToMap[variant.afFieldHighest];
 			matrixCard[afMapName].forEach( function(rangeEntry) {
-				if (+variant[variant.afFieldHighest] > rangeEntry.min && +variant[variant.afFieldHighest] <= rangeEntry.max) {
+				if (+variant.afHighest > rangeEntry.min && +variant.afHighest <= rangeEntry.max) {
 					if (rangeEntry.value < lowestAf) {
 						lowestAf = rangeEntry.value;
 						afClazz = rangeEntry.clazz;
@@ -1185,6 +1185,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			       window.geneSource == 'refseq' ? true : false,
 			       true,  // hgvs notation
 			       true,  // rsid
+			       false, // vep af
 			       useServerCache // serverside cache
 			    ).then( function(data) {
 
@@ -1334,6 +1335,7 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
 			       window.geneSource == 'refseq' ? true : false,
 			       true,  // hgvs notation
 			       true,  // rsid
+			       false, // vep af
 			       useServerCache // serverside cache
 			    ).then( function(data) {
 
@@ -1717,6 +1719,7 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 		variant.harmfulVariantLevel = 'none';
 		variant.harmfulVariant = null;
 		variant.afFieldHighest = null;
+		variant.afHighest = '.';
 
 		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
 
@@ -1746,9 +1749,9 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 	    	var clinvarDisplay = null;
 	    	var clinvarKey = null;
 	    	for (var key in matrixCard.clinvarMap) {
-	    		var me = matrixCard.clinvarMap[key];
-	    		if (me.clazz == variant.clinvar) {
-	    			clinvarEntry = me;
+	    		var self = matrixCard.clinvarMap[key];
+	    		if (self.clazz == variant.clinvar) {
+	    			clinvarEntry = self;
 	    			clinvarDisplay = key;
 	    			clinvarKey = key;
 	    		}
@@ -1762,39 +1765,20 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 	    	variantDanger.inheritance = true;
 	    }
 
+	    // Figure out which is the highest AF between exac, 1000g, and gnomAD
+		me._determineHighestAf(variant);
 
-
-
-		var evaluateAf = function(af) {
-			var afMapName = matrixCard.afFieldToMap[af];
+		// Determine if the highest AF is in a range that we consider 'rare'
+		if (variant.afFieldHighest) {
+			var afMapName = matrixCard.afFieldToMap[variant.afFieldHighest];
 			matrixCard[afMapName].forEach( function(rangeEntry) {
-				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
+				if (+variant.afHighest > rangeEntry.min && +variant.afHighest <= rangeEntry.max) {
 					if (rangeEntry.badge) {
-						variantDanger.af = +variant[af];
+						variantDanger.af = +variant.afHighest;
 						variantDanger.meetsAf = true;
 					}
 				}
-			});
-		}
-
-
-		// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
-		// as 'lowest' af for all variants in gene
-		if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
-			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
-			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
-				variant.afFieldHighest = 'afExAC';
-			} else {
-				variant.afFieldHighest = 'af1000G';
-			}
-		} else if ($.isNumeric(variant.afExAC)) {
-			variant.afFieldHighest = 'afExAC';
-
-		} else if ($.isNumeric(variant.af1000G)) {
-			variant.afFieldHighest = 'af1000G';
-		}
-		if (variant.afFieldHighest) {
-			evaluateAf(variant.afFieldHighest);
+			});			
 		}
 
 		// Turn on flag for harmful variant if one is found
@@ -1812,6 +1796,52 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 		}
 	});
 
+}
+
+VariantModel.prototype._determineHighestAf = function(variant) {
+	var me = this;
+	// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
+	// as 'lowest' af for all variants in gene
+	var afHighest = null;
+	if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
+		// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
+		if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
+			variant.afFieldHighest = 'afExAC';
+		} else {
+			variant.afFieldHighest = 'af1000G';
+		}
+	} else if ($.isNumeric(variant.afExAC)) {
+		variant.afFieldHighest = 'afExAC';
+
+	} else if ($.isNumeric(variant.af1000G)) {
+		variant.afFieldHighest = 'af1000G';
+	}
+	afHighest = me.getHighestAf(variant);
+
+	if (global_vepAF) {
+		if ($.isNumeric(variant.vepAf.gnomAD.AF) && afHighest) {
+			if (variant.vepAf.gnomAD.AF >= afHighest) {
+				variant.afFieldHighest = 'vepAf.gnomAD.AF';
+			} 
+		} else if ($.isNumeric(variant.vepAf.gnomAD.AF)) {
+			variant.afFieldHighest = 'vepAf.gnomAD.AF';
+		}
+	} 
+	variant.afHighest = me.getHighestAf(variant);
+}
+
+VariantModel.prototype.getHighestAf = function(variant) {
+	var me = this;
+	if (variant.afFieldHighest) {
+		var subfields = variant.afFieldHighest.split(".");
+		var current = variant;
+		subfields.forEach(function(subfield) {
+			current = current[subfield];
+		})
+		return current;
+	} else {
+		return null;
+	}
 }
 
 VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedInfo) {
@@ -2130,7 +2160,8 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 	       matrixCard.clinvarMap,
 	       window.geneSource == 'refseq' ? true : false,
 	       window.isLevelBasic || getVariantIds,  // hgvs notation
-	       getVariantIds  // rsid
+	       getVariantIds,  // rsid
+	       global_vepAF    // vep af
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];

@@ -3466,7 +3466,9 @@ function promiseDetermineInheritance(promise) {
 			    $("#matrix-panel .loader .loader-label").text("Ranking variants");
 				$("#feature-matrix-note").removeClass("hide");
 	
-				genesCard.refreshCurrentGeneBadge();
+				genesCard.refreshCurrentGeneBadge(null, null, function() {
+					cacheHelper.showAnalyzeAllProgress();	
+				});
 
 				resolve();
 
@@ -3536,7 +3538,12 @@ function promiseDetermineInheritance(promise) {
 					//mat $("#matrix-panel .loader").addClass("hide");
 					$("#feature-matrix-note").removeClass("hide");
 
-					resolve();		
+					probandVariantCard.model._cacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript);	
+
+					genesCard.refreshCurrentGeneBadge(null, trioVcfData.proband, function() {
+						resolve();		
+					});
+
 				}
 			}
 
@@ -3746,7 +3753,7 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function percentage(a) {
+function percentage(a, showSign=true) {
 	var pct = a * 100;
 	var places = 0;
 	if (pct < .001) {
@@ -3760,7 +3767,7 @@ function percentage(a) {
 	} else {
 		places = 0;
 	}
-	return round(pct, places) + "%";
+	return round(pct, places) + (showSign ? "%" : "");
 }
 
 function round(value, places) {
