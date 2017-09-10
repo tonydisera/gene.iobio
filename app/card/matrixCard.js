@@ -138,8 +138,6 @@ function MatrixCard() {
 		{name:'Present in Affected'          , id:'affected',       order:8, index:8,   match: 'exact', attribute: 'affected_summary',  map: this.affectedMap},
 		{name:'Absent in Unaffected'         , id:'unaffected',     order:9, index:9,   match: 'exact', attribute: 'unaffected_summary',  map: this.unaffectedMap},
 		{name:'Allele Frequency <5%'         , id:'af-highest',     order:10, index:11, match: 'range', attribute: 'afHighest',      map: this.afHighestMap},
-		//{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:11, index:4,  match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		//{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:12, index:5,  match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
 		{name:'Zygosity'                     , id:'zygosity',       order:11, index:4, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
 		{name:'Genotype'                     , id:'genotype',       order:12, index:5, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
@@ -1188,74 +1186,7 @@ MatrixCard.prototype.showMutationTasterSymbol = function(selection, options) {
 	         .style("pointer-events", "none")
 	         .style("fill", colors[attrs.clazz]);
 };
-MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
-	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
-	var symbolDimNc = { transform: "translate(2,2)",    size: "11" };
-	if (options.cellSize > 18) {
-		symbolDim   = { transform: "translate(2,2)",    size: "17" };
-		symbolDimNc = { transform: "translate(6,6)",    size: "10" };
-	}
-	var symbolAttrs = {
-		afexac_unique_nc: { fill: "none",                   stroke: "#6b6666", transform: symbolDimNc.transform, size: symbolDimNc.size},
-		afexac_unique:    { fill: "rgb(199, 0, 1)",         stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_uberrare:  { fill: "rgba(204, 28, 29, 0.79)",stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_superrare: { fill: "rgba(255, 44, 0, 0.76)", stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_rare:      { fill: "rgb(247, 138, 31)",      stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_uncommon:  { fill: "rgb(224, 195, 128)",     stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_common:    { fill: "rgb(189,189,189)",       stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size}
-	}
-	// For the gene badge, we will display in a smaller size
-	if (options && options.hasOwnProperty('transform')) {
-		symbolAttrs[selection.datum().clazz].transform = options.transform;
-	}
-	if (options && options.hasOwnProperty('height')) {
-		symbolAttrs[selection.datum().clazz].sideLength = options.height;
-	}
-	selection.append("g")
-		.attr("class", function(d, i) { return d.clazz; })
-		.attr("transform", function(d,i) {
-			return  symbolAttrs[d.clazz].transform;
-		})
-		.append("use")
-		.attr("xlink:href", "#af-symbol")
-		.style("pointer-events", "none")
-		.style("fill",   function(d,i) { return symbolAttrs[d.clazz].fill; })
-		.style("stroke", function(d,i) { return symbolAttrs[d.clazz].stroke; })
-		.attr("width",   function(d,i) { return symbolAttrs[d.clazz].size; })
-		.attr("height",  function(d,i) { return symbolAttrs[d.clazz].size; });
 
-};
-
-MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
-	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
-	if (options.cellSize > 18) {
-		symbolDim   = { transform: "translate(2,2)",    size: "17" };
-	}
-	var symbolAttrs = {
-		af1000g_unique:    { fill: "rgb(199, 0, 1)",          transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_uberrare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_superrare: { fill: "rgba(255, 44, 0, 0.76)",  transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size},
-	}
-	// For the gene badge, we will display in a smaller size
-	if (options && options.hasOwnProperty('transform')) {
-		symbolAttrs[selection.datum().clazz].transform = options.transform;
-	}
-	if (options && options.hasOwnProperty('height')) {
-		symbolAttrs[selection.datum().clazz].size = options.height;
-	}
-	selection.append("g")
-		.attr("class", function(d, i)    { return d.clazz; })
-		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
-		.append("use")
-		.attr("xlink:href", "#af-symbol")
-		.style("pointer-events", "none")
-		.style("fill", function(d,i)  { return symbolAttrs[d.clazz].fill; })
-		.attr("width", function(d,i)  { return symbolAttrs[d.clazz].size; })
-		.attr("height", function(d,i) { return symbolAttrs[d.clazz].size; });
-};
 
 MatrixCard.prototype.showAfSymbol = function(selection, options) {
 	var symbolDim   = { transform: "translate(2,2)",    size: "12" };

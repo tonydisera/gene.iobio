@@ -327,27 +327,15 @@ describe('MatrixCard', function() {
 	});
 
 
-	describe('#showAfExacSymbol', function() {
+	describe('#showAfRareSymbol', function() {
 		var data, mc, options;
 
 		beforeEach(function() {
 			setFixtures(
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>'
+				'<g class="cell"></g>' 
 			);
 			data = [
-				{ clazz: "afexac_unique_nc" },
-				{ clazz: "afexac_unique" },
-				{ clazz: "afexac_uberrare" },
-				{ clazz: "afexac_superrare" },
-				{ clazz: "afexac_rare" },
-				{ clazz: "afexac_uncommon" },
-				{ clazz: "afexac_common" }
+				{ clazz: "afhighest_rare" }
 			];
 			options = {cellSize: 22};
 			d3.selectAll('.cell').data(data);
@@ -356,156 +344,41 @@ describe('MatrixCard', function() {
 
 		it('sets the correct transform to each symbol group', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection, options);
-			expect($('g.afexac_unique_nc')).toHaveAttr('transform', 'translate(6,6)');
-			expect($('g.afexac_unique')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.afexac_uberrare')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.afexac_superrare')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.afexac_rare')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.afexac_uncommon')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.afexac_common')).toHaveAttr('transform', 'translate(2,2)');
+			mc.showAfRareSymbol(selection, options);
+			expect($('g.afhighest_rare')).toHaveAttr('transform', 'translate(2,2)');
 		});
 
 		it('sets the correct fill to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection, options);
-			expect($('g.afexac_unique_nc > use')).toHaveFill('none');
-			expect($('g.afexac_unique > use')).toHaveFill('rgb(199, 0, 1)');
-			expect($('g.afexac_uberrare > use')).toHaveFill('rgb(204, 28, 29)');
-			expect($('g.afexac_superrare > use')).toHaveFill('rgb(255, 44, 0)');
-			expect($('g.afexac_rare > use')).toHaveFill('rgb(247, 138, 31)');
-			expect($('g.afexac_uncommon > use')).toHaveFill('rgb(224, 195, 128)');
-			expect($('g.afexac_common > use')).toHaveFill('rgb(189,189,189)');
+			mc.showAfRareSymbol(selection, options);
+			expect($('g.afhighest_rare > use')).toHaveFill('rgb(204, 28, 29)');
 		});
 
 		it('sets the correct stroke to each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection, options);
-			expect($('g.afexac_unique_nc > use')).toHaveStroke('#6b6666');
-			expect($('g.afexac_unique > use')).toHaveStroke('none');
-			expect($('g.afexac_uberrare > use')).toHaveStroke('none');
-			expect($('g.afexac_superrare > use')).toHaveStroke('none');
-			expect($('g.afexac_rare > use')).toHaveStroke('none');
-			expect($('g.afexac_uncommon > use')).toHaveStroke('none');
-			expect($('g.afexac_common > use')).toHaveStroke('none');
+			mc.showAfRareSymbol(selection, options);
+			expect($('g.afhighest_rare > use')).toHaveStroke('none');
 		});
 
 		it('sets the correct width on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection, options);
-			expect($('g.afexac_unique_nc > use')).toHaveAttr('width', '10');
-			expect($('g.afexac_unique > use')).toHaveAttr('width', '17');
-			expect($('g.afexac_uberrare > use')).toHaveAttr('width', '17');
-			expect($('g.afexac_superrare > use')).toHaveAttr('width', '17');
-			expect($('g.afexac_rare > use')).toHaveAttr('width', '17');
-			expect($('g.afexac_uncommon > use')).toHaveAttr('width', '17');
-			expect($('g.afexac_common > use')).toHaveAttr('width', '17');
+			mc.showAfRareSymbol(selection, options);
+			expect($('g.afhighest_rare > use')).toHaveAttr('width', '17');
 		});
 
 		it('sets the correct height on each symbol <use> element', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection, options);
-			expect($('g.afexac_unique_nc > use')).toHaveAttr('height', '10');
-			expect($('g.afexac_unique > use')).toHaveAttr('height', '17');
-			expect($('g.afexac_uberrare > use')).toHaveAttr('height', '17');
-			expect($('g.afexac_superrare > use')).toHaveAttr('height', '17');
-			expect($('g.afexac_rare > use')).toHaveAttr('height', '17');
-			expect($('g.afexac_uncommon > use')).toHaveAttr('height', '17');
-			expect($('g.afexac_common > use')).toHaveAttr('height', '17');
+			mc.showAfRareSymbol(selection, options);
+			expect($('g.afhighest_rare > use')).toHaveAttr('height', '17');
 		});
 
 		it('sets the correct width on each symbol <use> element when cell size < 18', function() {
 			var selection = d3.selectAll('.cell');
-			mc.showAfExacSymbol(selection, {cellSize: 17});
-			expect($('g.afexac_unique_nc > use')).toHaveAttr('width', '11');
-			expect($('g.afexac_unique > use')).toHaveAttr('width', '12');
-			expect($('g.afexac_uberrare > use')).toHaveAttr('width', '12');
-			expect($('g.afexac_superrare > use')).toHaveAttr('width', '12');
-			expect($('g.afexac_rare > use')).toHaveAttr('width', '12');
-			expect($('g.afexac_uncommon > use')).toHaveAttr('width', '12');
-			expect($('g.afexac_common > use')).toHaveAttr('width', '12');
+			mc.showAfRareSymbol(selection, {cellSize: 17});
+			expect($('g.afhighest_rare > use')).toHaveAttr('width', '12');
 		});
 	});
 
-	describe('#showAf1000gSymbol', function() {
-		var data, mc, options;
-
-		beforeEach(function() {
-			setFixtures(
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>' +
-				'<g class="cell"></g>'
-			);
-			data = [
-				{ clazz: "af1000g_unique" },
-				{ clazz: "af1000g_uberrare" },
-				{ clazz: "af1000g_superrare" },
-				{ clazz: "af1000g_rare" },
-				{ clazz: "af1000g_uncommon" },
-				{ clazz: "af1000g_common" }
-			];
-			options = {cellSize: 22};
-			d3.selectAll('.cell').data(data);
-			mc = new MatrixCard();
-		});
-
-		it('sets the correct transform to each symbol group', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection, options);
-			expect($('g.af1000g_unique')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.af1000g_uberrare')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.af1000g_superrare')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.af1000g_rare')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.af1000g_uncommon')).toHaveAttr('transform', 'translate(2,2)');
-			expect($('g.af1000g_common')).toHaveAttr('transform', 'translate(2,2)');
-		});
-
-		it('sets the correct fill to each symbol <use> element', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection, options);
-			expect($('g.af1000g_unique > use')).toHaveFill('rgb(199, 0, 1)');
-			expect($('g.af1000g_uberrare > use')).toHaveFill('rgb(204, 28, 29)');
-			expect($('g.af1000g_superrare > use')).toHaveFill('rgb(255, 44, 0)');
-			expect($('g.af1000g_rare > use')).toHaveFill('rgb(247, 138, 31)');
-			expect($('g.af1000g_uncommon > use')).toHaveFill('rgb(224, 195, 128)');
-			expect($('g.af1000g_common > use')).toHaveFill('rgb(189,189,189)');
-		});
-
-		it('sets the correct width on each symbol <use> element', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection, options);
-			expect($('g.af1000g_unique > use')).toHaveAttr('width', '17');
-			expect($('g.af1000g_uberrare > use')).toHaveAttr('width', '17');
-			expect($('g.af1000g_superrare > use')).toHaveAttr('width', '17');
-			expect($('g.af1000g_rare > use')).toHaveAttr('width', '17');
-			expect($('g.af1000g_uncommon > use')).toHaveAttr('width', '17');
-			expect($('g.af1000g_common > use')).toHaveAttr('width', '17');
-		});
-
-		it('sets the correct height on each symbol <use> element', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection, options);
-			expect($('g.af1000g_unique > use')).toHaveAttr('height', '17');
-			expect($('g.af1000g_uberrare > use')).toHaveAttr('height', '17');
-			expect($('g.af1000g_superrare > use')).toHaveAttr('height', '17');
-			expect($('g.af1000g_rare > use')).toHaveAttr('height', '17');
-			expect($('g.af1000g_uncommon > use')).toHaveAttr('height', '17');
-			expect($('g.af1000g_common > use')).toHaveAttr('height', '17');
-		});
-		it('sets the correct width on each symbol <use> element', function() {
-			var selection = d3.selectAll('.cell');
-			mc.showAf1000gSymbol(selection, {cellSize: 17});
-			expect($('g.af1000g_unique > use')).toHaveAttr('width', '12');
-			expect($('g.af1000g_uberrare > use')).toHaveAttr('width', '12');
-			expect($('g.af1000g_superrare > use')).toHaveAttr('width', '12');
-			expect($('g.af1000g_rare > use')).toHaveAttr('width', '12');
-			expect($('g.af1000g_uncommon > use')).toHaveAttr('width', '12');
-			expect($('g.af1000g_common > use')).toHaveAttr('width', '12');
-		});
-	});
 
 	describe('#showHomSymbol', function() {
 		var selection, mc, options;

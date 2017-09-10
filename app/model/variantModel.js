@@ -435,7 +435,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    	var clinvarKey = null;
 	    	for (var key in matrixCard.clinvarMap) {
 	    		var me = matrixCard.clinvarMap[key];
-	    		if (me.clazz == variant.clinvar) {
+	    		if (clinvarEntry == null && me.clazz == variant.clinvar) {
 	    			clinvarEntry = me;
 	    			clinvarDisplay = key;
 	    			clinvarKey = key;
@@ -460,7 +460,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 					if (rangeEntry.value < lowestAf) {
 						lowestAf = rangeEntry.value;
 						afClazz = rangeEntry.clazz;
-						afBadge = rangeEntry.badge;
+						afField = variant.afFieldHighest;
 					}
 				}
 			});
@@ -2207,10 +2207,6 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 	return new Promise( function(resolve, reject) {
 		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 
-			// We have the AFs from 1000G and ExAC.  Now set the level so that variants
-		    // can be filtered by range.
-		    me._determineVariantAfLevels(theVcfData, transcript );
-
 
 		    // Show the snpEff effects / vep consequences in the filter card
 		    me._populateEffectFilters(theVcfData.features);
@@ -2333,43 +2329,6 @@ VariantModel.prototype._populateRecFilters  = function(variants) {
 	});	
 }
 
-
-
-VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcript) {
-	var me = this;
-    // Post processing:
-    // We have the af1000g and afexac, so now determine the level for filtering
-    // by range.
-   theVcfData.features.forEach(function(variant) {
-  	// For ExAC levels, differentiate between af not found and in
-  	// coding region (level = private) and af not found and intronic (non-coding)
-  	// region (level = unknown)
-  	if (variant.afExAC == 0) {
-		variant.afExAC = -100;
-    	getCodingRegions(transcript).forEach(function(codingRegion) {
-    		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
-    			variant.afExAC = 0;
-    		}
-    	});
-  	}
-
-    variant.afexaclevels = {};
-		matrixCard.afExacMap.forEach( function(rangeEntry) {
-			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
-				variant.afexaclevel = rangeEntry.clazz;
-				variant.afexaclevels[rangeEntry.clazz] = rangeEntry.clazz;
-			}
-		});
-
-		variant.af1000glevels = {};
-		matrixCard.af1000gMap.forEach( function(rangeEntry) {
-			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
-				variant.af1000glevel = rangeEntry.clazz;
-				variant.af1000glevels[rangeEntry.clazz] = rangeEntry.clazz;
-			}
-		});
-	});
-}
 
 
 
@@ -2745,9 +2704,6 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 	// Now merge called data with variant set and display.
 	// Prepare vcf and fb data for comparisons
 	me._prepareVcfAndFbData(theFbData, theVcfData);
-
-	// Determine allele freq levels
-	me._determineVariantAfLevels(theFbData, window.selectedTranscript);
 
 	// Filter the freebayes variants to only keep the ones
 	// not present in the vcf variant set.

@@ -3216,8 +3216,6 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 	                		variant.extraAnnot = true;
 	                	})
 
-						vc.model._determineVariantAfLevels(theFbData, theTranscript);
-
 			        	// Pileup the variants
 			        	var pileupObject = vc.model._pileupVariants(theFbData.features, theGeneObject.start, theGeneObject.end);
 						theFbData.maxLevel = pileupObject.maxLevel + 1;
