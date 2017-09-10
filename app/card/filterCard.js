@@ -61,23 +61,6 @@ FilterCard.prototype.autoSetFilters = function() {
 	
 	this.displayRecFilters();
 	this.initFilterListeners();
-	/*
-	// If filter status has unique values of PASS + another status (e.g '.' or 'FAIL'),
-	// automatically filter variants to only include those with status PASS.
-	var statusCount = 0;
-	var passStatus = false;
-	for ( key in this.recFilters) {
-		if (key == 'PASS') {
-			passStatus = true;
-		}
-		statusCount++;	
-	}
-	if (passStatus && statusCount > 1) {
-		this.annotsToInclude.PASS = {key: "recfilter", state: true, value: "PASS"};		
-		d3.select("svg#PASS").classed("current", true);
-	} 
-	*/
-
 }
 
 FilterCard.prototype.displayAffectedFilters = function() {
@@ -375,16 +358,6 @@ FilterCard.prototype.init = function() {
 		me.onSelectAnnotationScheme();
 	});
 
-/*
-	$('#select-annotation-scheme').selectivity();
-    $('#select-annotation-scheme').on('change', function(event) {
-    	me.onSelectAnnotationScheme(event.value);
-    });
-	$('#select-af-scheme').selectivity();
-    $('#select-af-scheme').on('change', function(event) {
-    	me.onSelectAFScheme(event.value);
-    });
- */
 
 	// Default annotation scheme to VEP
 	this.setAnnotationScheme("VEP");
@@ -694,103 +667,15 @@ FilterCard.prototype.enableFilters = function() {
 }
 
 FilterCard.prototype.disableFilters = function() {
-	/*
-	d3.selectAll(".impact").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".highestImpactVep").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".vepImpact").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".type").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".zygosity").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".effect").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".vepConsequence").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".sift").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".polyphen").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".regulatory").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".afexaclevels").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".af1000glevels").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".inheritance").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-	d3.selectAll(".clinvar").each( function(d,i) {		
-		d3.select(this).classed("inactive", true);
-	});
-
-	$("#af-range-filter").addClass("hide");
-	$("#coverage-filter").addClass("hide");
-*/
 }
 
 FilterCard.prototype.enableClinvarFilters = function(theVcfData) {	
-	/*
-	if (theVcfData == null || theVcfData.features == null) {
-		return;
-	}
-	
-	var clinvarVariantMap = {};
-	theVcfData.features.forEach( function(variant) {
-		if (variant.clinvar != null && variant.clinvar != '' && variant.clinvar != 'none') {
-			clinvarVariantMap[variant.clinvar] = 'Y';
-		}
-	});
-	d3.selectAll(".clinvar").each( function(d,i) {
-		var clinvar = d3.select(this).attr("id");
-		var clinvarPresent = clinvarVariantMap[clinvar];
-		d3.select(this).classed("inactive", clinvarPresent == null);
-	});
-*/
-
 }
 
 FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
-
-	/*
-	if (theVcfData == null || theVcfData.features == null) {
-		return;
-	}
-	var inheritanceVariantMap = {};
-	if (theVcfData == null || theVcfData.features == null) {
-		return;
-	}
-	theVcfData.features.forEach( function(variant) {
-		if (variant.inheritance != null && variant.inheritance != '' && variant.inheritance != 'none') {
-			inheritanceVariantMap[variant.inheritance] = 'Y';
-		}
-	});
-	d3.selectAll(".inheritance").each( function(d,i) {
-		var inheritance = d3.select(this).attr("id");
-		var inheritancePresent = inheritanceVariantMap[inheritance];
-		d3.select(this).classed("inactive", inheritancePresent == null);
-	});
-*/
 }
 
 FilterCard.prototype.enableCoverageFilters = function() {
-	/*
-	$("#coverage-filter").removeClass("hide");
-	*/
 }
 
 
