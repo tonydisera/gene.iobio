@@ -131,6 +131,29 @@
     <div class="subheading level-basic level-edu">- Advanced filtering -</div>
 
 
+   <!-- Allele Frequency -->
+  <div>
+
+    <div style="width:335px;display: flex;flex-wrap: wrap;">
+
+      <div>
+        <h4>Allele Frequency</h4>
+
+        <div id="afhighest-range-filter" style="clear:both;text-align:left;margin-bottom:2px;">
+                <input type="number" id="af-amount-start" value="" style="width: 48px;margin-bottom: 1px;">
+                -
+                <input type="number" id="af-amount-end" value="" style="width: 48px;margin-bottom: 1px;">
+                %
+                <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+                Go
+                </a>
+        </div>
+      </div>
+      
+    </div>    
+        
+
+  </div>  
 
     <div style="display:flex;flex-direction:row;width:335px;justify-content:space-between">
      <!-- Inheritance -->
@@ -159,50 +182,11 @@
         
       </div>
 
-      <!-- VCF Record Filters -->
-      <div id="rec-filter-panel"  style="clear:both;margin-right:10px;width:150px">
-          <h4>
-              <span style="float:left;">VCF Filter status </span> 
-              <a id="vcf-filter-status-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="What is this field?">
-                <span id="vcf-filter-status-help-icon" class="material-icons">help</span> 
-              </a>         
-
-              <div id="vcf-filter-status-info" class="collapse" aria-expanded="false">
-                The 'Filter status' is a tag set by filtering software to explain the result of
-                filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
-                recommended to display variants marked with 'PASS' if present. Often, if some variants
-                are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
-                For more detailed information, with examples, see the blog post on 'Filter status'.
-              </div>          
-
-          </h4>
-          <div style="clear:both;">
-              <div id="rec-filter-box" style="display:flex;flex-direction:column"></div>
-          </div>
-      </div>
-
-
-     <!-- Coverage -->
-      <div >
-        
-        <h4 >
-          Coverage (minimum)
-        </h4>
-
-        <!-- coverage -->  
-        <div id="coverage-filter" style="text-align:left;" >
-          
-          <input type="number" id="coverage-min" value="" style="width:40px;margin-bottom:1px">
-          X
-          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
-          Go
-          </a>
-        </div>
-
-
-      </div>
+    
 
     </div>
+
+
 
     <!-- Present in affected / absent in unaffected -->
     <div style="display:flex;flex-direction:column;width:335px;justify-content:flex-start;margin-bottom:5px">
@@ -219,6 +203,8 @@
         <div id="absent-in-unaffected" class="hide" style="display:flex;flex-direction:row;flex-wrap:wrap;">
         </div>
     </div>
+
+
 
 
   <!-- Generic annotations -->
@@ -382,125 +368,6 @@
     </div>
 
    
-   <!-- Allele Frequency -->
-  <div>
-
-  <div style="width:335px;display: flex;flex-wrap: wrap;">
-
-          <div class="afexaclevel-panel" style="display: flex;flex-direction: column;flex-wrap: wrap;width: 150px;">
-
-
-            <h4>
-        Allele Frequency ExAC
-      </h4><svg id="afexac_unique" class="afexaclevels" width="70" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">private</text>
-                <g class=" afexac_unique">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(199, 0, 1);"></use>
-                </g>
-              </svg><svg id="afexac_uberrare" class="afexaclevels" width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; .01%</text>
-                <g class=" afexac_uberrare">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgba(204, 28, 29, 0.79);"></use>
-                </g>
-              </svg><svg id="afexac_superrare" class="afexaclevels" width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; .1%</text>
-                <g class=" afexac_superrare">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgba(255, 44, 0, 0.76);"></use>
-                </g>
-              </svg><svg id="afexac_rare" class="afexaclevels" width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; 1%</text>
-                <g class=" afexac_rare">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(247, 138, 31);"></use>
-                </g>
-              </svg><svg id="afexac_uncommon" class="afexaclevels" width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; 5%</text>
-                <g class=" afexac_uncommon">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(224, 195, 128);"></use>
-                </g>
-              </svg><svg id="afexac_common" class="afexaclevels" width="60" height="17" transform="translate(0,0)">
-                <g class=" af_common">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(189,189,189);"></use>
-                </g>
-                <text class="name" style="fill-opacity: 1;" x="20" y="11">&gt; 5%</text>
-              </svg><svg id="afexac_unique_nc" class="afexaclevels" width="110" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">n/a (noncoding)</text>
-                <g transform="translate(0,3)" class=" afexac_unique_nc">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill:none;stroke: #6b6666;"></use>
-                </g>
-              </svg>
-
-            
-
-          <div id="afexac-range-filter" style="clear:both;text-align:left;margin-bottom:2px;">
-            <input type="number" id="af-amount-start" value="" style="width: 38px;margin-bottom: 1px;">
-            -
-            <input type="number" id="af-amount-end" value="" style="width: 38px;margin-bottom: 1px;">
-            %
-            <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
-            Go
-            </a>
-          </div></div>
-
-          <div class="af1000glevel-panel " style="display: flex;flex-direction: column;flex-wrap: wrap;float: left;width: 140px;align-items: flex-start;">
-
-          <h4>
-            Allele Frequency 1000G
-          </h4>
-              <svg id="af1000g_unique" class="af1000glevels  " width="70" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">private</text>
-                <g class=" af1000g_unique">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(199, 0, 1);"></use>
-                </g>
-              </svg><svg id="af1000g_uberrare" class="af1000glevels  " width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; .01%</text>
-                <g class=" af1000g_uberrare">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(215, 75, 76);"></use>
-                </g>
-              </svg><svg id="af1000g_superrare" class="af1000glevels  " width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; .1%</text>
-                <g class=" af1000g_superrare">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(255, 94, 61);"></use>
-                </g>
-              </svg><svg id="af1000g_rare" class="af1000glevels  " width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; 1%</text>
-                <g class=" af1000g_rare">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(247, 138, 31);"></use>
-                </g>
-              </svg><svg id="af1000g_uncommon" class="af1000glevels  " width="60" height="17" transform="translate(0,0)">
-                <text class="name" x="20" y="11" style="fill-opacity: 1;">&lt; 5%</text>
-                <g class=" af1000g_uncommon">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="12" height="12" style="fill: rgb(224, 195, 128);"></use>
-                </g>
-              </svg><svg id="af1000g_common" class="af1000glevels" width="60" height="17" transform="translate(0,0)">
-                <g class=" af1000g_common">
-                  <use xmlns:xlink="http://www.w4.org/1999/xlink" xlink:href="#af-symbol" width="18" height="12" style="fill: rgb(189, 189, 189);"></use>
-                </g>
-                <text class="name" style="fill-opacity: 1;" x="20" y="11">&gt; 5%</text></svg>
-
-            
-          <div id="af1000g-range-filter" style="clear:both;text-align:left;margin-bottom:2px;margin-top: 18px;">
-            <input type="number" id="af-amount-start" value="" style="width: 38px;margin-bottom: 1px;">
-            -
-            <input type="number" id="af-amount-end" value="" style="width: 38px;margin-bottom: 1px;">
-            %
-            <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
-            Go
-            </a>
-          </div></div> 
-          
-
-          <!-- allele freq range -->
-          
-      </div>    
-      
-
-  </div>
-
-
-
-
-
-
 
      <!-- PolyPhen and SIFT  -->
     <div style="display:flex;flex-direction:row;justify-content:space-between;width:300px">
@@ -666,6 +533,53 @@
 
     </div>
 
+    <div style="display:flex;flex-direction:row;width:335px;justify-content:space-between">
+
+
+      <!-- VCF Record Filters -->
+      <div id="rec-filter-panel"  style="clear:both;margin-right:10px;width:150px">
+          <h4>
+              <span style="float:left;">VCF Filter status </span> 
+              <a id="vcf-filter-status-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="What is this field?">
+                <span id="vcf-filter-status-help-icon" class="material-icons">help</span> 
+              </a>         
+
+              <div id="vcf-filter-status-info" class="collapse" aria-expanded="false">
+                The 'Filter status' is a tag set by filtering software to explain the result of
+                filters applied to each variant in the VCF file prior to loading into gene.iobio. It is
+                recommended to display variants marked with 'PASS' if present. Often, if some variants
+                are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
+                For more detailed information, with examples, see the blog post on 'Filter status'.
+              </div>          
+
+          </h4>
+          <div style="clear:both;">
+              <div id="rec-filter-box" style="display:flex;flex-direction:column"></div>
+          </div>
+      </div>
+
+
+     <!-- Coverage -->
+      <div >
+        
+        <h4 >
+          Coverage (minimum)
+        </h4>
+
+        <!-- coverage -->  
+        <div id="coverage-filter" style="text-align:left;" >
+          
+          <input type="number" id="coverage-min" value="" style="width:40px;margin-bottom:1px">
+          X
+          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+          Go
+          </a>
+        </div>
+
+
+      </div>
+
+    </div>
     <div style="display:flex;flex-direction:row;justify-content: space-between;width: 335px;">
 
 

@@ -3080,8 +3080,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		return me.filterKnownVariants(data, start, end, bypassRangeFilter);
 	}
 
-	var afFieldExac  = "afExAC";
-	var afField1000g = "af1000G";
+
 	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;
 	var effectField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'effect' : 'vepConsequence';
 
@@ -3133,18 +3132,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 		// Allele frequency Exac - Treat null and blank af as 0
-		var variantAf = d[afFieldExac] || 0;
-		var meetsAfExac = true;
-		if ($.isNumeric(filterObject.afMinExac) && $.isNumeric(filterObject.afMaxExac)) {
-			// Exclude n/a ExAC allele freq (for intronic variants, af=-100) from range criteria
-			meetsAfExac = (variantAf >= filterObject.afMinExac && variantAf <= filterObject.afMaxExac);
-		}
-		// Allele frequency 1000g - Treat null and blank af as 0
-		variantAf = d[afField1000g] || 0;
-		var meetsAf1000g = true;
-		if ($.isNumeric(filterObject.afMin1000g) && $.isNumeric(filterObject.afMax1000g)) {
-			// Exclude n/a 1000g allele freq (for intronic variants, af=-100) from range criteria
-			meetsAf1000g = (variantAf >= filterObject.afMin1000g && variantAf <= filterObject.afMax1000g);
+		var variantAf = d.afHighest && d.afHighest != "." ? d.afHighest : 0;
+		var meetsAf = true;
+		if ($.isNumeric(filterObject.afMin) && $.isNumeric(filterObject.afMax)) {
+			meetsAf = (variantAf >= filterObject.afMin && variantAf <= filterObject.afMax);
 		}
 
 		var meetsLoadedVsCalled = false;
@@ -3295,7 +3286,7 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 
-		return (!isHomRef || isGenotypeAbsent) && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled && passAffectedStatus;
+		return (!isHomRef || isGenotypeAbsent) && meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled && passAffectedStatus;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures, start, end);

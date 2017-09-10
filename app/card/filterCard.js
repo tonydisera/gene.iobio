@@ -1,13 +1,17 @@
 function FilterCard() {
 	this.clickedAnnotIds = new Object();
 	this.annotsToInclude = new Object();
+
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
 	this.recFilters = new Object();
+	
 	this.annotationScheme = "vep";
 	this.pathogenicityScheme = "clinvar";
-	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .afexaclevels, .af1000glevels, .inheritance, .clinvar, .uasibs, .recfilter";
-	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Allele Freq ExAC, Allele Freq 1000G, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
+	
+	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity,  .inheritance, .clinvar, .uasibs, .recfilter";
+	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
+	
 	this.applyLowCoverageFilter = false;
 
 	// standard filters
@@ -222,22 +226,20 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 	var me = this;
 	me.clearFilters();
 	$(button).addClass('current');
+
+	+$('#afhighest-range-filter #af-amount-start').val(0);
+	+$('#afhighest-range-filter #af-amount-end').val(5);
+
 	var annots = null;
 	if (filterName == me.LOW_COVERAGE) {
 		me.applyLowCoverageFilter = true;
 	} else if (filterName == me.KNOWN_CAUSATIVE) {
 		annots = 	{
-			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
-			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
-			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			clinvar_path:     {key: 'clinvar',       label: "ClinVar",           state: true, value: 'clinvar_path',     valueDisplay: 'pathogenic'},
 			clinvar_lpath:    {key: 'clinvar',       label: "ClinVar",           state: true, value: 'clinvar_lpath',    valueDisplay: 'likely pathogenic'}
 		}
 	} else if (filterName == me.DENOVO) {
 		annots = 	{
-			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
-			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
-			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			denovo:           {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'denovo',           valueDisplay: 'de novo'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
 			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
@@ -246,9 +248,6 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 		}
 	} else if (filterName == me.RECESSIVE) {
 		annots = 	{
-			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
-			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
-			afexac_unique_nc: {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			recessive:        {key: 'inheritance',   label: "Inheritance mode",  state: true, value: 'recessive',        valueDisplay: 'recessive'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'HIGH',             valueDisplay: 'high'},
 			MODERATE:         {key: 'highestImpactVep',label: "VEP impact",      state: true, value: 'MODERATE',         valueDisplay: 'moderate'},
@@ -257,9 +256,6 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 		}
 	} else if (filterName == me.FUNCTIONAL_IMPACT) {
 		annots = 	{
-			af1000g_uncommon: {key: 'af1000glevels', label: "Allele Freq 1000G", state: true, value: 'af1000g_uncommon', valueDisplay: '< 5%'},
-			afexac_uncommon:  {key: 'afexaclevels',  label: "Allele Freq ExAC",  state: true, value: 'afexac_uncommon',  valueDisplay: '< 5%'},
-			afexac_unique_nc: {key: 'afexaclevels',    label: "Allele Freq ExAC",  state: true, value: 'afexac_unique_nc', valueDisplay: 'n/a'},
 			denovo:           {key: 'inheritance',     label: "Inheritance mode",  state: true, not: true, value: 'denovo',           valueDisplay: 'de novo'},
 			recessive:        {key: 'inheritance',     label: "Inheritance mode",  state: true, not: true, value: 'recessive',        valueDisplay: 'recessive'},
 			HIGH:             {key: 'highestImpactVep',label: "VEP impact",        state: true, value: 'HIGH',             valueDisplay: 'high'},
@@ -278,6 +274,8 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 			d3.select('#filter-track #' + key + "." + annot.key).classed("not-equal", true);
 		}
 	}
+
+
 }
 
 FilterCard.prototype.getFilterObject = function() {
@@ -285,9 +283,6 @@ FilterCard.prototype.getFilterObject = function() {
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
 	if (isLevelBasic) {
 		var annots = 	{
-			af1000g_rare:     {key: 'af1000glevels', state: true, value: 'af1000g_rare'},
-			exac_rare:        {key: 'afexaclevels',  state: true, value: 'afexac_rare'},
-			afexac_unique_nc: {key: 'afexaclevels',  state: true, value: 'afexac_unique_nc'},
 			clinvar_path:     {key: 'clinvar',       state: true, value: 'clinvar_path'},
 			clinvar_lpath:    {key: 'clinvar',       state: true, value: 'clinvar_lpath'},
 			clinvar_uc:       {key: 'clinvar',       state: true, value: 'clinvar_uc'},
@@ -298,23 +293,16 @@ FilterCard.prototype.getFilterObject = function() {
 		}
 		annots.PASS = {key: 'recfilter', state: true, value: 'PASS'};
 		
-		return { annotsToInclude: annots };
+		return { afMin: 0, afMax: .01, annotsToInclude: annots };
 	}
 
-	var afMinExac = $('#afexac-range-filter #af-amount-start').val() != '' ? +$('#afexac-range-filter #af-amount-start').val() / 100 : null;
-	var afMaxExac = $('#afexac-range-filter #af-amount-end').val()   != '' ? +$('#afexac-range-filter #af-amount-end').val()   / 100 : null;
-
-	var afMin1000g = $('#af1000g-range-filter #af-amount-start').val() != '' ? +$('#af1000g-range-filter #af-amount-start').val() / 100 : null;
-	var afMax1000g = $('#af1000g-range-filter #af-amount-end').val()   != '' ? +$('#af1000g-range-filter #af-amount-end').val()   / 100 : null;
-
-
+	var afMin = $('#afhighest-range-filter #af-amount-start').val() != '' ? +$('#afhighest-range-filter #af-amount-start').val() / 100 : null;
+	var afMax = $('#afhighest-range-filter #af-amount-end').val()   != '' ? +$('#afhighest-range-filter #af-amount-end').val()   / 100 : null;
 
 	return {
 		'coverageMin': +$('#coverage-min').val(),
-		'afMinExac': afMinExac,
-		'afMaxExac': afMaxExac,
-		'afMin1000g': afMin1000g,
-		'afMax1000g': afMax1000g,
+		'afMin': afMin,
+		'afMax': afMax,
 		'annotsToInclude': this.annotsToInclude,
 		'exonicOnly': $('#exonic-only-cb').is(":checked"),
 		'loadedVariants': $('#loaded-variants-cb').is(":checked"),
@@ -418,36 +406,16 @@ FilterCard.prototype.init = function() {
 	// listen for enter key on af amount input range
 	$('#af-amount-start').on('keydown', function() {
 		if(event.keyCode == 13) {
-			// We are filtering on range, so clear out the af level filters
-			me.resetAfFilters("af1000glevel");
-			me.resetAfFilters("afexaclevel");
-
 			window.filterVariants();
 	    }
 	});
 	$('#af-amount-end').on('keydown', function() {
 		if(event.keyCode == 13) {
-			// We are filtering on range, so clear out the af level filters
-			me.resetAfFilters("af1000glevel");
-			me.resetAfFilters("afexaclevel");
-
-
 			window.filterVariants();
 	    }
 	});
 	// listen for go button on af range
-	$('#afexac-range-filter #af-go-button').on('click', function() {
-		// We are filtering on range, so clear out the af level filters
-		me.resetAfFilters("af1000glevel");
-		me.resetAfFilters("afexaclevel");
-		me.clearCurrentStandardFilter();
-
-		window.filterVariants();
-	});
-	$('#af1000g-range-filter #af-go-button').on('click', function() {
-		// We are filtering on range, so clear out the af level filters
-		me.resetAfFilters("af1000glevel");
-		me.resetAfFilters("afexaclevel");
+	$('#afhighest-range-filter #af-go-button').on('click', function() {
 		me.clearCurrentStandardFilter();
 
 		window.filterVariants();
@@ -539,34 +507,7 @@ FilterCard.prototype.init = function() {
 
 
 	    });	    
-	   d3.selectAll('#afexac-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#afexac-scheme' ).classed("current", true);
-	    	d3.select('#af1000g-scheme' ).classed("current", false);
-
-	    	d3.selectAll(".afexaclevels").classed("nocolor", false);
-	    	d3.selectAll(".af1000glevels").classed("nocolor", true);
-
-	    	// De-select an af1000g filters
-	    	me.resetAfFilters("af1000glevel");
-	    	me.resetAfRange();
 	   
-	    	window.filterVariants();
-
-	    });
-	   d3.selectAll('#af1000g-scheme')
-	    .on("click", function(d) {
-	    	d3.select('#afexac-scheme' ).classed("current", false);
-	    	d3.select('#af1000g-scheme' ).classed("current", true);
-
-	    	d3.selectAll(".afexaclevels").classed("nocolor", true);
-	    	d3.selectAll(".af1000glevels").classed("nocolor", false);
-
-	    	me.resetAfFilters("afexaclevel");
-	    	me.resetAfRange();
-
-	    	window.filterVariants();
-	    });
 
 	    this.initFilterListeners();
 	  
@@ -617,14 +558,6 @@ FilterCard.prototype.initFilterListeners = function(filterSelector, theAnnotClas
 	  		}
 	  	});
 
-
-	  	// If af level clicked on, reset af range filter
-	  	if (d3.select(this).attr("class").indexOf("af1000glevel") || 
-	  		d3.select(this).attr("class").indexOf("afexaclevel")) {
-	  		if (on) {
-				me.resetAfRange();
-	  		}
-	  	}
 
 
 	  	// Remove from or add to list of clicked ids
@@ -693,8 +626,6 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .vepConsequence').classed('current', false);
 	d3.selectAll('#filter-track .impact').classed('current', false);
 	d3.selectAll('#filter-track .effect').classed('current', false);
-	d3.selectAll('#filter-track .af1000glevels').classed('current', false);
-	d3.selectAll('#filter-track .afexaclevels').classed('current', false);
 	d3.selectAll('#filter-track .type').classed('current', false);
 	d3.selectAll('#filter-track .zygosity').classed('current', false);
 	d3.selectAll('#filter-track .sift').classed('current', false);
@@ -705,10 +636,8 @@ FilterCard.prototype.clearFilters = function() {
 	d3.selectAll('#filter-track .inheritance').classed('not-equal', false);
 	d3.selectAll('#filter-track .regulatory').classed('current', false);
 	d3.selectAll('#filter-track .uasibs').classed('current', false);
-	$('#afexac-range-filter #af-amount-start').val("");
-	$('#afexac-range-filter #af-amount-end').val("");
-	$('#af1000g-range-filter #af-amount-start').val("");
-	$('#af1000g-range-filter #af-amount-end').val("");
+	$('#afhighest-range-filter #af-amount-start').val("");
+	$('#afhighest-range-filter #af-amount-end').val("");
 	$('#coverage-min').val('');
 	this.setExonicOnlyFilter(false);
 
@@ -719,28 +648,8 @@ FilterCard.prototype.clearFilters = function() {
 FilterCard.prototype.resetAfRange = function() {
 	$('#af-amount-start').val("");
 	$('#af-amount-end').val("");	
-
-	$("#af1000grange-flag").addClass("hide");
-	$("#afexacrange-flag").addClass("hide");
-
-
 }
 
-FilterCard.prototype.resetAfFilters = function(scheme) {
-	var me = this;
-
-	// De-select af level filters
-	d3.selectAll("." + scheme).classed("current", false);
-
-	d3.selectAll("." + scheme).each(function(d,i) {
-		var id = d3.select(this).attr("id");
-		me.clickedAnnotIds[id] = false;
-  		me.annotsToInclude[id] = {'key':   scheme, 
-									'value': id,  
-									'state': false};
-
-	});
-}
 
 FilterCard.prototype.enableFilters = function() {
 	d3.selectAll(".impact").each( function(d,i) {		
@@ -771,12 +680,6 @@ FilterCard.prototype.enableFilters = function() {
 		d3.select(this).classed("inactive", false);
 	});
 	d3.selectAll(".regulatory").each( function(d,i) {		
-		d3.select(this).classed("inactive", false);
-	});
-	d3.selectAll(".afexaclevels").each( function(d,i) {		
-		d3.select(this).classed("inactive", false);
-	});
-	d3.selectAll(".af1000glevels").each( function(d,i) {		
 		d3.select(this).classed("inactive", false);
 	});
 	d3.selectAll(".inheritance").each( function(d,i) {		
@@ -1148,14 +1051,9 @@ FilterCard.prototype._getFilterString = function() {
 		filterString += AND(filterString) + filterBox("not intronic");
 	}
 
-	if (filterObject.afMinExac != null && filterObject.afMaxExac != null) {
-		if (filterObject.afMinExac >= 0 && filterObject.afMaxExac < 1) {
-			filterString += AND(filterString) + filterBox("ExAC allele frequency between " + filterObject.afMinExac + " and  " + filterObject.afMaxExac);
-		}
-	}
-	if (filterObject.afMin1000g != null && filterObject.afMax1000g != null) {
-		if (filterObject.afMin1000g >= 0 && filterObject.afMax1000g < 1) {
-			filterString += AND(filterString) + filterBox("1000g allele frequency between " + filterObject.afMin1000g + " and  " + filterObject.afMax1000g);
+	if (filterObject.afMin != null && filterObject.afMax != null) {
+		if (filterObject.afMin >= 0 && filterObject.afMax < 1) {
+			filterString += AND(filterString) + filterBox("Allele freqency between " + filterObject.afMin + " and  " + filterObject.afMax);
 		}
 	}
 
@@ -1290,11 +1188,8 @@ FilterCard.prototype.classifyByImpact = function(d) {
     for (key in d.regulatory) {
     	regulatory += " " + key;		
     }
-
-    var af1000g = Object.keys(d.af1000glevels).join(" ");
-    var afexac = Object.keys(d.afexaclevels).join(" ");
 	
-	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + (d.inheritance ? d.inheritance.toLowerCase() : "") + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory +  ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + (d.inheritance ? d.inheritance.toLowerCase() : "") + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory +  ' ' + FilterCard.getRecFilterClazz(d) + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
 }
 
 FilterCard.getRecFilterClazz = function(variant) {
@@ -1342,12 +1237,8 @@ FilterCard.prototype.classifyByEffect = function(d) {
     for (key in d.regulatory) {
     	regulatory += " " + key;		
     }
-
-    var af1000g = Object.keys(d.af1000glevels).join(" ");
-    var afexac = Object.keys(d.afexaclevels).join(" ");
-
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d)  + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
 }
 
 
@@ -1387,20 +1278,14 @@ FilterCard.prototype.classifyByZygosity = function(d) {
     for (key in d.regulatory) {
     	regulatory += " " + key;		
     }
-    var af1000g = Object.keys(d.af1000glevels).join(" ");
-    var afexac = Object.keys(d.afexaclevels).join(" ");
-
     
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+ d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+ d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' '  + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
 }
 
 
 FilterCard.prototype.classifyByClinvar = function(d) {
 	
-    var af1000g = Object.keys(d.af1000glevels).join(" ");
-    var afexac = Object.keys(d.afexaclevels).join(" ");
-	
-	return  'variant ' + d.type.toLowerCase()  +  ' ' + afexac + ' ' + af1000g + ' ' + d.clinvar + ' colorby_' + d.clinvar; 
+	return  'variant ' + d.type.toLowerCase()  +  ' '  + d.clinvar + ' colorby_' + d.clinvar; 
 }
 
 
