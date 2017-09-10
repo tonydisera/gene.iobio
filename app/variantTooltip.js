@@ -651,8 +651,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
 	var gnomADAfRow = "";
-	var gnomADAfRowWide = "";
-	if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37") {
+	var gnomADAfRowWide = "";	
+	if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37" && variant.vepAf.gnomAD.hasOwnProperty("AF")) {
 		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "n/a" : percentage(variant.vepAf.gnomAD.AF)), '6px')
 		var af   =  variant.vepAf.gnomAD.AF == "." ? "n/a" : percentage(variant.vepAf.gnomAD.AF);
 		var link =  "<a target='_gnomad' href='http://gnomad.broadinstitute.org/variant/" + variant.chrom + "-" + variant.start + "-" + variant.ref + "-" + variant.alt + "'>" + af + "</a>";
