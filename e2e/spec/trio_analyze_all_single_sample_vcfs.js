@@ -67,7 +67,7 @@ module.exports = {
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
 
   },
-/*
+
 
   'Click denovo inheritance (custom) filter': function(client) {
     nav.clickFilter();
@@ -194,7 +194,7 @@ module.exports = {
     fatherVariantCard.assertLowCoverageGlyphCountEquals(9);
   },
 
-*/
+
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
 
     filterPanel.clickClearAll();
@@ -234,6 +234,7 @@ module.exports = {
     tooltip.selector = tooltip.PROBAND_TOOLTIP;
     probandVariantCard.clickCalledVariantSymbol(".snp.het.denovo.sift_tolerated.polyphen_benign.clinvar_lpath");
     client.pause(2000);
+    tooltip.selector = tooltip.PROBAND_TOOLTIP;
     evaluateTooltip(tooltip);
     tooltip.clickUnpin();
 

@@ -64,15 +64,10 @@ module.exports = {
     matrixTrack.assertMostSevereImpactModifier([14, 15, 16]);
   },
 
-  'Allele Frequency ExAC row should be accurate': function(client) {
-    matrixTrack.assertAfexacCommon([1, 2, 3, 4, 14, 15, 16]);
-    matrixTrack.assertAfexacUniqueNc([5, 6, 7, 8, 9, 10, 11, 12, 13]);
+  'Allele Frequency <5% row should be accurate': function(client) {
+    matrixTrack.assertAfHighest([5]);
   },
 
-  'Allele Frequency 1000G row should be accurate': function(client) {
-    matrixTrack.assertAf1000gCommon([1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
-    matrixTrack.assertAf1000gUnique([5]);
-  },
 
   'Warning appears when no variants passing filter a gene': function(client) {
     nav.clickFilter();

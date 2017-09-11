@@ -142,7 +142,7 @@ module.exports = {
       theTooltip.expectInheritanceEquals('de novo inheritance');
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
-      theTooltip.expectClinvarSpan('likely pathogenic');
+      theTooltip.expectClinvar('likely pathogenic');
       theTooltip.expectClinvarClinSig('cardiomyopathy', 'Cardiomyopathy');
       theTooltip.expectPolyphen('benign');
       theTooltip.expectSIFT('tolerated');
