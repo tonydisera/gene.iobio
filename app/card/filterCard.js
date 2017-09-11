@@ -9,7 +9,7 @@ function FilterCard() {
 	this.annotationScheme = "vep";
 	this.pathogenicityScheme = "clinvar";
 	
-	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity,  .inheritance, .clinvar, .uasibs, .recfilter";
+	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .inheritance, .clinvar, .uasibs, .recfilter";
 	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
 	
 	this.applyLowCoverageFilter = false;
