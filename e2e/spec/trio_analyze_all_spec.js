@@ -57,7 +57,7 @@ module.exports = {
     client.pause(1000);
     
     filterPanel.clickInheritanceDenovo();
-    client.pause(1000);
+    client.pause(2000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
   
@@ -67,7 +67,7 @@ module.exports = {
     client.pause(1000);
 
     filterPanel.clickKnownCausative();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertKnownCausativeCounts(1,1);
     appTitleSection.assertAnalyzeAllCounts(1,4,1,4);
 
@@ -76,7 +76,7 @@ module.exports = {
   'De novo VUS filter': function(client) {
 
     filterPanel.clickDenovoVus();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertDenovoVusCounts(2,0);
     appTitleSection.assertAnalyzeAllCounts(2,3,0,5);
 
@@ -84,7 +84,7 @@ module.exports = {
   'Recessive VUS filter': function(client) {
 
     filterPanel.clickRecessiveVus();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertRecessiveVusCounts(0,0);
     appTitleSection.assertAnalyzeAllCounts(0,5,0,5);
 
@@ -92,7 +92,7 @@ module.exports = {
   'High or Moderate Impact filter': function(client) {
 
     filterPanel.clickHighOrModerateImpact();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertHighOrModerateImpactCounts(1,0);
     appTitleSection.assertAnalyzeAllCounts(1,4,0,5);
 
@@ -102,10 +102,10 @@ module.exports = {
   'Clear filter and click denovo inheritance (custom) filter': function(client) {
     client.pause(1000);
     filterPanel.clickClearAll();
-    client.pause(1000);
+    client.pause(2000);
     
     filterPanel.clickInheritanceDenovo();
-    client.pause(1000);
+    client.pause(2000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
   
@@ -114,7 +114,7 @@ module.exports = {
   'Low gene coverage filter': function(client) {
 
     filterPanel.clickLowCoverage();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertLowCoverageCounts(2,2);
     appTitleSection.assertAnalyzeAllCounts(2,3,2,3);
 
@@ -123,7 +123,7 @@ module.exports = {
 
     filterPanel.clickClearAll();
     filterPanel.assertKnownCausativeCounts(1,1);
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertDenovoVusCounts(2,0);
     filterPanel.assertRecessiveVusCounts(0,0);
     filterPanel.assertHighOrModerateImpactCounts(1,0);
@@ -135,14 +135,14 @@ module.exports = {
 
   'Click on AIRE and validate recfilter . (unassigned) counts': function(client) {
     nav.clickFilter();
-    client.pause(1000);   
+    client.pause(2000);   
 
     nav.searchGene('AIRE');
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
     filterPanel.clickRecfilterUnassigned();
-    client.pause(1000);
+    client.pause(2000);
     probandVariantCard.assertLoadedVariantSymbolCountEquals('4');
 
   },
@@ -153,7 +153,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('AIRE');
     
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
@@ -162,7 +162,7 @@ module.exports = {
 
     nav.searchGene('PDHA1');
     
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
@@ -179,7 +179,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('MYLK2');
     
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertLoadedVariantCountEquals(2);
     probandVariantCard.assertCalledVariantCountEquals(1);

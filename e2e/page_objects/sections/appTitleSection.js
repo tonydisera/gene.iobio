@@ -21,7 +21,7 @@ module.exports = {
       this.waitForElementPresent('@analyzeAllDone', 120000);
     },
     waitForCallAllDone: function() {
-      this.waitForElementPresent('@callAllDone', 120000);
+      this.waitForElementPresent('@callAllDone', 240000);
     },
     clickRemoveAll: function() {
       return this.click('@removeAll');
