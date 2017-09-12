@@ -122,11 +122,11 @@ CacheIndexStore.prototype.getAllKeys = function(callback) {
 	    getKeys.onsuccess = function() {
 	    	allKeys = allKeys.concat(keys);
 	    	count++;
-	    	if (count == Object.keys(me.objectStores) {
+	    	if (count == Object.keys(me.objectStores).length) {
 		    	if (callback) {
 		    		callback(getKeys.result);
 		    	}
-	    	})
+	    	}
 	    };
 	}
 }
