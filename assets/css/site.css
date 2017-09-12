@@ -221,6 +221,12 @@ h5 {
   outline-offset: 4px !important;
   outline-width: 2px !important; }
 
+.attention-warning {
+  outline-color: #03a9f4 !important;
+  outline-style: solid !important;
+  outline-offset: 4px !important;
+  outline-width: 2px !important; }
+
 .navbar-nav .attention {
   outline-offset: -6px;
   outline-width: 6px; }
@@ -408,6 +414,9 @@ i.material-icons {
   .alert.alert-info {
     background-color: transparent;
     color: #717171; }
+  .alert.alert-warning {
+    background-color: #03a9f4;
+    color: rgba(255, 255, 255, 0.84); }
 
 .alert-dismissable .close, .alert-dismissible .close {
   position: relative;

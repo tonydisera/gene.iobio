@@ -17,26 +17,29 @@ CacheHelper.prototype.isolateSession = function() {
 
 CacheHelper.prototype.checkCacheSize = function() {
 	var counts = this.getCacheSize(false);
-	if (counts.other > 0 || counts.otherApp > 0) {
+	$('#cache-alert1').addClass("hide");
+	$("#other-app-cache-panel").removeClass("attention");
+
+	$('#cache-alert2').addClass("hide");
+	$("#other-cache-panel").removeClass("attention-warning");
+
+	if (counts.other > 0) {
 		cacheHelper.openDialog();
-		$('#cache-alert').removeClass("hide");
+		$('#cache-alert2').removeClass("hide");
+		$("#other-cache-panel").addClass("attention-warning");
+		$("#other-cache-detail-link").attr("aria-expanded", true);
+		$("#other-cache-detail").attr("aria-expanded", true);
+		$("#other-cache-detail").addClass("in");
+	} 
 
-		if (counts.other > 0) {
-			$("#other-cache-panel").addClass("attention");
-		} else {
-			$("#other-cache-panel").removeClass("attention");
-		}
-
-		if (counts.otherApp > 0) {
-			$("#other-app-cache-panel").addClass("attention");
-		} else {
-			$("#other-app-cache-panel").removeClass("attention");
-		}
-	} else {
-		$('#cache-alert').addClass("hide");	
-		$("#other-cache-panel").removeClass("attention");
-		$("#other-app-cache-panel").removeClass("attention");	
-	}
+	if (counts.otherApp > 0) {
+		cacheHelper.openDialog();
+		$('#cache-alert1').removeClass("hide");
+		$("#other-app-cache-panel").addClass("attention");
+		$("#other-app-cache-detail-link").attr("aria-expanded", true);
+		$("#other-app-cache-detail").attr("aria-expanded", true);
+		$("#other-app-cache-detail").addClass("in");
+	} 
 }
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
@@ -998,6 +1001,10 @@ CacheHelper.prototype.clearCacheItem = function(key) {
 
 CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther, clearOtherApp) {
 	var me = this;
+	var clearCurrentSessionCache = false;
+	if (launchTimestampToClear == me.launchTimestamp) {
+		clearCurrentSessionCache = true;
+	}
 	var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
 	if (localStorage) {
 		//CacheHelper._logCacheSize();
@@ -1023,18 +1030,22 @@ CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther,
 		keysToRemove.forEach( function(key) {
 			localStorage.removeItem(key);			
 		})
-		window.gene = null;
-		genesCard._hideCurrentGene();
+		if (clearCurrentSessionCache) {
+			window.gene = null;
+			genesCard._hideCurrentGene();
 
-		filterCard.clearFilters();
-		if (window.variantCards && window.variantCards.length > 0) {
-			filterVariants();
+			filterCard.clearFilters();
+			if (window.variantCards && window.variantCards.length > 0) {
+				filterVariants();
+			}
+			filterCard.resetStandardFilterCounts();
+
+			me.hideAnalyzeAllProgress();			
 		}
-		filterCard.resetStandardFilterCounts();
 
-		me.hideAnalyzeAllProgress();
-		//CacheHelper._logCacheSize();
-		//CacheHelper._logCacheContents();
+		if (clearOther || clearOtherApp) {
+			me.checkCacheSize();
+		}
 	}
 }
 
@@ -1057,7 +1068,7 @@ CacheHelper.prototype.clearAll = function() {
 CacheHelper.prototype.clearOther = function() {
 	var me = this;
 	// confirm dialog
-	alertify.confirm("Clear all cached data for other gene.iobio sessions?  IMPORTANT: Save any gene.iobio analysis in other browser tabs before clearing the cache.", function (e) {
+	alertify.confirm("Clear all cached data for other gene.iobio sessions?  IMPORTANT: To save analysis, bookmark any variants of interest in other browser tabs before clearing the cache.", function (e) {
 	    if (e) {
 			// user clicked "ok"
 			me._clearCache(null, true, false);
