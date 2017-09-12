@@ -64,7 +64,7 @@ CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCount
 	me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
 
 
-	if (me.showCallAllProgress) {
+	if (me.showCallAllProgress && (counts.called.analyzed > 0 || counts.called.error > 0) ) {
 		me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
 	} else {
 		$('#called-progress-bar').addClass("hide");			
