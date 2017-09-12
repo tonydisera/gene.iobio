@@ -776,6 +776,9 @@ var Bam = Class.extend({
     
     var tabixArgs = ['-h', clinvarUrl, regionParm];
     var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL});
+
+    cmd = cmd.pipe(IOBIO.vt, ['view', '-f', '\"INFO.CLNSIG=~\'5|4\'\"', '-'], {ssl: useSSL});
+
     
     return cmd;
   },
