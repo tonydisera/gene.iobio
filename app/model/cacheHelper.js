@@ -207,8 +207,10 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 }
 
 CacheHelper.prototype.hideAnalyzeAllProgress = function() {
-	$("#analyze-all-progress").addClass("hide");
 	$("#analyze-all-progress .bar").css("width", "0%");	
+
+	$("#call-all-progress .bar").css("width", "0%");	
+	$("#call-all-progress #not-analyzed-bar").text("");	
 }
 
 
