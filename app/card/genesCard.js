@@ -282,6 +282,10 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 
 }
 
+GenesCard.prototype.setOrderBy = function(sortBy) {
+	$('#select-gene-sort')[0].selectize.setValue(sortBy);
+}
+
 GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 	this.sortedGeneNames = null;
 	if (sortBy == null) {

@@ -848,12 +848,14 @@ FilterCard.prototype.filterGenes = function(callback) {
 	// After the filter has been applied to the current gene's variants,
 	// refresh all of the gene badges based on the filter
 	if (me.applyLowCoverageFilter) {
+		genesCard.setOrderBy(genesCard.LOW_COVERAGE_OPTION);
 		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
 		cacheHelper.showGeneCounts(geneCounts);	
 		if (callback) {
 			callback();
 		}
 	} else {
+		genesCard.setOrderBy(genesCard.HARMFUL_VARIANTS_OPTION);
 		var geneCounts = cacheHelper.refreshGeneBadges(function() {
 			cacheHelper.showAnalyzeAllProgress();	
 			if (callback) {
