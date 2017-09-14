@@ -175,14 +175,13 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			}
 		}	
 
-		if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
+		if (variant.clinvarSubmissions && variant.clinvarSubmissions.length > 0) {
 			var clinsigUniq = {};
-			for (var key in variant.clinvarSubmissions) {
-				var submission = variant.clinvarSubmissions[key];
+			variant.clinvarSubmissions.forEach(function(submission) {
 				submission.clinsig.split(",").forEach(function(clinsig) {
 					clinsigUniq[clinsig] = "";
 				})
-			}
+			})
 			for (var clinsig in clinsigUniq) {
 				injectClinvarBadge(clinsig, clinsig, 'translate(0,0)');
 			}
@@ -197,10 +196,10 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 
 
 
-		if (variant.clinvarSubmissions && Object.keys(variant.clinvarSubmissions).length > 0) {
-			for (var key in variant.clinvarSubmissions) {
-				var submission = variant.clinvarSubmissions[key];
-				injectClinvarBadge(submission.clinsig, key);
+		if (variant.clinvarSubmissions && variant.clinvarSubmissions.length > 0) {
+			for (var idx = 0; idx < variant.clinvarSubmissions.length; idx++) {
+				var submission = variant.clinvarSubmissions[idx];
+				injectClinvarBadge(submission.clinsig, idx.toString());
 			}
 		} else if (variant.clinVarClinicalSignificance) {
 		    for (clinsig in variant.clinVarClinicalSignificance) {
@@ -350,6 +349,13 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			impactDisplay += key;
 		}
 	} 
+
+	var coord = variant.chrom + ":" + variant.start;
+	var refalt = variant.ref + "->" + variant.alt;
+	if (variant.ref == '' && variant.alt == '') {
+		refalt = '(' + variant.len + ' bp)';
+	}
+
 	var clinSigDisplay = "";
 	for (var key in variant.clinVarClinicalSignificance) {
 		if (key != 'none' && key != 'undefined' ) {
@@ -372,12 +378,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		}
 	} 
 
-	//var coord = variant.start + (variant.end > variant.start+1 ?  '-' + variant.end : "");
-	var coord = variant.chrom + ":" + variant.start;
-	var refalt = variant.ref + "->" + variant.alt;
-	if (variant.ref == '' && variant.alt == '') {
-		refalt = '(' + variant.len + ' bp)';
-	}
 
 	var clinvarUrl = "";
 	var clinvarLink = "";
@@ -405,12 +405,18 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay, null, 'tooltip-clinvar-pheno');		
 			}
 
-		} else if (variant.clinvarSubmissions != null && Object.keys(variant.clinvarSubmissions).length > 0) {
+		} else if (variant.clinvarSubmissions != null && variant.clinvarSubmissions.length > 0) {
 			phenotypeDisplay = "";
-			for (var key in variant.clinvarSubmissions) {
-				var submission = variant.clinvarSubmissions[key];
+			var simplePhenotypeDisplay = "";
+			var clinsigUniq = {};
+			for (var idx = 0; idx < variant.clinvarSubmissions.length; idx++) {
+				var submission = variant.clinvarSubmissions[idx];
 
-				clinvarLink += "<div style='clear:both' class='tooltip-clinsig-link" + key + "'>";
+				submission.clinsig.split(",").forEach(function(clinsig) {
+					clinsigUniq[clinsig] = "";					
+				})
+
+				clinvarLink += "<div style='clear:both' class='tooltip-clinsig-link" + idx.toString() + "'>";
 
 				var accessions = submission.accession.split(",");
 				var clinsigs   = submission.clinsig.split(",");
@@ -421,26 +427,18 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
 					clinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
 				}	
-				clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype + '</span>';
-
-				if (submission.phenotype != 'not_provided' || submission.phenotype != "not_specified") {
-					if (phenotypeDisplay.length > 0) {
-						phenotypeDisplay += ", ";
+				if (submission.phenotype != 'not_provided' && submission.phenotype != "not_specified") {
+					clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype.split("_").join(" ") + '</span>';
+					if (simplePhenotypeDisplay.length > 0) {
+						simplePhenotypeDisplay += ", ";
 					}
-					phenotypeDisplay += submission.phenotype;					
+					simplePhenotypeDisplay += submission.phenotype.split("_").join(" ");
 				}
 
 				clinvarLink += "</div>"
-			}
+			};
 
 			var clinsigSummary = "";
-			var clinsigUniq = {};
-			for (var key in variant.clinvarSubmissions) {
-				var submission = variant.clinvarSubmissions[key];
-				submission.clinsig.split(",").forEach(function(clinsig) {
-					clinsigUniq[clinsig] = "";					
-				})
-			}	
 			for (var clinsig in clinsigUniq) {
 				var style = 'display:inline-block;'
 				if (clinsigSummary.length > 0) {
@@ -451,7 +449,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				clinsigSummary += "</span>";
 			}	
 			clinvarSimpleRow1 = me._tooltipSimpleClinvarSigRow('ClinVar', clinsigSummary );	
-			clinvarSimpleRow2 = me._tooltipHeaderRow(phenotypeDisplay, '', '', '', '', null, 'style=padding-top:0px');	
+			clinvarSimpleRow2 = me._tooltipHeaderRow(simplePhenotypeDisplay, '', '', '', '', null, 'style=padding-top:0px');	
 		} else {
 			clinvarLink = clinSigDisplay;
 		}		

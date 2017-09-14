@@ -2249,7 +2249,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
   var me = this;
 
   var result = {
-    clinvarSubmissions: {},
+    clinvarSubmissions: [],
     clinVarClinicalSignificance: {},
     clinVarPhenotype:  {},
     clinVarAccession: {},
@@ -2258,13 +2258,11 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
   }
 
 
-  var getClinvarSubmission = function(clinvarSubmissions, idx) {
-    var entry = clinvarSubmissions[idx.toString()];
-    if (entry == null) {
-      entry = { clinsig: "", phenotype: "", accession: "" };
-      clinvarSubmissions[idx.toString()] = entry;
+  var initClinvarSubmissions = function(clinvarSubmissions, length) {
+    for (var i = 0; i < length; i++) {
+      var entry = { clinsig: "", phenotype: "", accession: "" };
+      clinvarSubmissions.push(entry);
     }
-    return entry;
   }
 
 
@@ -2273,9 +2271,11 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
     if (annotToken.indexOf("CLNSIG=") == 0) {
       var clinvarCode = annotToken.substring(7, annotToken.length);  
 
+      initClinvarSubmissions(result.clinvarSubmissions, clinvarCode.split("|").length);
+
       var idx = 0;
       clinvarCode.split("|").forEach(function(codePart) {
-        var submission = getClinvarSubmission(result.clinvarSubmissions, idx);
+        var submission = result.clinvarSubmissions[idx];
 
         codePart.split(",").forEach(function(code) {
 
@@ -2302,7 +2302,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
       var idx = 0;
       phenotypesStr.split("|").forEach(function(pheno) {
         
-        var submission = getClinvarSubmission(result.clinvarSubmissions, idx);
+        var submission = result.clinvarSubmissions[idx];
         submission.phenotype = pheno;
 
         result.clinVarPhenotype[pheno] = idx.toString();
@@ -2313,7 +2313,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
       var idx = 0;
       accessionIds.split("|").forEach(function(accessionId) {
 
-        var submission = getClinvarSubmission(result.clinvarSubmissions, idx);
+        var submission = result.clinvarSubmissions[idx];
         submission.accession = accessionId;
 
           result.clinVarAccession[accessionId] = idx.toString();
