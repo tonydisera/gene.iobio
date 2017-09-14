@@ -31,7 +31,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		if (lock) {
 			html = variantTooltip.formatContent(variant, null, 'tooltip-wide');
 		} else {	
-			var pinMessage = variantCard ? "click on variant to pin tooltip" : "click on column to pin tooltip";
+			var pinMessage = variantCard ? "click on variant for more details" : "click on column for more details";
 			html = variantTooltip.formatContent(variant, pinMessage, null, null, null, null, variantCard);
 		}		
 	}
@@ -842,7 +842,7 @@ VariantTooltip.prototype.variantTooltipMinimalHTML = function(variant) {
 
 VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 	if (pinMessage == null) {
-		pinMessage = 'Click on variant to pin tooltip';
+		pinMessage = 'Click on variant for more details';
 	}
 
 
@@ -861,13 +861,13 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 		if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
 			return '<div class="row tooltip-footer">'
 			  + '<div class="col-sm-8" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge + removeBookmarkLink  + '</div>'
-			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unpin</a>' + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">close</a>' + '</div>'
 			  + '</div>';
 
 		} else {
 			return '<div class="row tooltip-footer" style="">'
 			  + '<div class="col-sm-8" style="text-align:left;">' + bookmarkLink + '</div>'
-			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">unpin</a>' + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">close</a>' + '</div>'
 			  + '</div>';
 
 		}
