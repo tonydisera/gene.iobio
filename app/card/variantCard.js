@@ -1144,7 +1144,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		if (me.isViewable()) {
 			me.cardSelector.find('.vcfloader').removeClass("hide");
 			var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
-			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with " + annotationEngines);
+			me.cardSelector.find('.vcfloader .loader-label').text(me.getRelationship() == "known-variants" ? "Accessing variants" : "Annotating variants with " + annotationEngines);
 			me.cardSelector.find("#region-flag").addClass("hide");			
 		}
 
