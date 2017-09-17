@@ -174,6 +174,11 @@ $(document).ready(function(){
 	// Compile handlebar templates, when all are loaded
 	// call init();
 	var promises = [];
+	promises.push(promiseLoadTemplate('templates/welcomePanelTemplate.hbs').then(function(compiledTemplate) {
+		welcomePanelTemplate = compiledTemplate;
+		welcomePanel.init();
+
+	}));
 	promises.push(promiseLoadTemplate('templates/dataCardEntryTemplate.hbs').then(function(compiledTemplate) {
 		dataCardEntryTemplate = compiledTemplate;
 	}));
@@ -228,9 +233,6 @@ $(document).ready(function(){
 	}));
 	promises.push(promiseLoadTemplate('templates/filterAffectedTemplate.hbs').then(function(compiledTemplate) {
 		filterAffectedTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/welcomePanelTemplate.hbs').then(function(compiledTemplate) {
-		welcomePanelTemplate = compiledTemplate;
 	}));
 	Promise.all(promises).then(function() {
 		// Initialize genomeBuild helper
@@ -316,7 +318,6 @@ function init() {
 		return;			
 	}
 
-	welcomePanel.init();
 
 	if (isMygene2) {
 		$('#intro').append(introTemplate());
