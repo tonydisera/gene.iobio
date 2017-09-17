@@ -371,7 +371,7 @@ function init() {
 		closeSlideLeft();
 	});
 
-	//initializeTours();
+	initializeTours();
 
     // Encapsulate logic for animate.css into a jquery function
     $.fn.extend({
