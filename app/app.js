@@ -27,6 +27,7 @@ var legendTemplate = null;
 var navbarTemplate = null;
 var modalsTemplate = null;
 var filterAffectedTemplate = null;
+var welcomePanelTemplate = null;
 
 // The selected (sub-) region of the gene.  Null
 // when there is not an active selection.
@@ -97,6 +98,8 @@ var variantTooltip = new VariantTooltip();
 
 // matrix card
 var matrixCard = new MatrixCard();
+
+var welcomePanel = new WelcomePanel();
 
 
 
@@ -226,7 +229,9 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/filterAffectedTemplate.hbs').then(function(compiledTemplate) {
 		filterAffectedTemplate = compiledTemplate;
 	}));
-
+	promises.push(promiseLoadTemplate('templates/welcomePanelTemplate.hbs').then(function(compiledTemplate) {
+		welcomePanelTemplate = compiledTemplate;
+	}));
 	Promise.all(promises).then(function() {
 		// Initialize genomeBuild helper
 		genomeBuildHelper = new GenomeBuildHelper();
@@ -310,7 +315,9 @@ function init() {
 		window.location.assign(exhibitUrl);
 		return;			
 	}
-	
+
+	welcomePanel.init();
+
 	if (isMygene2) {
 		$('#intro').append(introTemplate());
 		if (isLevelBasic) {

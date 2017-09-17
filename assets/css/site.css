@@ -857,132 +857,6 @@ a.btn {
   padding-top: 5px;
   width: 100%; }
 
-#welcome-area {
-  text-align: center;
-  margin-top: 60px;
-  display: flex;
-  justify-content: space-around;
-  flex-direction: column;
-  align-items: center; }
-  #welcome-area #welcome-panel {
-    background-color: white;
-    padding-bottom: 15px;
-    padding-top: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-top: 20px;
-    width: 850px; }
-    #welcome-area #welcome-panel #welcome-label {
-      color: #5d809d;
-      font-size: 20px; }
-    #welcome-area #welcome-panel button {
-      color: #5d809d;
-      font-size: 17px !important;
-      margin-left: 7px;
-      margin-right: 7px; }
-    #welcome-area #welcome-panel #welcome-panel-content {
-      width: 820px;
-      display: flex;
-      justify-content: center; }
-      #welcome-area #welcome-panel #welcome-panel-content i.material-icons {
-        font-size: 20px;
-        vertical-align: middle;
-        display: inline-block;
-        padding-top: 2px;
-        float: left; }
-      #welcome-area #welcome-panel #welcome-panel-content span.bullet-item {
-        display: inline-block;
-        float: left;
-        word-wrap: break-word;
-        width: 260px;
-        margin-left: 5px;
-        margin-bottom: 10px; }
-      #welcome-area #welcome-panel #welcome-panel-content .description-paragraph {
-        text-align: left;
-        margin-left: 0px;
-        margin-right: 0px;
-        margin-top: 40px;
-        color: #717171;
-        font-size: 18px;
-        margin-right: 40px; }
-        #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li {
-          padding-bottom: 10px; }
-          #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
-            padding-bottom: 4px; }
-      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-heading {
-        font-size: 18px;
-        color: #717171;
-        margin-top: 10px; }
-      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel {
-        margin-top: 5px;
-        margin-bottom: 10px; }
-      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-content {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 10px; }
-      #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well {
-        position: relative;
-        width: 170px;
-        height: 140px;
-        text-align: center;
-        margin-left: 0px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-title {
-          margin-top: 10px;
-          margin-left: 10px;
-          margin-right: 10px;
-          color: #5d809d;
-          font-size: 16px;
-          line-height: 17px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint {
-          width: 150px;
-          height: 100px;
-          margin-top: 5px;
-          margin-left: 10px;
-          background-color: grey;
-          background-size: cover; }
-          #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint #play-button {
-            cursor: pointer;
-            opacity: 0.5;
-            color: rgba(70, 70, 70, 0.9);
-            font-size: 90px;
-            position: absolute;
-            top: 15px;
-            left: 40px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-multigene-analysis {
-          background-image: url("../../assets/images/thumbprint-multigene.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-saving-analysis {
-          background-image: url("../../assets/images/thumbprint-bookmarks.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-coverage-analysis {
-          background-image: url("../../assets/images/thumbprint-coverage.png"); }
-      #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large {
-        position: relative;
-        width: 200px;
-        height: 130px;
-        text-align: center;
-        margin-left: 0px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-title {
-          margin-top: 10px;
-          margin-left: 10px;
-          margin-right: 10px;
-          color: #5d809d;
-          font-size: 16px;
-          line-height: 17px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large {
-          width: 200px;
-          height: 130px;
-          background-color: grey;
-          background-size: cover; }
-          #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large #play-button {
-            cursor: pointer;
-            opacity: 0.5;
-            color: rgba(70, 70, 70, 0.9);
-            font-size: 90px;
-            position: absolute;
-            top: 15px;
-            left: 60px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-getting-started {
-          background-image: url("../../assets/images/thumbprint-getting-started.png"); }
-
 .icon {
   width: 30px;
   height: 30px;
@@ -1753,6 +1627,159 @@ inputinput:-moz-placeholder {
 #freebayes-settings-modal .fb-setting-label {
   width: 200px;
   display: inline-block; }
+
+#welcome-area {
+  text-align: center;
+  margin-top: 60px;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  align-items: center; }
+  #welcome-area #welcome-panel {
+    background-color: white;
+    padding-bottom: 15px;
+    padding-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 20px;
+    width: 850px; }
+    #welcome-area #welcome-panel #welcome-label {
+      color: #5d809d;
+      font-size: 20px; }
+    #welcome-area #welcome-panel button {
+      color: #5d809d;
+      font-size: 17px !important;
+      margin-left: 7px;
+      margin-right: 7px; }
+    #welcome-area #welcome-panel #welcome-panel-content {
+      width: 820px;
+      display: flex;
+      justify-content: center; }
+      #welcome-area #welcome-panel #welcome-panel-content i.material-icons {
+        font-size: 20px;
+        vertical-align: middle;
+        display: inline-block;
+        padding-top: 2px;
+        float: left; }
+      #welcome-area #welcome-panel #welcome-panel-content span.bullet-item {
+        display: inline-block;
+        float: left;
+        word-wrap: break-word;
+        width: 260px;
+        margin-left: 5px;
+        margin-bottom: 10px; }
+      #welcome-area #welcome-panel #welcome-panel-content .description-paragraph {
+        text-align: left;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 40px;
+        color: #717171;
+        font-size: 18px;
+        margin-right: 40px; }
+        #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li {
+          padding-bottom: 10px; }
+          #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
+            padding-bottom: 4px; }
+      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-heading {
+        font-size: 18px;
+        color: #717171;
+        margin-top: 10px; }
+      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel {
+        margin-top: 5px;
+        margin-bottom: 10px; }
+      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-content {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px; }
+      #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well {
+        position: relative;
+        width: 170px;
+        height: 140px;
+        text-align: center;
+        margin-left: 0px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-title {
+          margin-top: 10px;
+          margin-left: 10px;
+          margin-right: 10px;
+          color: #5d809d;
+          font-size: 16px;
+          line-height: 17px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint {
+          width: 150px;
+          height: 100px;
+          margin-top: 5px;
+          margin-left: 10px;
+          background-color: grey;
+          background-size: cover; }
+          #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint #play-button {
+            cursor: pointer;
+            opacity: 0.5;
+            color: rgba(70, 70, 70, 0.9);
+            font-size: 90px;
+            position: absolute;
+            top: 15px;
+            left: 40px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-multigene-analysis {
+          background-image: url("../../assets/images/thumbprint-multigene.png"); }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-saving-analysis {
+          background-image: url("../../assets/images/thumbprint-bookmarks.png"); }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-coverage-analysis {
+          background-image: url("../../assets/images/thumbprint-coverage.png"); }
+      #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large {
+        position: relative;
+        width: 200px;
+        height: 130px;
+        text-align: center;
+        margin-left: 0px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-title {
+          margin-top: 10px;
+          margin-left: 10px;
+          margin-right: 10px;
+          color: #5d809d;
+          font-size: 16px;
+          line-height: 17px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large {
+          width: 200px;
+          height: 130px;
+          background-color: grey;
+          background-size: cover; }
+          #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large #play-button {
+            cursor: pointer;
+            opacity: 0.5;
+            color: rgba(70, 70, 70, 0.9);
+            font-size: 90px;
+            position: absolute;
+            top: 15px;
+            left: 60px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-getting-started {
+          background-image: url("../../assets/images/thumbprint-getting-started.png"); }
+
+#screencast-panel {
+  text-align: center;
+  margin-top: 50px;
+  overflow: visible; }
+  #screencast-panel .video-container {
+    height: 550px;
+    width: 680px;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto; }
+    #screencast-panel .video-container h4 {
+      font-size: 21px;
+      padding-top: 10px;
+      margin-right: 50px; }
+    #screencast-panel .video-container .video-stop-button {
+      float: left;
+      margin-left: 10px;
+      padding-left: 0;
+      margin-top: 5px;
+      margin-bottom: 0px; }
+      #screencast-panel .video-container .video-stop-button i.material-icons {
+        text-align: left; }
+    #screencast-panel .video-container .iframe-placeholder {
+      position: relative;
+      height: 0;
+      padding-bottom: 75%; }
 
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {

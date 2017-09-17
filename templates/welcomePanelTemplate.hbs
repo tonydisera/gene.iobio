@@ -1,0 +1,143 @@
+<div id="screencast-panel" class="hide">
+ 
+  <div id="screencast-getting-started" class="hide video-container">
+    <button  class="video-stop-button btn btn-default" onclick="welcomePanel.stopVideo('screencast-getting-started')">
+      <i class="material-icons">arrow_back</i>
+    </button>
+    <h4>Getting started</h4>
+    <div class="iframe-placeholder"></div>
+  </div>
+
+  <div id="screencast-coverage-analysis" class="hide video-container" >
+      <button class="video-stop-button btn btn-default" onclick="welcomePanel.stopVideo('screencast-coverage-analysis')">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <h4>Assessing insufficient coverage</h4>
+      <div class="iframe-placeholder"></div>
+  </div>
+
+  <div id="screencast-saving-analysis" class="hide video-container" >
+      <button class="video-stop-button btn btn-default" onclick="welcomePanel.stopVideo('screencast-saving-analysis')">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <h4>Saving your analysis with Bookmarks</h4>
+      <div class="iframe-placeholder"></div>
+  </div>
+
+  <div id="screencast-multi-gene-analysis" class="hide video-container" >
+      <button class="video-stop-button btn btn-default" onclick="welcomePanel.stopVideo('screencast-multi-gene-analysis')">
+        <i class="material-icons" style="text-align: left;">
+          arrow_back
+        </i>
+      </button>
+      <h4>Multi-gene analysis</h4>
+      <div class="iframe-placeholder"></div>
+  </div>
+</div>    
+
+
+
+
+
+<div id="welcome-area" class="hide">
+  <div id="welcome-panel" >
+    <div id="welcome-label">
+      A web tool for disease-causing variant interrogation 
+    </div>  
+    <div id="welcome-panel-content">
+      <div class="description-paragraph">
+        <div>
+
+          <div>
+            <i class="material-icons">check_circle</i>
+            <span class="bullet-item">Real-time analysis</span>
+          </div>
+
+          <div>
+            <i class="material-icons">check_circle</i>
+            <span class="bullet-item">On-the-fly annotation</span>
+          </div>
+          <div>
+            <i class="material-icons">check_circle</i>
+            <span class="bullet-item">Integrated genomic visualizations</span>
+          </div>
+          <div>
+            <i class="material-icons">check_circle</i>
+            <span class="bullet-item">On-demand variant calling</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="video-thumbprint-panel">
+        <div id="video-thumbprint-heading">Getting started</div>
+        <div id="video-thumbprint-content">
+
+          <div class="video-thumbprint-well-large shadow-z-2">
+            <div id="welcome-screencast-panel-getting-started" class="video-thumbprint-large" >
+              <i class="material-icons" id="play-button" onclick="welcomePanel.playVideo('screencast-getting-started')">
+                play_arrow
+              </i>
+            </div>
+            <div class="video-title"></div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>    
+
+
+
+
+    <div>  
+      <button id="load-demo-data" class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');dataCard.loadDemoData()">
+        <span style="">Try it with demo data</span>
+      </button>
+      <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');pageGuide.open()">
+        <span style="">Take guided tour</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="welcome-panel" >
+    <div id="welcome-label">
+      What's new
+    </div>  
+    <div id="welcome-panel-content" style="display:flex;justify-content:space-around">
+
+
+      <div id="video-thumbprint-panel">
+        <div id="video-thumbprint-content">
+
+          <div class="video-thumbprint-well ">
+            <div id="welcome-screencast-panel-coverage-analysis" class="video-thumbprint shadow-z-2" >
+              <i class="material-icons" id="play-button" onclick="welcomePanel.playVideo('screencast-coverage-analysis')">play_arrow
+              </i>
+            </div>
+            <div class="video-title">Detecting insufficient coverage</div>
+          </div>
+
+          <div class="video-thumbprint-well ">
+            <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint shadow-z-2" >
+              <i class="material-icons" id="play-button" onclick="welcomePanel.playVideo('screencast-saving-analysis')">play_arrow
+              </i>
+            </div>
+            <div class="video-title">Saving your analysis</div>                
+          </div>
+
+          <div class="video-thumbprint-well ">
+            <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint shadow-z-2">
+              <i class="material-icons" id="play-button" onclick="welcomePanel.playVideo('screencast-multi-gene-analysis')">play_arrow
+              </i>
+            </div>
+            <div class="video-title">Multi-gene analysis</div>     
+          </div>                           
+        </div>
+      </div>
+
+
+    </div>    
+  </div>
+
+</div>
