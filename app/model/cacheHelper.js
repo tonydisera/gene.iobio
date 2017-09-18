@@ -16,15 +16,15 @@ CacheHelper.prototype.isolateSession = function() {
 }
 
 CacheHelper.prototype.checkCacheSize = function() {
+	var me = this;
+
 	var counts = this.getCacheSize(false);
 	$('#cache-alert1').addClass("hide");
 	$("#other-app-cache-panel").removeClass("attention");
 
 	$('#cache-alert2').addClass("hide");
 	$("#other-cache-panel").removeClass("attention-warning");
-
 	if (counts.other > 0) {
-		cacheHelper.openDialog();
 		$('#cache-alert2').removeClass("hide");
 		$("#other-cache-panel").addClass("attention-warning");
 		$("#other-cache-detail-link").attr("aria-expanded", true);
@@ -33,13 +33,33 @@ CacheHelper.prototype.checkCacheSize = function() {
 	} 
 
 	if (counts.otherApp > 0) {
-		cacheHelper.openDialog();
 		$('#cache-alert1').removeClass("hide");
 		$("#other-app-cache-panel").addClass("attention");
 		$("#other-app-cache-detail-link").attr("aria-expanded", true);
 		$("#other-app-cache-detail").attr("aria-expanded", true);
 		$("#other-app-cache-detail").addClass("in");
 	} 
+
+	if (counts.other > 0 || counts.otherApp > 0) {
+		alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
+		    if (e) {
+				// user clicked "ok", clear the cache for other, and other app
+				if (counts.other > 0) {
+					me._clearCache(null, true, false);
+				}
+				if (counts.otherApp > 0) {
+					me._clearCache(null, false, true);
+				}
+		        
+		    } 
+		}, function() {
+			// user clicked cancel
+			me.openDialog();
+		})
+		.set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});   		;
+	}
+
+
 }
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
@@ -1025,9 +1045,9 @@ CacheHelper.prototype.clearAll = function() {
 			cacheHelper.showAnalyzeAllProgress();
   			me.refreshDialog();
 	        
-	    } else {
-	        // user clicked "cancel"
-	    }
+	    } 
+	}, function() {
+		// user clicked "cancel"
 	})
 	.set('labels', {ok:'OK', cancel:'Cancel'});   		;
 }
@@ -1040,9 +1060,7 @@ CacheHelper.prototype.clearOther = function() {
 			me._clearCache(null, true, false);
   			me.refreshDialog();
 	        
-	    } else {
-	        // user clicked "cancel"
-	    }
+	    } 
 	    		
 	})
 	.set('labels', {ok:'OK', cancel:'Cancel'});   
@@ -1056,8 +1074,6 @@ CacheHelper.prototype.clearOtherApp = function() {
 			me._clearCache(null, false, true);
   			me.refreshDialog();
 	        
-	    } else {
-	        // user clicked "cancel"
 	    }
 	   
 	}) .set('labels', {ok:'OK', cancel:'Cancel'});   		

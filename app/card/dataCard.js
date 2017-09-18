@@ -313,8 +313,7 @@ DataCard.prototype.loadMygene2Data = function() {
 					    function(){ 
 					    	loadProband();
 					    }
-					 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});   	
-		alertify.set('labels', {ok:'OK', cancel:'Cancel'});      	
+					 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});   			
 	} else {
 		
 		var endpointUrl = mygene2Endpoint + "?token=" + getUrlParameter("token");
@@ -341,7 +340,7 @@ DataCard.prototype.loadMygene2Data = function() {
 				    	loadProband();
 				    }
 				 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
-		        alertify.set('labels', {ok:'OK', cancel:'Cancel'});      
+		         
 		    }
 		});
 	}
