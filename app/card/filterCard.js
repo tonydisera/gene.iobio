@@ -261,6 +261,53 @@ FilterCard.prototype.setStandardFilter = function(button, filterName) {
 
 }
 
+FilterCard.prototype.setStandardFilterCount = function(field, counts, notAnalyzedCount, clearStandardFilterCounts) {
+	var me = this;
+	if (this.hasFilters()) {
+		if ($('#standard-filter-panel .standard-filter-btn.current').attr("id") == "button-low-coverage" && field == 'called') {
+			// we bypass 'called' variant counts for the coverage filter
+		} else {		
+			var filterCountSelector = 'span.standard-filter-count #' + field + '-variant-count';
+			// If a standard filter has been applied, update its counts
+			if (clearStandardFilterCounts) {
+				$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).text("");
+				$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).addClass('hide');
+			}
+			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).text(counts.pass);
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).attr("title", counts.pass + (counts.pass == 1 ? " gene contains " : " genes contain ") + field + " variants that pass this filter");
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass('hide');
+				if (counts.pass == 0) {
+					$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).addClass("none");
+				} else {
+					$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass("none");
+				}
+
+			}			
+		}
+	}
+
+
+	// Show a "some genes not analyzed" warning symbol next to standard filters.  Make sure
+	// to exclude loaded variants from the warning when only alignments were provided
+	if (notAnalyzedCount > 0 && (!getProbandVariantCard().model.isAlignmentsOnly() || field == 'called')) {
+		var filterCountId = field + '-variant-count';
+		$('#standard-filter-panel .variant-count').each( function(i,val) {
+			if ($(val).attr('id') == filterCountId) {
+				if ($(val).hasClass("hide")) {
+					$(val).parent().find('#unanalyzed-' + field + '-warning').addClass("hide"); 
+				} else {
+					$(val).parent().find('#unanalyzed-' + field + '-warning').removeClass("hide"); 
+				}				
+			}
+		})
+	} else {
+		$('#standard-filter-panel .standard-filter-btn.current').parent().find('#unanalyzed-' + field + '-warning').addClass("hide");
+	}
+
+
+}
+
 FilterCard.prototype.getFilterObject = function() {
 	var me = this;
 	// For mygene2 beginner mode, return a fixed filter of AF < 1% and PASS filter.
