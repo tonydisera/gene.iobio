@@ -2968,7 +2968,7 @@ function addVariantCard() {
 
 function addKnownVariantsCard()  {
 
-	$('#known-variants-cards #variant-badges').removeClass("hide");
+//	$('#known-variants-cards #variant-badges').removeClass("hide");
 	$('#select-known-variants-filter-box').removeClass("hide");
 
 	

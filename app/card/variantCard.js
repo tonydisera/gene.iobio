@@ -1064,15 +1064,21 @@ VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data, geneOb
 VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition, isZoom) {
 	var me = this;
 
+	if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+		me.cardSelector.find("#variant-badges").addClass("hide");
+		me.cardSelector.find('.vcfloader').addClass("hide");
+		return;
+	}
+	if (this.getRelationship() == 'known-variants') {
+		showKnownVariantsHistoChart(false);
+	}
+
+
 	if (this.isViewable()) {
 		this.cardSelector.removeClass("hide");
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 	}
 
-	if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
-		me.cardSelector.find('.vcfloader').addClass("hide");
-		return;
-	}
 
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData) {
