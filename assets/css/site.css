@@ -2155,17 +2155,24 @@ inputinput:-moz-placeholder {
         height: 20px;
         padding-top: 2px; }
       #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count {
-        background-color: rgba(18, 127, 170, 0.65); }
+        background-color: rgba(18, 127, 170, 0.65);
+        cursor: pointer; }
         #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count.none {
           background-color: #e8e6e6; }
       #filter-track #standard-filter-panel .standard-filter-count #called-variant-count {
-        background-color: #b4c688; }
+        background-color: #b4c688;
+        cursor: pointer; }
         #filter-track #standard-filter-panel .standard-filter-count #called-variant-count.none {
           background-color: #e8e6e6; }
-      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-warning {
-        color: #d97b7b;
-        font-size: 22px;
-        vertical-align: bottom;
+      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-loaded-warning {
+        font-weight: bold;
+        color: #b32f2f;
+        font-size: 17px;
+        cursor: pointer; }
+      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-called-warning {
+        font-weight: bold;
+        color: #b32f2f;
+        font-size: 17px;
         cursor: pointer; }
   #filter-track .checkbox label {
     font-size: 12px;

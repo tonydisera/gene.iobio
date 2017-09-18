@@ -171,22 +171,28 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 
 	// Refresh the standard filter count if it applies
 	if (filterCard.hasFilters()) {
-		var filterCountSelector = 'span.standard-filter-count #' + field + '-variant-count';
-		// If a standard filter has been applied, update its counts
-		if (clearStandardFilterCounts) {
-			$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).text("");
-			$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).addClass('hide');
-		}
-		if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
-			$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).text(counts.pass);
-			$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass('hide');
-			if (counts.pass == 0) {
-				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).addClass("none");
-			} else {
-				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass("none");
-			}
 
-		}			
+		if ($('#standard-filter-panel .standard-filter-btn.current').attr("id") == "button-low-coverage" && field == 'called') {
+			// we bypass 'called' variant counts for the coverage filter
+		} else {		
+			var filterCountSelector = 'span.standard-filter-count #' + field + '-variant-count';
+			// If a standard filter has been applied, update its counts
+			if (clearStandardFilterCounts) {
+				$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).text("");
+				$('#standard-filter-panel .standard-filter-btn').parent().find(filterCountSelector).addClass('hide');
+			}
+			if ($('#standard-filter-panel .standard-filter-btn.current').length > 0) {
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).text(counts.pass);
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).attr("title", counts.pass + (counts.pass == 1 ? " gene " : " genes ") + "contain " + field + " variants that pass filter ");
+				$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass('hide');
+				if (counts.pass == 0) {
+					$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).addClass("none");
+				} else {
+					$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass("none");
+				}
+
+			}			
+		}
 	}
 
 	// Show a "some genes not analyzed" warning symbol next to standard filters.  Make sure
@@ -196,14 +202,14 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 		$('#standard-filter-panel .variant-count').each( function(i,val) {
 			if ($(val).attr('id') == filterCountId) {
 				if ($(val).hasClass("hide")) {
-					$(val).parent().find('#unanalyzed-warning').addClass("hide"); 
+					$(val).parent().find('#unanalyzed-' + field + '-warning').addClass("hide"); 
 				} else {
-					$(val).parent().find('#unanalyzed-warning').removeClass("hide"); 
+					$(val).parent().find('#unanalyzed-' + field + '-warning').removeClass("hide"); 
 				}				
 			}
 		})
 	} else {
-		$('#standard-filter-panel .standard-filter-btn.current').parent().find('#unanalyzed-warning').addClass("hide");
+		$('#standard-filter-panel .standard-filter-btn.current').parent().find('#unanalyzed-' + field + '-warning').addClass("hide");
 	}
 
 
