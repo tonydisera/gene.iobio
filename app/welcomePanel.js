@@ -62,7 +62,7 @@ WelcomePanel.prototype.playVideo = function(videoName) {
 
 
 	// Hide the welcome panel and show the video panel
-	$('#welcome-panel').addClass('hide');
+	$('#welcome-area').addClass('hide');
 	$('#screencast-panel').removeClass('hide');
 	$('.video-container').addClass('hide');
 	videoContainer.removeClass('hide');
@@ -73,7 +73,7 @@ WelcomePanel.prototype.stopVideo = function(videoName) {
 	var me = this;
 
 	var videoContainer = $('#' + videoName);
-	$('#welcome-panel').removeClass('hide');
+	$('#welcome-area').removeClass('hide');
 	$('#screencast-panel').addClass('hide');
 	videoContainer.find('.screencast-video').stop();
 }
