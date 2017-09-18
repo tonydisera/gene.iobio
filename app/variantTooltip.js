@@ -1073,7 +1073,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 		       	+ "</span>"
 		        + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
 
-	        var zyg = genotype ? (!genotype.hasOwnProperty('zygosity') || genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
+	        var zyg = genotype ? (!genotype.hasOwnProperty('zygosity') || genotype.zygosity == null || genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
 			row.append("div")
 			   .attr("class",  "tooltip-zygosity label " + zyg)
 			   .text(capitalizeFirstLetter(zyg));
