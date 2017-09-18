@@ -533,7 +533,7 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	 		 .append("span")
 	         .attr("class", "bookmark-number")
 	         .text(function(d,i) {
-	         	return i + ".";
+	         	return i+1 + ".";
 	         })
 
 
