@@ -1810,8 +1810,8 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 			});
 			if (targetVariants.length > 0) {
 				var annotatedVariant = targetVariants[0];
-				annotatedVariant.screenXMatrix = screenX;
-	        	annotatedVariant.screenYMatrix = screenY;
+				annotatedVariant.screenX = screenX;
+	        	annotatedVariant.screenY = screenY;
 				me._showTooltipImpl(tooltip, annotatedVariant, sourceVariantCard, true);
 			} else {
 				if (callbackNotFound) {
