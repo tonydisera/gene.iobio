@@ -45,6 +45,22 @@
       A web tool for disease-causing variant interrogation 
     </div>  
     <div id="welcome-panel-content">
+
+      <div id="video-thumbprint-panel">
+        <div id="video-thumbprint-heading">Getting started</div>
+        <div id="video-thumbprint-content">
+
+          <div class="video-thumbprint-well-large shadow-z-2">
+            <div id="welcome-screencast-panel-getting-started" class="video-thumbprint-large" >
+              <i class="material-icons" id="play-button" onclick="welcomePanel.playVideo('screencast-getting-started')">
+                play_arrow
+              </i>
+            </div>
+            <div class="video-title"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="description-paragraph">
         <div>
 
@@ -69,28 +85,12 @@
 
       </div>
 
-      <div id="video-thumbprint-panel">
-        <div id="video-thumbprint-heading">Getting started</div>
-        <div id="video-thumbprint-content">
-
-          <div class="video-thumbprint-well-large shadow-z-2">
-            <div id="welcome-screencast-panel-getting-started" class="video-thumbprint-large" >
-              <i class="material-icons" id="play-button" onclick="welcomePanel.playVideo('screencast-getting-started')">
-                play_arrow
-              </i>
-            </div>
-            <div class="video-title"></div>
-          </div>
-        </div>
-      </div>
-
-
     </div>    
 
 
 
 
-    <div>  
+    <div style="margin-top:30px">  
       <button id="load-demo-data" class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');dataCard.loadDemoData()">
         <span style="">Try it with demo data</span>
       </button>
@@ -100,11 +100,11 @@
     </div>
   </div>
 
-  <div class="welcome-panel" >
+  <div class="welcome-panel" style="width:620px;margin-top:40px">
     <div id="welcome-label">
       What's new
     </div>  
-    <div id="welcome-panel-content" style="display:flex;justify-content:space-around">
+    <div id="welcome-panel-content" style="width:620px;display:flex;justify-content:space-around">
 
 
       <div id="video-thumbprint-panel">
