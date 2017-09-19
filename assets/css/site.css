@@ -1668,14 +1668,14 @@ inputinput:-moz-placeholder {
         word-wrap: break-word;
         width: 260px;
         margin-left: 5px;
-        margin-bottom: 10px; }
+        margin-bottom: 15px; }
       #welcome-area .welcome-panel #welcome-panel-content .description-paragraph {
         text-align: left;
         margin-top: 50px;
         color: #717171;
         font-size: 18px;
         margin-right: 0px;
-        margin-left: 80px; }
+        margin-left: 100px; }
         #welcome-area .welcome-panel #welcome-panel-content .description-paragraph li {
           padding-bottom: 10px; }
           #welcome-area .welcome-panel #welcome-panel-content .description-paragraph li li {
