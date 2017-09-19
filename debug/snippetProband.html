@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Snippet Test WGS Platinum Trio</title>
+        <title>Snippet Test WGS Platinum for a Proband</title>
         <style>
             body {
                 font-family: Helvetica;
@@ -10,7 +10,7 @@
     </head>
     <body>
 
-        <h1>Snippet - Loading genes for Platinum WGS spike-in trio.</h1>
+        <h1>Snippet - Loading genes for Platinum WGS spike-in proband.</h1>
         <h2 id="data-source"></h2>
         <div id="main">
 
@@ -41,15 +41,9 @@
             var runCount = 0;
             var global_vepAF = false;
 
-            function uniq(theArray) {
-               return Array.from(new Set(theArray));
-            }
-
 
             var sampleNames = {
-                proband: 'NA12878',
-                mother:  'NA12892',
-                father:  'NA12891'
+                proband: 'NA12878'
             };                
             var vcfUrl = "https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz";
             var vcfWorkers = {
@@ -68,7 +62,6 @@
             var genomeBuildHelper = null;
             var cacheHelper = null;
             var useCache = false;
-            var global_vepAF = false;
 
             $(document).ready(function(){
                 //$('#data-source').text(new_iobio_services);
@@ -99,36 +92,28 @@
                 vcfWorkers.proband = vcfiobio();         
                 vcfWorkers.proband.openVcfUrl(vcfUrl, null, function() {
 
-                    vcfWorkers.mother = vcfiobio();         
-                    vcfWorkers.mother.openVcfUrl(vcfUrl, null, function() {
+                    
+                    runCount++;
 
-                        vcfWorkers.father = vcfiobio();         
-                        vcfWorkers.father.openVcfUrl(vcfUrl, null, function() {
-                            runCount++;
+                    if (runCount == 1) {
+                        geneCount = 1;
+                        start = Date.now();
 
-                            if (runCount == 1) {
-                                geneCount = 1;
-                                start = Date.now();
-
-                                var table = '<table id="result-table" style="width:600px"><tr>';
-                                table += 
-                                      '<td>'  +             '</td>'
-                                    + '<td>'  + 'gene'    + '</td>'
-                                    + '<td>'  + 'proband' + '</td>'
-                                    + '<td>'  + 'mother'  + '</td>'
-                                    + '<td>'  + 'father'  + '</td>'
-                                    + '<td>'  + 'sec'     + '</td>'                               
-                                table += '</tr></table>';    
-                                $('#main').append(table);
+                        var table = '<table id="result-table" style="width:600px"><tr>';
+                        table += 
+                              '<td>'  +             '</td>'
+                            + '<td>'  + 'gene'    + '</td>'
+                            + '<td>'  + 'proband' + '</td>'
+                            + '<td>'  + 'sec'     + '</td>'                               
+                        table += '</tr></table>';    
+                        $('#main').append(table);
 
 
 
-                                runNextGene();
+                        runNextGene();
 
-                            }
-                        });
+                    }
 
-                    });
                 });
             }
 
@@ -156,42 +141,31 @@
                 console.log("PROCESSING GENE " + geneObject.gene_name);
                 var promises = [];
 
-                var theSamples = [
-                  {sampleName: sampleNames.proband, vcfSampleName: sampleNames.proband },
-                  {sampleName: sampleNames.mother,  vcfSampleName: sampleNames.mother },
-                  {sampleName: sampleNames.father,  vcfSampleName: sampleNames.father }
-                ]
 
                 var thePromise =  
                     vcfWorkers.proband.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  [],
-                                                  true,  
-                                                  theSamples,
-                                                  annotationEngine, {}, isRefSeq, 
-                                                  true, true, global_vepAF, useCache)
+                                                  [], false, [sampleNames.proband], annotationEngine, {}, isRefSeq, 
+                                                  hgvsNotation, getRsId, global_vepAF, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
-                                    var results = data[1];
-                                    geneObject.probandCount =  results[0].features.length;
-                                    geneObject.motherCount  =  results[1].features.length;
-                                    geneObject.fatherCount  =  results[2].features.length;
+                                    var theVcfData = data[1];
+                                    geneObject.probandCount =  theVcfData.features.length;
                               });
+                promises.push(thePromise);
+            
 
-
-
-                thePromise.then(function(data) {
+                Promise.all(promises).then(function(data) {
                     end = Date.now();
                     var sec = round((end - start) / 1000, 2);
+;
                     var row = '<tr>';
                     row += 
                           '<td>'  + geneCount               + '</td>'
                         + '<td>'  + geneObject.gene_name    + '</td>'
                         + '<td>'  + geneObject.probandCount + '</td>'
-                        + '<td>'  + geneObject.motherCount  + '</td>'
-                        + '<td>'  + geneObject.fatherCount  + '</td>'
                         + '<td>'    + sec                   + '</td>'
                     row += '</tr>';    
-                    console.log("***** " + geneCount + ". " + "FINISHED WITH TRIO FOR GENE "  + ' *******');
+                    console.log("***** " + geneCount + ". " + "FINISHED. "  + ' *******');
 
                     
                     $("#main #result-table").append(row);

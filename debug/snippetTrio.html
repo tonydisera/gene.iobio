@@ -39,6 +39,7 @@
             var start = 0;
             var end = 0;
             var runCount = 0;
+            var global_vepAF = true;
 
 
             var sampleNames = {
@@ -112,7 +113,6 @@
                                     + '<td>'  + 'mother'  + '</td>'
                                     + '<td>'  + 'father'  + '</td>'
                                     + '<td>'  + 'sec'     + '</td>'                               
-                                    + '<td>'  + 'variant/sec' + '</td>';                                
                                 table += '</tr></table>';    
                                 $('#main').append(table);
 
@@ -151,10 +151,11 @@
                 console.log("PROCESSING GENE " + geneObject.gene_name);
                 var promises = [];
 
+
                 var thePromise =  
                     vcfWorkers.proband.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  false, [sampleNames.proband], annotationEngine, {}, isRefSeq, 
-                                                  hgvsNotation, getRsId, useCache)
+                                                  [], false, [sampleNames.proband], annotationEngine, {}, isRefSeq, 
+                                                  hgvsNotation, getRsId, global_vepAF, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
                                     var theVcfData = data[1];
@@ -164,8 +165,8 @@
 
                 thePromise =  
                     vcfWorkers.mother.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  false, [sampleNames.mother], annotationEngine, {}, isRefSeq, 
-                                                  hgvsNotation, getRsId, useCache)
+                                                  [], false, [sampleNames.mother], annotationEngine, {}, isRefSeq, 
+                                                  hgvsNotation, getRsId, global_vepAF. useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
                                     var theVcfData = data[1];
@@ -175,8 +176,8 @@
 
                 thePromise =  
                     vcfWorkers.father.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  false, [sampleNames.father], annotationEngine, {}, isRefSeq, 
-                                                  hgvsNotation, getRsId, useCache)
+                                                  [], false, [sampleNames.father], annotationEngine, {}, isRefSeq, 
+                                                  hgvsNotation, getRsId, global_vepAF, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
                                     var theVcfData = data[1];
@@ -188,7 +189,6 @@
                 Promise.all(promises).then(function(data) {
                     end = Date.now();
                     var sec = round((end - start) / 1000, 2);
-                    var variantPerSec = round((geneObject.probandCount+geneObject.motherCount+geneObject.fatherCount)/sec, 2);
                     var row = '<tr>';
                     row += 
                           '<td>'  + geneCount               + '</td>'
@@ -197,7 +197,6 @@
                         + '<td>'  + geneObject.motherCount  + '</td>'
                         + '<td>'  + geneObject.fatherCount  + '</td>'
                         + '<td>'    + sec                   + '</td>'
-                        + '<td>'    + variantPerSec         + '</td>';
                     row += '</tr>';    
                     console.log("***** " + geneCount + ". " + "FINISHED WITH TRIO FOR GENE "  + ' *******');
 
