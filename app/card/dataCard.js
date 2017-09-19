@@ -1161,11 +1161,11 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	panelSelector.find('#vcf-sample-box').addClass('hide');
 
 	if (me.mode == 'trio' && variantCard.getRelationship() == 'proband') {
-		$('#unaffected-sibs-box').removeClass('hide');
-		$('#affected-sibs-box').removeClass('hide');
 		$('#unaffected-sibs-select')[0].selectize.clearOptions();
 		$('#affected-sibs-select')[0].selectize.clearOptions();
 	}
+	$('#unaffected-sibs-box').addClass('hide');
+	$('#affected-sibs-box').addClass('hide');
 	variantCard.clearVcf();
 	window.enableLoadButton();
 }
