@@ -2806,9 +2806,13 @@ function getRelevantVariantCards() {
 	if (!hideKnownVariantsCard) {
 		rels['known-variants'] = true;
 	}
-	return variantCards.filter(function(vc) {
-		return rels[vc.getRelationship()];
-	})
+	if (variantCards && variantCards.length > 0) {
+		return variantCards.filter(function(vc) {
+			return rels[vc.getRelationship()];
+		})		
+	} else {
+		return [];
+	}
 }
 
 function setGeneratedSampleNames() {
