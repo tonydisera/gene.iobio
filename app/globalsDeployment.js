@@ -36,7 +36,7 @@ var global_getVariantIdsForGene = false;
 var global_maxGeneCount         = 100;
 
 // Should vep retrieve allele frequencies (for gnomad, 1000G, ESP)
-var global_vepAF                = true;
+var global_vepAF                = false;
 
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
