@@ -1694,7 +1694,6 @@ VariantModel.prototype.postInheritanceParsing = function(theVcfData, theGene, th
 	var theVcfData = theVcfData ? theVcfData : me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
 
 	me._determineAffectedStatus(theVcfData, affectedInfo);
-	me.performAdditionalParsing(theVcfData);
 
 	me._cacheData(theVcfData, "vcfData", theGene.gene_name, theTranscript);	
 

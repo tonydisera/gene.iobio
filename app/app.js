@@ -3172,6 +3172,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 			bams, 
 			window.geneSource == 'refseq' ? true : false, 
 			fbSettings.arguments,
+			global_vepAF, // vep af
 			function(theData, trRefName) {
 
 				translatedRefName = trRefName;
@@ -3277,6 +3278,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		bams, 
 		window.geneSource == 'refseq' ? true : false, 
 		fbSettings.arguments,
+		global_vepAF,    // vep af
 		function(theData, trRefName, theGeneObject, theTranscript) {
 
 			translatedRefName = trRefName;
@@ -3535,6 +3537,11 @@ function promiseDetermineInheritance(promise) {
 					var affectedInfo = isAlignmentsOnly() || samplesInSingleVcf() ? null : getAffectedInfo();
 					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfo);
 					trioModel.compareVariantsToMotherFather(function() {
+						getRelevantVariantCards().forEach(function(vc) {
+							if (trioVcfData[vc.getRelationship()]) {
+								vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()]);
+							}
+						})
 						postInheritanceProcessing(trioVcfData.proband, probandVariantCard);
 					});
 
