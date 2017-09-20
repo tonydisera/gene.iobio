@@ -824,9 +824,9 @@ DataCard.prototype.init = function() {
 		genesCard.clearGeneInfos();
 
 		genesCard.showAnalyzeAllButton();		
-
 		// Clear the cache
 		cacheHelper.clearCache();
+		cacheHelper.hideAnalyzeAllProgress();
 
 		// Clear any filters
 		filterCard.clearFilters();
