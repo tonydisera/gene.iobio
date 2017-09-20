@@ -1816,6 +1816,7 @@ var effectCategories = [
                     'af':                       annot.af,
                     'af1000G':                  me._parseAf(altIdx, annot.af1000G),
                     'afExAC':                   me._parseAf(altIdx, annot.afExAC),
+                    'afgnomAD':                 annot.vep.af && annot.vep.af.gnomAD && annot.vep.af.gnomAD.AF ? annot.vep.af.gnomAD.AF : '',
                     'rsid' :                    annot.rs,
                     'combinedDepth':            annot.combinedDepth,
 

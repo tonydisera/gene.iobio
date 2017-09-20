@@ -2025,19 +2025,6 @@ GenesCard.prototype._setGeneBadgeDetailedGlyphs = function(geneBadge, dangerObje
 
 	}
 
-	if (dangerObject.AF) {
-		var clazz   = Object.keys(dangerObject.AF)[0];
-		var afField = dangerObject.AF[clazz].field;
-		var afValue  = dangerObject.AF[clazz].value;
-		if (clazz && afField) {
-			geneBadge.find('#gene-badge-symbols').append("<svg class=\"af-badge\" height=\"12\" width=\"12\">");
-			var options = {width:10, height:10, transform: 'translate(0,0)'};
-			var selection = d3.select(geneBadge.find('#gene-badge-symbols .af-badge')[0]).data([{clazz: clazz}]);
-			var symbolFunction = afField == 'afExAC' ? matrixCard.showAfExacSymbol : matrixCard.showAf1000gSymbol;
-			symbolFunction(selection, options);			
-		}
-	}
-
 }
 
 GenesCard.prototype.selectGeneBadge = function(badgeElement) {
