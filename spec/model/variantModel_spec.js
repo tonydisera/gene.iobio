@@ -454,31 +454,36 @@ describe('variantModel', function() {
 			variant_1 = {
 				zygosity: 'HOM',
 				recfilter: 'PASS',
-				genotype: {zygosity: 'HOM', absent: false}
+				genotype: {zygosity: 'HOM', absent: false},
+				genotypes: {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HET', absent: false} }
 			};
 
 			variant_2 = {
 				zygosity: 'HET',
 				recfilter: 'PASS',
-				genotype: {zygosity: 'HET', absent: false}
+				genotype: {zygosity: 'HET', absent: false},
+				genotypes: {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HOM', absent: false} }
 			};
 
 			variant_3 = {
 				zygosity: 'HET',
 				recfilter: '.',
-				genotype: {zygosity: 'HET', absent: false}
+				genotype: {zygosity: 'HET', absent: false},
+				genotypes: {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HET', absent: false} }
 			};
 
 			variant_4 = {
 				zygosity: 'HOM',
 				recfilter: '.',
-				genotype: {zygosity: 'HOM', absent: false}
+				genotype: {zygosity: 'HOM', absent: false},
+				genotypes: {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOM', absent: false} }
 			};
 
 			variant_5 = {
 				zygosity: 'HOMREF',
 				recfilter: 'PASS',
-				genotype: {zygosity: 'HOMREF', absent: false}
+				genotype: {zygosity: 'HOMREF', absent: false},
+				genotypes: {NA12878: {zygosity: 'HOMREF', absent: false}, NA12892: {zygosity: 'HOMREF', absent: false} }
 			}
 
 			data = {
@@ -732,6 +737,75 @@ describe('variantModel', function() {
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2]);
 			});
+		});
+
+		describe('when filtering on present in affected', function() {			
+			it('filters on affected present', function() {
+				variantModel.affectedStatus = "affected";
+				var probandVariantCard = 
+				{
+						getRelationship: jasmine.createSpy().and.returnValue('proband'),
+						getSampleName:   jasmine.createSpy().and.returnValue('NA12878'),
+						model: variantModel
+				};
+				var motherVariantCard = 
+				{
+						getRelationship: jasmine.createSpy().and.returnValue('mother'),
+						getSampleName:   jasmine.createSpy().and.returnValue('NA12892')
+				};
+				var fatherVariantCard = 
+				{
+						getRelationship: jasmine.createSpy().and.returnValue('father'),
+						getSampleName:   jasmine.createSpy().and.returnValue('NA12891')
+				};
+				filterObject.affectedInfo = [
+					{
+						filter: true,
+						id: "affected-_-proband-_-NA12878",
+						label: "proband",
+						relationship: "proband",
+						status: "affected",
+						variantCard: probandVariantCard
+					},
+					{
+						filter: true,
+						id: "affected-_-mother-_-NA12892",
+						label: "mother",
+						relationship: "mother",
+						status: "affected",
+						variantCard: motherVariantCard
+					}
+					
+				];
+				window.variantCards = [
+					probandVariantCard,
+					motherVariantCard,
+					fatherVariantCard
+				]
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
+
+				variant_1.genotypes = {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOMREF', absent: false} };
+				filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_2, variant_3, variant_4]);
+
+				variant_1.genotypes = {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HOM', absent: false} };
+				variant_2.genotypes = {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HET', absent: false} }; 
+				filterObject.affectedInfo.push(
+				{
+						filter: true,
+						id: "affected-_-father-_-NA12891",
+						label: "father",
+						relationship: "father",
+						status: "unaffected",
+						variantCard: fatherVariantCard
+				});
+				filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_3, variant_4]);
+
+
+			});
+
 		});
 	});
 
