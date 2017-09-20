@@ -40,7 +40,7 @@ module.exports = {
     variantTooltip.expectVepImpact('high');
     variantTooltip.expectVepConsequence('stop gained');
     variantTooltip.expectClinvar('pathogenic');
-    variantTooltip.expectClinvarClinSig('smith-magenis syndrome', 'Smith-Magenis_syndrome');
+    variantTooltip.expectClinvarClinSig('smith-magenis syndrome', 'Smith-Magenis syndrome');
     variantTooltip.expectAFExAC('0%');
     variantTooltip.expectAF1000G('0%');
     variantTooltip.expectQual('2880.99');
