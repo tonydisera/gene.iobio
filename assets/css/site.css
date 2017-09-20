@@ -3459,6 +3459,10 @@ text.ref-count {
   color: #717171 !important;
   font-size: 12px; }
 
+textarea#genes-to-copy {
+  width: 325px;
+  height: 280px; }
+
 #edit-list-li {
   color: #717171 !important;
   font-size: 13px;
@@ -4651,5 +4655,8 @@ text.ref-count {
 @media screen and (max-width: 767px) {
   .collapse.in .or {
     display: none !important; } }
+@media screen and (max-height: 510px) {
+  textarea#genes-to-copy {
+    height: 150px; } }
 
 /*# sourceMappingURL=site.css.map */
