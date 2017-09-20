@@ -598,7 +598,7 @@ var Bam = Class.extend({
    },
 
 
-   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, fbArgs, callback) {
+   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, fbArgs, vepAF, callback) {
     var me = this;
 
     var refName     = geneObject.chr; 
@@ -729,6 +729,13 @@ var Bam = Class.extend({
         vepArgs.push(" --assembly");
         vepArgs.push(genomeBuildHelper.getCurrentBuildName());
         vepArgs.push(" --format vcf");
+        if (vepAF) {
+          vepArgs.push("--af_gnomad");
+          vepArgs.push("--af_esp");
+          vepArgs.push("--af_1kg");
+          vepArgs.push("--max_af");
+        }
+
         if (isRefSeq) {
           vepArgs.push("--refseq");
         }
