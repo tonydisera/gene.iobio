@@ -87,7 +87,7 @@ module.exports = {
       selector: '#mother-data',
       commands: [{
         selectPlatinumTrio: function() {
-          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
+          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@vcfSampleBox');
         },
         inputUrl: function(url) {
           this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
@@ -113,7 +113,7 @@ module.exports = {
       selector: '#father-data',
       commands: [{
         selectPlatinumTrio: function() {
-          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
+          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@vcfSampleBox');
         }, 
         inputUrl: function(url) {
           this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
