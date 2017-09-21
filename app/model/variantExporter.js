@@ -339,7 +339,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 							} 
 
 							var sampleNamesToGenotype = getProbandVariantCard().getSampleNamesToGenotype();
-							getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0)
+							getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0, global_vepAF)
 		                	   .then(function(data) {
 		                			var theFbData = data[1];
 

@@ -723,7 +723,7 @@ var Bam = Class.extend({
 
         // Get Allele Frequencies from 1000G and ExAC
         cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
-
+        
         // VEP to annotate
         var vepArgs = [];
         vepArgs.push(" --assembly");

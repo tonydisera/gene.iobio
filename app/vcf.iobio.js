@@ -696,7 +696,7 @@ var effectCategories = [
 
         var allRecs = headerRecords.concat(recordsForRegions);
 
-        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, clinvarMap, isRefSeq && hgvsNotation, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId)
+        me._promiseAnnotateVcfRecords(allRecs, refName, geneObject, selectedTranscript, clinvarMap, isRefSeq && hgvsNotation, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF)
         .then( function(data) {
             callback(data[0], data[1]);
         }, function(error) {
@@ -756,9 +756,9 @@ var effectCategories = [
     // normalize variants
     cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
 
-    // get allele frequencies from 1000G and ExAC
+    // if af not retreived from vep, get allele frequencies from 1000G and ExAC in af service
     cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
-
+    
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (annotationEngine == 'none') {
       // skip annotation if annotationEngine set to  'none'
@@ -858,7 +858,7 @@ var effectCategories = [
       });
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, (hgvsNotation && getRsId), isMultiSample, sampleNamesToGenotype, null);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, (hgvsNotation && getRsId), isMultiSample, sampleNamesToGenotype, null, vepAF);
 
 
       callback(annotatedRecs, results);
@@ -1198,7 +1198,7 @@ var effectCategories = [
 
   }
 
-  exports.promiseParseVcfRecordsForASample = function(annotatedRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, sampleNamesToGenotype, sampleIndex) {
+  exports.promiseParseVcfRecordsForASample = function(annotatedRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, sampleNamesToGenotype, sampleIndex, vepAF) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1239,20 +1239,20 @@ var effectCategories = [
 
 
       // Parse the vcf object into a variant object that is visualized by the client.
-      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, false, sampleNamesToGenotype, sampleIndex);
+      var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, false, sampleNamesToGenotype, sampleIndex, vepAF);
       resolve([annotatedRecs, results]);
 
     });
   }
 
-  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId) {
+  exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the
       // info field.
-      me._annotateVcfRegion(records, refName, vcfSampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, function(annotatedData) {
+      me._annotateVcfRegion(records, refName, vcfSampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF, function(annotatedData) {
 
         var annotatedRecs = annotatedData.split("\n");
         var vcfObjects = [];
@@ -1286,7 +1286,7 @@ var effectCategories = [
         });
 
         // Parse the vcf object into a variant object that is visualized by the client.
-        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, sampleNamesToGenotype, null);
+        var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, sampleNamesToGenotype, null, vepAF);
         resolve([annotatedRecs, results]);
       });
     });
@@ -1559,7 +1559,7 @@ var effectCategories = [
 
 
 
-  exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, callback, callbackClinvar) {
+  exports._annotateVcfRegion = function(records, refName, sampleName, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF, callback, callbackClinvar) {
     var me = this;
 
     //  Figure out the reference sequence file path
@@ -1595,9 +1595,9 @@ var effectCategories = [
     // Normalize the variants (e.g. AAA->AAG becomes A->AG)
     cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFastaFile, '-'], {ssl: useSSL})
 
-    // Get Allele Frequencies from 1000G and ExAC
+    // If af not retreived from VEP, get Allele Frequencies from 1000G and ExAC service
     cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL})
-
+    
 
     if (annotationEngine == 'none') {
       // skip annotation with vep or snpeff if annotationEngine is not set
@@ -1607,6 +1607,12 @@ var effectCategories = [
       vepArgs.push(" --assembly");
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
+      if (vepAF) {
+        vepArgs.push("--af_gnomad");
+        vepArgs.push("--af_esp");
+        vepArgs.push("--af_1kg");
+        vepArgs.push("--max_af");
+      }      
       if (isRefSeq) {
         vepArgs.push("--refseq");
       }
@@ -1649,7 +1655,7 @@ var effectCategories = [
   }
 
 
-  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, parseMultiSample, sampleNames, sampleIndex) {
+  exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, parseMultiSample, sampleNames, sampleIndex, vepAF) {
 
       var me = this;
       var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
@@ -1746,7 +1752,7 @@ var effectCategories = [
             }
 
 
-            var annot = me._parseAnnot(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID);
+            var annot = me._parseAnnot(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, vepAF);
 
             var clinvarResult = me.parseClinvarInfo(rec.info, clinvarMap);
 
@@ -1814,7 +1820,7 @@ var effectCategories = [
                     'af':                       annot.af,
                     'af1000G':                  me._parseAf(altIdx, annot.af1000G),
                     'afExAC':                   me._parseAf(altIdx, annot.afExAC),
-                    'afgnomAD':                 annot.vep.af && annot.vep.af.gnomAD && annot.vep.af.gnomAD.AF ? annot.vep.af.gnomAD.AF : '',
+                    'afgnomAD':                 vepAF ? annot.vep.af['gnomAD'].AF : '',
                     'rsid' :                    annot.rs,
                     'combinedDepth':            annot.combinedDepth,
 
@@ -1897,7 +1903,7 @@ var effectCategories = [
       return  parseMultiSample ? results :  results[0];
   };
 
-exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID) {
+exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
   var me = this;
 
   var annot = {
@@ -1971,7 +1977,7 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
     
     } else if (annotToken.indexOf("CSQ") == 0) {
 
-      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID)
+      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF)
 
     } else if (annotToken.indexOf("AVIA3") == 0) {
       me._parseGenericAnnot("AVIA3", annotToken, annot);
@@ -2000,7 +2006,7 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
 
 
 */
-exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID) {
+exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
   var me = this;
 
   var vepFields = me.infoFields.VEP;
@@ -2111,7 +2117,7 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
           me._appendTranscript(polyphenObject, polyphenDisplay, theTranscriptId);
           annot.vep.allPolyphen[polyphenScore] = polyphenObject;
 
-          if (global_vepAF) {
+          if (vepAF) {
             me._parseVepAfAnnot(VEP_FIELDS_AF_GNOMAD, vepFields, vepTokens, "gnomAD", "gnomAD", annot);
             me._parseVepAfAnnot(VEP_FIELDS_AF_1000G,  vepFields, vepTokens, "1000G",  null,     annot);
             me._parseVepAfAnnot(VEP_FIELDS_AF_ESP,    vepFields, vepTokens, "ESP",    null,     annot);

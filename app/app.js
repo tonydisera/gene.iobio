@@ -3069,7 +3069,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 		}		
 		var vc = getRelevantVariantCards()[sampleIndex];
 		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
-		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex)
+		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 	                	var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
@@ -3214,7 +3214,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		}		
 		var vc = cards[sampleIndex];
 		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
-		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex)
+		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 
@@ -3257,7 +3257,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 		}		
 		var vc = cards[sampleIndex];
 		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
-		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex)
+		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
 	                .then(function(data) {
 	                	var theFbData = data[1];
 

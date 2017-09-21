@@ -279,7 +279,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 
 	}
 	injectAfSymbol(variant.afExAC, 'Allele Freq ExAC', 'afexac-badge');
-	injectAfSymbol(variant.afExAC, 'Allele Freq 1000G', 'af1000g-badge');
+	injectAfSymbol(variant.af1000G, 'Allele Freq 1000G', 'af1000g-badge');
 	injectAfSymbol(variant.afgnomAD, 'Allele Freq gnomAD', 'afgnomad-badge');
 	
 }
@@ -633,7 +633,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
 	var gnomADAfRow = "";
-	var gnomADAfRowWide = "";	
+	var gnomADAfRowWide = "";
+	var exacAfRow = "";
+	var exacAfRowWide = "";	
 	if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37" && variant.vepAf.gnomAD.hasOwnProperty("AF")) {
 		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "n/a" : percentage(variant.vepAf.gnomAD.AF)), '6px')
 		var af   =  variant.vepAf.gnomAD.AF == "." ? "n/a" : percentage(variant.vepAf.gnomAD.AF);
@@ -652,6 +654,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			}
 			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + buf + '</span>');
 		}
+	} else {
+		exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), gnomADAfRow.length > 0 ? '0px' : '6px');
+		exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'));
 	}
 
 	if (rec) {
@@ -673,6 +678,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		rec.HGVSp            = vepHGVSpDisplay;
 		rec.afExAC           = (variant.afExAC == -100 ? "n/a" : variant.afExAC);
 		rec.af1000G          = variant.af1000G;
+		rec.afgnomAD         = variant.afgnomAD;
 		rec.qual             = variant.qual;
 		rec.filter           = variant.filter;
 		rec.freebayesCalled  = variant.fbCalled;
@@ -714,7 +720,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ inheritanceModeRow
 			+ siftPolyphenRow
 			+ gnomADAfRow
-			+ me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), gnomADAfRow.length > 0 ? '0px' : '6px')
+			+ exacAfRow
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
 			+ clinvarSimpleRow1
 			+ clinvarSimpleRow2
@@ -741,7 +747,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var rightDiv = 
 			'<div class="tooltip-right-column">'
 			+ gnomADAfRowWide
-			+ me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'))
+			+ exacAfRowWide
 			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
 			+ me._tooltipRow('Qual', variant.qual, null, true) 
 			+ me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
