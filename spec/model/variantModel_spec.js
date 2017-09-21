@@ -270,7 +270,7 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						afexac_rare: { field: 'afExAC', value: 5 }
+						afhighest_rare: { field: 'afExAC', value: 5 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
@@ -299,7 +299,7 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						af1000g_unique: { field: 'af1000G', value: 2 }
+						afhighest_rare: { field: 'af1000G', value: 2 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
@@ -328,7 +328,7 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						afexac_rare: { field: 'afExAC', value: 5 }
+						afhighest_rare: { field: 'afExAC', value: 5 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
@@ -357,7 +357,7 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						af1000g_unique: { field: 'af1000G', value: 2 }
+						afhighest_rare: { field: 'af1000G', value: 2 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 

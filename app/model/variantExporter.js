@@ -16,6 +16,7 @@ function VariantExporter() {
 		{field: 'consequence', 			exportVcf: true},
 		{field: 'afExAC', 				exportVcf: true},
 		{field: 'af1000G', 				exportVcf: true},
+		{field: 'afgnomAD', 			exportVcf: true},
 		{field: 'inheritance', 			exportVcf: true}, 
 		{field: 'polyphen', 			exportVcf: true},
 		{field: 'SIFT', 				exportVcf: true},

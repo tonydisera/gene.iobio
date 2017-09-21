@@ -116,46 +116,6 @@ module.exports = {
       return this.api.useXpath().moveToElement(filter.synonymous, 1,1).click(filter.synonymous);
     },
 
-    clickAfexacUnique: function() {
-      return this.api.useXpath().moveToElement(filter.afexacUnique, 1,1).click(filter.afexacUnique);      
-    },
-    clickAfexacUberrare: function() {
-      return this.api.useXpath().moveToElement(filter.afexacUberrare, 1,1).click(filter.afexacUberrare);      
-    },
-    clickAfexacSuperrare: function() {
-      return this.api.useXpath().moveToElement(filter.afexacSuperrare, 1,1).click(filter.afexacSuperrare);      
-    },
-    clickAfexacRare: function() {
-      return this.api.useXpath().moveToElement(filter.afexacRare, 1,1).click(filter.afexacRare);      
-    },
-    clickAfexacUncommon: function() {
-      return this.api.useXpath().moveToElement(filter.afexacUncommon, 1,1).click(filter.afexacUncommon);      
-    },
-    clickAfexacCommon: function() {
-      return this.api.useXpath().moveToElement(filter.afexacCommon, 1,1).click(filter.afexacCommon);      
-    },
-    clickAfexacUniqueNc: function() {
-      return this.api.useXpath().moveToElement(filter.afexacUniqueNc, 1,1).click(filter.afexacUniqueNc);      
-    },
-
-    clickAf1000gUnique: function() {
-      return this.api.useXpath().moveToElement(filter.af1000gUnique, 1,1).click(filter.af1000gUnique);      
-    },
-    clickAf1000gUberrare: function() {
-      return this.api.useXpath().moveToElement(filter.af1000gUberrare, 1,1).click(filter.af1000gUberrare);      
-    },
-    clickAf1000gSuperrare: function() {
-      return this.api.useXpath().moveToElement(filter.af1000gSuperrare, 1,1).click(filter.af1000gSuperrare);      
-    },
-    clickAf1000gRare: function() {
-      return this.api.useXpath().moveToElement(filter.af1000gRare, 1,1).click(filter.af1000gRare);      
-    },
-    clickAf1000gUncommon: function() {
-      return this.api.useXpath().moveToElement(filter.af1000gUncommon, 1,1).click(filter.af1000gUncommon);      
-    },    
-    clickAf1000gCommon: function() {
-      return this.api.useXpath().moveToElement(filter.af1000gCommon, 1,1).click(filter.af1000gCommon);      
-    },
 
     clickClearAll: function() {
       return this.click('@clearAll');

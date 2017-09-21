@@ -454,8 +454,7 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 
 
 	    if (variant.afFieldHighest) {
-	    	var afMapName = matrixCard.afFieldToMap[variant.afFieldHighest];
-			matrixCard[afMapName].forEach( function(rangeEntry) {
+			matrixCard.afHighestMap.forEach( function(rangeEntry) {
 				if (+variant.afHighest > rangeEntry.min && +variant.afHighest <= rangeEntry.max) {
 					if (rangeEntry.value < lowestAf) {
 						lowestAf = rangeEntry.value;
@@ -1769,8 +1768,7 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 
 		// Determine if the highest AF is in a range that we consider 'rare'
 		if (variant.afFieldHighest) {
-			var afMapName = matrixCard.afFieldToMap[variant.afFieldHighest];
-			matrixCard[afMapName].forEach( function(rangeEntry) {
+			matrixCard.afHighestMap.forEach( function(rangeEntry) {
 				if (+variant.afHighest > rangeEntry.min && +variant.afHighest <= rangeEntry.max) {
 					if (rangeEntry.badge) {
 						variantDanger.af = +variant.afHighest;
@@ -1820,10 +1818,10 @@ VariantModel.prototype._determineHighestAf = function(variant) {
 	if (global_vepAF) {
 		if ($.isNumeric(variant.vepAf.gnomAD.AF) && afHighest) {
 			if (variant.vepAf.gnomAD.AF >= afHighest) {
-				variant.afFieldHighest = 'vepAf.gnomAD.AF';
+				variant.afFieldHighest = 'afgnomAD';
 			} 
 		} else if ($.isNumeric(variant.vepAf.gnomAD.AF)) {
-			variant.afFieldHighest = 'vepAf.gnomAD.AF';
+			variant.afFieldHighest = 'afgnomAD';
 		}
 	} 
 	variant.afHighest = me.getHighestAf(variant);

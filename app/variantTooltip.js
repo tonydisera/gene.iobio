@@ -251,52 +251,36 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		}
 	}	
 
-	if (matrixCard.isNumeric(variant.afExAC)) {
-		var rawValue = variant.afExAC;
-		var afClazz = null;
-		var afSymbolFunction = null;
-		var lowestValue = 999;
-		matrixCard.afHighestMap.forEach( function(rangeEntry) {
-			if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-				if (rangeEntry.value < lowestValue) {
-					lowestValue = rangeEntry.value;
-					afClazz = rangeEntry.clazz;
-					afSymbolFunction = rangeEntry.symbolFunction;					
+
+	var injectAfSymbol = function(af, header, afBadgeClass) {
+		if (matrixCard.isNumeric(af)) {
+			var rawValue = af;
+			var afClazz = null;
+			var afSymbolFunction = null;
+			var lowestValue = 999;
+			matrixCard.afHighestMap.forEach( function(rangeEntry) {
+				if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
+					if (rangeEntry.value < lowestValue) {
+						lowestValue = rangeEntry.value;
+						afClazz = rangeEntry.clazz;
+						afSymbolFunction = rangeEntry.symbolFunction;					
+					}
 				}
-			}
-		});
-		var afLabel = tooltip.selectAll('.tooltip-header').filter( function(d) { 
-			return d3.select(this).text() == 'Allele Freq ExAC'; 
-		});
-		if (afClazz && !afLabel.empty()) {
-			$(afLabel.node()).next().prepend("<svg class=\"afexac-badge\" style=\"float:left\" height=\"14\" width=\"15\">");
-			var selection = d3.select(afLabel[0].parentNode).select('.afexac-badge').data([{clazz: afClazz}]);
-			afSymbolFunction(selection, {transform: 'translate(2,0)'});		
+			});
+			var afLabel = tooltip.selectAll('.tooltip-header').filter( function(d) { 
+				return d3.select(this).text() == header; 
+			});
+			if (afClazz && !afLabel.empty()) {
+				$(afLabel.node()).next().prepend("<svg class=\"" + afBadgeClass + "\" style=\"float:left\" height=\"14\" width=\"15\">");
+				var selection = d3.select(afLabel[0].parentNode).select('.' + afBadgeClass).data([{clazz: afClazz}]);
+				afSymbolFunction(selection, {transform: 'translate(2,0)'});		
+			}			
 		}
+
 	}
-	if (matrixCard.isNumeric(variant.af1000G)) {
-		var rawValue = variant.af1000G;
-		var afClazz = null;
-		var afSymbolFunction = null;
-		var lowestValue = 999;
-		matrixCard.afHighestMap.forEach( function(rangeEntry) {
-			if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-				if (rangeEntry.value < lowestValue) {
-					lowestValue = rangeEntry.value;
-					afClazz = rangeEntry.clazz;
-					afSymbolFunction = rangeEntry.symbolFunction;
-				}
-			}
-		});
-		var afLabel = tooltip.selectAll('.tooltip-header').filter( function(d) { 
-			return d3.select(this).text() == 'Allele Freq 1000G'; 
-		});
-		if (afClazz && !afLabel.empty()) {
-			$(afLabel.node()).next().prepend("<svg class=\"af1000g-badge\" style=\"float:left\" height=\"14\" width=\"15\">");
-			var selection = d3.select(afLabel[0].parentNode).select('.af1000g-badge').data([{clazz: afClazz}]);
-			afSymbolFunction(selection, {transform: 'translate(2,0)'});		
-		}		
-	}
+	injectAfSymbol(variant.afExAC, 'Allele Freq ExAC', 'afexac-badge');
+	injectAfSymbol(variant.afExAC, 'Allele Freq 1000G', 'af1000g-badge');
+	injectAfSymbol(variant.afgnomAD, 'Allele Freq gnomAD', 'afgnomad-badge');
 	
 }
 

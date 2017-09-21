@@ -1802,8 +1802,6 @@ var effectCategories = [
                     // fields to init to 'empty'
                     'consensus':                rec.consensus,
                     'inheritance':              '',
-                    'af1000glevel':             '',
-                    'afexaclevel:':             '',
 
                     // clinvar coords
                     'clinvarStart':            clinvarObject.clinvarStart,

@@ -66,8 +66,7 @@ describe('filterCard', function() {
 				clinvar_cd:       {key: 'clinvar',       state: true, value: 'clinvar_cd'},
 				clinvar_other:    {key: 'clinvar',       state: true, value: 'clinvar_other'},
 				clinvar_lbenign:  {key: 'clinvar',       state: true, value: 'clinvar_lbenign'},
-				clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'},
-				PASS:             {key: 'recfilter',     state: true, value: 'PASS'}				
+				clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}		
 			};
 			var expectedFilterObject = {
 				afMin: 0,
