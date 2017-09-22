@@ -1052,7 +1052,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 
 	        if (firstTime) {
 	        	row.style("padding-top", "6px");
-	        	me._appendReadCountHeading(container);
+	        	me._appendReadCountHeading(row);
 	        	firstTime = false;
 	        }
 			row.append("div")
