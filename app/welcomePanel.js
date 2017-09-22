@@ -4,7 +4,7 @@ function WelcomePanel() {
 
 	this.videoConfigs = {
 		'screencast-getting-started': {
-			src: "https://www.youtube.com/embed/XVh_bEsMgcc?rel=0&ecver=2",
+			src: "https://www.youtube.com/embed/5g5wT1xDCfY?ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",

@@ -1725,6 +1725,13 @@ inputinput:-moz-placeholder {
           background-image: url("../../assets/images/thumbprint-bookmarks.png"); }
         #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-coverage-analysis {
           background-image: url("../../assets/images/thumbprint-coverage.png"); }
+      #welcome-area .welcome-panel #welcome-panel-content #video-thumbprint-heading-large {
+        font-size: 21px;
+        color: white;
+        position: relative;
+        top: 95px;
+        z-index: 1;
+        cursor: default; }
       #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large {
         position: relative;
         width: 250px;
@@ -1735,7 +1742,7 @@ inputinput:-moz-placeholder {
           margin-top: 10px;
           margin-left: 10px;
           margin-right: 10px;
-          color: #5d809d;
+          color: white;
           font-size: 16px;
           line-height: 17px; }
         #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large {
@@ -1745,14 +1752,16 @@ inputinput:-moz-placeholder {
           background-size: cover; }
           #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large #play-button {
             cursor: pointer;
-            opacity: 0.7;
-            color: rgba(70, 70, 70, 0.9);
+            opacity: 0.4;
+            color: white;
             font-size: 90px;
             position: absolute;
             top: 35px;
-            left: 80px; }
+            left: 80px;
+            cuursor: pointer;
+            z-index: 200; }
         #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-getting-started {
-          background-image: url("../../assets/images/thumbprint-getting-started.png"); }
+          background-image: url("../../assets/images/blue-green-background.png"); }
 
 #screencast-panel {
   text-align: center;
