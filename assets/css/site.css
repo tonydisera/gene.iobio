@@ -1630,7 +1630,7 @@ inputinput:-moz-placeholder {
 
 #welcome-area {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 60px;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
@@ -1646,6 +1646,8 @@ inputinput:-moz-placeholder {
     #welcome-area .welcome-panel #welcome-label {
       color: #5d809d;
       font-size: 20px; }
+    #welcome-area .welcome-panel #what-is-new-link {
+      font-size: 18px; }
     #welcome-area .welcome-panel button {
       color: #5d809d;
       font-size: 17px !important;
