@@ -4,37 +4,56 @@
 
 
 
-      <div style="min-width:165px;text-align:left;width:1px;margin-right:10px">
+      <div style="min-width:215px;text-align:left;width:1px;margin-right:10px">
           <div class="legend-label" style="width:100px">Gene summary</div>
 
           <div>
-            <svg  width="105" height="18" style="margin-left:0px;display:inline-block" class="harmful1-variant legend-element level-edu glyph">
+            <svg  width="120" height="18" style="margin-left:0px;display:inline-block" class="harmful1-variant legend-element level-edu glyph">
               <g transform="translate(0,0)">
                   <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="13" height="13" style="pointer-events: none;">
                   </use>
-                  <text class="name" x="16" y="11">Harmful variant</text>
+                  <text class="name" x="16" y="11">Rare ClinVar variant</text>
               </g>
             </svg>
 
             <a class="legend-help-link"  data-toggle="collapse" href="#harmful1-variant-help" aria-expanded="false">more...</a>
-            <div id="harmful1-variant-help" style="clear:both" class="legend-help collapse">Rare (&lt;5 AF%) variant that is clinvar pathogenic or high impact</div>
+            <div id="harmful1-variant-help" style="clear:both" class="legend-help collapse">Rare (&lt;5 AF%) variant that is clinvar pathogenic or likely pathogenic</div>
           </div>
 
           <div>
-            <svg  width="105" height="18" style="margin-left:0px;display:inline-block" class="harmful2-variant legend-element level-edu glyph">
-              <g transform="translate(0,0)">
-                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="13" height="13" style="pointer-events: none;">
+            <svg  width="140" height="18" style="margin-left:0px;display:inline-block" class="harmful2-variant legend-element level-edu glyph">
+              <g transform="translate(-1,0)">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#error-symbol" width="15" height="15" style="pointer-events: none;">
                   </use>
-                  <text class="name" x="16" y="11">Harmful variant</text>
+                  <text class="name" x="16" y="11">Rare high impact variant</text>
               </g>
             </svg>
 
             <a class="legend-help-link" data-toggle="collapse" href="#harmful2-variant-help" aria-expanded="false">more...</a>
-            <div id="harmful2-variant-help"  class="legend-help collapse">Rare (&lt;5 AF%) variant that is moderate impact</div>
+            <div id="harmful2-variant-help"  class="legend-help collapse">Rare (&lt;5 AF%) variant that is high impact</div>
           </div>
 
+          <div>
+            <svg  width="170" height="18" style="margin-left:0px;display:inline-block" class="harmful3-variant legend-element level-edu glyph">
+              <g transform="translate(-1,0)">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#error-symbol" width="15" height="15" style="pointer-events: none;">
+                  </use>
+                  <text class="name" x="16" y="11">Rare moderate impact variant</text>
+              </g>
+            </svg>
+
+            <a class="legend-help-link" data-toggle="collapse" href="#harmful3-variant-help" aria-expanded="false">more...</a>
+            <div id="harmful3-variant-help"  class="legend-help collapse">Rare (&lt;5 AF%) variant that is moderate impact</div>
+          </div>          
+
           <div style="clear:both">
-           <i id="gene-badge-coverage-problem" style="display:inline-block;padding-top: 2px;padding-right: 3px;" class="material-icons glyph level-edu">error</i>
+            <svg id="gene-badge-coverage-problem" width="17" height="25" style="margin-left:0px;display:inline-block" class="legend-element level-edu glyph">
+              <g transform="translate(0,2)">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#trending-down-symbol" width="12" height="12" style="pointer-events: none;">
+                  </use>
+              </g>
+            </svg>
+
            <span class="legend-text" style="vertical-align:top">Insufficient coverage</span>
 
             <a class="legend-help-link" data-toggle="collapse" href="#insufficient-coverage-help" aria-expanded="false">more...</a>
