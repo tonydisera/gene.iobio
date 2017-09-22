@@ -3620,7 +3620,10 @@ textarea#genes-to-copy {
   fill: #9d2024; }
 
 .harmful2-variant {
-  fill: #d6635c; }
+  fill: #d84d4d; }
+
+.harmful3-variant {
+  fill: #ef9754; }
 
 #gene-badge-harmful1-variant {
   display: none;
@@ -3628,7 +3631,11 @@ textarea#genes-to-copy {
 
 #gene-badge-harmful2-variant {
   display: none;
-  fill: #d6635c; }
+  fill: #d84d4d; }
+
+#gene-badge-harmful3-variant {
+  display: none;
+  fill: #ef9754; }
 
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
@@ -3645,6 +3652,8 @@ textarea#genes-to-copy {
 #gene-badge.has-harmful1-variant #gene-badge-harmful1-variant {
   display: inline-block; }
 #gene-badge.has-harmful2-variant #gene-badge-harmful2-variant {
+  display: inline-block; }
+#gene-badge.has-harmful3-variant #gene-badge-harmful3-variant {
   display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }

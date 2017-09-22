@@ -97,6 +97,7 @@ function MatrixCard() {
     this.harmfulVariantMap = {
                         1:    {value: 1,   badge: true,  clazz: 'harmful1-variant',  symbolFunction: this.showHarmfulVariantSymbol},
                         2:    {value: 2,   badge: true,  clazz: 'harmful2-variant',  symbolFunction: this.showHarmfulVariantSymbol},
+                        3:    {value: 3,   badge: true,  clazz: 'harmful3-variant',  symbolFunction: this.showHarmfulVariantSymbol},
                         none: {value: 101, badge: false, clazz: '',                  symbolFunction: ''}
                  };
 	// For af range, value must be > min and <= max
@@ -984,20 +985,21 @@ MatrixCard.prototype.showHarmfulVariantSymbol = function(selection, options) {
 	var width, height, clazz;
 	options = options || {};
 
+	var datumAttrs = selection.datum() || {};
+
 	var attrs = {
 		width: "13",
 		height: "13",
-		transform: "translate(2,2)",
+		transform: datumAttrs.rank && datumAttrs.rank == 1 ? "translate(2,3)" : "translate(2,2)",
 		clazz: ""
 	};
 
-	var datumAttrs = selection.datum() || {};
-
+	
 	var cellSizeAttrs = {};
 	if (options.cellSize > 18) {
 		cellSizeAttrs.width = "16",
 		cellSizeAttrs.height = "16",
-		cellSizeAttrs.transform = "translate(2,2)"
+		cellSizeAttrs.transform = datumAttrs.rank && datumAttrs.rank == 1 ? "translate(2,3)" : "translate(2,2)"
 	}
 
 	$.extend(attrs, datumAttrs, cellSizeAttrs, options);
@@ -1005,10 +1007,10 @@ MatrixCard.prototype.showHarmfulVariantSymbol = function(selection, options) {
 	selection.append("g")
 	         .attr("transform", attrs.transform)
 	         .append("use")
-	         .attr("xlink:href", "#lightning-symbol")
+	         .attr("xlink:href", datumAttrs.rank == 1 ? "#lightning-symbol" : "#error-symbol")
 	         .attr("class", attrs.clazz)
-	         .attr("width", attrs.width)
-	         .attr("height", attrs.height)
+	         .attr("width",  datumAttrs.rank == 1 ? attrs.width - 2  : attrs.width )
+	         .attr("height", datumAttrs.rank == 1 ? attrs.height - 2 : attrs.height)
 	         .style("pointer-events", "none");
 };
 

@@ -1787,7 +1787,7 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 			            'SIFT'       : variantDanger.sift,
 				        'impact'     : variantDanger.impact, 
 			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false,
-			            'level'      : variantDanger.clinvar || variantDanger.impact == 'high' ? 1 : 2			            			          
+			            'level'      : variantDanger.clinvar ? 1 : (variantDanger.impact == 'high' ? 2 : 3)			            			          
 			};
 			variant.harmfulVariantLevel = variant.harmfulVariant.level;
 		}

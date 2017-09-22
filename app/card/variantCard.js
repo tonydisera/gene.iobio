@@ -273,7 +273,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		 	    							  .append('use')
 		 	    							  .attr('height',     '16')
 		 	    							  .attr('width',      '16')
-		 	    							  .attr('href', '#error-symbol')
+		 	    							  .attr('href', '#trending-down-symbol')
 		 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
 		 	    							  .data([d]);									
 								}

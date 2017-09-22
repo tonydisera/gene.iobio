@@ -361,7 +361,11 @@ textarea#genes-to-copy
   fill: #9d2024
 
 .harmful2-variant
-  fill: #d6635c
+  fill: #d84d4d
+
+.harmful3-variant
+  fill: #ef9754
+
 
 #gene-badge-harmful1-variant
   display: none 
@@ -369,8 +373,11 @@ textarea#genes-to-copy
 
 #gene-badge-harmful2-variant
   display: none 
-  fill: #d6635c
+  fill: #d84d4d
 
+#gene-badge-harmful3-variant
+  display: none 
+  fill: #ef9754
 
 
 
@@ -403,6 +410,9 @@ textarea#genes-to-copy
   &.has-harmful2-variant
     #gene-badge-harmful2-variant
       display: inline-block 
+  &.has-harmful3-variant
+    #gene-badge-harmful3-variant
+      display: inline-block       
 
   &:hover #gene-badge-remove
     visibility: visible 

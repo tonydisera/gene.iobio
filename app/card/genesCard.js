@@ -1670,6 +1670,7 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("has-coverage-problem");
 	geneBadge.removeClass("has-harmful1-variant");
 	geneBadge.removeClass("has-harmful2-variant");
+	geneBadge.removeClass("has-harmful3-variant");
 	geneBadge.removeClass("failed-filter");
 }
 
@@ -1768,6 +1769,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 
 	geneBadge.removeClass("has-harmful1-variant");
 	geneBadge.removeClass("has-harmful2-variant");
+	geneBadge.removeClass("has-harmful3-variant");
 
 	if (dangerObject.harmfulVariantsInfo && dangerObject.harmfulVariantsInfo.length > 0) {
 
