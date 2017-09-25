@@ -3539,14 +3539,14 @@ function promiseDetermineInheritance(promise) {
 					trioModel.compareVariantsToMotherFather(function() {
 						getRelevantVariantCards().forEach(function(vc) {
 							if (trioVcfData[vc.getRelationship()]) {
-								vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()]);
+								vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()], window.selectedTranscript);
 							}
 						})
 						postInheritanceProcessing(trioVcfData.proband, probandVariantCard);
 					});
 
 				} else {
-					probandVariantCard.model.performAdditionalParsing(trioVcfData.proband);
+					probandVariantCard.model.performAdditionalParsing(trioVcfData.proband, window.selectedTranscript);
 
 					probandVariantCard.determineMaxAlleleCount();
 

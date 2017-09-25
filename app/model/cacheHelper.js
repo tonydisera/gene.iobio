@@ -535,7 +535,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 
 		getRelevantVariantCards().forEach(function(vc) {
 			if (trioVcfData[vc.getRelationship()]) {
-				vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()]);
+				vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()], transcript);
 			}
 		})
 

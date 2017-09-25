@@ -1706,7 +1706,7 @@ VariantModel.prototype.postInheritanceParsing = function(theVcfData, theGene, th
 }
 
 
-VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
+VariantModel.prototype.performAdditionalParsing = function(theVcfData, theTranscript) {
 	var me = this;
 	if (theVcfData == null || theVcfData.features == null) {
 		return;
@@ -1720,6 +1720,18 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData) {
 		variant.afHighest = '.';
 
 		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
+
+	  	// For ExAC levels, differentiate between af not found and in
+	  	// coding region (level = private) and af not found and intronic (non-coding)
+	  	// region (level = unknown)
+	  	if (variant.afExAC == 0) {
+			variant.afExAC = -100;
+	    	getCodingRegions(theTranscript).forEach(function(codingRegion) {
+	    		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
+	    			variant.afExAC = 0;
+	    		}
+	    	});
+	  	}
 
 
 	    for (key in variant.highestImpactVep) {
