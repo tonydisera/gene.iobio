@@ -3049,9 +3049,9 @@ text.ref-count {
       width: 360px;
       overflow: auto; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
-        width: 90px; }
+        width: 105px; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
-        width: 250px; }
+        width: 240px; }
   .tooltip-wide .tooltip-right-column {
     float: left;
     padding-top: 5px;

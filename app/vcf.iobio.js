@@ -2033,7 +2033,9 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
           annot.vep.vepConsequence[token] = token;
         })
 
-        annot.vep.vepExon[vepTokens[vepFields.EXON]] = vepTokens[vepFields.EXON];
+        if (vepTokens[vepFields.EXON] && vepTokens[vepFields.EXON].length > 0) {
+          annot.vep.vepExon[vepTokens[vepFields.EXON]] = vepTokens[vepFields.EXON];
+        } 
         annot.vep.vepHGVSc[vepTokens[vepFields.HGVSc]] = vepTokens[vepFields.HGVSc];
         annot.vep.vepHGVSp[vepTokens[vepFields.HGVSp]] = vepTokens[vepFields.HGVSp];
         annot.vep.vepAminoAcids[vepTokens[vepFields.Amino_acids]] = vepTokens[vepFields.Amino_acids];

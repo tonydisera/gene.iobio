@@ -296,8 +296,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	}
 
 	var exonDisplay = "";
-	if (variant.hasOwnProperty("vepExon")) {
-		exonDisplay += "    Exon ";
+	if (variant.hasOwnProperty("vepExon") && !$.isEmptyObject(variant.vepExon)) {
+		exonDisplay += "Exon ";
 		exonDisplay += Object.keys(variant.vepExon).join(",");
 	}
 
@@ -515,18 +515,28 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	}     	
 	var vepHGVScDisplay = "";
 	var vepHGVSpDisplay = "";
+	var vepHGVSpAbbrev  = "";
 	if (variant.fbCalled == 'Y' || variant.extraAnnot) {
 		for (var key in variant.vepHGVSc) {
-			if (vepHGVScDisplay.length > 0) {
-			  	vepHGVScDisplay += ", ";
+			if (key.length > 0) {
+				if (vepHGVScDisplay.length > 0) {
+				  	vepHGVScDisplay += ", ";
+				}
+				vepHGVScDisplay += key;				
 			}
-			vepHGVScDisplay += key;
 		}   		
 		for (var key in variant.vepHGVSp) {
-			if (vepHGVSpDisplay.length > 0) {
-			  	vepHGVSpDisplay += ", ";
+			if (key.length > 0) {
+				if (vepHGVSpDisplay.length > 0) {
+				  	vepHGVSpDisplay += ", ";
+				}			
+				vepHGVSpDisplay += key;
+
+				if (vepHGVSpAbbrev.length < 0) {
+					vepHGVSpAbbrev += ", ";
+				}
+				vepHGVSpAbbrev = key.split(":p.")[1];				
 			}
-			vepHGVSpDisplay += key;
 		}   
 	} else {
 		// Show the loading gif for the hgvs notations (for tooltips only; not export record)
@@ -659,6 +669,14 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'));
 	}
 
+	var moreRow = '<div class="tooltip-row">'
+				+    '<div class="col-sm-3"></div>'
+				+    '<div class="col-sm-7">'
+				+    ' <a data-toggle="collapse" href="#tooltip-more" aria-expanded="false">more...</a>'
+				+    '</div>'
+				+ '</div>';
+
+
 	if (rec) {
 		rec.inheritance      = variant.inheritance ? matrixCard.getInheritanceLabel(variant.inheritance) : "";
 		rec.impact           = vepImpactDisplay;
@@ -678,7 +696,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		rec.HGVSp            = vepHGVSpDisplay;
 		rec.afExAC           = (variant.afExAC == -100 ? "n/a" : variant.afExAC);
 		rec.af1000G          = variant.af1000G;
-		rec.afgnomAD         = variant.afgnomAD;
+		rec.afgnomAD         = variant.afgnomAD == "." ? 0 : variant.afgnomAD;
 		rec.qual             = variant.qual;
 		rec.filter           = variant.filter;
 		rec.freebayesCalled  = variant.fbCalled;
@@ -714,7 +732,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(theTranscript ? 'Transcript ' + theTranscript.transcript_id : "", exonDisplay, '', '')
+			+ me._tooltipMainHeaderRow(exonDisplay, vepHGVSpAbbrev, '', '')
 			+ me._tooltipMainHeaderRow(vepImpactDisplay, vepConsequenceDisplay, '', '', 'impact-badge')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -723,8 +741,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ exacAfRow
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
 			+ clinvarSimpleRow1
-			+ clinvarSimpleRow2
-			+ me._tooltipRowAlleleCounts() 
+			+ clinvarSimpleRow2			
 			+ me._linksRow(variant, pinMessage)
 		);                  
 
@@ -732,16 +749,21 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		var leftDiv =  
 		    '<div class="tooltip-left-column">' 
-			+ me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
-			+ me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
-		    + me._tooltipRow('VEP Consequence', vepConsequenceDisplay)
-			+ me._tooltipRow('VEP Impact', ' '  + vepImpactDisplay, null, true, 'impact-badge')
-			+ vepHighestImpactExamineRow			
-			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
-			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
-			+ me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
-			+ me._tooltipRow('&nbsp;', phenotypeDisplay, null, false, 'tooltip-clinvar-pheno')
-			+ me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
+		    +   me._tooltipRow('VEP Consequence', vepConsequenceDisplay)
+			+   me._tooltipRow('VEP Impact', ' '  + vepImpactDisplay, null, true, 'impact-badge')
+			+   vepHighestImpactExamineRow			
+			+   me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
+			+   me._tooltipRow('&nbsp;', phenotypeDisplay, null, false, 'tooltip-clinvar-pheno')
+			+   moreRow
+			+   "<div id='tooltip-more' class='collapse'>"
+			+      me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
+			+      me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
+			+      me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
+			+      me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
+			+      me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
+			+      me._tooltipRow('Qual', variant.qual, null, true) 
+			+      me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
+			+   "</div>"
 			+ "</div>";
 
 		var rightDiv = 
@@ -749,8 +771,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ gnomADAfRowWide
 			+ exacAfRowWide
 			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
-			+ me._tooltipRow('Qual', variant.qual, null, true) 
-			+ me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
 			+ me._tooltipRowAlleleCounts() 
 			+ "</div>";
 
@@ -763,7 +783,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		    '<div class="tooltip-wide">'
 			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(theTranscript ? 'Transcript ' + theTranscript.transcript_id : "", exonDisplay, '', '')
+			+ me._tooltipMainHeaderRow(exonDisplay, vepHGVSpAbbrev, '', '')
 			+ inheritanceModeRow
 			+ '<div class="row" style="max-height:225px;overflow-y:scroll">' 
 				+ leftDiv
