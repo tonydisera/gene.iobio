@@ -3024,12 +3024,10 @@ text.ref-count {
     font-size: 14px; }
   .tooltip-wide .tooltip-row {
     clear: both;
-    padding-bottom: 3px; }
-    .tooltip-wide .tooltip-row.ped-info {
-      padding-bottom: 6px; }
+    padding-bottom: 8px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
-    padding-top: 0px !important;
+    padding-top: 10px !important;
     padding-bottom: 2px; }
     .tooltip-wide .tooltip-footer .bookmark-badge {
       height: 14px;
@@ -3049,9 +3047,9 @@ text.ref-count {
       width: 360px;
       overflow: auto; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
-        width: 105px; }
+        width: 115px; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
-        width: 240px; }
+        width: 230px; }
   .tooltip-wide .tooltip-right-column {
     float: left;
     padding-top: 5px;

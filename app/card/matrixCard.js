@@ -678,7 +678,7 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 		screenY += $('#nav-edu-tour').outerHeight();
 	} 
 
-	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, null, null, adjustPosition);
+	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, getProbandVariantCard(), null, adjustPosition);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});

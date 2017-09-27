@@ -1864,8 +1864,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 	var x = variant.screenX + 7;
 	var y = variant.screenY - 27;
-	
-	
+
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, x, y, me);
 
 	tooltip.select("#unpin").on('click', function() {

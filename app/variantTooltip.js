@@ -285,7 +285,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 }
 
 
-VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec, geneObject, theTranscript) {
+VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec, geneObject, theTranscript, variantCard) {
 	var me = this;
 
 	geneObject = geneObject ? geneObject : window.gene;
@@ -367,6 +367,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var clinvarLink = "";
 	var clinvarSimpleRow1 = '';
 	var clinvarSimpleRow2 = '';
+	var knownVariantsClinvarLink = '';	
 	if (isLevelEdu) {
 		if (clinSigDisplay != null && clinSigDisplay != "") {
 			clinvarSimpleRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');	
@@ -384,7 +385,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			clinvarLink += '<a  href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
 			clinvarLink += '</div>';
 			
-			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '<span>', null);		
+			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '</span>', null);		
 			if (phenotypeDisplay) {
 				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay, null, 'tooltip-clinvar-pheno');		
 			}
@@ -408,8 +409,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					var accessionSingle = accessions[i];
 					var clinsigSingle   = clinsigs.length > i ? clinsigs[i] : "?";
 
-					clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
-					clinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
+					clinvarUrl   = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accessionSingle;
+					clinvarLink +=  '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="float:left;padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
+
+					knownVariantsClinvarLink += "<span style='clear:both' class='tooltip-clinsig-link" + clinsigSingle + "'>";
+					knownVariantsClinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
+
 				}	
 				if (submission.phenotype != 'not_provided' && submission.phenotype != "not_specified") {
 					clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype.split("_").join(" ") + '</span>';
@@ -515,7 +520,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	}     	
 	var vepHGVScDisplay = "";
 	var vepHGVSpDisplay = "";
-	var vepHGVSpAbbrev  = "";
 	if (variant.fbCalled == 'Y' || variant.extraAnnot) {
 		for (var key in variant.vepHGVSc) {
 			if (key.length > 0) {
@@ -531,11 +535,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				  	vepHGVSpDisplay += ", ";
 				}			
 				vepHGVSpDisplay += key;
-
-				if (vepHGVSpAbbrev.length < 0) {
-					vepHGVSpAbbrev += ", ";
-				}
-				vepHGVSpAbbrev = key.split(":p.")[1];				
 			}
 		}   
 	} else {
@@ -616,6 +615,10 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			});
 		}
 	};
+	if (dbSnpLink.length == 0 && variant.rsid && variant.rsid.length > 0) {
+		dbSnpUrl   = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + variant.rsid;
+		dbSnpLink +=  '<a href="' + dbSnpUrl + '" target="_dbsnp"' + '>' + 'rs' + variant.rsid + '</a>';							
+	}
 
 	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
 	                          ? ''
@@ -647,34 +650,29 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 	var exacAfRow = "";
 	var exacAfRowWide = "";	
 	if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37" && variant.vepAf.gnomAD.hasOwnProperty("AF")) {
-		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF)), '6px')
+		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF)), '6px');
 		var af   =  variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF);
 		var link =  "<a target='_gnomad' href='http://gnomad.broadinstitute.org/variant/" + variant.chrom + "-" + variant.start + "-" + variant.ref + "-" + variant.alt + "'>" + af + "</a>";
-		gnomADAfRowWide = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (af == "." ? af : link) + '</span>');
+		var popAF = "";
 		if (variant.vepAf.gnomAD.AF != ".") {
-			var buf = "";
 			for (var key in variant.vepAf.gnomAD) {
 				if (key != "AF") {
 					var label = key.split("_")[0];
-					if (buf.length > 0) {
-						buf += ", ";
+					if (popAF.length > 0) {
+						popAF += ", ";
 					}
-					buf += label + " " + (variant.vepAf.gnomAD[key] == "." ? "." : percentage(variant.vepAf.gnomAD[key]));					
+					popAF += label + " " + (variant.vepAf.gnomAD[key] == "." ? "." : percentage(variant.vepAf.gnomAD[key]));					
 				}
 			}
-			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + buf + '</span>');
+		}
+		gnomADAfRowWide  = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (variant.vepAf.gnomAD.AF == "." ? af : link) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
+		if (popAF.length > 0) {
+			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
 		}
 	} else {
 		exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), gnomADAfRow.length > 0 ? '0px' : '6px');
 		exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'));
 	}
-
-	var moreRow = '<div class="tooltip-row">'
-				+    '<div class="col-sm-3"></div>'
-				+    '<div class="col-sm-7">'
-				+    ' <a data-toggle="collapse" href="#tooltip-more" aria-expanded="false">more...</a>'
-				+    '</div>'
-				+ '</div>';
 
 
 	if (rec) {
@@ -732,7 +730,6 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		return (
 			me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(exonDisplay, vepHGVSpAbbrev, '', '')
 			+ me._tooltipMainHeaderRow(vepImpactDisplay, vepConsequenceDisplay, '', '', 'impact-badge')
 			+ vepHighestImpactRow
 			+ inheritanceModeRow
@@ -740,8 +737,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ gnomADAfRow
 			+ exacAfRow
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
-			+ clinvarSimpleRow1
-			+ clinvarSimpleRow2			
+			+ (variantCard.getRelationship() == 'known-variants' ? me._tooltipRow('&nbsp;', knownVariantsClinvarLink, '6px')  : clinvarSimpleRow1)
+			+ (variantCard.getRelationship() == 'known-variants' ? clinvarSimpleRow2 : '')	
 			+ me._linksRow(variant, pinMessage)
 		);                  
 
@@ -754,16 +751,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+   vepHighestImpactExamineRow			
 			+   me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
 			+   me._tooltipRow('&nbsp;', phenotypeDisplay, null, false, 'tooltip-clinvar-pheno')
-			+   moreRow
-			+   "<div id='tooltip-more' class='collapse'>"
-			+      me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
-			+      me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
-			+      me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
-			+      me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
-			+      me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
-			+      me._tooltipRow('Qual', variant.qual, null, true) 
-			+      me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
-			+   "</div>"
+			+   me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
+			+   me._tooltipRow('HGVSp', vepHGVSpDisplay, null, true)
+			+   me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, true, 'polyphen-glyph')
+			+   me._tooltipRow('SIFT', vepSIFTDisplay, null, true, 'sift-glyph')
+			+   me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ "</div>";
 
 		var rightDiv = 
@@ -772,6 +764,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ exacAfRowWide
 			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
 			+ me._tooltipRowAlleleCounts() 
+			+   me._tooltipRow('Qual', variant.qual, null, true) 
+			+   me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
 			+ "</div>";
 
 
@@ -781,11 +775,10 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		var div =
 		    '<div class="tooltip-wide">'
-			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord, dbSnpLink, 'ref-alt')
+			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
 			+ calledVariantRow
-			+ me._tooltipMainHeaderRow(exonDisplay, vepHGVSpAbbrev, '', '')
 			+ inheritanceModeRow
-			+ '<div class="row" style="max-height:225px;overflow-y:scroll">' 
+			+ '<div class="row" style="max-height:205px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
@@ -999,9 +992,13 @@ VariantTooltip.prototype._tooltipShortTextRow = function(value1, value2, value3,
 
 
 
-VariantTooltip.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow, valueClazz) {
+VariantTooltip.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow, valueClazz, paddingBottom) {
 	if (alwaysShow || (value && value != '')) {
-		var style = paddingTop ? ' style="padding-top:' + paddingTop + '" '  : '';
+		var style = paddingTop || paddingBottom ? 
+		              (' style="' 
+		               + (paddingTop    ? 'padding-top:'    + paddingTop + ';'  : '' )
+		               + (paddingBottom ? 'padding-bottom:' + paddingBottom + ';' : '') 
+		               + '"') : '';
 		var valueClazzes = "tooltip-value";
 		if (valueClazz) {
 			valueClazzes += " " + valueClazz;
@@ -1071,7 +1068,6 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 	                       .attr("class", rel + "-alt-count tooltip-row ped-info");	
 
 	        if (firstTime) {
-	        	row.style("padding-top", "6px");
 	        	me._appendReadCountHeading(row);
 	        	firstTime = false;
 	        }
@@ -1115,7 +1111,7 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
 
 	var svg = container.append("div")	
 					   .attr("id", "allele-count-legend")	
-		           	   .style("padding-top", "5px")		           	   
+		           	   .style("padding-top", "0px")		           	   
 				       .append("svg")
 				       .attr("width", 198)
 	           		   .attr("height", "20");

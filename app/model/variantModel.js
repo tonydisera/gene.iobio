@@ -1732,6 +1732,9 @@ VariantModel.prototype.performAdditionalParsing = function(theVcfData, theTransc
 	    		}
 	    	});
 	  	}
+	  	if (variant.afgnomAD == '.') {
+	  		variant.afgnomAD = 0;
+	  	}
 
 
 	    for (key in variant.highestImpactVep) {
