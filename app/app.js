@@ -1230,7 +1230,7 @@ function toggleSampleTrio(show) {
 		dataCard.mode = 'trio';
 		$('#mother-data').removeClass("hide");
 		$('#father-data').removeClass("hide");
-		if ($('#proband-data').find('#vcf-sample-select option').length > 1) {
+		if (Object.keys($('#proband-data #vcf-sample-select')[0].selectize.options).length > 0) {
 			$('#unaffected-sibs-box').removeClass("hide");
 			$('#affected-sibs-box').removeClass("hide");
 		} else {
