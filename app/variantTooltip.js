@@ -645,6 +645,23 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
+
+	var formatPopAF = function(afObject) {
+		var popAF = "";
+		if (afObject['AF'] != ".") {
+			for (var key in afObject) {
+				if (key != "AF") {
+					var label = key.split("_")[0];
+					if (popAF.length > 0) {
+						popAF += ", ";
+					}
+					popAF += label + " " + (afObject[key] == "." ? "0%" : percentage(afObject[key]));					
+				}
+			}
+		}		
+		return popAF;
+	}
+
 	var gnomADAfRow = "";
 	var gnomADAfRowWide = "";
 	var exacAfRow = "";
@@ -653,26 +670,30 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF)), '6px');
 		var af   =  variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF);
 		var link =  "<a target='_gnomad' href='http://gnomad.broadinstitute.org/variant/" + variant.chrom + "-" + variant.start + "-" + variant.ref + "-" + variant.alt + "'>" + af + "</a>";
-		var popAF = "";
-		if (variant.vepAf.gnomAD.AF != ".") {
-			for (var key in variant.vepAf.gnomAD) {
-				if (key != "AF") {
-					var label = key.split("_")[0];
-					if (popAF.length > 0) {
-						popAF += ", ";
-					}
-					popAF += label + " " + (variant.vepAf.gnomAD[key] == "." ? "." : percentage(variant.vepAf.gnomAD[key]));					
-				}
-			}
-		}
+		var popAF = formatPopAF(variant.vepAf.gnomAD);
 		gnomADAfRowWide  = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (variant.vepAf.gnomAD.AF == "." ? af : link) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
 		if (popAF.length > 0) {
 			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
 		}
+
 	} else {
 		exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), gnomADAfRow.length > 0 ? '0px' : '6px');
 		exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'));
 	}
+
+	var popAf1000GRow = "";
+	var af1000GRow = "";
+	if (global_vepAF && variant.vepAf['1000G']) {
+		popAF = formatPopAF(variant.vepAf['1000G']);
+		if (variant.af1000G) {
+			af1000GRow    = me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
+			popAf1000GRow = me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
+		} else {
+			popAf1000GRow =  me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + popAF + '</span>');
+
+		}
+	}
+	
 
 
 	if (rec) {
@@ -762,7 +783,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			'<div class="tooltip-right-column">'
 			+ gnomADAfRowWide
 			+ exacAfRowWide
-			+ me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>')
+			+ af1000GRow
+			+ popAf1000GRow
 			+ me._tooltipRowAlleleCounts() 
 			+   me._tooltipRow('Qual', variant.qual, null, true) 
 			+   me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
@@ -801,6 +823,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, false, 'polyphen-glyph')
 			+ me._tooltipRow('ClinVar', clinvarLink, null, false, 'tooltip-clinvar-pheno')
 			+ me._tooltipRow('&nbsp;', phenotypeDisplay)
+			+ me._tooltipRow('Allele Freq gnomAD', percentage(variant.afgnomAD))
 			+ me._tooltipRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)))
 			+ me._tooltipRow('Allele Freq 1000G', percentage(variant.af1000G))
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay)
