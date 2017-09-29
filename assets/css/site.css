@@ -1630,7 +1630,7 @@ inputinput:-moz-placeholder {
 
 #welcome-area {
   text-align: center;
-  margin-top: 60px;
+  margin-top: 10px;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
@@ -1648,13 +1648,14 @@ inputinput:-moz-placeholder {
       font-size: 20px; }
     #welcome-area .welcome-panel #what-is-new-link {
       font-size: 18px; }
+    #welcome-area .welcome-panel #helpful-articles-link {
+      font-size: 18px; }
     #welcome-area .welcome-panel button {
       color: #5d809d;
       font-size: 17px !important;
       margin-left: 7px;
       margin-right: 7px; }
     #welcome-area .welcome-panel #welcome-panel-content {
-      width: 820px;
       display: flex;
       justify-content: center;
       margin-top: 10px; }
