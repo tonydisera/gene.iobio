@@ -37,7 +37,7 @@ vcfiobio = function module() {
   var regionIndex = 0;
   var stream = null;
 
-  var VEP_FIELDS_AF_1000G  = "AFR_AF|AMR_AF|EAS_AF|EUR_AF|SAS_AF".split("|");
+  var VEP_FIELDS_AF_1000G  = "AF|AFR_AF|AMR_AF|EAS_AF|EUR_AF|SAS_AF".split("|");
   var VEP_FIELDS_AF_ESP    = "AA_AF|EA_AF".split("|");
   var VEP_FIELDS_AF_GNOMAD = "gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF".split("|");
   var VEP_FIELDS_AF_MAX    = "MAX_AF|MAX_AF_POPS".split("|");
@@ -771,6 +771,7 @@ var effectCategories = [
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
       if (vepAF) {
+        vepArgs.push("--af");
         vepArgs.push("--af_gnomad");
         vepArgs.push("--af_esp");
         vepArgs.push("--af_1kg");
@@ -1608,6 +1609,7 @@ var effectCategories = [
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
       if (vepAF) {
+        vepArgs.push("--af");
         vepArgs.push("--af_gnomad");
         vepArgs.push("--af_esp");
         vepArgs.push("--af_1kg");

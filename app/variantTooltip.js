@@ -671,23 +671,25 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		var af   =  variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF);
 		var link =  "<a target='_gnomad' href='http://gnomad.broadinstitute.org/variant/" + variant.chrom + "-" + variant.start + "-" + variant.ref + "-" + variant.alt + "'>" + af + "</a>";
 		var popAF = formatPopAF(variant.vepAf.gnomAD);
-		gnomADAfRowWide  = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (variant.vepAf.gnomAD.AF == "." ? af : link) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
+		gnomADAfRowWide  = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (variant.vepAf.gnomAD.AF == "." ? af : link) + '</span>', null, true, null, '0px');
 		if (popAF.length > 0) {
-			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
+			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>', null, true, null, '0px');
 		}
 
-	} else {
-		exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)), gnomADAfRow.length > 0 ? '0px' : '6px');
-		exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'));
-	}
+	} 	
 
+	exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)),  '0px' );
+	exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'), null, true, null, '0px');
+	
 	var popAf1000GRow = "";
 	var af1000GRow = "";
 	if (global_vepAF && variant.vepAf['1000G']) {
 		popAF = formatPopAF(variant.vepAf['1000G']);
 		if (variant.af1000G) {
 			af1000GRow    = me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
-			popAf1000GRow = me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
+			if (popAF.length > 0) {
+				popAf1000GRow = me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
+			}
 		} else {
 			popAf1000GRow =  me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + popAF + '</span>');
 
