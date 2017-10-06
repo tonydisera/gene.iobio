@@ -3039,7 +3039,7 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
 VariantModel.prototype.filterVariants = function(data, filterObject, start, end, bypassRangeFilter) {
 	var me = this;
 
-	if (data == null && data.features == null) {
+	if (data == null || data.features == null) {
 		console.log("Empty data/features");
 		return;
 	}
