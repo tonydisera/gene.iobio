@@ -31,7 +31,7 @@ vcfiobio = function module() {
   var refData = [];
   var refDensity = [];
   var refName = "";
-  var infoFields =  null;
+  var infoFields =  {};
 
   var regions = [];
   var regionIndex = 0;
@@ -373,7 +373,9 @@ var effectCategories = [
   exports.getVcfFile = function() {
     return vcfFile;
   }
-
+  exports.getTabixFile = function() {
+    return tabixFile;
+  }
   exports.setVcfFile = function(file) {
     vcfFile = file;
   }
@@ -1896,7 +1898,7 @@ var effectCategories = [
           'transcript':         selectedTranscript,
           'variantRegionStart': variantRegionStart, 
           'features':           allVariants[i],
-          'genericAnnotators':  Object.keys(me.infoFields)
+          'genericAnnotators':  me.infoFields ? Object.keys(me.infoFields) : []
         };
         results.push(data);
       }
