@@ -1232,10 +1232,14 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 				me.populateSampleDropdowns(variantCard, me.panelSelectorFilesSelected, sampleNames);
 
 			} else {
+				if (sampleNames.length == 1) {
+					variantCard.setSampleName(sampleNames[0]);									
+				} else {
+					variantCard.setSampleName("");									
+					variantCard.setDefaultSampleName(null);
+				}
 				me.panelSelectorFilesSelected.find('#vcf-sample-select-box').removeClass("attention");
 
-				variantCard.setSampleName("");				
-				variantCard.setDefaultSampleName(null);
 				window.removeUrl('sample'+cardIndex);
 				
 				me.enableLoadButtonIfBuildSet(true);
@@ -1375,8 +1379,12 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 					me.populateSampleDropdowns(variantCard, panelSelector, sampleNames);
 
 				} else {
-					variantCard.setSampleName("");
-					variantCard.setDefaultSampleName(null);
+					if (sampleNames.length == 1) {
+						variantCard.setSampleName(sampleNames[0]);									
+					} else {
+						variantCard.setSampleName("");									
+						variantCard.setDefaultSampleName(null);
+					}
 					panelSelector.find('#vcf-sample-select-box').removeClass("attention");
 					window.removeUrl('sample'+cardIndex);
 
