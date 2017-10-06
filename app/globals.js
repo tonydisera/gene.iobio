@@ -7,7 +7,7 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 //
 var DEV_IOBIO                 = "nv-dev-new.iobio.io/";
 var STAGE_IOBIO               = "nv-purple.iobio.io/";
-var PROD_IOBIO                = "nv-prod.iobio.io/";
+var PROD_IOBIO                = "nv-blue.iobio.io/";
 
 var CURRENT_IOBIO             = PROD_IOBIO;
 
@@ -34,8 +34,7 @@ IOBIO.snpEff                  = iobio_services  + "snpeff/";
 IOBIO.vt                      = iobio_services  + "vt/";  
 IOBIO.af                      = iobio_services  + "af/";  
 IOBIO.vep                     = iobio_services  + "vep/"; 
-IOBIO.vep                     = "nv-blue.iobio.io/" + "vep/"; 
-//IOBIO.contigAppender          = iobio_services  + "ctgapndr/";
+IOBIO.contigAppender          = iobio_services  + "ctgapndr/";
 IOBIO.bcftools                = iobio_services  + "bcftools/";
 IOBIO.coverage                = iobio_services + "coverage/ ";
 IOBIO.samtools                = iobio_services +  "samtools/";
