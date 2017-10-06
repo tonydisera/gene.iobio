@@ -30,8 +30,8 @@ module.exports = {
     dataCard.selectTrio();
     dataCard.selectGenomeBuild('GRCh37');
     dataCard.section.probandData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam");
-    dataCard.section.motherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
-    dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
+    dataCard.section.motherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
+    dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
     client.pause(2000);
@@ -143,7 +143,7 @@ module.exports = {
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');
-      theTooltip.expectClinvarClinSig('cardiomyopathy');
+      theTooltip.expectClinvarClinSig('cardiomyopathy', 'Cardiomyopathy');
       theTooltip.expectPolyphen('benign');
       theTooltip.expectSIFT('tolerated');
       theTooltip.expectAFExAC('0.003%');
@@ -153,8 +153,8 @@ module.exports = {
       theTooltip.expectHGVScEquals("ENST00000375994.2:c.595A>G");
       theTooltip.expectHGVSpEquals("ENSP00000365162.2:p.Ile199Val");
       theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'proband', 10, 39, 49, 'Het');
-      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 55, 'Homref');
-      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 45, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 55, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 45, 'Homref');
 
     }
 

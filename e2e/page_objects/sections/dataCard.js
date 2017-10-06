@@ -87,8 +87,14 @@ module.exports = {
       selector: '#mother-data',
       commands: [{
         selectPlatinumTrio: function() {
-          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
+          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@vcfSampleBox');
         },
+        inputUrl: function(url) {
+          this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
+        },
+        inputTbiUrl: function(url) {
+          this.setValue('@tbiUrlInput', [url, this.api.Keys.ENTER]);
+        },        
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
         },        
@@ -98,6 +104,8 @@ module.exports = {
         alignmentsButton: { selector: '#bam-dropdown-button' },
         platinumTrio: { selector: '#display-platinum-vcf-url-item' },
         vcfSampleBox: { selector: '#vcf-sample-box' },
+        urlInput: { selector: '#url-input' },
+        tbiUrlInput: { selector: '#url-tbi-input' },
         bamUrlInput: { selector: '#bam-url-input' }
       }
     },
@@ -105,8 +113,14 @@ module.exports = {
       selector: '#father-data',
       commands: [{
         selectPlatinumTrio: function() {
-          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@probandVcfSampleBox');
+          return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@vcfSampleBox');
         }, 
+        inputUrl: function(url) {
+          this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
+        },
+        inputTbiUrl: function(url) {
+          this.setValue('@tbiUrlInput', [url, this.api.Keys.ENTER]);
+        },        
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
         }  
@@ -116,6 +130,8 @@ module.exports = {
         alignmentsButton: { selector: '#bam-dropdown-button' },
         platinumTrio: { selector: '#display-platinum-vcf-url-item' },
         vcfSampleBox: { selector: '#vcf-sample-box' },
+        urlInput: { selector: '#url-input' },
+        tbiUrlInput: { selector: '#url-tbi-input' },
         bamUrlInput: { selector: '#bam-url-input' }
 
       }

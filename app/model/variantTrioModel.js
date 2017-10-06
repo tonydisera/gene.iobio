@@ -1,8 +1,32 @@
-function VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData, sibsVcfData) {
+function VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData, sibsVcfData, affectedInfo) {
 	this.probandVcfData = probandVcfData;
 	this.motherVcfData = motherVcfData;
 	this.fatherVcfData = fatherVcfData;
 	this.sibsVcfData = sibsVcfData;
+
+	// This is only passed in when the genotypes must be 'stitched together' because
+	// samples of mother and father are in separate vcf files
+	this.affectedInfo = affectedInfo;
+	this.motherAffectedInfo = null;
+	this.fatherAffectedInfo = null;
+	this.probandAffectedInfo = null;
+	if (this.affectedInfo && motherVcfData) {
+		this.motherAffectedInfo = this.affectedInfo.filter(function(info) {
+			return info.relationship == 'mother';
+		})[0];
+	}
+	if (this.affectedInfo && fatherVcfData) {
+		this.fatherAffectedInfo = this.affectedInfo.filter(function(info) {
+			return info.relationship == 'father';
+		})[0];
+	}
+	if (this.affectedInfo && probandVcfData) {
+		this.probandAffectedInfo = this.affectedInfo.filter(function(info) {
+			return info.relationship == 'proband';
+		})[0];
+	}
+
+
 	this.sibsVcfDataTransient = [];
 }
 
@@ -50,6 +74,8 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		variant.genotypeRefCountFather  = null;
 		variant.genotypeDepthFather     = null;
 		variant.bamDepthFather          = null;
+
+
 	});
 	me.fatherVcfData.features.forEach(function(variant) {
 		variant.compareMotherFather     = null;
@@ -63,6 +89,8 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		variant.genotypeRefCountMother  = null;
 		variant.genotypeDepthMother     = null;
 		variant.bamDepthMother          = null;
+		
+	
 	});
 
 
@@ -91,7 +119,12 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		    variantB.genotypeRefCountProband = variantA.genotypeRefCount;
 		    variantB.genotypeDepthProband    = variantA.genotypeDepth;
 		    variantB.bamDepthProband         = variantA.bamDepth;
-		}
+
+			me._syncGenotypes(variantA, variantB, 
+				me.probandAffectedInfo ? me.probandAffectedInfo.variantCard.getSampleName() : null,
+				me.motherAffectedInfo  ? me.motherAffectedInfo.variantCard.getSampleName() : null);	
+
+	    }
 	).then( function() {
 
 		 // Compare the proband variants to the father's variants
@@ -116,6 +149,11 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	        	variantB.genotypeRefCountProband = variantA.genotypeRefCount;
 			    variantB.genotypeDepthProband    = variantA.genotypeDepth;
 			    variantB.bamDepthProband         = variantA.bamDepth;
+
+				me._syncGenotypes(variantA, variantB, 
+					me.probandAffectedInfo ? me.probandAffectedInfo.variantCard.getSampleName() : null,
+					me.fatherAffectedInfo  ? me.fatherAffectedInfo.variantCard.getSampleName() : null);	
+
 
 	        });  	
 
@@ -170,6 +208,9 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		    variantFather.genotypeRefCountMother = variantMother.genotypeRefCount;
 		    variantFather.genotypeDepthMother    = variantMother.genotypeDepth;
 		    variantFather.bamDepthMother         = variantMother.bamDepth;
+
+	    	me._syncGenotypes(variantMother, variantFather); 
+
 		}
 	).then( function() {
 
@@ -177,6 +218,27 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		console.log("error occured when comparing proband variants to mother?");
 	})	
 
+}
+
+VariantTrioModel.prototype._syncGenotypes = function(variantA, variantB, polyFillSampleA, polyFillSampleB) {
+	var me = this;
+    if (polyFillSampleA && polyFillSampleB) {
+    	// Polyfill the genotypes for the trio if the samples for parent in separate file from proband
+	    variantA.genotypes[polyFillSampleB] = variantB.genotype;
+	    variantB.genotypes[polyFillSampleA] = variantA.genotype;
+    }
+    // Sync up the genotypes across all samples.  There may be affected/unaffected sib genotypes
+    // in the parent vcf, so sync both proband->parent and parent->proband
+	for (var sampleName in variantA.genotypes) {
+		if (!variantB.genotypes[sampleName]) {
+			variantB.genotypes[sampleName] = variantA.genotypes[sampleName];
+		}
+	}
+	for (var sampleName in variantB.genotypes) {
+		if (!variantA.genotypes[sampleName]) {
+			variantA.genotypes[sampleName] = variantB.genotypes[sampleName];
+		}
+	}	    
 }
 
 
@@ -363,146 +425,6 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 		resolve();	
 	
 	});
-
-
-}
-
-
-
-// TODO:  Need to load unaffected sibs vcf data (variantModel.loadVariantDataOnly) beforehand
-VariantTrioModel.prototype.determineSibsStatus = function(sibsVcfData, affectedStatus, sibsCount, onUpdate) {
-	var me = this;
-	me.sibsVcfData = sibsVcfData;
-
-	me.probandVcfData.features = me.probandVcfData.features.sort(VariantModel.orderVariantsByPosition);
-
-	me.sibsTransientVcfData = [];
-	me.sibsVcfData.forEach( function(vcfData) {
-		me.sibsTransientVcfData.push(vcfData);
-	})
-
-	var sibZygosityAttr = affectedStatus + "_zygosity";
-	var affectedAttr    = affectedStatus + "Sibs";
-	me.nextCompareSib(affectedStatus, function() {
-
-		me.probandVcfData.features.forEach( function(variant) {
-			 variant[affectedAttr] = "none";
-			 if (variant[sibZygosityAttr]) {
-			 	 var matchesCount = 0;
-			 	 var matchesHomCount = 0;
-				 Object.keys(variant[sibZygosityAttr]).forEach( function(key) {
-				 	var sibZygosity = variant[sibZygosityAttr][key];
-					if (sibZygosity != null) {
-						if (sibZygosity.toLowerCase() != 'none' && sibZygosity.toLowerCase() != 'gt_unknown' && sibZygosity.toLowerCase() != 'homref') {
-						 	matchesCount++;
-						}
-					 	if (sibZygosity.toLowerCase() == 'hom' && variant.inheritance.toLowerCase() == 'recessive') {
-						 	matchesHomCount++;
-					 	}
-				 	}
-				 });
-
-				 if (variant.inheritance.toLowerCase() == 'recessive'
-				 	&& matchesHomCount > 0 
-				 	&& matchesHomCount == sibsCount) { 
-				 	variant[affectedAttr] = "recessive_all";
-				 } else if (variant.inheritance.toLowerCase() == 'recessive'
-				 	      && matchesHomCount > 0 )  {
-				 	variant[affectedAttr] = "recessive_some";
-				 } else if (variant.inheritance.toLowerCase() == 'recessive' && affectedStatus == 'unaffected')  {
-				 	variant[affectedAttr] = "recessive_none";
-				 } else if (matchesCount > 0 && matchesCount == sibsCount) {
-				 	variant[affectedAttr] = "present_all";
-				 }  else if (matchesCount > 0) {
-				 	variant[affectedAttr] = "present_some"
-				 }  else {
-				 	variant[affectedAttr] = "present_none";
-				 }  	 	 
-			 } 
-		});
-
-		if (onUpdate) {
-			onUpdate();
-		}
-
-	});
-
-}
-
-VariantTrioModel.prototype.nextCompareSib = function(affectedStatus, callback) {
-	var me = this;
-	if (me.sibsTransientVcfData.length > 0) {
-		var vcfData = me.sibsTransientVcfData.shift();
-		me.promiseCompareToSib(vcfData, affectedStatus).then( function() {
-			me.nextCompareSib(affectedStatus, callback);
-		});		
-	} else {
-		callback();
-	} 
-}
-
-
-VariantTrioModel.prototype.promiseCompareToSib = function(sibVcfData, affectedStatus) {
-	var me = this;
-	
-	return new Promise( function(resolve, reject) {
-
-		me.probandVcfData.features.forEach(function(variant) {
-			if (variant[affectedStatus + "_zygosity"] == null) {
-				variant[affectedStatus + "_zygosity"] = {};
-			}
-			if (variant[affectedStatus + "_genotypeAltCount"] == null) {
-				variant[affectedStatus + "_genotypeAltCount"] = {};
-			}			
-			if (variant[affectedStatus + "_genotypeRefCount"] == null) {
-				variant[affectedStatus + "_genotypeRefCount"] = {};
-			}			
-			if (variant[affectedStatus + "_genotypeDepth"] == null) {
-				variant[affectedStatus + "_genotypeDepth"] = {};
-			}			
-			if (variant[affectedStatus + "_bamDepth"] == null) {
-				variant[affectedStatus + "_bamDepth"] = {};
-			}			
-			variant[affectedStatus + "_zygosity"][sibVcfData.name] = "none";		
-        	variant[affectedStatus + "_genotypeAltCount"][sibVcfData.name] = null;
-        	variant[affectedStatus + "_genotypeRefCount"][sibVcfData.name] = null;
-        	variant[affectedStatus + "_genotypeDepth"][sibVcfData.name] = null;
-        	variant[affectedStatus + "_bamDepth"][sibVcfData.name] = null;
-		});
-				
-		var idx = 0;
-		me.promiseCompareVariants(
-			me.probandVcfData,	
-			sibVcfData,		
-			// This is the attribute on variant a (proband) and variant b (unaffected sib)
-	        // that will store whether the variant is unique or matches.
-	        null,	        
-	    	// This is the callback function called every time we find the same variant
-	    	// in both sets. Here we take the father variant's zygosity and store it in the
-	    	// proband's variant for further sorting/display in the feature matrix.
-	        function(variantA, variantB) {
-	        	variantA[affectedStatus + "_zygosity"][sibVcfData.name]         = variantB.zygosity.toLowerCase() == "gt_unknown" ? "homref" : variantB.zygosity;
-	        	variantA[affectedStatus + "_genotypeAltCount"][sibVcfData.name] = variantB.genotypeAltCount;
-	        	variantA[affectedStatus + "_genotypeRefCount"][sibVcfData.name] = variantB.genotypeRefCount;
-	        	variantA[affectedStatus + "_genotypeDepth"][sibVcfData.name]    = variantB.genotypeDepth;
-	        	variantA[affectedStatus + "_bamDepth"][sibVcfData.name]         = variantB.bamDepth;
-	        },
-	        function(variantA, variantB) {
-	        	if (variantA) {
-	        		variantA[affectedStatus + "_zygosity"][sibVcfData.name]         = "none";
-	        		variantA[affectedStatus + "_genotypeAltCount"][sibVcfData.name] = null;
-	        		variantA[affectedStatus + "_genotypeRefCount"][sibVcfData.name] = null;
-	        		variantA[affectedStatus + "_genotypeDepth"][sibVcfData.name]    = null;
-	        		variantA[affectedStatus + "_bamDepth"][sibVcfData.name]         = null;
-	        	}
-	        }
-	     ).then( function() {
-	     	resolve();
-	     });
-
-	});
-
-
 
 
 }

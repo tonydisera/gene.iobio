@@ -4,9 +4,10 @@ module.exports = {
 		importGeneSet: function(genes) {
 			this.waitForElementVisible('@importGeneSetDropdown', 30000);
 			var geneString = genes.join(",");
-			return this.click('@importGeneSetDropdown')
-								 .setValue('textarea#genes-to-copy', geneString)
-							   .click('#get-genes-copy-paste-button');
+			this.click('@importGeneSetDropdown')
+				.setValue('textarea#genes-to-copy', geneString);
+			this.waitForElementVisible('@copyPasteButton', 2000);
+			this.click('@copyPasteButton');
 		},
 		clickACMG56Genes: function() {
 			this.waitForElementVisible('@ACMG56Genes', 30000);
@@ -15,6 +16,7 @@ module.exports = {
 	}],
 	elements: {
 		importGeneSetDropdown: { selector: '#get-genes-dropdown button.dropdown-toggle' },
+		copyPasteButton: { selector: '#get-genes-dropdown #get-genes-copy-paste-button' },
 		ACMG56Genes: { selector: '#get-acmg-genes' }
 	}
 }

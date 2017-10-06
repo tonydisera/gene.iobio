@@ -16,6 +16,7 @@ function VariantExporter() {
 		{field: 'consequence', 			exportVcf: true},
 		{field: 'afExAC', 				exportVcf: true},
 		{field: 'af1000G', 				exportVcf: true},
+		{field: 'afgnomAD', 			exportVcf: true},
 		{field: 'inheritance', 			exportVcf: true}, 
 		{field: 'polyphen', 			exportVcf: true},
 		{field: 'SIFT', 				exportVcf: true},
@@ -337,7 +338,8 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 								theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
 							} 
 
-							getProbandVariantCard().model.vcf.promiseParseVcfRecords(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, 0)
+							var sampleNamesToGenotype = getProbandVariantCard().getSampleNamesToGenotype();
+							getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0, global_vepAF)
 		                	   .then(function(data) {
 		                			var theFbData = data[1];
 
@@ -434,16 +436,31 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 	 	revisedVariant.extraAnnot = true;
 
 	 	// If this is a trio, get the genotypes for mother and father
-	 	if (revisedVariant.genotypes.length == 3) {
-			revisedVariant.motherZygosity          = revisedVariant.genotypes[1].zygosity;
-			revisedVariant.genotypeAltCountMother  = revisedVariant.genotypes[1].altCount;
-			revisedVariant.genotypeRefCountMother  = revisedVariant.genotypes[1].refCount;
-			revisedVariant.genotypeDepthMother     = revisedVariant.genotypes[1].genotypeDepth;
+	 	if (Object.keys(revisedVariant.genotypes).length == 3) {
+	 		var motherGenotype = null;
+	 		var fatherGenotype = null;
+	 		for (var key in revisedVariant.genotypes) {
+	 			var gt = revisedVariant.genotypes[key];
+	 			if (gt.sampleIndex == 1) {
+	 				motherGenotype = gt;
+	 			} else if (gt.sampleIndex == 2) {
+	 				fatherGenotype = gt;
+	 			}
+	 		}
+	 		if (motherGenotype) {
+				revisedVariant.motherZygosity          = motherGenotype.zygosity;
+				revisedVariant.genotypeAltCountMother  = motherGenotype.altCount;
+				revisedVariant.genotypeRefCountMother  = motherGenotype.refCount;
+				revisedVariant.genotypeDepthMother     = motherGenotype.genotypeDepth;
 
-			revisedVariant.fatherZygosity          = revisedVariant.genotypes[2].zygosity;
-			revisedVariant.genotypeAltCountFather  = revisedVariant.genotypes[2].altCount;
-			revisedVariant.genotypeRefCountFather  = revisedVariant.genotypes[2].refCount;
-			revisedVariant.genotypeDepthFather     = revisedVariant.genotypes[2].genotypeDepth;
+	 		}
+	 		if (fatherGenotype) { 			
+				revisedVariant.fatherZygosity          = fatherGenotype.zygosity;
+				revisedVariant.genotypeAltCountFather  = fatherGenotype.altCount;
+				revisedVariant.genotypeRefCountFather  = fatherGenotype.refCount;
+				revisedVariant.genotypeDepthFather     = fatherGenotype.genotypeDepth;
+	 		}
+
 	 	}
 	 	VariantTrioModel.determineInheritance(revisedVariant);
 
@@ -466,17 +483,17 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 	 	});
 
 	 	// Set the clinvar start, alt, ref for clinvar web access
-		getProbandVariantCard().model.vcf.formatClinvarCoordinates(theVariant, theVariant);
+		getProbandVariantCard().model.vcf._formatClinvarCoordinates(theVariant, theVariant);
 
 	 	// Get the clinvar data and load into the variant record
 	 	var dummyVcfData  = {features: [revisedVariant]};
-	 	var clinvarLoader = isClinvarOffline ? getProbandVariantCard().model._refreshVariantsWithClinvarVariants.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvar.bind(getProbandVariantCard().model, dummyVcfData);
+	 	var clinvarLoader = isClinvarOffline || clinvarSource == "vcf" ? getProbandVariantCard().model._refreshVariantsWithClinvarVCFRecs.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvarEutils.bind(getProbandVariantCard().model, dummyVcfData);
 		getProbandVariantCard().model
 		   .vcf
-		   .promiseGetClinvarRecordsImpl(dummyVcfData.features, 
-		   								 getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
-		   								 theGeneObject, 
-		   	                             clinvarLoader)	
+		   .promiseGetClinvarRecords(dummyVcfData, 
+		   						     getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
+		   						     theGeneObject, 
+		   	                         clinvarLoader)	
 		   .then(function() {
 				
 				variantTooltip.formatContent(revisedVariant, null, "record", rec);

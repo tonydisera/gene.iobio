@@ -2,7 +2,7 @@
     with for a local deployment.  This entire .js can be replaced or modified to suit the 
     specific iobio deployment environment.
 */
-var version               = "2.4";
+var version               = "2.5";
 
 var isOffline             = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
@@ -22,6 +22,21 @@ var useServerCache        = false;
 var mygene2Endpoint       = "";
 var mygene2XAuthToken     = "";
 
+
+// Get clinvar annotations from 'eutils' or 'vcf'
+var clinvarSource        = "vcf";
+
+// Allow freebayes runtime args to be set by user
+var allowFreebayesSettings  = false;
+
+// get hgvs, rsid annotation for all variants
+var global_getVariantIdsForGene = false;
+
+// How many genes can be analyzed in one session.  Set to null if no limitation.
+var global_maxGeneCount         = 100;
+
+// Should vep retrieve allele frequencies (for gnomad, 1000G, ESP)
+var global_vepAF                = true ;
 
 /*
 * This variable controls special behavior for running gene.iobio education edition, with

@@ -282,6 +282,10 @@ GenesCard.prototype.showAnalyzeAllButton = function(hideAll = false) {
 
 }
 
+GenesCard.prototype.setOrderBy = function(sortBy) {
+	$('#select-gene-sort')[0].selectize.setValue(sortBy);
+}
+
 GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 	this.sortedGeneNames = null;
 	if (sortBy == null) {
@@ -335,6 +339,18 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 	}
 
 	var dangers = [danger1, danger2];
+
+
+	// lowests (non-zero) harmful variant level  = highest relevance
+	var harmfulVariantValues = [9999, 9999]; 
+	dangers.forEach(function(danger, index) {
+		if (danger.harmfulVariantsLevel) {
+			harmfulVariantValues[index] = danger.harmfulVariantsLevel;
+		}
+	});
+	if (harmfulVariantValues[0] !== harmfulVariantValues[1]) {
+		return harmfulVariantValues[0] - harmfulVariantValues[1];
+	}	
 
 	// lowest clinvar value = highest relevance
 	var clinvarValues = [9999, 9999];
@@ -493,6 +509,7 @@ GenesCard.prototype.pageToGene = function(geneName) {
 GenesCard.prototype.viewDefaultsGenesPerPage = function() {
 	var me = this;
 	me.GENES_PER_PAGE = this.GENES_PER_PAGE_DEFAULT;
+	$('#gene-badge-container').removeClass("view-all");
 	me._initPaging(me.getGeneNames(), true);
 }
 
@@ -500,6 +517,7 @@ GenesCard.prototype.viewAllGenes = function() {
 	var me = this;
 	me.GENES_PER_PAGE = 1000000;
 	me._initPaging(me.getGeneNames(), true);
+	$('#gene-badge-container').addClass("view-all");
 }
 
 GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
@@ -552,6 +570,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		this.currentPageNumber = startOver ? 1 : Math.min(me.currentPageNumber, pageCount);
 		$('#gene-page-control').removeClass("hide");
 		$('#gene-paging-links').removeClass("hide");
+		$('#gene-badge-container').addClass("page-control")
 		$('#gene-page-selection').bootpag({
 			page: me.currentPageNumber,
 	        total: pageCount,
@@ -562,9 +581,11 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 		if (this.GENES_PER_PAGE > this.GENES_PER_PAGE_DEFAULT) {
 			$('#gene-page-control').removeClass("hide");
 			$('#gene-paging-links').removeClass("hide");
+			$('#gene-badge-container').addClass("page-control")
 		} else {
 			$('#gene-page-control').addClass("hide");
 			$('#gene-paging-links').addClass("hide");
+			$('#gene-badge-container').removeClass("page-control")
 		}
 		$('#gene-page-selection').html("");
 		this.currentPageNumber = 1;
@@ -573,6 +594,7 @@ GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
 	} else {
 		$('#gene-page-control').addClass("hide");
 		$('#gene-paging-links').addClass("hide");
+		$('#gene-badge-container').removeClass("page-control")
 		$('#gene-page-selection').html("");
 	}
 
@@ -620,9 +642,20 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 		alertify.alert(message);
 	}
 
-		if (Object.keys(duplicateGeneNames).length > 0) {
+	if (Object.keys(duplicateGeneNames).length > 0) {
 		var message = "Bypassing duplicate gene name(s): " + Object.keys(duplicateGeneNames).join(", ") + ".";
 		alertify.alert(message);
+	}
+
+	if (global_maxGeneCount && geneNames.length > global_maxGeneCount) {
+		var bypassedCount = geneNames.length - global_maxGeneCount;
+		geneNames = geneNames.slice(0, global_maxGeneCount);
+		alertify.alert("Due to browser cache limitations, only the first " + global_maxGeneCount 
+			+ " genes were added. " 
+			+ bypassedCount.toString() 
+			+ " " 
+			+ (bypassedCount == 1 ? "gene" : "genes") 
+			+  " bypassed.");
 	}
 
 	// Remove gene badges not specified in the text area
@@ -1238,7 +1271,8 @@ GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPagin
 GenesCard.prototype._hideCurrentGene = function() {
 	$('#nav-section').addClass("hide");
 	$('#matrix-track').addClass("hide");
-	$('.variant-card').addClass("hide");	
+	$('.variant-card').addClass("hide");
+	$('#known-variants-all-card').addClass("hide");	
 }
 
 
@@ -1314,6 +1348,11 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 
 GenesCard.prototype.addGene = function(geneName) {
 	var me = this;
+
+	if (global_maxGeneCount && geneNames.length >= global_maxGeneCount) {
+		alertify.alert("Cannot add gene " + geneName + ".  Only " + global_maxGeneCount + " can be added due to browse cache limitations.");
+		return;
+	}
 
 	geneName = geneName.toUpperCase();
 
@@ -1454,7 +1493,7 @@ GenesCard.prototype._setBookmarkBadge = function(geneName) {
 		geneBadge.find("#gene-badge-bookmark svg").remove();
 		if (bookmarkCard.isBookmarkedGene(geneName)) {
 			geneBadge.find('#gene-badge-bookmark').append("<svg class=\"bookmark-badge\" height=\"12\" width=\"12\">");
-			var selection = d3.select(geneBadge.find('#gene-badge-bookmark .bookmark-badge')[0]).data([{translate: 'translate(1,-1)', width:12, height:16, clazz: 'bookmark'}]);
+			var selection = d3.select(geneBadge.find('#gene-badge-bookmark .bookmark-badge')[0]).data([{translate: 'translate(3,1)', width:9, height:9, clazz: 'bookmark'}]);
 			matrixCard.showBookmarkSymbol(selection);
 		}
 	}
@@ -1492,7 +1531,7 @@ GenesCard.prototype._setPhenotypeBadge = function(geneName) {
 		});
 }
 
-GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
+GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback) {
 	var me = this;
 
 	if (error && error.length > 0) {
@@ -1516,17 +1555,26 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData) {
 
 			if (theVcfData == null ) {
 				me.setGeneBadgeWarning(window.gene.gene_name, true);
+				if (callback) {
+					callback();
+				}
 			} else if (theVcfData.features && theVcfData.features.length == 0) {
 				// There are 0 variants.  Summarize danger so that we know we have
 				// analyzed this gene
 				var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll);
 				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+				if (callback) {
+					callback();
+				}
 			} else if (theVcfData.features && theVcfData.features.length > 0) {
 				var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 
 
 				var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll);
 				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+				if (callback) {
+					callback();
+				}
 
 			}
 		});	
@@ -1620,7 +1668,9 @@ GenesCard.prototype.clearGeneGlyphs = function(geneName) {
 	geneBadge.removeClass("has-called-variants");
 	geneBadge.removeClass("selected");
 	geneBadge.removeClass("has-coverage-problem");
-	geneBadge.removeClass("has-harmful-variant");
+	geneBadge.removeClass("has-harmful1-variant");
+	geneBadge.removeClass("has-harmful2-variant");
+	geneBadge.removeClass("has-harmful3-variant");
 	geneBadge.removeClass("failed-filter");
 }
 
@@ -1717,14 +1767,18 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 	// Indicate if gene has a bookmared variants
 	me._setBookmarkBadge(geneName);
 
-	geneBadge.removeClass("has-harmful-variant");
-
+	geneBadge.removeClass("has-harmful1-variant");
+	geneBadge.removeClass("has-harmful2-variant");
+	geneBadge.removeClass("has-harmful3-variant");
 
 	if (dangerObject.harmfulVariantsInfo && dangerObject.harmfulVariantsInfo.length > 0) {
-		geneBadge.addClass("has-harmful-variant");		
+
+		var harmfulVariantClazz = "has-harmful"        + dangerObject.harmfulVariantsLevel + "-variant";
+		var harmfulVariantBadge = "gene-badge-harmful" + dangerObject.harmfulVariantsLevel + "-variant";
+		geneBadge.addClass(harmfulVariantClazz);		
 
 
-		var selection = d3.select(geneBadge.find('#gene-badge-harmful-variant')[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
+		var selection = d3.select(geneBadge.find('#' + harmfulVariantBadge)[0]).data([{ 'harmfulVariantsInfo': dangerObject.harmfulVariantsInfo }]);
 		selection.on("mouseover", function(d,i) {
 			if (d && d.hasOwnProperty("harmfulVariantsInfo") && d.harmfulVariantsInfo.length > 0) {
 				var x = d3.event.pageX;
@@ -1736,7 +1790,7 @@ GenesCard.prototype.setGeneBadgeGlyphs = function(geneName, dangerObject, select
 					} 
 					message += "<div style='display:table'>"
 					        +  "<div style='display:table-cell;margin-left:3px;vertical-align:top'> - </div>" 
-					        +  "<div style='display:table-cell;margin-left:6px'>" + "Contains ";
+					        +  "<div style='display:table-cell;margin-left:6px'>" + "Contains rare ";
 
 					var desc = "";
 					var inherit = "";
@@ -1971,19 +2025,6 @@ GenesCard.prototype._setGeneBadgeDetailedGlyphs = function(geneBadge, dangerObje
 			}
 		}
 
-	}
-
-	if (dangerObject.AF) {
-		var clazz   = Object.keys(dangerObject.AF)[0];
-		var afField = dangerObject.AF[clazz].field;
-		var afValue  = dangerObject.AF[clazz].value;
-		if (clazz && afField) {
-			geneBadge.find('#gene-badge-symbols').append("<svg class=\"af-badge\" height=\"12\" width=\"12\">");
-			var options = {width:10, height:10, transform: 'translate(0,0)'};
-			var selection = d3.select(geneBadge.find('#gene-badge-symbols .af-badge')[0]).data([{clazz: clazz}]);
-			var symbolFunction = afField == 'afExAC' ? matrixCard.showAfExacSymbol : matrixCard.showAf1000gSymbol;
-			symbolFunction(selection, options);			
-		}
 	}
 
 }

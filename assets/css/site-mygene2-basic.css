@@ -123,7 +123,8 @@ h5 {
   text-shadow: none; }
 
 #nav-card {
-  padding-top: 3px; }
+  padding-top: 3px;
+  min-height: 30px; }
 
 .pagination {
   margin: 0px 0; }
@@ -800,6 +801,9 @@ a.btn {
   color: #717171;
   font-size: 13px; }
 
+.checkbox .checkbox-material .check {
+  border: 1px solid rgba(0, 0, 0, 0.54); }
+
 .material-dropdown .form-control {
   background: white; }
 .material-dropdown li.disabled {
@@ -813,7 +817,7 @@ a.btn {
 #genes-control-track {
   background: white;
   padding-right: 10px;
-  padding-top: 10px;
+  padding-top: 15px;
   padding-bottom: 0px;
   margin-bottom: 5px;
   margin-top: 0px;
@@ -859,39 +863,51 @@ a.btn {
           padding-bottom: 10px; }
           #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
             padding-bottom: 4px; }
+      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-heading {
+        font-size: 18px;
+        color: #5d809d;
+        margin-top: 10px; }
       #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel {
         width: 75%;
+        margin-top: 15px; }
+      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-content {
+        display: flex;
+        flex-wrap: wrap;
         margin-top: 10px; }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-heading {
-          font-size: 18px;
-          color: #717171;
-          margin-top: 10px; }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content {
-          display: flex;
-          flex-wrap: wrap; }
-          #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint {
-            width: 190px;
-            height: 140px;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            background-color: grey;
-            margin-left: 0px;
-            margin-right: 5px;
-            background-size: cover; }
-            #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #video-thumbprint-content .video-thumbprint #play-button {
-              margin-top: 25px;
-              margin-bottom: auto;
-              font-size: 100px;
-              cursor: pointer;
-              opacity: 0.5;
-              color: white;
-              font-size: 90px; }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-multigene-analysis {
-          background-image: url("../../assets/images/screencast-multigene-analysis.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-saving-analysis {
-          background-image: url("../../assets/images/screencast-saving-analysis.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel #welcome-screencast-panel-coverage-analysis {
-          background-image: url("../../assets/images/screencast-coverage-analysis.png"); }
+      #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well {
+        position: relative;
+        width: 170px;
+        height: 140px;
+        text-align: center;
+        margin-left: 15px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-title {
+          margin-top: 10px;
+          margin-left: 10px;
+          margin-right: 10px;
+          color: #5d809d;
+          font-size: 16px;
+          line-height: 17px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint {
+          width: 150px;
+          height: 100px;
+          margin-top: 5px;
+          margin-left: 10px;
+          background-color: grey;
+          background-size: cover; }
+          #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint #play-button {
+            cursor: pointer;
+            opacity: 0.5;
+            color: rgba(70, 70, 70, 0.9);
+            font-size: 90px;
+            position: absolute;
+            top: 15px;
+            left: 40px; }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-multigene-analysis {
+          background-image: url("../../assets/images/thumbprint-multigene.png"); }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-saving-analysis {
+          background-image: url("../../assets/images/thumbprint-bookmarks.png"); }
+        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-coverage-analysis {
+          background-image: url("../../assets/images/thumbprint-coverage.png"); }
 
 .icon {
   width: 30px;
@@ -1082,6 +1098,14 @@ section {
   margin-bottom: 0px;
   padding-bottom: 0px;
   clear: both; }
+  #gene-track .axis.x .tick line {
+    transform: translateY(-14px);
+    stroke-width: 1px; }
+  #gene-track .axis.x .tick text {
+    transform: translateY(6px); }
+  #gene-track .axis.x path {
+    transform: translateY(-20px);
+    display: none; }
 
 #bam-track {
   margin-bottom: 0px;
@@ -1291,10 +1315,12 @@ header {
     fill: rgba(218, 165, 0, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
-    stroke: lightgray; }
+    stroke: lightgray;
+    stroke-dasharray: 5, 5; }
   #bam-depth .threshold text {
     font-size: 12px;
-    fill: #717171; }
+    fill: #717171;
+    cursor: pointer; }
 
 #vcf-variants .circle, #fb-variants .circle, #vcf-variants .arrow-line, #fb-variants .arrow-line {
   stroke: #3586c0;
@@ -1313,12 +1339,19 @@ header {
   stroke: #3586c0;
   pointer-events: none; }
 
+#vcf-variants .axis.x .tick line {
+  display: none;
+  stroke: rgba(211, 211, 211, 0.84); }
+
 #bam-depth .circle-label {
   fill: #3586c0;
   font-size: 13px;
   font-weight: bold;
   stroke: none;
   pointer-events: none; }
+
+#bam-depth .y.axis .tick text {
+  font-size: 11px; }
 
 .bar {
   stroke: black;
@@ -1331,10 +1364,9 @@ header {
     opacity: 0; }
 
 #bam-depth path.line {
-  stroke: black;
+  stroke: rgba(128, 128, 128, 0.81);
   stroke-width: 1;
-  fill: none;
-  opacity: 0.5; }
+  fill: none; }
 
 .area-chart-gradient-top {
   stop-color: grey;
@@ -1357,6 +1389,13 @@ header {
   #zoom-region-chart .axis text {
     font-size: 11px;
     fill: #787878; }
+  #zoom-region-chart .axis.x .tick line {
+    transform: translateY(-14px); }
+  #zoom-region-chart .axis.x .tick text {
+    transform: translateY(6px); }
+  #zoom-region-chart .axis.x path {
+    transform: translateY(-20px);
+    display: none; }
 
 #zoom-region-start {
   float: left;
@@ -1625,6 +1664,12 @@ inputinput:-moz-placeholder {
   flex: 2;
   flex-grow: 0;
   align-self: flex-end; }
+
+#freebayes-settings-modal .fb-setting {
+  padding-top: 10px; }
+#freebayes-settings-modal .fb-setting-label {
+  width: 200px;
+  display: inline-block; }
 
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {
@@ -1940,7 +1985,8 @@ inputinput:-moz-placeholder {
     font-size: 13px;
     color: #5d809d !important;
     margin-top: 12px;
-    margin-bottom: 5px; }
+    margin-bottom: 5px;
+    display: inline-block; }
   #filter-track .subheading {
     font-size: 15px;
     color: #5d809d !important;
@@ -2052,13 +2098,16 @@ inputinput:-moz-placeholder {
   stroke: #ABA2A2; }
 
 #thumbs-green-symbol {
-  fill: #81A966; }
+  fill: #81A966;
+  color: #81A966; }
 
 #thumbs-red-symbol {
-  fill: #ad494a; }
+  fill: #ad494a;
+  color: #ad494a; }
 
 #thumbs-grey-symbol {
-  fill: #8b8b8b; }
+  fill: #8b8b8b;
+  color: #8b8b8b; }
 
 .variant.homref {
   opacity: 0 !important;
@@ -2528,12 +2577,27 @@ inputinput:-moz-placeholder {
   width: 180px;
   min-height: 25px; }
 
-.sib-zygosity {
+.tooltip-affected-symbol {
+  font-size: 14px;
+  color: #b32f2f !important;
+  float: right;
+  padding-right: 2px; }
+
+.tooltip-ped-label {
+  padding-top: 0px;
+  vertical-align: top;
+  text-align: left;
+  width: 49px;
+  float: left;
+  font-size: 12px;
+  color: #717171; }
+
+.ped-zygosity {
   width: 75px;
   float: left; }
 
-.tooltip-row.sib-info {
-  padding-bottom: 2px; }
+.tooltip-row.ped-info {
+  padding-bottom: 5px; }
 
 .tooltip-zygosity {
   float: left;
@@ -2560,6 +2624,9 @@ inputinput:-moz-placeholder {
   color: white; }
 .tooltip-zygosity.unknown {
   background-color: #b9edf3 !important; }
+.tooltip-zygosity.none {
+  background-color: transparent !important;
+  border: solid thin #5D809D !important; }
 
 .tooltip-subtitle {
   font-size: 12px;
@@ -2792,8 +2859,8 @@ text.ref-count {
   .tooltip-wide .tooltip-row {
     clear: both;
     padding-bottom: 3px; }
-    .tooltip-wide .tooltip-row.sib-info {
-      padding-bottom: 2px; }
+    .tooltip-wide .tooltip-row.ped-info {
+      padding-bottom: 6px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
     padding-top: 0px !important;
@@ -3247,27 +3314,25 @@ text.ref-count {
   margin-top: 0px;
   margin-bottom: 8px;
   margin-right: 10px;
-  height: 21px; }
+  height: 21px;
+  display: inline-block; }
 
 #gene-badge.failed-filter {
   opacity: 0.65; }
 
 #gene-badge.loading {
-  border-left: #d8d8d8 solid 10px;
-  height: 22px; }
+  border-left: #d8d8d8 solid 10px; }
 
 #gene-badge.loading.selected {
   border-left: #5d809d solid 12px; }
 
 #gene-badge.selected {
-  border-left: #5d809d solid 12px;
-  height: 22px; }
+  border-left: #5d809d solid 12px; }
   #gene-badge.selected #gene-badge-name, #gene-badge.selected #gene-badge-danger-count, #gene-badge.selected #gene-badge-remove i {
     font-weight: bold; }
 
 #gene-badge.phenolyzer #gene-badge-button {
-  border: solid 1px #9FC2D0;
-  height: 21px; }
+  border: solid 1px #9FC2D0; }
   #gene-badge.phenolyzer #gene-badge-button.user-visited {
     border: solid 2px #9FC2D0; }
 
@@ -3420,23 +3485,22 @@ text.ref-count {
     margin-left: 20px; }
 
 #gene-badge-container {
-  display: flex;
-  display: -webkit-flex;
-  flex-flow: row wrap;
-  -webkit-flex-flow: row wrap;
-  justify-content: center;
-  -webkit-justify-content: center;
-  max-height: 150px;
-  overflow-y: auto;
   padding-bottom: 0px;
   padding-top: 0px;
-  visibility: visible; }
+  visibility: visible;
+  overflow: auto;
+  text-align: center; }
   #gene-badge-container.hide {
-    display: flex !important;
+    display: block !important;
     visibility: hidden; }
-  #gene-badge-container a {
+  #gene-badge-container.view-all {
+    max-height: 150px;
+    overflow-y: auto; }
+  #gene-badge-container.page-control {
+    text-align: left; }
+  #gene-badge-container #gene-badge a {
     color: #717171 !important; }
-    #gene-badge-container a:hover {
+    #gene-badge-container #gene-badge a:hover {
       text-decoration: underline !important; }
   #gene-badge-container #gene-badge-remove {
     visibility: hidden; }
@@ -3463,10 +3527,13 @@ text.ref-count {
 #gene-page-control {
   margin-top: 0px;
   margin-bottom: 5px;
-  text-align: center; }
+  text-align: right;
+  float: right;
+  display: inline-block; }
   #gene-page-control #gene-paging-links {
     display: inline-block;
-    width: 160px; }
+    margin-right: 20px;
+    margin-left: 30px; }
   #gene-page-control a.gene-paging-link {
     color: #717171 !important;
     font-size: 12px;
@@ -3921,6 +3988,177 @@ text.ref-count {
 #legend.level-basic .exon-symbol text {
   font-size: 14px;
   fill: #717171; }
+
+#show-known-variants-cb-area {
+  display: inline-block;
+  float: left;
+  margin-left: 20px;
+  margin-top: -4px;
+  margin-bottom: 0px; }
+
+#known-variants-chart {
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px; }
+  #known-variants-chart #known-variants-nav {
+    text-align: left;
+    margin-bottom: 2px; }
+    #known-variants-chart #known-variants-nav .tooltip {
+      background-color: initial;
+      border: none;
+      box-shadow: none; }
+    #known-variants-chart #known-variants-nav .chart-label {
+      vertical-align: top;
+      display: inline-block;
+      margin-top: 4px;
+      margin-right: 10px; }
+    #known-variants-chart #known-variants-nav .loader {
+      margin-left: 10px;
+      display: inline-block;
+      margin-top: 2px;
+      margin-bottom: 0px; }
+      #known-variants-chart #known-variants-nav .loader .loader-label {
+        font-size: 12px; }
+    #known-variants-chart #known-variants-nav .chart-type {
+      margin: 0;
+      padding: 2px;
+      vertical-align: top;
+      cursor: pointer; }
+      #known-variants-chart #known-variants-nav .chart-type.selected {
+        font-weight: bold;
+        border: solid 0.5px #3586c0;
+        border-radius: 4px;
+        padding: 1px; }
+      #known-variants-chart #known-variants-nav .chart-type .material-icons {
+        font-size: 17px; }
+  #known-variants-chart svg {
+    vertical-align: bottom; }
+    #known-variants-chart svg .axis text {
+      font-size: 12px !important; }
+    #known-variants-chart svg .axis.axis--x .tick {
+      visibility: hidden; }
+    #known-variants-chart svg .layer.benign .stacked-element {
+      fill: #9cc231;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+    #known-variants-chart svg .layer.path .stacked-element {
+      fill: #ad494A;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+    #known-variants-chart svg .layer.other .stacked-element {
+      fill: #e7ba52;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+    #known-variants-chart svg .layer.unknown .stacked-element {
+      fill: #bdbdbd;
+      stroke: #717171;
+      stroke-width: 0.5px; }
+
+#analyze-all-genes {
+  vertical-align: top;
+  margin-top: 3px;
+  margin-right: 10px;
+  display: inline-block;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 12px;
+  padding-right: 12px;
+  font-size: 13px;
+  color: #717171 !important;
+  margin-bottom: 15px; }
+
+#call-variants-dropdown {
+  vertical-align: top;
+  display: inline-block;
+  margin-top: 3px;
+  margin-right: 3px;
+  margin-bottom: 15px; }
+  #call-variants-dropdown a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 13px;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: #717171 !important; }
+    #call-variants-dropdown a.disabled {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+      box-shadow: initial 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12); }
+
+#analyze-genes-progress {
+  overflow: hidden;
+  margin-top: 1px;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-top: -3px; }
+  #analyze-genes-progress #total-genes-label {
+    float: left;
+    margin-right: 5px;
+    font-size: 12px;
+    color: #717171;
+    margin-left: 5px;
+    margin-top: 10px;
+    display: block; }
+  #analyze-genes-progress #analyzed-progress-bar {
+    float: left;
+    display: inline-block;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    margin-left: 6px;
+    margin-bottom: 0px; }
+    #analyze-genes-progress #analyzed-progress-bar.no-alignments #called-progress-bar-label {
+      color: #cacaca; }
+    #analyze-genes-progress #analyzed-progress-bar .bar {
+      background-color: transparent;
+      height: 16px;
+      float: left;
+      width: 0%;
+      text-align: center; }
+    #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar {
+      width: 150px;
+      background-color: transparent;
+      color: #717070;
+      border: #d5d5d5;
+      border-style: solid;
+      border-width: thin;
+      font-size: 12px;
+      padding: 0px 0px 0px 0px !important;
+      vertical-align: middle;
+      height: 17px;
+      margin-left: 5px;
+      margin-bottom: 0px;
+      margin-top: 0px;
+      display: inline-block; }
+      #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar .text {
+        text-align: center;
+        width: 100%;
+        color: white; }
+      #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #analyzed-bar {
+        background-color: transparent; }
+        #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #analyzed-bar #passed-filter-bar {
+          background-color: rgba(18, 127, 170, 0.65);
+          height: 15px;
+          color: white; }
+        #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #analyzed-bar #not-passed-filter-bar {
+          background-color: #e8e6e6;
+          height: 15px; }
+      #analyze-genes-progress #analyzed-progress-bar .analysis-progress-bar #not-analyzed-bar {
+        background-color: transparent; }
+    #analyze-genes-progress #analyzed-progress-bar #call-all-progress {
+      border-top: transparent; }
+      #analyze-genes-progress #analyzed-progress-bar #call-all-progress #analyzed-bar #passed-filter-bar {
+        background-color: #b4c688;
+        height: 16px;
+        color: white; }
+      #analyze-genes-progress #analyzed-progress-bar #call-all-progress #analyzed-bar #not-passed-filter-bar {
+        height: 16px; }
+    #analyze-genes-progress #analyzed-progress-bar .progress-bar-label {
+      float: left;
+      width: 43px;
+      font-size: 12px;
+      padding-top: 1px;
+      color: #717171; }
 
 .mygene2 {
   display: none !important; }

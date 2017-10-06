@@ -12,7 +12,20 @@ function VariantCard() {
 	this.cardIndex = null;
 }
 
+VariantCard.prototype.getSampleNamesToGenotype = function() {
+	var sampleNames = null;
+	if (this.getRelationship() == 'proband') {
+		sampleNames = [];
+		getAffectedInfo().forEach(function(info) {
+			sampleNames.push(info.variantCard.getSampleName());
+		})
+	}	
+	return sampleNames;
+}
 
+VariantCard.prototype.getSampleIdentifier = function(sampleName) {
+	return this.model.getSampleIdentifier(sampleName);
+}
 
 VariantCard.prototype.getName = function() {
 	return this.model.getName();
@@ -20,6 +33,10 @@ VariantCard.prototype.getName = function() {
 
 VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
+}
+
+VariantCard.prototype.isAffected = function() {
+	return this.model.isAffected();
 }
 
 VariantCard.prototype.setName = function(theName) {
@@ -40,6 +57,11 @@ VariantCard.prototype.setSampleName = function(sampleName) {
 		this.setVariantCardLabel();
 	}
 }
+
+VariantCard.prototype.setGeneratedSampleName = function(sampleName) {
+	this.model.setGeneratedSampleName(sampleName);
+}
+
 
 VariantCard.prototype.getSampleName = function() {
 	return this.model.getSampleName();
@@ -175,11 +197,12 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 	var me = this;	
 
 	// init model
-	this.model = new VariantModel();
-	this.model.init();
+	if (this.model == null) {
+		this.model = new VariantModel();
+	}
+	this.model.init();		
 
 	this.cardIndex = cardIndex;
-
 
 	if (this.isViewable()) {
 		this.cardSelector = cardSelector;
@@ -250,7 +273,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		 	    							  .append('use')
 		 	    							  .attr('height',     '16')
 		 	    							  .attr('width',      '16')
-		 	    							  .attr('href', '#error-symbol')
+		 	    							  .attr('href', '#trending-down-symbol')
 		 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
 		 	    							  .data([d]);									
 								}
@@ -281,7 +304,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
-				    .tooltipHTML(variantTooltip.formatContent)
+				    .tooltipHTML(variantTooltip.formatContent)				    
 				    .on("d3rendered", function() {
 				    	
 				    })
@@ -310,6 +333,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 						}
 
 					});
+		this.vcfChart.clazz(this.getDefaultVariantColorClass());
 
 		// The 'missing variants' chart, variants that freebayes found that were not in orginal
 		// variant set from vcf
@@ -348,6 +372,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 							matrixCard.clearSelections();
 						}
 					});
+		this.fbChart.clazz(this.getDefaultVariantColorClass());
 
 
 		this.cardSelector.find('#shrink-button').on('click', function() {
@@ -373,10 +398,13 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 			}
 		});
 
+
 	}
 
 
 };
+
+
 
 VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip, lock, onClose) {
 	var me = this;
@@ -455,7 +483,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl, baiUrl, callback) {
 				this.cardSelector.find("#bam-track").addClass("hide");
 				this.cardSelector.find(".covloader").addClass("hide");
 				this.cardSelector.find(".fbloader").addClass("hide");
-				this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+				this.cardSelector.find('#zoom-region-chart').addClass("hide");
 
 				this.cardSelector.find("#fb-chart-label").addClass("hide");
 				this.cardSelector.find("#fb-separator").addClass("hide");
@@ -557,10 +585,20 @@ VariantCard.prototype.setVariantCardLabel = function() {
 	} else if (isLevelBasic) {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName());
 	} else {
-		this.cardSelector.find('#variant-card-label').text(
-   			this.model.getName() == this.model.getSampleName()  ? 
-   		  	this.model.getName() : 
-   		  	this.model.getSampleName() + " " + this.model.getName());
+		var label = "";
+		if (this.getRelationship() == 'known-variants') {
+			label = "CLINVAR VARIANTS"
+			this.cardSelector.find('#card-relationship-label').text("");
+		} else if (this.model.isGeneratedSampleName) {
+			label = this.model.getName();
+		} else {
+			label = 
+   				this.model.getName() == this.model.getSampleName()  ? 
+   		  		this.model.getName() : 
+   		  		this.model.getSampleName() + " " + this.model.getName()
+		}
+
+		this.cardSelector.find('#variant-card-label').text(label);
 	}
 
 }
@@ -571,10 +609,7 @@ VariantCard.prototype.loadBamDataSource = function(dataSourceName, callback) {
 	this.model.loadBamDataSource(dataSourceName, function() {
 		me.showDataSources(dataSourceName);
 
-		selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-		me.zoomRegionChart.regionStart(+window.gene.start);
-		me.zoomRegionChart.regionEnd(+window.gene.end);
-		me.zoomRegionChart(selection);
+		me.fillZoomRegionChart();
 
 		callback();
 	});
@@ -662,12 +697,12 @@ VariantCard.prototype.clearWarnings = function() {
 /* 
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, fullRefresh) {
+VariantCard.prototype.promiseLoadAndShowVariants = function (fullRefresh) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
 		if (fullRefresh) {
-			me.prepareToShowVariants(classifyClazz);
+			me.prepareToShowVariants();
 		}
 		
 		// Clear out previous variant data and set up variant card
@@ -694,7 +729,7 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (classifyClazz, full
 }
 
 
-VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
+VariantCard.prototype.prepareToShowVariants = function() {
 	var me = this;
 
 	me.cardSelector.removeClass("hide");
@@ -714,24 +749,7 @@ VariantCard.prototype.prepareToShowVariants = function(classifyClazz) {
 	if (me.isViewable()) {
 		//filterCard.clearFilters();
 
-		me.vcfChart.clazz(classifyClazz);
-		me.fbChart.clazz(classifyClazz);
-
-		if (me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
-			me.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
-
-			// Workaround.  For some reason, d3 doesn't clean up previous transcript
-			// as expected.  So we will just force the svg to be removed so that we
-			// start with a clean slate to avoid the bug where switching between transcripts
-			// resulted in last transcripts features not clearing out.
-			me.d3CardSelector.select('#zoom-region-chart svg').remove();
-
-			selection = me.d3CardSelector.select("#zoom-region-chart").datum([window.selectedTranscript]);
-			me.zoomRegionChart.regionStart(+window.gene.start);
-			me.zoomRegionChart.regionEnd(+window.gene.end);
-			me.zoomRegionChart(selection);
-
-		}
+		me.fillZoomRegionChart();
 
 
     	me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
@@ -811,13 +829,9 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 
 	});
 
-    var selection = this.d3CardSelector.select("#zoom-region-chart").datum([filteredTranscript]);
-	this.zoomRegionChart.regionStart(!brush.empty() ? regionStart : window.gene.start);
-	this.zoomRegionChart.regionEnd(!brush.empty() ? regionEnd : window.gene.end);
-	this.zoomRegionChart(selection);
-	this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
 
-	this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
+	this.fillZoomRegionChart(filteredTranscript, !brush.empty() ? regionStart : window.gene.start, !brush.empty() ? regionEnd : window.gene.end);
+
 
 	this.cardSelector.find('#vcf-track').removeClass("hide");
 	this.cardSelector.find('#vcf-variants').css("display", "block");
@@ -950,6 +964,36 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 
 }
 
+VariantCard.prototype.fillZoomRegionChart = function(filteredTranscript, start, end) {
+	var me = this;
+
+	var theTranscript = filteredTranscript ? filteredTranscript : window.selectedTranscript;
+	var start = start ? start : window.gene.start;
+	var end   = end   ? end   : window.gene.end;
+
+
+	if (me.getRelationship() == 'known-variants' || me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
+
+		// Workaround.  For some reason, d3 doesn't clean up previous transcript
+		// as expected.  So we will just force the svg to be removed so that we
+		// start with a clean slate to avoid the bug where switching between transcripts
+		// resulted in last transcripts features not clearing out.
+		me.d3CardSelector.select('#zoom-region-chart svg').remove();
+		me.cardSelector.find("#zoom-region-chart").removeClass("hide");
+
+		selection = me.d3CardSelector.select("#zoom-region-chart").datum([theTranscript]);
+		me.zoomRegionChart.regionStart(+start);
+		me.zoomRegionChart.regionEnd(+end);
+		me.zoomRegionChart(selection);
+
+	}	
+
+    if (filteredTranscript) {
+		this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
+	}
+
+}
+
 
 VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, maxDepth) {
 	if (this.isViewable()) {
@@ -971,8 +1015,6 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 
 		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
-
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
 
 		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, "cutoff", "threshold" );
 	}
@@ -1022,10 +1064,21 @@ VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data, geneOb
 VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition, isZoom) {
 	var me = this;
 
+	if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+		me.cardSelector.find("#variant-badges").addClass("hide");
+		me.cardSelector.find('.vcfloader').addClass("hide");
+		return;
+	}
+	if (this.getRelationship() == 'known-variants') {
+		showKnownVariantsHistoChart(false);
+	}
+
+
 	if (this.isViewable()) {
 		this.cardSelector.removeClass("hide");
 		this.cardSelector.find('#vcf-track').removeClass("hide");
 	}
+
 
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 	if (theVcfData) {
@@ -1097,7 +1150,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		if (me.isViewable()) {
 			me.cardSelector.find('.vcfloader').removeClass("hide");
 			var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
-			me.cardSelector.find('.vcfloader .loader-label').text("Annotating variants with " + annotationEngines);
+			me.cardSelector.find('.vcfloader .loader-label').text(me.getRelationship() == "known-variants" ? "Accessing variants" : "Annotating variants with " + annotationEngines);
 			me.cardSelector.find("#region-flag").addClass("hide");			
 		}
 
@@ -1169,8 +1222,9 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						}	 				
 				   	    
 						if (me.getRelationship() == 'proband') {
-							genesCard.refreshCurrentGeneBadge();
-							cacheHelper.showAnalyzeAllProgress();							
+							//genesCard.refreshCurrentGeneBadge(null, null, function() {
+							//	cacheHelper.showAnalyzeAllProgress();							
+							//});
 						}
 					} else {
 						if (me.getRelationship() == 'proband') {
@@ -1242,6 +1296,9 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 		return;
 	}
 
+	if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+		return;
+	}
 
 	$('#vcf-legend').css("display", "block");		
 	this.cardSelector.find('#vcf-chart-label').removeClass("hide");		
@@ -1275,10 +1332,8 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
     if (isLevelEdu && eduTourNumber == "2") {
 		this.cardSelector.find('#zoom-region-chart').addClass("hide");
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "hidden");
     } else {
 		this.cardSelector.find('#zoom-region-chart').removeClass("hide");
-		this.cardSelector.find('#zoom-region-chart').css("visibility", "visible");
     }
 
 	resizeCardWidths();
@@ -1322,8 +1377,8 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 
 	// If only alignments provided, only show feature matrix if variants have been called.
-	if (isAlignmentsOnly() && theVcfData.features.length == 0) {
-		if (!theVcfData.loadState || !theVcfData.loadState['called']) {
+	if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
+		if (!theVcfData || !theVcfData.loadState || !theVcfData.loadState['called']) {
 			$('#matrix-track').addClass("hide");
 			me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
  	  		me.cardSelector.find("#vcf-variant-count").text("");
@@ -1361,14 +1416,11 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 	
 	if (data) {
 		this.cardSelector.find('#fb-chart-label').removeClass("hide");
-		me.cardSelector.find('#zoom-region-chart').css("visibility", "visible");	
 		if (me.model.isVcfReadyToLoad()) {
 			this.cardSelector.find('#fb-separator').removeClass("hide");
-			//me.cardSelector.find('#zoom-region-chart').css("margin-top", "0px");	
 
 		} else {
 			this.cardSelector.find('#fb-separator').addClass("hide");
-			//me.cardSelector.find('#zoom-region-chart').css("margin-top", "-25px");	
 		}
 
 		this.cardSelector.find('#fb-variants').removeClass("hide");
@@ -1520,10 +1572,18 @@ VariantCard.prototype.updateCalledVariantsWithInheritance = function() {
 }
 
 
+VariantCard.prototype.getDefaultVariantColorClass = function() {
+	if (this.getRelationship() == 'known-variants') {
+		return filterCard.classifyByClinvar;
+	} else {
+		return filterCard.classifyByImpact;
+	}
+}
 
-VariantCard.prototype.variantClass = function(clazz) {
-	this.vcfChart.clazz(clazz);
-	this.fbChart.clazz(clazz);
+VariantCard.prototype.setVariantColorClass = function(clazz) {
+	var me = this;
+	this.vcfChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);
+	this.fbChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);		
 }
 
 
@@ -1566,7 +1626,7 @@ VariantCard.prototype.filterAndShowLoadedVariants = function(theVcfData, showTra
 
 		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
 		// this by checking if the number filter flags exceed those that are hidden
-		if (filterCard.hasFilters()) {
+		if (filterCard.hasFilters() || filterCard.hasCardSpecificFilters(this.getRelationship()) ) {
 			this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').removeClass("hide");
 			this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(filteredVcfData));
@@ -1686,7 +1746,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 		}
 		
 	}
-	if (this.vcfChart != null) {
+	if (this.vcfChart != null  && !matchingVariant) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
 		var lock = clickedVariant != null && this == sourceVariantCard;
 
@@ -1711,6 +1771,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard, lock) {
 	var me = this;
 
+
 	// Only show the tooltip for the chart user mouses over / click
     if (this != sourceVariantCard) {
     	return;
@@ -1731,28 +1792,52 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 		}
 	}
 
+	if (me.getRelationship() == 'known-variants') {
+		lock = false;
+	}
+
+
 	if (lock  && !isLevelEdu && !isLevelBasic)  {
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);
 		
-		me.model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-		        .then( function(refreshedVariant) {
+		var showTooltipExtraAnnot = function(annotatedVariants, callbackNotFound) {
+			var targetVariants = annotatedVariants.filter(function(v) {
+				return clickedVariant &&
+	        		   clickedVariant.start == v.start &&
+	        		   clickedVariant.ref   == v.ref &&
+	        		   clickedVariant.alt   == v.alt;
+			});
+			if (targetVariants.length > 0) {
+				var annotatedVariant = targetVariants[0];
+				annotatedVariant.screenX = screenX;
+	        	annotatedVariant.screenY = screenY;
+				me._showTooltipImpl(tooltip, annotatedVariant, sourceVariantCard, true);
+			} else {
+				if (callbackNotFound) {
+					callbackNotFound();
+				}
+			}
 
-		        	// Now show tooltip again with the hgvs notations.  Only show
-		        	// if we haven't clicked on another variant
-		        	if (clickedVariant &&
-		        		clickedVariant.start == refreshedVariant.start &&
-		        		clickedVariant.ref == refreshedVariant.ref &&
-		        		clickedVariant.alt == refreshedVariant.alt) {
-
-						refreshedVariant.screenX= screenX;
-			        	refreshedVariant.screenY = screenY;
-
-						me._showTooltipImpl(tooltip, refreshedVariant, sourceVariantCard, true)
+		}
 
 
-		        	}
-		        });
+		me.model
+	      .promiseGetImpactfulVariantIds(window.gene, window.selectedTranscript)
+		  .then( function(annotatedVariants) {
+				// If the clicked variant is in the list of annotated variants, show the
+				// tooltip; otherwise, the callback will get the extra annots for this
+				// specific variant
+				showTooltipExtraAnnot(annotatedVariants, function() {
+					// The clicked variant wasn't annotated in the batch of variants.  Get the
+					// extra annots for this specific variant.
+					getProbandVariantCard()
+					    .model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+				        .then( function(refreshedVariant) {
+				        	showTooltipExtraAnnot([refreshedVariant]);
+				        })
+				})
+  		  });		        
 
 				
 	} else {
@@ -1779,8 +1864,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 	var x = variant.screenX + 7;
 	var y = variant.screenY - 27;
-	
-	
+
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, x, y, me);
 
 	tooltip.select("#unpin").on('click', function() {

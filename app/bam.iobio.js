@@ -598,7 +598,7 @@ var Bam = Class.extend({
    },
 
 
-   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, callback) {
+   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, fbArgs, vepAF, callback) {
     var me = this;
 
     var refName     = geneObject.chr; 
@@ -670,6 +670,29 @@ var Bam = Class.extend({
         });
         freebayesArgs.push("-f");
         freebayesArgs.push(refFastaFile);
+        if (fbArgs && fbArgs.useSuggestedVariants.value == true) {
+          freebayesArgs.push("-@");
+          freebayesArgs.push(me.getSuggestedVariantsCmd(trRefName, geneObject));          
+        }
+        if (fbArgs) {
+          for (var key in fbArgs) {
+            var theArg = fbArgs[key];
+            if (theArg.hasOwnProperty('argName')) {
+              if (theArg.hasOwnProperty('isFlag') && theArg.isFlag == true) {
+                if (theArg.value && theArg.value == true) {
+                    freebayesArgs.push(theArg.argName);
+                }
+              } else {
+                if (theArg.value && theArg.value != '') {
+                  freebayesArgs.push(theArg.argName);
+                  freebayesArgs.push(theArg.value);
+                }
+              }
+              
+            }
+          }
+
+        }
 
         
         var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs, {ssl: useSSL});
@@ -700,12 +723,20 @@ var Bam = Class.extend({
 
         // Get Allele Frequencies from 1000G and ExAC
         cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
-
+        
         // VEP to annotate
         var vepArgs = [];
         vepArgs.push(" --assembly");
         vepArgs.push(genomeBuildHelper.getCurrentBuildName());
         vepArgs.push(" --format vcf");
+        if (vepAF) {
+          vepArgs.push("--af");
+          vepArgs.push("--af_gnomad");
+          vepArgs.push("--af_esp");
+          vepArgs.push("--af_1kg");
+          vepArgs.push("--max_af");
+        }
+
         if (isRefSeq) {
           vepArgs.push("--refseq");
         }
@@ -743,6 +774,22 @@ var Bam = Class.extend({
     });
 
    },
+
+
+  getSuggestedVariantsCmd: function(refName, geneObject) {
+    // Create an iobio command get get the variants from clinvar for the region of the gene
+    var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
+
+    var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
+    
+    var tabixArgs = ['-h', clinvarUrl, regionParm];
+    var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL});
+
+    cmd = cmd.pipe(IOBIO.vt, ['view', '-f', '\"INFO.CLNSIG=~\'5|4\'\"', '-'], {ssl: useSSL});
+
+    
+    return cmd;
+  },
 
    getGeneCoverage: function(geneObject, transcript, bams, callback) {
     var me = this;

@@ -20,18 +20,21 @@ function MatrixCard() {
 
 	this.clinvarMap     = {
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
-			  		    'pathogenic/likely_pathogenic' : {value: 2,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
+			  		    'pathogenic/likely_pathogenic' : 
+			  		                              {value: 2,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
                         'likely_pathogenic'     : {value: 3,   badge: true, examineBadge: true, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
                         'uncertain_significance': {value: 4,   badge: true, examineBadge: true, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  {value: 4, badge: true, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
-                        'conflicting_data_from_submitters': {value: 5, badge: true, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
-                        'drug_response'         : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'confers_sensitivity'   : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'risk_factor'           : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'other'                 : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbo},
-                        'association'           : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'protective'            : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
-                        'not_provided'          : {value: 131, badge: false, examineBadge: false, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+						'conflicting_interpretations_of_pathogenicity':  
+						                          {value: 4,   badge: true, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
+                        'conflicting_data_from_submitters': 
+                                                  {value: 5,   badge: true,  examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
+                        'drug_response'         : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'confers_sensitivity'   : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'risk_factor'           : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'other'                 : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'association'           : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'protective'            : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
+                        'not_provided'          : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'likely_benign'         : {value: 141, badge: false, examineBadge: true, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'benign/likely_benign'  : {value: 141, badge: false, examineBadge: true, clazz: 'clinvar_lbenign', symbolFunction: this.showClinVarSymbol},
                         'benign'                : {value: 151, badge: false, examineBadge: true, clazz: 'clinvar_benign', symbolFunction: this.showClinVarSymbol},
@@ -80,55 +83,49 @@ function MatrixCard() {
                         N: {value: 2, badge: false, clazz: '',          symbolFunction: this.showBookmarkSymbol}
                      };
 	this.unaffectedMap = {
-		                recessive_none: {value: 1,   badge: true,  clazz: 'unaffected', symbolFunction: this.showSibNotRecessiveSymbol},
-                        recessive_some: {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
-                        recessive_all:  {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibRecessiveSymbol},
-                        present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
-                        present_all:    {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
-                        present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showSibPresentSymbol},
+                        present_some:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
+                        present_all:    {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
+                        present_none:   {value: 104, badge: false, clazz: 'unaffected', symbolFunction: this.showAffectedPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'unaffected', symbolFunction: ''}
                  };
 	this.affectedMap = {
-		                recessive_all:  {value: 1,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
-                        recessive_some: {value: 2,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibRecessiveSymbol},
-                        present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
-                        present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
-                        present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showSibPresentSymbol},
+                        present_all:    {value: 3,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
+                        present_some:   {value: 4,   badge: true,  clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
+                        present_none:   {value: 104, badge: false, clazz: 'affected',  symbolFunction: this.showAffectedPresentSymbol},
                         none:           {value: 104, badge: false, clazz: 'affected',  symbolFunction: ''}
                  };
+    this.harmfulVariantMap = {
+                        1:    {value: 1,   badge: true,  clazz: 'harmful1-variant',  symbolFunction: this.showHarmfulVariantSymbol},
+                        2:    {value: 2,   badge: true,  clazz: 'harmful2-variant',  symbolFunction: this.showHarmfulVariantSymbol},
+                        3:    {value: 3,   badge: true,  clazz: 'harmful3-variant',  symbolFunction: this.showHarmfulVariantSymbol},
+                        none: {value: 101, badge: false, clazz: '',                  symbolFunction: ''}
+                 };
 	// For af range, value must be > min and <= max
-	this.afExacMap = [ {min: -100.1, max: -100,   value: +99, badge: true, clazz: 'afexac_unique_nc', symbolFunction: this.showAfExacSymbol},
-                       {min: -1.1,   max: +0,     value: +2,  badge: true, clazz: 'afexac_unique',    symbolFunction: this.showAfExacSymbol},
-                       {min: -1.1,   max: +.0001, value: +3,  badge: true, clazz: 'afexac_uberrare',   symbolFunction: this.showAfExacSymbol},
-                       {min: -1.1,   max: +.001,  value: +4,  badge: true, clazz: 'afexac_superrare',  symbolFunction: this.showAfExacSymbol},
-                       {min: -1.1,   max: +.01,   value: +5,  badge: true, clazz: 'afexac_rare',       symbolFunction: this.showAfExacSymbol},
-                       {min: -1.1,   max: +.05,   value: +6,  badge: true, clazz: 'afexac_uncommon',   symbolFunction: this.showAfExacSymbol},
-                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'afexac_common',     symbolFunction: this.showAfExacSymbol},
-                      ];
-	this.af1000gMap= [ {min: -1.1,   max: +0,     value: +2,  badge: true, clazz: 'af1000g_unique',     symbolFunction: this.showAf1000gSymbol},
-                       {min: -1.1,   max: +.0001, value: +3,  badge: true, clazz: 'af1000g_uberrare',   symbolFunction: this.showAf1000gSymbol},
-                       {min: -1.1,   max: +.001,  value: +4,  badge: true, clazz: 'af1000g_superrare',  symbolFunction: this.showAf1000gSymbol},
-                       {min: -1.1,   max: +.01,   value: +5,  badge: true, clazz: 'af1000g_rare',       symbolFunction: this.showAf1000gSymbol},
-                       {min: -1.1,   max: +.05,   value: +6,  badge: true, clazz: 'af1000g_uncommon',   symbolFunction: this.showAf1000gSymbol},
-                       {min: +.05,   max: +1,     value: +7,  badge: false, clazz: 'af1000g_common',     symbolFunction: this.showAf1000gSymbol},
+	this.afHighestMap = [ {min: -100.1, max: -100,   value: +99, badge: false, clazz: '',    symbolFunction: ''},
+                       {min: -1.1,   max: +0,        value: +2,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.0001,    value: +3,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.001,     value: +4,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.01,      value: +5,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: -1.1,   max: +.05,      value: +6,  badge: true, clazz: 'afhighest_rare',    symbolFunction: this.showAfRareSymbol},
+                       {min: +.05,   max: +1,        value: +7,  badge: false,clazz: '',    symbolFunction: ''},
                       ];
 
 
 
 	this.matrixRows = [
-		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:0, index:2, match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
-		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:1, index:6, match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
-		{name:'Pathogenicity - SIFT'         , id:'sift',           order:2, index:7, match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
-		{name:'Impact (VEP)'                 , id:'impact',         order:3, index:0, match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
-		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:4, index:1, match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
-		{name:'Bookmark'                     , id:'bookmark',       order:5, index:10, match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
-		{name:'Inheritance Mode'             , id:'inheritance',    order:6, index:3, match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
-		{name:'Present in Affected sibs', id:'affected-sibs',  order:7, index:8, match: 'exact', attribute: 'affectedSibs',  map: this.affectedMap},
-		{name:'Absent in Unaffected sibs'          , id:'unaffected-sibs',order:8, index:9, match: 'exact', attribute: 'unaffectedSibs',  map: this.unaffectedMap},
-		{name:'Allele Frequency - ExAC'      , id:'af-exac',        order:9, index:4, match: 'range', attribute: 'afExAC',      map: this.afExacMap},
-		{name:'Allele Frequency - 1000G'     , id:'af-1000g',       order:10, index:5, match: 'range', attribute: 'af1000G',     map: this.af1000gMap},
-		{name:'Zygosity'                     , id:'zygosity',       order:11, index:11, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
-		{name:'Genotype'                     , id:'genotype',       order:12, index:12, match: 'field', attribute: 'eduGenotypeReversed' }
+		{name:'Harmful variant'              , id:'harmfulVariant', order:0, index:12,  match: 'exact', attribute: 'harmfulVariantLevel',     map: this.harmfulVariantMap },
+		{name:'Pathogenicity - ClinVar'      , id:'clinvar',        order:1, index:2,   match: 'exact', attribute: 'clinVarClinicalSignificance',     map: this.clinvarMap },
+		{name:'Pathogenicity - PolyPhen'     , id:'polyphen',       order:2, index:6,   match: 'exact', attribute: 'vepPolyPhen', map: this.polyphenMap},
+		{name:'Pathogenicity - SIFT'         , id:'sift',           order:3, index:7,   match: 'exact', attribute: 'vepSIFT',     map: this.siftMap},
+		{name:'Impact (VEP)'                 , id:'impact',         order:4, index:0,   match: 'exact', attribute: IMPACT_FIELD_TO_COLOR,   map: this.impactMap},
+		{name:'Most severe impact (VEP)'     , id:'highest-impact', order:5, index:1,   match: 'exact', attribute: IMPACT_FIELD_TO_FILTER,  map: this.highestImpactMap},
+		{name:'Bookmark'                     , id:'bookmark',       order:6, index:10,  match: 'exact', attribute: 'isBookmark',     map: this.bookmarkMap },
+		{name:'Inheritance Mode'             , id:'inheritance',    order:7, index:3,   match: 'exact', attribute: 'inheritance', map: this.inheritanceMap},
+		{name:'Present in Affected'          , id:'affected',       order:8, index:8,   match: 'exact', attribute: 'affected_summary',  map: this.affectedMap},
+		{name:'Absent in Unaffected'         , id:'unaffected',     order:9, index:9,   match: 'exact', attribute: 'unaffected_summary',  map: this.unaffectedMap},
+		{name:'Allele Frequency <5%'         , id:'af-highest',     order:10, index:11, match: 'range', attribute: 'afHighest',      map: this.afHighestMap},
+		{name:'Zygosity'                     , id:'zygosity',       order:11, index:4, match: 'exact', attribute: 'zygosity',      map: this.zygosityMap},
+		{name:'Genotype'                     , id:'genotype',       order:12, index:5, match: 'field', attribute: 'eduGenotypeReversed' }
 	];
 
 	this.matrixRowsBasic = [
@@ -142,7 +139,7 @@ function MatrixCard() {
 		{name:'Ref'                    ,id:'ref',             order:7,  index:7,  match:  'field', height: 21, attribute: 'ref',                         },
 		{name:'Alt'                    ,id:'alt',             order:8,  index:8,  match:  'field', height: 21, attribute: 'alt'                          },
 		{name:'Mutation Freq 1000G'    ,id:'af-1000g',        order:9,  index:9,  match:  'field', height: 21, attribute: 'af1000G',                     formatFunction: this.formatAlleleFrequencyPercentage },
-		{name:'Mutation Freq ExAC'     ,id:'af-exac',         order:10, index:10,  match: 'field', height: 21, attribute: 'afExAC',                      formatFunction: this.formatAlleleFrequencyPercentage }
+		{name:'Mutation Freq gnomAD'   ,id:'af-gnomAD',       order:10, index:10,  match: 'field', height: 21, attribute: 'afgnomAD',                    formatFunction: this.formatAlleleFrequencyPercentage }
 	];
 
 
@@ -304,8 +301,8 @@ MatrixCard.prototype.init = function() {
 			this.removeRow('Inheritance Mode', me.matrixRows);
 		}
 		this.removeRow('Most severe impact (VEP)', me.matrixRows);
-		this.removeRow('Present in Affected sibs', me.matrixRows);
-		this.removeRow('Absent in Unaffected sibs', me.matrixRows);
+		this.removeRow('Present in Affected', me.matrixRows);
+		this.removeRow('Absent in Unaffected', me.matrixRows);
 		this.removeRow('Allele Frequency - 1000G', me.matrixRows);
 		this.removeRow('Allele Frequency - ExAC', me.matrixRows);
 
@@ -451,6 +448,7 @@ MatrixCard.prototype._isolateVariants = function() {
 	});
 
 }
+
 
 MatrixCard.prototype.addBookmarkFlag = function(theVariant) {
 	var me = this;
@@ -618,23 +616,46 @@ MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) 
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(variant, true)
 
-		getProbandVariantCard().model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
-	        .then( function(refreshedVariant) {
 
-        		// Now show tooltip again with the hgvs notations.  Only show
-	        	// if we haven't clicked on another variant
-	        	if (clickedVariant &&
-	        		clickedVariant.start == refreshedVariant.start &&
-	        		clickedVariant.ref == refreshedVariant.ref &&
-	        		clickedVariant.alt == refreshedVariant.alt) {
 
-		        	refreshedVariant.screenXMatrix = xMatrix;
-		        	refreshedVariant.screenYMatrix = yMatrix;
-					me._showTooltipImpl(refreshedVariant, true, adjustPosition);
+		var showTooltipExtraAnnot = function(annotatedVariants, callbackNotFound) {
+			var targetVariants = annotatedVariants.filter(function(v) {
+				return clickedVariant &&
+	        		   clickedVariant.start == v.start &&
+	        		   clickedVariant.ref   == v.ref &&
+	        		   clickedVariant.alt   == v.alt;
+			});
+			if (targetVariants.length > 0) {
+				var annotatedVariant = targetVariants[0];
+				annotatedVariant.screenXMatrix = xMatrix;
+	        	annotatedVariant.screenYMatrix = yMatrix;
+				me._showTooltipImpl(annotatedVariant, true, adjustPosition);
+			} else {
+				if (callbackNotFound) {
+					callbackNotFound();
 				}
+			}
 
+		}
 
-	        });
+		getProbandVariantCard()
+		    .model
+		    .promiseGetImpactfulVariantIds(window.gene, window.selectedTranscript)
+			.then( function(annotatedVariants) {
+				// If the clicked variant is in the list of annotated variants, show the
+				// tooltip; otherwise, the callback will get the extra annots for this
+				// specific variant
+				showTooltipExtraAnnot(annotatedVariants, function() {
+					// The clicked variant wasn't annotated in the batch of variants.  Get the
+					// extra annots for this specific variant.
+					getProbandVariantCard()
+					    .model.promiseGetVariantExtraAnnotations(window.gene, window.selectedTranscript, variant)
+				        .then( function(refreshedVariant) {
+				        	showTooltipExtraAnnot([refreshedVariant]);
+				        })
+				})
+			});
+
 	} else {
 		me._showTooltipImpl(variant, lock, adjustPosition);
 	}
@@ -657,7 +678,7 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 		screenY += $('#nav-edu-tour').outerHeight();
 	} 
 
-	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, null, null, adjustPosition);
+	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, getProbandVariantCard(), null, adjustPosition);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
 	});
@@ -671,11 +692,6 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 		return;
 	}
 
-	if (filterCard.shouldWarnForNonPassVariants()) {
-		$('#low-quality-legend').removeClass("hide");
-	} else {
-		$('#low-quality-legend').addClass("hide");
-	}
 
 	// Flag any bookmarked variants
     bookmarkCard.determineVariantBookmarks(theVcfData, window.gene);
@@ -684,13 +700,32 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	// Figure out if we should show the unaffected sibs row
 	if (this.filteredMatrixRows == null) {
 		this.filteredMatrixRows = $.extend(true, [], this.matrixRows);
-		if (variantCardsSibs['affected'] == null || variantCardsSibs['affected'].length == 0) {
-			me.removeRow('Present in Affected sibs', me.filteredMatrixRows);
+		var affectedInfo = getAffectedInfo();
+		var affected = affectedInfo.filter(function(info) {
+			return info.status == 'affected' && info.relationship != 'proband';
+		})
+		var unaffected = affectedInfo.filter(function(info) {
+			return info.status == 'unaffected' && info.relationship != 'proband';
+		})
+		if (affected.length == 0) {
+			me.removeRow('Present in Affected', me.filteredMatrixRows);
 		}
-		if (variantCardsSibs['unaffected'] == null || variantCardsSibs['unaffected'].length == 0) {
-			me.removeRow('Absent in Unaffected sibs', me.filteredMatrixRows);
+		if (unaffected.length == 0) {
+			me.removeRow('Absent in Unaffected', me.filteredMatrixRows);
 		}
+
+		// Figure out if we should show any rows for generic annotations
+		var genericMatrixRows = genericAnnotation.getMatrixRows(theVcfData.genericAnnotators);
+
+		genericMatrixRows.forEach(function(matrixRow) {
+			matrixRow.index = me.filteredMatrixRows.length;
+			matrixRow.order = me.filteredMatrixRows.length;
+			me.filteredMatrixRows.push(matrixRow);
+		})
 	}
+
+
+
 
 	resizeCardWidths();
 
@@ -724,7 +759,12 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 		}
 
 		me.filteredMatrixRows.forEach( function(matrixRow) {
-			var rawValue = variant[matrixRow.attribute];
+			var rawValue = null;
+			if (matrixRow.attribute instanceof Array) {
+				rawValue = genericAnnotation.getValue(variant, matrixRow.attribute);
+			} else {
+				rawValue = variant[matrixRow.attribute];
+			}
 			var theValue    = null;
 			var mappedValue = null;
 			var mappedClazz = null;
@@ -747,7 +787,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 					} else {
 						mappedValue = theValue;
 					}
-					symbolFunction = me.showTextSymbol;
+					symbolFunction = matrixRow.symbolFunction ? matrixRow.symbolFunction : me.showTextSymbol;
 
 				} else if (matrixRow.match == 'exact') {
 					// We are going to get the mapped value through exact match,
@@ -872,31 +912,23 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 
 
     var unfilteredVcfData = getProbandVariantCard().model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (isLevelBasic) {
-		if (unfilteredVcfData != null && unfilteredVcfData.features != null && unfilteredVcfData.features.length == 0) {
-			$('#matrix-track #no-variants.level-basic').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else {
-			$('#matrix-track #no-variants.level-basic').addClass("hide");
-			$('#matrix-panel').removeClass("hide");
-		}
+
+    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
+    	$('#zero-variants').addClass("zero-filtered-variants");
+    	$('#zero-variants').text("No variants passed the filter" );
+    	$('#zero-variants').removeClass("hide");
+		$('#matrix-panel').addClass("hide");
+	} else if (sortedFeatures.length == 0 ) {
+    	$('#zero-variants').removeClass("zero-filtered-variants");
+    	$('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
+    	$('#zero-variants').removeClass("hide");
+		$('#matrix-panel').addClass("hide");
 	} else {
-	    if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
-	    	$('#zero-variants').addClass("zero-filtered-variants");
-	    	$('#zero-variants').text("No variants passed the filter" );
-	    	$('#zero-variants').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else if (sortedFeatures.length == 0 ) {
-	    	$('#zero-variants').removeClass("zero-filtered-variants");
-	    	$('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
-	    	$('#zero-variants').removeClass("hide");
-			$('#matrix-panel').addClass("hide");
-		} else {
-	    	$('#zero-variants').text("");
-	    	$('#zero-variants').addClass("hide");
-			$('#matrix-panel').removeClass("hide");
-		}		
-	}
+    	$('#zero-variants').text("");
+    	$('#zero-variants').addClass("hide");
+		$('#matrix-panel').removeClass("hide");
+	}		
+
 
 
    
@@ -947,6 +979,39 @@ MatrixCard.prototype.showColumnHeaderSymbol = function(selection, options) {
 	})
 
 
+};
+
+MatrixCard.prototype.showHarmfulVariantSymbol = function(selection, options) {
+	var width, height, clazz;
+	options = options || {};
+
+	var datumAttrs = selection.datum() || {};
+
+	var attrs = {
+		width: "13",
+		height: "13",
+		transform: datumAttrs.rank && datumAttrs.rank == 1 ? "translate(2,3)" : "translate(2,2)",
+		clazz: ""
+	};
+
+	
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.width = "16",
+		cellSizeAttrs.height = "16",
+		cellSizeAttrs.transform = datumAttrs.rank && datumAttrs.rank == 1 ? "translate(2,3)" : "translate(2,2)"
+	}
+
+	$.extend(attrs, datumAttrs, cellSizeAttrs, options);
+
+	selection.append("g")
+	         .attr("transform", attrs.transform)
+	         .append("use")
+	         .attr("xlink:href", datumAttrs.rank == 1 ? "#lightning-symbol" : "#error-symbol")
+	         .attr("class", attrs.clazz)
+	         .attr("width",  datumAttrs.rank == 1 ? attrs.width - 2  : attrs.width )
+	         .attr("height", datumAttrs.rank == 1 ? attrs.height - 2 : attrs.height)
+	         .style("pointer-events", "none");
 };
 
 MatrixCard.prototype.showClinVarSymbol = function(selection, options) {
@@ -1065,56 +1130,82 @@ MatrixCard.prototype.showSiftSymbol = function(selection, options) {
 	         .style("fill", colors[attrs.clazz]);
 };
 
-MatrixCard.prototype.showAfExacSymbol = function(selection, options) {
+MatrixCard.prototype.showMutationTasterSymbol = function(selection, options) {
+	options = options || {};
+	var attrs = {
+		transform: "translate(2,2)",
+		width: "14",
+		height: "14",
+		clazz: ""
+	};
+
+	var cellSizeAttrs = {};
+	if (options.cellSize > 18) {
+		cellSizeAttrs.width = "17",
+		cellSizeAttrs.height = "17",
+		cellSizeAttrs.transform = "translate(2,2)"		
+	}
+
+	var datumAttrs = selection.datum() || {};
+
+	$.extend(attrs, datumAttrs, options, cellSizeAttrs);
+
+	var colors = {
+		mt_disease_causing_auto: "#ad494A",
+		mt_disease_causing:      "#FB7737",
+		mt_polymorphism:         "rgba(231,186,82,1)",
+		mt_polymorphism_auto:    "rgba(181, 207, 107,1)"
+	};
+
+	selection.append("g")
+	         .attr("transform", attrs.transform)
+	         .append("use")
+	         .attr("xlink:href", "#danger-symbol")
+	         .attr("width", attrs.width)
+	         .attr("height", attrs.height)
+	         .style("pointer-events", "none")
+	         .style("fill", colors[attrs.clazz]);
+};
+
+
+MatrixCard.prototype.showAfSymbol = function(selection, options) {
 	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
-	var symbolDimNc = { transform: "translate(2,2)",    size: "11" };
 	if (options.cellSize > 18) {
 		symbolDim   = { transform: "translate(2,2)",    size: "17" };
-		symbolDimNc = { transform: "translate(6,6)",    size: "10" };
 	}
 	var symbolAttrs = {
-		afexac_unique_nc: { fill: "none",                   stroke: "#6b6666", transform: symbolDimNc.transform, size: symbolDimNc.size},
-		afexac_unique:    { fill: "rgb(199, 0, 1)",         stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_uberrare:  { fill: "rgba(204, 28, 29, 0.79)",stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_superrare: { fill: "rgba(255, 44, 0, 0.76)", stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_rare:      { fill: "rgb(247, 138, 31)",      stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_uncommon:  { fill: "rgb(224, 195, 128)",     stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size},
-		afexac_common:    { fill: "rgb(189,189,189)",       stroke: "none",    transform: symbolDim.transform,   size: symbolDim.size}
+		af_unique:    { fill: "rgb(199, 0, 1)",          transform: symbolDim.transform,   size: symbolDim.size},
+		af_uberrare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size},
+		af_superrare: { fill: "rgba(255, 44, 0, 0.76)",  transform: symbolDim.transform,   size: symbolDim.size},
+		af_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
+		af_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
+		af_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size}
 	}
 	// For the gene badge, we will display in a smaller size
 	if (options && options.hasOwnProperty('transform')) {
 		symbolAttrs[selection.datum().clazz].transform = options.transform;
 	}
 	if (options && options.hasOwnProperty('height')) {
-		symbolAttrs[selection.datum().clazz].sideLength = options.height;
+		symbolAttrs[selection.datum().clazz].size = options.height;
 	}
 	selection.append("g")
-		.attr("class", function(d, i) { return d.clazz; })
-		.attr("transform", function(d,i) {
-			return  symbolAttrs[d.clazz].transform;
-		})
+		.attr("class", function(d, i)    { return d.clazz; })
+		.attr("transform", function(d,i) { return symbolAttrs[d.clazz].transform; })
 		.append("use")
 		.attr("xlink:href", "#af-symbol")
 		.style("pointer-events", "none")
-		.style("fill",   function(d,i) { return symbolAttrs[d.clazz].fill; })
-		.style("stroke", function(d,i) { return symbolAttrs[d.clazz].stroke; })
-		.attr("width",   function(d,i) { return symbolAttrs[d.clazz].size; })
-		.attr("height",  function(d,i) { return symbolAttrs[d.clazz].size; });
-
+		.style("fill", function(d,i)  { return symbolAttrs[d.clazz].fill; })
+		.attr("width", function(d,i)  { return symbolAttrs[d.clazz].size; })
+		.attr("height", function(d,i) { return symbolAttrs[d.clazz].size; });
 };
 
-MatrixCard.prototype.showAf1000gSymbol = function(selection, options) {
+MatrixCard.prototype.showAfRareSymbol = function(selection, options) {
 	var symbolDim   = { transform: "translate(2,2)",    size: "12" };
 	if (options.cellSize > 18) {
 		symbolDim   = { transform: "translate(2,2)",    size: "17" };
 	}
 	var symbolAttrs = {
-		af1000g_unique:    { fill: "rgb(199, 0, 1)",          transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_uberrare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_superrare: { fill: "rgba(255, 44, 0, 0.76)",  transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_rare:      { fill: "rgb(247, 138, 31)",       transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_uncommon:  { fill: "rgb(224, 195, 128)",      transform: symbolDim.transform,   size: symbolDim.size},
-		af1000g_common:    { fill: "rgb(189,189,189)",        transform: symbolDim.transform,   size: symbolDim.size},
+		afhighest_rare:  { fill: "rgba(204, 28, 29, 0.79)", transform: symbolDim.transform,   size: symbolDim.size}
 	}
 	// For the gene badge, we will display in a smaller size
 	if (options && options.hasOwnProperty('transform')) {
@@ -1187,28 +1278,6 @@ MatrixCard.prototype.showDeNovoSymbol = function(selection, options) {
 
 };
 
-MatrixCard.prototype.showSibNotRecessiveSymbol = function(selection, options) {
-	if (selection.datum().clazz == "affected") {
-		selection.append("g")
-		         .attr("id", "thumbs-grey-symbol")
-		         .attr("transform", "translate(1,2)")
-		         .append("use")
-		         .attr("xlink:href", '#thumbs-down-symbol')
-		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .style("pointer-events", "none");
-	} else {
-		selection.append("g")
-		         .attr("id", "thumbs-green-symbol")
-		         .attr("transform", "translate(1,2)")
-		         .append("use")
-		         .attr("xlink:href", '#thumbs-up-symbol')
-		         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-		         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-		         .style("pointer-events", "none");		
-	}
-	
-};
 
 MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	var translate = options.cellSize > 18 ? "translate(3,0)" : "translate(0,0)";
@@ -1229,30 +1298,27 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
 	MatrixCard.wrap(text, options.cellSize, 3);
 };
 
-MatrixCard.prototype.showSibRecessiveSymbol = function (selection, options) {
-	if (selection.datum().value == 'recessive_all' && selection.datum().clazz == "affected") {
-		selection.append("g")
-			         .attr("id", "thumbs-green-symbol")
-			         .attr("transform", options.transform || "translate(1,2)")
-			         .append("use")
-			         .attr("xlink:href", '#thumbs-up-symbol')
-			         .attr("width",  options && options.cellSize > 18 ? "16" : "14")
-			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-			         .style("pointer-events", "none");
-	} else  {
-		selection.append("g")
-			         .attr("id", "thumbs-grey-symbol")
-			         .attr("transform", "translate(1,2)")
-			         .append("use")
-			         .attr("xlink:href", '#question-mark-symbol')
-			         .attr("width", options && options.cellSize > 18 ? "16" : "14")
-			         .attr("height", options && options.cellSize > 18 ? "16" : "14")
-			         .style("pointer-events", "none");
-	}
-
+MatrixCard.prototype.showNumericSymbol = function (selection, options) {
+	var translate = options.cellSize > 18 ? "translate(0,4)" : "translate(0,0)";
+	var text =  selection.append("g")
+				         .attr("transform", translate)
+				         .append("text")
+				         .attr("class", function(d,i) {
+				         	if (selection.datum().clickFunction) {
+				         		return "clickable";
+				         	} else {
+				         		return "";
+				         	}
+				     	 })
+				         .attr("x", 0)
+				         .attr("y", isLevelBasic ? 14 : 11)
+				         .attr("dy", "0em")
+				         .text(selection.datum().value);
+	MatrixCard.wrap(text, options.cellSize, 3, options.cellSize - 1);
 };
 
-MatrixCard.prototype.showSibPresentSymbol = function (selection, options) {
+
+MatrixCard.prototype.showAffectedPresentSymbol = function (selection, options) {
 	var symbolLink = null;
 	var id = "thumbs-grey-symbol";
 
@@ -1409,7 +1475,7 @@ MatrixCard.prototype.showImpactBadge = function(selection, variant, impactClazz)
 
     var symbolSize = symbolScale(6);
 
-	if (type.toUpperCase() == 'SNP') {
+	if (type.toUpperCase() == 'SNP' || type.toUpperCase() == 'MNP') {
 		selection.append("g")
 		          .attr("transform", transform1)
 		         .append("rect")
@@ -1552,6 +1618,10 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 
 }
 
+MatrixCard.prototype.formatAfHighest = function(variant, afField) {
+	return afField && afField.length > 0 && +variant[afField] < .1 ? percentage(variant[afField], false) : "";
+}
+
 MatrixCard.prototype.formatInheritance = function(variant, value) {
 	return this.getInheritanceLabel(value);
 }
@@ -1561,10 +1631,13 @@ MatrixCard.prototype.getInheritanceLabel = function(inheritance) {
 	return matrixRow ? matrixRow.display : inheritance;
 }
 
-MatrixCard.wrap = function(text, width, maxLines) {
+MatrixCard.wrap = function(text, width, maxLines, x) {
   if (maxLines == null) {
   	maxLines = 10;
   }
+  var theX       = x ? x : 0;
+  var textAnchor = x ? "end" : "start";
+
   text.each(function() {
     var text = d3.select(this),
         words = text.text()
@@ -1580,7 +1653,12 @@ MatrixCard.wrap = function(text, width, maxLines) {
         lineHeight = 1.1, // ems
         y = text.attr("y"),
         dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        tspan = text.text(null)
+                    .append("tspan")
+                    .style("text-anchor", textAnchor)
+                    .attr("x", theX)
+                    .attr("y", y)
+                    .attr("dy", dy + "em");
     while (word = words.pop()) {
       line.push(word);
       if (lineNumber < maxLines) {
@@ -1592,7 +1670,10 @@ MatrixCard.wrap = function(text, width, maxLines) {
 	        line.pop();
 	        tspan.text(line.join(" "));
 	        line = [word];
-	        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+	        tspan = text.append("tspan").attr("x", theX).attr("y", y)
+	                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+	                    .style("text-anchor", textAnchor)
+	                    .text(word);
 	      }
       }
     }

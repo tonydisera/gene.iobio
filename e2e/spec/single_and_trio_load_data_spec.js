@@ -18,7 +18,7 @@ module.exports = {
 
   'Loading Platinum Single shows the correct cards (only proband)': function(client) {
     indexPage.load();
-    nav.searchGene('BRCA2');
+    nav.searchGene('AIRE');
 
     nav.clickData();
     dataCard.selectSingle();
@@ -27,7 +27,7 @@ module.exports = {
     dataCard.clickLoad();
 
 
-    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
+    transcriptCard.expect.element('@geneName').text.to.equal('AIRE');
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.not.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.not.be.visible;
@@ -41,7 +41,7 @@ module.exports = {
     dataCard.section.fatherData.selectPlatinumTrio();
     dataCard.clickLoad();
 
-    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
+    transcriptCard.expect.element('@geneName').text.to.equal('AIRE');
     indexPage.expect.element('@probandVariantCard').to.be.visible;
     indexPage.expect.element('@motherVariantCard').to.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.be.visible;
@@ -54,7 +54,7 @@ module.exports = {
     dataCard.selectTrio();
     dataCard.clickLoad();
 
-    transcriptCard.expect.element('@geneName').text.to.equal('BRCA2');
+    transcriptCard.expect.element('@geneName').text.to.equal('AIRE');
     indexPage.expect.element('@motherVariantCard').to.be.visible;
     indexPage.expect.element('@fatherVariantCard').to.be.visible;
   },

@@ -186,6 +186,10 @@
   color: $sidebar-text-color !important
   font-size: 12px
 
+textarea#genes-to-copy
+  width: 325px
+  height: 280px
+  
 
 
 #edit-list-li
@@ -246,13 +250,14 @@
   margin-bottom: 8px
   margin-right: 10px
   height: 21px
+  display: inline-block
 
 #gene-badge.failed-filter
   opacity: .65
 
 #gene-badge.loading
   border-left: #d8d8d8  solid 10px
-  height: 22px
+  //height: 22px
 
 
 #gene-badge.loading.selected
@@ -261,7 +266,7 @@
 
 #gene-badge.selected
   border-left:  $app-color solid 12px
-  height: 22px
+  //height: 22px
   #gene-badge-button
     //box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19)
 
@@ -271,7 +276,7 @@
 #gene-badge.phenolyzer
   #gene-badge-button
     border: solid 1px #9FC2D0
-    height: 21px
+    //height: 21px
 
     &.user-visited
       border: solid 2px #9FC2D0
@@ -346,6 +351,37 @@
     margin-top: 1px
 
 
+.gene-badge-harmful-variant
+  font-size: 15px
+  margin-top: -1px
+  margin-left: 2px
+  float: left  
+
+.harmful1-variant
+  fill: #9d2024
+
+.harmful2-variant
+  fill: #d84d4d
+
+.harmful3-variant
+  fill: #ef9754
+
+
+#gene-badge-harmful1-variant
+  display: none 
+  fill: #9d2024
+
+#gene-badge-harmful2-variant
+  display: none 
+  fill: #d84d4d
+
+#gene-badge-harmful3-variant
+  display: none 
+  fill: #ef9754
+
+
+
+
 #gene-badge
   &.visited
     #gene-badge-loaded
@@ -368,7 +404,15 @@
   &.has-harmful-variant
     #gene-badge-harmful-variant
       display: inline-block 
-
+  &.has-harmful1-variant
+    #gene-badge-harmful1-variant
+      display: inline-block 
+  &.has-harmful2-variant
+    #gene-badge-harmful2-variant
+      display: inline-block 
+  &.has-harmful3-variant
+    #gene-badge-harmful3-variant
+      display: inline-block       
 
   &:hover #gene-badge-remove
     visibility: visible 
@@ -459,27 +503,29 @@
 
 
 #gene-badge-container
-  display: flex
-  display: -webkit-flex
-  flex-flow: row wrap
-  -webkit-flex-flow: row wrap
-  justify-content: center
-  -webkit-justify-content: center
-  max-height: 150px
-  overflow-y: auto
   padding-bottom: 0px
   padding-top: 0px
   visibility: visible
+  overflow: auto
+  text-align: center
 
   &.hide
-    display: flex !important
+    display:  block !important
     visibility: hidden
 
-  a
-    color:  $sidebar-text-color !important
+  &.view-all
+    max-height: 150px  
+    overflow-y: auto
 
-    &:hover
-      text-decoration: underline !important
+  &.page-control
+    text-align: center
+
+  #gene-badge
+    a
+      color:  $sidebar-text-color !important
+
+      &:hover
+        text-decoration: underline !important
 
 
   #gene-badge-remove
@@ -512,10 +558,13 @@
   margin-top: 0px
   margin-bottom: 5px
   text-align: center
+  float: none
+  display: block
 
   #gene-paging-links
     display: inline-block
-    width: 160px
+    margin-right: 20px
+    margin-left: 30px    
 
   a.gene-paging-link
     color:  $sidebar-text-color !important

@@ -1,0 +1,289 @@
+#known-variants-nav-area
+  display: inline-block
+  padding-top: 0px
+  float: left
+
+  #known-variants-nav-radio-buttons
+    display: inline-block
+    margin-top: 2px
+    padding-top: 0px
+    float: left
+    margin-right: 15px
+
+    .radio 
+      label 
+        font-size: 13px
+        color: $text-color 
+        padding-top: 1px
+
+
+  #known-variants-nav-chart-type  
+    margin-left: 10px
+    margin-top: 0px
+    float: left
+
+    .tooltip
+      background-color: initial
+      border: none
+      box-shadow: none
+
+    .chart-label
+      vertical-align: top
+      display: inline-block
+      margin-top: 4px
+      margin-right: 10px
+
+    .loader
+      margin-left: 10px
+      display: inline-block
+      margin-top: 2px
+      margin-bottom: 0px
+
+      .loader-label
+        font-size: 12px
+
+    .chart-type
+      margin: 0
+      padding: 2px
+      vertical-align: top
+      cursor: pointer
+
+      &.selected
+        font-weight: bold
+        border: solid .5px $current-color
+        border-radius: 4px
+        padding: 1px
+
+      .material-icons
+        font-size: 17px    
+
+
+  text
+    color: $text-color
+    fill:  $text-color
+    font-size: 12px    
+
+  svg.known-variants-clinvar
+    margin-right:  10px
+
+  svg.known-variants-clinvar:hover
+    cursor: pointer
+    font-weight: bold
+    fill: $current-color
+    outline: solid 2px $current-frame-color 
+  
+  svg.known-variants-clinvar.current:hover
+    font-weight: bold
+    cursor: pointer
+    outline: solid 2px $current-color 
+
+
+#select-known-variants-filter-box
+  min-width: 200px
+  max-width: 500px
+  display: inline-block
+  margin-left: 10px
+  float: left
+
+  .selectize-input
+    input
+      width: 120px !important
+
+
+      &::-webkit-input-placeholder
+        font-size: 12px !important
+
+      &::-moz-placeholder 
+        font-size: 12px !important
+
+      &input:-moz-placeholder
+        font-size: 12px !important
+
+    &.has-items
+      input
+        width: 4px !important
+
+  .selectize-control.multi 
+    .selectize-input.has-items 
+      padding: 3px 8px 0px
+
+
+
+#transcript-card
+  #known-variants-nav
+    margin-left: 10px
+    text-align: left
+    display: inline-block
+    vertical-align: top
+
+  #known-variants-chart
+    margin-left: 0px
+
+
+  #known-variants-display-label
+    font-size: 13px
+    color: $text-color
+    display: inline-block
+    vertical-align: top
+    padding-top: 4px
+    margin-left: 10px
+    margin-right: 4px
+
+
+
+#known-variants-all-card
+  min-height: 35px
+
+  #known-variants-nav-area
+    display: inline-block
+    padding-top: 0px
+
+  .track
+    background-color: transparent !important
+
+  .track-expand
+    background-color:  transparent !important
+
+  .card-label
+    //color:  #06a7bc !important
+
+  #known-variants-chart
+    margin-bottom: -8px
+
+  #known-variants-cards
+    margin-left: -10px
+    margin-right: -10px
+    margin-bottom: 5px
+
+    .badge-label
+      font-size: 12px
+
+    #variant-badges
+      margin-left: 20px !important
+
+    .variant-card
+      margin-top: -3px
+      box-shadow:  none
+      margin-bottom: -10px
+      min-height: initial
+      
+      #variant-heading
+        display: none !important
+
+      #minimize-button
+        display: none !important
+      #expand-button
+        display: none !important
+      #shrink-button
+        display: none !important
+      #bam-track
+        display: none !important
+
+      .tooltip
+        #bookmarkLink
+          display: none !important
+
+
+#transcript-card
+
+  #show-known-variants-cb-area 
+    margin-left: 10px !important
+    float: none !important
+
+  #show-known-variants-card-cb-area
+    float: none !important
+    margin-left: 20px !important
+    display: inline-block !important
+
+  #known-variants-nav-area
+    display: inline-block
+    padding-top: 6px
+
+  #known-variants-chart
+    margin-bottom: -20px !important
+
+  #known-variants-cards
+    margin-left: -10px
+    margin-right: -10px
+    margin-top: -30px
+
+    .badge-label
+      font-size: 12px 
+
+    #variant-badges
+      float: right !important
+      margin-top: -6px !important
+
+    .variant-card
+      box-shadow:  none
+      margin-bottom: -25px
+
+      #variant-heading
+        display: none !important
+
+      #zoom-region-chart
+        display: none !important
+      #bam-track
+        display: none !important
+
+      #minimize-button
+        display: none !important
+      #expand-button
+        display: none !important
+      #shrink-button
+        display: none !important
+
+      
+
+
+#known-variants-cards
+  #vcf-chart-label
+    display: none !important
+
+  #variant-heading
+    min-width: initial
+    max-width: initial
+
+
+//
+// Known Variants Histogram
+//
+#known-variants-chart
+  padding: 0px
+  margin-top: 0px
+  margin-bottom: 0px
+
+
+  svg
+    vertical-align: bottom
+    .axis
+      text
+        font-size: 12px !important
+
+      &.axis--x
+        .tick
+          visibility: hidden
+    
+    .layer.benign
+      .stacked-element
+        fill: rgba(156, 194, 49, 1)
+        stroke: $text-color
+        stroke-width: .5px
+
+    .layer.path
+      .stacked-element
+        fill: #ad494A
+        stroke: $text-color
+        stroke-width: .5px
+
+    .layer.other
+      .stacked-element
+        fill: rgba(231, 186, 82, 1)
+        stroke: $text-color
+        stroke-width: .5px
+
+    .layer.unknown
+      .stacked-element
+        fill: rgb(189, 189, 189)
+        stroke: $text-color
+        stroke-width: .5px

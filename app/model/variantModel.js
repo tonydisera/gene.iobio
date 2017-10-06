@@ -20,12 +20,10 @@ function VariantModel() {
 	this.name = "";
 	this.vcfRefNamesMap = {};
 	this.sampleName = "";
+	this.isGeneratedSampleName = false;
 	this.defaultSampleName = null;
 	this.relationship = null;
 	this.affectedStatus = null;
-
-	this.GET_RSID = false;
-	this.GET_HGVS = false;
 
 	this.lastVcfAlertify = null;
 	this.lastBamAlertify = null;
@@ -34,6 +32,10 @@ function VariantModel() {
 }
 
 
+VariantModel.prototype.getSampleIdentifier = function(theSampleName) {
+	var id = this.relationship + "&&" + this.sampleName + "&&" + theSampleName;
+}
+
 VariantModel.prototype.setLoadState = function(theVcfData, taskName) {
 	if (theVcfData != null) {
 		if (theVcfData.loadState == null) {
@@ -41,6 +43,10 @@ VariantModel.prototype.setLoadState = function(theVcfData, taskName) {
 		}
 		theVcfData.loadState[taskName] = true;
 	}
+}
+
+VariantModel.prototype.getAnnotators = function() {
+	return this.vcf ? this.vcf.getAnnotators() : [];
 }
 
 VariantModel.prototype.isLoaded = function() {
@@ -132,6 +138,48 @@ VariantModel.prototype.reconstituteFbData = function(theVcfData) {
 		}
    	});	
    	return theFbData;				
+}
+
+VariantModel.prototype.promiseGetKnownVariants = function(geneObject, transcript, binLength) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+		var refName = me._stripRefName(geneObject.chr);
+		me.vcf.promiseGetKnownVariants(refName, geneObject, transcript, binLength)
+		        .then(function(results) {
+		        	resolve(results);
+		        	/*
+		        	if (transcript) {
+						var exonBins = me.binKnownVariantsByExons(geneObject, transcript, binLength, results);
+						resolve(exonBins);	        	
+					} else {
+			        	resolve(results);
+					}
+					*/
+		        },
+		        function(error) {
+		        	reject(error);
+		        });
+	})
+}
+
+VariantModel.prototype.binKnownVariantsByExons = function(geneObject, transcript, binLength, results) {
+	var exonBins = [];
+	transcript.features.filter(function(feature) {
+		return feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'CDS';
+	}).forEach(function(exon) {
+		var exonBin = {point: (+exon.start + ((+exon.end - +exon.start)/2)), start: exon.start, end: exon.end, total: +0, path: +0, benign: +0, unknown: +0, other: +0};
+		results.forEach(function(rec) {
+			if (+rec.start >= +exon.start && +rec.end <= +exon.end) {
+				exonBin.total    += +rec.total;
+				exonBin.path     += +rec.path;
+				exonBin.benign   += +rec.benign;
+				exonBin.other    += +rec.other;
+				exonBin.unknown  += +rec.unknown;
+			}
+		})
+		exonBins.push(exonBin);
+	})	
+	return exonBins;
 }
 
 
@@ -348,7 +396,6 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 
 	theVcfData.features.forEach( function(variant) {
 
-		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
 
 	    for (key in variant.highestImpactSnpeff) {
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
@@ -361,102 +408,66 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
 	    		consequenceClasses[key] = consequenceClasses[key] || {};
 	    		consequenceClasses[key][variant.type] = variant.highestImpactVep[key]; // key = consequence, value = transcript id
-	    		if (key == 'HIGH' || key == 'MODERATE') {
-	    			variantDanger.impact = key.toLowerCase();
-	    		}
 	    	}
 	    }
 
 	    for (key in variant.highestSIFT) {
-				if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
-					var clazz = matrixCard.siftMap[key].clazz;
-					dangerCounts.SIFT = {};
-					dangerCounts.SIFT[clazz] = {};
-					dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
-					variantDanger.sift = key.split("_").join(" ").toLowerCase();
-				}
+			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
+				var clazz = matrixCard.siftMap[key].clazz;
+				dangerCounts.SIFT = {};
+				dangerCounts.SIFT[clazz] = {};
+				dangerCounts.SIFT[clazz][key] = variant.highestSIFT[key];
+			}
 	    }
 
 	    for (key in variant.highestPolyphen) {
 	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
-					var clazz = matrixCard.polyphenMap[key].clazz;
-					dangerCounts.POLYPHEN = {};
-					dangerCounts.POLYPHEN[clazz] = {};
-					dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
-					variantDanger.polyphen = key.split("_").join(" ").toLowerCase();;
-;
-	    	}
+				var clazz = matrixCard.polyphenMap[key].clazz;
+				dangerCounts.POLYPHEN = {};
+				dangerCounts.POLYPHEN[clazz] = {};
+				dangerCounts.POLYPHEN[clazz][key] = variant.highestPolyphen[key];
+			}
 	    }
 
-	    if (variant.hasOwnProperty('clinVarClinicalSignificance')) {
-	    	for (key in variant.clinVarClinicalSignificance) {
-		    	if (matrixCard.clinvarMap.hasOwnProperty(key)  && matrixCard.clinvarMap[key].badge) {
-						clinvarClasses[key] = matrixCard.clinvarMap[key];
-						variantDanger.clinvar = key.split("_").join(" ").toLowerCase();;
-		    	}
+	    if (variant.hasOwnProperty('clinvar')) {
+	    	var clinvarEntry = null;
+	    	var clinvarDisplay = null;
+	    	var clinvarKey = null;
+	    	for (var key in matrixCard.clinvarMap) {
+	    		var me = matrixCard.clinvarMap[key];
+	    		if (clinvarEntry == null && me.clazz == variant.clinvar) {
+	    			clinvarEntry = me;
+	    			clinvarDisplay = key;
+	    			clinvarKey = key;
+	    		}
+	    	}
+	    	if (clinvarEntry && clinvarEntry.badge) {
+				clinvarClasses[clinvarKey] = clinvarEntry;
 	    	}
 	    }
 
 	    if (variant.inheritance && variant.inheritance != 'none') {
 	    	var clazz = matrixCard.inheritanceMap[variant.inheritance].clazz;
 	    	inheritanceClasses[clazz] = variant.inheritance;
-	    	variantDanger.inheritance = true;
 	    }
 
 
 
-	    var evaluateAf = function(af, afMap) {
-			afMap.forEach( function(rangeEntry) {
-				if (+variant[af] > rangeEntry.min && +variant[af] <= rangeEntry.max) {
+	    if (variant.afFieldHighest) {
+			matrixCard.afHighestMap.forEach( function(rangeEntry) {
+				if (+variant.afHighest > rangeEntry.min && +variant.afHighest <= rangeEntry.max) {
 					if (rangeEntry.value < lowestAf) {
 						lowestAf = rangeEntry.value;
 						afClazz = rangeEntry.clazz;
-						afField = af;
-						afBadge = rangeEntry.badge;
-					}
-					if (rangeEntry.badge) {
-						variantDanger.af = +variant[af];
-						variantDanger.meetsAf = true;
+						afField = variant.afFieldHighest;
 					}
 				}
 			});
 		}
 
-		// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
-		// as 'lowest' af for all variants in gene
-		var af = null;
-		var afMap = null;
-		if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
-			// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
-			if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
-				af = 'afExAC';
-				afMap = matrixCard.afExacMap;
-			} else {
-				af = 'af1000G';
-				afMap = matrixCard.af1000gMap;
-			}
-		} else if ($.isNumeric(variant.afExAC)) {
-			af = 'afExAC';
-			afMap = matrixCard.afExacMap;
-
-		} else if ($.isNumeric(variant.af1000G)) {
-			af = 'af1000G';
-			afMap = matrixCard.af1000gMap;
-		}
-		if (af && afMap) {
-			evaluateAf(af, afMap);
-		}
-
 		// Turn on flag for harmful variant if one is found
-		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
-			var info = {'type'       : variant.type,
-			            'clinvar'    : variantDanger.clinvar, 
-			            'polyphen'   : variantDanger.polyphen,
-			            'SIFT'       : variantDanger.sift,
-				        'impact'     : variantDanger.impact, 
-			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false
-			           };
-			dangerCounts.harmfulVariantsInfo.push(info);
+		if (variant.harmfulVariant) {
+			dangerCounts.harmfulVariantsInfo.push(variant.harmfulVariant);
 		}
 	});
 
@@ -490,6 +501,11 @@ VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAl
 		}
 		return {};
 	}
+
+	var hvLevel = dangerCounts.harmfulVariantsInfo
+							  .map( d => d.level )
+							  .reduce( (min, cur) => Math.min( min, cur ), Infinity );
+	dangerCounts.harmfulVariantsLevel = hvLevel == Infinity ? null : hvLevel;
 
 	dangerCounts.CONSEQUENCE = getLowestImpact(consequenceClasses);
 	dangerCounts.IMPACT = filterCard.getAnnotationScheme().toLowerCase() == 'vep' ? dangerCounts.CONSEQUENCE : getLowestImpact(impactClasses);
@@ -670,6 +686,12 @@ VariantModel.prototype.setRelationship = function(theRelationship) {
 	this.relationship = theRelationship;	
 }
 
+
+VariantModel.prototype.isAffected = function() {
+	return this.affectedStatus && this.affectedStatus == 'affected' ? true : false;
+}
+
+
 VariantModel.prototype.setAffectedStatus = function(theAffectedStatus) {
 	this.affectedStatus = theAffectedStatus;
 }
@@ -684,9 +706,20 @@ VariantModel.prototype.setSampleName = function(sampleName) {
 	this.sampleName = sampleName;
 }
 
+VariantModel.prototype.setGeneratedSampleName = function(sampleName) {
+	this.sampleName = sampleName;
+	this.isGeneratedSampleName = true;
+}
+
+
 
 VariantModel.prototype.getSampleName = function() {
 	return this.sampleName;
+}
+
+VariantModel.prototype.getVcfSampleName = function() {
+	// Returns a sample name if provided in the vcf header; otherwise returns null.
+	return !this.isGeneratedSampleName ? (this.sampleName == "" ? null : this.sampleName) : null;
 }
 
 
@@ -1143,12 +1176,16 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				   me.getVcfRefName(theGene.chr), 
 				   fakeGeneObject,
 			       theTranscript,
-			       (sampleNames ? sampleNames.join(",") : me.sampleName),
-			       filterCard.annotationScheme.toLowerCase(),
+			       null,   // regions
+			       false,  // is multi-sample
+			       me._getSamplesToRetrieve(),  // sample names
+			       filterCard.annotationScheme.toLowerCase(), // annot scheme
+			       matrixCard.clinvarMap,  // clinvar map
 			       window.geneSource == 'refseq' ? true : false,
-			       true,
-			       true,
-			       useServerCache
+			       true,  // hgvs notation
+			       true,  // rsid
+			       false, // vep af
+			       useServerCache // serverside cache
 			    ).then( function(data) {
 
 			    	var rawVcfRecords = data[0];
@@ -1159,21 +1196,24 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 			    			} else {
 			    				return false;
 			    			}
-			    		} else {
+			    		} else if (record != "") {
 			    			var fields = record.split("\t");
 			    			var chrom = fields[0];
 			    			var start = fields[1];
 			    			var ref   = fields[3];
 			    			var alt   = fields[4];
-			    			if (me.getVcfRefName(theGene.chr) == chrom &&
-			    				start == variant.start &&
-				    		    alt   == variant.alt &&
-				    			ref   == variant.ref) {
-				    			return true;
-				    		} else {
-				    			return false;
-				    		}
-				    		
+			    			var found = false;
+			    			alt.split(",").forEach(function(theAlt) {
+				    			if (!found && 
+				    				me.getVcfRefName(theGene.chr) == chrom &&
+				    				start    == variant.start &&
+					    		    theAlt   == variant.alt &&
+					    			ref      == variant.ref) {
+				    				found = true;
+				    			}
+
+			    			})
+			    			return found;
 			    		}
 			    	});
 
@@ -1182,55 +1222,66 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 			    	if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
 			    		// Now update the hgvs notation on the variant
-			    		var v = theVcfData.features[0];
+			    		var matchingVariants = theVcfData.features.filter(function(aVariant) {
+			    			return variant.chrom == aVariant.chrom &&
+				    			   variant.start == aVariant.start &&
+					    		   variant.alt   == aVariant.alt &&
+					    		   variant.ref   == aVariant.ref
+			    		});
+			    		if (matchingVariants.length > 0) {
+			    			var v = matchingVariants[0];
+				    		if (format && format == 'csv') {			    			
+				    			resolve([v, variant, vcfRecords]);
+				    		} else if (format && format == 'vcf') {
+				    			if (vcfRecords) {
+				    				resolve([v, variant, vcfRecords]);
+				    			} else {
+				    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
+				    			}
+				    		} else {
+				    			var cachedVcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
+				    			if (cachedVcfData) {
+						    		var theVariants = cachedVcfData.features.filter(function(d) {
+						    			if (d.start == v.start &&
+						    				d.alt == v.alt &&
+						    				d.ref == v.ref) {
+						    				return true;
+						    			} else {
+						    				return false;
+						    			}
+						    		});
+						    		if (theVariants && theVariants.length > 0) {
+							    		var theVariant = theVariants[0];
+					
+										// set the hgvs and rsid on the existing variant
+							    		theVariant.extraAnnot = true;
+							    		theVariant.vepHGVSc = v.vepHGVSc;
+							    		theVariant.vepHGVSp = v.vepHGVSp;
+							    		theVariant.vepVariationIds = v.vepVariationIds;
 
-			    		if (format && format == 'csv') {			    			
-			    			resolve([v, variant, vcfRecords]);
-			    		} else if (format && format == 'vcf') {
-			    			if (vcfRecords) {
-			    				resolve([v, variant, vcfRecords]);
-			    			} else {
-			    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
-			    			}
-			    		} else {
-			    			var cachedVcfData = me.getVcfDataForGene(theGene, theTranscript);
-			    			if (cachedVcfData) {
-					    		var theVariants = cachedVcfData.features.filter(function(d) {
-					    			if (d.start == v.start &&
-					    				d.alt == v.alt &&
-					    				d.ref == v.ref) {
-					    				return true;
-					    			} else {
-					    				return false;
-					    			}
-					    		});
-					    		if (theVariants && theVariants.length > 0) {
-						    		var theVariant = theVariants[0];
-				
-									// set the hgvs and rsid on the existing variant
-						    		theVariant.extraAnnot = true;
-						    		theVariant.vepHGVSc = v.vepHGVSc;
-						    		theVariant.vepHGVSp = v.vepHGVSp;
-						    		theVariant.vepVariationIds = v.vepVariationIds;
+								    	// re-cache the data
+									    me._cacheData(cachedVcfData, "vcfData", theGene.gene_name, theTranscript);	
 
-							    	// re-cache the data
-								    me._cacheData(cachedVcfData, "vcfData", theGene.gene_name, theTranscript);	
-
-							    	// return the annotated variant
-									resolve(theVariant);
-					    		} else {
-				    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v .alt;				
+								    	// return the annotated variant
+										resolve(theVariant);
+						    		} else {
+					    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v .alt;				
+						    			console.log(msg);
+						    			reject(msg);
+						    		}			    		
+				    			} else {
+				    				var msg = "Unable to update gene vcfData cache with updated HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v.alt;				
 					    			console.log(msg);
 					    			reject(msg);
-					    		}			    		
-			    			} else {
-			    				var msg = "Unable to update gene vcfData cache with updated HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v.alt;				
-				    			console.log(msg);
-				    			reject(msg);
 
-			    			}
+				    			}
 
+				    		}			    			
+			    		} else {
+			    			reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 			    		}
+
+
 			    	} else {
 			    		var msg = "Empty results returned from VariantModel.promiseGetVariantExtraAnnotations() for variant " + variant.chrom + " " + variant.start + " " + variant.ref + "->" + variant.alt;
 			    		console.log(msg);
@@ -1247,6 +1298,78 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 
 }
 
+VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, theTranscript) {
+	var me = this;
+
+
+	return new Promise( function(resolve, reject) {
+
+		me._promiseVcfRefName(theGeneObject.chr).then( function() {
+			var trRefName = me.getVcfRefName(theGeneObject.chr);
+
+			// Get the coords for variants of high or moder impact
+			var theVcfData = me._getCachedData("vcfData", theGeneObject.gene_name, theTranscript);	
+
+			var regions   = theVcfData.features.filter(function(variant) {
+				if (variant.fbCalled != 'Y' && variant.extraAnnot) {
+					return false;
+				} else {
+					return (variant.vepImpact['HIGH'] || variant.vepImpact['MODERATE']);
+				}
+			}).map(function(variant) {
+				return {name: trRefName, start: variant.start, end: variant.end};
+			})
+			
+			if (regions.length > 0) {
+
+				me.vcf.promiseGetVariants(
+				   trRefName, 
+				   theGeneObject,
+			       theTranscript,
+			       regions,   // regions
+			       false,        // is multi-sample
+			       me._getSamplesToRetrieve(),  // sample names
+			       filterCard.annotationScheme.toLowerCase(), // annot scheme
+			       matrixCard.clinvarMap,  // clinvar map
+			       window.geneSource == 'refseq' ? true : false,
+			       true,  // hgvs notation
+			       true,  // rsid
+			       false, // vep af
+			       useServerCache // serverside cache
+			    ).then( function(data) {
+
+			    	var annotVcfData = data[1];	
+
+			    	if (annotVcfData != null && annotVcfData.features != null && annotVcfData.features.length > 0) {
+			    		// refresh the variants with the variant ids
+			    		me._refreshVariantsWithVariantIds(theVcfData, annotVcfData);
+					    me._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript);
+					    me.theVcfData = theVcfData;	
+
+					    resolve(theVcfData.features);
+			    	} else {
+			    		var msg = "Empty results returned from VariantModel.promiseGetImpactfulVariantIds() for gene " + theGeneObject.gene_name;
+			    		console.log(msg);
+			    		reject(msg);
+			    	}
+
+				});	
+
+			} else {
+				var alreadyAnnotVariants = theVcfData.features.filter(function(variant) {
+					return (variant.fbCalled != 'Y' && variant.extraAnnot);
+				});
+				resolve(alreadyAnnotVariants);
+			}
+
+		});
+
+
+
+			
+	});
+
+}
 VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript) {
 	var me = this;
 
@@ -1274,8 +1397,11 @@ VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript)
 				   me.getVcfRefName(theGene.chr), 
 				   theGene,
 			       theTranscript,
-			       sampleNames,
+			       null,   // regions
+			       false,  // is multi-sample
+			       me._getSamplesToRetrieve(),
 			       filterCard.annotationScheme.toLowerCase(),
+			       matrixCard.clinvarMap,
 			       window.geneSource == 'refseq' ? true : false
 			    ).then( function(data) {
 			    	var annotatedRecs = data[0];
@@ -1359,6 +1485,8 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					me.getVcfRefName(theGene.chr),
 					theGene,
 			        theTranscript,
+			        global_getVariantIdsForGene,
+			        false,   // parseMultipleSamples
 			        onVcfData)
 				.then( function(data) {
 			    	
@@ -1387,7 +1515,8 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 					    		reject("Unable to cache annotated variants for gene " + data.gene.gene_name);
 					    	};	
 				    	}
-				    	me.vcfData = data;		    	
+				    	me.vcfData = data;		
+
 						resolve(me.vcfData);
 
 			    	} else {
@@ -1410,6 +1539,373 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 	});
 
 }
+
+VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, theTranscript, variantCards) {
+	var me = this;
+
+	return new Promise( function(resolve, reject) {
+
+		// First the gene vcf data has been cached, just return
+		// it.  (No need to retrieve the variants from the iobio service.)
+		resultMap = {};
+		variantCards.forEach(function(vc) {
+			var vcfData = vc.model._getCachedData("vcfData", theGene.gene_name, theTranscript);
+			if (vcfData != null && vcfData != '') {
+				resultMap[vc.getRelationship()] = vcfData;
+
+				vc.model.vcfData = vcfData;
+				me._populateEffectFilters(me.vcfData.features);
+				me._populateRecFilters(me.vcfData.features);
+				if (me.getRelationship() == 'proband') {
+				    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
+				}
+			}
+		})
+		if (Object.keys(resultMap).length == variantCards.length) {
+			resolve(resultMap);
+		} else {
+
+
+			// Place any called variants back in the cache (for proband).  This is necessary, because 
+			// the mother and father vcf data will not be cached?
+			var theFbData = getProbandVariantCard().model.getFbDataForGene(theGene, theTranscript, true);
+			if (theFbData && theFbData.features) {
+				getProbandVariantCard().model._cacheData(theFbData, "fbData", theGene.gene_name, theTranscript);
+			}
+
+			// We don't have the variants for the gene in cache, 
+			// so call the iobio services to retreive the variants for the gene region 
+			// and annotate them.
+			me._promiseVcfRefName(theGene.chr).then( function() {
+				var refName = me.getVcfRefName(theGene.chr);
+				me._promiseGetAndAnnotateVariants(
+					refName,
+					theGene,
+			        theTranscript,
+			        global_getVariantIdsForGene,
+			        true // parseMultipleSamples
+			        )
+				.then( function(results) {
+
+					if (results && results.length > 0) {
+						var data = results[0];
+				    	
+				    	// Associate the correct gene with the data
+				    	var theGeneObject = null;
+				    	for( var key in window.geneObjects) {
+				    		var geneObject = geneObjects[key];
+				    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+				    			geneObject.start == data.start &&
+				    			geneObject.end == data.end &&
+				    			geneObject.strand == data.strand) {
+				    			theGeneObject = geneObject;
+				    		}
+				    	}
+				    	if (theGeneObject) {
+
+				    		var resultMap = {};
+				    		var idx = 0;
+				    		var variantCards = getRelevantVariantCards();
+
+				    		var postProcessNextVariantCard = function(idx, callback) {
+
+				    			if (idx == variantCards.length) {
+				    				if (callback) {
+				    					callback();
+				    				}
+				    				return;
+				    			} else {
+					    			var vc          = variantCards[idx];
+					    			var theVcfData  = results[idx];
+					    			if (theVcfData == null) {
+					    				if (callback) {
+					    					callback();
+					    				}
+					    				return;
+					    			}
+					    			
+					    			theVcfData.gene = theGeneObject;
+					    			resultMap[vc.getRelationship()] = theVcfData;
+
+					    			// Perform post-annotation processing for each variant card's model
+								    vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData)
+								      .then(function() {
+							    		// Flag any bookmarked variants
+							    		if (vc.getRelationship() == 'proband') {
+									    	bookmarkCard.determineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
+
+											me._populateEffectFilters(theVcfData.features);
+											me._populateRecFilters(theVcfData.features);
+										    filterCard.displayDataGeneratedFilters();
+									    }
+
+								    	// Cache the data (if there are variants)
+								    	if (theVcfData && theVcfData.features) {
+									    	if (!vc.model._cacheData(theVcfData, "vcfData", theVcfData.gene.gene_name, theVcfData.transcript)) {
+									    		reject("Unable to cache annotated variants for gene " + theVcfData.gene.gene_name);
+									    	};	
+								    	}
+
+								    	//  Store the data and process next variant card
+								    	vc.model.vcfData = theVcfData;		
+								    	idx++;
+								    	postProcessNextVariantCard(idx, callback);
+								      })
+				    			}
+				    		}
+
+				    		postProcessNextVariantCard(idx, function() {
+
+				    			resolve(resultMap);
+				    		});
+
+
+				    	} else {
+				    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+				    		console.log(error);
+				    		reject(error);
+				    	}						
+					} else {
+			    		var error = "ERROR - empty vcf results for " + theGene.gene_name;;
+			    		console.log(error);
+			    		reject(error);
+					}
+
+
+			    }, function(error) {
+			    	reject(error);
+			    });
+			}, function(error) {
+				reject("missing reference")
+			});
+
+		}
+
+
+
+	});
+
+}
+
+
+VariantModel.prototype.postInheritanceParsing = function(theVcfData, theGene, theTranscript, affectedInfo, callback) {
+	var me = this;
+	var theVcfData = theVcfData ? theVcfData : me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
+
+	me._determineAffectedStatus(theVcfData, affectedInfo);
+
+	me._cacheData(theVcfData, "vcfData", theGene.gene_name, theTranscript);	
+
+	// For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
+	// at this point
+	me.vcfData = null;
+
+	if (callback) {
+		callback(theVcfData);		
+	}
+}
+
+
+VariantModel.prototype.performAdditionalParsing = function(theVcfData, theTranscript) {
+	var me = this;
+	if (theVcfData == null || theVcfData.features == null) {
+		return;
+	}
+
+	theVcfData.features.forEach(function(variant) {
+
+		variant.harmfulVariantLevel = 'none';
+		variant.harmfulVariant = null;
+		variant.afFieldHighest = null;
+		variant.afHighest = '.';
+
+		var variantDanger = {meetsAf: false, af: false, impact: false,  clinvar: false, sift: false, polyphen: false, inheritance: false};
+
+	  	// For ExAC levels, differentiate between af not found and in
+	  	// coding region (level = private) and af not found and intronic (non-coding)
+	  	// region (level = unknown)
+	  	if (variant.afExAC == 0) {
+			variant.afExAC = -100;
+	    	getCodingRegions(theTranscript).forEach(function(codingRegion) {
+	    		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
+	    			variant.afExAC = 0;
+	    		}
+	    	});
+	  	}
+	  	if (variant.afgnomAD == '.') {
+	  		variant.afgnomAD = 0;
+	  	}
+
+
+	    for (key in variant.highestImpactVep) {
+	    	if (matrixCard.impactMap.hasOwnProperty(key) && matrixCard.impactMap[key].badge) {
+	    		if (key == 'HIGH' || key == 'MODERATE') {
+	    			variantDanger.impact = key.toLowerCase();
+	    		}
+	    	}
+	    }
+
+	    for (key in variant.highestSIFT) {
+			if (matrixCard.siftMap.hasOwnProperty(key) && matrixCard.siftMap[key].badge) {
+				variantDanger.sift = key.split("_").join(" ").toLowerCase();
+			}
+	    }
+
+	    for (key in variant.highestPolyphen) {
+	    	if (matrixCard.polyphenMap.hasOwnProperty(key) && matrixCard.polyphenMap[key].badge) {
+				variantDanger.polyphen = key.split("_").join(" ").toLowerCase();
+	    	}
+	    }
+
+	    if (variant.hasOwnProperty('clinvar')) {
+	    	var clinvarEntry = null;
+	    	var clinvarDisplay = null;
+	    	var clinvarKey = null;
+	    	for (var key in matrixCard.clinvarMap) {
+	    		var self = matrixCard.clinvarMap[key];
+	    		if (self.clazz == variant.clinvar) {
+	    			clinvarEntry = self;
+	    			clinvarDisplay = key;
+	    			clinvarKey = key;
+	    		}
+	    	}
+	    	if (clinvarEntry && clinvarEntry.badge) {
+				variantDanger.clinvar = clinvarDisplay;
+	    	}
+	    }
+
+	    if (variant.inheritance && variant.inheritance != 'none') {
+	    	variantDanger.inheritance = true;
+	    }
+
+	    // Figure out which is the highest AF between exac, 1000g, and gnomAD
+		me._determineHighestAf(variant);
+
+		// Determine if the highest AF is in a range that we consider 'rare'
+		if (variant.afFieldHighest) {
+			matrixCard.afHighestMap.forEach( function(rangeEntry) {
+				if (+variant.afHighest > rangeEntry.min && +variant.afHighest <= rangeEntry.max) {
+					if (rangeEntry.badge) {
+						variantDanger.af = +variant.afHighest;
+						variantDanger.meetsAf = true;
+					}
+				}
+			});			
+		}
+
+		// Turn on flag for harmful variant if one is found
+		if (variantDanger.meetsAf && (variantDanger.impact || variantDanger.clinvar || variantDanger.sift || variantDanger.polyphen)) {
+			variant.harmfulVariant = {
+				        'type'       : variant.type,
+			            'clinvar'    : variantDanger.clinvar, 
+			            'polyphen'   : variantDanger.polyphen,
+			            'SIFT'       : variantDanger.sift,
+				        'impact'     : variantDanger.impact, 
+			            'inheritance': variant.inheritance && variant.inheritance != 'none' ? variant.inheritance : false,
+			            'level'      : variantDanger.clinvar ? 1 : (variantDanger.impact == 'high' ? 2 : 3)			            			          
+			};
+			variant.harmfulVariantLevel = variant.harmfulVariant.level;
+		}
+	});
+
+}
+
+VariantModel.prototype._determineHighestAf = function(variant) {
+	var me = this;
+	// Find the highest value (the least rare AF) betweem exac and 1000g to evaluate
+	// as 'lowest' af for all variants in gene
+	var afHighest = null;
+	if ($.isNumeric(variant.afExAC) && $.isNumeric(variant.af1000G)) {
+		// Ignore exac n/a.  If exac is higher than 1000g, evaluate exac
+		if (variant.afExAC > -100 && variant.afExAC >= variant.af1000G) {
+			variant.afFieldHighest = 'afExAC';
+		} else {
+			variant.afFieldHighest = 'af1000G';
+		}
+	} else if ($.isNumeric(variant.afExAC)) {
+		variant.afFieldHighest = 'afExAC';
+
+	} else if ($.isNumeric(variant.af1000G)) {
+		variant.afFieldHighest = 'af1000G';
+	}
+	afHighest = me.getHighestAf(variant);
+
+	if (global_vepAF) {
+		if ($.isNumeric(variant.vepAf.gnomAD.AF) && afHighest) {
+			if (variant.vepAf.gnomAD.AF >= afHighest) {
+				variant.afFieldHighest = 'afgnomAD';
+			} 
+		} else if ($.isNumeric(variant.vepAf.gnomAD.AF)) {
+			variant.afFieldHighest = 'afgnomAD';
+		}
+	} 
+	variant.afHighest = me.getHighestAf(variant);
+}
+
+VariantModel.prototype.getHighestAf = function(variant) {
+	var me = this;
+	if (variant.afFieldHighest) {
+		var subfields = variant.afFieldHighest.split(".");
+		var current = variant;
+		subfields.forEach(function(subfield) {
+			current = current[subfield];
+		})
+		return current;
+	} else {
+		return null;
+	}
+}
+
+VariantModel.prototype._determineAffectedStatus = function(theVcfData, affectedInfo) {
+	var me = this;
+
+	var affectedSibs = affectedInfo.filter(function(info) {
+		return info.status == 'affected' && info.relationship != 'proband';
+	})
+	me._determineAffectedStatusImpl(theVcfData, 'affected', affectedSibs)
+
+	var unaffectedSibs = affectedInfo.filter(function(info) {
+		return info.status == 'unaffected' && info.relationship != 'proband';
+	})
+	me._determineAffectedStatusImpl(theVcfData, 'unaffected', unaffectedSibs)
+}
+
+VariantModel.prototype._determineAffectedStatusImpl = function(theVcfData, affectedStatus, affectedInfo) {
+	var me = this;
+	theVcfData.features.forEach( function(variant) {
+		VariantModel._determineAffectedStatusForVariant(variant, affectedStatus, affectedInfo);
+	});
+}
+
+VariantModel._determineAffectedStatusForVariant = function(variant, affectedStatus, affectedInfo) {
+	
+	var matchesCount = 0;
+	var summaryField    = affectedStatus + "_summary";
+
+	variant[summaryField]                         = "none";
+
+	affectedInfo.forEach(function(info) {
+	 	var sampleName  = info.variantCard.getSampleName();
+	 	var genotype    = variant.genotypes[sampleName];
+
+	 	if (genotype) {
+
+		 	var zyg  = genotype.zygosity ? genotype.zygosity : "none";
+			if (zyg.toLowerCase() != 'none' && zyg.toLowerCase() != 'gt_unknown' && zyg.toLowerCase() != 'homref') {
+			 	matchesCount++;
+			}
+	 	} 
+	})	
+
+	if (matchesCount > 0 && matchesCount == affectedInfo.length) {
+		variant[summaryField] = "present_all";
+	}  else if (matchesCount > 0) {
+		variant[summaryField] = "present_some"
+	}  else {
+		variant[summaryField] = "present_none";
+	}  	 	 	
+}
+
 
 VariantModel.prototype.isCached = function(geneName, transcript) {
 	var key = this._getCacheKey("vcfData", geneName.toUpperCase(), transcript);
@@ -1440,7 +1936,7 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			// so call the iobio services to retreive the variants for the gene region 
 			// and annotate them.
 			me._promiseVcfRefName(ref).then( function() {
-				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript)
+				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript, false)
 				.then( function(data) {
 					// Associate the correct gene with the data
 			    	var theGeneObject = null;
@@ -1455,6 +1951,9 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 			    		}
 			    	}
 			    	if (theGeneObject) {
+			    		me._populateEffectFilters(data.features);
+						me._populateRecFilters(data.features);
+
 			    		// Flag any bookmarked variants
 					    bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
 
@@ -1487,95 +1986,6 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 
 }
 
-VariantModel.prototype._promiseCacheCalledVariants = function(ref, geneObject, transcript) {
-	var me = this;
-	return new Promise( function(resolve, reject) {
-		var fbData = me._getCachedData("fbData", geneObject.gene_name, transcript);
-		if (fbData) {
-			resolve(fbData);
-		} else {
-
-			// Call Freebayes variants
-			me.bam.getFreebayesVariants(ref, 
-				geneObject.start, 
-				geneObject.end, 
-				geneObject.strand, 
-				window.geneSource == 'refseq' ? true : false,
-				function(data) {
-
-				if (data == null || data.length == 0) {
-					reject("A problem occurred while calling variants.");
-				}
-
-				// Parse string into records
-				var fbRecs = [];
-				var recs = data.split("\n");
-				recs.forEach( function(rec) {
-					fbRecs.push(rec);
-				});
-				
-
-				// Annotate the fb variants
-				me.vcf.promiseAnnotateVcfRecords(fbRecs, me.getBamRefName(ref), geneObject, 
-					                             transcript, null, 
-					                             filterCard.annotationScheme.toLowerCase(),
-					                             window.geneSource == 'refseq' ? true : false)
-			    .then( function(data) {
-
-			    	var theData = data[1];
-
-			    	// Flag the called variants
-				   	theData.features.forEach( function(feature) {
-				   		feature.fbCalled = 'Y';
-				   	});
-		    		return me.vcf.promiseGetClinvarRecords(
-					    		theData, 
-					    		me._stripRefName(ref), geneObject, 
-					    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theData) : me._refreshVariantsWithClinvar.bind(me, theData));
-
-
-
-
-			    }, function(error) {
-			    	var message = "Problem when annotating called variants in Analyze All. " + error;
-					console.log(message);
-					reject({isValid: false, message: message});
-			    })
-			    .then (function(data) {
-
-
-					// We are done getting the clinvar data for called variants.
-			    	// Now merge called data with variant set and display.
-					// Prepare vcf and fb data for comparisons
-					//me._prepareVcfAndFbData(data);
-
-		        	// Filter the freebayes variants to only keep the ones
-		        	// not present in the vcf variant set.
-					me._determineVariantAfLevels(data, transcript);
-
-		        	// Pileup the variants
-		        	var pileupObject = me._pileupVariants(data.features, geneObject.start, geneObject.end);
-					data.maxLevel = pileupObject.maxLevel + 1;
-					data.featureWidth = pileupObject.featureWidth;		
-
-					// Cache the freebayes variants.
-					me._cacheData(data, "fbData", geneObject.gene_name, transcript);
-					me._cacheData(data, "vcfData", geneObject.gene_name, transcript);
-					resolve(data);
-			
-			    	
-			    }, function(error) {
-			    	var message = "Problem when calling variants in Analyze All. " + error;
-					console.log(message);
-					reject({isValid: false, message: message});
-			    });
-			
-			});	
-
-		}		
-	});
-	
-}
 
 VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 	return cacheHelper.getCacheKey(
@@ -1678,12 +2088,66 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 VariantModel.prototype.pruneIntronVariants = function(data) {
 	if (data.features.length > 500) {
 		filterCard.setExonicOnlyFilter();
+	} else {
+		filterCard.setExonicOnlyFilter(false);
+	}
+}
 
-	}	
+VariantModel.prototype._getSamplesToRetrieve = function() {
+	var me = this;
+	var samplesToRetrieve = [];
+	
+	if (me.getVcfSampleName()) {
+		samplesToRetrieve.push( {vcfSampleName: me.getVcfSampleName(), 
+			                     sampleName:    me.getSampleName() } );
+		
+		// Include all of the sample names for the proband
+		getAffectedInfo().forEach(function(info) {
+			if (info.variantCard.model == me) {
+				// ignore the affected info for this sample.  We already added it 
+				// to the list of samples to retrieve
+
+			} else if (info.variantCard.model.getVcfSampleName() && me._otherSampleInThisVcf(info.variantCard.model) ) {
+				// If the 'other' sample exists in the sample multi-sample vcf as this sample,
+				// add it to the list of samples to retrieve.  For example, an affected sib could be in the
+				// mother's vcf file.   In this case, we will retreive both the mother and affected sib at 
+				// the same time so we can obtain the genotype for the affected sib and sync up to the
+				// proband later (when inheritance is determined)
+				samplesToRetrieve.push( {vcfSampleName: info.variantCard.model.getVcfSampleName(), 
+					                     sampleName:    info.variantCard.model.getSampleName() } );
+			}
+		})
+			
+	} else {
+		samplesToRetrieve.push( {vcfSampleName: "", 
+			                     sampleName:    me.getSampleName() } );
+	}
+
+	return samplesToRetrieve;
+
+}
+
+VariantModel.prototype._otherSampleInThisVcf = function(otherModel) {
+	var me = this;
+	var theVcfs = {};
+
+	var pushVcfFile = function(model) {
+		if (model.vcfUrlEntered) {
+			theVcfs[model.vcf.getVcfURL()] = true;
+		} else {
+			theVcfs[model.vcf.getVcfFile().name] = true;
+		}			
+	}
+
+	pushVcfFile(me);
+	pushVcfFile(otherModel);
+		
+	return Object.keys(theVcfs).length == 1;
 }
 
 
-VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, onVcfData) {
+
+VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject, transcript, getVariantIds=false, parseMultipleSamples=false, onVcfData=null) {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
@@ -1697,104 +2161,111 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 		}
 
 
-		var sampleNames = me.sampleName;
-		if (sampleNames != null && sampleNames != "") {
-			if (me.relationship != 'proband') {
-				sampleNames += "," + getProbandVariantCard().getSampleName();
-			}			
-		}
-
-
-
 		me.vcf.promiseGetVariants(
 		   me.getVcfRefName(ref), 
 		   geneObject,
 		   transcript,
-	       sampleNames,
-	       filterCard.annotationScheme.toLowerCase(),
+		   null,   // regions
+		   parseMultipleSamples, // is multi-sample
+	       me._getSamplesToRetrieve(), 
+	       me.getRelationship() == 'known-variants' ? 'none' : filterCard.annotationScheme.toLowerCase(),
+	       matrixCard.clinvarMap,
 	       window.geneSource == 'refseq' ? true : false,
-	       window.isLevelBasic ? true : me.GET_HGVS,
-	       me.GET_RSID
+	       window.isLevelBasic || getVariantIds,  // hgvs notation
+	       getVariantIds,  // rsid
+	       global_vepAF    // vep af
 	    ).then( function(data) {
 
 	    	var annotatedRecs = data[0];
-	    	var theVcfData = data[1];
-
-		    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-
-
-		    	// We have the AFs from 1000G and ExAC.  Now set the level so that variants
-			    // can be filtered by range.
-			    me._determineVariantAfLevels(theVcfData, transcript );
-
-
-			    // Show the snpEff effects / vep consequences in the filter card
-			    me._populateEffectFilters(theVcfData.features);
-
-			    // Determine the unique values in the VCF filter field 
-			    me._populateRecFilters(theVcfData.features);
-
-			    // Invoke callback now that we have annotated variants
-			    me.vcfData = theVcfData;
-		    	if (onVcfData) {
-		    		onVcfData(theVcfData);
-		    	}
+	    	var results = data[1];
 		
-		    	// Get the clinvar records (for proband, mom, data)
-		    	// 
-		    	if (me.getRelationship() != 'sibling') {
-			    	return me.vcf.promiseGetClinvarRecords(
+			if (parseMultipleSamples) {
 
-			    		theVcfData, 
-			    		me._stripRefName(ref), geneObject, 
-			    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theVcfData) : me._refreshVariantsWithClinvar.bind(me, theVcfData));
+		    	resolve(results);
 
-		    	} else {
-		    		
-		    		resolve(theVcfData);
-		    	}	
-
-
-	    	} else if (theVcfData.features.length == 0) {
-
-			    // Invoke callback now that we have annotated variants
-			    me.vcfData = theVcfData;
-		    	if (onVcfData) {
-		    		onVcfData(theVcfData);
-		    	}
-		    	resolve(theVcfData);
+			} else {
+				var theVcfData = results;
+				if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
+					me._promisePostAnnotateProcessing(ref, geneObject, transcript, theVcfData, onVcfData).then(function() {
+						me.setLoadState(theVcfData, 'clinvar');
+						resolve(theVcfData);
+					}, function(error) {
+						console.log("An error occurred when performing postAnnotateProcessing");
+						reject("_promiseGetAndAnnotateVariants(): " + error);
+					})
+				} else if (theVcfData.features.length == 0) {
+			    	resolve(theVcfData);		
+				} else {
+					reject("_promiseGetAndAnnotateVariants() No variants");
+				}
+			}
 
 
-	    	} else {
-	    		reject("_promiseGetAndAnnotateVariants() No variants");
-	    	}
-
-		
 	    }, 
 	    function(error) {
 	    	// If error when annotating clinvar records	    	
 	    	console.log("an error occurred when annotating vcf records " + error);
 	    	reject(error);
 
-	    }).then( function(data) {
-	    	// We are done getting clinvar records.
-	    	me.setLoadState(data, 'clinvar');
-	    	resolve(data);
-	    }, 
-	    function(error) {
-	    	console.log("an error occurred after vcf data returned (post processing) " + error);
-	    	reject(error);
-	    });
-
-	
-		
-
-
+	    })
 
 	});
 
 
 }
+
+VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject, transcript, theVcfData, onVcfData) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+		if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
+
+
+		    // Show the snpEff effects / vep consequences in the filter card
+		    me._populateEffectFilters(theVcfData.features);
+
+		    // Determine the unique values in the VCF filter field 
+		    me._populateRecFilters(theVcfData.features);
+
+		    // Invoke callback now that we have annotated variants
+		    me.vcfData = theVcfData;
+			if (onVcfData) {
+				onVcfData(theVcfData);
+			}
+
+			//
+			// Get the clinvar records (for proband, mom, data)
+			// 
+			if (me.getRelationship() == 'sibling') {
+				resolve(theVcfData);
+			} else if (me.getRelationship() == 'known-variants') {
+				resolve(theVcfData);
+			} else {
+		    	me.vcf.promiseGetClinvarRecords(
+		    		theVcfData, 
+		    		me._stripRefName(ref), geneObject, 
+		    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theVcfData) : me._refreshVariantsWithClinvarEutils.bind(me, theVcfData))
+		    	.then(function() {
+		    		resolve(theVcfData);
+		    	}, function(error) {
+		    		reject(error);
+		    	});
+			}
+
+		} else if (theVcfData.features.length == 0) {
+
+		    // Invoke callback now that we have annotated variants
+		    me.vcfData = theVcfData;
+		    if (onVcfData) {
+		    	onVcfData(theVcfData);
+		    }
+		    resolve(theVcfData);
+
+		} 		
+	})
+
+
+}
+
 
 VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 	var theVcfData = null;
@@ -1870,43 +2341,6 @@ VariantModel.prototype._populateRecFilters  = function(variants) {
 	});	
 }
 
-
-
-VariantModel.prototype._determineVariantAfLevels = function(theVcfData, transcript) {
-	var me = this;
-    // Post processing:
-    // We have the af1000g and afexac, so now determine the level for filtering
-    // by range.
-   theVcfData.features.forEach(function(variant) {
-  	// For ExAC levels, differentiate between af not found and in
-  	// coding region (level = private) and af not found and intronic (non-coding)
-  	// region (level = unknown)
-  	if (variant.afExAC == 0) {
-		variant.afExAC = -100;
-    	getCodingRegions(transcript).forEach(function(codingRegion) {
-    		if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
-    			variant.afExAC = 0;
-    		}
-    	});
-  	}
-
-    variant.afexaclevels = {};
-		matrixCard.afExacMap.forEach( function(rangeEntry) {
-			if (+variant.afExAC > rangeEntry.min && +variant.afExAC <= rangeEntry.max) {
-				variant.afexaclevel = rangeEntry.clazz;
-				variant.afexaclevels[rangeEntry.clazz] = rangeEntry.clazz;
-			}
-		});
-
-		variant.af1000glevels = {};
-		matrixCard.af1000gMap.forEach( function(rangeEntry) {
-			if (+variant.af1000G > rangeEntry.min && +variant.af1000G <= rangeEntry.max) {
-				variant.af1000glevel = rangeEntry.clazz;
-				variant.af1000glevels[rangeEntry.clazz] = rangeEntry.clazz;
-			}
-		});
-	});
-}
 
 
 
@@ -2022,7 +2456,61 @@ VariantModel.prototype._refreshVariantsWithCoverage = function(theVcfData, cover
 
 }
 
-VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVars) {	
+VariantModel.prototype._refreshVariantsWithVariantIds = function(theVcfData, annotatedVcfData) {
+
+	var me = this;
+	if (theVcfData == null) {
+		return;
+	}
+	var loadVariantIds = function(recs, annotedRecs) {
+		for( var vcfIter = 0, annotIter = 0; vcfIter < recs.length && annotIter < annotedRecs.length; null) {
+
+			var annotatedRec = annotedRecs[annotIter];
+			
+			// compare curr variant and curr clinVar record
+			if (recs[vcfIter].start == +annotatedRec.start) {	
+
+				// add clinVar info to variant if it matches
+				if (recs[vcfIter].alt == annotatedRec.alt &&
+					recs[vcfIter].ref == annotatedRec.ref) {
+
+					var variant = recs[vcfIter];
+
+					// set the hgvs and rsid on the existing variant
+		    		variant.extraAnnot      = true;
+		    		variant.vepHGVSc        = annotatedRec.vepHGVSc;
+		    		variant.vepHGVSp        = annotatedRec.vepHGVSp;
+		    		variant.vepVariationIds = annotatedRec.vepVariationIds;	
+
+					vcfIter++;
+					annotIter++;
+				} else {
+					// If clinvar entry didn't match the variant, figure out if the vcf
+					// iter (multiple vcf recs with same position as 1 clinvar rec) or 
+					// the clinvar iter needs to be advanced (multiple clinvar recs with same
+					// position as 1 vcf rec)
+					if (vcfIter+1 < recs.length && recs[vcfIter+1].start == +annotatedRec.start) {
+						vcfIter++;
+					} else {
+						annotIter++;
+					}
+				}
+				
+			} else if (recs[vcfIter].start < +annotatedRec.start) {						
+				vcfIter++;
+			} else {
+				annotIter++;
+			}
+		}
+	}
+
+	// Load the clinvar info for the variants loaded from the vcf	
+	var sortedFeatures      = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
+	var sortedAnnotVariants = annotatedVcfData.features.sort(VariantModel.orderVariantsByPosition)
+	loadVariantIds(sortedFeatures, sortedAnnotVariants);
+}
+
+VariantModel.prototype._refreshVariantsWithClinvarEutils = function(theVcfData, clinVars) {	
 	var me = this;
 	var clinVarIds = clinVars.uids;
 	if (theVcfData == null) {
@@ -2046,9 +2534,15 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 					vcfIter++;
 					clinvarIter++;
 				} else {
-					// Only advance the clinvar iterator if clinvar entry didn't match the variant
-					// because there can be multiple clinvar entries for the same position.
-					clinvarIter++;
+					// If clinvar entry didn't match the variant, figure out if the vcf
+					// iter (multiple vcf recs with same position as 1 clinvar rec) or 
+					// the clinvar iter needs to be advanced (multiple clinvar recs with same
+					// position as 1 vcf rec)
+					if (vcfIter+1 < recs.length && recs[vcfIter+1].clinvarStart == clinVarStart) {
+						vcfIter++;
+					} else {
+						clinvarIter++;
+					}
 				}
 			} else if (recs[vcfIter].start < clinVarStart) {						
 				vcfIter++;
@@ -2065,73 +2559,47 @@ VariantModel.prototype._refreshVariantsWithClinvar = function(theVcfData, clinVa
 }
 
 
-VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData, clinvarVariants) {	
+VariantModel.prototype._refreshVariantsWithClinvarVCFRecs= function(theVcfData, clinvarVariants) {	
 	var me = this;
 	if (theVcfData == null) {
 		return;
 	}
 
-	var parseClinvarInfo = function(variant, clinvarVariant) {		
-		clinvarCodes = {
-			'0':   'not_provided',
-			'1':   'not_provided',
-			'2':   'benign',
-			'3':   'likely_benign',
-			'4':   'likely_pathogenic',
-			'5':   'pathogenic',
-			'6':   'drug_response',
-			'7':   'other',
-			'255': 'other'
-		};
-		clinvarVariant.info.split(";").forEach( function (annotToken) {
-			if (annotToken.indexOf("CLNSIG=") == 0) {
-            	var clinvarCode = annotToken.substring(7, annotToken.length);  
-            	variant.clinVarClinicalSignificance = {};
-            	clinvarCode.split("|").forEach(function(code) {
-	            	clinvarToken = clinvarCodes[code];
-	            	var mapEntry = matrixCard.clinvarMap[clinvarToken];
-					if (mapEntry != null) {
-						if (variant.clinvarRank == null || 
-							mapEntry.value < variant.clinvarRank) {
-							variant.clinvarRank = mapEntry.value;
-							variant.clinvar = mapEntry.clazz;
-						}
-						variant.clinVarClinicalSignificance[clinvarToken] = "Y";
-					}	
 
-            	})
-            } else if (annotToken.indexOf("CLNDBN=") == 0) {
-            	phenotypes = annotToken.substring(7, annotToken.length);  
-            	variant.clinVarPhenotype = {};
-            	phenotypes.split("|").forEach(function(phenotype) {
-            		
-            		variant.clinVarPhenotype[phenotype] = "Y";
-            	})
-            }       
-		})
-	}
+	var loadClinvarProperties = function(recs, clinvarRecs) {
+		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarRecs.length; null) {
 
-
-	var loadClinvarProperties = function(recs) {
-		for( var vcfIter = 0, clinvarIter = 0; vcfIter < recs.length && clinvarIter < clinvarVariants.length; null) {
-
-			var clinvarVariant = clinvarVariants[clinvarIter];
+			var clinvarRec = clinvarRecs[clinvarIter];
 			
 			// compare curr variant and curr clinVar record
-			if (recs[vcfIter].start == +clinvarVariant.pos) {			
+			if (recs[vcfIter].start == +clinvarRec.pos) {	
+
+
 				// add clinVar info to variant if it matches
-				if (recs[vcfIter].alt == clinvarVariant.alt &&
-					recs[vcfIter].ref == clinvarVariant.ref) {
-					parseClinvarInfo(recs[vcfIter], clinvarVariant);
+				if (recs[vcfIter].alt == clinvarRec.alt &&
+					recs[vcfIter].ref == clinvarRec.ref) {
+					var variant = recs[vcfIter];
+
+					var result = me.vcf.parseClinvarInfo(clinvarRec.info, matrixCard.clinvarMap);
+					for (var key in result) {
+						variant[key] = result[key]; 
+					}
+
 					vcfIter++;
 					clinvarIter++;
 				} else {
-					// Only advance the clinvar iterator if clinvar entry didn't match the variant
-					// because there can be multiple clinvar entries for the same position.
-					clinvarIter++;
+					// If clinvar entry didn't match the variant, figure out if the vcf
+					// iter (multiple vcf recs with same position as 1 clinvar rec) or 
+					// the clinvar iter needs to be advanced (multiple clinvar recs with same
+					// position as 1 vcf rec)
+					if (vcfIter+1 < recs.length && recs[vcfIter+1].start == +clinvarRec.pos) {
+						vcfIter++;
+					} else {
+						clinvarIter++;
+					}
 				}
 				
-			} else if (recs[vcfIter].start < +clinvarVariant.pos) {						
+			} else if (recs[vcfIter].start < +clinvarRec.pos) {						
 				vcfIter++;
 			} else {
 				clinvarIter++;
@@ -2141,7 +2609,8 @@ VariantModel.prototype._refreshVariantsWithClinvarVariants= function(theVcfData,
 
 	// Load the clinvar info for the variants loaded from the vcf	
 	var sortedFeatures = theVcfData.features.sort(VariantModel.orderVariantsByPosition);
-	loadClinvarProperties(sortedFeatures);
+	var sortedClinvarVariants = clinvarVariants.sort(VariantModel.orderVariantsByPosition)
+	loadClinvarProperties(sortedFeatures, sortedClinvarVariants);
 
 }
 
@@ -2155,19 +2624,21 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 
 	var clinSigObject = variant.clinVarClinicalSignificance;
 	if (clinSigObject == null) {
-		variant.clinVarClinicalSignificance = {"none": "Y"};
+		variant.clinVarClinicalSignificance = {"none": "0"};
 	}
 
 	var clinSigString = clinvar.clinical_significance.description;
 	var clinSigTokens = clinSigString.split(", ");
+	var idx = 0;
 	clinSigTokens.forEach( function(clinSigToken) {
 		if (clinSigToken != "") {		
 			// Replace space with underlink
 			clinSigToken = clinSigToken.split(" ").join("_").toLowerCase();
-			variant.clinVarClinicalSignificance[clinSigToken] = 'Y';
+			variant.clinVarClinicalSignificance[clinSigToken] = idx.toString();
+			idx++;
 
 			// Get the clinvar "classification" for the highest ranked clinvar 
-			// designation. (e.g. "pathologic" trumps "benign");
+			// designation. (e.g. "pathogenic" trumps "benign");
 			var mapEntry = matrixCard.clinvarMap[clinSigToken];
 			if (mapEntry != null) {
 				if (variant.clinvarRank == null || 
@@ -2190,16 +2661,33 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 	var phTokens = clinvar.trait_set.map(function(d) { return d.trait_name; }).join ('; ')
 	if (phTokens != "") {
 		var tokens = phTokens.split("; ");
+		var idx = 0;
 		tokens.forEach(function(phToken) {
 			// Replace space with underlink
 			phToken = phToken.split(" ").join("_");
-			variant.clinVarPhenotype[phToken.toLowerCase()] = 'Y';
+			variant.clinVarPhenotype[phToken.toLowerCase()] = idx.toString();
+			idx++;
 		});
 	}
 }
 
 VariantModel.prototype.clearCalledVariants = function() {
+	var me = this;
 	this._cacheData(null, "fbData", window.gene.gene_name, window.selectedTranscript);
+
+	if (this.relationship == 'proband') {
+		var theVcfData = this._getCachedData("vcfData",  window.gene.gene_name, window.selectedTranscript);
+		if (theVcfData && theVcfData.features && theVcfData.features.length > 0) {
+			var loadedVariantsOnly = theVcfData.features.filter(function(variant) {
+				return !variant.fbCalled || variant.fbCalled != 'Y';
+			})
+			if (loadedVariantsOnly.length < theVcfData.features.length ) {
+				theVcfData.features = loadedVariantsOnly;
+				this._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
+				me.vcfData = theVcfData;
+			}			
+		}
+	}
 }
 
 
@@ -2229,9 +2717,6 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 	// Prepare vcf and fb data for comparisons
 	me._prepareVcfAndFbData(theFbData, theVcfData);
 
-	// Determine allele freq levels
-	me._determineVariantAfLevels(theFbData, window.selectedTranscript);
-
 	// Filter the freebayes variants to only keep the ones
 	// not present in the vcf variant set.
 	me._determineUniqueFreebayesVariants(window.gene, window.selectedTranscript, theVcfData, theFbData);
@@ -2249,7 +2734,7 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 	me.vcf.promiseGetClinvarRecords(
 	    		theFbData, 
 	    		me._stripRefName(window.gene.chr), window.gene, 
-	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theFbData) : me._refreshVariantsWithClinvar.bind(me, theFbData)
+	    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theFbData) : me._refreshVariantsWithClinvarEutils.bind(me, theFbData)
 	    ).then( function() {
 	    	if (callback) {
 
@@ -2262,6 +2747,7 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
 						fbVariant.source.clinvar                     = fbVariant.clinvar;
 						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+						fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
 					}					
 				});	 
 
@@ -2300,7 +2786,7 @@ VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, the
 	me.vcf.promiseGetClinvarRecords(
 	    		theFbData, 
 	    		me._stripRefName(geneObject.chr), geneObject, 
-	    		isClinvarOffline ? me._refreshVariantsWithClinvarVariants.bind(me, theFbData) : me._refreshVariantsWithClinvar.bind(me, theFbData)
+	    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theFbData) : me._refreshVariantsWithClinvarEutils.bind(me, theFbData)
 	    ).then( function() {
 
     		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
@@ -2312,6 +2798,7 @@ VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, the
 					fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
 					fbVariant.source.clinvar                     = fbVariant.clinvar;
 					fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+					fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
 				}					
 			});	 
 	    	if (callback) {
@@ -2362,6 +2849,14 @@ VariantModel.prototype.loadCalledTrioGenotypes = function(theVcfData, theFbData,
 				fbVariant.fatherZygosity              = source.fatherZygosity;
 				fbVariant.motherZygosity              = source.motherZygosity;
 				fbVariant.uasibsZygosity              = source.uasibsZygosity;
+				['affected', 'unaffected']
+				.forEach(function(affectedStatus) {
+					['summary', 'zygosity', 'genotypeAltCount', 'genotypeRefCount', 'genotypeDepth', 'bamDepth']
+					.forEach(function(field) {
+						var attr = affectedStatus + "_" + field;
+						fbVariant[attr]  = source[attr];
+					})
+				})				
 				if (me.relationship != 'proband') {
 					fbVariant.genotypeRefCountProband      = source.genotypeRefCountProband;
 					fbVariant.genotypeAltCountProband      = source.genotypeAltCountProband;
@@ -2544,13 +3039,16 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
 VariantModel.prototype.filterVariants = function(data, filterObject, start, end, bypassRangeFilter) {
 	var me = this;
 
-	if (data == null && data.features == null) {
+	if (data == null || data.features == null) {
 		console.log("Empty data/features");
 		return;
 	}
 
-	var afFieldExac  = "afExAC";
-	var afField1000g = "af1000G";
+	if (me.relationship == 'known-variants') {
+		return me.filterKnownVariants(data, start, end, bypassRangeFilter);
+	}
+
+
 	var impactField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'impact' : IMPACT_FIELD_TO_FILTER;
 	var effectField = filterCard.annotationScheme.toLowerCase() === 'snpeff' ? 'effect' : 'vepConsequence';
 
@@ -2558,24 +3056,41 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 	var	coverageMin = filterObject.coverageMin;
 	var intronsExcludedCount = 0;
 
+	var affectedFilters = null;
+	if (filterObject.affectedInfo) {
+		affectedFilters = filterObject.affectedInfo.filter(function(info) {
+			return info.filter;
+		});
+	} else {
+		affectedFilters = {};
+	}
+
 
 	var filteredFeatures = data.features.filter(function(d) {
 
-		if (filterCard.shouldWarnForNonPassVariants()) {
-			if (d.recfilter != 'PASS') {
-				if (!d.hasOwnProperty('fbCalled') || d.fbCalled != 'Y') {
-					d.featureClass = 'low-quality';
-				} else {
-					d.featureClass = '';
-				}
-			} else {
-				d.featureClass = '';
-			}
+		var passAffectedStatus = true;
+		if (me.getRelationship() == 'proband' && affectedFilters.length > 0) {
+			affectedFilters.forEach(function(info) {
+				var genotype = d.genotypes[info.variantCard.getSampleName()];
+				var zygosity = genotype && genotype.zygosity ? genotype.zygosity : "gt_unknown";
+
+				if (info.status == 'affected') {
+					if (zygosity.toUpperCase() != 'HET' && zygosity.toUpperCase() != 'HOM') {
+						passAffectedStatus = false;
+					}
+				} else if (info.status == 'unaffected') {
+					if (zygosity.toUpperCase() == 'HET' || zygosity.toUpperCase() == 'HOM') {
+						passAffectedStatus = false;
+					}
+				}					
+			})
 		}
+
 
 		// We don't want to display homozygous reference variants in the variant chart
 		// or feature matrix (but we want to keep it to show trio allele counts).
-		var isHomRef = (d.zygosity != null && d.zygosity.toLowerCase() == 'homref') ? true : false;
+		var isHomRef = (d.zygosity != null && (d.zygosity.toLowerCase() == 'gt_unknown' || d.zygosity.toLowerCase() == 'homref')) ? true : false;
+		var isGenotypeAbsent = d.genotype == null ? true :(d.genotype.absent ? d.genotype.absent : false);
 
 		var meetsRegion = true;
 		if (!bypassRangeFilter) {
@@ -2585,18 +3100,10 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 		// Allele frequency Exac - Treat null and blank af as 0
-		var variantAf = d[afFieldExac] || 0;
-		var meetsAfExac = true;
-		if ($.isNumeric(filterObject.afMinExac) && $.isNumeric(filterObject.afMaxExac)) {
-			// Exclude n/a ExAC allele freq (for intronic variants, af=-100) from range criteria
-			meetsAfExac = (variantAf >= filterObject.afMinExac && variantAf <= filterObject.afMaxExac);
-		}
-		// Allele frequency 1000g - Treat null and blank af as 0
-		variantAf = d[afField1000g] || 0;
-		var meetsAf1000g = true;
-		if ($.isNumeric(filterObject.afMin1000g) && $.isNumeric(filterObject.afMax1000g)) {
-			// Exclude n/a 1000g allele freq (for intronic variants, af=-100) from range criteria
-			meetsAf1000g = (variantAf >= filterObject.afMin1000g && variantAf <= filterObject.afMax1000g);
+		var variantAf = d.afHighest && d.afHighest != "." ? d.afHighest : 0;
+		var meetsAf = true;
+		if ($.isNumeric(filterObject.afMin) && $.isNumeric(filterObject.afMax)) {
+			meetsAf = (variantAf >= filterObject.afMin && variantAf <= filterObject.afMax);
 		}
 
 		var meetsLoadedVsCalled = false;
@@ -2747,16 +3254,12 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		}
 
 
-		return !isHomRef && meetsRegion && meetsAfExac && meetsAf1000g && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled;
+		return (!isHomRef || isGenotypeAbsent) && meetsRegion && meetsAf && meetsCoverage && meetsAnnot && meetsNotEqualAnnot && meetsExonic && meetsLoadedVsCalled && passAffectedStatus;
 	});
 
 	var pileupObject = this._pileupVariants(filteredFeatures, start, end);
 
 	var vcfDataFiltered = {
-		count: data.count,
-		countMatch: data.countMatch,
-		countUnique: data.countUnique,
-		sampleCount : data.sampleCount,
 		intronsExcludedCount: intronsExcludedCount,
 		end: end,
 		features: filteredFeatures,
@@ -2765,9 +3268,57 @@ VariantModel.prototype.filterVariants = function(data, filterObject, start, end,
 		name: data.name,
 		start: start,
 		strand: data.strand,
-		variantRegionStart: start
+		variantRegionStart: start,
+		genericAnnotators: data.genericAnnotators
 	};
 	return vcfDataFiltered;
+}
+
+VariantModel.prototype.filterKnownVariants = function(data, start, end, bypassRangeFilter) {
+	var me = this;
+
+	var theFilters = filterCard.getCardSpecificFilters('known-variants').filter(function(theFilter) {
+		return theFilter.value == true;
+	})
+	
+	var filteredVariants = data.features.filter(function (d) {
+
+		var meetsRegion = true;
+		if (!bypassRangeFilter) {
+			if (start != null && end != null ) {
+				meetsRegion = (d.start >= start && d.start <= end);
+			}			
+		}			
+
+		var meetsFilter = true;
+		if (theFilters.length > 0) {
+			var meetsFilter = false;
+			theFilters.forEach( function(theFilter) {
+				if (d[theFilter.key] == theFilter.clazz) {
+					meetsFilter = true;
+				}
+			});
+		}
+
+		return meetsRegion && meetsFilter;
+
+	}) 
+
+	var pileupObject = this._pileupVariants(filteredVariants, start, end);
+
+	var vcfDataFiltered = {
+		intronsExcludedCount: 0,
+		end: end,
+		features: filteredVariants,
+		maxLevel: pileupObject.maxLevel + 1,
+		featureWidth: pileupObject.featureWidth,
+		name: data.name,
+		start: start,
+		strand: data.strand,
+		variantRegionStart: start,
+		genericAnnotators: data.genericAnnotators
+	};
+	return vcfDataFiltered;	
 }
 
 
@@ -2780,12 +3331,13 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 
 				me.vcf.promiseGetVariants(
 					 me.getVcfRefName(window.gene.chr), 
-					 window.gene.start, 
-					 window.gene.end, 
-					 window.gene.strand, 
+					 window.gene, 
 					 window.selectedTranscript,
-					 me.sampleName,
+					 null,     // regions
+					 false,    // is multi-sample
+					 me._getSamplesToRetrieve(),
 					 filterCard.annotationScheme.toLowerCase(),
+					 matrixCard.clinvarMap,
 					 window.geneSource == 'refseq' ? true : false)
 				.then( function(data) {
 
@@ -2892,8 +3444,8 @@ VariantModel.getNonCanonicalHighestImpactsVep = function(variant) {
 
 
 VariantModel.orderVariantsByPosition = function(a, b) {
-	var refAltA = a.type.toLowerCase() + " " + a.ref + "->" + a.alt;
-	var refAltB = b.type.toLowerCase() + " " + b.ref + "->" + b.alt;
+	var refAltA = a.ref + "->" + a.alt;
+	var refAltB = b.ref + "->" + b.alt;
 
 	var chromA = a.chrom.indexOf("chr") == 0 ? a.chrom.split("chr")[1] : a.chrom;
 	var chromB = b.chrom.indexOf("chr") == 0 ? b.chrom.split("chr")[1] : b.chrom;

@@ -9,7 +9,7 @@ module.exports = {
 
   
   commands: [{
-    expectTitleLine2Equals: function(text) {
+    expectTitleEquals: function(text) {
   		this.expect.element('@title').text.to.equal(text);
   	},
   	expectHGVScEquals: function(text) {
@@ -37,10 +37,24 @@ module.exports = {
       this.expect.element('@sift').text.to.equals(text);
     },         
     expectClinvar: function(text) {
-      this.expect.element('@clinvar').text.to.equals(text);
+      this.expect.element('@clinvarLink').text.to.equals(text);
     },
-    expectClinvarClinSig: function(text) {
-      this.expect.element('@clinvarClinSig').text.to.equals(text);
+    expectClinvarSpan: function(text) {
+      this.expect.element('@clinvarSpan').text.to.equals(text);
+    },
+    expectClinvarClinSigExact: function(text1) {
+      var clinsigXPath = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//*[contains(@class, "tooltip-clinvar-pheno")]';
+      var self = this;
+      self.api.useXpath().getText(clinsigXPath, function(result) {
+          self.assert.ok(result.value == text1, 'check if the clinvar phenotype is equal to value1');            
+      })   
+    },    
+    expectClinvarClinSig: function(text1, text2) {
+      var clinsigXPath = '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//*[contains(@class, "tooltip-clinvar-pheno")]';
+      var self = this;
+      self.api.useXpath().getText(clinsigXPath, function(result) {
+          self.assert.ok((text1 && result.value == text1) ||  (text2 && result.value == text2), 'check if the clinvar phenotype is equal to value1 or value2');            
+      })   
     },  
     expectAFExAC: function(text) {
       this.expect.element('@afExAC').text.to.equals(text);
@@ -103,18 +117,24 @@ module.exports = {
     bookmarkLink:  {selector: '#bookmarkLink', locateStrategy: 'css selector'},
     removeBookmarkLink:  {selector: '#remove-bookmark-link', locateStrategy: 'css selector'},
     unpinLink:  {selector: 'a#unpin', locateStrategy: 'css selector'},
+    
     inheritance: {selector: '//*[local-name()="svg" and @class="inheritance-badge"]/following-sibling::span', locateStrategy: 'xpath'},
-    vepConsequence: {selector: '//div[@class="tooltip-header" and text()="VEP Consequence"]/following-sibling::div', locateStrategy: 'xpath'},
-    vepImpact: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Impact"]/following-sibling::div', locateStrategy: 'xpath'},
+    
+    vepConsequence:    {selector: '//div[@class="tooltip-header" and text()="VEP Consequence"]/following-sibling::div', locateStrategy: 'xpath'},
+    vepImpact:         {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Impact"]/following-sibling::div', locateStrategy: 'xpath'},
     vepHighestImpact : {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Most severe impact"]/following-sibling::div', locateStrategy: 'xpath'},
+    
     polyphen: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="PolyPhen"]/following-sibling::div', locateStrategy: 'xpath'},
-    sift: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="SIFT"]/following-sibling::div', locateStrategy: 'xpath'},
-    clinvar: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div/span/a', locateStrategy: 'xpath'},
-    clinvarClinSig: {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/parent::node()/following-sibling::div/div[@class="tooltip-value"]', locateStrategy: 'xpath'},
-    afExAC: {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq ExAC"]/following-sibling::div', locateStrategy: 'xpath'},
+    sift:     {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="SIFT"]/following-sibling::div', locateStrategy: 'xpath'},
+   
+    clinvarLink:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div//a', locateStrategy: 'xpath'},
+    clinvarSpan:        {selector:  '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="ClinVar"]/following-sibling::div//div/span', locateStrategy: 'xpath'},
+   
+    afExAC:  {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq ExAC"]/following-sibling::div', locateStrategy: 'xpath'},
     af1000G: {selector:'//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Allele Freq 1000G"]/following-sibling::div', locateStrategy: 'xpath'},
-    qual: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Qual"]/following-sibling::div', locateStrategy: 'xpath'},
-    filter: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Filter"]/following-sibling::div', locateStrategy: 'xpath'}
+   
+    qual:   {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="Qual"]/following-sibling::div', locateStrategy: 'xpath'},
+    filter: {selector: '//div[contains(@class,"tooltip") and contains(@class,"tooltip-wide")]//div[@class="tooltip-header" and text()="VCF filter status"]/following-sibling::div', locateStrategy: 'xpath'}
   }
 
 }

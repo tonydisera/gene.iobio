@@ -5,9 +5,9 @@
     font-size: 11px
     line-height: normal
     .danger
-      color: $coverage-problem-color
+      color: $coverage-problem-tooltip-color
     a.danger
-      color: $coverage-problem-color !important
+      color: $coverage-problem-tooltip-color !important
     #exon-tooltip-close
       float: right
       color: white !important
@@ -21,9 +21,9 @@
 #zoom-region-chart
   .tooltip
     .danger
-      color: $coverage-problem-color
+      color: $coverage-problem-tooltip-color
     a.danger
-      color: $coverage-problem-color !important
+      color: $coverage-problem-tooltip-color !important
     #exon-tooltip-close
       float: right
       color: white !important
@@ -32,6 +32,9 @@
     #exon-tooltip-title
       display: inline-block
       float: left
+
+#matrix-tooltip
+  position: fixed
 
 .tooltip-title
   font-size: 12px
@@ -66,10 +69,13 @@
 
 .tooltip-value
   overflow-wrap: break-word
-  float: right
+  float: left
   width: 220px
-  margin-right: 5px
+  margin-right: 0px
+  margin-left: 10px
 
+.tooltip-clinvar-link
+  padding-top: 1px
 
 .tooltip-header
   overflow-wrap: break-all
@@ -93,13 +99,28 @@
   width: 180px
   min-height: 25px
 
-.sib-zygosity
+.tooltip-affected-symbol
+  font-size: 14px
+  color: $danger-color !important
+  float: right
+  padding-right: 2px  
+
+.tooltip-ped-label
+  padding-top: 0px
+  vertical-align: top
+  text-align: left
+  width: 49px
+  float: left
+  font-size: 12px
+  color: $text-color
+
+.ped-zygosity
   width: 75px 
   float: left 
 
 .tooltip-row
-  &.sib-info
-    padding-bottom: 2px
+  &.ped-info
+    padding-bottom: 5px
 
 .tooltip-zygosity
   float: left
@@ -130,6 +151,10 @@
 
   &.unknown
     background-color: #b9edf3 !important
+
+  &.none
+    background-color: transparent !important  
+    border: solid thin #5D809D !important
 
 .tooltip-subtitle
   font-size: 12px
@@ -343,7 +368,7 @@ text
     border-top-color: rgba(0, 0, 0, 0.2)
     bottom: -10px
     content: ""
-    right: 328px
+    right: 343px
 
   &:after
     position: absolute
@@ -353,7 +378,16 @@ text
     border-right: 9px solid transparent
     bottom: -8px
     content: ""
-    right: 330px
+    right: 345px
+
+.tooltip-extra-wide.arrow-down-center
+  &:before 
+    right: 448px
+
+  &:after
+    right: 450px
+
+
  
 .tooltip.black-arrow-left
   &:after
@@ -387,7 +421,10 @@ text
   padding-top: 0px
 
 .tooltip.tooltip-wide
-  width: 650px !important
+  width: 680px !important
+
+  &.tooltip-extra-wide
+    width: 1000px !important
 
 .tooltip-wide
   font-size: 13px 
@@ -399,14 +436,11 @@ text
 
   .tooltip-row
     clear: both
-    padding-bottom: 3px
-
-    &.sib-info
-      padding-bottom: 2px
+    padding-bottom: 8px
 
   .tooltip-footer
     margin-top: 0px !important
-    padding-top: 0px !important
+    padding-top: 10px !important
     padding-bottom: 2px
 
     .bookmark-badge
@@ -425,26 +459,43 @@ text
     float: left
     padding-top: 5px
     padding-bottom: 0px
+    margin-left: 10px
     .tooltip-row
-      width: 330px
+      width: 360px
       overflow: auto
       .tooltip-header
-        width: 90px
+        width: 115px
       .tooltip-value
-        width: 220px
+        width: 230px
 
     
   .tooltip-right-column
-    float: right
+    float: left
     padding-top: 5px
     padding-bottom: 0px
     .tooltip-row
       width: 300px    
       overflow: auto
       .tooltip-header
-        width: 110px
+        width: 112px
       .tooltip-value
-        width: 150px      
+        width: 150px 
+
+  .tooltip-info-column
+    float: left
+    padding-top: 5px
+    padding-bottom: 0px
+    max-height: 200px
+    overflow-y: auto
+    width: 299px
+    .tooltip-row
+      width: 299px     
+      overflow: auto
+      .tooltip-header
+        width: 80px
+        word-wrap: break-word
+      .tooltip-value
+        width: 200px         
 
   a
     font-size: 13px !important
@@ -471,6 +522,15 @@ text
 
   .row
     line-height: 13px !important
+
+  .tooltip-clinvar-link
+    padding-top: 0px
+
+
+.tooltip-extra-wide
+  .row
+    margin-left: -5px
+    margin-right: -5px
 
 
     

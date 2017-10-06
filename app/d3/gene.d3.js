@@ -46,15 +46,12 @@ function geneD3() {
       geneD3_regionStart = undefined,
       geneD3_regionEnd = undefined,      
       geneD3_widthPercent = undefined,
-      geneD3_heightPercent = undefined,     
-      showBrushLine = false;
+      geneD3_heightPercent = undefined;
       
 
 
   //  options
   var defaults = {};
-
-  var brushAllowance = 0;
 
   var featureClass = function(d,i) {
     return d.feature_type.toLowerCase();
@@ -76,8 +73,6 @@ function geneD3() {
 
 
     selection.each(function(data) {
-
-       brushAllowance = geneD3_showBrush ? 20 : 0;
 
        // calculate height
        var padding = data.length > 1 ? geneD3_trackHeight/2 : 0;
@@ -107,6 +102,13 @@ function geneD3() {
       // Update the y-scale.
       y  .domain([0, data.length]);
       y  .range([innerHeight , 0]);
+
+
+      data.forEach(function(transcript) {
+        transcript.features.forEach(function(feature) {
+          feature.transcript_type = transcript.transcript_type;
+        })
+      })
 
 
       // Select the svg element, if it exists.
@@ -140,57 +142,16 @@ function geneD3() {
       // Update the inner dimensions.
       g.attr("transform", "translate(" + margin.left + "," + parseInt(margin.top+featureGlyphHeight) + ")");
 
-      g.selectAll("line.brush-line").remove();
 
       // Brush
       var brush = d3.svg.brush()
         .x(x)
         .on("brushend", function() {
             var extentRect = d3.select("g.x.brush rect.extent");
-            
-            var xExtent = +extentRect.attr("x") + (+extentRect.attr("width") / 2);
-            var heightExtent = +extentRect.attr("height") - 10;
+            var xExtent = +extentRect.attr("x");
 
-            g.selectAll("line.brush-line").remove();
+            extentRect.attr("x", xExtent - 1);
 
-            if (showBrushLine) {
-              if (!brush.empty()) {
-                g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', xExtent)
-                  .attr('x2', xExtent)          
-                  .attr('y1', heightExtent -20)
-                  .attr('y2', heightExtent );
-
-                 g.append('line')
-                  .attr('class', 'brush-line')
-                  .attr('x1', 40 )
-                  .attr('x2',  geneD3_width - margin.left - margin.right - 40)          
-                  .attr('y1', heightExtent)
-                  .attr('y2', heightExtent);
-
-                if (geneD3_widthPercent && geneD3_heightPercent) {
-                  svg.attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom+brushAllowance))
-                     .attr("preserveAspectRatio", "xMaxYMid meet");
-                } 
-
-                svg.attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
-                   .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom+brushAllowance);
-
-
-              } else {
-                 if (geneD3_widthPercent && geneD3_heightPercent) {
-                    svg.attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom))
-                       .attr("preserveAspectRatio", "xMaxYMid meet");
-                  } 
-
-                  svg.attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
-                     .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
-               
-              }
-
-
-            }
             dispatch.d3brush(brush);
 
 
@@ -207,8 +168,8 @@ function geneD3() {
 
 
       if (geneD3_showBrush) {
-        var brushHeight = geneD3_height + 20;
-        var brushY = -20;
+        var brushHeight = geneD3_height + margin.top;
+        var brushY = (margin.top-1) * -1;
         g.selectAll("g.x.brush").remove();
         var theBrush = g.selectAll("g.x.brush").data([0]);
         theBrush.enter().append("g")
@@ -217,9 +178,6 @@ function geneD3() {
             .selectAll("rect")
             .attr("y", brushY)
             .attr("height", brushHeight);
-        theBrush.exit().remove();
-
-           
       }    
 
       // add tooltip div
@@ -339,26 +297,22 @@ function geneD3() {
           .attr('class', 'arrow')
           .attr('d', centerArrow);      
 
-      var filterFeatures = null;
-      if ( transcript.datum().transcript_type == 'protein_coding' 
-        || transcript.datum().transcript_type == 'mRNA' 
-        || transcript.datum().transcript_type == 'transcript'
-        || transcript.datum().transcript_type == 'primary_transcript') {
-        filterFeatures = function(d) {
-           var ft = d.feature_type.toLowerCase(); 
-           return  (ft == 'utr' || ft == 'cds');
-        };
-      } else {
-        filterFeatures = function(d) {
-           var ft = d.feature_type.toLowerCase(); 
-           return ft == 'exon';
-        };
+
+      var filterFeature = function(feature) {
+          if ( feature.transcript_type == 'protein_coding' 
+              || feature.transcript_type == 'mRNA' 
+              || feature.transcript_type == 'transcript'
+              || feature.transcript_type == 'primary_transcript') {
+            return feature.feature_type.toLowerCase() == 'utr' || feature.feature_type.toLowerCase() == 'cds';
+          } else {
+            return feature.feature_type.toLowerCase() == 'exon';
+          }
       }
 
 
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
-          return filterFeatures(d); 
+          return filterFeature(d);
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -424,7 +378,7 @@ function geneD3() {
       transcript.selectAll(".feature_glyph").remove();
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
-          return filterFeatures(d); 
+          return filterFeature(d); 
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -459,7 +413,7 @@ function geneD3() {
       // Update class
       transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
         return d['features'].filter( function(d) {
-          return filterFeatures(d); 
+          return filterFeature(d); 
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -700,11 +654,7 @@ function geneD3() {
     return chart;
   }
 
-  chart.showBrushLine = function(_) {
-    if (!arguments.length) return showBrushLine;
-    showBrushLine = _;
-    return chart;
-  }
+
   // This adds the "on" methods to our custom exports
   d3.rebind(chart, dispatch, "on");
 

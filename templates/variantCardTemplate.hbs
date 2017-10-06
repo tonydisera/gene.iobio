@@ -8,11 +8,13 @@
       </span>
                   
       <span id="variant-card-label" class="card-label keep-case" style="float:left;margin-left:3px;margin-right:10px;"></span>
-    </span>
+      </span>
+
     
     <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
       <li class="level-edu level-basic">                       
-        <span id="vcf-variant-count-label" class="level-edu level-basic badge-label hide">Variants Loaded</span>
+        <span id="vcf-variant-count-label" class="level-edu level-basic badge-label hide">Variants Loaded
+        </span>
         <span id="vcf-variant-count" class="badge"></span>
       </li>
 
@@ -64,6 +66,7 @@
     </ul>
 
 
+
     <a href="javascript:void(0)" class="level-edu level-basic" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">remove</i>
     </a>
@@ -79,19 +82,19 @@
 
 
   </div>
-  
- 
 
-  <div style="margin-top:25px;width: 100%;text-align: center;clear: both;">
-    <div class="loader vcfloader hide"  style="display: inline;">
+
+
+  <div style="text-align: center;clear: both;">
+    <div class="loader vcfloader hide"  style="display: inline-block;">
       <span class="loader-label"></span>
       <img src="assets/images/wheel.gif">
     </div>
-    <div class="loader fbloader hide" style="display: inline;padding-left: 20px;">
+    <div class="loader fbloader hide" style="display: inline-block;padding-left: 20px;">
       <span class="loader-label">Calling Variants</span>      
       <img src="assets/images/wheel.gif">
     </div>
-    <div class="loader covloader hide" style="display: inline;padding-left: 20px;">
+    <div class="loader covloader hide" style="display: inline-block;padding-left: 20px;">
       <span class="loader-label"></span>      
       <img src="assets/images/wheel.gif">
     </div>
@@ -151,7 +154,7 @@
           </div>
           <div >
             <div id="vcf-chart-label" class="level-edu level-basic chart-label hide" 
-             style="margin-top: 4px;margin-bottom: -10px;">
+             style="display:inline-block;margin-top: 0px;margin-bottom: -10px;">
               Variants loaded
             </div>
             <div id="vcf-variants">

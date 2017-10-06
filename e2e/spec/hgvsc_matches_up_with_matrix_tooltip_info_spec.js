@@ -24,15 +24,18 @@ module.exports = {
     client.pause(1000);
     appTitleSection.selectRefSeqTranscript();
     matrixTrack.waitForMatrixLoaded();
+    client.pause(2000);
     
-    matrixTrack.clickColumn(1);
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
+    matrixTrack.clickColumn(1);
     variantTooltip.waitForTooltip();   
+    
     client.pause(4000); 
     
+    variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     variantTooltip.expectVepConsequence('stop gained');
     variantTooltip.expectInheritanceEquals('recessive inheritance');
-    variantTooltip.expectTitleLine2Equals('SNP G->A rs527236033 17:17698535');
+    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033');
     variantTooltip.expectHGVScEquals('NM_030665.3:c.2273G>A');
     
     client.end();

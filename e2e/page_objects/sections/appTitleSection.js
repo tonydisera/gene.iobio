@@ -18,10 +18,10 @@ module.exports = {
                  .click('#call-variants-dropdown li a#call-variants-selected-gene');
     },
     waitForAnalyzeAllDone: function() {
-      this.waitForElementPresent('@analyzeAllDone', 60000);
+      this.waitForElementPresent('@analyzeAllDone', 120000);
     },
     waitForCallAllDone: function() {
-      this.waitForElementPresent('@callAllDone', 60000);
+      this.waitForElementPresent('@callAllDone', 240000);
     },
     clickRemoveAll: function() {
       return this.click('@removeAll');
@@ -88,7 +88,7 @@ module.exports = {
     assertAnalyzeAllProgressLabel: function(label) {
       var self = this;
       self.api.useXpath().getText(
-        '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]/div[@class="text"]', 
+        '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]/div[@class="text"]', 
         function(result) 
       {
         self.assert.equal(result.value, label);
@@ -99,7 +99,7 @@ module.exports = {
     assertCallAllProgressLabel: function(label) {
       var self = this;
       self.api.useXpath().getText(
-        '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]/div[@class="text"]', 
+        '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]/div[@class="text"]', 
         function(result) 
       {
         self.assert.equal(result.value, label);
@@ -113,7 +113,7 @@ module.exports = {
 
       if (analyzedPassedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
           function(result) 
         {
           self.assert.equal(result.value, analyzedPassedCount);
@@ -122,7 +122,7 @@ module.exports = {
 
       if (analyzedFailedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
           function(result) 
         {
           self.assert.equal(result.value, analyzedFailedCount);
@@ -131,7 +131,7 @@ module.exports = {
 
       if (calledPassedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
           function(result) 
         {
           self.assert.equal(result.value, calledPassedCount);
@@ -140,7 +140,7 @@ module.exports = {
 
       if (calledFailedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]/div[@id="analyze-all-panel"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
           function(result) 
         {
           self.assert.equal(result.value, calledFailedCount);

@@ -104,6 +104,7 @@
 		color: $app-color !important
 		margin-top: 12px
 		margin-bottom: 5px
+		display: inline-block
 
 	.subheading
 		font-size: 15px 
@@ -175,21 +176,30 @@
 
 			#loaded-variant-count
 				background-color: $loaded-variant-progress-color
+				cursor: pointer
 
 				&.none
 					background-color:  $not-pass-color
 
 			#called-variant-count
 				background-color: $called-variant-color
+				cursor: pointer
 
 				&.none
 					background-color:  $not-pass-color
 
-			#unanalyzed-warning
-				color: $warning-background-color
-				font-size: 22px
-				vertical-align: bottom
+			#unanalyzed-loaded-warning
+				font-weight: bold
+				color: $danger-color
+				font-size: 17px	
 				cursor: pointer
+
+			#unanalyzed-called-warning
+				font-weight: bold
+				color: $danger-color
+				font-size: 17px			
+				cursor: pointer
+
 
 	.checkbox
 		label

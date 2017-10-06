@@ -102,6 +102,7 @@ describe('variantModel', function() {
 				loadedCount: 5, 
 				calledCount: 0,
 				harmfulVariantsInfo: [],
+				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
 				geneCoverageProblem: false
@@ -139,6 +140,7 @@ describe('variantModel', function() {
 				loadedCount: 5, 
 				calledCount: 0,				
 				harmfulVariantsInfo: [],
+				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
 				geneCoverageProblem: false
@@ -165,6 +167,7 @@ describe('variantModel', function() {
 				loadedCount: 4, 
 				calledCount: 0,
 				harmfulVariantsInfo: [],
+				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
 				geneCoverageProblem: false
@@ -191,6 +194,7 @@ describe('variantModel', function() {
 				loadedCount: 4, 
 				calledCount: 0,
 				harmfulVariantsInfo: [],
+				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
 				geneCoverageProblem: false
@@ -200,10 +204,10 @@ describe('variantModel', function() {
 		it('returns a danger counts object with the correct clinvar', function() {
 			var vcfData = {
 				features: [
-					{ type: 'snp', clinVarClinicalSignificance: { none: "Y", "benign/likely_benign": "Y" } },
-					{ type: 'snp', clinVarClinicalSignificance: { pathogenic: {} } },
-					{ type: 'snp', clinVarClinicalSignificance: { uncertain_significance: {} } },
-					{ type: 'snp', clinVarClinicalSignificance: { "": {} } }
+					{ type: 'snp', clinvar: "clinvar_lbenign" },
+					{ type: 'snp', clinvar: "clinvar_path" },
+					{ type: 'snp', clinvar: "clinvar_uc" },
+					{ type: 'snp', clinvar: "" }
 				]
 			};
 			expect(VariantModel.summarizeDanger(vcfData)).toEqual({
@@ -218,6 +222,7 @@ describe('variantModel', function() {
 				loadedCount: 4, 
 				calledCount: 0,
 				harmfulVariantsInfo: [],
+				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
 				geneCoverageProblem: false				
@@ -243,6 +248,7 @@ describe('variantModel', function() {
 				loadedCount: 4, 
 				calledCount: 0,
 				harmfulVariantsInfo: [],
+				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
 				geneCoverageProblem: false	
@@ -254,8 +260,8 @@ describe('variantModel', function() {
 				window.matrixCard = new MatrixCard();
 				var vcfData = {
 					features: [
-						{ type: 'snp', afExAC: 0.04, af1000G: 0.03 }, // value of 6
-						{ type: 'snp', afExAC: 0.005, af1000G: 0.001 }, // value of 5
+						{ type: 'snp', afExAC: 0.04,  af1000G: 0.03,  afFieldHighest: 'afExAC',  afHighest: 0.04 }, // value of 6
+						{ type: 'snp', afExAC: 0.005, af1000G: 0.001, afFieldHighest: 'afExAC',  afHighest: 0.005 }, // value of 5
 					]
 				};
 				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
@@ -264,12 +270,13 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						afexac_rare: { field: 'afExAC', value: 5 }
+						afhighest_rare: { field: 'afExAC', value: 5 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
 					calledCount: 0,
 					harmfulVariantsInfo: [],
+					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
 					geneCoverageProblem: false	
@@ -282,8 +289,8 @@ describe('variantModel', function() {
 				window.matrixCard = new MatrixCard();
 				var vcfData = {
 					features: [
-						{ type: 'snp', afExAC: -1.05, af1000G: -1 }, // value of 2
-						{ type: 'snp', afExAC: 0.01, af1000G: 0.02 }, // value of 6
+						{ type: 'snp', afExAC: -1.05, af1000G: -1,  afHighest: -1,   afFieldHighest: 'af1000G' }, // value of 2
+						{ type: 'snp', afExAC: 0.01, af1000G: 0.02, afHighest: 0.02, afFieldHighest: 'af1000G' }, // value of 6
 					]
 				};
 				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
@@ -292,12 +299,13 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						af1000g_unique: { field: 'af1000G', value: 2 }
+						afhighest_rare: { field: 'af1000G', value: 2 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
 					calledCount: 0,
 					harmfulVariantsInfo: [],
+					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
 					geneCoverageProblem: false			
@@ -310,8 +318,8 @@ describe('variantModel', function() {
 				window.matrixCard = new MatrixCard();
 				var vcfData = {
 					features: [
-						{ type: 'snp', afExAC: 0.04 }, // value of 6
-						{ type: 'snp', afExAC: 0.005 }, // value of 5
+						{ type: 'snp', afExAC: 0.04,  afHighest: 0.04,  afFieldHighest: 'afExAC' }, // value of 6
+						{ type: 'snp', afExAC: 0.005, afHighest: 0.005, afFieldHighest: 'afExAC' }  // value of 5
 					]
 				};
 				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
@@ -320,12 +328,13 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						afexac_rare: { field: 'afExAC', value: 5 }
+						afhighest_rare: { field: 'afExAC', value: 5 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
 					calledCount: 0,
 					harmfulVariantsInfo: [],
+					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
 					geneCoverageProblem: false				
@@ -338,8 +347,8 @@ describe('variantModel', function() {
 				window.matrixCard = new MatrixCard();
 				var vcfData = {
 					features: [
-						{ type: 'snp', af1000G: -1 }, // value of 2
-						{ type: 'snp', af1000G: 0.02 }, // value of 6
+						{ type: 'snp', af1000G: -1,   afHighest: -1,   afFieldHighest: 'af1000G' }, // value of 2
+						{ type: 'snp', af1000G: 0.02, afHighest: 0.02, afFieldHighest: 'af1000G'  }, // value of 6
 					]
 				};
 				expect(VariantModel.summarizeDanger(vcfData)).toEqual({
@@ -348,12 +357,13 @@ describe('variantModel', function() {
 					IMPACT: {},
 					CONSEQUENCE: {},
 					AF: {
-						af1000g_unique: { field: 'af1000G', value: 2 }
+						afhighest_rare: { field: 'af1000G', value: 2 }
 					},
 					featureCount: 2,
 					loadedCount: 2, 
 					calledCount: 0,
 					harmfulVariantsInfo: [],
+					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
 					geneCoverageProblem: false			
@@ -443,27 +453,37 @@ describe('variantModel', function() {
 		beforeEach(function() {
 			variant_1 = {
 				zygosity: 'HOM',
-				recfilter: 'PASS'
+				recfilter: 'PASS',
+				genotype: {zygosity: 'HOM', absent: false},
+				genotypes: {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HET', absent: false} }
 			};
 
 			variant_2 = {
 				zygosity: 'HET',
-				recfilter: 'PASS'
+				recfilter: 'PASS',
+				genotype: {zygosity: 'HET', absent: false},
+				genotypes: {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HOM', absent: false} }
 			};
 
 			variant_3 = {
 				zygosity: 'HET',
-				recfilter: '.'
+				recfilter: '.',
+				genotype: {zygosity: 'HET', absent: false},
+				genotypes: {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HET', absent: false} }
 			};
 
 			variant_4 = {
 				zygosity: 'HOM',
-				recfilter: '.'
+				recfilter: '.',
+				genotype: {zygosity: 'HOM', absent: false},
+				genotypes: {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOM', absent: false} }
 			};
 
 			variant_5 = {
 				zygosity: 'HOMREF',
-				recfilter: 'PASS'
+				recfilter: 'PASS',
+				genotype: {zygosity: 'HOMREF', absent: false},
+				genotypes: {NA12878: {zygosity: 'HOMREF', absent: false}, NA12892: {zygosity: 'HOMREF', absent: false} }
 			}
 
 			data = {
@@ -478,8 +498,8 @@ describe('variantModel', function() {
 
 			filterObject = {
 				'coverageMin': 100,
-				'afMinExac': 0,
-				'afMaxExac': 1,
+				'afMin': 0,
+				'afMax': 1,
 				'annotsToInclude': {},
 				'exonicOnly': false
 		  };
@@ -491,19 +511,16 @@ describe('variantModel', function() {
 			data.features = [];
 			var vcfDataFiltered = variantModel.filterVariants(data, filterObject, 100, 200);
 			expect(vcfDataFiltered).toEqual({
-				count: 33,
-				countMatch: 10,
-				countUnique: 2,
-				sampleCount: 2,
 				intronsExcludedCount: 0,
 				end: 200,
 				features: [],
 				maxLevel: 11,
-				featureWidth: 100,
+				featureWidth: 100, 
 				name: "vcf track",
 				start: 100,
 				strand: "+",
-				variantRegionStart: 100
+				variantRegionStart: 100,
+				genericAnnotators: undefined
 			})
 		});
 
@@ -512,27 +529,7 @@ describe('variantModel', function() {
 			expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 		});
 
-		describe('when there is a PASS filter applied to the vcf records', function() {
-			it('assigns a feature class of low-quality for each variant that does not have a PASS filter record', function() {
-				spyOn(filterCard, 'shouldWarnForNonPassVariants').and.returnValue(true);
-				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.features[0].featureClass).toEqual('');
-				expect(filteredData.features[1].featureClass).toEqual('');
-				expect(filteredData.features[2].featureClass).toEqual('low-quality');
-				expect(filteredData.features[3].featureClass).toEqual('low-quality');
-			});
-		});
 
-		describe('when there is not a PASS filter applied to the vcf records', function() {
-			it('assigns a feature class of low-quality for each variant that does not have a PASS filter record', function() {			
-				spyOn(filterCard, 'shouldWarnForNonPassVariants').and.returnValue(false);
-				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.features[0].featureClass).toBeUndefined();
-				expect(filteredData.features[1].featureClass).toBeUndefined();
-				expect(filteredData.features[2].featureClass).toBeUndefined();
-				expect(filteredData.features[3].featureClass).toBeUndefined();
-			});
-		});
 
 		it('filters out variants that do not start within the specified region', function() {
 			start = 5;
@@ -545,71 +542,71 @@ describe('variantModel', function() {
 			expect(filteredData.features).toEqual([variant_1, variant_2]);
 		});
 
-		describe('when filtering out variants that do not meet the specifed afExAC allele frequency', function() {
+		describe('when filtering out variants that do not meet the specifed (highest) allele frequency', function() {
 			it('filters out variants that are not in the specified range', function() {
-				variant_1.afExAC = null;
-				variant_2.afExAC = '';
-				variant_3.afExAC = 0.5;
-				variant_4.afExAC = 0.8;
-				filterObject.afMinExac = 0.6;
-				filterObject.afMaxExac = 1;
+				variant_1.afHighest = null;
+				variant_2.afHighest = '';
+				variant_3.afHighest = 0.5;
+				variant_4.afHighest = 0.8;
+				filterObject.afMin = 0.6;
+				filterObject.afMax = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_4]);
 			});
 
 			it('treats null and blank string allele frequencies as 0', function() {
-				variant_1.afExAC = null;
-				variant_2.afExAC = '';
-				variant_3.afExAC = 0.5;
-				variant_4.afExAC = 0.9;
-				filterObject.afMinExac = 0;
-				filterObject.afMaxExac = 0.7;
+				variant_1.afHighest = null;
+				variant_2.afHighest = '';
+				variant_3.afHighest = 0.5;
+				variant_4.afHighest = 0.9;
+				filterObject.afMin = 0;
+				filterObject.afMax = 0.7;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3]);
 			});
 
 			it('defaults to keeping all variants when afMin and afMax in the filterObject are null', function() {
-				variant_1.afExAC = null;
-				variant_2.afExAC = '';
-				variant_3.afExAC = 0.5;
-				variant_4.afExAC = 0.9;
-				filterObject.afMinExac = null;
-				filterObject.afMaxExac = null;
+				variant_1.afHighest = null;
+				variant_2.afHighest = '';
+				variant_3.afHighest = 0.5;
+				variant_4.afHighest = 0.9;
+				filterObject.afMin = null;
+				filterObject.afMax = null;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
 
 			it('defaults to keeping all variants when afMin and afMax in the filterObject are NaN', function() {
-				variant_1.afExAC = null;
-				variant_2.afExAC = '';
-				variant_3.afExAC = 0.5;
-				variant_4.afExAC = 0.9;
-				filterObject.afMinExac = NaN;
-				filterObject.afMaxExac = NaN;
+				variant_1.afHighest = null;
+				variant_2.afHighest = '';
+				variant_3.afHighest = 0.5;
+				variant_4.afHighest = 0.9;
+				filterObject.afMin = NaN;
+				filterObject.afMax = NaN;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
 
 			it('defaults to keeping all variants when afMin and afMax in the filterObject are 0 and 1, respectively', function() {
-				variant_1.afExAC = null;
-				variant_2.afExAC = '';
-				variant_3.afExAC = 0.5;
-				variant_4.afExAC = 0.9;
-				filterObject.afMinExac = 0;
-				filterObject.afMaxExac = 1;
+				variant_1.afHighest = null;
+				variant_2.afHighest = '';
+				variant_3.afHighest = 0.5;
+				variant_4.afHighest = 0.9;
+				filterObject.afMin = 0;
+				filterObject.afMax = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
 			});
 		});
 
-		describe('when filtering out variants that do not meet the specifed af1000G allele frequency', function() {
+		describe('when filtering out variants that do not meet the specifed (highest) allele frequency', function() {
 			it('filters out variants that are not in the specified range', function() {
-				variant_1.af1000G = null;
-				variant_2.af1000G = '';
-				variant_3.af1000G = 0.5;
-				variant_4.af1000G = 0.8;
-				filterObject.afMin1000g = 0.6;
-				filterObject.afMax1000g = 1;
+				variant_1.afHighest = null;
+				variant_2.afHighest = '';
+				variant_3.afHighest = 0.5;
+				variant_4.afHighest = 0.8;
+				filterObject.afMin = 0.6;
+				filterObject.afMax = 1;
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_4]);
 			});
@@ -690,43 +687,14 @@ describe('variantModel', function() {
 		});
 
 		describe('when filtering on annotations', function() {
-			it('filters out all variants that do not meet the value of each annotation', function() {
-				filterObject.annotsToInclude = {
-					afexac_rare: { key: "afexaclevels", state: true, value: "afexac_rare" }
-				};
-				variant_1.afexaclevels = { afexac_rare: 'afexac_rare' };
-				variant_2.afexaclevels = {};
-				variant_3.afexaclevels = '';
-				variant_4.afexaclevels = 'afexac_rare';
-				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.features).toEqual([variant_1, variant_4]);
-			});
-
-			it('does not filter on any annotations that have a state of false', function() {
-				filterObject.annotsToInclude = {
-					afexac_rare: { key: "afexaclevels", state: false, value: "afexac_rare" }
-				};
-				variant_1.afexaclevels = { afexac_rare: 'afexac_rare' };
-				variant_2.afexaclevels = {};
-				variant_3.afexaclevels = '';
-				variant_4.afexaclevels = 'afexac_rare';
-				var filteredData = variantModel.filterVariants(data, filterObject);
-				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
-			});
-
 			it('filters correctly on multiple annotations', function() {
 				filterObject.annotsToInclude = {
-					afexac_rare: { key: "afexaclevels", state: true, value: "afexac_rare" },
 					MODERATE: { key: "vepImpact", state: true, value: "MODERATE" },
 					downstream_gene_variant: { key: "vepConsequence", state: false, value: "downstream_gene_variant" }
 				};
-				variant_1.afexaclevels = { afexac_rare: 'afexac_rare' };
 				variant_1.vepImpact = { MODERATE: 'MODERATE' };
-				variant_2.afexaclevels = {};
 				variant_2.vepImpact = {};
-				variant_3.afexaclevels = '';
 				variant_2.vepImpact = '';
-				variant_4.afexaclevels = { afexac_rare: 'afexac_rare' };
 				variant_4.vepImpact = { LOW: 'LOW' };
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1]);
@@ -769,6 +737,75 @@ describe('variantModel', function() {
 				var filteredData = variantModel.filterVariants(data, filterObject);
 				expect(filteredData.features).toEqual([variant_1, variant_2]);
 			});
+		});
+
+		describe('when filtering on present in affected', function() {			
+			it('filters on affected present', function() {
+				variantModel.affectedStatus = "affected";
+				var probandVariantCard = 
+				{
+						getRelationship: jasmine.createSpy().and.returnValue('proband'),
+						getSampleName:   jasmine.createSpy().and.returnValue('NA12878'),
+						model: variantModel
+				};
+				var motherVariantCard = 
+				{
+						getRelationship: jasmine.createSpy().and.returnValue('mother'),
+						getSampleName:   jasmine.createSpy().and.returnValue('NA12892')
+				};
+				var fatherVariantCard = 
+				{
+						getRelationship: jasmine.createSpy().and.returnValue('father'),
+						getSampleName:   jasmine.createSpy().and.returnValue('NA12891')
+				};
+				filterObject.affectedInfo = [
+					{
+						filter: true,
+						id: "affected-_-proband-_-NA12878",
+						label: "proband",
+						relationship: "proband",
+						status: "affected",
+						variantCard: probandVariantCard
+					},
+					{
+						filter: true,
+						id: "affected-_-mother-_-NA12892",
+						label: "mother",
+						relationship: "mother",
+						status: "affected",
+						variantCard: motherVariantCard
+					}
+					
+				];
+				window.variantCards = [
+					probandVariantCard,
+					motherVariantCard,
+					fatherVariantCard
+				]
+				var filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_1, variant_2, variant_3, variant_4]);
+
+				variant_1.genotypes = {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOMREF', absent: false} };
+				filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_2, variant_3, variant_4]);
+
+				variant_1.genotypes = {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HOM', absent: false} };
+				variant_2.genotypes = {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HET', absent: false} }; 
+				filterObject.affectedInfo.push(
+				{
+						filter: true,
+						id: "affected-_-father-_-NA12891",
+						label: "father",
+						relationship: "father",
+						status: "unaffected",
+						variantCard: fatherVariantCard
+				});
+				filteredData = variantModel.filterVariants(data, filterObject);
+				expect(filteredData.features).toEqual([variant_3, variant_4]);
+
+
+			});
+
 		});
 	});
 
@@ -828,55 +865,5 @@ describe('variantModel', function() {
 		});
 	});
 
-	describe('#_determineVariantAfLevels', function() {
-		it('sets afExAC to -100 on variants whose allele frequency are not found and intronic to distinguish them', function() {
-			var transcript = 'transcript';
-			var variant_1 = { afExAC: 0, start: 150, end: 160 };
-			var variant_2 = { afExAC: 0, start: 320, end: 330 };
-			var variant_3 = { afExAC: 0, start: 410, end: 420 };
-			var vcfData = { features: [variant_1, variant_2, variant_3] };
-			spyOn(window, 'getCodingRegions').and.returnValue([{ start: 100, end: 200 }, { start: 400, end: 500 }]);
-			variantModel._determineVariantAfLevels(vcfData, transcript);
-			expect(window.getCodingRegions).toHaveBeenCalledWith('transcript');
-			expect(variant_1.afExAC).toEqual(0);
-			expect(variant_2.afExAC).toEqual(-100);
-			expect(variant_3.afExAC).toEqual(0);
-		});
 
-		it('sets afexaclevel and afexaclevels on the variant depending on the afExAC of the variant', function() {
-			var transcript = 'transcript';
-			var variant_1 = { afExAC: ".0005" };
-			var variant_2 = { afExAC: ".05" };
-			var variant_3 = { afExAC: -100 };
-			var vcfData = { features: [variant_1, variant_2, variant_3] };
-			variantModel._determineVariantAfLevels(vcfData, transcript);
-			expect(variant_1.afexaclevel).toEqual('afexac_uncommon');
-			expect(variant_1.afexaclevels).toEqual({ 'afexac_superrare': 'afexac_superrare', 'afexac_rare': 'afexac_rare', 'afexac_uncommon': 'afexac_uncommon'});
-			expect(variant_2.afexaclevel).toEqual('afexac_uncommon');
-			expect(variant_2.afexaclevels).toEqual({ 'afexac_uncommon': 'afexac_uncommon' });
-			expect(variant_3.afexaclevel).toEqual('afexac_unique_nc');
-			expect(variant_3.afexaclevels).toEqual({ 'afexac_unique_nc': 'afexac_unique_nc' });
-		});
-
-		it('sets af1000glevel and af1000glevels on the variant depending on the af1000G of the variant', function() {
-			var transcript = 'transcript';
-			var variant_1 = { af1000G: ".0005" };
-			var variant_2 = { af1000G: ".05" };
-			var variant_3 = { af1000G: 0 };
-			var vcfData = { features: [variant_1, variant_2, variant_3] };
-			variantModel._determineVariantAfLevels(vcfData, transcript);
-			expect(variant_1.af1000glevel).toEqual('af1000g_uncommon');
-			expect(variant_1.af1000glevels).toEqual({ 'af1000g_superrare': 'af1000g_superrare', 'af1000g_rare': 'af1000g_rare', 'af1000g_uncommon': 'af1000g_uncommon'});
-			expect(variant_2.af1000glevel).toEqual('af1000g_uncommon');
-			expect(variant_2.af1000glevels).toEqual({ 'af1000g_uncommon': 'af1000g_uncommon' });
-			expect(variant_3.af1000glevel).toEqual('af1000g_uncommon');
-			expect(variant_3.af1000glevels).toEqual({
-				'af1000g_unique': 'af1000g_unique',
-				'af1000g_uberrare': 'af1000g_uberrare',
-				'af1000g_superrare': 'af1000g_superrare',
-				'af1000g_rare': 'af1000g_rare',
-				'af1000g_uncommon': 'af1000g_uncommon',
-			});
-		});
-	});
 });

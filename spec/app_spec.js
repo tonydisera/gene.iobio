@@ -95,7 +95,6 @@ describe('app', function() {
 			expect($('#bookmark-card')).toHaveClass('hide');
 			expect($('#recall-card')).toHaveClass('hide');
 			expect($('#help-card')).toHaveClass('hide');
-			expect($('#button-show-filters')).toHaveClass('selected');
 		});
 
 		it('shows genes card when Phenolyzer is selected', function() {
@@ -106,7 +105,6 @@ describe('app', function() {
 			expect($('#bookmark-card')).toHaveClass('hide');
 			expect($('#recall-card')).toHaveClass('hide');
 			expect($('#help-card')).toHaveClass('hide');
-			expect($('#button-show-phenolyzer')).toHaveClass('selected');
 		});
 
 		it('shows bookmark card when Bookmarks is selected', function() {
@@ -117,7 +115,6 @@ describe('app', function() {
 			expect($('#bookmark-card')).not.toHaveClass('hide');
 			expect($('#recall-card')).toHaveClass('hide');
 			expect($('#help-card')).toHaveClass('hide');
-			expect($('#button-show-bookmarks')).toHaveClass('selected');
 		});
 
 		it('shows recall card when Recall is selected', function() {
@@ -128,7 +125,6 @@ describe('app', function() {
 			expect($('#bookmark-card')).toHaveClass('hide');
 			expect($('#recall-card')).not.toHaveClass('hide');
 			expect($('#help-card')).toHaveClass('hide');
-			expect($('#button-find-missing-variants')).toHaveClass('selected');
 		});
 
 		it('shows help card when Help is selected', function() {
@@ -139,7 +135,6 @@ describe('app', function() {
 			expect($('#bookmark-card')).toHaveClass('hide');
 			expect($('#recall-card')).toHaveClass('hide');
 			expect($('#help-card')).not.toHaveClass('hide');
-			expect($('#button-show-help')).toHaveClass('selected');
 		});
 	});
 });

@@ -1,4 +1,4 @@
-var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, motherVariantCard, filterPanel, nav;
+var indexPage, appTitleSection, dataCard, matrixTrack, tooltip, bookmarkPanel, probandVariantCard, fatherVariantCard, filterPanel, nav;
 
 module.exports = {
   tags: [],
@@ -13,7 +13,7 @@ module.exports = {
     matrixTrack = indexPage.section.matrixTrack;  
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
-    motherVariantCard = indexPage.section.motherVariantCard;
+    fatherVariantCard = indexPage.section.fatherVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
     tooltip = indexPage.section.variantTooltip;
@@ -49,7 +49,6 @@ module.exports = {
 
   },
 
-
   'Click denovo inheritance (custom) filter': function(client) {
     nav.clickFilter();
     client.pause(1000);   
@@ -58,7 +57,7 @@ module.exports = {
     client.pause(1000);
     
     filterPanel.clickInheritanceDenovo();
-    client.pause(1000);
+    client.pause(2000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
   
@@ -68,7 +67,7 @@ module.exports = {
     client.pause(1000);
 
     filterPanel.clickKnownCausative();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertKnownCausativeCounts(1,1);
     appTitleSection.assertAnalyzeAllCounts(1,4,1,4);
 
@@ -77,7 +76,7 @@ module.exports = {
   'De novo VUS filter': function(client) {
 
     filterPanel.clickDenovoVus();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertDenovoVusCounts(2,0);
     appTitleSection.assertAnalyzeAllCounts(2,3,0,5);
 
@@ -85,7 +84,7 @@ module.exports = {
   'Recessive VUS filter': function(client) {
 
     filterPanel.clickRecessiveVus();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertRecessiveVusCounts(0,0);
     appTitleSection.assertAnalyzeAllCounts(0,5,0,5);
 
@@ -93,7 +92,7 @@ module.exports = {
   'High or Moderate Impact filter': function(client) {
 
     filterPanel.clickHighOrModerateImpact();
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertHighOrModerateImpactCounts(1,0);
     appTitleSection.assertAnalyzeAllCounts(1,4,0,5);
 
@@ -103,10 +102,10 @@ module.exports = {
   'Clear filter and click denovo inheritance (custom) filter': function(client) {
     client.pause(1000);
     filterPanel.clickClearAll();
-    client.pause(1000);
+    client.pause(2000);
     
     filterPanel.clickInheritanceDenovo();
-    client.pause(1000);
+    client.pause(2000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
   
@@ -115,8 +114,8 @@ module.exports = {
   'Low gene coverage filter': function(client) {
 
     filterPanel.clickLowCoverage();
-    client.pause(1000);
-    filterPanel.assertLowCoverageCounts(2,2);
+    client.pause(2000);
+    filterPanel.assertLowCoverageCounts(2);
     appTitleSection.assertAnalyzeAllCounts(2,3,2,3);
 
   },
@@ -124,7 +123,7 @@ module.exports = {
 
     filterPanel.clickClearAll();
     filterPanel.assertKnownCausativeCounts(1,1);
-    client.pause(1000);
+    client.pause(2000);
     filterPanel.assertDenovoVusCounts(2,0);
     filterPanel.assertRecessiveVusCounts(0,0);
     filterPanel.assertHighOrModerateImpactCounts(1,0);
@@ -136,14 +135,14 @@ module.exports = {
 
   'Click on AIRE and validate recfilter . (unassigned) counts': function(client) {
     nav.clickFilter();
-    client.pause(1000);   
+    client.pause(2000);   
 
     nav.searchGene('AIRE');
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
     filterPanel.clickRecfilterUnassigned();
-    client.pause(1000);
+    client.pause(2000);
     probandVariantCard.assertLoadedVariantSymbolCountEquals('4');
 
   },
@@ -154,7 +153,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('AIRE');
     
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
@@ -163,16 +162,16 @@ module.exports = {
 
     nav.searchGene('PDHA1');
     
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
     probandVariantCard.assertDangerExonCountEquals(1);
     probandVariantCard.assertLowCoverageGlyphCountEquals(1);
 
-    motherVariantCard.waitForBamDepthLoaded();
-    motherVariantCard.assertDangerExonCountEquals(9);
-    motherVariantCard.assertLowCoverageGlyphCountEquals(9);
+    fatherVariantCard.waitForBamDepthLoaded();
+    fatherVariantCard.assertDangerExonCountEquals(9);
+    fatherVariantCard.assertLowCoverageGlyphCountEquals(9);
   },
 
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
@@ -180,7 +179,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('MYLK2');
     
-    client.pause(1000);
+    client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertLoadedVariantCountEquals(2);
     probandVariantCard.assertCalledVariantCountEquals(1);
@@ -193,7 +192,7 @@ module.exports = {
       theTooltip.expectVepImpact('moderate');
       theTooltip.expectVepConsequence('missense variant');
       theTooltip.expectClinvar('likely pathogenic');
-      theTooltip.expectClinvarClinSig('cardiomyopathy');
+      theTooltip.expectClinvarClinSigExact('Cardiomyopathy');
       theTooltip.expectPolyphen('benign');
       theTooltip.expectSIFT('tolerated');
       theTooltip.expectAFExAC('0.003%');
@@ -203,8 +202,8 @@ module.exports = {
       theTooltip.expectHGVScEquals("ENST00000375994.2:c.595A>G");
       theTooltip.expectHGVSpEquals("ENSP00000365162.2:p.Ile199Val");
       theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'proband', 10, 39, 49, 'Het');
-      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 55, 'Homref');
-      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 45, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'father',  null, null, 55, 'Homref');
+      theTooltip.expectAlleleCountsEquals(theTooltip.selector, 'mother',  null, null, 45, 'Homref');
 
     }
 
@@ -222,12 +221,14 @@ module.exports = {
     matrixTrack.clickColumn(1);
     tooltip.selector = tooltip.MATRIX_TOOLTIP;
     tooltip.waitForTooltip();
+    tooltip.selector = tooltip.MATRIX_TOOLTIP;
     evaluateTooltip(tooltip);
 
     
   },
 
   'end': function(client) {
+    client.end();
   }
 
   

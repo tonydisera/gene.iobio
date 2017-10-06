@@ -21,12 +21,15 @@
 
 #thumbs-green-symbol
   fill: #81A966
+  color: #81A966
 
 #thumbs-red-symbol
   fill: rgb(173, 73, 74)
+  color: rgb(173, 73, 74)
 
 #thumbs-grey-symbol
-  fill: #8b8b8b
+  fill: #b6b6b6
+  color: #b6b6b6
 
 
 .variant
@@ -56,6 +59,28 @@
 .impact_NOIMPACT, .impact_none, .effect_none
   fill: #FAF5BE
   stroke: #807D7D
+
+.colorby_clinvar_path
+  fill:   $clinvar-path-color
+  color:  $clinvar-path-color
+.colorby_clinvar_lpath
+  fill:   $clinvar-lpath-color
+  color:  $clinvar-lpath-color
+.colorby_clinvar_uc
+  fill:   $clinvar-uc-color
+  color:  $clinvar-uc-color
+.colorby_clinvar_cd
+  fill:   $clinvar-cd-color
+  color:  $clinvar-cd-color  
+.colorby_clinvar_other
+  fill:   $clinvar-other-color
+  color:  $clinvar-other-color
+.colorby_clinvar_benign
+  fill:   $clinvar-benign-color
+  color:  $clinvar-benign-color
+.colorby_clinvar_lbenign
+  fill:   $clinvar-lbenign-color
+  color:  $clinvar-lbenign-color
 
 #feature-matrix
   
@@ -177,18 +202,16 @@
   font-weight: bold
   fill: $current-color
   outline: solid 2px $current-frame-color 
-  outline-offset: -2px
+  
 
 .tooltip-zygosity:hover
   outline: solid 2px $current-frame-color 
-  outline-offset: -2px
-
+  
 .impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover,  .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover
   font-weight: bold
   cursor: pointer
   outline: solid 2px $current-color 
-  outline-offset: -2px
-
+  
   &.not-equal
     outline: none
 
@@ -198,7 +221,7 @@
 .current
   font-weight: bold
   outline: solid 2px $current-color
-  outline-offset: -2px
+
 
   &.not-equal
     background-image: linear-gradient(transparent 7px,$current-color 7px,$current-color 9px,transparent 9px)

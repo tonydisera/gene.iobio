@@ -1,17 +1,16 @@
 @import variables
 
 
-// These  are styles for the gene.iobio education edition, with
-// a simplified interface and logic.  Remember to set the isLevelEdu flag
-// in app/globalsDeployment.js
-//@import levelEdu
-
- 
-
 body
   font-family: $app-font, sans-serif !important
   margin-top: -5px 
 
+
+
+// These  are styles for the gene.iobio education edition, with
+// a simplified interface and logic.  Remember to set the isLevelEdu flag
+// in app/globalsDeployment.js
+//@import levelEdu
 
 
 .navbar 
@@ -183,6 +182,7 @@ h5
 
 #nav-card
   padding-top: 3px
+  min-height: 30px
 
 .pagination
   margin: 0px 0
@@ -293,6 +293,12 @@ h5
   outline-offset: 4px !important
   outline-width: 2px !important
 
+.attention-warning
+  outline-color:  rgb(3, 169, 244) !important
+  outline-style: solid !important
+  outline-offset: 4px !important
+  outline-width: 2px !important
+
 .navbar-nav
   .attention
     outline-offset: -6px
@@ -312,6 +318,28 @@ h5
   border-radius: 0 !important
   border: none !important
   color: $text-color
+
+.selectize-control.multi 
+  .selectize-input:after 
+    content: '\e252'
+    font-family: "Glyphicons Halflings"
+    line-height: 2
+    display: block
+    position: absolute
+    top: 20%
+    right: 4px
+    background-color: white
+    font-size: 9px
+    cursor: pointer
+
+
+.selectize-control.multi 
+  .selectize-input.dropdown-active:after 
+    content: '\e253'
+    font-family: "Glyphicons Halflings"
+    background-color: white
+
+
 
 #gene-source-box
   .selectize-input
@@ -495,6 +523,10 @@ i.material-icons
   &.alert-info
     background-color: transparent
     color: $text-color
+
+  &.alert-warning 
+    background-color: rgb(3, 169, 244)
+    color: rgba(255,255,255, 0.84)
 
 .alert-dismissable .close, .alert-dismissible .close
   position: relative
@@ -973,6 +1005,12 @@ a.btn
   color: $text-color
   font-size: 13px
 
+
+.checkbox 
+  .checkbox-material 
+    .check 
+      border: 1px solid rgba(0,0,0, .54)
+
 .material-dropdown
   .form-control
     background: white
@@ -991,7 +1029,7 @@ a.btn
 #genes-control-track
   background: white
   padding-right: 10px
-  padding-top: 10px
+  padding-top: 15px
   padding-bottom: 0px
   margin-bottom: 5px
   margin-top: 0px
@@ -1003,113 +1041,6 @@ a.btn
   padding-bottom: 5px
   padding-top: 5px
   width: 100%
-
-#welcome-area
-  text-align: center
-  margin-top: 100px
-  display: flex
-  justify-content: space-around
-
-
-  #welcome-panel
-    background-color: white
-    padding-bottom: 15px
-    padding-top: 15px  
-    padding-left: 10px
-    padding-right: 10px
-
-
-    #welcome-label
-      color: $app-color
-      font-size: 20px
-
-
-    button
-      color: $app-color
-      font-size: 17px !important
-      margin-left: 7px
-      margin-right: 7px      
-
-    #welcome-panel-content
-      width: 820px
-
-
-      .description-paragraph
-        text-align: left
-        margin-left: 0px
-        margin-right: 30px
-        margin-top: 20px
-        color: $text-color
-        font-size: 18px
-        width: 25%
-
-        li
-          padding-bottom: 10px
-          
-          li
-            padding-bottom: 4px
-
-
-      #video-thumbprint-heading
-        font-size: 18px
-        color: $app-color
-        margin-top: 10px 
-
-      #video-thumbprint-panel
-        width: 75%
-        margin-top: 15px
-
-
-      #video-thumbprint-content
-        display: flex
-        flex-wrap: wrap
-        margin-top: 10px
-
-      .video-thumbprint-well
-        position: relative
-        width: 170px
-        height: 140px
-        text-align: center    
-        margin-left: 15px 
-
-
-        .video-title
-          margin-top: 10px
-          margin-left: 10px
-          margin-right: 10px
-          color: $app-color
-          font-size: 16px
-          line-height: 17px
-
-        .video-thumbprint
-          width: 150px
-          height: 100px
-          margin-top: 5px
-          margin-left: 10px
-          background-color: grey
-          background-size: cover        
-
-          #play-button
-            cursor: pointer
-            opacity: 0.5
-            color: rgba(70, 70, 70, 0.9)
-            font-size: 90px
-            position: absolute
-            top: 15px
-            left: 40px            
-
-
-        #welcome-screencast-panel-multigene-analysis
-          background-image: url('../../assets/images/thumbprint-multigene.png')
-
-        #welcome-screencast-panel-saving-analysis
-          background-image: url('../../assets/images/thumbprint-bookmarks.png')
-
-
-        #welcome-screencast-panel-coverage-analysis
-          background-image: url('../../assets/images/thumbprint-coverage.png')
-
-
 
 .icon
   width: 30px
@@ -1395,8 +1326,8 @@ section
   border: none 
   position: relative
   pointer-events: none
-  top: 10px
-  margin-top: -10px
+  top: 0px
+  margin-top: 0px
   height: 23px
   visibility: visible
   width:  26px
@@ -1494,10 +1425,15 @@ header
 
 
 
-
-#matrix-track g.bookmark, #examine-card g.bookmark, #gene-badge-button g.bookmark, .tooltip g.bookmark
+#matrix-track g.bookmark, #examine-card g.bookmark, .tooltip g.bookmark
   fill: #3773A7
   opacity: .7
+
+#gene-badge-button g.bookmark
+  fill: transparent
+  stroke: #3773A7
+  stroke-width: 3px
+  opacity: 1
 
 .arrow_box
   position: relative
@@ -1681,6 +1617,9 @@ header
   .y.axis
     line
       stroke-width: .5px
+
+#gene-viz
+  margin-top: -25px
 
 #gene-viz .axis
   line, path
@@ -1974,6 +1913,39 @@ input
   align-self: flex-end
 
 
+#freebayes-settings-modal
+  .fb-setting
+    padding-top: 10px
+    
+  .fb-setting-label
+    width: 200px
+    display: inline-block
+
+
+::-webkit-file-upload-button 
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
+  font-family:  $app-font
+  color:  $text-color
+  border: none
+  border-radius: 2px
+  position: relative
+  padding: 8px 8px
+  margin: 1px 1px
+  font-size: 13px
+  font-weight: 500
+  letter-spacing: 0
+  will-change: box-shadow, transform
+  -webkit-transition: -webkit-box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1)
+  -o-transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1)
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1)
+  outline: 0
+  cursor: pointer
+  text-decoration: none
+  background: transparent
+
+
+@import welcome
+
 @import slideout
 
 @import filters
@@ -1998,6 +1970,10 @@ input
 
 @import legend
 
+@import knownvariants
+
+@import analyzeall
+
 // This style adds a panel to the top of the main view, explaining how
 // gene.iobio works in Mygene2.  There are nav buttons to go
 // from beginner to advanced modes
@@ -2007,6 +1983,7 @@ input
 // of the app. Uncomment this import to turn on styling for the Beginner mode.
 //@import levelBasic
 
+ 
 
 
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px)
@@ -2218,8 +2195,15 @@ input
           p.wrapped
             &.wide
               width: 67px
+            
 
 @media screen and (max-width: 767px) 
   .collapse.in
     .or
       display: none !important
+
+@media screen and (max-height: 510px)
+  textarea#genes-to-copy
+    height: 150px 
+
+  

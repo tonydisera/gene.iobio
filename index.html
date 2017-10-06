@@ -170,7 +170,7 @@
                onclick="filterCard.clearFilters();filterVariants()">
                   Clear all
               </a>              
-              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:-50px">
+              <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:-30px">
                 <span class="material-icons">tune</span> 
                 Filter
               </a>
@@ -217,110 +217,108 @@
     <div id="intro" class="hide level-basic shadow-z-2">
     </div>
 
-    <div id="filter-summary-track" class="hide shadow-z-2 track level-edu level-basic">
-      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filter</span>
+    <div id="filter-summary-track" class="hide app-panel level-edu level-basic shadow-z-2 track">
+      <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
       <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
-        Clear filter
-      </button>
+         Clear filter
+      </button>      
       <div id="filter-summary-loader" class="loader hide level-edu level-basic">
         <span class="loader-label"></span>
         <img src="assets/images/wheel.gif">
       </div> 
-
            
     </div>
 
-
-    <div id="genes-control-track" class="hide level-basic shadow-z-2">
-      
-      <button id="refresh-badges-button" class="hide btn btn-default icon-button-sm btn-raised" onclick="cacheHelper.refreshGeneBadges()">
-        Refresh all
-      </button>
-
+    <div id="genes-control-track" class="hide app-panel level-basic shadow-z-2">
 
       <div  class="nav-stretch level-basic" style="margin-top:-13px;">
           <div class="card-label level-edu" style="float:left;padding-top:8px;margin-right:10px;">Selected Genes</div>
           <!-- gene badges for navigation -->
           <div id="genes-panel" class="hide nav-center">
 
+            <div>
+
               <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
-                  Analyze all genes
+                Analyze all genes
               </button>
 
-              <div id="call-variants-dropdown" class="hide btn-group level-edu level-mygene2" style="display:inline-block;float:left">
+              <div id="call-variants-dropdown" class="hide btn-group level-edu level-mygene2">
                 <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
                   Call Variants
                   <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a href="javascript:void(0)" id="call-variants-selected-gene" onclick="jointCallVariants(false)">for selected gene</a></li>
-                  <li><a href="javascript:void(0)" id="call-variants-all-genes" onclick="cacheHelper.analyzeAll(true)">for all genes</a></li>
+
+                  <li><a href="javascript:void(0)" id="call-variants-selected-gene" onclick="jointCallVariants(false)">selected gene</a></li>
+
+                  <li><a href="javascript:void(0)" id="call-variants-all-genes" onclick="cacheHelper.analyzeAll(true)">all genes</a></li>
+
+                  <li id="show-fb-settings" class="hide">
+                    <a href="javascript:void(0)" onclick="showFreebayesSettingsDialog()">settings</a>
+                  </li>
                 </ul>
               </div>
 
 
-            <div id="analyze-all-panel" class="level-edu">
+              <div id="analyze-genes-progress" class="level-edu level-basic">
 
-              <!-- Buttons for editting gene list, done editting gene list -->
-              <div id="manage-genes" class="manage-gene-links level-edu level-basic">
 
-                <div id="total-genes-label"></div>
 
-                <div id="analyzed-progress-bar" >
-                  
-
-                  <div >
-                    <span class='progress-bar-label'>Loaded</span>
-
-                    <div id="analyze-all-progress" class="analysis-progress-bar">
-                      <div class="text">0 analyzed</div>   
-                      <div style="float:left;margin-top:-17px;width:100%">                 
-                        <div id="analyzed-bar" class="bar" width="0%" >
-                          <div id="passed-filter-bar" class="bar" width="0%"></div>
-                          <div id="not-passed-filter-bar" class="bar" width="0%"></div>
-                        </div>
+                  <div id="analyzed-progress-bar" >
                     
-                        <div id="not-analyzed-bar" class="bar" width="100%">                      
-                        </div>
-                      </div>
 
-                     </div>
+                    <div >
+                      <span class='progress-bar-label'>Loaded</span>
+
+                      <div id="analyze-all-progress" class="analysis-progress-bar">
+                        <div class="text">0 analyzed</div>   
+                        <div style="float:left;margin-top:-17px;width:100%">                 
+                          <div id="analyzed-bar" class="bar" width="0%" >
+                            <div id="passed-filter-bar" class="bar" width="0%"></div>
+                            <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                          </div>
+                      
+                          <div id="not-analyzed-bar" class="bar" width="100%">                      
+                          </div>
+                        </div>
+
+                       </div>
+                    </div>
+
+
+                    <div style='margin-top:-1px;float:left'>
+                      <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
+
+                      <div id="call-all-progress" class="analysis-progress-bar">
+                        <div class="text" >0 analyzed</div>   
+                        <div style="float:left;margin-top:-17px;width:100%">                 
+                          <div id="analyzed-bar" class="bar" width="0%" >
+                            <div id="passed-filter-bar" class="bar" width="0%"></div>
+                            <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                          </div>
+                      
+                          <div id="not-analyzed-bar"class="bar" width="100%">                      
+                          </div>
+                        </div>
+
+                       </div>
+
+                    </div>
+
                   </div>
 
 
-                  <div style='margin-top:-1px;float:left'>
-                    <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
+                  <div id="total-genes-label"></div>                
 
-                    <div id="call-all-progress" class="analysis-progress-bar">
-                      <div class="text" >0 analyzed</div>   
-                      <div style="float:left;margin-top:-17px;width:100%">                 
-                        <div id="analyzed-bar" class="bar" width="0%" >
-                          <div id="passed-filter-bar" class="bar" width="0%"></div>
-                          <div id="not-passed-filter-bar" class="bar" width="0%"></div>
-                        </div>
-                    
-                        <div id="not-analyzed-bar"class="bar" width="100%">                      
-                        </div>
-                      </div>
-
-                     </div>
-
-                  </div>
-
-                </div>
-
-               
+                
               </div>
 
-              
-            </div>
-           
               <div id="manage-genes-box">               
                 <div id="manage-genes-dropdown" class="level-edu level-basic" >
                   <div class="btn-toolbar">
-                    <div class="btn-group" style="display:inline;">
+                    <div class="btn-group" style="display:inline;margin-bottom:0px">
 
-                      <button type="button" style="padding-top: 2px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                      <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                           Manage genes
                           <span style="margin-left:6px" class="caret"></span>
                       </button>
@@ -357,39 +355,41 @@
                 </div>
               </div>
 
-            <div style="float:right">
-              <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
-              <div id="select-gene-container">
-                  <select id="select-gene-sort" class="level-edu">
-                  </select>
+              <div style="float:right">
+                <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
+                <div id="select-gene-container">
+                    <select id="select-gene-sort" class="level-edu">
+                    </select>
+                </div>
               </div>
+              
             </div>
 
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
+              <div id="gene-page-control" class="hide level-edu level-basic">
+                <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
                 
-            </div>
-          </div>
-          <div id="gene-page-control" class="hide level-edu level-basic">
-            <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
-            
-            <div id="gene-page-selection" class="level-basic"></div>
+                <div id="gene-page-selection" class="level-basic"></div>
 
-            <div id="gene-paging-links" class="hide">
-              <a href="javascript:void(0)" id="view-50-genes" 
-                 class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
-                    View 40
-              </a>
-              <a href="javascript:void(0)" id="view-all-genes" 
-                 class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
-                | all
-              </a>
+                <div id="gene-paging-links" class="hide">
+                  <a href="javascript:void(0)" id="view-50-genes" 
+                     class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
+                        View 40
+                  </a>
+                  <a href="javascript:void(0)" id="view-all-genes" 
+                     class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
+                    | all
+                  </a>
+                </div>
+              </div>                
             </div>
           </div>
+
       </div>          
     </div>
     
-    <div id="nav-section" class="fixed level-edu hide">
+    <div id="nav-section" class="fixed app-panel level-edu hide">
 
 
       <div id="nav-card" class="shadow-z-2">
@@ -407,6 +407,8 @@
 
           <div id="region-track" class="level-edu level-basic" style="clear:both;">
               <div class="card-label" style="float:left;">Selected Gene</div>
+
+
 
 
               <div id="select-gene-box"  class="level-basic hide">
@@ -466,7 +468,6 @@
           </div>
 
 
-
           <!-- Non protein-coding gene badges -->
           <div id="non-protein-coding" class="level-edu level-basic"  style="clear: both;padding-bottom: 0px;display: block;">
               <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
@@ -485,6 +486,7 @@
 
           <div id="transcript-panel" class="level-edu fullview" >
             <div id="gene-track" class="track hide">  
+
                 <div id="top-coordinate-frame" class="hide">
                   <svg height="23" width="28">
                       <g  transform="translate(0,0)">
@@ -510,119 +512,11 @@
 
     </div>  
 
-   
-
-
-    <div id="screencast-panel" class="hide" style="text-align:center;margin-top:50px;overflow: visible;">
-      
-      <div id="screencast-coverage-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
-          <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-coverage-analysis #screencast-video').stop()">
-            <i class="material-icons" style="text-align: left;">arrow_back</i>
-          </button>
-          <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Assessing insufficient coverage</h4>
-
-              <div style="position:relative;height:0;padding-bottom:75.0%"><iframe src="https://www.youtube.com/embed/4VG1au5txn0?rel=0&ecver=2" width="480" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen=""></iframe></div>
-
-
-        </div>
-
-      <div id="screencast-saving-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
-          <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-saving-analysi #screencast-video').stop()">
-            <i class="material-icons" style="text-align: left;">arrow_back</i>
-          </button>
-          <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Saving your analysis with Bookmarks</h4>
-
-
-          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/JlXoBlWvniE?rel=0" frameborder="0" allowfullscreen></iframe>
-
-
-      </div>
-      <div id="screencast-multi-gene-analysis" class="hide" style="height: 550px;width: 680px;background-color: white;margin-left: auto;margin-right: auto;">
-          <button style="float:left;margin-left:10px;padding-left: 0;margin-top: 5px;margin-bottom: 0px;" class="btn  btn-default" onclick="$('#welcome-panel').removeClass('hide');$('#welcome-screencast-panel').removeClass('hide');$('#screencast-panel').addClass('hide');$('#screencast-multi-gene-analysis #screencast-video').stop()">
-            <i class="material-icons" style="text-align: left;">arrow_back</i>
-          </button>
-          <h4 style="font-size: 21px;padding-top: 10px;margin-right:50px">Multi-gene analysis</h4>
-
-          <iframe id="screencast-video" width="620" height="465" src="https://www.youtube.com/embed/QiJ7wuN8LYQ?rel=0" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </div>    
-
-   
-
-
-
-    <div id="welcome-area" class="hide">
-      <div id="welcome-panel" >
-        <div id="welcome-label">
-          A web tool for disease-causing variant interrogation 
-        </div>  
-        <div id="welcome-panel-content" style="display:flex;justify-content:space-around">
-          <div class="description-paragraph">
-            <ul>
-
-              <li>Real-time analysis
-              </li>
-
-              <li>On-the-fly annotation</li>
-              <li>Integrated genomic visualizations</li>
-              <li>On-demand variant calling
-              </li>
-            </ui>
-
-          </div>
-
-          <div id="video-thumbprint-panel">
-            <div id="video-thumbprint-heading">What's new</div>
-            <div id="video-thumbprint-content">
-
-              <div class="video-thumbprint-well ">
-                <div id="welcome-screencast-panel-coverage-analysis" class="video-thumbprint shadow-z-2" >
-                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-coverage-analysis').removeClass('hide');$('#screencast-multigene-analysis').addClass('hide');$('#screencast-saving-analysis').addClass('hide');">play_arrow</i>
-                </div>
-                <div class="video-title">Detecting insufficient coverage</div>
-              </div>
-              <div class="video-thumbprint-well ">
-                <div id="welcome-screencast-panel-saving-analysis" class="video-thumbprint shadow-z-2" >
-                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').removeClass('hide');$('#screencast-multi-gene-analysis').addClass('hide');$('#screencast-coverage-analysis').addClass('hide');">play_arrow</i>
-                </div>
-                <div class="video-title">Saving your analysis</div>                
-              </div>
-              <div class="video-thumbprint-well ">
-                <div id="welcome-screencast-panel-multigene-analysis" class="video-thumbprint shadow-z-2">
-                  <i class="material-icons" id="play-button" onclick="$('#welcome-panel').addClass('hide');$('#welcome-screencast-panel').addClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-multi-gene-analysis').removeClass('hide');$('#screencast-panel').removeClass('hide');$('#screencast-saving-analysis').addClass('hide');$('#screencast-coverage-analysis').addClass('hide');">play_arrow</i>
-                </div>
-                <div class="video-title">Multi-gene analysis</div>     
-              </div>                           
-            </div>
-          </div>
-
-
-        </div>    
-
-
-        <div>  
-          <button id="load-demo-data" class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');dataCard.loadDemoData()">
-            <span style="">Try it with demo data</span>
-          </button>
-          <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');pageGuide.open()">
-            <span style="">Take an app tour</span>
-          </button>
-          <button   class="btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');showDataDialog('variants');">
-            <span style="">Start your analysis</span>
-          </button>
-        </div>
-        <div>  
-          <button id="show-screencast" class="hide btn btn-raised btn-default" onclick="$('#welcome-panel').addClass('hide');$('#screencast-panel').removeClass('hide')">
-            <span style="">What's in this release?</span>
-          </button>
-        </div>
-
-      </div>
+    <div id="welcome-panel-placeholder">
     </div>
-
      
 
-    <div id="track-section" class="push" style="display:flex;margin-top:5px;">
+    <div id="track-section" class="push app-panel" style="display:flex;margin-top:5px;">
 
         <div id="matrix-track" style="width:100%;overflow-x:auto" class="track shadow-z-2 hide">
 
@@ -638,11 +532,7 @@
 
             <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
-            <div id="zero-variants" class="warning level-edu level-basic hide">              
-            </div>
-
-            <div id="no-variants" class="warning level-basic hide">
-              No clinvar variants under 1% population frequency found
+            <div id="zero-variants" class="warning level-edu hide">              
             </div>
     
             <div id="matrix-panel"  style="clear:both;min-height:30px"
@@ -681,15 +571,7 @@
                   </div>
 
                 </div>
-                <div class="level-edu level-basic" style="display: inline-block;vertical-align: top;">
-                  <span id="low-quality-legend" >
-                      <div id="low-quality-legend-box"></div>
-                      <p id="low-quality-legend-text">
-                          shaded columns: flagged for not meeting filtering criteria
-                      </p>
-                  </span>
-                           
-                </div>
+                
 
               </div> 
             </div>
@@ -709,12 +591,27 @@
     <div id="coordinate-frame" class="">
     </div>
 
-    <div id="proband-variant-card"  >
+    <div id="known-variants-all-card" class="hide app-panel track shadow-z-2 level-basic level-edu">
+      <span class="card-label" style="float:left;margin-right:10px;padding-top:3px">CLINVAR VARIANTS</span>
+      <div id="known-variants-nav-area">
+      </div>
+      <div id="known-variants-chart" class="stacked-bar-chart track hide">
+      </div>        
+      <div id="known-variants-cards">
+      </div>
+    </div>
+    
+    
+    <div id="proband-variant-card" class="app-panel" >
     </div>
 
 
-    <div id="other-variant-cards">
+    
+
+    <div id="other-variant-cards" class="app-panel">
     </div>
+
+
 
 
     <div id="splash" class="hide horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
@@ -810,6 +707,8 @@
 
 <script src="app/d3/geneList.d3.js"></script>
 <script src="app/d3/histogram.d3.js"></script>
+<script src="app/d3/stackedBarChart.d3.js"></script>
+<script src="app/d3/stackedAreaChart.d3.js"></script>
 <script src="app/d3/line.d3.js"></script>
 <script src="app/d3/gene.d3.js"></script>
 <script src="app/d3/variant.d3.js"></script>
@@ -826,9 +725,11 @@
 <script src="app/model/genomeBuildHelper.js"></script>  
 <script src="app/model/variantExporter.js"></script>  
 <script src="app/model/variantImporter.js"></script>  
+<script src="app/model/genericAnnotation.js"></script>  
 
 <script src="app/legend.js"></script>
 <script src="app/variantTooltip.js"></script>
+<script src="app/welcomePanel.js"></script>
 
 <script src="app/card/dataCard.js"></script>
 <script src="app/card/matrixCard.js"></script>

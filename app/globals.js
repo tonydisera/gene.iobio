@@ -7,7 +7,7 @@ var IMPACT_FIELD_TO_COLOR     = 'vepImpact';
 //
 var DEV_IOBIO                 = "nv-dev-new.iobio.io/";
 var STAGE_IOBIO               = "nv-purple.iobio.io/";
-var PROD_IOBIO                = "nv-prod.iobio.io/";
+var PROD_IOBIO                = "nv-blue.iobio.io/";
 
 var CURRENT_IOBIO             = PROD_IOBIO;
 
@@ -42,6 +42,7 @@ IOBIO.samtoolsOnDemand        = iobio_services + (useOnDemand ? "od_samtools/" :
 IOBIO.freebayes               = iobio_services + "freebayes/"; 
 IOBIO.vcflib                  = iobio_services + "vcflib/";
 IOBIO.geneCoverage            = iobio_services + "genecoverage/";
+IOBIO.knownvariants           = iobio_services + "knownvariants/";
 
 
 // URL for Phenolyzer
