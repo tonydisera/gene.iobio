@@ -358,7 +358,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			if (phenotypeDisplay.length > 0) {
 			  	phenotypeDisplay += ", ";
 			}
-			phenotypeDisplay += key.split("_").join(" ");
+			phenotypeDisplay += key.split("_").join(" ").split("\\x2c").join(", ");
 		}
 	} 
 
@@ -417,11 +417,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 				}	
 				if (submission.phenotype != 'not_provided' && submission.phenotype != "not_specified") {
-					clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype.split("_").join(" ") + '</span>';
+					clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype.split("_").join(" ").split("\\x2c").join(", ") + '</span>';
 					if (simplePhenotypeDisplay.length > 0) {
 						simplePhenotypeDisplay += ", ";
 					}
-					simplePhenotypeDisplay += submission.phenotype.split("_").join(" ");
+					simplePhenotypeDisplay += submission.phenotype.split("_").join(" ").split("\\x2c").join(", ");
 				}
 
 				clinvarLink += "</div>"
