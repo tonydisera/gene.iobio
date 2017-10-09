@@ -4300,4 +4300,58 @@ function goToHome() {
 
 
 
+/*
+ *
+ * Upload proband vcf file and run script to generate variant bookmarks for rare high-impat variants.
+ *
+ */
+findRareVariants = function() {
+
+	var closeDialog = function() {
+		$('#find-rare-variants-modal').modal('hide');
+	}
+
+	var formData = new FormData();
+	if (getProbandVariantCard().model.vcfUrlEntered) {
+		formData.append("vcf-url", getProbandVariantCard().model.vcf.getVcfURL());
+	} else {
+		formData.append('vcf', getProbandVariantCard().model.vcf.getVcfFile());
+	    formData.append('tabix', getProbandVariantCard().model.vcf.getTabixFile());		
+	}
+    formData.append('sample-name', getProbandVariantCard().getSampleName());
+    formData.append('email-to', $('#email-to').val())
+
+  	var xhr = new XMLHttpRequest();
+  	xhr.open('POST', findRareVariantsServer, true);
+	xhr.onload = function(e) {
+    	if (this.status == 200) {
+    		var theResponse = {};
+      		var tokens = this.response.split("\n");
+      		tokens.forEach(function(token) {
+      			var tag   = token.split(":")[0];
+      			var value = token.split(":")[1];
+      			theResponse[tag] = value;
+      		})
+      		if (theResponse.status && theResponse.status == 'success') {
+	      		closeDialog();
+	      		alertify.alert(theResponse.message);
+      		} else {
+      			alertify.alert(theResponse.message);
+      		}
+    	} else {
+    		alertify.alert("Error code " + this.status + " returned from server.");
+    	}
+  	};
+	xhr.onprogress = function (e) {
+	    //if (e.lengthComputable) {
+	    //    console.log(e.loaded+  " / " + e.total)
+	    //}
+	}
+	xhr.onloadstart = function (e) {
+	}
+	xhr.onloadend = function (e) {
+	}  	
+  	xhr.send(formData);  // multipart/form-data
+}
+
  
