@@ -1328,8 +1328,25 @@ GenesCard.prototype._clearGenesImpl = function() {
 }
 
 
-
 GenesCard.prototype.removeGeneBadge = function(badgeElement) {
+	var me = this;
+	var theGeneName = $(badgeElement).parent().find("#gene-badge-name").text();
+	alertify.confirm("",
+		"Are you sure you want to remove gene " + theGeneName + "?",
+		function (e) {
+			// ok
+			me.removeGeneBadgeImpl(badgeElement);
+		},
+		function() {
+			// cancel
+		}
+
+	).set('labels', {ok:'OK', cancel:'Cancel'});   				
+
+}
+
+
+GenesCard.prototype.removeGeneBadgeImpl = function(badgeElement) {
 	var me = this;
 
 	var theGeneName = $(badgeElement).parent().find("#gene-badge-name").text();
