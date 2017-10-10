@@ -48,7 +48,7 @@ module.exports = {
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'proband', 38, 1,  39, 'Hom');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'father',  26, 25, 51, 'Het');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_TOOLTIP, 'mother',  30, 33, 63, 'Het');
-    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033' );
+    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 Exon 3/6 rs527236033' );
     variantTooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
 
 
@@ -108,7 +108,7 @@ module.exports = {
     
     variantTooltip.waitForTooltip();
     client.pause(1000);
-    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033');
+    variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 Exon 3/6 rs527236033');
     variantTooltip.expectHGVSpEquals('ENSP00000323074.4:p.Trp758Ter');
     variantTooltip.expectAlleleCountsEquals(variantTooltip.MATRIX_variantTooltip, 'proband', 38, 1, 39, 'Hom');
 
