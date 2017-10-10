@@ -1725,6 +1725,8 @@ var effectCategories = [
             var type = null;
             var end = null;
 
+            var isMultiAllelic = alts.length > 1;
+
             if (alt.indexOf("<") == 0 && alt.indexOf(">") > 0) {
               var annotTokens = rec.info.split(";");
               annotTokens.forEach(function(annotToken) {
@@ -1756,7 +1758,7 @@ var effectCategories = [
             }
 
 
-            var annot = me._parseAnnot(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, vepAF);
+            var annot = me._parseAnnot(rec, alt, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF);
 
             var clinvarResult = me.parseClinvarInfo(rec.info, clinvarMap);
 
@@ -1907,7 +1909,7 @@ var effectCategories = [
       return  parseMultiSample ? results :  results[0];
   };
 
-exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
+exports._parseAnnot = function(rec, alt, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
   var me = this;
 
   var annot = {
@@ -1981,7 +1983,7 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
     
     } else if (annotToken.indexOf("CSQ") == 0) {
 
-      me._parseVepAnnot(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF)
+      me._parseVepAnnot(alt, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF)
 
     } else if (annotToken.indexOf("AVIA3") == 0) {
       me._parseGenericAnnot("AVIA3", annotToken, annot);
@@ -2010,7 +2012,7 @@ exports._parseAnnot = function(rec, altIdx, geneObject, selectedTranscript, sele
 
 
 */
-exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
+exports._parseVepAnnot = function(alt, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
   var me = this;
 
   var vepFields = me.infoFields.VEP;
@@ -2020,122 +2022,134 @@ exports._parseVepAnnot = function(annotToken, annot, geneObject, selectedTranscr
 
   transcriptTokens.forEach(function(transcriptToken) {
       var vepTokens   = transcriptToken.split("|");
-      var feature     = vepTokens[vepFields.Feature];
-      var featureType = vepTokens[vepFields.Feature_type];
 
-      // If the transcript is the selected transcript, parse
-      // all of the vep fields.  We place these into maps
-      // because we can have multiple vep consequences for
-      // the same transcript.
-      // TODO:  Need to sort so that highest impact shows first
-      //        and is used for filtering and ranking purposes.
-      if (featureType == 'Transcript' && (feature == selectedTranscriptID || feature == selectedTranscript.transcript_id)) {
-        annot.vep.vepImpact[vepTokens[vepFields.IMPACT]] = vepTokens[vepFields.IMPACT];
-
-        var consequence = vepTokens[vepFields.Consequence];
-        consequence.split("&").forEach( function(token) {
-          annot.vep.vepConsequence[token] = token;
-        })
-
-        if (vepTokens[vepFields.EXON] && vepTokens[vepFields.EXON].length > 0) {
-          annot.vep.vepExon[vepTokens[vepFields.EXON]] = vepTokens[vepFields.EXON];
-        } 
-        annot.vep.vepHGVSc[vepTokens[vepFields.HGVSc]] = vepTokens[vepFields.HGVSc];
-        annot.vep.vepHGVSp[vepTokens[vepFields.HGVSp]] = vepTokens[vepFields.HGVSp];
-        annot.vep.vepAminoAcids[vepTokens[vepFields.Amino_acids]] = vepTokens[vepFields.Amino_acids];
-        annot.vep.vepVariationIds[vepTokens[vepFields.Existing_variation]] = vepTokens[vepFields.Existing_variation];
-
-        var siftString = vepTokens[vepFields.SIFT];
-        var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
-        annot.vep.vepSIFT[siftDisplay] = siftDisplay;
-        annot.vep.sift['sift_'+ siftDisplay] = 'sift_' + siftDisplay;
-
-        var polyphenString = vepTokens[vepFields.PolyPhen];
-        var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
-        annot.vep.vepPolyPhen[polyphenDisplay] = polyphenDisplay;
-        annot.vep.polyphen['polyphen_' + polyphenDisplay] = 'polyphen_' + polyphenDisplay;
-
-      } else if (featureType == 'RegulatoryFeature' || featureType == 'MotifFeature' ) {
-        annot.vep.vepRegs.push( {
-          'impact' :  vepTokens[vepFields.IMPACT],
-          'consequence' : vepTokens[vepFields.Consequence],
-          'biotype': vepTokens[vepFields.BIOTYPE],
-          'motifName' : vepTokens[vepFields.MOTIF_NAME],
-          'motifPos'  : vepTokens[vepFields.MOTIF_POS],
-          'motifHiInf' : vepTokens[vepFields.HIGH_INF_POS]
-        });
-        var reg = vepTokens[vepFields.Consequence] == 'regulatory_region_variant' ? vepTokens[vepFields.BIOTYPE] : vepTokens[vepFields.Consequence];
-        var regKey = reg;
-        if (reg == "promoter") {
-          regKey = "the_promoter";
-        }
-
-        var valueUrl = "";
-        if (feature != "" && feature != null) {
-          var url = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_ENSEMBL_URL) + "Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
-          valueUrl = '<a href="' + url + '" target="_reg">' + reg.split("_").join(" ").toLowerCase() + '</a>';
-        } else {
-          valueUrl = reg.split("_").join(" ").toLowerCase();
-        }
-        annot.vep.regulatory[(featureType == 'RegulatoryFeature' ? "reg_" : "mot_") + regKey.toLowerCase()] = valueUrl;
-      }
-      if (featureType == 'Transcript') {
-        var theTranscriptId = feature;
-
-        // Only keep annotations that are for transcripts that in the gene's list of known
-        // transcripts
-        var validTranscript = false;
-        geneObject.transcripts.forEach( function(transcript) {
-        if (transcript.transcript_id.indexOf(theTranscriptId) == 0) {
-          validTranscript = true;
+      var keep = true;
+      if (isMultiAllelic && vepFields.hasOwnProperty('Allele') && vepFields.Allele >= 0) {
+        var vepAllele   = vepTokens[vepFields.Allele];
+        if (alt && alt.length > 0 && vepAllele && vepAllele.length > 0 && vepAllele != '-' && alt != '-') {
+          if (vepAllele.toUpperCase() != alt.toUpperCase()) {
+            keep = false;
           }
-        });
-        if (validTranscript) {
-          // Keep track of all VEP impact and consequence so that we can determine the highest impact
-          // variant across all transcripts
-          var theImpact = vepTokens[vepFields.IMPACT];
-          var theConsequences = vepTokens[vepFields.Consequence];
+        }       
+      }
+
+      if (keep) {
+        var feature     = vepTokens[vepFields.Feature];
+        var featureType = vepTokens[vepFields.Feature_type];
+
+        // If the transcript is the selected transcript, parse
+        // all of the vep fields.  We place these into maps
+        // because we can have multiple vep consequences for
+        // the same transcript.
+        // TODO:  Need to sort so that highest impact shows first
+        //        and is used for filtering and ranking purposes.
+        if (featureType == 'Transcript' && (feature == selectedTranscriptID || feature == selectedTranscript.transcript_id)) {
+          annot.vep.vepImpact[vepTokens[vepFields.IMPACT]] = vepTokens[vepFields.IMPACT];
+
+          var consequence = vepTokens[vepFields.Consequence];
+          consequence.split("&").forEach( function(token) {
+            annot.vep.vepConsequence[token] = token;
+          })
+
+          if (vepTokens[vepFields.EXON] && vepTokens[vepFields.EXON].length > 0) {
+            annot.vep.vepExon[vepTokens[vepFields.EXON]] = vepTokens[vepFields.EXON];
+          } 
+          annot.vep.vepHGVSc[vepTokens[vepFields.HGVSc]] = vepTokens[vepFields.HGVSc];
+          annot.vep.vepHGVSp[vepTokens[vepFields.HGVSp]] = vepTokens[vepFields.HGVSp];
+          annot.vep.vepAminoAcids[vepTokens[vepFields.Amino_acids]] = vepTokens[vepFields.Amino_acids];
+          annot.vep.vepVariationIds[vepTokens[vepFields.Existing_variation]] = vepTokens[vepFields.Existing_variation];
+
           var siftString = vepTokens[vepFields.SIFT];
           var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
-          var siftScore = siftString != null && siftString != "" ? siftString.split("(")[1].split(")")[0] : 99;
+          annot.vep.vepSIFT[siftDisplay] = siftDisplay;
+          annot.vep.sift['sift_'+ siftDisplay] = 'sift_' + siftDisplay;
+
           var polyphenString = vepTokens[vepFields.PolyPhen];
           var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
-          var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : -99;
+          annot.vep.vepPolyPhen[polyphenDisplay] = polyphenDisplay;
+          annot.vep.polyphen['polyphen_' + polyphenDisplay] = 'polyphen_' + polyphenDisplay;
 
-          var consequencesObject = annot.vep.allVep[theImpact];
-          if (consequencesObject == null) {
-            consequencesObject = {};
-          }
-          me._appendTranscript(consequencesObject, theConsequences, theTranscriptId);
-          annot.vep.allVep[theImpact] = consequencesObject;
-
-          var siftObject = annot.vep.allSIFT[siftScore];
-          if (siftObject == null) {
-            siftObject = {};
-          }
-          me._appendTranscript(siftObject, siftDisplay, theTranscriptId);
-          annot.vep.allSIFT[siftScore] = siftObject;
-
-          var polyphenObject = annot.vep.allPolyphen[polyphenScore];
-          if (polyphenObject == null) {
-            polyphenObject = {};
-          }
-          me._appendTranscript(polyphenObject, polyphenDisplay, theTranscriptId);
-          annot.vep.allPolyphen[polyphenScore] = polyphenObject;
-
-          if (vepAF) {
-            me._parseVepAfAnnot(VEP_FIELDS_AF_GNOMAD, vepFields, vepTokens, "gnomAD", "gnomAD", annot);
-            me._parseVepAfAnnot(VEP_FIELDS_AF_1000G,  vepFields, vepTokens, "1000G",  null,     annot);
-            me._parseVepAfAnnot(VEP_FIELDS_AF_ESP,    vepFields, vepTokens, "ESP",    null,     annot);
-            me._parseVepAfAnnot(VEP_FIELDS_AF_MAX,    vepFields, vepTokens, "MAX",    "MAX",    annot);            
+        } else if (featureType == 'RegulatoryFeature' || featureType == 'MotifFeature' ) {
+          annot.vep.vepRegs.push( {
+            'impact' :  vepTokens[vepFields.IMPACT],
+            'consequence' : vepTokens[vepFields.Consequence],
+            'biotype': vepTokens[vepFields.BIOTYPE],
+            'motifName' : vepTokens[vepFields.MOTIF_NAME],
+            'motifPos'  : vepTokens[vepFields.MOTIF_POS],
+            'motifHiInf' : vepTokens[vepFields.HIGH_INF_POS]
+          });
+          var reg = vepTokens[vepFields.Consequence] == 'regulatory_region_variant' ? vepTokens[vepFields.BIOTYPE] : vepTokens[vepFields.Consequence];
+          var regKey = reg;
+          if (reg == "promoter") {
+            regKey = "the_promoter";
           }
 
-        } else {
-          var consequence = vepTokens[vepFields.Consequence];
-          //console.log(geneObject.gene_name + " " + consequence + ": throwing out invalid transcript " + theTranscriptId);
+          var valueUrl = "";
+          if (feature != "" && feature != null) {
+            var url = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_ENSEMBL_URL) + "Regulation/Context?db=core;fdb=funcgen;rf=" + feature;
+            valueUrl = '<a href="' + url + '" target="_reg">' + reg.split("_").join(" ").toLowerCase() + '</a>';
+          } else {
+            valueUrl = reg.split("_").join(" ").toLowerCase();
+          }
+          annot.vep.regulatory[(featureType == 'RegulatoryFeature' ? "reg_" : "mot_") + regKey.toLowerCase()] = valueUrl;
         }
+        if (featureType == 'Transcript') {
+          var theTranscriptId = feature;
 
+          // Only keep annotations that are for transcripts that in the gene's list of known
+          // transcripts
+          var validTranscript = false;
+          geneObject.transcripts.forEach( function(transcript) {
+          if (transcript.transcript_id.indexOf(theTranscriptId) == 0) {
+            validTranscript = true;
+            }
+          });
+          if (validTranscript) {
+            // Keep track of all VEP impact and consequence so that we can determine the highest impact
+            // variant across all transcripts
+            var theImpact = vepTokens[vepFields.IMPACT];
+            var theConsequences = vepTokens[vepFields.Consequence];
+            var siftString = vepTokens[vepFields.SIFT];
+            var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
+            var siftScore = siftString != null && siftString != "" ? siftString.split("(")[1].split(")")[0] : 99;
+            var polyphenString = vepTokens[vepFields.PolyPhen];
+            var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
+            var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : -99;
 
+            var consequencesObject = annot.vep.allVep[theImpact];
+            if (consequencesObject == null) {
+              consequencesObject = {};
+            }
+            me._appendTranscript(consequencesObject, theConsequences, theTranscriptId);
+            annot.vep.allVep[theImpact] = consequencesObject;
+
+            var siftObject = annot.vep.allSIFT[siftScore];
+            if (siftObject == null) {
+              siftObject = {};
+            }
+            me._appendTranscript(siftObject, siftDisplay, theTranscriptId);
+            annot.vep.allSIFT[siftScore] = siftObject;
+
+            var polyphenObject = annot.vep.allPolyphen[polyphenScore];
+            if (polyphenObject == null) {
+              polyphenObject = {};
+            }
+            me._appendTranscript(polyphenObject, polyphenDisplay, theTranscriptId);
+            annot.vep.allPolyphen[polyphenScore] = polyphenObject;
+
+            if (vepAF) {
+              me._parseVepAfAnnot(VEP_FIELDS_AF_GNOMAD, vepFields, vepTokens, "gnomAD", "gnomAD", annot);
+              me._parseVepAfAnnot(VEP_FIELDS_AF_1000G,  vepFields, vepTokens, "1000G",  null,     annot);
+              me._parseVepAfAnnot(VEP_FIELDS_AF_ESP,    vepFields, vepTokens, "ESP",    null,     annot);
+              me._parseVepAfAnnot(VEP_FIELDS_AF_MAX,    vepFields, vepTokens, "MAX",    "MAX",    annot);            
+            }
+
+          } else {
+            var consequence = vepTokens[vepFields.Consequence];
+            //console.log(geneObject.gene_name + " " + consequence + ": throwing out invalid transcript " + theTranscriptId);
+          }
+
+        }
       }
 
   });  
