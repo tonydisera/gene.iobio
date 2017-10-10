@@ -153,17 +153,29 @@ VariantImporter.parseRecordsTSV = function(data) {
 		for (var i = 1; i < recs.length; i++) {
 			var rec = recs[i];
 
-			var fields = rec.split(/\s+/);
+			if (rec.trim().length > 0) {
 
-			// Parse the tab separate record into fields
-			var importRec = {};
-			for (var x = 0; x < fields.length; x++) {
-				var properFieldName = idxMap[x];
-				if (properFieldName) {
-					importRec[properFieldName] = fields[x];
+				var fields = rec.split(/\s+/);
+
+				// Parse the tab separate record into fields
+				var importRec = {};
+				for (var x = 0; x < fields.length; x++) {
+					var properFieldName = idxMap[x];
+					if (properFieldName) {
+						var value = fields[x];
+
+						// Replace - with . (for alt and ref)
+						if (properFieldName == 'alt' || properFieldName == 'ref') {
+							if (value == '-') {
+								value = '.';
+							}
+						}
+
+						importRec[properFieldName] = value;
+					}
 				}
+				importRecords.push(importRec);
 			}
-			importRecords.push(importRec);
 
 		};
 
