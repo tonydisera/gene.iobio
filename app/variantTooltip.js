@@ -252,35 +252,6 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 	}	
 
 
-	var injectAfSymbol = function(af, header, afBadgeClass) {
-		if (matrixCard.isNumeric(af)) {
-			var rawValue = af;
-			var afClazz = null;
-			var afSymbolFunction = null;
-			var lowestValue = 999;
-			matrixCard.afHighestMap.forEach( function(rangeEntry) {
-				if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-					if (rangeEntry.value < lowestValue) {
-						lowestValue = rangeEntry.value;
-						afClazz = rangeEntry.clazz;
-						afSymbolFunction = rangeEntry.symbolFunction;					
-					}
-				}
-			});
-			var afLabel = tooltip.selectAll('.tooltip-header').filter( function(d) { 
-				return d3.select(this).text() == header; 
-			});
-			if (afClazz && !afLabel.empty()) {
-				$(afLabel.node()).next().prepend("<svg class=\"" + afBadgeClass + "\" style=\"float:left\" height=\"14\" width=\"15\">");
-				var selection = d3.select(afLabel[0].parentNode).select('.' + afBadgeClass).data([{clazz: afClazz}]);
-				afSymbolFunction(selection, {transform: 'translate(2,0)'});		
-			}			
-		}
-
-	}
-	injectAfSymbol(variant.afExAC, 'Allele Freq ExAC', 'afexac-badge');
-	injectAfSymbol(variant.af1000G, 'Allele Freq 1000G', 'af1000g-badge');
-	injectAfSymbol(variant.afgnomAD, 'Allele Freq gnomAD', 'afgnomad-badge');
 	
 }
 
