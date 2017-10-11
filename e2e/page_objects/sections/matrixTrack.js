@@ -236,6 +236,7 @@ module.exports = {
         self.api.useCss();
       });
     },
+  
     assertSymbols: function(label, variants, symbolSelector, expectation) {
       var self = this;
       this.api.elements('xpath', precedingSiblingsToLabel(label), function(precedingLabelElements) {
