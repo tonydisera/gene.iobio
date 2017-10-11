@@ -18,7 +18,7 @@ module.exports = {
                  .click('#call-variants-dropdown li a#call-variants-selected-gene');
     },
     waitForAnalyzeAllDone: function() {
-      this.waitForElementPresent('@analyzeAllDone', 120000);
+      this.waitForElementPresent('@analyzeAllDone', 240000);
     },
     waitForCallAllDone: function() {
       this.waitForElementPresent('@callAllDone', 240000);

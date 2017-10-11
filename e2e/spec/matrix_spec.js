@@ -17,13 +17,9 @@ module.exports = {
 
   'Loading data should work': function(client) {
     indexPage.load();
+    indexPage.clickDemoGene();
+    client.pause(2000);
     nav.searchGene('BRCA1');
-    nav.clickData();
-    dataCard.selectSingle();
-    dataCard.selectGenomeBuild('GRCh37');
-    // dataCard.section.probandData.selectPlatinumTrio();
-    dataCard.section.probandData.inputDefaults();
-    dataCard.clickLoad();
 
     matrixTrack.waitForMatrixLoaded();
   },
@@ -43,8 +39,7 @@ module.exports = {
   },
 
   'PolyPhen Pathogenicity row should be accurate': function(client) {
-    matrixTrack.assertPolyPhenPossiblyDamaging([1]);
-    matrixTrack.assertPolyPhenBenign([2, 3, 4]);
+    matrixTrack.assertPolyPhenBenign([1, 2, 3, 4]);
     matrixTrack.assertPolyPhenNull([5, 6, 7, 8]);
   },
 
@@ -64,11 +59,6 @@ module.exports = {
     matrixTrack.assertMostSevereImpactModifier([14, 15, 16]);
   },
 
-  'Allele Frequency <5% row should be accurate': function(client) {
-    matrixTrack.assertAfHighest([5]);
-  },
-
-
   'Warning appears when no variants passing filter a gene': function(client) {
     nav.clickFilter();
     client.pause(1000);    
@@ -80,6 +70,7 @@ module.exports = {
     // now select vep HIGH filter
     filterPanel.clickVepHigh();
     matrixTrack.waitForZeroFilteredVariantsWarning();
+
   },  
 
   'Warning appears when no variants found for a gene': function(client) {
@@ -87,9 +78,15 @@ module.exports = {
     matrixTrack.waitForZeroVariantsWarning();
   },  
 
+  'Allele Frequency <5% row should be accurate': function(client) {
+    filterPanel.clickClearAll();
+    nav.searchGene("RAI1");
+    matrixTrack.waitForMatrixLoaded();    
+    matrixTrack.assertAfHighest([1,2]);
+  },
+
   'Zygosity row should be accurate': function(client) {
-    // matrixTrack.assertZygosityHet([]);
-    // matrixTrack.assertZygosityHom([]);
+    matrixTrack.assertZygosityHom([1,3,4]);
     client.end();
   }
 }
