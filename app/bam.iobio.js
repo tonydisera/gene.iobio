@@ -729,6 +729,7 @@ var Bam = Class.extend({
         vepArgs.push(" --assembly");
         vepArgs.push(genomeBuildHelper.getCurrentBuildName());
         vepArgs.push(" --format vcf");
+        vepArgs.push(" --allele_number");
         if (vepAF) {
           vepArgs.push("--af");
           vepArgs.push("--af_gnomad");
