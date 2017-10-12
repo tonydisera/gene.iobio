@@ -772,6 +772,7 @@ var effectCategories = [
       vepArgs.push(" --assembly");
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
+      vepArgs.push(" --allele_number");      
       if (vepAF) {
         vepArgs.push("--af");
         vepArgs.push("--af_gnomad");
@@ -1610,6 +1611,7 @@ var effectCategories = [
       vepArgs.push(" --assembly");
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
+      vepArgs.push(" --allele_number");
       if (vepAF) {
         vepArgs.push("--af");
         vepArgs.push("--af_gnomad");
@@ -1758,7 +1760,7 @@ var effectCategories = [
             }
 
 
-            var annot = me._parseAnnot(rec, alt, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF);
+            var annot = me._parseAnnot(rec, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF);
 
             var clinvarResult = me.parseClinvarInfo(rec.info, clinvarMap);
 
@@ -1909,7 +1911,7 @@ var effectCategories = [
       return  parseMultiSample ? results :  results[0];
   };
 
-exports._parseAnnot = function(rec, alt, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
+exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
   var me = this;
 
   var annot = {
@@ -1983,7 +1985,7 @@ exports._parseAnnot = function(rec, alt, altIdx, isMultiAllelic, geneObject, sel
     
     } else if (annotToken.indexOf("CSQ") == 0) {
 
-      me._parseVepAnnot(alt, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF)
+      me._parseVepAnnot(altIdx, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF)
 
     } else if (annotToken.indexOf("AVIA3") == 0) {
       me._parseGenericAnnot("AVIA3", annotToken, annot);
@@ -2012,7 +2014,7 @@ exports._parseAnnot = function(rec, alt, altIdx, isMultiAllelic, geneObject, sel
 
 
 */
-exports._parseVepAnnot = function(alt, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
+exports._parseVepAnnot = function(altIdx, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
   var me = this;
 
   var vepFields = me.infoFields.VEP;
@@ -2024,13 +2026,15 @@ exports._parseVepAnnot = function(alt, isMultiAllelic, annotToken, annot, geneOb
       var vepTokens   = transcriptToken.split("|");
 
       var keep = true;
-      if (isMultiAllelic && vepFields.hasOwnProperty('Allele') && vepFields.Allele >= 0) {
-        var vepAllele   = vepTokens[vepFields.Allele];
-        if (alt && alt.length > 0 && vepAllele && vepAllele.length > 0 && vepAllele != '-' && alt != '-') {
-          if (vepAllele.toUpperCase() != alt.toUpperCase()) {
-            keep = false;
-          }
-        }       
+      if (isMultiAllelic) {
+        if (vepFields.hasOwnProperty('ALLELE_NUM') && vepFields.ALLELE_NUM >= 0) {
+          var vepAlleleNumber   = vepTokens[vepFields.ALLELE_NUM];
+          if (altIdx >= 0 &&  vepAlleleNumber >= 0) {
+            if (altIdx+1 != vepAlleleNumber) {
+              keep = false;
+            }
+          }  
+        }     
       }
 
       if (keep) {
