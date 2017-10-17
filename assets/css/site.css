@@ -27,6 +27,26 @@ body {
     .navbar .navbar-nav .dropdown-submenu.pull-left > .dropdown-menu {
       left: -100%;
       margin-left: 10px; }
+    .navbar .navbar-nav .navbar-button {
+      padding-left: 8px;
+      padding-right: 8px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      margin-top: 13px;
+      margin-left: 5px;
+      font-size: 14px;
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      line-height: 22px; }
+      .navbar .navbar-nav .navbar-button .material-icons {
+        font-size: 15px;
+        float: left;
+        vertical-align: bottom;
+        padding-right: 3px;
+        padding-top: 3px;
+        color: white; }
+      .navbar .navbar-nav .navbar-button .button-label {
+        font-size: 14px;
+        color: white; }
   .navbar .navbar-brand {
     height: 50px;
     margin-top: -6px;
@@ -187,7 +207,7 @@ h5 {
 
 .form-group .radio label {
   font-size: 14px;
-  line-height: 16px;
+  line-height: 16px m;
   color: #717171; }
 .form-group .radio input[type=radio]:checked ~ .check {
   background-color: #5d809d; }
@@ -197,6 +217,16 @@ h5 {
 .form-group.is-focused .radio label {
   color: #717171; }
   .form-group.is-focused .radio label:hover {
+    color: #717171; }
+
+.modal-label {
+  font-size: 13px;
+  color: #717171; }
+
+.modal-button {
+  font-size: 14px;
+  color: #717171 !important; }
+  .modal-button .material-icons {
     color: #717171; }
 
 .form-control,

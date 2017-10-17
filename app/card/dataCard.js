@@ -1480,3 +1480,4 @@ DataCard.prototype.setDataSourceRelationship = function(panelSelector) {
 	variantCard.setRelationship(dsRelationship);	
 	window.updateUrl('rel' + cardIndex, dsRelationship);
 }
+

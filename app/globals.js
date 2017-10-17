@@ -22,6 +22,7 @@ var geneToPhenoServer         = iobio_http_services + "gene2pheno/";
 var hpoServer                 = iobio_http_services + "hpo/";
 var phenolyzerServer          = "https://7z68tjgpw4.execute-api.us-east-1.amazonaws.com/dev/phenolyzer/";
 var phenolyzerOnlyServer      = iobio_http_services + "phenolyzer/";
+var findRareVariantsServer    = "http://nv-dev-new.iobio.io/awesomescript/upload";
 
 // email service
 var emailServer               = (useSSL ? "wss://" : "ws://") +   iobio_services + "email/";

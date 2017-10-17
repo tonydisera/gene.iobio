@@ -33,6 +33,33 @@
   </div>
 </div>
 
+<!-- Find rare variants dialog -->
+<div class="modal fade" id="find-rare-variants-modal" tabindex="-1" role="dialog">
+  <div style="width:400px" class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="padding-top:10px;">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>   
+        <i class="material-icons" style="vertical-align:middle;font-size:15px">dialpad</i>
+        <span class="modal-title" style="vertical-align:middle">Find rare high-impact variants</span>
+      </div>
+      <div class="modal-body">
+          <div>
+            <span class="modal-label">Send results to</span>
+            <input id="email-to" name="email-to" style="width:100%" placeholder="Email"/>
+          </div>
+
+      </div>
+      <div class="modal-footer" style="clear-both;margin-right:20px">
+          <button class="btn btn-default btn-raised modal-button" onclick="findRareVariants();">
+            Run analysis
+          </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 <!-- Version dialog -->
 <div class="modal fade" id="version-modal" tabindex="-1" role="dialog">
