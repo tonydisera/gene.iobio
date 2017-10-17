@@ -385,6 +385,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 			me.minimizeCard(true);
 		});
 
+
 		// Listen for side bar open and close events and adjust the position
 		// of the tooltip and the variant circle if a variant is 'locked'.
 		$('#slider-left').on("open", function() {

@@ -1175,7 +1175,7 @@ section {
     margin-top: 0px !important;
     margin-bottom: 5px !important; }
   .variant-card #coverage-problem-alert {
-    width: 240px;
+    width: 300px;
     text-align: center;
     background-color: #857caf;
     color: white;
@@ -1190,12 +1190,23 @@ section {
     margin-bottom: 0px; }
     .variant-card #coverage-problem-alert svg {
       display: inline-block;
-      float: nonec; }
+      float: none; }
     .variant-card #coverage-problem-alert span {
       display: inline-block;
       vertical-align: top;
       padding-top: 2px;
       padding-left: 2px; }
+    .variant-card #coverage-problem-alert button {
+      display: inline-block;
+      color: white !important;
+      padding-top: 1px;
+      padding-bottom: 1px;
+      padding-left: 10px;
+      padding-right: 10px;
+      float: right;
+      margin-top: 2px;
+      font-size: 13px;
+      background-color: rgba(255, 255, 255, 0.31) !important; }
 
 .stats-box {
   display: flex;
