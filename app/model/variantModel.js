@@ -1910,7 +1910,7 @@ VariantModel._determineAffectedStatusForVariant = function(variant, affectedStat
 VariantModel.prototype.isCached = function(geneName, transcript) {
 	var key = this._getCacheKey("vcfData", geneName.toUpperCase(), transcript);
 	var data = localStorage.getItem(key);
-	return data != null;
+	return data != null && data != "";
 }
 
 VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneObject, transcript, checkForCalledVariants) {
@@ -2067,7 +2067,7 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 	var data = null;
 	if (localStorage) {
       	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind, geneName, transcript));
-      	if (dataCompressed != null) {
+      	if (dataCompressed != null && dataCompressed != "") {
 			var dataString = null;
 			var start = Date.now();
 			try {

@@ -489,7 +489,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 		var theVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
 		var theFbData  = vc.model.getFbDataForGene(geneObject, transcript);
 
-		if (theVcfData == null) {
+		if (theVcfData == null && analyzeCalledVariants && theFbData != null) {
 			theVcfData = {features: []};
 		}
 
