@@ -1174,6 +1174,28 @@ section {
   .variant-card #bam-track .loader {
     margin-top: 0px !important;
     margin-bottom: 5px !important; }
+  .variant-card #coverage-problem-alert {
+    width: 240px;
+    text-align: center;
+    background-color: #857caf;
+    color: white;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    min-height: 10px;
+    height: 25px;
+    float: none;
+    display: inline-block;
+    margin-left: -300px;
+    margin-right: 10px;
+    margin-bottom: 0px; }
+    .variant-card #coverage-problem-alert svg {
+      display: inline-block;
+      float: nonec; }
+    .variant-card #coverage-problem-alert span {
+      display: inline-block;
+      vertical-align: top;
+      padding-top: 2px;
+      padding-left: 2px; }
 
 .stats-box {
   display: flex;
@@ -1295,8 +1317,8 @@ header {
     pointer-events: none; }
   #bam-depth .region {
     stroke-width: 1px;
-    stroke: rgba(105, 116, 216, 0.5);
-    fill: rgba(105, 116, 216, 0.5); }
+    stroke: rgba(133, 124, 175, 0.5);
+    fill: rgba(133, 124, 175, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
     stroke: lightgray;
@@ -2121,7 +2143,7 @@ inputinput:-moz-placeholder {
   margin-right: 70px;
   color: #717171; }
   #coverage-thresholds.attention {
-    outline-color: #8b9bc0;
+    outline-color: #857caf;
     outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
@@ -3390,17 +3412,17 @@ text.ref-count {
   font-size: 12px; }
 
 #zoom-region-chart.ibo-gene .cds.danger {
-  fill: rgba(116, 123, 182, 0.85);
+  fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
 #zoom-region-chart.ibo-gene .utr.danger {
-  fill: rgba(116, 123, 182, 0.85);
+  fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
 
 #gene-viz.ibo-gene .cds.danger {
-  fill: rgba(116, 123, 182, 0.85);
+  fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
 #gene-viz.ibo-gene .utr.danger {
-  fill: rgba(116, 123, 182, 0.85);
+  fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
 
 #genes-panel {
@@ -3637,8 +3659,8 @@ textarea#genes-to-copy {
   margin-top: -1px;
   margin-left: 0px;
   float: left;
-  color: #8b9bc0;
-  fill: #8b9bc0;
+  color: #857caf;
+  fill: #857caf;
   display: none; }
   #gene-badge-coverage-problem.dropdown-item {
     display: inline-block;
@@ -3646,7 +3668,7 @@ textarea#genes-to-copy {
     margin-top: 1px; }
 
 .coverage-problem-glyph {
-  fill: #8b9bc0; }
+  fill: #857caf; }
 
 #gene-badge-harmful-variant {
   font-size: 15px;

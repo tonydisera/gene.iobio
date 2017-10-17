@@ -268,12 +268,12 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		 		    				parent.append('g')     
 		 		    						  .attr("id", exonId)
 		 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
-		 	    							  .attr('transform',  'translate(' + (regionX - 8) + ',-16)')
+		 	    							  .attr('transform',  'translate(' + (regionX - 12) + ',-16)')
 		 	    							  .data([d])
 		 	    							  .append('use')
-		 	    							  .attr('height',     '16')
-		 	    							  .attr('width',      '16')
-		 	    							  .attr('href', '#trending-down-symbol')
+		 	    							  .attr('height',     '22')
+		 	    							  .attr('width',      '22')
+		 	    							  .attr('href', '#long-arrow-down-symbol')
 		 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
 		 	    							  .data([d]);									
 								}
@@ -760,6 +760,7 @@ VariantCard.prototype.prepareToShowVariants = function() {
     	me.cardSelector.find('#vcf-variant-count').text("");
     	me.cardSelector.find('#called-variant-count-label').addClass("hide");
     	me.cardSelector.find('#called-variant-count').text("");
+    	me.cardSelector.find('#coverage-problem-alert').addClass("hide");
     	me.cardSelector.find('#gene-box').text("");
     	me.cardSelector.find('#gene-box').css("visibility", "hidden");
     	if (isLevelEdu && eduTourNumber == "1") {
@@ -900,7 +901,7 @@ VariantCard.prototype.highlightLowCoverageRegions = function(transcript, regionS
 						}
 				  })
 		this.bamDepthChart.highlightRegions(dangerRegions, {}, regionStart, regionEnd, filterCard.geneCoverageMedian);
-		//this.d3CardSelector.select('#bam-chart-label #gene-badge-coverage-problem').classed("hide", dangerRegions.length == 0);
+		this.d3CardSelector.select('#coverage-problem-alert').classed("hide", dangerRegions.length == 0);
 	}
 }
 
