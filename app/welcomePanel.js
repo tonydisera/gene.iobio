@@ -4,7 +4,7 @@ function WelcomePanel() {
 
 	this.videoConfigs = {
 		'screencast-getting-started': {
-			src: "https://www.youtube.com/embed/5g5wT1xDCfY?ecver=2",
+			src: "https://www.youtube.com/embed/5g5wT1xDCfY?rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
@@ -18,14 +18,14 @@ function WelcomePanel() {
 			allowfullscreen: ""
 		},
 		'screencast-saving-analysis': {
-			src: "https://www.youtube.com/embed/JlXoBlWvniE?rel=0",
+			src: "https://www.youtube.com/embed/JlXoBlWvniE?rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
 			allowfullscreen: ""
 		},
 		'screencast-multi-gene-analysis': {
-			src: "https://www.youtube.com/embed/QiJ7wuN8LYQ?rel=0",
+			src: "https://www.youtube.com/embed/QiJ7wuN8LYQ?rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
