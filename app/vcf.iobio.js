@@ -144,18 +144,11 @@ var effectCategories = [
     vcfURL = url;
     tbiUrl = theTbiUrl;
 
-    var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(vcf\.gz)$/;
-    var parts = rexp.exec(url);
-    // first element has entire url, the second element is the .vcf.gz extension.
-    var extension = parts && parts.length == 2  ? parts[1] : null;
-    if (extension == null) {
-      callback(false, "Please specify a URL to a compressed, indexed vcf file with the file extension vcf.gz");
-    } else {
-      this.checkVcfUrl(url, tbiUrl, function(success, message) {
-          callback(success, message);
-      });
-    }
-
+    
+    this.checkVcfUrl(url, tbiUrl, function(success, message) {
+        callback(success, message);
+    });
+    
   }
 
   exports.getHeader = function(callback) {
@@ -163,9 +156,9 @@ var effectCategories = [
 
       var buffer = "";
       var success = false;
-      var args = ['-H', vcfURL];
+      var args = ['-H', '"'+vcfURL+'"'];
       if (tbiUrl) {
-        args.push(tbiUrl);
+        args.push('"'+tbiUrl+'"');
       }
       var cmd = new iobio.cmd(
             IOBIO.tabix,
@@ -213,9 +206,9 @@ var effectCategories = [
     var buffer = "";
     var recordCount = 0;
 
-    var args = ['-H', url];
+    var args = ['-H', '"'+url+'"'];
     if (tbiUrl) {
-      args.push(tbiUrl);
+      args.push('"'+tbiUrl+'"');
     }
     var cmd = new iobio.cmd(
         IOBIO.tabix,
@@ -482,9 +475,9 @@ var effectCategories = [
 
     var args = ['-i'];
     if (tbiUrl) {
-      args.push(tbiUrl);
+      args.push('"'+tbiUrl+'"');
     } else {
-      args.push(vcfURL + '.tbi');
+      args.push('"'+vcfURL + '.tbi'+'"');
     }
 
     var cmd = new iobio.cmd(
@@ -742,9 +735,9 @@ var effectCategories = [
     var contigNameFile = new Blob([contigStr])
 
     // Create an iobio command get get the variants and add any header recs.
-    var args = ['-h', vcfURL, regionParm];
+    var args = ['-h', '"'+vcfURL+'"', regionParm];
     if (tbiUrl) {
-      args.push(tbiUrl);
+      args.push('"'+tbiUrl+'"');
     }
     var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
       .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
@@ -1092,9 +1085,9 @@ var effectCategories = [
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
 
-    var args = ['-h', vcfURL, '1:1-1'];
+    var args = ['-h', '"'+vcfURL+'"', '1:1-1'];
     if (tbiUrl) {
-      args.push(tbiUrl);
+      args.push('"'+tbiUrl+'"');
     }
     var cmd = new iobio.cmd(
         IOBIO.tabix,
@@ -1144,7 +1137,7 @@ var effectCategories = [
     })
     var contigNameFile = new Blob([contigStr])
 
-    var args = ['-h', vcfURL, region];
+    var args = ['-h', '"'+vcfURL+'"', region];
     if (tbiUrl) {
       args.push(tbiUrl);
     }
