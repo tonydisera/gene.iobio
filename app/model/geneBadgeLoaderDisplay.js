@@ -11,7 +11,7 @@
 		},
 		addGene: function(geneName, pageNumber) {
 			this.queue.push({
-				geneName: geneName,
+				geneName: geneName.toUpperCase(),
 				pageNumber: pageNumber
 			});
 			setText.call(this);
@@ -19,7 +19,7 @@
 		},
 		removeGene: function(geneName) {
 			for(var i = this.queue.length - 1; i >= 0; i--) {
-			  if (this.queue[i].geneName === geneName) {
+			  if (this.queue[i].geneName.toUpperCase() === geneName.toUpperCase()) {
 			  	this.queue.splice(i, 1);
 			  	break;
 			  }
