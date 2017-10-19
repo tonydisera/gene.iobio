@@ -1012,8 +1012,8 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 
 		if (success) {
 			variantCard.setName(variantCard.getName());
-			window.updateUrl('bam' + cardIndex, bamUrl);
-			window.updateUrl('bai' + cardIndex, baiUrl);
+			window.updateUrl('bam' + cardIndex, encodeURIComponent(bamUrl));
+			window.updateUrl('bai' + cardIndex, encodeURIComponent(baiUrl));
 			me.setDefaultBuildFromData();
 			me.enableLoadButtonIfBuildSet(true);		
 		} else {
@@ -1364,8 +1364,8 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 	panelSelector.find('#vcf-sample-box').addClass('hide');
 	panelSelector.find('.vcf-sample.loader').removeClass('hide');
 
-	window.updateUrl('vcf'+cardIndex, vcfUrl);
-	window.updateUrl('tbi'+cardIndex, tbiUrl);
+	window.updateUrl('vcf'+cardIndex, encodeURIComponent(vcfUrl));
+	window.updateUrl('tbi'+cardIndex, encodeURIComponent(tbiUrl));
 	
 	variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
 		if (vcfUrl && vcfUrl != "") {

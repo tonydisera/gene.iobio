@@ -79,56 +79,49 @@ var Bam = Class.extend({
     var me = this;
     var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
       
-    var rexp = /^(?:ftp|http|https):\/\/(?:(?:[^.]+|[^\/]+)(?:\.|\/))*?(bam)$/;
-    var parts = rexp.exec(url);
-    // first element has entire url, second has the bam extension.
-    var extension = parts && parts.length == 2  ? parts[1] : null;
-    if (extension == null) {
-      callback(false, "Please specify a URL to a compressed, indexed alignment file with the file extension bam");
-    } else {
-      var success = null;
-      var args = ['view', '-H', url];
-      if (baiUrl) {
-        args.push(baiUrl);
-      }
-      var cmd = new iobio.cmd(
-          samtools,
-          args,
-          {ssl: useSSL}
-      );
 
-      cmd.on('data', function(data) {
-        if (data != undefined) {
-          success = true;
-        }
-      });
-
-      cmd.on('end', function() {
-        if (success == null) {
-          success = true;
-        }
-        if (success) {
-          callback(success);
-        }
-      });
-
-      cmd.on('error', function(error) {
-        if (me.ignoreErrorMessage(error)) {
-          success = true;
-          callback(success)
-        } else {
-          if (success == null) {
-            success = false;
-            me.bamUri = url;
-            callback(success, me.translateErrorMessage(error));
-          }
-        }
-
-      });
-
-      cmd.run();      
-      
+    var success = null;
+    var args = ['view', '-H', '"'+url+'"'];
+    if (baiUrl) {
+      args.push('"'+baiUrl+'"');
     }
+    var cmd = new iobio.cmd(
+        samtools,
+        args,
+        {ssl: useSSL}
+    );
+
+    cmd.on('data', function(data) {
+      if (data != undefined) {
+        success = true;
+      }
+    });
+
+    cmd.on('end', function() {
+      if (success == null) {
+        success = true;
+      }
+      if (success) {
+        callback(success);
+      }
+    });
+
+    cmd.on('error', function(error) {
+      if (me.ignoreErrorMessage(error)) {
+        success = true;
+        callback(success)
+      } else {
+        if (success == null) {
+          success = false;
+          me.bamUri = url;
+          callback(success, me.translateErrorMessage(error));
+        }
+      }
+
+    });
+
+    cmd.run();      
+
   },
 
 
@@ -258,7 +251,7 @@ var Bam = Class.extend({
       if ( this.sourceType == "url") {
          var regionStr = "";
          regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = samtools + "?cmd= view -b " + this.bamUri + regionStr + (this.baiUri ? " " + this.baiUri : "") + "&protocol=http&encoding=binary";
+         var url = samtools + "?cmd= view -b " + '"'+this.bamUri+'"' + regionStr + (this.baiUri ? " " + '"'+this.baiUri+'"' : "") + "&protocol=http&encoding=binary";
       } else {
 
         var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client");
@@ -333,10 +326,15 @@ var Bam = Class.extend({
         callback(null);
       } else {
 
-        var success = null;
+        var args = ['view', '-H', '"'+me.bamUri+'"'];
+        if (me.baiUri) {
+          args.push('"'+me.baiUri+'"');
+        }
+
+        var success = null;        
         var cmd = new iobio.cmd(
             samtools,
-            ['view', '-H', me.bamUri]
+            args
         );
         var rawHeader = "";
         cmd.on('data', function(data) {
@@ -371,9 +369,9 @@ var Bam = Class.extend({
         callback(null);
       } else {
 
-        var args = ['view', '-H', me.bamUri];
+        var args = ['view', '-H', '"'+me.bamUri+'"'];
         if (me.baiUri) {
-          args.push(me.baiUri);
+          args.push('"'+me.baiUri+'"');
         }
 
         var success = null;
@@ -498,9 +496,9 @@ var Bam = Class.extend({
         // When bam file is read as a local file, just stream sam records for region to
         // samtools mpileup.
         if (me.sourceType == "url") {
-          var args = ['view', '-b', me.bamUri, regionArg];
+          var args = ['view', '-b', '"'+me.bamUri+'"', regionArg];
           if (me.baiUri) {
-            args.push(me.baiUri);
+            args.push('"'+me.baiUri+'"');
           }
           cmd = new iobio.cmd(samtools, args,
             {
@@ -623,9 +621,9 @@ var Bam = Class.extend({
             var bam = bams[idx];
 
             if (bam.sourceType == "url") {
-              var args = ['view', '-b', bam.bamUri, regionArg];
+              var args = ['view', '-b', '"'+bam.bamUri+'"', regionArg];
               if (bam.baiUri) {
-                args.push(bam.baiUri);
+                args.push('"'+bam.baiUri+'"');
               }
               var bamCmd = new iobio.cmd(samtools, args,
               {
@@ -829,9 +827,9 @@ var Bam = Class.extend({
             var bam = bams[idx];
 
             if (bam.sourceType == "url") {
-              var args = ['view', '-b', bam.bamUri, regionArg];
+              var args = ['view', '-b', '"'+bam.bamUri+'"', regionArg];
               if (bam.baiUri) {
-                args.push(bam.baiUri);
+                args.push('"'+bam.baiUri+'"');
               }
               var bamCmd = new iobio.cmd(samtools, args,
               {

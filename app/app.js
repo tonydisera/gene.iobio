@@ -1599,12 +1599,13 @@ function loadUrlSources() {
 	if (vcf != null) {
 		Object.keys(vcf).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
-			var tbiUrl    = tbi && Object.keys(tbi).length > 0 ? tbi["tbi"+cardIndex] : null;
+			var tbiUrl    = tbi && Object.keys(tbi).length > 0 ? decodeUrl(tbi["tbi"+cardIndex]) : null;
 			var variantCard      = variantCards[+cardIndex];
 			if (variantCard) {
 				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 				var panelSelector    = $(panelSelectorStr);
-				panelSelector.find('#url-input').val(vcf[urlParameter]);
+				var vcfUrl = decodeUrl(vcf[urlParameter]);
+				panelSelector.find('#url-input').val(vcfUrl);
 				panelSelector.find('#url-input').removeClass("hide");
 				if (tbiUrl && tbiUrl != "") {
 					panelSelector.find('#url-tbi-input').val(tbiUrl);
@@ -1625,12 +1626,12 @@ function loadUrlSources() {
 	if (bam != null) {
 		Object.keys(bam).forEach(function(urlParameter) {
 			var cardIndex = urlParameter.substring(3);
-			var baiUrl    = bai && Object.keys(bai).length > 0 ? bai["bai"+cardIndex] : null;
+			var baiUrl    = bai && Object.keys(bai).length > 0 ? decodeUrl(bai["bai"+cardIndex]) : null;
 			var variantCard      = variantCards[+cardIndex];
 			if (variantCard) {
 				var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
 				var panelSelector    = $(panelSelectorStr);
-				panelSelector.find('#bam-url-input').val(bam[urlParameter]);
+				panelSelector.find('#bam-url-input').val(decodeUrl(bam[urlParameter]));
 				panelSelector.find('#bam-url-input').removeClass("hide");
 				if (baiUrl && baiUrl != "") {
 					panelSelector.find('#bai-url-input').val(baiUrl);
@@ -4354,6 +4355,13 @@ findRareVariants = function() {
 	xhr.onloadend = function (e) {
 	}  	
   	xhr.send(formData);  // multipart/form-data
+}
+
+function decodeUrl(url) {
+  if (url && (url.slice(0,14) == 'https%3A%2F%2F' || url.slice(0,13) == 'http%3A%2F%2F'))
+    return decodeURIComponent(url)
+  else
+    return url;
 }
 
  
