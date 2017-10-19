@@ -9,6 +9,7 @@ function CacheHelper(loaderDisplay) {
 	this.geneBadgeLoaderDisplay = loaderDisplay;
 	this.showCallAllProgress = false;
 	this.KEY_DELIM = "^";
+	this.start = null;
 }
 
 CacheHelper.prototype.isolateSession = function() {
@@ -225,6 +226,8 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
 
 CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
 	var me = this;
+
+	this.start = new Date();
 	
 	if (analyzeCalledVariants) {
 		me.showCallAllProgress = true;
@@ -241,6 +244,12 @@ CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
 		me.genesToCache.push(geneName);
 	});
 	me.cacheGenes(analyzeCalledVariants, function() {
+
+		console.log("");
+		console.log("******   ANALYZE ALL ELAPSED TIME *******");
+		console.log((new Date() - me.start) / 10000 + " seconds ");
+		console.log("*******************************************")
+		console.log("");
 
 		// After all genes have been cached, refresh the gene badges in case
 		// filters were applied while genes were still in the process of being

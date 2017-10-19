@@ -1071,7 +1071,7 @@ VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callback
 		}
 
 	} else {
-		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 5000, useServerCache,
+		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 2000, useServerCache,
 	 	  function(coverageForRegion, coverageForPoints) {
 	 	  	if (coverageForRegion != null) {
 				me.bamData = {gene: gene.gene_name,

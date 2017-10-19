@@ -427,6 +427,7 @@ MatrixCard.prototype.init = function() {
 }
 
 
+
 MatrixCard.prototype.unpin = function(saveClickedVariant) {
 	if (!saveClickedVariant) {
 		clickedVariant = null;
@@ -572,6 +573,11 @@ MatrixCard.prototype.reset = function() {
 }
 
 
+MatrixCard.prototype.tooltipScroll = function(direction) {
+	variantTooltip.scroll(direction, "#matrix-tooltip");
+}
+
+
 MatrixCard.prototype.hideTooltip = function() {
 	//var tooltip = d3.select('#container #matrix-track .tooltip');
 	var tooltip = d3.select('#matrix-tooltip');
@@ -681,6 +687,12 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, getProbandVariantCard(), null, adjustPosition);
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin();
+	});
+	tooltip.select("#tooltip-scroll-up").on('click', function() {
+		me.tooltipScroll("up");
+	});
+	tooltip.select("#tooltip-scroll-down").on('click', function() {
+		me.tooltipScroll("down");
 	});
 
 }
