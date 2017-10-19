@@ -2840,9 +2840,6 @@ inputinput:-moz-placeholder {
   width: 75px;
   float: left; }
 
-.tooltip-row.ped-info {
-  padding-bottom: 5px; }
-
 .tooltip-zygosity {
   float: left;
   font-size: 9px;
@@ -3125,6 +3122,8 @@ text.ref-count {
   .tooltip-wide .tooltip-row {
     clear: both;
     padding-bottom: 6px; }
+    .tooltip-wide .tooltip-row.ped-info {
+      padding-bottom: 0px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
     padding-top: 10px !important;
@@ -3160,7 +3159,7 @@ text.ref-count {
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-header {
         width: 112px; }
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-value {
-        width: 150px; }
+        width: 178px; }
   .tooltip-wide .tooltip-info-column {
     float: left;
     padding-top: 5px;
@@ -3180,8 +3179,12 @@ text.ref-count {
     font-size: 13px !important; }
     .tooltip-wide a:hover, .tooltip-wide a:focus {
       font-size: 13px !important; }
-  .tooltip-wide a:hover, .tooltip-wide a:focus {
-    font-size: 13px !important; }
+  .tooltip-wide .highest-impact-badge span {
+    font-size: 11px !important; }
+  .tooltip-wide .highest-impact-badge a {
+    font-size: 11px !important; }
+    .tooltip-wide .highest-impact-badge a:hover, .tooltip-wide .highest-impact-badge a:focus {
+      font-size: 11px !important; }
   .tooltip-wide .tooltip-footer {
     clear: both; }
     .tooltip-wide .tooltip-footer a {

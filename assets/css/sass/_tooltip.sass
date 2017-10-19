@@ -118,10 +118,6 @@
   width: 75px 
   float: left 
 
-.tooltip-row
-  &.ped-info
-    padding-bottom: 5px
-
 .tooltip-zygosity
   float: left
   font-size: 9px
@@ -458,6 +454,9 @@ text
     clear: both
     padding-bottom: 6px
 
+    &.ped-info
+      padding-bottom: 0px
+
   .tooltip-footer
     margin-top: 0px !important
     padding-top: 10px !important
@@ -499,7 +498,7 @@ text
       .tooltip-header
         width: 112px
       .tooltip-value
-        width: 150px 
+        width: 178px 
 
   .tooltip-info-column
     float: left
@@ -522,10 +521,14 @@ text
 
     &:hover, &:focus
       font-size: 13px !important
-     
-  a
-    &:hover, &:focus
-      font-size: 13px !important      
+
+  .highest-impact-badge
+    span
+      font-size:  11px !important
+    a
+      font-size: 11px !important
+      &:hover, &:focus
+        font-size: 11px !important
 
   .tooltip-footer
     clear: both

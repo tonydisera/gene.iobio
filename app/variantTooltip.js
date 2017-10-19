@@ -125,7 +125,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 	}
 
 
-	var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(0,2)' : 'translate(5,6)';
+	var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(1,2)' : 'translate(5,6)';
 	
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 	var impactDivSelector = selector == '.tooltip-wide' ? '.tooltip-value' : '.tooltip-title';
@@ -464,15 +464,14 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		vepHighestImpactValue          = impactKey.toUpperCase();
 		
 		nonCanonicalEffects.forEach(function(nonCanonicalEffect) {
-			vepHighestImpactDisplay += " ("; 
+			vepHighestImpactDisplay += "<span>  ("; 
 			for (effectKey in nonCanonicalEffect) {
 				var transcriptString = nonCanonicalEffect[effectKey].url;
-				vepHighestImpactDisplay += " " + effectKey.split("\&").join(" & ") + ' in ' + transcriptString;
-				//vepHighestImpactDisplaySimple += effectKey.split("\&").join(" & ") + "  ";
+				vepHighestImpactDisplay += " " + effectKey.split("\&").join(" & ") + 'in ' + transcriptString;
 				vepHighestImpactInfo += " " + effectKey.split("\&").join(" & ") + " in " + nonCanonicalEffect[effectKey].display;
 
 			}
-			vepHighestImpactDisplay += ")"; 
+			vepHighestImpactDisplay += ")</span> "; 
 		})
 		vepHighestImpactDisplaySimple += " in non-canonical transcripts";
 	}
