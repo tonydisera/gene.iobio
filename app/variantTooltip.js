@@ -29,7 +29,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 	
 	if (html == null) {
 		if (lock) {
-			html = variantTooltip.formatContent(variant, null, 'tooltip-wide');
+			html = variantTooltip.formatContent(variant, null, 'tooltip-wide', null, null, null, variantCard);
 		} else {	
 			var pinMessage = variantCard ? "click on variant for more details" : "click on column for more details";
 			html = variantTooltip.formatContent(variant, pinMessage, null, null, null, null, variantCard);
@@ -62,6 +62,10 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		x = sidebarAdjustX(x);
 	}
 
+
+	if (lock && !isLevelEdu) {
+		me.showScrollButtons($(tooltip[0]));
+	}
 
 
 
@@ -666,6 +670,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		}
 	}
+
+	var bookmarkBadge = '';
+	if (window.clickedVariant && window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
+		bookmarkBadge = '<svg class="bookmark-badge" height="14" width="14" style="padding-top:2px" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="14" height="14"></use></g></svg>';
+	}
+
 	
 
 
@@ -733,7 +743,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
 			+ (variantCard.getRelationship() == 'known-variants' ? me._tooltipRow('&nbsp;', knownVariantsClinvarLink, '6px')  : clinvarSimpleRow1)
 			+ (variantCard.getRelationship() == 'known-variants' ? clinvarSimpleRow2 : '')	
-			+ me._linksRow(variant, pinMessage)
+			+ me._linksRow(variant, pinMessage, variantCard)
 		);                  
 
 	} else if (type == 'tooltip-wide') {
@@ -770,15 +780,15 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 		var div =
 		    '<div class="tooltip-wide">'
-			+ me._tooltipMainHeaderRow(geneObject ? geneObject.gene_name : "", variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
+			+ me._tooltipMainHeaderRow(bookmarkBadge + (geneObject ? geneObject.gene_name : ""), variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
 			+ calledVariantRow
 			+ inheritanceModeRow
-			+ '<div class="row" style="max-height:205px;overflow-y:scroll">' 
+			+ '<div id="tooltip-body" class="row" style="max-height:205px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
 			+ '</div>'
-			+ me._linksRow(variant)	
+			+ me._linksRow(variant, null, variantCard)	
 			+ "</div>";
 
 		return div;
@@ -805,7 +815,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRow('Qual', variant.qual) 
 			+ me._tooltipRow('Filter', variant.recfilter) 
 			+ me._tooltipRowAlleleCounts() 
-			+ me._linksRow(variant)
+			+ me._linksRow(variant, null, variantCard)
 		);                  
 
 	}
@@ -837,16 +847,17 @@ VariantTooltip.prototype.variantTooltipMinimalHTML = function(variant) {
 }
 
 
-VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
+VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) {
 	if (pinMessage == null) {
 		pinMessage = 'Click on variant for more details';
 	}
+	var scrollUpButton = '<button id="tooltip-scroll-up" class="tooltip-button  btn btn-raised btn-default" ><i class="material-icons">arrow_upward</i>up</button>'
+	var scrollDownButton = '<button id="tooltip-scroll-down" class="tooltip-button btn btn-raised btn-default" ><i class="material-icons">arrow_downward</i>more</button>'
 
 
-	var bookmarkLink =  '<a id="bookmarkLink" href="javascript:void(0)" onclick="bookmarkVariant();showAsBookmarked(this);">bookmark this variant</a>';
+	var bookmarkLink =  '<button id="bookmarkLink"  class="tooltip-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);">bookmark</button>';
 	
-	var bookmarkBadge = '<svg class="bookmark-badge" height="14" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="12" height="12"></use><text x="12" y="11" style="fill: black;">bookmarked</text></g></svg>';
-	var removeBookmarkLink  =  '<a id="remove-bookmark-link" href="javascript:void(0)" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove bookmark</a>'
+	var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove bookmark</button>'
 	showAsBookmarked = function(container) {
 		$(container).parent().html(bookmarkBadge + removeBookmarkLink);
 	};
@@ -854,33 +865,29 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage) {
 		$(container).parent().html(bookmarkLink);
 	};
 
+	var unpin =  '<button id="unpin"  class="tooltip-button btn btn raised btn-default"  >close</button>'
+
 	if (window.clickedVariant) {
 		if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
 			return '<div class="row tooltip-footer">'
-			  + '<div class="col-sm-8" id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge + removeBookmarkLink  + '</div>'
-			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">close</a>' + '</div>'
+			  + '<div class="col-sm-4" id="bookmarkLink" style="text-align:left;">' +  removeBookmarkLink  + '</div>'
+			  + '<div class="col-sm-4"  style="text-align:center;">' +  (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + unpin + '</div>'
 			  + '</div>';
 
 		} else {
 			return '<div class="row tooltip-footer" style="">'
-			  + '<div class="col-sm-8" style="text-align:left;">' + bookmarkLink + '</div>'
-			  + '<div class="col-sm-4" style="text-align:right;">' + '<a id="unpin" href="javascript:void(0)">close</a>' + '</div>'
+			  + '<div class="col-sm-4" style="text-align:left;">' + bookmarkLink + '</div>'
+			  + '<div class="col-sm-4"  style="text-align:center;">' +  (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
+			  + '<div class="col-sm-4" style="text-align:right;">' + unpin + '</div>'
 			  + '</div>';
 
 		}
 		
 	} else {
-		if (variant.hasOwnProperty('isBookmark') && variant.isBookmark == 'Y') {
-			return '<div class="row tooltip-footer">'
-			  + '<div class="col-sm-6 " id="bookmarkLink" style="text-align:left;">' +  bookmarkBadge + '</div>'
-			  + '<div class="col-md-6 " style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
-			  + '</div>';
-
-		} else {
-			return '<div class="row tooltip-footer">'
-			  + '<div class="col-md-12 " style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
-			  + '</div>';
-		}
+		return '<div class="row tooltip-footer">'
+		  + '<div class="col-md-12 " style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
+		  + '</div>';
 	}
 }
 
@@ -1038,6 +1045,38 @@ VariantTooltip.prototype._tooltipRowAlleleCounts = function(label) {
 		 + '</div>';
 }
 
+VariantTooltip.prototype.scroll = function(dir="down", parentContainerSelector) {
+	var me = this;
+
+	scrollHeight = $(parentContainerSelector + ' #tooltip-body').innerHeight();
+	var multiplier = 1;
+	if (dir == "up") {
+		multiplier =  -1;
+	}
+	$(parentContainerSelector + ' #tooltip-body').animate({
+	    scrollTop: scrollHeight * multiplier
+	}, 1000, function() {
+		me.showScrollButtons($(parentContainerSelector));
+	});	
+}
+
+VariantTooltip.prototype.showScrollButtons = function(parentNode) {
+		var pos = parentNode.find('#tooltip-body').scrollTop();
+		var contentHeight = parentNode.find('#tooltip-body')[0].scrollHeight - parentNode.find('.tooltip-wide .tooltip-row').css('padding-bottom').split("px")[0];
+		scrollHeight = parentNode.find('#tooltip-body').innerHeight();
+
+		if (scrollHeight + pos < contentHeight) {
+			parentNode.find('#tooltip-scroll-down').removeClass("hide");
+		} else {
+			parentNode.find('#tooltip-scroll-down').addClass("hide");
+		}
+
+		if (pos == 0) {
+			parentNode.find('#tooltip-scroll-up').addClass("hide");
+		} else {
+			parentNode.find('#tooltip-scroll-up').removeClass("hide");
+		}	
+}
 
 VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, container, variant, barWidth) {
 	var me = this;

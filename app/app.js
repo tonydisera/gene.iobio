@@ -2626,6 +2626,8 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 		return;
 	}
 
+	unpinAll();
+
 	genesCard.flagUserVisitedGene(window.gene.gene_name);
 	$('#welcome-area').addClass("hide");
 

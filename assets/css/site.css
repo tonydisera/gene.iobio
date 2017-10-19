@@ -2904,6 +2904,21 @@ inputinput:-moz-placeholder {
 .tooltip .row {
   line-height: 12px !important; }
 
+.tooltip .tooltip-button {
+  padding: 0px 8px 0px 6px;
+  font-size: 14px;
+  color: white !important;
+  background-color: rgba(93, 128, 157, 0.85) !important;
+  margin-top: 1px;
+  margin-bottom: 1px; }
+  .tooltip .tooltip-button i {
+    font-size: 16px;
+    color: white; }
+.tooltip #tooltip-scroll-up {
+  background-color: #4797dd !important; }
+.tooltip #tooltip-scroll-down {
+  background-color: #4797dd !important; }
+
 .tooltip {
   position: absolute;
   z-index: 20;
@@ -3109,7 +3124,7 @@ text.ref-count {
     font-size: 14px; }
   .tooltip-wide .tooltip-row {
     clear: both;
-    padding-bottom: 8px; }
+    padding-bottom: 6px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
     padding-top: 10px !important;

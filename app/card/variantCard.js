@@ -1872,7 +1872,12 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	tooltip.select("#unpin").on('click', function() {
 		me.unpin(null, true);
 	});
-
+	tooltip.select("#tooltip-scroll-up").on('click', function() {
+		me.tooltipScroll("up");
+	});
+	tooltip.select("#tooltip-scroll-down").on('click', function() {
+		me.tooltipScroll("down");
+	});
 
 }
 
@@ -2012,6 +2017,10 @@ VariantCard.prototype.addBookmarkFlag = function(variant, key, singleFlag) {
 	if (singleFlag) {
 		this.d3CardSelector.selectAll("#vcf-track .bookmark#" + key).classed("current", true);
 	}
+}
+
+VariantCard.prototype.tooltipScroll = function(direction) {
+	variantTooltip.scroll(direction, "#vcf-variants .tooltip");
 }
 
 
