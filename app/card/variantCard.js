@@ -420,7 +420,7 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
 	var coverageRow = function(fieldName, coverageVal, covFields) {
 		var row = '<div>';
 		row += '<span style="padding-left:10px;width:60px;display:inline-block">' + fieldName   + '</span>';
-		row += '<span style="width:40px;display:inline-block">' + round(coverageVal, 2) + '</span>';
+		row += '<span style="width:40px;display:inline-block">' + d3.round(coverageVal) + '</span>';
 		row += '<span class="' + (covFields[fieldName] ? 'danger' : '') + '">' + (covFields[fieldName] ? covFields[fieldName]: '') + '</span>';
 		row += "</div>";
 		return row;
