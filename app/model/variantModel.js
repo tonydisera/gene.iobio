@@ -2289,9 +2289,12 @@ VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
 
 	if (theVcfData.features.length > 0) {
 		theVcfData.features.forEach(function(variant) {
-			setMaxAlleleCount(variant.genotypeDepth);
-			setMaxAlleleCount(variant.genotypeDepthMother);
-			setMaxAlleleCount(variant.genotypeDepthFather);
+			for (var key in variant.genotypes) {
+				var gt = variant.genotypes[key];
+				if (gt.hasOwnProperty('genotypeDepth')) {
+					setMaxAlleleCount(gt.genotypeDepth)
+				}
+			}
 		});
 		theVcfData.maxAlleleCount = maxAlleleCount;
 	} else if (dataCard.mode == 'trio') {

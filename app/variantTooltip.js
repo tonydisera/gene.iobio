@@ -5,6 +5,8 @@ function VariantTooltip() {
 	this.WIDTH_HOVER        = 360;
 	this.WIDTH_SIMPLE       = 280;
 	this.WIDTH_SIMPLE_WIDER = 500;
+	this.WIDTH_ALLELE_COUNT_BAR = 160;
+	this.WIDTH_ALLELE_COUNT_ROW = 300;
 	this.VALUE_EMPTY        = "-";
 	this.AFFECTED_GLYPH =   "<i class='material-icons tooltip-affected-symbol'>spellcheck</i>";
 
@@ -43,7 +45,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		variantCard = window.getProbandVariantCard();
 	}
 	var selection = tooltip.select("#coverage-svg");
-	me.createAlleleCountSVGTrio(variantCard, selection, variant, lock ? 150 : null);
+	me.createAlleleCountSVGTrio(variantCard, selection, variant, me.WIDTH_ALLELE_COUNT_BAR);
 
 
 
@@ -1143,12 +1145,12 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 
 
 VariantTooltip.prototype._appendReadCountHeading = function(container) {
-
+	var me = this;
 	var svg = container.append("div")	
 					   .attr("id", "allele-count-legend")	
 		           	   .style("padding-top", "0px")		           	   
 				       .append("svg")
-				       .attr("width", 198)
+				       .attr("width", me.WIDTH_ALLELE_COUNT_ROW)
 	           		   .attr("height", "20");
 	svg.append("text")
 		   .attr("x", "0")
@@ -1208,8 +1210,9 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
 
 VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, 
 	genotypeRefCount, genotypeDepth, bamDepth, barWidth) {
+	var me = this;
 
-	var MAX_BAR_WIDTH = barWidth ? barWidth : 185;
+	var MAX_BAR_WIDTH = barWidth ? barWidth : me.ALLELE_COUNT_BAR_WIDTH;
 	var PADDING = 20;
 	var BAR_WIDTH = 0;
 	if ((genotypeDepth == null || genotypeDepth == '') && (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0)) {
