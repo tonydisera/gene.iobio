@@ -1786,7 +1786,7 @@ var effectCategories = [
                     'ref':                      rec.ref,
                     'alt':                      alt, 
                     'qual':                     rec.qual, 
-                    'recfilter':                rec.filter,
+                    'recfilter':                rec.filter.split(";").join("-"),
 
                     'extraAnnot':               hasExtraAnnot,
 
