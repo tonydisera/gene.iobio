@@ -484,9 +484,9 @@ var Bam = Class.extend({
         });
         var maxPointsArg = "";
         if (maxPoints) {
-          maxPointsArg = " -m " + maxPoints;
+          maxPointsArg = "-m " + maxPoints;
         } else {
-          maxPointsArg = " -m 0"
+          maxPointsArg = "-m 0"
         }
         var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
         var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
@@ -502,10 +502,10 @@ var Bam = Class.extend({
           }
           cmd = new iobio.cmd(samtools, args,
             {
-              'urlparams': {'encoding':'binary'},
+              'urlparams': { 'encoding':'binary'},
               ssl: useSSL
             });
-          cmd = cmd.pipe(samtools, ["mpileup", "-"], {ssl: useSSL});
+          cmd = cmd.pipe(samtools, ["mpileup", "-"], {urlparams: {protocol: 'http'}, ssl: useSSL});
         } else {
 
           function writeSamFile (stream) {
@@ -538,7 +538,9 @@ var Bam = Class.extend({
             cmd = cmd.pipe("nv-dev-new.iobio.io/coverage/", [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL, urlparams: urlParameters});
         } else {
           // After running samtools mpileup, run coverage service to summarize point data.
-          cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
+          // NOTE:  Had to change to protocol http(); otherwise signed URLs don't work (with websockets)
+          cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {urlparams: {protocol: "http"}, ssl: useSSL});
+
         }
 
         var samData = "";
@@ -797,7 +799,7 @@ var Bam = Class.extend({
     var regionStart = geneObject.start;
     var regionEnd   = geneObject.end; 
 
-        
+      
     this.transformRefName(refName, function(trRefName){
 
       // Create a region text file with the gene name followed by
@@ -836,7 +838,7 @@ var Bam = Class.extend({
                 'urlparams': {'encoding':'binary'},
                 ssl: useSSL
               });
-              getBamCmds.push(bamCmd);
+              getBamCmds.push(bamCmd.url());
 
               idx++;
               nextBamCmd(bams, idx, callback);
