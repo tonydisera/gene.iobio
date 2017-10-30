@@ -359,96 +359,107 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
     	}
 
     	
+    	me.promiseIsCachedForProband(geneObject, transcript, analyzeCalledVariants)
+    	 .then(function(data) {
 
-	    if (me.isCachedForProband(geneObject, transcript, analyzeCalledVariants)) {
+    	 	var theGeneObject      = data.geneObject;
+    	 	var theTranscript      = data.transcript;
+    	 	var shouldCallVariants = data.shouldCallVariants;
+    	 	var isCached           = data.isCached;
 
-	    	// This gene has already been analyzed. Take this gene off of the queue and see
-	    	// if next batch of genes should be analyzed
-	    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
-	    	me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-	    
-		
-		} else {
 
-			// The gene is ready to be analyzed.  Annotate the variants in the vcf for
-			// this gene and if 'analyze all' includes calling variants, perform
-			// joint calling as well.
+		    if (isCached) {
 
-			// Show that we are working on this gene
-			genesCard._geneBadgeLoading(geneObject.gene_name, true);
-
-			if (me.isCachedForCards(geneObject.gene_name, transcript) || isAlignmentsOnly()) {
-
-				// If the 'analyze all' will include calling variants, the gene may already have loaded
-				// variants (user has clicked on the gene).  In this case, we only want to invoke the
-				// code to joint call the variants for the trio (and determine inheritance) once.  					
-				analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback);
-
+		    	// This gene has already been analyzed. Take this gene off of the queue and see
+		    	// if next batch of genes should be analyzed
+		    	genesCard._geneBadgeLoading(theGeneObject.gene_name, false);
+		    	me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);
+		    
+			
 			} else {
 
+				// The gene is ready to be analyzed.  Annotate the variants in the vcf for
+				// this gene and if 'analyze all' includes calling variants, perform
+				// joint calling as well.
 
-				if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
-					// We have a multi-sample vcf, so we only need to retrieve the vcf records once for
-					// the proband and then obtain the genotypes for the mother/father and affected/unaffected
-					// sibs.
-					getProbandVariantCard().model.promiseGetVariantsMultipleSamples(geneObject, transcript, getRelevantVariantCards())
-					  .then( function() {
-					  	analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback)
+				// Show that we are working on this gene
+				genesCard._geneBadgeLoading(theGeneObject.gene_name, true);
 
-					  }, function(error) {
-						// An error occurred.  Set the gene badge with an error glyph
-		    			// and move on to analyzing the next gene
-		    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-	    				var message = error.hasOwnProperty("message") ? error.message : error;
-		    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-		    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+				if (me.isCachedForCards(theGeneObject.gene_name, theTranscript) || isAlignmentsOnly()) {
 
-						getProbandVariantCard().summarizeError(geneObject.gene_name, error);
-    					// take this gene off of the queue and see
-    					// if next batch of genes should be analyzed
-			    		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);										  	
+					// If the 'analyze all' will include calling variants, the gene may already have loaded
+					// variants (user has clicked on the gene).  In this case, we only want to invoke the
+					// code to joint call the variants for the trio (and determine inheritance) once.  					
+					analyzeVariantsForGene(theGeneObject, theTranscript, shouldCallVariants, callback);
 
-					  })
 				} else {
-					// This is the time this gene's variants have been cached.
-				    // For each sample, get and annotate the genes and
-				    // cache the variants
-			    	getRelevantVariantCards().forEach(function(variantCard) {
 
-			    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-				    		variantCard.model.promiseCacheVariants(
-				    			geneObject.chr,
-				    			geneObject, 
-							 	transcript)
-				    		.then( function(vcfData) {
-								if (me.isCachedForCards(vcfData.gene.gene_name, vcfData.transcript)) {
-									// Once all analysis of the gene variants for each of
-									// the samples is complete, call variants (optional) and
-									// process the trio to determine inheritance
-					    			analyzeVariantsForGene(vcfData.gene, vcfData.transcript, analyzeCalledVariants, callback);
-					    		}
 
-				    		}, function(error) {
+					if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
+						// We have a multi-sample vcf, so we only need to retrieve the vcf records once for
+						// the proband and then obtain the genotypes for the mother/father and affected/unaffected
+						// sibs.
+						getProbandVariantCard().model.promiseGetVariantsMultipleSamples(theGeneObject, theTranscript, getRelevantVariantCards())
+						  .then( function() {
+						  	analyzeVariantsForGene(theGeneObject, theTranscript, shouldCallVariants, callback)
 
-				    			// An error occurred.  Set the gene badge with an error glyph
-				    			// and move on to analyzing the next gene
-				    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-			    				var message = error.hasOwnProperty("message") ? error.message : error;
-				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-				    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
+						  }, function(error) {
+							// An error occurred.  Set the gene badge with an error glyph
+			    			// and move on to analyzing the next gene
+			    			genesCard.setGeneBadgeError(theGeneObject.gene_name);			    				
+		    				var message = error.hasOwnProperty("message") ? error.message : error;
+			    			console.log("problem caching data for gene " + theGeneObject.gene_name + ". " + message);
+			    			genesCard._geneBadgeLoading(theGeneObject.gene_name, false);
 
-								getVariantCard("proband").summarizeError(geneObject.gene_name, error);
-		    					// take this gene off of the queue and see
-		    					// if next batch of genes should be analyzed
-					    		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);					
-				    		});
+							getProbandVariantCard().summarizeError(theGeneObject.gene_name, error);
+	    					// take this gene off of the queue and see
+	    					// if next batch of genes should be analyzed
+				    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);										  	
 
-			    		}
+						  })
+					} else {
+						// This is the time this gene's variants have been cached.
+					    // For each sample, get and annotate the genes and
+					    // cache the variants
+				    	getRelevantVariantCards().forEach(function(variantCard) {
 
-			    	});							
-				}
-		    }				
-		}
+				    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
+					    		variantCard.model.promiseCacheVariants(
+					    			theGeneObject.chr,
+					    			theGeneObject, 
+								 	theTranscript)
+					    		.then( function(vcfData) {
+									if (me.isCachedForCards(vcfData.gene.gene_name, vcfData.transcript)) {
+										// Once all analysis of the gene variants for each of
+										// the samples is complete, call variants (optional) and
+										// process the trio to determine inheritance
+						    			analyzeVariantsForGene(vcfData.gene, vcfData.transcript, shouldCallVariants, callback);
+						    		}
+
+					    		}, function(error) {
+
+					    			// An error occurred.  Set the gene badge with an error glyph
+					    			// and move on to analyzing the next gene
+					    			genesCard.setGeneBadgeError(theGeneObject.gene_name);			    				
+				    				var message = error.hasOwnProperty("message") ? error.message : error;
+					    			console.log("problem caching data for gene " + theGeneObject.gene_name + ". " + message);
+					    			genesCard._geneBadgeLoading(theGeneObject.gene_name, false);
+
+									getVariantCard("proband").summarizeError(theGeneObject.gene_name, error);
+			    					// take this gene off of the queue and see
+			    					// if next batch of genes should be analyzed
+						    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);					
+					    		});
+
+				    		}
+
+				    	});							
+					}
+			    }				
+			}
+
+    	 });
+
 	    	
 
 	 },
@@ -671,12 +682,24 @@ CacheHelper.prototype.cacheNextGene = function(geneName, analyzeCalledVariants, 
 	this.cacheGenes(analyzeCalledVariants, callback);
 }
 
-CacheHelper.prototype.isCachedForProband = function(geneObject, transcript, checkForCalledVariants) {
-	// If we are analyzing loaded variants, return true if the vcf data is cached (and inheritance loaded)
-	// and we have danger summary for this gene.  If we are also analyzing called variants return true
-	// if the above condition is met plus we have cached the called variants for this gene.
-	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneObject, transcript, checkForCalledVariants)
-		|| (!checkForCalledVariants && getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name));
+CacheHelper.prototype.promiseIsCachedForProband = function(geneObject, transcript, checkForCalledVariants) {
+	return new Promise(function(resolve, reject) {
+		// If we are analyzing loaded variants, return true if the vcf data is cached (and inheritance loaded)
+		// and we have danger summary for this gene.  If we are also analyzing called variants return true
+		// if the above condition is met plus we have cached the called variants for this gene.
+		getProbandVariantCard().promiseGetDangerSummary(geneObject.gene_name)
+		 .then(function(dangerSummary) {
+			if (getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneObject, transcript, checkForCalledVariants)
+			|| (!checkForCalledVariants && dangerSummary)) {
+				resolve({geneObject: geneObject, transcript: transcript, shouldCallVariants: checkForCalledVariants, isCached: true});
+			} else {
+				resolve({geneObject: geneObject, transcript: transcript, shouldCallVariants: checkForCalledVariants, isCached: false});
+			}
+		 }, function(error) {
+		 	console.log("An error occurred in CacheHelper.isCachedForProband: " + error);
+		 	resolve({geneObject: geneObject, transcript: transcript, shouldCallVariants: checkForCalledVariants, isCached: false});
+		 });
+	});
 }
 
 CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
@@ -852,29 +875,32 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 					var promise = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript})
 					 .then(function(geneCoverageAll) {
 
-						var dangerObject = getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name);
+						getProbandVariantCard().promiseGetDangerSummary(geneObject.gene_name)
+						 .then(function(dangerSummary) {
+						 	if (geneCoverageAll && dangerObject) {
+						 		var clearOtherDanger = refreshOnly ? false : true;
+						 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
+
+						  		counts.all.analyzed++;
+						  		counts.loaded.analyzed++;
+						  		counts.called.analyzed++;
+						 		if (dangerObject.geneCoverageProblem) {
+						  			counts.all.pass++;
+						  			counts.loaded.pass++;
+						  			counts.called.pass++;
+						  		}
+								
+						 		getProbandVariantCard().model.cacheDangerSummary(dangerObject, keyObject.gene);
+								genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
+					 		} else {
+						  		counts.all.unanalyzed++;
+						  		counts.loaded.unanalyzed++;
+						  		counts.called.unanalyzed++;
+
+					 		}					 	
+						 })
 				 		
-					 	if (geneCoverageAll && dangerObject) {
-					 		var clearOtherDanger = refreshOnly ? false : true;
-					 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
-
-					  		counts.all.analyzed++;
-					  		counts.loaded.analyzed++;
-					  		counts.called.analyzed++;
-					 		if (dangerObject.geneCoverageProblem) {
-					  			counts.all.pass++;
-					  			counts.loaded.pass++;
-					  			counts.called.pass++;
-					  		}
-							
-					 		getProbandVariantCard().model.cacheDangerSummary(dangerObject, keyObject.gene);
-							genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
-				 		} else {
-					  		counts.all.unanalyzed++;
-					  		counts.loaded.unanalyzed++;
-					  		counts.called.unanalyzed++;
-
-				 		}
+	
 					 }, function(error) {
 					 	var msg = "Problem encountered in CacheHelper.refreshGeneBadgesGeneCoverage() " + error;
 					 	console.log(msg);
@@ -930,29 +956,32 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
 	  		}
 
 	  		var theFbData = null;
-			var ds = getVariantCard("proband").model.getDangerSummaryForGene(geneObject.gene_name);
-			if (theVcfData && theVcfData.features && ds && ds.CALLED) {
-				theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
-			}
+			getVariantCard("proband").promiseGetDangerSummary(geneObject.gene_name)
+			 .then(function(ds) {
+				if (theVcfData && theVcfData.features && ds && ds.CALLED) {
+					theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
+				}
 
-			var options = {};
-			if (theFbData) {
-				options.CALLED = true;
-			}
+				var options = {};
+				if (theFbData) {
+					options.CALLED = true;
+				}
 
-			promiseGetCachedGeneCoverage(geneObject,{ transcript_id: keyObject.transcript})
-			 .then(function(geneCoverageAll) {
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverageAll);
+				promiseGetCachedGeneCoverage(geneObject,{ transcript_id: keyObject.transcript})
+				 .then(function(geneCoverageAll) {
+			  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverageAll);
 
-				getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
-				
-				genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
+					getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
+					
+					genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
 
-				me.refreshNextGeneBadge(keys, geneCount, callback);	
+					me.refreshNextGeneBadge(keys, geneCount, callback);	
 
+				 })
+
+		 	
 			 })
-
-  		});
+	  		});
 	}
 }
 

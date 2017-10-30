@@ -8,6 +8,7 @@
 	this.currentPageNumber = 1;
 	this.geneNameLoading = null;
 	this.sortedGeneNames = null;
+	this.geneToDangerSummaryMap = {};
 	this.legend = null;
 
 	this.LOW_COVERAGE_OPTION    = "insufficient coverage";
@@ -287,25 +288,66 @@ GenesCard.prototype.setOrderBy = function(sortBy) {
 }
 
 GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
-	this.sortedGeneNames = null;
+	var me = this;
+	me.sortedGeneNames = null;
 	if (sortBy == null) {
 		sortBy = $('#select-gene-sort')[0].selectize.getValue();
 		if (sortBy == "") {
 			// If the dropdown is empty, set to 'harmful variants'
-			$('#select-gene-sort')[0].selectize.setValue(this.HARMFUL_VARIANTS_OPTION);
-			sortBy = this.HARMFUL_VARIANTS_OPTION;
+			$('#select-gene-sort')[0].selectize.setValue(me.HARMFUL_VARIANTS_OPTION);
+			sortBy = me.HARMFUL_VARIANTS_OPTION;
 		}
 	} else if (setDropdown) {
 		$('#select-gene-sort')[0].selectize.setValue(sortBy);
 	}
+
+
 	if (sortBy.indexOf("gene name") >= 0) {
-		this.sortedGeneNames = geneNames.slice().sort();
-	} else if (sortBy.indexOf(this.HARMFUL_VARIANTS_OPTION) >= 0) {
-		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummary);
-	} else if (sortBy.indexOf(this.LOW_COVERAGE_OPTION) >= 0) {
-		this.sortedGeneNames = geneNames.slice().sort(this.compareDangerSummaryByLowCoverage);
+		me.sortedGeneNames = geneNames.slice().sort();
+		me._initPaging(me.sortedGeneNames, true);
+
+	} else {
+		me._promiseMapDangerSummaries()
+		 .then(function() {
+			if (sortBy.indexOf(me.HARMFUL_VARIANTS_OPTION) >= 0) {
+				me.sortedGeneNames = geneNames.slice().sort(GenesCard.compareDangerSummary);
+			} else if (sortBy.indexOf(me.LOW_COVERAGE_OPTION) >= 0) {
+				me.sortedGeneNames = geneNames.slice().sort(GenesCard.compareDangerSummaryByLowCoverage);
+			}
+			me._initPaging(me.sortedGeneNames, true);
+
+		 })
+
 	}
-	this._initPaging(this.sortedGeneNames, true);
+
+}
+
+GenesCard.prototype._promiseMapDangerSummaries = function() {
+	var me = this;
+
+	return new Promise(function(resolve, reject) {
+		var promises = [];
+		geneNames.forEach(function(geneName) {
+			var dangerSummary = me.geneToDangerSummaryMap[geneName];
+			if (dangerSummary == null) {
+				var promise = getProbandVariantCard().promiseGetDangerSummary(geneName)
+				.then( function(ds) {
+					me.geneToDangerSummaryMap[geneName] = ds;
+				}, function(error) {
+					console.log("Error in GenesCard._promiseMapDangerSummaries(): " + error)
+					reject(error);
+				});
+				promises.push(promise);
+			}
+		})
+
+		Promise.all(promises).then(function() {
+			resolve();
+		});
+
+	});
+
+	
 }
 
 GenesCard.prototype.getGeneNames = function() {
@@ -326,9 +368,10 @@ GenesCard.prototype.getPageCount = function() {
 	return Math.ceil(window.geneNames.length / this.GENES_PER_PAGE);
 }
 
-GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
-	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
-	var danger2 = getProbandVariantCard().getDangerSummaryForGene(geneName2);
+GenesCard.compareDangerSummary = function(geneName1, geneName2) {
+
+	var danger1 = genesCard.geneToDangerSummaryMap[geneName1];
+	var danger2 = genesCard.geneToDangerSummaryMap[geneName2];
 
 	if (danger1 == null && danger2 == null) {
 		return 0;
@@ -439,9 +482,10 @@ GenesCard.prototype.compareDangerSummary = function(geneName1, geneName2) {
 }
 
 
-GenesCard.prototype.compareDangerSummaryByLowCoverage = function(geneName1, geneName2) {
-	var danger1 = getProbandVariantCard().getDangerSummaryForGene(geneName1);
-	var danger2 = getProbandVariantCard().getDangerSummaryForGene(geneName2);
+GenesCard.compareDangerSummaryByLowCoverage = function(geneName1, geneName2) {
+	var danger1 = genesCard.geneToDangerSummaryMap[geneName1];
+	var danger2 = genesCard.geneToDangerSummaryMap[geneName2];
+
 
 	if (danger1 == null && danger2 == null) {
 		return 0;
@@ -547,18 +591,22 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 		}
 		// If the danger summary has already been determined,
 		// set the appropriate gene badges.
-		var geneSummary = getProbandVariantCard().getDangerSummaryForGene(name);
-		if (geneSummary && geneSummary.error == null) {
-			me.setGeneBadgeGlyphs(name, geneSummary);
-		} else if (geneSummary && geneSummary.error) {
-			me.setGeneBadgeWarning(name);
-		}
-		if (geneUserVisits[name]) {
-			me.flagUserVisitedGene(name);
-		}
-		if (cacheHelper.isGeneInProgress(name)) {
-			me.showGeneBadgeLoading(name, true);
-		}
+		getProbandVariantCard().promiseGetDangerSummary(name)
+		 .then(function (geneSummary) {
+
+			if (geneSummary && geneSummary.error == null) {
+				me.setGeneBadgeGlyphs(geneSummary.geneName, geneSummary);
+			} else if (geneSummary && geneSummary.error) {
+				me.setGeneBadgeWarning(geneSummary.geneName);
+			}
+			if (geneSummary && geneUserVisits[geneSummary.geneName]) {
+				me.flagUserVisitedGene(geneSummary.geneName);
+			}
+			if (geneSummary && cacheHelper.isGeneInProgress(geneSummary.geneName)) {
+				me.showGeneBadgeLoading(geneSummary.geneName, true);
+			}
+
+		 })
 	}
 
 }
@@ -1246,6 +1294,9 @@ GenesCard.prototype.clearGeneInfo = function(theGeneName) {
 	if (geneToLatestTranscript && geneToLatestTranscript.hasOwnProperty(theGeneName)) {
 		delete geneToLatestTranscript[theGeneName];
 	}
+	if (this.geneToLatestTranscript && this.geneToLatestTranscript[theGeneName]) {
+		delete this.geneToLatestTranscript[theGeneName];
+	}
 }
 
 GenesCard.prototype._removeGeneHousekeeping = function(theGeneName, performPaging=true, updateAnalyzedCounts=true) {
@@ -1314,6 +1365,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 	};
 	window.gene = null;
 	window.selectedTranscript = null;
+	me.geneToDangerSummaryMap = {};
 	me._hideCurrentGene();
 
 	me._onGeneBadgeUpdate();
@@ -1562,39 +1614,45 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback)
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		}
 
-		var theFbData = getProbandVariantCard().model.getFbDataForGene(window.gene, window.selectedTranscript, true)
-		var options = {};
-		if (theFbData) {
-			options.CALLED = true;
-		}
+		vc.promiseGetDangerSummary(window.gene)
+		 .then(function(dangerSummary) {
 
-		promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverageAll) {
-
-			if (theVcfData == null ) {
-				me.setGeneBadgeWarning(window.gene.gene_name, true);
-				if (callback) {
-					callback();
-				}
-			} else if (theVcfData.features && theVcfData.features.length == 0) {
-				// There are 0 variants.  Summarize danger so that we know we have
-				// analyzed this gene
-				var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll);
-				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
-				if (callback) {
-					callback();
-				}
-			} else if (theVcfData.features && theVcfData.features.length > 0) {
-				var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
-
-
-				var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll);
-				me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
-				if (callback) {
-					callback();
-				}
-
+			var theFbData = getProbandVariantCard().model.getFbDataForGene(window.gene, window.selectedTranscript, true)
+			var options = {};
+			if (theFbData || (dangerSummary && dangerSummary.CALLED)) {
+				options.CALLED = true;
 			}
-		});	
+
+			promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverageAll) {
+
+				if (theVcfData == null ) {
+					me.setGeneBadgeWarning(window.gene.gene_name, true);
+					if (callback) {
+						callback();
+					}
+				} else if (theVcfData.features && theVcfData.features.length == 0) {
+					// There are 0 variants.  Summarize danger so that we know we have
+					// analyzed this gene
+					var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll);
+					me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+					if (callback) {
+						callback();
+					}
+				} else if (theVcfData.features && theVcfData.features.length > 0) {
+					var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
+
+
+					var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll);
+					me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+					if (callback) {
+						callback();
+					}
+
+				}
+			});	
+
+		 })
+
 
 	}
 }

@@ -113,10 +113,15 @@ VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscrip
 		// Reconstitute called variants from vcf data that contains called variants
 		if (theFbData == null || theFbData.features == null) {
 			var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
-			var dangerSummary = me.getDangerSummaryForGene(geneObject.gene_name);
-			if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
-				theFbData = me.reconstituteFbData(theVcfData);
-			}
+			var dangerSummary = me.promiseGetDangerSummary(geneObject.gene_name)
+			 .then(function(dangerSummary) {
+				if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
+					theFbData = me.reconstituteFbData(theVcfData);
+				}
+			 }, 
+			 function(error) {
+			 	console.log("An error occurred in VariantMode.getFbDataForGene: " + error);
+			 })
 		} 
 	}
 	return theFbData;
@@ -349,10 +354,8 @@ VariantModel.prototype.getBamDataForGene = function(geneObject) {
 	return data ? data.coverage : null;
 }
 
-VariantModel.prototype.getDangerSummaryForGene = function(geneName) {
-	var me = this;
-	var	dangerSummary = this._getCachedData("dangerSummary", geneName, null);
-	return dangerSummary;
+VariantModel.prototype.promiseGetDangerSummary = function(geneName) {
+	return this._promiseGetCachedData("dangerSummary", geneName, null);
 }
 
 VariantModel.prototype.getVariantCount = function(data) {
@@ -372,9 +375,10 @@ VariantModel.prototype.getVariantCount = function(data) {
 	return loadedVariantCount;
 }
 
-VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAll) {
+VariantModel._summarizeDanger = function(geneName, theVcfData, options = {}, geneCoverageAll) {
 
 	var dangerCounts = $().extend({}, options);
+	dangerCounts.geneName = geneName;
 	VariantModel.summarizeDangerForGeneCoverage(dangerCounts, geneCoverageAll);
 
 	if (theVcfData == null ) {

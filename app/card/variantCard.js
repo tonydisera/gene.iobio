@@ -123,7 +123,7 @@ VariantCard.prototype.promiseGetGeneCoverage = function(geneObject, transcript) 
 }
 
 VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverageAll) {
-	var dangerSummary = VariantModel.summarizeDanger(data, options, geneCoverageAll);
+	var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);
 	this.model.cacheDangerSummary(dangerSummary, geneName);
 	return dangerSummary;
 }
@@ -134,8 +134,8 @@ VariantCard.prototype.summarizeError = function(geneName, error) {
 	return dangerSummary;
 }
 
-VariantCard.prototype.getDangerSummaryForGene = function(geneName) {
-	return this.model.getDangerSummaryForGene(geneName);
+VariantCard.prototype.promiseGetDangerSummary = function(geneName) {
+	return this.model.promiseGetDangerSummary(geneName);
 }
 
 VariantCard.prototype.isCached = function(geneName, transcript) {
