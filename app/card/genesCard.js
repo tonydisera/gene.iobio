@@ -1568,7 +1568,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback)
 			options.CALLED = true;
 		}
 
-		promiseGetGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverageAll) {
+		promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript).then(function(geneCoverageAll) {
 
 			if (theVcfData == null ) {
 				me.setGeneBadgeWarning(window.gene.gene_name, true);

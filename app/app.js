@@ -434,7 +434,7 @@ function init() {
 				if (!selectedTranscript) {
 					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
 					getCodingRegions(selectedTranscript);
-			    	markCodingRegions(window.gene, window.selectedTranscript);
+			    	promiseMarkCodingRegions(window.gene, window.selectedTranscript);
 				}
 			} else {
 	    		$('#zoom-hint').text('To zoom into region, drag over gene model.');
@@ -1727,11 +1727,13 @@ function onCloseTranscriptMenuEvent() {
 }
 
 function selectCurrentTranscript() {
-	markCodingRegions(window.gene, window.selectedTranscript);
-	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-	d3.selectAll("#gene-viz .transcript rect").remove();
- 	getCodingRegions(window.selectedTranscript);
- 	loadTracksForGene();	
+	promiseMarkCodingRegions(window.gene, window.selectedTranscript)
+		.then(function() {
+			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+			d3.selectAll("#gene-viz .transcript rect").remove();
+		 	getCodingRegions(window.selectedTranscript);
+		 	loadTracksForGene();				
+		})
 }
 
 function getCanonicalTranscript(theGeneObject) {
@@ -1899,7 +1901,10 @@ function getCodingRegions(transcript) {
 	return [];
 }
 
-function markCodingRegions(geneObject, transcript) {
+
+
+function promiseMarkCodingRegions(geneObject, transcript) {
+	var exonPromises = [];
 	transcript.features.forEach(function(feature) {
 		if (!feature.hasOwnProperty("danger")) {
 			feature.danger = {proband: false, mother: false, father: false};
@@ -1907,29 +1912,38 @@ function markCodingRegions(geneObject, transcript) {
 		if (!feature.hasOwnProperty("geneCoverage")) {
 			feature.geneCoverage = {proband: false, mother: false, father: false};
 		}
+
+
 		getRelevantVariantCards().forEach(function(vc) {
-			var geneCoverage = vc.model.getGeneCoverageForGene(geneObject, transcript);
-			if (geneCoverage) {
-				var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
-					return feature.start == gc.start && feature.end == gc.end;
-				});
-				if (matchingFeatureCoverage.length > 0) {
-					var gc = matchingFeatureCoverage[0];
-					feature.geneCoverage[vc.getRelationship()] = gc;
-					feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
-				} else {
-					feature.danger[vc.getRelationship()]  = false;
-				}
-			} else {
-				feature.danger[vc.getRelationship()] = false;
-			}
+			var promise = vc.model.promiseGetCachedGeneCoverage(geneObject, transcript)
+			 .then(function(geneCoverage) {
+					if (geneCoverage) {
+						var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
+							return feature.start == gc.start && feature.end == gc.end;
+						});
+						if (matchingFeatureCoverage.length > 0) {
+							var gc = matchingFeatureCoverage[0];
+							feature.geneCoverage[vc.getRelationship()] = gc;
+							feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
+						} else {
+							feature.danger[vc.getRelationship()]  = false;
+						}
+					} else {
+						feature.danger[vc.getRelationship()] = false;
+					}
 
+			 })
+			exonPromises.push(promise);
 		})
-
 	})
 
-	var exonCount = 0;
-	var exonNumber = 1;
+	return Promise.all(exonPromises).then(function() {
+		var sortedExons = _getSortedExonsForTranscript(transcript);
+		_setTranscriptExonNumbers(transcript, sortedExons);
+	});
+}
+
+function _getSortedExonsForTranscript(transcript) {
 	var sortedExons = transcript
 		.features.filter(function(feature) {
 			return feature.feature_type.toUpperCase() == 'EXON';
@@ -1950,16 +1964,23 @@ function markCodingRegions(geneObject, transcript) {
 			return compare * strandMultiplier;
 
 		})
+	
+	var exonCount = 0;
 	sortedExons.forEach(function(exon) {
 		exonCount++
-	})
+	})	
 
+	var exonNumber = 1;
 	sortedExons.forEach(function(exon) {
 		exon.exon_number = exonNumber + "/" + exonCount;
 		exonNumber++;
-	})
+	})	
+	return sortedExons;	
+}
 
-	// Now set the exon number on each UTR and CDS within the corresponding exon
+
+function _setTranscriptExonNumbers(transcript, sortedExons) {
+	// Set the exon number on each UTR and CDS within the corresponding exon
 	transcript.features.forEach(function(feature) {
 		if (feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR') {
 			sortedExons.forEach(function(exon) {
@@ -1970,7 +1991,6 @@ function markCodingRegions(geneObject, transcript) {
 		}
 	})
 }
-
 function hasDataSources() {
 	var hasDataSource = false;
 	variantCards.forEach( function(variantCard) {
@@ -2654,11 +2674,11 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 		// so that the coverage scales across all samples.
 		var variantPromises = [];
 
+		promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript, true).then(function() {
+	    	return promiseMarkCodingRegions(window.gene, window.selectedTranscript);
 
+		}).then(function() {
 
-		promiseGetGeneCoverage(window.gene, window.selectedTranscript, true).then(function() {
-
-	    	markCodingRegions(window.gene, window.selectedTranscript);
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
 
@@ -2911,9 +2931,11 @@ function showTranscripts(regionStart, regionEnd) {
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
 		}
-    	markCodingRegions(window.gene, window.selectedTranscript);
-		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-		getCodingRegions(window.selectedTranscript);
+    	promiseMarkCodingRegions(window.gene, window.selectedTranscript)
+    		.then(function() {
+				geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+				getCodingRegions(window.selectedTranscript);
+    		});
 	}
 
 
@@ -3320,42 +3342,29 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 }
 
-function promiseGetGeneCoverage(geneObject, transcript, showProgress=false) {
-	return new Promise(function(resolve,reject) {
+
+function promiseGetCachedGeneCoverage(geneObject, transcript) {
+
+	return new Promise(function(resolve, reject) {
+		var geneCoverageAll = {};
 
 		var promises = [];
-
 		getRelevantVariantCards().forEach(function(vc) {
-			if (vc.isBamLoaded()) {
-				if (showProgress) {
-					vc.showBamProgress("Analyzing coverage in coding regions");
-				}
-				var promise = vc.promiseGetGeneCoverage(geneObject, transcript).then(function(theVariantCard) {
-					if (showProgress) {
-						theVariantCard.endBamProgress();
-					}
-				})
-				promises.push(promise);
-			} 
-		});
+			var promise = vc.model.promiseGetGeneCoverage(geneObject, transcript)
+			 .then(function(gc) {
+				geneCoverageAll[vc.getRelationship()] = gc;
+			 },
+			 function(error) {
+			 	reject(error);
+			 })
+			promises.push(promise);
 
+		})	
 		Promise.all(promises).then(function() {
-			var geneCoverageAll = getCachedGeneCoverage(geneObject, transcript);
-
 			resolve(geneCoverageAll);
+		})		
+	})
 
-		})
-
-	});
-}
-
-function getCachedGeneCoverage(geneObject, transcript) {
-	var geneCoverageAll = {};
-	getRelevantVariantCards().forEach(function(vc) {
-		var gc = vc.model.getGeneCoverageForGene(geneObject, transcript);
-		geneCoverageAll[vc.getRelationship()] = gc;
-	})	
-	return geneCoverageAll;
 }
 
 

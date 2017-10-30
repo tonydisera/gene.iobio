@@ -189,26 +189,32 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
-		var cachedGeneCoverage = me.getGeneCoverageForGene(geneObject, transcript);
-		if (cachedGeneCoverage) {
-			resolve(cachedGeneCoverage)
-		} else {
-			me.bam.getGeneCoverage(geneObject, 
-				transcript,
-				[me.bam],	
-				function(theData, trRefName, theGeneObject, theTranscript) {
-					var geneCoverageObjects = me._parseGeneCoverage(theData);
-					if (geneCoverageObjects.length > 0) {
-						me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
-						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
-						resolve(geneCoverageObjects)
-					} else {
-						console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
-						resolve([]);
-					}
-				}	
-			);
-		}
+		me.promiseGetCachedGeneCoverage(geneObject, transcript)
+		 .then( function(cachedGeneCoverage) {
+			if (cachedGeneCoverage) {
+				resolve(cachedGeneCoverage)
+			} else {
+				me.bam.getGeneCoverage(geneObject, 
+					transcript,
+					[me.bam],	
+					function(theData, trRefName, theGeneObject, theTranscript) {
+						var geneCoverageObjects = me._parseGeneCoverage(theData);
+						if (geneCoverageObjects.length > 0) {
+							me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
+							me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
+							resolve(geneCoverageObjects)
+						} else {
+							console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+							resolve([]);
+						}
+					}	
+				);
+			}
+
+		 },
+		 function(error) {
+		 	reject(error);
+		 });
 
 	});
 }
@@ -267,9 +273,8 @@ VariantModel.prototype._parseGeneCoverage = function(theData) {
 	return geneCoverageObjects;
 }
 
-VariantModel.prototype.getGeneCoverageForGene = function(geneObject, selectedTranscript) {
-	var geneCoverage = this._getCachedData("geneCoverage", geneObject.gene_name, selectedTranscript);
-	return geneCoverage;
+VariantModel.prototype.promiseGetCachedGeneCoverage = function(geneObject, selectedTranscript) {
+	return this._promiseGetCachedData("geneCoverage", geneObject.gene_name, selectedTranscript);
 }
 
 VariantModel.prototype.setGeneCoverageForGene = function(geneCoverage, geneObject, transcript) {
@@ -2059,7 +2064,23 @@ VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcrip
     }
 }
 
-VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript) {
+
+VariantModel.prototype._promiseGetCachedData = function(dataKind, geneName, transcript) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		me._getCachedData(dataKind, geneName, transcript, 
+			function(data) {
+				resolve(data);
+			},
+			function(error) {
+				var msg = "Error occurred when calling VariantModel._getCachedData(): " + error;
+				console.log(msg);
+				reject(msg);
+			});
+	})
+}
+
+VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript, callback, callbackError) {
 	var me = this;
 
 	geneName = geneName.toUpperCase();
@@ -2078,11 +2099,19 @@ VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript)
 				 	console.log("time to decompress cache " + dataKind + " = " + (Date.now() - start));
 				 }
 			} catch(e) {
-				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey(dataKind, geneName, transcript));
+				var msg = "an error occurred when uncompressing vcf data for key " + me._getCacheKey(dataKind, geneName, transcript);
+				console.log(msg);
+				if (callbackError) {
+					callbackError(msg);
+				}
 			}
       	} 
 	} 
-	return data;
+	if (callback) {
+		callback(data);
+	} else {
+		return data;
+	}
 }
 
 VariantModel.prototype.pruneIntronVariants = function(data) {

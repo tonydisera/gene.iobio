@@ -884,9 +884,14 @@ FilterCard.prototype.clearCardSpecificFilters = function(relationship) {
 
 
 FilterCard.prototype.refreshGeneCoverageBadges = function() {
-	cacheHelper.refreshGeneBadgesGeneCoverage(true);
-	$('#filter-track #coverage-thresholds').removeClass('attention');
-	loadTracksForGene();
+	cacheHelper.promiseRefreshGeneBadgesGeneCoverage(true)
+	 .then(function() {
+		$('#filter-track #coverage-thresholds').removeClass('attention');
+		loadTracksForGene();
+
+	 }, function(error) {
+	 	console.log("Problem encounted in FilterCard.refreshGeneCoverageBadges(): " + error);
+	 });
 }
 
 
@@ -896,11 +901,18 @@ FilterCard.prototype.filterGenes = function(callback) {
 	// refresh all of the gene badges based on the filter
 	if (me.applyLowCoverageFilter) {
 		genesCard.setOrderBy(genesCard.LOW_COVERAGE_OPTION);
-		var geneCounts = cacheHelper.refreshGeneBadgesGeneCoverage();
-		cacheHelper.showGeneCounts(geneCounts);	
-		if (callback) {
-			callback();
-		}
+		var geneCounts = cacheHelper.promiseRefreshGeneBadgesGeneCoverage()
+		 .then(function(geneCounts) {
+			cacheHelper.showGeneCounts(geneCounts);	
+			if (callback) {
+				callback();
+			}
+		 }, function(error) {
+		 	console.log("Problem encounted in FilterCard.filterGenes():  " + error);
+		 	if (callback) {
+		 		callback();
+		 	}
+		 });
 	} else {
 		genesCard.setOrderBy(genesCard.HARMFUL_VARIANTS_OPTION);
 		var geneCounts = cacheHelper.refreshGeneBadges(function() {
