@@ -863,19 +863,26 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			resolve(null);
 		}
 
-		var coverage = me.model.getBamDataForGene(window.gene);
-		if (coverage != null) {
-			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-			resolve(coverage);
-		} else {
-			// If we have variant, get coverage for every variant
-			me.showBamProgress("Calculating coverage");
-			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
-				me.endBamProgress();
+		me.model.promiseGetBamData(window.gene)
+		 .then(function(coverage) {
+			if (coverage != null) {
 				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-				resolve(coverageData);
-			});
-		}					
+				resolve(coverage);
+			} else {
+				// If we have variant, get coverage for every variant
+				me.showBamProgress("Calculating coverage");
+				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
+					me.endBamProgress();
+					genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+					resolve(coverageData);
+				});
+			}					
+
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in VariantCard.promiseLoadBamDepth(): " + error;
+		 	reject(msg);
+		 })
 	});
 
 }
@@ -931,38 +938,45 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		this.cardSelector.removeClass("hide");
 	}
 
-	var coverage = this.model.getBamDataForGene(window.gene);
-	var theVcfData = this.model.getVcfDataForGene(window.gene, selectedTranscript);
-	if (coverage != null) {
-		me.endBamProgress();
-		if (regionStart && regionEnd) {
-			var filteredData = me.model.filterBamDataByRegion(coverage, regionStart, regionEnd);
-			me._fillBamChart(filteredData, regionStart, regionEnd, maxDepth);
-		} else {
-			me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
-		}
-		
-		if (callbackDataLoaded) {
-	   	    callbackDataLoaded(me);
-   	    }
-	} else {
-
-		// If we have variants, get coverage for every variant
-		me.showBamProgress("Calculating coverage");
-
-		
-		this.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+	this.model.promiseGetBamData(window.gene)
+	 .then(function(coverage){
+		var theVcfData = me.model.getVcfDataForGene(window.gene, selectedTranscript);
+		if (coverage != null) {
 			me.endBamProgress();
-			me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
-
+			if (regionStart && regionEnd) {
+				var filteredData = me.model.filterBamDataByRegion(coverage, regionStart, regionEnd);
+				me._fillBamChart(filteredData, regionStart, regionEnd, maxDepth);
+			} else {
+				me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
+			}
+			
 			if (callbackDataLoaded) {
 		   	    callbackDataLoaded(me);
 	   	    }
+		} else {
 
-		});
+			// If we have variants, get coverage for every variant
+			me.showBamProgress("Calculating coverage");
 
-	}
+			
+			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+				me.endBamProgress();
+				me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
 
+				if (callbackDataLoaded) {
+			   	    callbackDataLoaded(me);
+		   	    }
+
+			});
+
+		}
+
+	 }, 
+	 function(error) {
+	 	me.endBamProgress();
+	 	console.log("A problem occurred in VariantCard._showBamDepth(): " + error);
+	 });
+	
 
 }
 
@@ -1896,32 +1910,43 @@ VariantCard.prototype.hideVariantCircle = function(variant) {
 }
 
 VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) {
-	if (this.model.getBamDataForGene(window.gene) != null) {
-		var bamDepth = null;
-		if (sourceVariantCard == this && variant.bamDepth != null && variant.bamDepth != '') {
-			bamDepth = variant.bamDepth;
-		} else {
-			var matchingVariant = this.model.getMatchingVariant(variant);
-			if (matchingVariant != null) {
-				bamDepth = matchingVariant.bamDepth;
-				// If samtools mpileup didn't return coverage for this position, use the variant's depth
-				// field.
-				if (bamDepth == null || bamDepth == '') {
-					bamDepth = matchingVariant.genotypeDepth;
+	var me = this;
+	this.model.promiseGetBamData(window.gene)
+ 	 .then(function(coverage) {
+		 if (coverage != null) {
+			var bamDepth = null;
+			if (sourceVariantCard == me && variant.bamDepth != null && variant.bamDepth != '') {
+				bamDepth = variant.bamDepth;
+			} else {
+				var matchingVariant = me.model.getMatchingVariant(variant);
+				if (matchingVariant != null) {
+					bamDepth = matchingVariant.bamDepth;
+					// If samtools mpileup didn't return coverage for this position, use the variant's depth
+					// field.
+					if (bamDepth == null || bamDepth == '') {
+						bamDepth = matchingVariant.genotypeDepth;
+					}
 				}
 			}
-		}
 
-		this.bamDepthChart.showCircle()(variant.start, bamDepth);
+			me.bamDepthChart.showCircle()(variant.start, bamDepth);
+	    }
 
+ 	 },
+ 	 function(error) {
 
-    }
+ 	 });
 }
 
 VariantCard.prototype.hideCoverageCircle = function() {
-	if (this.model.getBamDataForGene(window.gene) != null){
-		this.bamDepthChart.hideCircle()();
-	}	
+	var me = this;
+	me.model.promiseGetBamData(window.gene)
+	 .then(function(coverage) {
+	 	if (coverage) {
+	 		me.bamDepthChart.hideCircle()();
+	 	}
+
+	 })
 }
 
 VariantCard.prototype.getMaxAlleleCount = function() {

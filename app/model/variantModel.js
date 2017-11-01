@@ -328,31 +328,42 @@ VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selected
 	return data;
 }
 
-VariantModel.prototype.getBamDataForGene = function(geneObject) {
+VariantModel.prototype.promiseGetBamData = function(geneObject) {
 	var me = this;
-	var data = null;
+	return new Promise(function(resolve, reject) {
 
-	if (geneObject == null) {
-		return null;
-	}
-	
-	if (me.bamData != null) {
-		if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
-			geneObject.start == me.bamData.start &&
-			geneObject.end == me.bamData.end) {
-			data = me.bamData;
-		}		
-	} 
+		var data = null;
 
-	if (data == null) {
-		// Find in cache
-		data = this._getCachedData("bamData", geneObject.gene_name, null);
-		if (data != null && data != '') {
-			me.bamData = data;
+		if (geneObject == null) {
+			reject("Error VariantModel.promiseGetBamData(): geneObject is null");
 		}
-	} 
-	return data ? data.coverage : null;
+		
+		if (me.bamData != null) {
+			if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
+				geneObject.start == me.bamData.start &&
+				geneObject.end == me.bamData.end) {
+				data = me.bamData;
+				resolve(data.coverage);
+			}		
+		} 
+		if (data == null) {
+			// Find in cache
+			me._promiseGetCachedData("bamData", geneObject.gene_name, null)
+			 .then(function(data) {
+				if (data != null && data != '') {
+					me.bamData = data;
+				}
+				resolve( data ? data.coverage : null);
+			 }, 
+			 function(error) {
+			 	var msg = "An error occurred in VariantModel.promiseGetBamData(): " + error;
+			 	reject(msg);
+			 })
+		} 
+
+	})
 }
+
 
 VariantModel.prototype.promiseGetDangerSummary = function(geneName) {
 	return this._promiseGetCachedData("dangerSummary", geneName, null);
