@@ -1614,7 +1614,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback)
 			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
 		}
 
-		vc.promiseGetDangerSummary(window.gene)
+		vc.promiseGetDangerSummary(window.gene.gene_name)
 		 .then(function(dangerSummary) {
 
 			var theFbData = getProbandVariantCard().model.getFbDataForGene(window.gene, window.selectedTranscript, true)

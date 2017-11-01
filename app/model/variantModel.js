@@ -2087,6 +2087,10 @@ VariantModel.prototype._promiseGetCachedData = function(dataKind, geneName, tran
 VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript, callback, callbackError) {
 	var me = this;
 
+	if (geneName == null) {
+		console.log("empty gene name for VariantModel._getCachedData");
+	}
+
 	geneName = geneName.toUpperCase();
 
 	var data = null;
