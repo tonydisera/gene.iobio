@@ -1049,13 +1049,14 @@ VariantTooltip.prototype._tooltipRowAlleleCounts = function(label) {
 VariantTooltip.prototype.scroll = function(dir="down", parentContainerSelector) {
 	var me = this;
 
+	var topPos = $(parentContainerSelector + ' #tooltip-body').scrollTop();
 	scrollHeight = $(parentContainerSelector + ' #tooltip-body').innerHeight();
 	var multiplier = 1;
 	if (dir == "up") {
 		multiplier =  -1;
 	}
 	$(parentContainerSelector + ' #tooltip-body').animate({
-	    scrollTop: scrollHeight * multiplier
+	    scrollTop: (topPos + scrollHeight) * multiplier
 	}, 1000, function() {
 		me.showScrollButtons($(parentContainerSelector));
 	});	

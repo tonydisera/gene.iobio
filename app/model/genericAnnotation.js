@@ -236,6 +236,7 @@ GenericAnnotation.prototype.formatContent = function(variant, clazzMap, EMPTY_VA
 
 			}
 		}
+		annotDiv += "</div>"
 	}	
 	return annotDiv;
 }
