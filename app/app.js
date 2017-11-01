@@ -573,6 +573,12 @@ function init() {
 		// this becomes the 'new' site gene source
 		siteGeneSource = geneSource;
 		geneToLatestTranscript = {};
+		getRelevantVariantCards().forEach(function(vc) {
+			// When switching from gencode->refseq or vice/versa, 
+			// the VEP tokens will be formatted in a different order,
+			// so make sure we clear out the token indices 
+			vc.model.vcf.clearVepInfoFields();
+		})
 		if (window.gene) {
 			genesCard.selectGene(window.gene.gene_name);
 		}

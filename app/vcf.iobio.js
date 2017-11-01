@@ -784,7 +784,7 @@ var effectCategories = [
       if (getRsId) {
         vepArgs.push("--check_existing");
       }
-      if (hgvsNotation || getRsId) {
+      if (hgvsNotation || getRsId || isRefSeq) {
         vepArgs.push("--fasta");
         vepArgs.push(refFastaFile);
       }
@@ -1013,6 +1013,9 @@ var effectCategories = [
     return key;
   }
 
+  exports.clearVepInfoFields = function() {
+    this.infoFields.VEP = null;
+  }
 
   exports._parseHeaderForInfoFields = function(record) {
     var me = this;
