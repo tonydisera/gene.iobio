@@ -505,7 +505,7 @@ var Bam = Class.extend({
               'urlparams': { 'encoding':'binary'},
               ssl: useSSL
             });
-          cmd = cmd.pipe(samtools, ["mpileup", "-"], {urlparams: {protocol: 'http'}, ssl: useSSL});
+          cmd = cmd.pipe(samtools, ["mpileup", "-"], {ssl: useSSL});
         } else {
 
           function writeSamFile (stream) {
@@ -539,7 +539,7 @@ var Bam = Class.extend({
         } else {
           // After running samtools mpileup, run coverage service to summarize point data.
           // NOTE:  Had to change to protocol http(); otherwise signed URLs don't work (with websockets)
-          cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {urlparams: {protocol: "http"}, ssl: useSSL});
+          cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
 
         }
 
