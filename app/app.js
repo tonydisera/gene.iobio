@@ -3191,8 +3191,10 @@ function jointCallVariantsImpl(checkCache, callback) {
 	} else {
 		var bams = [];
 		getRelevantVariantCards().forEach(function(vc) {
-			vc.clearCalledVariants();
-			bams.push(vc.model.bam);
+			if (vc.getRelationship() != 'known-variants') {
+				vc.clearCalledVariants();
+				bams.push(vc.model.bam);				
+			}
 		});
 
 		showCallingProgress();
@@ -3228,7 +3230,9 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 	var bams = [];
 	var cards = getRelevantVariantCards();
 	cards.forEach(function(vc) {
-		bams.push(vc.model.bam);
+		if (vc.getRelationship() != 'known-variants') {
+			bams.push(vc.model.bam);
+		}
 	});
 
 	

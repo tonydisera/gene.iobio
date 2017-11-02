@@ -538,6 +538,7 @@ var Bam = Class.extend({
             cmd = cmd.pipe("nv-dev-new.iobio.io/coverage/", [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL, urlparams: urlParameters});
         } else {
           // After running samtools mpileup, run coverage service to summarize point data.
+          // NOTE:  Had to change to protocol http(); otherwise signed URLs don't work (with websockets)
           cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
 
         }
