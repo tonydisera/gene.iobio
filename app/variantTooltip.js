@@ -1126,12 +1126,17 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 			var barContainer = row.append("div")
 		                          .attr("class", rel + "-alt-count tooltip-allele-count-bar")
 			if (genotype) {
-				me._appendAlleleCountSVG(barContainer, 
-					genotype.altCount, 
-					genotype.refCount, 
-					genotype.genotypeDepth, 
-					null,
-					barWidth);
+				getProbandVariantCard().promiseGetMaxAlleleCount()
+				 .then(function(maxAlleleCount) {
+					me._appendAlleleCountSVG(barContainer, 
+						genotype.altCount, 
+						genotype.refCount, 
+						genotype.genotypeDepth, 
+						null,
+						barWidth,
+						maxAlleleCount);
+
+				 });
 			}
 		}
 
@@ -1209,7 +1214,7 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
 }
 
 VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, 
-	genotypeRefCount, genotypeDepth, bamDepth, barWidth) {
+	genotypeRefCount, genotypeDepth, bamDepth, barWidth, maxAlleleCount) {
 	var me = this;
 
 	var MAX_BAR_WIDTH = barWidth ? barWidth : me.ALLELE_COUNT_BAR_WIDTH;
@@ -1224,8 +1229,10 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 	    return;
 	}
 
+
+
 	if (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0) {
-		BAR_WIDTH = d3.round(MAX_BAR_WIDTH * (genotypeDepth / getProbandVariantCard().getMaxAlleleCount()));
+		BAR_WIDTH = d3.round(MAX_BAR_WIDTH * (genotypeDepth / maxAlleleCount));
 		container.select("svg").remove();
 		var svg = container
 	            .append("svg")
@@ -1258,7 +1265,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 	var otherCount = totalCount - (+genotypeRefCount + +genotypeAltCount);
 
 	// proportion the widths of alt, other (for multi-allelic), and ref
-	BAR_WIDTH      = d3.round((MAX_BAR_WIDTH) * (totalCount / getProbandVariantCard().getMaxAlleleCount()));
+	BAR_WIDTH      = d3.round((MAX_BAR_WIDTH) * (totalCount / maxAlleleCount));
 	if (BAR_WIDTH < 10) {
 		BAR_WIDTH = 10;
 	}

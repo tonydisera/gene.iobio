@@ -104,23 +104,14 @@ VariantCard.prototype.isBamLoaded = function() {
 	return this.model.isBamLoaded();
 }
 
-VariantCard.prototype.variantsHaveBeenCalled = function() {
-	return this.model.variantsHaveBeenCalled();
+VariantCard.prototype.promiseVariantsHaveBeenCalled = function() {
+	return this.model.promiseVariantsHaveBeenCalled();
 }
 
 VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
-
-VariantCard.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
-	var me = this;
-	return new Promise(function(resolve, reject) {
-		me.model.promiseGetGeneCoverage(geneObject, transcript).then(function() {
-			resolve(me);
-		});
-
-	})
-}
+ 
 
 VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverageAll) {
 	var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);
@@ -846,10 +837,12 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	
 	this._showVariants(regionStart, regionEnd, 
 		function() {
-			me.filterAndShowCalledVariants(regionStart, regionEnd);
-			if (callback) {
-				callback();
-			}
+			me.promiseFilterAndShowCalledVariants(regionStart, regionEnd)
+			 .then(function(data) {
+				if (callback) {
+					callback();
+				}			 	
+			 })
 		}, 
 		null, true);
 }
@@ -1102,9 +1095,12 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		// Set the current model's loaded and called variants based on the cached data.		
 		me.model.setLoadedVariants(theVcfData);
 		if (me.model.isBamLoaded()) {
-			var theFbData = me.model.getFbDataForGene(window.gene, window.selectedTranscript, true);
-			me.model.setCalledVariants(theFbData);
-			me.model.loadCalledTrioGenotypes();
+			me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
+			 .then(function(data) {
+			 	var theFbData = data.fbData;
+				me.model.setCalledVariants(theFbData);
+				me.model.loadCalledTrioGenotypes();
+			 })
 			
 		}	
 
@@ -1121,19 +1117,31 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
 			if (me.model.isBamLoaded()) {
-		        if (me.model.hasCalledVariants()) {
-			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());
-	        	
-		        } else if (me.model.variantsHaveBeenCalled()) {
-		        	// If call variants has occurred but 0 variants returned.
-			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').text("0");	        		        	
-		        }	
+				me.model.promiseHasCalledVariants()
+				 .then(function(hasCalledVariants) {
+			        if (hasCalledVariants) {
+				        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+						me.cardSelector.find('#called-variant-count').removeClass("hide");
+						me.model.promiseGetCalledVariantCount().then(function(count) {
+							me.cardSelector.find('#called-variant-count').text(count);
+						})
+		        	
+			        } else {
+			        	me.model.promiseVariantsHaveBeenCalled()
+			        	 .then(function(variantsHaveBeenCalled) {
+			        	 	if (variantsHaveBeenCalled) {
+					        	// If call variants has occurred but 0 variants returned.
+						        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+								me.cardSelector.find('#called-variant-count').removeClass("hide");
+								me.cardSelector.find('#called-variant-count').text("0");	        		        	
+			        	 	}
 
-				me.filterAndShowCalledVariants();	
+			        	 })
+			        }	
+
+					me.promiseFilterAndShowCalledVariants();	
+
+				 })
 			}	
 
 			me.populateRecFilters(theVcfData);
@@ -1410,7 +1418,7 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	}
 
 	// Show called variants
-	this.filterAndShowCalledVariants();
+	this.promiseFilterAndShowCalledVariants();
 
 	// Show feature matrix
 	window.matrixCard.fillFeatureMatrix(me._filterVariants());
@@ -1418,11 +1426,17 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 
 VariantCard.prototype.sortFeatureMatrix = function() {
 
-	var filteredVcfData = this.model.isVcfLoaded() ? 
-	       this.filterAndShowLoadedVariants() 
-	     : this.filterAndShowCalledVariants();
+	if (this.model.isVcfLoaded() ) {
+		var filteredVcfData = this.filterAndShowLoadedVariants();
+		window.matrixCard.fillFeatureMatrix(filteredVcfData);		
+	}  else {
+	     this.promiseFilterAndShowCalledVariants()
+	      .then(function(filteredVcfData) {
+			window.matrixCard.fillFeatureMatrix(filteredVcfData);
+	      });
+	}
 	
-	window.matrixCard.fillFeatureMatrix(filteredVcfData);
+	
 }
 
 
@@ -1502,12 +1516,16 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 		// Show the called variant count
 		me.cardSelector.find('#called-variant-count-label').removeClass("hide");
 		me.cardSelector.find('#called-variant-count').removeClass("hide");
-		me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());
+		me.model.promiseGetCalledVariantCount().then(function(count) {
+			me.cardSelector.find('#called-variant-count').text(count);
+		})
 		me.cardSelector.find('#displayed-called-variant-count-label').addClass("hide");
 		me.cardSelector.find('#displayedcalled-variant-count').addClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
-		$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
+		me.model.promiseGetCalledVariantCount().then(function(count) {
+			$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(count + " variants called for " + me.getRelationship());
+		})
 	} else if (state == 'done') {
 		me.cardSelector.find('.fbloader').addClass("hide");			
 	} else if (state == 'error') {
@@ -1603,35 +1621,52 @@ VariantCard.prototype.setVariantColorClass = function(clazz) {
 }
 
 
-VariantCard.prototype.filterAndShowCalledVariants = function(regionStart, regionEnd) {
+VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart, regionEnd) {
 	var me = this;
-	if (this.model.hasCalledVariants()) {
+	return new Promise(function(resolve, reject) {
+		me.model.promiseHasCalledVariants()
+		 .then(function(hasCalledVariants) {
+		 	if (hasCalledVariants) {
+				me.cardSelector.find('.fbloader').addClass("hide");
 
-		me.cardSelector.find('.fbloader').addClass("hide");
-		var filteredFBData = this._filterVariants(this.model.getFbDataForGene(window.gene, window.selectedTranscript), this.fbChart);
+				me.model.promiseGetFbData(window.gene, window.selectedTranscript)
+				 .then(function(data) {
+				 	var theFbData = data.fbData;
+					var filteredFBData = me._filterVariants(theFbData, me.fbChart);
 
+					// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
+					// this by checking if the number filter flags exceed those that are hidden
+					if (me.cardSelector.find(".filter-flag").length > me.cardSelector.find(".filter-flag.hide").length 
+						|| me.cardSelector.find("#region-flag").length > me.cardSelector.find("#region-flag.hide").length
+						|| me.cardSelector.find("#recfilter-flag").length > me.cardSelector.find("#recfilter-flag.hide").length) {
+						me.cardSelector.find('#displayed-called-variant-count-label').removeClass("hide");
+						me.cardSelector.find('#displayed-called-variant-count').removeClass("hide");
+						me.cardSelector.find('#displayed-called-variant-count').text(filteredFBData.features.length);
+					} else {
+						me.cardSelector.find('#displayed-called-variant-count-label').addClass("hide");
+						me.cardSelector.find('#displayed-called-variant-count').addClass("hide");
+						me.cardSelector.find('#displayed-called-variant-count').text("");
+					}
+					me._fillFreebayesChart(filteredFBData, 
+									       regionStart ? regionStart : window.gene.start, 
+										   regionEnd ? regionEnd : window.gene.end);
 
-		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
-		// this by checking if the number filter flags exceed those that are hidden
-		if (this.cardSelector.find(".filter-flag").length > this.cardSelector.find(".filter-flag.hide").length 
-			|| this.cardSelector.find("#region-flag").length > this.cardSelector.find("#region-flag.hide").length
-			|| this.cardSelector.find("#recfilter-flag").length > this.cardSelector.find("#recfilter-flag.hide").length) {
-			this.cardSelector.find('#displayed-called-variant-count-label').removeClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').removeClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').text(filteredFBData.features.length);
-		} else {
-			this.cardSelector.find('#displayed-called-variant-count-label').addClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').addClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').text("");
-		}
-		me._fillFreebayesChart(filteredFBData, 
-						       regionStart ? regionStart : window.gene.start, 
-							   regionEnd ? regionEnd : window.gene.end);
+					resolve(filteredFBData);
 
-		return filteredFBData;
-	}  else {
-		return null;
-	}
+				 })
+			}  else {
+				resolve(null);
+			}
+		 },
+		 function(error) {
+		 	var msg = "VariantCard.promiseFilterAndShowCalledVariants(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 });
+
+	});
+	
+
 }
 
 
@@ -1712,12 +1747,18 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 	// show X for missing variant on vcf variant chart.
 	var matchingVariant = null;
 	var tooltip = null;
-	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
-		matchingVariant = this.fbChart.showCircle()(variant, container, false, true);
-		if (matchingVariant) {
-			tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
-		}
+	if (this.fbChart != null) {
+		this.model.promiseHasCalledVariants()
+		 .then(function(isTrue) {
+		 	if (isTrue) {
+				var container = this.d3CardSelector.selectAll('#fb-variants > svg');
+				matchingVariant = this.fbChart.showCircle()(variant, container, false, true);
+				if (matchingVariant) {
+					tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
+				}
+			}
+
+		 })
 		
 	}
 	if (this.vcfChart != null) {
@@ -1742,43 +1783,49 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	// show X for missing variant on vcf variant chart.
 	var matchingVariant = null;
 	var indicateMissingVariant = false;
-	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
-		var lock = clickedVariant != null && this == sourceVariantCard;
+	this.model.promiseHasCalledVariants()	
+	 .then(function(hasCalledVariants) {
+		if (me.fbChart != null && hasCalledVariants) {
+			var container = me.d3CardSelector.selectAll('#fb-variants > svg');
+			var lock = clickedVariant != null && me == sourceVariantCard;
+				
+			// Show the missing variant on the fbchart if we just have variants from those
+			// called from alignments (no vcf variants loaded)	
+			if (!me.model.isVcfLoaded()) {
+				indicateMissingVariant = true;
+			}
+
+			matchingVariant = me.fbChart.showCircle()(variant, container, indicateMissingVariant, lock);
+
+
+			if (matchingVariant && sourceVariantCard) {
+				var tooltip = me.d3CardSelector.select("#fb-variants .tooltip");
+				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
+
+			}
+
+		}
+
+		if (me.vcfChart != null  && !matchingVariant) {
+			var container = me.d3CardSelector.selectAll('#vcf-variants > svg');;
+			var lock = clickedVariant != null && me == sourceVariantCard;
+
+			// Only show the X for missing variant if we didn't already find the variant in
+			// the fb variants
+			var indicateMissingVariant = matchingVariant == null ? true : false;
+		
+			matchingVariant = me.vcfChart.showCircle()(variant, container, indicateMissingVariant, lock);
+
+			if (matchingVariant && sourceVariantCard) {
+				var tooltip = me.d3CardSelector.select("#vcf-variants .tooltip");
+				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
+
+			}
 			
-		// Show the missing variant on the fbchart if we just have variants from those
-		// called from alignments (no vcf variants loaded)	
-		if (!me.model.isVcfLoaded()) {
-			indicateMissingVariant = true;
 		}
 
-		matchingVariant = this.fbChart.showCircle()(variant, container, indicateMissingVariant, lock);
-
-
-		if (matchingVariant && sourceVariantCard) {
-			var tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
-			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
-
-		}
-		
-	}
-	if (this.vcfChart != null  && !matchingVariant) {
-		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
-		var lock = clickedVariant != null && this == sourceVariantCard;
-
-		// Only show the X for missing variant if we didn't already find the variant in
-		// the fb variants
-		var indicateMissingVariant = matchingVariant == null ? true : false;
-	
-		matchingVariant = this.vcfChart.showCircle()(variant, container, indicateMissingVariant, lock);
-
-		if (matchingVariant && sourceVariantCard) {
-			var tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
-			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
-
-		}
-		
-	}
+			
+	 })
 	
 }
 
@@ -1897,15 +1944,22 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 
 VariantCard.prototype.hideVariantCircle = function(variant) {
+	var me = this;
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');
 		var parentContainer = this.d3CardSelector.selectAll('#vcf-variants');
 		this.vcfChart.hideCircle()(container, parentContainer);
 	}
-	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
-		var parentContainer = this.d3CardSelector.selectAll('#fb-variants');
-		this.fbChart.hideCircle()(container, parentContainer);
+	if (this.fbChart != null) {
+		this.model.promiseHasCalledVariants()
+		 .then(function(isTrue) {
+		 	if (isTrue) {
+				var container = me.d3CardSelector.selectAll('#fb-variants > svg');
+				var parentContainer = me.d3CardSelector.selectAll('#fb-variants');
+				me.fbChart.hideCircle()(container, parentContainer);
+
+		 	}
+		 })
 	}
 }
 
@@ -1949,19 +2003,40 @@ VariantCard.prototype.hideCoverageCircle = function() {
 	 })
 }
 
-VariantCard.prototype.getMaxAlleleCount = function() {
-	var theVcfData = this.model.isVcfLoaded() 
-				      ? this.model.getVcfDataForGene(window.gene, window.selectedTranscript)
-				      : this.model.getFbDataForGene(window.gene, window.selectedTranscript)
-	if (theVcfData == null) {
-		return null;
+VariantCard.prototype.promiseGetMaxAlleleCount = function() {
+	var me = this;
+
+	var resolveIt = function(resolve, theVcfData) {
+		if (theVcfData == null) {
+			resolve(null);
+		} else {
+			var count = theVcfData.maxAlleleCount;
+			if (!count) {
+				me.determineMaxAlleleCount(theVcfData);
+				resolve(theVcfData.maxAlleleCount);
+			} else {
+				resolve(count);					
+			}				
+		}
+
 	}
-	var count = theVcfData.maxAlleleCount;
-	if (!count) {
-		this.determineMaxAlleleCount(theVcfData);
-		count = theVcfData.maxAlleleCount;
-	}
-	return count;
+
+	return new Promise(function(resolve, reject) {
+		var theVcfData = null;
+		if (me.model.isVcfLoaded()) {
+			theVcfData = me.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+			resolveIt(resolve, theVcfData);
+		} else {
+			me.model.promiseGetFbData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	theVcfData = data.fbData;
+			 	resolveIt(resolve, theVcfData);
+			 })
+		
+
+		}
+	})
+
 }
 
 
