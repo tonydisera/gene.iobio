@@ -199,11 +199,13 @@ BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject,
 			bookmarkKeys.forEach( function(bookmarkKey) {
 				var bookmarkEntry = me.bookmarkedVariants[bookmarkKey];
 				var theBookmarkEntry = bookmarkEntry.hasOwnProperty("isProxy") ? me.reviseCoord(bookmarkEntry, geneObject) : bookmarkEntry;
-				var variant = getProbandVariantCard().getBookmarkedVariant(theBookmarkEntry, vcfData, geneObject, theTranscript);
-				if (variant) {
-					variant.isBookmark = 'Y';
-					me.bookmarkedVariants[bookmarkKey] = variant;
-				}
+				getProbandVariantCard().promiseGetBookmarkedVariant(theBookmarkEntry, vcfData, geneObject, theTranscript)
+				 .then(function(variant) {
+					if (variant) {
+						variant.isBookmark = 'Y';
+						me.bookmarkedVariants[bookmarkKey] = variant;
+					}				 	
+				 })
 			});
 		}
 		//me.refreshBookmarkList();
@@ -249,14 +251,17 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 	// Now flag all other bookmarked variants for a gene
 	bookmarkKeys.forEach( function(key) {		
 		var theBookmarkEntry = me.bookmarkedVariants[key];
-		var theVariant = me.resolveBookmarkedVariant(key, theBookmarkEntry, geneObject, theTranscript);
-		if (theVariant) {
-			theVariant.isBookmark = 'Y';
-			if (displayVariantFlag) {
-				variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
-			}
+		me.promiseResolveBookmarkedVariant(key, theBookmarkEntry, geneObject, theTranscript)
+		 .then(function(theVariant) {
+			if (theVariant) {
+				theVariant.isBookmark = 'Y';
+				if (displayVariantFlag) {
+					variantCard.addBookmarkFlag(theVariant, me.compressKey(key), false);		
+				}
 
-		} 
+			} 
+
+		 })
 	});
 
 	// Now that we have resolved the bookmark entries for a gene, refresh the
@@ -266,26 +271,30 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 	
 }
 
-BookmarkCard.prototype.resolveBookmarkedVariant = function(key, bookmarkEntry, geneObject, theTranscript) {
+BookmarkCard.prototype.promiseResolveBookmarkedVariant = function(key, bookmarkEntry, geneObject, theTranscript) {
 	var me = this;
 
-	var variant = null;
 	if (bookmarkEntry.hasOwnProperty("isProxy") && bookmarkEntry.isProxy) {
-		variant = getProbandVariantCard().getBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject), null, geneObject, theTranscript);
-		if (variant) {
-			variant.isBookmark = "Y";
-			variant.isProxy = false;			
-			variant.chrom = bookmarkEntry.chrom;
-			me.bookmarkedVariants[key] = variant;
-			bookmarkEntry = variant;									
-		} 
-	} else {
-		variant = bookmarkEntry;
-		variant.isBookmark = "Y";	
-		variant.isProxy = false;	
-	}
+		getProbandVariantCard().promiseGetBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject), null, geneObject, theTranscript)
+		 .then(function(variant) {
+			var variant = null;
+			if (variant) {
+				variant.isBookmark = "Y";
+				variant.isProxy = false;			
+				variant.chrom = bookmarkEntry.chrom;
+				me.bookmarkedVariants[key] = variant;
+				bookmarkEntry = variant;									
+			} else {
+				variant = bookmarkEntry;
+				variant.isBookmark = "Y";	
+				variant.isProxy = false;	
+			}
 
-	return variant;
+			resolve(variant);
+		 })
+	} else {
+		resolve(null);
+	}
 	
 }
 
@@ -494,19 +503,22 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 								unpinAll();
 
 								var showBookmarkedVariant = function(bookmarkEntry, key) {
-									var variant = me.resolveBookmarkedVariant(key, bookmarkEntry, window.gene, window.selectedTranscript);
-									currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
-									if (variant) {
-										me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
-										if (!variant.extraAnnot) {
-											me.promiseGetExtraAnnotsForVariant(variant, window.gene, window.selectedTranscript)
-											  .then(function(refreshedVariant) {
-											  	me._refreshVariantLabel(refreshedVariant, key);
-											  })									
-										} else {
-											me._refreshVariantLabel(variant, key);
-										}									
-									} 
+									me.promiseResolveBookmarkedVariant(key, bookmarkEntry, window.gene, window.selectedTranscript)
+									 .then(function(variant) {
+										currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
+										if (variant) {
+											me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
+											if (!variant.extraAnnot) {
+												me.promiseGetExtraAnnotsForVariant(variant, window.gene, window.selectedTranscript)
+												  .then(function(refreshedVariant) {
+												  	me._refreshVariantLabel(refreshedVariant, key);
+												  })									
+											} else {
+												me._refreshVariantLabel(variant, key);
+											}									
+										} 
+
+									 })
 								}
 
 								if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
@@ -557,13 +569,15 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 	         	if (entry.value.isProxy && entry.value.freebayesCalled == 'Y') {
 					me.showTooltip("Click 'Call variants' button analyze this bookmarked variant.", screenX, screenY, 100);
 	         	} else {
-					var variant = me.resolveBookmarkedVariant(entry.key, entry.value, geneObjects[geneName], theTranscript);
-		            unpinAll();
-					if (variant) {
-			            me._showVariantTooltip(variant, screenX, screenY, geneObjects[geneName], theTranscript);
-					} else {
-						me.showTooltip("Click on bookmark to analyze variant for this gene.", screenX, screenY, 100);
-					}						
+					me.promiseResolveBookmarkedVariant(entry.key, entry.value, geneObjects[geneName], theTranscript)
+					 .then(function(variant) {
+			            unpinAll();
+						if (variant) {
+				            me._showVariantTooltip(variant, screenX, screenY, geneObjects[geneName], theTranscript);
+						} else {
+							me.showTooltip("Click on bookmark to analyze variant for this gene.", screenX, screenY, 100);
+						}											 	
+					 })
 
 	         	}
 					
@@ -914,18 +928,21 @@ BookmarkCard.prototype._showVariantTooltip = function(variant, screenX, screenY,
 BookmarkCard.prototype._validateBookmarksFound = function(bookmarkDiv, bookmarkKeys, geneObject, theTranscript) {
 	var me = this;
 	bookmarkKeys.forEach( function(key) {		
-		var variant = me.resolveBookmarkedVariant(key, me.bookmarkedVariants[key], geneObject, theTranscript);
+		me.promiseResolveBookmarkedVariant(key, me.bookmarkedVariants[key], geneObject, theTranscript)
+		 .then(function(variant) {
+			if (variant == null) {
+				bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+					return entry.key == key;
+				}).select("span.not-found").classed("hide", false);
+			} else {
+				bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
+					return entry.key == key;
+				}).select("span.not-found").classed("hide", true);
+				me._refreshVariantLabel(variant, key);
+			}
+		 });
 
-		if (variant == null) {
-			bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
-				return entry.key == key;
-			}).select("span.not-found").classed("hide", false);
-		} else {
-			bookmarkDiv.selectAll("a.bookmark").filter(function(entry) {
-				return entry.key == key;
-			}).select("span.not-found").classed("hide", true);
-			me._refreshVariantLabel(variant, key);
-		}
+
 	});
 }
 

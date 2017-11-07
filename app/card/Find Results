@@ -1,0 +1,37 @@
+Searching 36 files for "determineMaxAlleleCount"
+
+/Users/tonyd/work/gene.iobio/app/app.js:
+ 3533  			probandVariantCard.populateEffectFilters();
+ 3534  
+ 3535: 			probandVariantCard.determineMaxAlleleCount();
+ 3536  			
+ 3537  			// Enable inheritance filters
+ ....
+ 3629  						probandVariantCard.model.performAdditionalParsing(trioVcfData.proband, window.selectedTranscript);
+ 3630  
+ 3631: 						probandVariantCard.determineMaxAlleleCount();
+ 3632  
+ 3633  						probandVariantCard.populateEffectFilters();					
+
+/Users/tonyd/work/gene.iobio/app/card/variantCard.js:
+ 1732  
+ 1733  
+ 1734: VariantCard.prototype.determineMaxAlleleCount = function(vcfData) {
+ 1735: 	return this.model.determineMaxAlleleCount(vcfData);
+ 1736  }
+ 1737  
+ ....
+ 2026  			var count = theVcfData.maxAlleleCount;
+ 2027  			if (!count) {
+ 2028: 				me.determineMaxAlleleCount(theVcfData);
+ 2029  				resolve(theVcfData.maxAlleleCount);
+ 2030  			} else {
+
+/Users/tonyd/work/gene.iobio/app/model/variantModel.js:
+ 2528  
+ 2529  
+ 2530: VariantModel.prototype.promiseDetermineMaxAlleleCount = function(vcfData) {
+ 2531  	var me = this;
+ 2532  
+
+6 matches across 3 files

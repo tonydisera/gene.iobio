@@ -1,12 +1,13 @@
 function VariantTooltip() {
 	this.examinedVariant = null;
-	this.WIDTH_LOCK         = 680;
-	this.WIDTH_EXTRA_WIDE   = 840;
-	this.WIDTH_HOVER        = 360;
-	this.WIDTH_SIMPLE       = 280;
-	this.WIDTH_SIMPLE_WIDER = 500;
+	this.WIDTH_LOCK             = 680;
+	this.WIDTH_EXTRA_WIDE       = 840;
+	this.WIDTH_HOVER            = 360;
+	this.WIDTH_SIMPLE           = 280;
+	this.WIDTH_SIMPLE_WIDER     = 500;
 	this.WIDTH_ALLELE_COUNT_BAR = 160;
 	this.WIDTH_ALLELE_COUNT_ROW = 300;
+	this.HEIGHT_SCROLLABLE_AREA = 200;
 	this.VALUE_EMPTY        = "-";
 	this.AFFECTED_GLYPH =   "<i class='material-icons tooltip-affected-symbol'>spellcheck</i>";
 
@@ -784,7 +785,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipMainHeaderRow(bookmarkBadge + (geneObject ? geneObject.gene_name : ""), variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
 			+ calledVariantRow
 			+ inheritanceModeRow
-			+ '<div id="tooltip-body" class="row" style="max-height:205px;overflow-y:scroll">' 
+			+ '<div id="tooltip-body" class="row" style="max-height:' + me.HEIGHT_SCROLLABLE_AREA +  'px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv

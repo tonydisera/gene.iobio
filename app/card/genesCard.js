@@ -325,6 +325,8 @@ GenesCard.prototype.sortGenes = function(sortBy, setDropdown) {
 GenesCard.prototype._promiseMapDangerSummaries = function() {
 	var me = this;
 
+	me.geneToDangerSummaryMap = {};
+
 	return new Promise(function(resolve, reject) {
 		var promises = [];
 		geneNames.forEach(function(geneName) {
@@ -1608,56 +1610,78 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback)
 	} else {
 		var theVcfData = null;
 		var vc = getProbandVariantCard();
+
+		var promise = null;
 		if (vcfData) {
-			theVcfData = vcfData;
+			promise = new Promise(function(resolve,reject) {
+				theVcfData = vcfData;
+				resolve();
+			})
 		} else {
-			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+			promise =vc.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+ 	         .then(function(data) {
+ 	         	theVcfData = data.vcfData;
+ 	         })
 		}
 
-		vc.promiseGetDangerSummary(window.gene.gene_name)
-		 .then(function(dangerSummary) {
+		promise
+		 .then(function() {
+			vc.promiseGetDangerSummary(window.gene.gene_name)
+			 .then(function(dangerSummary) {
 
-			getProbandVariantCard().model.promiseGetFbData(window.gene, window.selectedTranscript, true)
-			 .then(function(data) {
-			 	var theFbData = data.fbData;
-				var options = {};
-				if (theFbData || (dangerSummary && dangerSummary.CALLED)) {
-					options.CALLED = true;
-				}
-
-				promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript).then(function(data) {
-					var geneCoverageAll = data.geneCoverage;
-					if (theVcfData == null ) {
-						me.setGeneBadgeWarning(window.gene.gene_name, true);
-						if (callback) {
-							callback();
-						}
-					} else if (theVcfData.features && theVcfData.features.length == 0) {
-						// There are 0 variants.  Summarize danger so that we know we have
-						// analyzed this gene
-						var dangerObject = vc.summarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll);
-						me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
-						if (callback) {
-							callback();
-						}
-					} else if (theVcfData.features && theVcfData.features.length > 0) {
-						var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
-
-
-						var dangerObject = vc.summarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll);
-						me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
-						if (callback) {
-							callback();
-						}
-
+				getProbandVariantCard().model.promiseGetFbData(window.gene, window.selectedTranscript, true)
+				 .then(function(data) {
+				 	var theFbData = data.fbData;
+					var options = {};
+					if (theFbData || (dangerSummary && dangerSummary.CALLED)) {
+						options.CALLED = true;
 					}
-				});	
+
+					promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript).then(function(data) {
+						var geneCoverageAll = data.geneCoverage;
+						if (theVcfData == null ) {
+							me.setGeneBadgeWarning(window.gene.gene_name, true);
+							if (callback) {
+								callback();
+							}
+						} else if (theVcfData.features && theVcfData.features.length == 0) {
+							// There are 0 variants.  Summarize danger so that we know we have
+							// analyzed this gene
+							vc.promiseSummarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll)
+							 then(function(dangerObject) {
+								me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+								if (callback) {
+									callback();
+								}							 	
+							 },
+							 function(error) {
+							 	var msg = "A problem occurred in GenesCard.refreshCurrentGeneBadge(): " + error;
+							 	console.log(msg);
+							 	if (callback) {
+								 	callback();
+							 	}
+							 })
+						} else if (theVcfData.features && theVcfData.features.length > 0) {
+							var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), window.gene.start, window.gene.end, true);
 
 
-			 });
-	
-		 })
+							vc.promiseSummarizeDanger(window.gene.gene_name, filteredVcfData, options, geneCoverageAll)
+							 .then(function(dangerObject) {
+								me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
+								if (callback) {
+									callback();
+								}
+							});
+						}
+					});	
 
+
+				 });
+		
+			 })
+
+
+			 })
 
 	}
 }

@@ -38,6 +38,11 @@ var global_maxGeneCount         = 100;
 // Should vep retrieve allele frequencies (for gnomad, 1000G, ESP)
 var global_vepAF                = true ;
 
+// What browser cache implementation is used: 'localStorage' or 'indexedDB'
+var BROWSER_CACHE_LOCAL_STORAGE = 'localStorage';
+var BROWSER_CACHE_INDEXED_DB    = 'indexedDB';
+var global_browserCache         = BROWSER_CACHE_LOCAL_STORAGE;
+
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
 * a simplified interface and logic.  

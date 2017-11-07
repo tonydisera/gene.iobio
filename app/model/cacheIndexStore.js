@@ -41,19 +41,28 @@ CacheIndexStore.prototype.setData = function(dataKind, key, gene, data, callback
 	store.put({id: key, gene: gene, data: data});
 }
 
-CacheIndexStore.prototype.getData = function(dataKind, key, callback) {
+CacheIndexStore.prototype.promiseGetData = function(dataKind, key) {
 	var me = this;
 
- 	var tx        = me.db.transaction(dataKind, "readonly");
-    var store     = tx.objectStore(dataKind);
-    
-    var getData = store.get(key);
 
-    getData.onsuccess = function() {
-    	if (callback) {
-    		callback(getData.result);
-    	}
-    };
+	return new Promise(function(resolve, reject) {
+	 	var tx        = me.db.transaction(dataKind, "readonly");
+	    var store     = tx.objectStore(dataKind);
+	    
+	    var getData = store.get(key);
+
+	    getData.onsuccess = function() {
+	    	resolve(getData.result);
+	    };
+
+	    getData.onerror = function(event) {
+	    	var msg = "Error in CacheIndexStore.promiseGetData():  " + event.target.errorCode;
+	    	console.log(msg);
+	    	reject(msg);
+	    }
+
+	})
+
 
 }
 
