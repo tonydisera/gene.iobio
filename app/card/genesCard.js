@@ -1648,7 +1648,7 @@ GenesCard.prototype.refreshCurrentGeneBadge = function(error, vcfData, callback)
 							// There are 0 variants.  Summarize danger so that we know we have
 							// analyzed this gene
 							vc.promiseSummarizeDanger(window.gene.gene_name, theVcfData, options, geneCoverageAll)
-							 then(function(dangerObject) {
+							 .then(function(dangerObject) {
 								me.setGeneBadgeGlyphs(window.gene.gene_name, dangerObject, true);
 								if (callback) {
 									callback();

@@ -31,14 +31,26 @@ CacheIndexStore.prototype.init = function(callback) {
 	};
 }
 
-CacheIndexStore.prototype.setData = function(dataKind, key, gene, data, callback) {
+CacheIndexStore.prototype.promiseSetData = function(dataKind, key, gene, data, callback) {
 	var me = this;
 
-	var tx        = me.db.transaction(dataKind, "readwrite");
-    var store     = tx.objectStore(dataKind);
-	tx.oncomplete = callback;	
-    
-	store.put({id: key, gene: gene, data: data});
+	return new Promise(function(resolve, reject) {
+		var tx        = me.db.transaction(dataKind, "readwrite");
+	    var store     = tx.objectStore(dataKind);
+
+		tx.oncomplete = function() {
+			resolve();
+		} 	
+		tx.onerror = function(event) {
+			var msg = "Error in CacheIndexStore.promiseSetData():  " + event.target.errorCode;
+	    	console.log(msg);
+	    	reject(msg);
+		}
+	    
+		store.put({id: key, gene: gene, data: data});		
+	})
+
+
 }
 
 CacheIndexStore.prototype.promiseGetData = function(dataKind, key) {

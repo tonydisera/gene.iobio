@@ -706,7 +706,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 						});
 
 				});
-				
+
 
 			})
 
@@ -1437,6 +1437,42 @@ CacheHelper.useLocalStorage = function() {
 }
 CacheHelper.useIndexedDB = function() {
 	return window.global_browserCache == BROWSER_CACHE_INDEXED_DB;
+}
+
+CacheHelper.promiseCacheData = function(key, data) {
+	var me = this;
+
+	return new Promise(function(resolve, reject) {
+
+		if (CacheHelper.useLocalStorage()) {
+			if (localStorage) {
+				var dataString = JSON.stringify(data);
+		    	stringCompress = new StringCompress();
+
+		    	var dataStringCompressed = null;
+		    	try {
+					dataStringCompressed = LZString.compressToUTF16(dataString);
+
+			    	try {
+				      	localStorage.setItem(key, dataStringCompressed);
+				      	resolve();
+			    	} catch(error) {
+				      	reject(error);
+			    	}    		
+				} catch(error) {
+					reject(error);
+				}
+			} else {
+				reject("no local storage")
+			}
+		} else if (CacheHelper.useIndexedDB()) {
+			return me.cacheIndexStore.promiseSetData(key, data);
+		} else {
+			reject("Unable to determine browser cache method")
+		}
+
+	})
+
 }
 
 CacheHelper.promiseGetData = function(key, decompressIt=true) {

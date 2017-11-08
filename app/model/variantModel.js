@@ -3654,65 +3654,24 @@ VariantModel.prototype._promiseGetData = function(dataKind, geneName, transcript
 VariantModel.prototype._promiseCacheData = function(data, dataKind, geneName, transcript) {
 	var me = this;
 	return new Promise(function(resolve, reject) {
-		var success = me._cacheData(data, dataKind, geneName, transcript);
-	 	if (success) {
+		var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript);
+		CacheHelper.promiseCacheData(key, data)
+		 .then(function() {
 		 	resolve();
-	 	} else {
-	 		reject();
-	 	}
+		 },
+		 function(error) {
+		 	CacheHelper.showError(key, error);
+		    genesCard.hideGeneBadgeLoading(geneName);
+	   		genesCard.clearGeneGlyphs(geneName);
+	   		genesCard.setGeneBadgeError(geneName);    
+	   		alertify.set('notifier','position', 'top-right');
+	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);		
+		 	reject(error);
+		 })
 	})
 }
 
-VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
-	var me = this;
-	geneName = geneName.toUpperCase();
 
-	if (localStorage) {
-		var success = true;
-		var dataString = JSON.stringify(data);
-
-    	stringCompress = new StringCompress();
-
-    	var dataStringCompressed = null;
-    	try {
-			dataStringCompressed = LZString.compressToUTF16(dataString);
-    	} catch (e) {    		
-	   		success = false;
-	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
-    		alertify.set('notifier','position', 'top-right');
-	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);
-    	}
-
-    	if (success) {
-	    	try {
-	    		if (me.debugMe) {
-		    		console.log("caching "  + dataKind + ' ' + me.relationship + ' ' + geneName + " = " + dataString.length + '->' + dataStringCompressed.length);
-	    		}
-		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
-
-	    	} catch(error) {
-	    		success = false;
-		      	CacheHelper.showError(me._getCacheKey(dataKind, geneName, transcript), error);
-		      	genesCard.hideGeneBadgeLoading(geneName);
-	    	}    		
-    	}
-
-    	if (!success) {
-	   		genesCard.hideGeneBadgeLoading(geneName);
-	   		genesCard.clearGeneGlyphs(geneName);
-	   		genesCard.setGeneBadgeError(geneName);    		
-    	}
-
-    	
-      	return success;
-    } else {
-   		genesCard.hideGeneBadgeLoading(geneName);
-   		genesCard.clearGeneGlyphs(geneName);
-   		genesCard.setGeneBadgeError(geneName);    		
-
-    	return false;
-    }
-}
 
 
 
