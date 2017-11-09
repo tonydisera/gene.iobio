@@ -312,33 +312,38 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
-		me.promiseGetCachedGeneCoverage(geneObject, transcript)
-		 .then( function(cachedGeneCoverage) {		 	
-			if (cachedGeneCoverage) {
-				resolve({model: me, 'geneCoverage': cachedGeneCoverage})
-			} else {
-				me.bam.getGeneCoverage(geneObject, 
-					transcript,
-					[me.bam],	
-					function(theData, trRefName, theGeneObject, theTranscript) {
-						var geneCoverageObjects = me._parseGeneCoverage(theData);
-						if (geneCoverageObjects.length > 0) {
-							me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
-							me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
-							resolve({model: me, gene: theGeneObject, transcript: theTranscript, 'geneCoverage': geneCoverageObjects});
-						} else {
-							console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
-							resolve({model: me, gene: theGeneObject, transcript: theTranscript, 'geneCoverage': []});
-						}
-					}	
-				);
-			}
+		if (transcript.features == null || transcript.features.length == 0) {
+			resolve({model: me, gene: geneObject, transcript: transcript, 'geneCoverage': []});
+		} else {
+			me.promiseGetCachedGeneCoverage(geneObject, transcript)
+			 .then( function(cachedGeneCoverage) {		 	
+				if (cachedGeneCoverage) {
+					resolve({model: me, 'geneCoverage': cachedGeneCoverage})
+				} else {
+					me.bam.getGeneCoverage(geneObject, 
+						transcript,
+						[me.bam],	
+						function(theData, trRefName, theGeneObject, theTranscript) {
+							var geneCoverageObjects = me._parseGeneCoverage(theData);
+							if (geneCoverageObjects.length > 0) {
+								me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
+								me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
+								resolve({model: me, gene: theGeneObject, transcript: theTranscript, 'geneCoverage': geneCoverageObjects});
+							} else {
+								console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+								resolve({model: me, gene: theGeneObject, transcript: theTranscript, 'geneCoverage': []});
+							}
+						}	
+					);
+				}
 
-		 },
-		 function(error) {
-		 	reject(error);
-		 });
-
+			 },
+			 function(error) {
+			 	reject(error);
+			 });
+		
+		}
+	
 	});
 }
 

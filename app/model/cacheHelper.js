@@ -286,30 +286,35 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
 	}
 
 
-
-	// If we still have genes in the cache queue, exit. (Wait to kick off next batch 
-	// of genes to analyze until all genes in last batch are analyzed.)
-	if (me.cacheQueue.length > 0) {
+	// If we are already have the max size of genes in the queue, don't
+	// queue anymore.
+	if (me.cacheQueue.length >= DEFAULT_BATCH_SIZE) {
 		return;
 	}
 
 
-	// Determine the batch size.  (It will be smaller that the
-	// default batch size if the genes remaining to be cached is
-	// smaller than the batch size.)
-	me.batchSize = Math.min(me.genesToCache.length, DEFAULT_BATCH_SIZE);
+	// Figure out how much to replinish in the cache queue
+	var sizeToQueue = DEFAULT_BATCH_SIZE - me.cacheQueue.length;
+
+	// Just queue genes to the end of the (unanalyzed) genes list
+	if (sizeToQueue > me.genesToCache.length) {
+		sizeToQueue = me.genesToCache.length;
+	}
+	var startingPos = me.cacheQueue.length == 0 ? 0 : me.cacheQueue.length;
 
 	// Place next batch of genes in caching queue 
-	for (var i = 0; i < me.batchSize; i++) {
+	for (var i = 0; i < sizeToQueue; i++) {
 		me.cacheQueue.push(me.genesToCache[i]);
 	}
 	// Remove this batch of genes from the list of all genes to be cached
-	for (var i = 0; i < me.batchSize; i++) {
+	for (var i = 0; i < sizeToQueue; i++) {
 		me.genesToCache.shift();
 	}
 	// Invoke method to cache each of the genes in the queue
-	for (var i = 0; i < me.batchSize; i++) {
+	var count = 0;
+	for (var i = startingPos; i < DEFAULT_BATCH_SIZE && count < sizeToQueue; i++) {
 		me.cacheGene(me.cacheQueue[i], analyzeCalledVariants, callback);
+		count++;
 	}
 
 
@@ -586,7 +591,8 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 				}
 
 				if (theVcfData == null) {
-					console.log("Unable to processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available");
+					var msg = "Unable to CacheHelper.processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available";
+					console.log(msg);
 					genesCard.clearGeneGlyphs(geneObject.gene_name);
 					genesCard.setGeneBadgeError(geneObject.gene_name);	
 					if (cacheNext) {
@@ -984,8 +990,10 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 							  			counts.called.pass++;
 							  		}
 									
-							 		getProbandVariantCard().model.cacheDangerSummary(dangerObject, data.gene.gene_name);
-									genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
+							 		getProbandVariantCard().model.promiseCacheDangerSummary(dangerObject, data.gene.gene_name)
+							 		 .then(function() {
+										genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
+							 		 })
 						 		} else {
 							  		counts.all.unanalyzed++;
 							  		counts.loaded.unanalyzed++;
@@ -1176,22 +1184,6 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 	})
 
 }
-
-/*
-CacheHelper._logCacheContents = function() {
-	var x, xLen, log=[],total=0;
-	for (x in localStorage){
-		xLen =  ((localStorage[x].length * 1 + x.length * 1)/1024); 
-		log.push(x + " = " +  xLen.toFixed(2) + " KB"); 
-		total+= xLen}; 
-		if (total > 1024){
-			log.unshift("Total = " + (total/1024).toFixed(2)+ " MB");
-		} else{
-			log.unshift("Total = " + total.toFixed(2)+ " KB");}; 
-			console.log(log.join("\n")
-	);	
-}
-*/
 
 
 CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clearOther, clearOtherApp) {
@@ -1388,7 +1380,7 @@ CacheHelper.prototype.clearCacheForGene = function(geneName) {
 		 	var promises = [];
 			keys.forEach( function(key) {
 				var keyObject = CacheHelper._parseCacheKey(key);
-				me.promiseRemoveCacheItem(keyObject.dataKind, key);
+				var p = me.promiseRemoveCacheItem(keyObject.dataKind, key);
 				promises.push(p);
 			});
 
@@ -1502,6 +1494,7 @@ CacheHelper.showError = function(key, cacheError) {
 	}
 
 }
+
 
 CacheHelper.useLocalStorage = function() {
 	return window.global_browserCache == BROWSER_CACHE_LOCAL_STORAGE;
@@ -1718,5 +1711,37 @@ CacheHelper.prototype.promiseGetAllKeys = function() {
 	});
 
 }
+
+
+
+CacheHelper.prototype.logCacheContents = function() {
+	var me = this;
+
+	var itemSize = 0; 
+	var log = [];
+	var total = 0;
+
+	me.promiseGetAllKeys()
+	 .then(function(allKeys) {
+	 	allKeys.forEach(function(key) {
+	 		var keyObject = CacheHelper._parseCacheKey(key);
+	 		me.promiseGetData(keyObject.dataKind, key, false)
+	 		 .then(function(data) {
+
+				itemSize =  ((data.length * 1 + key.length * 1)/1024); 
+				log.push(key + " = " +  itemSize.toFixed(2) + " KB"); 
+				total += itemSize; 
+				if (total > 1024){
+					log.unshift("Total = " + (total/1024).toFixed(2)+ " MB");
+				} else {
+					log.unshift("Total = " + total.toFixed(2)+ " KB"); 
+					console.log(log.join("\n"));
+				}
+	 		 })
+	 	})
+	 })
+}
+
+
 
 
