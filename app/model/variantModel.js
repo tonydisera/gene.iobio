@@ -1015,7 +1015,6 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 		);
 
 	});
-
 }
 
 VariantModel.prototype.clearVcf = function(cardIndex) {
@@ -2239,7 +2238,8 @@ VariantModel.prototype.promiseCacheDangerSummary = function(dangerSummary, geneN
 
 VariantModel.prototype.clearCacheItem = function(dataKind, geneName, transcript) {
 	var me = this;
-	cacheHelper.clearCacheItem(me._getCacheKey(dataKind, geneName, transcript));
+	var key = me._getCacheKey(dataKind, geneName, transcript);
+	cacheHelper.promiseRemoveCacheItem(dataKind, key);
 }
 
 
@@ -3638,7 +3638,7 @@ VariantModel.prototype._promiseGetData = function(dataKind, geneName, transcript
 			reject(msg);
 		} else {
 			var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript)
-			CacheHelper.promiseGetData(key)
+			cacheHelper.promiseGetData(dataKind, key)
 			 .then(function(data) {
 			 	resolve(data);
 			 },
@@ -3655,7 +3655,7 @@ VariantModel.prototype._promiseCacheData = function(data, dataKind, geneName, tr
 	var me = this;
 	return new Promise(function(resolve, reject) {
 		var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript);
-		CacheHelper.promiseCacheData(key, data)
+		cacheHelper.promiseCacheData(dataKind, key, data)
 		 .then(function() {
 		 	resolve();
 		 },

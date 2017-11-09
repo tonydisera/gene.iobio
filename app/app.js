@@ -289,6 +289,7 @@ function init() {
 	detectWindowResize();
 
 	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
+
 	cacheHelper = new CacheHelper(loaderDisplay);
 
 	if (!isLevelEdu && !isMygene2) {
