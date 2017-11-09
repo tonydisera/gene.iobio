@@ -157,15 +157,6 @@ CacheIndexStore.prototype.promiseGetAllKeys = function() {
 			    var store      = tx.objectStore(dataKind);
 
 				var getKeys = store.getAllKeys();
-			    count++;
-				if (getKeys.result != null) {
-					getKeys.result.forEach(function(key) {
-						allKeys.push(key);
-					})
-				}
-		    	if (count == Object.keys(me.objectStores).length) {
-		    		resolve(allKeys);
-		    	}
 				getKeys.onerror = function(event) {
 					var msg = "Error in CacheIndexStore.promiseGetAllKeys():  " + event.target.errorCode + ". " + dataKind;
 			    	console.log(msg);
@@ -173,7 +164,15 @@ CacheIndexStore.prototype.promiseGetAllKeys = function() {
 				}
 
 			    getKeys.onsuccess = function(event) {
-			    	
+					if (event.target.result != null) {
+						event.target.result.forEach(function(key) {
+							allKeys.push(key);
+						})
+					}
+				    count++;
+			    	if (count == Object.keys(me.objectStores).length) {
+			    		resolve(allKeys);
+			    	}
 			    };
 			}		
 

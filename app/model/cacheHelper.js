@@ -1129,6 +1129,7 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 				  	var p = me.promiseGetData(keyObject.dataKind, key, false)
 				  	 .then(function(data) {
 						if (keyObject.launchTimestamp == me.launchTimestamp) {
+							size += data.length;
 						  	if (keyObject.dataKind == CacheHelper.BAM_DATA) {
 						  		coverageSize +=  data.length;
 						  	}
