@@ -2120,11 +2120,20 @@ VariantModel._determineAffectedStatusForVariant = function(variant, affectedStat
 }
 
 
-VariantModel.prototype.isCached = function(geneName, transcript) {
+VariantModel.prototype.promiseIsCached = function(geneName, transcript) {
 	var me = this;
-	var key = this._getCacheKey(CacheHelper.VCF_DATA, geneName.toUpperCase(), transcript);
-	var data = localStorage.getItem(key);
-	return data != null && data != "";
+
+	return new Promise(function(resolve, reject) {
+		var key = me._getCacheKey(CacheHelper.VCF_DATA, geneName.toUpperCase(), transcript);
+		cacheHelper.promiseGetData(CacheHelper.VCF_DATA, key)
+		 .then(function(data) {
+			resolve(data != null && data != "");
+		 },
+		 function(error) {
+		 	reject(error);
+		 })
+
+	})
 }
 
 VariantModel.prototype.promiseIsCachedAndInheritanceDetermined = function(geneObject, transcript, checkForCalledVariants) {

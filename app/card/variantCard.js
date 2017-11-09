@@ -145,8 +145,8 @@ VariantCard.prototype.promiseGetDangerSummary = function(geneName) {
 	return this.model.promiseGetDangerSummary(geneName);
 }
 
-VariantCard.prototype.isCached = function(geneName, transcript) {
-	return this.model.isCached(geneName, transcript);
+VariantCard.prototype.promiseIsCached = function(geneName, transcript) {
+	return this.model.promiseIsCached(geneName, transcript);
 }
 
 VariantCard.prototype.hide = function() {
@@ -2116,7 +2116,7 @@ VariantCard.prototype.promiseGetMaxAlleleCount = function() {
 		} else {
 			var count = theVcfData.maxAlleleCount;
 			if (!count) {
-				medetermineMaxAlleleCount(theVcfData)
+				me.determineMaxAlleleCount(theVcfData)
 				 .then(function() {
 					resolve(theVcfData.maxAlleleCount);
 				 },
