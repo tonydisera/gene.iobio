@@ -882,7 +882,7 @@ CacheHelper.prototype.getNextGeneCounts = function(genesToCount, counts, callbac
 		var key = getProbandVariantCard().model._getCacheKey(CacheHelper.DANGER_SUMMARY_DATA, geneName);
 
 		// Get danger summary for gene
-    	me.promiseGetData(CacheHelper.DANGER_SUMMARY_DATA, key)
+    	me.promiseGetData(key)
     		.then(function(danger) {
 				if (danger != null) {
 					
@@ -933,7 +933,7 @@ CacheHelper.prototype.refreshGeneBadges = function(callback) {
 	
 	var dataKind = CacheHelper.VCF_DATA;
 
-	me.promiseGetAllKeys()
+	me.promiseGetKeys()
 	 .then(function(allKeys) {
 	 	var keys = [];
 
@@ -986,7 +986,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 
 		var thePromises = [];
 
-		me.promiseGetAllKeys()
+		me.promiseGetKeys()
 		 .then(function(allKeys) {
 		 	allKeys.forEach(function(key) {
 				keyObject = CacheHelper._parseCacheKey(key);
@@ -1088,7 +1088,7 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
 		var keyObject = theKey.keyObject;
 	  	var geneObject = window.geneObjects[keyObject.gene];
 
-  		me.promiseGetDataThreaded(keyObject.dataKind, key) 
+  		me.promiseGetDataThreaded(key) 
   		 .then(function(theVcfData) {
 
 	  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
@@ -1159,7 +1159,7 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 				 
 				var keyObject = CacheHelper._parseCacheKey(key);
 				if (keyObject) {			
-				  	var p = me.promiseGetData(keyObject.dataKind, key, false)
+				  	var p = me.promiseGetData(key, false)
 				  	 .then(function(data) {
 						if (keyObject.launchTimestamp == me.launchTimestamp) {
 							size += data.length;
@@ -1335,7 +1335,7 @@ CacheHelper.prototype.promiseClearCoverageCache = function() {
 	var me = this;
 
 	return new Promise(function(resolve, reject) {
-		me.promiseGetAllKeys()
+		me.promiseGetKeys()
 		 .then(function(allKeys) {
 		 	var promises = [];
 		 	allKeys.forEach(function(key) {		 		
@@ -1390,7 +1390,7 @@ CacheHelper.prototype.clearCacheForGene = function(geneName) {
 	var me = this;
 
 	return new Promise(function(resolve, reject) {
-		me.promiseGetAllKeys()
+		me.promiseGetKeys()
 		 .then(function(allKeys) {
 		 	var keys = [];
 		 	allKeys.forEach(function(key) {
@@ -1566,7 +1566,7 @@ CacheHelper.promiseDecompressData = function(dataCompressed, decompressIt) {
 	});
 }
 
-CacheHelper.prototype.promiseCacheData = function(dataKind, key, data) {
+CacheHelper.prototype.promiseCacheData = function(key, data) {
 	var me = this;
 
 	return new Promise(function(resolve, reject) {
@@ -1589,7 +1589,7 @@ CacheHelper.prototype.promiseCacheData = function(dataKind, key, data) {
 			CacheHelper.promiseCompressData(data)
 	    	 .then(function(dataStringCompressed) {
 				var keyObject = CacheHelper._parseCacheKey(key);
-				return me.cacheIndexStore.promiseSetData(dataKind, keyObject.gene, key, dataStringCompressed)
+				return me.cacheIndexStore.promiseSetData(keyObject.dataKind, keyObject.gene, key, dataStringCompressed)
 	    	 })
 	    	 .then(function() {
 	    	 	resolve();
@@ -1607,7 +1607,7 @@ CacheHelper.prototype.promiseCacheData = function(dataKind, key, data) {
 
 }
 
-CacheHelper.prototype.promiseGetData = function(dataKind, key, decompressIt=true) {
+CacheHelper.prototype.promiseGetData = function(key, decompressIt=true) {
 	var me = this;
 	return new Promise(function(resolve, reject) {
 
@@ -1625,7 +1625,8 @@ CacheHelper.prototype.promiseGetData = function(dataKind, key, decompressIt=true
 	      		 });
 		    } 
 		} else if (CacheHelper.useIndexedDB()) {
-			me.cacheIndexStore.promiseGetData(dataKind, key, decompressIt)
+			var keyObject = CacheHelper._parseCacheKey(key);
+			me.cacheIndexStore.promiseGetData(keyObject.dataKind, key, decompressIt)
 			 .then(function(dataCompressed) {
 	      		CacheHelper.promiseDecompressData(dataCompressed, decompressIt)
 	      		 .then(function(data) {
@@ -1645,11 +1646,11 @@ CacheHelper.prototype.promiseGetData = function(dataKind, key, decompressIt=true
 }
 
 
-CacheHelper.prototype.promiseGetDataThreaded = function(dataKind, key) {
+CacheHelper.prototype.promiseGetDataThreaded = function(key) {
 	var me = this;
 
 	return new Promise(function(resolve, reject) {
-		cacheHelper.promiseGetData(dataKind, key, false)
+		cacheHelper.promiseGetData(key, false)
 		 .then(function(dataCompressed) {
 
 	      	if (dataCompressed != null) {
@@ -1708,6 +1709,28 @@ CacheHelper.prototype.promiseRemoveCacheItem = function(dataKind, key) {
 }
 
 
+CacheHelper.prototype.promiseGetKeys = function() {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+
+		me.promiseGetAllKeys()
+		 .then(function(allKeys) {
+
+			var filteredKeys = allKeys.filter(function(key) {
+				var keyObject = CacheHelper._parseCacheKey(key);
+				return keyObject && (keyObject.launchTimestamp == me.launchTimestamp);
+			})
+			resolve(filteredKeys);
+		 }, 
+		 function(error) {
+		 	reject(error);
+		 })
+
+	});
+
+}
+
+
 CacheHelper.prototype.promiseGetAllKeys = function() {
 	var me = this;
 	return new Promise(function(resolve, reject) {
@@ -1737,50 +1760,89 @@ CacheHelper.prototype.promiseGetAllKeys = function() {
 
 }
 
+CacheHelper.prototype.logCacheContents = function(filterObject) {
+	var me = this;
+	me.promiseGetKeys()
+	 .then(function(keys) {
+	 	me._logCacheContents(keys, filterObject);
+	 });
+}
+
+CacheHelper.prototype.logAllCacheContents = function(filterObject) {
+	var me = this;
+	me.promiseGetAllKeys()
+	 .then(function(allKeys) {
+	 	me._logCacheContents(allKeys, filterObject);
+	 });
+}
 
 
-CacheHelper.prototype.logCacheContents = function() {
+CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
 	var me = this;
 
 	var itemSize = 0; 
 	var lines = [];
-	var total = 0;
+	var totalKb = 0;
 
-	me.promiseGetAllKeys()
-	 .then(function(allKeys) {
-	 	var promises = [];
-	 	allKeys.forEach(function(key) {
-	 		var keyObject = CacheHelper._parseCacheKey(key);
-	 		var p = me.promiseGetData(keyObject.dataKind, key, false)
+ 	var promises = [];
+ 	keys.forEach(function(key) {
+ 		var keyObject = CacheHelper._parseCacheKey(key);
+ 		var keep = true;
+ 		if (filterObject && Object.keys(filterObject).length > 0) {
+ 			keep = false;
+ 			var matchesRel = true;
+ 			if (filterObject.hasOwnProperty('relationship')) {
+ 				if (keyObject.relationship != filterObject.relationship) {
+ 					matchesRel = false;
+ 				}
+ 			}
+ 			var matchesGene = true;
+ 			if (filterObject.hasOwnProperty('gene')) {
+ 				if (keyObject.gene != filterObject.gene) {
+ 					matchesGene = false;
+ 				}
+ 			}
+ 			var matchesDataKind = true;
+ 			if (filterObject.hasOwnProperty('dataKind')) {
+ 				if (keyObject.dataKind != filterObject.dataKind) {
+ 					matchesDataKind = false;
+ 				}
+ 			} 
+ 			keep = matchesRel && matchesGene && matchesDataKind;			
+ 		}
+ 		if (keep) {
+	 		var p = me.promiseGetData(key, false)
 	 		 .then(function(data) {
 
 	 		 	if (data) {
 		 		 	var dataSize = data.length + key.length;
-					total += dataSize; 
-
 					itemSize =  (dataSize/1024); 
-
+					totalKb += itemSize; 
 					lines.push(key + " = " +  itemSize.toFixed(2) + " KB"); 
-
 	 		 	} else {
 					lines.push(key + " = " + " 0KB"); 
 	 		 	}
 	 		 })
 	 		 promises.push(p);
 
-	 	})
-		Promise.all(promises).then(function() {
-		 	if (total > 1024){
-				lines.unshift("Total = " + (total/1024).toFixed(2)+ " MB");
-			} else {
-				lines.unshift("Total = " + total.toFixed(2)+ " KB"); 
-			}
-			console.log(lines.join("\n"));
-		},
-		function(error) {
-			console.log("An error occurred in CacheHelper.logCacheContents(): " + error);
-			console.log(lines.join("\n"));
-		});
+ 		}
+
+ 	})
+	Promise.all(promises).then(function() {
+	 	if (totalKb > 1024){
+			lines.unshift("Total = " + (totalKb/1024).toFixed(2)+ " MB");
+		} else {
+			lines.unshift("Total = " + totalKb.toFixed(2)+ " KB"); 
+		}
+		console.log(lines.join("\n"));
+	});
+}
+
+CacheHelper.prototype.logData = function(key) {
+	var me = this;
+	me.promiseGetData(key)
+	 .then(function(data) {
+	 	console.log(data);
 	 })
 }
 

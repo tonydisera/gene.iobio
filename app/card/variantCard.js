@@ -2140,7 +2140,6 @@ VariantCard.prototype.promiseGetMaxAlleleCount = function() {
 			 	var theVcfData = data.vcfData;
 			 	resolveIt(resolve, theVcfData);
 			 })
-			resolveIt(resolve, theVcfData);
 		} else {
 			me.model.promiseGetFbData(window.gene, window.selectedTranscript)
 			 .then(function(data) {

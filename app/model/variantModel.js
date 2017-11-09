@@ -701,10 +701,7 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 			}
 		}
 
-	} else if (geneCoverageAll) {
-		console.log("no geneCoverage to summarize danger");
-		showStackTrace(new Error());
-	}
+	} 
 
 	// When we are just showing gene badges for low coverage and not reporting on status of
 	// filtered variants, clear out the all of the danger summary object related to variants
@@ -2125,7 +2122,7 @@ VariantModel.prototype.promiseIsCached = function(geneName, transcript) {
 
 	return new Promise(function(resolve, reject) {
 		var key = me._getCacheKey(CacheHelper.VCF_DATA, geneName.toUpperCase(), transcript);
-		cacheHelper.promiseGetData(CacheHelper.VCF_DATA, key)
+		cacheHelper.promiseGetData(key)
 		 .then(function(data) {
 			resolve(data != null && data != "");
 		 },
@@ -3652,7 +3649,7 @@ VariantModel.prototype._promiseGetData = function(dataKind, geneName, transcript
 			reject(msg);
 		} else {
 			var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript)
-			cacheHelper.promiseGetData(dataKind, key)
+			cacheHelper.promiseGetData(key)
 			 .then(function(data) {
 			 	resolve(data);
 			 },
@@ -3669,7 +3666,7 @@ VariantModel.prototype._promiseCacheData = function(data, dataKind, geneName, tr
 	var me = this;
 	return new Promise(function(resolve, reject) {
 		var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript);
-		cacheHelper.promiseCacheData(dataKind, key, data)
+		cacheHelper.promiseCacheData(key, data)
 		 .then(function() {
 		 	resolve();
 		 },
