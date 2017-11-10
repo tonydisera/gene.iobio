@@ -11,7 +11,6 @@ function CacheHelper(loaderDisplay) {
 	this.KEY_DELIM = "^";
 	this.start = null;
 	this.cacheIndexStore = new CacheIndexStore();
-	this.cacheIndexStore.init();
 
 
 }
@@ -23,58 +22,61 @@ CacheHelper.DANGER_SUMMARY_DATA = "dangerSummary";
 CacheHelper.GENE_COVERAGE_DATA  = "geneCoverage";
 
 
+CacheHelper.prototype.promiseInit = function() {
+	return this.cacheIndexStore.promiseInit();
+}
+
+
 CacheHelper.prototype.isolateSession = function() {
 	this.launchTimestamp = Date.now().valueOf();	
 }
 
-CacheHelper.prototype.checkCacheSize = function() {
+CacheHelper.prototype.promiseCheckCacheSize = function() {
 	var me = this;
 
-	this.promiseGetCacheSize(false)
-	 .then(function(counts) {
-		$('#cache-alert1').addClass("hide");
-		$("#other-app-cache-panel").removeClass("attention");
+	return new Promise(function(resolve, reject) {
+		me.promiseGetCacheSize(false)
+		 .then(function(counts) {
 
-		$('#cache-alert2').addClass("hide");
-		$("#other-cache-panel").removeClass("attention-warning");
-		if (counts.other > 0) {
-			$('#cache-alert2').removeClass("hide");
-			$("#other-cache-panel").addClass("attention-warning");
-			$("#other-cache-detail-link").attr("aria-expanded", true);
-			$("#other-cache-detail").attr("aria-expanded", true);
-			$("#other-cache-detail").addClass("in");
-		} 
+			if (counts.otherSessions > 0 || counts.otherUse > 0) {
+				alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
+				    if (e) {
+						// user clicked "ok", clear the cache for other, and other app
+						if (counts.otherSessions > 0) {
+							me._promiseClearCache(null, true, false)
+							 .then(function() {
+							 	resolve();
+							 },
+							 function(error) {
+							 	reject(error);
+							 })
+						}
+						if (counts.otherUse > 0) {
+							me._promiseClearCache(null, false, true)
+							 .then(function() {
+							 	resolve();
+							 }, 
+							 function(error) {
+							 	reject(error);
+							 })
+						}
+				        
+				    } 
+				}, function() {
+					// user clicked cancel
+					me.openDialog();
+					resolve();
+				})
+				.set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});   		;
+			} else {
+				resolve();
+			}
 
-		if (counts.otherApp > 0) {
-			$('#cache-alert1').removeClass("hide");
-			$("#other-app-cache-panel").addClass("attention");
-			$("#other-app-cache-detail-link").attr("aria-expanded", true);
-			$("#other-app-cache-detail").attr("aria-expanded", true);
-			$("#other-app-cache-detail").addClass("in");
-		} 
-
-		if (counts.other > 0 || counts.otherApp > 0) {
-			alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
-			    if (e) {
-					// user clicked "ok", clear the cache for other, and other app
-					if (counts.other > 0) {
-						me._promiseClearCache(null, true, false);
-					}
-					if (counts.otherApp > 0) {
-						me._promiseClearCache(null, false, true);
-					}
-			        
-			    } 
-			}, function() {
-				// user clicked cancel
-				me.openDialog();
-			})
-			.set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});   		;
-		}
-
-	 })
+		 })
 
 
+	})
+	
 }
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
@@ -261,7 +263,7 @@ CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
 
 		console.log("");
 		console.log("******   ANALYZE ALL ELAPSED TIME *******");
-		console.log((new Date() - me.start) / 10000 + " seconds ");
+		console.log((new Date() - me.start) / 1000 + " seconds ");
 		console.log("*******************************************")
 		console.log("");
 
@@ -1066,7 +1068,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 
 }
 
-CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
+CacheHelper.prototype.clearCache = function(launchTimestampToClear, showCacheDialog=false) {
 	var me = this;
 	if (keepLocalStorage) {
 		
@@ -1074,8 +1076,31 @@ CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
 		me._promiseClearCache(launchTimestampToClear, false, false)
 		 .then(function() {
 			me.genesToCache = [];
+			if (showCacheDialog) {
+				me.refreshDialog();
+			}
 		 })
 	}
+}
+
+CacheHelper.prototype.promiseClearCache = function(launchTimestampToClear) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		if (keepLocalStorage) {
+			resolve();
+			
+		} else {
+			me._promiseClearCache(launchTimestampToClear, false, false)
+			 .then(function() {
+				me.genesToCache = [];
+				resolve();
+			 },
+			 function(error) {
+			 	reject(error);
+			 })
+		}		
+	})
+
 }
 
 CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback) {
@@ -1149,49 +1174,56 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 
 	return new Promise(function(resolve, reject) {
 		var size = 0;
-		var otherSize = 0;
 		var coverageSize = 0;
-		var otherAppSize = 0;
+
+		var otherSessionsSize = 0;
+		var otherSessionsInfo = {};
+
+		var otherUseSize = 0;
 		me.promiseGetAllKeys()
 		 .then(function(allKeys) {
 		 	var promises = []
 			allKeys.forEach(function(key) {
-				 
 				var keyObject = CacheHelper._parseCacheKey(key);
 				if (keyObject) {			
 				  	var p = me.promiseGetData(key, false)
 				  	 .then(function(data) {
-						if (keyObject.launchTimestamp == me.launchTimestamp) {
-							size += data.length;
-						  	if (keyObject.dataKind == CacheHelper.BAM_DATA) {
-						  		coverageSize +=  data.length;
-						  	}
-						  	
-						} else {
-							otherSize += data.length;
-						}
+				  	 	if (data != null) {
+							if (keyObject.launchTimestamp == me.launchTimestamp) {
+								size += data.length;
+							  	if (keyObject.dataKind == CacheHelper.BAM_DATA) {
+							  		coverageSize +=  data.length;
+							  	}
+							  	
+							} else {
+								otherSessionsSize += data.length;
+								
+
+								var sessionTotal = otherSessionsInfo[keyObject.launchTimestamp];
+								if (sessionTotal == null) {
+									sessionTotal = 0;
+								}
+								sessionTotal += data.length;
+								otherSessionsInfo[keyObject.launchTimestamp] = sessionTotal;
+							}				  	 		
+				  	 	}
 					});
 				  	promises.push(p);
 				} else {
 					// TODO - How to determine size of cache items for other apps?
-					otherAppSize += 0;
+					otherUseSize += 0;
 				}
 		 	})
 			Promise.all(promises).then(function() {
-				if (format) {
-					resolve( {total:     (CacheHelper._sizeMB(size) + " MB"), 
-					        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
-					        other:     (CacheHelper._sizeMB(otherSize) + " MB"),
-					        otherApp:  (CacheHelper._sizeMB(otherAppSize) + " MB")
-					    });
-				} else {
-					resolve ({total:     (CacheHelper._sizeMB(size)), 
-					        coverage:  (CacheHelper._sizeMB(coverageSize)),
-					        other:     (CacheHelper._sizeMB(otherSize)),
-					        otherApp:  (CacheHelper._sizeMB(otherAppSize))
-					       });
+				
+					resolve({ total:           format ? (CacheHelper._sizeMB(size) + " MB") : size, 
+					          coverage:        format ? (CacheHelper._sizeMB(coverageSize) + " MB") : coverageSize,
+					          otherSessions:   format ? (CacheHelper._sizeMB(otherSessionsSize) + " MB") : otherSessionsSize,
+					          otherUse:        format ? (CacheHelper._sizeMB(otherUseSize) + " MB") : otherUseSize,
+					          'otherSessionsInfo':  otherSessionsInfo
+					        });
 
-				}			
+							
 
 			},
 			function(error) {
@@ -1264,9 +1296,9 @@ CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clea
 					me.hideAnalyzeAllProgress();			
 				}
 
-				if (clearOther || clearOtherApp) {
-					me.checkCacheSize();
-				}
+				//if (clearOther || clearOtherApp) {
+				//	me.checkCacheSize();
+				//}
 				resolve();
 
 			})
@@ -1365,12 +1397,46 @@ CacheHelper.prototype.promiseClearCoverageCache = function() {
 CacheHelper.prototype.refreshDialog = function() {
 	var me = this;
 	return new Promise(function(resolve, reject) {
-		me.promiseGetCacheSize()
-		 .then(function(sizes) {
-			$("#cache-size").text(sizes.total);
-			$("#coverage-size").text(sizes.coverage);
-			$("#other-cache-size").text(sizes.other);
-			$("#other-app-cache-size").text(sizes.otherApp);
+		var formatOtherSessions = function(otherSessions) {
+			var html = "";
+			var sortedDates = Object.keys(otherSessions).sort();
+			sortedDates.forEach(function(theDate) {
+				var size = otherSessions[theDate];
+				html += '<div><span style="display:inline-block;width:140px">' + formatDate(new Date(theDate * 1)) + '</span><span style="display:inline-block;width:100px">' + CacheHelper._sizeMB(size, 1) + " MB</span>" + "<a href='javascript:void(0)' + onclick='cacheHelper.clearCache(" + theDate + ",true)'>Clear</a></div>";
+			});
+			return html;
+		}
+
+		me.promiseGetCacheSize(false)
+		 .then(function(counts) {
+			$('#other-use-cache-alert').addClass("hide");
+			$("#other-use-cache-panel").removeClass("attention");
+
+			$('#other-sessions-cache-alert').addClass("hide");
+			$("#other-sessions-cache-panel").removeClass("attention-warning");
+
+			if (counts.otherSessions > 0) {
+				$('#other-sessions-cache-alert').removeClass("hide");
+				$("#other-sessions-cache-panel").addClass("attention-warning");
+				$("#other-sessions-cache-detail-link").attr("aria-expanded", true);
+				$("#other-sessions-cache-detail").attr("aria-expanded", true);
+				$("#other-sessions-cache-detail").addClass("in");
+			} 
+
+			if (counts.otherUse > 0) {
+				$('#other-use-cache-alert').removeClass("hide");
+				$("#other-app-use-cache-panel").addClass("attention");
+				$("#other-app-use-cache-detail-link").attr("aria-expanded", true);
+				$("#other-app-use-cache-detail").attr("aria-expanded", true);
+				$("#other-app-use-cache-detail").addClass("in");
+			} 
+
+
+			$("#cache-size").text(CacheHelper._sizeMB(counts.total) + " MB");
+			$("#coverage-size").text(CacheHelper._sizeMB(counts.coverage) + " MB");
+			$("#other-sessions-cache-size").text(CacheHelper._sizeMB(counts.otherSessions) + " MB");
+			$('#other-sessions-cache-info').html(formatOtherSessions(counts.otherSessionsInfo));
+			$("#other-use-cache-size").text(CacheHelper._sizeMB(counts.otherUse) + " MB");
 			resolve();
 		 })		
 	})
@@ -1447,10 +1513,12 @@ CacheHelper.prototype._isProbandVariantCache = function(key) {
 
 
 
-CacheHelper._sizeMB = function(size) {
+CacheHelper._sizeMB = function(size, decimalPlaces=1) {
+	var multiplier = Math.pow(10, decimalPlaces+1);
 	var _sizeMB = size / (1024*1024);
-	return  Math.round(_sizeMB * 100) / 100;
+	return  Math.round(_sizeMB * multiplier) / multiplier;
 }
+
 
 
 CacheHelper._parseCacheKey = function(cacheKey) {

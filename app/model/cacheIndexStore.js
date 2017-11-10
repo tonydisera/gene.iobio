@@ -5,28 +5,37 @@ function CacheIndexStore() {
 	this.objectStores = {'vcfData': null, 'fbData' : null, 'dangerSummary': null, 'geneCoverage': null, 'bamData': null};
 }
 
-CacheIndexStore.prototype.init = function(callback) {
+CacheIndexStore.prototype.promiseInit = function(callback) {
 	var me = this;
-	window.indexedStore = {};
 
+	return new Promise(function(resolve, reject) {
+		window.indexedStore = {};
 
-	// attempt to open the database
-	var open = indexedDB.open(me.app, me.version);
+		// attempt to open the database
+		var open = indexedDB.open(me.app, me.version);
 
-	// upgrade/create the database if needed
-	open.onupgradeneeded = function(event) {
-		me.db = open.result;
-		me.createObjectStores();
-	};
+		// upgrade/create the database if needed
+		open.onupgradeneeded = function(event) {
+			me.db = open.result;
+			me.createObjectStores();
+			resolve();
+		};
 
-	open.onsuccess = function(ev) {
-		// assign the database for access outside
-		me.db = open.result;
-		me.createObjectStores();
-		if (callback) {
-			callback();
-		}
-	};
+		open.onsuccess = function(ev) {
+			// assign the database for access outside
+			me.db = open.result;
+			me.createObjectStores();
+			resolve();
+		};
+
+		open.onerror = function(event) {
+			var msg = "Error in CacheIndexStore.promiseInit():  " + event.target.errorCode;
+	    	console.log(msg);
+	    	reject(msg);
+		};
+
+	})
+
 }
 
 CacheIndexStore.prototype.createObjectStores = function() {
