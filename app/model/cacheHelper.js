@@ -705,16 +705,20 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 								// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
 								// and father in cache as we need these to show allele counts and genotypes for trio
 								// with determineInheritance() on selected gene is invoked)
-								getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
-								getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
+								if (CacheHelper.useLocalStorage()) {
+									getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
+									getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);														
+								}
 								getVariantCard("proband" ).model.clearCacheItem(CacheHelper.FB_DATA, geneObject.gene_name, transcript);					
 
 
 							} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
 								// Don't clear cache for currently selected
 								// gene though as this will result in no inheritance mode being detected.
-								getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
-								getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
+								if (CacheHelper.useLocalStorage()) {
+									getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
+									getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);														
+								}
 							}
 
 
@@ -1240,6 +1244,24 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 
 	})
 
+}
+
+CacheHelper.prototype.cleanupCacheOnClose = function(launchTimestampToClear) {
+	var me = this;
+	if (CacheHelper.useLocalStorage() && localStorage) {
+		var keys = [];
+		for (var i=0; i<=localStorage.length-1; i++)  {  
+			var key = localStorage.key(i); 	
+			var keyObject = CacheHelper._parseCacheKey(key);
+			if (keyObject && keyObject.launchTimestamp == launchTimestampToClear) {
+				keys.push(key);
+			}
+		}
+
+		keys.forEach(function(key) {
+			localStorage.removeItem(key);
+		})
+	}
 }
 
 

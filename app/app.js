@@ -342,15 +342,12 @@ function addCloseListeners() {
 
 	if (!isLevelEdu && !isMygene2) {
 		window.onbeforeunload = function (event) {
-			console.log("window.onbeforeunload()")
 		    launchTimestampToClear = cacheHelper.launchTimestamp;
 	    	return "Are you sure you want to exit gene.iobio?";
 		};
 	}
 	window.onunload = function () {
-    	cacheHelper.promiseClearCache(launchTimestampToClear)
-    	 .then(function() {
-    	 })
+		cacheHelper.cleanupCacheOnClose();
 	};		
 }
 

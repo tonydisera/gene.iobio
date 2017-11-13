@@ -17,14 +17,16 @@ CacheIndexStore.prototype.promiseInit = function(callback) {
 		// upgrade/create the database if needed
 		open.onupgradeneeded = function(event) {
 			me.db = open.result;
-			me.createObjectStores();
-			resolve();
+			console.log('CacheIndexStore: upgraded needed..');
+			me.promiseCreateObjectStores(event)
+			 .then(function() {
+				resolve();
+			 })
 		};
 
 		open.onsuccess = function(ev) {
 			// assign the database for access outside
-			me.db = open.result;
-			me.createObjectStores();
+			me.db = open.result;			
 			resolve();
 		};
 
@@ -38,16 +40,42 @@ CacheIndexStore.prototype.promiseInit = function(callback) {
 
 }
 
-CacheIndexStore.prototype.createObjectStores = function() {
+CacheIndexStore.prototype.promiseCreateObjectStores = function(event) {
 	var me = this;
-	var existingNames = me.db.objectStoreNames;
-	for (var dataKind in me.objectStores) {
-		if (!existingNames.contains(dataKind)) {
-			var store = me.db.createObjectStore(dataKind, {keyPath: "id"});
-			var index = store.createIndex("geneIndex", "gene", {unique: false});			
-		}
-	}
 
+	return new Promise(function(resolve, reject) {
+		var existingNames = me.db.objectStoreNames;
+		var promises = [];
+
+		for (var dataKind in me.objectStores) {
+			if (!existingNames.contains(dataKind)) {
+				var store = me.db.createObjectStore(dataKind, {keyPath: "id"});
+				var index = store.createIndex("geneIndex", "gene", {unique: false});
+
+				var transaction = event.target.transaction;
+				var p = new Promise(function(resolve, reject) {
+		        	transaction.oncomplete = function(event) {    
+		                // Now store is available to be populated
+		                resolve();
+		            }				
+		            transaction.onerror = function(event) {
+						var msg = "Error in CacheIndexStore.promiseCreateObjectStores():  " + event.target.errorCode;
+				    	console.log(msg);
+				    	reject(msg);
+	    			};				
+				})
+				promises.push(p);
+			}
+		}
+		Promise.all(promises).then(function() {
+			resolve();
+		}, 
+		function(error) {
+			reject(error);
+		})
+
+	})
+	
 }
 
 CacheIndexStore.prototype.promiseSetData = function(dataKind, gene, key, data) {
