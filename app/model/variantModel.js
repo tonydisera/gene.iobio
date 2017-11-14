@@ -152,7 +152,7 @@ VariantModel.prototype.promiseGetVcfData = function(geneObject, selectedTranscri
 					// If the vcf data is null, see if there are called variants in the cache.  If so,
 					// copy the called variants into the vcf data.
 					if (whenEmptyUseFbData && me.isAlignmentsOnly()) {
-						me.promiseGetFbData(CacheHelper.FB_DATA, geneObject, selectedTranscript)
+						me.promiseGetFbData(geneObject, selectedTranscript)
 						 .then(function(theFbData) {
 							// If no variants are loaded, create a dummy vcfData with 0 features
 							if (theFbData && theFbData.features) {
@@ -3163,6 +3163,7 @@ VariantModel.prototype.isAlignmentsOnly = function() {
  * No variants are loaded, create a dummy vcfData with 0 features
  */
 VariantModel.prototype.promiseCacheDummyVcfDataAlignmentsOnly = function(theFbData, theGeneObject, theTranscript) {
+	var me = this;
 	return new Promise(function(resolve, reject) {
 		theVcfData = $.extend({}, theFbData);
 		theVcfData.features = [];
