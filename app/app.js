@@ -250,7 +250,7 @@ $(document).ready(function(){
 });
 
 function initHub() {
-	var api = "http://localhost:3000/apiv1"; // Update hub URL
+	var api = window.location.protocol + "//" + window.location.hostname+ ":3000/apiv1";
 
 	// Parse params
 	var params = {};
