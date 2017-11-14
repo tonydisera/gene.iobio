@@ -164,6 +164,8 @@ var widthFactors = [
 
 $(document).ready(function(){
 
+	initHub();
+
 	determineStyle();
 
 	if (detectIE() != false) {
@@ -208,6 +210,52 @@ $(document).ready(function(){
 
 	
 });
+
+function initHub() {
+	var api = "http://localhost:3000/apiv1"; // Update hub URL
+
+	// Parse params
+	var params = {};
+	window.location.hash
+		.slice(1)
+		.split('&')
+		.forEach(function(pair) {
+			var [param, value] = pair.split('=');
+			params[param] = value;
+		})
+	var { sample_uuid, access_token, token_type } = params;
+
+	// Remove Access token from url
+	// ... omitted... too lazy to figure this out
+
+	if ( sample_uuid != undefined ){
+		// Save access token to local storage, so it can be used on browser refreshes
+		localStorage.setItem('hub-iobio-tkn', token_type + ' ' + access_token);
+
+		// Get files
+		$.ajax({
+			url: api + '/samples/'+sample_uuid+'/files',
+			type: 'GET',
+			contentType: 'application/json',
+			headers: {
+				'Authorization': localStorage.getItem('hub-iobio-tkn')
+			}
+		}).then(appendHubFileNamesToURL);
+	}
+}
+
+// Get sample name, gene(?), build(?) from ajax call and then only call this for each file?
+function appendHubFileNamesToURL(res) {
+	res.data.forEach(function(file) {
+		var {uri, name, type } = file;
+		updateUrl(type+"0", uri);
+		updateUrl("name0", name.split(".")[0]);
+		updateUrl("sample0", name.split(".")[0]);
+		updateUrl("genes","RAI1,AIRE,MYLK2,PDGFB,PDHA1");
+		updateUrl("build","GRCh37");
+	})
+}
+
 
 function promiseLoadTemplates()  {
 	return new Promise(function(resolve, reject) {
